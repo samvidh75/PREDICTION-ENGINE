@@ -4,6 +4,31 @@
 
 :root {
   color-scheme: dark;
+
+  /* StockStory India master design tokens (CSS variables) */
+  --ss-bg-primary: #020304;
+
+  --ss-surface-2: #0A0D10;
+  --ss-surface-3: #10141A;
+  --ss-surface-4: #151A21;
+  --ss-surface-tertiary: #1B212A;
+
+  --ss-accent-cyan: #7CF7D4;
+  --ss-accent-deep-cyan: #43D9BD;
+  --ss-accent-electric-blue-soft: #5BA7FF;
+  --ss-accent-muted-magenta: #D16BA5;
+  --ss-accent-warning: #D98C7A;
+
+  --ss-radius-small: 14px;
+  --ss-radius-medium: 22px;
+  --ss-radius-large: 28px;
+  --ss-radius-orb: 999px;
+
+  --ss-shadow-layer-1: 0 0 40px rgba(0, 0, 0, 0.45);
+  --ss-shadow-layer-2: 0 20px 80px rgba(0, 0, 0, 0.32);
+  --ss-shadow-layer-3: 0 0 120px rgba(0, 255, 210, 0.03);
+
+  --ss-ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html,
@@ -13,7 +38,7 @@ body {
 
 body {
   margin: 0;
-  background: #020304;
+  background: var(--ss-bg-primary);
   color: rgba(255, 255, 255, 0.92);
   font-family: Inter, Satoshi, Geist, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
   overflow-x: hidden;
