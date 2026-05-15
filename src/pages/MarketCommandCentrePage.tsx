@@ -11,7 +11,9 @@ import OrbEffects from "../components/intelligence/OrbEffects";
 import IntelligenceHUD from "../components/intelligence/IntelligenceHUD";
 import HolographicTelemetryEngine from "../components/telemetry/HolographicTelemetryEngine";
 import InstitutionalActivityNetwork from "../components/commandCentre/InstitutionalActivityNetwork";
-import NeuralMarketSynthesisPanel from "../components/synthesis/NeuralMarketSynthesisPanel";
+import MarketScannerEngine from "../components/scanner/MarketScannerEngine";
+import MacroIntelligenceEngine from "../components/macro/MacroIntelligenceEngine";
+import { useNeuralMarketSynthesisSuperengine } from "../services/synthesis/useNeuralMarketSynthesisSuperengine";
 
 type Sector = {
   id: string;
@@ -59,6 +61,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
   const { scrollProgress, isMobile } = useMotionController();
 
   const tone = useMemo(() => microTone(state), [state]);
+  const { synthesis } = useNeuralMarketSynthesisSuperengine();
 
   const orbScale = prefersReducedMotion ? 1 : scrollProgress;
 
@@ -282,10 +285,17 @@ export default function MarketCommandCentrePage(): JSX.Element {
         <InstitutionalActivityNetwork className="mx-auto max-w-[1400px]" />
       </section>
 
-      {/* Remaining sections (7–10): Neural synthesis core */}
+      {/* SECTION 7–10: Macro Intelligence OS (global macro learning ecosystem) */}
       <section className="relative z-[12] px-6 sm:px-[72px] pb-24">
         <div className="mx-auto max-w-[1680px]">
-          <NeuralMarketSynthesisPanel compact={isMobile} />
+          <MacroIntelligenceEngine synthesis={synthesis} confidenceState={state} theme={theme} compact={isMobile} />
+        </div>
+      </section>
+
+      {/* SECTION 11–13: Market Scanner ecosystem (Opportunity Discovery Matrix + 9-system layers) */}
+      <section className="relative z-[12] px-6 sm:px-[72px] pb-24">
+        <div className="mx-auto max-w-[1680px]">
+          <MarketScannerEngine synthesis={synthesis} confidenceState={state} theme={theme} compact={isMobile} />
         </div>
       </section>
     </div>

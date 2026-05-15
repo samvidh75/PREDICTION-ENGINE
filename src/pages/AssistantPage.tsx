@@ -8,6 +8,7 @@ import { useMotionController } from "../components/motion/MotionController";
 import AssistantContextPanel from "../components/assistant/AssistantContextPanel";
 import { generateAssistantResponse, type AssistantMemory } from "../services/assistant/assistantResponseEngine";
 import type { AssistantResponse } from "../services/assistant/assistantResponseEngine";
+import useBeginnerIntelligenceCalibration from "../hooks/useBeginnerIntelligenceCalibration";
 
 type ChatMessage = {
   id: string;
@@ -62,10 +63,16 @@ export default function AssistantPage(): JSX.Element {
   const { isMobile } = useMotionController();
   const { state: confidenceState, theme, marketState, narrativeKey } = useConfidenceEngine();
 
+  const { experienceLevel } = useBeginnerIntelligenceCalibration();
+
   const [memory, setMemory] = useState<AssistantMemory>({
     preferredSectors: [],
-    experienceLevel: "beginner",
+    experienceLevel,
   });
+
+  useEffect(() => {
+    setMemory((prev) => ({ ...prev, experienceLevel }));
+  }, [experienceLevel]);
 
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -130,9 +137,11 @@ export default function AssistantPage(): JSX.Element {
 
     // Simulated calm “intelligence pulse” delay (no typing dots).
     window.setTimeout(() => {
+      const memoryForEngine: AssistantMemory = { ...memory, experienceLevel };
+
       const resp: AssistantResponse = generateAssistantResponse({
         userText: trimmed,
-        memory,
+        memory: memoryForEngine,
         context,
       });
 

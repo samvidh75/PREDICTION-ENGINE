@@ -13,7 +13,8 @@ import CompanyFoundingTimeline from "../components/companyUniverse/CompanyFoundi
 import CompanyLeadershipLayer from "../components/companyUniverse/CompanyLeadershipLayer";
 import MasterInfographicEngine from "../components/infographics/MasterInfographicEngine";
 import VolumetricFinancialTowers from "../components/infographics/VolumetricFinancialTowers";
-import MarketCapPositioningRail from "../components/infographics/MarketCapPositioningRail";
+import BeginnerFinancialSimplificationRail from "../components/infographics/BeginnerFinancialSimplificationRail";
+import BeginnerToExpertEvolutionPathway from "../components/beginner/BeginnerToExpertEvolutionPathway";
 
 function healthLabel(state: CompanyHealthState): string {
   switch (state) {
@@ -133,7 +134,11 @@ export default function CompanyUniversePage(): JSX.Element {
       >
         <VolumetricFinancialTowers points={model.financialTelemetry} />
         <div className="mt-6">
-          <MarketCapPositioningRail />
+          <BeginnerFinancialSimplificationRail />
+        </div>
+
+        <div className="mt-6">
+          <BeginnerToExpertEvolutionPathway />
         </div>
       </MasterInfographicEngine>
 

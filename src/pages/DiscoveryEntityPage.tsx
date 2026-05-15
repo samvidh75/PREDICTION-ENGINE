@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useConfidenceEngine, type ConfidenceState } from "../components/intelligence/ConfidenceEngine";
 import type { DiscoveryEntity, DiscoveryEntityKind } from "../services/discovery/discoveryTypes";
 import { getDiscoveryIndex } from "../services/discovery/discoveryIndex";
@@ -86,19 +86,78 @@ function formatTag(tag: string): string {
 export default function DiscoveryEntityPage(): JSX.Element {
   const { state, theme, marketState } = useConfidenceEngine();
 
-  const { kind, id } = useMemo(() => {
+  const readRouteKindId = () => {
     const params = new URLSearchParams(window.location.search);
     const nextKind = (params.get("kind") ?? "").trim();
     const nextId = (params.get("id") ?? "").trim();
     return { kind: nextKind, id: nextId };
+  };
+
+  const [kind, setKind] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return readRouteKindId().kind;
+  });
+  const [id, setId] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return readRouteKindId().id;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const sync = () => {
+      const next = readRouteKindId();
+      setKind(next.kind);
+      setId(next.id);
+    };
+
+    window.addEventListener("urlchange", sync);
+    window.addEventListener("popstate", sync);
+
+    return () => {
+      window.removeEventListener("urlchange", sync);
+      window.removeEventListener("popstate", sync);
+    };
   }, []);
 
+  const index = useMemo(() => getDiscoveryIndex(), []);
+
   const entity = useMemo(() => {
-    if (!kind || !id) return null;
-    const index = getDiscoveryIndex();
+    if (index.length === 0) return null;
+    const fallback = index[0] ?? null;
+    if (!fallback) return null;
+
+    if (!kind || !id) return fallback;
+
     const found = index.find((e) => e.id === id && e.kind === kind);
-    return found ?? null;
-  }, [kind, id]);
+    return found ?? fallback;
+  }, [index, kind, id]);
+
+  const shouldReplaceRoute = useMemo(() => {
+    if (index.length === 0) return false;
+    const fallback = index[0] ?? null;
+    if (!fallback) return false;
+
+    if (!kind || !id) return true;
+
+    const found = index.find((e) => e.id === id && e.kind === kind);
+    return !found;
+  }, [index, kind, id]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!shouldReplaceRoute || !entity) return;
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "explore");
+    params.set("kind", entity.kind);
+    params.set("id", entity.id);
+
+    window.history.replaceState({}, "", `?${params.toString()}`);
+    setKind(entity.kind);
+    setId(entity.id);
+    window.dispatchEvent(new Event("urlchange"));
+  }, [shouldReplaceRoute, entity]);
 
   const relatedSectors = useMemo(() => {
     if (!entity?.details?.relatedSectors?.length) return [];

@@ -12,6 +12,7 @@ import CompanyUniversePage from "./pages/CompanyUniversePage";
 import LivingInterfaceEngine from "./components/spatial/LivingInterfaceEngine";
 import MasterMotionEngine from "./components/motion/MasterMotionEngine";
 import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
+import IntelligenceNavigationRail from "./components/navigation/IntelligenceNavigationRail";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
 
@@ -30,6 +31,34 @@ function getPageKeyFromUrl(): PageKey {
     if (raw === "explore") return "explore";
     if (raw === "dashboard" || raw === "market") return "dashboard";
     return "stock";
+  } catch {
+    return "stock";
+  }
+}
+
+function getRouteSignatureFromUrl(): string {
+  if (typeof window === "undefined") return "stock";
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+
+    const page = (params.get("page") ?? "stock").toLowerCase().trim();
+    const kind = (params.get("kind") ?? "").trim();
+    const id = (params.get("id") ?? "").trim();
+
+    const searchParam = params.get("search");
+    const q = (params.get("q") ?? "").trim();
+
+    const searchOpen = searchParam === "1" || searchParam?.toLowerCase() === "true";
+    const searchSig = searchOpen ? `search:${q}` : "";
+
+    if (page === "explore") {
+      return `explore:${kind}:${id}`;
+    }
+
+    if (searchSig) return `${page}:${searchSig}`;
+
+    return `page:${page}`;
   } catch {
     return "stock";
   }
@@ -64,9 +93,13 @@ export default function App(): JSX.Element {
   }, [draftProfile]);
 
   const [pageKey, setPageKey] = useState<PageKey>(() => getPageKeyFromUrl());
+  const [routeSignature, setRouteSignature] = useState<string>(() => getRouteSignatureFromUrl());
 
   useEffect(() => {
-    const sync = () => setPageKey(getPageKeyFromUrl());
+    const sync = () => {
+      setPageKey(getPageKeyFromUrl());
+      setRouteSignature(getRouteSignatureFromUrl());
+    };
 
     // Support pushState-based navigation + back/forward.
     window.addEventListener("urlchange", sync);
@@ -104,9 +137,10 @@ export default function App(): JSX.Element {
             />
           ) : (
             <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
-              <CinematicTransitionLayer activeKey={pageKey} enabled>
+              <CinematicTransitionLayer activeKey={routeSignature} enabled>
                 {mainView}
               </CinematicTransitionLayer>
+              <IntelligenceNavigationRail />
             </LivingInterfaceEngine>
           )}
         </MasterMotionEngine>

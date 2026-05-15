@@ -1,7 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useConfidenceEngine, type ConfidenceState, type ConfidenceTheme } from "../../components/intelligence/ConfidenceEngine";
 import type { SectorId } from "../../services/portfolio/portfolioIntelligenceEngine";
 import type { MarketState } from "../../services/intelligence/marketState";
+import HolographicFinancialConceptExplainer, { type FinancialConceptKey } from "../explanations/HolographicFinancialConceptExplainer";
 
 function confidenceLabel(state: ConfidenceState): string {
   switch (state) {
@@ -84,6 +85,9 @@ export default function AssistantContextPanel(props: {
 }): JSX.Element {
   const { state, theme, marketState } = useConfidenceEngine();
 
+  const [openConcept, setOpenConcept] = useState<FinancialConceptKey | null>(null);
+  const closeExplainer = () => setOpenConcept(null);
+
   const preferred = props.preferredSectors ?? [];
 
   const relevantSectors = useMemo(() => {
@@ -99,7 +103,8 @@ export default function AssistantContextPanel(props: {
   const toneLabel = toneLabelFromMarketState(marketState);
 
   return (
-    <aside
+    <>
+      <aside
       className="w-[340px] max-w-[340px] rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]"
       style={{ boxShadow: envGlowShadow(state, theme) }}
     >
@@ -130,9 +135,38 @@ export default function AssistantContextPanel(props: {
         )}
       </div>
 
+      <div className="mt-4 rounded-[22px] border border-white/10 bg-black/20 p-4">
+        <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Tap to learn</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setOpenConcept("liquidity")}
+            className="rounded-full border border-white/10 bg-black/25 px-[12px] py-[6px] text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white/90 hover:border-white/20 transition"
+          >
+            Liquidity
+          </button>
+          <button
+            type="button"
+            onClick={() => setOpenConcept("volatility")}
+            className="rounded-full border border-white/10 bg-black/25 px-[12px] py-[6px] text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white/90 hover:border-white/20 transition"
+          >
+            Volatility
+          </button>
+        </div>
+
+        <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/45">
+          Calm holographic explanation • non-intrusive
+        </div>
+      </div>
+
       <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
         Educational framing • no certainty claims • no execution
       </div>
     </aside>
-  );
+
+      {openConcept !== null && (
+        <HolographicFinancialConceptExplainer concept={openConcept} open={true} onClose={closeExplainer} />
+      )}
+      </>
+    );
 }

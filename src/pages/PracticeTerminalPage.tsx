@@ -10,6 +10,8 @@ import AmbientBackground from "../components/ambient/AmbientBackground";
 import SentimentFlow from "../components/intelligence/SentimentFlow";
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
+import usePracticeReplayEngine from "../hooks/usePracticeReplayEngine";
+import PracticeReplayPanel from "../components/practice/PracticeReplayPanel";
 
 type PositionEvent = {
   id: string;
@@ -167,6 +169,18 @@ export default function PracticeTerminalPage(): JSX.Element {
   const [reflection, setReflection] = useState<string>("");
   const [reflectionLog, setReflectionLog] = useState<Array<{ id: string; at: number; text: string }>>([]);
 
+  const {
+    frames,
+    cursorIndex,
+    isReplayMode,
+    cursorFrame,
+    enterReplay,
+    exitReplay,
+    setCursorIndex,
+    captureFrame,
+    clear: clearReplay,
+  } = usePracticeReplayEngine({ maxFrames: 140 });
+
   const simStartAtRef = useRef<number>(Date.now());
 
   const positionsN = useMemo(() => computeWeightPct(positions), [positions]);
@@ -240,10 +254,17 @@ export default function PracticeTerminalPage(): JSX.Element {
 
   const simulatePosition = () => {
     const pct = clamp(allocationPct, 1, 60);
+    const now = Date.now();
+
     if (remainingCash <= 0) {
       setEvents((prev) => [
         ...prev,
-        { id: `sim_${Date.now()}`, at: Date.now(), kind: "evaluate", text: "Simulated environment is near full allocation. Re-evaluate exposure before adding more." },
+        {
+          id: `sim_${now}`,
+          at: now,
+          kind: "evaluate",
+          text: "Simulated environment is near full allocation. Re-evaluate exposure before adding more.",
+        },
       ]);
       return;
     }
@@ -255,31 +276,42 @@ export default function PracticeTerminalPage(): JSX.Element {
 
     setPositions((prev) => {
       const existing = prev.find((p) => p.ticker === selected.ticker);
+      let nextPositions: PortfolioHolding[];
+
       if (!existing) {
-        return [
+        nextPositions = [
           ...prev,
           {
-            id: `pos_${selected.ticker}_${Date.now()}`,
+            id: `pos_${selected.ticker}_${now}`,
             company: selected.company,
             ticker: selected.ticker,
             sector: selected.sector,
             weight: delta,
           },
         ];
+      } else {
+        nextPositions = prev.map((p) =>
+          p.ticker === selected.ticker ? { ...p, weight: Math.max(0, p.weight + delta) } : p,
+        );
       }
 
-      return prev.map((p) =>
-        p.ticker === selected.ticker
-          ? { ...p, weight: Math.max(0, p.weight + delta) }
-          : p,
-      );
+      captureFrame({
+        at: now,
+        marketState: marketSnapshot.snapshot.marketState,
+        marketInputs: marketSnapshot.snapshot.marketInputs,
+        confidenceState,
+        narrativeKey,
+        holdings: nextPositions,
+      });
+
+      return nextPositions;
     });
 
     setEvents((prev) => [
       ...prev,
       {
-        id: `sim_${Date.now()}`,
-        at: Date.now(),
+        id: `sim_${now}`,
+        at: now,
         kind: "simulate",
         text: `Simulated exposure added: ${selected.company} (${selected.sector}) into the educational portfolio environment.`,
       },
@@ -300,6 +332,9 @@ export default function PracticeTerminalPage(): JSX.Element {
     setReflection("");
     setReflectionLog([]);
     simStartAtRef.current = now;
+
+    clearReplay();
+    exitReplay();
   };
 
   const sessionProgress = useMemo(() => {
@@ -541,9 +576,25 @@ export default function PracticeTerminalPage(): JSX.Element {
                   <motion.button
                     type="button"
                     onClick={() => {
+                      const now = Date.now();
+
+                      captureFrame({
+                        at: now,
+                        marketState: marketSnapshot.snapshot.marketState,
+                        marketInputs: marketSnapshot.snapshot.marketInputs,
+                        confidenceState,
+                        narrativeKey,
+                        holdings: positions,
+                      });
+
                       setEvents((prev) => [
                         ...prev,
-                        { id: `eval_${Date.now()}`, at: Date.now(), kind: "evaluate", text: "Evaluate exposure: compare concentration texture against confidence environment and liquidity sensitivity." },
+                        {
+                          id: `eval_${now}`,
+                          at: now,
+                          kind: "evaluate",
+                          text: "Evaluate exposure: compare concentration texture against confidence environment and liquidity sensitivity.",
+                        },
                       ]);
                     }}
                     whileHover={!prefersReducedMotion ? { translateY: -2 } : undefined}
@@ -561,6 +612,18 @@ export default function PracticeTerminalPage(): JSX.Element {
                   <div className="mt-2 text-[13px] leading-[1.6] text-white/70">
                     {portfolioIntelligence.narrative.supporting}
                   </div>
+                </div>
+
+                <div className="mt-6">
+                  <PracticeReplayPanel
+                    frames={frames}
+                    cursorIndex={cursorIndex}
+                    isReplayMode={isReplayMode}
+                    cursorFrame={cursorFrame}
+                    enterReplay={enterReplay}
+                    exitReplay={exitReplay}
+                    setCursorIndex={setCursorIndex}
+                  />
                 </div>
               </div>
             </div>
