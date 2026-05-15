@@ -9,22 +9,28 @@ import AssistantPage from "./pages/AssistantPage";
 import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
 import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
 import CompanyUniversePage from "./pages/CompanyUniversePage";
+import PublicLandingPage from "./pages/PublicLandingPage";
+import PublicAboutPage from "./pages/PublicAboutPage";
 import LivingInterfaceEngine from "./components/spatial/LivingInterfaceEngine";
 import { SpatialEnvironmentProvider } from "./components/spatial/SpatialEnvironmentContext";
 import SpatialInterfaceReconstructionEngine from "./components/spatial/SpatialInterfaceReconstructionEngine";
 import MasterMotionEngine from "./components/motion/MasterMotionEngine";
 import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
 import IntelligenceNavigationRail from "./components/navigation/IntelligenceNavigationRail";
+import IntelligenceHUD from "./components/intelligence/IntelligenceHUD";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
 
-type PageKey = "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
+type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
 function getPageKeyFromUrl(): PageKey {
-  if (typeof window === "undefined") return "stock";
+  if (typeof window === "undefined") return "landing";
   try {
     const params = new URLSearchParams(window.location.search);
-    const raw = (params.get("page") ?? "stock").toLowerCase().trim();
+    const raw = (params.get("page") ?? "landing").toLowerCase().trim();
+
+    if (raw === "landing") return "landing";
+    if (raw === "about") return "about";
 
     if (raw === "company") return "company";
     if (raw === "community") return "community";
@@ -32,19 +38,21 @@ function getPageKeyFromUrl(): PageKey {
     if (raw === "assistant") return "assistant";
     if (raw === "explore") return "explore";
     if (raw === "dashboard" || raw === "market") return "dashboard";
-    return "stock";
+    if (raw === "stock") return "stock";
+
+    return "landing";
   } catch {
-    return "stock";
+    return "landing";
   }
 }
 
 function getRouteSignatureFromUrl(): string {
-  if (typeof window === "undefined") return "stock";
+  if (typeof window === "undefined") return "landing";
 
   try {
     const params = new URLSearchParams(window.location.search);
 
-    const page = (params.get("page") ?? "stock").toLowerCase().trim();
+    const page = (params.get("page") ?? "landing").toLowerCase().trim();
     const kind = (params.get("kind") ?? "").trim();
     const id = (params.get("id") ?? "").trim();
 
@@ -114,12 +122,17 @@ export default function App(): JSX.Element {
   }, []);
 
   const mainView = useMemo(() => {
+    if (pageKey === "landing") return <PublicLandingPage />;
+    if (pageKey === "about") return <PublicAboutPage />;
+
     if (pageKey === "company") return <CompanyUniversePage />;
     if (pageKey === "community") return <CommunityHubPage />;
     if (pageKey === "practice") return <PracticeTerminalPage />;
     if (pageKey === "assistant") return <AssistantPage />;
     if (pageKey === "explore") return <DiscoveryEntityPage />;
     if (pageKey === "dashboard") return <MarketIntelligenceDashboard />;
+    if (pageKey === "stock") return <StockStoryPage />;
+
     return <StockStoryPage />;
   }, [pageKey]);
 
@@ -144,7 +157,9 @@ export default function App(): JSX.Element {
                 <CinematicTransitionLayer activeKey={routeSignature} enabled>
                   {mainView}
                 </CinematicTransitionLayer>
-                <IntelligenceNavigationRail />
+
+                {pageKey === "landing" || pageKey === "about" ? null : <IntelligenceHUD />}
+                {pageKey === "landing" || pageKey === "about" ? null : <IntelligenceNavigationRail />}
               </LivingInterfaceEngine>
             )}
           </SpatialEnvironmentProvider>

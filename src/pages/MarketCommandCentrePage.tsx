@@ -8,7 +8,6 @@ import AmbientBackground from "../components/ambient/AmbientBackground";
 import SentimentFlow from "../components/intelligence/SentimentFlow";
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
-import IntelligenceHUD from "../components/intelligence/IntelligenceHUD";
 import HolographicTelemetryEngine from "../components/telemetry/HolographicTelemetryEngine";
 import InstitutionalActivityNetwork from "../components/commandCentre/InstitutionalActivityNetwork";
 import MarketScannerEngine from "../components/scanner/MarketScannerEngine";
@@ -136,8 +135,6 @@ export default function MarketCommandCentrePage(): JSX.Element {
       <div className="noise" />
       <SentimentFlow />
 
-      {/* Premium fixed HUD */}
-      <IntelligenceHUD />
 
       {/* SECTION 1 + 2: Atmosphere + Market Core */}
       <section

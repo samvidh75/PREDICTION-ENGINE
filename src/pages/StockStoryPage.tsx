@@ -284,7 +284,6 @@ export default function StockStoryPage(): JSX.Element {
       <AmbientBackground />
       <div className="noise" />
       <SentimentFlow />
-      <IntelligenceHUD />
 
       {/* Ambient Hero Layer */}
       <section
@@ -570,4 +569,3 @@ export default function StockStoryPage(): JSX.Element {
 }
 
 // Fixed premium HUD (top nav + search + toast) is currently implemented in IntelligenceHUD.
-import IntelligenceHUD from "../components/intelligence/IntelligenceHUD";

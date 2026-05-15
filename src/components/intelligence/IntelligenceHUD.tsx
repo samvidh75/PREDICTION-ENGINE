@@ -180,6 +180,12 @@ export default function IntelligenceHUD(): JSX.Element {
       const qParam = params.get("q");
       if (typeof qParam === "string" && qParam.trim().length > 0) setQuery(qParam);
       setSearchOpen(true);
+
+      // Clean URL so overlay open doesn't repeatedly re-trigger on refresh/back.
+      const url = new URL(window.location.href);
+      url.searchParams.delete("search");
+      url.searchParams.delete("q");
+      window.history.replaceState({}, "", url.toString());
     }
   }, []);
 
