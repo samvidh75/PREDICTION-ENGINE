@@ -3,11 +3,14 @@ import { AnimatePresence, motion, useReducedMotion, useTransform } from "framer-
 import { useConfidenceEngine, type ConfidenceState } from "./ConfidenceEngine";
 import { useMotionController } from "../motion/MotionController";
 
-type SearchResult = {
-  id: string;
-  label: string;
-  kind: "stock" | "sector" | "theme" | "market_narrative";
-};
+import { universalIntelligenceSearch } from "../../services/discovery/universalIntelligenceSearch";
+import { getDiscoveryIndex } from "../../services/discovery/discoveryIndex";
+import {
+  loadDiscoveryMemory,
+  saveDiscoveryMemory,
+  updateDiscoveryMemoryWithEntity,
+} from "../../services/discovery/discoveryMemory";
+import type { DiscoveryMemory, DiscoveryResult } from "../../services/discovery/discoveryTypes";
 
 function labelForState(state: ConfidenceState): string {
   switch (state) {
@@ -41,10 +44,19 @@ function notificationForState(state: ConfidenceState): string {
   }
 }
 
+function formatKind(kind: DiscoveryResult["kind"]): string {
+  return kind.replaceAll("_", " ");
+}
+
+function relationshipPreview(tags: string[]): string {
+  return tags.slice(0, 2).join(" • ");
+}
+
 export default function IntelligenceHUD(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
-  const { state, theme } = useConfidenceEngine();
+  const { state, theme, marketState, narrativeKey } = useConfidenceEngine();
   const { scrollProgress } = useMotionController();
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(0);
@@ -52,55 +64,60 @@ export default function IntelligenceHUD(): JSX.Element {
   const [toastOpen, setToastOpen] = useState(false);
   const toastTimeoutRef = useRef<number | null>(null);
 
+  const [discoveryMemory, setDiscoveryMemory] = useState<DiscoveryMemory>(() => loadDiscoveryMemory());
+  const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [debugNavHint, setDebugNavHint] = useState<string | null>(null);
+
   const navHeight = useTransform(scrollProgress, [0, 1], [72, 64]);
   const navOpacity = useTransform(scrollProgress, [0, 1], [0.75, 0.92]);
   const navBlur = useTransform(scrollProgress, [0, 1], ["blur(0px)", "blur(10px)"]);
 
   const statusPill = useMemo(() => labelForState(state), [state]);
 
-  const searchResults = useMemo<SearchResult[]>(() => {
-    const q = query.trim().toLowerCase();
-    const all: SearchResult[] = [
-      { id: "r_1", label: "NSE Banking Momentum", kind: "theme" },
-      { id: "r_2", label: "Large-cap Institutional Flow", kind: "market_narrative" },
-      { id: "r_3", label: "Liquidity Breadth Watch", kind: "theme" },
-      { id: "r_4", label: "Sector Rotation Signal", kind: "market_narrative" },
-      { id: "r_5", label: "Volatility Conditions Monitor", kind: "theme" },
-      { id: "r_6", label: "Banking & Payments Exposure", kind: "sector" },
-      { id: "r_7", label: "Institutional Accumulation Index", kind: "theme" },
-      { id: "r_8", label: "Risk Intensity Readout", kind: "market_narrative" },
-    ];
+  const searchResults = useMemo<DiscoveryResult[]>(() => {
+    return universalIntelligenceSearch({
+      query,
+      confidenceState: state,
+      marketStateLabel: marketState,
+      narrativeKey,
+      preferredSectors: discoveryMemory.preferredSectors,
+      preferredThemes: discoveryMemory.preferredThemes,
+    });
+  }, [query, state, marketState, narrativeKey, discoveryMemory.preferredSectors, discoveryMemory.preferredThemes]);
 
-    if (!q) return all.slice(0, 6);
+  const suggestionChips = useMemo<string[]>(() => {
+    const preferred = [...discoveryMemory.preferredSectors, ...discoveryMemory.preferredThemes];
+    const topTitles = searchResults.map((r) => r.title);
 
-    const ranked = all
-      .map((r) => {
-        const text = (r.label + " " + r.kind).toLowerCase();
-        const score = text.includes(q) ? 100 : 0;
-        return { r, score };
-      })
-      .filter((x) => x.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map((x) => x.r);
+    const combined = [...preferred, ...topTitles];
 
-    return ranked.length ? ranked : all.slice(0, 6);
-  }, [query]);
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const item of combined) {
+      const key = item.trim().toLowerCase();
+      if (!key) continue;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(item.trim());
+      if (out.length >= 6) break;
+    }
+    return out;
+  }, [discoveryMemory.preferredSectors, discoveryMemory.preferredThemes, searchResults]);
 
   useEffect(() => {
     if (!searchOpen) return;
-    if (!query.trim()) {
-      setVisibleCount(0);
-      return;
-    }
+
+    const total = Math.min(searchResults.length, 6);
 
     if (prefersReducedMotion) {
-      setVisibleCount(searchResults.length);
+      setVisibleCount(total);
       return;
     }
 
     setVisibleCount(0);
     const stepMs = 140;
-    const total = Math.min(searchResults.length, 6);
 
     let i = 0;
     const id = window.setInterval(() => {
@@ -110,7 +127,7 @@ export default function IntelligenceHUD(): JSX.Element {
     }, stepMs);
 
     return () => window.clearInterval(id);
-  }, [searchOpen, query, prefersReducedMotion, searchResults]);
+  }, [searchOpen, prefersReducedMotion, searchResults]);
 
   useEffect(() => {
     // Toast appears softly and automatically; no aggressive UI.
@@ -126,6 +143,21 @@ export default function IntelligenceHUD(): JSX.Element {
   }, [toastOpen]);
 
   useEffect(() => {
+    if (!searchOpen) {
+      setSuggestionsVisible(false);
+      return;
+    }
+
+    if (prefersReducedMotion) {
+      setSuggestionsVisible(true);
+      return;
+    }
+
+    const id = window.setTimeout(() => setSuggestionsVisible(true), 650);
+    return () => window.clearTimeout(id);
+  }, [searchOpen, prefersReducedMotion]);
+
+  useEffect(() => {
     if (!searchOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -139,8 +171,36 @@ export default function IntelligenceHUD(): JSX.Element {
 
   const pillGlow = state === "ELEVATED_RISK" ? theme.warningGlow : theme.cyanGlow;
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+
+    const searchParam = params.get("search");
+    if (searchParam === "1" || searchParam === "true") {
+      const qParam = params.get("q");
+      if (typeof qParam === "string" && qParam.trim().length > 0) setQuery(qParam);
+      setSearchOpen(true);
+    }
+  }, []);
+
+  const onOpenEntity = (r: DiscoveryResult): void => {
+    setDebugNavHint(`${r.kind} • ${r.title}`);
+
+    const index = getDiscoveryIndex();
+    const entity = index.find((x) => x.id === r.id && x.kind === r.kind);
+
+    if (entity) {
+      const next = updateDiscoveryMemoryWithEntity(discoveryMemory, entity);
+      setDiscoveryMemory(next);
+      saveDiscoveryMemory(next);
+    }
+
+    const nextUrl = `?page=explore&kind=${encodeURIComponent(r.kind)}&id=${encodeURIComponent(r.id)}`;
+    window.location.href = nextUrl;
+  };
+
   return (
-    <div className="pointer-events-none absolute inset-0 z-[10]" style={{ opacity: 0.95 }}>
+    <div className="absolute inset-0 z-[10]" style={{ opacity: 0.95 }}>
       {/* Top Navigation */}
       <motion.div
         style={{
@@ -158,9 +218,7 @@ export default function IntelligenceHUD(): JSX.Element {
         >
           {/* Left: brand */}
           <div className="flex items-center gap-3">
-            <div className="text-[12px] uppercase tracking-[0.22em] text-white/80">
-              StockStory India
-            </div>
+            <div className="text-[12px] uppercase tracking-[0.22em] text-white/80">StockStory India</div>
           </div>
 
           {/* Center: market state pill */}
@@ -196,12 +254,10 @@ export default function IntelligenceHUD(): JSX.Element {
                   transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
                 />
               </div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                Market Intelligence Active
-              </div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">Market Intelligence Active</div>
             </div>
 
-            {/* Buttons (visual only; future wiring) */}
+            {/* Buttons */}
             <button
               type="button"
               className="text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white/85 transition"
@@ -265,8 +321,9 @@ export default function IntelligenceHUD(): JSX.Element {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.55)" }} />
-            <div className="absolute inset-0 backdrop-blur-[10px]" />
+            <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.60)" }} />
+            <div className="absolute inset-0 pointer-events-none backdrop-blur-[14px]" />
+
             <div className="relative h-full flex items-start justify-center pt-[96px] px-6">
               <motion.div
                 initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
@@ -274,14 +331,15 @@ export default function IntelligenceHUD(): JSX.Element {
                 exit={{ opacity: 0, y: 10, filter: "blur(10px)" }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 style={{
-                  width: "min(920px, 100%)",
+                  width: "min(960px, 100%)",
                   borderRadius: 24,
-                  background: "rgba(14,16,20,0.72)",
+                  background: "rgba(2,3,4,0.88)",
                   border: "1px solid rgba(255,255,255,0.06)",
-                  boxShadow: "0 0 60px rgba(0,0,0,0.5)",
+                  boxShadow: "0 0 60px rgba(0,0,0,0.55)",
                 }}
               >
                 <div className="p-4 sm:p-6">
+                  {/* Header row */}
                   <div className="flex items-center gap-3">
                     <div
                       className="h-8 w-8 rounded-full"
@@ -290,54 +348,128 @@ export default function IntelligenceHUD(): JSX.Element {
                         border: "1px solid rgba(255,255,255,0.06)",
                       }}
                     />
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Market Intelligence Search</div>
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Universal Intelligence Search</div>
                   </div>
 
+                  {/* Search input */}
                   <div className="mt-5">
                     <motion.input
+                      ref={inputRef}
                       autoFocus
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search stocks, sectors, themes…"
+                      placeholder="Explore market intelligence…"
                       className="w-full outline-none"
                       style={{
-                        height: 64,
+                        height: 72,
                         borderRadius: 24,
                         paddingLeft: 24,
                         paddingRight: 24,
-                        background: "rgba(14,16,20,0.72)",
-                        border: "1px solid rgba(255,255,255,0.06)",
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.05)",
                         color: "rgba(255,255,255,0.92)",
-                        fontSize: 18,
+                        fontSize: 22,
                         letterSpacing: "-0.01em",
                       }}
                     />
                   </div>
 
+                  <AnimatePresence>
+                    {query.trim().length === 0 && suggestionsVisible && suggestionChips.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 6, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: 6, filter: "blur(10px)" }}
+                        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                        className="mt-3"
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          {suggestionChips.map((chip, idx) => (
+                            <motion.button
+                              key={`${chip}_${idx}`}
+                              type="button"
+                              onClick={() => {
+                                setQuery(chip);
+                                inputRef.current?.focus();
+                              }}
+                              className="h-[34px] rounded-full border border-white/10 bg-black/20 px-[14px] text-[11px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+                              whileHover={
+                                prefersReducedMotion
+                                  ? undefined
+                                  : {
+                                      translateY: -2,
+                                      boxShadow: `0 0 0 1px rgba(255,255,255,0.06), 0 0 22px ${theme.cyanGlow}`,
+                                    }
+                              }
+                            >
+                              {chip}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Subheader + empty state */}
                   <div className="mt-4">
                     <div className="text-[10px] uppercase tracking-[0.18em] text-white/45">
-                      Results recalibrating progressively
+                      Exploring market intelligence…
                     </div>
 
+                    {debugNavHint && (
+                      <div className="mt-3 rounded-[16px] border border-white/10 bg-black/20 px-4 py-3 text-[13px] text-white/85">
+                        Navigating to explore: {debugNavHint}
+                      </div>
+                    )}
+
                     <AnimatePresence mode="popLayout">
-                      {query.trim().length > 0 && (
+                      {searchResults.length === 0 ? (
+                        <div className="mt-3 rounded-[16px] border border-white/10 bg-black/25 px-4 py-3 text-[13px] text-white/80">
+                          No matching intelligence environments detected.
+                        </div>
+                      ) : (
                         <div className="mt-3 space-y-2">
                           {searchResults.slice(0, visibleCount).map((r, i) => (
-                            <motion.div
-                              key={r.id}
+                            <motion.a
+                              key={`${r.kind}_${r.id}`}
+                              href={`?page=explore&kind=${encodeURIComponent(r.kind)}&id=${encodeURIComponent(r.id)}`}
+                              onPointerDown={() => onOpenEntity(r)}
+                              onClick={() => onOpenEntity(r)}
                               initial={{ opacity: 0, y: 6, filter: "blur(8px)" }}
                               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                               exit={{ opacity: 0, y: 6, filter: "blur(8px)" }}
                               transition={{ duration: 0.35, delay: i * 0.03 }}
-                              className="rounded-[16px] border border-white/10 bg-black/25 px-4 py-3"
+                              className="block w-full text-left rounded-[16px] border border-white/10 bg-black/25 px-4 py-3 hover:bg-black/35 transition"
                             >
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="text-[13px] text-white/90">{r.label}</div>
-                                <div className="text-[10px] uppercase tracking-[0.18em] text-white/50">
-                                  {r.kind.replaceAll("_", " ")}
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-[13px] text-white/92 truncate">{r.title}</div>
+                                  </div>
+                                  <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-white/50">
+                                    {formatKind(r.kind)}
+                                  </div>
+
+                                  <div className="mt-2 text-[13px] leading-[1.6] text-white/82">
+                                    {r.narrativeSummary}
+                                  </div>
+
+                                  <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/45">
+                                    Env: {r.confidenceEnvironment} • {relationshipPreview(r.relationshipIndicators)}
+                                  </div>
                                 </div>
+
+                                <div
+                                  className="h-[10px] w-[10px] rounded-full mt-1 shrink-0"
+                                  style={{
+                                    background: state === "ELEVATED_RISK" ? theme.warningGlow : theme.cyanGlow,
+                                    boxShadow: `0 0 18px ${state === "ELEVATED_RISK" ? theme.warningGlow : theme.cyanGlow}`,
+                                    opacity: 0.9,
+                                  }}
+                                  aria-hidden="true"
+                                />
                               </div>
-                            </motion.div>
+                            </motion.a>
                           ))}
                         </div>
                       )}
@@ -351,6 +483,11 @@ export default function IntelligenceHUD(): JSX.Element {
                     onClick={() => {
                       setSearchOpen(false);
                       setQuery("");
+
+                      const url = new URL(window.location.href);
+                      url.searchParams.delete("search");
+                      url.searchParams.delete("q");
+                      window.history.replaceState({}, "", url.toString());
                     }}
                     className="text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white/85 transition"
                   >

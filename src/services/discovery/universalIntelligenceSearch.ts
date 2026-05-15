@@ -19,18 +19,65 @@ function tokenise(q: string): string[] {
 
 function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): number {
   const qTokens = tokenise(input.query);
-  if (!qTokens.length) return 0.2;
 
-  const title = entity.title.toLowerCase();
-  const narrative = entity.shortNarrative.toLowerCase();
+  const titleLower = entity.title.toLowerCase();
+  const narrativeLower = entity.shortNarrative.toLowerCase();
 
-  const keywordHits = qTokens.reduce((acc, t) => {
-    if (entity.keywords.some((k) => k.toLowerCase() === t)) return acc + 1.2;
-    if (title.includes(t)) return acc + 0.9;
-    if (narrative.includes(t)) return acc + 0.7;
-    if (entity.relationshipTags.some((rt) => rt.includes(t))) return acc + 0.5;
-    return acc;
-  }, 0);
+  // Base “understanding” score when query is empty.
+  const keywordHits = qTokens.length
+    ? qTokens.reduce((acc, t) => {
+        if (entity.keywords.some((k) => k.toLowerCase() === t)) return acc + 1.2;
+        if (titleLower.includes(t)) return acc + 0.9;
+        if (narrativeLower.includes(t)) return acc + 0.7;
+        if (entity.relationshipTags.some((rt) => rt.includes(t))) return acc + 0.5;
+        return acc;
+      }, 0)
+    : 0.2;
+
+  const preferredSectors = input.preferredSectors ?? [];
+  const preferredThemes = input.preferredThemes ?? [];
+
+  const preferredSectorSet = new Set(preferredSectors.map((s) => s.toLowerCase().trim()));
+  const preferredThemeSet = new Set(preferredThemes.map((t) => t.toLowerCase().trim()));
+
+  function titleTokens(t: string): string[] {
+    return normalizeQuery(t)
+      .split(/[\s&,+/.-]+/g)
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .slice(0, 5);
+  }
+
+  // Discovery Memory bias (gentle, not overpowering):
+  // - exact sector/theme title match => strong bias
+  // - relatedSectors match => medium bias
+  // - token overlap in keywords/title/narrative => soft bias
+  let memoryBoost = 0;
+
+  const entityRelatedSectors = entity.details?.relatedSectors ?? [];
+
+  if (entity.kind === "sector" && preferredSectorSet.has(titleLower)) memoryBoost += 0.9;
+  if (entity.kind === "theme" && preferredThemeSet.has(titleLower)) memoryBoost += 0.9;
+
+  if (preferredSectors.length && entityRelatedSectors.some((s) => preferredSectorSet.has(s.toLowerCase().trim()))) {
+    memoryBoost += 0.35;
+  }
+
+  // Soft token overlap bias:
+  if (preferredSectors.length || preferredThemes.length) {
+    const tokens = [...preferredSectors, ...preferredThemes].flatMap(titleTokens);
+    const keywordLower = entity.keywords.map((k) => k.toLowerCase());
+
+    for (const tok of tokens) {
+      if (!tok) continue;
+      if (titleLower.includes(tok)) memoryBoost += 0.12;
+      if (narrativeLower.includes(tok)) memoryBoost += 0.08;
+      if (keywordLower.some((k) => k.includes(tok))) memoryBoost += 0.10;
+      if (entity.relationshipTags.some((rt) => rt.includes(tok.replaceAll(" ", "_")))) memoryBoost += 0.05;
+    }
+  }
+
+  memoryBoost = Math.min(memoryBoost, 1.6);
 
   // Confidence-driven modulation:
   // - in elevated risk, prefer behavioural_condition + cautious/guarded themes
@@ -39,10 +86,10 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
 
   let confidenceBoost = 0;
   if (conf === "ELEVATED_RISK") {
-    if (entity.kind === "behavioural_condition" || entity.title.toLowerCase().includes("defensive")) confidenceBoost = 0.65;
+    if (entity.kind === "behavioural_condition" || titleLower.includes("defensive")) confidenceBoost = 0.65;
     if (entity.kind === "theme") confidenceBoost = 0.4;
   } else if (conf === "MOMENTUM_WEAKENING") {
-    if (entity.kind === "behavioural_condition" || entity.title.toLowerCase().includes("pacing")) confidenceBoost = 0.6;
+    if (entity.kind === "behavioural_condition" || titleLower.includes("pacing")) confidenceBoost = 0.6;
     if (entity.kind === "market_narrative") confidenceBoost = 0.25;
   } else if (conf === "STABLE_CONVICTION") {
     if (entity.kind === "market_narrative" || entity.kind === "institutional_environment") confidenceBoost = 0.55;
@@ -53,7 +100,7 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
   // Narrative key helps stable ordering but doesn't look like randomness.
   const narrativeStability = (input.narrativeKey % 17) / 100; // 0..0.16
 
-  const raw = keywordHits + confidenceBoost + narrativeStability;
+  const raw = keywordHits + confidenceBoost + memoryBoost + narrativeStability;
   return raw;
 }
 
@@ -107,10 +154,10 @@ export function universalIntelligenceSearch(input: DiscoverySearchInput): Discov
   // If query is empty, we still surface understanding (curiosity-first).
   const queryIsEmpty = !input.query.trim();
 
-  // Score all entities
+  // Score all entities (query empty still gets Discovery Memory bias + confidence modulation)
   const scored = index
     .map((e) => {
-      const s = queryIsEmpty ? 0.3 : scoreEntity(e, input);
+      const s = scoreEntity(e, input);
       return { e, s };
     })
     .sort((a, b) => b.s - a.s);

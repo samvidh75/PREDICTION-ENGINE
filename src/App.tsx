@@ -7,10 +7,11 @@ import CommunityHubPage from "./pages/CommunityHubPage";
 import PracticeTerminalPage from "./pages/PracticeTerminalPage";
 import AssistantPage from "./pages/AssistantPage";
 import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
+import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
 
-type PageKey = "stock" | "community" | "practice" | "assistant" | "explore";
+type PageKey = "stock" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
 function getPageKeyFromUrl(): PageKey {
   if (typeof window === "undefined") return "stock";
@@ -22,15 +23,35 @@ function getPageKeyFromUrl(): PageKey {
     if (raw === "practice") return "practice";
     if (raw === "assistant") return "assistant";
     if (raw === "explore") return "explore";
+    if (raw === "dashboard" || raw === "market") return "dashboard";
     return "stock";
   } catch {
     return "stock";
   }
 }
 
+function getSkipOnboardingFlag(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("skipOnboarding");
+    return raw === "1" || raw?.toLowerCase() === "true";
+  } catch {
+    return false;
+  }
+}
+
+const DEFAULT_SKIP_PROFILE: UserProfile = {
+  focusAreas: ["Institutional activity"],
+  volatilityComfort: "Calm environments",
+  investingHorizon: "Long-term focus",
+  analysisDepth: "Editorial overview",
+  modules: ["Institutional activity"],
+};
+
 export default function App(): JSX.Element {
-  const [onboardingComplete, setOnboardingComplete] = useState(false);
-  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(null);
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => getSkipOnboardingFlag());
+  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(() => (getSkipOnboardingFlag() ? DEFAULT_SKIP_PROFILE : null));
 
   const overrideInputs: MarketInputs | null = useMemo(() => {
     if (!draftProfile) return null;
@@ -57,6 +78,7 @@ export default function App(): JSX.Element {
     if (pageKey === "practice") return <PracticeTerminalPage />;
     if (pageKey === "assistant") return <AssistantPage />;
     if (pageKey === "explore") return <DiscoveryEntityPage />;
+    if (pageKey === "dashboard") return <MarketIntelligenceDashboard />;
     return <StockStoryPage />;
   }, [pageKey]);
 

@@ -9,6 +9,7 @@ import SentimentFlow from "../components/intelligence/SentimentFlow";
 
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
+import StockStoryChartIntegration from "../components/charts/StockStoryChartIntegration";
 
 function confidenceLabel(state: ConfidenceState): string {
   switch (state) {
@@ -543,10 +544,11 @@ export default function StockStoryPage(): JSX.Element {
             <div className="rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-[24px] p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Chart Integration System</div>
               <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                Placeholder panel for TradingView integration (future): styled to remain secondary so narrative interpretation stays primary.
+                Narrative-first cinematic chart surface (TradingView-ready): subtle, calm, and interpretation-supported.
               </div>
-              <div className="mt-4 h-[220px] rounded-[20px] border border-white/10 bg-black/25 flex items-center justify-center">
-                <div className="text-[12px] uppercase tracking-[0.18em] text-white/45">Chart area</div>
+
+              <div className="mt-4">
+                <StockStoryChartIntegration ticker={stock.ticker} defaultTimeframe="1M" />
               </div>
             </div>
           </div>
