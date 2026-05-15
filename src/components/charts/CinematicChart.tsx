@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useConfidenceEngine, type ConfidenceState } from "../intelligence/ConfidenceEngine";
 import type { ChartNarrativeCapsule, ChartTimeframe, ConfidenceOverlayMode, Candle } from "./chartTypes";
+import { useSpatialEnvironment } from "../spatial/SpatialEnvironmentContext";
 import {
   computePriceDomain,
   computeRollingRange,
@@ -162,9 +163,15 @@ function buildNarrativeCapsules(args: {
 export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: CinematicChartProps): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { state, theme, narrativeKey, narrativeVariant } = useConfidenceEngine();
+  const { chartCapsuleMax, chartDprMax, tooltipWidthPx, chartOverlayDefault } = useSpatialEnvironment();
 
   const [timeframe, setTimeframe] = useState<ChartTimeframe>(defaultTimeframe);
-  const [overlayMode, setOverlayMode] = useState<ConfidenceOverlayMode>("narratives");
+  const [overlayMode, setOverlayMode] = useState<ConfidenceOverlayMode>(() => chartOverlayDefault as ConfidenceOverlayMode);
+
+  useEffect(() => {
+    setOverlayMode(chartOverlayDefault);
+  }, [chartOverlayDefault]);
+
   const [chartMode, setChartMode] = useState<ChartMode>("candles");
   const [tooltip, setTooltip] = useState<null | { xPx: number; yPx: number; title: string; lines: { label: string; value: string }[] }>(null);
 
@@ -193,9 +200,10 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
 
   const capsules = useMemo(() => {
     const all = buildNarrativeCapsules({ state, narrativeKey, overlayMode });
-    // On smaller screens we’ll still render them, but with CSS they’ll feel subtle.
-    return all;
-  }, [state, narrativeKey, overlayMode]);
+    const maxCapsules = Math.max(1, Math.floor(chartCapsuleMax));
+    // On smaller screens we’ll still render them, but we cap overlay density for clarity.
+    return all.slice(0, maxCapsules);
+  }, [state, narrativeKey, overlayMode, chartCapsuleMax]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -214,7 +222,7 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
       w = Math.max(240, Math.floor(rect.width));
       h = Math.max(220, Math.floor(rect.height));
 
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      dpr = Math.max(1, Math.min(chartDprMax, window.devicePixelRatio || 1));
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
 
@@ -418,7 +426,7 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
     return () => {
       ro.disconnect();
     };
-  }, [candles, candleStroke.wick, chartMode, downFill, priceDomain, rollingRange, sma, state, upFill]);
+  }, [candles, candleStroke.wick, chartMode, downFill, priceDomain, rollingRange, sma, state, upFill, chartDprMax]);
 
   const onMove = (ev: React.PointerEvent) => {
     const root = rootRef.current;
@@ -592,7 +600,7 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
                 left: tooltip.xPx,
                 top: tooltip.yPx,
                 transform: "translate(14px, -100%)",
-                width: 290,
+                width: tooltipWidthPx,
                 borderRadius: 18,
                 padding: 16,
                 background: "rgba(10,12,16,0.62)",

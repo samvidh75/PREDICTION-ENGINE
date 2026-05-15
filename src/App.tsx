@@ -10,6 +10,8 @@ import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
 import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
 import CompanyUniversePage from "./pages/CompanyUniversePage";
 import LivingInterfaceEngine from "./components/spatial/LivingInterfaceEngine";
+import { SpatialEnvironmentProvider } from "./components/spatial/SpatialEnvironmentContext";
+import SpatialInterfaceReconstructionEngine from "./components/spatial/SpatialInterfaceReconstructionEngine";
 import MasterMotionEngine from "./components/motion/MasterMotionEngine";
 import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
 import IntelligenceNavigationRail from "./components/navigation/IntelligenceNavigationRail";
@@ -127,22 +129,25 @@ export default function App(): JSX.Element {
     <MotionController>
       <ConfidenceEngine paused={shouldShowOnboarding} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
         <MasterMotionEngine enabled={!shouldShowOnboarding}>
-          {shouldShowOnboarding ? (
-            <OnboardingPage
-              onComplete={(profile) => {
-                setDraftProfile(profile);
-                setOnboardingComplete(true);
-              }}
-              onDraftChange={(profile) => setDraftProfile(profile)}
-            />
-          ) : (
-            <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
-              <CinematicTransitionLayer activeKey={routeSignature} enabled>
-                {mainView}
-              </CinematicTransitionLayer>
-              <IntelligenceNavigationRail />
-            </LivingInterfaceEngine>
-          )}
+          <SpatialEnvironmentProvider enabled>
+            <SpatialInterfaceReconstructionEngine enabled={!shouldShowOnboarding} />
+            {shouldShowOnboarding ? (
+              <OnboardingPage
+                onComplete={(profile) => {
+                  setDraftProfile(profile);
+                  setOnboardingComplete(true);
+                }}
+                onDraftChange={(profile) => setDraftProfile(profile)}
+              />
+            ) : (
+              <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
+                <CinematicTransitionLayer activeKey={routeSignature} enabled>
+                  {mainView}
+                </CinematicTransitionLayer>
+                <IntelligenceNavigationRail />
+              </LivingInterfaceEngine>
+            )}
+          </SpatialEnvironmentProvider>
         </MasterMotionEngine>
       </ConfidenceEngine>
     </MotionController>

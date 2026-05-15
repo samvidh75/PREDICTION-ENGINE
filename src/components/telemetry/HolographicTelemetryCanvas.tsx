@@ -3,6 +3,7 @@ import { useReducedMotion } from "framer-motion";
 import type { HolographicTelemetryModel, TelemetryPoint, TelemetryRail } from "./telemetryTypes";
 import { toneToGlow } from "./telemetryTypes";
 import { useMasterMotion } from "../motion/MasterMotionEngine";
+import { useSpatialEnvironment } from "../spatial/SpatialEnvironmentContext";
 
 type PointLink = { aIndex: number; bIndex: number; weight: number };
 
@@ -39,6 +40,7 @@ export default function HolographicTelemetryCanvas({
 }): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { signals } = useMasterMotion();
+  const { motionBudget } = useSpatialEnvironment();
 
   const slowdown = Math.min(3.2, signals.slowdownFactor);
 
@@ -91,12 +93,14 @@ export default function HolographicTelemetryCanvas({
     let dpr = 1;
     let raf: number | null = null;
 
+    const dprCap = quality === "low" ? 1.15 : quality === "balanced" ? 1.6 : 2;
+
     const resize = () => {
       const rect = root.getBoundingClientRect();
       w = Math.max(240, Math.floor(rect.width));
       h = Math.max(180, Math.floor(rect.height));
 
-      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      dpr = Math.max(1, Math.min(dprCap, window.devicePixelRatio || 1));
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       canvas.style.width = `${w}px`;
@@ -291,8 +295,14 @@ export default function HolographicTelemetryCanvas({
       ctx.shadowBlur = 0;
     };
 
+    let lastDrawMs = 0;
+    const frameIntervalMs = quality === "low" ? Infinity : Math.round(16 + (1 - motionBudget) * 44);
+
     const tick = (tMs: number) => {
-      drawFrame(tMs);
+      if (tMs - lastDrawMs >= frameIntervalMs) {
+        drawFrame(tMs);
+        lastDrawMs = tMs;
+      }
       raf = requestAnimationFrame(tick);
     };
 
@@ -306,7 +316,7 @@ export default function HolographicTelemetryCanvas({
       ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [bands, model, points, rails, links, quality, prefersReducedMotion, tone, slowdown]);
+  }, [bands, model, points, rails, links, quality, prefersReducedMotion, tone, slowdown, motionBudget]);
 
   return (
     <div ref={rootRef} className={className} style={{ width: "100%", height: "100%", ...style }}>

@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { useReducedMotion } from "framer-motion";
 import { useConfidenceEngine, type ConfidenceState } from "../intelligence/ConfidenceEngine";
-import { useMotionController } from "../motion/MotionController";
+import { useSpatialEnvironment } from "../spatial/SpatialEnvironmentContext";
 import type { HolographicTelemetryModel, TelemetryBand, TelemetryPoint, TelemetryReadout, TelemetryRail } from "./telemetryTypes";
 
 function hashStringToSeed(input: string): number {
@@ -334,13 +333,11 @@ function buildReadouts(args: {
 }
 
 export function useHolographicTelemetryModel(): HolographicTelemetryModel {
-  const prefersReducedMotion = useReducedMotion();
-  const { isMobile } = useMotionController();
+  const { telemetryQuality } = useSpatialEnvironment();
   const { state, theme, narrativeKey } = useConfidenceEngine();
 
   const model = useMemo<HolographicTelemetryModel>(() => {
-    const quality: HolographicTelemetryModel["quality"] =
-      prefersReducedMotion || isMobile ? "low" : state === "ELEVATED_RISK" ? "balanced" : "high";
+    const quality: HolographicTelemetryModel["quality"] = telemetryQuality;
 
     const seed = hashStringToSeed(`holo_tel_${state}_${narrativeKey}`);
     const rnd = mulberry32(seed);
@@ -392,7 +389,7 @@ export function useHolographicTelemetryModel(): HolographicTelemetryModel {
       confidenceState: state,
       theme,
     };
-  }, [prefersReducedMotion, isMobile, state, theme, narrativeKey]);
+  }, [telemetryQuality, state, theme, narrativeKey]);
 
   return model;
 }

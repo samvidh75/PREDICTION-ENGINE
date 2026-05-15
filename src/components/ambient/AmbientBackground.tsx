@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useConfidenceEngine } from "../intelligence/ConfidenceEngine";
 import { useMasterMotion } from "../motion/MasterMotionEngine";
+import { useSpatialEnvironment } from "../spatial/SpatialEnvironmentContext";
 
 type Particle = {
   id: string;
@@ -23,13 +24,17 @@ export default function AmbientBackground(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { theme } = useConfidenceEngine();
   const { signals } = useMasterMotion();
+  const { ambientParticleCount, motionBudget } = useSpatialEnvironment();
 
   // Prevent “too slow to feel alive” pacing when cognitive load calms motion.
   const slowdown = Math.min(3.2, signals.slowdownFactor);
 
   const particles = useMemo<Particle[]>(() => {
-    const count = 30;
+    const count = Math.max(6, ambientParticleCount);
     const seeded = Array.from({ length: count }).map((_, i) => i);
+
+    const opacityScale = 0.75 + motionBudget * 0.25;
+    const sizeScale = 0.92 + motionBudget * 0.18;
 
     const palette: Particle["hue"][] = ["cyan", "deepBlue", "cyan", "magenta", "deepBlue", "cyan", "warning"];
 
@@ -39,8 +44,8 @@ export default function AmbientBackground(): JSX.Element {
       const xPct = (Math.sin(t) * 0.5 + 0.5) * 100;
       const yPct = (Math.cos(t * 1.3) * 0.5 + 0.5) * 100;
 
-      const sizePx = clamp(1.2 + (Math.sin(t * 0.7) * 0.5 + 0.5) * 2.0, 1.1, 3.0);
-      const opacity = clamp(0.03 + (Math.cos(t * 0.9) * 0.5 + 0.5) * 0.06, 0.03, 0.08);
+      const sizePx = clamp(1.2 + (Math.sin(t * 0.7) * 0.5 + 0.5) * 2.0, 1.1, 3.0) * sizeScale;
+      const opacity = clamp(0.03 + (Math.cos(t * 0.9) * 0.5 + 0.5) * 0.06, 0.03, 0.08) * opacityScale;
 
       const depthScale = clamp(0.65 + (Math.sin(t * 0.33) * 0.5 + 0.5) * 0.9, 0.6, 1.4);
 
@@ -61,7 +66,7 @@ export default function AmbientBackground(): JSX.Element {
         delaySec,
       };
     });
-  }, []);
+  }, [ambientParticleCount, motionBudget]);
 
   const fogCyan = theme.cyanGlow;
   const fogMagenta = theme.magentaGlow;
