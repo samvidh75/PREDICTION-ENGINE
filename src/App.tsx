@@ -9,6 +9,9 @@ import AssistantPage from "./pages/AssistantPage";
 import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
 import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
 import CompanyUniversePage from "./pages/CompanyUniversePage";
+import LivingInterfaceEngine from "./components/spatial/LivingInterfaceEngine";
+import MasterMotionEngine from "./components/motion/MasterMotionEngine";
+import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
 
@@ -90,17 +93,23 @@ export default function App(): JSX.Element {
   return (
     <MotionController>
       <ConfidenceEngine paused={shouldShowOnboarding} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
-        {shouldShowOnboarding ? (
-          <OnboardingPage
-            onComplete={(profile) => {
-              setDraftProfile(profile);
-              setOnboardingComplete(true);
-            }}
-            onDraftChange={(profile) => setDraftProfile(profile)}
-          />
-        ) : (
-          mainView
-        )}
+        <MasterMotionEngine enabled={!shouldShowOnboarding}>
+          {shouldShowOnboarding ? (
+            <OnboardingPage
+              onComplete={(profile) => {
+                setDraftProfile(profile);
+                setOnboardingComplete(true);
+              }}
+              onDraftChange={(profile) => setDraftProfile(profile)}
+            />
+          ) : (
+            <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
+              <CinematicTransitionLayer activeKey={pageKey} enabled>
+                {mainView}
+              </CinematicTransitionLayer>
+            </LivingInterfaceEngine>
+          )}
+        </MasterMotionEngine>
       </ConfidenceEngine>
     </MotionController>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useConfidenceEngine } from "./ConfidenceEngine";
 import { useMotionController } from "../motion/MotionController";
+import { useMasterMotion } from "../motion/MasterMotionEngine";
 
 type NeuralParticle = {
   id: string;
@@ -24,6 +25,10 @@ export default function MarketOrb(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { state, theme } = useConfidenceEngine();
   const { mouseX, mouseY, isMobile } = useMotionController();
+  const { signals } = useMasterMotion();
+
+  // Global temporal calibration (luxury calm)
+  const slowdown = Math.min(3.2, signals.slowdownFactor);
 
   const neuralParticles = useMemo<NeuralParticle[]>(() => {
     const count = isMobile ? 12 : 18;
@@ -83,22 +88,22 @@ export default function MarketOrb(): JSX.Element {
       });
 
       // Remove after the animation completes
-      const removeInMs = 2600;
+      const removeInMs = 2600 * slowdown;
       window.setTimeout(() => {
         setWaves((prev) => prev.filter((w) => w.id !== id));
       }, removeInMs);
 
-      const delayMs = 4000 + Math.random() * 2000; // 4–6s
+      const delayMs = (4000 + Math.random() * 2000) * slowdown; // 4–6s
       timeoutId = window.setTimeout(emit, delayMs);
     };
 
-    timeoutId = window.setTimeout(emit, 1200);
+    timeoutId = window.setTimeout(emit, 1200 * slowdown);
 
     return () => {
       cancelled = true;
       if (timeoutId) window.clearTimeout(timeoutId);
     };
-  }, [prefersReducedMotion, state, isMobile]);
+  }, [prefersReducedMotion, state, isMobile, slowdown]);
 
   return (
     <div
@@ -124,15 +129,15 @@ export default function MarketOrb(): JSX.Element {
                 scale: [1, breathScaleMax, 1],
               }
         }
-        transition={
-          prefersReducedMotion
-            ? undefined
-            : {
-                duration: 8,
-                repeat: Infinity,
-                ease: [0.22, 1, 0.36, 1],
+              transition={
+                prefersReducedMotion
+                  ? undefined
+                  : {
+                      duration: 8 * slowdown,
+                      repeat: Infinity,
+                      ease: [0.22, 1, 0.36, 1],
+                    }
               }
-        }
       />
 
       {/* Orb body (glass energy sphere) */}
@@ -179,9 +184,9 @@ export default function MarketOrb(): JSX.Element {
                 scale: [0.96, waveScaleMax, waveScaleMax],
               }}
               transition={{
-                duration: 2.6,
+                duration: 2.6 * slowdown,
                 ease: [0.22, 1, 0.36, 1],
-                delay: idx * 0.02,
+                delay: idx * 0.02 * slowdown,
               }}
             />
           ))}
@@ -201,7 +206,7 @@ export default function MarketOrb(): JSX.Element {
                 boxShadow: `0 0 40px ${ringShadow}`,
               }}
               animate={{ rotate: 360 }}
-              transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 120 * slowdown, repeat: Infinity, ease: "linear" }}
             />
             {/* Ring 2: 180s CCW */}
             <motion.div
@@ -215,7 +220,7 @@ export default function MarketOrb(): JSX.Element {
                 boxShadow: `0 0 44px ${ringShadow}`,
               }}
               animate={{ rotate: -360 }}
-              transition={{ duration: 180, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 180 * slowdown, repeat: Infinity, ease: "linear" }}
             />
             {/* Ring 3: 240s CW (slightly different tone) */}
             <motion.div
@@ -229,7 +234,7 @@ export default function MarketOrb(): JSX.Element {
                 boxShadow: `0 0 52px ${isRisk ? theme.warningGlow : isWeak ? theme.deepBlueGlow : theme.cyanGlow}`,
               }}
               animate={{ rotate: 360 }}
-              transition={{ duration: 240, repeat: Infinity, ease: "linear" }}
+              transition={{ duration: 240 * slowdown, repeat: Infinity, ease: "linear" }}
             />
           </>
         )}
@@ -250,7 +255,7 @@ export default function MarketOrb(): JSX.Element {
               opacity: [0.28, isRisk ? 0.55 : isWeak ? 0.45 : 0.50, 0.28],
               scale: [1, 1.03, 1],
             }}
-            transition={{ duration: 5, repeat: Infinity, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 5 * slowdown, repeat: Infinity, ease: [0.22, 1, 0.36, 1] }}
           />
         )}
 
@@ -283,7 +288,7 @@ export default function MarketOrb(): JSX.Element {
                     }
               }
               transition={{
-                duration: 6 + p.depth * 2,
+                duration: (6 + p.depth * 2) * slowdown,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -304,7 +309,7 @@ export default function MarketOrb(): JSX.Element {
               opacity: [0.20, 0.70, 0.20],
               scale: [1, 1.01, 1],
             }}
-            transition={{ duration: 2.0, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 2.0 * slowdown, repeat: Infinity, ease: "easeInOut" }}
           />
         )}
       </motion.div>

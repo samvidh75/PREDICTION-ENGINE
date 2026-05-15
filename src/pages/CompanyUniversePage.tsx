@@ -11,6 +11,9 @@ import { useCompanyUniverseModel } from "../services/company/useCompanyUniverseM
 import type { CompanyHealthState } from "../types/CompanyUniverse";
 import CompanyFoundingTimeline from "../components/companyUniverse/CompanyFoundingTimeline";
 import CompanyLeadershipLayer from "../components/companyUniverse/CompanyLeadershipLayer";
+import MasterInfographicEngine from "../components/infographics/MasterInfographicEngine";
+import VolumetricFinancialTowers from "../components/infographics/VolumetricFinancialTowers";
+import MarketCapPositioningRail from "../components/infographics/MarketCapPositioningRail";
 
 function healthLabel(state: CompanyHealthState): string {
   switch (state) {
@@ -119,6 +122,20 @@ export default function CompanyUniversePage(): JSX.Element {
       {/* Section 2 + Section 3 (cinematic modules live) */}
       <CompanyFoundingTimeline milestones={model.foundingTimeline} />
       <CompanyLeadershipLayer founders={model.founders} leadership={model.leadership} />
+
+      {/* Section 4 (first master infographic slice) */}
+      <MasterInfographicEngine
+        enabled={!prefersReducedMotion}
+        ticker={model.ticker}
+        healthState={model.healthState}
+        healthTheme={model.healthTheme}
+        financialTelemetry={model.financialTelemetry}
+      >
+        <VolumetricFinancialTowers points={model.financialTelemetry} />
+        <div className="mt-6">
+          <MarketCapPositioningRail />
+        </div>
+      </MasterInfographicEngine>
 
       {/* Placeholder for remaining sections (scaffolding only; cinematic components follow later) */}
       <section className="relative z-[12] px-6 sm:px-[72px] pb-24">

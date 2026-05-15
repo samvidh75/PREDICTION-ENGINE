@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useConfidenceEngine } from "../intelligence/ConfidenceEngine";
+import { useMasterMotion } from "../motion/MasterMotionEngine";
 
 type Particle = {
   id: string;
@@ -21,6 +22,10 @@ function clamp(n: number, min: number, max: number): number {
 export default function AmbientBackground(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { theme } = useConfidenceEngine();
+  const { signals } = useMasterMotion();
+
+  // Prevent “too slow to feel alive” pacing when cognitive load calms motion.
+  const slowdown = Math.min(3.2, signals.slowdownFactor);
 
   const particles = useMemo<Particle[]>(() => {
     const count = 30;
@@ -101,15 +106,15 @@ export default function AmbientBackground(): JSX.Element {
                     opacity: [0.48, 0.58, 0.48],
                   }
             }
-            transition={
-              prefersReducedMotion
-                ? undefined
-                : {
-                    duration: 40,
-                    repeat: Infinity,
-                    ease: "easeInOut",
+                  transition={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          duration: 40 * slowdown,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }
                   }
-            }
           />
         ))}
       </div>
@@ -150,16 +155,16 @@ export default function AmbientBackground(): JSX.Element {
                       opacity: [opacity * 0.75, opacity, opacity * 0.7],
                     }
               }
-              transition={
-                prefersReducedMotion
-                  ? undefined
-                  : {
-                      duration: p.durationSec,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: p.delaySec,
+                    transition={
+                      prefersReducedMotion
+                        ? undefined
+                        : {
+                            duration: p.durationSec * slowdown,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: p.delaySec * slowdown,
+                          }
                     }
-              }
             />
           );
         })}

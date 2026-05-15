@@ -9,8 +9,9 @@ import SentimentFlow from "../components/intelligence/SentimentFlow";
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
 import IntelligenceHUD from "../components/intelligence/IntelligenceHUD";
-import MarketPulseLayer from "../components/dashboard/MarketPulseLayer";
+import HolographicTelemetryEngine from "../components/telemetry/HolographicTelemetryEngine";
 import InstitutionalActivityNetwork from "../components/commandCentre/InstitutionalActivityNetwork";
+import NeuralMarketSynthesisPanel from "../components/synthesis/NeuralMarketSynthesisPanel";
 
 type Sector = {
   id: string;
@@ -222,7 +223,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">smooth • minimal • calm</div>
         </div>
 
-        <MarketPulseLayer />
+        <HolographicTelemetryEngine compact heightPx={360} showHeader={false} />
       </section>
 
       {/* SECTION 4: Sector Intelligence Matrix */}
@@ -281,16 +282,10 @@ export default function MarketCommandCentrePage(): JSX.Element {
         <InstitutionalActivityNetwork className="mx-auto max-w-[1400px]" />
       </section>
 
-      {/* Remaining sections (7–10): placeholders for next iteration */}
+      {/* Remaining sections (7–10): Neural synthesis core */}
       <section className="relative z-[12] px-6 sm:px-[72px] pb-24">
         <div className="mx-auto max-w-[1680px]">
-          <div className="rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-[24px] p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Predictive & Macro Intelligence</div>
-            <div className="mt-3 text-[22px] font-medium text-white/92">next layers to arrive: probabilistic radar, macro telemetry, and AI synthesis</div>
-            <div className="mt-4 text-[14px] leading-[1.9] text-white/80 max-w-[980px]">
-              Sections 7–10 will be added next: predictive intelligence layer, macro environment system, adaptive market radar, and AI synthesis core—maintaining the same holographic intelligence minimalism and calm performance constraints.
-            </div>
-          </div>
+          <NeuralMarketSynthesisPanel compact={isMobile} />
         </div>
       </section>
     </div>

@@ -10,6 +10,8 @@ import SentimentFlow from "../components/intelligence/SentimentFlow";
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
 import StockStoryChartIntegration from "../components/charts/StockStoryChartIntegration";
+import HolographicTelemetryEngine from "../components/telemetry/HolographicTelemetryEngine";
+import NeuralMarketSynthesisPanel from "../components/synthesis/NeuralMarketSynthesisPanel";
 
 function confidenceLabel(state: ConfidenceState): string {
   switch (state) {
@@ -545,6 +547,10 @@ export default function StockStoryPage(): JSX.Element {
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Chart Integration System</div>
               <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
                 Narrative-first cinematic chart surface (TradingView-ready): subtle, calm, and interpretation-supported.
+              </div>
+
+              <div className="mt-4">
+                <NeuralMarketSynthesisPanel compact />
               </div>
 
               <div className="mt-4">
