@@ -5,9 +5,9 @@ export type NeuralHealthometerState =
   | "Structurally Healthy"
   | "Stable Expansion"
   | "Confidence Improving"
-  | "Momentum Sensitive"
-  | "Volatility Exposed"
-  | "Structurally Fragile";
+  | "Volatility Sensitive"
+  | "Liquidity Fragile"
+  | "Structurally Weakening";
 
 export type NeuralScannerCategory =
   | "strongest_structural_health"

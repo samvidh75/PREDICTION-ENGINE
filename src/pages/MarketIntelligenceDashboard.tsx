@@ -1,6 +1,6 @@
 import React from "react";
-import MarketCommandCentrePage from "./MarketCommandCentrePage";
+import MarketIntelligenceCommandCentre from "../components/dashboard/MarketIntelligenceCommandCentre";
 
 export default function MarketIntelligenceDashboard(): JSX.Element {
-  return <MarketCommandCentrePage />;
+  return <MarketIntelligenceCommandCentre />;
 }

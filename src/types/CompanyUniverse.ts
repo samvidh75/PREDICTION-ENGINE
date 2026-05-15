@@ -2,9 +2,9 @@ export type CompanyHealthState =
   | "STRUCTURALLY_HEALTHY"
   | "STABLE_EXPANSION"
   | "CONFIDENCE_IMPROVING"
-  | "MOMENTUM_WEAKENING"
+  | "LIQUIDITY_FRAGILE"
   | "VOLATILITY_SENSITIVE"
-  | "STRUCTURALLY_FRAGILE";
+  | "STRUCTURALLY_WEAKENING";
 
 export type HealthTheme = {
   label: string;

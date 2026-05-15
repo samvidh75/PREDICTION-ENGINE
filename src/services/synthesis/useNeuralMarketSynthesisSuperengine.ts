@@ -4,7 +4,7 @@ import type { NeuralMarketSynthesis } from "./neuralMarketSynthesisTypes";
 import type { ConfidenceState } from "../../components/intelligence/ConfidenceEngine";
 import { useConfidenceEngine } from "../../components/intelligence/ConfidenceEngine";
 import { useMotionController } from "../../components/motion/MotionController";
-import { MarketService } from "../market/marketService";
+import { MarketService, type MarketComposite, type MarketConnectionStatus } from "../market/marketService";
 import { useMarketService } from "../ui/environmentSync";
 import { buildNeuralMarketSynthesisEngine } from "./neuralMarketSynthesisEngine";
 
@@ -17,7 +17,8 @@ function pickQuality(args: { prefersReducedMotion: boolean | null; isMobile: boo
 
 export function useNeuralMarketSynthesisSuperengine(): {
   synthesis: NeuralMarketSynthesis;
-  connectionStatus: "disconnected" | "connecting" | "connected" | "reconnecting";
+  connectionStatus: MarketConnectionStatus;
+  marketSnapshot: MarketComposite;
 } {
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useMotionController();
@@ -40,5 +41,9 @@ export function useNeuralMarketSynthesisSuperengine(): {
     });
   }, [marketStream.snapshot, state, theme, narrativeKey, quality]);
 
-  return { synthesis, connectionStatus: marketStream.connectionStatus };
+  return {
+    synthesis,
+    connectionStatus: marketStream.connectionStatus,
+    marketSnapshot: marketStream.snapshot,
+  };
 }

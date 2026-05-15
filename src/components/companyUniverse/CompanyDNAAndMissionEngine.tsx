@@ -26,7 +26,7 @@ function healthTone(health: CompanyHealthState): {
         emphasis: "capability discipline strengthens the narrative cadence",
         caution: "no outcomes promised; context-first mapping only",
       };
-    case "MOMENTUM_WEAKENING":
+    case "LIQUIDITY_FRAGILE":
       return {
         missionTone: "selectivity mission adaptation",
         emphasis: "confirmation cycles lengthen; operational soul remains intact",
@@ -38,7 +38,7 @@ function healthTone(health: CompanyHealthState): {
         emphasis: "risk margins tighten; governance becomes the stabilizer",
         caution: "avoid panic language; keep learning tone",
       };
-    case "STRUCTURALLY_FRAGILE":
+    case "STRUCTURALLY_WEAKENING":
     default:
       return {
         missionTone: "resilience-first mission guardrails",
@@ -112,7 +112,7 @@ export default function CompanyDNAAndMissionEngine(props: {
 
     const longTermVision = `Long-term vision: ${l1 ? l1.philosophy : "resilience-first execution"} — educational framing prioritises repeatability signals over certainty outcomes.`;
 
-    const culturalPositioning = `Cultural positioning: the narrative tends to become more ${healthState === "VOLATILITY_SENSITIVE" || healthState === "STRUCTURALLY_FRAGILE" ? "governance-aware and guarded" : "continuity-first"} when risk margins tighten.`;
+    const culturalPositioning = `Cultural positioning: the narrative tends to become more ${healthState === "VOLATILITY_SENSITIVE" || healthState === "STRUCTURALLY_WEAKENING" ? "governance-aware and guarded" : "continuity-first"} when risk margins tighten.`;
 
     return [
       { title: "Company DNA (mission)", body: coreMission },

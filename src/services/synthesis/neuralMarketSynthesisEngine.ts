@@ -47,32 +47,42 @@ function healthometerStateFrom(conf: ConfidenceState, market: MarketComposite | 
   const liquidity = market?.marketInputs.liquidityBreadth ?? 0.6;
   const inst = market?.marketInputs.institutionalParticipation ?? 0.58;
 
-  if (conf === "ELEVATED_RISK") return "Volatility Exposed";
-  if (conf === "MOMENTUM_WEAKENING") {
-    // Momentum weakness becomes "Momentum Sensitive" more often unless liquidity is too low.
-    if (liquidity < 0.46) return "Volatility Exposed";
-    return "Momentum Sensitive";
+  // When multiple structural stress signals align, treat the environment as structurally weakening.
+  const structurallyWeakening =
+    inst < 0.5 && liquidity < 0.46 && volStability < 0.52;
+
+  if (structurallyWeakening) return "Structurally Weakening";
+
+  // Volatility/pace sensitivity.
+  if (conf === "ELEVATED_RISK") {
+    return liquidity < 0.46 ? "Liquidity Fragile" : "Volatility Sensitive";
   }
 
-  // When confidence is supportive, refine by macro texture proxies.
+  if (conf === "MOMENTUM_WEAKENING") {
+    // Momentum weakness tightens pacing especially when liquidity is thin.
+    if (liquidity < 0.46) return "Liquidity Fragile";
+    return "Volatility Sensitive";
+  }
+
+  // Supportive confidence: structural cues can improve confidence tone.
   if (conf === "CONFIDENCE_RISING") {
     if (inst > 0.62 && liquidity > 0.5 && volStability > 0.5) return "Confidence Improving";
     return "Stable Expansion";
   }
 
-  // Neutral/stable conviction.
+  // Neutral environment: refine by volatility stability.
   if (conf === "NEUTRAL_ENVIRONMENT") {
-    if (volStability < 0.55) return "Momentum Sensitive";
+    if (liquidity < 0.46) return "Liquidity Fragile";
+    if (volStability < 0.55) return "Volatility Sensitive";
     return "Stable Expansion";
   }
 
   // STABLE_CONVICTION
   if (conf === "STABLE_CONVICTION") {
-    if (volStability > 0.6 && liquidity > 0.52) return "Structurally Healthy";
+    if (volStability > 0.62 && liquidity > 0.52 && inst > 0.55) return "Structurally Healthy";
     return "Stable Expansion";
   }
 
-  // fallback
   return "Stable Expansion";
 }
 
@@ -121,13 +131,13 @@ function healthometerRationale(state: NeuralHealthometerState, conf: ConfidenceS
         return "Healthometer reading: stable expansion with supportive confidence boundaries and continuity-first interpretation.";
       case "Confidence Improving":
         return "Healthometer reading: confidence improving as structural cues remain present and interpretive margins stay contained.";
-      case "Momentum Sensitive":
-        return "Healthometer reading: momentum sensitive context, where timing and exposure texture shape how quickly narratives become responsive.";
-      case "Volatility Exposed":
-        return "Healthometer reading: volatility exposed context, where uncertainty increases interpretive sensitivity but remains probabilistic and measured.";
-      case "Structurally Fragile":
+      case "Volatility Sensitive":
+        return "Healthometer reading: volatility sensitive context, where volatility texture can change how quickly narratives become responsive.";
+      case "Liquidity Fragile":
+        return "Healthometer reading: liquidity fragile context, where liquidity breadth constraints tighten pacing and interpretive margins.";
+      case "Structurally Weakening":
       default:
-        return "Healthometer reading: structurally fragile context, where interpretation stays guarded and avoids certainty inflation.";
+        return "Healthometer reading: structurally weakening context, where interpretation stays guarded and avoids certainty inflation.";
     }
   })();
 

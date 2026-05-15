@@ -52,13 +52,13 @@ function healthThemeFor(state: CompanyHealthState): HealthTheme {
       return { label: "Stable Expansion", glowCyan: "rgba(0,255,210,0.16)", glowAmber: "rgba(123,247,212,0.12)", glowWarning: "rgba(217,140,122,0.08)", glowDeep: "rgba(0,120,255,0.11)" };
     case "CONFIDENCE_IMPROVING":
       return { label: "Confidence Improving", glowCyan: "rgba(0,255,210,0.15)", glowAmber: "rgba(255,185,90,0.10)", glowWarning: "rgba(217,140,122,0.07)", glowDeep: "rgba(0,120,255,0.10)" };
-    case "MOMENTUM_WEAKENING":
-      return { label: "Momentum Weakening", glowCyan: "rgba(0,120,255,0.10)", glowAmber: "rgba(217,140,122,0.07)", glowWarning: "rgba(209,107,165,0.10)", glowDeep: "rgba(209,107,165,0.08)" };
+    case "LIQUIDITY_FRAGILE":
+      return { label: "Liquidity Fragile", glowCyan: "rgba(0,120,255,0.10)", glowAmber: "rgba(217,140,122,0.07)", glowWarning: "rgba(209,107,165,0.10)", glowDeep: "rgba(209,107,165,0.08)" };
     case "VOLATILITY_SENSITIVE":
       return { label: "Volatility Sensitive", glowCyan: "rgba(0,120,255,0.08)", glowAmber: "rgba(255,185,90,0.10)", glowWarning: "rgba(255,120,120,0.14)", glowDeep: "rgba(217,140,122,0.08)" };
-    case "STRUCTURALLY_FRAGILE":
+    case "STRUCTURALLY_WEAKENING":
     default:
-      return { label: "Structurally Fragile", glowCyan: "rgba(0,120,255,0.07)", glowAmber: "rgba(255,120,120,0.10)", glowWarning: "rgba(255,120,120,0.18)", glowDeep: "rgba(217,140,122,0.09)" };
+      return { label: "Structurally Weakening", glowCyan: "rgba(0,120,255,0.07)", glowAmber: "rgba(255,120,120,0.10)", glowWarning: "rgba(255,120,120,0.18)", glowDeep: "rgba(217,140,122,0.09)" };
   }
 }
 
@@ -82,9 +82,9 @@ function deriveHealthState(ticker: string, narrativeKey: number, signalSeed: num
   if (v < 18) return "STRUCTURALLY_HEALTHY";
   if (v < 36) return "STABLE_EXPANSION";
   if (v < 54) return "CONFIDENCE_IMPROVING";
-  if (v < 72) return "MOMENTUM_WEAKENING";
+  if (v < 72) return "LIQUIDITY_FRAGILE";
   if (v < 88) return "VOLATILITY_SENSITIVE";
-  return "STRUCTURALLY_FRAGILE";
+  return "STRUCTURALLY_WEAKENING";
 }
 
 function buildNarrative(ticker: string, state: CompanyHealthState, narrativeKey: number): CompanyNarrative {
@@ -97,19 +97,19 @@ function buildNarrative(ticker: string, state: CompanyHealthState, narrativeKey:
         ? "Stable expansion with controlled confidence—growth supported, not forced."
         : state === "CONFIDENCE_IMPROVING"
           ? "Confidence improves as operational discipline tightens around measurable execution."
-          : state === "MOMENTUM_WEAKENING"
-            ? "Momentum softens with selectivity—confirmation cycles lengthen, yet structure holds."
+          : state === "LIQUIDITY_FRAGILE"
+            ? "Liquidity constraints tighten pacing—confirmation cycles lengthen, yet structure remains interpretable."
             : state === "VOLATILITY_SENSITIVE"
               ? "Volatility sensitivity rises—risk margins tighten while governance remains the stabilizer."
-              : "Structural fragility shows through risk conditions—interpretation stays guarded and contextual.";
+              : "Structural weakening shows through risk conditions—interpretation stays guarded and contextual.";
 
   const bodyA =
-    state === "MOMENTUM_WEAKENING"
-      ? "Over the latest phases, participation narrows slightly, and follow-through depends more strongly on liquidity quality."
+    state === "LIQUIDITY_FRAGILE"
+      ? "Over the latest phases, participation can narrow slightly, and follow-through depends more strongly on liquidity quality."
       : state === "VOLATILITY_SENSITIVE"
         ? "When volatility pressure broadens, narrative clarity tightens. The business remains interpretable—certainty does not inflate."
-        : state === "STRUCTURALLY_FRAGILE"
-          ? "In fragile environments, operational signals become harder to sustain. The intelligent lens focuses on resilience and governance."
+        : state === "STRUCTURALLY_WEAKENING"
+          ? "In weakening environments, operational signals become harder to sustain. The intelligent lens focuses on resilience and governance."
           : "Business evolution reads as deliberate: operating signals stay coherent while institutional participation adapts responsibly.";
 
   const bodyB =
@@ -272,13 +272,19 @@ function buildNews(ticker: string, narrativeKey: number): CompanyNewsItem[] {
 
 function buildStrategicSummary(state: CompanyHealthState, narrativeKey: number): string {
   const k = narrativeKey % 4;
-  if (state === "STRUCTURALLY_HEALTHY") return "The company currently reflects structurally improving operational resilience alongside stable institutional participation and disciplined long-horizon positioning.";
-  if (state === "STABLE_EXPANSION") return "Business evolution reads as stable expansion: growth pathways hold with controlled confidence and calm operational execution.";
-  if (state === "CONFIDENCE_IMPROVING") return "Operational discipline tightens around measurable execution. Confidence atmospheres improve gradually while risk framing stays contained.";
-  if (state === "MOMENTUM_WEAKENING") return "Momentum softens with selective participation. The business remains interpretable, with confirmation cycles lengthening rather than breaking.";
-  if (state === "VOLATILITY_SENSITIVE") return "Volatility sensitivity increases the interpretive margin. Governance and capital discipline become the stabilisers for narrative clarity.";
-  if (k % 2 === 0) return "Structural fragility emerges under uncertain conditions. Interpretation focuses on resilience-first reading and governance continuity.";
-  return "Structural fragility persists. The intelligent lens stays guarded: probabilistic guidance with no certainty inflation.";
+  if (state === "STRUCTURALLY_HEALTHY")
+    return "The company currently reflects structurally improving operational resilience alongside stable institutional participation and disciplined long-horizon positioning.";
+  if (state === "STABLE_EXPANSION")
+    return "Business evolution reads as stable expansion: growth pathways hold with controlled confidence and calm operational execution.";
+  if (state === "CONFIDENCE_IMPROVING")
+    return "Operational discipline tightens around measurable execution. Confidence atmospheres improve gradually while risk framing stays contained.";
+  if (state === "LIQUIDITY_FRAGILE")
+    return "Liquidity constraints tighten interpretive pacing. The business remains interpretable, with confirmation cycles lengthening rather than breaking.";
+  if (state === "VOLATILITY_SENSITIVE")
+    return "Volatility sensitivity increases the interpretive margin. Governance and capital discipline become the stabilisers for narrative clarity.";
+  if (k % 2 === 0)
+    return "Structural weakening emerges under uncertain conditions. Interpretation focuses on resilience-first reading and governance continuity.";
+  return "Structural weakening persists. The intelligent lens stays guarded: probabilistic guidance with no certainty inflation.";
 }
 
 function buildFutureCapsules(state: CompanyHealthState, narrativeKey: number): { id: string; body: string }[] {
@@ -288,11 +294,11 @@ function buildFutureCapsules(state: CompanyHealthState, narrativeKey: number): {
       ? "Electric mobility positioning may continue strengthening as participation conditions remain supportive."
       : state === "CONFIDENCE_IMPROVING"
         ? "Operational efficiency improvements could gradually stabilise profitability environments."
-        : state === "MOMENTUM_WEAKENING"
-          ? "Selective follow-through may require liquidity quality to stabilise before momentum conditions can broaden again."
+        : state === "LIQUIDITY_FRAGILE"
+          ? "Selective follow-through may require liquidity quality to stabilise pacing before conditions can broaden again."
           : state === "VOLATILITY_SENSITIVE"
             ? "Volatility-driven uncertainty may fade slowly if governance clarity and capital discipline remain consistent."
-            : state === "STRUCTURALLY_FRAGILE"
+            : state === "STRUCTURALLY_WEAKENING"
               ? "Near-term probability may remain guarded until resilience signals become repeatable and measurable across cycles."
               : "Resilience-first execution could sustain steady institutional confidence across future phases.";
   const b =
@@ -329,8 +335,8 @@ export function computeCompanyUniverseModel(inputs: CompanyInputs): CompanyUnive
         ? "Confidence expands responsibly"
         : healthState === "CONFIDENCE_IMPROVING"
           ? "Execution clarity is tightening"
-          : healthState === "MOMENTUM_WEAKENING"
-            ? "Momentum needs confirmation"
+          : healthState === "LIQUIDITY_FRAGILE"
+            ? "Liquidity needs calibration"
             : healthState === "VOLATILITY_SENSITIVE"
               ? "Risk margins are tightening"
               : "Resilience signals must repeat";
@@ -349,8 +355,8 @@ export function computeCompanyUniverseModel(inputs: CompanyInputs): CompanyUnive
           ? "Selective Strength"
           : healthState === "CONFIDENCE_IMPROVING"
             ? "Institutional Accumulation"
-            : healthState === "MOMENTUM_WEAKENING"
-              ? "Momentum Fragmentation"
+            : healthState === "LIQUIDITY_FRAGILE"
+              ? "Liquidity Pacing Sensitivity"
               : healthState === "VOLATILITY_SENSITIVE"
                 ? "Elevated Volatility"
                 : "Broad Weakness",

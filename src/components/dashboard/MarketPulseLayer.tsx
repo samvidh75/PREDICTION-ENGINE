@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { animate, useMotionValue, useReducedMotion, useMotionValueEvent } from "framer-motion";
+
 import { useConfidenceEngine } from "../intelligence/ConfidenceEngine";
+import type { MarketComposite, MarketConnectionStatus } from "../../services/market/marketService";
 
 type PulseCard = {
   id: string;
@@ -10,14 +12,13 @@ type PulseCard = {
   interpret: string;
 };
 
+type Props = {
+  marketSnapshot: MarketComposite;
+  connectionStatus: MarketConnectionStatus;
+};
+
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
-}
-
-function seededNoise(seed: number): number {
-  // Deterministic 0..1 based on seed (no external deps).
-  const x = Math.sin(seed * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
 }
 
 function formatNumber(n: number): string {
@@ -25,13 +26,7 @@ function formatNumber(n: number): string {
   return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
-function AnimatedNumber({
-  value,
-  suffix,
-}: {
-  value: number;
-  suffix?: string;
-}): JSX.Element {
+function AnimatedNumber({ value }: { value: number }): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const mv = useMotionValue(value);
   const [display, setDisplay] = useState<string>(formatNumber(value));
@@ -56,152 +51,155 @@ function AnimatedNumber({
       ease: [0.22, 1, 0.36, 1],
     });
 
-    // In case value is identical, we still want to avoid unnecessary motion.
     void from;
   }, [mv, prefersReducedMotion, value]);
 
   return <span>{display}</span>;
 }
 
-export default function MarketPulseLayer(): JSX.Element {
+function isElevatedRisk(state: string): boolean {
+  return state === "ELEVATED_RISK";
+}
+
+function isMomentumWeakening(state: string): boolean {
+  return state === "MOMENTUM_WEAKENING";
+}
+
+export default function MarketPulseLayer({ marketSnapshot, connectionStatus }: Props): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
-  const { state, marketState, narrativeKey } = useConfidenceEngine();
+  const { state, marketState } = useConfidenceEngine();
+
+  const streamMarketState = marketSnapshot.marketState;
 
   const cards = useMemo<PulseCard[]>(() => {
-    // Seeded values: stable between orchestrator recalibrations.
-    const s = narrativeKey + (state.charCodeAt(0) ?? 0);
+    const nifty = streamMarketState.nifty;
+    const sensex = streamMarketState.sensex;
+    const bankNifty = streamMarketState.bankNifty;
+    const vix = streamMarketState.vix;
+    const breadthPct = streamMarketState.breadthPct;
+    const fiiDiiTone = streamMarketState.fiiDiiTone;
 
-    const n1 = seededNoise(s + 1);
-    const n2 = seededNoise(s + 2);
-    const n3 = seededNoise(s + 3);
-    const n4 = seededNoise(s + 4);
-    const n5 = seededNoise(s + 5);
-    const n6 = seededNoise(s + 6);
+    const isRisk = isElevatedRisk(state);
+    const isWeak = isMomentumWeakening(state);
 
-    const isRisk = state === "ELEVATED_RISK";
-    const isWeak = state === "MOMENTUM_WEAKENING";
+    const breadthTone =
+      breadthPct <= 44
+        ? "Breadth narrows, so participation becomes more sensitive."
+        : breadthPct <= 52
+          ? "Breadth remains moderate; interpretation stays structured."
+          : "Breadth looks supportive; confidence remains calmer.";
 
-    const nifty = 22400 + (n1 - 0.5) * 180 + (isRisk ? -(n2 * 40) : n2 * 25);
-    const sensex = 73800 + (n3 - 0.5) * 260 + (isWeak ? -(n4 * 70) : n4 * 55);
+    const flowLabel = fiiDiiTone >= 0 ? "Institutional bias" : "Caution bias";
+    const interpretFlows =
+      fiiDiiTone >= 0
+        ? "Institutional flows show constructive bias; retail tone stays filtered."
+        : "Institutional bias softens; liquidity conditions become the main stabilizer.";
 
-    const bankNifty = 48900 + (n2 - 0.5) * 320 + (isRisk ? -(n1 * 110) : n1 * 60);
-    const vix = isRisk
-      ? 15.8 + n5 * 5.6
-      : isWeak
-        ? 13.9 + n5 * 3.6
-        : 12.4 + n5 * 2.8;
-
-    const breadth = clamp(52 + (n6 - 0.5) * 24 + (isWeak ? -6 : 0), 28, 72);
-    const fiiDii = clamp((n2 - 0.5) * 2.2 + (n1 - 0.5) * 0.9, -2.6, 2.6);
-
-    const pulseTone = isRisk ? "Elevated Volatility" : isWeak ? "Momentum Weakening" : "Stability";
+    const interpretVix =
+      vix >= 15
+        ? "India VIX is elevated—volatility conditions remain active but not chaotic."
+        : vix >= 13
+          ? "India VIX is moderate—volatility pressure concentrates in pockets."
+          : "India VIX stays contained—volatility conditions are calm and orderly.";
 
     const interpretNifty = isRisk
-      ? "Nifty is holding structure while volatility remains a conditioning factor."
+      ? "Nifty holds structure while volatility remains a conditioning factor."
       : isWeak
         ? "Index levels remain resilient despite selective weakness across breadth."
-        : "Nifty remains stable with constructive participation signals.";
+        : "Nifty remains supported with constructive participation signals.";
 
     const interpretSensex = isRisk
       ? "Sensex maintains a controlled posture as risk sensitivity rises."
       : isWeak
         ? "Sensex stays resilient while momentum across mid-breadth softens."
-        : "Sensex remains supported; leadership is selective and steady.";
+        : "Sensex remains steady; leadership is selective and supportive.";
 
     const interpretBank = isRisk
       ? "Bank Nifty shows steadiness despite tighter uncertainty margins."
       : isWeak
-        ? "Bank Nifty breadth is present but follow-through is more cautious."
+        ? "Bank Nifty breadth is present but follow-through becomes more cautious."
         : "Bank Nifty strength remains intact with measured institutional tone.";
 
-    const interpretVix = isRisk
-      ? "India VIX is elevated—volatility conditions remain active but not chaotic."
-        : isWeak
-          ? "India VIX remains moderate—volatility pressure concentrates in pockets."
-          : "India VIX stays contained; volatility conditions are calm and orderly.";
-
     const interpretBreadth = isRisk
-      ? "Sector breadth is selective—participation is disciplined under elevated conditions."
+      ? "Sector breadth is selective—participation becomes disciplined under elevated conditions."
       : isWeak
         ? "Breadth narrows subtly; momentum leadership becomes less broad."
-        : "Breadth looks supportive; participation is consistent with stable market health.";
+        : "Breadth looks supportive; participation remains consistent with stable market health.";
 
-    const interpretFlows = fiiDii >= 0
-      ? "Institutional flows show constructive bias; retail tone stays filtered."
-      : "Institutional bias softens; liquidity conditions remain the main stabilizer.";
+    const interpretBreadthUnified = (() => {
+      const confLine = interpretBreadth;
+      return `${confLine} ${breadthTone}`;
+    })();
 
-    // FII/DII simplified as educational “flow direction”
-    const flowLabel = fiiDii >= 0 ? "Institutional bias" : "Caution bias";
+    const safeNifty = clamp(nifty, 15000, 40000);
+    const safeSensex = clamp(sensex, 50000, 120000);
+    const safeBankNifty = clamp(bankNifty, 25000, 80000);
+    const safeVix = clamp(vix, 8, 30);
+    const safeBreadth = clamp(breadthPct, 25, 85);
+    const safeFii = clamp(fiiDiiTone, -2, 2);
 
     return [
       {
         id: "p_nifty",
         name: "Nifty",
-        value: nifty,
-        unit: "",
+        value: safeNifty,
         interpret: interpretNifty,
       },
       {
         id: "p_sensex",
         name: "Sensex",
-        value: sensex,
-        unit: "",
+        value: safeSensex,
         interpret: interpretSensex,
       },
       {
         id: "p_bank",
         name: "Bank Nifty",
-        value: bankNifty,
-        unit: "",
+        value: safeBankNifty,
         interpret: interpretBank,
       },
       {
         id: "p_vix",
         name: "India VIX",
-        value: vix,
+        value: safeVix,
         unit: "",
         interpret: interpretVix,
       },
       {
         id: "p_breadth",
         name: "Sector breadth",
-        value: breadth,
+        value: safeBreadth,
         unit: "%",
-        interpret: interpretBreadth,
+        interpret: interpretBreadthUnified,
       },
       {
         id: "p_flows",
         name: "FII/DII flow tone",
-        value: Math.round(Math.abs(fiiDii) * 10) / 10,
-        unit: "",
+        value: Math.round(Math.abs(safeFii) * 10) / 10,
         interpret: `${flowLabel}: ${interpretFlows}`,
       },
     ];
-  }, [narrativeKey, state, marketState]);
+  }, [marketSnapshot, state, streamMarketState]);
 
   const toneGlow = useMemo(() => {
-    if (state === "ELEVATED_RISK") return "rgba(255,120,120,0.20)";
-    if (state === "MOMENTUM_WEAKENING") return "rgba(255,0,140,0.14)";
+    if (isElevatedRisk(state)) return "rgba(255,120,120,0.20)";
+    if (isMomentumWeakening(state)) return "rgba(255,0,140,0.14)";
     if (state === "CONFIDENCE_RISING") return "rgba(0,255,210,0.18)";
     return "rgba(0,120,255,0.16)";
   }, [state]);
 
-  // If reduced motion, keep layout stable.
   void prefersReducedMotion;
+
+  const topLabel = useMemo(() => {
+    if (connectionStatus === "connecting" || connectionStatus === "reconnecting") return "Reconnecting…";
+    if (connectionStatus === "disconnected") return "Telemetry offline";
+    return state === "ELEVATED_RISK" ? "Volatility active" : state === "MOMENTUM_WEAKENING" ? "Momentum selective" : "Conditions stable";
+  }, [connectionStatus, state]);
 
   return (
     <section className="relative z-[9]">
       <div className="mb-4 flex items-center justify-between">
-        <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">
-          Market Pulse Layer
-        </div>
-        <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-          {state === "ELEVATED_RISK"
-            ? "Volatility active"
-            : state === "MOMENTUM_WEAKENING"
-              ? "Momentum selective"
-              : "Conditions stable"}
-        </div>
+        <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Market Pulse Layer</div>
+        <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">{topLabel}</div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

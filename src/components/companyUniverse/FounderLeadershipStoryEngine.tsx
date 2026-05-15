@@ -10,11 +10,11 @@ function toneForHealth(health: CompanyHealthState): { glow: string; descriptor: 
       return { glow: "rgba(255,200,90,0.18)", descriptor: "controlled confidence" };
     case "CONFIDENCE_IMPROVING":
       return { glow: "rgba(0,255,210,0.16)", descriptor: "execution clarity tightening" };
-    case "MOMENTUM_WEAKENING":
-      return { glow: "rgba(0,120,255,0.10)", descriptor: "selectivity and longer confirmation cycles" };
+    case "LIQUIDITY_FRAGILE":
+      return { glow: "rgba(209,107,165,0.10)", descriptor: "selectivity and longer confirmation cycles" };
     case "VOLATILITY_SENSITIVE":
       return { glow: "rgba(217,140,122,0.18)", descriptor: "volatility-conditioned governance" };
-    case "STRUCTURALLY_FRAGILE":
+    case "STRUCTURALLY_WEAKENING":
     default:
       return { glow: "rgba(217,140,122,0.20)", descriptor: "guarded resilience-first learning posture" };
   }

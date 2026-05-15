@@ -18,11 +18,11 @@ export default function FutureProbabilityNarrativeSystem(props: {
         return "responsible expansion pathway";
       case "CONFIDENCE_IMPROVING":
         return "execution clarity improvement lens";
-      case "MOMENTUM_WEAKENING":
+      case "LIQUIDITY_FRAGILE":
         return "selectivity with longer confirmation cycles";
       case "VOLATILITY_SENSITIVE":
         return "volatility-conditioned interpretive margins";
-      case "STRUCTURALLY_FRAGILE":
+      case "STRUCTURALLY_WEAKENING":
       default:
         return "guarded resilience-first learning posture";
     }
@@ -35,11 +35,11 @@ export default function FutureProbabilityNarrativeSystem(props: {
         return healthTheme.glowCyan;
       case "STABLE_EXPANSION":
         return healthTheme.glowAmber;
-      case "MOMENTUM_WEAKENING":
+      case "LIQUIDITY_FRAGILE":
         return healthTheme.glowDeep;
       case "VOLATILITY_SENSITIVE":
         return healthTheme.glowWarning;
-      case "STRUCTURALLY_FRAGILE":
+      case "STRUCTURALLY_WEAKENING":
       default:
         return healthTheme.glowWarning;
     }

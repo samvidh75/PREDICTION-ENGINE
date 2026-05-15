@@ -35,11 +35,11 @@ function healthTone(health: CompanyHealthState): string {
       return "controlled confidence";
     case "CONFIDENCE_IMPROVING":
       return "execution clarity tightening";
-    case "MOMENTUM_WEAKENING":
+    case "LIQUIDITY_FRAGILE":
       return "selectivity and longer confirmation cycles";
     case "VOLATILITY_SENSITIVE":
       return "volatility-conditioned sensitivity";
-    case "STRUCTURALLY_FRAGILE":
+    case "STRUCTURALLY_WEAKENING":
     default:
       return "guarded resilience-first mapping";
   }

@@ -42,11 +42,11 @@ function healthShort(health: NeuralHealthometerState): string {
       return "Calm expansion";
     case "Confidence Improving":
       return "Improving confidence";
-    case "Momentum Sensitive":
-      return "Momentum sensitivity";
-    case "Volatility Exposed":
-      return "Volatility exposure";
-    case "Structurally Fragile":
+    case "Volatility Sensitive":
+      return "Volatility sensitivity";
+    case "Liquidity Fragile":
+      return "Liquidity constraints";
+    case "Structurally Weakening":
     default:
       return "Guarded resilience";
   }

@@ -19,6 +19,19 @@
   --ss-accent-muted-magenta: #D16BA5;
   --ss-accent-warning: #D98C7A;
 
+  /* Glow propagation (intentionally restrained for premium calm) */
+  --ss-glow-cyan: rgba(0, 255, 210, 0.18);
+  --ss-glow-cyan-strong: rgba(0, 255, 210, 0.26);
+
+  --ss-glow-deep-blue: rgba(0, 120, 255, 0.14);
+  --ss-glow-deep-blue-strong: rgba(0, 120, 255, 0.22);
+
+  --ss-glow-magenta: rgba(209, 107, 165, 0.20);
+  --ss-glow-magenta-strong: rgba(209, 107, 165, 0.28);
+
+  --ss-glow-warning: rgba(217, 140, 122, 0.16);
+  --ss-glow-warning-strong: rgba(217, 140, 122, 0.24);
+
   --ss-radius-small: 14px;
   --ss-radius-medium: 22px;
   --ss-radius-large: 28px;
@@ -29,6 +42,15 @@
   --ss-shadow-layer-3: 0 0 120px rgba(0, 255, 210, 0.03);
 
   --ss-ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Glassmorphism “surface physics” presets (calm + premium) */
+  --ss-glass-bg: rgba(0, 0, 0, 0.20);
+  --ss-glass-bg-2: rgba(0, 0, 0, 0.35);
+  --ss-glass-border: rgba(255, 255, 255, 0.10);
+  --ss-glass-border-2: rgba(255, 255, 255, 0.18);
+
+  /* Typography */
+  --ss-font-ui: Inter, Satoshi, Geist, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
 html,
@@ -40,7 +62,7 @@ body {
   margin: 0;
   background: var(--ss-bg-primary);
   color: rgba(255, 255, 255, 0.92);
-  font-family: Inter, Satoshi, Geist, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-family: var(--ss-font-ui);
   overflow-x: hidden;
 }
 
@@ -64,4 +86,63 @@ body {
 .layer {
   will-change: transform, opacity;
   transform: translate3d(0, 0, 0);
+}
+
+/* -------------------------------------------------------------
+   Master Visual System (lightweight initial surface + label API)
+   ------------------------------------------------------------- */
+
+.ss-glass {
+  background: var(--ss-glass-bg);
+  border: 1px solid var(--ss-glass-border);
+  border-radius: var(--ss-radius-large);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: var(--ss-shadow-layer-1);
+}
+
+.ss-glass-2 {
+  background: var(--ss-glass-bg-2);
+  border: 1px solid var(--ss-glass-border);
+  border-radius: var(--ss-radius-medium);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+}
+
+.ss-laser-label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.60);
+}
+
+.ss-telemetry-pill {
+  border-radius: var(--ss-radius-orb);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 18px var(--ss-glow-cyan);
+}
+
+.ss-neural-glow-edge {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 0 120px var(--ss-glow-cyan);
+}
+
+.ss-focus-outline {
+  outline: none;
+}
+
+.ss-focus-outline:focus-visible {
+  outline: 2px solid rgba(0, 255, 210, 0.35);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ss-focus-outline:focus-visible {
+    outline: 2px solid rgba(0, 255, 210, 0.30);
+  }
 }

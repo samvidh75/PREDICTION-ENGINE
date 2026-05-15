@@ -47,11 +47,11 @@ function toneForHealth(healthState: CompanyHealthState, healthTheme: HealthTheme
       return { toneGlow: healthTheme.glowAmber, toneEdgeGlow: healthTheme.glowAmber };
     case "CONFIDENCE_IMPROVING":
       return { toneGlow: healthTheme.glowCyan, toneEdgeGlow: healthTheme.glowCyan };
-    case "MOMENTUM_WEAKENING":
+    case "LIQUIDITY_FRAGILE":
       return { toneGlow: healthTheme.glowDeep, toneEdgeGlow: healthTheme.glowDeep };
     case "VOLATILITY_SENSITIVE":
       return { toneGlow: healthTheme.glowWarning, toneEdgeGlow: healthTheme.glowWarning };
-    case "STRUCTURALLY_FRAGILE":
+    case "STRUCTURALLY_WEAKENING":
     default:
       return { toneGlow: healthTheme.glowWarning, toneEdgeGlow: healthTheme.glowWarning };
   }
