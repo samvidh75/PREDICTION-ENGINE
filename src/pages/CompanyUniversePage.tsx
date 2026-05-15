@@ -10,7 +10,10 @@ import OrbEffects from "../components/intelligence/OrbEffects";
 import { useCompanyUniverseModel } from "../services/company/useCompanyUniverseModel";
 import type { CompanyHealthState } from "../types/CompanyUniverse";
 import CompanyFoundingTimeline from "../components/companyUniverse/CompanyFoundingTimeline";
-import CompanyLeadershipLayer from "../components/companyUniverse/CompanyLeadershipLayer";
+import FounderLeadershipStoryEngine from "../components/companyUniverse/FounderLeadershipStoryEngine";
+import StrategicTransformationLayer from "../components/companyUniverse/StrategicTransformationLayer";
+import FutureProbabilityNarrativeSystem from "../components/companyUniverse/FutureProbabilityNarrativeSystem";
+import CompanyDNAAndMissionEngine from "../components/companyUniverse/CompanyDNAAndMissionEngine";
 import MasterInfographicEngine from "../components/infographics/MasterInfographicEngine";
 import VolumetricFinancialTowers from "../components/infographics/VolumetricFinancialTowers";
 import BeginnerFinancialSimplificationRail from "../components/infographics/BeginnerFinancialSimplificationRail";
@@ -122,7 +125,12 @@ export default function CompanyUniversePage(): JSX.Element {
 
       {/* Section 2 + Section 3 (cinematic modules live) */}
       <CompanyFoundingTimeline milestones={model.foundingTimeline} />
-      <CompanyLeadershipLayer founders={model.founders} leadership={model.leadership} />
+      <FounderLeadershipStoryEngine
+        companyName={model.companyName}
+        healthState={model.healthState}
+        founders={model.founders}
+        leadership={model.leadership}
+      />
 
       {/* Section 4 (first master infographic slice) */}
       <MasterInfographicEngine
@@ -142,6 +150,23 @@ export default function CompanyUniversePage(): JSX.Element {
         </div>
       </MasterInfographicEngine>
 
+      {/* Section: Strategic Transformation Layer (documentary-style, SEBI-safe educational mapping) */}
+      <StrategicTransformationLayer
+        ticker={model.ticker}
+        healthState={model.healthState}
+        strategicSummary={model.strategicSummary}
+        financialTelemetry={model.financialTelemetry}
+      />
+
+      {/* Section: Future Probability Narrative System */}
+      {/* Uses model.futureProbabilityCapsules (educational probability capsules; no guarantees) */}
+      <FutureProbabilityNarrativeSystem
+        healthState={model.healthState}
+        healthTheme={model.healthTheme}
+        capsules={model.futureProbabilityCapsules}
+        companyName={model.companyName}
+      />
+
       {/* Placeholder for remaining sections (scaffolding only; cinematic components follow later) */}
       <section className="relative z-[12] px-6 sm:px-[72px] pb-24">
         <div className="mx-auto max-w-[1680px]">
@@ -149,7 +174,7 @@ export default function CompanyUniversePage(): JSX.Element {
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Company Universe</div>
             <div className="mt-3 text-[22px] font-medium text-white/92">Cinematic documentary modules (in-progress)</div>
             <div className="mt-4 text-[14px] leading-[1.9] text-white/80">
-              Sections 4–12 will be added next: company evolution engine, market share ecosystem, financial telemetry system, healthometer visuals, institutional consensus atmosphere, future probability layer, company news intelligence, temporal performance evolution, and strategic intelligence summary.
+              Next up: company DNA & mission engine, business evolution timeline corridors, industry battle mapping, market share ecosystem, institutional intelligence atmosphere, future probability narrative, and company news intelligence.
             </div>
           </div>
         </div>

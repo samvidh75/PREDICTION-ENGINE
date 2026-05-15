@@ -9,6 +9,7 @@ import AssistantContextPanel from "../components/assistant/AssistantContextPanel
 import { generateAssistantResponse, type AssistantMemory } from "../services/assistant/assistantResponseEngine";
 import type { AssistantResponse } from "../services/assistant/assistantResponseEngine";
 import useBeginnerIntelligenceCalibration from "../hooks/useBeginnerIntelligenceCalibration";
+import { useNeuralMarketSynthesisSuperengine } from "../services/synthesis/useNeuralMarketSynthesisSuperengine";
 
 type ChatMessage = {
   id: string;
@@ -62,6 +63,7 @@ export default function AssistantPage(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useMotionController();
   const { state: confidenceState, theme, marketState, narrativeKey } = useConfidenceEngine();
+  const { synthesis } = useNeuralMarketSynthesisSuperengine();
 
   const { experienceLevel } = useBeginnerIntelligenceCalibration();
 
@@ -111,8 +113,9 @@ export default function AssistantPage(): JSX.Element {
       theme,
       narrativeKey,
       portfolioSummary,
+      synthesis,
     };
-  }, [confidenceState, marketState, theme, narrativeKey]);
+  }, [confidenceState, marketState, theme, narrativeKey, synthesis]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -146,6 +149,7 @@ export default function AssistantPage(): JSX.Element {
       });
 
       setMemory(resp.updatedMemory);
+      setSuggested(resp.suggestedFollowups);
 
       const maybeEnv = resp.environmentNotification
         ? ([
@@ -170,14 +174,11 @@ export default function AssistantPage(): JSX.Element {
     }, 520);
   };
 
-  const suggested = useMemo(() => {
-    const base: string[] = [
-      "What does rising volatility mean right now?",
-      "Why are banking conditions remaining relatively calm?",
-      "How does liquidity behave when market breadth narrows?",
-    ];
-    return base;
-  }, []);
+  const [suggested, setSuggested] = useState<string[]>([
+    "What does rising volatility mean right now?",
+    "Why are banking conditions remaining relatively calm?",
+    "How does liquidity behave when market breadth narrows?",
+  ]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020304]">

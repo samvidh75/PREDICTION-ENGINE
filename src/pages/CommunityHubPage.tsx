@@ -2,6 +2,9 @@ import React, { useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useConfidenceEngine, type ConfidenceState, type ConfidenceTheme } from "../components/intelligence/ConfidenceEngine";
 import IntelligenceFeed from "../components/community/IntelligenceFeed";
+import CinematicConversationInterface from "../components/community/CinematicConversationInterface";
+import CommunityRoomRail, { type CommunityRoomId } from "../components/community/CommunityRoomRail";
+import CommunityReputationIntelligence from "../components/community/CommunityReputationIntelligence";
 
 function confidenceLabel(state: ConfidenceState): string {
   switch (state) {
@@ -85,9 +88,7 @@ export default function CommunityHubPage(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { state, theme } = useConfidenceEngine();
 
-  const [activeRoom, setActiveRoom] = useState<
-    "Banking Intelligence" | "Technology Structure" | "Market Behaviour" | "Volatility Environment" | "Institutional Flow" | "Earnings Analysis"
-  >("Market Behaviour");
+  const [activeRoom, setActiveRoom] = useState<CommunityRoomId>("Market Behaviour");
 
   const toneGlow = useMemo(() => glowFor(state, theme), [state, theme]);
 
@@ -111,12 +112,9 @@ export default function CommunityHubPage(): JSX.Element {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020304]">
-      <div className="absolute inset-0 z-0">
-        {/* Soft atmosphere stays handled globally by existing layers; here we only keep layout content. */}
-      </div>
+      <div className="absolute inset-0 z-0">{/* global atmosphere handled elsewhere */}</div>
 
       <div className="relative z-[10] px-[20px] sm:px-[72px] pt-[96px] pb-[80px]">
-        {/* Top intro */}
         <div className="max-w-[1680px] mx-auto">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
@@ -131,13 +129,13 @@ export default function CommunityHubPage(): JSX.Element {
 
             <div className="rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Community atmosphere</div>
-              <div className="mt-3 text-[20px] font-semibold text-white/92">{state === "ELEVATED_RISK" ? "Defensive interpretive focus" : "Structured editorial clarity"}</div>
+              <div className="mt-3 text-[20px] font-semibold text-white/92">
+                {state === "ELEVATED_RISK" ? "Defensive interpretive focus" : "Structured editorial clarity"}
+              </div>
               <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
                 Reputation prioritises consistency and clarity. Moderation blocks certainty claims and manipulation language.
               </div>
-              <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                Tone: calm • credible • non-manipulative
-              </div>
+              <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">Tone: calm • credible • non-manipulative</div>
             </div>
           </div>
 
@@ -148,14 +146,10 @@ export default function CommunityHubPage(): JSX.Element {
             </SectionCard>
           </div>
 
-          {/* Remaining sections (layout + placeholders for now) */}
+          {/* Core conversation ecosystem */}
           <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <SectionCard
-                title="Thesis Network"
-                subtitle="Structured market theses (no prediction framing)"
-                toneGlow={toneGlow}
-              >
+              <SectionCard title="Thesis Network" subtitle="Structured market theses (no prediction framing)" toneGlow={toneGlow}>
                 <div className="space-y-4">
                   <PlaceholderThread
                     title="Defensive rotation emerges even under index-level stability"
@@ -171,111 +165,51 @@ export default function CommunityHubPage(): JSX.Element {
               </SectionCard>
 
               <div className="mt-8">
-                <SectionCard title="Structured Discussions" subtitle="Threaded intelligence cards" toneGlow={toneGlow}>
-                  <div className="space-y-4">
-                    <PlaceholderThread
-                      title="Reasoning prompt: what changed in the environment?"
-                      body="Discussions encourage context-first framing: confidence environment, liquidity condition, and behavioural cues—no impulsive trading language."
-                      toneGlow={toneGlow}
-                    />
-                  </div>
+                <SectionCard title="Cinematic Conversation Interface" subtitle="Quality-tuned discussion cards" toneGlow={toneGlow}>
+                  <CinematicConversationInterface roomId={activeRoom} roomName={activeRoom} />
                 </SectionCard>
               </div>
             </div>
 
             <div className="lg:col-span-5">
               <SectionCard title="Market Rooms" subtitle="Elite research environments" toneGlow={toneGlow}>
-                <div className="flex flex-wrap gap-2">
-                  {(
-                    [
-                      "Banking Intelligence",
-                      "Technology Structure",
-                      "Market Behaviour",
-                      "Volatility Environment",
-                      "Institutional Flow",
-                      "Earnings Analysis",
-                    ] as const
-                  ).map((room) => {
-                    const active = room === activeRoom;
-                    return (
-                      <button
-                        key={room}
-                        type="button"
-                        onClick={() => setActiveRoom(room)}
-                        className="h-[32px] rounded-full border border-white/10 bg-black/20 px-[14px] text-[11px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
-                        style={{
-                          borderColor: active ? "rgba(255,255,255,0.18)" : undefined,
-                          color: active ? "rgba(255,255,255,0.85)" : undefined,
-                          boxShadow: active ? `0 0 18px ${toneGlow}` : undefined,
-                        }}
-                      >
-                        {room}
-                      </button>
-                    );
-                  })}
-                </div>
+                <CommunityRoomRail activeRoom={activeRoom} onChange={setActiveRoom} />
 
                 <div className="mt-5 rounded-[22px] border border-white/10 bg-black/20 p-5">
                   <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Current room</div>
                   <div className="mt-3 text-[18px] font-semibold text-white/92">{activeRoom}</div>
                   <div className="mt-3 text-[14px] leading-[1.8] text-white/80">{roomSubtitle}</div>
-                  <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                    Moderation: blocks certainty claims and manipulation language
-                  </div>
+                  <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">AI conversation quality system: spam/pump/manipulation tuned down</div>
                 </div>
               </SectionCard>
 
               <div className="mt-8">
                 <SectionCard title="Insight Reputation System" subtitle="Credibility signals (not popularity)" toneGlow={toneGlow}>
-                  <div className="space-y-3">
+                  <CommunityReputationIntelligence />
+                  <div className="mt-4 text-[13px] leading-[1.8] text-white/80">
+                    Trust rewards consistency, educational value, and respectful reasoning—without badges or influencer culture.
+                  </div>
+                </SectionCard>
+              </div>
+
+              {!prefersReducedMotion && (
+                <div className="mt-8">
+                  <SectionCard title="Reflection & Learning System" subtitle="Long-term market understanding" toneGlow={toneGlow}>
                     <div className="rounded-[22px] border border-white/10 bg-black/20 p-5">
-                      <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Behavioural credibility</div>
+                      <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Learning loop</div>
                       <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                        Reputation prioritises consistency, structured reasoning, and calm interpretation.
+                        Reflection journals and thesis evolution tracking reinforce disciplined reasoning—without shaming or grades.
                       </div>
+                      <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">Built for calm progress • no influencer culture</div>
                     </div>
-                    <div className="rounded-[22px] border border-white/10 bg-black/20 p-5">
-                      <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Anti-hype moderation</div>
-                      <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                        Language suggesting guaranteed outcomes or “pump” behaviour is blocked before it spreads.
-                      </div>
-                    </div>
-                  </div>
-                </SectionCard>
-              </div>
-
-              <div className="mt-8">
-                <SectionCard title="Reflection & Learning System" subtitle="Long-term market understanding" toneGlow={toneGlow}>
-                  <div className="rounded-[22px] border border-white/10 bg-black/20 p-5">
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Learning loop</div>
-                    <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                      Reflection journals and thesis evolution tracking reinforce disciplined reasoning—without shaming or grades.
-                    </div>
-                    <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                      Built for calm progress • no influencer culture
-                    </div>
-                  </div>
-                </SectionCard>
-              </div>
-
-              <div className="mt-8">
-                <SectionCard title="Community Intelligence Layer" subtitle="Macro understanding from collective notes" toneGlow={toneGlow}>
-                  <div className="rounded-[22px] border border-white/10 bg-black/20 p-5">
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Aggregate environment</div>
-                    <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                      Community influence improves understanding of confidence contexts and behavioural patterns—without steering prediction certainty.
-                    </div>
-                  </div>
-                </SectionCard>
-              </div>
-
-              {/* Mobile performance hint */}
-              {!prefersReducedMotion && <div className="mt-6 text-[11px] uppercase tracking-[0.18em] text-white/45">Optimised for calm rendering on mobile</div>}
+                  </SectionCard>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="mt-10 text-center text-[12px] uppercase tracking-[0.18em] text-white/45">
-            Collaborative institutional-grade market interpretation • Educational only • No certainty claims
+            Institutional-grade conversational ecosystem • Educational only • No certainty claims
           </div>
         </div>
       </div>
