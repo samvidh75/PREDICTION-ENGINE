@@ -8,10 +8,11 @@ import PracticeTerminalPage from "./pages/PracticeTerminalPage";
 import AssistantPage from "./pages/AssistantPage";
 import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
 import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
+import CompanyUniversePage from "./pages/CompanyUniversePage";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
 
-type PageKey = "stock" | "community" | "practice" | "assistant" | "explore" | "dashboard";
+type PageKey = "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
 function getPageKeyFromUrl(): PageKey {
   if (typeof window === "undefined") return "stock";
@@ -19,6 +20,7 @@ function getPageKeyFromUrl(): PageKey {
     const params = new URLSearchParams(window.location.search);
     const raw = (params.get("page") ?? "stock").toLowerCase().trim();
 
+    if (raw === "company") return "company";
     if (raw === "community") return "community";
     if (raw === "practice") return "practice";
     if (raw === "assistant") return "assistant";
@@ -74,6 +76,7 @@ export default function App(): JSX.Element {
   }, []);
 
   const mainView = useMemo(() => {
+    if (pageKey === "company") return <CompanyUniversePage />;
     if (pageKey === "community") return <CommunityHubPage />;
     if (pageKey === "practice") return <PracticeTerminalPage />;
     if (pageKey === "assistant") return <AssistantPage />;
