@@ -6,7 +6,6 @@ import AmbientBackground from "../ambient/AmbientBackground";
 import SentimentFlow from "../intelligence/SentimentFlow";
 import MarketOrb from "../intelligence/MarketOrb";
 import OrbEffects from "../intelligence/OrbEffects";
-import IntelligenceHUD from "../intelligence/IntelligenceHUD";
 
 import EnvironmentalTransitionSystem from "../spatial/EnvironmentalTransitionSystem";
 import { useConfidenceEngine, type ConfidenceState, type ConfidenceTheme } from "../intelligence/ConfidenceEngine";
@@ -29,6 +28,43 @@ import { usePremiumEntitlement } from "../../services/premium/usePremiumEntitlem
 import type { PremiumTier } from "../../services/premium/premiumEntitlementStore";
 
 import SubsystemErrorBoundary from "../diagnostics/SubsystemErrorBoundary";
+import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+
+type SecondaryStepKey = "sector" | "scanners" | "macro" | "health" | "institutional" | "feed";
+
+function stepTitle(key: SecondaryStepKey): string {
+  switch (key) {
+    case "sector":
+      return "Sector intelligence";
+    case "scanners":
+      return "Scanner previews";
+    case "macro":
+      return "Macro intelligence";
+    case "health":
+      return "Healthometer deep telemetry";
+    case "institutional":
+      return "Institutional overlays";
+    case "feed":
+      return "Cinematic AI feed";
+  }
+}
+
+function stepSubtitle(key: SecondaryStepKey): string {
+  switch (key) {
+    case "sector":
+      return "Rotational intelligence nodes (educational, probabilistic).";
+    case "scanners":
+      return "Scan surfaces and opportunity cues (educational only).";
+    case "macro":
+      return "Macro pressure + geopolitical context (no recommendations).";
+    case "health":
+      return "Deep probabilistic health framing (educational margins only).";
+    case "institutional":
+      return "Participation web + liquidity corridors (no broker-style flows).";
+    case "feed":
+      return "Narratives and syntheses (educational, calm density).";
+  }
+}
 
 export default function MarketIntelligenceCommandCentre(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
@@ -50,205 +86,211 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   }, [state, theme]);
 
   const adaptivePriority = useMemo(() => {
-    if (state === "ELEVATED_RISK") {
-      return ["Market Health Environment", "Sector Rotation Ecosystem", "Central Intelligence Core"];
-    }
-    if (state === "MOMENTUM_WEAKENING") {
-      return ["Sector Rotation Ecosystem", "Market Health Environment", "Central Intelligence Core"];
-    }
-    if (state === "CONFIDENCE_RISING") {
-      return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Institutional Activity Layer"];
-    }
+    if (state === "ELEVATED_RISK") return ["Market Health Environment", "Sector Rotation Ecosystem", "Central Intelligence Core"];
+    if (state === "MOMENTUM_WEAKENING") return ["Sector Rotation Ecosystem", "Market Health Environment", "Central Intelligence Core"];
+    if (state === "CONFIDENCE_RISING") return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Institutional Activity Layer"];
     return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Cinematic Intelligence Feed"];
   }, [state]);
 
-  const sections = useMemo(() => {
-    const core = (
-      <SubsystemErrorBoundary subsystem="dashboard_core" phase="render">
-        <CentralIntelligenceCore
-          synthesis={synthesis}
-          confidenceState={state}
-          theme={theme}
-          marketStateLabel={marketState}
-          beginner={beginner || !hasPremium}
-        />
-      </SubsystemErrorBoundary>
-    );
+  const core = (
+    <SubsystemErrorBoundary subsystem="dashboard_core" phase="render">
+      <CentralIntelligenceCore
+        synthesis={synthesis}
+        confidenceState={state}
+        theme={theme}
+        marketStateLabel={marketState}
+        beginner={beginner || !hasPremium}
+      />
+    </SubsystemErrorBoundary>
+  );
 
-    const pulse = <MarketPulseLayer marketSnapshot={marketSnapshot} connectionStatus={connectionStatus} />;
+  const pulse = <MarketPulseLayer marketSnapshot={marketSnapshot} connectionStatus={connectionStatus} />;
 
-    const architecture = (
-      <section className="relative z-[12] px-6 sm:px-[72px] pb-10">
-        <div className="mx-auto max-w-[1680px]">
-          <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Neural Dashboard Architecture</div>
-            <div className="mt-3 text-[22px] font-medium text-white/92">Breathing layouts • spatial hierarchy • calm density</div>
-            <div className="mt-3 text-[14px] leading-[1.9] text-white/85 max-w-[92ch]">
-              This command centre uses deliberate spacing and layered cards so the intelligence remains readable at every scroll.
-              Beginner mode reduces density and keeps only the most essential interpretive surfaces.
-            </div>
-            <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-              educational-only • no recommendations • no trade framing
-            </div>
+  const sectorStep = (
+    <section className="relative z-[12]">
+      <SectorRotationEcosystem state={state} theme={theme} compact={beginner || isMobile} />
+    </section>
+  );
 
-            <div className="mt-6">
-              <MarketScannerEngine
-                synthesis={synthesis}
-                confidenceState={state}
-                theme={theme}
-                compact={!hasPremium}
-              />
-            </div>
+  const scannersStep = (
+    <section className="relative z-[12] px-6 sm:px-[72px] pb-10">
+      <div className="mx-auto max-w-[1680px]">
+        <MarketScannerEngine synthesis={synthesis} confidenceState={state} theme={theme} compact={!hasPremium} />
+      </div>
+    </section>
+  );
+
+  const macroStep = (
+    <section className="relative z-[12] px-6 sm:px-[72px] pb-10">
+      <div className="mx-auto max-w-[1680px]">
+        <MacroIntelligenceEngine synthesis={synthesis} confidenceState={state} theme={theme} compact={!hasPremium || beginner || isMobile} />
+      </div>
+    </section>
+  );
+
+  const healthStep = (
+    <section className="relative z-[12]">
+      <MarketHealthEnvironment synthesis={synthesis} confidenceState={state} theme={theme} beginner={beginner || !hasPremium} />
+    </section>
+  );
+
+  const institutionalStep = (
+    <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
+      <div className="mx-auto max-w-[1680px] mb-6">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Institutional Activity Layer</div>
+            <div className="mt-3 text-[22px] font-medium text-white/92">Participation web (strategic • premium)</div>
           </div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">liquidity corridors • interpretive pulses</div>
         </div>
-      </section>
-    );
+      </div>
 
-    const prioritisation = (
-      <section className="relative z-[12] px-6 sm:px-[72px] pb-10">
-        <div className="mx-auto max-w-[1680px]">
-          <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Adaptive Intelligence Prioritisation</div>
-            <div className="mt-3 text-[22px] font-medium text-white/92">Focus elevates naturally under market tone</div>
-            <div className="mt-3 text-[14px] leading-[1.9] text-white/85">
-              Elevated interpretive modules right now:{" "}
-              <span className="text-white/92 font-semibold">{adaptivePriority.join(" • ")}</span>
-            </div>
-            <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-              adaptation is calm • educational • probabilistic pacing
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-
-    const macro = (
-      <section className="relative z-[12] px-6 sm:px-[72px] pb-10">
-        <div className="mx-auto max-w-[1680px]">
-          <MacroIntelligenceEngine
-            synthesis={synthesis}
-            confidenceState={state}
-            theme={theme}
-            compact={!hasPremium || beginner || isMobile}
+      {hasInstitutional ? (
+        <InstitutionalActivityNetwork className="mx-auto max-w-[1400px]" />
+      ) : (
+        <div className="mx-auto max-w-[1400px]">
+          <PremiumLockCard
+            requiredTier={"institutional" satisfies PremiumTier}
+            title="Institutional Activity Tier"
+            subtitle="Participation web + liquidity flow corridors (educational)"
+            previewLines={[
+              "Deep FII/DII posture as participation-quality context",
+              "Defensive rotation cues interpreted calmly (no fear framing)",
+              "Institutional intelligence surfaces without recommendations",
+            ]}
+            accentGlow={theme.warningGlow}
+            ctaLabel="Unlock institutional intelligence"
           />
         </div>
-      </section>
-    );
+      )}
 
-    const health = (
-      <section className="relative z-[12]">
-        <MarketHealthEnvironment
-          synthesis={synthesis}
-          confidenceState={state}
-          theme={theme}
-          beginner={beginner || !hasPremium}
-        />
-      </section>
-    );
+      <div className="mx-auto max-w-[1680px] mt-6 text-[12px] uppercase tracking-[0.18em] text-white/45 px-0 sm:px-0">
+        {hasInstitutional
+          ? "FII/DII posture rendered as educational context • no broker-style flows"
+          : "Institutional tier unlocks deeper participation intelligence (educational only) • no recommendations"}
+      </div>
+    </section>
+  );
 
-    const institutional = (
+  const feedStep = (
+    <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
+      <div className="mx-auto max-w-[1680px]">
+        {hasPremium ? (
+          <>
+            <IntelligenceFeed />
+            <div className="mt-6">
+              <NeuralMarketSynthesisPanel compact={false} />
+            </div>
+          </>
+        ) : (
+          <PremiumLockCard
+            requiredTier={"premium" satisfies PremiumTier}
+            title="Cinematic Intelligence Feed"
+            subtitle="High-quality intelligence narratives (educational)"
+            previewLines={[
+              "Macro developments translated into calm learning contexts",
+              "Sector evolution + behavioural notes as probabilistic framing",
+              "Institutional behavior interpreted without fear-driven headlines",
+            ]}
+            accentGlow={theme.cyanGlow}
+            ctaLabel="Unlock cinematic feed"
+          />
+        )}
+      </div>
+    </section>
+  );
+
+  const stepsByKey: Record<SecondaryStepKey, { content: React.ReactNode }> = {
+    sector: { content: sectorStep },
+    scanners: { content: scannersStep },
+    macro: { content: macroStep },
+    health: { content: healthStep },
+    institutional: { content: (
       <SubsystemErrorBoundary subsystem="dashboard_institutional" phase="render">
-        <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
-          <div className="mx-auto max-w-[1680px] mb-6">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Institutional Activity Layer</div>
-                <div className="mt-3 text-[22px] font-medium text-white/92">Participation web (strategic • premium)</div>
-              </div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">liquidity corridors • interpretive pulses</div>
-            </div>
-          </div>
-
-          {hasInstitutional ? (
-            <InstitutionalActivityNetwork className="mx-auto max-w-[1400px]" />
-          ) : (
-            <div className="mx-auto max-w-[1400px]">
-              <PremiumLockCard
-                requiredTier={"institutional" satisfies PremiumTier}
-                title="Institutional Activity Tier"
-                subtitle="Participation web + liquidity flow corridors (educational)"
-                previewLines={[
-                  "Deep FII/DII posture as participation-quality context",
-                  "Defensive rotation cues interpreted calmly (no fear framing)",
-                  "Institutional intelligence surfaces without recommendations",
-                ]}
-                accentGlow={theme.warningGlow}
-                ctaLabel="Unlock institutional intelligence"
-              />
-            </div>
-          )}
-
-          <div className="mx-auto max-w-[1680px] mt-6 text-[12px] uppercase tracking-[0.18em] text-white/45 px-0 sm:px-0">
-            {hasInstitutional
-              ? "FII/DII posture rendered as educational context • no broker-style flows"
-              : "Institutional tier unlocks deeper participation intelligence (educational only) • no recommendations"}
-          </div>
-        </section>
+        {institutionalStep}
       </SubsystemErrorBoundary>
-    );
-
-    const feed = (
+    )},
+    feed: { content: (
       <SubsystemErrorBoundary subsystem="dashboard_cinematic_feed" phase="render">
-        <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
-          <div className="mx-auto max-w-[1680px]">
-            {hasPremium ? (
-              <>
-                <IntelligenceFeed />
-                <div className="mt-6">
-                  <NeuralMarketSynthesisPanel compact={false} />
-                </div>
-              </>
-            ) : (
-              <PremiumLockCard
-                requiredTier={"premium" satisfies PremiumTier}
-                title="Cinematic Intelligence Feed"
-                subtitle="High-quality intelligence narratives (educational)"
-                previewLines={[
-                  "Macro developments translated into calm learning contexts",
-                  "Sector evolution + behavioural notes as probabilistic framing",
-                  "Institutional behavior interpreted without fear-driven headlines",
-                ]}
-                accentGlow={theme.cyanGlow}
-                ctaLabel="Unlock cinematic feed"
-              />
-            )}
-          </div>
-        </section>
+        {feedStep}
       </SubsystemErrorBoundary>
-    );
+    )},
+  };
 
-    const sector = (
-      <section className="relative z-[12]">
-        <SectorRotationEcosystem state={state} theme={theme} compact={beginner || isMobile} />
-      </section>
-    );
+  const orderedSecondaryKeys = useMemo<SecondaryStepKey[]>(() => {
+    const pick = (key: SecondaryStepKey, candidates: string[]) => {
+      const hit = candidates.some((c) => c.toLowerCase().includes(key));
+      return hit;
+    };
 
-    const coreNodes = beginerCapableOrder(adaptivePriority, {
-      core,
-      pulse,
-      architecture,
-      prioritisation,
-      macro,
-      health,
-      institutional,
-      feed,
-      sector,
-    });
-    return coreNodes;
-  }, [
-    adaptivePriority,
-    beginerCapableOrder,
-    synthesis,
-    state,
-    theme,
-    marketState,
-    beginner,
-    isMobile,
-    hasPremium,
-    hasInstitutional,
-  ]);
+    // Map adaptivePriority strings into our stable step keys.
+    const priority0 = adaptivePriority[0] ?? "";
+    const priority1 = adaptivePriority[1] ?? "";
 
-  // Atmosphere engine (System 10): real-time scene tint + breathing transition
+    const candidates: SecondaryStepKey[] = [];
+
+    if (priority0.includes("Sector Rotation")) candidates.push("sector");
+    if (priority0.includes("Health")) candidates.push("health");
+    if (priority0.includes("Macro")) candidates.push("macro");
+    if (priority0.includes("Institutional")) candidates.push("institutional");
+    if (priority0.includes("Cinematic") || priority0.includes("Feed")) candidates.push("feed");
+    if (priority0.includes("Scanner")) candidates.push("scanners");
+
+    if (candidates.length < 2) {
+      // Safe defaults for the next layer.
+      candidates.push("scanners", "sector");
+    }
+
+    // De-dupe + stable remainder order
+    const all: SecondaryStepKey[] = ["sector", "scanners", "macro", "health", "institutional", "feed"];
+    const seen = new Set<SecondaryStepKey>();
+    const out: SecondaryStepKey[] = [];
+    for (const k of candidates.concat(all)) {
+      if (!k) continue;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(k);
+      if (out.length >= all.length) break;
+    }
+    return out;
+  }, [adaptivePriority]);
+
+  const secondaryFront = (
+    <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
+      <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Intelligence Layers</div>
+      <div className="mt-3 text-[22px] font-medium text-white/92">Progressively revealed command intelligence</div>
+      <div className="mt-3 text-[14px] leading-[1.9] text-white/85 max-w-[92ch]">
+        Right now we elevate:{" "}
+        <span className="text-white/92 font-semibold">
+          {adaptivePriority.join(" • ")}
+        </span>
+        . Expand to reveal deeper telemetry without overwhelming first impressions.
+      </div>
+      <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
+        educational only • no recommendations • calm density
+      </div>
+    </div>
+  );
+
+  const secondarySteps = orderedSecondaryKeys.map((k) => ({
+    id: k,
+    label: stepTitle(k),
+    content: stepsByKey[k].content,
+  }));
+
+  const secondaryLayer = (
+    <ProgressiveDisclosure
+      debugLabel="dashboard_layers_secondary"
+      front={secondaryFront}
+      steps={secondarySteps}
+      collapsedCtaLabel="Expand intelligence layers"
+      collapseCtaLabel="Collapse"
+      initialStepIndex={0}
+      className="mt-0"
+    />
+  );
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020304]">
       <EnvironmentalTransitionSystem enabled={!prefersReducedMotion} />
@@ -259,86 +301,28 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
 
       {!prefersReducedMotion && <SentimentFlow />}
 
-      {/* Fixed, premium HUD */}
-      <IntelligenceHUD />
-
       {/* Holographic core visual (non-intrusive) */}
       <div className="relative z-[5] pointer-events-none">
-        <div className="absolute left-1/2 top-[34%] -translate-x-1/2 -translate-y-1/2 opacity-[0.95]" style={{ filter: "saturate(1.05)" }}>
+        <div
+          className="absolute left-1/2 top-[34%] -translate-x-1/2 -translate-y-1/2 opacity-[0.95]"
+          style={{ filter: "saturate(1.05)" }}
+        >
           <MarketOrb />
           <OrbEffects />
         </div>
         <div className="absolute inset-0" style={{ boxShadow: `inset 0 0 260px ${atmosphereGlow}` }} />
       </div>
 
-      {/* SECTION SYSTEMS 1–9 (10 is the overlay engine above + subtle note below) */}
       <div className="relative z-[6]">
-        {sections}
+        {/* Primary focus zone */}
+        {core}
+        <section className="relative z-[12]">{pulse}</section>
 
-        {/* System 10: atmosphere card (controls emotional feel, stays subtle) */}
+        {/* Secondary expandable intelligence zone (single entry point to reduce clutter) */}
         <section className="relative z-[12] px-6 sm:px-[72px] pb-20">
-          <div className="mx-auto max-w-[1680px]">
-            <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Dashboard Atmosphere Engine</div>
-              <div className="mt-3 text-[22px] font-medium text-white/92">Breathes with market tone (calm • computational)</div>
-              <div className="mt-3 text-[14px] leading-[1.9] text-white/85 max-w-[92ch]">
-                The environment recalibrates under volatility intensity and confidence boundaries. Motion is restrained for emotional comfort
-                and educational clarity. No fear framing, no recommendations, no certainty claims.
-              </div>
-              <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                subtle breathing • probabilistic pacing • SEBI-safe interpretive tone
-              </div>
-            </div>
-          </div>
+          <div className="mx-auto max-w-[1680px]">{secondaryLayer}</div>
         </section>
       </div>
     </div>
   );
-}
-
-function beginerCapableOrder(
-  adaptivePriority: string[],
-  nodes: {
-    core: React.ReactNode;
-    pulse: React.ReactNode;
-    architecture: React.ReactNode;
-    prioritisation: React.ReactNode;
-    macro: React.ReactNode;
-    health: React.ReactNode;
-    institutional: React.ReactNode;
-    feed: React.ReactNode;
-    sector: React.ReactNode;
-  },
-): React.ReactNode[] {
-  // Deterministic reorder: elevate what adaptivePriority suggests, without removing any of the 9 content systems.
-  const prioritySet = new Set(adaptivePriority);
-
-  const order: Array<keyof typeof nodes> = [
-    "core",
-    "pulse",
-    "architecture",
-    "prioritisation",
-    prioritySet.has("Market Health Environment") ? "health" : "institutional",
-    prioritySet.has("Sector Rotation Ecosystem") ? "sector" : "macro",
-    prioritySet.has("Macro & Global Awareness Layer") ? "macro" : "feed",
-    "institutional",
-    "feed",
-  ];
-
-  // Ensure uniqueness while keeping first occurrence.
-  const out: React.ReactNode[] = [];
-  const seen = new Set<string>();
-  for (const k of order) {
-    if (seen.has(k)) continue;
-    seen.add(k);
-    out.push(<React.Fragment key={k}>{nodes[k]}</React.Fragment>);
-  }
-
-  // In case we dropped one due to ordering uniqueness, append leftovers.
-  const allKeys: Array<keyof typeof nodes> = ["core", "pulse", "architecture", "prioritisation", "macro", "health", "institutional", "feed", "sector"];
-  for (const k of allKeys) {
-    if (!seen.has(k)) out.push(<React.Fragment key={k}>{nodes[k]}</React.Fragment>);
-  }
-
-  return out;
 }

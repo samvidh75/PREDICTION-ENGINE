@@ -111,13 +111,41 @@ export default function App(): JSX.Element {
       setRouteSignature(getRouteSignatureFromUrl());
     };
 
+    const dispatchUrlChange = () => {
+      window.dispatchEvent(new Event("urlchange"));
+    };
+
     // Support pushState-based navigation + back/forward.
     window.addEventListener("urlchange", sync);
     window.addEventListener("popstate", sync);
 
+    // Make "urlchange" reliable even if some components call history.pushState/replaceState
+    // without manually dispatching the event.
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+
+    (window.history as unknown as { pushState: typeof window.history.pushState }).pushState = (
+      ...args: Parameters<typeof window.history.pushState>
+    ) => {
+      const res = originalPushState.apply(window.history, args);
+      dispatchUrlChange();
+      return res;
+    };
+
+    (window.history as unknown as { replaceState: typeof window.history.replaceState }).replaceState = (
+      ...args: Parameters<typeof window.history.replaceState>
+    ) => {
+      const res = originalReplaceState.apply(window.history, args);
+      dispatchUrlChange();
+      return res;
+    };
+
     return () => {
       window.removeEventListener("urlchange", sync);
       window.removeEventListener("popstate", sync);
+
+      (window.history as unknown as { pushState: typeof window.history.pushState }).pushState = originalPushState;
+      (window.history as unknown as { replaceState: typeof window.history.replaceState }).replaceState = originalReplaceState;
     };
   }, []);
 
