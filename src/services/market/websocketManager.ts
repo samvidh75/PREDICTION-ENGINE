@@ -18,6 +18,8 @@ function seededNoise(seed: number): number {
   return x - Math.floor(x);
 }
 
+const MARKET_SIMULATION_ENABLED = import.meta.env.VITE_MARKET_SIMULATION === "1";
+
 /**
  * WebsocketManager
  * - persistent manager
@@ -62,7 +64,16 @@ export class WebsocketManager {
 
     this.updateStatus("connecting");
 
-    // simulate connect handshake
+    // No-fake-live rule:
+    // Unless explicitly enabled, we do NOT emit synthetic prices.
+    if (!MARKET_SIMULATION_ENABLED) {
+      window.setTimeout(() => {
+        this.updateStatus("disconnected");
+      }, 450);
+      return;
+    }
+
+    // simulate connect handshake (dev-only)
     window.setTimeout(() => {
       this.updateStatus("connected");
 

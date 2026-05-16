@@ -1,7 +1,8 @@
-import { WebsocketManager, type MarketWebsocketEvent } from "./websocketManager";
-import { MarketStateEngine } from "./marketStateEngine";
 import type { MarketInputs } from "../../services/intelligence/marketState";
 import type { MarketState } from "../../types/MarketState";
+import type { MarketIndexEvent, MarketIndexProvider } from "./providers/MarketIndexProvider";
+import { WebsocketMarketIndexProvider } from "./providers/WebsocketMarketIndexProvider";
+import { MarketStateEngine } from "./marketStateEngine";
 
 export type MarketConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
@@ -26,13 +27,16 @@ function clamp(n: number, min: number, max: number): number {
 
 /**
  * MarketService
- * - persistent websocket manager
+ * - provider-backed market index streaming
  * - normalizes via MarketStateEngine
  * - publishes composite snapshots
  * - applies minimal batching to prevent render storms
+ *
+ * NOTE:
+ * This facade preserves the existing MarketService API for all current UI consumers.
  */
 export class MarketService {
-  private ws = new WebsocketManager();
+  private provider: MarketIndexProvider;
   private engine = new MarketStateEngine({ alpha: 0.18 });
 
   private subscribers: Set<Subscriber> = new Set();
@@ -50,6 +54,7 @@ export class MarketService {
   };
 
   private pendingEmit: number | null = null;
+  private unsubProvider: (() => void) | null = null;
 
   private cacheSnapshot: MarketComposite = {
     at: now(),
@@ -57,6 +62,10 @@ export class MarketService {
     marketInputs: this.engine.update(this.lastState),
     connectionStatus: this.connectionStatus,
   };
+
+  constructor(args?: { provider?: MarketIndexProvider }) {
+    this.provider = args?.provider ?? new WebsocketMarketIndexProvider();
+  }
 
   subscribe(fn: Subscriber): () => void {
     this.subscribers.add(fn);
@@ -78,12 +87,18 @@ export class MarketService {
   }
 
   start(): void {
-    this.ws.subscribe((ev) => this.onEvent(ev));
-    this.ws.connect();
+    if (this.unsubProvider) return;
+
+    this.unsubProvider = this.provider.subscribe((ev) => this.onEvent(ev));
+    this.provider.start();
   }
 
   stop(): void {
-    this.ws.disconnect();
+    if (this.unsubProvider) {
+      this.unsubProvider();
+      this.unsubProvider = null;
+    }
+    this.provider.stop();
   }
 
   private publishSnapshot(next: MarketComposite): void {
@@ -103,10 +118,11 @@ export class MarketService {
     }, MIN_MS);
   }
 
-  private onEvent(ev: MarketWebsocketEvent): void {
+  private onEvent(ev: MarketIndexEvent): void {
     if (ev.type === "connection_status") {
-      const nextStatus = ev.payload.status;
+      const nextStatus = ev.payload.status as MarketConnectionStatus;
       this.connectionStatus = nextStatus;
+
       this.scheduleEmit({
         at: ev.at,
         marketState: this.lastState,
