@@ -1,4 +1,17 @@
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, OAuthProvider, sendPasswordResetEmail, verifyPasswordResetCode, confirmPasswordReset, signOut as firebaseSignOut, type User } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
+  OAuthProvider,
+  sendPasswordResetEmail,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
+  signOut as firebaseSignOut,
+  type User,
+} from "firebase/auth";
 
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "./sessionStore";
 import { getFirebaseAuthClient } from "./firebaseClient";
@@ -23,6 +36,8 @@ export type SignUpWithEmail = (name: string, email: string, password: string) =>
 export type SendOtp = (email: string) => Promise<{ expiresInSeconds: number; debugOtpCode?: string }>;
 export type VerifyOtp = (email: string, code: string) => Promise<{ ok: true }>;
 export type ResetPassword = (email: string, code: string, newPassword: string) => Promise<AuthUser>;
+
+export type SubscribeSession = (cb: (user: AuthUser | null) => void) => () => void;
 
 function makeAuthError(message: string): AuthError {
   return { message };
@@ -120,10 +135,24 @@ async function signUpWithEmail(name: string, email: string, password: string): P
     await updateProfile(result.user, { displayName: name.trim() });
   }
 
-  // Re-read user to reflect updated profile.
-  const refreshedUser = result.user.reload().then(() => auth.currentUser).then((u) => u ?? result.user);
-  const u = await refreshedUser;
-  return persistAuthUser(u);
+  // Refresh after profile update.
+  await result.user.reload();
+  return persistAuthUser(auth.currentUser ?? result.user);
+}
+
+function subscribeSessionImpl(cb: (user: AuthUser | null) => void): () => void {
+  const { auth } = getFirebaseAuthClient();
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      clearAuthSession();
+      cb(null);
+      return;
+    }
+
+    cb(persistAuthUser(user));
+  });
+
+  return unsubscribe;
 }
 
 export const authService: {
@@ -139,6 +168,7 @@ export const authService: {
 
   restoreSession: () => Promise<AuthUser | null>;
   signOut: () => Promise<void>;
+  subscribeSession: SubscribeSession;
 } = {
   signInWithGoogle: (async (): Promise<AuthUser> => {
     try {
@@ -200,10 +230,9 @@ export const authService: {
 
       const { auth } = getFirebaseAuthClient();
 
-      // Firebase password reset emails contain an action code inside the link.
-      // We treat that action code as the user-entered “OTP”.
-      // UX: user requests a code, then pastes the code from the email link.
-      const expiresInSeconds = 300; // UI guidance; Firebase may have its own expiry.
+      // Firebase password reset email flow:
+      // We send the reset email, then the “OTP code” stage expects the user to paste the action code from the link.
+      const expiresInSeconds = 300;
 
       await sendPasswordResetEmail(auth, trimmedEmail);
 
@@ -250,9 +279,9 @@ export const authService: {
 
       await confirmPasswordReset(auth, trimmedCode, trimmedPassword);
 
-      // After confirming reset, we sign the user in to maintain continuity.
-      const result = await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
-      return persistAuthUser(result.user);
+      // After confirming reset, sign in for continuity.
+      const result = await signInWithEmail(trimmedEmail, trimmedPassword);
+      return result;
     } catch (e) {
       throw makeAuthError(mapFirebaseErrorToMessage(e));
     }
@@ -262,25 +291,17 @@ export const authService: {
     const existing = loadAuthSession();
     if (existing.status !== "authenticated") {
       return new Promise<AuthUser | null>((resolve) => {
-        const { auth } = getFirebaseAuthClient();
-        // Ensure we still hydrate from Firebase if the local session is stale.
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = subscribeSessionImpl((user) => {
           unsubscribe();
-          if (!user) return resolve(null);
-          resolve(persistAuthUser(user));
+          resolve(user);
         });
       });
     }
 
     return new Promise<AuthUser | null>((resolve) => {
-      const { auth } = getFirebaseAuthClient();
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const unsubscribe = subscribeSessionImpl((user) => {
         unsubscribe();
-        if (!user) {
-          clearAuthSession();
-          return resolve(null);
-        }
-        resolve(persistAuthUser(user));
+        resolve(user);
       });
     });
   }) satisfies () => Promise<AuthUser | null>,
@@ -290,4 +311,8 @@ export const authService: {
     await firebaseSignOut(auth);
     clearAuthSession();
   }) satisfies () => Promise<void>,
+
+  subscribeSession: (cb: (user: AuthUser | null) => void): (() => void) => {
+    return subscribeSessionImpl(cb);
+  },
 };

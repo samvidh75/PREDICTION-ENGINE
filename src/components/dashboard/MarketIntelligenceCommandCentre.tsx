@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 import HiddenGridOverlay from "../ambient/HiddenGridOverlay";
@@ -46,6 +46,7 @@ import SubsystemErrorBoundary from "../diagnostics/SubsystemErrorBoundary";
 import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
 import { loadDiscoveryMemory as loadDiscoveryMemoryForPills } from "../../services/discovery/discoveryMemory";
 import { seedFirstRunSecondaryKeys } from "../../services/onboarding/dashboardSeedingEngine";
+import useAuthSession from "../../hooks/auth/useAuthSession";
 
 type SecondaryStepKey = "sector" | "scanners" | "macro" | "health" | "institutional" | "feed";
 
@@ -146,19 +147,30 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   const { experienceLevel } = useBeginnerIntelligenceCalibration();
   const beginner = experienceLevel === "beginner";
 
+  const auth = useAuthSession();
+  const uid = auth.status === "authenticated" ? auth.user?.uid : undefined;
+
   const { hasPremium, hasInstitutional } = usePremiumEntitlement();
 
   const { state, theme, marketState } = useConfidenceEngine();
   const { synthesis, marketSnapshot, connectionStatus } = useNeuralMarketSynthesisSuperengine();
 
   // First-run onboarding overlay state (persistent, dismissed after interaction)
-  const [firstDashboardPending, setFirstDashboardPending] = useState<boolean>(() => {
-    const flag = loadFirstDashboardFlag();
-    return flag?.pending ?? false;
-  });
+  // Important: uid is hydrated asynchronously. We must re-compute once uid is available
+  // to avoid reading the anonymous (base) key and sticking with it.
+  const [firstDashboardPending, setFirstDashboardPending] = useState<boolean>(false);
 
-  const seedSelection = useMemo(() => loadOnboardingSeedSelection(), []);
-  const explorationGoalOverride = useMemo(() => loadOnboardingExplorationGoalOverride(), []);
+  useEffect(() => {
+    if (auth.status !== "authenticated" || !uid) {
+      setFirstDashboardPending(false);
+      return;
+    }
+    const flag = loadFirstDashboardFlag(uid);
+    setFirstDashboardPending(flag?.pending ?? false);
+  }, [auth.status, uid]);
+
+  const seedSelection = useMemo(() => loadOnboardingSeedSelection(uid), [uid]);
+  const explorationGoalOverride = useMemo(() => loadOnboardingExplorationGoalOverride(uid), [uid]);
   const preferredStepKey = useMemo(() => {
     const fromGoal = explorationGoalToStepKey(explorationGoalOverride);
     return fromGoal ?? onboardingPreferredStepKey(seedSelection);
@@ -167,7 +179,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   const preferredSearchPills = useMemo(() => derivePreferredSearchPills(), []);
 
   const dismissOverlay = () => {
-    dismissFirstDashboardOverlay();
+    dismissFirstDashboardOverlay(uid);
     setFirstDashboardPending(false);
   };
 

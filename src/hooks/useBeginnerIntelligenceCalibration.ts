@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { loadAuthSession } from "../services/auth/sessionStore";
 import { loadOnboardingLearningDepthOverride } from "../services/onboarding/onboardingFirstRunMemory";
 
 type ExperienceLevel = "beginner" | "intermediate";
@@ -9,7 +10,7 @@ type BeginnerCalibration = {
   lastAt: number;
 };
 
-const STORAGE_KEY = "beginner_intel_calibration_v1";
+const STORAGE_KEY_BASE = "beginner_intel_calibration_v1";
 
 function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
@@ -34,18 +35,26 @@ function safeParse(raw: string | null): BeginnerCalibration | null {
 }
 
 export default function useBeginnerIntelligenceCalibration() {
+  const auth = loadAuthSession();
+  const uid = auth.status === "authenticated" ? auth.uid : undefined;
+
+  const calibrationKey = useMemo(() => {
+    if (uid && uid.trim().length > 0) return `${STORAGE_KEY_BASE}_${uid}`;
+    return STORAGE_KEY_BASE;
+  }, [uid]);
+
   const [calibration, setCalibration] = useState<BeginnerCalibration>(() => ({
     sessionsSeen: 0,
     learningActions: 0,
     lastAt: Date.now(),
   }));
 
-  const [onboardingLearningDepthOverride] = useState(() => loadOnboardingLearningDepthOverride());
+  const onboardingLearningDepthOverride = useMemo(() => loadOnboardingLearningDepthOverride(uid), [uid]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(calibrationKey);
     const parsed = safeParse(raw);
 
     const now = Date.now();
@@ -56,9 +65,9 @@ export default function useBeginnerIntelligenceCalibration() {
       lastAt: now,
     };
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(calibrationKey, JSON.stringify(next));
     setCalibration(next);
-  }, []);
+  }, [calibrationKey]);
 
   const experienceLevel: ExperienceLevel = useMemo(() => {
     // Onboarding override takes priority: user explicitly chose learning depth.

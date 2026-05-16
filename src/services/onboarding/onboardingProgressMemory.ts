@@ -50,21 +50,77 @@ function normaliseUid(uid: string): string {
   return uid.trim();
 }
 
-function resolveStorageKey(uid?: string): string {
-  const u = (uid && uid.trim().length > 0 ? uid.trim() : loadAuthSession().uid) ?? "";
-  if (!u) return STORAGE_KEY_BASE;
-  return `${STORAGE_KEY_BASE}_${normaliseUid(u)}`;
+function getEffectiveUid(uid?: string): string | null {
+  if (uid && uid.trim().length > 0) return normaliseUid(uid);
+
+  const s = loadAuthSession();
+  if (s.status !== "authenticated") return null;
+  if (!s.uid) return null;
+
+  return normaliseUid(s.uid);
 }
 
-const VALID_PHASES: OnboardingPhase[] = ["ENTRY", "IDENTITY", "PERSONALITY_VOL", "PERSONALITY_HORIZON", "PERSONALITY_DEPTH", "PREFERENCES", "ENVIRONMENT", "ACTIVATION"];
+function resolveStorageKey(uid?: string): string {
+  const effectiveUid = getEffectiveUid(uid);
+  if (!effectiveUid) return STORAGE_KEY_BASE;
+  return `${STORAGE_KEY_BASE}_${effectiveUid}`;
+}
+
+function migrateLegacyProgressIfNeeded(effectiveUid: string): void {
+  if (typeof window === "undefined") return;
+
+  const targetKey = `${STORAGE_KEY_BASE}_${normaliseUid(effectiveUid)}`;
+
+  // Only migrate when target doesn't exist, but legacy base does.
+  const targetRaw = window.localStorage.getItem(targetKey);
+  if (targetRaw) return;
+
+  const legacyRaw = window.localStorage.getItem(STORAGE_KEY_BASE);
+  if (!legacyRaw) return;
+
+  try {
+    window.localStorage.setItem(targetKey, legacyRaw);
+    window.localStorage.removeItem(STORAGE_KEY_BASE);
+  } catch {
+    // ignore
+  }
+}
+
+const VALID_PHASES: OnboardingPhase[] = [
+  "ENTRY",
+  "IDENTITY",
+  "PERSONALITY_VOL",
+  "PERSONALITY_HORIZON",
+  "PERSONALITY_DEPTH",
+  "PREFERENCES",
+  "ENVIRONMENT",
+  "ACTIVATION",
+];
 const VALID_SUBSTAGES: OnboardingActivationSubStage[] = ["auth", "guided"];
 const VALID_AUTH_MODES: AuthMode[] = ["google", "email", "apple"];
 
-const VALID_FOCUS_AREAS: MarketInterestArea[] = ["Long-term investing", "Market trends", "Sector intelligence", "Swing analysis", "Institutional activity"];
+const VALID_FOCUS_AREAS: MarketInterestArea[] = [
+  "Long-term investing",
+  "Market trends",
+  "Sector intelligence",
+  "Swing analysis",
+  "Institutional activity",
+];
 const VALID_VOLATILITY_COMFORT: VolatilityComfort[] = ["Calm environments", "Moderate dynamics", "Responsive environments"];
 const VALID_INVESTING_HORIZON: InvestingHorizon[] = ["Long-term focus", "Balanced horizon", "Active analyst mode"];
-const VALID_ANALYSIS_DEPTH: AnalysisDepth[] = ["Editorial overview", "Technical-informed narrative", "Structural intelligence depth"];
-const VALID_MODULES: IntelligenceModule[] = ["Institutional activity", "Momentum analysis", "Long-term quality", "Volatility insights", "Sector rotation", "Earnings interpretation"];
+const VALID_ANALYSIS_DEPTH: AnalysisDepth[] = [
+  "Editorial overview",
+  "Technical-informed narrative",
+  "Structural intelligence depth",
+];
+const VALID_MODULES: IntelligenceModule[] = [
+  "Institutional activity",
+  "Momentum analysis",
+  "Long-term quality",
+  "Volatility insights",
+  "Sector rotation",
+  "Earnings interpretation",
+];
 
 function isValidPhase(raw: unknown): raw is OnboardingPhase {
   return typeof raw === "string" && (VALID_PHASES as string[]).includes(raw);
@@ -120,23 +176,33 @@ function safeParse(raw: string | null): OnboardingProgress | null {
     const safeDraft: OnboardingProgress["draft"] | undefined = hasDraft
       ? {
           focusAreas:
-            draft && "focusAreas" in draft && isValidFocusAreas((draft as { focusAreas?: unknown }).focusAreas)
+            draft &&
+            "focusAreas" in draft &&
+            isValidFocusAreas((draft as { focusAreas?: unknown }).focusAreas)
               ? (draft as { focusAreas: MarketInterestArea[] }).focusAreas
               : undefined,
           volatilityComfort:
-            draft && "volatilityComfort" in draft && isValidVolatilityComfort((draft as { volatilityComfort?: unknown }).volatilityComfort)
+            draft &&
+            "volatilityComfort" in draft &&
+            isValidVolatilityComfort((draft as { volatilityComfort?: unknown }).volatilityComfort)
               ? (draft as { volatilityComfort: VolatilityComfort }).volatilityComfort
               : undefined,
           investingHorizon:
-            draft && "investingHorizon" in draft && isValidInvestingHorizon((draft as { investingHorizon?: unknown }).investingHorizon)
+            draft &&
+            "investingHorizon" in draft &&
+            isValidInvestingHorizon((draft as { investingHorizon?: unknown }).investingHorizon)
               ? (draft as { investingHorizon: InvestingHorizon }).investingHorizon
               : undefined,
           analysisDepth:
-            draft && "analysisDepth" in draft && isValidAnalysisDepth((draft as { analysisDepth?: unknown }).analysisDepth)
+            draft &&
+            "analysisDepth" in draft &&
+            isValidAnalysisDepth((draft as { analysisDepth?: unknown }).analysisDepth)
               ? (draft as { analysisDepth: AnalysisDepth }).analysisDepth
               : undefined,
           modules:
-            draft && "modules" in draft && isValidModules((draft as { modules?: unknown }).modules)
+            draft &&
+            "modules" in draft &&
+            isValidModules((draft as { modules?: unknown }).modules)
               ? (draft as { modules: IntelligenceModule[] }).modules
               : undefined,
         }
@@ -153,7 +219,7 @@ function safeParse(raw: string | null): OnboardingProgress | null {
               : undefined,
           email:
             auth && "email" in auth && typeof (auth as { email?: unknown }).email === "string"
-              ? (((auth as { email: string }).email as string))
+              ? ((auth as { email: string }).email as string)
               : undefined,
         }
       : undefined;
@@ -172,6 +238,10 @@ function safeParse(raw: string | null): OnboardingProgress | null {
 
 export function loadOnboardingProgress(uid?: string): OnboardingProgress | null {
   if (typeof window === "undefined") return null;
+
+  const effectiveUid = getEffectiveUid(uid);
+  if (effectiveUid) migrateLegacyProgressIfNeeded(effectiveUid);
+
   try {
     const key = resolveStorageKey(uid);
     return safeParse(window.localStorage.getItem(key));
@@ -192,9 +262,15 @@ export function saveOnboardingProgress(progress: OnboardingProgress, uid?: strin
 
 export function clearOnboardingProgress(uid?: string): void {
   if (typeof window === "undefined") return;
+
+  const effectiveUid = getEffectiveUid(uid);
   try {
     const key = resolveStorageKey(uid);
     window.localStorage.removeItem(key);
+    if (effectiveUid) {
+      // Also remove legacy anonymous base so it doesn't re-migrate later.
+      window.localStorage.removeItem(STORAGE_KEY_BASE);
+    }
   } catch {
     // ignore
   }

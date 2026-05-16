@@ -21,10 +21,10 @@ import IntelligenceHUD from "./components/intelligence/IntelligenceHUD";
 import SubsystemErrorBoundary from "./components/diagnostics/SubsystemErrorBoundary";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
-import { loadAuthSession } from "./services/auth/sessionStore";
-import { loadUserProfile, saveUserProfile } from "./services/auth/userProfileStore";
 import { markFirstDashboardPending } from "./services/onboarding/onboardingFirstRunMemory";
-import { clearOnboardingProgress, loadOnboardingProgress } from "./services/onboarding/onboardingProgressMemory";
+import { clearOnboardingProgress, loadOnboardingProgress, type OnboardingProgress } from "./services/onboarding/onboardingProgressMemory";
+import { loadUserProfile, saveUserProfile } from "./services/auth/userProfileStore";
+import useAuthSession from "./hooks/auth/useAuthSession";
 
 type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
@@ -98,24 +98,18 @@ const DEFAULT_SKIP_PROFILE: UserProfile = {
   modules: ["Institutional activity"],
 };
 
+function computeOnboardingComplete(uid: string): boolean {
+  const progress = loadOnboardingProgress(uid);
+  // If progress is null, onboarding is complete.
+  return progress === null;
+}
+
 export default function App(): JSX.Element {
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
-    const authOk = loadAuthSession().status === "authenticated";
-    if (!authOk) return false;
+  const auth = useAuthSession();
 
-    // If the user is authenticated but onboarding progress still exists, we must continue onboarding.
-    return loadOnboardingProgress() === null;
-  });
+  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(null);
 
-  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(() => {
-    if (loadAuthSession().status !== "authenticated") return null;
-    return loadUserProfile() ?? DEFAULT_SKIP_PROFILE;
-  });
-
-  const overrideInputs: MarketInputs | null = useMemo(() => {
-    if (!draftProfile) return null;
-    return profileToMarketInputs(draftProfile);
-  }, [draftProfile]);
+  const [onboardingCompleteState, setOnboardingCompleteState] = useState<boolean>(false);
 
   const [pageKey, setPageKey] = useState<PageKey>(() => getPageKeyFromUrl());
   const [routeSignature, setRouteSignature] = useState<string>(() => getRouteSignatureFromUrl());
@@ -134,8 +128,6 @@ export default function App(): JSX.Element {
     window.addEventListener("urlchange", sync);
     window.addEventListener("popstate", sync);
 
-    // Make "urlchange" reliable even if some components call history.pushState/replaceState
-    // without manually dispatching the event.
     const originalPushState = window.history.pushState;
     const originalReplaceState = window.history.replaceState;
 
@@ -164,24 +156,35 @@ export default function App(): JSX.Element {
     };
   }, []);
 
-  const mainView = useMemo(() => {
-    if (pageKey === "landing") return <PublicLandingPage />;
-    if (pageKey === "about") return <PublicAboutPage />;
-
-    if (pageKey === "company") return <CompanyUniversePage />;
-    if (pageKey === "community") return <CommunityHubPage />;
-    if (pageKey === "practice") return <PracticeTerminalPage />;
-    if (pageKey === "assistant") return <AssistantPage />;
-    if (pageKey === "explore") return <DiscoveryEntityPage />;
-    if (pageKey === "dashboard") return <MarketIntelligenceDashboard />;
-    if (pageKey === "stock") return <StockStoryPage />;
-
-    return <StockStoryPage />;
-  }, [pageKey]);
-
   const isPublicPage = pageKey === "landing" || pageKey === "about";
   const skipOnboarding = getSkipOnboardingFlag();
-  const shouldShowOnboarding = !skipOnboarding && !onboardingComplete && !isPublicPage;
+
+  const isAuthLoading = auth.status === "loading";
+  const isAuthed = auth.status === "authenticated" && !!auth.user;
+  const uid = isAuthed ? auth.user!.uid : undefined;
+
+  useEffect(() => {
+    if (!isAuthed || !uid) {
+      setDraftProfile(null);
+      setOnboardingCompleteState(false);
+      return;
+    }
+
+    const existing = loadUserProfile(uid) ?? DEFAULT_SKIP_PROFILE;
+    setDraftProfile(existing);
+    setOnboardingCompleteState(computeOnboardingComplete(uid));
+  }, [isAuthed, uid]);
+
+  const overrideInputs: MarketInputs | null = useMemo(() => {
+    if (!draftProfile) return null;
+    return profileToMarketInputs(draftProfile);
+  }, [draftProfile]);
+
+  // Route protection rule:
+  // - Public pages never require auth.
+  // - Private pages require auth even if skipOnboarding=true.
+  // - After auth is present, skipOnboarding=true skips onboarding content (only if onboarding is complete).
+  const shouldShowOnboarding = !isPublicPage && !isAuthLoading && (!isAuthed || (!onboardingCompleteState && !skipOnboarding));
 
   const routeSubsystem = useMemo(() => {
     switch (pageKey) {
@@ -208,45 +211,97 @@ export default function App(): JSX.Element {
     }
   }, [pageKey]);
 
+  const mainView = useMemo(() => {
+    if (pageKey === "landing") return <PublicLandingPage />;
+    if (pageKey === "about") return <PublicAboutPage />;
+
+    if (pageKey === "company") return <CompanyUniversePage />;
+    if (pageKey === "community") return <CommunityHubPage />;
+    if (pageKey === "practice") return <PracticeTerminalPage />;
+    if (pageKey === "assistant") return <AssistantPage />;
+    if (pageKey === "explore") return <DiscoveryEntityPage />;
+    if (pageKey === "dashboard") return <MarketIntelligenceDashboard />;
+    if (pageKey === "stock") return <StockStoryPage />;
+
+    return <StockStoryPage />;
+  }, [pageKey]);
+
+  // Hydration guard: avoids “random onboarding/dashboard flicker” during auth restoration.
+  if (isAuthLoading && !isPublicPage) {
+    return (
+      <MotionController>
+        <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
+          <MasterMotionEngine enabled={false}>
+              <SpatialEnvironmentProvider enabled>
+                <SpatialInterfaceReconstructionEngine enabled={false} />
+                <div className="min-h-screen w-full flex items-center justify-center bg-[#020304]">
+                  <div className="rounded-[28px] border border-white/10 bg-black/30 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)] max-w-[560px] w-[calc(100%-32px)]">
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/55">Restoring secure session</div>
+                    <div className="mt-3 text-[18px] font-semibold text-white/92">Please wait—identity is being verified.</div>
+                    <div className="mt-3 text-[13px] leading-[1.7] text-white/75">
+                      This prevents accidental logouts and keeps your learning workspace connected.
+                    </div>
+                  </div>
+                </div>
+              </SpatialEnvironmentProvider>
+          </MasterMotionEngine>
+        </ConfidenceEngine>
+      </MotionController>
+    );
+  }
+
   return (
     <MotionController>
       <ConfidenceEngine paused={shouldShowOnboarding} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
         <MasterMotionEngine enabled={!shouldShowOnboarding}>
-          <SpatialEnvironmentProvider enabled>
-            <SpatialInterfaceReconstructionEngine enabled={!shouldShowOnboarding} />
-            {shouldShowOnboarding ? (
-              <OnboardingPage
-                onComplete={(profile) => {
-                  clearOnboardingProgress();
-                  markFirstDashboardPending();
-                  setDraftProfile(profile);
-                  setOnboardingComplete(true);
-                  saveUserProfile(profile);
-                }}
-                onDraftChange={(profile) => {
-                  setDraftProfile(profile);
-                  if (profile) saveUserProfile(profile);
-                }}
-              />
-            ) : (
-              <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
-                <CinematicTransitionLayer activeKey={routeSignature} enabled>
-                  <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
-                    {mainView}
-                  </SubsystemErrorBoundary>
-                </CinematicTransitionLayer>
+            <SpatialEnvironmentProvider enabled>
+              <SpatialInterfaceReconstructionEngine enabled={!shouldShowOnboarding} />
+              {shouldShowOnboarding ? (
+                <OnboardingPage
+                  onComplete={(profile) => {
+                    if (!uid) {
+                      // If uid is missing (should be rare: onboarding completed before auth hydration),
+                      // we still allow the flow, and subsequent sign-in will restore from Firebase.
+                      setDraftProfile(profile);
+                      setOnboardingCompleteState(true);
+                      return;
+                    }
 
-                <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
-                  <IntelligenceHUD />
-                </SubsystemErrorBoundary>
-                {pageKey === "landing" || pageKey === "about" ? null : (
-                  <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
-                    <IntelligenceNavigationRail />
+                    clearOnboardingProgress(uid);
+                    markFirstDashboardPending(uid);
+                    setDraftProfile(profile);
+                    setOnboardingCompleteState(true);
+                    saveUserProfile(profile, uid);
+                  }}
+                  onDraftChange={(profile) => {
+                    if (!profile) {
+                      setDraftProfile(null);
+                      return;
+                    }
+                    setDraftProfile(profile);
+                    if (uid) saveUserProfile(profile, uid);
+                  }}
+                />
+              ) : (
+                <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
+                  <CinematicTransitionLayer activeKey={routeSignature} enabled>
+                    <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
+                      {mainView}
+                    </SubsystemErrorBoundary>
+                  </CinematicTransitionLayer>
+
+                  <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
+                    <IntelligenceHUD />
                   </SubsystemErrorBoundary>
-                )}
-              </LivingInterfaceEngine>
-            )}
-          </SpatialEnvironmentProvider>
+
+                  {pageKey === "landing" || pageKey === "about" ? null : (
+                    <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
+                      <IntelligenceNavigationRail />
+                    </SubsystemErrorBoundary>
+                  )}
+                </LivingInterfaceEngine>
+              )}
+            </SpatialEnvironmentProvider>
         </MasterMotionEngine>
       </ConfidenceEngine>
     </MotionController>
