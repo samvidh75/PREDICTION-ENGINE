@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useConfidenceEngine } from "../../components/intelligence/ConfidenceEngine";
 import { computeCompanyUniverseModel, type CompanyInputs } from "./companyUniverseEngine";
 import type { CompanyUniverseModel } from "../../types/CompanyUniverse";
+import { sanitizeCompanyUniverseModelStrings } from "../../lib/compliance/sanitizeIntelligenceStrings";
 
 export function useCompanyUniverseModel(ticker: string): CompanyUniverseModel {
   const { narrativeKey } = useConfidenceEngine();
@@ -17,5 +18,10 @@ export function useCompanyUniverseModel(ticker: string): CompanyUniverseModel {
 
   const model = useMemo(() => computeCompanyUniverseModel(inputs), [inputs]);
 
-  return model;
+  // Enforce educational-only language at the model boundary (prevents any accidental “advisory” phrasing).
+  const compliantModel = useMemo(() => {
+    return sanitizeCompanyUniverseModelStrings(model, { level: "educational" });
+  }, [model]);
+
+  return compliantModel;
 }

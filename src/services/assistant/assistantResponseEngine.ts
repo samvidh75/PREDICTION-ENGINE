@@ -2,6 +2,7 @@ import type { ConfidenceState, ConfidenceTheme } from "../../components/intellig
 import type { MarketState } from "../intelligence/marketState";
 import type { SectorId } from "../portfolio/portfolioIntelligenceEngine";
 import type { NeuralMarketSynthesis } from "../synthesis/neuralMarketSynthesisTypes";
+import { applyComplianceCopyFilter } from "../../lib/compliance/complianceCopyFilter";
 
 export type AssistantMemory = {
   preferredSectors: SectorId[];
@@ -395,10 +396,20 @@ export function generateAssistantResponse(args: {
 
   const environmentNotification = buildEnvironmentNotification(context, memory);
 
+  const compliantReply = applyComplianceCopyFilter(reply, "educational");
+  const compliantFollowups = suggestedFollowups.map((q) => applyComplianceCopyFilter(q, "educational"));
+
+  const compliantEnvironmentNotification = environmentNotification
+    ? {
+        title: applyComplianceCopyFilter(environmentNotification.title, "educational"),
+        body: applyComplianceCopyFilter(environmentNotification.body, "educational"),
+      }
+    : undefined;
+
   return {
-    reply,
+    reply: compliantReply,
     updatedMemory,
-    suggestedFollowups,
-    environmentNotification,
+    suggestedFollowups: compliantFollowups,
+    environmentNotification: compliantEnvironmentNotification,
   };
 }

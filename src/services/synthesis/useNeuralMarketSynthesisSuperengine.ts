@@ -7,6 +7,7 @@ import { useMotionController } from "../../components/motion/MotionController";
 import { MarketService, type MarketComposite, type MarketConnectionStatus } from "../market/marketService";
 import { useMarketService } from "../ui/environmentSync";
 import { buildNeuralMarketSynthesisEngine } from "./neuralMarketSynthesisEngine";
+import { sanitizeNeuralMarketSynthesisStrings } from "../../lib/compliance/sanitizeIntelligenceStrings";
 
 function pickQuality(args: { prefersReducedMotion: boolean | null; isMobile: boolean; state: ConfidenceState }): "low" | "balanced" | "high" {
   const { prefersReducedMotion, isMobile, state } = args;
@@ -32,13 +33,16 @@ export function useNeuralMarketSynthesisSuperengine(): {
   const quality = pickQuality({ prefersReducedMotion, isMobile, state });
 
   const synthesis = useMemo(() => {
-    return buildNeuralMarketSynthesisEngine({
+    const raw = buildNeuralMarketSynthesisEngine({
       market: marketStream.snapshot,
       confidenceState: state,
       theme,
       narrativeKey,
       quality,
     });
+
+    // Enforce educational-only language at the synthesis boundary.
+    return sanitizeNeuralMarketSynthesisStrings(raw, { level: "educational" });
   }, [marketStream.snapshot, state, theme, narrativeKey, quality]);
 
   return {

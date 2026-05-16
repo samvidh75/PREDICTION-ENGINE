@@ -4,11 +4,15 @@ import CinematicChart from "./CinematicChart";
 
 type StockStoryChartIntegrationProps = {
   ticker: string;
+  compareTicker?: string | null;
+  onClearCompare?: () => void;
   defaultTimeframe?: ChartTimeframe;
 };
 
 export default function StockStoryChartIntegration({
   ticker,
+  compareTicker = null,
+  onClearCompare,
   defaultTimeframe = "1M",
 }: StockStoryChartIntegrationProps): JSX.Element {
   const [ready, setReady] = useState(false);
@@ -31,7 +35,7 @@ export default function StockStoryChartIntegration({
       )}
 
       <div className={ready ? "opacity-100" : "opacity-0"} style={{ transition: "opacity 260ms ease" }}>
-        <CinematicChart ticker={ticker} defaultTimeframe={defaultTimeframe} />
+<CinematicChart ticker={ticker} compareTicker={compareTicker} onClearCompare={onClearCompare} defaultTimeframe={defaultTimeframe} />
       </div>
     </div>
   );

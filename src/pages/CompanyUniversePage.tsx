@@ -23,7 +23,10 @@ import CompanyHealthometerEnvironment from "../components/companyUniverse/Compan
 import CompanyInstitutionalIntelligenceLayer from "../components/companyUniverse/CompanyInstitutionalIntelligenceLayer";
 
 import CompanyFinancialInfographicEcosystem from "../components/companyUniverse/CompanyFinancialInfographicEcosystem";
+import CompanyProgressiveFinancialAnalysis from "../components/companyUniverse/CompanyProgressiveFinancialAnalysis";
 import CompanyNewsEcosystem from "../components/companyUniverse/CompanyNewsEcosystem";
+import CompanyMarketStoryLayer from "../components/companyUniverse/CompanyMarketStoryLayer";
+import CompanyMarketEventsLayer from "../components/companyUniverse/CompanyMarketEventsLayer";
 
 import MacroIntelligenceEngine from "../components/macro/MacroIntelligenceEngine";
 import StockStoryChartIntegration from "../components/charts/StockStoryChartIntegration";
@@ -59,18 +62,17 @@ import useBeginnerIntelligenceCalibration from "../hooks/useBeginnerIntelligence
 function healthLabel(state: CompanyHealthState): string {
   switch (state) {
     case "STRUCTURALLY_HEALTHY":
-      return "Structurally Healthy";
+      return "Strong";
     case "STABLE_EXPANSION":
-      return "Stable Expansion";
+      return "Stable";
     case "CONFIDENCE_IMPROVING":
-      return "Confidence Improving";
+      return "Improving";
     case "LIQUIDITY_FRAGILE":
-      return "Liquidity Fragile";
+      return "Weakening";
     case "VOLATILITY_SENSITIVE":
-      return "Volatility Sensitive";
     case "STRUCTURALLY_WEAKENING":
     default:
-      return "Structurally Weakening";
+      return "High Risk";
   }
 }
 
@@ -147,8 +149,10 @@ export default function CompanyUniversePage(): JSX.Element {
   const { isMobile } = useMotionController();
   const [brokerOpen, setBrokerOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [compareTicker, setCompareTicker] = useState<string | null>(null);
   const [watchlistVersion, setWatchlistVersion] = useState<number>(0);
   const chartsSectionRef = useRef<HTMLElement | null>(null);
+  const didAutoScrollCompareRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -175,6 +179,76 @@ export default function CompanyUniversePage(): JSX.Element {
   }, []);
 
   const model = useCompanyUniverseModel(ticker);
+
+  // Chart compare overlay: URL param driven for persistence.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("compare") ?? params.get("compareTicker");
+    const cleaned = (raw ?? "").toUpperCase().trim();
+
+    if (!cleaned) {
+      setCompareTicker(null);
+      return;
+    }
+
+    const primary = model.ticker.toUpperCase().trim();
+    if (cleaned === primary) {
+      setCompareTicker(null);
+      return;
+    }
+
+    setCompareTicker(cleaned);
+  }, [model.ticker]);
+
+  const clearCompareOverlay = () => {
+    setCompareTicker(null);
+
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("compare");
+    url.searchParams.delete("compareTicker");
+    window.history.replaceState({}, "", url.toString());
+  };
+
+  const onCompareOnPage = (nextTicker: string) => {
+    const cleaned = (nextTicker ?? "").toUpperCase().trim();
+    if (!cleaned) return;
+
+    const primary = model.ticker.toUpperCase().trim();
+    if (cleaned === primary) {
+      clearCompareOverlay();
+      return;
+    }
+
+    setCompareTicker(cleaned);
+
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("compare", cleaned);
+    window.history.replaceState({}, "", url.toString());
+  };
+
+  // Auto-scroll once when a compare overlay becomes active, so the chart compare pill is immediately visible.
+  useEffect(() => {
+    if (!compareTicker) {
+      didAutoScrollCompareRef.current = false;
+      return;
+    }
+
+    if (didAutoScrollCompareRef.current) return;
+    didAutoScrollCompareRef.current = true;
+
+    const id = window.setTimeout(() => {
+      chartsSectionRef.current?.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    }, 180);
+
+    return () => window.clearTimeout(id);
+  }, [compareTicker, prefersReducedMotion]);
 
   const sectorMapping = useMemo(() => getCompanySectorMapping(model.ticker), [model.ticker]);
   const sectorAvailable = Boolean(sectorMapping.exploreId);
@@ -235,16 +309,16 @@ export default function CompanyUniversePage(): JSX.Element {
         className="relative z-[11]"
         style={{
           height: "90vh",
-          paddingTop: 96,
-          paddingBottom: 64,
-          paddingLeft: 72,
-          paddingRight: 72,
+          paddingTop: isMobile ? 84 : 96,
+          paddingBottom: isMobile ? 44 : 64,
+          paddingLeft: isMobile ? 20 : 72,
+          paddingRight: isMobile ? 20 : 72,
         }}
       >
         <div className="absolute inset-0" />
         <div className="relative h-full">
           {/* Left: identity + emotional doc framing */}
-          <div className="absolute left-0 top-0 w-full sm:w-[600px]">
+          <div className={isMobile ? "relative w-full" : "absolute left-0 top-0 w-full sm:w-[600px]"}>
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">
               {model.ticker} • {model.marketStateLabel}
             </div>
@@ -322,39 +396,44 @@ export default function CompanyUniversePage(): JSX.Element {
           </div>
 
           {/* Center: orb ecosystem */}
-          <div className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2">
-            <MarketOrb />
-            <OrbEffects />
-          </div>
+          {!isMobile && (
+            <div className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2">
+              <MarketOrb />
+              <OrbEffects />
+            </div>
+          )}
 
           {/* Right: institutional + macro strategic readouts */}
-          <div className="absolute right-0 top-0 w-[410px]">
-            <div
-              className="rounded-[24px] border border-white/10 bg-black/40 backdrop-blur-[24px] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]"
-              style={{ boxShadow: `0 0 40px rgba(0,0,0,0.35), 0 0 120px ${heroGlow}` }}
-            >
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Hero Intelligence Rail</div>
+          {!isMobile && (
+            <div className="absolute right-0 top-0 w-[410px]">
+              <div
+                className="rounded-[24px] border border-white/10 bg-black/40 backdrop-blur-[24px] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]"
+                style={{ boxShadow: `0 0 40px rgba(0,0,0,0.35), 0 0 120px ${heroGlow}` }}
+              >
+                <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Hero Intelligence Rail</div>
 
-              <div className="mt-4 text-[18px] font-semibold text-white/92">{healthLabel(model.healthState)}</div>
+                <div className="mt-4 text-[18px] font-semibold text-white/92">{healthLabel(model.healthState)}</div>
 
-              <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
-                Sector positioning: <span className="text-white/92 font-semibold">{model.positioningRailLabel}</span>
-              </div>
+                <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
+                  Sector positioning: <span className="text-white/92 font-semibold">{model.positioningRailLabel}</span>
+                </div>
 
-              <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
-                Institutional confidence: <span className="text-white/92 font-semibold">{confidenceLabel(confidenceState)}</span>
-              </div>
+                <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
+                  Institutional confidence:{" "}
+                  <span className="text-white/92 font-semibold">{confidenceLabel(confidenceState)}</span>
+                </div>
 
-              <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
-                Macro sensitivity: <span className="text-white/92 font-semibold">{synthesis.macroGeopolitical.headline}</span>
-              </div>
+                <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
+                  Macro sensitivity: <span className="text-white/92 font-semibold">{synthesis.macroGeopolitical.headline}</span>
+                </div>
 
-              <div className="mt-5 rounded-[20px] border border-white/10 bg-black/20 p-4">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-white/60">Strategic summary (SEBI-safe)</div>
-                <div className="mt-2 text-[14px] leading-[1.6] text-white/85">{model.strategicSummary}</div>
+                <div className="mt-5 rounded-[20px] border border-white/10 bg-black/20 p-4">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/60">Strategic summary (SEBI-safe)</div>
+                  <div className="mt-2 text-[14px] leading-[1.6] text-white/85">{model.strategicSummary}</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -373,6 +452,7 @@ export default function CompanyUniversePage(): JSX.Element {
         onClose={() => setCompareOpen(false)}
         primaryTicker={model.ticker}
         theme={confidenceTheme}
+        onCompareOnPage={onCompareOnPage}
       />
 
       {/* 2) Live Market Telemetry Core */}
@@ -397,6 +477,26 @@ export default function CompanyUniversePage(): JSX.Element {
         theme={confidenceTheme}
         beginner={beginner}
         isMobile={isMobile}
+      />
+
+      {/* 3.5) Market Story & Narrative Layer */}
+      <CompanyMarketStoryLayer
+        companyName={model.companyName}
+        ticker={model.ticker}
+        sectorLabel={sectorMapping.label}
+        healthState={model.healthState}
+        healthTheme={model.healthTheme}
+        founders={model.founders}
+        leadership={model.leadership}
+        narrativeBody={model.narrative.body}
+        strategicSummary={model.strategicSummary}
+        positioningRailLabel={model.positioningRailLabel}
+        financialTelemetry={model.financialTelemetry}
+        futureCapsules={model.futureProbabilityCapsules}
+        synthesis={synthesis}
+        confidenceState={confidenceState}
+        confidenceTheme={confidenceTheme}
+        beginner={beginner}
       />
 
       {/* 4) Company Storytelling Ecosystem */}
@@ -426,7 +526,7 @@ export default function CompanyUniversePage(): JSX.Element {
       />
 
       {/* 5) TradingView-Grade Chart Universe */}
-      <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
+      <section ref={chartsSectionRef} className="relative z-[12] px-6 sm:px-[72px] pb-14">
         <div className="mx-auto max-w-[1680px]">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
@@ -443,7 +543,12 @@ export default function CompanyUniversePage(): JSX.Element {
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-[24px] p-6 shadow-[0_0_50px_rgba(0,0,0,0.35)]">
-            <StockStoryChartIntegration ticker={model.ticker} defaultTimeframe="1M" />
+            <StockStoryChartIntegration
+              ticker={model.ticker}
+              compareTicker={compareTicker}
+              onClearCompare={clearCompareOverlay}
+              defaultTimeframe="1M"
+            />
           </div>
         </div>
       </section>
@@ -457,7 +562,7 @@ export default function CompanyUniversePage(): JSX.Element {
         beginner={beginner}
       />
 
-      {/* 7) Financial Infographic Ecosystem */}
+      {/* 7) Progressive Financial Analysis System */}
       <MasterInfographicEngine
         enabled={!prefersReducedMotion}
         ticker={model.ticker}
@@ -467,23 +572,15 @@ export default function CompanyUniversePage(): JSX.Element {
       >
         <section className="relative z-[12] px-6 sm:px-[72px] pb-14">
           <div className="mx-auto max-w-[1680px]">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-              <div className="lg:col-span-5">
-                <VolumetricFinancialTowers points={model.financialTelemetry} />
-                <div className="mt-6">
-                  <BeginnerFinancialSimplificationRail />
-                </div>
-              </div>
-
-              <div className="lg:col-span-7">
-                <CompanyFinancialInfographicEcosystem
-                  points={model.financialTelemetry}
-                  beginner={beginner}
-                  healthState={model.healthState}
-                  healthTheme={model.healthTheme}
-                />
-              </div>
-            </div>
+            <CompanyProgressiveFinancialAnalysis
+              ticker={model.ticker}
+              points={model.financialTelemetry}
+              healthState={model.healthState}
+              healthTheme={model.healthTheme}
+              confidenceState={confidenceState}
+              confidenceTheme={confidenceTheme}
+              beginner={beginner}
+            />
           </div>
         </section>
       </MasterInfographicEngine>
@@ -513,6 +610,9 @@ export default function CompanyUniversePage(): JSX.Element {
         theme={confidenceTheme}
         beginner={beginner}
       />
+
+      {/* Market-wide context (separate from company news) */}
+      <CompanyMarketEventsLayer synthesis={synthesis} confidenceState={confidenceState} theme={confidenceTheme} beginner={beginner} />
 
       {/* 10) Adaptive Beginner Understanding System */}
       <section className="relative z-[12] px-6 sm:px-[72px] pb-24">

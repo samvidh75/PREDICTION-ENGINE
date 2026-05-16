@@ -12,6 +12,7 @@ import { useConfidenceEngine, type ConfidenceState, type ConfidenceTheme } from 
 import { useNeuralMarketSynthesisSuperengine } from "../../services/synthesis/useNeuralMarketSynthesisSuperengine";
 
 import MarketPulseLayer from "./MarketPulseLayer";
+import AdaptiveDashboardShell from "./AdaptiveDashboardShell";
 import DashboardCommandSearchBar from "./DashboardCommandSearchBar";
 import TopMoversSnapshot from "./TopMoversSnapshot";
 import MacroIntelligenceEngine from "../macro/MacroIntelligenceEngine";
@@ -24,6 +25,9 @@ import MarketScannerEngine from "../scanner/MarketScannerEngine";
 import NeuralMarketSynthesisPanel from "../synthesis/NeuralMarketSynthesisPanel";
 import { useMotionController } from "../motion/MotionController";
 import useBeginnerIntelligenceCalibration from "../../hooks/useBeginnerIntelligenceCalibration";
+
+import MarketOverviewPanel from "../market/MarketOverviewPanel";
+import MarketStructuredNewsFeed from "../market/MarketStructuredNewsFeed";
 
 import BeginnerModeOverlay from "../onboarding/BeginnerModeOverlay";
 import {
@@ -187,19 +191,9 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Intelligence feed"];
   }, [state]);
 
-  const core = (
-    <SubsystemErrorBoundary subsystem="dashboard_core" phase="render">
-      <CentralIntelligenceCore
-        synthesis={synthesis}
-        confidenceState={state}
-        theme={theme}
-        marketStateLabel={marketState}
-        beginner={beginner || !hasPremium}
-      />
-    </SubsystemErrorBoundary>
-  );
+  const core = null;
 
-  const pulse = <MarketPulseLayer marketSnapshot={marketSnapshot} connectionStatus={connectionStatus} />;
+  const pulse = null;
 
   const statusPill = useMemo(() => {
     if (connectionStatus === "connecting" || connectionStatus === "reconnecting") return "Syncing";
@@ -455,34 +449,22 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       </div>
 
       <div className="relative z-[6]">
-        {/* Primary focus zone: command search + pulse + top movers + personalised insight */}
-        <section className="relative z-[12] px-6 sm:px-[72px] pt-10 pb-8">
-          <div className="mx-auto max-w-[1680px] flex flex-col gap-6">
-            <DashboardCommandSearchBar
-              statusPill={statusPill}
-              preferredPills={preferredSearchPills}
-              onOpenSearch={onOpenSearchFromDashboard}
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-              <section className="relative z-[12]">{pulse}</section>
-              <TopMoversSnapshot
-                marketSnapshot={marketSnapshot}
-                connectionStatus={connectionStatus}
-                confidenceState={state}
-                theme={theme}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Personalised AI insight */}
-        {core}
-
-        {/* Secondary expandable intelligence zone (single entry point to reduce clutter) */}
-        <section className="relative z-[12] px-6 sm:px-[72px] pb-20">
-          <div className="mx-auto max-w-[1680px]">{secondaryLayer}</div>
-        </section>
+        <AdaptiveDashboardShell
+          isMobile={isMobile}
+          beginner={beginner}
+          hasPremium={hasPremium}
+          hasInstitutional={hasInstitutional}
+          state={state}
+          theme={theme}
+          marketStateLabel={marketState}
+          synthesis={synthesis}
+          marketSnapshot={marketSnapshot}
+          connectionStatus={connectionStatus}
+          statusPill={statusPill}
+          preferredSearchPills={preferredSearchPills}
+          onOpenSearch={onOpenSearchFromDashboard}
+          firstDashboardPending={firstDashboardPending}
+        />
       </div>
     </div>
   );

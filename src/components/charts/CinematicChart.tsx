@@ -15,6 +15,8 @@ type ChartMode = "candles" | "structure";
 
 type CinematicChartProps = {
   ticker: string;
+  compareTicker?: string | null;
+  onClearCompare?: () => void;
   defaultTimeframe?: ChartTimeframe;
 };
 
@@ -160,7 +162,12 @@ function buildNarrativeCapsules(args: {
   return base;
 }
 
-export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: CinematicChartProps): JSX.Element {
+export default function CinematicChart({
+  ticker,
+  compareTicker = null,
+  onClearCompare,
+  defaultTimeframe = "1M",
+}: CinematicChartProps): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { state, theme, narrativeKey, narrativeVariant } = useConfidenceEngine();
   const { chartCapsuleMax, chartDprMax, tooltipWidthPx, chartOverlayDefault } = useSpatialEnvironment();
@@ -185,7 +192,27 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
 
   const candles = series.candles;
 
-  const priceDomain = useMemo(() => computePriceDomain(candles, 0.08), [candles]);
+  const compareSeries = useMemo(() => {
+    if (!compareTicker) return null;
+    const raw = compareTicker.toUpperCase().trim();
+    if (!raw) return null;
+    if (raw === ticker.toUpperCase().trim()) return null;
+
+    return getSyntheticChartSeries(`${raw}_${narrativeVariant}`, timeframe);
+  }, [compareTicker, timeframe, narrativeVariant, ticker]);
+
+  const compareCandles = compareSeries?.candles ?? [];
+
+  const priceDomain = useMemo(() => {
+    if (!compareSeries || compareCandles.length === 0) return computePriceDomain(candles, 0.08);
+    return computePriceDomain([...candles, ...compareCandles], 0.08);
+  }, [candles, compareSeries, compareCandles]);
+
+  const compareSma = useMemo(() => {
+    if (!compareCandles.length) return [];
+    const closes = compareCandles.map((c) => c.c);
+    return computeSMA(closes, Math.max(6, Math.round(closes.length * 0.10)));
+  }, [compareCandles]);
 
   const sma = useMemo(() => {
     const closes = candles.map((c) => c.c);
@@ -353,6 +380,24 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
+
+      // Educational compare overlay (thin dashed SMA)
+      if (compareSma.length === sma.length && compareSma.length > 0 && compareSeries) {
+        ctx.save();
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = "rgba(255,255,255,0.26)";
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        for (let i = 0; i < candles.length; i += 1) {
+          const x = toX(i) + candleW / 2;
+          const y = toChartY(compareSma[i]);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+        ctx.setLineDash([]);
+      }
     };
 
     const drawCandles = () => {
@@ -407,6 +452,24 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
       }
       ctx.stroke();
 
+      // Educational compare overlay (thin dashed SMA)
+      if (compareSma.length === sma.length && compareSma.length > 0 && compareSeries) {
+        ctx.save();
+        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = "rgba(255,255,255,0.26)";
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        for (let i = 0; i < candles.length; i += 1) {
+          const x = toX(i) + candleW / 2;
+          const y = toChartY(compareSma[i]);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+        ctx.setLineDash([]);
+      }
+
       // Minimal “confidence glow band” based on state
       const glowAlpha = state === "ELEVATED_RISK" ? 0.05 : state === "MOMENTUM_WEAKENING" ? 0.04 : 0.035;
       ctx.fillStyle = state === "ELEVATED_RISK" ? `rgba(255,120,120,${glowAlpha})` : `rgba(0,255,210,${glowAlpha})`;
@@ -426,7 +489,7 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
     return () => {
       ro.disconnect();
     };
-  }, [candles, candleStroke.wick, chartMode, downFill, priceDomain, rollingRange, sma, state, upFill, chartDprMax]);
+  }, [candles, compareSeries, compareCandles, compareSma, candleStroke.wick, chartMode, downFill, priceDomain, rollingRange, sma, state, upFill, chartDprMax]);
 
   const onMove = (ev: React.PointerEvent) => {
     const root = rootRef.current;
@@ -490,6 +553,31 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
               {tf}
             </button>
           ))}
+
+          {compareTicker && compareSeries && (
+            <div
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-black/25 px-3 py-2"
+              style={{ boxShadow: "0 0 60px rgba(0,0,0,0.15)" }}
+            >
+              <div className="text-[10px] uppercase tracking-[0.18em] text-white/60 whitespace-nowrap">
+                compare: {compareTicker.toUpperCase().trim()}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onClearCompare?.()}
+                disabled={!onClearCompare}
+                className={[
+                  "h-[22px] w-[22px] rounded-full border text-white/70 hover:text-white/95 transition flex items-center justify-center",
+                  onClearCompare ? "border-white/10 bg-black/20" : "border-white/10 bg-black/10 text-white/35 cursor-not-allowed",
+                ].join(" ")}
+                aria-label="Clear chart comparison"
+                title={onClearCompare ? "Clear comparison overlay" : "Comparison clear callback unavailable"}
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

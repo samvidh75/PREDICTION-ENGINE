@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import type { ConfidenceTheme } from "../intelligence/ConfidenceEngine";
 import type { CompanyHealthState } from "../../types/CompanyUniverse";
-import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 
 function seiSafeNote(): string {
   return "Comparison is educational only • no certainty claims • no trade execution • SEBI-safe framing";
@@ -12,11 +11,13 @@ export default function CompanyCompareModal({
   onClose,
   primaryTicker,
   theme,
+  onCompareOnPage,
 }: {
   open: boolean;
   onClose: () => void;
   primaryTicker: string;
   theme: ConfidenceTheme;
+  onCompareOnPage: (ticker: string) => void;
 }): JSX.Element | null {
   const [secondaryTicker, setSecondaryTicker] = useState<string>("INFY");
 
@@ -82,13 +83,24 @@ export default function CompanyCompareModal({
               <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Company A</div>
               <div className="mt-3 text-[18px] font-semibold text-white/92">{cleanedPrimary}</div>
 
-              <div className="mt-4">
+              <div className="mt-4 space-y-3">
                 <button
                   type="button"
                   onClick={() => openCompany(cleanedPrimary)}
-                  className="h-[44px] rounded-full border border-white/10 bg-black/30 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/85 hover:bg-black/35 hover:border-white/20 transition"
+                  className="h-[44px] rounded-full border border-white/10 bg-black/30 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/85 hover:bg-black/35 hover:border-white/20 transition w-full"
                 >
                   Open Company A
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onCompareOnPage(cleanedPrimary);
+                    onClose();
+                  }}
+                  className="h-[44px] rounded-full border border-white/10 bg-black/25 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/90 hover:bg-black/35 hover:border-white/20 transition w-full"
+                >
+                  Compare on this page
                 </button>
               </div>
             </div>
@@ -105,13 +117,24 @@ export default function CompanyCompareModal({
                 />
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 space-y-3">
                 <button
                   type="button"
                   onClick={() => openCompany(cleanedSecondary || cleanedPrimary)}
-                  className="h-[44px] rounded-full border border-white/10 bg-black/30 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/85 hover:bg-black/35 hover:border-white/20 transition"
+                  className="h-[44px] rounded-full border border-white/10 bg-black/30 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/85 hover:bg-black/35 hover:border-white/20 transition w-full"
                 >
                   Open Company B
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onCompareOnPage(cleanedSecondary || cleanedPrimary);
+                    onClose();
+                  }}
+                  className="h-[44px] rounded-full border border-white/10 bg-black/25 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/90 hover:bg-black/35 hover:border-white/20 transition w-full"
+                >
+                  Compare on this page
                 </button>
               </div>
             </div>

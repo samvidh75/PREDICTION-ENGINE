@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import type { NeuralMarketSynthesis, NeuralHealthometerState } from "../../services/synthesis/neuralMarketSynthesisTypes";
 import type { ConfidenceState, ConfidenceTheme } from "../../components/intelligence/ConfidenceEngine";
 import HealthometerEcosystem from "../healthometer/HealthometerEcosystem";
+import { toHealthUxState } from "../healthometer/healthometerUxStateMapping";
 
 type Props = {
   synthesis: NeuralMarketSynthesis;
@@ -11,21 +12,7 @@ type Props = {
 };
 
 function labelForHealth(state: NeuralHealthometerState): string {
-  switch (state) {
-    case "Structurally Healthy":
-      return "Structurally Healthy";
-    case "Stable Expansion":
-      return "Stable Expansion";
-    case "Confidence Improving":
-      return "Confidence Improving";
-    case "Volatility Sensitive":
-      return "Volatility Sensitive";
-    case "Liquidity Fragile":
-      return "Liquidity Fragile";
-    case "Structurally Weakening":
-    default:
-      return "Structurally Weakening";
-  }
+  return toHealthUxState(state);
 }
 
 function glowForConfidence(conf: ConfidenceState, theme: ConfidenceTheme): string {

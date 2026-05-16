@@ -8,18 +8,17 @@ import { CompanyUniverseCard } from "./CompanyUniverseSectionFrame";
 function healthLabel(state: CompanyHealthState): string {
   switch (state) {
     case "STRUCTURALLY_HEALTHY":
-      return "Structurally Healthy";
+      return "Strong";
     case "STABLE_EXPANSION":
-      return "Stable Expansion";
+      return "Stable";
     case "CONFIDENCE_IMPROVING":
-      return "Confidence Improving";
+      return "Improving";
     case "LIQUIDITY_FRAGILE":
-      return "Liquidity Fragile";
+      return "Weakening";
     case "VOLATILITY_SENSITIVE":
-      return "Volatility Sensitive";
     case "STRUCTURALLY_WEAKENING":
     default:
-      return "Structurally Weakening";
+      return "High Risk";
   }
 }
 

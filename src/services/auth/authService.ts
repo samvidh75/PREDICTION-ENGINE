@@ -1,4 +1,7 @@
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, OAuthProvider, sendPasswordResetEmail, verifyPasswordResetCode, confirmPasswordReset, signOut as firebaseSignOut, type User } from "firebase/auth";
+
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "./sessionStore";
+import { getFirebaseAuthClient } from "./firebaseClient";
 
 export type AuthUser = {
   uid: string;
@@ -21,10 +24,6 @@ export type SendOtp = (email: string) => Promise<{ expiresInSeconds: number; deb
 export type VerifyOtp = (email: string, code: string) => Promise<{ ok: true }>;
 export type ResetPassword = (email: string, code: string, newPassword: string) => Promise<AuthUser>;
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
 function makeAuthError(message: string): AuthError {
   return { message };
 }
@@ -42,43 +41,89 @@ function validatePassword(password: string): string | null {
   return trimmed;
 }
 
-type OtpEntry = {
-  code: string;
-  expiresAtMs: number;
-  verified: boolean;
-};
-
-const otpStore: Record<string, OtpEntry | undefined> = {};
-
-function genOtpCode(): string {
-  // Stable, calm stub (not cryptographic).
-  const x = Math.floor((Date.now() / 1000) % 1000000);
-  return String(x).padStart(6, "0");
+function userProviderToAuthProvider(user: User): AuthUser["provider"] {
+  const providerIds = user.providerData.map((p) => p.providerId);
+  if (providerIds.some((id) => id.includes("google"))) return "google";
+  if (providerIds.some((id) => id.includes("apple"))) return "apple";
+  return "email";
 }
 
-async function persistAndReturnAuthUser(session: {
-  uid: string;
-  provider: "google" | "email" | "apple";
-  email?: string;
-  displayName?: string;
-}): Promise<AuthUser> {
-  const user: AuthUser = {
-    uid: session.uid,
-    provider: session.provider,
-    email: session.email,
-    displayName: session.displayName,
+function persistAuthUser(user: User): AuthUser {
+  const authUser: AuthUser = {
+    uid: user.uid,
+    provider: userProviderToAuthProvider(user),
+    email: user.email ?? undefined,
+    displayName: user.displayName ?? undefined,
   };
 
   saveAuthSession({
     status: "authenticated",
-    uid: user.uid,
-    provider: user.provider,
-    email: user.email,
-    displayName: user.displayName,
+    uid: authUser.uid,
+    provider: authUser.provider,
+    email: authUser.email,
+    displayName: authUser.displayName,
     createdAtMs: Date.now(),
   });
 
-  return user;
+  return authUser;
+}
+
+function mapFirebaseErrorToMessage(e: unknown): string {
+  if (!e || typeof e !== "object") return "Authentication could not be completed. Please try again.";
+
+  // Firebase errors are typically { code, message }.
+  const maybe = e as { code?: string; message?: string };
+  const msg = typeof maybe.message === "string" ? maybe.message : undefined;
+  const code = typeof maybe.code === "string" ? maybe.code : undefined;
+
+  // Calm, trust-first messages (avoid “legal” tone).
+  if (code === "auth/user-not-found") return "No account was found for this email. Please check and try again.";
+  if (code === "auth/wrong-password") return "The password is incorrect. Please try again.";
+  if (code === "auth/invalid-email") return "Please enter a valid email address.";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait briefly and try again.";
+  if (code === "auth/popup-blocked") return "Sign-in was blocked by the browser. Please allow pop-ups and try again.";
+  if (code === "auth/network-request-failed") return "Network connection was interrupted. Please try again.";
+
+  if (msg) return msg;
+
+  return "Authentication could not be completed. Please try again.";
+}
+
+async function signInWithProvider(provider: "google" | "apple"): Promise<AuthUser> {
+  const { auth } = getFirebaseAuthClient();
+
+  if (provider === "google") {
+    const googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+    const result = await signInWithPopup(auth, googleProvider);
+    return persistAuthUser(result.user);
+  }
+
+  const appleProvider = new OAuthProvider("apple.com");
+  // Note: Firebase may require Apple sign-in configuration in Firebase console.
+  // We keep UX calm and rely on Firebase errors if not configured.
+  const result = await signInWithPopup(auth, appleProvider);
+  return persistAuthUser(result.user);
+}
+
+async function signInWithEmail(email: string, password: string): Promise<AuthUser> {
+  const { auth } = getFirebaseAuthClient();
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  return persistAuthUser(result.user);
+}
+
+async function signUpWithEmail(name: string, email: string, password: string): Promise<AuthUser> {
+  const { auth } = getFirebaseAuthClient();
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+
+  if (name.trim().length > 0) {
+    await updateProfile(result.user, { displayName: name.trim() });
+  }
+
+  // Re-read user to reflect updated profile.
+  const refreshedUser = result.user.reload().then(() => auth.currentUser).then((u) => u ?? result.user);
+  const u = await refreshedUser;
+  return persistAuthUser(u);
 }
 
 export const authService: {
@@ -96,155 +141,153 @@ export const authService: {
   signOut: () => Promise<void>;
 } = {
   signInWithGoogle: (async (): Promise<AuthUser> => {
-    await delay(900);
-    return persistAndReturnAuthUser({
-      uid: "stub_uid_google",
-      provider: "google",
-      displayName: "Market Intelligence Member",
-    });
+    try {
+      return await signInWithProvider("google");
+    } catch (e) {
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
+    }
   }) satisfies SignInWithGoogle,
 
   signInWithApple: (async (): Promise<AuthUser> => {
-    await delay(900);
-    return persistAndReturnAuthUser({
-      uid: "stub_uid_apple",
-      provider: "apple",
-      displayName: "Market Intelligence Member",
-    });
+    try {
+      return await signInWithProvider("apple");
+    } catch (e) {
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
+    }
   }) satisfies SignInWithApple,
 
   signInWithEmail: (async (email: string, password: string): Promise<AuthUser> => {
-    await delay(900);
+    try {
+      const trimmedEmail = validateEmail(email);
+      const trimmedPassword = validatePassword(password);
 
-    const trimmedEmail = validateEmail(email);
-    const trimmedPassword = validatePassword(password);
+      if (!trimmedEmail || !trimmedPassword) {
+        throw makeAuthError("Authentication could not be completed. Please verify your credentials.");
+      }
 
-    if (!trimmedEmail || !trimmedPassword) {
-      throw makeAuthError("Authentication could not be completed. Please verify your credentials.");
+      return await signInWithEmail(trimmedEmail, trimmedPassword);
+    } catch (e) {
+      if (typeof e === "object" && e && "message" in e && typeof (e as { message?: unknown }).message === "string") {
+        throw e;
+      }
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
     }
-
-    return persistAndReturnAuthUser({
-      uid: "stub_uid_email",
-      provider: "email",
-      email: trimmedEmail,
-      displayName: "Market Intelligence Member",
-    });
   }) satisfies SignInWithEmail,
 
   signUpWithEmail: (async (name: string, email: string, password: string): Promise<AuthUser> => {
-    await delay(950);
+    try {
+      const trimmedEmail = validateEmail(email);
+      const trimmedPassword = validatePassword(password);
+      const trimmedName = name.trim();
 
-    const trimmedEmail = validateEmail(email);
-    const trimmedPassword = validatePassword(password);
-    const trimmedName = name.trim();
+      if (!trimmedEmail || !trimmedPassword || trimmedName.length < 2) {
+        throw makeAuthError("Sign up could not be completed. Please verify your details.");
+      }
 
-    if (!trimmedEmail || !trimmedPassword || trimmedName.length < 2) {
-      throw makeAuthError("Sign up could not be completed. Please verify your details.");
+      return await signUpWithEmail(trimmedName, trimmedEmail, trimmedPassword);
+    } catch (e) {
+      if (typeof e === "object" && e && "message" in e && typeof (e as { message?: unknown }).message === "string") {
+        throw e;
+      }
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
     }
-
-    return persistAndReturnAuthUser({
-      uid: `stub_uid_email_signup_${trimmedEmail.toLowerCase()}`,
-      provider: "email",
-      email: trimmedEmail,
-      displayName: trimmedName,
-    });
   }) satisfies SignUpWithEmail,
 
   sendOtp: (async (email: string): Promise<{ expiresInSeconds: number; debugOtpCode?: string }> => {
-    await delay(600);
+    try {
+      const trimmedEmail = validateEmail(email);
+      if (!trimmedEmail) throw makeAuthError("Recovery code could not be delivered. Please verify the email address.");
 
-    const trimmedEmail = validateEmail(email);
-    if (!trimmedEmail) {
-      throw makeAuthError("OTP delivery could not be completed. Please verify the email address.");
+      const { auth } = getFirebaseAuthClient();
+
+      // Firebase password reset emails contain an action code inside the link.
+      // We treat that action code as the user-entered “OTP”.
+      // UX: user requests a code, then pastes the code from the email link.
+      const expiresInSeconds = 300; // UI guidance; Firebase may have its own expiry.
+
+      await sendPasswordResetEmail(auth, trimmedEmail);
+
+      return { expiresInSeconds };
+    } catch (e) {
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
     }
-
-    const expiresInSeconds = 300; // 5 minutes
-    const otpCode = genOtpCode();
-    otpStore[trimmedEmail.toLowerCase()] = {
-      code: otpCode,
-      expiresAtMs: Date.now() + expiresInSeconds * 1000,
-      verified: false,
-    };
-
-    // Stub: OTP isn't actually emailed. We return a debug code so the OTP flow is testable.
-    return { expiresInSeconds, debugOtpCode: otpCode };
   }) satisfies SendOtp,
 
   verifyOtp: (async (email: string, code: string): Promise<{ ok: true }> => {
-    await delay(500);
+    try {
+      const trimmedEmail = validateEmail(email);
+      if (!trimmedEmail) throw makeAuthError("OTP verification could not be completed. Please verify your email.");
 
-    const trimmedEmail = validateEmail(email);
-    if (!trimmedEmail) {
-      throw makeAuthError("OTP verification could not be completed. Please verify your email.");
+      const trimmedCode = code.trim();
+      if (trimmedCode.length < 4) throw makeAuthError("OTP verification could not be completed. Please verify the code and try again.");
+
+      const { auth } = getFirebaseAuthClient();
+      const actionEmail = await verifyPasswordResetCode(auth, trimmedCode);
+
+      if (actionEmail.toLowerCase() !== trimmedEmail.toLowerCase()) {
+        throw makeAuthError("OTP verification could not be completed. Please verify the code and try again.");
+      }
+
+      return { ok: true };
+    } catch (e) {
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
     }
-
-    const entry = otpStore[trimmedEmail.toLowerCase()];
-    if (!entry) {
-      throw makeAuthError("OTP verification could not be completed. Please request a new code.");
-    }
-
-    if (Date.now() > entry.expiresAtMs) {
-      otpStore[trimmedEmail.toLowerCase()] = undefined;
-      throw makeAuthError("OTP has expired. Please request a new code.");
-    }
-
-    const trimmedCode = code.trim();
-    if (trimmedCode !== entry.code) {
-      throw makeAuthError("OTP verification could not be completed. Please verify the code and try again.");
-    }
-
-    entry.verified = true;
-    otpStore[trimmedEmail.toLowerCase()] = entry;
-    return { ok: true };
   }) satisfies VerifyOtp,
 
   resetPassword: (async (email: string, code: string, newPassword: string): Promise<AuthUser> => {
-    await delay(900);
+    try {
+      const trimmedEmail = validateEmail(email);
+      const trimmedPassword = validatePassword(newPassword);
 
-    const trimmedEmail = validateEmail(email);
-    const trimmedPassword = validatePassword(newPassword);
-    if (!trimmedEmail || !trimmedPassword) {
-      throw makeAuthError("Password reset could not be completed. Please verify the details.");
-    }
-
-    // Re-verify OTP as a calm correctness step.
-    await (async () => {
-      const entry = otpStore[trimmedEmail.toLowerCase()];
-      if (!entry) throw makeAuthError("Password reset could not be completed. Please request a new OTP.");
-      if (Date.now() > entry.expiresAtMs) {
-        otpStore[trimmedEmail.toLowerCase()] = undefined;
-        throw makeAuthError("OTP has expired. Please request a new code.");
+      if (!trimmedEmail || !trimmedPassword) {
+        throw makeAuthError("Password reset could not be completed. Please verify the details.");
       }
-      if (code.trim() !== entry.code) throw makeAuthError("Password reset could not be completed. OTP is incorrect.");
-    })();
 
-    // Issue a fresh session as part of session restoration.
-    return persistAndReturnAuthUser({
-      uid: `stub_uid_email_reset_${trimmedEmail.toLowerCase()}`,
-      provider: "email",
-      email: trimmedEmail,
-      displayName: "Market Intelligence Member",
-    });
+      const trimmedCode = code.trim();
+      if (trimmedCode.length < 4) throw makeAuthError("Password reset could not be completed. OTP is incorrect.");
+
+      const { auth } = getFirebaseAuthClient();
+
+      await confirmPasswordReset(auth, trimmedCode, trimmedPassword);
+
+      // After confirming reset, we sign the user in to maintain continuity.
+      const result = await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+      return persistAuthUser(result.user);
+    } catch (e) {
+      throw makeAuthError(mapFirebaseErrorToMessage(e));
+    }
   }) satisfies ResetPassword,
 
-  restoreSession: (async () => {
-    await delay(300);
+  restoreSession: (async (): Promise<AuthUser | null> => {
+    const existing = loadAuthSession();
+    if (existing.status !== "authenticated") {
+      return new Promise<AuthUser | null>((resolve) => {
+        const { auth } = getFirebaseAuthClient();
+        // Ensure we still hydrate from Firebase if the local session is stale.
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          unsubscribe();
+          if (!user) return resolve(null);
+          resolve(persistAuthUser(user));
+        });
+      });
+    }
 
-    const s = loadAuthSession();
-    if (s.status !== "authenticated") return null;
-
-    if (!s.uid || !s.provider) return null;
-
-    return {
-      uid: s.uid,
-      provider: s.provider,
-      email: s.email,
-      displayName: s.displayName,
-    } satisfies AuthUser;
+    return new Promise<AuthUser | null>((resolve) => {
+      const { auth } = getFirebaseAuthClient();
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe();
+        if (!user) {
+          clearAuthSession();
+          return resolve(null);
+        }
+        resolve(persistAuthUser(user));
+      });
+    });
   }) satisfies () => Promise<AuthUser | null>,
 
-  signOut: (async () => {
-    await delay(250);
+  signOut: (async (): Promise<void> => {
+    const { auth } = getFirebaseAuthClient();
+    await firebaseSignOut(auth);
     clearAuthSession();
   }) satisfies () => Promise<void>,
 };

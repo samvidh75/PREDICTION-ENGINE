@@ -7,6 +7,8 @@ import type {
   UserProfile,
 } from "../auth/userProfile";
 
+import { loadAuthSession } from "../auth/sessionStore";
+
 export type OnboardingPhase =
   | "ENTRY"
   | "IDENTITY"
@@ -42,7 +44,17 @@ export type OnboardingProgress = {
   updatedAt: number;
 };
 
-const STORAGE_KEY = "ss_onboarding_progress_v1";
+const STORAGE_KEY_BASE = "ss_onboarding_progress_v1";
+
+function normaliseUid(uid: string): string {
+  return uid.trim();
+}
+
+function resolveStorageKey(uid?: string): string {
+  const u = (uid && uid.trim().length > 0 ? uid.trim() : loadAuthSession().uid) ?? "";
+  if (!u) return STORAGE_KEY_BASE;
+  return `${STORAGE_KEY_BASE}_${normaliseUid(u)}`;
+}
 
 const VALID_PHASES: OnboardingPhase[] = ["ENTRY", "IDENTITY", "PERSONALITY_VOL", "PERSONALITY_HORIZON", "PERSONALITY_DEPTH", "PREFERENCES", "ENVIRONMENT", "ACTIVATION"];
 const VALID_SUBSTAGES: OnboardingActivationSubStage[] = ["auth", "guided"];
@@ -140,7 +152,9 @@ function safeParse(raw: string | null): OnboardingProgress | null {
               ? (auth as { authMode: AuthMode }).authMode
               : undefined,
           email:
-            auth && "email" in auth && typeof (auth as { email?: unknown }).email === "string" ? ((auth as { email: string }).email as string) : undefined,
+            auth && "email" in auth && typeof (auth as { email?: unknown }).email === "string"
+              ? (((auth as { email: string }).email as string))
+              : undefined,
         }
       : undefined;
 
@@ -156,28 +170,31 @@ function safeParse(raw: string | null): OnboardingProgress | null {
   }
 }
 
-export function loadOnboardingProgress(): OnboardingProgress | null {
+export function loadOnboardingProgress(uid?: string): OnboardingProgress | null {
   if (typeof window === "undefined") return null;
   try {
-    return safeParse(window.localStorage.getItem(STORAGE_KEY));
+    const key = resolveStorageKey(uid);
+    return safeParse(window.localStorage.getItem(key));
   } catch {
     return null;
   }
 }
 
-export function saveOnboardingProgress(progress: OnboardingProgress): void {
+export function saveOnboardingProgress(progress: OnboardingProgress, uid?: string): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    const key = resolveStorageKey(uid);
+    window.localStorage.setItem(key, JSON.stringify(progress));
   } catch {
     // ignore
   }
 }
 
-export function clearOnboardingProgress(): void {
+export function clearOnboardingProgress(uid?: string): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.removeItem(STORAGE_KEY);
+    const key = resolveStorageKey(uid);
+    window.localStorage.removeItem(key);
   } catch {
     // ignore
   }

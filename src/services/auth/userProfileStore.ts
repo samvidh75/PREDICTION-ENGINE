@@ -1,22 +1,35 @@
 import type { UserProfile } from "./userProfile";
+import { loadAuthSession } from "./sessionStore";
 
-const STORAGE_KEY = "ss_user_profile_v1";
+const STORAGE_KEY_BASE = "ss_user_profile_v1";
 
-export function saveUserProfile(profile: UserProfile): void {
+function normaliseUid(uid: string): string {
+  return uid.trim();
+}
+
+function getStorageKey(uid?: string): string {
+  const u = (uid && uid.trim().length > 0 ? uid.trim() : loadAuthSession().uid) ?? "";
+  if (!u) return STORAGE_KEY_BASE; // anonymous fallback (should be rare)
+  return `${STORAGE_KEY_BASE}_${normaliseUid(u)}`;
+}
+
+export function saveUserProfile(profile: UserProfile, uid?: string): void {
   if (typeof window === "undefined") return;
 
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    const key = getStorageKey(uid);
+    window.localStorage.setItem(key, JSON.stringify(profile));
   } catch {
-    // ignore persistence failures
+    // ignore persistence failures; UI still functions in-memory
   }
 }
 
-export function loadUserProfile(): UserProfile | null {
+export function loadUserProfile(uid?: string): UserProfile | null {
   if (typeof window === "undefined") return null;
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(uid);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return null;
 
     const parsed = JSON.parse(raw) as Partial<UserProfile>;
@@ -32,11 +45,12 @@ export function loadUserProfile(): UserProfile | null {
   }
 }
 
-export function clearUserProfile(): void {
+export function clearUserProfile(uid?: string): void {
   if (typeof window === "undefined") return;
 
   try {
-    window.localStorage.removeItem(STORAGE_KEY);
+    const key = getStorageKey(uid);
+    window.localStorage.removeItem(key);
   } catch {
     // ignore
   }
