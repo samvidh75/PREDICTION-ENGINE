@@ -5,8 +5,7 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { loadDiscoveryMemory } from "../../services/discovery/discoveryMemory";
 import { getDiscoveryIndex } from "../../services/discovery/discoveryIndex";
 import type { DiscoveryEntityKind } from "../../services/discovery/discoveryTypes";
-
-type PageKey = "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
+import { navigate, navigateToExplore, navigateToStock, type PageKey } from "../../architecture/navigation/routeCoordinator";
 
 type NavItem = {
   id: string;
@@ -206,43 +205,25 @@ export default function IntelligenceNavigationRail(): JSX.Element {
   }, [narrativeKey]);
 
   const navigateTo = (targetPage: PageKey): void => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", targetPage);
-
     if (targetPage === "explore") {
       const index = getDiscoveryIndex();
       const fallback = index[0] ?? null;
 
       const exploreEntity = exploreTarget ?? (fallback ? { kind: fallback.kind, id: fallback.id } : null);
+      if (!exploreEntity) return;
 
-      if (exploreEntity) {
-        url.searchParams.set("kind", exploreEntity.kind);
-        url.searchParams.set("id", exploreEntity.id);
-      }
-    } else {
-      url.searchParams.delete("kind");
-      url.searchParams.delete("id");
-    }
-
-    // Explore routing is entity-specific (kind/id). Full navigation guarantees
-    // DiscoveryEntityPage reads correct params on mount.
-    if (targetPage === "explore") {
-      window.location.href = url.toString();
+      // “Hard” nav ensures DiscoveryEntityPage reads correct kind/id on mount.
+      navigateToExplore(exploreEntity.kind, exploreEntity.id, { mode: "hard" });
       return;
     }
 
-    window.history.pushState({}, "", url.toString());
-    window.dispatchEvent(new Event("urlchange"));
+    navigate({ page: targetPage, mode: "push" });
   };
 
   const openGuidedSearch = (q: string): void => {
     // We rely on IntelligenceHUD's mount-time URL param parsing:
     // ?search=1&q=... opens the overlay.
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", "stock");
-    url.searchParams.set("search", "1");
-    url.searchParams.set("q", q);
-    window.location.href = url.toString();
+    navigateToStock({ openSearchQ: q, mode: "hard" });
   };
 
   const railWidthClass = isMobile ? "w-[100%]" : "w-[210px]";

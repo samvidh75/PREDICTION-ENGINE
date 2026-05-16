@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { authService, type AuthError } from "../services/auth/authService";
+import CinematicAuthGateway from "../components/auth/CinematicAuthGateway";
+import GuidedSearchDiscoveryStep from "../components/onboarding/GuidedSearchDiscoveryStep";
 import {
   profileToMarketInputs,
   type UserProfile,
@@ -21,6 +23,14 @@ import SentimentFlow from "../components/intelligence/SentimentFlow";
 import MarketOrb from "../components/intelligence/MarketOrb";
 import OrbEffects from "../components/intelligence/OrbEffects";
 import { useMotionController } from "../components/motion/MotionController";
+import { navigate } from "../architecture/navigation/routeCoordinator";
+import {
+  saveOnboardingExplorationGoalOverride,
+  saveOnboardingLearningDepthOverride,
+  saveOnboardingSeedSelection,
+  type OnboardingExplorationGoalOverride,
+} from "../services/onboarding/onboardingFirstRunMemory";
+import { seedDiscoveryMemoryWithPreferredInterests } from "../services/discovery/discoveryMemory";
 
 type Phase =
   | "ENTRY"
@@ -31,6 +41,74 @@ type Phase =
   | "PREFERENCES"
   | "ENVIRONMENT"
   | "ACTIVATION";
+
+function getAutoProviderFromUrl(): "google" | "apple" | null {
+  if (typeof window === "undefined") return null;
+  if (!import.meta.env?.DEV) return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get("autoProvider") ?? "").toLowerCase().trim();
+    if (raw === "google" || raw === "apple") return raw;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// Allows QA deep-links to bypass fragile button timing in the prototype.
+// Example: ?page=stock&onbPhase=ACTIVATION
+function getOnboardingPhaseFromUrl(): Phase | null {
+  if (typeof window === "undefined") return null;
+  if (!import.meta.env?.DEV) return null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get("onbPhase") ?? "").toUpperCase().trim();
+
+    const allowed: Phase[] = [
+      "ENTRY",
+      "IDENTITY",
+      "PERSONALITY_VOL",
+      "PERSONALITY_HORIZON",
+      "PERSONALITY_DEPTH",
+      "PREFERENCES",
+      "ENVIRONMENT",
+      "ACTIVATION",
+    ];
+
+    return (allowed as string[]).includes(raw) ? (raw as Phase) : null;
+  } catch {
+    return null;
+  }
+}
+
+const DEFAULT_ONBOARDING_PROFILE: UserProfile = {
+
+  focusAreas: ["Institutional activity"],
+  volatilityComfort: "Calm environments",
+  investingHorizon: "Long-term focus",
+  analysisDepth: "Editorial overview",
+  modules: ["Institutional activity"],
+};
+
+function explorationGoalFromSelection(kind: string, title: string): OnboardingExplorationGoalOverride {
+  const k = kind.toLowerCase();
+  const t = title.toLowerCase();
+
+  if (k === "market_narrative" || k === "macro_trend") return "feed";
+  if (k === "behavioural_condition") return "health";
+  if (k === "stock") return "scanners";
+
+  if (k === "theme") {
+    if (t.includes("liquidity") || t.includes("narrowing") || t.includes("volatility")) return "health";
+    if (t.includes("institutional") || t.includes("defensive") || t.includes("rotation")) return "sector";
+    return "sector";
+  }
+
+  if (k === "sector") return "sector";
+  if (k === "institutional_environment") return "sector";
+
+  return "scanners";
+}
 
 function marketStateLabel(state: ReturnType<typeof computeMarketState>): string {
   switch (state) {
@@ -149,13 +227,34 @@ export default function OnboardingPage({
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useMotionController();
 
-  const [phase, setPhase] = useState<Phase>("ENTRY");
+  const [phase, setPhase] = useState<Phase>(() => getOnboardingPhaseFromUrl() ?? "ENTRY");
 
   const [focusAreas, setFocusAreas] = useState<MarketInterestArea | null>(null);
   const [volatilityComfort, setVolatilityComfort] = useState<VolatilityComfort | null>(null);
   const [investingHorizon, setInvestingHorizon] = useState<InvestingHorizon | null>(null);
   const [analysisDepth, setAnalysisDepth] = useState<AnalysisDepth | null>(null);
   const [modules, setModules] = useState<IntelligenceModule[]>([]);
+
+  // If we deep-link straight to ACTIVATION, we still need a non-null profileDraft
+  // for the auth gateway to be able to complete the onboarding orchestration.
+  useEffect(() => {
+    if (phase !== "ACTIVATION") return;
+
+    const empty =
+      !focusAreas &&
+      !volatilityComfort &&
+      !investingHorizon &&
+      !analysisDepth &&
+      modules.length === 0;
+
+    if (!empty) return;
+
+    setFocusAreas(DEFAULT_ONBOARDING_PROFILE.focusAreas[0]);
+    setVolatilityComfort(DEFAULT_ONBOARDING_PROFILE.volatilityComfort);
+    setInvestingHorizon(DEFAULT_ONBOARDING_PROFILE.investingHorizon);
+    setAnalysisDepth(DEFAULT_ONBOARDING_PROFILE.analysisDepth);
+    setModules(DEFAULT_ONBOARDING_PROFILE.modules);
+  }, [phase, focusAreas, volatilityComfort, investingHorizon, analysisDepth, modules.length]);
 
   const [authMode, setAuthMode] = useState<"google" | "email" | "apple" | "">("");
   const [email, setEmail] = useState("");
@@ -164,6 +263,8 @@ export default function OnboardingPage({
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [activating, setActivating] = useState(false);
+
+  const [activationSubStage, setActivationSubStage] = useState<"auth" | "guided">("auth");
 
   const activationTimeoutRef = useRef<number | null>(null);
 
@@ -179,6 +280,53 @@ export default function OnboardingPage({
       modules: safeModules,
     };
   }, [focusAreas, volatilityComfort, investingHorizon, analysisDepth, modules]);
+
+  useEffect(() => {
+    if (!analysisDepth) return;
+    saveOnboardingLearningDepthOverride(analysisDepth);
+  }, [analysisDepth]);
+
+  const discoveryPrefs = useMemo(() => {
+    if (!profileDraft) return { preferredSectors: undefined as string[] | undefined, preferredThemes: undefined as string[] | undefined };
+
+    const preferredSectors: string[] = [];
+    const preferredThemes: string[] = [];
+
+    const focus = profileDraft.focusAreas;
+    const mods = profileDraft.modules;
+
+    // Themes (must match discoveryIndex titles)
+    if (mods.includes("Institutional activity") || focus.includes("Institutional activity")) {
+      preferredThemes.push("Institutional Selectivity");
+    }
+    if (mods.includes("Sector rotation")) {
+      preferredThemes.push("Defensive Rotation");
+    }
+    if (mods.includes("Volatility insights") || profileDraft.volatilityComfort === "Calm environments") {
+      preferredThemes.push("Liquidity Narrowing");
+    }
+
+    // Sectors (must match discoveryIndex titles)
+    if (mods.includes("Momentum analysis") || focus.includes("Market trends")) {
+      preferredSectors.push("IT", "Banking");
+    }
+    if (mods.includes("Sector rotation") || focus.includes("Sector intelligence")) {
+      preferredSectors.push("FMCG", "Defence");
+    }
+    if (mods.includes("Long-term quality") || focus.includes("Long-term investing")) {
+      preferredSectors.push("Pharma", "Energy");
+    }
+
+    if (preferredSectors.length === 0) preferredSectors.push("Banking", "IT", "FMCG", "Pharma");
+    if (preferredThemes.length === 0) preferredThemes.push("Liquidity Narrowing", "Institutional Selectivity");
+
+    const dedupe = (arr: string[], cap: number) => Array.from(new Set(arr)).slice(0, cap);
+
+    return {
+      preferredSectors: dedupe(preferredSectors, 6),
+      preferredThemes: dedupe(preferredThemes, 6),
+    };
+  }, [profileDraft]);
 
   const derivedEnvironment = useMemo(() => {
     if (!profileDraft) return null;
@@ -201,6 +349,11 @@ export default function OnboardingPage({
       if (activationTimeoutRef.current) window.clearTimeout(activationTimeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (phase !== "ACTIVATION") return;
+    setActivationSubStage("auth");
+  }, [phase]);
 
   const canProceedIdentity = !!focusAreas;
   const canProceedVol = !!volatilityComfort;
@@ -342,6 +495,24 @@ export default function OnboardingPage({
                   <div className="text-[48px] font-semibold leading-[1.05] tracking-[-0.04em]">{headerText}</div>
                   <div className="mt-4 max-w-[740px] text-[15px] leading-[1.8] text-white/85">
                     Enter a luxury financial intelligence environment—calm, precise, and structurally informed.
+                  </div>
+
+                  <div className="mt-7 max-w-[760px]">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Progressive introduction</div>
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        ["Search", "Universal search—taught gently."],
+                        ["Market Pulse", "Real-time tone & telemetry texture."],
+                        ["Stories", "Cinematic learning, not feature walls."],
+                        ["Healthometer", "Simplified stability boundaries."],
+                        ["Company Discovery", "Begin with one safe guided target."],
+                      ].map(([title, body]) => (
+                        <div key={title} className="rounded-[18px] border border-white/10 bg-black/18 backdrop-blur-2xl p-4">
+                          <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">{title}</div>
+                          <div className="mt-2 text-[13px] leading-[1.7] text-white/80">{body}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="mt-8 flex items-center gap-4">
@@ -693,7 +864,7 @@ export default function OnboardingPage({
                           <div className="text-[16px] font-semibold text-white/92">
                             {activating ? "Integrating your intelligence environment…" : "Calibrating your experience…"}
                           </div>
-                          <PulseBars active={!prefersReducedMotion && !authLoading && !activating} />
+                          <PulseBars active={!prefersReducedMotion && !activating} />
                         </div>
 
                         <div className="mt-4 text-[13px] leading-[1.8] text-white/80">
@@ -709,102 +880,50 @@ export default function OnboardingPage({
                       </div>
                     </div>
 
-                    {/* Auth Panel */}
+                    {/* Auth + Guided Search Panel */}
                     <div className="w-full lg:w-[420px]">
-                      <div className="rounded-[28px] border border-white/10 bg-black/35 backdrop-blur-2xl p-[36px] shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-                        <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Account access</div>
-                        <div className="mt-3 text-[18px] font-semibold text-white/92">
-                          Sign in to synchronise your intelligence environment
-                        </div>
+                      {activationSubStage === "auth" ? (
+                        <CinematicAuthGateway
+                          restoreOnMount={false}
+                          autoProvider={getAutoProviderFromUrl()}
+                          onAuthed={() => {
+                            setAuthError(null);
+                            setAuthLoading(false);
+                            setActivating(true);
+                            setActivationSubStage("guided");
+                          }}
+                        />
+                      ) : (
+                        <GuidedSearchDiscoveryStep
+                          confidenceState={derivedEnvironment?.confidenceState ?? "NEUTRAL_ENVIRONMENT"}
+                          marketStateLabel={derivedMarketStateName || "Balanced Environment"}
+                          narrativeKey={7}
+                          preferredSectors={discoveryPrefs.preferredSectors}
+                          preferredThemes={discoveryPrefs.preferredThemes}
+                          onContinue={(selected) => {
+                            if (!profileDraft) return;
 
-                        <div className="mt-5 flex flex-col gap-3">
-                          <button
-                            type="button"
-                            disabled={authLoading || activating}
-                            onClick={() => {
-                              setAuthMode("google");
-                              setAuthError(null);
-                              void doLogin();
-                            }}
-                            className="h-[58px] rounded-[18px] border border-white/10 bg-black/25 text-white/85 hover:text-white/95 transition disabled:opacity-50"
-                          >
-                            Continue with Google
-                          </button>
+                            saveOnboardingSeedSelection({
+                              kind: selected.kind,
+                              id: selected.id,
+                              title: selected.title,
+                              savedAt: Date.now(),
+                            });
 
-                          <button
-                            type="button"
-                            disabled={authLoading || activating}
-                            onClick={() => {
-                              setAuthMode("apple");
-                              setAuthError(null);
-                              void doLogin();
-                            }}
-                            className="h-[58px] rounded-[18px] border border-white/10 bg-black/25 text-white/85 hover:text-white/95 transition disabled:opacity-50"
-                          >
-                            Continue with Apple
-                          </button>
-                        </div>
+                            saveOnboardingExplorationGoalOverride(
+                              explorationGoalFromSelection(selected.kind, selected.title),
+                            );
 
-                        <div className="mt-5">
-                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Email login</div>
+                            seedDiscoveryMemoryWithPreferredInterests(
+                              discoveryPrefs.preferredSectors ?? [],
+                              discoveryPrefs.preferredThemes ?? [],
+                            );
 
-                          <div className="mt-3 flex flex-col gap-3">
-                            <input
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder="Email"
-                              className="h-[58px] rounded-[18px] bg-white/3 border border-white/5 px-4 text-white/90 outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/30"
-                              disabled={authLoading || activating}
-                            />
-                            <input
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="Password"
-                              type="password"
-                              className="h-[58px] rounded-[18px] bg-white/3 border border-white/5 px-4 text-white/90 outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/30"
-                              disabled={authLoading || activating}
-                            />
-
-                            <button
-                              type="button"
-                              disabled={authLoading || activating}
-                              onClick={() => {
-                                setAuthMode("email");
-                                setAuthError(null);
-                                void doLogin();
-                              }}
-                              className="h-[58px] rounded-[18px] bg-black/25 border border-white/10 text-white/85 hover:text-white/95 transition disabled:opacity-50"
-                            >
-                              Continue with Email
-                            </button>
-                          </div>
-                        </div>
-
-                        <AnimatePresence>
-                          {authError && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 6, filter: "blur(8px)" }}
-                              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                              exit={{ opacity: 0, y: -6, filter: "blur(8px)" }}
-                              className="mt-4 text-[13px] leading-[1.6] text-white/80"
-                              role="alert"
-                            >
-                              {authError}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        {authLoading && (
-                          <div className="mt-4 flex items-center gap-3 text-[13px] text-white/75">
-                            <PulseBars active />
-                            Synchronising authentication…
-                          </div>
-                        )}
-
-                        <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                          No spinners • Calm feedback • Premium tone
-                        </div>
-                      </div>
+                            onComplete(profileDraft);
+                            navigate({ page: "dashboard", mode: "hard" });
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 </motion.div>

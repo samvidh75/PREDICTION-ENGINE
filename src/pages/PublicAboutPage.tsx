@@ -17,6 +17,7 @@ import { getDiscoveryIndex } from "../services/discovery/discoveryIndex";
 import PremiumCard from "../designSystem/PremiumCard";
 import { HeroKicker, HeroTitle } from "../designSystem/TypographyIntelligence";
 import ProgressiveDisclosure from "../designSystem/ProgressiveDisclosure";
+import { navigateToExplore, navigateToStock } from "../architecture/navigation/routeCoordinator";
 
 function glowForState(state: ConfidenceState, theme: ConfidenceTheme): string {
   if (state === "ELEVATED_RISK") return theme.warningGlow;
@@ -64,11 +65,7 @@ export default function PublicAboutPage(): JSX.Element {
   }, [q, state, marketState, narrativeKey, discoveryMemory.preferredSectors, discoveryMemory.preferredThemes]);
 
   const openExplore = (r: DiscoveryResult) => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", "explore");
-    url.searchParams.set("kind", r.kind);
-    url.searchParams.set("id", r.id);
-    window.location.href = url.toString();
+    navigateToExplore(r.kind, r.id, { mode: "hard" });
   };
 
   return (
@@ -113,11 +110,7 @@ export default function PublicAboutPage(): JSX.Element {
                   className="h-[56px] px-[26px] rounded-[18px] border border-white/10 bg-black/35 text-white/92 hover:text-white/100 transition text-[11px] uppercase tracking-[0.18em]"
                   style={{ boxShadow: `0 0 70px rgba(0,0,0,0.25), 0 0 90px ${pageGlow}` }}
                   onClick={() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("page", "stock");
-                    url.searchParams.delete("search");
-                    url.searchParams.delete("q");
-                    window.location.href = url.toString();
+                    navigateToStock({ mode: "hard", preserveParamKeys: ["skipOnboarding"] });
                   }}
                 >
                   Start the learning environment

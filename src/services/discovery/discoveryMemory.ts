@@ -62,6 +62,23 @@ function dedupeAndCap(values: string[], cap: number): string[] {
   return out;
 }
 
+export function seedDiscoveryMemoryWithPreferredInterests(preferredSectors: string[], preferredThemes: string[]): void {
+  if (typeof window === "undefined") return;
+
+  const prev = loadDiscoveryMemory();
+
+  const safeSectors = Array.isArray(preferredSectors) ? preferredSectors.filter((x) => typeof x === "string" && x.trim().length > 0) : [];
+  const safeThemes = Array.isArray(preferredThemes) ? preferredThemes.filter((x) => typeof x === "string" && x.trim().length > 0) : [];
+
+  const next = {
+    preferredSectors: dedupeAndCap([...prev.preferredSectors, ...safeSectors], 8),
+    preferredThemes: dedupeAndCap([...prev.preferredThemes, ...safeThemes], 8),
+    lastUpdatedAt: Date.now(),
+  };
+
+  saveDiscoveryMemory(next);
+}
+
 export function updateDiscoveryMemoryWithEntity(prev: DiscoveryMemory, entity: DiscoveryEntity): DiscoveryMemory {
   const nextSectors = [...prev.preferredSectors];
   const nextThemes = [...prev.preferredThemes];

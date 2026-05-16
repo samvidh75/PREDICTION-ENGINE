@@ -18,8 +18,12 @@ import MasterMotionEngine from "./components/motion/MasterMotionEngine";
 import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
 import IntelligenceNavigationRail from "./components/navigation/IntelligenceNavigationRail";
 import IntelligenceHUD from "./components/intelligence/IntelligenceHUD";
+import SubsystemErrorBoundary from "./components/diagnostics/SubsystemErrorBoundary";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import type { MarketInputs } from "./services/intelligence/marketState";
+import { loadAuthSession } from "./services/auth/sessionStore";
+import { loadUserProfile, saveUserProfile } from "./services/auth/userProfileStore";
+import { markFirstDashboardPending } from "./services/onboarding/onboardingFirstRunMemory";
 
 type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
@@ -94,8 +98,12 @@ const DEFAULT_SKIP_PROFILE: UserProfile = {
 };
 
 export default function App(): JSX.Element {
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => getSkipOnboardingFlag());
-  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(() => (getSkipOnboardingFlag() ? DEFAULT_SKIP_PROFILE : null));
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => loadAuthSession().status === "authenticated");
+
+  const [draftProfile, setDraftProfile] = useState<UserProfile | null>(() => {
+    if (loadAuthSession().status !== "authenticated") return null;
+    return loadUserProfile() ?? DEFAULT_SKIP_PROFILE;
+  });
 
   const overrideInputs: MarketInputs | null = useMemo(() => {
     if (!draftProfile) return null;
@@ -164,7 +172,33 @@ export default function App(): JSX.Element {
     return <StockStoryPage />;
   }, [pageKey]);
 
-  const shouldShowOnboarding = !onboardingComplete && pageKey === "stock";
+  const isPublicPage = pageKey === "landing" || pageKey === "about";
+  const shouldShowOnboarding = !onboardingComplete && !isPublicPage;
+
+  const routeSubsystem = useMemo(() => {
+    switch (pageKey) {
+      case "landing":
+        return "public_landing";
+      case "about":
+        return "public_about";
+      case "stock":
+        return "stock_story";
+      case "explore":
+        return "explore_discovery";
+      case "dashboard":
+        return "market_intelligence_dashboard";
+      case "company":
+        return "company_universe";
+      case "community":
+        return "community_hub";
+      case "practice":
+        return "practice_terminal";
+      case "assistant":
+        return "assistant_page";
+      default:
+        return `route_${pageKey}`;
+    }
+  }, [pageKey]);
 
   return (
     <MotionController>
@@ -175,19 +209,34 @@ export default function App(): JSX.Element {
             {shouldShowOnboarding ? (
               <OnboardingPage
                 onComplete={(profile) => {
+                  markFirstDashboardPending();
                   setDraftProfile(profile);
                   setOnboardingComplete(true);
+                  saveUserProfile(profile);
                 }}
-                onDraftChange={(profile) => setDraftProfile(profile)}
+                onDraftChange={(profile) => {
+                  setDraftProfile(profile);
+                  if (profile) saveUserProfile(profile);
+                }}
               />
             ) : (
               <LivingInterfaceEngine enabled={!shouldShowOnboarding}>
                 <CinematicTransitionLayer activeKey={routeSignature} enabled>
-                  {mainView}
+                  <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
+                    {mainView}
+                  </SubsystemErrorBoundary>
                 </CinematicTransitionLayer>
 
-                {pageKey === "landing" || pageKey === "about" ? null : <IntelligenceHUD />}
-                {pageKey === "landing" || pageKey === "about" ? null : <IntelligenceNavigationRail />}
+                {pageKey === "landing" || pageKey === "about" ? null : (
+                  <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
+                    <IntelligenceHUD />
+                  </SubsystemErrorBoundary>
+                )}
+                {pageKey === "landing" || pageKey === "about" ? null : (
+                  <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
+                    <IntelligenceNavigationRail />
+                  </SubsystemErrorBoundary>
+                )}
               </LivingInterfaceEngine>
             )}
           </SpatialEnvironmentProvider>

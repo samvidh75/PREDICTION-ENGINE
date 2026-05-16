@@ -18,6 +18,12 @@ type ProgressiveDisclosureProps = {
   initialStepIndex?: number;
 
   /**
+   * Whether the disclosure starts expanded (auto-open).
+   * Defaults to false.
+   */
+  initialOpen?: boolean;
+
+  /**
    * Label for the CTA shown while collapsed.
    * Defaults to "Expand intelligence".
    */
@@ -37,6 +43,7 @@ export default function ProgressiveDisclosure({
   front,
   steps,
   initialStepIndex = 0,
+  initialOpen = false,
   collapsedCtaLabel = "Expand intelligence",
   collapseCtaLabel = "Collapse",
   className,
@@ -45,7 +52,7 @@ export default function ProgressiveDisclosure({
   const prefersReducedMotion = useReducedMotion();
   const safeInitial = Math.max(0, Math.min(initialStepIndex, Math.max(0, steps.length - 1)));
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(initialOpen);
   const [activeIdx, setActiveIdx] = useState<number>(safeInitial);
 
   const active = useMemo(() => {

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useTransform } from "framer-motion";
 import { useConfidenceEngine, type ConfidenceState } from "./ConfidenceEngine";
 import { useMotionController } from "../motion/MotionController";
+import { navigateToExplore } from "../../architecture/navigation/routeCoordinator";
 
 import CommandResultCard from "../commandCentre/universalCommandCentre/CommandResultCard";
 import { predictiveDiscoveryArchitecture } from "../../services/search/PredictiveDiscoveryArchitecture";
@@ -374,8 +375,7 @@ export default function IntelligenceHUD(): JSX.Element {
     predictiveDiscoveryArchitecture.addToRecentSearches(r.title);
     setMemoryTick((t) => t + 1);
 
-    const nextUrl = `?page=explore&kind=${encodeURIComponent(r.kind)}&id=${encodeURIComponent(r.id)}`;
-    window.location.href = nextUrl;
+    navigateToExplore(r.kind, r.id, { mode: "hard", preserveParamKeys: ["skipOnboarding"] });
   };
 
   return (

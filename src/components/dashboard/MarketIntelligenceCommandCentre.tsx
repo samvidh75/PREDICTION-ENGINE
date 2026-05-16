@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 import HiddenGridOverlay from "../ambient/HiddenGridOverlay";
@@ -23,12 +23,22 @@ import NeuralMarketSynthesisPanel from "../synthesis/NeuralMarketSynthesisPanel"
 import { useMotionController } from "../motion/MotionController";
 import useBeginnerIntelligenceCalibration from "../../hooks/useBeginnerIntelligenceCalibration";
 
+import BeginnerModeOverlay from "../onboarding/BeginnerModeOverlay";
+import {
+  dismissFirstDashboardOverlay,
+  loadFirstDashboardFlag,
+  loadOnboardingExplorationGoalOverride,
+  loadOnboardingSeedSelection,
+} from "../../services/onboarding/onboardingFirstRunMemory";
+import { navigateToExplore, navigateToStock } from "../../architecture/navigation/routeCoordinator";
+
 import PremiumLockCard from "../premium/PremiumLockCard";
 import { usePremiumEntitlement } from "../../services/premium/usePremiumEntitlement";
 import type { PremiumTier } from "../../services/premium/premiumEntitlementStore";
 
 import SubsystemErrorBoundary from "../diagnostics/SubsystemErrorBoundary";
 import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+import { loadDiscoveryMemory as loadDiscoveryMemoryForPills } from "../../services/discovery/discoveryMemory";
 
 type SecondaryStepKey = "sector" | "scanners" | "macro" | "health" | "institutional" | "feed";
 
@@ -66,6 +76,63 @@ function stepSubtitle(key: SecondaryStepKey): string {
   }
 }
 
+function explorationGoalToStepKey(goal: string | null): SecondaryStepKey | null {
+  if (!goal) return null;
+  if (goal === "scanners") return "scanners";
+  if (goal === "sector") return "sector";
+  if (goal === "health") return "health";
+  if (goal === "feed") return "feed";
+  return null;
+}
+
+function onboardingPreferredStepKey(seed: { kind: string; title: string } | null): SecondaryStepKey {
+  if (!seed) return "scanners";
+
+  const title = seed.title.toLowerCase();
+  const kind = seed.kind.toLowerCase();
+
+  if (kind === "sector") return "sector";
+  if (kind === "theme") {
+    if (title.includes("institutional")) return "institutional";
+    if (title.includes("liquidity") || title.includes("narrowing") || title.includes("volatility")) return "health";
+    if (title.includes("rotation") || title.includes("defensive")) return "sector";
+    if (title.includes("macro")) return "macro";
+    return "scanners";
+  }
+
+  if (kind === "stock") return "scanners";
+  return "scanners";
+}
+
+function derivePreferredSearchPills(): string[] {
+  try {
+    const mem = loadDiscoveryMemoryForPills();
+    const base = [...mem.preferredSectors, ...mem.preferredThemes];
+
+    const uniq: string[] = [];
+    const seen = new Set<string>();
+
+    for (const x of base) {
+      const v = x.trim();
+      if (!v) continue;
+
+      const k = v.toLowerCase();
+      if (seen.has(k)) continue;
+
+      seen.add(k);
+      uniq.push(v);
+
+      if (uniq.length >= 6) break;
+    }
+
+    if (uniq.length > 0) return uniq;
+  } catch {
+    // ignore
+  }
+
+  return ["institutional selectivity", "sector rotation", "liquidity narrowing", "volatility posture", "long-term quality", "earnings environment"];
+}
+
 export default function MarketIntelligenceCommandCentre(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useMotionController();
@@ -76,6 +143,31 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
 
   const { state, theme, marketState } = useConfidenceEngine();
   const { synthesis, marketSnapshot, connectionStatus } = useNeuralMarketSynthesisSuperengine();
+
+  // First-run onboarding overlay state (persistent, dismissed after interaction)
+  const [firstDashboardPending, setFirstDashboardPending] = useState<boolean>(() => {
+    const flag = loadFirstDashboardFlag();
+    return flag?.pending ?? false;
+  });
+
+  const seedSelection = useMemo(() => loadOnboardingSeedSelection(), []);
+  const explorationGoalOverride = useMemo(() => loadOnboardingExplorationGoalOverride(), []);
+  const preferredStepKey = useMemo(() => {
+    const fromGoal = explorationGoalToStepKey(explorationGoalOverride);
+    return fromGoal ?? onboardingPreferredStepKey(seedSelection);
+  }, [seedSelection, explorationGoalOverride]);
+
+  const preferredSearchPills = useMemo(() => derivePreferredSearchPills(), []);
+
+  const dismissOverlay = () => {
+    dismissFirstDashboardOverlay();
+    setFirstDashboardPending(false);
+  };
+
+  const onboardingInitialStepIndex = useMemo(() => {
+    // We compute it later when orderedSecondaryKeys exist; placeholder until then.
+    return 0;
+  }, []);
 
   const atmosphereGlow = useMemo(() => {
     const t: ConfidenceTheme = theme;
@@ -206,29 +298,26 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     scanners: { content: scannersStep },
     macro: { content: macroStep },
     health: { content: healthStep },
-    institutional: { content: (
-      <SubsystemErrorBoundary subsystem="dashboard_institutional" phase="render">
-        {institutionalStep}
-      </SubsystemErrorBoundary>
-    )},
-    feed: { content: (
-      <SubsystemErrorBoundary subsystem="dashboard_cinematic_feed" phase="render">
-        {feedStep}
-      </SubsystemErrorBoundary>
-    )},
+    institutional: {
+      content: (
+        <SubsystemErrorBoundary subsystem="dashboard_institutional" phase="render">
+          {institutionalStep}
+        </SubsystemErrorBoundary>
+      ),
+    },
+    feed: {
+      content: (
+        <SubsystemErrorBoundary subsystem="dashboard_cinematic_feed" phase="render">
+          {feedStep}
+        </SubsystemErrorBoundary>
+      ),
+    },
   };
 
   const orderedSecondaryKeys = useMemo<SecondaryStepKey[]>(() => {
-    const pick = (key: SecondaryStepKey, candidates: string[]) => {
-      const hit = candidates.some((c) => c.toLowerCase().includes(key));
-      return hit;
-    };
-
-    // Map adaptivePriority strings into our stable step keys.
-    const priority0 = adaptivePriority[0] ?? "";
-    const priority1 = adaptivePriority[1] ?? "";
-
     const candidates: SecondaryStepKey[] = [];
+
+    const priority0 = adaptivePriority[0] ?? "";
 
     if (priority0.includes("Sector Rotation")) candidates.push("sector");
     if (priority0.includes("Health")) candidates.push("health");
@@ -238,14 +327,13 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     if (priority0.includes("Scanner")) candidates.push("scanners");
 
     if (candidates.length < 2) {
-      // Safe defaults for the next layer.
       candidates.push("scanners", "sector");
     }
 
-    // De-dupe + stable remainder order
     const all: SecondaryStepKey[] = ["sector", "scanners", "macro", "health", "institutional", "feed"];
     const seen = new Set<SecondaryStepKey>();
     const out: SecondaryStepKey[] = [];
+
     for (const k of candidates.concat(all)) {
       if (!k) continue;
       if (seen.has(k)) continue;
@@ -253,8 +341,25 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       out.push(k);
       if (out.length >= all.length) break;
     }
-    return out;
-  }, [adaptivePriority]);
+
+    if (!firstDashboardPending) return out;
+
+    const preferredIdx = out.indexOf(preferredStepKey);
+    const seeded = (() => {
+      if (preferredIdx <= 0) return out;
+      const preferred = out[preferredIdx];
+      return [preferred, ...out.filter((x) => x !== preferred)];
+    })();
+
+    // “No overwhelm” rule: show fewer layers on first run.
+    return seeded.slice(0, 3);
+  }, [adaptivePriority, firstDashboardPending, preferredStepKey]);
+
+  const onboardingInitialStepIndexFinal = useMemo(() => {
+    const idx = orderedSecondaryKeys.indexOf(preferredStepKey);
+    if (idx >= 0) return idx;
+    return 0;
+  }, [orderedSecondaryKeys, preferredStepKey]);
 
   const secondaryFront = (
     <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
@@ -267,9 +372,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
         </span>
         . Expand to reveal deeper telemetry without overwhelming first impressions.
       </div>
-      <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-        educational only • no recommendations • calm density
-      </div>
+      <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">educational only • no recommendations • calm density</div>
     </div>
   );
 
@@ -286,7 +389,8 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       steps={secondarySteps}
       collapsedCtaLabel="Expand intelligence layers"
       collapseCtaLabel="Collapse"
-      initialStepIndex={0}
+      initialStepIndex={onboardingInitialStepIndexFinal}
+      initialOpen={firstDashboardPending}
       className="mt-0"
     />
   );
@@ -300,6 +404,21 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       <div className="noise" />
 
       {!prefersReducedMotion && <SentimentFlow />}
+
+      <BeginnerModeOverlay
+        visible={firstDashboardPending}
+        preferredSearchPills={preferredSearchPills}
+        seedSelection={seedSelection}
+        onOpenSearch={(q) => {
+          dismissOverlay();
+          navigateToStock({ openSearchQ: q, mode: "hard", preserveParamKeys: ["skipOnboarding"] });
+        }}
+        onExploreSeed={(seed) => {
+          dismissOverlay();
+          navigateToExplore(seed.kind, seed.id, { mode: "hard", preserveParamKeys: ["skipOnboarding"] });
+        }}
+        onDismiss={dismissOverlay}
+      />
 
       {/* Holographic core visual (non-intrusive) */}
       <div className="relative z-[5] pointer-events-none">

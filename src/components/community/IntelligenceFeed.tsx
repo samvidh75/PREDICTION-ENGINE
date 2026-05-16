@@ -100,7 +100,11 @@ function softFeedCopy(state: ConfidenceState, key: number): { title: string; bod
   }
 }
 
-export default function IntelligenceFeed(): JSX.Element {
+type Props = {
+  compact?: boolean;
+};
+
+export default function IntelligenceFeed({ compact = false }: Props): JSX.Element {
   const { state, theme, narrativeKey } = useConfidenceEngine();
   const [activeCategory, setActiveCategory] = useState<FeedCategory>("Market narratives");
 
@@ -140,8 +144,9 @@ export default function IntelligenceFeed(): JSX.Element {
   }, [state, narrativeKey]);
 
   const visible = useMemo(() => {
-    return feedItems.filter((it) => it.category === activeCategory).slice(0, 4);
-  }, [feedItems, activeCategory]);
+    const limit = compact ? 2 : 4;
+    return feedItems.filter((it) => it.category === activeCategory).slice(0, limit);
+  }, [feedItems, activeCategory, compact]);
 
   const activeGlow = glowFor(state, theme);
 

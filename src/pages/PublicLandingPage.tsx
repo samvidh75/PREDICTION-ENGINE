@@ -19,6 +19,7 @@ import PremiumCard from "../designSystem/PremiumCard";
 import { HeroKicker, HeroTitle } from "../designSystem/TypographyIntelligence";
 import SpatialHierarchyEngine from "../designSystem/SpatialHierarchyEngine";
 import ProgressiveDisclosure from "../designSystem/ProgressiveDisclosure";
+import { navigateToAbout, navigateToExplore, navigateToStock } from "../architecture/navigation/routeCoordinator";
 
 function classNames(...xs: Array<string | false | null | undefined>): string {
   return xs.filter(Boolean).join(" ");
@@ -31,13 +32,6 @@ function glowForState(state: ConfidenceState, theme: ConfidenceTheme): string {
   return theme.deepBlueGlow;
 }
 
-function navigateToExplore(r: DiscoveryResult): void {
-  const url = new URL(window.location.href);
-  url.searchParams.set("page", "explore");
-  url.searchParams.set("kind", r.kind);
-  url.searchParams.set("id", r.id);
-  window.location.href = url.toString();
-}
 
 export default function PublicLandingPage(): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
@@ -94,12 +88,8 @@ export default function PublicLandingPage(): JSX.Element {
   }, [query, state, marketState, narrativeKey, discoveryMemory.preferredSectors, discoveryMemory.preferredThemes]);
 
   const onStart = () => {
-    // Public conversion: move into onboarding (login is inside onboarding).
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", "stock");
-    url.searchParams.delete("search");
-    url.searchParams.delete("q");
-    window.location.href = url.toString();
+    // Public conversion: move into learning (login is inside onboarding).
+    navigateToStock({ mode: "hard", preserveParamKeys: ["skipOnboarding"] });
   };
 
   return (
@@ -142,9 +132,7 @@ export default function PublicLandingPage(): JSX.Element {
                   className="text-[11px] uppercase tracking-[0.18em] text-white/65 hover:text-white/90 transition"
                   onClick={() => {
                     if (item.id === "about") {
-                      const url = new URL(window.location.href);
-                      url.searchParams.set("page", "about");
-                      window.location.href = url.toString();
+                      navigateToAbout({ mode: "hard" });
                       return;
                     }
                     document.getElementById(item.id)?.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
@@ -284,7 +272,7 @@ export default function PublicLandingPage(): JSX.Element {
                   <button
                     key={`${r.kind}_${r.id}`}
                     type="button"
-                    onClick={() => navigateToExplore(r)}
+                    onClick={() => navigateToExplore(r.kind, r.id, { mode: "hard" })}
                     className={classNames(
                       "text-left rounded-[18px] border border-white/10 bg-black/20 p-4",
                       focus ? "hover:border-white/20" : "hover:border-white/18",
@@ -457,11 +445,7 @@ export default function PublicLandingPage(): JSX.Element {
                 <button
                   type="button"
                   className="h-[56px] px-[24px] rounded-[18px] border border-white/10 bg-black/20 text-white/70 hover:text-white/95 transition text-[11px] uppercase tracking-[0.18em]"
-                  onClick={() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("page", "about");
-                    window.location.href = url.toString();
-                  }}
+                  onClick={() => navigateToAbout({ mode: "hard" })}
                 >
                   About StockStory
                 </button>

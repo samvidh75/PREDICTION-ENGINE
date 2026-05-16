@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { loadOnboardingLearningDepthOverride } from "../services/onboarding/onboardingFirstRunMemory";
 
 type ExperienceLevel = "beginner" | "intermediate";
 
@@ -39,6 +40,8 @@ export default function useBeginnerIntelligenceCalibration() {
     lastAt: Date.now(),
   }));
 
+  const [onboardingLearningDepthOverride] = useState(() => loadOnboardingLearningDepthOverride());
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -58,11 +61,16 @@ export default function useBeginnerIntelligenceCalibration() {
   }, []);
 
   const experienceLevel: ExperienceLevel = useMemo(() => {
-    // Simple, deterministic progression:
+    // Onboarding override takes priority: user explicitly chose learning depth.
+    if (onboardingLearningDepthOverride) {
+      return onboardingLearningDepthOverride === "Editorial overview" ? "beginner" : "intermediate";
+    }
+
+    // Fallback deterministic progression:
     // - First 1-2 sessions => beginner
     // - After that => intermediate
     return calibration.sessionsSeen <= 2 ? "beginner" : "intermediate";
-  }, [calibration.sessionsSeen]);
+  }, [calibration.sessionsSeen, onboardingLearningDepthOverride]);
 
   const simplificationIntensity = useMemo(() => {
     // Beginner => higher simplification (more plain language, fewer dense details)
