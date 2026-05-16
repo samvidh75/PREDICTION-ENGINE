@@ -530,7 +530,7 @@ export default function CinematicChart({ ticker, defaultTimeframe = "1M" }: Cine
           className="relative z-[2] w-full h-[260px] block"
           onPointerMove={onMove}
           onPointerLeave={onLeave}
-          aria-label="Cinematic market chart"
+          aria-label="Market chart"
           role="img"
         />
 

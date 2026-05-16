@@ -211,7 +211,7 @@ export default function HolographicFinancialConceptExplainer({
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Holographic explanation</div>
+                <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Concept explanation</div>
                 <div className="mt-2 text-[22px] font-semibold text-white/92 leading-[1.2]">{text.title}</div>
                 <div className="mt-2 text-[13px] leading-[1.7] text-white/75">
                   Educational only • calm interpretation • no execution
@@ -229,7 +229,7 @@ export default function HolographicFinancialConceptExplainer({
             </div>
 
             <div className="mt-4 rounded-[22px] border border-white/10 bg-black/25 p-4">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Precision hologram</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Learning visualization</div>
               <div className="mt-3">
                 <HolographicConceptVisual
                   concept={concept}

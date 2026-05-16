@@ -112,7 +112,7 @@ export default function CommunityHubPage(): JSX.Element {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020304]">
-      <div className="absolute inset-0 z-0">{/* global atmosphere handled elsewhere */}</div>
+      <div className="absolute inset-0 z-0">{/* global ambience handled elsewhere */}</div>
 
       <div className="relative z-[10] px-[20px] sm:px-[72px] pt-[96px] pb-[80px]">
         <div className="max-w-[1680px] mx-auto">
@@ -128,7 +128,7 @@ export default function CommunityHubPage(): JSX.Element {
             </div>
 
             <div className="rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-2xl p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Community atmosphere</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Community tone</div>
               <div className="mt-3 text-[20px] font-semibold text-white/92">
                 {state === "ELEVATED_RISK" ? "Defensive interpretive focus" : "Structured editorial clarity"}
               </div>
@@ -165,7 +165,7 @@ export default function CommunityHubPage(): JSX.Element {
               </SectionCard>
 
               <div className="mt-8">
-                <SectionCard title="Cinematic Conversation Interface" subtitle="Quality-tuned discussion cards" toneGlow={toneGlow}>
+                <SectionCard title="Conversation Interface" subtitle="Quality-tuned discussion cards" toneGlow={toneGlow}>
                   <CinematicConversationInterface roomId={activeRoom} roomName={activeRoom} />
                 </SectionCard>
               </div>

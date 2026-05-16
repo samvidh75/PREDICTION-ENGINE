@@ -541,7 +541,7 @@ export default function CinematicAuthGateway({
         </div>
 
         <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-          {prefersReducedMotion ? "Reduced motion enabled." : "Cinematic motion enabled."}
+          {prefersReducedMotion ? "Reduced motion enabled." : "Motion enabled."}
         </div>
 
         {/* keep stage changes traceable */}

@@ -83,7 +83,7 @@ export default function PublicAboutPage(): JSX.Element {
             <div className="lg:flex-1">
               <HeroKicker>About StockStory India</HeroKicker>
 
-              <HeroTitle>A calm intelligence operating system — engineered for understanding.</HeroTitle>
+              <HeroTitle>A calm intelligence workspace — engineered for understanding.</HeroTitle>
 
               <p className="mt-5 text-[15px] leading-[1.95] text-white/85 max-w-[78ch]">
                 Most interfaces resize. StockStory India reconstructs spatial intelligence environments so the experience feels
@@ -129,7 +129,7 @@ export default function PublicAboutPage(): JSX.Element {
               <PremiumCard variant="hero" glow={pageGlow}>
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Neural ambience</div>
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Calm learning tone</div>
                     <div className="mt-3 text-[22px] font-medium text-white/92">
                       {state === "ELEVATED_RISK"
                         ? "Volatility-conditioned caution"
@@ -184,7 +184,7 @@ export default function PublicAboutPage(): JSX.Element {
               <PremiumCard variant="intelligence" glow={pageGlow}>
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Cinematic probabilistic core</div>
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Calm probabilistic core</div>
                     <div className="mt-3 text-[20px] font-semibold text-white/92">A calm learning nucleus</div>
                   </div>
                   <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">educational only</div>
@@ -198,12 +198,12 @@ export default function PublicAboutPage(): JSX.Element {
             steps={[
               {
                 id: "rails",
-                label: "Holographic rails",
+                label: "Guided rails",
                 content: (
                   <PremiumCard variant="intelligence" glow={pageGlow}>
                     <div className="flex items-end justify-between gap-4">
                       <div>
-                        <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Holographic intelligence rails</div>
+                  <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Structured intelligence rails</div>
                         <div className="mt-3 text-[20px] font-semibold text-white/92">Precision telemetry rendering</div>
                       </div>
                       <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">device-aware</div>
@@ -225,7 +225,7 @@ export default function PublicAboutPage(): JSX.Element {
             <PremiumCard variant="intelligence" glow={pageGlow}>
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                  <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Market Universe</div>
+                  <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Market overview</div>
                   <div className="mt-3 text-[22px] font-medium text-white/92">Sector intelligence, rendered as calm context</div>
                 </div>
                 <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">no clutter • guided reading</div>
@@ -250,7 +250,7 @@ export default function PublicAboutPage(): JSX.Element {
           <PremiumCard variant="intelligence" glow={pageGlow}>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <div>
-                <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Cinematic search preview</div>
+                <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Search preview</div>
                 <div className="mt-2 text-[22px] font-medium text-white/92">Try a topic—get educational environments</div>
               </div>
               <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">instant • calm • probabilistic</div>

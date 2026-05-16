@@ -129,14 +129,14 @@ export default function MarketCommandCentrePage(): JSX.Element {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020304]">
-      {/* Base atmosphere */}
+      {/* Base background */}
       <HiddenGridOverlay />
       <AmbientBackground />
       <div className="noise" />
       <SentimentFlow />
 
 
-      {/* SECTION 1 + 2: Atmosphere + Market Core */}
+      {/* SECTION 1 + 2: Market Core */}
       <section
         className="relative z-[11]"
         style={{
@@ -153,7 +153,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
         <div className="relative h-full">
           {/* Left: what matters most */}
           <div className="absolute left-0 top-0 w-full sm:w-[540px]">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Holographic Market Command Centre</div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Market Command Centre</div>
             <div className="mt-3 text-[44px] font-semibold leading-[1.05] tracking-[-0.04em]">
               {tone.title}
             </div>
@@ -218,7 +218,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
         <div className="mx-auto max-w-[1680px] mb-6 flex items-end justify-between gap-4">
           <div>
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Live Telemetry Grid</div>
-            <div className="mt-3 text-[22px] font-medium text-white/92">floating aerospace capsules</div>
+            <div className="mt-3 text-[22px] font-medium text-white/92">Structured telemetry tiles</div>
           </div>
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">smooth • minimal • calm</div>
         </div>

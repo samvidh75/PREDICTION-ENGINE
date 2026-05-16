@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 import HiddenGridOverlay from "../components/ambient/HiddenGridOverlay";
@@ -27,6 +27,14 @@ import CompanyNewsEcosystem from "../components/companyUniverse/CompanyNewsEcosy
 
 import MacroIntelligenceEngine from "../components/macro/MacroIntelligenceEngine";
 import StockStoryChartIntegration from "../components/charts/StockStoryChartIntegration";
+
+import CompanyPrimaryActionBar from "../components/companyUniverse/CompanyPrimaryActionBar";
+import CompanyCompareModal from "../components/companyUniverse/CompanyCompareModal";
+import Company52WeekRangeMini from "../components/companyUniverse/Company52WeekRangeMini";
+import { getCompanySectorMapping } from "../components/companyUniverse/getCompanySectorMapping";
+
+import { addTickerToWatchlist, isTickerInWatchlist, removeTickerFromWatchlist } from "../services/portfolio/watchlistStore";
+import { navigateToExplore } from "../architecture/navigation/routeCoordinator";
 
 import MasterInfographicEngine from "../components/infographics/MasterInfographicEngine";
 import VolumetricFinancialTowers from "../components/infographics/VolumetricFinancialTowers";
@@ -138,6 +146,26 @@ export default function CompanyUniversePage(): JSX.Element {
 
   const { isMobile } = useMotionController();
   const [brokerOpen, setBrokerOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [watchlistVersion, setWatchlistVersion] = useState<number>(0);
+  const chartsSectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("broker");
+    const shouldOpen = raw === "1" || raw?.toLowerCase() === "true";
+
+    if (!shouldOpen) return;
+
+    setBrokerOpen(true);
+
+    // Clear param so refresh/back doesn't keep re-opening.
+    const url = new URL(window.location.href);
+    url.searchParams.delete("broker");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
 
   const ticker = useMemo(() => {
     if (typeof window === "undefined") return "TTM";
@@ -147,6 +175,31 @@ export default function CompanyUniversePage(): JSX.Element {
   }, []);
 
   const model = useCompanyUniverseModel(ticker);
+
+  const sectorMapping = useMemo(() => getCompanySectorMapping(model.ticker), [model.ticker]);
+  const sectorAvailable = Boolean(sectorMapping.exploreId);
+
+  const watchlistHasTicker = useMemo(() => isTickerInWatchlist(model.ticker), [model.ticker, watchlistVersion]);
+
+  const onToggleWatchlist = () => {
+    if (watchlistHasTicker) removeTickerFromWatchlist(model.ticker);
+    else addTickerToWatchlist(model.ticker);
+    setWatchlistVersion((v) => v + 1);
+  };
+
+  const onOpenCharts = () => {
+    chartsSectionRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
+  const onViewSector = () => {
+    const exploreId = sectorMapping.exploreId;
+    if (!exploreId) return;
+
+    navigateToExplore("sector", exploreId, { mode: "hard", preserveParamKeys: ["skipOnboarding"] });
+  };
 
   const { state: confidenceState, theme: confidenceTheme } = useConfidenceEngine();
   const { synthesis } = useNeuralMarketSynthesisSuperengine();
@@ -226,6 +279,17 @@ export default function CompanyUniversePage(): JSX.Element {
               </div>
             </div>
 
+            {/* Sector + 52-week range (overview essentials) */}
+            <div className="mt-5">
+              <div className="text-[12px] uppercase tracking-[0.18em] text-white/55">
+                Sector: <span className="text-white/92 font-semibold">{sectorMapping.label}</span>
+              </div>
+
+              <div className="mt-4">
+                <Company52WeekRangeMini ticker={model.ticker} confidenceState={confidenceState} />
+              </div>
+            </div>
+
             {/* Healthometer pill */}
             <div className="mt-6 inline-flex items-center gap-3 rounded-[999px] border border-white/10 bg-black/25 backdrop-blur-2xl px-[14px] py-[10px]">
               <div
@@ -239,17 +303,21 @@ export default function CompanyUniversePage(): JSX.Element {
               <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">{healthLabel(model.healthState)}</div>
             </div>
 
-            {/* Broker CTA */}
-            <div className="mt-5 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setBrokerOpen(true)}
-                className="h-[44px] rounded-full border border-white/10 bg-black/25 px-[16px] text-[12px] uppercase tracking-[0.18em] text-white/85 hover:bg-black/35 hover:border-white/20 transition"
-              >
-                Continue via Broker
-              </button>
-
-              <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Educational universe • no trade execution</div>
+            <CompanyPrimaryActionBar
+              onOpenCharts={onOpenCharts}
+              onCompareCompany={() => setCompareOpen(true)}
+              watchlistHasTicker={watchlistHasTicker}
+              onToggleWatchlist={onToggleWatchlist}
+              sectorLabel={sectorMapping.label}
+              sectorAvailable={sectorAvailable}
+              onViewSector={onViewSector}
+              healthState={model.healthState}
+              theme={confidenceTheme}
+              onContinueViaBroker={() => setBrokerOpen(true)}
+              isMobile={isMobile}
+            />
+            <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/45">
+              Educational workspace • no trade execution
             </div>
           </div>
 
@@ -296,6 +364,14 @@ export default function CompanyUniversePage(): JSX.Element {
         onClose={() => setBrokerOpen(false)}
         ticker={model.ticker}
         healthState={model.healthState}
+        theme={confidenceTheme}
+      />
+
+      {/* Compare modal */}
+      <CompanyCompareModal
+        open={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        primaryTicker={model.ticker}
         theme={confidenceTheme}
       />
 
@@ -354,7 +430,7 @@ export default function CompanyUniversePage(): JSX.Element {
         <div className="mx-auto max-w-[1680px]">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">TradingView-Grade Chart Universe</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">TradingView-Grade Chart Suite</div>
               <div className="mt-3 text-[22px] font-medium text-white/92">Narrative-first technical interpretation</div>
               <div className="mt-3 text-[14px] leading-[1.9] text-white/75 max-w-[90ch]">
                 Candlestick structure + confidence overlays are educational context. They connect to the macro and institutional learning tone—without giving certainty or trade advice.
@@ -362,7 +438,7 @@ export default function CompanyUniversePage(): JSX.Element {
             </div>
 
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-              mode: {isMobile ? "mobile-calm" : "cinematic"} • chart overlays: educational
+              mode: {isMobile ? "mobile-calm" : "calm"} • chart overlays: educational
             </div>
           </div>
 

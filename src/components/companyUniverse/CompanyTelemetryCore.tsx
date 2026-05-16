@@ -73,7 +73,7 @@ export default function CompanyTelemetryCore({
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Live Market Telemetry Core</div>
-            <div className="mt-3 text-[22px] font-medium text-white/92">Real-time behaviour, cinematic context</div>
+            <div className="mt-3 text-[22px] font-medium text-white/92">Real-time behaviour, analytic context</div>
             <div className="mt-2 text-[14px] leading-[1.9] text-white/75">
               {ticker.toUpperCase().trim()} • telemetry updates are educational and synthetic-safe
             </div>

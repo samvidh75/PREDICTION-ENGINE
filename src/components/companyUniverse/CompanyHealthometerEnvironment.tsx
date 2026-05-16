@@ -108,8 +108,8 @@ export default function CompanyHealthometerEnvironment({
         <div className="mx-auto max-w-[1680px]">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Healthometer Intelligence Environment</div>
-              <div className="mt-3 text-[22px] font-medium text-white/92">Holographic health spheres + calm confidence boundaries</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Health Overview</div>
+              <div className="mt-3 text-[22px] font-medium text-white/92">Calm health boundaries with structured context</div>
             </div>
 
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
@@ -120,7 +120,7 @@ export default function CompanyHealthometerEnvironment({
           {/* Visual pulse (neural rings) */}
           <div className="mb-6">
             <HolographicTelemetryEngine
-              title={isMobile ? undefined : "Neural pulse rings (contextual visualization)"}
+              title={isMobile ? undefined : "Market pulse (contextual visualization)"}
               compact
               heightPx={isMobile ? 280 : 320}
               showHeader={false}

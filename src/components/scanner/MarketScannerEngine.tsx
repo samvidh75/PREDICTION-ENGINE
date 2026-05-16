@@ -197,9 +197,9 @@ export default function MarketScannerEngine({
   const cinematicCard: ScannerCardDef = useMemo(
     () => ({
       key: "cinematicInterface",
-      pill: "Cinematic scanner interface",
+      pill: "Context scanner interface",
       title: synthesis.narrative.editorialHeadline,
-      body: synthesis.narrative.cinematicBody,
+      body: synthesis.narrative.cinematicBody.replace(/cinematic/gi, "calm"),
       glow: theme.deepBlueGlow,
     }),
     [synthesis.narrative.editorialHeadline, synthesis.narrative.cinematicBody, theme.deepBlueGlow],

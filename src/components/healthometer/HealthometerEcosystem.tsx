@@ -36,6 +36,8 @@ export default function HealthometerEcosystem({
 
   const showDense = !beginner;
 
+  const narrativeBody = synthesis.narrative.cinematicBody;
+
   const system1Structural: React.ReactNode = (
     <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
       <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Structural Health Core</div>
@@ -54,7 +56,7 @@ export default function HealthometerEcosystem({
     <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
       <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Probabilistic Intelligence Engine</div>
       <div className="mt-3 text-[20px] font-medium text-white/92">{synthesis.narrative.editorialHeadline}</div>
-      <div className="mt-3 text-[14px] leading-[1.9] text-white/80">{synthesis.narrative.cinematicBody}</div>
+      <div className="mt-3 text-[14px] leading-[1.9] text-white/80">{narrativeBody}</div>
       <div className="mt-3 text-[12px] uppercase tracking-[0.18em] text-white/45">{synthesis.narrative.conditionsNote}</div>
     </div>
   );
@@ -113,7 +115,7 @@ export default function HealthometerEcosystem({
 
   const system9CinematicRendering: React.ReactNode = (
     <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-      <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Cinematic Health Rendering Engine</div>
+      <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Health Rendering Engine</div>
       <div className="mt-3 text-[14px] leading-[1.9] text-white/80">
         The visuals breathe with the confidence lens, keeping emotional tone calm and computational.
       </div>

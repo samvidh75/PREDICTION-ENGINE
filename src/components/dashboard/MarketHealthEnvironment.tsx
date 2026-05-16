@@ -49,7 +49,7 @@ export default function MarketHealthEnvironment({ synthesis, confidenceState, th
             <div className="mt-3 text-[22px] font-medium text-white/92">The emotional centre (educational)</div>
           </div>
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-            {compact ? "Beginner clarity • simplified" : "Atmospheric health rendering"}
+            {compact ? "Beginner clarity • simplified" : "Health rendering"}
           </div>
         </div>
 

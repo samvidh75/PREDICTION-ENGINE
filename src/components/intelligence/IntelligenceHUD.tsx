@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, useTransform } from "framer-motion";
 import { useConfidenceEngine, type ConfidenceState } from "./ConfidenceEngine";
 import { useMotionController } from "../motion/MotionController";
-import { navigateToExplore } from "../../architecture/navigation/routeCoordinator";
+import { navigateToExplore, navigateToStock } from "../../architecture/navigation/routeCoordinator";
 
 import CommandResultCard from "../commandCentre/universalCommandCentre/CommandResultCard";
 import { predictiveDiscoveryArchitecture } from "../../services/search/PredictiveDiscoveryArchitecture";
@@ -123,7 +123,68 @@ export default function IntelligenceHUD(): JSX.Element {
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const mobileGestureStartRef = useRef<{ x: number; y: number } | null>(null);
+  const handleMobilePointerDown = (e: React.PointerEvent): void => {
+    if (!isMobile) return;
+    mobileGestureStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleMobilePointerUp = (e: React.PointerEvent): void => {
+    if (!isMobile) return;
+    const start = mobileGestureStartRef.current;
+    mobileGestureStartRef.current = null;
+    if (!start) return;
+
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+
+    // Horizontal swipe: keep it strict to avoid fighting taps/vertical scroll.
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    const threshold = 60;
+
+    if (absX < threshold) return;
+    if (absX < absY) return;
+
+    const maxIdx = searchResults.length - 1;
+    if (maxIdx < 0) return;
+
+    if (dx < 0) {
+      // swipe left -> next
+      setActiveIndex((prev) => Math.min(maxIdx, prev + 1));
+    } else {
+      // swipe right -> prev
+      setActiveIndex((prev) => Math.max(0, prev - 1));
+    }
+  };
+
   const [debugNavHint, setDebugNavHint] = useState<string | null>(null);
+
+  const [isPublicPage, setIsPublicPage] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get("page") ?? "").toLowerCase().trim();
+    return raw === "landing" || raw === "about";
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const read = () => {
+      const params = new URLSearchParams(window.location.search);
+      const raw = (params.get("page") ?? "").toLowerCase().trim();
+      setIsPublicPage(raw === "landing" || raw === "about");
+    };
+
+    read();
+    window.addEventListener("urlchange", read);
+    window.addEventListener("popstate", read);
+
+    return () => {
+      window.removeEventListener("urlchange", read);
+      window.removeEventListener("popstate", read);
+    };
+  }, []);
 
   const navHeight = useTransform(scrollProgress, [0, 1], [72, 64]);
   const navOpacity = useTransform(scrollProgress, [0, 1], [0.75, 0.92]);
@@ -132,7 +193,73 @@ export default function IntelligenceHUD(): JSX.Element {
   const statusPill = useMemo(() => labelForState(state), [state]);
 
   const searchResults = useMemo<DiscoveryResult[]>(() => {
-    return universalIntelligenceSearch({
+    const predicted = predictiveDiscoveryArchitecture.generatePredictions(query);
+
+    const tickerSectorByTicker: Record<string, string> = {
+      TCS: "IT Services",
+      INFY: "IT Services",
+      RELIANCE: "Energy & Retail",
+      HDFCBANK: "Banking",
+      ICICIBANK: "Banking",
+      SBIN: "Banking",
+      BHARTIARTL: "Telecom",
+      ITC: "FMCG",
+      HINDUNILVR: "FMCG",
+      LT: "Infrastructure",
+    };
+
+    const stockPredicted: DiscoveryResult[] = predicted
+      .filter((p) => p.type === SearchResultType.STOCK)
+      .slice(0, 3)
+      .map((p) => ({
+        id: `pred_stock_${p.id}`,
+        kind: "stock",
+        // Spec: show company name prominently, ticker as intelligence identity.
+        title: p.subtitle,
+        ticker: p.id,
+        companyName: p.subtitle,
+        sector: tickerSectorByTicker[p.id] ?? undefined,
+        miniChartSeed: p.id,
+        narrativeSummary: "Predicted interest: educational stock context based on current confidence conditions.",
+        confidenceEnvironment: marketState,
+        marketContext: "Market context is treated as structure adaptation rather than prediction.",
+        relationshipIndicators: ["confidence_context", "structure_first", "pacing_awareness"],
+      }));
+
+    const sectorIdByName = new Map<string, { id: string; title: string }>([
+      ["banking", { id: "sec_banking", title: "Banking" }],
+      ["it", { id: "sec_it", title: "IT" }],
+      ["it services", { id: "sec_it", title: "IT" }],
+      ["energy", { id: "sec_energy", title: "Energy" }],
+      ["fmcg", { id: "sec_fmcg", title: "FMCG" }],
+      ["pharmaceuticals", { id: "sec_pharma", title: "Pharma" }],
+      ["pharma", { id: "sec_pharma", title: "Pharma" }],
+      ["defence", { id: "sec_defence", title: "Defence" }],
+      ["defense", { id: "sec_defence", title: "Defence" }],
+    ]);
+
+    const sectorPredicted: DiscoveryResult[] = predicted
+      .filter((p) => p.type === SearchResultType.SECTOR)
+      .slice(0, 3)
+      .flatMap((p) => {
+        const key = p.title.toLowerCase().trim();
+        const mapped = sectorIdByName.get(key);
+        if (!mapped) return [];
+
+        const out: DiscoveryResult = {
+          id: mapped.id,
+          kind: "sector",
+          title: mapped.title,
+          narrativeSummary: "Predicted sector focus: educational context aligned to current confidence conditions.",
+          confidenceEnvironment: marketState,
+          marketContext: "Sector context is treated as structural pacing support, not execution guidance.",
+          relationshipIndicators: ["confidence_context", "sector_pacing", "liquidity_texture"],
+        };
+
+        return [out];
+      });
+
+    const discoveryResults = universalIntelligenceSearch({
       query,
       confidenceState: state,
       marketStateLabel: marketState,
@@ -140,7 +267,29 @@ export default function IntelligenceHUD(): JSX.Element {
       preferredSectors: discoveryMemory.preferredSectors,
       preferredThemes: discoveryMemory.preferredThemes,
     });
-  }, [query, state, marketState, narrativeKey, discoveryMemory.preferredSectors, discoveryMemory.preferredThemes]);
+
+    // Predictions first, then discovery, limited to keep overlay calm.
+    // Also dedupe by (kind,id) so React keys stay stable.
+    const combined = [...stockPredicted, ...sectorPredicted, ...discoveryResults];
+    const seen = new Set<string>();
+    const unique: DiscoveryResult[] = [];
+
+    for (const r of combined) {
+      const k = `${r.kind}_${r.id}`;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      unique.push(r);
+    }
+
+    return unique.slice(0, 10);
+  }, [
+    query,
+    state,
+    marketState,
+    narrativeKey,
+    discoveryMemory.preferredSectors,
+    discoveryMemory.preferredThemes,
+  ]);
 
   const suggestionChips = useMemo<string[]>(() => {
     const preferred = [...discoveryMemory.preferredSectors, ...discoveryMemory.preferredThemes];
@@ -167,6 +316,12 @@ export default function IntelligenceHUD(): JSX.Element {
   useEffect(() => {
     if (!searchOpen) return;
 
+    if (isMobile) {
+      // Mobile: swipe-driven, don’t progressively reveal multiple cards.
+      setVisibleCount(1);
+      return;
+    }
+
     const total = Math.min(searchResults.length, 6);
 
     if (prefersReducedMotion) {
@@ -185,17 +340,29 @@ export default function IntelligenceHUD(): JSX.Element {
     }, stepMs);
 
     return () => window.clearInterval(id);
-  }, [searchOpen, prefersReducedMotion, searchResults]);
+  }, [searchOpen, prefersReducedMotion, searchResults, isMobile]);
 
   // Keep keyboard focus inside the progressively revealed range.
   useEffect(() => {
     if (!searchOpen) return;
+
+    if (isMobile) {
+      // Swipe should be able to move beyond visibleCount (we render a single active card).
+      if (searchResults.length === 0) {
+        if (activeIndex !== 0) setActiveIndex(0);
+        return;
+      }
+      const maxIdx = searchResults.length - 1;
+      if (activeIndex > maxIdx) setActiveIndex(Math.max(0, maxIdx));
+      return;
+    }
+
     if (visibleCount <= 0) {
       if (activeIndex !== 0) setActiveIndex(0);
       return;
     }
     if (activeIndex >= visibleCount) setActiveIndex(visibleCount - 1);
-  }, [searchOpen, visibleCount, activeIndex]);
+  }, [searchOpen, visibleCount, activeIndex, isMobile, searchResults]);
 
   // Elegant loading shell (for perceived intelligence “emergence”).
   useEffect(() => {
@@ -249,11 +416,11 @@ export default function IntelligenceHUD(): JSX.Element {
         // We still intercept to enable spatial navigation through cards.
         e.preventDefault();
 
-        const max = Math.max(0, Math.min(visibleCount, searchResults.length) - 1);
-        if (max <= 0) return;
+        const maxIdx = isMobile ? Math.max(0, searchResults.length - 1) : Math.max(0, Math.min(visibleCount, searchResults.length) - 1);
+        if (maxIdx <= 0 && searchResults.length <= 1) return;
 
         setActiveIndex((prev) => {
-          if (e.key === "ArrowDown") return Math.min(max, prev + 1);
+          if (e.key === "ArrowDown") return Math.min(maxIdx, prev + 1);
           return Math.max(0, prev - 1);
         });
         return;
@@ -261,9 +428,9 @@ export default function IntelligenceHUD(): JSX.Element {
 
       if (e.key === "Enter") {
         // Select current active result
-        const max = Math.max(0, Math.min(visibleCount, searchResults.length) - 1);
-        if (max < 0) return;
-        if (activeIndex < 0 || activeIndex > max) return;
+        const maxIdx = isMobile ? Math.max(0, searchResults.length - 1) : Math.max(0, Math.min(visibleCount, searchResults.length) - 1);
+        if (searchResults.length === 0) return;
+        if (activeIndex < 0 || activeIndex > maxIdx) return;
 
         e.preventDefault();
         const r = searchResults[activeIndex];
@@ -273,7 +440,7 @@ export default function IntelligenceHUD(): JSX.Element {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [searchOpen, visibleCount, searchResults, activeIndex]);
+  }, [searchOpen, visibleCount, searchResults, activeIndex, isMobile]);
 
   const pillGlow = state === "ELEVATED_RISK" ? theme.warningGlow : theme.cyanGlow;
 
@@ -375,26 +542,40 @@ export default function IntelligenceHUD(): JSX.Element {
     predictiveDiscoveryArchitecture.addToRecentSearches(r.title);
     setMemoryTick((t) => t + 1);
 
+    if (r.kind === "stock") {
+      const parsedTicker =
+        r.ticker ??
+        (r.title.length > 0 && r.title.length <= 6 && r.title === r.title.toUpperCase() && /^[A-Z0-9.\-]+$/.test(r.title)
+          ? r.title
+          : "");
+
+      if (parsedTicker) {
+        navigateToStock({ mode: "hard", ticker: parsedTicker, preserveParamKeys: ["skipOnboarding"] });
+        return;
+      }
+    }
+
     navigateToExplore(r.kind, r.id, { mode: "hard", preserveParamKeys: ["skipOnboarding"] });
   };
 
   return (
     <div className="absolute inset-0 z-[10]" style={{ opacity: 0.95 }}>
       {/* Top Navigation */}
-      <motion.div
-        style={{
-          height: navHeight,
-          opacity: navOpacity,
-          backdropFilter: navBlur,
-        }}
-        className="pointer-events-auto fixed left-0 right-0 top-0 z-[12]"
-      >
-        <div
-          className="mx-auto w-full max-w-[1680px] px-6 sm:px-[72px] flex items-center justify-between"
+      {!isPublicPage && (
+        <motion.div
           style={{
-            background: "linear-gradient(180deg, rgba(2,3,4,0.75) 0%, rgba(2,3,4,0.00) 100%)",
+            height: navHeight,
+            opacity: navOpacity,
+            backdropFilter: navBlur,
           }}
+          className="pointer-events-auto fixed left-0 right-0 top-0 z-[12]"
         >
+          <div
+            className="mx-auto w-full max-w-[1680px] px-6 sm:px-[72px] flex items-center justify-between"
+            style={{
+              background: "linear-gradient(180deg, rgba(2,3,4,0.75) 0%, rgba(2,3,4,0.00) 100%)",
+            }}
+          >
           {/* Left: brand */}
           <div className="flex items-center gap-3">
             <div className="text-[12px] uppercase tracking-[0.22em] text-white/80">StockStory India</div>
@@ -461,8 +642,9 @@ export default function IntelligenceHUD(): JSX.Element {
               Profile
             </button>
           </div>
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Toast (institutional / premium) */}
       <AnimatePresence>
@@ -503,18 +685,20 @@ export default function IntelligenceHUD(): JSX.Element {
             <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.60)" }} />
             <div className="absolute inset-0 pointer-events-none backdrop-blur-[14px]" />
 
-            <div className="relative h-full flex items-start justify-center pt-[96px] px-6">
+            <div className={isMobile ? "relative h-full flex items-start justify-center pt-0 px-0" : "relative h-full flex items-start justify-center pt-[96px] px-6"}>
               <motion.div
                 initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: 10, filter: "blur(10px)" }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                onPointerDown={isMobile ? handleMobilePointerDown : undefined}
+                onPointerUp={isMobile ? handleMobilePointerUp : undefined}
                 style={{
-                  width: "min(960px, 100%)",
-                  borderRadius: 24,
+                  width: isMobile ? "100%" : "min(960px, 100%)",
+                  borderRadius: isMobile ? 0 : 24,
                   background: "rgba(2,3,4,0.88)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  boxShadow: "0 0 60px rgba(0,0,0,0.55)",
+                  border: isMobile ? "none" : "1px solid rgba(255,255,255,0.06)",
+                  boxShadow: isMobile ? "none" : "0 0 60px rgba(0,0,0,0.55)",
                 }}
               >
                 <div className="p-4 sm:p-6">
@@ -618,8 +802,11 @@ export default function IntelligenceHUD(): JSX.Element {
                         </div>
                       ) : (
                         <div className="mt-3 space-y-2">
-                          {searchResults.slice(0, visibleCount).map((r, i) => {
-                            const isActive = i === activeIndex;
+                          {(isMobile
+                            ? (searchResults[activeIndex] ? [searchResults[activeIndex]] : [])
+                            : searchResults.slice(0, visibleCount)
+                          ).map((r, i) => {
+                            const isActive = isMobile ? true : i === activeIndex;
                             return (
                               <CommandResultCard
                                 key={`${r.kind}_${r.id}`}
@@ -667,7 +854,7 @@ export default function IntelligenceHUD(): JSX.Element {
                     </div>
                   ) : (
                     <div className="mt-2 text-[12px] text-white/45">
-                      Explore any intelligence entry to seed your cinematic continuity.
+                      Explore any intelligence entry to support your editorial continuity.
                     </div>
                   )}
                 </div>

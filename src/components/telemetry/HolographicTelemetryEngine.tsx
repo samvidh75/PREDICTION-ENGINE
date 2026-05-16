@@ -24,7 +24,7 @@ function confidenceToneLabel(readout: TelemetryReadout): string {
 }
 
 export default function HolographicTelemetryEngine({
-  title = "Holographic Telemetry Engine",
+  title = "Market Signal Engine",
   compact = false,
   heightPx = 420,
   showHeader = true,
@@ -48,7 +48,7 @@ export default function HolographicTelemetryEngine({
           <div className="min-w-0">
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">{title}</div>
             <div className="mt-2 text-[22px] font-medium text-white/92 leading-[1.15]">
-              engineering-grade signal rails
+              Structured market signals
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export default function HolographicTelemetryEngine({
         {/* Minimal footer trust line */}
         <div className="absolute left-4 bottom-3 z-[4] pointer-events-none">
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-            probabilistic telemetry • calm signal only
+            Educational signal context • calm and clear
           </div>
         </div>
       </div>

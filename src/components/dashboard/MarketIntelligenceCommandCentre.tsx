@@ -12,6 +12,8 @@ import { useConfidenceEngine, type ConfidenceState, type ConfidenceTheme } from 
 import { useNeuralMarketSynthesisSuperengine } from "../../services/synthesis/useNeuralMarketSynthesisSuperengine";
 
 import MarketPulseLayer from "./MarketPulseLayer";
+import DashboardCommandSearchBar from "./DashboardCommandSearchBar";
+import TopMoversSnapshot from "./TopMoversSnapshot";
 import MacroIntelligenceEngine from "../macro/MacroIntelligenceEngine";
 import InstitutionalActivityNetwork from "../commandCentre/InstitutionalActivityNetwork";
 import IntelligenceFeed from "../community/IntelligenceFeed";
@@ -39,6 +41,7 @@ import type { PremiumTier } from "../../services/premium/premiumEntitlementStore
 import SubsystemErrorBoundary from "../diagnostics/SubsystemErrorBoundary";
 import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
 import { loadDiscoveryMemory as loadDiscoveryMemoryForPills } from "../../services/discovery/discoveryMemory";
+import { seedFirstRunSecondaryKeys } from "../../services/onboarding/dashboardSeedingEngine";
 
 type SecondaryStepKey = "sector" | "scanners" | "macro" | "health" | "institutional" | "feed";
 
@@ -55,7 +58,7 @@ function stepTitle(key: SecondaryStepKey): string {
     case "institutional":
       return "Institutional overlays";
     case "feed":
-      return "Cinematic AI feed";
+      return "AI intelligence feed";
   }
 }
 
@@ -181,7 +184,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     if (state === "ELEVATED_RISK") return ["Market Health Environment", "Sector Rotation Ecosystem", "Central Intelligence Core"];
     if (state === "MOMENTUM_WEAKENING") return ["Sector Rotation Ecosystem", "Market Health Environment", "Central Intelligence Core"];
     if (state === "CONFIDENCE_RISING") return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Institutional Activity Layer"];
-    return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Cinematic Intelligence Feed"];
+    return ["Central Intelligence Core", "Macro & Global Awareness Layer", "Intelligence feed"];
   }, [state]);
 
   const core = (
@@ -197,6 +200,20 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   );
 
   const pulse = <MarketPulseLayer marketSnapshot={marketSnapshot} connectionStatus={connectionStatus} />;
+
+  const statusPill = useMemo(() => {
+    if (connectionStatus === "connecting" || connectionStatus === "reconnecting") return "Syncing";
+    if (connectionStatus === "disconnected") return "Telemetry offline";
+    if (state === "ELEVATED_RISK") return "Elevated volatility";
+    if (state === "MOMENTUM_WEAKENING") return "Momentum selective";
+    if (state === "CONFIDENCE_RISING") return "Constructive strength";
+    return "Balanced conditions";
+  }, [connectionStatus, state]);
+
+  const onOpenSearchFromDashboard = (q: string) => {
+    dismissOverlay();
+    navigateToStock({ openSearchQ: q, mode: "hard", preserveParamKeys: ["skipOnboarding"] });
+  };
 
   const sectorStep = (
     <section className="relative z-[12]">
@@ -270,7 +287,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       <div className="mx-auto max-w-[1680px]">
         {hasPremium ? (
           <>
-            <IntelligenceFeed />
+            <IntelligenceFeed compact={firstDashboardPending || beginner} />
             <div className="mt-6">
               <NeuralMarketSynthesisPanel compact={false} />
             </div>
@@ -278,7 +295,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
         ) : (
           <PremiumLockCard
             requiredTier={"premium" satisfies PremiumTier}
-            title="Cinematic Intelligence Feed"
+            title="Intelligence feed"
             subtitle="High-quality intelligence narratives (educational)"
             previewLines={[
               "Macro developments translated into calm learning contexts",
@@ -286,7 +303,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
               "Institutional behavior interpreted without fear-driven headlines",
             ]}
             accentGlow={theme.cyanGlow}
-            ctaLabel="Unlock cinematic feed"
+            ctaLabel="Unlock intelligence feed"
           />
         )}
       </div>
@@ -352,7 +369,12 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     })();
 
     // “No overwhelm” rule: show fewer layers on first run.
-    return seeded.slice(0, 3);
+    return seedFirstRunSecondaryKeys({
+      orderedKeys: seeded,
+      preferredStepKey,
+      firstDashboardPending,
+      maxLayers: 3,
+    });
   }, [adaptivePriority, firstDashboardPending, preferredStepKey]);
 
   const onboardingInitialStepIndexFinal = useMemo(() => {
@@ -433,9 +455,29 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
       </div>
 
       <div className="relative z-[6]">
-        {/* Primary focus zone */}
+        {/* Primary focus zone: command search + pulse + top movers + personalised insight */}
+        <section className="relative z-[12] px-6 sm:px-[72px] pt-10 pb-8">
+          <div className="mx-auto max-w-[1680px] flex flex-col gap-6">
+            <DashboardCommandSearchBar
+              statusPill={statusPill}
+              preferredPills={preferredSearchPills}
+              onOpenSearch={onOpenSearchFromDashboard}
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <section className="relative z-[12]">{pulse}</section>
+              <TopMoversSnapshot
+                marketSnapshot={marketSnapshot}
+                connectionStatus={connectionStatus}
+                confidenceState={state}
+                theme={theme}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Personalised AI insight */}
         {core}
-        <section className="relative z-[12]">{pulse}</section>
 
         {/* Secondary expandable intelligence zone (single entry point to reduce clutter) */}
         <section className="relative z-[12] px-6 sm:px-[72px] pb-20">

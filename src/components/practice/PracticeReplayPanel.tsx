@@ -103,7 +103,7 @@ export default function PracticeReplayPanel({
       <div className="flex items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Market Replay Engine</div>
-          <div className="mt-3 text-[22px] font-medium text-white/92 leading-[1.2]">Cinematic replay for learning</div>
+          <div className="mt-3 text-[22px] font-medium text-white/92 leading-[1.2]">Replay for learning</div>
         </div>
 
         <div className="shrink-0 flex items-center gap-3">

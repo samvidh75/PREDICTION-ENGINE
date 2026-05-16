@@ -60,16 +60,16 @@ export default function BeginnerModeOverlay({
               {/* Header */}
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Beginner-first futurism</div>
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Beginner-first guidance</div>
                   <div className="mt-2 text-[22px] font-semibold text-white/92 leading-[1.1]">
-                    {stage === "search" ? "Open your calm command centre" : "Enter your guided universe"}
+                    {stage === "search" ? "Open your calm workspace" : "Enter your guided learning step"}
                   </div>
                   <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
                     {stage === "search"
                       ? "Pick a gentle lens. We’ll keep everything educational—no pressure, no noise."
                       : canExplore
                         ? "We’ll seed your environment around the selection you made during onboarding."
-                        : "Your guided seed isn’t ready yet. Start with a calm search instead."}
+                        : "Your guided step isn’t ready yet. Start with a calm search instead."}
                   </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function BeginnerModeOverlay({
               <div className="mt-6">
                 {stage === "search" && (
                   <>
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Quick search lenses</div>
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Quick search filters</div>
 
                     <div className="mt-3 flex flex-wrap gap-2">
                       {pills.map((q) => (
@@ -113,7 +113,7 @@ export default function BeginnerModeOverlay({
 
                 {stage === "explore" && (
                   <>
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Your onboarding seed</div>
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Your guided selection</div>
 
                     <div className="mt-3">
                       {seedSelection ? (
@@ -167,7 +167,7 @@ export default function BeginnerModeOverlay({
                         ].join(" ")}
                         aria-disabled={!canExplore}
                       >
-                        Enter guided universe
+                        Continue with guided selection
                       </motion.button>
                     </div>
                   </>

@@ -198,7 +198,7 @@ export default function MarketCapPositioningRail(): JSX.Element {
             <div
               role="button"
               tabIndex={0}
-              aria-label="Open Market cap holographic explainer"
+              aria-label="Open market cap explainer"
               onClick={() => setOpenConcept("marketCap")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") setOpenConcept("marketCap");
@@ -219,7 +219,7 @@ export default function MarketCapPositioningRail(): JSX.Element {
             <div
               role="button"
               tabIndex={0}
-              aria-label="Open PE holographic explainer"
+              aria-label="Open PE explainer"
               onClick={() => setOpenConcept("pe")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") setOpenConcept("pe");

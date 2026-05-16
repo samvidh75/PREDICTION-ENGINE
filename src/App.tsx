@@ -24,6 +24,7 @@ import type { MarketInputs } from "./services/intelligence/marketState";
 import { loadAuthSession } from "./services/auth/sessionStore";
 import { loadUserProfile, saveUserProfile } from "./services/auth/userProfileStore";
 import { markFirstDashboardPending } from "./services/onboarding/onboardingFirstRunMemory";
+import { clearOnboardingProgress, loadOnboardingProgress } from "./services/onboarding/onboardingProgressMemory";
 
 type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
 
@@ -98,7 +99,13 @@ const DEFAULT_SKIP_PROFILE: UserProfile = {
 };
 
 export default function App(): JSX.Element {
-  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => loadAuthSession().status === "authenticated");
+  const [onboardingComplete, setOnboardingComplete] = useState<boolean>(() => {
+    const authOk = loadAuthSession().status === "authenticated";
+    if (!authOk) return false;
+
+    // If the user is authenticated but onboarding progress still exists, we must continue onboarding.
+    return loadOnboardingProgress() === null;
+  });
 
   const [draftProfile, setDraftProfile] = useState<UserProfile | null>(() => {
     if (loadAuthSession().status !== "authenticated") return null;
@@ -173,7 +180,8 @@ export default function App(): JSX.Element {
   }, [pageKey]);
 
   const isPublicPage = pageKey === "landing" || pageKey === "about";
-  const shouldShowOnboarding = !onboardingComplete && !isPublicPage;
+  const skipOnboarding = getSkipOnboardingFlag();
+  const shouldShowOnboarding = !skipOnboarding && !onboardingComplete && !isPublicPage;
 
   const routeSubsystem = useMemo(() => {
     switch (pageKey) {
@@ -209,6 +217,7 @@ export default function App(): JSX.Element {
             {shouldShowOnboarding ? (
               <OnboardingPage
                 onComplete={(profile) => {
+                  clearOnboardingProgress();
                   markFirstDashboardPending();
                   setDraftProfile(profile);
                   setOnboardingComplete(true);
@@ -227,11 +236,9 @@ export default function App(): JSX.Element {
                   </SubsystemErrorBoundary>
                 </CinematicTransitionLayer>
 
-                {pageKey === "landing" || pageKey === "about" ? null : (
-                  <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
-                    <IntelligenceHUD />
-                  </SubsystemErrorBoundary>
-                )}
+                <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
+                  <IntelligenceHUD />
+                </SubsystemErrorBoundary>
                 {pageKey === "landing" || pageKey === "about" ? null : (
                   <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
                     <IntelligenceNavigationRail />

@@ -239,7 +239,7 @@ export default function HolographicConceptVisual({
               aria-hidden="true"
             />
 
-            <div className="absolute left-5 top-4 text-[11px] uppercase tracking-[0.18em] text-white/55">laser pulse</div>
+            <div className="absolute left-5 top-4 text-[11px] uppercase tracking-[0.18em] text-white/55">Volatility signal</div>
             <div className="absolute right-5 top-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
               {beginnerMode
                 ? "sensitivity field"
@@ -340,9 +340,9 @@ export default function HolographicConceptVisual({
 
     // fallback single
     return (
-      <div className="rounded-[18px] border border-white/10 bg-black/20 p-5">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">holographic precision</div>
-        <div className="mt-3 text-[13px] leading-[1.6] text-white/80">Concept visualization will refine as the learning lens expands.</div>
+        <div className="rounded-[18px] border border-white/10 bg-black/20 p-5">
+        <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">Learning visualization</div>
+        <div className="mt-3 text-[13px] leading-[1.6] text-white/80">Concept visualization will refine as insights become clearer.</div>
       </div>
     );
   }, [concept, payload, confidenceState, prefersReducedMotion, toneGlow, toneEdgeGlow, beginnerMode, m, pos01]);

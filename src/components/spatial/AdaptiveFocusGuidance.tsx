@@ -34,11 +34,11 @@ function getFocusText(pageKey: string, stage: number, state: ConfidenceState): {
 
   if (pageKey === "stock") {
     const items = [
-      { primary: "Hero environment", secondary: `Primary lens is ${riskTone}; interpretation stays calm.` },
+      { primary: "Focus overview", secondary: `Primary lens is ${riskTone}; interpretation stays calm.` },
       { primary: "Institutional layer", secondary: `Participation patterns are treated as context boundaries.` },
       { primary: "Financial intelligence", secondary: `Metric environments support educational reading, not certainty.` },
       { primary: "Behavioural analysis", secondary: `Context shapes interpretation pacing; margins stay guarded.` },
-      { primary: "Chart integration system", secondary: `Neural synthesis overlays remain probabilistic and learning-focused.` },
+      { primary: "Chart integration system", secondary: `Chart synthesis overlays remain probabilistic and learning-focused.` },
     ];
 
     return items[Math.min(items.length - 1, stage)] ?? items[0]!;

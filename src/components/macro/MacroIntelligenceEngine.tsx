@@ -99,12 +99,13 @@ export default function MacroIntelligenceEngine({
       200,
     )} Macro-to-stock linking preview: macro texture → pacing sensitivity → ${health} tone.`;
 
-    const worldInterfaceTitle = "Cinematic world intelligence interface";
-    const worldInterfaceBody = `${compactText(synthesis.narrative.cinematicBody, 280)} The interface is massive yet calm: education-first, probabilistic, and emotionally comfortable.`;
+    const worldInterfaceTitle = "Global intelligence interface";
+    const worldInterfaceNarrativeBody = synthesis.narrative.cinematicBody.replace(/cinematic/gi, "calm");
+    const worldInterfaceBody = `${compactText(worldInterfaceNarrativeBody, 280)} The interface is steady and clear: education-first, probabilistic, and emotionally comfortable.`;
 
     const planetTelemetryTitle = "Planetary market telemetry system";
     const planetTelemetryBody =
-      "A cinematic spatial rendering of global flow texture. It communicates pace, breadth, and liquidity conditioning—never news, fear, or outcomes.";
+      "A structured spatial rendering of global flow texture. It communicates pace, breadth, and liquidity conditioning—never news, fear, or outcomes.";
 
     const globalCoreCard: MacroSystemCardDef = {
       key: "core",
@@ -180,7 +181,7 @@ export default function MacroIntelligenceEngine({
 
     const worldCard: MacroSystemCardDef = {
       key: "interface",
-      systemLabel: "CINEMATIC WORLD INTELLIGENCE INTERFACE",
+      systemLabel: "GLOBAL INTELLIGENCE INTERFACE",
       title: worldInterfaceTitle,
       body: worldInterfaceBody,
       glow: theme.deepBlueGlow,
@@ -215,7 +216,7 @@ export default function MacroIntelligenceEngine({
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Macro Intelligence OS</div>
             <div className="mt-3 text-[26px] font-medium text-white/92 leading-[1.1]">Global macro intelligence ecosystem</div>
             <div className="mt-2 text-[14px] leading-[1.8] text-white/75 max-w-[82ch]">
-              Cinematic, interconnected macro learning—analytical, calm, and probabilistic. No news feed. No fear framing.
+              Structured macro learning—analytical, calm, and probabilistic. No news feed. No fear framing.
             </div>
           </div>
 

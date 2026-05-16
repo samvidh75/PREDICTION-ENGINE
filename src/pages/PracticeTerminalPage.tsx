@@ -408,7 +408,7 @@ export default function PracticeTerminalPage(): JSX.Element {
                   boxShadow: `0 0 40px rgba(0,0,0,0.35), 0 0 ${orbTightening > 0.75 ? 120 : 70}px rgba(0,255,210,0.03)`,
                 }}
               >
-                <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Confidence atmosphere</div>
+                <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Confidence environment</div>
                 <div className="mt-3 text-[22px] font-semibold text-white/92">{confidenceLabel(confidenceState)}</div>
                 <div className="mt-3 text-[14px] leading-[1.7] text-white/80">
                   {portfolioIntelligence.health.environment}
@@ -732,7 +732,7 @@ export default function PracticeTerminalPage(): JSX.Element {
                   {
                     id: "l1",
                     title: "Confidence environments are contextual",
-                    body: "Your simulated confidence atmosphere changes as concentration and volatility sensitivity evolve, without assuming certainty.",
+                    body: "Your simulated confidence environment changes as concentration and volatility sensitivity evolve, without assuming certainty.",
                   },
                   {
                     id: "l2",

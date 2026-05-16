@@ -392,7 +392,7 @@ export default function StockStoryPage(): JSX.Element {
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Financial Intelligence System</div>
-              <div className="mt-3 text-[22px] font-medium text-white/92">Cinematic metric environments</div>
+              <div className="mt-3 text-[22px] font-medium text-white/92">Metric intelligence environments</div>
             </div>
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">no tables • only interpretation</div>
           </div>
@@ -545,7 +545,7 @@ export default function StockStoryPage(): JSX.Element {
             <div className="rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-[24px] p-6 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Chart Integration System</div>
               <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                Narrative-first cinematic chart surface (TradingView-ready): subtle, calm, and interpretation-supported.
+                Narrative-first chart surface (TradingView-ready): subtle, calm, and interpretation-supported.
               </div>
 
               <div className="mt-4">

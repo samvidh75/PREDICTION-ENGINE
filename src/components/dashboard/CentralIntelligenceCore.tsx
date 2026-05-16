@@ -126,7 +126,7 @@ export default function CentralIntelligenceCore({
           <div className="min-w-0">
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Central Intelligence Core</div>
             <div className="mt-3 text-[26px] font-medium text-white/92 leading-[1.1]">
-              Holographic neural condition nucleus (educational)
+              Market intelligence core (educational)
             </div>
             <div className="mt-3 text-[14px] leading-[1.9] text-white/80 max-w-[90ch]">
               A calm, probabilistic orchestration of market health, liquidity texture, volatility posture, and macro pressure.

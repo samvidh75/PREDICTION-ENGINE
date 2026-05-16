@@ -242,7 +242,7 @@ export default function AssistantPage(): JSX.Element {
 
                       {isThinking && (
                         <div className="rounded-[24px] border border-white/10 bg-black/[0.22] p-[24px]">
-                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">Calm intelligence pulse</div>
+                          <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">Calm guidance status</div>
                           <div className="mt-3 flex items-center gap-3">
                             <motion.div
                               className="h-[10px] w-[10px] rounded-full"

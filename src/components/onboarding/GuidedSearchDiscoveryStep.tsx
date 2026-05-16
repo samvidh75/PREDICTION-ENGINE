@@ -12,6 +12,7 @@ type Props = {
   narrativeKey: number;
   preferredSectors?: string[];
   preferredThemes?: string[];
+  beginner?: boolean;
   onContinue: (selected: DiscoveryResult) => void;
 };
 
@@ -26,6 +27,7 @@ export default function GuidedSearchDiscoveryStep({
   narrativeKey,
   preferredSectors,
   preferredThemes,
+  beginner = false,
   onContinue,
 }: Props): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
@@ -35,6 +37,7 @@ export default function GuidedSearchDiscoveryStep({
   const [continuing, setContinuing] = useState(false);
 
   const results = useMemo<DiscoveryResult[]>(() => {
+    const limit = beginner ? 3 : 4;
     return universalIntelligenceSearch({
       query,
       confidenceState,
@@ -42,8 +45,8 @@ export default function GuidedSearchDiscoveryStep({
       narrativeKey,
       preferredSectors,
       preferredThemes,
-    }).slice(0, 4);
-  }, [query, confidenceState, marketStateLabel, narrativeKey, preferredSectors, preferredThemes]);
+    }).slice(0, limit);
+  }, [query, confidenceState, marketStateLabel, narrativeKey, preferredSectors, preferredThemes, beginner]);
 
   const selected = useMemo(() => results.find((r) => r.id === selectedId) ?? null, [results, selectedId]);
   const canContinue = selected !== null && !continuing;
@@ -114,7 +117,9 @@ export default function GuidedSearchDiscoveryStep({
         </div>
 
         <div className="mt-8">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">Your search lens</div>
+          <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
+            {beginner ? "Your gentle search lens" : "Your search lens"}
+          </div>
           <div className="mt-3">
             <input
               value={query}
@@ -122,7 +127,7 @@ export default function GuidedSearchDiscoveryStep({
                 setQuery(e.target.value);
                 setSelectedId(null);
               }}
-              placeholder="Try: volatility, institutional, sector rotation…"
+              placeholder={beginner ? "Try: volatility, institutional, rotation…" : "Try: volatility, institutional, sector rotation…"}
               className="w-full h-[58px] rounded-[18px] bg-white/3 border border-white/5 px-4 text-white/90 outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/30"
             />
           </div>
@@ -214,7 +219,7 @@ export default function GuidedSearchDiscoveryStep({
         </div>
 
         <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-          Beginner-first futurism • fewer overlays • calm educational context
+          {beginner ? "Beginner-first guidance • fewer options • calm educational context" : "Beginner-first guidance • calm educational context"}
         </div>
       </motion.div>
     </div>

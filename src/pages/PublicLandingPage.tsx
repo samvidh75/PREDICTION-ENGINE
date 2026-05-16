@@ -40,8 +40,8 @@ export default function PublicLandingPage(): JSX.Element {
 
   const pageGlow = useMemo(() => glowForState(state, theme), [state, theme]);
 
-  // Cinematic hero copy stays short; avoid feature walls.
-  const heroStatement = "A cinematic luxury financial intelligence operating system — from the 22nd century.";
+  // Premium, calm hero copy (no sci-fi phrasing).
+  const heroStatement = "Structured market intelligence for modern investors.";
 
   const [query, setQuery] = useState<string>("");
   const [results, setResults] = useState<DiscoveryResult[]>([]);
@@ -114,7 +114,7 @@ export default function PublicLandingPage(): JSX.Element {
               <div className="h-[10px] w-[10px] rounded-full" style={{ background: pageGlow, boxShadow: `0 0 20px ${pageGlow}` }} />
               <div className="min-w-0">
                 <div className="text-[12px] uppercase tracking-[0.22em] text-white/80 truncate">StockStory India</div>
-                <div className="mt-[2px] text-[11px] uppercase tracking-[0.18em] text-white/50 truncate">Cinematic intelligence</div>
+                <div className="mt-[2px] text-[11px] uppercase tracking-[0.18em] text-white/50 truncate">Market intelligence</div>
               </div>
             </div>
 
@@ -173,12 +173,12 @@ export default function PublicLandingPage(): JSX.Element {
             debugLabel="landing_hero"
             primary={
               <div>
-                <HeroKicker>World’s most futuristic financial intelligence operating system</HeroKicker>
+                <HeroKicker>Calm, structured market intelligence</HeroKicker>
 
                 <HeroTitle>{heroStatement}</HeroTitle>
 
                 <div className="mt-5 text-[15px] leading-[1.95] text-white/85 max-w-[70ch]">
-                  Calm, probabilistic intelligence — reconstructed spatially for desktop, laptop, tablet, and mobile.
+                  Calm, structured market intelligence across desktop, laptop, tablet, and mobile.
                   No certainty claims. No trade execution framing.
                 </div>
 
@@ -189,18 +189,18 @@ export default function PublicLandingPage(): JSX.Element {
                     style={{ boxShadow: `0 0 70px rgba(0,0,0,0.25), 0 0 90px ${pageGlow}` }}
                     onClick={onStart}
                   >
-                    Initialize Intelligence
+                    Begin learning
                   </button>
 
                   <div className="h-[56px] px-[18px] rounded-[18px] border border-white/10 bg-black/20 flex items-center">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">
-                      Educational only • SEBI-safe • calm feedback
+                      Educational only • SEBI-safe • calm guidance
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-2">
-                  {["Probabilistic business analysis", "Cinematic financial storytelling", "Contextual market intelligence"].map((x) => (
+                  {["Probabilistic business analysis", "Structured market storytelling", "Contextual market intelligence"].map((x) => (
                     <span
                       key={x}
                       className="ss-telemetry-pill px-[14px] py-[10px] text-[11px] uppercase tracking-[0.18em] text-white/70 rounded-full border border-white/10"
@@ -219,7 +219,7 @@ export default function PublicLandingPage(): JSX.Element {
                   <div className="absolute inset-0 rounded-[32px] border border-white/10 bg-black/20 backdrop-blur-[24px]" style={{ boxShadow: `0 0 80px rgba(0,0,0,0.35)` }} />
                   <div className="relative">
                     <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 text-[10px] uppercase tracking-[0.18em] text-white/45">
-                      neural market pulse
+                      Market pulse
                     </div>
                     <div className="scale-[1.02]">
                       <MarketOrb />
@@ -240,11 +240,11 @@ export default function PublicLandingPage(): JSX.Element {
             <div className="rounded-[28px] border border-white/10 bg-black/25 backdrop-blur-[24px] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div>
-                  <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Cinematic Search Preview</div>
+                  <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Search preview</div>
                   <div className="mt-2 text-[20px] font-medium text-white/92">Search is the heart of StockStory India</div>
                 </div>
                 <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-                  Type anything — get educational intelligence environments
+                  Type a topic — get structured insights
                 </div>
               </div>
 
@@ -340,23 +340,23 @@ export default function PublicLandingPage(): JSX.Element {
               },
               {
                 id: "charts",
-                label: "Cinematic Charts",
+            label: "Guided Charts",
                 content: (
                   <PremiumCard variant="chart" glow={pageGlow} className="p-6">
-                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Cinematic Charts</div>
-                    <div className="mt-3 text-[18px] font-semibold text-white/92">Interpretation-supported chart universes</div>
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Guided Charts</div>
+                    <div className="mt-3 text-[18px] font-semibold text-white/92">Interpretation-supported chart suites</div>
                     <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
                       Gesture-friendly surfaces with device-tier density control.
                     </div>
                     <div className="mt-4">
                       {/* Reuse StockStory ticker by default */}
-                      {/* The chart component itself is already “cinematic + responsive”. */}
-                      {/* Dynamically imported would complicate; keep direct usage minimal. */}
+                      {/* The chart component itself is already calm + responsive. */}
+                      {/* Dynamic imports would complicate; keep direct usage minimal. */}
                       {/* eslint-disable-next-line react/jsx-no-undef */}
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     </div>
                     <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-white/45">
-                      Advanced chart universes are available inside the learning flow
+                      Advanced chart suites are available inside the learning flow
                     </div>
                   </PremiumCard>
                 ),
@@ -424,7 +424,7 @@ export default function PublicLandingPage(): JSX.Element {
                   { k: "SEBI-safe", v: "Educational probabilistic lens" },
                   { k: "Calm tone", v: "Emotional comfort with premium pacing" },
                   { k: "Device-tier", v: "Density & rendering adapt per environment" },
-                  { k: "Luxury clarity", v: "Readable hierarchy across charts + telemetry" },
+                  { k: "Clarity focus", v: "Readable hierarchy across charts + telemetry" },
                 ].map((x) => (
                   <div key={x.k} className="rounded-[22px] border border-white/10 bg-black/20 p-4">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-white/55">{x.k}</div>
@@ -456,13 +456,13 @@ export default function PublicLandingPage(): JSX.Element {
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Pricing preview</div>
               <div className="mt-3 text-[18px] font-semibold text-white/92">Start with educational intelligence</div>
               <div className="mt-3 text-[14px] leading-[1.8] text-white/80">
-                Premium tiers unlock deeper cinematic feed surfaces (still educational — calm professionalism only).
+                Premium tiers unlock deeper market context feeds (still educational and calm).
               </div>
 
               <div className="mt-5 space-y-3">
                 {[
                   { tier: "Free", glow: theme.deepBlueGlow, line: "Core chart + educational intelligence surfaces" },
-                  { tier: "Premium", glow: theme.cyanGlow, line: "Cinematic intelligence feed + deeper context rails" },
+                  { tier: "Premium", glow: theme.cyanGlow, line: "Intelligence feed + deeper context rails" },
                   { tier: "Institutional", glow: theme.warningGlow, line: "Participation web + institutional-grade learning context" },
                 ].map((x) => (
                   <div key={x.tier} className="rounded-[22px] border border-white/10 bg-black/20 p-4" style={{ boxShadow: `0 0 60px ${x.glow} inset` }}>

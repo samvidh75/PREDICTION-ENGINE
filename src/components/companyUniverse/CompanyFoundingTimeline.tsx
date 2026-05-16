@@ -15,7 +15,7 @@ export default function CompanyFoundingTimeline({
         <CompanyUniverseSectionHeader
           kicker="FOUNDER STORY TIMELINE"
           title="Interactive company biography"
-          subtitle="Vertical documentary rails with laser-linked milestones—editorial structure, not data clutter."
+          subtitle="Vertical documentary rails with linked milestones—editorial structure, not data clutter."
         />
 
         <div className="relative">

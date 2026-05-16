@@ -155,7 +155,7 @@ export default function AssistantContextPanel(props: {
         </div>
 
         <div className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/45">
-          Calm holographic explanation • non-intrusive
+          Calm concept explanation • non-intrusive
         </div>
       </div>
 

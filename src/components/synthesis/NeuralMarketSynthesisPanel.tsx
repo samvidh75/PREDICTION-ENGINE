@@ -19,6 +19,9 @@ export default function NeuralMarketSynthesisPanel({ compact = false }: PanelPro
 
   const quality = synthesis.quality;
 
+  const narrativeBody = synthesis.narrative.cinematicBody.replace(/cinematic/gi, "calm");
+  const conditionsNote = synthesis.narrative.conditionsNote.replace(/cinematic/gi, "calm");
+
   const timeline = useMemo(() => {
     const count = compact ? (quality === "low" ? 2 : 3) : quality === "low" ? 3 : 4;
     return pickTop(synthesis.timeline, count);
@@ -33,14 +36,14 @@ export default function NeuralMarketSynthesisPanel({ compact = false }: PanelPro
     <section className="relative">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Neural Market Synthesis</div>
+<div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Market Synthesis</div>
           <div className="mt-3 text-[22px] font-medium text-white/92">
-            {compact ? "Probabilistic intelligence core" : "Cinematic probabilistic intelligence core"}
+            {compact ? "Probabilistic insight core" : "Probabilistic insight core"}
           </div>
         </div>
 
         <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">
-          {connectionStatus === "connected" ? "live synthesis texture" : connectionStatus === "connecting" ? "connecting signal rail" : "synthesis offline frame"}
+          {connectionStatus === "connected" ? "Live insights" : connectionStatus === "connecting" ? "Connecting insights" : "Insights offline"}
         </div>
       </div>
 
@@ -50,12 +53,12 @@ export default function NeuralMarketSynthesisPanel({ compact = false }: PanelPro
           <div className="md:col-span-2">
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Confidence environment headline</div>
             <div className="mt-2 text-[18px] leading-[1.6] text-white/92 font-semibold">{synthesis.narrative.editorialHeadline}</div>
-            <div className="mt-3 text-[14px] leading-[1.8] text-white/80">{synthesis.narrative.cinematicBody}</div>
-            <div className="mt-3 text-[12px] uppercase tracking-[0.18em] text-white/45">{synthesis.narrative.conditionsNote}</div>
+            <div className="mt-3 text-[14px] leading-[1.8] text-white/80">{narrativeBody}</div>
+            <div className="mt-3 text-[12px] uppercase tracking-[0.18em] text-white/45">{conditionsNote}</div>
           </div>
 
           <div>
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Neural Healthometer</div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Healthometer</div>
             <div className="mt-2 text-[20px] font-semibold text-white/92">{healthometerLabel(synthesis.healthometer.state)}</div>
             <div className="mt-3 text-[13px] leading-[1.7] text-white/80">{synthesis.healthometer.rationale}</div>
             <div className="mt-3 rounded-[18px] border border-white/10 bg-black/25 p-4">
@@ -93,7 +96,7 @@ export default function NeuralMarketSynthesisPanel({ compact = false }: PanelPro
           </div>
 
           <div className="lg:col-span-1 rounded-[22px] border border-white/10 bg-black/25 p-5">
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Cinematic timeline anchors</div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">Timeline anchors</div>
             <div className="mt-4 space-y-3">
               {timeline.map((t) => (
                 <div key={t.id} className="rounded-[18px] border border-white/10 bg-black/20 p-4">

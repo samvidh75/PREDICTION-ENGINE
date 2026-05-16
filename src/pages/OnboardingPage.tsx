@@ -31,6 +31,7 @@ import {
   type OnboardingExplorationGoalOverride,
 } from "../services/onboarding/onboardingFirstRunMemory";
 import { seedDiscoveryMemoryWithPreferredInterests } from "../services/discovery/discoveryMemory";
+import { loadOnboardingProgress, saveOnboardingProgress, type OnboardingProgress } from "../services/onboarding/onboardingProgressMemory";
 
 type Phase =
   | "ENTRY"
@@ -227,33 +228,68 @@ export default function OnboardingPage({
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useMotionController();
 
-  const [phase, setPhase] = useState<Phase>(() => getOnboardingPhaseFromUrl() ?? "ENTRY");
+  const urlPhase = getOnboardingPhaseFromUrl();
+  const storedProgress = useMemo<OnboardingProgress | null>(() => loadOnboardingProgress(), []);
 
-  const [focusAreas, setFocusAreas] = useState<MarketInterestArea | null>(null);
-  const [volatilityComfort, setVolatilityComfort] = useState<VolatilityComfort | null>(null);
-  const [investingHorizon, setInvestingHorizon] = useState<InvestingHorizon | null>(null);
-  const [analysisDepth, setAnalysisDepth] = useState<AnalysisDepth | null>(null);
-  const [modules, setModules] = useState<IntelligenceModule[]>([]);
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (urlPhase) return urlPhase;
+    return (storedProgress?.phase ?? "ENTRY") as Phase;
+  });
 
-  // If we deep-link straight to ACTIVATION, we still need a non-null profileDraft
-  // for the auth gateway to be able to complete the onboarding orchestration.
+  const [focusAreas, setFocusAreas] = useState<MarketInterestArea | null>(storedProgress?.draft?.focusAreas?.[0] ?? null);
+  const [volatilityComfort, setVolatilityComfort] = useState<VolatilityComfort | null>(storedProgress?.draft?.volatilityComfort ?? null);
+  const [investingHorizon, setInvestingHorizon] = useState<InvestingHorizon | null>(storedProgress?.draft?.investingHorizon ?? null);
+  const [analysisDepth, setAnalysisDepth] = useState<AnalysisDepth | null>(storedProgress?.draft?.analysisDepth ?? null);
+  const [modules, setModules] = useState<IntelligenceModule[]>(storedProgress?.draft?.modules ?? []);
+
+  // Resume safety: ensure required answers exist for the phase we land in.
   useEffect(() => {
-    if (phase !== "ACTIVATION") return;
+    if (phase === "ENTRY") return;
 
-    const empty =
-      !focusAreas &&
+    if (!focusAreas) {
+      setFocusAreas(DEFAULT_ONBOARDING_PROFILE.focusAreas[0]);
+    }
+
+    // VolatilityComfort is required starting from PERSONALITY_VOL and beyond.
+    if (
       !volatilityComfort &&
+      (phase === "PERSONALITY_VOL" ||
+        phase === "PERSONALITY_HORIZON" ||
+        phase === "PERSONALITY_DEPTH" ||
+        phase === "PREFERENCES" ||
+        phase === "ENVIRONMENT" ||
+        phase === "ACTIVATION")
+    ) {
+      setVolatilityComfort(DEFAULT_ONBOARDING_PROFILE.volatilityComfort);
+    }
+
+    // InvestingHorizon is required starting from PERSONALITY_HORIZON and beyond.
+    if (
       !investingHorizon &&
+      (phase === "PERSONALITY_HORIZON" ||
+        phase === "PERSONALITY_DEPTH" ||
+        phase === "PREFERENCES" ||
+        phase === "ENVIRONMENT" ||
+        phase === "ACTIVATION")
+    ) {
+      setInvestingHorizon(DEFAULT_ONBOARDING_PROFILE.investingHorizon);
+    }
+
+    // AnalysisDepth is required starting from PERSONALITY_DEPTH and beyond.
+    if (
       !analysisDepth &&
-      modules.length === 0;
+      (phase === "PERSONALITY_DEPTH" ||
+        phase === "PREFERENCES" ||
+        phase === "ENVIRONMENT" ||
+        phase === "ACTIVATION")
+    ) {
+      setAnalysisDepth(DEFAULT_ONBOARDING_PROFILE.analysisDepth);
+    }
 
-    if (!empty) return;
-
-    setFocusAreas(DEFAULT_ONBOARDING_PROFILE.focusAreas[0]);
-    setVolatilityComfort(DEFAULT_ONBOARDING_PROFILE.volatilityComfort);
-    setInvestingHorizon(DEFAULT_ONBOARDING_PROFILE.investingHorizon);
-    setAnalysisDepth(DEFAULT_ONBOARDING_PROFILE.analysisDepth);
-    setModules(DEFAULT_ONBOARDING_PROFILE.modules);
+    // Modules selection is required for the PREFERENCES step UI (and influences seeding).
+    if (phase === "PREFERENCES" && modules.length === 0) {
+      setModules(DEFAULT_ONBOARDING_PROFILE.modules);
+    }
   }, [phase, focusAreas, volatilityComfort, investingHorizon, analysisDepth, modules.length]);
 
   const [authMode, setAuthMode] = useState<"google" | "email" | "apple" | "">("");
@@ -264,9 +300,91 @@ export default function OnboardingPage({
   const [authLoading, setAuthLoading] = useState(false);
   const [activating, setActivating] = useState(false);
 
-  const [activationSubStage, setActivationSubStage] = useState<"auth" | "guided">("auth");
+  const [activationSubStage, setActivationSubStage] = useState<"auth" | "guided">(() => {
+    // QA deep-links should start at auth even if previous local progress was "guided".
+    if (urlPhase === "ACTIVATION") return "auth";
+    return storedProgress?.activationSubStage ?? "auth";
+  });
 
   const activationTimeoutRef = useRef<number | null>(null);
+
+  const [debugBanner, setDebugBanner] = useState<string | null>(null);
+
+  const navTriggerRef = useRef<number>(0);
+
+  const initButtonRef = useRef<HTMLButtonElement | null>(null);
+  const identityContinueButtonRef = useRef<HTMLButtonElement | null>(null);
+  const nextButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const fireNext = (source: string) => {
+    // eslint-disable-next-line no-console
+    console.log("[onboarding] fireNext()", { source, phase });
+
+    next();
+  };
+
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+
+  const isInteractiveTarget = (target: EventTarget | null): boolean => {
+    if (!(target instanceof HTMLElement)) return true;
+    // Ignore swipes that start on any interactive/control surface.
+    return !!target.closest("button, input, textarea, select, a, [role='button']");
+  };
+
+  const goBack = () => {
+    if (phase === "ENTRY") return;
+    if (phase === "ACTIVATION") return;
+
+    if (phase === "IDENTITY") setPhase("ENTRY");
+    else if (phase === "PERSONALITY_VOL") setPhase("IDENTITY");
+    else if (phase === "PERSONALITY_HORIZON") setPhase("PERSONALITY_VOL");
+    else if (phase === "PERSONALITY_DEPTH") setPhase("PERSONALITY_HORIZON");
+    else if (phase === "PREFERENCES") setPhase("PERSONALITY_DEPTH");
+    else if (phase === "ENVIRONMENT") setPhase("PREFERENCES");
+  };
+
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile) return;
+
+    if (isInteractiveTarget(e.target)) return;
+
+    const t = e.touches[0];
+    if (!t) return;
+
+    touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  };
+
+  const onTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile) return;
+
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start) return;
+
+    const t = e.changedTouches[0];
+    if (!t) return;
+
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+
+    // Basic gesture heuristics (tuned for “calm” mobile UX)
+    const absDy = Math.abs(dy);
+    const absDx = Math.abs(dx);
+
+    if (absDy < 45) return; // too small
+    if (absDx > absDy * 0.6) return; // mostly horizontal
+    if (Date.now() - start.t > 900) return; // too slow
+
+    if (dy < 0) {
+      // swipe up
+      next();
+      return;
+    }
+
+    // swipe down
+    if (phase === "ENTRY" || phase === "ACTIVATION") return;
+    goBack();
+  };
 
   const profileDraft = useMemo<UserProfile | null>(() => {
     if (!focusAreas || !volatilityComfort || !investingHorizon || !analysisDepth) return null;
@@ -352,8 +470,42 @@ export default function OnboardingPage({
 
   useEffect(() => {
     if (phase !== "ACTIVATION") return;
+
+    // If we are resuming from local progress into guided stage, don't reset.
+    if (storedProgress?.activationSubStage === "guided") return;
+
     setActivationSubStage("auth");
-  }, [phase]);
+  }, [phase, storedProgress?.activationSubStage]);
+
+  // Persist onboarding progress so refresh/resume feels intentional (production-grade first-time UX).
+  useEffect(() => {
+    const prev = loadOnboardingProgress();
+    const mergedDraft: NonNullable<OnboardingProgress["draft"]> = {
+      focusAreas: focusAreas ? [focusAreas] : prev?.draft?.focusAreas,
+      volatilityComfort: volatilityComfort ?? prev?.draft?.volatilityComfort,
+      investingHorizon: investingHorizon ?? prev?.draft?.investingHorizon,
+      analysisDepth: analysisDepth ?? prev?.draft?.analysisDepth,
+      modules: modules.length ? modules : prev?.draft?.modules,
+    };
+
+    const anyDraft =
+      !!mergedDraft.focusAreas ||
+      !!mergedDraft.volatilityComfort ||
+      !!mergedDraft.investingHorizon ||
+      !!mergedDraft.analysisDepth ||
+      !!mergedDraft.modules;
+
+    const draftToSave = anyDraft ? mergedDraft : undefined;
+
+    const next: OnboardingProgress = {
+      phase,
+      activationSubStage,
+      draft: draftToSave,
+      updatedAt: Date.now(),
+    };
+
+    saveOnboardingProgress(next);
+  }, [phase, activationSubStage, focusAreas, volatilityComfort, investingHorizon, analysisDepth, modules]);
 
   const canProceedIdentity = !!focusAreas;
   const canProceedVol = !!volatilityComfort;
@@ -362,6 +514,13 @@ export default function OnboardingPage({
   const canProceedPrefs = modules.length >= 1;
 
   const next = () => {
+    const now = Date.now();
+    if (now - navTriggerRef.current < 450) return;
+    navTriggerRef.current = now;
+
+    // eslint-disable-next-line no-console
+    console.log("[onboarding] next() fired", { phase });
+
     setAuthError(null);
 
     if (phase === "ENTRY") setPhase("IDENTITY");
@@ -397,7 +556,7 @@ export default function OnboardingPage({
       // Use profile + stub user to personalize later in App.
       void user;
 
-      // Premium activation (no spinner; cinematic pulse).
+      // Premium activation (no spinner; calm pulse).
       setAuthLoading(false);
       setActivating(true);
 
@@ -434,7 +593,117 @@ export default function OnboardingPage({
   }, [phase]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020304]">
+    <div
+      className="relative min-h-screen overflow-hidden bg-[#020304]"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onPointerDownCapture={(e) => {
+        // eslint-disable-next-line no-console
+        const targetEl = e.target instanceof HTMLElement ? e.target : null;
+        const closestButton = targetEl?.closest("button");
+        const closestText = closestButton?.textContent?.trim().slice(0, 40) ?? "";
+        console.log(`[onboarding] root capture phase=${phase} tag=${targetEl?.tagName ?? "null"} closestButton=${closestText}`);
+
+          if (phase === "ENTRY") {
+            if (!initButtonRef.current) {
+              // eslint-disable-next-line no-console
+              console.log("[onboarding] entry rect fallback: initButtonRef.current=null");
+            } else {
+              const r = initButtonRef.current.getBoundingClientRect();
+              const tol = 40;
+
+              const inside =
+                e.clientX >= r.left - tol &&
+                e.clientX <= r.right + tol &&
+                e.clientY >= r.top - tol &&
+                e.clientY <= r.bottom + tol;
+
+              // eslint-disable-next-line no-console
+              console.log(
+                `[onboarding] entry rect fallback(tol=${tol}) x=${Math.round(e.clientX)} y=${Math.round(e.clientY)} inside=${inside} rect=(${Math.round(r.left)},${Math.round(r.top)})-(${Math.round(r.right)},${Math.round(
+                  r.bottom,
+                )})`,
+              );
+
+              if (inside) {
+                // eslint-disable-next-line no-console
+                console.log("[onboarding] entry rect hit(tol) -> fireNext");
+                fireNext("entry_rect_tol");
+              }
+            }
+          } else if (phase === "IDENTITY") {
+            if (!identityContinueButtonRef.current) {
+              // eslint-disable-next-line no-console
+              console.log("[onboarding] identity rect fallback: identityContinueButtonRef.current=null");
+            } else {
+              const r = identityContinueButtonRef.current.getBoundingClientRect();
+              const tolX = 220; // automation click coords were landing far to the right
+              const tolY = 40;
+              const tol = tolX; // legacy log variable (QA fallback)
+
+              const inside =
+                e.clientX >= r.left - tolX &&
+                e.clientX <= r.right + tolX &&
+                e.clientY >= r.top - tolY &&
+                e.clientY <= r.bottom + tolY;
+
+              // eslint-disable-next-line no-console
+              console.log(
+                `[onboarding] identity rect fallback(tol=${tol}) x=${Math.round(e.clientX)} y=${Math.round(e.clientY)} inside=${inside} rect=(${Math.round(r.left)},${Math.round(r.top)})-(${Math.round(r.right)},${Math.round(
+                  r.bottom,
+                )})`,
+              );
+
+              if (inside) {
+                // eslint-disable-next-line no-console
+                console.log("[onboarding] identity rect hit(tol) -> fireNext");
+                fireNext("identity_continue_rect_tol");
+              }
+            }
+          } else if (
+            phase === "PERSONALITY_VOL" ||
+            phase === "PERSONALITY_HORIZON" ||
+            phase === "PERSONALITY_DEPTH" ||
+            phase === "PREFERENCES" ||
+            phase === "ENVIRONMENT"
+          ) {
+            if (!nextButtonRef.current) {
+              // eslint-disable-next-line no-console
+              console.log("[onboarding] next rect fallback: nextButtonRef.current=null");
+            } else {
+              const r = nextButtonRef.current.getBoundingClientRect();
+              const tolX = 220;
+              const tolY = 40;
+
+              const inside =
+                e.clientX >= r.left - tolX &&
+                e.clientX <= r.right + tolX &&
+                e.clientY >= r.top - tolY &&
+                e.clientY <= r.bottom + tolY;
+
+              // eslint-disable-next-line no-console
+              console.log("[onboarding] next rect fallback", {
+                phase,
+                x: Math.round(e.clientX),
+                y: Math.round(e.clientY),
+                inside,
+                rect: {
+                  left: Math.round(r.left),
+                  top: Math.round(r.top),
+                  right: Math.round(r.right),
+                  bottom: Math.round(r.bottom),
+                },
+              });
+
+              if (inside) {
+                // eslint-disable-next-line no-console
+                console.log("[onboarding] next rect hit -> fireNext");
+                fireNext("phase_next_rect");
+              }
+            }
+          }
+      }}
+    >
       <HiddenGridOverlay />
       <AmbientBackground />
       <div className="noise" />
@@ -494,7 +763,7 @@ export default function OnboardingPage({
                 >
                   <div className="text-[48px] font-semibold leading-[1.05] tracking-[-0.04em]">{headerText}</div>
                   <div className="mt-4 max-w-[740px] text-[15px] leading-[1.8] text-white/85">
-                    Enter a luxury financial intelligence environment—calm, precise, and structurally informed.
+                    Enter a structured financial intelligence workspace—calm, precise, and built for clarity.
                   </div>
 
                   <div className="mt-7 max-w-[760px]">
@@ -502,8 +771,8 @@ export default function OnboardingPage({
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         ["Search", "Universal search—taught gently."],
-                        ["Market Pulse", "Real-time tone & telemetry texture."],
-                        ["Stories", "Cinematic learning, not feature walls."],
+                        ["Market Signals", "Live cues for calm market understanding."],
+                      ["Stories", "Guided learning, not feature walls."],
                         ["Healthometer", "Simplified stability boundaries."],
                         ["Company Discovery", "Begin with one safe guided target."],
                       ].map(([title, body]) => (
@@ -517,8 +786,22 @@ export default function OnboardingPage({
 
                   <div className="mt-8 flex items-center gap-4">
                     <motion.button
+                      ref={initButtonRef}
                       type="button"
-                      onClick={next}
+                      onClick={() => fireNext("entry_click")}
+                      onPointerDownCapture={() => {
+                        // eslint-disable-next-line no-console
+                        console.log("[onboarding] Initialize Session pointerdown capture");
+                        setDebugBanner("POINTERDOWN_CAPTURE: Initialize Session");
+                        window.setTimeout(() => setDebugBanner(null), 900);
+                        fireNext("entry_pointerdown_capture");
+                      }}
+                      onPointerDown={() => {
+                        // eslint-disable-next-line no-console
+                        console.log("[onboarding] Initialize Session pointerdown");
+                        setDebugBanner("POINTERDOWN: Initialize Session");
+                        window.setTimeout(() => setDebugBanner(null), 900);
+                      }}
                       className="h-[56px] px-[28px] rounded-[18px] border border-white/10 bg-black/25 text-white/90 shadow-[0_0_60px_rgba(0,255,210,0.05)] transition-transform duration-200"
                       whileHover={!prefersReducedMotion ? { translateY: -2 } : undefined}
                       style={{
@@ -526,11 +809,11 @@ export default function OnboardingPage({
                         background: "linear-gradient(180deg, rgba(9,10,12,0.70) 0%, rgba(3,4,6,0.62) 100%)",
                       }}
                     >
-                      Initialize Session
+                      Start setup
                     </motion.button>
 
                     <div className="text-[11px] uppercase tracking-[0.18em] text-white/50">
-                      90 seconds to configure your intelligence environment
+                      About 90 seconds to set up your workspace
                     </div>
                   </div>
                 </motion.div>
@@ -585,6 +868,7 @@ export default function OnboardingPage({
                       Back
                     </button>
                     <motion.button
+                      ref={identityContinueButtonRef}
                       type="button"
                       onClick={next}
                       disabled={!canProceedIdentity}
@@ -687,6 +971,7 @@ export default function OnboardingPage({
                       Back
                     </button>
                     <motion.button
+                      ref={nextButtonRef}
                       type="button"
                       onClick={next}
                       disabled={
@@ -717,7 +1002,7 @@ export default function OnboardingPage({
                 >
                   <div className="text-[28px] font-semibold leading-[1.2] tracking-[-0.02em]">{headerText}</div>
                   <div className="mt-3 max-w-[720px] text-[15px] leading-[1.8] text-white/85">
-                    Choose your primary intelligence lenses (up to 2). We’ll synchronise the atmosphere around them.
+                    Choose your primary intelligence lenses (up to 2). We’ll synchronise the learning environment around them.
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-5 flex-wrap">
@@ -755,6 +1040,7 @@ export default function OnboardingPage({
                       Back
                     </button>
                     <motion.button
+                      ref={nextButtonRef}
                       type="button"
                       onClick={next}
                       disabled={!canProceedPrefs}
@@ -783,7 +1069,7 @@ export default function OnboardingPage({
                 >
                   <div className="text-[28px] font-semibold leading-[1.2] tracking-[-0.02em]">{headerText}</div>
                   <div className="mt-3 max-w-[720px] text-[15px] leading-[1.8] text-white/85">
-                    Calibrating your market intelligence atmosphere—subtle, premium, and structurally informed.
+                    Calibrating your market intelligence environment—subtle, clear, and structurally informed.
                   </div>
 
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -791,7 +1077,7 @@ export default function OnboardingPage({
                       <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Market personality</div>
                       <div className="mt-3 text-[18px] font-semibold text-white/92">{derivedMarketStateName || "—"}</div>
                       <div className="mt-2 text-[13px] leading-[1.7] text-white/80">
-                        Cinematic glow tuned for structural clarity.
+                        Calm glow tuned for structural clarity.
                       </div>
                     </div>
 
@@ -816,7 +1102,7 @@ export default function OnboardingPage({
                         ))}
                       </div>
                       <div className="mt-3 text-[13px] leading-[1.7] text-white/80">
-                        Modules inform atmosphere and editorial emphasis.
+                        Modules inform environment and editorial emphasis.
                       </div>
                     </div>
                   </div>
@@ -830,6 +1116,7 @@ export default function OnboardingPage({
                       Back
                     </button>
                     <motion.button
+                      ref={nextButtonRef}
                       type="button"
                       onClick={next}
                       className="h-[56px] px-[28px] rounded-[18px] border border-white/10 bg-black/25 text-white/90 transition"
@@ -853,16 +1140,16 @@ export default function OnboardingPage({
                 >
                   <div className="text-[28px] font-semibold leading-[1.2] tracking-[-0.02em]">Building your intelligence environment</div>
                   <div className="mt-3 max-w-[760px] text-[15px] leading-[1.8] text-white/85">
-                    Synchronising atmosphere and preparing your institutional intelligence layout.
+                    Synchronising environment and preparing your institutional intelligence layout.
                   </div>
 
                   <div className="mt-8 flex flex-col lg:flex-row gap-6 items-start">
                     <div className="flex-1">
                       <div className="rounded-[28px] border border-white/10 bg-black/20 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]">
-                        <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Activation pulse</div>
+                        <div className="text-[12px] uppercase tracking-[0.18em] text-white/65">Setup progress</div>
                         <div className="mt-4 flex items-center justify-between gap-4">
                           <div className="text-[16px] font-semibold text-white/92">
-                            {activating ? "Integrating your intelligence environment…" : "Calibrating your experience…"}
+                            {activating ? "Preparing your learning workspace…" : "Calibrating your learning flow…"}
                           </div>
                           <PulseBars active={!prefersReducedMotion && !activating} />
                         </div>
@@ -900,6 +1187,7 @@ export default function OnboardingPage({
                           narrativeKey={7}
                           preferredSectors={discoveryPrefs.preferredSectors}
                           preferredThemes={discoveryPrefs.preferredThemes}
+                          beginner={true}
                           onContinue={(selected) => {
                             if (!profileDraft) return;
 

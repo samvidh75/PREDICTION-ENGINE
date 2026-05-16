@@ -2,6 +2,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import type { ConfidenceState, ConfidenceTheme } from "../../intelligence/ConfidenceEngine";
 import type { DiscoveryResult } from "../../../services/discovery/discoveryTypes";
+import { addTickerToWatchlist, isTickerInWatchlist } from "../../../services/portfolio/watchlistStore";
+import IntelligenceMiniChart from "../../search/IntelligenceMiniChart";
 
 type Props = {
   result: DiscoveryResult;
@@ -47,6 +49,8 @@ export default function CommandResultCard({
   const borderIdle = "rgba(255,255,255,0.10)";
 
   const title = result.title.trim();
+
+  const explicitTicker = result.ticker ? result.ticker.toUpperCase().trim() : "";
   const tickerGuess =
     title.length > 0 &&
     title.length <= 6 &&
@@ -54,6 +58,12 @@ export default function CommandResultCard({
     /^[A-Z0-9.\-]+$/.test(title)
       ? title
       : "";
+
+  const ticker = explicitTicker || tickerGuess;
+  const miniChartSeed = (result.miniChartSeed ?? ticker ?? result.title).trim();
+
+  const [watchlistVersion, setWatchlistVersion] = React.useState<number>(0);
+  const watchlistHasTicker = ticker ? isTickerInWatchlist(ticker) : false;
 
   return (
     <motion.div
@@ -127,6 +137,10 @@ export default function CommandResultCard({
                 />
               </div>
             </div>
+
+            <div className="shrink-0">
+              <IntelligenceMiniChart tickerSeed={miniChartSeed} confidenceState={state} widthPx={160} heightPx={64} />
+            </div>
           </div>
 
           <div className="mt-3 flex items-center justify-between gap-3">
@@ -139,20 +153,90 @@ export default function CommandResultCard({
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const url = new URL(window.location.href);
-                url.searchParams.set("page", "stock");
-                if (tickerGuess) url.searchParams.set("ticker", tickerGuess);
-                window.location.href = url.toString();
-              }}
-              className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
-            >
-              Open charts
-            </button>
+            {ticker && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("page", "stock");
+                  url.searchParams.set("ticker", ticker);
+                  window.location.href = url.toString();
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                Open charts
+              </button>
+            )}
+
+            {ticker && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  addTickerToWatchlist(ticker);
+                  setWatchlistVersion((v) => v + 1);
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                {watchlistHasTicker ? "In watchlist" : "Add to watchlist"}
+              </button>
+            )}
+
+            {result.kind === "sector" && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("page", "explore");
+                  url.searchParams.set("kind", "sector");
+                  url.searchParams.set("id", result.id);
+                  window.location.href = url.toString();
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                Compare sector
+              </button>
+            )}
+
+            {ticker && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("page", "company");
+                  url.searchParams.set("ticker", ticker);
+                  url.searchParams.set("broker", "1");
+                  window.location.href = url.toString();
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                Continue via Broker
+              </button>
+            )}
+
+            {ticker && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("page", "company");
+                  url.searchParams.set("ticker", ticker);
+                  window.location.href = url.toString();
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                View news
+              </button>
+            )}
 
             <button
               type="button"
@@ -168,19 +252,22 @@ export default function CommandResultCard({
               AI analysis
             </button>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const url = new URL(window.location.href);
-                url.searchParams.set("page", "company");
-                window.location.href = url.toString();
-              }}
-              className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
-            >
-              Healthometer
-            </button>
+            {ticker && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("page", "company");
+                  url.searchParams.set("ticker", ticker);
+                  window.location.href = url.toString();
+                }}
+                className="h-[30px] rounded-full border border-white/10 bg-black/20 px-[12px] text-[10px] uppercase tracking-[0.18em] text-white/60 hover:text-white/85 transition"
+              >
+                Healthometer
+              </button>
+            )}
           </div>
         </div>
       </div>
