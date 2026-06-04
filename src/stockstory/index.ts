@@ -64,3 +64,10 @@ export {
   VALUATION_WEIGHTS,
   RISK_WEIGHTS,
 } from './config/EngineWeights';
+
+// Percentile scoring
+export { PercentileEngine } from './scoring/PercentileEngine';
+export type { Distribution, PercentileScoreMap } from './scoring/PercentileEngine';
+export { SectorPercentileEngine } from './scoring/SectorPercentileEngine';
+export type { PercentileMetric } from './scoring/SectorPercentileEngine';
+export { SectorDistributionEngine } from './analytics/SectorDistributionEngine';
