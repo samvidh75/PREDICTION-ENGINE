@@ -4,6 +4,7 @@ import { CompanyCard } from '../company/CompanyCard';
 import { StockRegistry } from '../../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
 import { RecentSearchStore } from '../../services/search/RecentSearchStore';
+import { PageHeader, CustomTable, Button } from '../ui/DesignSystem';
 
 interface SnapshotItem {
   index: string;
@@ -116,23 +117,19 @@ export const DashboardHub: React.FC = () => {
   }, [watchlists]);
 
   return (
-    <div className="w-full space-y-12 pb-16 text-white max-w-7xl mx-auto antialiased">
-      {/* 1. Time-based Greeting Header */}
-      <section className="border-b border-white/5 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400 block mb-1">
-            RESEARCH TERMINAL
-          </span>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
-            {greeting}, Samvidh
-          </h1>
-          <p className="text-xs text-gray-400 font-medium">
-            What deserves my attention?
-          </p>
-        </div>
-      </section>
+    <div className="w-full space-y-8 pb-12 text-white max-w-7xl mx-auto antialiased">
+      {/* Page Header */}
+      <PageHeader 
+        title={`Greeting, Samvidh (${greeting})`} 
+        subtitle="What deserves my attention?" 
+        primaryAction={
+          <Button variant="primary" onClick={() => handleNavigate("discovery")}>
+            Discover Ideas
+          </Button>
+        }
+      />
 
-      {/* 2. Today’s Opportunities (Maximum 5 cards) */}
+      {/* 1. Today’s Opportunities (Maximum 5 cards) */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-amber-400" />
@@ -166,7 +163,7 @@ export const DashboardHub: React.FC = () => {
 
       {/* Grid container for updates and research */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 3. Watchlist Updates (Maximum 5 items) */}
+        {/* 2. Watchlist Updates */}
         <section className="space-y-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -184,59 +181,44 @@ export const DashboardHub: React.FC = () => {
             </button>
           </div>
           
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
-            {followedTickers.length === 0 ? (
-              <div className="p-8 text-center text-xs text-white/30 space-y-3">
-                <p>Your watchlist is empty.</p>
-                <button
-                  onClick={() => handleNavigate("discovery")}
-                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
-                >
-                  Discover Stocks
-                </button>
-              </div>
-            ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-white/5 text-white/40 font-medium">
-                    <th className="p-4">Ticker</th>
-                    <th className="p-4">Name</th>
-                    <th className="p-4">Rating</th>
-                    <th className="p-4 text-right">Action</th>
+          {followedTickers.length === 0 ? (
+            <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
+              <p>Your watchlist is empty.</p>
+              <Button variant="secondary" onClick={() => handleNavigate("discovery")}>
+                Discover Stocks
+              </Button>
+            </div>
+          ) : (
+            <CustomTable headers={["Ticker", "Name", "Rating", "Action"]}>
+              {followedTickers.map((ticker) => {
+                const info = StockRegistry.getStock(ticker);
+                const score = info?.telemetrySnapshot?.healthScore 
+                  ? Math.round(info.telemetrySnapshot.healthScore) 
+                  : 80;
+                return (
+                  <tr 
+                    key={ticker}
+                    onClick={() => handleCompanyClick(ticker)}
+                    className="hover:bg-white/[0.02] cursor-pointer transition-colors"
+                  >
+                    <td className="p-4 font-mono font-bold text-white">{ticker}</td>
+                    <td className="p-4 text-white/70 max-w-[180px] truncate">{info?.companyName || `${ticker} India`}</td>
+                    <td className="p-4">
+                      <span className="px-2 py-0.5 rounded border border-white/10 text-white/80 font-mono text-[10px]">
+                        {score} / 100
+                      </span>
+                    </td>
+                    <td className="p-4 text-right">
+                      <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Open Briefing</span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {followedTickers.map((ticker) => {
-                    const info = StockRegistry.getStock(ticker);
-                    const score = info?.telemetrySnapshot?.healthScore 
-                      ? Math.round(info.telemetrySnapshot.healthScore) 
-                      : 80;
-                    return (
-                      <tr 
-                        key={ticker}
-                        onClick={() => handleCompanyClick(ticker)}
-                        className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors"
-                      >
-                        <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                        <td className="p-4 text-white/70 max-w-[180px] truncate">{info?.companyName || `${ticker} India`}</td>
-                        <td className="p-4">
-                          <span className="px-2 py-0.5 rounded border border-white/10 text-white/80 font-mono text-[10px]">
-                            {score} / 100
-                          </span>
-                        </td>
-                        <td className="p-4 text-right">
-                          <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Open Briefing</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
+                );
+              })}
+            </CustomTable>
+          )}
         </section>
 
-        {/* 4. Recent Research (Recently viewed companies) */}
+        {/* 3. Recent Research */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <RefreshCw className="w-4 h-4 text-violet-400" />
@@ -245,51 +227,37 @@ export const DashboardHub: React.FC = () => {
             </span>
           </div>
           
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
-            {recentResearch.length === 0 ? (
-              <div className="p-8 text-center text-xs text-white/30 space-y-3">
-                <p>No recently viewed companies yet.</p>
-                <button
-                  onClick={() => handleNavigate("discovery")}
-                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
-                >
-                  Discover Stocks
-                </button>
-              </div>
-            ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-white/5 text-white/40 font-medium">
-                    <th className="p-4">Ticker</th>
-                    <th className="p-4">Sector</th>
-                    <th className="p-4 text-right">Action</th>
+          {recentResearch.length === 0 ? (
+            <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
+              <p>No recently viewed companies yet.</p>
+              <Button variant="secondary" onClick={() => handleNavigate("discovery")}>
+                Discover Stocks
+              </Button>
+            </div>
+          ) : (
+            <CustomTable headers={["Ticker", "Sector", "Action"]}>
+              {recentResearch.slice(0, 5).map((ticker) => {
+                const info = StockRegistry.getStock(ticker);
+                return (
+                  <tr 
+                    key={ticker}
+                    onClick={() => handleCompanyClick(ticker)}
+                    className="hover:bg-white/[0.02] cursor-pointer transition-colors"
+                  >
+                    <td className="p-4 font-mono font-bold text-white">{ticker}</td>
+                    <td className="p-4 text-white/60">{info?.sector || "Conglomerate"}</td>
+                    <td className="p-4 text-right">
+                      <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Resume Analysis</span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {recentResearch.slice(0, 5).map((ticker) => {
-                    const info = StockRegistry.getStock(ticker);
-                    return (
-                      <tr 
-                        key={ticker}
-                        onClick={() => handleCompanyClick(ticker)}
-                        className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors"
-                      >
-                        <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                        <td className="p-4 text-white/60">{info?.sector || "Conglomerate"}</td>
-                        <td className="p-4 text-right">
-                          <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Resume Analysis</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
+                );
+              })}
+            </CustomTable>
+          )}
         </section>
       </div>
 
-      {/* 5. Market Snapshot (Compact Only) */}
+      {/* 4. Market Snapshot (Compact Only) */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Layers className="w-4 h-4 text-cyan-400" />

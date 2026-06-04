@@ -68,22 +68,11 @@ export function hashStringToSeed(input: string): number {
 }
 
 export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number; industryPe: number; fiveYearPeAvg: number } {
-  const seed = hashStringToSeed(`${ticker}_${healthSeed}_valuation`);
-  const v1 = (seed % 997) / 997; // 0..1
-  const v2 = ((seed * 3) % 991) / 991;
-  const v3 = ((seed * 7) % 983) / 983;
-
-  // Market cap: 25k crore .. 18 lakh crore (range for readability)
-  const marketCap = Math.round((2.5e11 + v1 * 1.55e13) * (0.92 + v2 * 0.18));
-
-  const pe = 9 + v2 * 28; // 9..37
-  const industryPe = 10 + v3 * 30; // 10..40
-  const fiveYearPeAvg = 11 + v1 * 26; // 11..37
-
   return {
-    marketCap,
-    pe,
-    industryPe,
-    fiveYearPeAvg,
+    marketCap: 0,
+    pe: NaN,
+    industryPe: NaN,
+    fiveYearPeAvg: NaN,
   };
+}
 }

@@ -98,7 +98,7 @@ export default function CompanyTelemetryCore({
         >
           <div className={isMobile ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 lg:grid-cols-12 gap-6"}>
             <div className={isMobile ? "" : "lg:col-span-4"}>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Live price (synthetic)</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative model price</div>
               <div className="mt-3 text-[34px] font-semibold leading-[1.05] text-white/92">
                 {snap.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
               </div>
@@ -110,7 +110,7 @@ export default function CompanyTelemetryCore({
               </div>
 
               <div className="mt-5 rounded-[22px] border border-white/10 bg-black/25 p-4">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Volume (synthetic)</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative volume</div>
                 <div className="mt-2 text-[18px] font-semibold text-white/92">
                   {snap.volume.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </div>

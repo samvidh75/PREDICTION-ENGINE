@@ -25,7 +25,7 @@ export const MarketExplorer: React.FC = () => {
       </div>
       <div className="text-right">
         <div className="text-sm font-bold text-white font-vos-display">
-          ₹{stock.fiftyTwoWeekRange.current.toLocaleString("en-IN")}
+          Open for live quote
         </div>
         <span className="text-[9px] uppercase font-bold text-emerald-400">
           {stock.healthStatus}

@@ -370,12 +370,12 @@ export default function CompanyUniversePage(): JSX.Element {
             {/* Live telemetry micro HUD */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-[520px]">
               <div className="rounded-[22px] border border-white/10 bg-black/25 backdrop-blur-2xl p-4">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Live price (synthetic)</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative model price</div>
                 <div className="mt-2 text-[22px] font-semibold text-white/92" style={{ textShadow: `0 0 44px ${heroGlow}` }}>
                   {formatINRPrice(heroTelemetry.price)}
                 </div>
                 <div className="mt-2 text-[12px] leading-[1.6] text-white/75">
-                  Daily movement: <span className="text-white/92 font-semibold">{signFmt(heroTelemetry.dailyChangePct)}</span>
+                  Model movement: <span className="text-white/92 font-semibold">{signFmt(heroTelemetry.dailyChangePct)}</span>
                 </div>
               </div>
 

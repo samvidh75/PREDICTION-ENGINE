@@ -13,7 +13,11 @@ interface Props {
 export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<RegisteredStock[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const suggestions = ["RELIANCE", "HAL", "BEL", "IRFC", "GRANULES"];
+  const totalItemsCount = results.length > 0 ? results.length : suggestions.length;
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -22,15 +26,32 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         onClose();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev < totalItemsCount - 1 ? prev + 1 : prev));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : 0));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (results.length > 0) {
+          const index = activeIndex >= 0 && activeIndex < results.length ? activeIndex : 0;
+          handleSelect(results[index]);
+        } else {
+          const index = activeIndex >= 0 && activeIndex < suggestions.length ? activeIndex : 0;
+          handleSelect(suggestions[index]);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
+  }, [onClose, results, activeIndex, totalItemsCount]);
 
   const handleSearch = (value: string) => {
     setQuery(value);
+    setActiveIndex(-1);
     if (value.trim().length < 2) {
       setResults([]);
       return;
@@ -74,7 +95,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
-      <div className="w-full max-w-[700px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
+      <div className="w-full md:w-[700px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
         <div className="flex items-center gap-3.5 px-4 h-[52px] bg-white/[0.02] border-b border-white/10">
           <Search className="w-4 h-4 text-white/60" />
           <input
@@ -97,17 +118,25 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {results.length > 0 ? (
-            results.map((stock) => (
-              <CompanyCard
-                key={stock.symbol}
-                ticker={stock.symbol}
-                name={stock.companyName}
-                sector={stock.sector}
-                marketCap={stock.marketCap.formatted}
-                score={getScore(stock)}
-                whyItMatters={getOneLineReason(stock)}
-                onClick={() => handleSelect(stock)}
-              />
+            results.map((stock, idx) => (
+              <div 
+                key={stock.symbol} 
+                className={`transition-all duration-150 rounded-xl ${
+                  idx === activeIndex 
+                    ? "ring-2 ring-cyan-400 bg-white/[0.03]" 
+                    : ""
+                }`}
+              >
+                <CompanyCard
+                  ticker={stock.symbol}
+                  name={stock.companyName}
+                  sector={stock.sector}
+                  marketCap={stock.marketCap.formatted}
+                  score={getScore(stock)}
+                  whyItMatters={getOneLineReason(stock)}
+                  onOpenBriefing={() => handleSelect(stock)}
+                />
+              </div>
             ))
           ) : query.length >= 2 ? (
             <div className="py-12 text-center text-xs text-white/45 uppercase tracking-widest font-mono">No matching companies found</div>
@@ -118,12 +147,16 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
                 <span>Suggested searches</span>
               </div>
               <div className="flex flex-wrap gap-2.5">
-                {["RELIANCE", "HAL", "BEL", "IRFC", "GRANULES"].map((symbol) => (
+                {suggestions.map((symbol, idx) => (
                   <button
                     key={symbol}
                     type="button"
                     onClick={() => handleSelect(symbol)}
-                    className="px-4 py-2 border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] rounded-full text-xs font-semibold text-cyan-400 hover:text-white transition font-mono cursor-pointer"
+                    className={`px-4 py-2 border rounded-full text-xs font-semibold transition font-mono cursor-pointer ${
+                      idx === activeIndex
+                        ? "border-cyan-400 bg-cyan-400 text-black font-bold"
+                        : "border-white/5 bg-white/[0.02] hover:bg-white/[0.06] text-cyan-400 hover:text-white"
+                    }`}
                   >
                     {symbol}
                   </button>

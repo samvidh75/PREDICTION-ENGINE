@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { AlertEngine, SmartAlert, AlertCategory } from "../services/portfolio/AlertEngine";
 import { Bell, Check, CheckCheck, Trash2, Pin, Archive } from "lucide-react";
+import { PageHeader, Button } from "../components/ui/DesignSystem";
 
 type AlertFilter = "all" | AlertCategory;
 type AlertStatusFilter = "all" | "unread" | "read" | "archived";
@@ -14,8 +15,20 @@ interface StructuredAlertContent {
 
 export const AlertCentrePage: React.FC = () => {
   const [alerts, setAlerts] = useState<SmartAlert[]>(() => AlertEngine.getAlerts());
-  const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set());
-  const [pinnedIds, setPinnedIds] = useState<Set<string>>(new Set());
+  const [archivedIds, setArchivedIds] = useState<Set<string>>(() => {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("ss_archived_alerts_v1");
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    }
+    return new Set();
+  });
+  const [pinnedIds, setPinnedIds] = useState<Set<string>>(() => {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("ss_pinned_alerts_v1");
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    }
+    return new Set();
+  });
   const [categoryFilter, setCategoryFilter] = useState<AlertFilter>("all");
   const [statusFilter, setStatusFilter] = useState<AlertStatusFilter>("all");
 
@@ -48,6 +61,9 @@ export const AlertCentrePage: React.FC = () => {
     setArchivedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ss_archived_alerts_v1", JSON.stringify(Array.from(next)));
+      }
       return next;
     });
   }, []);
@@ -56,6 +72,9 @@ export const AlertCentrePage: React.FC = () => {
     setPinnedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("ss_pinned_alerts_v1", JSON.stringify(Array.from(next)));
+      }
       return next;
     });
   }, []);
@@ -132,9 +151,21 @@ export const AlertCentrePage: React.FC = () => {
     else list = list.filter(a => !archivedIds.has(a.id));
 
     return list.sort((a, b) => {
-      const ap = pinnedIds.has(a.id) ? 0 : 1;
-      const bp = pinnedIds.has(b.id) ? 0 : 1;
-      return ap - bp;
+      const pinA = pinnedIds.has(a.id) ? 1 : 0;
+      const pinB = pinnedIds.has(b.id) ? 1 : 0;
+      if (pinB !== pinA) return pinB - pinA;
+
+      const getImportance = (cat: AlertCategory) => {
+        switch (cat) {
+          case "Risk": return 5;
+          case "Factor": return 4;
+          case "Momentum": return 3;
+          case "Market": return 2;
+          case "News": return 1;
+          default: return 1;
+        }
+      };
+      return getImportance(b.category) - getImportance(a.category);
     });
   }, [alerts, categoryFilter, statusFilter, archivedIds, pinnedIds]);
 
@@ -149,29 +180,20 @@ export const AlertCentrePage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-6 select-none p-6 md:p-8 bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
+    <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-5">
-        <div>
-          <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400 block mb-1">
-            Intelligence Alerts
-          </span>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Alert Centre
-          </h1>
-          <p className="mt-1 text-xs text-white/40 font-mono">
-            {unreadCount} unread · {alerts.length} total
-          </p>
-        </div>
-        <div className="mt-3 md:mt-0 flex items-center gap-2">
-          <button
+      <PageHeader
+        title="Alert Centre"
+        subtitle="What changed?"
+        primaryAction={
+          <Button
+            variant="secondary"
             onClick={markAllRead}
-            className="h-8 px-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-[11px] font-medium text-white/70 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <CheckCheck className="w-3.5 h-3.5" /> Mark All Read
-          </button>
-        </div>
-      </div>
+            <CheckCheck className="w-3.5 h-3.5 mr-1" /> Dismiss All Alerts
+          </Button>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
@@ -217,14 +239,20 @@ export const AlertCentrePage: React.FC = () => {
       {/* Alert List */}
       <div className="flex flex-col space-y-4">
         {filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-white/30">
-            <Bell className="w-8 h-8 mb-3 opacity-30 animate-bounce" />
+          <div className="flex flex-col items-center justify-center py-16 text-white/30 space-y-3">
+            <Bell className="w-8 h-8 opacity-30 animate-bounce" />
             <span className="text-sm font-medium">No alerts match your filters</span>
-            <span className="text-xs mt-1">Adjust your filters or check back later</span>
+            <button
+              onClick={() => handleNavigateToCompany("RELIANCE")}
+              className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
+            >
+              Browse Opportunities
+            </button>
           </div>
         )}
         {filtered.map(alert => {
           const content = getStructuredContent(alert);
+          const isPinned = pinnedIds.has(alert.id);
           return (
             <div
               key={alert.id}
@@ -232,9 +260,9 @@ export const AlertCentrePage: React.FC = () => {
                 alert.isRead
                   ? "bg-white/[0.01] border-white/5"
                   : "bg-white/[0.03] border-white/10"
-              } ${pinnedIds.has(alert.id) ? "ring-1 ring-amber-400/30" : ""}`}
+              } ${isPinned ? "ring-1 ring-amber-400/30" : ""}`}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-3">
                     {!alert.isRead && (
@@ -243,7 +271,7 @@ export const AlertCentrePage: React.FC = () => {
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border font-mono ${categoryColor[alert.category]}`}>
                       {alert.category}
                     </span>
-                    {pinnedIds.has(alert.id) && (
+                    {isPinned && (
                       <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider font-mono">Pinned</span>
                     )}
                     <span className="text-[10px] text-white/30 ml-auto shrink-0 font-mono">{alert.timestamp}</span>
@@ -274,40 +302,28 @@ export const AlertCentrePage: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  {!alert.isRead && (
-                    <button
-                      onClick={() => markRead(alert.id)}
-                      title="Mark read"
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all cursor-pointer"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                <div className="flex flex-row md:flex-col items-stretch gap-2 shrink-0 md:w-32 pt-2 md:pt-0">
                   <button
-                    onClick={() => togglePin(alert.id)}
-                    title={pinnedIds.has(alert.id) ? "Unpin" : "Pin"}
-                    className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all cursor-pointer ${
-                      pinnedIds.has(alert.id)
-                        ? "bg-amber-400/10 text-amber-400"
-                        : "bg-white/5 hover:bg-white/10 text-white/40 hover:text-white"
-                    }`}
+                    onClick={() => handleNavigateToCompany(alert.symbol)}
+                    className="py-1.5 px-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-black text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer text-center"
                   >
-                    <Pin className="w-3.5 h-3.5" />
+                    Open Company
                   </button>
                   <button
-                    onClick={() => toggleArchive(alert.id)}
-                    title="Archive"
-                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all cursor-pointer"
+                    onClick={() => togglePin(alert.id)}
+                    className={`py-1.5 px-3 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer text-center ${
+                      isPinned 
+                        ? "bg-amber-400/10 border-amber-400/25 text-amber-400" 
+                        : "bg-white/5 border-white/5 hover:bg-white/10 text-white/70 hover:text-white"
+                    }`}
                   >
-                    <Archive className="w-3.5 h-3.5" />
+                    {isPinned ? "Saved" : "Save Later"}
                   </button>
                   <button
                     onClick={() => deleteAlert(alert.id)}
-                    title="Delete"
-                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/5 hover:bg-rose-500/10 text-white/40 hover:text-rose-450 transition-all cursor-pointer"
+                    className="py-1.5 px-3 rounded-lg bg-white/5 border border-white/5 hover:bg-rose-500/10 text-white/60 hover:text-rose-400 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer text-center"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    Dismiss
                   </button>
                 </div>
               </div>

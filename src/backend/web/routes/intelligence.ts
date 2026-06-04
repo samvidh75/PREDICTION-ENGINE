@@ -430,21 +430,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
         }));
       }
 
-      // Deterministic dynamic fallback
-      let hash = 0;
-      for (let i = 0; i < sym.length; i++) {
-        hash = sym.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const seed = Math.abs(hash);
-      const baseRev = 50000 + (seed % 100000);
-      const baseProf = baseRev * (0.15 + (seed % 15) / 100);
-
-      return [
-        { label: "Revenue Trend", val: `₹${(baseRev).toLocaleString("en-IN")} Cr`, desc: `CAGR: ${(8 + (seed % 8)).toFixed(1)}% over 3 yrs`, spark: [20 + (seed % 10), 35 + (seed % 8), 45 + (seed % 12), 60 + (seed % 15)] },
-        { label: "Operating Profits", val: `₹${(baseProf).toLocaleString("en-IN")} Cr`, desc: `Operating margin at ${(15 + (seed % 15)).toFixed(1)}%`, spark: [15 + (seed % 5), 25 + (seed % 10), 30 + (seed % 8), 42 + (seed % 12)] },
-        { label: "Operating Margins", val: `${(15 + (seed % 15)).toFixed(1)}%`, desc: `Expanded ${(50 + (seed % 200))} bps YoY`, spark: [30, 31, 31, 35] },
-        { label: "Free Cash Flow", val: `₹${(baseProf * 0.7).toLocaleString("en-IN")} Cr`, desc: `${(85 + (seed % 10))}% cash conversion rate`, spark: [10, 20, 35, 38] }
-      ];
+      return [];
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -455,26 +442,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      let hash = 0;
-      for (let i = 0; i < sym.length; i++) {
-        hash = sym.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const seed = Math.abs(hash);
-      const promoter = 10 + (seed % 40);
-      const fii = 20 + ((seed >> 2) % 30);
-      const dii = 20 + ((seed >> 4) % 25);
-      const publicRetail = 100 - promoter - fii - dii;
-
-      const categories = [
-        { category: "Promoters", share: `${promoter.toFixed(1)}%`, change: "Unchanged" },
-        { category: "FIIs / FPIs", share: `${fii.toFixed(1)}%`, change: (seed % 2 === 0 ? "+" : "-") + ((seed % 150) / 100).toFixed(2) + "% this quarter" },
-        { category: "DIIs / Mutual Funds", share: `${dii.toFixed(1)}%`, change: (seed % 3 === 0 ? "+" : "-") + ((seed % 120) / 100).toFixed(2) + "% this quarter" },
-        { category: "Public / Retail", share: `${publicRetail.toFixed(1)}%`, change: (seed % 2 === 0 ? "-" : "+") + (((seed >> 1) % 180) / 100).toFixed(2) + "% this quarter" }
-      ];
-
-      const comment = `Domestic and foreign institutions (DII/FII) accumulated shares steadily, offset by a contraction in retail holdings. This institutional alignment historically supports stable capital buffers during macro cycles.`;
-
-      return { categories, comment };
+      return { categories: [], comment: '' };
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -485,20 +454,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      let hash = 0;
-      for (let i = 0; i < sym.length; i++) {
-        hash = sym.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const seed = Math.abs(hash);
-      const pe = (15 + (seed % 20)).toFixed(1);
-      const medianPe = (14 + (seed % 21)).toFixed(1);
-      const sectorPe = (18 + (seed % 15)).toFixed(1);
-
-      return {
-        historicalValuation: `Currently trading at a trailing P/E of ${pe}x, tracking near its historical 5-year median (${medianPe}x).`,
-        currentValuation: `Margin stability indicates that current prices do not trade at excessive multipliers, offering comfortable margins of safety.`,
-        peerComparison: `Sector median multiples track at ${sectorPe}x. ${sym} represents a slight valuation compression relative to peer indices despite exhibiting superior margin stability.`
-      };
+      return { historicalValuation: 'Unavailable', currentValuation: 'Unavailable', peerComparison: 'Unavailable' };
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -509,11 +466,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      return [
-        { title: "Talent Cost Pressures", desc: "Rising wage bills in competitive digital domains could squeeze project-level margins." },
-        { title: "Currency Shifts", desc: "Unfavorable movements in USD/INR conversions could create translation variances in core earnings reports." },
-        { title: "Global Client Capex Shocks", desc: "Sudden client spending pauses in North American or European nodes may impact the order book velocity." }
-      ];
+      return [];
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -524,10 +478,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      return [
-        { title: "Major Enterprise Order Wins", desc: "Securing multi-year large cloud transformation deals acts as a principal driver for order backlog upgrades." },
-        { title: "Strategic M&A Announcements", desc: "Targeted bolt-on acquisitions in specialized fields can expand technical competencies and customer pipelines." }
-      ];
+      return [];
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -538,11 +490,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      return [
-        { date: "May 2026", event: "Q4 Earnings Release", detail: "Reported stable operating margins with strong cash conversion." },
-        { date: "March 2026", event: "Institutional Shareholding Report", detail: "Institutional stake expanded over the quarter." },
-        { date: "January 2026", event: "Announces strategic partnership", detail: "Collaboration on generative enterprise cloud platforms." }
-      ];
+      return [];
+    
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }

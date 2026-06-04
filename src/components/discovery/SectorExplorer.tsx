@@ -149,7 +149,7 @@ export const SectorExplorer: React.FC = () => {
                   <div className="text-[9px] text-gray-400">{stock.companyName}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs font-bold text-white font-vos-display">₹{stock.fiftyTwoWeekRange.current.toLocaleString("en-IN")}</div>
+                  Open for live quote
                   <div className="text-[9px] text-emerald-400 font-bold uppercase">{stock.healthStatus}</div>
                 </div>
               </button>

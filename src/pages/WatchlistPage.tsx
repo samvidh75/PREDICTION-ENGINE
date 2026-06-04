@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { WatchlistEngine, CustomWatchlist } from "../services/portfolio/WatchlistEngine";
 import { SmartWatchlistEngine, SmartWatchlist } from "../services/portfolio/SmartWatchlistEngine";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
+import { PageHeader, CustomTable, Button } from "../components/ui/DesignSystem";
 
 interface RowProps {
   ticker: string;
@@ -26,10 +27,10 @@ const WatchlistRow: React.FC<RowProps> = ({ ticker, score, onClick, onRemove }) 
 
   return (
     <tr className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors">
-      <td className="p-4">
+      <td className="p-4 font-mono font-bold text-white">
         <button 
           onClick={onClick}
-          className="font-mono font-bold text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
+          className="text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
         >
           {ticker}
         </button>
@@ -84,26 +85,25 @@ export const WatchlistPage: React.FC = () => {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const activeTickers = selectedList.startsWith("smart-")
+  const rawActiveTickers = selectedList.startsWith("smart-")
     ? smartWatchlists[parseInt(selectedList.split("-")[1]) || 0]?.tickers || []
     : watchlists.find((w) => w.id === selectedList)?.tickers || [];
+
+  const activeTickers = useMemo(() => {
+    return [...rawActiveTickers].sort((a, b) => {
+      const timeA = NoteEngine.getNote(a).timestamp || 0;
+      const timeB = NoteEngine.getNote(b).timestamp || 0;
+      return timeB - timeA;
+    });
+  }, [rawActiveTickers]);
 
   return (
     <div className="w-full flex flex-col space-y-8 select-none bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
       {/* Page Header */}
-      <div className="flex justify-between items-center border-b border-white/5 pb-6">
-        <div>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 block mb-1">
-            MONITOR
-          </span>
-          <h2 className="text-3xl font-bold tracking-tight text-white">
-            Watchlist Centre
-          </h2>
-          <p className="text-xs text-white/40 mt-1">
-            What am I monitoring?
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Watchlist Centre"
+        subtitle="What am I monitoring?"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Column 1: Lists & Smart Watchlists */}
@@ -167,41 +167,30 @@ export const WatchlistPage: React.FC = () => {
             {activeTickers.length === 0 ? (
               <div className="p-8 text-center text-xs text-white/30 space-y-3">
                 <p>No watched stocks in this category.</p>
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() => navigateToStock({ ticker: "RELIANCE", mode: "push" })}
-                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
                 >
                   Browse Opportunity
-                </button>
+                </Button>
               </div>
             ) : (
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-white/5 text-white/40 font-medium">
-                    <th className="p-4">Ticker</th>
-                    <th className="p-4">Score</th>
-                    <th className="p-4">Last Update</th>
-                    <th className="p-4">Why am I watching this?</th>
-                    <th className="p-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeTickers.map((ticker) => {
-                    const info = StockRegistry.getStock(ticker);
-                    const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
+              <CustomTable headers={["Ticker", "Score", "Last Update", "Why am I watching this?", "Actions"]}>
+                {activeTickers.map((ticker) => {
+                  const info = StockRegistry.getStock(ticker);
+                  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
 
-                    return (
-                      <WatchlistRow
-                        key={ticker}
-                        ticker={ticker}
-                        score={score}
-                        onClick={() => navigateToStock({ ticker, mode: "push" })}
-                        onRemove={() => handleRemoveTicker(ticker)}
-                      />
-                    );
-                  })}
-                </tbody>
-              </table>
+                  return (
+                    <WatchlistRow
+                      key={ticker}
+                      ticker={ticker}
+                      score={score}
+                      onClick={() => navigateToStock({ ticker, mode: "push" })}
+                      onRemove={() => handleRemoveTicker(ticker)}
+                    />
+                  );
+                })}
+              </CustomTable>
             )}
           </div>
         </div>

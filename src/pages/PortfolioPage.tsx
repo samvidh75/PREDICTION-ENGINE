@@ -5,6 +5,7 @@ import { Plus, Upload, Trash2, Edit2, X, AlertCircle, ArrowUpRight, ArrowDownRig
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { formatINR, useLiveQuotes } from "../hooks/useLiveQuotes";
+import { PageHeader, CustomTable, Button, SmallCard, MediumCard } from "../components/ui/DesignSystem";
 
 export const PortfolioPage: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
@@ -98,9 +99,18 @@ export const PortfolioPage: React.FC = () => {
     setCsvText("");
   };
 
+  const handleNavigateToStockTab = (symbol: string, tab: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock");
+    params.set("id", symbol);
+    params.set("tab", tab);
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
   // Perform dynamic calculations for "What needs attention?" metrics
   const calculatedHoldings = useMemo(() => {
-    return snapshot.holdings.map(h => {
+    const list = snapshot.holdings.map(h => {
       const info = StockRegistry.getStock(h.symbol);
       const quoteState = liveQuotes[h.symbol];
       const currentPrice = quoteState?.quote?.price ?? null;
@@ -117,6 +127,23 @@ export const PortfolioPage: React.FC = () => {
         gainLossPct,
         sector: info?.sector || h.sector || "Other"
       };
+    });
+
+    const getRiskScore = (health: string) => {
+      switch (health) {
+        case "unhealthy": return 5;
+        case "weakening": return 4;
+        case "stable": return 3;
+        case "healthy": return 2;
+        case "veryHealthy": return 1;
+        default: return 3;
+      }
+    };
+
+    return list.sort((a, b) => {
+      const healthA = StockRegistry.getStock(a.symbol)?.healthStatus || "stable";
+      const healthB = StockRegistry.getStock(b.symbol)?.healthStatus || "stable";
+      return getRiskScore(healthB) - getRiskScore(healthA);
     });
   }, [liveQuotes, snapshot.holdings]);
 
@@ -157,39 +184,31 @@ export const PortfolioPage: React.FC = () => {
   return (
     <div className="w-full flex flex-col space-y-8 bg-[#020304] text-white min-h-screen font-sans relative max-w-7xl mx-auto antialiased">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-6">
-        <div>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-400 block mb-1">
-            PORTFOLIO SUITE
-          </span>
-          <h2 className="text-3xl font-bold tracking-tight text-white font-sans">
-            Portfolio Centre
-          </h2>
-          <p className="text-xs text-white/40 mt-1">
-            Live exposure auditing. Total Value: {totalPortfolioValue > 0 ? formatINR(totalPortfolioValue) : "Live quotes unavailable"}
-          </p>
-        </div>
+      <PageHeader
+        title="Portfolio Centre"
+        subtitle="What needs attention?"
+        primaryAction={
+          <div className="flex items-center gap-3">
+            <Button
+              variant="primary"
+              onClick={() => setIsAddOpen(true)}
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" /> Add Holding
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setIsImportOpen(true)}
+            >
+              <Upload className="w-3.5 h-3.5 mr-1" /> Import CSV
+            </Button>
+          </div>
+        }
+      />
 
-        <div className="mt-4 md:mt-0 flex items-center gap-3">
-          <button
-            onClick={() => setIsAddOpen(true)}
-            className="h-9 px-4 bg-cyan-400 text-black font-semibold text-xs rounded-xl flex items-center gap-2 hover:bg-cyan-300 transition-all cursor-pointer font-sans"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add Holding
-          </button>
-          <button
-            onClick={() => setIsImportOpen(true)}
-            className="h-9 px-4 bg-white/5 border border-white/5 text-white/80 font-semibold text-xs rounded-xl flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer font-sans"
-          >
-            <Upload className="w-3.5 h-3.5" /> Import CSV
-          </button>
-        </div>
-      </div>
-
-      {/* V4 SUMMARY GRID: What needs attention? */}
+      {/* SUMMARY GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Best Performer */}
-        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+        <MediumCard className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
             <ArrowUpRight className="w-5 h-5" />
           </div>
@@ -204,10 +223,10 @@ export const PortfolioPage: React.FC = () => {
               <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
             )}
           </div>
-        </div>
+        </MediumCard>
 
         {/* Worst Performer */}
-        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+        <MediumCard className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 shrink-0">
             <ArrowDownRight className="w-5 h-5" />
           </div>
@@ -222,10 +241,10 @@ export const PortfolioPage: React.FC = () => {
               <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
             )}
           </div>
-        </div>
+        </MediumCard>
 
         {/* Risk Concentration */}
-        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+        <MediumCard className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 shrink-0">
             <ShieldAlert className="w-5 h-5" />
           </div>
@@ -240,24 +259,33 @@ export const PortfolioPage: React.FC = () => {
               <span className="text-xs font-medium text-white/30 block mt-0.5">No exposure</span>
             )}
           </div>
-        </div>
+        </MediumCard>
       </div>
 
       {/* HOLDINGS TABLE */}
       <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col space-y-4">
         <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider">Holdings Inventory</span>
         <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-white/5 text-white/40 font-medium">
-                <th className="p-4">Ticker</th>
-                <th className="p-4">Allocation</th>
-                <th className="p-4">Value</th>
-                <th className="p-4">Return</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          {calculatedHoldings.length === 0 ? (
+            <div className="p-8 text-center text-xs text-white/30 space-y-3">
+              <p>No holdings added yet.</p>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="primary"
+                  onClick={() => setIsAddOpen(true)}
+                >
+                  Add Asset
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setIsImportOpen(true)}
+                >
+                  Import CSV
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <CustomTable headers={["Ticker", "Allocation", "Value", "Return", "Analysis Shortcuts", "Actions"]}>
               {calculatedHoldings.map((h) => {
                 const allocationPct = totalPortfolioValue > 0 && h.totalValue !== null
                   ? ((h.totalValue / totalPortfolioValue) * 100).toFixed(1)
@@ -266,11 +294,11 @@ export const PortfolioPage: React.FC = () => {
                 return (
                   <tr 
                     key={h.symbol}
-                    className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors"
+                    className="hover:bg-white/[0.02] transition-colors"
                   >
                     <td className="p-4">
                       <button
-                        onClick={() => navigateToStock({ ticker: h.symbol, mode: "push" })}
+                        onClick={() => handleNavigateToStockTab(h.symbol, "overview")}
                         className="font-mono font-bold text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
                       >
                         {h.symbol}
@@ -278,8 +306,39 @@ export const PortfolioPage: React.FC = () => {
                     </td>
                     <td className="p-4 text-white/70 font-mono">{allocationPct}%</td>
                     <td className="p-4 text-white/80 font-mono">{h.totalValue !== null ? formatINR(h.totalValue) : "Live quote unavailable"}</td>
-                    <td className={`p-4 font-mono font-bold ${h.gainLossPct !== null && h.gainLossPct >= 0 ? "text-emerald-400" : "text-rose-450"}`}>
+                    <td className={`p-4 font-mono font-bold ${h.gainLossPct !== null && h.gainLossPct >= 0 ? "text-emerald-400" : "text-rose-450"}`}> 
                       {h.gainLossPct !== null ? `${h.gainLossPct >= 0 ? "+" : ""}${h.gainLossPct.toFixed(1)}%` : "Unavailable"}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleNavigateToStockTab(h.symbol, "overview")}
+                          className="text-[10px] text-cyan-400 hover:underline font-semibold bg-transparent border-none cursor-pointer"
+                        >
+                          Briefing
+                        </button>
+                        <span className="text-white/20">|</span>
+                        <button 
+                          onClick={() => handleNavigateToStockTab(h.symbol, "risks")}
+                          className="text-[10px] text-white/50 hover:text-rose-400 hover:underline bg-transparent border-none cursor-pointer"
+                        >
+                          Risk
+                        </button>
+                        <span className="text-white/20">|</span>
+                        <button 
+                          onClick={() => handleNavigateToStockTab(h.symbol, "valuation")}
+                          className="text-[10px] text-white/50 hover:text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
+                        >
+                          Valuation
+                        </button>
+                        <span className="text-white/20">|</span>
+                        <button 
+                          onClick={() => handleNavigateToStockTab(h.symbol, "ownership")}
+                          className="text-[10px] text-white/50 hover:text-cyan-400 hover:underline bg-transparent border-none cursor-pointer"
+                        >
+                          Ownership
+                        </button>
+                      </div>
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -304,8 +363,8 @@ export const PortfolioPage: React.FC = () => {
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+            </CustomTable>
+          )}
         </div>
       </div>
 

@@ -4,21 +4,22 @@ export interface ResearchNote {
   symbol: string;
   note: string;
   lastUpdated: string;
+  timestamp?: number;
 }
 
 export class NoteEngine {
   private static getNotesMap(): Record<string, ResearchNote> {
     if (typeof window === "undefined") {
       return {
-        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday" },
-        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago" },
+        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday", timestamp: Date.now() - 86400000 },
+        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago", timestamp: Date.now() - 172800000 },
       };
     }
     const raw = localStorage.getItem("stockstory_watchlist_notes_v1");
     if (!raw) {
       const initial = {
-        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday" },
-        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago" },
+        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday", timestamp: Date.now() - 86400000 },
+        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago", timestamp: Date.now() - 172800000 },
       };
       localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(initial));
       return initial;
@@ -32,7 +33,7 @@ export class NoteEngine {
 
   public static getNote(symbol: string): ResearchNote {
     const map = this.getNotesMap();
-    return map[symbol.toUpperCase()] || { symbol, note: "", lastUpdated: "Never" };
+    return map[symbol.toUpperCase()] || { symbol, note: "", lastUpdated: "Never", timestamp: 0 };
   }
 
   public static saveNote(symbol: string, note: string): void {
@@ -42,6 +43,7 @@ export class NoteEngine {
       symbol: sym,
       note,
       lastUpdated: new Date().toLocaleDateString(),
+      timestamp: Date.now()
     };
     if (typeof window !== "undefined") {
       localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(map));
