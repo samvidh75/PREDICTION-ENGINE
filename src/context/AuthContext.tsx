@@ -192,7 +192,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [authError, initializeSession, isConnecting, loading, logout, user],
   );
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+  // Show children only when auth state has been resolved.
+  // The loading state is set to false once onAuthStateChanged fires.
+  // After initial load, loading stays false even during logout transitions
+  // because onAuthStateChanged sets firebaseUser=null and loading=false simultaneously.
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

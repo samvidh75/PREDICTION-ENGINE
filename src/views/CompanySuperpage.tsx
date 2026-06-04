@@ -24,16 +24,19 @@ export const CompanySuperpage: React.FC = () => {
 
   const [intel, setIntel] = useState<any>(() => getCompanyIntelligence(symbol));
 
-  // Details states
+  // Details states — each section loads independently
   const [financials, setFinancials] = useState<any>(null);
+  const [financialsLoading, setFinancialsLoading] = useState<boolean>(true);
   const [ownership, setOwnership] = useState<any>(null);
+  const [ownershipLoading, setOwnershipLoading] = useState<boolean>(true);
   const [valuation, setValuation] = useState<any>(null);
+  const [valuationLoading, setValuationLoading] = useState<boolean>(true);
   const [risks, setRisks] = useState<any>(null);
+  const [risksLoading, setRisksLoading] = useState<boolean>(true);
   const [catalysts, setCatalysts] = useState<any>(null);
+  const [catalystsLoading, setCatalystsLoading] = useState<boolean>(true);
   const [timeline, setTimeline] = useState<any>(null);
-
-  const [detailsLoading, setDetailsLoading] = useState<boolean>(true);
-  const [detailsError, setDetailsError] = useState<string | null>(null);
+  const [timelineLoading, setTimelineLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetch(`/api/intelligence/company/${symbol}`)
@@ -56,50 +59,59 @@ export const CompanySuperpage: React.FC = () => {
     };
   }, [symbol]);
 
+  // Load each section independently — never block page rendering
   useEffect(() => {
-    setDetailsLoading(true);
-    setDetailsError(null);
+    setFinancialsLoading(true);
+    fetch(`/api/company/${symbol}/financials`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setFinancials(data || []))
+      .catch(() => setFinancials([]))
+      .finally(() => setFinancialsLoading(false));
+  }, [symbol]);
 
-    Promise.all([
-      fetch(`/api/company/${symbol}/financials`).then(res => {
-        if (!res.ok) throw new Error("Financials error");
-        return res.json();
-      }),
-      fetch(`/api/company/${symbol}/ownership`).then(res => {
-        if (!res.ok) throw new Error("Ownership error");
-        return res.json();
-      }),
-      fetch(`/api/company/${symbol}/valuation`).then(res => {
-        if (!res.ok) throw new Error("Valuation error");
-        return res.json();
-      }),
-      fetch(`/api/company/${symbol}/risks`).then(res => {
-        if (!res.ok) throw new Error("Risks error");
-        return res.json();
-      }),
-      fetch(`/api/company/${symbol}/catalysts`).then(res => {
-        if (!res.ok) throw new Error("Catalysts error");
-        return res.json();
-      }),
-      fetch(`/api/company/${symbol}/timeline`).then(res => {
-        if (!res.ok) throw new Error("Timeline error");
-        return res.json();
-      })
-    ])
-      .then(([fin, own, val, rsk, cat, time]) => {
-        setFinancials(fin);
-        setOwnership(own);
-        setValuation(val);
-        setRisks(rsk);
-        setCatalysts(cat);
-        setTimeline(time);
-      })
-      .catch(() => {
-        setDetailsError("Detailed metrics temporarily unavailable.");
-      })
-      .finally(() => {
-        setDetailsLoading(false);
-      });
+  useEffect(() => {
+    setOwnershipLoading(true);
+    fetch(`/api/company/${symbol}/ownership`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setOwnership(data || { categories: [], comment: '' }))
+      .catch(() => setOwnership({ categories: [], comment: '' }))
+      .finally(() => setOwnershipLoading(false));
+  }, [symbol]);
+
+  useEffect(() => {
+    setValuationLoading(true);
+    fetch(`/api/company/${symbol}/valuation`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setValuation(data || { historicalValuation: '', currentValuation: '', peerComparison: '' }))
+      .catch(() => setValuation({ historicalValuation: '', currentValuation: '', peerComparison: '' }))
+      .finally(() => setValuationLoading(false));
+  }, [symbol]);
+
+  useEffect(() => {
+    setRisksLoading(true);
+    fetch(`/api/company/${symbol}/risks`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setRisks(Array.isArray(data) ? data : []))
+      .catch(() => setRisks([]))
+      .finally(() => setRisksLoading(false));
+  }, [symbol]);
+
+  useEffect(() => {
+    setCatalystsLoading(true);
+    fetch(`/api/company/${symbol}/catalysts`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setCatalysts(Array.isArray(data) ? data : []))
+      .catch(() => setCatalysts([]))
+      .finally(() => setCatalystsLoading(false));
+  }, [symbol]);
+
+  useEffect(() => {
+    setTimelineLoading(true);
+    fetch(`/api/company/${symbol}/timeline`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setTimeline(Array.isArray(data) ? data : []))
+      .catch(() => setTimeline([]))
+      .finally(() => setTimelineLoading(false));
   }, [symbol]);
 
   const setPage = (pageKey: string, idVal?: string) => {
@@ -240,7 +252,7 @@ export const CompanySuperpage: React.FC = () => {
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Financial Quality
         </span>
-        {detailsLoading ? (
+        {financialsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map(idx => (
               <div key={idx} className="bg-white/[0.01] border border-white/5 rounded-xl p-4 h-[150px] flex items-center justify-center">
@@ -248,16 +260,7 @@ export const CompanySuperpage: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : detailsError || !financials ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Financial data unavailable."}</span>
-          </div>
-        ) : financials.length === 0 ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-xl p-6 text-center text-xs text-gray-500 font-mono">
-            NO FINANCIAL STATISTICAL HISTORY PRESENT
-          </div>
-        ) : (
+        ) : !financials || financials.length === 0 ? null : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {financials.map((chart: any) => (
               <div key={chart.label} className="bg-white/[0.01] border border-white/5 rounded-xl p-4 flex flex-col justify-between h-[150px]">
@@ -285,172 +288,109 @@ export const CompanySuperpage: React.FC = () => {
         )}
       </section>
 
-      {/* SECTION 6: Ownership Trends */}
+      {/* SECTION 6: Ownership Trends — hide if no data */}
+      {!ownershipLoading && ownership && ownership.categories && ownership.categories.length > 0 && (
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-6">
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Ownership Trends
         </span>
-        {detailsLoading ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex items-center justify-center h-[180px]">
-            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-2 gap-4">
+            {ownership.categories.map((o: any) => (
+              <div key={o.category} className="bg-white/[0.02] border border-white/5 p-4 rounded-xl">
+                <span className="text-[9px] text-gray-500 uppercase block">{o.category}</span>
+                <span className="text-sm font-bold text-white font-mono block mt-1">{o.share}</span>
+                <span className={`text-[9px] mt-1 block ${o.change.startsWith("-") ? "text-rose-400" : o.change === "Unchanged" ? "text-gray-400" : "text-emerald-400"}`}>
+                  {o.change}
+                </span>
+              </div>
+            ))}
           </div>
-        ) : detailsError || !ownership ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Ownership data unavailable."}</span>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="grid grid-cols-2 gap-4">
-              {ownership.categories.map((o: any) => (
-                <div key={o.category} className="bg-white/[0.02] border border-white/5 p-4 rounded-xl">
-                  <span className="text-[9px] text-gray-500 uppercase block">{o.category}</span>
-                  <span className="text-sm font-bold text-white font-mono block mt-1">{o.share}</span>
-                  <span className={`text-[9px] mt-1 block ${o.change.startsWith("-") ? "text-rose-400" : o.change === "Unchanged" ? "text-gray-400" : "text-emerald-400"}`}>
-                    {o.change}
-                  </span>
-                </div>
-              ))}
-            </div>
+          {ownership.comment && (
             <p className="text-xs leading-relaxed text-gray-300">
               <strong>Ownership Shift Commentary:</strong> {ownership.comment}
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </section>
+      )}
 
-      {/* SECTION 7: Valuation Context */}
+      {/* SECTION 7: Valuation Context — hide if no data */}
+      {!valuationLoading && valuation && (valuation.currentValuation || valuation.historicalValuation) && (
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Valuation Context
         </span>
-        {detailsLoading ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex items-center justify-center h-[100px]">
-            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs leading-relaxed text-gray-300">
+          <div className="space-y-2">
+            {valuation.historicalValuation && <p><strong>Historical Valuation:</strong> {valuation.historicalValuation}</p>}
+            {valuation.currentValuation && <p><strong>Current Valuation:</strong> {valuation.currentValuation}</p>}
           </div>
-        ) : detailsError || !valuation ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Valuation context unavailable."}</span>
+          <div className="space-y-2">
+            {valuation.peerComparison && <p><strong>Peer Comparison:</strong> {valuation.peerComparison}</p>}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs leading-relaxed text-gray-300">
-            <div className="space-y-2">
-              <p><strong>Historical Valuation:</strong> {valuation.historicalValuation}</p>
-              <p><strong>Current Valuation:</strong> {valuation.currentValuation}</p>
-            </div>
-            <div className="space-y-2">
-              <p><strong>Peer Comparison:</strong> {valuation.peerComparison}</p>
-            </div>
-          </div>
-        )}
+        </div>
       </section>
+      )}
 
-      {/* SECTION 8: Risks */}
+      {/* SECTION 8: Risks — hide if no risks generated */}
+      {!risksLoading && risks && risks.length > 0 && (
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Risks
         </span>
-        {detailsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map(idx => (
-              <div key={idx} className="bg-white/[0.01] border border-white/5 rounded-xl p-4 h-[100px] flex items-center justify-center">
-                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {risks.map((r: any, i: number) => (
+            <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-2 text-rose-400">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-xs font-semibold text-white">{r.title}</span>
               </div>
-            ))}
-          </div>
-        ) : detailsError || !risks ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Risks profiles unavailable."}</span>
-          </div>
-        ) : risks.length === 0 ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-8 text-center text-xs text-gray-500 font-mono">
-            NO SPECIFIC REGULATORY OR OPERATING RISKS RECORDED
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {risks.map((r: any, i: number) => (
-              <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-4 space-y-2">
-                <div className="flex items-center gap-2 text-rose-400">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="text-xs font-semibold text-white">{r.title}</span>
-                </div>
-                <p className="text-xs text-gray-400 leading-relaxed">{r.desc}</p>
-              </div>
-            ))}
-          </div>
-        )}
+              <p className="text-xs text-gray-400 leading-relaxed">{r.desc}</p>
+            </div>
+          ))}
+        </div>
       </section>
+      )}
 
-      {/* SECTION 9: Catalysts */}
+      {/* SECTION 9: Catalysts — hide if no catalysts detected */}
+      {!catalystsLoading && catalysts && catalysts.length > 0 && (
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Catalysts
         </span>
-        {detailsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2].map(idx => (
-              <div key={idx} className="bg-white/[0.01] border border-white/5 rounded-xl p-4 h-[80px] flex items-center justify-center">
-                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {catalysts.map((c: any, i: number) => (
+            <div key={i} className="flex gap-4 items-start p-3 bg-white/[0.02] border border-white/5 rounded-xl text-xs leading-relaxed text-gray-300">
+              <span className="text-cyan-400 font-bold font-mono">0{i+1}</span>
+              <div>
+                <h4 className="font-semibold text-white mb-1">{c.title}</h4>
+                <p>{c.desc}</p>
               </div>
-            ))}
-          </div>
-        ) : detailsError || !catalysts ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Catalyst trackers unavailable."}</span>
-          </div>
-        ) : catalysts.length === 0 ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-8 text-center text-xs text-gray-500 font-mono">
-            NO CAPITAL OR RESTRUCTURING CATALYSTS DETECTED
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {catalysts.map((c: any, i: number) => (
-              <div key={i} className="flex gap-4 items-start p-3 bg-white/[0.02] border border-white/5 rounded-xl text-xs leading-relaxed text-gray-300">
-                <span className="text-cyan-400 font-bold font-mono">0{i+1}</span>
-                <div>
-                  <h4 className="font-semibold text-white mb-1">{c.title}</h4>
-                  <p>{c.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </section>
+      )}
 
-      {/* SECTION 10: Timeline */}
+      {/* SECTION 10: Timeline — hide if no events */}
+      {!timelineLoading && timeline && timeline.length > 0 && (
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-6">
         <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-bold block">
           Corporate Timeline
         </span>
-        {detailsLoading ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex items-center justify-center h-[150px]">
-            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
-          </div>
-        ) : detailsError || !timeline ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center font-mono">
-            <AlertTriangle className="w-5 h-5 text-amber-400 mb-2" />
-            <span className="text-xs text-gray-500 uppercase tracking-widest">{detailsError || "Announcements timeline unavailable."}</span>
-          </div>
-        ) : timeline.length === 0 ? (
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-8 text-center text-xs text-gray-500 font-mono">
-            NO IMPORTANT TIMELINE RECORDS REPORTED
-          </div>
-        ) : (
-          <div className="relative border-l border-white/10 pl-6 ml-3 space-y-6">
-            {timeline.map((t: any, i: number) => (
-              <div key={i} className="relative space-y-1">
-                <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-cyan-400 border border-white/10" />
-                <span className="text-[10px] font-mono text-cyan-400 block">{t.date}</span>
-                <h4 className="text-xs font-semibold text-white">{t.event}</h4>
-                <p className="text-xs text-gray-400 leading-relaxed">{t.detail}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="relative border-l border-white/10 pl-6 ml-3 space-y-6">
+          {timeline.map((t: any, i: number) => (
+            <div key={i} className="relative space-y-1">
+              <div className="absolute -left-[31px] top-1 w-2.5 h-2.5 rounded-full bg-cyan-400 border border-white/10" />
+              <span className="text-[10px] font-mono text-cyan-400 block">{t.date}</span>
+              <h4 className="text-xs font-semibold text-white">{t.event}</h4>
+              <p className="text-xs text-gray-400 leading-relaxed">{t.detail}</p>
+            </div>
+          ))}
+        </div>
       </section>
+      )}
 
       {/* SECTION 11: Related Companies */}
       <section className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">

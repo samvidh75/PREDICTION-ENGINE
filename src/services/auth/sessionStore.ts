@@ -11,6 +11,9 @@ export type AuthSession = {
 
 const STORAGE_KEY = "ss_auth_session_v1";
 
+// Sessions older than 7 days are considered expired and will be cleared
+const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
 export function loadAuthSession(): AuthSession {
   if (typeof window === "undefined") {
     return { status: "anonymous" };
@@ -23,13 +26,20 @@ export function loadAuthSession(): AuthSession {
     const parsed = JSON.parse(raw) as Partial<AuthSession>;
     if (!parsed || parsed.status !== "authenticated") return { status: "anonymous" };
 
+    // Validate session age — expire if older than 7 days
+    const createdAtMs = typeof parsed.createdAtMs === "number" ? parsed.createdAtMs : undefined;
+    if (createdAtMs && Date.now() - createdAtMs > SESSION_MAX_AGE_MS) {
+      clearAuthSession();
+      return { status: "anonymous" };
+    }
+
     return {
       status: "authenticated",
       uid: parsed.uid,
       email: parsed.email,
       displayName: parsed.displayName,
       provider: parsed.provider,
-      createdAtMs: typeof parsed.createdAtMs === "number" ? parsed.createdAtMs : undefined,
+      createdAtMs,
     };
   } catch {
     return { status: "anonymous" };
@@ -41,6 +51,8 @@ export function saveAuthSession(session: AuthSession): void {
 
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    // Dispatch storage event for cross-tab sync
+    window.dispatchEvent(new Event("ss:auth-session-changed"));
   } catch {
     // ignore persistence failures; auth UI still functions in-memory
   }

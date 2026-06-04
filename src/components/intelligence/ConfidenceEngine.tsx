@@ -52,27 +52,19 @@ export function useConfidenceEngine(): ConfidenceContextValue {
   return ctx;
 }
 
-const DEFAULT_INPUTS: MarketInputs = {
-  trendConsistency: 0.62,
-  volatilityStability: 0.66,
-  institutionalParticipation: 0.58,
-  liquidityBreadth: 0.60,
-  sentimentAlignment: 0.56,
-  sectorMomentum: 0.57,
-  earningsQuality: 0.60,
+// Neutral starting point - replaced by live API data immediately
+const NEUTRAL_INPUTS: MarketInputs = {
+  trendConsistency: 0.50,
+  volatilityStability: 0.50,
+  institutionalParticipation: 0.50,
+  liquidityBreadth: 0.50,
+  sentimentAlignment: 0.50,
+  sectorMomentum: 0.50,
+  earningsQuality: 0.50,
 };
 
 function clamp01(v: number): number {
   return Math.max(0, Math.min(1, v));
-}
-
-function randn(): number {
-  // Box–Muller
-  let u = 0;
-  let v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
-  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
 function deriveLabel(marketState: MarketState): string {
@@ -123,6 +115,37 @@ function deriveFromInputs(inputs: MarketInputs): {
   return { marketState, confidence, theme };
 }
 
+/**
+ * Fetches live market intelligence data from the API endpoint.
+ * The API returns computed MarketInputs derived from actual market data
+ * (database factor snapshots, sector breadth, volatility readings, etc.).
+ */
+async function fetchLiveMarketInputs(): Promise<MarketInputs | null> {
+  try {
+    const response = await fetch("/api/intelligence/market", {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (!data) return null;
+
+    // Map API response to MarketInputs shape
+    // The API returns computed metrics; we normalize them to 0-1 range
+    return {
+      trendConsistency: clamp01((data.trendConsistency ?? data.trend_strength ?? 50) / 100),
+      volatilityStability: clamp01((data.volatilityStability ?? data.volatility_stability ?? 50) / 100),
+      institutionalParticipation: clamp01((data.institutionalParticipation ?? data.institutional_participation ?? 50) / 100),
+      liquidityBreadth: clamp01((data.liquidityBreadth ?? data.liquidity_breadth ?? 50) / 100),
+      sentimentAlignment: clamp01((data.sentimentAlignment ?? data.sentiment_alignment ?? 50) / 100),
+      sectorMomentum: clamp01((data.sectorMomentum ?? data.sector_momentum ?? 50) / 100),
+      earningsQuality: clamp01((data.earningsQuality ?? data.earnings_quality ?? 50) / 100),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function ConfidenceEngine({
   children,
   initialInputs,
@@ -136,9 +159,10 @@ export default function ConfidenceEngine({
 }): JSX.Element {
   const prefersReducedMotion = useReducedMotion();
 
-  const inputsRef = useRef<MarketInputs>(initialInputs ?? DEFAULT_INPUTS);
+  const inputsRef = useRef<MarketInputs>(initialInputs ?? NEUTRAL_INPUTS);
+  const lastPolledRef = useRef<number>(0);
 
-  const initialDerived = useMemo(() => deriveFromInputs(initialInputs ?? DEFAULT_INPUTS), [initialInputs]);
+  const initialDerived = useMemo(() => deriveFromInputs(initialInputs ?? NEUTRAL_INPUTS), [initialInputs]);
 
   const [marketState, setMarketState] = useState<MarketState>(initialDerived.marketState);
   const [state, setState] = useState<ConfidenceState>(initialDerived.confidence);
@@ -162,60 +186,43 @@ export default function ConfidenceEngine({
     setNarrativeKey((k) => k + 1);
   }, [inputsOverride]);
 
+  // Poll live market intelligence API periodically to drive the confidence state
+  // from actual data instead of random drift
   useEffect(() => {
     if (paused) return;
     if (prefersReducedMotion) return;
 
     let cancelled = false;
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    const tick = () => {
+    const poll = async () => {
       if (cancelled) return;
 
-      const prev = inputsRef.current;
+      const liveInputs = await fetchLiveMarketInputs();
 
-      // Very small drift to avoid “attention seeking” UI churn.
-      const volatilityVol = prev.volatilityStability;
-      const driftStrength = 0.04 + (1 - volatilityVol) * 0.03;
+      if (cancelled) return;
 
-      const nextInputs: MarketInputs = {
-        trendConsistency: clamp01(prev.trendConsistency + randn() * driftStrength),
-        volatilityStability: clamp01(prev.volatilityStability + randn() * (driftStrength + 0.01)),
-        institutionalParticipation: clamp01(prev.institutionalParticipation + randn() * driftStrength),
-        liquidityBreadth: clamp01(prev.liquidityBreadth + randn() * driftStrength),
-        sentimentAlignment: clamp01(prev.sentimentAlignment + randn() * driftStrength),
-        sectorMomentum: clamp01(prev.sectorMomentum + randn() * driftStrength),
-        earningsQuality: clamp01(prev.earningsQuality + randn() * (driftStrength * 0.45)),
-      };
+      if (liveInputs) {
+        inputsRef.current = liveInputs;
+        const next = deriveFromInputs(liveInputs);
 
-      // Occasional larger recalibration to ensure the market state adapts.
-      if (Math.random() < 0.16) {
-        nextInputs.volatilityStability = clamp01(nextInputs.volatilityStability + (randn() * 0.12 - 0.02));
-        nextInputs.liquidityBreadth = clamp01(nextInputs.liquidityBreadth + randn() * 0.10);
+        setMarketState(next.marketState);
+        setState(next.confidence);
+        setTheme(next.theme);
+        setNarrativeKey((k) => k + 1);
+        lastPolledRef.current = Date.now();
       }
 
-      inputsRef.current = nextInputs;
-
-      const next = deriveFromInputs(nextInputs);
-
-      setMarketState(next.marketState);
-      setState(next.confidence);
-      setTheme(next.theme);
-      setNarrativeKey((k) => k + 1);
-
-      // Narrative refresh cadence: 15–45 seconds depending on volatility intensity.
-      // Higher volatility => lower stability => shorter interval.
-      const intervalMs = Math.round(15000 + nextInputs.volatilityStability * 30000);
-
-      timeoutId = window.setTimeout(tick, intervalMs);
+      // Poll every 30 seconds
+      timeoutId = setTimeout(poll, 30_000);
     };
 
     // Kick immediately for presence.
-    timeoutId = window.setTimeout(tick, 900);
+    timeoutId = setTimeout(poll, 500);
 
     return () => {
       cancelled = true;
-      if (timeoutId) window.clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [paused, prefersReducedMotion]);
 

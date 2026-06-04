@@ -56,6 +56,9 @@ export function mapAuthError(error: unknown): string {
       return "Firebase authentication is not configured correctly for this app.";
     case "auth/missing-email":
       return "Please enter your email address.";
+    case "auth/id-token-expired":
+    case "auth/session-expired":
+      return "Your session has expired. Please sign in again.";
   }
 
   // Fallback pattern matching in error message if code is not directly present
