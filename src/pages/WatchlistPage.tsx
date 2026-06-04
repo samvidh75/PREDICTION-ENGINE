@@ -5,6 +5,7 @@ import { AlertEngine } from "../services/portfolio/AlertEngine";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { CompanyCard } from "../components/company/CompanyCard";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import { NoteEngine } from "../services/portfolio/NoteEngine";
 
 export const WatchlistPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
@@ -88,10 +89,9 @@ export const WatchlistPage: React.FC = () => {
               <thead>
                 <tr className="border-b border-white/5 text-white/40 font-medium">
                   <th className="p-4">Ticker</th>
-                  <th className="p-4">Price</th>
-                  <th className="p-4">Change</th>
                   <th className="p-4">Quality Score</th>
-                  <th className="p-4">Reason Being Watched</th>
+                  <th className="p-4">Last Update</th>
+                  <th className="p-4">Watch Reason</th>
                 </tr>
               </thead>
               <tbody>
@@ -100,29 +100,34 @@ export const WatchlistPage: React.FC = () => {
                   : watchlists.find((w) => w.id === selectedList)?.tickers || []
                 ).map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
-                  const price = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : "₹2,943.45";
-                  const change = "+1.85%";
-                  const isPositive = true;
                   const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
-                  
-                  const reason = ticker === "TCS" ? "A large software exporter with steady cash generation." :
-                    ticker === "RELIANCE" ? "A diversified market leader across energy, retail, and telecom." :
-                    (info?.sector || "Conglomerate").toLowerCase().includes("bank") ? "Credit growth and deposits under monitor." :
-                    "Actively tracked company with stable volume metrics.";
+                  const noteObj = NoteEngine.getNote(ticker);
+                  const lastUpdate = noteObj.lastUpdated;
 
                   return (
                     <tr 
                       key={ticker}
-                      onClick={() => {
-                        navigateToStock({ ticker, mode: "push" });
-                      }}
-                      className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors"
+                      className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors"
                     >
-                      <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                      <td className="p-4 text-white/80">{price}</td>
-                      <td className={`p-4 font-mono font-bold ${isPositive ? "text-emerald-400" : "text-rose-400"}`}>{change}</td>
+                      <td className="p-4">
+                        <button 
+                          onClick={() => navigateToStock({ ticker, mode: "push" })}
+                          className="font-mono font-bold text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
+                        >
+                          {ticker}
+                        </button>
+                      </td>
                       <td className="p-4 text-cyan-400 font-mono font-bold">{score}/100</td>
-                      <td className="p-4 text-white/60 max-w-[220px] truncate">{reason}</td>
+                      <td className="p-4 text-white/40 font-mono">{lastUpdate}</td>
+                      <td className="p-4">
+                        <input
+                          type="text"
+                          value={noteObj.note}
+                          onChange={(e) => NoteEngine.saveNote(ticker, e.target.value)}
+                          placeholder="Why are you watching this company?"
+                          className="bg-white/5 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 w-full"
+                        />
+                      </td>
                     </tr>
                   );
                 })}

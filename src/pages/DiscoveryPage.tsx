@@ -22,63 +22,53 @@ interface DiscoverCategory {
 
 const CATEGORIES: DiscoverCategory[] = [
   {
-    title: "Trending Companies",
-    icon: <Flame className="w-5 h-5 text-amber-400 animate-pulse" />,
-    companies: [
-      { symbol: "TATAMOTORS", name: "Tata Motors Ltd.", score: 81, price: "₹924.50", change: "+3.2%", isPositive: true, oneLiner: "JLR profitability driving strong margins expansions." },
-      { symbol: "SUZLON", name: "Suzlon Energy Ltd.", score: 64, price: "₹45.10", change: "+4.9%", isPositive: true, oneLiner: "Wind capacity orders hit record highs this quarter." },
-      { symbol: "HAL", name: "Hindustan Aeronautics", score: 84, price: "₹4,120.00", change: "+1.8%", isPositive: true, oneLiner: "Defense acquisition council signs off on new orders." },
-      { symbol: "ADANIENT", name: "Adani Enterprises", score: 71, price: "₹3,150.20", change: "-1.5%", isPositive: false, oneLiner: "FII holding consolidates after run-up." }
-    ]
-  },
-  {
-    title: "Popular Searches",
-    icon: <Search className="w-5 h-5 text-cyan-400" />,
-    companies: [
-      { symbol: "RELIANCE", name: "Reliance Industries", score: 86, price: "₹2,845.00", change: "+1.9%", isPositive: true, oneLiner: "Retail margins expansion driving conglomerate multiples." },
-      { symbol: "HDFCBANK", name: "HDFC Bank Ltd.", score: 82, price: "₹1,510.20", change: "-0.5%", isPositive: false, oneLiner: "Interest coverage stable at historic levels." },
-      { symbol: "INFY", name: "Infosys Ltd.", score: 88, price: "₹1,420.50", change: "-2.4%", isPositive: false, oneLiner: "BFSI software deals pipeline showing moderate slowdown." },
-      { symbol: "ITC", name: "ITC Ltd.", score: 85, price: "₹428.40", change: "+0.8%", isPositive: true, oneLiner: "FMCG margins stable despite raw material index swings." }
-    ]
-  },
-  {
-    title: "High Quality Businesses",
+    title: "High Quality",
     icon: <Trophy className="w-5 h-5 text-yellow-400" />,
     companies: [
-      { symbol: "TCS", name: "Tata Consultancy", score: 93, price: "₹3,850.00", change: "+0.8%", isPositive: true, oneLiner: "Industry-leading return on capital and cash conversion." },
-      { symbol: "LT", name: "Larsen & Toubro Ltd.", score: 87, price: "₹3,540.00", change: "+1.2%", isPositive: true, oneLiner: "Pristine capital deployment in infrastructure segment." },
-      { symbol: "HINDUNILVR", name: "Hindustan Unilever", score: 90, price: "₹2,350.10", change: "+0.3%", isPositive: true, oneLiner: "Unaligned consumer moat with 98% cash flows conversion." },
-      { symbol: "COALINDIA", name: "Coal India Ltd.", score: 78, price: "₹450.40", change: "+2.1%", isPositive: true, oneLiner: "Strong dividend yield supported by direct mining flow." }
+      { symbol: "TCS", name: "Tata Consultancy Services", score: 93, price: "₹3,850.00", change: "+0.8%", isPositive: true, oneLiner: "Industry-leading return on capital and cash conversion." },
+      { symbol: "HINDUNILVR", name: "Hindustan Unilever", score: 90, price: "₹2,350.10", change: "+0.3%", isPositive: true, oneLiner: "Unaligned consumer moat with 98% cash flow conversion." },
+      { symbol: "NESTLEIND", name: "Nestle India", score: 88, price: "₹2,510.40", change: "+0.5%", isPositive: true, oneLiner: "Dominant brand power with high return on equity." },
+      { symbol: "INFY", name: "Infosys", score: 87, price: "₹1,420.50", change: "-2.4%", isPositive: false, oneLiner: "Consistent execution and cash generation capability." },
+      { symbol: "RELIANCE", name: "Reliance Industries", score: 86, price: "₹2,845.00", change: "+1.9%", isPositive: true, oneLiner: "Massive scale and digital/retail engine dominance." }
     ]
   },
   {
-    title: "Momentum Leaders",
-    icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
-    companies: [
-      { symbol: "BHEL", name: "Bharat Heavy Elec.", score: 68, price: "₹278.40", change: "+5.1%", isPositive: true, oneLiner: "Power equipment grid orders spark massive volumes." },
-      { symbol: "PFC", name: "Power Finance Corp", score: 80, price: "₹465.10", change: "+3.8%", isPositive: true, oneLiner: "Loan book expansion tracks national power grids updates." },
-      { symbol: "RECLTD", name: "REC Ltd.", score: 82, price: "₹512.40", change: "+4.2%", isPositive: true, oneLiner: "Clean energy financing velocity driving margins." },
-      { symbol: "RVNL", name: "Rail Vikas Nigam", score: 72, price: "₹385.00", change: "+4.9%", isPositive: true, oneLiner: "Railway infrastructure contracts delivery timeline." }
-    ]
-  },
-  {
-    title: "Sector Leaders",
+    title: "High Growth",
     icon: <Sparkles className="w-5 h-5 text-fuchsia-400" />,
     companies: [
-      { symbol: "NTPC", name: "NTPC Ltd.", score: 81, price: "₹355.20", change: "+1.4%", isPositive: true, oneLiner: "Leads national power generation capacity upgrades." },
-      { symbol: "MARUTI", name: "Maruti Suzuki India", score: 80, price: "₹12,420.00", change: "+1.5%", isPositive: true, oneLiner: "Dominates passenger vehicles market with premium mix." },
-      { symbol: "SUNPHARMA", name: "Sun Pharmaceutical", score: 85, price: "₹1,540.00", change: "-0.2%", isPositive: false, oneLiner: "Specialty pharmaceutical portfolio records double-digit gains." },
-      { symbol: "ICICIBANK", name: "ICICI Bank Ltd.", score: 89, price: "₹1,110.40", change: "+1.1%", isPositive: true, oneLiner: "Core retail deposit growth outperforms peer group averages." }
+      { symbol: "HAL", name: "Hindustan Aeronautics", score: 84, price: "₹4,120.00", change: "+1.8%", isPositive: true, oneLiner: "Defense acquisition pipeline accelerating sales." },
+      { symbol: "BEL", name: "Bharat Electronics", score: 82, price: "₹210.30", change: "+3.5%", isPositive: true, oneLiner: "Order book growth driven by defense electronics push." },
+      { symbol: "TRENT", name: "Trent", score: 85, price: "₹4,200.00", change: "+5.2%", isPositive: true, oneLiner: "Westside and Zudio expansion fueling supernormal growth." },
+      { symbol: "DIXON", name: "Dixon Technologies", score: 81, price: "₹7,210.00", change: "+2.7%", isPositive: true, oneLiner: "Electronics manufacturing services scaling rapidly." }
     ]
   },
   {
-    title: "Recently Added",
+    title: "Value Opportunities",
+    icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
+    companies: [
+      { symbol: "COALINDIA", name: "Coal India", score: 78, price: "₹450.40", change: "+2.1%", isPositive: true, oneLiner: "Compelling dividend yield and low price-to-earnings." },
+      { symbol: "ONGC", name: "Oil & Natural Gas Corp", score: 75, price: "₹260.10", change: "-0.4%", isPositive: false, oneLiner: "Robust cash flows trading at discount to book value." },
+      { symbol: "BPCL", name: "Bharat Petroleum", score: 74, price: "₹612.30", change: "+1.2%", isPositive: true, oneLiner: "High dividend yield and refining margin recovery." },
+      { symbol: "IOC", name: "Indian Oil Corp", score: 72, price: "₹168.40", change: "-0.8%", isPositive: false, oneLiner: "Under-valued oil marketing business with stable demand." }
+    ]
+  },
+  {
+    title: "Momentum",
+    icon: <Flame className="w-5 h-5 text-amber-400 animate-pulse" />,
+    companies: [
+      { symbol: "SUZLON", name: "Suzlon Energy", score: 64, price: "₹45.10", change: "+4.9%", isPositive: true, oneLiner: "Wind capacity orders hit record highs this quarter." },
+      { symbol: "RVNL", name: "Rail Vikas Nigam", score: 72, price: "₹385.00", change: "+4.9%", isPositive: true, oneLiner: "Railway infrastructure contracts delivery momentum." },
+      { symbol: "RECLTD", name: "REC Ltd.", score: 82, price: "₹512.40", change: "+4.2%", isPositive: true, oneLiner: "Power financing expansion driving momentum breakout." },
+      { symbol: "PFC", name: "Power Finance Corp", score: 80, price: "₹465.10", change: "+3.8%", isPositive: true, oneLiner: "Loan book expansion tracks power sector grid upgrades." }
+    ]
+  },
+  {
+    title: "Turnarounds",
     icon: <PlusCircle className="w-5 h-5 text-sky-400" />,
     companies: [
-      { symbol: "JIOFIN", name: "Jio Financial Services", score: 75, price: "₹354.20", change: "+2.1%", isPositive: true, oneLiner: "Digital payment and retail lending solutions rollout." },
-      { symbol: "IREDA", name: "IREDA Ltd.", score: 77, price: "₹185.40", change: "+4.8%", isPositive: true, oneLiner: "State-backed clean energy funding infrastructure." },
-      { symbol: "TATASTEEL", name: "Tata Steel Ltd.", score: 74, price: "₹174.20", change: "+4.8%", isPositive: true, oneLiner: "Global supply contracts update drives steel capacity." },
-      { symbol: "ZOMATO", name: "Zomato Ltd.", score: 70, price: "₹192.10", change: "-1.1%", isPositive: false, oneLiner: "Quick commerce delivery network achieves EBITDA breakeven." }
+      { symbol: "TATAMOTORS", name: "Tata Motors", score: 81, price: "₹924.50", change: "+3.2%", isPositive: true, oneLiner: "JLR profitability driving strong margin expansion." },
+      { symbol: "BHEL", name: "Bharat Heavy Elec.", score: 68, price: "₹278.40", change: "+5.1%", isPositive: true, oneLiner: "Power equipment grid orders sparking revenue turnaround." },
+      { symbol: "YESBANK", name: "Yes Bank", score: 55, price: "₹24.50", change: "-0.2%", isPositive: false, oneLiner: "Asset quality stabilizing with gradual loan book cleanup." }
     ]
   }
 ];

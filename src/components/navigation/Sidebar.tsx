@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Search, Briefcase, Eye, Bell, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Search, Compass, Briefcase, Eye, Bell, Settings, LogOut } from "lucide-react";
 import { useNavigation, ViewType } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,6 +16,7 @@ export const Sidebar: React.FC = () => {
   const links: NavItem[] = [
     { id: "terminal", label: "Home", icon: <LayoutDashboard className="w-4 h-4" /> },
     { id: "search", label: "Search", icon: <Search className="w-4 h-4" /> },
+    { id: "discovery", label: "Discovery", icon: <Compass className="w-4 h-4" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="w-4 h-4" /> },
     { id: "portfolio", label: "Portfolio", icon: <Briefcase className="w-4 h-4" /> },
     { id: "alerts", label: "Alerts", icon: <Bell className="w-4 h-4" /> },

@@ -3,7 +3,7 @@ import { User, Bell, Shield, Lock, Eye, Trash2 } from "lucide-react";
 import { AlertEngine, AlertCategory } from "../services/portfolio/AlertEngine";
 import { useAuth } from "../context/AuthContext";
 
-type SettingsTab = "profile" | "notifications" | "appearance" | "security" | "account";
+type SettingsTab = "profile" | "notifications" | "appearance" | "security";
 
 export const SettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -51,8 +51,7 @@ export const SettingsPage: React.FC = () => {
             { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
             { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
             { id: "appearance", label: "Appearance", icon: <Eye className="w-4 h-4" /> },
-            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> },
-            { id: "account", label: "Account", icon: <Trash2 className="w-4 h-4" /> }
+            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -165,27 +164,6 @@ export const SettingsPage: React.FC = () => {
                     className="px-4 py-2 border border-white/10 text-white font-semibold text-xs rounded-xl hover:bg-white/5 transition-all cursor-pointer bg-transparent"
                   >
                     Send Reset Link
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "account" && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-bold text-white mb-1">Account Management</h2>
-                <p className="text-xs text-gray-400">Deactivate profile or end your session.</p>
-              </div>
-              <div className="max-w-md space-y-4">
-                <div className="p-4 bg-red-950/10 border border-red-900/20 rounded-xl">
-                  <span className="text-xs font-bold text-red-200 block mb-1">Sign Out Session</span>
-                  <p className="text-[10px] text-red-400/70 mb-3">End the current secure identity session.</p>
-                  <button 
-                    onClick={() => logout()}
-                    className="px-4 py-2 bg-red-500 text-white font-bold text-xs rounded-xl hover:bg-red-650 transition-all cursor-pointer border-none"
-                  >
-                    Sign Out Now
                   </button>
                 </div>
               </div>

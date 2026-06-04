@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 
+import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
+import { Star } from "lucide-react";
+
 type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks";
 
 function profileFromUrl() {
@@ -28,6 +31,22 @@ export const StockStoryPage: React.FC = () => {
   const stock = useMemo(() => profileFromUrl(), []);
   const info = useMemo(() => StockRegistry.getStock(stock.symbol), [stock.symbol]);
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
+
+  const isInWatchlist = useMemo(() => {
+    return watchlists.some(w => w.tickers.includes(stock.symbol));
+  }, [watchlists, stock.symbol]);
+
+  const handleToggleWatchlist = () => {
+    const defaultList = watchlists[0];
+    if (!defaultList) return;
+    if (isInWatchlist) {
+      WatchlistEngine.removeTicker(defaultList.id, stock.symbol);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, stock.symbol);
+    }
+    setWatchlists([...WatchlistEngine.getWatchlists()]);
+  };
 
   const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 82;
   const currentPrice = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : "₹2,943.45";
@@ -48,6 +67,17 @@ export const StockStoryPage: React.FC = () => {
             <span>•</span>
             <span>Market Cap: {info?.marketCap.formatted || "₹50,000 Cr"}</span>
           </div>
+          <button
+            onClick={handleToggleWatchlist}
+            className={`mt-3 h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer ${
+              isInWatchlist 
+                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30" 
+                : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            <Star className={`w-3.5 h-3.5 ${isInWatchlist ? "fill-cyan-400" : ""}`} />
+            {isInWatchlist ? "Watching" : "Add to Watchlist"}
+          </button>
         </div>
 
         <div className="flex gap-8">

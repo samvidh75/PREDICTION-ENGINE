@@ -22,10 +22,12 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        if (isOpen) onClose();
-        else onClose(); // parent toggles state
+        onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -33,9 +35,9 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
   }, [isOpen, onClose]);
 
   const searchResults = useMemo(() => {
-    if (query.trim().length < 2) return []; // Section 144: render after 2 characters
+    if (query.trim().length < 2) return [];
     const raw = StockSearchEngine.search(query, 12);
-    return SearchRankingEngine.rank(raw, query).slice(0, 8); // Section 135: max 8 visible per section
+    return SearchRankingEngine.rank(raw, query).slice(0, 8);
   }, [query]);
 
   if (!isOpen) return null;
@@ -45,9 +47,9 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
       <div 
         className="relative border border-white/10 p-6 flex flex-col justify-between overflow-hidden"
         style={{
-          width: 760,
-          height: 640,
-          borderRadius: 28,
+          width: 700,
+          height: 600,
+          borderRadius: 20,
           background: "rgba(5, 7, 10, 0.97)",
           backdropFilter: "blur(30px)",
           boxShadow: "0 20px 80px rgba(0, 0, 0, 0.7)"
@@ -55,7 +57,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between pb-4 border-b border-white/5">
-            <span className="text-[12px] uppercase tracking-[0.18em] text-white/55 font-semibold">Command Centre</span>
+            <span className="text-[12px] uppercase tracking-[0.18em] text-white/55 font-semibold">Search Company Universe</span>
             <button 
               type="button" 
               onClick={onClose}
@@ -69,17 +71,17 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
             <input
               autoFocus
               type="text"
-              placeholder="Search Company, Ticker, Sector, or Theme..."
+              placeholder="Type ticker, company name, or sector..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-[52px] bg-black/40 border border-white/10 rounded-[18px] px-5 text-white/92 text-[15px] outline-none focus:border-green-400/40 transition"
+              className="w-full h-[48px] bg-black/40 border border-white/10 rounded-[14px] px-5 text-white text-[14px] outline-none focus:border-cyan-500/50 transition font-sans"
             />
           </div>
 
           <div className="mt-6 flex-1 overflow-y-auto pr-1 space-y-6">
             {searchResults.length > 0 ? (
               <div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold">Stocks</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold font-mono">Results</div>
                 <div className="space-y-2">
                   {searchResults.map((stock) => (
                     <button
@@ -90,20 +92,18 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
                         navigateToStock({ ticker: stock.ticker, mode: "push" });
                         onClose();
                       }}
-                      className="w-full h-[72px] rounded-[18px] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 px-4 flex items-center justify-between transition text-left"
+                      className="w-full h-[64px] rounded-[14px] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-cyan-500/25 px-4 flex items-center justify-between transition text-left cursor-pointer"
                     >
-                      <div className="min-w-0">
-                        <div className="text-[14px] font-semibold text-white/92 truncate">{stock.companyName}</div>
-                        <div className="text-[11px] uppercase tracking-[0.18em] text-white/45 mt-1">{stock.ticker} • {stock.exchange}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[14px] font-semibold text-white/92">₹{stock.price.toFixed(2)}</div>
-                        <div 
-                          className="text-[11px] font-medium mt-1"
-                          style={{ color: stock.dailyChangePct >= 0 ? "#00D17A" : "#FF5B6E" }}
-                        >
-                          {stock.dailyChangePct >= 0 ? "+" : ""}{stock.dailyChangePct.toFixed(2)}%
+                      <div className="min-w-0 flex-1 pr-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] font-mono font-bold text-white">{stock.ticker}</span>
+                          <span className="text-[11px] text-white/40 truncate">{stock.companyName}</span>
                         </div>
+                        <div className="text-[10px] text-white/50 mt-1 truncate">{stock.sector}</div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-[10px] uppercase text-white/40 tracking-wider font-mono">Quality Score</div>
+                        <div className="text-[13px] font-bold text-cyan-400 font-mono mt-0.5">{stock.healthScore || 80}</div>
                       </div>
                     </button>
                   ))}
@@ -111,15 +111,15 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
               </div>
             ) : query.trim().length >= 2 ? (
               <div className="text-center py-12">
-                <div className="text-[13px] text-white/45 uppercase tracking-[0.18em]">No matching opportunities found</div>
+                <div className="text-[12px] text-white/45 uppercase tracking-[0.18em] font-mono">No results found</div>
               </div>
             ) : (
               <div>
                 {recent.length > 0 && (
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold">Recent Searches</div>
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold font-mono">Recent Research</div>
                     <div className="flex flex-wrap gap-2">
-                      {recent.slice(0, 8).map((ticker) => (
+                      {recent.slice(0, 6).map((ticker) => (
                         <button
                           key={ticker}
                           type="button"
@@ -127,7 +127,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
                             navigateToStock({ ticker, mode: "push" });
                             onClose();
                           }}
-                          className="h-[34px] rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.08] hover:border-white/15 px-[14px] text-[11px] uppercase tracking-[0.18em] text-white/70 transition"
+                          className="h-[30px] rounded-full border border-white/10 bg-white/[0.02] hover:bg-white/[0.08] px-3.5 text-[10px] uppercase tracking-[0.12em] text-white/70 transition font-mono cursor-pointer"
                         >
                           {ticker}
                         </button>
@@ -137,13 +137,13 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
                 )}
 
                 <div className="mt-8">
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold">Quick Actions</div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/45 mb-3 font-semibold font-mono">Quick Actions</div>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { label: "Open Dashboard", path: "dashboard" },
-                      { label: "Open Assistant", path: "assistant" },
-                      { label: "Open Company Universe", path: "company" },
-                      { label: "Open Simulated lessons", path: "practice" }
+                      { label: "Home / Dashboard", path: "dashboard" },
+                      { label: "Market Discovery", path: "discovery" },
+                      { label: "Watchlist Manager", path: "watchlist" },
+                      { label: "Portfolio Analytics", path: "portfolio" }
                     ].map((act) => (
                       <button
                         key={act.label}
@@ -153,7 +153,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
                           window.dispatchEvent(new Event("popstate"));
                           onClose();
                         }}
-                        className="h-[46px] rounded-[14px] border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] text-[12px] text-white/75 hover:text-white/92 px-4 flex items-center justify-between transition text-left"
+                        className="h-[42px] rounded-[10px] border border-white/5 bg-white/[0.02] hover:bg-cyan-500/5 hover:border-cyan-500/20 text-[11px] text-white/75 hover:text-white px-4 flex items-center justify-between transition text-left cursor-pointer"
                       >
                         {act.label}
                       </button>

@@ -7,21 +7,45 @@ export interface ResearchNote {
 }
 
 export class NoteEngine {
-  private static notes: Record<string, ResearchNote> = {
-    RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday" },
-    HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago" },
-  };
+  private static getNotesMap(): Record<string, ResearchNote> {
+    if (typeof window === "undefined") {
+      return {
+        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday" },
+        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago" },
+      };
+    }
+    const raw = localStorage.getItem("stockstory_watchlist_notes_v1");
+    if (!raw) {
+      const initial = {
+        RELIANCE: { symbol: "RELIANCE", note: "Watch Q4 earnings. Monitor retail growth margins.", lastUpdated: "Yesterday" },
+        HAL: { symbol: "HAL", note: "Monitor defence budget allocations and export delivery speeds.", lastUpdated: "2 days ago" },
+      };
+      localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(initial));
+      return initial;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  }
 
   public static getNote(symbol: string): ResearchNote {
-    return this.notes[symbol.toUpperCase()] || { symbol, note: "", lastUpdated: "Never" };
+    const map = this.getNotesMap();
+    return map[symbol.toUpperCase()] || { symbol, note: "", lastUpdated: "Never" };
   }
 
   public static saveNote(symbol: string, note: string): void {
     const sym = symbol.toUpperCase();
-    this.notes[sym] = {
+    const map = this.getNotesMap();
+    map[sym] = {
       symbol: sym,
       note,
-      lastUpdated: "Just now",
+      lastUpdated: new Date().toLocaleDateString(),
     };
+    if (typeof window !== "undefined") {
+      localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(map));
+      window.dispatchEvent(new Event("watchlistchange"));
+    }
   }
 }
