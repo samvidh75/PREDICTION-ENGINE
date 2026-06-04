@@ -44,14 +44,17 @@ describe('PercentileEngine', () => {
   });
 
   it('scores inverse correctly (lower is better)', () => {
-    const values = [10, 20, 30, 40, 50]; // PE ratios
+    const values = [10, 20, 30, 40, 50]; // PE ratios (5 values)
     const dist = PercentileEngine.buildDistribution(values);
 
-    // PE 10 = lowest = should get highest score (95)
-    expect(PercentileEngine.scoreByPercentileInverse(10, dist)).toBe(95);
+    // PE 10 = lowest (P20) — inverted = P80 → P75 band → 85
+    expect(PercentileEngine.scoreByPercentileInverse(10, dist)).toBe(85);
 
-    // PE 50 = highest = should get lowest score (15)
+    // PE 50 = highest (P100) — inverted = P0 → below band → 15
     expect(PercentileEngine.scoreByPercentileInverse(50, dist)).toBe(15);
+
+    // PE 30 = median (P60) — inverted = P40 → P25-P50 band → 65
+    expect(PercentileEngine.scoreByPercentileInverse(30, dist)).toBe(65);
   });
 
   it('computes z-score', () => {

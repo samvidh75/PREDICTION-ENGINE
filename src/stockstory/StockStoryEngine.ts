@@ -34,6 +34,8 @@ import { evaluateGovernancePenalty } from './risk/GovernancePenalty';
 import { applyPenalties, type Penalty } from './scoring/PenaltyScorer';
 
 export class StockStoryEngine {
+  public riskDampeningCoefficient: number = 0.45;
+
   evaluate(inputs: EngineInputs): StockStoryOutput {
     // ── Run all engines ─────────────────────────────────────────────
     const growth = growthEngine.evaluate(inputs);
@@ -58,8 +60,13 @@ export class StockStoryEngine {
     );
 
     // ── Continuous risk dampening ───────────────────────────────────
-    const riskDampening = Math.max(0, (risk.score - 15) * 0.50);
-    const dampenedHealth = clampScore(preAdjustHealth - riskDampening);
+    const stretchCenter = 58;
+    const stretchFactor = 1.7;
+    const stretchedHealth = clampScore(
+      Math.round(stretchCenter + (preAdjustHealth - stretchCenter) * stretchFactor)
+    );
+    const riskDampening = Math.max(0, (risk.score - 15) * this.riskDampeningCoefficient);
+    const dampenedHealth = clampScore(stretchedHealth - riskDampening);
 
     // ── Apply Penalty Framework ─────────────────────────────────────
     const allPenalties: Penalty[] = [
@@ -134,7 +141,7 @@ export class StockStoryEngine {
     healthScore: number,
     riskScore: number
   ): CompanyClassification {
-    const riskAdjusted = healthScore - Math.max(0, (riskScore - 15) * 0.50);
+    const riskAdjusted = healthScore - Math.max(0, (riskScore - 15) * this.riskDampeningCoefficient);
 
     if (riskAdjusted >= 80) return 'Excellent';
     if (riskAdjusted >= 65) return 'Healthy';
