@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { ArrowRight, Flame, Trophy, Sparkles, TrendingUp, RefreshCw, Layers } from 'lucide-react';
+import { ArrowRight, Flame, Trophy, RefreshCw, Layers } from 'lucide-react';
 import { CompanyCard } from '../company/CompanyCard';
 import { StockRegistry } from '../../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
@@ -92,6 +92,21 @@ export const DashboardHub: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const isWatched = (ticker: string) => {
+    return watchlists.some(w => w.tickers.includes(ticker));
+  };
+
+  const handleToggleWatchlist = (ticker: string) => {
+    const defaultList = watchlists[0];
+    if (!defaultList) return;
+    if (isWatched(ticker)) {
+      WatchlistEngine.removeTicker(defaultList.id, ticker);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, ticker);
+    }
+    setWatchlists([...WatchlistEngine.getWatchlists()]);
+  };
+
   const followedTickers = useMemo(() => {
     const unique = new Set<string>();
     watchlists.forEach(w => {
@@ -111,8 +126,8 @@ export const DashboardHub: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
             {greeting}, Samvidh
           </h1>
-          <p className="text-xs text-gray-400">
-            Welcome back. Every screen answers: "What should I do next?" within 3 seconds.
+          <p className="text-xs text-gray-400 font-medium">
+            What deserves my attention?
           </p>
         </div>
       </section>
@@ -132,41 +147,18 @@ export const DashboardHub: React.FC = () => {
               ? Math.round(info.telemetrySnapshot.healthScore) 
               : 82;
             return (
-              <div 
+              <CompanyCard
                 key={op.ticker}
-                className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 hover:border-cyan-500/20 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-sm font-bold text-white">{info?.companyName || op.ticker}</h3>
-                      <span className="text-[10px] font-mono text-white/40 block mt-0.5">{op.ticker} · {info?.sector || "Conglomerate"}</span>
-                    </div>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded border border-cyan-400/20 text-cyan-400 bg-cyan-400/5 font-mono">
-                      Score: {score}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3 mt-4 text-xs">
-                    <div>
-                      <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What Changed</span>
-                      <p className="text-white/80 leading-relaxed mt-0.5">{op.whatChanged}</p>
-                    </div>
-                    <div>
-                      <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">Why It Matters</span>
-                      <p className="text-white/80 leading-relaxed mt-0.5">{op.whyMatters}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={() => handleCompanyClick(op.ticker)}
-                  className="w-full mt-5 py-2.5 bg-white/[0.02] hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/30 rounded-xl text-xs font-semibold text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>Open Analysis</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+                ticker={op.ticker}
+                name={info?.companyName || op.ticker}
+                sector={info?.sector || "Conglomerate"}
+                marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                score={score}
+                whyItMatters={op.whyMatters}
+                isWatched={isWatched(op.ticker)}
+                onOpenBriefing={() => handleCompanyClick(op.ticker)}
+                onToggleWatchlist={() => handleToggleWatchlist(op.ticker)}
+              />
             );
           })}
         </div>
@@ -194,8 +186,14 @@ export const DashboardHub: React.FC = () => {
           
           <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
             {followedTickers.length === 0 ? (
-              <div className="p-8 text-center text-xs text-white/30">
-                Your watchlist is empty. Add companies to your watchlist to track them here.
+              <div className="p-8 text-center text-xs text-white/30 space-y-3">
+                <p>Your watchlist is empty.</p>
+                <button
+                  onClick={() => handleNavigate("discovery")}
+                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
+                >
+                  Discover Stocks
+                </button>
               </div>
             ) : (
               <table className="w-full text-left text-xs border-collapse">
@@ -249,8 +247,14 @@ export const DashboardHub: React.FC = () => {
           
           <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
             {recentResearch.length === 0 ? (
-              <div className="p-8 text-center text-xs text-white/30">
-                No recently viewed companies yet. Select opportunities or search to start researching.
+              <div className="p-8 text-center text-xs text-white/30 space-y-3">
+                <p>No recently viewed companies yet.</p>
+                <button
+                  onClick={() => handleNavigate("discovery")}
+                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
+                >
+                  Discover Stocks
+                </button>
               </div>
             ) : (
               <table className="w-full text-left text-xs border-collapse">

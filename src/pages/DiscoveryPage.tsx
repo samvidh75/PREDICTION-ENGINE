@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { TrendingUp, Sparkles, Trophy, Flame, PlusCircle, Search, ArrowRight } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { TrendingUp, Sparkles, Trophy, Flame, PlusCircle, Search } from "lucide-react";
 
 import { CompanyCard } from "../components/company/CompanyCard";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 
 interface DiscoverCompany {
   symbol: string;
@@ -75,6 +76,15 @@ const CATEGORIES: DiscoverCategory[] = [
 
 export const DiscoveryPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
+
+  useEffect(() => {
+    const handleWatchlistChange = () => {
+      setWatchlists([...WatchlistEngine.getWatchlists()]);
+    };
+    window.addEventListener("watchlistchange", handleWatchlistChange);
+    return () => window.removeEventListener("watchlistchange", handleWatchlistChange);
+  }, []);
 
   const handleCompanyClick = (symbol: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -82,6 +92,21 @@ export const DiscoveryPage: React.FC = () => {
     params.set("id", symbol);
     window.history.pushState({}, "", `?${params.toString()}`);
     window.dispatchEvent(new Event("urlchange"));
+  };
+
+  const isWatched = (ticker: string) => {
+    return watchlists.some(w => w.tickers.includes(ticker));
+  };
+
+  const handleToggleWatchlist = (ticker: string) => {
+    const defaultList = watchlists[0];
+    if (!defaultList) return;
+    if (isWatched(ticker)) {
+      WatchlistEngine.removeTicker(defaultList.id, ticker);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, ticker);
+    }
+    setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
   const filteredCategories = CATEGORIES.map(category => {
@@ -103,8 +128,8 @@ export const DiscoveryPage: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Netflix for Research
           </h1>
-          <p className="mt-2 text-xs md:text-sm text-gray-400 max-w-2xl leading-relaxed">
-            Discover investment ideas effortlessly. Scroll horizontally through factor-filtered companies.
+          <p className="mt-2 text-xs md:text-sm text-gray-400 max-w-2xl leading-relaxed font-medium">
+            What should I research?
           </p>
         </div>
 
@@ -121,7 +146,7 @@ export const DiscoveryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Horizontal Netflix Rails */}
+      {/* Horizontal Netflix Reels */}
       <div className="space-y-10">
         {filteredCategories.map((category) => (
           <div key={category.title} className="space-y-4">
@@ -144,7 +169,9 @@ export const DiscoveryPage: React.FC = () => {
                         marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
                         score={c.score}
                         whyItMatters={c.oneLiner}
-                        onClick={() => handleCompanyClick(c.symbol)}
+                        isWatched={isWatched(c.symbol)}
+                        onOpenBriefing={() => handleCompanyClick(c.symbol)}
+                        onToggleWatchlist={() => handleToggleWatchlist(c.symbol)}
                       />
                     </div>
                   );

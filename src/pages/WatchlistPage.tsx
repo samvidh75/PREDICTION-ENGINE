@@ -5,7 +5,14 @@ import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 
-const WatchlistRow: React.FC<{ ticker: string; score: number; onClick: () => void }> = ({ ticker, score, onClick }) => {
+interface RowProps {
+  ticker: string;
+  score: number;
+  onClick: () => void;
+  onRemove: () => void;
+}
+
+const WatchlistRow: React.FC<RowProps> = ({ ticker, score, onClick, onRemove }) => {
   const [noteObj, setNoteObj] = useState(() => NoteEngine.getNote(ticker));
 
   const handleNoteChange = (val: string) => {
@@ -38,6 +45,22 @@ const WatchlistRow: React.FC<{ ticker: string; score: number; onClick: () => voi
           className="bg-white/5 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 w-full"
         />
       </td>
+      <td className="p-4 text-right">
+        <div className="flex items-center justify-end gap-3 shrink-0">
+          <button 
+            onClick={onClick}
+            className="text-[11px] text-cyan-400 hover:underline font-semibold bg-transparent border-none cursor-pointer"
+          >
+            Open Briefing
+          </button>
+          <button 
+            onClick={onRemove}
+            className="text-[11px] text-rose-400 hover:underline font-semibold bg-transparent border-none cursor-pointer"
+          >
+            Remove
+          </button>
+        </div>
+      </td>
     </tr>
   );
 };
@@ -55,6 +78,16 @@ export const WatchlistPage: React.FC = () => {
     return () => window.removeEventListener("watchlistchange", handleWatchlistChange);
   }, []);
 
+  const handleRemoveTicker = (ticker: string) => {
+    if (selectedList.startsWith("smart-")) return; // Cannot edit smart lists
+    WatchlistEngine.removeTicker(selectedList, ticker);
+    setWatchlists([...WatchlistEngine.getWatchlists()]);
+  };
+
+  const activeTickers = selectedList.startsWith("smart-")
+    ? smartWatchlists[parseInt(selectedList.split("-")[1]) || 0]?.tickers || []
+    : watchlists.find((w) => w.id === selectedList)?.tickers || [];
+
   return (
     <div className="w-full flex flex-col space-y-8 select-none bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
       {/* Page Header */}
@@ -66,6 +99,9 @@ export const WatchlistPage: React.FC = () => {
           <h2 className="text-3xl font-bold tracking-tight text-white">
             Watchlist Centre
           </h2>
+          <p className="text-xs text-white/40 mt-1">
+            What am I monitoring?
+          </p>
         </div>
       </div>
 
@@ -128,34 +164,45 @@ export const WatchlistPage: React.FC = () => {
         <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col space-y-4 lg:col-span-3">
           <span className="text-[10px] uppercase text-white/40 font-bold tracking-wider">Watchlist Stocks</span>
           <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-white/5 text-white/40 font-medium">
-                  <th className="p-4">Ticker</th>
-                  <th className="p-4">Score</th>
-                  <th className="p-4">Last Update</th>
-                  <th className="p-4">Why am I watching this?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(selectedList.startsWith("smart-")
-                  ? smartWatchlists[parseInt(selectedList.split("-")[1]) || 0]?.tickers || []
-                  : watchlists.find((w) => w.id === selectedList)?.tickers || []
-                ).map((ticker) => {
-                  const info = StockRegistry.getStock(ticker);
-                  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
+            {activeTickers.length === 0 ? (
+              <div className="p-8 text-center text-xs text-white/30 space-y-3">
+                <p>No watched stocks in this category.</p>
+                <button
+                  onClick={() => navigateToStock({ ticker: "RELIANCE", mode: "push" })}
+                  className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[11px] rounded-lg cursor-pointer"
+                >
+                  Browse Opportunity
+                </button>
+              </div>
+            ) : (
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5 text-white/40 font-medium">
+                    <th className="p-4">Ticker</th>
+                    <th className="p-4">Score</th>
+                    <th className="p-4">Last Update</th>
+                    <th className="p-4">Why am I watching this?</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeTickers.map((ticker) => {
+                    const info = StockRegistry.getStock(ticker);
+                    const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
 
-                  return (
-                    <WatchlistRow
-                      key={ticker}
-                      ticker={ticker}
-                      score={score}
-                      onClick={() => navigateToStock({ ticker, mode: "push" })}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
+                    return (
+                      <WatchlistRow
+                        key={ticker}
+                        ticker={ticker}
+                        score={score}
+                        onClick={() => navigateToStock({ ticker, mode: "push" })}
+                        onRemove={() => handleRemoveTicker(ticker)}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>

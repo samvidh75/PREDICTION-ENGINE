@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { StockRegistry } from "../services/stocks/StockRegistry";
-
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { Star } from "lucide-react";
+import { NoteEngine } from "../services/portfolio/NoteEngine";
+import { Star, ArrowRight, Download, FileText, ArrowLeft, Compass } from "lucide-react";
 
-type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks";
+type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | "documents";
 
 function profileFromUrl() {
   if (typeof window === "undefined") {
@@ -30,8 +30,17 @@ function profileFromUrl() {
 export const StockStoryPage: React.FC = () => {
   const stock = useMemo(() => profileFromUrl(), []);
   const info = useMemo(() => StockRegistry.getStock(stock.symbol), [stock.symbol]);
-  const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [activeTab, setActiveTab] = useState<TabKey>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab") as TabKey;
+      const valid: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents"];
+      if (valid.includes(tab)) return tab;
+    }
+    return "overview";
+  });
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
+  const [noteText, setNoteText] = useState(() => NoteEngine.getNote(stock.symbol).note);
 
   const isInWatchlist = useMemo(() => {
     return watchlists.some(w => w.tickers.includes(stock.symbol));
@@ -48,18 +57,63 @@ export const StockStoryPage: React.FC = () => {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
+  const handleSaveNote = (val: string) => {
+    setNoteText(val);
+    NoteEngine.saveNote(stock.symbol, val);
+  };
+
   const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 82;
   const currentPrice = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : "₹2,943.45";
 
+  // Related companies: maximum 5, same sector only
+  const relatedCompanies = useMemo(() => {
+    const all = StockRegistry.getAllStocks();
+    return all
+      .filter(s => s.symbol !== stock.symbol && s.sector === stock.sector)
+      .slice(0, 5);
+  }, [stock.symbol, stock.sector]);
+
+  const handleCompanyClick = (symbol: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock");
+    params.set("id", symbol);
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
+  const navigateTo = (pageKey: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", pageKey);
+    params.delete("id");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
   return (
-    <div className="w-full space-y-8 pb-16 text-white max-w-7xl mx-auto antialiased">
-      {/* HERO SECTION */}
-      <section className="border-b border-white/5 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+    <div className="w-full space-y-6 pb-16 text-white max-w-7xl mx-auto antialiased px-4">
+      {/* Back and Utility Routing Actions */}
+      <div className="flex justify-between items-center text-xs">
+        <button
+          onClick={() => navigateTo("dashboard")}
+          className="text-cyan-400 hover:text-cyan-300 font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer flex items-center gap-1.5 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Return to Dashboard
+        </button>
+        <button
+          onClick={() => navigateTo("discovery")}
+          className="text-white/60 hover:text-white font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer flex items-center gap-1.5 transition-colors"
+        >
+          <Compass className="w-3.5 h-3.5" /> Open In Discovery
+        </button>
+      </div>
+
+      {/* 1. HERO SECTION (ABOVE THE FOLD ONLY) */}
+      <section className="border-b border-white/5 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <span className="text-[10px] font-bold text-white/45 uppercase tracking-widest block mb-1">
+          <span className="text-[9px] font-bold text-white/45 uppercase tracking-widest block mb-1">
             {stock.symbol} · NSE
           </span>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">
             {stock.companyName}
           </h1>
           <div className="flex items-center gap-2.5 text-xs text-white/50">
@@ -67,38 +121,89 @@ export const StockStoryPage: React.FC = () => {
             <span>•</span>
             <span>Market Cap: {info?.marketCap.formatted || "₹50,000 Cr"}</span>
           </div>
-          <button
-            onClick={handleToggleWatchlist}
-            className={`mt-3 h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer ${
-              isInWatchlist 
-                ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30" 
-                : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <Star className={`w-3.5 h-3.5 ${isInWatchlist ? "fill-cyan-400" : ""}`} />
-            {isInWatchlist ? "Watching" : "Add to Watchlist"}
-          </button>
+          <div className="flex items-center gap-4 mt-3">
+            <button
+              onClick={handleToggleWatchlist}
+              className={`h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer ${
+                isInWatchlist 
+                  ? "bg-rose-500/10 text-rose-400 border-rose-500/30" 
+                  : "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
+              }`}
+            >
+              <Star className={`w-3.5 h-3.5 ${isInWatchlist ? "fill-rose-450" : ""}`} />
+              {isInWatchlist ? "Remove From Watchlist" : "Add To Watchlist"}
+            </button>
+          </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex gap-6 shrink-0">
           <div>
-            <span className="text-[9px] uppercase tracking-wider text-white/30 block mb-0.5">Current Price</span>
-            <span className="text-2xl font-mono font-bold text-white">{currentPrice}</span>
+            <span className="text-[9px] uppercase tracking-wider text-white/30 block">Current Price</span>
+            <span className="text-xl md:text-2xl font-mono font-bold text-white">{currentPrice}</span>
           </div>
           <div>
-            <span className="text-[9px] uppercase tracking-wider text-white/30 block mb-0.5">Quality Score</span>
-            <span className="text-2xl font-mono font-bold text-cyan-400">{score}/100</span>
+            <span className="text-[9px] uppercase tracking-wider text-white/30 block">Quality Score</span>
+            <span className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{score}/100</span>
           </div>
         </div>
       </section>
 
-      {/* TABS HEADER */}
-      <div className="border-b border-white/5 flex gap-4 overflow-x-auto">
-        {(["overview", "financials", "valuation", "ownership", "risks"] as TabKey[]).map((tab) => (
+      {/* 2. BRIEF OVERVIEW CARDS GRID */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What Happened</span>
+          <p className="text-xs text-white/80 leading-relaxed mt-1">
+            Operating margins consolidated in core business units. Revenue performance was sustained by stable customer demand.
+          </p>
+        </div>
+        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">Why It Matters</span>
+          <p className="text-xs text-white/80 leading-relaxed mt-1">
+            Cash flows from operations remain highly resilient, protecting structural business quality metrics.
+          </p>
+        </div>
+        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What to Watch</span>
+          <p className="text-xs text-white/80 leading-relaxed mt-1">
+            Observe the changes in sector export tariffs and pricing power margins over the next fiscal quarter.
+          </p>
+        </div>
+      </section>
+
+      {/* Research Notes Editor */}
+      <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl space-y-2">
+        <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider block font-mono">My Research Notes</span>
+        <textarea
+          value={noteText}
+          onChange={(e) => handleSaveNote(e.target.value)}
+          placeholder="Add note details regarding why you are monitoring this stock..."
+          className="w-full h-16 bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 resize-none font-sans"
+        />
+      </div>
+
+      {/* 3. THREE KEY METRICS */}
+      <section className="grid grid-cols-3 gap-4 border-t border-b border-white/5 py-4">
+        <div className="text-center">
+          <span className="text-[9px] text-white/40 uppercase block font-mono">Quality</span>
+          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Improving</span>
+        </div>
+        <div className="text-center">
+          <span className="text-[9px] text-white/40 uppercase block font-mono">Valuation</span>
+          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Fairly Valued</span>
+        </div>
+        <div className="text-center">
+          <span className="text-[9px] text-white/40 uppercase block font-mono">Growth</span>
+          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Stable Potential</span>
+        </div>
+      </section>
+
+      {/* 4. TABS HEADER */}
+      <div className="border-b border-white/5 flex gap-2 overflow-x-auto scrollbar-none">
+        {(["overview", "financials", "valuation", "ownership", "risks", "documents"] as TabKey[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`h-11 px-4 text-xs font-semibold uppercase tracking-wider transition-all border-b-2 bg-transparent cursor-pointer ${
+            className={`h-9 px-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 bg-transparent cursor-pointer shrink-0 ${
               activeTab === tab
                 ? "border-cyan-400 text-cyan-400"
                 : "border-transparent text-white/50 hover:text-white"
@@ -109,111 +214,87 @@ export const StockStoryPage: React.FC = () => {
         ))}
       </div>
 
-      {/* TAB CONTENT */}
-      <div className="min-h-[300px] bg-white/[0.01] border border-white/5 rounded-2xl p-6 md:p-8">
+      {/* 5. TAB CONTENT */}
+      <div className="min-h-[200px] bg-white/[0.01] border border-white/5 rounded-2xl p-6">
         {activeTab === "overview" && (
-          <div className="space-y-6 max-w-3xl">
+          <div className="space-y-4 max-w-3xl">
             <div>
-              <h3 className="text-xs uppercase tracking-wider text-white/30 font-semibold mb-2">What happened</h3>
-              <p className="text-sm text-white/80 leading-relaxed font-normal">
-                {stock.symbol} registered strong growth momentum led by steady execution in core business activities and a sustained recovery in margins. Customer retention rates remain robust while operating leverage begins to lift profitability indexes.
+              <h3 className="text-[10px] uppercase tracking-wider text-white/30 font-semibold font-mono mb-1">Company Description</h3>
+              <p className="text-xs text-white/80 leading-relaxed font-normal">
+                {stock.companyName} is a leading enterprise in the {stock.sector} sector, focusing on sustainable capital deployment and robust cash conversion models.
               </p>
             </div>
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-white/30 font-semibold mb-2">Why it matters</h3>
-              <p className="text-sm text-white/80 leading-relaxed font-normal">
-                Strong free cash flow and ROE metrics indicate high structural business quality. Pristine capital deployment continues to protect minority shareholder value against macroeconomic headwinds.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-xs uppercase tracking-wider text-white/30 font-semibold mb-2">What to watch</h3>
-              <p className="text-sm text-white/80 leading-relaxed font-normal">
-                Watch margin compression indices and pricing power durability over next quarter as raw material indexes fluctuate.
-              </p>
+            <div className="text-[10px] text-white/30 font-mono">
+              Should I spend more time here?
             </div>
           </div>
         )}
 
         {activeTab === "financials" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">Revenue Growth (TTM)</span>
-              <span className="text-lg font-mono font-bold text-white">+14.2%</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">Revenue Growth</span>
+              <span className="text-sm font-mono font-bold text-white">+14.2%</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">EBITDA Margin</span>
-              <span className="text-lg font-mono font-bold text-white">22.5%</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">EBITDA Margin</span>
+              <span className="text-sm font-mono font-bold text-white">22.5%</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">ROE (Return on Equity)</span>
-              <span className="text-lg font-mono font-bold text-white">18.6%</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">ROE</span>
+              <span className="text-sm font-mono font-bold text-white">18.6%</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">Debt to Equity</span>
-              <span className="text-lg font-mono font-bold text-white">0.32</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">Debt to Equity</span>
+              <span className="text-sm font-mono font-bold text-white">0.32</span>
             </div>
           </div>
         )}
 
         {activeTab === "valuation" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">P/E Ratio</span>
-              <span className="text-lg font-mono font-bold text-white">{info?.peRatio || "24.5"}</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">P/E Ratio</span>
+              <span className="text-sm font-mono font-bold text-white">{info?.peRatio || "24.5"}</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">EV / EBITDA</span>
-              <span className="text-lg font-mono font-bold text-white">14.8</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">EV / EBITDA</span>
+              <span className="text-sm font-mono font-bold text-white">14.8</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">P/B Ratio</span>
-              <span className="text-lg font-mono font-bold text-white">3.4</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">P/B Ratio</span>
+              <span className="text-sm font-mono font-bold text-white">3.4</span>
             </div>
-            <div className="bg-white/[0.01] border border-white/5 p-5 rounded-xl">
-              <span className="text-[10px] text-white/40 block mb-1">Historical Average PE</span>
-              <span className="text-lg font-mono font-bold text-white">22.0</span>
+            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
+              <span className="text-[9px] text-white/40 block mb-1">Historic PE Avg</span>
+              <span className="text-sm font-mono font-bold text-white">22.0</span>
             </div>
           </div>
         )}
 
         {activeTab === "ownership" && (
-          <div className="space-y-4 max-w-md">
+          <div className="space-y-3 max-w-md">
             <div className="flex justify-between items-center text-xs">
               <span className="text-white/60">Promoters</span>
               <span className="font-mono font-bold">50.4%</span>
             </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
               <div className="bg-cyan-400 h-full" style={{ width: "50.4%" }} />
             </div>
 
-            <div className="flex justify-between items-center text-xs pt-2">
-              <span className="text-white/60">FII (Foreign Institutional)</span>
-              <span className="font-mono font-bold">22.1%</span>
+            <div className="flex justify-between items-center text-xs pt-1">
+              <span className="text-white/60">Institutions (FII/DII)</span>
+              <span className="font-mono font-bold">36.9%</span>
             </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-              <div className="bg-cyan-400 h-full" style={{ width: "22.1%" }} />
-            </div>
-
-            <div className="flex justify-between items-center text-xs pt-2">
-              <span className="text-white/60">DII (Domestic Institutional)</span>
-              <span className="font-mono font-bold">14.8%</span>
-            </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-              <div className="bg-cyan-400 h-full" style={{ width: "14.8%" }} />
-            </div>
-
-            <div className="flex justify-between items-center text-xs pt-2">
-              <span className="text-white/60">Public & Others</span>
-              <span className="font-mono font-bold">12.7%</span>
-            </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-              <div className="bg-cyan-400 h-full" style={{ width: "12.7%" }} />
+            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-cyan-400 h-full" style={{ width: "36.9%" }} />
             </div>
           </div>
         )}
 
         {activeTab === "risks" && (
-          <div className="space-y-4 text-sm text-white/80 max-w-2xl">
+          <div className="space-y-3 text-xs text-white/80 max-w-2xl">
+            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Top 3 Risks Only</span>
             <p className="flex items-start gap-2.5">
               <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
               <span><strong>Input Margin Cost Pressures:</strong> Fluctuation in raw material cost index could impact EBITDA margins next quarter.</span>
@@ -222,9 +303,65 @@ export const StockStoryPage: React.FC = () => {
               <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
               <span><strong>Regulatory Compliance Headwinds:</strong> Any changes in sectoral policy framework could affect overall capacity execution limits.</span>
             </p>
+            <p className="flex items-start gap-2.5">
+              <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
+              <span><strong>Capital Deployment Timelines:</strong> Delay in new plant updates might impact short term revenue acceleration.</span>
+            </p>
+          </div>
+        )}
+
+        {activeTab === "documents" && (
+          <div className="space-y-3 max-w-md">
+            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Corporate Filings & Disclosures</span>
+            {[
+              { label: "Annual Report FY25", filename: "annual_report_fy25.pdf" },
+              { label: "Investor Presentation Q3 FY26", filename: "investor_presentation_q3.pdf" },
+              { label: "Quarterly Results Statement", filename: "quarterly_earnings_results.pdf" }
+            ].map(doc => (
+              <div key={doc.label} className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/5 transition-all">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-cyan-400" />
+                  <span className="text-xs text-white/80 font-medium">{doc.label}</span>
+                </div>
+                <button className="p-1.5 bg-white/5 border border-white/5 hover:border-cyan-400/30 rounded-lg text-cyan-400 hover:text-cyan-300 cursor-pointer">
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>
+
+      {/* 6. RELATED COMPANIES / SIMILAR COMPANIES (SAME SECTOR ONLY, MAX 5) */}
+      {relatedCompanies.length > 0 && (
+        <section className="space-y-3 border-t border-white/5 pt-6">
+          <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider block font-mono">
+            View Similar Companies ({stock.sector})
+          </span>
+          <div className="flex flex-wrap gap-3">
+            {relatedCompanies.map(c => {
+              const info = StockRegistry.getStock(c.symbol);
+              const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
+              return (
+                <button
+                  key={c.symbol}
+                  onClick={() => handleCompanyClick(c.symbol)}
+                  className="flex items-center justify-between gap-4 px-4 py-2.5 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-cyan-500/20 transition-all cursor-pointer"
+                >
+                  <div className="text-left">
+                    <span className="text-xs font-mono font-bold text-white block">{c.symbol}</span>
+                    <span className="text-[10px] text-white/40 block truncate max-w-[120px]">{c.companyName}</span>
+                  </div>
+                  <div className="text-right border-l border-white/5 pl-3">
+                    <span className="text-[9px] text-white/45 block font-mono">Score</span>
+                    <span className="text-xs font-bold text-cyan-400 font-mono">{score}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

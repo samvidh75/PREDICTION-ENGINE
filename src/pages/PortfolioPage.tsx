@@ -4,6 +4,7 @@ import { PortfolioEngine, UserHolding } from "../services/portfolio/PortfolioEng
 import { Plus, Upload, Trash2, Edit2, X, AlertCircle, ArrowUpRight, ArrowDownRight, ShieldAlert } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import { formatINR, useLiveQuotes } from "../hooks/useLiveQuotes";
 
 export const PortfolioPage: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
@@ -20,6 +21,7 @@ export const PortfolioPage: React.FC = () => {
   const [sector, setSector] = useState("IT");
   const [csvText, setCsvText] = useState("");
   const [importError, setImportError] = useState("");
+  const liveQuotes = useLiveQuotes(snapshot.holdings.map((holding) => holding.symbol));
 
   const refreshSnapshot = useCallback(() => {
     setSnapshot(PortfolioSnapshotFactory.createSnapshot());
@@ -100,11 +102,12 @@ export const PortfolioPage: React.FC = () => {
   const calculatedHoldings = useMemo(() => {
     return snapshot.holdings.map(h => {
       const info = StockRegistry.getStock(h.symbol);
-      const currentPrice = info?.fiftyTwoWeekRange.current || h.avgBuyPrice;
-      const totalValue = h.shares * currentPrice;
+      const quoteState = liveQuotes[h.symbol];
+      const currentPrice = quoteState?.quote?.price ?? null;
+      const totalValue = currentPrice === null ? null : h.shares * currentPrice;
       const costBasis = h.shares * h.avgBuyPrice;
-      const gainLossVal = totalValue - costBasis;
-      const gainLossPct = costBasis > 0 ? (gainLossVal / costBasis) * 100 : 0;
+      const gainLossVal = totalValue === null ? null : totalValue - costBasis;
+      const gainLossPct = gainLossVal === null || costBasis <= 0 ? null : (gainLossVal / costBasis) * 100;
       return {
         ...h,
         companyName: info?.companyName || h.symbol,
@@ -115,27 +118,29 @@ export const PortfolioPage: React.FC = () => {
         sector: info?.sector || h.sector || "Other"
       };
     });
-  }, [snapshot.holdings]);
+  }, [liveQuotes, snapshot.holdings]);
 
   const totalPortfolioValue = useMemo(() => {
-    return calculatedHoldings.reduce((sum, h) => sum + h.totalValue, 0);
+    return calculatedHoldings.reduce((sum, h) => sum + (h.totalValue ?? 0), 0);
   }, [calculatedHoldings]);
 
   const bestPerformer = useMemo(() => {
     if (calculatedHoldings.length === 0) return null;
-    return [...calculatedHoldings].sort((a, b) => b.gainLossPct - a.gainLossPct)[0];
+    const priced = calculatedHoldings.filter((h) => h.gainLossPct !== null);
+    return priced.length ? [...priced].sort((a, b) => (b.gainLossPct ?? 0) - (a.gainLossPct ?? 0))[0] : null;
   }, [calculatedHoldings]);
 
   const worstPerformer = useMemo(() => {
     if (calculatedHoldings.length === 0) return null;
-    return [...calculatedHoldings].sort((a, b) => a.gainLossPct - b.gainLossPct)[0];
+    const priced = calculatedHoldings.filter((h) => h.gainLossPct !== null);
+    return priced.length ? [...priced].sort((a, b) => (a.gainLossPct ?? 0) - (b.gainLossPct ?? 0))[0] : null;
   }, [calculatedHoldings]);
 
   const riskConcentration = useMemo(() => {
     if (calculatedHoldings.length === 0) return { sector: "None", pct: 0 };
     const sectorValues: Record<string, number> = {};
     calculatedHoldings.forEach(h => {
-      sectorValues[h.sector] = (sectorValues[h.sector] || 0) + h.totalValue;
+      sectorValues[h.sector] = (sectorValues[h.sector] || 0) + (h.totalValue ?? 0);
     });
     let maxSector = "Other";
     let maxValue = 0;
@@ -161,7 +166,7 @@ export const PortfolioPage: React.FC = () => {
             Portfolio Centre
           </h2>
           <p className="text-xs text-white/40 mt-1">
-            Real-time exposure auditing. Total Value: ₹{totalPortfolioValue.toLocaleString("en-IN")}
+            Live exposure auditing. Total Value: {totalPortfolioValue > 0 ? formatINR(totalPortfolioValue) : "Live quotes unavailable"}
           </p>
         </div>
 
@@ -193,7 +198,7 @@ export const PortfolioPage: React.FC = () => {
             {bestPerformer ? (
               <div className="mt-0.5">
                 <span className="text-sm font-bold text-white block">{bestPerformer.symbol}</span>
-                <span className="text-xs font-mono font-bold text-emerald-400">+{bestPerformer.gainLossPct.toFixed(1)}% Return</span>
+                <span className="text-xs font-mono font-bold text-emerald-400">+{(bestPerformer.gainLossPct ?? 0).toFixed(1)}% Return</span>
               </div>
             ) : (
               <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
@@ -211,7 +216,7 @@ export const PortfolioPage: React.FC = () => {
             {worstPerformer ? (
               <div className="mt-0.5">
                 <span className="text-sm font-bold text-white block">{worstPerformer.symbol}</span>
-                <span className="text-xs font-mono font-bold text-rose-400">{worstPerformer.gainLossPct.toFixed(1)}% Return</span>
+                <span className="text-xs font-mono font-bold text-rose-400">{(worstPerformer.gainLossPct ?? 0).toFixed(1)}% Return</span>
               </div>
             ) : (
               <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
@@ -254,7 +259,7 @@ export const PortfolioPage: React.FC = () => {
             </thead>
             <tbody>
               {calculatedHoldings.map((h) => {
-                const allocationPct = totalPortfolioValue > 0 
+                const allocationPct = totalPortfolioValue > 0 && h.totalValue !== null
                   ? ((h.totalValue / totalPortfolioValue) * 100).toFixed(1)
                   : "0.0";
 
@@ -272,9 +277,9 @@ export const PortfolioPage: React.FC = () => {
                       </button>
                     </td>
                     <td className="p-4 text-white/70 font-mono">{allocationPct}%</td>
-                    <td className="p-4 text-white/80 font-mono">₹{h.totalValue.toLocaleString("en-IN")}</td>
-                    <td className={`p-4 font-mono font-bold ${h.gainLossPct >= 0 ? "text-emerald-400" : "text-rose-450"}`}>
-                      {h.gainLossPct >= 0 ? "+" : ""}{h.gainLossPct.toFixed(1)}%
+                    <td className="p-4 text-white/80 font-mono">{h.totalValue !== null ? formatINR(h.totalValue) : "Live quote unavailable"}</td>
+                    <td className={`p-4 font-mono font-bold ${h.gainLossPct !== null && h.gainLossPct >= 0 ? "text-emerald-400" : "text-rose-450"}`}>
+                      {h.gainLossPct !== null ? `${h.gainLossPct >= 0 ? "+" : ""}${h.gainLossPct.toFixed(1)}%` : "Unavailable"}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
