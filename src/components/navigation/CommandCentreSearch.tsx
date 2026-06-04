@@ -62,22 +62,22 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-black/75 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
-      <div className="w-full max-w-[720px] bg-[#020304] border border-white/5 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
-        <div className="flex items-center gap-4 px-5 h-[64px] bg-white/[0.01] border-b border-white/5">
-          <Search className="w-5 h-5 text-white/45" />
+    <div className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
+      <div className="w-full max-w-[640px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
+        <div className="flex items-center gap-3.5 px-4 h-[52px] bg-white/[0.02] border-b border-white/10">
+          <Search className="w-4 h-4 text-white/60" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(event) => handleSearch(event.target.value)}
-            placeholder="Search company, ticker, or sector..."
-            className="flex-1 bg-transparent text-white border-none outline-none text-[18px] placeholder-white/30 font-medium"
+            placeholder="Search Indian companies, tickers, or sectors..."
+            className="flex-1 bg-transparent text-white border-none outline-none text-[14px] placeholder-white/55 font-medium"
           />
           <button
             type="button"
             onClick={onClose}
-            className="p-2 hover:bg-white/5 rounded-full text-white/45 hover:text-white transition"
+            className="p-1.5 hover:bg-white/5 rounded-full text-white/50 hover:text-white transition"
             aria-label="Close search"
           >
             <X className="w-4 h-4" />

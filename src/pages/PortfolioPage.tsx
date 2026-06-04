@@ -11,6 +11,7 @@ import { PortfolioCoach } from "../services/portfolio/PortfolioCoach";
 import { getPortfolioIntelligence } from "../services/intelligence/clientIntelligenceProvider";
 import { PortfolioEngine, UserHolding } from "../services/portfolio/PortfolioEngine";
 import { Plus, Upload, Trash2, Edit2, X, AlertCircle } from "lucide-react";
+import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 
 export const PortfolioPage: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
@@ -272,10 +273,14 @@ export const PortfolioPage: React.FC = () => {
             <div className="flex flex-col space-y-2 max-h-[400px] overflow-y-auto pr-1">
               {snapshot.holdings.map((h) => (
                 <div key={h.symbol} className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between group hover:border-white/10 transition-all">
-                  <div>
+                  <button
+                    type="button"
+                    onClick={() => navigateToStock({ ticker: h.symbol, mode: "push" })}
+                    className="min-w-0 bg-transparent border-0 p-0 text-left cursor-pointer"
+                  >
                     <span className="text-sm font-bold text-white font-mono">{h.symbol}</span>
                     <span className="text-[10px] text-gray-400 block font-mono">{h.shares} Shares @ ₹{h.avgBuyPrice} // {h.sector}</span>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white font-mono mr-2">₹{(h.shares * h.avgBuyPrice).toLocaleString("en-IN")}</span>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -147,7 +147,7 @@ export function navigateToStock(opts?: {
   const searchOverlay = opts?.openSearchQ !== undefined ? { q: opts.openSearchQ } : undefined;
 
   navigate({
-    page: "company",
+    page: "stock",
     ticker: opts?.ticker,
     exchange: opts?.exchange,
     searchOverlay,
