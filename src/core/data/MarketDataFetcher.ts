@@ -6,7 +6,6 @@
 
 import { ICompanyTelemetry, MarketDataResponse } from '../../types/market';
 import { fetchFromAlphaVantage, fetchMultipleFromAlphaVantage } from './AlphaVantageFetcher';
-import { fetchMockCompanyData, fetchMultipleMockData } from './MockDataFetcher';
 import { MarketConfig } from '../MarketConfig';
 
 /**
@@ -59,15 +58,6 @@ export const fetchMarketTelemetry = async (
       }
     }
 
-    // Fallback to mock data if primary sources fail
-    if (MarketConfig.enableMockData) {
-      result = fetchMockCompanyData(symbol);
-      if (result.success && result.data) {
-        telemetryCache.set(symbol, { data: result.data, timestamp: Date.now() });
-        return result;
-      }
-    }
-
     return {
       success: false,
       data: null,
@@ -75,12 +65,6 @@ export const fetchMarketTelemetry = async (
     };
   } catch (error) {
     console.error(`Error fetching telemetry for ${symbol}:`, error);
-
-    // Try mock data as last resort
-    const mockResult = fetchMockCompanyData(symbol);
-    if (mockResult.success) {
-      return mockResult;
-    }
 
     return {
       success: false,
@@ -130,17 +114,6 @@ export const fetchMultipleTelemetry = async (
         }
       }
 
-      // For any symbols still not fetched, try mock data
-      const stillMissing = uncachedSymbols.filter((s) => !results.has(s));
-      if (stillMissing.length > 0 && MarketConfig.enableMockData) {
-        const mockResults = fetchMultipleMockData(stillMissing);
-        for (const [symbol, response] of mockResults) {
-          if (response.success && response.data) {
-            telemetryCache.set(symbol, { data: response.data, timestamp: now });
-          }
-          results.set(symbol, response);
-        }
-      }
     }
 
     return results;

@@ -116,15 +116,15 @@ export const DashboardHub: React.FC = () => {
               const info = StockRegistry.getStock(op.ticker);
               const score = info?.telemetrySnapshot?.healthScore 
                 ? Math.round(info.telemetrySnapshot.healthScore) 
-                : 82;
+                : null;
               return (
                 <CompanyCard
                   key={op.ticker}
                   ticker={op.ticker}
                   name={info?.companyName || op.ticker}
-                  sector={info?.sector || "Conglomerate"}
-                  marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
-                  score={score}
+                  sector={info?.sector || "Data unavailable"}
+                  marketCap={info?.marketCap.formatted || "Data unavailable"}
+                  score={score !== null ? score : "N/A"}
                   whyItMatters={op.whyMatters}
                   isWatched={isWatched(op.ticker)}
                   onOpenBriefing={() => handleCompanyClick(op.ticker)}
@@ -169,7 +169,7 @@ export const DashboardHub: React.FC = () => {
                 const info = StockRegistry.getStock(ticker);
                 const score = info?.telemetrySnapshot?.healthScore 
                   ? Math.round(info.telemetrySnapshot.healthScore) 
-                  : 80;
+                  : null;
                 return (
                   <tr 
                     key={ticker}
@@ -177,10 +177,10 @@ export const DashboardHub: React.FC = () => {
                     className="hover:bg-white/[0.02] cursor-pointer transition-colors"
                   >
                     <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                    <td className="p-4 text-white/70 max-w-[180px] truncate">{info?.companyName || `${ticker} India`}</td>
+                    <td className="p-4 text-white/70 max-w-[180px] truncate">{info?.companyName || "Data unavailable"}</td>
                     <td className="p-4">
                       <span className="px-2 py-0.5 rounded border border-white/10 text-white/80 font-mono text-[10px]">
-                        {score} / 100
+                        {score !== null ? `${score} / 100` : "N/A"}
                       </span>
                     </td>
                     <td className="p-4 text-right">
@@ -220,7 +220,7 @@ export const DashboardHub: React.FC = () => {
                     className="hover:bg-white/[0.02] cursor-pointer transition-colors"
                   >
                     <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                    <td className="p-4 text-white/60">{info?.sector || "Conglomerate"}</td>
+                    <td className="p-4 text-white/60">{info?.sector || "Data unavailable"}</td>
                     <td className="p-4 text-right">
                       <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Resume Analysis</span>
                     </td>

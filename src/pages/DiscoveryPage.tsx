@@ -47,10 +47,10 @@ export const DiscoveryPage: React.FC = () => {
             symbol: item.symbol,
             name: stock?.companyName || item.symbol,
             score: Math.round(item.score || 0),
-            price: item.price || 'Unavailable',
-            change: item.change || 'Unavailable',
+            price: item.price || null,
+            change: item.change || null,
             isPositive: item.change?.startsWith('+') || false,
-            oneLiner: item.oneLiner || 'Analysis data currently unavailable.'
+            oneLiner: item.oneLiner || 'Data unavailable'
           };
         });
         setCategories([
@@ -138,8 +138,8 @@ export const DiscoveryPage: React.FC = () => {
                       <CompanyCard
                         ticker={c.symbol}
                         name={c.name}
-                        sector={info?.sector || "Unavailable"}
-                        marketCap={info?.marketCap?.formatted || "Unavailable"}
+                        sector={info?.sector || "Data unavailable"}
+                        marketCap={info?.marketCap?.formatted || "Data unavailable"}
                         score={c.score}
                         whyItMatters={c.oneLiner}
                         isWatched={isWatched(c.symbol)}

@@ -56,7 +56,7 @@ export function formatPE(value: number): string {
 
 export function formatDebtRatio(value: number): string {
   if (!Number.isFinite(value)) return "—";
-  return `$x(value * 100).toFixed(1)}%`;
+  return `${(value * 100).toFixed(1)}%`;
 }
 
 export function hashStringToSeed(input: string): number {
@@ -68,7 +68,7 @@ export function hashStringToSeed(input: string): number {
   return h >>> 0;
 }
 
-export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number: industryPe: number; fiveYearPeAvg: number } {
+export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number; industryPe: number; fiveYearPeAvg: number } {
   return {
     marketCap: 0,
     pe: NaN,

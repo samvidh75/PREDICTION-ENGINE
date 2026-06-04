@@ -12,7 +12,7 @@ import { AnalyticsCoordinator } from "../services/diagnostics/AnalyticsCoordinat
 export const CompanySuperpage: React.FC = () => {
   // Extract symbol from URL parameters safely
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const symbol = (params?.get("id") || "INFY").toUpperCase();
+  const symbol = (params?.get("id") || "").toUpperCase();
 
   // Fetch raw performance metrics
   const { data, loading, error } = useCompanyData(symbol);
@@ -46,7 +46,7 @@ export const CompanySuperpage: React.FC = () => {
     const startTime = Date.now();
     return () => {
       const duration_ms = Date.now() - startTime;
-      const uid = getFirebaseAuthClient().auth.currentUser?.uid || "anonymous";
+      const uid = getFirebaseAuthClient().auth.currentUser?.uid || null;
       AnalyticsCoordinator.trackEvent("company_page_viewed", JSON.stringify({
         uid,
         symbol,
@@ -139,7 +139,7 @@ export const CompanySuperpage: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-white/5">
           <div>
             <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest block mb-1">
-              NSE: {data.symbol} // {intel?.sectorOutlook?.sector || "Technology Sector"}
+              NSE: {data.symbol} // {intel?.sectorOutlook?.sector || "Data unavailable"}
             </span>
             <h1 className="text-3xl font-bold tracking-tight text-white">{data.symbol} Corp.</h1>
           </div>
@@ -173,15 +173,15 @@ export const CompanySuperpage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs leading-relaxed text-gray-300">
           <div>
             <span className="text-white font-bold block mb-1">What happened?</span>
-            <p>{intel?.insight?.title || "No event metrics recorded for this period."}</p>
+            <p>{intel?.insight?.title || "Data unavailable"}</p>
           </div>
           <div>
             <span className="text-white font-bold block mb-1">Why it matters?</span>
-            <p>{intel?.insight?.summary || "No active structural explanations available."}</p>
+            <p>{intel?.insight?.summary || "Data unavailable"}</p>
           </div>
           <div>
             <span className="text-white font-bold block mb-1">What should investors watch?</span>
-            <p>{intel?.companyOutlook?.overallSummary || "No critical watch parameters identified."}</p>
+            <p>{intel?.companyOutlook?.overallSummary || "Data unavailable"}</p>
           </div>
         </div>
       </section>
@@ -197,7 +197,7 @@ export const CompanySuperpage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm leading-relaxed">
           <div className="space-y-4 text-gray-300">
             <p>
-              {intel?.narrative?.narrative250 || "Detailed narrative outlook is currently offline."}
+              {intel?.narrative?.narrative250 || "Data unavailable"}
             </p>
           </div>
           <div className="space-y-3">
@@ -222,10 +222,10 @@ export const CompanySuperpage: React.FC = () => {
             Business Quality
           </span>
           <div className="text-5xl font-mono font-bold text-white">
-            {dna?.businessQuality.score || "80"}%
+            {dna?.businessQuality.score || "N/A"}%
           </div>
           <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-3 py-1 rounded-full">
-            {dna?.businessQuality.status || "Strong"}
+            {dna?.businessQuality.status || "Data unavailable"}
           </span>
         </div>
         <div className="md:col-span-2 text-xs leading-relaxed text-gray-300 space-y-2">

@@ -8,10 +8,10 @@ type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | 
 
 function profileFromUrl() {
   if (typeof window === "undefined") {
-    return { companyName: "Reliance Industries", symbol: "RELIANCE", sector: "Energy & Retail" };
+    return { companyName: "Data unavailable", symbol: "N/A", sector: "Data unavailable" };
   }
   const params = new URLSearchParams(window.location.search);
-  const rawTicker = (params.get("id") ?? params.get("ticker") ?? "RELIANCE").toUpperCase().trim();
+  const rawTicker = (params.get("id") ?? params.get("ticker") ?? "").toUpperCase().trim();
   const stock = StockRegistry.getStock(rawTicker);
   if (stock) {
     return {
@@ -21,9 +21,9 @@ function profileFromUrl() {
     };
   }
   return {
-    companyName: `${rawTicker} India Ltd`,
-    symbol: rawTicker,
-    sector: "Conglomerate & Diversified",
+    companyName: "Data unavailable",
+    symbol: rawTicker || "N/A",
+    sector: "Data unavailable",
   };
 }
 
@@ -62,8 +62,8 @@ export const StockStoryPage: React.FC = () => {
     NoteEngine.saveNote(stock.symbol, val);
   };
 
-  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 82;
-  const currentPrice = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : "₹2,943.45";
+  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
+  const currentPrice = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : null;
 
   // Related companies: maximum 5, same sector only
   const relatedCompanies = useMemo(() => {
@@ -119,7 +119,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="flex items-center gap-2.5 text-xs text-white/50">
             <span>{stock.sector}</span>
             <span>•</span>
-            <span>Market Cap: {info?.marketCap.formatted || "₹50,000 Cr"}</span>
+            <span>Market Cap: {info?.marketCap.formatted || "Data unavailable"}</span>
           </div>
           <div className="flex items-center gap-4 mt-3">
             <button
@@ -139,11 +139,11 @@ export const StockStoryPage: React.FC = () => {
         <div className="flex gap-6 shrink-0">
           <div>
             <span className="text-[9px] uppercase tracking-wider text-white/30 block">Current Price</span>
-            <span className="text-xl md:text-2xl font-mono font-bold text-white">{currentPrice}</span>
+            <span className="text-xl md:text-2xl font-mono font-bold text-white">{currentPrice || "Data unavailable"}</span>
           </div>
           <div>
             <span className="text-[9px] uppercase tracking-wider text-white/30 block">Quality Score</span>
-            <span className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{score}/100</span>
+            <span className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{score !== null ? `${score}/100` : "Data unavailable"}</span>
           </div>
         </div>
       </section>
@@ -153,19 +153,19 @@ export const StockStoryPage: React.FC = () => {
         <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
           <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What Happened</span>
           <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Operating margins consolidated in core business units. Revenue performance was sustained by stable customer demand.
+            Data unavailable. Please check back later.
           </p>
         </div>
         <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
           <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">Why It Matters</span>
           <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Cash flows from operations remain highly resilient, protecting structural business quality metrics.
+            Data unavailable. Please check back later.
           </p>
         </div>
         <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
           <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What to Watch</span>
           <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Observe the changes in sector export tariffs and pricing power margins over the next fiscal quarter.
+            Data unavailable. Please check back later.
           </p>
         </div>
       </section>
@@ -185,15 +185,15 @@ export const StockStoryPage: React.FC = () => {
       <section className="grid grid-cols-3 gap-4 border-t border-b border-white/5 py-4">
         <div className="text-center">
           <span className="text-[9px] text-white/40 uppercase block font-mono">Quality</span>
-          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Improving</span>
+          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
         </div>
         <div className="text-center">
           <span className="text-[9px] text-white/40 uppercase block font-mono">Valuation</span>
-          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Fairly Valued</span>
+          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
         </div>
         <div className="text-center">
           <span className="text-[9px] text-white/40 uppercase block font-mono">Growth</span>
-          <span className="text-xs md:text-sm font-bold text-cyan-400 font-mono mt-0.5 block">Stable Potential</span>
+          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
         </div>
       </section>
 
@@ -234,19 +234,19 @@ export const StockStoryPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">Revenue Growth</span>
-              <span className="text-sm font-mono font-bold text-white">+14.2%</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">EBITDA Margin</span>
-              <span className="text-sm font-mono font-bold text-white">22.5%</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">ROE</span>
-              <span className="text-sm font-mono font-bold text-white">18.6%</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">Debt to Equity</span>
-              <span className="text-sm font-mono font-bold text-white">0.32</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
           </div>
         )}
@@ -255,65 +255,40 @@ export const StockStoryPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">P/E Ratio</span>
-              <span className="text-sm font-mono font-bold text-white">{info?.peRatio || "24.5"}</span>
+              <span className="text-sm font-mono font-bold text-white">{info?.peRatio || "Data unavailable"}</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">EV / EBITDA</span>
-              <span className="text-sm font-mono font-bold text-white">14.8</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">P/B Ratio</span>
-              <span className="text-sm font-mono font-bold text-white">3.4</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
               <span className="text-[9px] text-white/40 block mb-1">Historic PE Avg</span>
-              <span className="text-sm font-mono font-bold text-white">22.0</span>
+              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
             </div>
           </div>
         )}
 
         {activeTab === "ownership" && (
           <div className="space-y-3 max-w-md">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-white/60">Promoters</span>
-              <span className="font-mono font-bold">50.4%</span>
-            </div>
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-cyan-400 h-full" style={{ width: "50.4%" }} />
-            </div>
-
-            <div className="flex justify-between items-center text-xs pt-1">
-              <span className="text-white/60">Institutions (FII/DII)</span>
-              <span className="font-mono font-bold">36.9%</span>
-            </div>
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-cyan-400 h-full" style={{ width: "36.9%" }} />
-            </div>
+            <div className="text-xs text-white/40">Ownership data unavailable. Please check back later.</div>
           </div>
         )}
 
         {activeTab === "risks" && (
           <div className="space-y-3 text-xs text-white/80 max-w-2xl">
-            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Top 3 Risks Only</span>
-            <p className="flex items-start gap-2.5">
-              <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
-              <span><strong>Input Margin Cost Pressures:</strong> Fluctuation in raw material cost index could impact EBITDA margins next quarter.</span>
-            </p>
-            <p className="flex items-start gap-2.5">
-              <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
-              <span><strong>Regulatory Compliance Headwinds:</strong> Any changes in sectoral policy framework could affect overall capacity execution limits.</span>
-            </p>
-            <p className="flex items-start gap-2.5">
-              <span className="text-rose-400 shrink-0 font-bold">⚠️</span>
-              <span><strong>Capital Deployment Timelines:</strong> Delay in new plant updates might impact short term revenue acceleration.</span>
-            </p>
+            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Risk Analysis</span>
+            <p className="text-white/40">Risk data unavailable. Please check back later.</p>
           </div>
         )}
 
         {activeTab === "documents" && (
           <div className="space-y-3 max-w-md">
             <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Corporate Filings & Disclosures</span>
-            <div className="text-xs text-white/30">Documents currently unavailable.</div>
+            <div className="text-xs text-white/30">Documents data unavailable. Please check back later.</div>
           </div>
         )}
       </div>
@@ -327,7 +302,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="flex flex-wrap gap-3">
             {relatedCompanies.map(c => {
               const info = StockRegistry.getStock(c.symbol);
-              const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
+              const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
               return (
                 <button
                   key={c.symbol}
@@ -340,7 +315,7 @@ export const StockStoryPage: React.FC = () => {
                   </div>
                   <div className="text-right border-l border-white/5 pl-3">
                     <span className="text-[9px] text-white/45 block font-mono">Score</span>
-                    <span className="text-xs font-bold text-cyan-400 font-mono">{score}</span>
+                    <span className="text-xs font-bold text-cyan-400 font-mono">{score !== null ? score : "N/A"}</span>
                   </div>
                 </button>
               );
