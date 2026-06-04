@@ -62,7 +62,7 @@ export const AlertCentrePage: React.FC = () => {
   const categories: AlertCategory[] = ['Factor', 'Risk', 'Momentum', 'News', 'Market'];
 
   return (
-    <div className="w-full flex flex-col space-y-8 pb-12 bg-[#020304] text-white min-h-screen font-sans max-w-3xl mx-auto antialiased">
+    <div className="w-full flex flex-col space-y-8 pb-12 text-white min-h-screen font-sans max-w-3xl mx-auto antialiased">
       <PageHeader
         title="Alerts"
         subtitle="What changed?"

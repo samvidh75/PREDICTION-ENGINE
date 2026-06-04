@@ -65,7 +65,7 @@ export const DiscoveryPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-10 pb-12 bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
+    <div className="w-full flex flex-col space-y-10 pb-12 text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
       <PageHeader title="Discovery" subtitle="What should I research?" />
 
       {loading ? (

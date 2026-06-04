@@ -9,7 +9,6 @@ import MarketStories from "./views/MarketStories";
 import AnalysisHub from "./views/AnalysisHub";
 import DiscoveryEntityPage from "./pages/DiscoveryEntityPage";
 import MarketIntelligenceDashboard from "./pages/MarketIntelligenceDashboard";
-import CompanyUniversePage from "./pages/CompanyUniversePage";
 import PublicLandingPage from "./pages/PublicLandingPage";
 import PublicAboutPage from "./pages/PublicAboutPage";
 import LoginPage from "./pages/LoginPage";
@@ -295,7 +294,8 @@ function AppContent(): JSX.Element {
         {activePageKey === "discovery" && <DiscoveryPage />}
         {activePageKey === "settings" && <SettingsPage />}
         {activePageKey === "dashboard" && <DashboardHub />}
-        {activePageKey === "company" && <CompanyUniversePage />}
+        {activePageKey === "company" && hasStockId && <StockStoryPage />}
+        {activePageKey === "company" && !hasStockId && <DashboardHub />}
         {activePageKey === "stock" && hasStockId && <StockStoryPage />}
         {activePageKey === "stock" && !hasStockId && <DashboardHub />}
         {activePageKey === "academy" && <AcademyProvider><AcademyHub /></AcademyProvider>}

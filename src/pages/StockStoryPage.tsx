@@ -1,212 +1,258 @@
-import React, { useState, useMemo } from "react";
-import { StockRegistry } from "../services/stocks/StockRegistry";
-import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
+import React, { useEffect, useMemo, useState } from "react";
+import { AlertCircle, ArrowLeft, ArrowRight, Building2, Compass, FileText, Star } from "lucide-react";
+import { navigateToStock } from "../architecture/navigation/routeCoordinator";
+import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
-import { Star, ArrowRight, Download, FileText, ArrowLeft, Compass } from "lucide-react";
+import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
+import { RecentSearchStore } from "../services/search/RecentSearchStore";
+import { StockRegistry } from "../services/stocks/StockRegistry";
+import type { CompanyMetadata } from "../services/data/types";
 
 type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | "documents";
 
-function profileFromUrl() {
-  if (typeof window === "undefined") {
-    return { companyName: "Data unavailable", symbol: "N/A", sector: "Data unavailable" };
-  }
+type MetadataState = {
+  data: CompanyMetadata | null;
+  loading: boolean;
+  error: string | null;
+};
+
+const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents"];
+
+function readTickerFromUrl(): string {
+  if (typeof window === "undefined") return "RELIANCE";
   const params = new URLSearchParams(window.location.search);
-  const rawTicker = (params.get("id") ?? params.get("ticker") ?? "").toUpperCase().trim();
-  const stock = StockRegistry.getStock(rawTicker);
-  if (stock) {
-    return {
-      companyName: stock.companyName,
-      symbol: stock.symbol,
-      sector: stock.sector,
-    };
-  }
-  return {
-    companyName: "Data unavailable",
-    symbol: rawTicker || "N/A",
-    sector: "Data unavailable",
-  };
+  return (params.get("id") ?? params.get("ticker") ?? "RELIANCE").toUpperCase().trim() || "RELIANCE";
+}
+
+function readTabFromUrl(): TabKey {
+  if (typeof window === "undefined") return "overview";
+  const tab = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
+  return tab && tabs.includes(tab) ? tab : "overview";
+}
+
+function formatLargeINR(value?: number | null): string {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return "Data unavailable";
+  const crore = value / 10_000_000;
+  if (crore >= 100_000) return `Rs ${(crore / 100_000).toFixed(2)} L Cr`;
+  if (crore >= 1) return `Rs ${crore.toLocaleString("en-IN", { maximumFractionDigits: 0 })} Cr`;
+  return formatINR(value);
+}
+
+function formatDateTime(value?: string): string {
+  if (!value) return "Data unavailable";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Data unavailable";
+  return date.toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div className="rounded-lg border border-white/5 bg-white/[0.015] p-5 text-sm text-white/45">
+      {label} is not available from the connected data providers yet.
+    </div>
+  );
 }
 
 export const StockStoryPage: React.FC = () => {
-  const stock = useMemo(() => profileFromUrl(), []);
-  const info = useMemo(() => StockRegistry.getStock(stock.symbol), [stock.symbol]);
-  const [activeTab, setActiveTab] = useState<TabKey>(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tab = params.get("tab") as TabKey;
-      const valid: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents"];
-      if (valid.includes(tab)) return tab;
-    }
-    return "overview";
-  });
+  const ticker = useMemo(() => readTickerFromUrl(), []);
+  const registryStock = useMemo(() => StockRegistry.getStock(ticker), [ticker]);
+  const liveQuote = useLiveQuote(ticker);
+  const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
-  const [noteText, setNoteText] = useState(() => NoteEngine.getNote(stock.symbol).note);
+  const [noteText, setNoteText] = useState(() => NoteEngine.getNote(ticker).note);
+  const [metadata, setMetadata] = useState<MetadataState>({ data: null, loading: true, error: null });
+
+  useEffect(() => {
+    RecentSearchStore.addTicker(ticker);
+  }, [ticker]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setMetadata({ data: null, loading: true, error: null });
+
+    fetch(`/api/market-data/metadata/${encodeURIComponent(ticker)}`, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.error || `Metadata request failed with HTTP ${response.status}`);
+        return body as CompanyMetadata;
+      })
+      .then((data) => setMetadata({ data, loading: false, error: null }))
+      .catch((error: Error) => {
+        if (controller.signal.aborted) return;
+        setMetadata({ data: null, loading: false, error: error.message });
+      });
+
+    return () => controller.abort();
+  }, [ticker]);
+
+  const companyName =
+    metadata.data?.companyName && metadata.data.companyName !== ticker
+      ? metadata.data.companyName
+      : registryStock?.companyName || ticker;
+  const sector = metadata.data?.sector || registryStock?.sector || "Data unavailable";
+  const industry = metadata.data?.industry || "Data unavailable";
+  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || "NSE";
+  const marketCap = formatLargeINR(metadata.data?.marketCap);
+  const currency = metadata.data?.currency || "INR";
+  const quote = liveQuote.quote;
+  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
+  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : liveQuote.error || "Data unavailable";
 
   const isInWatchlist = useMemo(() => {
-    return watchlists.some(w => w.tickers.includes(stock.symbol));
-  }, [watchlists, stock.symbol]);
+    return watchlists.some((w) => w.tickers.includes(ticker));
+  }, [watchlists, ticker]);
+
+  const relatedCompanies = useMemo(() => {
+    if (!registryStock?.sector) return [];
+    return StockRegistry.getAllStocks()
+      .filter((stock) => stock.symbol !== ticker && stock.sector === registryStock.sector)
+      .slice(0, 6);
+  }, [registryStock?.sector, ticker]);
 
   const handleToggleWatchlist = () => {
     const defaultList = watchlists[0];
     if (!defaultList) return;
-    if (isInWatchlist) {
-      WatchlistEngine.removeTicker(defaultList.id, stock.symbol);
-    } else {
-      WatchlistEngine.addTicker(defaultList.id, stock.symbol);
-    }
+    if (isInWatchlist) WatchlistEngine.removeTicker(defaultList.id, ticker);
+    else WatchlistEngine.addTicker(defaultList.id, ticker);
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const handleSaveNote = (val: string) => {
-    setNoteText(val);
-    NoteEngine.saveNote(stock.symbol, val);
+  const handleSaveNote = (value: string) => {
+    setNoteText(value);
+    NoteEngine.saveNote(ticker, value);
   };
 
-  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
-  const currentPrice = info?.fiftyTwoWeekRange.current ? `₹${info.fiftyTwoWeekRange.current.toLocaleString("en-IN")}` : null;
-
-  // Related companies: maximum 5, same sector only
-  const relatedCompanies = useMemo(() => {
-    const all = StockRegistry.getAllStocks();
-    return all
-      .filter(s => s.symbol !== stock.symbol && s.sector === stock.sector)
-      .slice(0, 5);
-  }, [stock.symbol, stock.sector]);
-
-  const handleCompanyClick = (symbol: string) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock");
-    params.set("id", symbol);
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
-  };
-
-  const navigateTo = (pageKey: string) => {
+  const navigateToPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", pageKey);
     params.delete("id");
+    params.delete("tab");
     window.history.pushState({}, "", `?${params.toString()}`);
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const selectTab = (tab: TabKey) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock");
+    params.set("id", ticker);
+    params.set("tab", tab);
+    window.history.replaceState({}, "", `?${params.toString()}`);
+  };
+
   return (
-    <div className="w-full space-y-6 pb-16 text-white max-w-7xl mx-auto antialiased px-4">
-      {/* Back and Utility Routing Actions */}
-      <div className="flex justify-between items-center text-xs">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
+      <div className="flex items-center justify-between gap-3 text-xs">
         <button
-          onClick={() => navigateTo("dashboard")}
-          className="text-cyan-400 hover:text-cyan-300 font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer flex items-center gap-1.5 transition-colors"
+          onClick={() => navigateToPage("dashboard")}
+          className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Return to Dashboard
+          <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
         </button>
         <button
-          onClick={() => navigateTo("discovery")}
-          className="text-white/60 hover:text-white font-bold uppercase tracking-wider bg-transparent border-none cursor-pointer flex items-center gap-1.5 transition-colors"
+          onClick={() => navigateToPage("discovery")}
+          className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-white/60 transition-colors hover:text-white"
         >
-          <Compass className="w-3.5 h-3.5" /> Open In Discovery
+          <Compass className="h-3.5 w-3.5" /> Discovery
         </button>
       </div>
 
-      {/* 1. HERO SECTION (ABOVE THE FOLD ONLY) */}
-      <section className="border-b border-white/5 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <span className="text-[9px] font-bold text-white/45 uppercase tracking-widest block mb-1">
-            {stock.symbol} · NSE
-          </span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">
-            {stock.companyName}
-          </h1>
-          <div className="flex items-center gap-2.5 text-xs text-white/50">
-            <span>{stock.sector}</span>
-            <span>•</span>
-            <span>Market Cap: {info?.marketCap.formatted || "Data unavailable"}</span>
+      <section className="border-b border-white/5 pb-5">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/45">
+              <span>{ticker}</span>
+              <span>{exchange}</span>
+              <span>{currency}</span>
+            </div>
+            <h1 className="max-w-4xl text-2xl font-bold tracking-tight text-white md:text-3xl">{companyName}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/50">
+              <span>{sector}</span>
+              <span>•</span>
+              <span>{industry}</span>
+            </div>
+            {metadata.error && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-amber-300">
+                <AlertCircle className="h-3.5 w-3.5" />
+                Metadata provider unavailable. Showing verified quote data and local identity labels.
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-4 mt-3">
-            <button
-              onClick={handleToggleWatchlist}
-              className={`h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                isInWatchlist 
-                  ? "bg-rose-500/10 text-rose-400 border-rose-500/30" 
-                  : "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
-              }`}
-            >
-              <Star className={`w-3.5 h-3.5 ${isInWatchlist ? "fill-rose-450" : ""}`} />
-              {isInWatchlist ? "Remove From Watchlist" : "Add To Watchlist"}
-            </button>
+
+          <div className="grid min-w-[280px] grid-cols-2 gap-5">
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-white/30">Live Price</div>
+              <div className="mt-1 font-mono text-2xl font-bold text-white">{priceLabel}</div>
+              <div className={`mt-1 font-mono text-[11px] ${quote && quote.changePercent >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                {changeLabel}
+              </div>
+            </div>
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-white/30">Volume</div>
+              <div className="mt-1 font-mono text-2xl font-bold text-white">
+                {quote?.volume ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+              </div>
+              <div className="mt-1 font-mono text-[11px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-6 shrink-0">
-          <div>
-            <span className="text-[9px] uppercase tracking-wider text-white/30 block">Current Price</span>
-            <span className="text-xl md:text-2xl font-mono font-bold text-white">{currentPrice || "Data unavailable"}</span>
-          </div>
-          <div>
-            <span className="text-[9px] uppercase tracking-wider text-white/30 block">Quality Score</span>
-            <span className="text-xl md:text-2xl font-mono font-bold text-cyan-400">{score !== null ? `${score}/100` : "Data unavailable"}</span>
-          </div>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleToggleWatchlist}
+            className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${
+              isInWatchlist
+                ? "border-rose-500/30 bg-rose-500/10 text-rose-400"
+                : "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+            }`}
+          >
+            <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-400" : ""}`} />
+            {isInWatchlist ? "Remove From Watchlist" : "Add To Watchlist"}
+          </button>
         </div>
       </section>
 
-      {/* 2. BRIEF OVERVIEW CARDS GRID */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What Happened</span>
-          <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Data unavailable. Please check back later.
-          </p>
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Quote Source</div>
+          <div className="mt-2 text-sm text-white/80">Yahoo Finance provider chain</div>
+          <div className="mt-1 text-xs text-white/40">Falls back only to configured providers. No generated prices.</div>
         </div>
-        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">Why It Matters</span>
-          <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Data unavailable. Please check back later.
-          </p>
+        <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Market Cap</div>
+          <div className="mt-2 font-mono text-sm text-white/80">{marketCap}</div>
+          <div className="mt-1 text-xs text-white/40">{metadata.loading ? "Loading provider metadata..." : "Provider supplied field"}</div>
         </div>
-        <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-          <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block font-mono">What to Watch</span>
-          <p className="text-xs text-white/80 leading-relaxed mt-1">
-            Data unavailable. Please check back later.
-          </p>
+        <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Data Policy</div>
+          <div className="mt-2 text-sm text-white/80">Real data only</div>
+          <div className="mt-1 text-xs text-white/40">Missing corporate data is shown as unavailable.</div>
         </div>
       </section>
 
-      {/* Research Notes Editor */}
-      <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl space-y-2">
-        <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider block font-mono">My Research Notes</span>
+      <div className="rounded-lg border border-white/5 bg-white/[0.015] p-5">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">My Research Notes</div>
         <textarea
           value={noteText}
-          onChange={(e) => handleSaveNote(e.target.value)}
-          placeholder="Add note details regarding why you are monitoring this stock..."
-          className="w-full h-16 bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 resize-none font-sans"
+          onChange={(event) => handleSaveNote(event.target.value)}
+          placeholder="Add your own research notes for this company..."
+          className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
         />
       </div>
 
-      {/* 3. THREE KEY METRICS */}
-      <section className="grid grid-cols-3 gap-4 border-t border-b border-white/5 py-4">
-        <div className="text-center">
-          <span className="text-[9px] text-white/40 uppercase block font-mono">Quality</span>
-          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
-        </div>
-        <div className="text-center">
-          <span className="text-[9px] text-white/40 uppercase block font-mono">Valuation</span>
-          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
-        </div>
-        <div className="text-center">
-          <span className="text-[9px] text-white/40 uppercase block font-mono">Growth</span>
-          <span className="text-xs md:text-sm font-bold text-white/40 font-mono mt-0.5 block">Data unavailable</span>
-        </div>
-      </section>
-
-      {/* 4. TABS HEADER */}
-      <div className="border-b border-white/5 flex gap-2 overflow-x-auto scrollbar-none">
-        {(["overview", "financials", "valuation", "ownership", "risks", "documents"] as TabKey[]).map((tab) => (
+      <div className="flex gap-2 overflow-x-auto border-b border-white/5">
+        {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`h-9 px-3 text-[10px] font-bold uppercase tracking-wider transition-all border-b-2 bg-transparent cursor-pointer shrink-0 ${
-              activeTab === tab
-                ? "border-cyan-400 text-cyan-400"
-                : "border-transparent text-white/50 hover:text-white"
+            onClick={() => selectTab(tab)}
+            className={`h-10 shrink-0 border-b-2 bg-transparent px-3 text-[10px] font-bold uppercase tracking-wider transition-all ${
+              activeTab === tab ? "border-cyan-400 text-cyan-400" : "border-transparent text-white/50 hover:text-white"
             }`}
           >
             {tab}
@@ -214,112 +260,87 @@ export const StockStoryPage: React.FC = () => {
         ))}
       </div>
 
-      {/* 5. TAB CONTENT */}
-      <div className="min-h-[200px] bg-white/[0.01] border border-white/5 rounded-2xl p-6">
+      <div className="min-h-[220px] rounded-lg border border-white/5 bg-white/[0.01] p-6">
         {activeTab === "overview" && (
-          <div className="space-y-4 max-w-3xl">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <h3 className="text-[10px] uppercase tracking-wider text-white/30 font-semibold font-mono mb-1">Company Description</h3>
-              <p className="text-xs text-white/80 leading-relaxed font-normal">
-                {stock.companyName} is a leading enterprise in the {stock.sector} sector, focusing on sustainable capital deployment and robust cash conversion models.
-              </p>
+              <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30">
+                <Building2 className="h-3.5 w-3.5" /> Company Profile
+              </div>
+              <dl className="space-y-3 text-sm">
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Name</dt>
+                  <dd className="text-right text-white/85">{companyName}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Sector</dt>
+                  <dd className="text-right text-white/85">{sector}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Industry</dt>
+                  <dd className="text-right text-white/85">{industry}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Exchange</dt>
+                  <dd className="text-right text-white/85">{exchange}</dd>
+                </div>
+              </dl>
             </div>
-            <div className="text-[10px] text-white/30 font-mono">
-              Should I spend more time here?
-            </div>
-          </div>
-        )}
-
-        {activeTab === "financials" && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">Revenue Growth</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">EBITDA Margin</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">ROE</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">Debt to Equity</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "valuation" && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">P/E Ratio</span>
-              <span className="text-sm font-mono font-bold text-white">{info?.peRatio || "Data unavailable"}</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">EV / EBITDA</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">P/B Ratio</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
-            </div>
-            <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl">
-              <span className="text-[9px] text-white/40 block mb-1">Historic PE Avg</span>
-              <span className="text-sm font-mono font-bold text-white/40">Data unavailable</span>
+            <div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">Live Quote</div>
+              <dl className="space-y-3 text-sm">
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Price</dt>
+                  <dd className="text-right font-mono text-white/85">{priceLabel}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Change</dt>
+                  <dd className="text-right font-mono text-white/85">{changeLabel}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Volume</dt>
+                  <dd className="text-right font-mono text-white/85">{quote?.volume ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}</dd>
+                </div>
+                <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
+                  <dt className="text-white/45">Updated</dt>
+                  <dd className="text-right text-white/85">{formatDateTime(quote?.updatedAt)}</dd>
+                </div>
+              </dl>
             </div>
           </div>
         )}
 
-        {activeTab === "ownership" && (
-          <div className="space-y-3 max-w-md">
-            <div className="text-xs text-white/40">Ownership data unavailable. Please check back later.</div>
-          </div>
-        )}
-
-        {activeTab === "risks" && (
-          <div className="space-y-3 text-xs text-white/80 max-w-2xl">
-            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Risk Analysis</span>
-            <p className="text-white/40">Risk data unavailable. Please check back later.</p>
-          </div>
-        )}
-
+        {activeTab === "financials" && <EmptyState label="Financial statement data" />}
+        {activeTab === "valuation" && <EmptyState label="Valuation ratios" />}
+        {activeTab === "ownership" && <EmptyState label="Ownership and shareholding data" />}
+        {activeTab === "risks" && <EmptyState label="Risk analysis" />}
         {activeTab === "documents" && (
-          <div className="space-y-3 max-w-md">
-            <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Corporate Filings & Disclosures</span>
-            <div className="text-xs text-white/30">Documents data unavailable. Please check back later.</div>
+          <div>
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30">
+              <FileText className="h-3.5 w-3.5" /> Corporate Filings & Disclosures
+            </div>
+            <EmptyState label="Corporate filings" />
           </div>
         )}
       </div>
 
-      {/* 6. RELATED COMPANIES / SIMILAR COMPANIES (SAME SECTOR ONLY, MAX 5) */}
       {relatedCompanies.length > 0 && (
-        <section className="space-y-3 border-t border-white/5 pt-6">
-          <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider block font-mono">
-            View Similar Companies ({stock.sector})
-          </span>
+        <section className="border-t border-white/5 pt-6">
+          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/40">Same Sector Companies</div>
           <div className="flex flex-wrap gap-3">
-            {relatedCompanies.map(c => {
-              const info = StockRegistry.getStock(c.symbol);
-              const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
-              return (
-                <button
-                  key={c.symbol}
-                  onClick={() => handleCompanyClick(c.symbol)}
-                  className="flex items-center justify-between gap-4 px-4 py-2.5 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-cyan-500/20 transition-all cursor-pointer"
-                >
-                  <div className="text-left">
-                    <span className="text-xs font-mono font-bold text-white block">{c.symbol}</span>
-                    <span className="text-[10px] text-white/40 block truncate max-w-[120px]">{c.companyName}</span>
-                  </div>
-                  <div className="text-right border-l border-white/5 pl-3">
-                    <span className="text-[9px] text-white/45 block font-mono">Score</span>
-                    <span className="text-xs font-bold text-cyan-400 font-mono">{score !== null ? score : "N/A"}</span>
-                  </div>
-                </button>
-              );
-            })}
+            {relatedCompanies.map((company) => (
+              <button
+                key={company.symbol}
+                onClick={() => navigateToStock({ ticker: company.symbol, mode: "push" })}
+                className="flex items-center justify-between gap-4 rounded-lg border border-white/5 bg-white/[0.01] px-4 py-2.5 text-left transition-all hover:border-cyan-500/20 hover:bg-white/[0.03]"
+              >
+                <div>
+                  <div className="font-mono text-xs font-bold text-white">{company.symbol}</div>
+                  <div className="max-w-[160px] truncate text-[10px] text-white/40">{company.companyName}</div>
+                </div>
+                <ArrowRight className="h-3.5 w-3.5 text-cyan-400" />
+              </button>
+            ))}
           </div>
         </section>
       )}

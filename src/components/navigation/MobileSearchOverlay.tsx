@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+﻿import React, { useState, useMemo } from "react";
 import { StockSearchEngine } from "../../services/stocks/StockSearchIndex";
 import { SearchRankingEngine } from "../../services/search/SearchRankingEngine";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
@@ -23,7 +23,7 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#020304] flex flex-col p-4">
+    <div className="fixed inset-0 z-[9999] ss-workspace flex flex-col p-4">
       <div className="flex items-center justify-between gap-3">
         <input
           autoFocus
@@ -60,7 +60,7 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
             >
               <div>
                 <div className="text-[15px] font-semibold text-white/92 truncate max-w-[200px]">{stock.companyName}</div>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-white/45 mt-1">{stock.ticker} � {stock.exchange}</div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-white/45 mt-1">{stock.ticker} · {stock.exchange}</div>
               </div>
               <div className="text-right">
                 <div className="text-[15px] font-semibold text-white/92">
@@ -89,3 +89,4 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
     </div>
   );
 }
+

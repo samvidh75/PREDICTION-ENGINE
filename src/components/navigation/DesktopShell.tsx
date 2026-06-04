@@ -18,7 +18,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
   ];
 
   return (
-    <div className="hidden md:flex flex-col min-h-screen text-white font-mono bg-[#020304]">
+    <div className="hidden md:flex flex-col min-h-screen text-white font-mono ss-app-shell">
       {/* 1. Opaque 72px Header System */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 border-b"

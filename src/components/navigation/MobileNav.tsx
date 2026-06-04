@@ -49,7 +49,7 @@ export const MobileNav: React.FC = () => {
   return (
     <div className="md:hidden">
       {/* Bottom Tab Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-[90] bg-[#050505]/95 backdrop-blur-md border-t border-white/5 flex items-center justify-around h-16 px-2">
+      <div className="fixed bottom-0 left-0 right-0 z-[90] bg-[#172331]/95 backdrop-blur-xl border-t border-cyan-100/10 flex items-center justify-around h-16 px-2">
         {tabs.map(tab => {
           const isActive = tab.id === "search" ? false : currentView === tab.id;
           return (
@@ -91,7 +91,7 @@ export const MobileNav: React.FC = () => {
               animate="open"
               exit="closed"
               variants={menuVariants}
-              className="fixed top-0 right-0 h-full w-[280px] bg-[#050505]/95 border-l border-l-white/10 z-[105] p-6 flex flex-col backdrop-blur-md shadow-2xl"
+              className="fixed top-0 right-0 h-full w-[280px] bg-[#172331]/96 border-l border-l-cyan-100/10 z-[105] p-6 flex flex-col backdrop-blur-xl shadow-2xl"
             >
               <div className="flex items-center justify-between mb-8 pt-4">
                 <div className="text-base font-bold tracking-widest text-white">

@@ -12,8 +12,8 @@ export const SmallCard: React.FC<CardProps> = ({ children, className = "", onCli
     // Spacing: p-4 (16px), gap-2 (8px)
     <Comp
       onClick={onClick}
-      className={`text-left w-full bg-white/[0.01] border border-white/5 rounded-lg p-4 transition-all hover:border-white/10 ${
-        onClick ? "cursor-pointer hover:bg-white/[0.02]" : ""
+      className={`text-left w-full ss-panel-subtle rounded-lg p-4 transition-all hover:border-cyan-200/20 ${
+        onClick ? "cursor-pointer hover:bg-white/[0.08]" : ""
       } ${className}`}
     >
       {children}
@@ -27,8 +27,8 @@ export const MediumCard: React.FC<CardProps> = ({ children, className = "", onCl
     // Spacing: p-6 (24px)
     <Comp
       onClick={onClick}
-      className={`text-left w-full bg-white/[0.02] border border-white/10 rounded-xl p-6 transition-all hover:border-white/20 ${
-        onClick ? "cursor-pointer hover:bg-white/[0.03]" : ""
+      className={`text-left w-full ss-panel rounded-lg p-6 transition-all hover:border-cyan-200/24 ${
+        onClick ? "cursor-pointer hover:bg-white/[0.08]" : ""
       } ${className}`}
     >
       {children}
@@ -42,8 +42,8 @@ export const LargeCard: React.FC<CardProps> = ({ children, className = "", onCli
     // Spacing: p-8 (32px)
     <Comp
       onClick={onClick}
-      className={`text-left w-full bg-[#090b0e] border border-white/10 rounded-2xl p-8 shadow-xl transition-all ${
-        onClick ? "cursor-pointer hover:bg-[#0c0e12]" : ""
+      className={`text-left w-full ss-panel rounded-lg p-8 shadow-xl transition-all ${
+        onClick ? "cursor-pointer hover:bg-white/[0.08]" : ""
       } ${className}`}
     >
       {children}
@@ -68,7 +68,7 @@ export const Button: React.FC<ButtonProps> = ({
   
   const variantStyles = {
     primary: "bg-cyan-400 text-black hover:bg-cyan-300 border border-transparent",
-    secondary: "bg-white/5 border border-white/10 text-white hover:bg-white/10",
+    secondary: "bg-white/[0.075] border border-cyan-100/12 text-white hover:bg-white/[0.12]",
     ghost: "bg-transparent text-white/60 hover:text-white hover:bg-white/5 border border-transparent",
   };
 
@@ -98,10 +98,10 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, primaryAction }) => {
   return (
     // Spacing: py-6 (24px) or py-8 (32px), mb-6 (24px)
-    <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/5 pb-6 mb-6 gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-cyan-100/10 pb-6 mb-6 gap-4">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
-        <p className="mt-2 text-xs text-white/40 font-medium">{subtitle}</p>
+        <p className="mt-2 text-xs text-white/52 font-medium">{subtitle}</p>
       </div>
       {primaryAction && <div className="shrink-0 flex items-center">{primaryAction}</div>}
     </div>
@@ -116,10 +116,10 @@ interface TableProps {
 
 export const CustomTable: React.FC<TableProps> = ({ headers, children, className = "" }) => {
   return (
-    <div className={`overflow-x-auto w-full bg-white/[0.01] border border-white/5 rounded-2xl ${className}`}>
+    <div className={`overflow-x-auto w-full ss-panel rounded-lg ${className}`}>
       <table className="w-full text-left text-xs border-collapse">
         <thead>
-          <tr className="border-b border-white/10 text-white/40 font-semibold bg-white/[0.02]">
+          <tr className="border-b border-cyan-100/10 text-white/50 font-semibold bg-white/[0.045]">
             {headers.map((h, i) => (
               <th key={i} className="p-4 uppercase tracking-wider font-semibold font-mono">{h}</th>
             ))}

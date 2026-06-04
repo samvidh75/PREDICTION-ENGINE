@@ -230,7 +230,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
     ];
 
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-[99] h-[72px] border-t border-white/10 bg-[#020304]/80 backdrop-blur-2xl px-4 flex items-center justify-around shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+      <div className="fixed bottom-0 left-0 right-0 z-[99] h-[72px] border-t border-cyan-100/10 bg-[#172331]/88 backdrop-blur-2xl px-4 flex items-center justify-around shadow-[0_-10px_40px_rgba(5,12,20,0.22)]">
         {mobileNavItems.map((item) => {
           const active = pageKey === item.page;
           return (

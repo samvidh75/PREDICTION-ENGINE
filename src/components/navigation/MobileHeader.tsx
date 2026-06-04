@@ -3,7 +3,7 @@ import { Menu } from "lucide-react";
 
 export const MobileHeader: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 h-15 bg-[#020304]/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4 z-50 md:hidden select-none">
+    <header className="fixed top-0 left-0 right-0 h-15 bg-[#172331]/92 backdrop-blur-xl border-b border-cyan-100/10 flex items-center justify-between px-4 z-50 md:hidden select-none">
       {/* Core Corporate Logo Mark */}
       <span className="text-[13px] font-semibold tracking-widest text-white/90 uppercase font-sans">
         StockStory India

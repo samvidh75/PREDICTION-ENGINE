@@ -42,7 +42,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const closeSearch = () => setSearchOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#020304] text-white">
+    <div className="min-h-screen ss-app-shell text-white">
       {/* Desktop Shell persistence */}
       <DesktopShell currentRoute={routeInfo.route} onOpenSearch={openSearch}>
         {children}

@@ -33,7 +33,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 bg-[#020304] text-white min-h-screen font-sans max-w-5xl mx-auto antialiased">
+    <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 text-white min-h-screen font-sans max-w-5xl mx-auto antialiased">
       {/* Header */}
       <div className="border-b border-white/5 pb-6">
         <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400 block mb-1">
