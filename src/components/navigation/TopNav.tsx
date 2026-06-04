@@ -18,7 +18,37 @@ export const TopNav: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full h-[72px] bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#2a2e39] z-50 flex items-center px-8 select-none">
+    <>
+    <header className="fixed top-0 left-0 right-0 z-50 flex h-[60px] items-center justify-between border-b border-[#2a2e39] bg-[#0f0f0f]/95 px-4 backdrop-blur-xl md:hidden">
+      <button
+        type="button"
+        onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
+        className="border-none bg-transparent p-0 text-left text-[12px] font-bold uppercase tracking-[0.18em] text-[#f0f3fa]"
+      >
+        STOCKSTORY<span className="text-[#2962ff]">.INDIA</span>
+      </button>
+
+      {isAuthenticated && user ? (
+        <button
+          type="button"
+          onClick={triggerSearch}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#2a2e39] bg-[#131722] text-[#b2b5be]"
+          aria-label="Open search"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setPage("signup")}
+          className="h-10 rounded-full bg-[#2962ff] px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-white"
+        >
+          Start
+        </button>
+      )}
+    </header>
+
+    <nav className="fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-[#2a2e39] bg-[#0f0f0f]/95 px-8 backdrop-blur-xl md:flex">
       <div className="flex-shrink-0 w-[240px] flex items-center">
         <span 
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -76,6 +106,7 @@ export const TopNav: React.FC = () => {
         </div>
       )}
     </nav>
+    </>
   );
 };
 

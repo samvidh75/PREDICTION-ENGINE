@@ -285,6 +285,8 @@ function AppContent(): JSX.Element {
       return <PublicLandingPage />;
     }
 
+    if (activePageKey === "about") return <PublicAboutPage />;
+
     // Authenticated layout shell wrapper
     return (
       <AppLayout>

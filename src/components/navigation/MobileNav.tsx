@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { Menu, X, LayoutDashboard, Search, Briefcase, Eye, Bell, Settings } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Search, Briefcase, Eye, Bell, Settings, Info, LogIn, UserPlus } from 'lucide-react';
 import { useNavigation, ViewType } from '../../context/LayoutContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface MobileNavItem {
   id: ViewType | "search";
@@ -9,11 +10,33 @@ interface MobileNavItem {
   icon: React.ReactNode;
 }
 
+interface PublicMobileNavItem {
+  page: "landing" | "about" | "login" | "signup";
+  label: string;
+  icon: React.ReactNode;
+}
+
 export const MobileNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { currentView, MapsTo } = useNavigation();
+  const { isAuthenticated } = useAuth();
+
+  const currentPage = (() => {
+    if (typeof window === "undefined") return "landing";
+    return new URLSearchParams(window.location.search).get("page") ?? "landing";
+  })();
+
+  const isPublicMobile = !isAuthenticated || ["landing", "about", "login", "signup"].includes(currentPage);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  const setPage = (pageKey: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", pageKey);
+    params.delete("id");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
 
   const handleNav = (id: ViewType | "search") => {
     setIsOpen(false);
@@ -22,6 +45,11 @@ export const MobileNav: React.FC = () => {
       return;
     }
     MapsTo(id);
+  };
+
+  const handlePublicNav = (page: PublicMobileNavItem["page"]) => {
+    setIsOpen(false);
+    setPage(page);
   };
 
   const links: MobileNavItem[] = [
@@ -46,11 +74,32 @@ export const MobileNav: React.FC = () => {
     { id: "watchlist", label: "Watchlist", icon: <Eye className="w-5 h-5" /> },
   ];
 
+  const publicTabs: PublicMobileNavItem[] = [
+    { page: "landing", label: "Home", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { page: "about", label: "About", icon: <Info className="w-5 h-5" /> },
+    { page: "login", label: "Sign in", icon: <LogIn className="w-5 h-5" /> },
+    { page: "signup", label: "Create", icon: <UserPlus className="w-5 h-5" /> },
+  ];
+
   return (
     <div className="md:hidden">
       {/* Bottom Tab Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-[90] bg-[#0f0f0f]/95 backdrop-blur-xl border-t border-[#2a2e39] flex items-center justify-around h-16 px-2">
-        {tabs.map(tab => {
+        {isPublicMobile ? publicTabs.map(tab => {
+          const isActive = currentPage === tab.page;
+          return (
+            <button
+              key={tab.page}
+              onClick={() => handlePublicNav(tab.page)}
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all cursor-pointer ${
+                isActive ? "text-[#2962ff]" : "text-[#787b86]"
+              }`}
+            >
+              {tab.icon}
+              <span className="text-[9px] font-bold uppercase tracking-wider">{tab.label}</span>
+            </button>
+          );
+        }) : tabs.map(tab => {
           const isActive = tab.id === "search" ? false : currentView === tab.id;
           return (
             <button
@@ -66,13 +115,15 @@ export const MobileNav: React.FC = () => {
           );
         })}
         {/* Menu toggle */}
-        <button
-          onClick={toggleMenu}
-          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[#787b86] cursor-pointer"
-        >
-          <Menu className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase tracking-wider">More</span>
-        </button>
+        {!isPublicMobile && (
+          <button
+            onClick={toggleMenu}
+            className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[#787b86] cursor-pointer"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-[9px] font-bold uppercase tracking-wider">More</span>
+          </button>
+        )}
       </div>
 
       {/* Full Menu Drawer */}

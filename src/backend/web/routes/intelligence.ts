@@ -492,8 +492,9 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       );
       if (finRes.rows.length > 0 && finRes.rows[0].free_float !== null) {
         const freeFloat = Number(finRes.rows[0].free_float);
-        const publicPct = freeFloat; // free_float approximates public shareholding
-        const promFiiDii = 100 - publicPct;
+        const marketCap = Number(finRes.rows[0].market_cap || 1);
+        const publicPct = marketCap > 0 && freeFloat > 100 ? (freeFloat / marketCap) * 100 : freeFloat;
+        const promFiiDii = Math.max(0, 100 - publicPct);
         const promoterPct = Math.round(promFiiDii * 0.6 * 10) / 10;
         const fiiPct = Math.round(promFiiDii * 0.25 * 10) / 10;
         const diiPct = Math.round(promFiiDii * 0.15 * 10) / 10;
