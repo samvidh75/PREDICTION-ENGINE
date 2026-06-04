@@ -313,21 +313,7 @@ export const StockStoryPage: React.FC = () => {
         {activeTab === "documents" && (
           <div className="space-y-3 max-w-md">
             <span className="text-[10px] text-white/30 uppercase font-mono block mb-1">Corporate Filings & Disclosures</span>
-            {[
-              { label: "Annual Report FY25", filename: "annual_report_fy25.pdf" },
-              { label: "Investor Presentation Q3 FY26", filename: "investor_presentation_q3.pdf" },
-              { label: "Quarterly Results Statement", filename: "quarterly_earnings_results.pdf" }
-            ].map(doc => (
-              <div key={doc.label} className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/5 transition-all">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xs text-white/80 font-medium">{doc.label}</span>
-                </div>
-                <button className="p-1.5 bg-white/5 border border-white/5 hover:border-cyan-400/30 rounded-lg text-cyan-400 hover:text-cyan-300 cursor-pointer">
-                  <Download className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+            <div className="text-xs text-white/30">Documents currently unavailable.</div>
           </div>
         )}
       </div>

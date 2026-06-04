@@ -134,11 +134,11 @@ export class AlertEngine {
     if (!this.isCategoryEnabled(category)) return;
     const alerts = this.getAlerts();
     const next: SmartAlert = {
-      id: Math.random().toString(36).substring(2, 9),
+      id: Date.now().toString(36),
       category,
       title,
       body,
-      timestamp: "Just now",
+      timestamp: new Date().toISOString(),
       symbol,
       isRead: false
     };

@@ -89,49 +89,8 @@ export const AlertCentrePage: React.FC = () => {
 
   const getStructuredContent = (alert: SmartAlert): StructuredAlertContent => {
     const body = alert.body;
-    const symbol = alert.symbol;
-
-    if (symbol === "RELIANCE") {
-      return {
-        whatHappened: "Reliance factor rating was upgraded to High Health as operating margins consolidate.",
-        whyMatters: "Digital services operating efficiencies are compensating for commodity price declines, proving business quality resilience.",
-        suggestedStep: "Analyze Business Quality score on Reliance detail report.",
-        linkId: "RELIANCE"
-      };
-    }
-    if (symbol === "INFY") {
-      return {
-        whatHappened: "Infosys is showing minor risk exposure drift due to tech sector volatility adjustments.",
-        whyMatters: "Client spending revisions in North America are putting short-term pressure on margins stability.",
-        suggestedStep: "Audit Risk checklists and Valuation charts.",
-        linkId: "INFY"
-      };
-    }
-    if (symbol === "HAL") {
-      return {
-        whatHappened: "HAL cleared significant government project clearances, stabilizing domestic manufacturing timelines.",
-        whyMatters: "A massive order book backlog gets execution visibility, ensuring long-term revenue safety.",
-        suggestedStep: "Check corporate Catalysts Timeline details.",
-        linkId: "HAL"
-      };
-    }
-    if (symbol === "HDFCBANK") {
-      return {
-        whatHappened: "HDFC Bank pricing expanded beyond the 50-day moving average with supportive retail volumes.",
-        whyMatters: "Signals structural consolidation phase is ending and institutional participation is turning bullish.",
-        suggestedStep: "Explore current Ownership Flow trends.",
-        linkId: "HDFCBANK"
-      };
-    }
-    if (symbol === "NIFTY50" || symbol === "NIFTY" || body.toLowerCase().includes("nifty")) {
-      return {
-        whatHappened: "Broad Indian indices entered a BULL regime with 82% of tickers trading above their 50-day average.",
-        whyMatters: "Positive breadth shifts reduce tail risk across all holdings.",
-        suggestedStep: "View Portfolio weight metrics to check diversification balance.",
-      };
-    }
-
-    // Fallback if custom alerts are generated dynamically
+   
+// Fallback if custom alerts are generated dynamically
     return {
       whatHappened: body,
       whyMatters: `This structural change impacts the stock's fundamental rating in the ${alert.category} category.`,

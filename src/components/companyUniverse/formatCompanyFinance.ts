@@ -39,7 +39,7 @@ function formatINRWithCommas(value: number): string {
   return `${isNeg ? "-" : ""}₹${groups.join(",")},${last3}`;
 }
 
-export function formatMarketCap(value: number): { exact: string; words: string } {
+export function formatMarketCap(value: number): { exact: string; words: string } { if (!value || isNaN(value)) return { exact: "Unavailable", words: "Unavailable" }; return { exact: formatINRWithCommas(value), words: formatCompactRupees(value) }; } {
   return {
     exact: formatINRWithCommas(value),
     words: formatCompactRupees(value),
