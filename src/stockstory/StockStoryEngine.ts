@@ -32,8 +32,21 @@ import { evaluateDebtPenalty } from './risk/DebtPenalty';
 import { evaluateVolatilityPenalty } from './risk/VolatilityPenalty';
 import { evaluateGovernancePenalty } from './risk/GovernancePenalty';
 import { applyPenalties, type Penalty } from './scoring/PenaltyScorer';
+import { SectorDistributionEngine } from './analytics/SectorDistributionEngine';
+
+// ── Auto-initialise percentile distributions on module load ──────
+let _percentileReady = false;
+function ensurePercentileData(): void {
+  if (!_percentileReady) {
+    SectorDistributionEngine.initialise();
+    _percentileReady = true;
+  }
+}
 
 export class StockStoryEngine {
+  constructor() {
+    ensurePercentileData();
+  }
   public riskDampeningCoefficient: number = 0.45;
 
   evaluate(inputs: EngineInputs): StockStoryOutput {
