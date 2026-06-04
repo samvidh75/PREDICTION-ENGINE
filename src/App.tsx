@@ -352,11 +352,6 @@ function AppContent(): JSX.Element {
                           <IntelligenceHUD />
                         </SubsystemErrorBoundary>
  
-                        {activePageKey === "landing" || activePageKey === "about" ? null : (
-                          <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
-                            <IntelligenceNavigationRail />
-                          </SubsystemErrorBoundary>
-                        )}
                       </LivingInterfaceEngine>
                     </ResponsiveUIScalingLayer>
                   </AdaptiveColourCoordinationLayer>
