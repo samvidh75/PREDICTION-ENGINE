@@ -185,7 +185,7 @@ export default function DiscoveryEntityPage(): JSX.Element {
 
   if (!entity) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-[#020304]">
+      <div className="relative min-h-screen overflow-hidden bg-[#0f0f0f]">
         <div className="absolute inset-0 z-0" />
         <div className={getSpatialFrameClassNames("private", isMobile)}>
           <div className="mx-auto max-w-[1160px]">
@@ -232,7 +232,7 @@ export default function DiscoveryEntityPage(): JSX.Element {
   const tags = relationshipTags;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020304]">
+    <div className="relative min-h-screen overflow-hidden bg-[#0f0f0f]">
       <div className="absolute inset-0 z-0" />
       <div className={getSpatialFrameClassNames("private", isMobile)}>
         <div className="mx-auto max-w-[1160px]">

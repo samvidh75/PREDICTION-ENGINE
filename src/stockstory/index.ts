@@ -34,3 +34,9 @@ export { MomentumEngine, momentumEngine } from './engines/MomentumEngine';
 export { ValuationEngine, valuationEngine } from './engines/ValuationEngine';
 export { RiskEngine, riskEngine } from './engines/RiskEngine';
 export { ConfidenceEngine, confidenceEngine } from './engines/ConfidenceEngine';
+export { AccountingEngine, accountingEngine } from './engines/AccountingEngine';
+export type { AccountingEngineOutput } from './engines/AccountingEngine';
+
+// Sector adapter
+export { getSectorProfile, listSectorProfiles } from './SectorAdapter';
+export type { SectorProfile } from './SectorAdapter';

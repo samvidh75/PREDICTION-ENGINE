@@ -128,7 +128,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
   }, [state]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020304]">
+    <div className="relative min-h-screen overflow-hidden bg-[#0f0f0f]">
       {/* Base background */}
       <HiddenGridOverlay />
       <AmbientBackground />

@@ -335,7 +335,7 @@ export default function CompanyUniversePage(): JSX.Element {
   const heroGlow = useMemo(() => confidenceToneGlow(confidenceState, confidenceTheme), [confidenceState, confidenceTheme]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#020304]">
+    <div className="relative min-h-screen overflow-hidden bg-[#0f0f0f]">
       <HiddenGridOverlay />
       <AmbientBackground />
       <div className="noise" />

@@ -31,7 +31,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   ];
 
   return (
-    <div className="min-h-screen bg-[#020304] text-white">
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="mx-auto max-w-[1600px] px-6 py-10 sm:px-10 lg:px-16">
         <div className="mb-10 flex flex-col gap-5">
           <div className="inline-flex w-fit items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs uppercase tracking-[0.28em] text-cyan-200">

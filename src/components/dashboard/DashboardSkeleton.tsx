@@ -3,7 +3,7 @@ import React from "react";
 
 export const DashboardSkeleton: React.FC = () => {
   return (
-    <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 bg-[#020304] text-white min-h-screen animate-pulse">
+    <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 bg-[#0f0f0f] text-white min-h-screen animate-pulse">
       {/* Header Skeleton */}
       <div className="flex justify-between items-center border-b border-white/5 pb-6">
         <div className="space-y-2 w-1/3">
