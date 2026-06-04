@@ -17,7 +17,7 @@ export const PublicLandingPage: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#020304] overflow-x-hidden text-white flex flex-col font-sans select-none pb-12">
+    <main className="relative min-h-screen bg-[#0f0f0f] overflow-x-hidden text-[#f0f3fa] flex flex-col font-sans select-none pb-12">
       <TopNav />
       <MobileNav />
 
@@ -27,15 +27,15 @@ export const PublicLandingPage: React.FC = () => {
 
       <section className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 md:pt-40 md:pb-28 max-w-6xl mx-auto">
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-          <span className="text-[9px] tracking-[0.25em] font-mono text-cyan-400 font-semibold uppercase">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2962ff]" />
+          <span className="text-[9px] tracking-[0.25em] font-mono text-[#7da0ff] font-semibold uppercase">
             STRICTLY NOISE-FREE
           </span>
         </div>
 
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white mb-8 leading-[1.05]">
           Clear company intelligence <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7da0ff] via-[#2962ff] to-[#8f5cff]">
             for Indian investors.
           </span>
         </h1>
@@ -48,7 +48,7 @@ export const PublicLandingPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
           <button
             onClick={() => setPage("login")}
-            className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-cyan-400 transition-all hover:scale-[1.02] active:scale-[0.98] duration-150 text-sm uppercase tracking-wider cursor-pointer shadow-lg shadow-cyan-500/10"
+            className="px-8 py-4 bg-[#2962ff] text-white font-semibold rounded-full hover:bg-[#1e53e5] transition-all hover:scale-[1.02] active:scale-[0.98] duration-150 text-sm uppercase tracking-wider cursor-pointer shadow-lg shadow-[#2962ff]/10"
           >
             Start Research
           </button>
@@ -116,9 +116,9 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* The Solution Section */}
-      <section className="relative z-10 py-20 border-t border-white/5 bg-[#020304]">
+      <section className="relative z-10 py-20 border-t border-[#2a2e39] bg-[#0f0f0f]">
         <div className="max-w-4xl mx-auto px-6">
-          <span className="text-[9px] tracking-widest text-cyan-400 uppercase font-mono font-bold block mb-3 text-center">
+          <span className="text-[9px] tracking-widest text-[#7da0ff] uppercase font-mono font-bold block mb-3 text-center">
             THE SOLUTION
           </span>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-6 text-center">
@@ -143,7 +143,7 @@ export const PublicLandingPage: React.FC = () => {
               }
             ].map((s, idx) => (
               <div key={idx} className="bg-white/[0.01] border border-white/5 rounded-2xl p-6">
-                <h3 className="text-sm font-semibold text-cyan-400 mb-2 font-mono">{s.title}</h3>
+                <h3 className="text-sm font-semibold text-[#7da0ff] mb-2 font-mono">{s.title}</h3>
                 <p className="text-xs text-gray-400 leading-relaxed">{s.desc}</p>
               </div>
             ))}
@@ -155,7 +155,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="relative z-10 py-20 border-t border-white/5 bg-[#07090d]/30">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-[9px] tracking-widest text-cyan-400 uppercase font-mono font-bold block mb-3">
+            <span className="text-[9px] tracking-widest text-[#7da0ff] uppercase font-mono font-bold block mb-3">
               METHODOLOGY
             </span>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
@@ -181,7 +181,7 @@ export const PublicLandingPage: React.FC = () => {
               }
             ].map((item, idx) => (
               <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 flex flex-col justify-between h-[200px]">
-                <span className="text-xl font-mono text-cyan-400 font-bold">{item.step}</span>
+                <span className="text-xl font-mono text-[#7da0ff] font-bold">{item.step}</span>
                 <div>
                   <h3 className="text-sm font-semibold text-white mb-2">{item.title}</h3>
                   <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
@@ -193,10 +193,10 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* Sample Analysis Section */}
-      <section className="relative z-10 py-20 border-t border-white/5 bg-[#020304]">
+      <section className="relative z-10 py-20 border-t border-[#2a2e39] bg-[#0f0f0f]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <span className="text-[9px] tracking-widest text-cyan-400 uppercase font-mono font-bold block mb-3">
+            <span className="text-[9px] tracking-widest text-[#7da0ff] uppercase font-mono font-bold block mb-3">
               SAMPLE OUTPUT
             </span>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
@@ -210,10 +210,10 @@ export const PublicLandingPage: React.FC = () => {
           <div className="bg-[#0b0d11] border border-white/10 rounded-3xl p-6 md:p-8 space-y-6">
             <div className="flex justify-between items-center border-b border-white/5 pb-4">
               <div>
-                <span className="text-[10px] font-mono text-cyan-400 block mb-1">NSE: RELIANCE // CONGLOMERATE</span>
+                <span className="text-[10px] font-mono text-[#7da0ff] block mb-1">NSE: RELIANCE // CONGLOMERATE</span>
                 <h3 className="text-2xl font-bold text-white tracking-tight">Reliance Industries Ltd.</h3>
               </div>
-              <span className="text-xs font-mono text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/20">
+              <span className="text-xs font-mono text-[#22ab94] bg-[#22ab94]/10 px-3 py-1 rounded-full border border-[#22ab94]/20">
                 ACTIVE
               </span>
             </div>
@@ -234,7 +234,7 @@ export const PublicLandingPage: React.FC = () => {
             </div>
 
             <div className="bg-white/[0.01] border border-white/5 p-4 rounded-xl space-y-2">
-              <span className="text-[9px] font-mono text-cyan-400 uppercase tracking-wider block font-bold">Key Insight</span>
+              <span className="text-[9px] font-mono text-[#7da0ff] uppercase tracking-wider block font-bold">Key Insight</span>
               <p className="text-xs text-gray-300 leading-relaxed">
                 Operating margins expanded by 140 basis points in the latest quarter due to cost efficiency in digital services, compensating for minor volume declines in the oil-to-chemicals segment.
               </p>
@@ -247,7 +247,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="relative z-10 py-20 border-t border-white/5 bg-[#07090d]/30">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-[9px] tracking-widest text-cyan-400 uppercase font-mono font-bold block mb-3">
+            <span className="text-[9px] tracking-widest text-[#7da0ff] uppercase font-mono font-bold block mb-3">
               CAPABILITIES
             </span>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
@@ -291,9 +291,9 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* Trust Signals Section */}
-      <section className="relative z-10 py-20 border-t border-white/5 bg-[#020304]">
+      <section className="relative z-10 py-20 border-t border-[#2a2e39] bg-[#0f0f0f]">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <span className="text-[9px] tracking-widest text-emerald-400 uppercase font-mono font-bold block mb-3">
+          <span className="text-[9px] tracking-widest text-[#22ab94] uppercase font-mono font-bold block mb-3">
             TRUST PRINCIPLES
           </span>
           <h2 className="text-3xl font-bold tracking-tight text-white mb-6">
@@ -304,7 +304,7 @@ export const PublicLandingPage: React.FC = () => {
           </p>
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs text-gray-300 font-mono">
             <span>SEBI Compliant Research Layout</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22ab94]" />
             <span>500+ Indian Stocks</span>
           </div>
         </div>
@@ -314,7 +314,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="relative z-10 py-20 border-t border-white/5 bg-[#07090d]/30">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-[9px] tracking-widest text-cyan-400 uppercase font-mono font-bold block mb-3">
+            <span className="text-[9px] tracking-widest text-[#7da0ff] uppercase font-mono font-bold block mb-3">
               QUESTIONS & ANSWERS
             </span>
             <h2 className="text-3xl font-bold tracking-tight text-white">
@@ -346,7 +346,7 @@ export const PublicLandingPage: React.FC = () => {
                   className="w-full text-left flex justify-between items-center py-3 text-sm font-semibold text-white bg-transparent border-none cursor-pointer"
                 >
                   <span>{item.q}</span>
-                  <span className="text-cyan-400">{activeFaq === idx ? '−' : '+'}</span>
+                  <span className="text-[#7da0ff]">{activeFaq === idx ? '−' : '+'}</span>
                 </button>
                 {activeFaq === idx && (
                   <p className="text-xs text-gray-400 leading-relaxed mt-2 pl-1">
@@ -370,7 +370,7 @@ export const PublicLandingPage: React.FC = () => {
           </p>
           <button
             onClick={() => setPage("signup")}
-            className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-cyan-400 transition-all hover:scale-[1.02] active:scale-[0.98] duration-150 text-sm uppercase tracking-wider cursor-pointer shadow-lg shadow-cyan-500/10"
+            className="px-8 py-4 bg-[#2962ff] text-white font-semibold rounded-full hover:bg-[#1e53e5] transition-all hover:scale-[1.02] active:scale-[0.98] duration-150 text-sm uppercase tracking-wider cursor-pointer shadow-lg shadow-[#2962ff]/10"
           >
             Create Your Account
           </button>
@@ -378,7 +378,7 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* Footer Section */}
-      <footer className="relative z-10 py-12 border-t border-white/5 bg-[#020304] text-gray-600 text-xs">
+      <footer className="relative z-10 py-12 border-t border-[#2a2e39] bg-[#0f0f0f] text-gray-600 text-xs">
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <span className="font-bold text-white font-mono tracking-widest uppercase">STOCKSTORY.INDIA</span>

@@ -16,7 +16,7 @@ export const ProfileButton: React.FC = () => {
         className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
         aria-expanded={open}
       >
-        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-400 to-magenta-500" />
+        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#2962ff] to-[#8f5cff]" />
         <span className="text-xs font-medium text-white truncate max-w-[120px]">
           {user.displayName || user.email || 'Account'}
         </span>

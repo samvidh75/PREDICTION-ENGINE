@@ -43,7 +43,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
         {/* Central Search Primary Action */}
         <div 
           onClick={onOpenSearch}
-          className="w-96 h-10 px-4 rounded-full border bg-white/[0.03] border-white/10 hover:border-cyan-400/50 flex items-center gap-3 cursor-pointer text-gray-500 transition-all duration-300"
+          className="w-96 h-10 px-4 rounded-full border bg-[#131722] border-[#2a2e39] hover:border-[#2962ff]/60 flex items-center gap-3 cursor-pointer text-[#787b86] transition-all duration-300"
         >
           <Search className="w-4 h-4 text-gray-400" />
           <span className="text-xs font-mono select-none">Search stocks, markets... (Ctrl+K)</span>

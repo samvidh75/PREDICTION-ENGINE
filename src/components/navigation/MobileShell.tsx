@@ -30,7 +30,7 @@ export const MobileShell: React.FC<MobileShellProps> = ({ currentRoute, onOpenSe
         <span className="text-xs font-bold tracking-widest text-white">STOCKSTORY</span>
         <button 
           onClick={onOpenSearch}
-          className="p-2 hover:bg-white/5 rounded-full text-cyan-400 cursor-pointer"
+          className="p-2 hover:bg-[#1e222d] rounded-full text-[#7da0ff] cursor-pointer"
           aria-label="Search"
         >
           <Search className="w-5 h-5" />
@@ -58,7 +58,7 @@ export const MobileShell: React.FC<MobileShellProps> = ({ currentRoute, onOpenSe
               key={item.route}
               onClick={() => NavigationCoordinator.navigateTo(item.route)}
               className={`w-full h-full flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-300 ${
-                active ? 'text-cyan-400' : 'text-gray-500'
+                active ? 'text-[#7da0ff]' : 'text-gray-500'
               }`}
             >
               <item.icon className="w-[22px] h-[22px]" />
@@ -69,7 +69,7 @@ export const MobileShell: React.FC<MobileShellProps> = ({ currentRoute, onOpenSe
         {/* Direct search shortcut tab */}
         <button
           onClick={onOpenSearch}
-          className="w-full h-full flex flex-col items-center justify-center gap-1 cursor-pointer text-gray-500 hover:text-cyan-400"
+          className="w-full h-full flex flex-col items-center justify-center gap-1 cursor-pointer text-gray-500 hover:text-[#7da0ff]"
         >
           <Search className="w-[22px] h-[22px]" />
           <span className="text-[11px] uppercase tracking-wider font-semibold">Search</span>

@@ -83,19 +83,7 @@ export class FactorEngine {
     const sector = symbolInfo.sector || "Technology";
 
     // Fetch average market and sector momentum to calculate Sector Strength and Relative factors
-    const sectorMomentumRes = await query(
-      `SELECT dp.trade_date::text as date, AVG((dp.close - dp.open)/dp.open) as avg_return
-       FROM daily_prices dp
-       JOIN symbols s ON dp.symbol = s.symbol
-       WHERE s.sector = $1
-       GROUP BY dp.trade_date`,
-      [sector]
-    );
-
-    const sectorMomentumMap = new Map<string, number>();
-    for (const r of sectorMomentumRes.rows) {
-      sectorMomentumMap.set(r.date, Number(r.avg_return));
-    }
+    const sectorMomentumMap = await this.getSectorMomentumMap(sector);
 
     const n = features.length;
     const snapshots: StockFactorSnapshot[] = [];
