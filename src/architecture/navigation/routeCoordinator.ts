@@ -54,8 +54,6 @@ export function buildRouteUrl(args: {
 
   const preserve = new Set<string>(args.preserveParamKeys ?? []);
   // Always start from a clean slate for the keys we manage.
-  // Preserve any explicit param keys that callers want retained.
-  // (We only touch managed keys below.)
   if (!preserve.has("page")) url.searchParams.delete("page");
   if (!preserve.has("kind")) url.searchParams.delete("kind");
   if (!preserve.has("id")) url.searchParams.delete("id");
@@ -76,7 +74,7 @@ export function buildRouteUrl(args: {
     url.searchParams.set("q", args.searchOverlay.q);
   }
 
-  if (args.page === "stock") setOrDelete(url, "id", args.ticker);
+  if (args.page === "stock" || args.page === "company") setOrDelete(url, "id", args.ticker);
   else setOrDelete(url, "ticker", args.ticker);
   setOrDelete(url, "exchange", args.exchange);
 
@@ -149,7 +147,7 @@ export function navigateToStock(opts?: {
   const searchOverlay = opts?.openSearchQ !== undefined ? { q: opts.openSearchQ } : undefined;
 
   navigate({
-    page: "stock",
+    page: "company",
     ticker: opts?.ticker,
     exchange: opts?.exchange,
     searchOverlay,

@@ -4,8 +4,6 @@ import ConfidenceEngine from "./components/intelligence/ConfidenceEngine";
 import StockStoryPage from "./pages/StockStoryPage";
 import { AcademyProvider } from "./context/AcademyContext.jsx";
 import { IS_DEV_ENVIRONMENT } from "./config/domain";
-// ... (other imports unchanged)
-
 
 import MarketStories from "./views/MarketStories";
 import AnalysisHub from "./views/AnalysisHub";
@@ -69,10 +67,9 @@ function getPageKeyFromUrl(): PageKey {
     if (raw === "login") return "login";
     if (raw === "signup") return "signup";
 
-    if (raw === "company") return "company";
+    if (raw === "company" || raw === "stock") return "company";
     if (raw === "explore") return "explore";
     if (raw === "dashboard" || raw === "market") return "dashboard";
-    if (raw === "stock") return "stock";
     if (raw === "portfolio") return "portfolio";
     if (raw === "watchlist") return "watchlist";
     if (raw === "alerts") return "alerts";
@@ -116,8 +113,6 @@ function getRouteSignatureFromUrl(): string {
   }
 }
 
-
-
 const DEFAULT_SKIP_PROFILE: UserProfile = {
   focusAreas: ["Institutional activity"],
   volatilityComfort: "Calm environments",
@@ -125,8 +120,6 @@ const DEFAULT_SKIP_PROFILE: UserProfile = {
   analysisDepth: "Editorial overview",
   modules: ["Institutional activity"],
 };
-
-// Onboarding bypassed - direct route to dashboard
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LayoutProvider, useNavigation } from "./context/LayoutContext";
@@ -354,11 +347,11 @@ function AppContent(): JSX.Element {
                             {mainView}
                           </SubsystemErrorBoundary>
                         </CinematicTransitionLayer>
-
+ 
                         <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
                           <IntelligenceHUD />
                         </SubsystemErrorBoundary>
-
+ 
                         {activePageKey === "landing" || activePageKey === "about" ? null : (
                           <SubsystemErrorBoundary subsystem="intelligence_navigation_rail" phase="render">
                             <IntelligenceNavigationRail />

@@ -177,7 +177,7 @@ export default function CompanyUniversePage(): JSX.Element {
   const ticker = useMemo(() => {
     if (typeof window === "undefined") return "TTM";
     const params = new URLSearchParams(window.location.search);
-    const raw = params.get("ticker") ?? "TTM";
+    const raw = params.get("id") ?? params.get("ticker") ?? "TTM";
     return raw.toUpperCase().trim() || "TTM";
   }, []);
 
