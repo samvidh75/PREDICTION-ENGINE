@@ -1,11 +1,12 @@
 /**
- * StockStory Engine — Orchestrator
+ * StockStory Engine — Orchestrator (RC-ENGINE-003)
  * 
- * Runs all 7 engines + AccountingEngine and produces the final output contract.
- * 
- * FIX (RC-ENGINE-002): Stronger risk dampening (continuous, no hard threshold).
- * FIX (RC-ENGINE-002): Advisory language removed — all narrative is descriptive.
- * FIX (RC-ENGINE-002): AccountingEngine integrated for earnings quality signal.
+ * Integrates:
+ * - SectorWeightEngine for sector-aware factor weighting
+ * - Penalty Framework (Accounting, Debt, Volatility, Governance)
+ * - Configurable Weights
+ * - Confidence Engine (independent from health score)
+ * - Standardised Scoring (0-100, banded)
  */
 
 import {
@@ -17,6 +18,7 @@ import {
   weightedAverage,
 } from './types';
 import { getSectorProfile } from './SectorAdapter';
+import { computeSectorWeightedHealth } from './sectors/SectorWeightEngine';
 import { growthEngine } from './engines/GrowthEngine';
 import { qualityEngine } from './engines/QualityEngine';
 import { stabilityEngine } from './engines/StabilityEngine';
@@ -25,6 +27,11 @@ import { valuationEngine } from './engines/ValuationEngine';
 import { riskEngine } from './engines/RiskEngine';
 import { confidenceEngine } from './engines/ConfidenceEngine';
 import { accountingEngine } from './engines/AccountingEngine';
+import { evaluateAccountingPenalty } from './risk/AccountingPenalty';
+import { evaluateDebtPenalty } from './risk/DebtPenalty';
+import { evaluateVolatilityPenalty } from './risk/VolatilityPenalty';
+import { evaluateGovernancePenalty } from './risk/GovernancePenalty';
+import { applyPenalties, type Penalty } from './scoring/PenaltyScorer';
 
 export class StockStoryEngine {
   evaluate(inputs: EngineInputs): StockStoryOutput {
@@ -37,24 +44,38 @@ export class StockStoryEngine {
     const risk = riskEngine.evaluate(inputs);
     const accounting = accountingEngine.evaluate(inputs);
 
-    // ── Compute Health Score (weighted) ─────────────────────────────
-    const healthScore = weightedAverage([
-      { score: growth.score, weight: 25 },
-      { score: quality.score, weight: 25 },
-      { score: stability.score, weight: 20 },
-      { score: momentum.score, weight: 15 },
-      { score: valuation.score, weight: 15 },
-    ]);
+    // ── Sector-weighted health score ────────────────────────────────
+    const sectorName = inputs.sector?.name ?? 'General';
+    const preAdjustHealth = computeSectorWeightedHealth(
+      {
+        growth: growth.score,
+        quality: quality.score,
+        stability: stability.score,
+        valuation: valuation.score,
+        momentum: momentum.score,
+      },
+      sectorName
+    );
 
     // ── Continuous risk dampening ───────────────────────────────────
-    // riskDampening = proportional penalty starting at riskScore > 40
     const riskDampening = Math.max(0, (risk.score - 40) * 0.35);
-    const adjustedHealth = clampScore(healthScore - riskDampening);
+    const dampenedHealth = clampScore(preAdjustHealth - riskDampening);
+
+    // ── Apply Penalty Framework ─────────────────────────────────────
+    const allPenalties: Penalty[] = [
+      ...evaluateAccountingPenalty(inputs),
+      ...evaluateDebtPenalty(inputs),
+      ...evaluateVolatilityPenalty(inputs),
+      ...evaluateGovernancePenalty(inputs),
+    ];
+
+    const { finalScore: adjustedHealth, result: penaltyResult } =
+      applyPenalties(dampenedHealth, allPenalties);
 
     // ── Classification ──────────────────────────────────────────────
     const classification = this.classify(adjustedHealth, risk.score);
 
-    // ── Confidence ──────────────────────────────────────────────────
+    // ── Confidence (independent from health score) ──────────────────
     const confidence = confidenceEngine.evaluate(inputs, {
       growth: growth.score,
       quality: quality.score,
@@ -72,6 +93,7 @@ export class StockStoryEngine {
       adjustedHealth,
       classification,
       confidence.level,
+      confidence.score,
       growth.score,
       quality.score,
       stability.score,
@@ -79,6 +101,7 @@ export class StockStoryEngine {
       momentum.score,
       risk.score,
       accounting.score,
+      penaltyResult.totalPenalty,
       inputs
     );
 
@@ -137,7 +160,8 @@ export class StockStoryEngine {
   private generateNarrative(
     healthScore: number,
     classification: CompanyClassification,
-    confidence: ConfidenceLevel,
+    confidenceLevel: ConfidenceLevel,
+    confidenceScore: number,
     growth: number,
     quality: number,
     stability: number,
@@ -145,13 +169,14 @@ export class StockStoryEngine {
     momentum: number,
     risk: number,
     accountingQuality: number,
+    penaltyTotal: number,
     inputs: EngineInputs
   ): string {
     const symbol = inputs.symbol;
     const profile = getSectorProfile(inputs.sector?.name ?? 'General');
     const parts: string[] = [];
 
-    // ── Descriptive observation (not recommendation) ────────────────
+    // ── Descriptive observation ─────────────────────────────────────
     if (classification === 'Excellent') {
       parts.push(
         `${symbol} registers excellent composite health across measured dimensions relative to ${profile.name} sector benchmarks.`
@@ -184,63 +209,43 @@ export class StockStoryEngine {
     ];
     scores.sort((a, b) => b[1] - a[1]);
     const [topName, topScore] = scores[0];
-
     if (topScore >= 70) {
-      parts.push(
-        `${topName} (${topScore}/100) is the strongest-performing dimension.`
-      );
+      parts.push(`${topName} (${topScore}/100) is the strongest-performing dimension.`);
     }
 
     // ── Weakness callout ────────────────────────────────────────────
     const [bottomName, bottomScore] = scores[scores.length - 1];
     if (bottomScore < 40) {
-      parts.push(
-        `${bottomName} (${bottomScore}/100) is the weakest dimension and may merit closer review.`
-      );
+      parts.push(`${bottomName} (${bottomScore}/100) is the weakest dimension and may merit closer review.`);
     }
 
     // ── Risk context ────────────────────────────────────────────────
     if (risk > 65) {
-      parts.push(
-        `Risk indicators are elevated (${risk}/100), reflecting above-average volatility or cash flow stress.`
-      );
+      parts.push(`Risk indicators are elevated (${risk}/100), reflecting above-average volatility or cash flow stress.`);
     } else if (risk < 35) {
-      parts.push(
-        `Risk metrics are contained (${risk}/100), indicating lower-than-average stress signals.`
-      );
+      parts.push(`Risk metrics are contained (${risk}/100), indicating lower-than-average stress signals.`);
     }
 
-    // ── Accounting quality context ──────────────────────────────────
+    // ── Accounting quality ──────────────────────────────────────────
     if (accountingQuality < 40) {
-      parts.push(
-        `Accounting quality signals (${accountingQuality}/100) suggest earnings may not be fully backed by operating cash flows.`
-      );
+      parts.push(`Accounting quality signals (${accountingQuality}/100) suggest earnings may not be fully backed by operating cash flows.`);
     }
 
-    // ── Confidence context ──────────────────────────────────────────
-    if (confidence === 'Very High') {
-      parts.push(`Confidence in this assessment is very high.`);
-    } else if (confidence === 'High') {
-      parts.push(`Confidence is high.`);
-    } else if (confidence === 'Medium') {
-      parts.push(`Confidence is moderate — some data gaps or signal divergence exist.`);
-    } else {
-      parts.push(`Confidence is low — this assessment should be treated as directional.`);
+    // ── Penalties ───────────────────────────────────────────────────
+    if (penaltyTotal > 0) {
+      parts.push(`${penaltyTotal} penalty point(s) applied for detected stress signals.`);
     }
 
-    // ── Descriptive closing (no recommendations) ────────────────────
+    // ── Confidence ──────────────────────────────────────────────────
+    parts.push(`Confidence: ${confidenceLevel} (${confidenceScore}/100).`);
+
+    // ── Closing ─────────────────────────────────────────────────────
     if (classification === 'Excellent' || classification === 'Healthy') {
-      parts.push(
-        `The company's profile aligns with above-average quality and stability characteristics within the ${profile.name} sector.`
-      );
+      parts.push(`The company's profile aligns with above-average quality and stability characteristics within the ${profile.name} sector.`);
     } else if (classification === 'Stable') {
-      parts.push(
-        `The composite profile suggests a holding pattern with no clear directional catalyst.`
-      );
+      parts.push(`The composite profile suggests a holding pattern with no clear directional catalyst.`);
     } else {
-      parts.push(
-        `The composite profile indicates below-average metrics that warrant careful evaluation against investment criteria.`
-      );
+      parts.push(`The composite profile indicates below-average metrics that warrant careful evaluation against investment criteria.`);
     }
 
     return parts.join(' ');
