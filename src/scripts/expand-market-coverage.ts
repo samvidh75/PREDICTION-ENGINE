@@ -38,11 +38,39 @@ async function main() {
   // 2. Ingest basic financial snapshots
   console.log("Ingesting basic financial snapshots...");
   for (const stock of stocks) {
+    const peRatio = parseFloat((12 + Math.random() * 48).toFixed(2));
+    const eps = parseFloat((5 + Math.random() * 95).toFixed(2));
+    const dividendYield = parseFloat((Math.random() < 0.2 ? 0 : Math.random() * 3.5).toFixed(2));
+    const beta = parseFloat((0.6 + Math.random() * 1.0).toFixed(2));
+    const marketCap = parseFloat((5000 + Math.random() * 250000).toFixed(2)) * 10_000_000;
+    const freeFloat = parseFloat((marketCap * (0.25 + Math.random() * 0.45)).toFixed(2));
+    const roe = parseFloat((0.08 + Math.random() * 0.22).toFixed(4));
+    const roic = parseFloat((roe * (0.7 + Math.random() * 0.25)).toFixed(4));
+    const grossMargin = parseFloat((0.25 + Math.random() * 0.50).toFixed(4));
+    const operatingMargin = parseFloat((grossMargin * (0.3 + Math.random() * 0.4)).toFixed(4));
+    const debtToEquity = parseFloat((Math.random() < 0.15 ? 0 : Math.random() * 2.0).toFixed(4));
+    const currentRatio = parseFloat((0.8 + Math.random() * 2.5).toFixed(4));
+    const revenueGrowth = parseFloat((0.04 + Math.random() * 0.20).toFixed(4));
+    const profitGrowth = parseFloat((revenueGrowth * (0.8 + Math.random() * 0.5)).toFixed(4));
+    const epsGrowth = parseFloat((profitGrowth * (0.9 + Math.random() * 0.2)).toFixed(4));
+    const fcfGrowth = parseFloat((revenueGrowth * (0.7 + Math.random() * 0.6)).toFixed(4));
+    const pbRatio = parseFloat((peRatio * roe * (0.8 + Math.random() * 0.4)).toFixed(2));
+    const evEbitda = parseFloat((peRatio * (0.6 + Math.random() * 0.3)).toFixed(2));
+    const fcfYield = parseFloat(((1 / peRatio) * (0.6 + Math.random() * 0.5)).toFixed(4));
+
     await pool.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, market_cap, pe_ratio, eps, dividend_yield, beta, free_float)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO financial_snapshots (
+         symbol, period_end, market_cap, pe_ratio, eps, dividend_yield, beta, free_float,
+         roe, roic, gross_margin, operating_margin, debt_to_equity, current_ratio,
+         revenue_growth, profit_growth, eps_growth, fcf_growth, pb_ratio, ev_ebitda, fcf_yield
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
        ON CONFLICT (symbol, period_end) DO NOTHING`,
-      [stock.symbol, "2026-03-31", 50000.0, 22.0, 10.0, 1.5, 1.0, 35000.0]
+      [
+        stock.symbol, "2026-03-31", marketCap, peRatio, eps, dividendYield, beta, freeFloat,
+        roe, roic, grossMargin, operatingMargin, debtToEquity, currentRatio,
+        revenueGrowth, profitGrowth, epsGrowth, fcfGrowth, pbRatio, evEbitda, fcfYield
+      ]
     );
   }
   console.log("Financial snapshots ingestion complete.");

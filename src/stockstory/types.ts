@@ -117,10 +117,9 @@ export interface StabilityEngineOutput {
 
 export interface MomentumEngineOutput {
   score: number;        // 0-100
-  rsiScore: number;
-  macdScore: number;
-  adxScore: number;
-  trendStrengthScore: number;
+  momentumScore: number;
+  trendScore: number;
+  volatilityScore: number;
   commentary: string;
 }
 

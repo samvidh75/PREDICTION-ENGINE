@@ -12,24 +12,24 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#020304] overflow-hidden text-white flex flex-col font-sans select-none antialiased [text-rendering:geometricPrecision]">
+    <main className="relative min-h-screen bg-[#0f0f0f] overflow-hidden text-[#f0f3fa] flex flex-col font-sans select-none antialiased [text-rendering:geometricPrecision]">
       <TopNav />
       <MobileNav />
 
       {/* Grid Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.035)_0%,rgba(255,255,255,0.015)_48%,transparent_100%)] pointer-events-none z-0" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(41,98,255,0.16)_0%,rgba(255,255,255,0.015)_48%,transparent_100%)] pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(120,123,134,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,123,134,0.10)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none -z-10" />
 
       <section className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 py-12 md:py-24">
         <div className="flex flex-col items-center w-full max-w-md">
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md mb-6 animate-[fadeIn_250ms_ease-out]">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            <span className="text-[10px] tracking-[0.25em] font-mono text-cyan-400 font-semibold uppercase">
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#2a2e39] bg-[#131722]/80 backdrop-blur-md mb-6 animate-[fadeIn_250ms_ease-out]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2962ff]" />
+            <span className="text-[10px] tracking-[0.25em] font-mono text-[#7da0ff] font-semibold uppercase">
               STOCKSTORY INDIA
             </span>
           </div>
 
-          <div className="w-full bg-white/[0.02] border border-white/5 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+          <div className="w-full bg-[#131722] border border-[#2a2e39] backdrop-blur-md rounded-2xl p-8 shadow-2xl">
             <CinematicAuthGateway onAuthed={goDashboard} initialStage="signup" />
           </div>
         </div>

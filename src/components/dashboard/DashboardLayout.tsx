@@ -5,7 +5,7 @@ import { DashboardHub } from './DashboardHub';
 
 export const DashboardLayout: React.FC = () => {
   return (
-    <div className="flex min-h-screen bg-[#020304] text-white">
+    <div className="flex min-h-screen bg-[#0f0f0f] text-[#f0f3fa]">
       {/* 22nd-century Navigation Control Rail */}
       <IntelligenceNavigationRail />
       

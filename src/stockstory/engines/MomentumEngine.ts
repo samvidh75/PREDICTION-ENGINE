@@ -91,34 +91,52 @@ export class MomentumEngine {
       else trendStrengthScore = 10;
     }
 
-    // ── ATR influence: higher ATR adds uncertainty ──────────────────
-    let atrAdjust = 0;
+    // ── Converted Sub-score 1: Momentum Score ───────────────────────
+    // blend of RSI and MACD
+    const momentumScore = weightedAverage([
+      { score: rsiScore, weight: 5 },
+      { score: macdScore, weight: 5 },
+    ]);
+
+    // ── Converted Sub-score 2: Trend Score ──────────────────────────
+    // blend of ADX and Trend Strength
+    const trendScore = weightedAverage([
+      { score: adxScore, weight: 4 },
+      { score: trendStrengthScore, weight: 6 },
+    ]);
+
+    // ── Converted Sub-score 3: Volatility Score ─────────────────────
+    // derived from Volatility & ATR (lower volatility/ATR = higher stability score)
+    let volatilityScore = 50;
+    const vol = features.volatility;
     const atr = features.atr;
-    if (atr !== null) {
-      // ATR is raw value; adjust based on ATR/trend balance
-      // Higher ATR with weak trend = poor momentum quality
-      if (adx !== null) {
-        const atrQuality = (adx / 100) / Math.max(atr * 5, 0.01);
-        atrAdjust = (atrQuality - 0.5) * 10; // small adjustment
+    if (vol !== null) {
+      const mappedVol = clampScore(100 - vol * 150);
+      let mappedAtr = 50;
+      if (atr !== null) {
+        // ATR relative adjustment
+        mappedAtr = clampScore(100 - (atr / 100) * 1000);
       }
+      volatilityScore = weightedAverage([
+        { score: mappedVol, weight: 6 },
+        { score: mappedAtr, weight: 4 },
+      ]);
     }
 
-    // ── Composite Score ─────────────────────────────────────────────
+    // ── Overall Momentum Engine composite score ─────────────────────
     const compositeScore = weightedAverage([
-      { score: rsiScore + atrAdjust, weight: 3 },
-      { score: macdScore + atrAdjust * 0.5, weight: 3 },
-      { score: adxScore, weight: 2 },
-      { score: trendStrengthScore, weight: 2 },
+      { score: momentumScore, weight: 5 },
+      { score: trendScore, weight: 3 },
+      { score: volatilityScore, weight: 2 },
     ]);
 
     const commentary = this.generateCommentary(compositeScore, features);
 
     return {
       score: compositeScore,
-      rsiScore: clampScore(rsiScore + atrAdjust),
-      macdScore: clampScore(macdScore + atrAdjust * 0.5),
-      adxScore,
-      trendStrengthScore,
+      momentumScore,
+      trendScore,
+      volatilityScore,
       commentary,
     };
   }
