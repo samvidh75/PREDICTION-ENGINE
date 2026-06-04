@@ -12,28 +12,15 @@ export interface NewsArticle {
   timestamp: string;
 }
 
-const MOCK_NEWS: NewsArticle[] = [
-  { id: "1", title: "Defence Production Allocations Exceed Budget Targets", summary: "Ministry reports multi-year acceleration in local components output and production speeds.", impact: "Positive", sector: "Defence", timestamp: "1 hour ago" },
-  { id: "2", title: "Banking Credit Growth Expands Steady 15% YoY", summary: "Financial institutions report steady capital utilization led by commercial infrastructure projects.", impact: "Positive", sector: "Banking", timestamp: "3 hours ago" },
-  { id: "3", title: "IT Service Exports Stable Near Global Bounds", summary: "Firms report stable billing cycles with slight recovery in localized delivery volumes.", impact: "Neutral", sector: "IT", timestamp: "5 hours ago" },
-  { id: "4", title: "Pharma API Clearances Align with International Inspections", summary: "Three manufacturing units clear regulatory safety audits, stabilizing long-term export channels.", impact: "Important", sector: "Pharma", timestamp: "6 hours ago" },
-  { id: "5", title: "Auto Manufacturing Adjusts EV Transition Timelines", summary: "Producers sync supply logistics to match regional passenger consumption patterns.", impact: "Neutral", sector: "Auto", timestamp: "8 hours ago" },
-  { id: "6", title: "National Railway Modernization Targets Steady Execution", summary: "Infrastructure modernization budgets fuel accelerated capital equipment orders.", impact: "Positive", sector: "Railways", timestamp: "12 hours ago" },
-  { id: "7", title: "Metals Global Demand Faces Short-term Pricing Headwinds", summary: "Inventory builds across production hubs suggest near-term pricing adjustments.", impact: "Negative", sector: "Metals", timestamp: "18 hours ago" },
-  { id: "8", title: "FMCG Rural Markets Volume Growth Consolidates Safely", summary: "FMCG players defend pricing margins as rural volume expansion remains stable.", impact: "Important", sector: "FMCG", timestamp: "1 day ago" },
-  { id: "9", title: "Green Energy Transition Gains Direct Structural Incentives", summary: "Policy updates offer direct support for grid integrations and transmission assets.", impact: "Positive", sector: "Energy", timestamp: "1 day ago" },
-  { id: "10", title: "Telecom Tariffs Firm Up, Enhancing ARPU Outlook", summary: "Carriers stabilize operational revenues as average data utilization continues expanding.", impact: "Important", sector: "Telecom", timestamp: "2 days ago" },
-];
-
 export class NewsCoordinator {
   private static liveNewsCache: NewsArticle[] = [];
   private static liveNewsAt = 0;
   private static liveNewsRefreshPromise: Promise<void> | null = null;
   private static readonly LIVE_NEWS_TTL_MS = 10 * 60 * 1000;
-  private static readonly LIVE_SYMBOLS = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "HAL"];
+  private static readonly LIVE_SYMBOLS = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "HAL", "ICICIBANK", "LT", "BAJFINANCE", "ITC", "HINDUNILVR"];
 
   public static getTopNews(symbol?: string, sector?: string): NewsArticle[] {
-    let list = [...this.getLiveNews(), ...MOCK_NEWS];
+    let list = this.getLiveNews();
     list = this.dedupe(list);
 
     if (symbol) {
@@ -54,6 +41,7 @@ export class NewsCoordinator {
 
     void this.refreshLiveNews();
 
+    if (list.length === 0) return [];
     return list.slice(0, 10);
   }
 
@@ -91,11 +79,11 @@ export class NewsCoordinator {
         });
 
         if (liveArticles.length > 0) {
-          this.liveNewsCache = this.dedupe([...liveArticles, ...MOCK_NEWS]).slice(0, 20);
+          this.liveNewsCache = this.dedupe(liveArticles).slice(0, 20);
           this.liveNewsAt = Date.now();
         }
       } catch {
-        // Keep last successful cache or fall back to mock feed.
+        // Keep last successful cache. If nothing cached, news is genuinely unavailable.
       } finally {
         this.liveNewsRefreshPromise = null;
       }
@@ -121,6 +109,11 @@ export class NewsCoordinator {
       HDFCBANK: "Banking",
       INFY: "IT",
       HAL: "Defence",
+      ICICIBANK: "Banking",
+      LT: "Infrastructure",
+      BAJFINANCE: "Banking",
+      ITC: "FMCG",
+      HINDUNILVR: "FMCG",
     };
     return map[symbol.toUpperCase()] ?? "Market";
   }

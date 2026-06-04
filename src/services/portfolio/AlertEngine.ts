@@ -16,53 +16,7 @@ export interface SmartAlert {
 const STORAGE_KEY_PREFIX = "stockstory_alerts_v2";
 const SETTINGS_KEY_PREFIX = "stockstory_alert_settings_v1";
 
-const DEFAULT_ALERTS: SmartAlert[] = [
-  {
-    id: "a1",
-    category: "Factor",
-    title: "Factor Rating Upgraded",
-    body: "RELIANCE has moved to a high health classification as operating margins consolidate.",
-    timestamp: "10 mins ago",
-    symbol: "RELIANCE",
-    isRead: false
-  },
-  {
-    id: "a2",
-    category: "Risk",
-    title: "Risk Level Drift",
-    body: "INFY is showing minor risk exposure drift due to tech sector volatility adjustments.",
-    timestamp: "1 hour ago",
-    symbol: "INFY",
-    isRead: false
-  },
-  {
-    id: "a3",
-    category: "News",
-    title: "High-Sentiment News Detected",
-    body: "HAL cleared significant government project clearances, stabilizing domestic manufacturing timelines.",
-    timestamp: "3 hours ago",
-    symbol: "HAL",
-    isRead: true
-  },
-  {
-    id: "a4",
-    category: "Momentum",
-    title: "Momentum Breakout Active",
-    body: "HDFCBANK pricing has expanded beyond the 50-day moving average with supportive retail volumes.",
-    timestamp: "5 hours ago",
-    symbol: "HDFCBANK",
-    isRead: false
-  },
-  {
-    id: "a5",
-    category: "Market",
-    title: "Market Regime Switch",
-    body: "Broad Indian indices entered a BULL regime with 82% of tickers trading above their 50-day average.",
-    timestamp: "1 day ago",
-    symbol: "NIFTY50",
-    isRead: true
-  }
-];
+const EMPTY_ALERTS: SmartAlert[] = [];
 
 export class AlertEngine {
   private static getStorageKey(): string {
@@ -95,7 +49,7 @@ export class AlertEngine {
   }
 
   public static getAlerts(): SmartAlert[] {
-    if (typeof window === "undefined") return DEFAULT_ALERTS;
+    if (typeof window === "undefined") return [...EMPTY_ALERTS];
     
     if (!this.isInitialSyncStarted) {
       this.isInitialSyncStarted = true;
@@ -105,13 +59,12 @@ export class AlertEngine {
     const key = this.getStorageKey();
     const raw = window.localStorage.getItem(key);
     if (!raw) {
-      window.localStorage.setItem(key, JSON.stringify(DEFAULT_ALERTS));
-      return DEFAULT_ALERTS;
+      return [...EMPTY_ALERTS];
     }
     try {
       return JSON.parse(raw) as SmartAlert[];
     } catch {
-      return DEFAULT_ALERTS;
+      return [...EMPTY_ALERTS];
     }
   }
 

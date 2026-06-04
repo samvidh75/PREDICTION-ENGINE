@@ -1,44 +1,69 @@
 import { HealthMetric, HealthStatus } from '../../types/healthometer';
 
-export class MockTelemetryStream {
-  private static instance: MockTelemetryStream;
-  private interval: NodeJS.Timeout | null = null;
+/**
+ * LiveTelemetryStream — polls the /api/healthometer endpoint for live
+ * market health metrics instead of generating mock data with random drift.
+ */
+export class LiveTelemetryStream {
+  private static instance: LiveTelemetryStream;
+  private interval: ReturnType<typeof setInterval> | null = null;
+  private lastSnapshot: any = null;
 
-  // Simulate Indian market sector drift
-  private baseMetrics: HealthMetric[] = [
-    { id: 'nse_vol', label: 'NSE Liquidity', value: 78, weight: 0.4, trend: 'neutral' },
-    { id: 'bse_sent', label: 'BSE Sentiment', value: 65, weight: 0.3, trend: 'improving' },
-    { id: 'sme_risk', label: 'SME Alpha', value: 42, weight: 0.3, trend: 'declining' },
-  ];
-
-  public static getInstance(): MockTelemetryStream {
-    if (!this.instance) this.instance = new MockTelemetryStream();
+  public static getInstance(): LiveTelemetryStream {
+    if (!this.instance) this.instance = new LiveTelemetryStream();
     return this.instance;
   }
 
   public subscribe(callback: (data: any) => void) {
-    this.interval = setInterval(() => {
-      const updatedMetrics = this.baseMetrics.map(m => {
-        const change = (Math.random() * 4 - 2);
-        const newValue = Math.min(100, Math.max(0, m.value + change));
-        return {
-          ...m,
-          value: Number(newValue.toFixed(2)),
-          trend: (change > 0 ? 'improving' : 'declining') as 'improving' | 'declining' | 'neutral'
-        };
-      });
+    // Fetch initial snapshot immediately
+    this.fetchAndDeliver(callback);
 
-      callback({
-        total: Number(updatedMetrics.reduce((acc, m) => acc + (m.value * m.weight), 0).toFixed(2)),
-        status: this.calculateStatus(updatedMetrics),
-        metrics: updatedMetrics,
-        lastUpdated: new Date().toISOString()
+    // Poll every 30 seconds
+    this.interval = setInterval(() => {
+      this.fetchAndDeliver(callback);
+    }, 30_000);
+  }
+
+  private async fetchAndDeliver(callback: (data: any) => void) {
+    try {
+      const response = await fetch('/api/healthometer', {
+        headers: { Accept: 'application/json' },
       });
-    }, 2000); // 2s polling interval for UI-animation stress testing
+      if (!response.ok) {
+        // Deliver last known snapshot if API is temporarily down
+        if (this.lastSnapshot) callback(this.lastSnapshot);
+        return;
+      }
+
+      const data = await response.json();
+      if (!data || !data.metrics) {
+        if (this.lastSnapshot) callback(this.lastSnapshot);
+        return;
+      }
+
+      const snapshot = {
+        total: Number(data.total ?? (data.metrics.reduce((acc: number, m: any) => acc + (m.value * (m.weight || 0.33)), 0))),
+        status: data.status || this.calculateStatus(data.metrics),
+        metrics: data.metrics.map((m: any) => ({
+          id: m.id || `metric_${Math.random().toString(36).substr(2, 6)}`,
+          label: m.label || 'Unknown',
+          value: Number(m.value) || 50,
+          weight: Number(m.weight) || 0.33,
+          trend: m.trend || 'neutral',
+        })),
+        lastUpdated: data.lastUpdated || new Date().toISOString(),
+      };
+
+      this.lastSnapshot = snapshot;
+      callback(snapshot);
+    } catch {
+      // Deliver last known snapshot if fetch fails
+      if (this.lastSnapshot) callback(this.lastSnapshot);
+    }
   }
 
   private calculateStatus(metrics: HealthMetric[]): HealthStatus {
-    const avg = metrics.reduce((acc, m) => acc + m.value, 0) / metrics.length;
+    const avg = metrics.reduce((acc, m) => acc + (m.value * (m.weight || 0.33)), 0);
     if (avg > 80) return 'very-healthy';
     if (avg > 60) return 'healthy';
     if (avg > 40) return 'stable';
@@ -53,4 +78,7 @@ export class MockTelemetryStream {
   }
 }
 
-export default MockTelemetryStream;
+// Keep the old export name for backward compatibility with existing imports
+export const MockTelemetryStream = LiveTelemetryStream;
+
+export default LiveTelemetryStream;

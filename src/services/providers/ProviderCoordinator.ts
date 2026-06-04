@@ -139,7 +139,7 @@ export class ProviderCoordinator {
           ? await breaker.execute(() => fn(provider))
           : await fn(provider);
         this.healthMonitor.recordSuccess(provider);
-        this.tracer.recordUsage(symbol, category, provider.constructor.name, false);
+        this.tracer?.recordUsage(symbol, category, provider.constructor.name, false);
         return result;
       } catch (err: any) {
         const msg = err?.message || String(err);
