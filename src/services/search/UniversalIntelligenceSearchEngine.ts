@@ -23,11 +23,44 @@ import {
   SearchQuery,
   SearchFilters
 } from '../../types/SearchTypes';
+import { StockRegistry } from '../stocks/StockRegistry';
 
 class UniversalIntelligenceSearchEngine {
   private searchIndex: Map<string, SearchResult[]> = new Map();
   private isIndexing: boolean = false;
   private holographicIntensity: number = 0.5;
+
+  private autoIndex(): void {
+    try {
+      const stocks = StockRegistry.getAllStocks();
+      const data: SearchResult[] = stocks.map(s => ({
+        id: s.symbol,
+        type: SearchResultType.STOCK,
+        title: s.companyName,
+        subtitle: `${s.symbol} | ${s.exchange}`,
+        description: `Analyze ${s.companyName} (${s.symbol}) health score and core narrative rails.`,
+        confidence: 1.0,
+        telemetry: {
+          healthometerScore: s.telemetrySnapshot?.healthScore ?? 50,
+        },
+        preview: {},
+        metadata: {
+          symbol: s.symbol,
+          sector: s.sector,
+          lastUpdated: Date.now()
+        }
+      }));
+      for (const item of data) {
+        const typeKey = item.type;
+        if (!this.searchIndex.has(typeKey)) {
+          this.searchIndex.set(typeKey, []);
+        }
+        this.searchIndex.get(typeKey)!.push(item);
+      }
+    } catch (e) {
+      console.error("Failed to autoindex:", e);
+    }
+  }
 
   /**
    * Initialize search index

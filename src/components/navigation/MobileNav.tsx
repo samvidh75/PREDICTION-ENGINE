@@ -40,10 +40,6 @@ export const MobileNav: React.FC = () => {
 
   const handleNav = (id: ViewType | "search") => {
     setIsOpen(false);
-    if (id === "search") {
-      window.dispatchEvent(new Event("ss:open-search"));
-      return;
-    }
     MapsTo(id);
   };
 
@@ -100,7 +96,7 @@ export const MobileNav: React.FC = () => {
             </button>
           );
         }) : tabs.map(tab => {
-          const isActive = tab.id === "search" ? false : currentView === tab.id;
+          const isActive = currentView === tab.id;
           return (
             <button
               key={tab.id}
@@ -155,7 +151,7 @@ export const MobileNav: React.FC = () => {
 
               <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
                 {links.map(link => {
-                  const isActive = link.id === "search" ? false : currentView === link.id;
+                  const isActive = currentView === link.id;
                   return (
                     <button
                       key={link.id}

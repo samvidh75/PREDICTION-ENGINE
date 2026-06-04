@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "../hooks/auth/useAuth";
 
-export type ViewType = "terminal" | "discovery" | "portfolio" | "watchlist" | "alerts" | "settings";
+export type ViewType = "terminal" | "search" | "discovery" | "portfolio" | "watchlist" | "alerts" | "settings";
 
 export type LayoutContextType = {
   currentView: ViewType;
@@ -15,12 +15,13 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const { isAuthenticated } = useAuth();
   const [currentView, setCurrentView] = useState<ViewType>("terminal");
 
-  const validViews: ViewType[] = ["terminal", "discovery", "portfolio", "watchlist", "alerts", "settings"];
+  const validViews: ViewType[] = ["terminal", "search", "discovery", "portfolio", "watchlist", "alerts", "settings"];
 
   const MapsTo = (targetView: ViewType) => {
     if (validViews.includes(targetView)) {
       let pageKey = "dashboard";
       if (targetView === "terminal") pageKey = "dashboard";
+      else if (targetView === "search") pageKey = "search";
       else if (targetView === "discovery") pageKey = "discovery";
       else if (targetView === "portfolio") pageKey = "portfolio";
       else if (targetView === "watchlist") pageKey = "watchlist";
@@ -43,6 +44,7 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const page = params.get('page');
     
     if (page === 'dashboard' || page === 'market') setCurrentView('terminal');
+    else if (page === 'search') setCurrentView('search');
     else if (page === 'discovery') setCurrentView('discovery');
     else if (page === 'portfolio') setCurrentView('portfolio');
     else if (page === 'watchlist') setCurrentView('watchlist');

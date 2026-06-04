@@ -24,10 +24,6 @@ export const Sidebar: React.FC = () => {
   ];
 
   const handleNavClick = (id: ViewType | "search") => {
-    if (id === "search") {
-      window.dispatchEvent(new Event("ss:open-search"));
-      return;
-    }
     MapsTo(id);
   };
 
@@ -36,7 +32,7 @@ export const Sidebar: React.FC = () => {
       <nav className="flex-1 space-y-1.5 px-3 overflow-y-auto">
         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#787b86] px-3 block mb-3 font-sans">Menu</span>
         {links.map(link => {
-          const isActive = link.id === "search" ? false : currentView === link.id;
+          const isActive = currentView === link.id;
           return (
             <button
               key={link.id}

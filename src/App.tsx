@@ -13,6 +13,7 @@ import PublicLandingPage from "./pages/PublicLandingPage";
 import PublicAboutPage from "./pages/PublicAboutPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import SearchPage from "./pages/SearchPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import AlertCentrePage from "./pages/AlertCentrePage";
@@ -46,6 +47,7 @@ type PageKey =
   | "company"
   | "explore"
   | "dashboard"
+  | "search"
   | "portfolio"
   | "watchlist"
   | "alerts"
@@ -69,6 +71,7 @@ function getPageKeyFromUrl(): PageKey {
     if (raw === "company" || raw === "stock") return "company";
     if (raw === "explore") return "explore";
     if (raw === "dashboard" || raw === "market") return "dashboard";
+    if (raw === "search") return "search";
     if (raw === "portfolio") return "portfolio";
     if (raw === "watchlist") return "watchlist";
     if (raw === "alerts") return "alerts";
@@ -102,6 +105,10 @@ function getRouteSignatureFromUrl(): string {
 
     if (page === "explore") {
       return `explore:${kind}:${id}`;
+    }
+
+    if (page === "search") {
+      return `search:${q}`;
     }
 
     if (searchSig) return `${page}:${searchSig}`;
@@ -203,7 +210,7 @@ function AppContent(): JSX.Element {
 
   const isAuthLoading = loading;
   const isAuthed = isAuthenticated && !!user;
-  const protectedPages: PageKey[] = ["dashboard", "discovery", "stock", "company", "watchlist", "portfolio", "alerts", "settings"];
+  const protectedPages: PageKey[] = ["dashboard", "search", "discovery", "stock", "company", "watchlist", "portfolio", "alerts", "settings"];
 
   // Route Guard: If not authenticated, protected pages must go to Login.
   const activePageKey = !isPublicPage && !isAuthed ? "login" : pageKey;
@@ -260,6 +267,8 @@ function AppContent(): JSX.Element {
         return "explore_discovery";
       case "dashboard":
         return "market_intelligence_dashboard";
+      case "search":
+        return "search_page";
       case "company":
         return "company_universe";
       case "portfolio":
@@ -296,6 +305,7 @@ function AppContent(): JSX.Element {
         {activePageKey === "discovery" && <DiscoveryPage />}
         {activePageKey === "settings" && <SettingsPage />}
         {activePageKey === "dashboard" && <DashboardHub />}
+        {activePageKey === "search" && <SearchPage />}
         {activePageKey === "company" && hasStockId && <StockStoryPage />}
         {activePageKey === "company" && !hasStockId && <DashboardHub />}
         {activePageKey === "stock" && hasStockId && <StockStoryPage />}

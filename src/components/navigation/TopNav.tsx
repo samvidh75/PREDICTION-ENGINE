@@ -9,6 +9,9 @@ export const TopNav: React.FC = () => {
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", pageKey);
+    if (pageKey !== "search") {
+      params.delete("q");
+    }
     window.history.pushState({}, "", `?${params.toString()}`);
     window.dispatchEvent(new Event("urlchange"));
   };

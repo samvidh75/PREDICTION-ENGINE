@@ -1,4 +1,4 @@
-export type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard";
+export type PageKey = "landing" | "about" | "stock" | "company" | "community" | "practice" | "assistant" | "explore" | "dashboard" | "search";
 
 export type ExploreRoute = {
   kind: string;
