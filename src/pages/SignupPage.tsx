@@ -12,7 +12,7 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#0f0f0f] overflow-hidden text-[#f0f3fa] flex flex-col font-sans select-none antialiased [text-rendering:geometricPrecision]">
+    <main className="ss-tv-app relative min-h-screen bg-[#0f0f0f] overflow-hidden text-[#f0f3fa] flex flex-col font-sans select-none antialiased [text-rendering:geometricPrecision]">
       <TopNav />
       <MobileNav />
 

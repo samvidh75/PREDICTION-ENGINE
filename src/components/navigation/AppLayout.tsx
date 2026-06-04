@@ -44,7 +44,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative bg-[#0f0f0f] text-[#f0f3fa]">
+    <div className="ss-tv-app h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative bg-[#0f0f0f] text-[#f0f3fa]">
       {/* Top Header - Desktop Viewport (h-18 / 72px) */}
       <div className="hidden md:block">
         <TopNav />
@@ -66,7 +66,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           h-[calc(100vh-72px)] 
           mt-[72px] 
           overflow-y-auto 
-          bg-[#0f0f0f]
+          ss-tv-market-grid bg-[#0f0f0f]
           md:ml-[240px]
           transition-all duration-300 ease-out
         ">

@@ -125,7 +125,7 @@ export const PublicAboutPage: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#05070d] text-[#f0f3fa] font-sans antialiased">
+    <main className="ss-tv-app relative min-h-screen overflow-x-hidden bg-[#05070d] text-[#f0f3fa] font-sans antialiased">
       <TopNav />
       <MobileNav />
 
@@ -300,7 +300,7 @@ export const PublicAboutPage: React.FC = () => {
                   Premium signal layer
                 </div>
                 <p className="mt-3 text-sm leading-6 text-white/82">
-                  Built to feel like a serious market desk, not a prototype screen.
+                  Built to feel like a serious market desk for real Indian company research.
                 </p>
               </div>
             </div>

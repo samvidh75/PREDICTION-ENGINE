@@ -17,7 +17,7 @@ export const PublicLandingPage: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-screen bg-[#0f0f0f] overflow-x-hidden text-[#f0f3fa] flex flex-col font-sans select-none pb-12">
+    <main className="ss-tv-app relative min-h-screen bg-[#0f0f0f] overflow-x-hidden text-[#f0f3fa] flex flex-col font-sans select-none pb-12">
       <TopNav />
       <MobileNav />
 

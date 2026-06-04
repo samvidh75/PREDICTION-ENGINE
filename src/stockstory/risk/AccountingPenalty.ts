@@ -10,6 +10,7 @@ import type { EngineInputs } from '../types';
 
 export function evaluateAccountingPenalty(inputs: EngineInputs): Penalty[] {
   const penalties: Penalty[] = [];
+  if (!inputs?.financials) return penalties;
   const { financials } = inputs;
 
   // Revenue-EPS divergence (EPS outpacing revenue by >20%)
