@@ -163,15 +163,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     try {
       await firebaseSignOut(firebaseAuth);
-      clearAuthSession();
-      window.dispatchEvent(new Event("ss:auth-session-changed"));
-      setUser(null);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Sign out could not be completed.";
       setAuthError(message);
       console.error("[AuthContext] Logout error:", error);
     } finally {
+      // Always clear local state regardless of Firebase signOut success/failure
+      clearAuthSession();
+      setUser(null);
       setIsConnecting(false);
+      // Force redirect to login page for clean session termination
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("page", "login");
+        window.history.replaceState({}, "", url.toString());
+        window.dispatchEvent(new Event("urlchange"));
+        window.dispatchEvent(new Event("ss:auth-session-changed"));
+      }
     }
   }, []);
 

@@ -1,159 +1,117 @@
-import React, { useState, useEffect } from "react";
-import { TrendingUp, Sparkles, Trophy, Flame, PlusCircle, Search } from "lucide-react";
-
-import { CompanyCard } from "../components/company/CompanyCard";
-import { StockRegistry } from "../services/stocks/StockRegistry";
-import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { PageHeader } from "../components/ui/DesignSystem";
+import React, { useState, useEffect } from 'react';
+import { Trophy, Sparkles, Flame, TrendingUp, PlusCircle } from 'lucide-react';
+import { StockRegistry } from '../services/stocks/StockRegistry';
+import { WatchlistEngine } from '../services/portfolio/WatchlistEngine';
+import { PageHeader } from '../components/ui/DesignSystem';
 
 interface DiscoverCompany {
   symbol: string;
   name: string;
   score: number;
-  price: string;
-  change: string;
-  isPositive: boolean;
-  oneLiner: string;
-}
-
-interface DiscoverCategory {
-  title: string;
-  icon: React.ReactNode;
-  companies: DiscoverCompany[];
 }
 
 export const DiscoveryPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
-  const [categories, setCategories] = useState<DiscoverCategory[]>([]);
+  const [rails, setRails] = useState<{ title: string; icon: React.ReactNode; companies: DiscoverCompany[] }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
 
   useEffect(() => {
-    const handleWatchlistChange = () => {
-      setWatchlists([...WatchlistEngine.getWatchlists()]);
-    };
-    window.addEventListener("watchlistchange", handleWatchlistChange);
-    return () => window.removeEventListener("watchlistchange", handleWatchlistChange);
+    const handleChange = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
+    window.addEventListener('watchlistchange', handleChange);
+    return () => window.removeEventListener('watchlistchange', handleChange);
   }, []);
 
   useEffect(() => {
     fetch('/api/intelligence/discovery/rankings')
       .then(res => res.json())
       .then(data => {
-        if (!data || data.error) throw new Error(data?.error || 'No data');
-        const mapToCompanies = (list: any[]) => list.map(item => {
-          const stock = StockRegistry.getStock(item.symbol);
-          return {
-            symbol: item.symbol,
-            name: stock?.companyName || item.symbol,
-            score: Math.round(item.score || 0),
-            price: item.price || null,
-            change: item.change || null,
-            isPositive: item.change?.startsWith('+') || false,
-            oneLiner: item.oneLiner || 'Data unavailable'
-          };
-        });
-        setCategories([
-          { title: 'High Quality', icon: <Trophy className="w-5 h-5 text-yellow-400" />, companies: mapToCompanies(data.highestQuality || []) },
-          { title: 'High Growth', icon: <Sparkles className="w-5 h-5 text-fuchsia-400" />, companies: mapToCompanies(data.highestGrowth || []) },
-          { title: 'Momentum', icon: <Flame className="w-5 h-5 text-amber-400 animate-pulse" />, companies: mapToCompanies(data.highestMomentum || []) },
-          { title: 'Turnarounds / Improving', icon: <PlusCircle className="w-5 h-5 text-sky-400" />, companies: mapToCompanies(data.topImproving || []) }
-        ].filter(c => c.companies.length > 0));
+        const mapList = (list: any[]) => (list || []).map((item: any) => ({
+          symbol: item.symbol,
+          name: StockRegistry.getStock(item.symbol)?.companyName || item.symbol,
+          score: Math.round(item.score || 0),
+        }));
+
+        setRails([
+          { title: 'High Quality', icon: <Trophy className="w-5 h-5 text-amber-400" />, companies: mapList(data.highestQuality) },
+          { title: 'High Growth', icon: <Sparkles className="w-5 h-5 text-fuchsia-400" />, companies: mapList(data.highestGrowth) },
+          { title: 'Value', icon: <TrendingUp className="w-5 h-5 text-emerald-400" />, companies: mapList(data.highestRisk?.slice().reverse()) },
+          { title: 'Momentum', icon: <Flame className="w-5 h-5 text-orange-400" />, companies: mapList(data.highestMomentum) },
+          { title: 'Turnarounds', icon: <PlusCircle className="w-5 h-5 text-sky-400" />, companies: mapList(data.topImproving) },
+        ].filter(r => r.companies.length > 0));
         setLoading(false);
       })
       .catch(() => {
-        setCategories([]);
+        setRails([]);
         setLoading(false);
       });
   }, []);
 
   const handleCompanyClick = (symbol: string) => {
     const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock");
-    params.set("id", symbol);
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
+    params.set('page', 'stock');
+    params.set('id', symbol);
+    window.history.pushState({}, '', `?${params.toString()}`);
+    window.dispatchEvent(new Event('urlchange'));
   };
 
-  const isWatched = (ticker: string) => {
-    return watchlists.some(w => w.tickers.includes(ticker));
-  };
+  const isWatched = (ticker: string) => watchlists.some(w => w.tickers.includes(ticker));
 
-  const handleToggleWatchlist = (ticker: string) => {
+  const toggleWatchlist = (ticker: string) => {
     const defaultList = watchlists[0];
     if (!defaultList) return;
-    if (isWatched(ticker)) {
-      WatchlistEngine.removeTicker(defaultList.id, ticker);
-    } else {
-      WatchlistEngine.addTicker(defaultList.id, ticker);
-    }
+    if (isWatched(ticker)) WatchlistEngine.removeTicker(defaultList.id, ticker);
+    else WatchlistEngine.addTicker(defaultList.id, ticker);
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const filteredCategories = categories.map(category => {
-    const filtered = category.companies.filter(c => 
-      c.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    return { ...category, companies: filtered.slice(0, 10) };
-  }).filter(category => category.companies.length > 0);
-
   return (
-    <div className="w-full flex flex-col space-y-8 select-none pb-12 bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
-      (* Page Header *)
-      <PageHeader
-        title="Discovery Hub"
-        subtitle="What should I research?"
-        primaryAction={
-          <div className="relative w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-            <input
-              type="text"
-              placeholder="Filter by ticker or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder-white/40 focus:outline-none focus:border-cyan-400 font-sans"
-            />
-          </div>
-        }
-      />
+    <div className="w-full flex flex-col space-y-10 pb-12 bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
+      <PageHeader title="Discovery" subtitle="What should I research?" />
 
-      (* Horizontal Netflix Reels *)
-      <div className="space-y-8">
-        {loading ? <div className="text-white/50 text-sm pl-4">Loading discovery feeds...</div> : filteredCategories.length === 0 ? <div className="text-white/50 text-sm pl-4">Discovery feeds currently unavailable.</div> :
-        filteredCategories.map((category) => (
-          <div key={category.title} className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-white/5 pb-2">
-              {category.icon}
-              <h2 className="text-lg font-bold text-white tracking-tight">{category.title}</h2>
-            </div>
-
-            (* Horizontal Scroll Rail *)
-            <div className="relative w-full">
-              <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent snap-x">
-                {category.companies.map((c) => {
-                  const info = StockRegistry.getStock(c.symbol);
-                  return (
-                    <div key={c.symbol} className="flex-shrink-0 w-[280px] snap-start">
-                      <CompanyCard
-                        ticker={c.symbol}
-                        name={c.name}
-                        sector={info?.sector || "Data unavailable"}
-                        marketCap={info?.marketCap?.formatted || "Data unavailable"}
-                        score={c.score}
-                        whyItMatters={c.oneLiner}
-                        isWatched={isWatched(c.symbol)}
-                        onOpenBriefing={() => handleCompanyClick(c.symbol)}
-                        onToggleWatchlist={() => handleToggleWatchlist(c.symbol)}
-                      />
-                    </div>
-                  );
-                }) }
+      {loading ? (
+        <div className="text-white/40 text-sm py-8 text-center">Loading discovery feeds...</div>
+      ) : rails.length === 0 ? (
+        <div className="text-white/40 text-sm py-8 text-center">Discovery feeds currently unavailable.</div>
+      ) : (
+        <div className="space-y-10">
+          {rails.map((rail) => (
+            <section key={rail.title} className="space-y-4">
+              <div className="flex items-center gap-2">
+                {rail.icon}
+                <h2 className="text-lg font-bold text-white">{rail.title}</h2>
+                <span className="text-xs text-white/40 ml-2">{rail.companies.length}</span>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+              <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-none snap-x">
+                {rail.companies.slice(0, 10).map((c) => (
+                  <div key={c.symbol} className="flex-shrink-0 w-[260px] snap-start">
+                    <button
+                      onClick={() => handleCompanyClick(c.symbol)}
+                      className="w-full text-left p-4 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer group"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="font-mono font-bold text-white">{c.symbol}</span>
+                        <span className="text-[10px] font-mono text-cyan-400">{c.score}</span>
+                      </div>
+                      <p className="text-xs text-white/60 leading-relaxed mb-3">{c.name}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-cyan-400 group-hover:text-cyan-300">Open</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleWatchlist(c.symbol); }}
+                          className={`text-[10px] px-2 py-0.5 rounded border cursor-pointer ${
+                            isWatched(c.symbol) ? 'text-amber-400 border-amber-400/20 bg-amber-400/10' : 'text-white/40 border-white/10 hover:text-white/70'
+                          }`}
+                        >
+                          {isWatched(c.symbol) ? 'Watching' : 'Watch'}
+                        </button>
+                      </div>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

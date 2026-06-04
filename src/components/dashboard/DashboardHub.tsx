@@ -1,272 +1,211 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ArrowRight, Flame, Trophy, RefreshCw, Layers } from 'lucide-react';
-import { CompanyCard } from '../company/CompanyCard';
 import { StockRegistry } from '../../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
 import { RecentSearchStore } from '../../services/search/RecentSearchStore';
-import { PageHeader, CustomTable, Button } from '../ui/DesignSystem';
-
-interface SnapshotItem {
-  index: string;
-  value: string;
-  change: string;
-  isPositive: boolean;
-}
-
-const marketSnapshots: SnapshotItem[] = [];
-
-interface Opportunity {
-  ticker: string;
-  whatChanged: string;
-  whyMatters: string;
-}
-
-const todayOpportunities: Opportunity[] = [];
+import { PageHeader, Button } from '../ui/DesignSystem';
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [recentResearch, setRecentResearch] = useState<string[]>([]);
+  const [opportunities, setOpportunities] = useState<any[]>([]);
+  const [marketData, setMarketData] = useState<any>(null);
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
-
-    const handleWatchlistChange = () => {
-      setWatchlists([...WatchlistEngine.getWatchlists()]);
-    };
+    const handleWatchlistChange = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
     window.addEventListener("watchlistchange", handleWatchlistChange);
     return () => window.removeEventListener("watchlistchange", handleWatchlistChange);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/intelligence/discovery/rankings')
+      .then(res => res.json())
+      .then(data => {
+        const merged = [
+          ...((data?.topImproving || []).map((item: any) => ({ ...item, category: 'Improving' }))),
+          ...((data?.highestQuality || []).map((item: any) => ({ ...item, category: 'Quality' }))),
+          ...((data?.highestMomentum || []).map((item: any) => ({ ...item, category: 'Momentum' }))),
+        ].slice(0, 5);
+        setOpportunities(merged.map((item: any) => {
+          const stock = StockRegistry.getStock(item.symbol);
+          return { ...item, companyName: stock?.companyName || item.symbol, sector: stock?.sector || '—' };
+        }));
+      })
+      .catch(() => setOpportunities([]));
+
+    fetch('/api/intelligence/market')
+      .then(res => res.json())
+      .then(data => setMarketData(data))
+      .catch(() => setMarketData(null));
+  }, []);
+
   const greeting = useMemo(() => {
-    const hours = new Date().getHours();
-    if (hours < 12) return "Good Morning";
-    if (hours < 17) return "Good Afternoon";
-    return "Good Evening";
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   }, []);
 
   const handleCompanyClick = (symbol: string) => {
     RecentSearchStore.addTicker(symbol);
     setRecentResearch(RecentSearchStore.getRecent());
-
     const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock");
-    params.set("id", symbol);
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
+    params.set('page', 'stock');
+    params.set('id', symbol);
+    window.history.pushState({}, '', `?${params.toString()}`);
+    window.dispatchEvent(new Event('urlchange'));
   };
 
   const handleNavigate = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
-    params.set("page", pageKey);
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
-  };
-
-  const isWatched = (ticker: string) => {
-    return watchlists.some(w => w.tickers.includes(ticker));
-  };
-
-  const handleToggleWatchlist = (ticker: string) => {
-    const defaultList = watchlists[0];
-    if (!defaultList) return;
-    if (isWatched(ticker)) {
-      WatchlistEngine.removeTicker(defaultList.id, ticker);
-    } else {
-      WatchlistEngine.addTicker(defaultList.id, ticker);
-    }
-    setWatchlists([...WatchlistEngine.getWatchlists()]);
+    params.set('page', pageKey);
+    window.history.pushState({}, '', `?${params.toString()}`);
+    window.dispatchEvent(new Event('urlchange'));
   };
 
   const followedTickers = useMemo(() => {
     const unique = new Set<string>();
-    watchlists.forEach(w => {
-      w.tickers.forEach(t => unique.add(t));
-    });
+    watchlists.forEach(w => w.tickers.forEach(t => unique.add(t)));
     return Array.from(unique).slice(0, 5);
   }, [watchlists]);
 
   return (
-    <div className="w-full space-y-8 pb-12 text-white max-w-7xl mx-auto antialiased">
-      {/* Page Header */}
-      <PageHeader 
-        title={`Greeting, Samvidh (${greeting})`} 
-        subtitle="What deserves my attention?" 
+    <div className="w-full space-y-10 pb-12 text-white max-w-7xl mx-auto antialiased font-sans">
+      {/* HERO */}
+      <PageHeader
+        title={`${greeting}`}
+        subtitle="What deserves my attention?"
         primaryAction={
-          <Button variant="primary" onClick={() => handleNavigate("discovery")}>
+          <Button variant="primary" onClick={() => handleNavigate('discovery')}>
             Discover Ideas
           </Button>
         }
       />
 
-      {/* 1. Today's Opportunities (Maximum 5 cards) */}
+      {/* 1. TODAY'S OPPORTUNITIES — max 5 */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-amber-400" />
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-            Today's Opportunities
-          </span>
+          <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Today's Opportunities</h2>
         </div>
-        {todayOpportunities.length === 0 ? (
-          <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
-            <p>Opportunity data currently unavailable.</p>
+        {opportunities.length === 0 ? (
+          <div className="p-6 bg-white/[0.02] rounded-xl text-center text-sm text-white/30">
+            No opportunity signals today. Check the Discovery page for active ideas.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {todayOpportunities.map((op) => {
-              const info = StockRegistry.getStock(op.ticker);
-              const score = info?.telemetrySnapshot?.healthScore 
-                ? Math.round(info.telemetrySnapshot.healthScore) 
-                : null;
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {opportunities.map((op: any) => (
+              <button
+                key={op.symbol}
+                onClick={() => handleCompanyClick(op.symbol)}
+                className="text-left p-5 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <span className="font-mono font-bold text-white text-sm">{op.symbol}</span>
+                  <span className="text-[10px] text-amber-400 font-mono bg-amber-400/10 px-2 py-0.5 rounded">
+                    {op.category}
+                  </span>
+                </div>
+                <p className="text-xs text-white/60 leading-relaxed mb-2">{op.companyName}</p>
+                <div className="flex items-center gap-2 text-[11px] text-cyan-400 group-hover:text-cyan-300">
+                  <span>Open Briefing</span>
+                  <ArrowRight className="w-3 h-3" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 2. WATCHLIST UPDATES */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-yellow-400" />
+            <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Watchlist Updates</h2>
+          </div>
+          <button onClick={() => handleNavigate('watchlist')} className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-transparent border-none cursor-pointer">
+            View All <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+        {followedTickers.length === 0 ? (
+          <div className="p-6 bg-white/[0.02] rounded-xl text-center text-sm text-white/30">
+            Your watchlist is empty. <button onClick={() => handleNavigate('discovery')} className="text-cyan-400 hover:underline bg-transparent border-none cursor-pointer">Discover stocks</button>.
+          </div>
+        ) : (
+          <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
+            {followedTickers.map((ticker) => {
+              const info = StockRegistry.getStock(ticker);
               return (
-                <CompanyCard
-                  key={op.ticker}
-                  ticker={op.ticker}
-                  name={info?.companyName || op.ticker}
-                  sector={info?.sector || "Data unavailable"}
-                  marketCap={info?.marketCap.formatted || "Data unavailable"}
-                  score={score !== null ? score : "N/A"}
-                  whyItMatters={op.whyMatters}
-                  isWatched={isWatched(op.ticker)}
-                  onOpenBriefing={() => handleCompanyClick(op.ticker)}
-                  onToggleWatchlist={() => handleToggleWatchlist(op.ticker)}
-                />
+                <button
+                  key={ticker}
+                  onClick={() => handleCompanyClick(ticker)}
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.03] border-b border-white/5 last:border-0 transition-colors cursor-pointer bg-transparent"
+                >
+                  <div>
+                    <span className="font-mono font-bold text-white text-sm">{ticker}</span>
+                    <span className="text-xs text-white/50 ml-3">{info?.companyName || '—'}</span>
+                  </div>
+                  <span className="text-[11px] text-cyan-400">Open</span>
+                </button>
               );
             })}
           </div>
         )}
       </section>
 
-      {/* Grid container for updates and research */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 2. Watchlist Updates */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-yellow-400" />
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-                Watchlist Updates
-              </span>
-            </div>
-            <button 
-              onClick={() => handleNavigate("watchlist")}
-              className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 bg-transparent border-none cursor-pointer"
-            >
-              <span>View Watchlist</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          
-          {followedTickers.length === 0 ? (
-            <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
-              <p>Your watchlist is empty.</p>
-              <Button variant="secondary" onClick={() => handleNavigate("discovery")}>
-                Discover Stocks
-              </Button>
-            </div>
-          ) : (
-            <CustomTable headers={["Ticker", "Name", "Rating", "Action"]}>
-              {followedTickers.map((ticker) => {
-                const info = StockRegistry.getStock(ticker);
-                const score = info?.telemetrySnapshot?.healthScore 
-                  ? Math.round(info.telemetrySnapshot.healthScore) 
-                  : null;
-                return (
-                  <tr 
-                    key={ticker}
-                    onClick={() => handleCompanyClick(ticker)}
-                    className="hover:bg-white/[0.02] cursor-pointer transition-colors"
-                  >
-                    <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                    <td className="p-4 text-white/70 max-w-[180px] truncate">{info?.companyName || "Data unavailable"}</td>
-                    <td className="p-4">
-                      <span className="px-2 py-0.5 rounded border border-white/10 text-white/80 font-mono text-[10px]">
-                        {score !== null ? `${score} / 100` : "N/A"}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Open Briefing</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </CustomTable>
-          )}
-        </section>
-
-        {/* 3. Recent Research */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-violet-400" />
-            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-              Recent Research
-            </span>
-          </div>
-          
-          {recentResearch.length === 0 ? (
-            <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
-              <p>No recently viewed companies yet.</p>
-              <Button variant="secondary" onClick={() => handleNavigate("discovery")}>
-                Discover Stocks
-              </Button>
-            </div>
-          ) : (
-            <CustomTable headers={["Ticker", "Sector", "Action"]}>
-              {recentResearch.slice(0, 5).map((ticker) => {
-                const info = StockRegistry.getStock(ticker);
-                return (
-                  <tr 
-                    key={ticker}
-                    onClick={() => handleCompanyClick(ticker)}
-                    className="hover:bg-white/[0.02] cursor-pointer transition-colors"
-                  >
-                    <td className="p-4 font-mono font-bold text-white">{ticker}</td>
-                    <td className="p-4 text-white/60">{info?.sector || "Data unavailable"}</td>
-                    <td className="p-4 text-right">
-                      <span className="text-cyan-400 hover:underline text-[11px] font-semibold">Resume Analysis</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </CustomTable>
-          )}
-        </section>
-      </div>
-
-      {/* 4. Market Snapshot (Compact Only) */}
+      {/* 3. RECENT RESEARCH */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-            Market Snapshot
-          </span>
+          <RefreshCw className="w-4 h-4 text-violet-400" />
+          <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Recent Research</h2>
         </div>
-        {marketSnapshots.length === 0 ? (
-          <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30">
-            Market index data currently unavailable.
+        {recentResearch.length === 0 ? (
+          <div className="p-6 bg-white/[0.02] rounded-xl text-center text-sm text-white/30">
+            No recently viewed companies.
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {marketSnapshots.map((item) => (
-              <div 
-                key={item.index} 
-                className="bg-white/[0.01] border border-white/5 rounded-xl p-3 flex justify-between items-center"
-              >
-                <div>
-                  <span className="text-[10px] font-medium text-white/50 block">{item.index}</span>
-                  <span className="text-sm font-bold font-mono text-white mt-0.5 block">{item.value}</span>
-                </div>
-                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                  item.change.startsWith("+") 
-                    ? "text-emerald-400 bg-emerald-400/10" 
-                    : "text-rose-400 bg-rose-400/10"
-                }`}>
-                  {item.change}
-                </span>
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-3">
+            {recentResearch.slice(0, 5).map((ticker) => {
+              const info = StockRegistry.getStock(ticker);
+              return (
+                <button
+                  key={ticker}
+                  onClick={() => handleCompanyClick(ticker)}
+                  className="px-4 py-2 bg-white/[0.02] border border-white/5 rounded-lg text-sm font-mono text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+                >
+                  {ticker} <span className="text-white/40 text-xs ml-2">{info?.sector || '—'}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
+
+      {/* 4. MARKET SNAPSHOT */}
+      {marketData && (
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-cyan-400" />
+          <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Market Snapshot</h2>
+        </div>
+        <div className="bg-white/[0.02] border border-white/5 rounded-xl p-5">
+          <p className="text-sm text-white/70 leading-relaxed">
+            {marketData?.marketState || marketData?.regime || 'Market data currently unavailable.'}
+          </p>
+          {marketData?.sectorExposure && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {Object.entries(marketData.sectorExposure).slice(0, 4).map(([sector, val]: [string, any]) => (
+                <span key={sector} className="text-[10px] px-2 py-1 bg-white/5 border border-white/10 rounded text-white/60">
+                  {sector}: {typeof val === 'number' ? `${(val * 100).toFixed(0)}%` : val}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      )}
     </div>
   );
 };
