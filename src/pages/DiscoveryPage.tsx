@@ -34,7 +34,7 @@ export const DiscoveryPage: React.FC = () => {
         setRails([
           { title: 'High Quality', icon: <Trophy className="w-5 h-5 text-amber-400" />, companies: mapList(data.highestQuality) },
           { title: 'High Growth', icon: <Sparkles className="w-5 h-5 text-fuchsia-400" />, companies: mapList(data.highestGrowth) },
-          { title: 'Value', icon: <TrendingUp className="w-5 h-5 text-emerald-400" />, companies: mapList(data.highestRisk?.slice().reverse()) },
+          { title: 'Value', icon: <TrendingUp className="w-5 h-5 text-[#22ab94]" />, companies: mapList(data.highestRisk?.slice().reverse()) },
           { title: 'Momentum', icon: <Flame className="w-5 h-5 text-orange-400" />, companies: mapList(data.highestMomentum) },
           { title: 'Turnarounds', icon: <PlusCircle className="w-5 h-5 text-sky-400" />, companies: mapList(data.topImproving) },
         ].filter(r => r.companies.length > 0));
@@ -90,11 +90,11 @@ export const DiscoveryPage: React.FC = () => {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <span className="font-mono font-bold text-white">{c.symbol}</span>
-                        <span className="text-[10px] font-mono text-cyan-400">{c.score}</span>
+                        <span className="text-[10px] font-mono text-[#7da0ff]">{c.score}</span>
                       </div>
                       <p className="text-xs text-white/60 leading-relaxed mb-3">{c.name}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-cyan-400 group-hover:text-cyan-300">Open</span>
+                        <span className="text-[10px] text-[#7da0ff] group-hover:text-[#f0f3fa]">Open</span>
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleWatchlist(c.symbol); }}
                           className={`text-[10px] px-2 py-0.5 rounded border cursor-pointer ${

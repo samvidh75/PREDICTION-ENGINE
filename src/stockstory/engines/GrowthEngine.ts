@@ -6,25 +6,27 @@
  * 
  * Extracts growth trajectory from financial statements.
  * Scores are normalized 0-100 where higher = stronger growth.
+ * 
+ * FIX (RC-ENGINE-002): Factor adjustment applied at composite level only.
  */
 
 import { EngineInputs, GrowthEngineOutput, clampScore, weightedAverage } from '../types';
 
 export class GrowthEngine {
   evaluate(inputs: EngineInputs): GrowthEngineOutput {
-    const { financials, historical } = inputs;
+    const { financials } = inputs;
 
     // ── Sub-score 1: Revenue Growth (0-100) ─────────────────────────
     let revenueGrowthScore = 50;
     if (financials.revenueGrowth !== null) {
       const rg = financials.revenueGrowth;
-      if (rg >= 0.20) revenueGrowthScore = 95;       // 20%+ explosive
-      else if (rg >= 0.15) revenueGrowthScore = 85;  // 15-20% very strong
-      else if (rg >= 0.10) revenueGrowthScore = 75;  // 10-15% strong
-      else if (rg >= 0.05) revenueGrowthScore = 60;  // 5-10% moderate
-      else if (rg >= 0) revenueGrowthScore = 40;     // 0-5% weak
-      else if (rg >= -0.05) revenueGrowthScore = 25; // negative slight
-      else revenueGrowthScore = 10;                   // sharp decline
+      if (rg >= 0.20) revenueGrowthScore = 95;
+      else if (rg >= 0.15) revenueGrowthScore = 85;
+      else if (rg >= 0.10) revenueGrowthScore = 75;
+      else if (rg >= 0.05) revenueGrowthScore = 60;
+      else if (rg >= 0) revenueGrowthScore = 40;
+      else if (rg >= -0.05) revenueGrowthScore = 25;
+      else revenueGrowthScore = 10;
     }
 
     // ── Sub-score 2: EPS Growth (0-100) ─────────────────────────────
@@ -65,16 +67,17 @@ export class GrowthEngine {
       else profitGrowthScore = 10;
     }
 
-    // ── Adjust based on growth factor from factor engine ────────────
-    const factorAdjust = (inputs.factors.growthFactor - 50) * 0.3;
-
     // ── Composite score (weighted) ──────────────────────────────────
-    const compositeScore = weightedAverage([
-      { score: revenueGrowthScore + factorAdjust, weight: 3 },
-      { score: epsGrowthScore + factorAdjust, weight: 3 },
-      { score: fcfGrowthScore + factorAdjust, weight: 2 },
-      { score: profitGrowthScore + factorAdjust, weight: 2 },
+    const rawComposite = weightedAverage([
+      { score: revenueGrowthScore, weight: 3 },
+      { score: epsGrowthScore, weight: 3 },
+      { score: fcfGrowthScore, weight: 2 },
+      { score: profitGrowthScore, weight: 2 },
     ]);
+
+    // ── Factor adjustment applied ONCE at composite level ───────────
+    const factorAdjust = (inputs.factors.growthFactor - 50) * 0.3;
+    const compositeScore = clampScore(rawComposite + factorAdjust);
 
     const commentary = this.generateCommentary(compositeScore, financials);
 

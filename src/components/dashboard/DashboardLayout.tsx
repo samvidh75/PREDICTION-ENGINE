@@ -12,7 +12,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Primary Workspace Content */}
       <main className="flex-1 pl-28 p-8 md:p-12 z-10 relative">
         <header className="mb-8 border-b border-white/5 pb-6">
-          <span className="text-[11px] font-mono font-medium uppercase tracking-widest text-cyan-400 block mb-1">
+          <span className="text-[11px] font-mono font-medium uppercase tracking-widest text-[#7da0ff] block mb-1">
             Secure Node // Active Shell
           </span>
           <h1 className="text-3xl font-bold tracking-tighter text-white">Market Intelligence Workspace</h1>

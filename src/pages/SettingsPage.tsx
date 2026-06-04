@@ -36,7 +36,7 @@ export const SettingsPage: React.FC = () => {
     <div className="w-full flex flex-col space-y-8 select-none p-6 md:p-8 text-white min-h-screen font-sans max-w-5xl mx-auto antialiased">
       {/* Header */}
       <div className="border-b border-white/5 pb-6">
-        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400 block mb-1">
+        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#7da0ff] block mb-1">
           CONFIG
         </span>
         <h1 className="text-3xl font-bold tracking-tight text-white">
@@ -58,7 +58,7 @@ export const SettingsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as SettingsTab)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-left transition-all shrink-0 cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-white text-black font-bold"
+                  ? "bg-[#2962ff] text-white font-bold"
                   : "bg-transparent text-white/50 hover:bg-white/5 hover:text-white"
               }`}
             >
@@ -83,7 +83,7 @@ export const SettingsPage: React.FC = () => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#2962ff]"
                   />
                 </div>
                 <div className="space-y-1">
@@ -95,7 +95,7 @@ export const SettingsPage: React.FC = () => {
                     className="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white/40 cursor-not-allowed"
                   />
                 </div>
-                <button className="px-5 py-2.5 bg-white text-black font-semibold text-xs rounded-xl hover:bg-cyan-400 transition-all cursor-pointer">
+                <button className="px-5 py-2.5 bg-[#2962ff] text-white font-semibold text-xs rounded-xl hover:bg-[#1e53e5] transition-all cursor-pointer">
                   Save Profile
                 </button>
               </div>
@@ -118,7 +118,7 @@ export const SettingsPage: React.FC = () => {
                     <button
                       onClick={() => toggleAlertCategory(cat)}
                       className={`w-10 h-5 rounded-full transition-all relative cursor-pointer ${
-                        alertCategories[cat] ? "bg-cyan-400" : "bg-white/10"
+                        alertCategories[cat] ? "bg-[#2962ff]" : "bg-white/10"
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all ${
@@ -142,7 +142,7 @@ export const SettingsPage: React.FC = () => {
                   <span className="text-xs font-bold text-white block">Dark Premium Mode</span>
                   <span className="text-[10px] text-gray-500 block">Deep Space Black theme is default and cannot be changed.</span>
                 </div>
-                <span className="text-[10px] font-bold text-cyan-400 font-mono uppercase bg-cyan-400/10 px-2 py-0.5 rounded border border-cyan-400/20">
+                <span className="text-[10px] font-bold text-[#7da0ff] font-mono uppercase bg-[#2962ff]/10 px-2 py-0.5 rounded border border-[#2962ff]/20">
                   LOCKED
                 </span>
               </div>

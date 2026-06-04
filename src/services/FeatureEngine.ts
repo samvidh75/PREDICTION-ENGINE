@@ -21,6 +21,26 @@ export interface StockFeatureSnapshot {
 }
 
 export class FeatureEngine {
+  private marketAvgPromise: Promise<Map<string, number>> | null = null;
+
+  private getMarketAvgMap(): Promise<Map<string, number>> {
+    if (!this.marketAvgPromise) {
+      this.marketAvgPromise = (async () => {
+        const marketAvgRes = await query(
+          `SELECT trade_date::text as date, AVG((close - open) / open) as avg_return
+           FROM daily_prices
+           GROUP BY trade_date`
+        );
+        const map = new Map<string, number>();
+        for (const r of marketAvgRes.rows) {
+          map.set(r.date, Number(r.avg_return));
+        }
+        return map;
+      })();
+    }
+    return this.marketAvgPromise;
+  }
+
   /**
    * Generates and stores feature snapshots for a given symbol.
    * Assumes historical price data is already stored in the daily_prices table.
@@ -214,15 +234,7 @@ export class FeatureEngine {
 
     // ── 8. Calculate Relative Strength (Asset vs Market Avg Return) ──
     // Fetch average market returns for each date to compute relative performance
-    const marketAvgRes = await query(
-      `SELECT trade_date::text as date, AVG((close - open) / open) as avg_return
-       FROM daily_prices
-       GROUP BY trade_date`
-    );
-    const marketAvgMap = new Map<string, number>();
-    for (const r of marketAvgRes.rows) {
-      marketAvgMap.set(r.date, Number(r.avg_return));
-    }
+    const marketAvgMap = await this.getMarketAvgMap();
     for (let i = 0; i < n; i++) {
       const date = dates[i];
       const assetReturn = opens[i] === 0 ? 0 : (closes[i] - opens[i]) / opens[i];

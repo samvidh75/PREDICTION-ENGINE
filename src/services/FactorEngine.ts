@@ -23,6 +23,30 @@ export interface StockFactorSnapshot {
 
 export class FactorEngine {
   private explanationEngine = new ExplanationEngine();
+  private sectorPromises = new Map<string, Promise<Map<string, number>>>();
+
+  private getSectorMomentumMap(sector: string): Promise<Map<string, number>> {
+    let prom = this.sectorPromises.get(sector);
+    if (!prom) {
+      prom = (async () => {
+        const sectorMomentumRes = await query(
+          `SELECT dp.trade_date::text as date, AVG((dp.close - dp.open)/dp.open) as avg_return
+           FROM daily_prices dp
+           JOIN symbols s ON dp.symbol = s.symbol
+           WHERE s.sector = $1
+           GROUP BY dp.trade_date`,
+          [sector]
+        );
+        const map = new Map<string, number>();
+        for (const r of sectorMomentumRes.rows) {
+          map.set(r.date, Number(r.avg_return));
+        }
+        return map;
+      })();
+      this.sectorPromises.set(sector, prom);
+    }
+    return prom;
+  }
 
   async calculateAndStoreFactors(symbol: string): Promise<StockFactorSnapshot[]> {
     // 1. Fetch features and prices from DB

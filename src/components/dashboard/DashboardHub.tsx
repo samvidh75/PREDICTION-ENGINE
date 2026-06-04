@@ -108,7 +108,7 @@ export const DashboardHub: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs text-white/60 leading-relaxed mb-2">{op.companyName}</p>
-                <div className="flex items-center gap-2 text-[11px] text-cyan-400 group-hover:text-cyan-300">
+                <div className="flex items-center gap-2 text-[11px] text-[#7da0ff] group-hover:text-[#f0f3fa]">
                   <span>Open Briefing</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
@@ -125,13 +125,13 @@ export const DashboardHub: React.FC = () => {
             <Trophy className="w-4 h-4 text-yellow-400" />
             <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Watchlist Updates</h2>
           </div>
-          <button onClick={() => handleNavigate('watchlist')} className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-transparent border-none cursor-pointer">
+          <button onClick={() => handleNavigate('watchlist')} className="text-[11px] text-[#7da0ff] hover:text-[#f0f3fa] flex items-center gap-1 bg-transparent border-none cursor-pointer">
             View All <ArrowRight className="w-3 h-3" />
           </button>
         </div>
         {followedTickers.length === 0 ? (
           <div className="p-6 bg-white/[0.02] rounded-xl text-center text-sm text-white/30">
-            Your watchlist is empty. <button onClick={() => handleNavigate('discovery')} className="text-cyan-400 hover:underline bg-transparent border-none cursor-pointer">Discover stocks</button>.
+            Your watchlist is empty. <button onClick={() => handleNavigate('discovery')} className="text-[#7da0ff] hover:underline bg-transparent border-none cursor-pointer">Discover stocks</button>.
           </div>
         ) : (
           <div className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
@@ -147,7 +147,7 @@ export const DashboardHub: React.FC = () => {
                     <span className="font-mono font-bold text-white text-sm">{ticker}</span>
                     <span className="text-xs text-white/50 ml-3">{info?.companyName || '—'}</span>
                   </div>
-                  <span className="text-[11px] text-cyan-400">Open</span>
+                  <span className="text-[11px] text-[#7da0ff]">Open</span>
                 </button>
               );
             })}
@@ -187,7 +187,7 @@ export const DashboardHub: React.FC = () => {
       {marketData && (
       <section className="space-y-4">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
+          <Layers className="w-4 h-4 text-[#2962ff]" />
           <h2 className="text-[11px] font-bold text-white/50 uppercase tracking-wider">Market Snapshot</h2>
         </div>
         <div className="bg-white/[0.02] border border-white/5 rounded-xl p-5">

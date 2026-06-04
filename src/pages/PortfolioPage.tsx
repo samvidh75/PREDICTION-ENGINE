@@ -100,7 +100,7 @@ export const PortfolioPage: React.FC = () => {
           {best ? (
             <div className="mt-2">
               <span className="text-sm font-bold text-white">{best.symbol}</span>
-              <span className="text-xs font-mono text-emerald-400 ml-2">+{best.gainLossPct?.toFixed(1)}%</span>
+              <span className="text-xs font-mono text-[#22ab94] ml-2">+{best.gainLossPct?.toFixed(1)}%</span>
             </div>
           ) : <span className="text-sm text-white/30 mt-2 block">—</span>}
         </div>
@@ -138,10 +138,10 @@ export const PortfolioPage: React.FC = () => {
           </div>
           {calculatedHoldings.map(h => (
             <div key={h.symbol} className="grid grid-cols-[1fr_80px_100px_80px_120px] gap-2 p-3 border-b border-white/5 last:border-0 hover:bg-white/[0.02] items-center">
-              <button onClick={() => handleOpenStock(h.symbol)} className="text-left font-mono font-bold text-white hover:text-cyan-400 cursor-pointer bg-transparent border-none pl-3">{h.symbol}</button>
+              <button onClick={() => handleOpenStock(h.symbol)} className="text-left font-mono font-bold text-white hover:text-[#7da0ff] cursor-pointer bg-transparent border-none pl-3">{h.symbol}</button>
               <span className="font-mono text-xs text-white/70">{h.shares}</span>
               <span className="font-mono text-xs text-white/70">{h.totalValue ? formatINR(h.totalValue) : '—'}</span>
-              <span className={`font-mono text-xs ${h.gainLossPct !== null && h.gainLossPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <span className={`font-mono text-xs ${h.gainLossPct !== null && h.gainLossPct >= 0 ? 'text-[#22ab94]' : 'text-[#f23645]'}`}>
                 {h.gainLossPct !== null ? `${h.gainLossPct >= 0 ? '+' : ''}${h.gainLossPct.toFixed(1)}%` : '—'}
               </span>
               <div className="flex items-center justify-end gap-1 pr-2">
@@ -157,14 +157,14 @@ export const PortfolioPage: React.FC = () => {
       {isAddOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-cyan-400">Add Holding</h3><button onClick={() => setIsAddOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Add Holding</h3><button onClick={() => setIsAddOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
             <form onSubmit={handleAddHolding} className="space-y-3">
               <input type="text" required placeholder="Ticker" value={symbol} onChange={e => setSymbol(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
               <div className="grid grid-cols-2 gap-3">
                 <input type="number" required placeholder="Shares" value={shares} onChange={e => setShares(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
                 <input type="number" required placeholder="Avg Buy Price" value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
               </div>
-              <button type="submit" className="w-full h-10 bg-cyan-400 text-black font-bold text-xs rounded-xl hover:bg-cyan-300">Add Asset</button>
+              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Add Asset</button>
             </form>
           </div>
         </div>
@@ -174,11 +174,11 @@ export const PortfolioPage: React.FC = () => {
       {editingHolding && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-cyan-400">Edit {editingHolding.symbol}</h3><button onClick={() => setEditingHolding(null)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Edit {editingHolding.symbol}</h3><button onClick={() => setEditingHolding(null)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
             <form onSubmit={handleEditHolding} className="space-y-3">
               <input type="number" required value={shares} onChange={e => setShares(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" placeholder="Shares" />
               <input type="number" required value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" placeholder="Avg Buy Price" />
-              <button type="submit" className="w-full h-10 bg-cyan-400 text-black font-bold text-xs rounded-xl hover:bg-cyan-300">Save</button>
+              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Save</button>
             </form>
           </div>
         </div>
@@ -188,11 +188,11 @@ export const PortfolioPage: React.FC = () => {
       {isImportOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-cyan-400">Import CSV</h3><button onClick={() => setIsImportOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Import CSV</h3><button onClick={() => setIsImportOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
             <form onSubmit={handleCSVImport} className="space-y-3">
               <textarea required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={e => setCsvText(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono resize-none" />
               {importError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-[10px]">{importError}</div>}
-              <button type="submit" className="w-full h-10 bg-cyan-400 text-black font-bold text-xs rounded-xl hover:bg-cyan-300">Parse & Import</button>
+              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Parse & Import</button>
             </form>
           </div>
         </div>

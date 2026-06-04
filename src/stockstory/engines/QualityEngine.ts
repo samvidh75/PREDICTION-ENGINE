@@ -6,25 +6,29 @@
  * 
  * Evaluates business quality through profitability and capital efficiency.
  * Scores are normalized 0-100 where higher = better quality.
+ * 
+ * FIX (RC-ENGINE-002): Factor adjustment at composite level only.
+ * FIX (RC-ENGINE-002): Sector-aware margin and ROE thresholds.
  */
 
 import { EngineInputs, QualityEngineOutput, clampScore, weightedAverage } from '../types';
+import { getSectorProfile } from '../SectorAdapter';
 
 export class QualityEngine {
   evaluate(inputs: EngineInputs): QualityEngineOutput {
-    const { financials, factors } = inputs;
+    const { financials, factors, sector } = inputs;
+    const profile = getSectorProfile(sector?.name ?? 'General');
 
-    // ── Sub-score 1: ROE (Return on Equity) ─────────────────────────
+    // ── Sub-score 1: ROE (Return on Equity) — sector-aware ─────────
     let roeNormalized = 50;
     if (financials.roe !== null) {
       const roe = financials.roe;
-      if (roe >= 0.25) roeNormalized = 95;       // 25%+ exceptional
-      else if (roe >= 0.20) roeNormalized = 85;  // 20-25% excellent
-      else if (roe >= 0.15) roeNormalized = 75;  // 15-20% strong
-      else if (roe >= 0.10) roeNormalized = 60;  // 10-15% good
-      else if (roe >= 0.05) roeNormalized = 45;  // 5-10% average
-      else if (roe >= 0) roeNormalized = 30;     // 0-5% weak
-      else roeNormalized = 10;                    // negative
+      if (roe >= profile.roeExceptional) roeNormalized = 95;
+      else if (roe >= profile.roeHigh) roeNormalized = 80;
+      else if (roe >= profile.roeFair) roeNormalized = 65;
+      else if (roe >= profile.roeLow) roeNormalized = 45;
+      else if (roe >= 0) roeNormalized = 30;
+      else roeNormalized = 10;
     }
 
     // ── Sub-score 2: ROIC (Return on Invested Capital) ──────────────
@@ -39,57 +43,57 @@ export class QualityEngine {
       else roicNormalized = 10;
     }
 
-    // ── Sub-score 3: Gross Margin ───────────────────────────────────
+    // ── Sub-score 3: Gross Margin — sector-aware ───────────────────
     let grossMarginScore = 50;
-    if (financials.grossMargin !== null) {
+    if (profile.useGrossMargin && financials.grossMargin !== null) {
       const gm = financials.grossMargin;
-      if (gm >= 0.60) grossMarginScore = 95;       // 60%+ premium pricing
-      else if (gm >= 0.45) grossMarginScore = 80;   // 45-60% strong moat
-      else if (gm >= 0.30) grossMarginScore = 65;   // 30-45% healthy
-      else if (gm >= 0.20) grossMarginScore = 50;   // 20-30% average
-      else if (gm >= 0.10) grossMarginScore = 35;   // 10-20% thin
-      else grossMarginScore = 20;                    // <10% commodity
+      if (gm >= profile.gmPremium) grossMarginScore = 95;
+      else if (gm >= profile.gmHigh) grossMarginScore = 80;
+      else if (gm >= profile.gmFair) grossMarginScore = 65;
+      else if (gm >= profile.gmLow) grossMarginScore = 45;
+      else grossMarginScore = 25;
     }
+    // For financials (banks/insurance), gross margin is not applicable → stays at 50 neutral
 
-    // ── Sub-score 4: Operating Margin ───────────────────────────────
+    // ── Sub-score 4: Operating Margin — sector-aware ───────────────
     let operatingMarginScore = 50;
     if (financials.operatingMargin !== null) {
       const om = financials.operatingMargin;
-      if (om >= 0.30) operatingMarginScore = 95;
-      else if (om >= 0.20) operatingMarginScore = 80;
-      else if (om >= 0.15) operatingMarginScore = 65;
-      else if (om >= 0.10) operatingMarginScore = 50;
-      else if (om >= 0.05) operatingMarginScore = 35;
-      else operatingMarginScore = 20;
+      if (om >= profile.omPremium) operatingMarginScore = 95;
+      else if (om >= profile.omHigh) operatingMarginScore = 80;
+      else if (om >= profile.omFair) operatingMarginScore = 65;
+      else if (om >= profile.omLow) operatingMarginScore = 45;
+      else operatingMarginScore = 25;
     }
 
     // ── Sub-score 5: Efficiency Score ───────────────────────────────
-    // Combines asset turnover proxy (derived from margins & ROE relationship)
-    // and operational efficiency signals from factor engine
-    const qualityFactorScore = factors.qualityFactor;
     const hasEfficiencyData = financials.roe !== null && financials.grossMargin !== null;
 
     let efficiencyScore = 50;
-    if (hasEfficiencyData) {
-      // If ROE is high relative to margins, suggests strong asset efficiency
+    if (hasEfficiencyData && profile.useGrossMargin) {
       const roe = financials.roe!;
       const gm = financials.grossMargin!;
       const efficiencyRatio = gm > 0 ? Math.min(roe / gm, 2.0) : 0;
-      efficiencyScore = clampScore(efficiencyRatio * 40 + 30 + (qualityFactorScore - 50) * 0.2);
-    } else {
-      efficiencyScore = clampScore(40 + (qualityFactorScore - 50) * 0.5);
+      efficiencyScore = clampScore(efficiencyRatio * 40 + 30);
     }
 
+    // ── Gross margin weight for financials: zero it out ─────────────
+    const gmWeight = profile.useGrossMargin ? 2 : 0;
+
     // ── Composite Score ─────────────────────────────────────────────
-    const compositeScore = weightedAverage([
+    const rawComposite = weightedAverage([
       { score: roeNormalized, weight: 2.5 },
       { score: roicNormalized, weight: 2.5 },
-      { score: grossMarginScore, weight: 2 },
+      { score: grossMarginScore, weight: gmWeight },
       { score: operatingMarginScore, weight: 2 },
       { score: efficiencyScore, weight: 1 },
     ]);
 
-    const commentary = this.generateCommentary(compositeScore, financials);
+    // ── Factor adjustment ONCE at composite level ───────────────────
+    const factorAdjust = (factors.qualityFactor - 50) * 0.2;
+    const compositeScore = clampScore(rawComposite + factorAdjust);
+
+    const commentary = this.generateCommentary(compositeScore, financials, profile);
 
     return {
       score: compositeScore,
@@ -102,16 +106,20 @@ export class QualityEngine {
     };
   }
 
-  private generateCommentary(score: number, f: EngineInputs['financials']): string {
+  private generateCommentary(
+    score: number,
+    f: EngineInputs['financials'],
+    profile: ReturnType<typeof getSectorProfile>
+  ): string {
     const hasData = f.roe !== null || f.roic !== null;
     if (!hasData) return 'Insufficient quality metrics. Score reflects neutral baseline.';
 
     if (score >= 80) {
       const parts: string[] = [];
-      if (f.roe !== null && f.roe >= 0.15) parts.push('high return on equity');
-      if (f.grossMargin !== null && f.grossMargin >= 0.40) parts.push('strong pricing power');
-      if (f.operatingMargin !== null && f.operatingMargin >= 0.20) parts.push('efficient operations');
-      return `Premium quality business: ${parts.join(', ')}. Superior profitability metrics indicate durable competitive advantages.`;
+      if (f.roe !== null && f.roe >= profile.roeHigh) parts.push('high return on equity');
+      if (profile.useGrossMargin && f.grossMargin !== null && f.grossMargin >= profile.gmHigh) parts.push('strong pricing power');
+      if (f.operatingMargin !== null && f.operatingMargin >= profile.omHigh) parts.push('efficient operations');
+      return `Premium quality business ${profile.name !== 'General' ? `within ${profile.name} sector` : ''}: ${parts.join(', ')}. Superior profitability metrics indicate durable competitive advantages.`;
     }
 
     if (score >= 60) {
@@ -119,7 +127,7 @@ export class QualityEngine {
     }
 
     if (score >= 40) {
-      return 'Average quality profile. Margins and returns are in line with market norms, suggesting moderate competitive positioning.';
+      return 'Average quality profile. Margins and returns are in line with sector norms, suggesting moderate competitive positioning.';
     }
 
     return 'Below-average quality. Weak return metrics and thin margins suggest limited competitive advantages or operational challenges.';

@@ -93,8 +93,8 @@ export const WatchlistPage: React.FC = () => {
                 const noteObj = NoteEngine.getNote(ticker);
                 return (
                   <div key={ticker} className="grid grid-cols-[1fr_80px_120px_1fr_80px] gap-2 p-3 border-b border-white/5 last:border-0 hover:bg-white/[0.02] items-center">
-                    <button onClick={() => navigateToStock({ ticker, mode: 'push' })} className="text-left font-mono font-bold text-white hover:text-cyan-400 cursor-pointer bg-transparent border-none pl-3">{ticker}</button>
-                    <span className="font-mono text-xs text-cyan-400">{score !== null ? `${score}` : '—'}</span>
+                    <button onClick={() => navigateToStock({ ticker, mode: 'push' })} className="text-left font-mono font-bold text-white hover:text-[#7da0ff] cursor-pointer bg-transparent border-none pl-3">{ticker}</button>
+                    <span className="font-mono text-xs text-[#7da0ff]">{score !== null ? `${score}` : '—'}</span>
                     <span className="text-[10px] text-white/40 font-mono">{noteObj.lastUpdated}</span>
                     <div>
                       <input

@@ -5,11 +5,11 @@ import { PageHeader } from '../components/ui/DesignSystem';
 
 function categoryColor(cat: AlertCategory): string {
   const map: Record<AlertCategory, string> = {
-    Factor: 'border-cyan-400/30 text-cyan-400',
+    Factor: 'border-[#2962ff]/30 text-[#7da0ff]',
     Risk: 'border-rose-400/30 text-rose-400',
     Momentum: 'border-amber-400/30 text-amber-400',
     News: 'border-violet-400/30 text-violet-400',
-    Market: 'border-emerald-400/30 text-emerald-400',
+    Market: 'border-[#22ab94]/30 text-[#22ab94]',
   };
   return map[cat] || 'border-white/20 text-white/60';
 }
@@ -70,7 +70,7 @@ export const AlertCentrePage: React.FC = () => {
           unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="text-[11px] text-cyan-400 hover:text-cyan-300 bg-transparent border-none cursor-pointer"
+              className="text-[11px] text-[#7da0ff] hover:text-[#f0f3fa] bg-transparent border-none cursor-pointer"
             >
               Mark all as read
             </button>
@@ -83,7 +83,7 @@ export const AlertCentrePage: React.FC = () => {
         <button
           onClick={() => setFilter('all')}
           className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border transition cursor-pointer ${
-            filter === 'all' ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
+            filter === 'all' ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
           }`}
         >
           All ({alerts.length})
@@ -93,7 +93,7 @@ export const AlertCentrePage: React.FC = () => {
             key={cat}
             onClick={() => setFilter(cat)}
             className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border transition cursor-pointer ${
-              filter === cat ? 'bg-white text-black border-white' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
+              filter === cat ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
             }`}
           >
             {cat}
@@ -119,7 +119,7 @@ export const AlertCentrePage: React.FC = () => {
               {/* Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  {!alert.isRead && <span className="w-2 h-2 rounded-full bg-cyan-400" />}
+                  {!alert.isRead && <span className="w-2 h-2 rounded-full bg-[#2962ff]" />}
                   <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${categoryColor(alert.category)}`}>
                     {alert.category}
                   </span>
@@ -143,8 +143,8 @@ export const AlertCentrePage: React.FC = () => {
 
                 {/* What to do */}
                 <div>
-                  <span className="text-[9px] uppercase tracking-wider text-cyan-400 block mb-1 font-semibold">What to do</span>
-                  <p className="text-xs text-cyan-400/70 leading-relaxed">{actionForCategory(alert.category)}</p>
+                  <span className="text-[9px] uppercase tracking-wider text-[#7da0ff] block mb-1 font-semibold">What to do</span>
+                  <p className="text-xs text-[#7da0ff]/70 leading-relaxed">{actionForCategory(alert.category)}</p>
                 </div>
               </div>
 
@@ -152,7 +152,7 @@ export const AlertCentrePage: React.FC = () => {
               <div className="flex items-center gap-3 mt-4 pt-3 border-t border-white/5">
                 <button
                   onClick={() => handleOpenCompany(alert.symbol)}
-                  className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 bg-transparent border-none cursor-pointer"
+                  className="text-[11px] font-semibold text-[#7da0ff] hover:text-[#f0f3fa] bg-transparent border-none cursor-pointer"
                 >
                   Open {alert.symbol}
                 </button>
