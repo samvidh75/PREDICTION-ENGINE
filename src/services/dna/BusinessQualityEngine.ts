@@ -1,0 +1,40 @@
+// src/services/dna/BusinessQualityEngine.ts
+import { RegisteredStock } from "../stocks/StockRegistry";
+
+export type DNAStatus = "Very Strong" | "Strong" | "Stable" | "Weakening" | "Weak";
+
+export class BusinessQualityEngine {
+  public static evaluate(stock: RegisteredStock): { score: number; status: DNAStatus } {
+    // Determine quality using PE ratio boundaries and 52-week price proximity as mock quality heuristics
+    let score = 70; // Base score
+    
+    const pe = stock.peRatio;
+    if (pe > 0 && pe < 20) {
+      score += 15; // Fair valuation quality
+    } else if (pe >= 20 && pe < 40) {
+      score += 5;
+    } else if (pe >= 40) {
+      score -= 10; // Overvalued / high expectations quality strain
+    } else {
+      score -= 20; // Loss making / negative PE quality impact
+    }
+
+    // High proximity to low bounds implies stable support / base quality
+    const range = stock.fiftyTwoWeekRange;
+    const proximity = (range.current - range.low) / (range.high - range.low || 1);
+    if (proximity > 0.4 && proximity < 0.8) {
+      score += 10;
+    }
+
+    score = Math.max(10, Math.min(100, score));
+
+    let status: DNAStatus = "Stable";
+    if (score >= 85) status = "Very Strong";
+    else if (score >= 70) status = "Strong";
+    else if (score >= 50) status = "Stable";
+    else if (score >= 30) status = "Weakening";
+    else status = "Weak";
+
+    return { score, status };
+  }
+}

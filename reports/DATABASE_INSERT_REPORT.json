@@ -1,0 +1,90 @@
+[
+  {
+    "table": "symbols",
+    "symbol": "RELIANCE",
+    "rowsInserted": 1,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:45.330Z"
+  },
+  {
+    "table": "daily_prices",
+    "symbol": "RELIANCE",
+    "rowsInserted": 23,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:45.509Z"
+  },
+  {
+    "table": "financial_snapshots",
+    "symbol": "RELIANCE",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": "All providers failed for financials(RELIANCE): FinnhubProvider: Finnhub HTTP 403: Forbidden",
+    "timestamp": "2026-06-03T05:25:46.757Z"
+  },
+  {
+    "table": "symbols",
+    "symbol": "TCS",
+    "rowsInserted": 1,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:48.004Z"
+  },
+  {
+    "table": "daily_prices",
+    "symbol": "TCS",
+    "rowsInserted": 23,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:48.155Z"
+  },
+  {
+    "table": "financial_snapshots",
+    "symbol": "TCS",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": "All providers failed for financials(TCS): FinnhubProvider: Finnhub HTTP 403: Forbidden",
+    "timestamp": "2026-06-03T05:25:49.277Z"
+  },
+  {
+    "table": "symbols",
+    "symbol": "INFY",
+    "rowsInserted": 1,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:51.485Z"
+  },
+  {
+    "table": "daily_prices",
+    "symbol": "INFY",
+    "rowsInserted": 23,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:51.634Z"
+  },
+  {
+    "table": "financial_snapshots",
+    "symbol": "INFY",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": "All providers failed for financials(INFY): FinnhubProvider: Finnhub HTTP 403: Forbidden",
+    "timestamp": "2026-06-03T05:25:53.475Z"
+  },
+  {
+    "table": "symbols",
+    "symbol": "HDFCBANK",
+    "rowsInserted": 1,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:55.170Z"
+  },
+  {
+    "table": "daily_prices",
+    "symbol": "HDFCBANK",
+    "rowsInserted": 23,
+    "status": "OK",
+    "timestamp": "2026-06-03T05:25:55.317Z"
+  },
+  {
+    "table": "financial_snapshots",
+    "symbol": "HDFCBANK",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": "All providers failed for financials(HDFCBANK): FinnhubProvider: CircuitBreaker: Open",
+    "timestamp": "2026-06-03T05:25:55.317Z"
+  }
+]

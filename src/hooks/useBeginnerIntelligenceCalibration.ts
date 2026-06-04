@@ -1,0 +1,104 @@
+import { useEffect, useMemo, useState } from "react";
+import { loadAuthSession } from "../services/auth/sessionStore";
+import { loadOnboardingLearningDepthOverride } from "../services/onboarding/onboardingFirstRunMemory";
+
+type ExperienceLevel = "beginner" | "intermediate";
+
+type BeginnerCalibration = {
+  sessionsSeen: number;
+  learningActions: number; // reserved for later (optional increments)
+  lastAt: number;
+};
+
+const STORAGE_KEY_BASE = "beginner_intel_calibration_v1";
+
+function clamp01(n: number): number {
+  return Math.max(0, Math.min(1, n));
+}
+
+function safeParse(raw: string | null): BeginnerCalibration | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<BeginnerCalibration>;
+    if (typeof parsed.sessionsSeen !== "number") return null;
+    if (typeof parsed.learningActions !== "number") return null;
+    if (typeof parsed.lastAt !== "number") return null;
+
+    return {
+      sessionsSeen: Math.max(0, parsed.sessionsSeen),
+      learningActions: Math.max(0, parsed.learningActions),
+      lastAt: parsed.lastAt,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export default function useBeginnerIntelligenceCalibration() {
+  const auth = loadAuthSession();
+  const uid = auth.status === "authenticated" ? auth.uid : undefined;
+
+  const calibrationKey = useMemo(() => {
+    if (uid && uid.trim().length > 0) return `${STORAGE_KEY_BASE}_${uid}`;
+    return STORAGE_KEY_BASE;
+  }, [uid]);
+
+  const [calibration, setCalibration] = useState<BeginnerCalibration>(() => ({
+    sessionsSeen: 0,
+    learningActions: 0,
+    lastAt: Date.now(),
+  }));
+
+  const onboardingLearningDepthOverride = useMemo(() => loadOnboardingLearningDepthOverride(uid), [uid]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const raw = window.localStorage.getItem(calibrationKey);
+    const parsed = safeParse(raw);
+
+    const now = Date.now();
+
+    const next: BeginnerCalibration = {
+      sessionsSeen: (parsed?.sessionsSeen ?? 0) + 1,
+      learningActions: parsed?.learningActions ?? 0,
+      lastAt: now,
+    };
+
+    window.localStorage.setItem(calibrationKey, JSON.stringify(next));
+    setCalibration(next);
+  }, [calibrationKey]);
+
+  const experienceLevel: ExperienceLevel = useMemo(() => {
+    // Onboarding override takes priority: user explicitly chose learning depth.
+    if (onboardingLearningDepthOverride) {
+      return onboardingLearningDepthOverride === "Editorial overview" ? "beginner" : "intermediate";
+    }
+
+    // Fallback deterministic progression:
+    // - First 1-2 sessions => beginner
+    // - After that => intermediate
+    return calibration.sessionsSeen <= 2 ? "beginner" : "intermediate";
+  }, [calibration.sessionsSeen, onboardingLearningDepthOverride]);
+
+  const simplificationIntensity = useMemo(() => {
+    // Beginner => higher simplification (more plain language, fewer dense details)
+    // Intermediate => lower simplification
+    const target = experienceLevel === "beginner" ? 0.75 : 0.4;
+    return clamp01(target);
+  }, [experienceLevel]);
+
+  const progress01 = useMemo(() => {
+    // For UI pathway: map sessionsSeen (0..5) to 0..1
+    return clamp01(calibration.sessionsSeen / 5);
+  }, [calibration.sessionsSeen]);
+
+  return {
+    experienceLevel,
+    simplificationIntensity,
+    progress01,
+    calibration,
+    // reserved: future increments from user interactions
+    // trackLearningAction: () => {}
+  };
+}

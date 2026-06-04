@@ -1,0 +1,965 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+:root {
+  color-scheme: dark;
+
+  /* Responsive UI scaling (adaptive typography + spacing) */
+  --ss-ui-type-scale: 1;
+  --ss-ui-space-scale: 1;
+
+  /* StockStory India master design tokens (CSS variables) */
+  --ss-bg-primary: #020304;
+
+  --ss-surface-2: #0A0D10;
+  --ss-surface-3: #10141A;
+  --ss-surface-4: #151A21;
+  --ss-surface-tertiary: #1B212A;
+
+  --ss-accent-cyan: #7CF7D4;
+  --ss-accent-deep-cyan: #43D9BD;
+  --ss-accent-electric-blue-soft: #5BA7FF;
+  --ss-accent-muted-magenta: #D16BA5;
+  --ss-accent-warning: #D98C7A;
+
+  /* Glow propagation (intentionally restrained for premium calm) */
+  --ss-glow-cyan: rgba(0, 255, 210, 0.18);
+  --ss-glow-cyan-strong: rgba(0, 255, 210, 0.26);
+
+  --ss-glow-deep-blue: rgba(0, 120, 255, 0.14);
+  --ss-glow-deep-blue-strong: rgba(0, 120, 255, 0.22);
+
+  --ss-glow-magenta: rgba(209, 107, 165, 0.20);
+  --ss-glow-magenta-strong: rgba(209, 107, 165, 0.28);
+
+  --ss-glow-warning: rgba(217, 140, 122, 0.16);
+  --ss-glow-warning-strong: rgba(217, 140, 122, 0.24);
+
+  /* Premium System 2.0 styles (Section 83) */
+  --ss-premium-border: rgba(0, 209, 122, 0.18);
+  --ss-premium-glow: rgba(0, 209, 122, 0.12);
+
+  /* Lighting Engine state lighting (Section 87) */
+  --ss-ambient-bullish: rgba(0, 209, 122, 0.08);
+  --ss-ambient-bearish: rgba(255, 91, 110, 0.06);
+  --ss-ambient-stable: rgba(87, 185, 255, 0.06);
+
+  --ss-radius-small: 14px;
+  --ss-radius-medium: 22px;
+  --ss-radius-large: 28px;
+  --ss-radius-extra-large: 32px;
+  --ss-radius-orb: 999px;
+
+  /* Spacing primitives (token-governed geometry) */
+  --ss-pad-4: 16px;
+  --ss-pad-5: 20px;
+  --ss-pad-6: 24px;
+
+  /* Rhythm / layout primitives (token-governed spacing) */
+  --ss-space-20: 20px;
+  --ss-space-64: 64px;
+  --ss-space-72: 72px;
+  --ss-space-80: 80px;
+  --ss-space-96: 96px;
+  --ss-space-110: 110px;
+
+  --ss-shadow-layer-1: 0 0 40px rgba(0, 0, 0, 0.45);
+  --ss-shadow-layer-2: 0 20px 80px rgba(0, 0, 0, 0.32);
+  --ss-shadow-layer-3: 0 0 120px rgba(0, 255, 210, 0.03);
+
+  /* Elevation hierarchy governance (cards/panels/overlays) */
+  --ss-elev-0-shadow: none;
+  --ss-elev-1-shadow: var(--ss-shadow-layer-1);
+  --ss-elev-2-shadow: var(--ss-shadow-layer-2);
+  --ss-elev-3-shadow: var(--ss-shadow-layer-3);
+
+  /* Blur hierarchy governance (readability-safe) */
+  --ss-blur-12: blur(12px);
+  --ss-blur-18: blur(18px);
+  --ss-blur-24: blur(24px);
+
+  /* Opacity hierarchy governance (overlay + surface physics) */
+  --ss-opacity-veil-1: 0.16;
+  --ss-opacity-veil-2: 0.22;
+  --ss-opacity-veil-3: 0.35;
+  --ss-opacity-border-veil: 0.10;
+
+  --ss-ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --ss-transition-fast: 120ms;
+  --ss-transition-medium: 220ms;
+  --ss-transition-slow: 320ms;
+
+  /* Glassmorphism “surface physics” presets (calm + premium) */
+  --ss-glass-bg: rgba(0, 0, 0, 0.20);
+  --ss-glass-bg-2: rgba(0, 0, 0, 0.35);
+  --ss-glass-border: rgba(255, 255, 255, 0.10);
+  --ss-glass-border-2: rgba(255, 255, 255, 0.18);
+
+  /* Typography */
+  /* Elite font pairing (from index.html): Geist Sans + Geist Mono */
+  --ss-font-ui: "Geist", "Geist Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --ss-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Hybrid semantic font-role variables:
+     Active semantic vars (--font-display/heading/body/...) are selected via CSS below
+     using the token-injected --font-*-desktop / --font-*-mobile vars. */
+
+  /* Intelligence OS Typography Tokens */
+  --ss-ty-kicker-size: 10px;
+  --ss-ty-kicker-letter-spacing: 0.28em;
+  --ss-ty-kicker-weight: 500;
+  --ss-ty-kicker-color: rgba(255,255,255,0.60);
+
+  --ss-ty-hero-title-size: 48px;
+  --ss-ty-hero-title-size-sm: 68px;
+  --ss-ty-hero-title-weight: 600;
+  --ss-ty-hero-title-line-height: 1.0;
+  --ss-ty-hero-title-tracking: -0.07em;
+  --ss-ty-hero-title-shadow: 0 0 40px rgba(0,255,210,0.07);
+
+  --ss-ty-section-title-size: 20px;
+  --ss-ty-section-title-size-sm: 22px;
+  --ss-ty-section-title-weight: 600;
+  --ss-ty-section-title-line-height: 1.15;
+  --ss-ty-section-title-tracking: -0.03em;
+  --ss-ty-section-title-color: rgba(255,255,255,0.92);
+
+  --ss-ty-micro-label-size: 10px;
+  --ss-ty-micro-label-letter-spacing: 0.22em;
+  --ss-ty-micro-label-weight: 500;
+  --ss-ty-micro-label-color: rgba(255,255,255,0.50);
+
+  --ss-ty-body-size: 14px;
+  --ss-ty-body-size-sm: 15px;
+  --ss-ty-body-weight: 400;
+  --ss-ty-body-line-height: 1.8;
+  --ss-ty-body-color: rgba(255,255,255,0.84);
+
+  --ss-ty-card-label-size: 11px;
+  --ss-ty-card-label-letter-spacing: 0.22em;
+  --ss-ty-card-label-weight: 500;
+  --ss-ty-card-label-color: rgba(255,255,255,0.65);
+
+  --ss-ty-card-heading-size: 17px;
+  --ss-ty-card-heading-size-sm: 18px;
+  --ss-ty-card-heading-weight: 600;
+  --ss-ty-card-heading-line-height: 1.25;
+  --ss-ty-card-heading-tracking: -0.02em;
+  --ss-ty-card-heading-color: rgba(255,255,255,0.92);
+
+  --ss-ty-card-body-size: 13.5px;
+  --ss-ty-card-body-size-sm: 14px;
+  --ss-ty-card-body-line-height: 1.75;
+  --ss-ty-card-body-color: rgba(255,255,255,0.80);
+
+  --ss-ty-shadow-soft: 0 0 22px rgba(0,255,210,0.06);
+
+  /* Typography calmness (driven at runtime by ResponsiveUIScalingLayer) */
+  --ss-ty-weight-bias: 0;
+  --ss-ty-tracking-bias-em: 0em;
+
+  /* Spatial typography depth (injected by SpatialTypographyRenderingEngine) */
+  --ss-ty-depth-shadow-soft: 0 0 0 rgba(0,0,0,0);
+  --ss-ty-depth-shadow: 0 0 0 rgba(0,0,0,0);
+
+  /* --- Premium Typography Module / Navigation / Telemetry --- */
+
+  /* Module headings (product-oriented, OS-module feel) */
+  --ss-ty-module-kicker-size: 10px;
+  --ss-ty-module-kicker-letter-spacing: 0.28em;
+  --ss-ty-module-kicker-weight: 500;
+  --ss-ty-module-kicker-color: rgba(255,255,255,0.60);
+  --ss-ty-module-kicker-shadow-soft: 0 0 22px rgba(0,255,210,0.06);
+
+  --ss-ty-module-title-size: 20px;
+  --ss-ty-module-title-size-sm: 22px;
+  --ss-ty-module-title-weight: 600;
+  --ss-ty-module-title-line-height: 1.15;
+  --ss-ty-module-title-tracking: -0.03em;
+  --ss-ty-module-title-color: rgba(255,255,255,0.92);
+
+  /* Widget support line */
+  --ss-ty-widget-support-size: 14px;
+  --ss-ty-widget-support-size-sm: 14px;
+  --ss-ty-widget-support-weight: 400;
+  --ss-ty-widget-support-line-height: 1.75;
+  --ss-ty-widget-support-color: rgba(255,255,255,0.82);
+
+  /* Navigation labels */
+  --ss-ty-nav-label-size: 11px;
+  --ss-ty-nav-label-letter-spacing: 0.18em;
+  --ss-ty-nav-label-color: rgba(255,255,255,0.72);
+  --ss-ty-nav-label-weight: 500;
+  --ss-ty-nav-label-line-height: 1.15;
+
+  /* Telemetry numeric typography */
+  --ss-ty-metric-value-size: 36px;
+  --ss-ty-metric-value-size-sm: 40px;
+  --ss-ty-metric-value-weight: 600;
+  --ss-ty-metric-value-line-height: 1.05;
+  --ss-ty-metric-value-tracking: -0.06em;
+  --ss-ty-metric-value-color: rgba(255,255,255,0.96);
+
+  --ss-ty-metric-subvalue-size: 13px;
+  --ss-ty-metric-subvalue-size-sm: 14px;
+  --ss-ty-metric-subvalue-weight: 500;
+  --ss-ty-metric-subvalue-line-height: 1.55;
+  --ss-ty-metric-subvalue-tracking: -0.01em;
+  --ss-ty-metric-subvalue-color: rgba(255,255,255,0.90);
+
+  --ss-ty-metric-label-size: 10px;
+  --ss-ty-metric-label-letter-spacing: 0.18em;
+  --ss-ty-metric-label-color: rgba(255,255,255,0.60);
+  --ss-ty-metric-label-weight: 600;
+  --ss-ty-metric-label-line-height: 1.2;
+}
+
+/* Active font-role selection (desktop/mobile orchestration)
+   TokenProvider injects:
+   - --font-*-desktop
+   - --font-*-mobile
+
+   We map those to the active vars used by typography CSS:
+   - --font-display
+   - --font-heading
+   - --font-body
+   - --font-overlay
+   - --font-telemetry
+   - --font-command
+*/
+:where(*) {
+  --font-display: var(--font-display-desktop);
+  --font-heading: var(--font-heading-desktop);
+  --font-body: var(--font-body-desktop);
+  --font-overlay: var(--font-overlay-desktop);
+  --font-telemetry: var(--font-telemetry-desktop);
+  --font-command: var(--font-command-desktop);
+}
+
+@media (max-width: 639px) {
+  :where(*) {
+    --font-display: var(--font-display-mobile);
+    --font-heading: var(--font-heading-mobile);
+    --font-body: var(--font-body-mobile);
+    --font-overlay: var(--font-overlay-mobile);
+    --font-telemetry: var(--font-telemetry-mobile);
+    --font-command: var(--font-command-mobile);
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ss-bg-primary);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Subtle “expensive” atmosphere without animating costly filters */
+.noise {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+}
+
+/* Prevent layout thrash; keep transforms on GPU */
+.layer {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+/* -------------------------------------------------------------
+   Premium Input & Surface Refinement (Step 5)
+   ------------------------------------------------------------- */
+
+.ss-input {
+  width: 100%;
+  height: calc(var(--ss-ui-type-scale) * 50px);
+  padding: 0 calc(var(--ss-ui-type-scale) * 14px);
+  border-radius: 16px;
+
+  /* less translucency = higher clarity */
+  background: rgba(0, 0, 0, 0.33);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: calc(var(--ss-ui-type-scale) * 14px);
+  line-height: 1.25;
+  outline: none;
+
+  transition: border-color 180ms var(--ss-ease-primary), background-color 180ms var(--ss-ease-primary), box-shadow 180ms var(--ss-ease-primary);
+}
+
+.ss-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ss-input:focus-visible {
+  border-color: rgba(0, 255, 210, 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 255, 210, 0.18);
+}
+
+.ss-input--compact {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+}
+
+.ss-input--tall {
+  height: calc(var(--ss-ui-type-scale) * 58px);
+}
+
+.ss-input--auth {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ss-input--auth:focus-visible {
+  border-color: rgba(0, 255, 210, 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 255, 210, 0.18);
+}
+
+/* Premium textarea primitive (Step 5) */
+.ss-textarea {
+  width: 100%;
+  border-radius: 16px;
+
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+
+  padding: 12px 12px;
+  resize: none;
+
+  font-family: var(--font-body);
+  line-height: 1.35;
+  font-size: calc(var(--ss-ui-type-scale) * 14px);
+
+  transition: border-color 180ms var(--ss-ease-primary), background-color 180ms var(--ss-ease-primary), box-shadow 180ms var(--ss-ease-primary);
+}
+
+.ss-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.30);
+}
+
+.ss-textarea:focus-visible {
+  border-color: rgba(0, 255, 210, 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 255, 210, 0.18);
+}
+
+/* Keep selects/textarea consistent */
+.ss-input,
+.ss-input textarea,
+.ss-input select {
+  font-family: var(--font-body);
+}
+
+.ss-input select {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* -------------------------------------------------------------
+   Master Visual System (lightweight initial surface + label API)
+   ------------------------------------------------------------- */
+
+.ss-glass {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--ss-glass-bg);
+  border: 1px solid var(--ss-glass-border);
+  border-radius: var(--ss-radius-large);
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  box-shadow: var(--ss-shadow-layer-1);
+
+  /* keep a consistent “premium surface physics” feel */
+  transform: translate3d(0, 0, 0);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease;
+}
+
+.ss-glass::before,
+.ss-glass-2::before,
+.ss-glass::after,
+.ss-glass-2::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ss-glass::before {
+  /* Volumetric “light capture” */
+  background:
+    radial-gradient(1200px circle at 18% 0%, rgba(124, 247, 212, 0.14), transparent 52%),
+    radial-gradient(900px circle at 70% 10%, rgba(91, 167, 255, 0.10), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0) 55%);
+  opacity: 0.95;
+}
+
+.ss-glass::after {
+  /* Laser edge line */
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(124, 247, 212, 0),
+      rgba(124, 247, 212, 0.38),
+      rgba(124, 247, 212, 0)
+    );
+  height: 2px;
+  top: 0;
+  opacity: 0.65;
+  transform: translateY(0);
+}
+
+.ss-glass:hover {
+  transform: translate3d(0, -4px, 0) scale(1.02);
+  border-color: rgba(0, 209, 122, 0.22);
+  box-shadow: 0 10px 70px rgba(0, 0, 0, 0.45), 0 0 120px rgba(0, 255, 210, 0.10);
+}
+
+.ss-glass-2 {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--ss-glass-bg-2);
+  border: 1px solid var(--ss-glass-border);
+  border-radius: var(--ss-radius-medium);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+
+  transform: translate3d(0, 0, 0);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 220ms ease;
+}
+
+.ss-glass-2::before {
+  /* Secondary surface volumetric glow */
+  background:
+    radial-gradient(1000px circle at 16% 0%, rgba(67, 217, 189, 0.12), transparent 56%),
+    radial-gradient(850px circle at 85% 20%, rgba(209, 107, 165, 0.08), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(0, 0, 0, 0) 60%);
+  opacity: 0.95;
+}
+
+.ss-glass-2::after {
+  /* Laser edge line */
+  background:
+    linear-gradient(
+      90deg,
+      rgba(124, 247, 212, 0),
+      rgba(124, 247, 212, 0.30),
+      rgba(124, 247, 212, 0)
+    );
+  height: 2px;
+  top: 0;
+  opacity: 0.55;
+}
+
+.ss-glass-2:hover {
+  transform: translate3d(0, -4px, 0) scale(1.02);
+  border-color: rgba(0, 209, 122, 0.20);
+  box-shadow: 0 10px 65px rgba(0, 0, 0, 0.42), 0 0 100px rgba(0, 255, 210, 0.10);
+}
+
+.ss-laser-label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.60);
+}
+
+.ss-telemetry-pill {
+  border-radius: var(--ss-radius-orb);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 18px var(--ss-glow-cyan);
+}
+
+.ss-neural-glow-edge {
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 0 120px var(--ss-glow-cyan);
+}
+
+.ss-focus-outline {
+  outline: none;
+}
+
+.ss-focus-outline:focus-visible {
+  outline: 2px solid rgba(0, 255, 210, 0.35);
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+
+/* -------------------------------------------------------------
+   Interaction-State System (governed pill buttons)
+   ------------------------------------------------------------- */
+
+.ss-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: calc(var(--ss-ui-space-scale) * 30px);
+  padding: 0 calc(var(--ss-ui-space-scale) * 12px);
+
+  border-radius: var(--ss-radius-orb);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.20);
+
+  color: rgba(255, 255, 255, 0.60);
+  font-size: calc(var(--ss-ui-type-scale) * 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+
+  transition: color 180ms var(--ss-ease-primary), background-color 180ms var(--ss-ease-primary), border-color 180ms var(--ss-ease-primary);
+}
+
+.ss-pill-btn:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ss-pill-btn:focus-visible {
+  outline: 2px solid rgba(0, 255, 210, 0.35);
+  outline-offset: 2px;
+}
+
+.ss-pill-btn--34 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: calc(var(--ss-ui-space-scale) * 34px);
+  padding: 0 calc(var(--ss-ui-space-scale) * 14px);
+
+  border-radius: var(--ss-radius-orb);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.20);
+
+  color: rgba(255, 255, 255, 0.60);
+  font-size: calc(var(--ss-ui-type-scale) * 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+
+  transition: color 180ms var(--ss-ease-primary), background-color 180ms var(--ss-ease-primary), border-color 180ms var(--ss-ease-primary);
+}
+
+.ss-pill-btn--34:hover {
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ss-pill-btn--34:focus-visible {
+  outline: 2px solid rgba(0, 255, 210, 0.35);
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------
+   Production UI Governance: interactive surface discipline
+   ------------------------------------------------------------- */
+
+.ss-card-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 180ms var(--ss-ease-primary), border-color 180ms var(--ss-ease-primary), box-shadow 180ms var(--ss-ease-primary);
+}
+
+.ss-card-clickable:active {
+  transform: translate3d(0, 0, 0) scale(0.98);
+}
+
+/* -------------------------------------------------------------
+   Elevation / blur / opacity governance primitives
+   ------------------------------------------------------------- */
+
+.ss-elev-0 {
+  box-shadow: var(--ss-elev-0-shadow);
+}
+
+.ss-elev-1 {
+  box-shadow: var(--ss-elev-1-shadow);
+}
+
+.ss-elev-2 {
+  box-shadow: var(--ss-elev-2-shadow);
+}
+
+.ss-elev-3 {
+  box-shadow: var(--ss-elev-3-shadow);
+}
+
+.ss-blur-12 {
+  backdrop-filter: var(--ss-blur-12);
+  -webkit-backdrop-filter: var(--ss-blur-12);
+}
+
+.ss-blur-18 {
+  backdrop-filter: var(--ss-blur-18);
+  -webkit-backdrop-filter: var(--ss-blur-18);
+}
+
+.ss-blur-24 {
+  backdrop-filter: var(--ss-blur-24);
+  -webkit-backdrop-filter: var(--ss-blur-24);
+}
+
+.ss-veil-1 {
+  background: rgba(0, 0, 0, var(--ss-opacity-veil-1));
+}
+
+.ss-veil-2 {
+  background: rgba(0, 0, 0, var(--ss-opacity-veil-2));
+}
+
+.ss-veil-3 {
+  background: rgba(0, 0, 0, var(--ss-opacity-veil-3));
+}
+
+/* -------------------------------------------------------------
+   Geometry tokens (radius/padding governance)
+   ------------------------------------------------------------- */
+
+.ss-radius-small {
+  border-radius: var(--ss-radius-small);
+}
+
+.ss-radius-medium {
+  border-radius: var(--ss-radius-medium);
+}
+
+.ss-radius-large {
+  border-radius: var(--ss-radius-large);
+}
+
+.ss-radius-extra-large {
+  border-radius: var(--ss-radius-extra-large);
+}
+
+.ss-pad-4 {
+  padding: calc(var(--ss-ui-space-scale) * var(--ss-pad-4));
+}
+
+.ss-pad-5 {
+  padding: calc(var(--ss-ui-space-scale) * var(--ss-pad-5));
+}
+
+.ss-pad-6 {
+  padding: calc(var(--ss-ui-space-scale) * var(--ss-pad-6));
+}
+
+/* -------------------------------------------------------------
+   Spacing rhythm / layout primitives
+   ------------------------------------------------------------- */
+
+.ss-px-20 {
+  padding-left: calc(var(--ss-ui-space-scale) * var(--ss-space-20));
+  padding-right: calc(var(--ss-ui-space-scale) * var(--ss-space-20));
+}
+
+.ss-px-72 {
+  padding-left: calc(var(--ss-ui-space-scale) * var(--ss-space-72));
+  padding-right: calc(var(--ss-ui-space-scale) * var(--ss-space-72));
+}
+
+.ss-pt-96 {
+  padding-top: calc(var(--ss-ui-space-scale) * var(--ss-space-96));
+}
+
+.ss-pt-110 {
+  padding-top: calc(var(--ss-ui-space-scale) * var(--ss-space-110));
+}
+
+.ss-pb-64 {
+  padding-bottom: calc(var(--ss-ui-space-scale) * var(--ss-space-64));
+}
+
+.ss-pb-80 {
+  padding-bottom: calc(var(--ss-ui-space-scale) * var(--ss-space-80));
+}
+
+/* -------------------------------------------------------------
+   Responsive spacing primitives (governed via OS tokens)
+   ------------------------------------------------------------- */
+@media (min-width: 640px) {
+  .ss-px-72-sm {
+    padding-left: calc(var(--ss-ui-space-scale) * var(--ss-space-72));
+    padding-right: calc(var(--ss-ui-space-scale) * var(--ss-space-72));
+  }
+}
+
+/* -------------------------------------------------------------
+   Intelligence OS Typography API (token-driven classes)
+   ------------------------------------------------------------- */
+.ss-ty-kicker {
+  font-family: var(--font-heading);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-kicker-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-kicker-weight) + var(--ss-ty-weight-bias));
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-kicker-size));
+  color: var(--ss-ty-kicker-color);
+  text-shadow: var(--ss-ty-depth-shadow-soft);
+  line-height: 1;
+}
+
+.ss-ty-hero-title {
+  font-family: var(--font-display);
+
+  margin-top: calc(var(--ss-ui-space-scale) * 16px); /* mt-4 */
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-hero-title-size));
+  font-weight: calc(var(--ss-ty-hero-title-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-hero-title-line-height);
+  letter-spacing: calc(var(--ss-ty-hero-title-tracking) + var(--ss-ty-tracking-bias-em));
+  text-shadow: var(--ss-ty-depth-shadow);
+}
+
+.ss-ty-section-title {
+  font-family: var(--font-heading);
+
+  margin-top: calc(var(--ss-ui-space-scale) * 12px); /* mt-3 */
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-section-title-size));
+  font-weight: calc(var(--ss-ty-section-title-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-section-title-line-height);
+  letter-spacing: calc(var(--ss-ty-section-title-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-section-title-color);
+}
+
+.ss-ty-micro-label {
+  font-family: var(--font-heading);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-micro-label-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-micro-label-weight) + var(--ss-ty-weight-bias));
+  font-size: var(--ss-ty-micro-label-size);
+  color: var(--ss-ty-micro-label-color);
+  line-height: 1.2;
+}
+
+.ss-ty-body {
+  font-family: var(--font-body);
+
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-body-size));
+  font-weight: var(--ss-ty-body-weight);
+  line-height: var(--ss-ty-body-line-height);
+  color: var(--ss-ty-body-color);
+}
+
+.ss-ty-card-label {
+  font-family: var(--font-heading);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-card-label-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-card-label-weight) + var(--ss-ty-weight-bias));
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-card-label-size));
+  color: var(--ss-ty-card-label-color);
+  line-height: 1.2;
+}
+
+.ss-ty-card-heading {
+  font-family: var(--font-heading);
+
+  margin-top: calc(var(--ss-ui-space-scale) * 12px); /* mt-3 */
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-card-heading-size));
+  font-weight: calc(var(--ss-ty-card-heading-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-card-heading-line-height);
+  letter-spacing: calc(var(--ss-ty-card-heading-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-card-heading-color);
+}
+
+.ss-ty-card-body {
+  font-family: var(--font-body);
+
+  margin-top: calc(var(--ss-ui-space-scale) * 8px); /* mt-2 */
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-card-body-size));
+  line-height: var(--ss-ty-card-body-line-height);
+  color: var(--ss-ty-card-body-color);
+}
+
+/* -------------------------------------------------------------
+   Premium Typography API (module + telemetry)
+   ------------------------------------------------------------- */
+
+.ss-ty-module-kicker {
+  font-family: var(--font-heading);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-module-kicker-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-module-kicker-weight) + var(--ss-ty-weight-bias));
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-module-kicker-size));
+  color: var(--ss-ty-module-kicker-color);
+  text-shadow: var(--ss-ty-depth-shadow-soft);
+  line-height: 1;
+}
+
+.ss-ty-module-title {
+  font-family: var(--font-heading);
+
+  margin-top: calc(var(--ss-ui-space-scale) * 12px); /* mt-3 */
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-module-title-size));
+  font-weight: calc(var(--ss-ty-module-title-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-module-title-line-height);
+  letter-spacing: calc(var(--ss-ty-module-title-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-module-title-color);
+  text-shadow: var(--ss-ty-depth-shadow-soft);
+}
+
+/* Command-centre / overlay typography */
+.ss-ty-overlay-title {
+  font-family: var(--font-overlay);
+
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-module-title-size));
+  font-weight: calc(var(--ss-ty-module-title-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-module-title-line-height);
+  letter-spacing: calc(var(--ss-ty-module-title-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-module-title-color);
+  text-shadow: var(--ss-ty-depth-shadow-overlay);
+}
+
+.ss-ty-widget-support {
+  font-family: var(--font-body);
+
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-widget-support-size));
+  font-weight: var(--ss-ty-widget-support-weight);
+  line-height: var(--ss-ty-widget-support-line-height);
+  color: var(--ss-ty-widget-support-color);
+}
+
+.ss-ty-nav-label {
+  font-family: var(--font-heading);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-nav-label-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-nav-label-weight) + var(--ss-ty-weight-bias));
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-nav-label-size));
+  color: var(--ss-ty-nav-label-color);
+  line-height: var(--ss-ty-nav-label-line-height);
+  text-shadow: var(--ss-ty-depth-shadow-soft);
+}
+
+.ss-ty-metric-value {
+  font-family: var(--font-telemetry);
+
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-metric-value-size));
+  font-weight: calc(var(--ss-ty-metric-value-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-metric-value-line-height);
+  letter-spacing: calc(var(--ss-ty-metric-value-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-metric-value-color);
+  text-shadow: var(--ss-ty-depth-shadow-metric);
+}
+
+.ss-ty-metric-subvalue {
+  font-family: var(--font-telemetry);
+
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-metric-subvalue-size));
+  font-weight: calc(var(--ss-ty-metric-subvalue-weight) + var(--ss-ty-weight-bias));
+  line-height: var(--ss-ty-metric-subvalue-line-height);
+  letter-spacing: calc(var(--ss-ty-metric-subvalue-tracking) + var(--ss-ty-tracking-bias-em));
+  color: var(--ss-ty-metric-subvalue-color);
+  text-shadow: var(--ss-ty-depth-shadow-metric);
+}
+
+.ss-ty-metric-label {
+  font-family: var(--font-telemetry);
+
+  text-transform: uppercase;
+  letter-spacing: calc(var(--ss-ty-metric-label-letter-spacing) + var(--ss-ty-tracking-bias-em));
+  font-weight: calc(var(--ss-ty-metric-label-weight) + var(--ss-ty-weight-bias));
+  font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-metric-label-size));
+  color: var(--ss-ty-metric-label-color);
+  line-height: var(--ss-ty-metric-label-line-height);
+  text-shadow: var(--ss-ty-depth-shadow-metric);
+}
+
+/* HUD telemetry numeric values (engineered scanability for “market summary” strips) */
+.ss-ty-telemetry-hud-value {
+  font-family: var(--font-telemetry);
+
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+
+  font-size: calc(var(--ss-ui-type-scale) * 18px);
+  font-weight: 600;
+  line-height: 1.2;
+
+  letter-spacing: calc(-0.02em + var(--ss-ty-tracking-bias-em));
+  color: rgba(255, 255, 255, 0.92);
+
+  text-shadow: var(--ss-ty-depth-shadow-metric);
+}
+
+/* Engineered telemetry numeric rendering (does NOT force large font-size)
+   so small HUD/card numbers feel “system-built”, not generic. */
+.ss-telemetry-numeric {
+  font-family: var(--font-telemetry);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+@media (min-width: 640px) {
+  .ss-ty-hero-title {
+    font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-hero-title-size-sm));
+  }
+
+  .ss-ty-section-title {
+    font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-section-title-size-sm));
+  }
+
+  .ss-ty-body {
+    font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-body-size-sm));
+  }
+
+  .ss-ty-card-heading {
+    font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-card-heading-size-sm));
+  }
+
+  .ss-ty-card-body {
+    font-size: calc(var(--ss-ui-type-scale) * var(--ss-ty-card-body-size-sm));
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ss-focus-outline:focus-visible {
+    outline: 2px solid rgba(0, 255, 210, 0.30);
+  }
+}
+
+/* Typography governance utilities */
+.ss-ty-flush {
+  margin-top: 0 !important;
+}
