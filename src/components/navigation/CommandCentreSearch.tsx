@@ -16,7 +16,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const suggestions = ["RELIANCE", "HAL", "BEL", "IRFC", "GRANULES"];
+  const suggestions: string[] = [];
   const totalItemsCount = results.length > 0 ? results.length : suggestions.length;
 
   useEffect(() => {
@@ -74,23 +74,15 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
     onClose();
   };
 
-  const getScore = (stock: RegisteredStock): number => {
+  const getScore = (stock: RegisteredStock): number | null => {
     const snapshotScore = stock.telemetrySnapshot?.healthScore;
     if (typeof snapshotScore === "number") return Math.round(snapshotScore);
-    if (stock.healthStatus === "veryHealthy") return 88;
-    if (stock.healthStatus === "healthy") return 78;
-    if (stock.healthStatus === "weakening") return 54;
-    if (stock.healthStatus === "unhealthy") return 38;
-    return 66;
+    return null;
   };
 
   const getOneLineReason = (stock: RegisteredStock): string => {
     const sector = stock.sector.toLowerCase();
-    if (stock.symbol === "TCS") return "A large software exporter with steady cash generation and margin discipline.";
-    if (stock.symbol === "RELIANCE") return "A diversified market leader across energy, retail, and telecom.";
-    if (sector.includes("bank")) return "Credit growth, deposits, and asset quality are the key factors to watch.";
-    if (sector.includes("it") || sector.includes("software")) return "Client spending, export demand, and margins drive the investment story.";
-    return "A useful company to review for sector position, valuation, and market attention.";
+    return "Data unavailable";
   };
 
   return (
@@ -132,7 +124,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
                   name={stock.companyName}
                   sector={stock.sector}
                   marketCap={stock.marketCap.formatted}
-                  score={getScore(stock)}
+                  score={getScore(stock) ?? "N/A"}
                   whyItMatters={getOneLineReason(stock)}
                   onOpenBriefing={() => handleSelect(stock)}
                 />

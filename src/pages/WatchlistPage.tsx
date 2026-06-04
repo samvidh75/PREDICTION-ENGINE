@@ -8,7 +8,7 @@ import { PageHeader, CustomTable, Button } from "../components/ui/DesignSystem";
 
 interface RowProps {
   ticker: string;
-  score: number;
+  score: number | null;
   onClick: () => void;
   onRemove: () => void;
 }
@@ -35,7 +35,7 @@ const WatchlistRow: React.FC<RowProps> = ({ ticker, score, onClick, onRemove }) 
           {ticker}
         </button>
       </td>
-      <td className="p-4 text-cyan-400 font-mono font-bold">{score}/100</td>
+      <td className="p-4 text-cyan-400 font-mono font-bold">{score !== null ? `${score}/100` : "N/A"}</td>
       <td className="p-4 text-white/40 font-mono">{noteObj.lastUpdated}</td>
       <td className="p-4">
         <input
@@ -178,7 +178,7 @@ export const WatchlistPage: React.FC = () => {
               <CustomTable headers={["Ticker", "Score", "Last Update", "Why am I watching this?", "Actions"]}>
                 {activeTickers.map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
-                  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
+                  const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
 
                   return (
                     <WatchlistRow

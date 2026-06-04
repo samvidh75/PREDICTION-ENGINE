@@ -18,9 +18,9 @@ for (const stock of dynamicList) {
     companyName: stock.name,
     exchange: stock.exchange as any,
     sector: stock.sector,
-    marketCap: { numeric: 50000, formatted: "₹50,000 Cr" },
-    peRatio: 22.0,
-    fiftyTwoWeekRange: { low: 100, high: 200, current: 150 },
+    marketCap: { numeric: 0, formatted: "Data unavailable" },
+    peRatio: 0,
+    fiftyTwoWeekRange: { low: 0, high: 0, current: 0 },
     healthStatus: "stable",
     lastUpdated: new Date().toISOString()
   };
@@ -38,20 +38,7 @@ export class StockRegistry {
     const found = MASTER_STOCK_REGISTRY[k];
     if (found) return found;
 
-    // Provide dynamic fallback for any valid symbol format to prevent "telemetry unavailable" error
-    if (k.length > 0) {
-      return {
-        symbol: k,
-        companyName: `${k} India Limited`,
-        exchange: "NSE",
-        sector: "Conglomerate & Diversified",
-        marketCap: { numeric: 50000, formatted: "₹50,000 Cr" },
-        peRatio: 22.0,
-        fiftyTwoWeekRange: { low: 100, high: 200, current: 150 },
-        healthStatus: "stable",
-        lastUpdated: new Date().toISOString()
-      };
-    }
+    // Return null for unknown symbols instead of providing fallback data
     return null;
   }
 
