@@ -41,15 +41,18 @@ export const DiscoveryPage: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         if (!data || data.error) throw new Error(data?.error || 'No data');
-        const mapToCompanies = (list: any[]) => list.map(item => ({
-          symbol: item.symbol,
-          name: StockRegistry.getStock(item.symbol)?.name || item.symbol,
-          score: Math.round(item.score || 0),
-          price: 'Unavailable',
-          change: 'Unavailable',
-          isPositive: true,
-          oneLiner: 'Discovered via quantitative factor analysis.'
-        }));
+        const mapToCompanies = (list: any[]) => list.map(item => {
+          const stock = StockRegistry.getStock(item.symbol);
+          return {
+            symbol: item.symbol,
+            name: stock?.companyName || item.symbol,
+            score: Math.round(item.score || 0),
+            price: item.price || 'Unavailable',
+            change: item.change || 'Unavailable',
+            isPositive: item.change?.startsWith('+') || false,
+            oneLiner: item.oneLiner || 'Analysis data currently unavailable.'
+          };
+        });
         setCategories([
           { title: 'High Quality', icon: <Trophy className="w-5 h-5 text-yellow-400" />, companies: mapToCompanies(data.highestQuality || []) },
           { title: 'High Growth', icon: <Sparkles className="w-5 h-5 text-fuchsia-400" />, companies: mapToCompanies(data.highestGrowth || []) },

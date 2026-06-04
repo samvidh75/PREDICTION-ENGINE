@@ -13,12 +13,7 @@ interface SnapshotItem {
   isPositive: boolean;
 }
 
-const marketSnapshots: SnapshotItem[] = [
-  { index: "NIFTY 50", value: "22,821.40", change: "+1.15%", isPositive: true },
-  { index: "SENSEX", value: "75,074.50", change: "+1.08%", isPositive: true },
-  { index: "BANK NIFTY", value: "49,235.80", change: "-0.22%", isPositive: false },
-  { index: "INDIA VIX", value: "13.45", change: "-4.20%", isPositive: false }
-];
+const marketSnapshots: SnapshotItem[] = [];
 
 interface Opportunity {
   ticker: string;
@@ -26,33 +21,7 @@ interface Opportunity {
   whyMatters: string;
 }
 
-const todayOpportunities: Opportunity[] = [
-  {
-    ticker: "RELIANCE",
-    whatChanged: "Operating margins consolidated in retail and digital business units.",
-    whyMatters: "Strong performance in telecom offset commodity headwind, proving conglomerate business quality."
-  },
-  {
-    ticker: "TATASTEEL",
-    whatChanged: "Global export contracts renewed with improved pricing realizations.",
-    whyMatters: "Capacity utilization spikes in domestic plants are translating into immediate free cash flow."
-  },
-  {
-    ticker: "INFY",
-    whatChanged: "Acquisition of leading European engineering firm cleared regulators.",
-    whyMatters: "Accelerates high-margin engineering services segments and expands continental market share."
-  },
-  {
-    ticker: "HDFCBANK",
-    whatChanged: "Credit growth momentum sustained at 16% YoY with deposits rising 18%.",
-    whyMatters: "Post-merger integration pain points are resolving faster than consensus street estimates."
-  },
-  {
-    ticker: "HAL",
-    whatChanged: "Secured export contract for upgraded trainer jets from Southeast Asia.",
-    whyMatters: "Validates international competitiveness and unlocks a non-governmental revenue channel."
-  }
-];
+const todayOpportunities: Opportunity[] = [];
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -129,7 +98,7 @@ export const DashboardHub: React.FC = () => {
         }
       />
 
-      {/* 1. Today’s Opportunities (Maximum 5 cards) */}
+      {/* 1. Today's Opportunities (Maximum 5 cards) */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-amber-400" />
@@ -137,28 +106,34 @@ export const DashboardHub: React.FC = () => {
             Today's Opportunities
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {todayOpportunities.map((op) => {
-            const info = StockRegistry.getStock(op.ticker);
-            const score = info?.telemetrySnapshot?.healthScore 
-              ? Math.round(info.telemetrySnapshot.healthScore) 
-              : 82;
-            return (
-              <CompanyCard
-                key={op.ticker}
-                ticker={op.ticker}
-                name={info?.companyName || op.ticker}
-                sector={info?.sector || "Conglomerate"}
-                marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
-                score={score}
-                whyItMatters={op.whyMatters}
-                isWatched={isWatched(op.ticker)}
-                onOpenBriefing={() => handleCompanyClick(op.ticker)}
-                onToggleWatchlist={() => handleToggleWatchlist(op.ticker)}
-              />
-            );
-          })}
-        </div>
+        {todayOpportunities.length === 0 ? (
+          <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30 space-y-3">
+            <p>Opportunity data currently unavailable.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {todayOpportunities.map((op) => {
+              const info = StockRegistry.getStock(op.ticker);
+              const score = info?.telemetrySnapshot?.healthScore 
+                ? Math.round(info.telemetrySnapshot.healthScore) 
+                : 82;
+              return (
+                <CompanyCard
+                  key={op.ticker}
+                  ticker={op.ticker}
+                  name={info?.companyName || op.ticker}
+                  sector={info?.sector || "Conglomerate"}
+                  marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                  score={score}
+                  whyItMatters={op.whyMatters}
+                  isWatched={isWatched(op.ticker)}
+                  onOpenBriefing={() => handleCompanyClick(op.ticker)}
+                  onToggleWatchlist={() => handleToggleWatchlist(op.ticker)}
+                />
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Grid container for updates and research */}
@@ -265,26 +240,32 @@ export const DashboardHub: React.FC = () => {
             Market Snapshot
           </span>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {marketSnapshots.map((item) => (
-            <div 
-              key={item.index} 
-              className="bg-white/[0.01] border border-white/5 rounded-xl p-3 flex justify-between items-center"
-            >
-              <div>
-                <span className="text-[10px] font-medium text-white/50 block">{item.index}</span>
-                <span className="text-sm font-bold font-mono text-white mt-0.5 block">{item.value}</span>
+        {marketSnapshots.length === 0 ? (
+          <div className="p-8 bg-white/[0.01] border border-white/5 rounded-2xl text-center text-xs text-white/30">
+            Market index data currently unavailable.
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {marketSnapshots.map((item) => (
+              <div 
+                key={item.index} 
+                className="bg-white/[0.01] border border-white/5 rounded-xl p-3 flex justify-between items-center"
+              >
+                <div>
+                  <span className="text-[10px] font-medium text-white/50 block">{item.index}</span>
+                  <span className="text-sm font-bold font-mono text-white mt-0.5 block">{item.value}</span>
+                </div>
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                  item.change.startsWith("+") 
+                    ? "text-emerald-400 bg-emerald-400/10" 
+                    : "text-rose-400 bg-rose-400/10"
+                }`}>
+                  {item.change}
+                </span>
               </div>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                item.change.startsWith("+") 
-                  ? "text-emerald-400 bg-emerald-400/10" 
-                  : "text-rose-400 bg-rose-400/10"
-              }`}>
-                {item.change}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

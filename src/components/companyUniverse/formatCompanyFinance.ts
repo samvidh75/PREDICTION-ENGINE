@@ -39,7 +39,8 @@ function formatINRWithCommas(value: number): string {
   return `${isNeg ? "-" : ""}₹${groups.join(",")},${last3}`;
 }
 
-export function formatMarketCap(value: number): { exact: string; words: string } { if (!value || isNaN(value)) return { exact: "Unavailable", words: "Unavailable" }; return { exact: formatINRWithCommas(value), words: formatCompactRupees(value) }; } {
+export function formatMarketCap(value: number): { exact: string; words: string } {
+  if (!value || isNaN(value)) return { exact: "Unavailable", words: "Unavailable" };
   return {
     exact: formatINRWithCommas(value),
     words: formatCompactRupees(value),
@@ -55,7 +56,7 @@ export function formatPE(value: number): string {
 
 export function formatDebtRatio(value: number): string {
   if (!Number.isFinite(value)) return "—";
-  return `${(value * 100).toFixed(1)}%`;
+  return `$x(value * 100).toFixed(1)}%`;
 }
 
 export function hashStringToSeed(input: string): number {
@@ -67,12 +68,11 @@ export function hashStringToSeed(input: string): number {
   return h >>> 0;
 }
 
-export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number; industryPe: number; fiveYearPeAvg: number } {
+export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number: industryPe: number; fiveYearPeAvg: number } {
   return {
     marketCap: 0,
     pe: NaN,
     industryPe: NaN,
     fiveYearPeAvg: NaN,
   };
-}
 }

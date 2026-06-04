@@ -150,7 +150,7 @@ export const CompanySuperpage: React.FC = () => {
             </div>
             <div>
               <span className="text-[9px] text-gray-500 uppercase block">Daily Change</span>
-              <span className="text-lg font-bold font-mono text-emerald-400">+1.24%</span>
+              <span className="text-lg font-bold font-mono text-gray-500">Unavailable</span>
             </div>
             <div>
               <span className="text-[9px] text-gray-500 uppercase block">Market Cap</span>
@@ -229,9 +229,9 @@ export const CompanySuperpage: React.FC = () => {
           </span>
         </div>
         <div className="md:col-span-2 text-xs leading-relaxed text-gray-300 space-y-2">
-          <p><strong>Competitive Position:</strong> Enjoys high switching costs due to deep integration in enterprise IT infrastructures, maintaining multi-year vendor dominance.</p>
-          <p><strong>Market Leadership:</strong> Tracks as a top-tier global software integrator with high relative pricing power in regional contract bidding.</p>
-          <p><strong>Industry Structure:</strong> The sector consolidation supports large-scale players with robust balance sheets, creating protective structural barriers against micro-cap challenges.</p>
+          <p><strong>Competitive Position:</strong> Data currently unavailable.</p>
+          <p><strong>Market Leadership:</strong> Data currently unavailable.</p>
+          <p><strong>Industry Structure:</strong> Data currently unavailable.</p>
         </div>
       </section>
 
@@ -458,15 +458,7 @@ export const CompanySuperpage: React.FC = () => {
           Related Companies
         </span>
         <div className="flex flex-wrap gap-3">
-          {["TCS", "WIPRO", "HCLTECH", "TECHM"].map((peer) => (
-            <button
-              key={peer}
-              onClick={() => setPage("stock", peer)}
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-cyan-500/30 text-xs font-mono text-cyan-400 rounded-lg transition-all cursor-pointer"
-            >
-              {peer}
-            </button>
-          ))}
+          <div className="text-xs text-gray-500">Related companies data currently unavailable.</div>
         </div>
       </section>
 
