@@ -23,47 +23,31 @@ export class QualityEngine {
     let roeNormalized = 50;
     if (financials.roe !== null) {
       const roe = financials.roe;
-      if (roe >= profile.roeExceptional) roeNormalized = 95;
-      else if (roe >= profile.roeHigh) roeNormalized = 80;
-      else if (roe >= profile.roeFair) roeNormalized = 65;
-      else if (roe >= profile.roeLow) roeNormalized = 45;
-      else if (roe >= 0) roeNormalized = 30;
-      else roeNormalized = 10;
+      const roeHigh = profile.roeHigh > 0 ? profile.roeHigh : 0.20;
+      roeNormalized = clampScore(Math.round((roe / roeHigh) * 55 + 25));
     }
 
     // ── Sub-score 2: ROIC (Return on Invested Capital) ──────────────
     let roicNormalized = 50;
     if (financials.roic !== null) {
       const roic = financials.roic;
-      if (roic >= 0.20) roicNormalized = 95;
-      else if (roic >= 0.15) roicNormalized = 80;
-      else if (roic >= 0.10) roicNormalized = 65;
-      else if (roic >= 0.05) roicNormalized = 50;
-      else if (roic >= 0) roicNormalized = 35;
-      else roicNormalized = 10;
+      roicNormalized = clampScore(Math.round((roic / 0.15) * 55 + 25));
     }
 
     // ── Sub-score 3: Gross Margin — sector-aware ───────────────────
     let grossMarginScore = 50;
     if (profile.useGrossMargin && financials.grossMargin !== null) {
       const gm = financials.grossMargin;
-      if (gm >= profile.gmPremium) grossMarginScore = 95;
-      else if (gm >= profile.gmHigh) grossMarginScore = 80;
-      else if (gm >= profile.gmFair) grossMarginScore = 65;
-      else if (gm >= profile.gmLow) grossMarginScore = 45;
-      else grossMarginScore = 25;
+      const gmHigh = profile.gmHigh > 0 ? profile.gmHigh : 0.40;
+      grossMarginScore = clampScore(Math.round((gm / gmHigh) * 55 + 25));
     }
-    // For financials (banks/insurance), gross margin is not applicable → stays at 50 neutral
 
     // ── Sub-score 4: Operating Margin — sector-aware ───────────────
     let operatingMarginScore = 50;
     if (financials.operatingMargin !== null) {
       const om = financials.operatingMargin;
-      if (om >= profile.omPremium) operatingMarginScore = 95;
-      else if (om >= profile.omHigh) operatingMarginScore = 80;
-      else if (om >= profile.omFair) operatingMarginScore = 65;
-      else if (om >= profile.omLow) operatingMarginScore = 45;
-      else operatingMarginScore = 25;
+      const omHigh = profile.omHigh > 0 ? profile.omHigh : 0.20;
+      operatingMarginScore = clampScore(Math.round((om / omHigh) * 55 + 25));
     }
 
     // ── Sub-score 5: Efficiency Score ───────────────────────────────
@@ -74,7 +58,7 @@ export class QualityEngine {
       const roe = financials.roe!;
       const gm = financials.grossMargin!;
       const efficiencyRatio = gm > 0 ? Math.min(roe / gm, 2.0) : 0;
-      efficiencyScore = clampScore(efficiencyRatio * 40 + 30);
+      efficiencyScore = clampScore(Math.round(efficiencyRatio * 35 + 25));
     }
 
     // ── Gross margin weight for financials: zero it out ─────────────

@@ -58,7 +58,7 @@ export class StockStoryEngine {
     );
 
     // ── Continuous risk dampening ───────────────────────────────────
-    const riskDampening = Math.max(0, (risk.score - 40) * 0.35);
+    const riskDampening = Math.max(0, (risk.score - 15) * 0.50);
     const dampenedHealth = clampScore(preAdjustHealth - riskDampening);
 
     // ── Apply Penalty Framework ─────────────────────────────────────
@@ -134,7 +134,7 @@ export class StockStoryEngine {
     healthScore: number,
     riskScore: number
   ): CompanyClassification {
-    const riskAdjusted = healthScore - Math.max(0, (riskScore - 40) * 0.35);
+    const riskAdjusted = healthScore - Math.max(0, (riskScore - 15) * 0.50);
 
     if (riskAdjusted >= 80) return 'Excellent';
     if (riskAdjusted >= 65) return 'Healthy';

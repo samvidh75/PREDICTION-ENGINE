@@ -25,33 +25,25 @@ export class StabilityEngine {
     if (financials.debtToEquity !== null) {
       const dte = financials.debtToEquity;
       if (dte <= 0) debtScore = 95;
-      else if (dte < profile.deLow) debtScore = 85;
-      else if (dte < profile.deModerate) debtScore = 75;
-      else if (dte < profile.deElevated) debtScore = 55;
-      else if (dte < profile.deExtreme) debtScore = 35;
-      else debtScore = 15;
+      else {
+        const deElevated = profile.deElevated > 0 ? profile.deElevated : 1.5;
+        debtScore = clampScore(Math.round(90 - (dte / deElevated) * 45));
+      }
     }
 
     // ── Sub-score 2: Cash / Liquidity Score — sector-aware ─────────
     let cashScore = 50;
     const currentRatio = financials.currentRatio;
     if (currentRatio !== null) {
-      if (currentRatio >= profile.crHealthy) cashScore = 90;
-      else if (currentRatio >= profile.crAdequate) cashScore = 75;
-      else if (currentRatio >= profile.crTight) cashScore = 55;
-      else if (currentRatio >= 0.5) cashScore = 30;
-      else cashScore = 10;
+      const crHealthy = profile.crHealthy > 0 ? profile.crHealthy : 2.0;
+      cashScore = clampScore(Math.round((currentRatio / crHealthy) * 55 + 25));
     }
 
     // ── Sub-score 3: Volatility Score (lower volatility = higher score)
     let volatilityScore = 50;
     if (features.volatility !== null) {
       const vol = features.volatility;
-      if (vol <= 0.15) volatilityScore = 90;
-      else if (vol <= 0.25) volatilityScore = 75;
-      else if (vol <= 0.35) volatilityScore = 55;
-      else if (vol <= 0.50) volatilityScore = 35;
-      else volatilityScore = 15;
+      volatilityScore = clampScore(Math.round(95 - vol * 180));
     }
 
     // ── Sub-score 4: Coverage Score (debt service capacity) ─────────
@@ -64,40 +56,25 @@ export class StabilityEngine {
         coverageScore = 95;
       } else {
         const coverageRatio = dte > 0.01 ? om / dte : 10;
-        if (coverageRatio >= 1.0) coverageScore = 90;
-        else if (coverageRatio >= 0.5) coverageScore = 75;
-        else if (coverageRatio >= 0.25) coverageScore = 55;
-        else if (coverageRatio >= 0.10) coverageScore = 35;
-        else coverageScore = 15;
+        coverageScore = clampScore(Math.round(Math.min(95, coverageRatio * 50 + 25)));
       }
     } else if (financials.debtToEquity !== null) {
       const dte = financials.debtToEquity;
-      if (dte <= profile.deElevated) coverageScore = 70;
-      else if (dte <= profile.deExtreme) coverageScore = 45;
-      else coverageScore = 20;
+      const deElevated = profile.deElevated > 0 ? profile.deElevated : 1.5;
+      coverageScore = clampScore(Math.round(80 - (dte / deElevated) * 35));
     }
 
     // ── Sub-score 5: Interest Coverage (NEW) ────────────────────────
-    // Proxy: operating margin relative to debt load
-    // For financials: operating margin already captures spread income
     let interestCoverageScore = 50;
     if (financials.operatingMargin !== null && financials.debtToEquity !== null) {
       const om = financials.operatingMargin;
       const dte = financials.debtToEquity;
 
       if (dte <= 0) {
-        interestCoverageScore = 95; // no debt = infinite coverage
+        interestCoverageScore = 95;
       } else {
-        // Interest coverage proxy: OM / DTE * sector adjustment
-        // Banks have low OM but operate with high DTE — their OM is effectively
-        // net interest margin, so the proxy still works directionally
         const icrProxy = (om * 100) / Math.max(dte, 0.1);
-        if (icrProxy >= 15) interestCoverageScore = 90;
-        else if (icrProxy >= 8) interestCoverageScore = 75;
-        else if (icrProxy >= 4) interestCoverageScore = 60;
-        else if (icrProxy >= 2) interestCoverageScore = 45;
-        else if (icrProxy >= 1) interestCoverageScore = 30;
-        else interestCoverageScore = 15;
+        interestCoverageScore = clampScore(Math.round(Math.min(95, (icrProxy / 10) * 50 + 25)));
       }
     }
 
