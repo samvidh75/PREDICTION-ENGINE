@@ -234,7 +234,7 @@ export default function MarketCommandCentrePage(): JSX.Element {
               <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Sector Intelligence Matrix</div>
               <div className="mt-3 text-[22px] font-medium text-white/92">rotational indicators</div>
             </div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">spatially contextual</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">market context</div>
           </div>
         </div>
 

@@ -46,7 +46,7 @@ export default function PremiumTierSwitch(): JSX.Element {
           className="absolute right-0 top-[34px] z-[30] rounded-[22px] border border-white/10 bg-black/60 backdrop-blur-[24px] shadow-[0_0_50px_rgba(0,0,0,0.45)] p-3"
           style={{ width: 220 }}
           role="menu"
-          aria-label="Choose premium tier (demo)"
+          aria-label="Choose premium tier"
         >
           <div className="text-[10px] uppercase tracking-[0.18em] text-white/55 px-2">Demo tier switch</div>
 
@@ -80,7 +80,7 @@ export default function PremiumTierSwitch(): JSX.Element {
           </div>
 
           <div className="mt-3 text-[10px] uppercase tracking-[0.18em] text-white/45 px-2">
-            Learning-first demo context
+            Learning-first research context
           </div>
         </div>
       )}

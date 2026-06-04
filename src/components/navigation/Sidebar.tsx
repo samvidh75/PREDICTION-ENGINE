@@ -32,7 +32,7 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-[240px] fixed top-18 bottom-0 left-0 bg-[#0f0f0f] border-r border-[#2a2e39] flex flex-col justify-between py-6 z-40 hidden md:flex select-none">
+    <aside className="ss-tv-neon-edge w-[240px] fixed top-18 bottom-0 left-0 bg-[#080a0f]/92 border-r border-white/10 flex flex-col justify-between py-6 z-40 hidden md:flex select-none backdrop-blur-xl">
       <nav className="flex-1 space-y-1.5 px-3 overflow-y-auto">
         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#787b86] px-3 block mb-3 font-sans">Menu</span>
         {links.map(link => {
@@ -43,8 +43,8 @@ export const Sidebar: React.FC = () => {
               onClick={() => handleNavClick(link.id)}
               className={`group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium transition-all duration-150 rounded-lg text-left cursor-pointer ${
                 isActive 
-                  ? "bg-[#2962ff]/15 text-[#7da0ff] font-semibold" 
-                  : "text-[#b2b5be] hover:bg-[#1e222d] hover:text-[#f0f3fa]"
+                  ? "bg-[#2962ff]/16 text-[#9bb5ff] font-semibold shadow-[0_0_24px_rgba(41,98,255,0.12)]" 
+                  : "text-[#b2b5be] hover:bg-white/[0.055] hover:text-[#f0f3fa]"
               }`}
             >
               <span className={`transition-colors duration-150 ${

@@ -19,7 +19,7 @@ export const TopNav: React.FC = () => {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-[60px] items-center justify-between border-b border-[#2a2e39] bg-[#0f0f0f]/95 px-4 backdrop-blur-xl md:hidden">
+    <header className="ss-tv-neon-edge fixed top-0 left-0 right-0 z-50 flex h-[60px] items-center justify-between border-b border-white/10 bg-[#080a0f]/92 px-4 backdrop-blur-xl md:hidden">
       <button
         type="button"
         onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -32,7 +32,7 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={triggerSearch}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#2a2e39] bg-[#131722] text-[#b2b5be]"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#b2b5be] shadow-[0_0_24px_rgba(41,98,255,0.14)]"
           aria-label="Open search"
         >
           <Search className="h-4 w-4" />
@@ -48,7 +48,7 @@ export const TopNav: React.FC = () => {
       )}
     </header>
 
-    <nav className="fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-[#2a2e39] bg-[#0f0f0f]/95 px-8 backdrop-blur-xl md:flex">
+    <nav className="ss-tv-neon-edge fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-white/10 bg-[#080a0f]/92 px-8 backdrop-blur-xl md:flex">
       <div className="flex-shrink-0 w-[240px] flex items-center">
         <span 
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -63,7 +63,7 @@ export const TopNav: React.FC = () => {
           <div className="flex-1 flex justify-center max-w-[600px] mx-auto">
             <button
               onClick={triggerSearch}
-              className="w-full h-11 bg-[#131722] border border-[#2a2e39] hover:border-[#2962ff]/60 rounded-lg flex items-center px-4 gap-3 cursor-pointer text-left focus:outline-none transition-all"
+              className="w-full h-11 bg-white/[0.04] border border-white/10 hover:border-[#2962ff]/60 rounded-lg flex items-center px-4 gap-3 cursor-pointer text-left focus:outline-none transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_rgba(41,98,255,0.08)]"
             >
               <Search className="w-4 h-4 text-[#787b86]" />
               <span className="text-xs text-[#787b86] font-normal">
@@ -76,7 +76,7 @@ export const TopNav: React.FC = () => {
             <button
               type="button"
               onClick={() => setPage("alerts")}
-              className="h-11 w-11 rounded-lg bg-[#131722] border border-[#2a2e39] hover:bg-[#1e222d] flex items-center justify-center transition-all cursor-pointer text-[#b2b5be] hover:text-[#f0f3fa]"
+              className="h-11 w-11 rounded-lg bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] flex items-center justify-center transition-all cursor-pointer text-[#b2b5be] hover:text-[#f0f3fa] shadow-[0_0_24px_rgba(41,98,255,0.08)]"
             >
               <Bell className="w-4 h-4" />
             </button>
