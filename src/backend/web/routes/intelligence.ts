@@ -8,6 +8,7 @@ import { portfolioIntelligenceEngine } from "../../../services/PortfolioIntellig
 import { narrativeEngine } from "../../../services/NarrativeEngine";
 import { NewsCoordinator } from "../../../services/news/NewsCoordinator";
 import { intelligenceCache } from "../../../services/intelligence/IntelligenceCache";
+import { stockStoryEngine } from "../../../stockstory";
 
 export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
   // GET /api/intelligence/company/:symbol
@@ -713,6 +714,146 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       }
 
       return catalysts.slice(0, 4);
+    } catch (err: any) {
+      reply.status(500).send({ error: err.message });
+    }
+  });
+
+  // GET /api/stockstory/:symbol
+  // Full StockStory 7-engine evaluation
+  app.get("/api/stockstory/:symbol", async (request, reply) => {
+    const { symbol } = request.params as { symbol: string };
+    const sym = symbol.toUpperCase().trim();
+
+    const cacheKey = `stockstory:${sym}`;
+    const cached = intelligenceCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    try {
+      // Fetch symbol metadata
+      const symInfo = await pool.query(
+        `SELECT sector FROM symbols WHERE symbol = $1`,
+        [sym]
+      );
+      const sector = symInfo.rows[0]?.sector || "Technology";
+
+      // Fetch latest features
+      const featRes = await pool.query(
+        `SELECT * FROM feature_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 1`,
+        [sym]
+      );
+
+      // Fetch latest factors
+      const factRes = await pool.query(
+        `SELECT * FROM factor_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 1`,
+        [sym]
+      );
+
+      // Fetch financial data
+      const finRes = await pool.query(
+        `SELECT * FROM financial_snapshots WHERE symbol = $1 ORDER BY period_end DESC LIMIT 1`,
+        [sym]
+      );
+
+      // Fetch historical features for trend analysis (last 30)
+      const histFeatRes = await pool.query(
+        `SELECT trade_date, rsi, macd_histogram, adx, volatility
+         FROM feature_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 30`,
+        [sym]
+      );
+
+      // Fetch historical factors for stability analysis (last 15)
+      const histFactRes = await pool.query(
+        `SELECT trade_date, factor_score, quality_factor, risk_factor, growth_factor
+         FROM factor_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 15`,
+        [sym]
+      );
+
+      const feat = featRes.rows[0];
+      const fact = factRes.rows[0];
+      const fin = finRes.rows[0];
+
+      // Build EngineInputs from database data
+      const engineInputs = {
+        symbol: sym,
+        tradeDate: fact?.trade_date
+          ? (fact.trade_date instanceof Date
+              ? fact.trade_date.toISOString().split("T")[0]
+              : String(fact.trade_date).split("T")[0])
+          : new Date().toISOString().split("T")[0],
+        features: {
+          rsi: feat?.rsi != null ? Number(feat.rsi) : null,
+          macd: feat?.macd != null ? Number(feat.macd) : null,
+          macdSignal: feat?.macd_signal != null ? Number(feat.macd_signal) : null,
+          macdHistogram: feat?.macd_histogram != null ? Number(feat.macd_histogram) : null,
+          adx: feat?.adx != null ? Number(feat.adx) : null,
+          atr: feat?.atr != null ? Number(feat.atr) : null,
+          bollingerWidth: feat?.bollinger_width != null ? Number(feat.bollinger_width) : null,
+          momentum: feat?.momentum != null ? Number(feat.momentum) : null,
+          volatility: feat?.volatility != null ? Number(feat.volatility) : null,
+          relativeStrength: feat?.relative_strength != null ? Number(feat.relative_strength) : null,
+          movingAverageDistance: feat?.moving_average_distance != null ? Number(feat.moving_average_distance) : null,
+          trendStrength: feat?.trend_strength != null ? Number(feat.trend_strength) : null,
+        },
+        factors: {
+          qualityFactor: fact ? Number(fact.quality_factor) : 50,
+          valueFactor: fact ? Number(fact.value_factor) : 50,
+          growthFactor: fact ? Number(fact.growth_factor) : 50,
+          momentumFactor: fact ? Number(fact.momentum_factor) : 50,
+          riskFactor: fact ? Number(fact.risk_factor) : 50,
+          sectorStrengthFactor: fact ? Number(fact.sector_strength_factor) : 50,
+          factorScore: fact ? Number(fact.factor_score) : 50,
+        },
+        financials: {
+          peRatio: fin?.pe_ratio != null ? Number(fin.pe_ratio) : null,
+          pbRatio: fin?.pb_ratio != null ? Number(fin.pb_ratio) : null,
+          eps: fin?.eps != null ? Number(fin.eps) : null,
+          dividendYield: fin?.dividend_yield != null ? Number(fin.dividend_yield) : null,
+          beta: fin?.beta != null ? Number(fin.beta) : null,
+          marketCap: fin?.market_cap != null ? Number(fin.market_cap) : null,
+          freeFloat: fin?.free_float != null ? Number(fin.free_float) : null,
+          fcfYield: null,
+          evEbitda: null,
+          roe: null,
+          roic: null,
+          debtToEquity: fin?.debt_to_equity != null ? Number(fin.debt_to_equity) : null,
+          currentRatio: fin?.current_ratio != null ? Number(fin.current_ratio) : null,
+          revenueGrowth: fin?.revenue_growth != null ? Number(fin.revenue_growth) : null,
+          profitGrowth: fin?.profit_growth != null ? Number(fin.profit_growth) : null,
+          epsGrowth: fin?.eps_growth != null ? Number(fin.eps_growth) : null,
+          fcfGrowth: null,
+          grossMargin: fin?.gross_margin != null ? Number(fin.gross_margin) : null,
+          operatingMargin: fin?.operating_margin != null ? Number(fin.operating_margin) : null,
+        },
+        historical: {
+          featureHistory: histFeatRes.rows.map(r => ({
+            tradeDate: r.trade_date instanceof Date ? r.trade_date.toISOString().split("T")[0] : String(r.trade_date).split("T")[0],
+            rsi: r.rsi != null ? Number(r.rsi) : 50,
+            macdHistogram: r.macd_histogram != null ? Number(r.macd_histogram) : 0,
+            adx: r.adx != null ? Number(r.adx) : 25,
+            volatility: r.volatility != null ? Number(r.volatility) : 0.25,
+          })),
+          factorHistory: histFactRes.rows.map(r => ({
+            tradeDate: r.trade_date instanceof Date ? r.trade_date.toISOString().split("T")[0] : String(r.trade_date).split("T")[0],
+            factorScore: Number(r.factor_score),
+            qualityFactor: Number(r.quality_factor),
+            riskFactor: Number(r.risk_factor),
+            growthFactor: Number(r.growth_factor),
+          })),
+        },
+        sector: {
+          name: sector,
+          sectorStrength: 50,
+          sectorMomentum: "Steady" as const,
+        },
+      };
+
+      // Run the StockStory engine
+      const storyResult = stockStoryEngine.evaluate(engineInputs);
+      intelligenceCache.set(cacheKey, storyResult);
+      return storyResult;
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }

@@ -17,7 +17,7 @@ export const MobileShell: React.FC<MobileShellProps> = ({ currentRoute, onOpenSe
   ];
 
   return (
-    <div className="flex md:hidden flex-col min-h-screen text-white font-mono ss-app-shell pb-24">
+    <div className="flex md:hidden flex-col min-h-screen bg-[#020304] text-white font-mono pb-24">
       {/* 1. Mobile Top Header System */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 border-b border-white/5"

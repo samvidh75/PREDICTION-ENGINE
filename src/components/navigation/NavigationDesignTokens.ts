@@ -2,8 +2,8 @@
 
 export const NAV_TOKENS = {
   // Opaque header bases
-  desktopBackground: "rgba(4, 6, 9, 0.96)",
-  mobileBackground: "rgba(2, 3, 4, 0.95)",
+  desktopBackground: "rgba(15, 15, 15, 0.96)",
+  mobileBackground: "rgba(15, 15, 15, 0.95)",
   backdropBlur: "blur(24px)",
   
   // Heights
@@ -12,18 +12,18 @@ export const NAV_TOKENS = {
   mobileBottomNavHeight: "72px",
   
   // Borders
-  border: "1px solid rgba(255, 255, 255, 0.08)",
+  border: "1px solid rgba(42, 46, 57, 1)",
   
   // Colours (Section 150)
-  textPrimary: "#F5F7FA",
-  textSecondary: "#AAB6C7",
-  textMuted: "#6D7888",
-  accentCyan: "#00D17A", // Cyan/Emerald theme active
-  accentMagenta: "#D946EF",
+  textPrimary: "#F0F3FA",
+  textSecondary: "#B2B5BE",
+  textMuted: "#787B86",
+  accentCyan: "#2962FF",
+  accentMagenta: "#8F5CFF",
   
   // Interactive Hover/Active states
-  hoverBg: "rgba(255, 255, 255, 0.04)",
-  activeBg: "rgba(255, 255, 255, 0.08)",
+  hoverBg: "rgba(30, 34, 45, 1)",
+  activeBg: "rgba(41, 98, 255, 0.16)",
   hoverTransition: "transition-all duration-300 ease-out",
 } as const;
 

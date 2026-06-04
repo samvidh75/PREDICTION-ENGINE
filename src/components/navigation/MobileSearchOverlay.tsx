@@ -23,7 +23,7 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] ss-workspace flex flex-col p-4">
+    <div className="fixed inset-0 z-[9999] bg-[#020304] flex flex-col p-4">
       <div className="flex items-center justify-between gap-3">
         <input
           autoFocus

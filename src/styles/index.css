@@ -12,18 +12,31 @@
   --ss-ui-space-scale: 1;
 
   /* StockStory India master design tokens (CSS variables) */
-  --ss-bg-primary: #020304;
+  --ss-bg-primary: #0f0f0f;
+  --ss-bg-secondary: #131722;
+  --ss-bg-tertiary: #1e222d;
+  --ss-bg-elevated: #242731;
+  --ss-border: #2a2e39;
+  --ss-border-strong: #363a45;
+  --ss-text-primary: #f0f3fa;
+  --ss-text-secondary: #b2b5be;
+  --ss-text-muted: #787b86;
+  --ss-tv-blue: #2962ff;
+  --ss-tv-blue-hover: #1e53e5;
+  --ss-tv-green: #22ab94;
+  --ss-tv-red: #f23645;
+  --ss-tv-yellow: #f0b90b;
 
-  --ss-surface-2: #0A0D10;
-  --ss-surface-3: #10141A;
-  --ss-surface-4: #151A21;
-  --ss-surface-tertiary: #1B212A;
+  --ss-surface-2: #131722;
+  --ss-surface-3: #1e222d;
+  --ss-surface-4: #242731;
+  --ss-surface-tertiary: #2a2e39;
 
-  --ss-accent-cyan: #7CF7D4;
-  --ss-accent-deep-cyan: #43D9BD;
-  --ss-accent-electric-blue-soft: #5BA7FF;
-  --ss-accent-muted-magenta: #D16BA5;
-  --ss-accent-warning: #D98C7A;
+  --ss-accent-cyan: #2962ff;
+  --ss-accent-deep-cyan: #1e53e5;
+  --ss-accent-electric-blue-soft: #5b8cff;
+  --ss-accent-muted-magenta: #8f5cff;
+  --ss-accent-warning: #f0b90b;
 
   /* Glow propagation (intentionally restrained for premium calm) */
   --ss-glow-cyan: rgba(0, 255, 210, 0.18);
@@ -39,8 +52,8 @@
   --ss-glow-warning-strong: rgba(217, 140, 122, 0.24);
 
   /* Premium System 2.0 styles (Section 83) */
-  --ss-premium-border: rgba(0, 209, 122, 0.18);
-  --ss-premium-glow: rgba(0, 209, 122, 0.12);
+  --ss-premium-border: rgba(41, 98, 255, 0.28);
+  --ss-premium-glow: rgba(41, 98, 255, 0.18);
 
   /* Lighting Engine state lighting (Section 87) */
   --ss-ambient-bullish: rgba(0, 209, 122, 0.08);
@@ -94,10 +107,10 @@
   --ss-transition-slow: 320ms;
 
   /* Glassmorphism “surface physics” presets (calm + premium) */
-  --ss-glass-bg: rgba(0, 0, 0, 0.20);
-  --ss-glass-bg-2: rgba(0, 0, 0, 0.35);
-  --ss-glass-border: rgba(255, 255, 255, 0.10);
-  --ss-glass-border-2: rgba(255, 255, 255, 0.18);
+  --ss-glass-bg: rgba(19, 23, 34, 0.72);
+  --ss-glass-bg-2: rgba(30, 34, 45, 0.84);
+  --ss-glass-border: rgba(120, 123, 134, 0.22);
+  --ss-glass-border-2: rgba(178, 181, 190, 0.28);
 
   /* Typography */
   /* Elite font pairing (from index.html): Geist Sans + Geist Mono */
@@ -259,7 +272,7 @@ body {
 body {
   margin: 0;
   background: var(--ss-bg-primary);
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ss-text-primary);
   font-family: var(--font-body);
   overflow-x: hidden;
 }
@@ -298,10 +311,10 @@ body {
   border-radius: 16px;
 
   /* less translucency = higher clarity */
-  background: rgba(0, 0, 0, 0.33);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--ss-bg-secondary);
+  border: 1px solid var(--ss-border);
 
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ss-text-primary);
   font-size: calc(var(--ss-ui-type-scale) * 14px);
   line-height: 1.25;
   outline: none;
@@ -310,12 +323,12 @@ body {
 }
 
 .ss-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--ss-text-muted);
 }
 
 .ss-input:focus-visible {
-  border-color: rgba(0, 255, 210, 0.35);
-  box-shadow: 0 0 0 2px rgba(0, 255, 210, 0.18);
+  border-color: rgba(41, 98, 255, 0.75);
+  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.22);
 }
 
 .ss-input--compact {
@@ -329,13 +342,13 @@ body {
 }
 
 .ss-input--auth {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(19, 23, 34, 0.92);
+  border: 1px solid var(--ss-border);
 }
 
 .ss-input--auth:focus-visible {
-  border-color: rgba(0, 255, 210, 0.35);
-  box-shadow: 0 0 0 2px rgba(0, 255, 210, 0.18);
+  border-color: rgba(41, 98, 255, 0.75);
+  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.22);
 }
 
 /* Premium textarea primitive (Step 5) */
