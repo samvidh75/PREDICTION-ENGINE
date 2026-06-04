@@ -11,6 +11,8 @@ import {
   TrendingUp as GainIcon,
   TrendingDown as LossIcon
 } from 'lucide-react';
+import { CompanyCard } from '../company/CompanyCard';
+import { StockRegistry } from '../../services/stocks/StockRegistry';
 
 interface SnapshotItem {
   index: string;
@@ -151,25 +153,22 @@ export const DashboardHub: React.FC = () => {
         {/* Top Movers */}
         <section className="space-y-4">
           <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest block">Top Movers</span>
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">
-            {topMovers.map((m, idx) => (
-              <div 
-                key={idx} 
-                onClick={() => handleCompanyClick(m.ticker)}
-                className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 rounded-xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5 gap-3"
-              >
-                <div>
-                  <span className="text-xs font-bold text-white font-mono block">{m.ticker}</span>
-                  <span className="text-[10px] text-gray-400 block">{m.name}</span>
-                </div>
-                <div className="flex flex-col md:items-end">
-                  <span className="text-xs font-semibold text-white font-mono">{m.price}</span>
-                  <span className={`text-[10px] font-semibold font-mono ${m.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
-                    {m.change}
-                  </span>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {topMovers.map((m, idx) => {
+              const info = StockRegistry.getStock(m.ticker);
+              return (
+                <CompanyCard
+                  key={idx}
+                  ticker={m.ticker}
+                  name={m.name}
+                  sector={info?.sector || "Conglomerate"}
+                  marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                  score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 82}
+                  whyItMatters={m.whyMatters}
+                  onClick={() => handleCompanyClick(m.ticker)}
+                />
+              );
+            })}
           </div>
         </section>
 
@@ -182,30 +181,22 @@ export const DashboardHub: React.FC = () => {
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-6">
-            {watchlistActivity.map((w, idx) => (
-              <div key={idx} className="space-y-3 pb-4 border-b border-white/5 last:border-b-0 last:pb-0">
-                <div className="flex justify-between items-center">
-                  <div className="cursor-pointer" onClick={() => handleCompanyClick(w.ticker)}>
-                    <span className="text-xs font-bold text-white font-mono block hover:underline">{w.ticker}</span>
-                    <span className="text-[10px] text-gray-400">{w.name}</span>
-                  </div>
-                  <span className="text-xs font-mono text-white/80">{w.changeReason}</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-white/[0.02] p-3 rounded-lg border border-white/5">
-                  <div>
-                    <span className="text-[9px] text-gray-500 uppercase block font-mono">Significance</span>
-                    <p className="text-gray-300 mt-0.5 leading-relaxed">{w.significance}</p>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-gray-500 uppercase block font-mono">Suggested Step</span>
-                    <p className="text-cyan-400 mt-0.5 leading-relaxed font-semibold cursor-pointer hover:underline" onClick={() => handleCompanyClick(w.ticker)}>
-                      {w.recommendation}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {watchlistActivity.map((w, idx) => {
+              const info = StockRegistry.getStock(w.ticker);
+              return (
+                <CompanyCard
+                  key={idx}
+                  ticker={w.ticker}
+                  name={w.name}
+                  sector={info?.sector || "Financials"}
+                  marketCap={info?.marketCap.formatted || "₹10,00,000 Cr"}
+                  score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 85}
+                  whyItMatters={w.significance}
+                  onClick={() => handleCompanyClick(w.ticker)}
+                />
+              );
+            })}
           </div>
         </section>
       </div>

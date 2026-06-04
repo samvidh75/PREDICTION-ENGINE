@@ -4,6 +4,8 @@ import { SmartWatchlistEngine, SmartWatchlist } from "../services/portfolio/Smar
 import { AlertEngine } from "../services/portfolio/AlertEngine";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { Eye, Bell, Shield, ArrowRight } from "lucide-react";
+import { CompanyCard } from "../components/company/CompanyCard";
+import { StockRegistry } from "../services/stocks/StockRegistry";
 
 export const WatchlistPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
@@ -88,29 +90,31 @@ export const WatchlistPage: React.FC = () => {
         {/* Column 2: Tickers in Active Watchlist */}
         <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col space-y-4">
           <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest font-mono">Watchlist Stocks</span>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-4">
             {/* Display list based on selection */}
             {(selectedList.startsWith("smart-")
               ? smartWatchlists[parseInt(selectedList.split("-")[1]) || 0]?.tickers || []
               : watchlists.find((w) => w.id === selectedList)?.tickers || []
-            ).map((ticker) => (
-              <button
-                key={ticker}
-                onClick={() => {
-                  navigateToStock({ ticker, mode: "push" });
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 border border-white/5 p-4 rounded-xl flex items-center justify-between transition-all cursor-pointer text-left"
-              >
-                <div>
-                  <div className="text-sm font-bold text-white font-mono">{ticker}</div>
-                  <span className="text-[9px] uppercase font-bold text-emerald-400 font-mono">ACTIVE MONITOR</span>
-                </div>
-                <div className="text-right flex items-center gap-1 text-[10px] text-cyan-400 hover:underline">
-                  <span>Explore</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </button>
-            ))}
+            ).map((ticker) => {
+              const info = StockRegistry.getStock(ticker);
+              return (
+                <CompanyCard
+                  key={ticker}
+                  ticker={ticker}
+                  name={info?.companyName || ticker}
+                  sector={info?.sector || "Conglomerate"}
+                  marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                  score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80}
+                  whyItMatters={
+                    ticker === "TCS" ? "A large software exporter with steady cash generation." :
+                    ticker === "RELIANCE" ? "A diversified market leader across energy, retail, and telecom." :
+                    (info?.sector || "Conglomerate").toLowerCase().includes("bank") ? "Credit growth, deposits, and asset quality are key monitoring metrics." :
+                    "Actively tracked company with stable volume metrics."
+                  }
+                  onClick={() => navigateToStock({ ticker, mode: "push" })}
+                />
+              );
+            })}
           </div>
         </div>
 

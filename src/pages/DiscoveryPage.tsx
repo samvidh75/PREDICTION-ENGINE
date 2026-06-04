@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { TrendingUp, Sparkles, Trophy, Flame, PlusCircle, Search, ArrowRight } from "lucide-react";
 
+import { CompanyCard } from "../components/company/CompanyCard";
+import { StockRegistry } from "../services/stocks/StockRegistry";
+
 interface DiscoverCompany {
   symbol: string;
   name: string;
@@ -140,40 +143,22 @@ export const DiscoveryPage: React.FC = () => {
             {/* Horizontal Scroll Rail */}
             <div className="relative w-full">
               <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent snap-x">
-                {category.companies.map((c) => (
-                  <div
-                    key={c.symbol}
-                    onClick={() => handleCompanyClick(c.symbol)}
-                    className="flex-shrink-0 w-[280px] bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-cyan-500/20 rounded-2xl p-5 cursor-pointer transition-all snap-start flex flex-col justify-between h-[180px] group"
-                  >
-                    <div>
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <div>
-                          <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest font-semibold block">
-                            {c.symbol}
-                          </span>
-                          <h3 className="font-bold text-white text-sm group-hover:text-cyan-400 transition-colors leading-tight line-clamp-1">
-                            {c.name}
-                          </h3>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <span className="text-[9px] font-mono text-gray-500 uppercase block font-semibold">Score</span>
-                          <span className="text-xs font-mono font-bold text-cyan-400">{c.score}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-400 leading-normal line-clamp-3">
-                        {c.oneLiner}
-                      </p>
+                {category.companies.map((c) => {
+                  const info = StockRegistry.getStock(c.symbol);
+                  return (
+                    <div key={c.symbol} className="flex-shrink-0 w-[280px] snap-start">
+                      <CompanyCard
+                        ticker={c.symbol}
+                        name={c.name}
+                        sector={info?.sector || "Conglomerate"}
+                        marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                        score={c.score}
+                        whyItMatters={c.oneLiner}
+                        onClick={() => handleCompanyClick(c.symbol)}
+                      />
                     </div>
-
-                    <div className="flex justify-between items-center border-t border-white/5 pt-3 mt-2 text-[10px] font-mono">
-                      <span className="text-white/80">{c.price}</span>
-                      <span className={c.isPositive ? "text-emerald-400" : "text-rose-400"}>
-                        {c.change}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

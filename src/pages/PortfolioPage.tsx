@@ -12,6 +12,8 @@ import { getPortfolioIntelligence } from "../services/intelligence/clientIntelli
 import { PortfolioEngine, UserHolding } from "../services/portfolio/PortfolioEngine";
 import { Plus, Upload, Trash2, Edit2, X, AlertCircle } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
+import { CompanyCard } from "../components/company/CompanyCard";
+import { StockRegistry } from "../services/stocks/StockRegistry";
 
 export const PortfolioPage: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
@@ -270,40 +272,47 @@ export const PortfolioPage: React.FC = () => {
           {/* Holdings List */}
           <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 flex flex-col space-y-4">
             <span className="text-[10px] uppercase text-gray-500 font-bold tracking-widest font-mono">Holdings Inventory</span>
-            <div className="flex flex-col space-y-2 max-h-[400px] overflow-y-auto pr-1">
-              {snapshot.holdings.map((h) => (
-                <div key={h.symbol} className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center justify-between group hover:border-white/10 transition-all">
-                  <button
-                    type="button"
-                    onClick={() => navigateToStock({ ticker: h.symbol, mode: "push" })}
-                    className="min-w-0 bg-transparent border-0 p-0 text-left cursor-pointer"
-                  >
-                    <span className="text-sm font-bold text-white font-mono">{h.symbol}</span>
-                    <span className="text-[10px] text-gray-400 block font-mono">{h.shares} Shares @ ₹{h.avgBuyPrice} // {h.sector}</span>
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-white font-mono mr-2">₹{(h.shares * h.avgBuyPrice).toLocaleString("en-IN")}</span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex flex-col space-y-4 max-h-[600px] overflow-y-auto pr-1">
+              {snapshot.holdings.map((h) => {
+                const info = StockRegistry.getStock(h.symbol);
+                return (
+                  <div key={h.symbol} className="relative group">
+                    <CompanyCard
+                      ticker={h.symbol}
+                      name={info?.companyName || h.symbol}
+                      sector={info?.sector || h.sector}
+                      marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                      score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80}
+                      whyItMatters={`Holding: ${h.shares} shares @ ₹${h.avgBuyPrice}. Actively tracked portfolio asset.`}
+                      onClick={() => navigateToStock({ ticker: h.symbol, mode: "push" })}
+                    />
+                    <div className="absolute top-4 right-16 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingHolding(h);
                           setShares(h.shares.toString());
                           setPrice(h.avgBuyPrice.toString());
                         }}
-                        className="p-1 bg-white/5 rounded text-white/55 hover:text-white hover:bg-white/10"
+                        className="p-1.5 bg-[#0a0b0e] border border-white/10 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+                        title="Edit Holding"
                       >
-                        <Edit2 className="w-3 h-3" />
+                        <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
-                        onClick={() => handleDeleteHolding(h.symbol)}
-                        className="p-1 bg-white/5 rounded text-rose-400/60 hover:text-rose-400 hover:bg-rose-500/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteHolding(h.symbol);
+                        }}
+                        className="p-1.5 bg-[#0a0b0e] border border-white/10 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
+                        title="Delete Holding"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { navigateToStock } from "../../architecture/navigation/routeCoordinator"
 import { UserJourneyEngine } from "../../services/behavior/UserJourneyEngine";
 import { RegisteredStock } from "../../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../../services/stocks/StockSearchEngine";
+import { CompanyCard } from "../company/CompanyCard";
 
 interface Props {
   onClose: () => void;
@@ -87,36 +88,16 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {results.length > 0 ? (
             results.map((stock) => (
-              <button
+              <CompanyCard
                 key={stock.symbol}
-                type="button"
+                ticker={stock.symbol}
+                name={stock.companyName}
+                sector={stock.sector}
+                marketCap={stock.marketCap.formatted}
+                score={getScore(stock)}
+                whyItMatters={getOneLineReason(stock)}
                 onClick={() => handleSelect(stock)}
-                className="w-full text-left rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.04] hover:border-cyan-400/20 p-4 transition-all duration-150 group"
-              >
-                <div className="grid grid-cols-[80px_1fr_auto] gap-4 items-start">
-                  <div className="rounded-lg border border-white/5 bg-black/40 px-3 py-2 text-center">
-                    <div className="text-[14px] font-bold text-cyan-400 font-mono">{stock.symbol}</div>
-                    <div className="mt-1 text-[9px] uppercase text-white/40 font-mono">{stock.exchange}</div>
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="text-[15px] font-semibold text-white group-hover:text-cyan-400 transition-colors truncate">
-                      {stock.companyName}
-                    </div>
-                    <div className="mt-1 text-[12px] text-white/55 truncate">
-                      {stock.sector} | {stock.marketCap.formatted.replace("₹", "Rs. ")}
-                    </div>
-                    <p className="mt-2 text-[12px] leading-relaxed text-white/65 truncate">{getOneLineReason(stock)}</p>
-                  </div>
-
-                  <div className="text-right shrink-0">
-                    <div className="text-[15px] font-bold text-white">
-                      Rs. {stock.fiftyTwoWeekRange.current.toLocaleString("en-IN")}
-                    </div>
-                    <div className="mt-1 text-[11px] font-semibold text-cyan-400">Score {getScore(stock)}/100</div>
-                  </div>
-                </div>
-              </button>
+              />
             ))
           ) : query.length >= 2 ? (
             <div className="py-12 text-center text-xs text-white/45 uppercase tracking-widest font-mono">No matching companies found</div>
