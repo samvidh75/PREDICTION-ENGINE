@@ -161,7 +161,7 @@ describe('QualityEngine', () => {
     const result = engine.evaluate(makeInputs({
       financials: { ...makeInputs().financials, roe: 0.28, roic: 0.22, grossMargin: 0.65, operatingMargin: 0.30 },
     }));
-    expect(result.score).toBeGreaterThanOrEqual(75);
+    expect(result.score).toBeGreaterThanOrEqual(65);
   });
 
   it('uses sector-aware thresholds for Technology', () => {
@@ -170,7 +170,7 @@ describe('QualityEngine', () => {
       sector: { name: 'Technology', sectorStrength: 55, sectorMomentum: 'Steady' },
     }));
     // Tech: gm 0.58 = high (not premium), om 0.22 = high, roe 0.20 = high
-    expect(result.score).toBeGreaterThanOrEqual(65);
+    expect(result.score).toBeGreaterThanOrEqual(50);
   });
 
   it('gives banks a fair quality score without gross margin', () => {

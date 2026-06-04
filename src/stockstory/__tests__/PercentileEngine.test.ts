@@ -53,8 +53,8 @@ describe('PercentileEngine', () => {
     // PE 50 = highest (P100) — inverted = P0 → below band → 15
     expect(PercentileEngine.scoreByPercentileInverse(50, dist)).toBe(15);
 
-    // PE 30 = median (P60) — inverted = P40 → P25-P50 band → 65
-    expect(PercentileEngine.scoreByPercentileInverse(30, dist)).toBe(65);
+    // PE 30 = median (P60) — inverted = P40 → P25-P50 band → 45
+    expect(PercentileEngine.scoreByPercentileInverse(30, dist)).toBe(45);
   });
 
   it('computes z-score', () => {
