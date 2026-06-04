@@ -24,14 +24,14 @@ export class QualityEngine {
     if (financials.roe !== null) {
       const roe = financials.roe;
       const roeHigh = profile.roeHigh > 0 ? profile.roeHigh : 0.20;
-      roeNormalized = clampScore(Math.round((roe / roeHigh) * 55 + 25));
+      roeNormalized = clampScore(Math.round((roe / roeHigh) * 40 + 20));
     }
 
     // ── Sub-score 2: ROIC (Return on Invested Capital) ──────────────
     let roicNormalized = 50;
     if (financials.roic !== null) {
       const roic = financials.roic;
-      roicNormalized = clampScore(Math.round((roic / 0.15) * 55 + 25));
+      roicNormalized = clampScore(Math.round((roic / 0.15) * 40 + 20));
     }
 
     // ── Sub-score 3: Gross Margin — sector-aware ───────────────────
@@ -39,7 +39,7 @@ export class QualityEngine {
     if (profile.useGrossMargin && financials.grossMargin !== null) {
       const gm = financials.grossMargin;
       const gmHigh = profile.gmHigh > 0 ? profile.gmHigh : 0.40;
-      grossMarginScore = clampScore(Math.round((gm / gmHigh) * 55 + 25));
+      grossMarginScore = clampScore(Math.round((gm / gmHigh) * 40 + 20));
     }
 
     // ── Sub-score 4: Operating Margin — sector-aware ───────────────
@@ -47,7 +47,7 @@ export class QualityEngine {
     if (financials.operatingMargin !== null) {
       const om = financials.operatingMargin;
       const omHigh = profile.omHigh > 0 ? profile.omHigh : 0.20;
-      operatingMarginScore = clampScore(Math.round((om / omHigh) * 55 + 25));
+      operatingMarginScore = clampScore(Math.round((om / omHigh) * 40 + 20));
     }
 
     // ── Sub-score 5: Efficiency Score ───────────────────────────────
@@ -58,7 +58,7 @@ export class QualityEngine {
       const roe = financials.roe!;
       const gm = financials.grossMargin!;
       const efficiencyRatio = gm > 0 ? Math.min(roe / gm, 2.0) : 0;
-      efficiencyScore = clampScore(Math.round(efficiencyRatio * 35 + 25));
+      efficiencyScore = clampScore(Math.round(efficiencyRatio * 20 + 20));
     }
 
     // ── Gross margin weight for financials: zero it out ─────────────
@@ -98,7 +98,7 @@ export class QualityEngine {
     const hasData = f.roe !== null || f.roic !== null;
     if (!hasData) return 'Insufficient quality metrics. Score reflects neutral baseline.';
 
-    if (score >= 80) {
+    if (score >= 75) {
       const parts: string[] = [];
       if (f.roe !== null && f.roe >= profile.roeHigh) parts.push('high return on equity');
       if (profile.useGrossMargin && f.grossMargin !== null && f.grossMargin >= profile.gmHigh) parts.push('strong pricing power');
@@ -106,11 +106,11 @@ export class QualityEngine {
       return `Premium quality business ${profile.name !== 'General' ? `within ${profile.name} sector` : ''}: ${parts.join(', ')}. Superior profitability metrics indicate durable competitive advantages.`;
     }
 
-    if (score >= 60) {
+    if (score >= 55) {
       return 'Above-average business quality. Profitability metrics are healthy with reasonable capital efficiency.';
     }
 
-    if (score >= 40) {
+    if (score >= 35) {
       return 'Average quality profile. Margins and returns are in line with sector norms, suggesting moderate competitive positioning.';
     }
 

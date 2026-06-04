@@ -24,10 +24,10 @@ export class StabilityEngine {
     let debtScore = 50;
     if (financials.debtToEquity !== null) {
       const dte = financials.debtToEquity;
-      if (dte <= 0) debtScore = 95;
+      if (dte <= 0) debtScore = 90;
       else {
         const deElevated = profile.deElevated > 0 ? profile.deElevated : 1.5;
-        debtScore = clampScore(Math.round(90 - (dte / deElevated) * 45));
+        debtScore = clampScore(Math.round(80 - (dte / deElevated) * 40));
       }
     }
 
@@ -36,14 +36,14 @@ export class StabilityEngine {
     const currentRatio = financials.currentRatio;
     if (currentRatio !== null) {
       const crHealthy = profile.crHealthy > 0 ? profile.crHealthy : 2.0;
-      cashScore = clampScore(Math.round((currentRatio / crHealthy) * 55 + 25));
+      cashScore = clampScore(Math.round((currentRatio / crHealthy) * 40 + 20));
     }
 
     // ── Sub-score 3: Volatility Score (lower volatility = higher score)
     let volatilityScore = 50;
     if (features.volatility !== null) {
       const vol = features.volatility;
-      volatilityScore = clampScore(Math.round(95 - vol * 180));
+      volatilityScore = clampScore(Math.round(85 - vol * 150));
     }
 
     // ── Sub-score 4: Coverage Score (debt service capacity) ─────────
@@ -53,15 +53,15 @@ export class StabilityEngine {
       const om = financials.operatingMargin;
 
       if (dte <= 0) {
-        coverageScore = 95;
+        coverageScore = 90;
       } else {
         const coverageRatio = dte > 0.01 ? om / dte : 10;
-        coverageScore = clampScore(Math.round(Math.min(95, coverageRatio * 50 + 25)));
+        coverageScore = clampScore(Math.round(Math.min(90, coverageRatio * 35 + 20)));
       }
     } else if (financials.debtToEquity !== null) {
       const dte = financials.debtToEquity;
       const deElevated = profile.deElevated > 0 ? profile.deElevated : 1.5;
-      coverageScore = clampScore(Math.round(80 - (dte / deElevated) * 35));
+      coverageScore = clampScore(Math.round(70 - (dte / deElevated) * 30));
     }
 
     // ── Sub-score 5: Interest Coverage (NEW) ────────────────────────
@@ -71,10 +71,10 @@ export class StabilityEngine {
       const dte = financials.debtToEquity;
 
       if (dte <= 0) {
-        interestCoverageScore = 95;
+        interestCoverageScore = 90;
       } else {
-        const icrProxy = (om * 100) / Math.max(dte, 0.1);
-        interestCoverageScore = clampScore(Math.round(Math.min(95, (icrProxy / 10) * 50 + 25)));
+        const icrProxy = om / Math.max(dte, 0.05);
+        interestCoverageScore = clampScore(Math.round((icrProxy / 0.5) * 40 + 20));
       }
     }
 
@@ -111,18 +111,18 @@ export class StabilityEngine {
     const hasData = f.debtToEquity !== null || f.currentRatio !== null;
     if (!hasData) return 'Insufficient stability data. Score reflects neutral baseline.';
 
-    if (score >= 80) {
+    if (score >= 75) {
       return `Exceptional stability within ${profile.name} sector norms. Low leverage, strong liquidity, and contained volatility indicate a resilient balance sheet.`;
     }
 
-    if (score >= 60) {
+    if (score >= 55) {
       const parts: string[] = [];
       if (f.debtToEquity !== null && f.debtToEquity <= profile.deElevated) parts.push('manageable debt levels');
       if (f.currentRatio !== null && f.currentRatio >= profile.crTight) parts.push('adequate liquidity');
       return `Solid stability profile: ${parts.join(', ')}. Balance sheet supports business operations without stress.`;
     }
 
-    if (score >= 40) {
+    if (score >= 35) {
       return 'Moderate stability. Some balance sheet metrics show strain relative to sector norms, but overall financial structure remains manageable.';
     }
 
