@@ -1,16 +1,5 @@
-import React from 'react';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Eye, 
-  Compass, 
-  Bell, 
-  Bookmark, 
-  History, 
-  ArrowRight,
-  TrendingUp as GainIcon,
-  TrendingDown as LossIcon
-} from 'lucide-react';
+import React, { useMemo } from 'react';
+import { ArrowRight, TrendingUp as GainIcon, TrendingDown as LossIcon } from 'lucide-react';
 import { CompanyCard } from '../company/CompanyCard';
 import { StockRegistry } from '../../services/stocks/StockRegistry';
 
@@ -21,7 +10,6 @@ interface SnapshotItem {
   isPositive: boolean;
   whatChanged: string;
   whyMatters: string;
-  whatWatch: string;
 }
 
 const marketSnapshots: SnapshotItem[] = [
@@ -31,8 +19,7 @@ const marketSnapshots: SnapshotItem[] = [
     change: "+1.15%",
     isPositive: true,
     whatChanged: "Nifty gained 260 points driven by a rally in metal and banking sectors.",
-    whyMatters: "Signal strength shows steady institutional capital inflow entering Indian equities.",
-    whatWatch: "Quarterly margin updates of top 5 index heavyweights tomorrow."
+    whyMatters: "Signal strength shows steady institutional capital inflow entering Indian equities."
   },
   {
     index: "SENSEX",
@@ -40,8 +27,7 @@ const marketSnapshots: SnapshotItem[] = [
     change: "+1.08%",
     isPositive: true,
     whatChanged: "Sensex closed at record high following favorable manufacturing index data.",
-    whyMatters: "Indicates strong domestic industrial output, reinforcing high business quality.",
-    whatWatch: "Inflation print releases scheduled for next Tuesday."
+    whyMatters: "Indicates strong domestic industrial output, reinforcing high business quality."
   },
   {
     index: "NIFTY BANK",
@@ -49,34 +35,49 @@ const marketSnapshots: SnapshotItem[] = [
     change: "-0.22%",
     isPositive: false,
     whatChanged: "Bank index slid slightly due to minor profit booking in public sector lenders.",
-    whyMatters: "Suggests a short-term consolidation phase in financial sector multiples.",
-    whatWatch: "Credit growth trajectory announcements from private banks."
+    whyMatters: "Suggests a short-term consolidation phase in financial sector multiples."
+  },
+  {
+    index: "INDIA VIX",
+    value: "13.45",
+    change: "-4.20%",
+    isPositive: true,
+    whatChanged: "Volatility index dropped significantly following stable global cues.",
+    whyMatters: "Lower market fear signals an ideal window for high quality stock accumulations."
   }
 ];
 
+const attentionItems = [
+  { ticker: "RELIANCE", trigger: "ROCE improved", explanation: "Capital efficiency improving with digital services margin expansion." },
+  { ticker: "TATASTEEL", trigger: "Global margins expansion", explanation: "Global steel price rebound directly boosts export earnings." },
+  { ticker: "INFY", trigger: "Free cash flow breakout", explanation: "95% operating income conversion to free cash flow supports higher dividends." },
+  { ticker: "HDFCBANK", trigger: "Net interest margin recovery", explanation: "Cost of funds stabilizing, driving higher earnings velocity." },
+  { ticker: "HAL", trigger: "Defense order pipeline breakout", explanation: "Strong multi-year order book provides high revenue visibility." }
+];
+
 const topMovers = [
-  { ticker: "TATASTEEL", name: "Tata Steel Ltd.", price: "₹174.20", change: "+4.85%", isPositive: true, whatChanged: "Steel prices rose globally.", whyMatters: "Direct margins improvement next quarter.", whatWatch: "Global supply contracts updates." },
-  { ticker: "INFY", name: "Infosys Ltd.", price: "₹1,420.50", change: "-2.40%", isPositive: false, whatChanged: "Guidance narrowed by North American clients.", whyMatters: "Softens near-term revenue growth velocity.", whatWatch: "New deal wins velocity in BFSI segment." },
-  { ticker: "RELIANCE", name: "Reliance Industries", price: "₹2,845.00", change: "+1.95%", isPositive: true, whatChanged: "Telecom subscriber additions accelerated.", whyMatters: "Boosts long-term business quality stable flows.", whatWatch: "Retail division margins optimization." }
+  { ticker: "SUZLON", price: "₹45.10", change: "+4.90%", isPositive: true },
+  { ticker: "BHEL", price: "₹278.40", change: "+5.10%", isPositive: true },
+  { ticker: "RECLTD", price: "₹512.40", change: "+4.20%", isPositive: true },
+  { ticker: "INFY", price: "₹1,420.50", change: "-2.40%", isPositive: false }
 ];
 
-const watchlistActivity = [
-  { ticker: "TCS", name: "Tata Consultancy Services", price: "₹3,850.00", change: "+0.85%", changeReason: "FII ownership increased by 0.4% this week.", significance: "Replaces random retail selling with long-term capital support.", recommendation: "Review latest shareholding pattern document." },
-  { ticker: "HDFCBANK", name: "HDFC Bank Ltd.", price: "₹1,510.20", change: "-0.50%", changeReason: "Promoter pledge details reported zero leverage change.", significance: "Maintains its pristine Financial Health status.", recommendation: "Check interest coverage stability indicators." }
-];
-
-const discoveryOpportunities = [
-  { title: "High Quality Businesses", desc: "12 companies reporting steady ROE > 22% over last 5 years.", ticker: "LT" },
-  { title: "Momentum Leaders", desc: "8 mid-caps showing strong relative strength index breakout.", ticker: "HAL" },
-  { title: "Sector Leaders", desc: "Energy conglomerates with capital reallocation efficiency.", ticker: "NTPC" }
-];
-
-const recentAlerts = [
-  { level: "high", title: "Promoter Stake Exit", ticker: "ADANIENT", desc: "Promoters reduced holding by 1.5% in open market.", action: "Investigate if capital was reallocated or exited." },
-  { level: "info", title: "Margin Expansion Alert", ticker: "MARUTI", desc: "Operating margin crossed 5-quarter average threshold.", action: "Audit if pricing power or lower raw material cost drove gains." }
+const watchlistSummary = [
+  { ticker: "TCS", name: "Tata Consultancy", price: "₹3,850.00", change: "+0.85%", isPositive: true },
+  { ticker: "HDFCBANK", name: "HDFC Bank Ltd.", price: "₹1,510.20", change: "-0.50%", isPositive: false },
+  { ticker: "LT", name: "Larsen & Toubro Ltd.", price: "₹3,540.00", change: "+1.20%", isPositive: true },
+  { ticker: "MARUTI", name: "Maruti Suzuki", price: "₹12,420.00", change: "+1.50%", isPositive: true },
+  { ticker: "IREDA", name: "IREDA Ltd.", price: "₹185.40", change: "+4.80%", isPositive: true }
 ];
 
 export const DashboardHub: React.FC = () => {
+  const greeting = useMemo(() => {
+    const hours = new Date().getHours();
+    if (hours < 12) return "Good Morning";
+    if (hours < 17) return "Good Afternoon";
+    return "Good Evening";
+  }, []);
+
   const handleCompanyClick = (symbol: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", "stock");
@@ -93,54 +94,43 @@ export const DashboardHub: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-10 pb-16 text-white max-w-7xl mx-auto antialiased">
-      {/* Good Morning / Header Card */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-r from-cyan-950/20 via-slate-950/40 to-[#0b0d11] p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-        <span className="text-[10px] tracking-[0.25em] font-mono text-cyan-400 font-semibold block mb-2">
-          INVESTOR CONSOLE
-        </span>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
-          Good Morning, Samvidh
+    <div className="w-full space-y-12 pb-16 text-white max-w-7xl mx-auto antialiased">
+      {/* SECTION 1: Greeting */}
+      <section className="border-b border-white/5 pb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
+          {greeting}, Samvidh
         </h1>
-        <p className="text-xs md:text-sm text-gray-400 max-w-2xl leading-relaxed">
-          The Indian markets show stable momentum. Standard diagnostic audits are up to date. You have 2 watchlist updates that require review.
+        <p className="text-xs text-gray-400">
+          Here is how the Indian equity markets look right now.
         </p>
       </section>
 
-      {/* Market Snapshot */}
+      {/* SECTION 2: Market Snapshot (4 Cards only) */}
       <section className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">Market Snapshot</span>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {marketSnapshots.map((item, idx) => (
-            <div key={idx} className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 flex flex-col justify-between hover:border-white/10 transition-all">
+        <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider block">
+          Market Snapshot
+        </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {marketSnapshots.map((item) => (
+            <div 
+              key={item.index} 
+              className="bg-white/[0.01] border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all flex flex-col justify-between"
+            >
               <div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-sm font-bold text-white font-mono">{item.index}</span>
-                  <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    item.isPositive ? "text-emerald-400 bg-emerald-400/10" : "text-rose-400 bg-rose-400/10"
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-bold text-white/80">{item.index}</span>
+                  <span className={`text-[10px] font-mono font-bold ${
+                    item.isPositive ? "text-emerald-400" : "text-rose-400"
                   }`}>
-                    {item.isPositive ? <GainIcon className="w-3.5 h-3.5" /> : <LossIcon className="w-3.5 h-3.5" />}
-                    <span>{item.change}</span>
-                  </div>
+                    {item.change}
+                  </span>
                 </div>
-                <span className="text-xl font-bold font-mono tracking-tight text-white block mb-4">{item.value}</span>
-                
-                <div className="space-y-3 border-t border-white/5 pt-4">
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500 block font-mono">What Changed</span>
-                    <p className="text-xs text-gray-300 mt-0.5 leading-relaxed">{item.whatChanged}</p>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500 block font-mono">Why It Matters</span>
-                    <p className="text-xs text-gray-300 mt-0.5 leading-relaxed">{item.whyMatters}</p>
-                  </div>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-wider text-gray-500 block font-mono">What to Watch</span>
-                    <p className="text-xs text-gray-300 mt-0.5 leading-relaxed font-semibold text-cyan-400">{item.whatWatch}</p>
-                  </div>
+                <div className="text-lg font-bold font-mono text-white mb-3">
+                  {item.value}
+                </div>
+                <div className="space-y-2 text-[11px] text-white/60 leading-normal">
+                  <p><strong>Changed:</strong> {item.whatChanged}</p>
+                  <p><strong>Why matters:</strong> {item.whyMatters}</p>
                 </div>
               </div>
             </div>
@@ -148,161 +138,110 @@ export const DashboardHub: React.FC = () => {
         </div>
       </section>
 
-      {/* Top Movers & Watchlist Activity */}
+      {/* SECTION 3: What Deserves My Attention (5 Cards) */}
+      <section className="space-y-4">
+        <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider block">
+          What Deserves My Attention
+        </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {attentionItems.map((item) => {
+            const info = StockRegistry.getStock(item.ticker);
+            return (
+              <CompanyCard
+                key={item.ticker}
+                ticker={item.ticker}
+                name={info?.companyName || item.ticker}
+                sector={info?.sector || "Conglomerate"}
+                marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
+                score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80}
+                whyItMatters={`${item.trigger}: ${item.explanation}`}
+                onClick={() => handleCompanyClick(item.ticker)}
+              />
+            );
+          })}
+        </div>
+      </section>
+
+      {/* SECTION 4 & 5 Grid: Top Movers & Watchlist Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Top Movers */}
+        {/* SECTION 4: Top Movers (Simple Table) */}
         <section className="space-y-4">
-          <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest block">Top Movers</span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {topMovers.map((m, idx) => {
-              const info = StockRegistry.getStock(m.ticker);
-              return (
-                <CompanyCard
-                  key={idx}
-                  ticker={m.ticker}
-                  name={m.name}
-                  sector={info?.sector || "Conglomerate"}
-                  marketCap={info?.marketCap.formatted || "₹50,000 Cr"}
-                  score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 82}
-                  whyItMatters={m.whyMatters}
-                  onClick={() => handleCompanyClick(m.ticker)}
-                />
-              );
-            })}
+          <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider block">
+            Top Movers
+          </span>
+          <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-white/5 text-white/40 font-medium">
+                  <th className="p-4">Ticker</th>
+                  <th className="p-4">Price</th>
+                  <th className="p-4 text-right">Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topMovers.map((m) => (
+                  <tr 
+                    key={m.ticker} 
+                    onClick={() => handleCompanyClick(m.ticker)}
+                    className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors"
+                  >
+                    <td className="p-4 font-mono font-bold text-white">{m.ticker}</td>
+                    <td className="p-4 text-white/80">{m.price}</td>
+                    <td className={`p-4 text-right font-mono font-bold ${
+                      m.isPositive ? "text-emerald-400" : "text-rose-400"
+                    }`}>
+                      {m.change}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
-        {/* Watchlist Activity */}
+        {/* SECTION 5: Watchlist Summary (5 Holdings + View All) */}
         <section className="space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">Watchlist Activity</span>
-            <button onClick={() => handleNavigate("watchlist")} className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer">
-              <span>View Watchlist</span>
-              <ArrowRight className="w-3 h-3" />
+            <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider">
+              Watchlist Summary
+            </span>
+            <button 
+              onClick={() => handleNavigate("watchlist")}
+              className="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 bg-transparent border-none cursor-pointer"
+            >
+              <span>View All</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {watchlistActivity.map((w, idx) => {
-              const info = StockRegistry.getStock(w.ticker);
-              return (
-                <CompanyCard
-                  key={idx}
-                  ticker={w.ticker}
-                  name={w.name}
-                  sector={info?.sector || "Financials"}
-                  marketCap={info?.marketCap.formatted || "₹10,00,000 Cr"}
-                  score={info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 85}
-                  whyItMatters={w.significance}
-                  onClick={() => handleCompanyClick(w.ticker)}
-                />
-              );
-            })}
-          </div>
-        </section>
-      </div>
-
-      {/* Discovery Opportunities & Recent Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Discovery Opportunities */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">Discovery Opportunities</span>
-            <button onClick={() => handleNavigate("discovery")} className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer">
-              <span>Go to Discover</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {discoveryOpportunities.map((op, idx) => (
-              <div 
-                key={idx} 
-                onClick={() => handleCompanyClick(op.ticker)}
-                className="bg-white/[0.02] border border-white/5 p-4 rounded-xl hover:border-cyan-500/30 transition-all cursor-pointer"
-              >
-                <Compass className="w-5 h-5 text-cyan-400 mb-3" />
-                <h3 className="text-xs font-bold text-white mb-1">{op.title}</h3>
-                <p className="text-[10px] text-gray-400 leading-normal">{op.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Alerts */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">Recent Alerts</span>
-            <button onClick={() => handleNavigate("alerts")} className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer">
-              <span>View All Alerts</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-4">
-            {recentAlerts.map((a, idx) => (
-              <div key={idx} className="flex gap-4 items-start pb-3 border-b border-white/5 last:border-b-0 last:pb-0">
-                <Bell className={`w-4 h-4 mt-0.5 ${a.level === 'high' ? 'text-amber-400' : 'text-cyan-400'}`} />
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-white font-mono">{a.title} ({a.ticker})</span>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">{a.desc}</p>
-                  <p className="text-[11px] text-cyan-400 mt-1 font-semibold cursor-pointer hover:underline" onClick={() => handleCompanyClick(a.ticker)}>
-                    Action: {a.action}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {/* Saved Research & Recent Companies */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Saved Research */}
-        <section className="space-y-4">
-          <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest block">Saved Research</span>
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-3">
-            {[
-              { ticker: "TATASTEEL", title: " टाटा Steel Q4 Margin Expansion Analysis", date: "Saved 2 days ago" },
-              { ticker: "INFY", title: "Infosys Cash Allocation & Dividend Moat Review", date: "Saved 1 week ago" }
-            ].map((s, idx) => (
-              <div 
-                key={idx} 
-                onClick={() => handleCompanyClick(s.ticker)}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5"
-              >
-                <Bookmark className="w-4 h-4 text-cyan-400" />
-                <div className="flex-1">
-                  <span className="text-xs font-medium text-white block">{s.title}</span>
-                  <span className="text-[9px] text-gray-500 block font-mono">{s.date}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Companies */}
-        <section className="space-y-4">
-          <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest block">Recent Companies</span>
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 space-y-3">
-            {[
-              { ticker: "RELIANCE", name: "Reliance Industries", lastViewed: "Viewed 3 hours ago" },
-              { ticker: "HDFCBANK", name: "HDFC Bank Ltd.", lastViewed: "Viewed 5 hours ago" }
-            ].map((r, idx) => (
-              <div 
-                key={idx} 
-                onClick={() => handleCompanyClick(r.ticker)}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/5"
-              >
-                <div className="flex items-center gap-3">
-                  <History className="w-4 h-4 text-gray-500" />
-                  <div>
-                    <span className="text-xs font-bold text-white font-mono block">{r.ticker}</span>
-                    <span className="text-[10px] text-gray-400">{r.name}</span>
-                  </div>
-                </div>
-                <span className="text-[9px] text-gray-500 font-mono">{r.lastViewed}</span>
-              </div>
-            ))}
+          <div className="bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-white/5 text-white/40 font-medium">
+                  <th className="p-4">Ticker</th>
+                  <th className="p-4">Name</th>
+                  <th className="p-4">Price</th>
+                  <th className="p-4 text-right">Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                {watchlistSummary.map((w) => (
+                  <tr 
+                    key={w.ticker}
+                    onClick={() => handleCompanyClick(w.ticker)}
+                    className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors"
+                  >
+                    <td className="p-4 font-mono font-bold text-white">{w.ticker}</td>
+                    <td className="p-4 text-white/70 max-w-[150px] truncate">{w.name}</td>
+                    <td className="p-4 text-white/80">{w.price}</td>
+                    <td className={`p-4 text-right font-mono font-bold ${
+                      w.isPositive ? "text-emerald-400" : "text-rose-400"
+                    }`}>
+                      {w.change}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </div>

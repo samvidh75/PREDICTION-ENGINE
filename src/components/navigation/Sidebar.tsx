@@ -13,15 +13,13 @@ export const Sidebar: React.FC = () => {
   const { currentView, MapsTo } = useNavigation();
   const { isAuthenticated, logout, isConnecting } = useAuth();
 
-  const primaryLinks: NavItem[] = [
+  const links: NavItem[] = [
     { id: "terminal", label: "Home", icon: <LayoutDashboard className="w-4 h-4" /> },
     { id: "search", label: "Search", icon: <Search className="w-4 h-4" /> },
-  ];
-
-  const investorLinks: NavItem[] = [
-    { id: "portfolio", label: "Portfolio", icon: <Briefcase className="w-4 h-4" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="w-4 h-4" /> },
+    { id: "portfolio", label: "Portfolio", icon: <Briefcase className="w-4 h-4" /> },
     { id: "alerts", label: "Alerts", icon: <Bell className="w-4 h-4" /> },
+    { id: "settings", label: "Settings", icon: <Settings className="w-4 h-4" /> },
   ];
 
   const handleNavClick = (id: ViewType | "search") => {
@@ -32,73 +30,45 @@ export const Sidebar: React.FC = () => {
     MapsTo(id);
   };
 
-  const renderSection = (title: string, links: NavItem[]) => (
-    <div className="mb-4">
-      <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 px-4 block mb-2 font-mono">{title}</span>
-      {links.map(link => {
-        const isActive = link.id === "search" ? false : currentView === link.id;
-        return (
-          <button
-            key={link.id}
-            onClick={() => handleNavClick(link.id)}
-            className="group w-full h-10 px-4 flex items-center space-x-3 text-[12px] tracking-wide font-medium text-white/50 transition-all duration-200 ease-out hover:bg-white/5 hover:text-white relative text-left cursor-pointer"
-          >
-            {/* Active indicator */}
-            <div
-              className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#06B6D4] transition-all duration-200 transform ${
-                isActive ? "scale-y-100" : "scale-y-0 group-hover:scale-y-100"
-              }`}
-            />
-            <span className={`transition-colors duration-200 ${
-              isActive ? "text-[#06B6D4]" : "text-white/40 group-hover:text-white/75"
-            }`}>
-              {link.icon}
-            </span>
-            <span className={`transition-colors duration-200 ${isActive ? "text-white font-semibold" : ""}`}>
-              {link.label}
-            </span>
-          </button>
-        );
-      })}
-    </div>
-  );
-
   return (
-    <aside className="w-65 fixed top-18 bottom-0 left-0 bg-[#020304] border-r border-white/5 flex flex-col justify-between py-6 z-40 hidden md:flex select-none">
-      <nav className="flex-1 space-y-2 px-2 overflow-y-auto">
-        {renderSection("Intelligence", primaryLinks)}
-        {renderSection("Investor", investorLinks)}
+    <aside className="w-[240px] fixed top-18 bottom-0 left-0 bg-[#020304] border-r border-white/5 flex flex-col justify-between py-6 z-40 hidden md:flex select-none">
+      <nav className="flex-1 space-y-1.5 px-3 overflow-y-auto">
+        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/30 px-3 block mb-3 font-sans">Menu</span>
+        {links.map(link => {
+          const isActive = link.id === "search" ? false : currentView === link.id;
+          return (
+            <button
+              key={link.id}
+              onClick={() => handleNavClick(link.id)}
+              className={`group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium transition-all duration-150 rounded-lg text-left cursor-pointer ${
+                isActive 
+                  ? "bg-white/5 text-cyan-400 font-semibold" 
+                  : "text-white/60 hover:bg-white/[0.02] hover:text-white"
+              }`}
+            >
+              <span className={`transition-colors duration-150 ${
+                isActive ? "text-cyan-400" : "text-white/40 group-hover:text-white/70"
+              }`}>
+                {link.icon}
+              </span>
+              <span>{link.label}</span>
+            </button>
+          );
+        })}
       </nav>
 
-      {/* Settings at bottom */}
-      <div className="px-2 border-t border-white/5 pt-4">
-        <button
-          onClick={() => MapsTo("settings")}
-          className={`group w-full h-10 px-4 flex items-center space-x-3 text-[12px] tracking-wide font-medium transition-all duration-200 ease-out hover:bg-white/5 relative text-left cursor-pointer ${
-            currentView === "settings" ? "text-white font-semibold" : "text-white/50"
-          }`}
-        >
-          <div
-            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#06B6D4] transition-all duration-200 transform ${
-              currentView === "settings" ? "scale-y-100" : "scale-y-0 group-hover:scale-y-100"
-            }`}
-          />
-          <Settings className={`w-4 h-4 transition-colors duration-200 ${
-            currentView === "settings" ? "text-[#06B6D4]" : "text-white/40 group-hover:text-white/75"
-          }`} />
-          <span>Settings</span>
-        </button>
-        {isAuthenticated && (
+      {isAuthenticated && (
+        <div className="px-3 border-t border-white/5 pt-4">
           <button
             onClick={() => void logout()}
             disabled={isConnecting}
-            className="group w-full h-10 px-4 flex items-center space-x-3 text-[12px] tracking-wide font-medium transition-all duration-200 ease-out hover:bg-white/5 relative text-left text-white/50 disabled:opacity-50 cursor-pointer"
+            className="group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium text-white/60 hover:bg-white/[0.02] hover:text-white transition-all rounded-lg text-left disabled:opacity-50 cursor-pointer"
           >
-            <LogOut className="w-4 h-4 text-white/40 group-hover:text-white/75" />
+            <LogOut className="w-4 h-4 text-white/40 group-hover:text-white/70" />
             <span>Sign out</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 };

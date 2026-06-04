@@ -19,6 +19,16 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   const handleSearch = (value: string) => {
     setQuery(value);
     if (value.trim().length < 2) {
@@ -64,7 +74,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
-      <div className="w-full max-w-[640px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
+      <div className="w-full max-w-[700px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
         <div className="flex items-center gap-3.5 px-4 h-[52px] bg-white/[0.02] border-b border-white/10">
           <Search className="w-4 h-4 text-white/60" />
           <input

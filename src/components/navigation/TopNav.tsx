@@ -1,84 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigationMotion } from '../../hooks/useNavigationMotion';
+import React from 'react';
+import { Search, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ProfileButton } from './ProfileButton';
 
 export const TopNav: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { controls } = useNavigationMotion();
-  const { user, logout, isConnecting } = useAuth();
+  const { user } = useAuth();
 
-  const handleSignOut = () => {
-    if (isConnecting) return;
-    void logout();
+  const triggerSearch = () => {
+    window.dispatchEvent(new Event("ss:open-search"));
   };
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <motion.nav 
-      animate={controls}
-      className={`fixed top-0 w-full z-[100] transition-all duration-500 ease-in-out ${
-        isScrolled ? 'bg-[#050505]/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'
-      }`}
-    >
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <div className="text-xl font-bold tracking-widest text-white">
-          STOCKSTORY<span className="text-cyan-500">.INDIA</span>
-        </div>
-
-        <div className="flex items-center gap-8 text-sm text-gray-400">
-          {[
-            { label: "Dashboard", page: "dashboard" },
-            { label: "Discover", page: "discovery" },
-          ].map((link) => (
-            <button
-              key={link.label}
-              onClick={() => {
-                const params = new URLSearchParams(window.location.search);
-                params.set("page", link.page);
-                window.history.pushState({}, "", `?${params.toString()}`);
-                window.dispatchEvent(new Event("urlchange"));
-              }}
-              className="hover:text-cyan-400 transition-colors bg-transparent border-none cursor-pointer"
-            >
-              {link.label}
-            </button>
-          ))}
-          {user ? (
-            <div className="flex items-center gap-3">
-              <ProfileButton />
-              <button
-                type="button"
-                disabled={isConnecting}
-                onPointerDown={handleSignOut}
-                onClick={handleSignOut}
-                className="px-4 py-2 border border-white/15 text-white rounded-full text-xs hover:bg-white/10 transition-all bg-transparent cursor-pointer disabled:opacity-50"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={() => {
-                const params = new URLSearchParams(window.location.search);
-                params.set("page", "login");
-                window.history.pushState({}, "", `?${params.toString()}`);
-                window.dispatchEvent(new Event("urlchange"));
-              }}
-              className="px-5 py-2 border border-white/20 text-white rounded-full text-sm hover:bg-white/10 transition-all bg-transparent cursor-pointer"
-            >
-              Sign in
-            </button>
-          )}
-        </div>
+    <nav className="fixed top-0 left-0 w-full h-[72px] bg-[#020304] border-b border-white/5 z-50 flex items-center px-8 select-none">
+      <div className="flex-shrink-0 w-[240px] flex items-center">
+        <span className="text-sm font-bold tracking-[0.2em] text-white">
+          STOCKSTORY<span className="text-cyan-400">.INDIA</span>
+        </span>
       </div>
-    </motion.nav>
+
+      <div className="flex-1 flex justify-center max-w-[600px] mx-auto">
+        <button
+          onClick={triggerSearch}
+          className="w-full h-11 bg-white/[0.02] border border-white/5 hover:border-white/10 rounded-xl flex items-center px-4 gap-3 cursor-pointer text-left focus:outline-none transition-all"
+        >
+          <Search className="w-4 h-4 text-white/40" />
+          <span className="text-xs text-white/40 font-normal">
+            Search stocks, companies or sectors (Cmd+K)...
+          </span>
+        </button>
+      </div>
+
+      <div className="flex-shrink-0 flex items-center gap-4 ml-auto">
+        <button
+          type="button"
+          onClick={() => {
+            const params = new URLSearchParams(window.location.search);
+            params.set("page", "alerts");
+            window.history.pushState({}, "", `?${params.toString()}`);
+            window.dispatchEvent(new Event("urlchange"));
+          }}
+          className="h-11 w-11 rounded-xl bg-white/[0.02] border border-white/5 hover:bg-white/5 flex items-center justify-center transition-all cursor-pointer text-white/60 hover:text-white"
+        >
+          <Bell className="w-4 h-4" />
+        </button>
+        {user && <ProfileButton />}
+      </div>
+    </nav>
   );
 };
 

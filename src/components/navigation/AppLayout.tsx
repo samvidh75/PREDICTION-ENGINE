@@ -57,22 +57,22 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Main Structural Body Split */}
       <div className="flex flex-1 w-full h-full overflow-hidden relative">
-        {/* Left Side Rail (w-65 / 260px) */}
+        {/* Left Side Rail (w-[240px]) */}
         <Sidebar />
 
         {/* Central Workspace */}
         <main className="
-          w-full md:w-[calc(100vw-260px)] 
-          h-[calc(100vh-124px)] md:h-[calc(100vh-72px)] 
-          mt-15 md:mt-18 
-          mb-16 md:mb-0 
-          md:ml-65 
+          w-full md:w-[calc(100vw-240px)] 
+          h-[calc(100vh-72px)] 
+          mt-[72px] 
           overflow-y-auto 
           bg-[#020304] 
-          px-4 md:px-8 py-4 md:py-8
+          md:ml-[240px]
           transition-all duration-300 ease-out
         ">
-          {children}
+          <div className="max-w-[1600px] mx-auto w-full px-4 md:px-8 py-8">
+            {children}
+          </div>
         </main>
       </div>
 
