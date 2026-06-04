@@ -1,16 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { WatchlistEngine, CustomWatchlist } from "../services/portfolio/WatchlistEngine";
 import { SmartWatchlistEngine, SmartWatchlist } from "../services/portfolio/SmartWatchlistEngine";
-import { AlertEngine } from "../services/portfolio/AlertEngine";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
-import { CompanyCard } from "../components/company/CompanyCard";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
+
+const WatchlistRow: React.FC<{ ticker: string; score: number; onClick: () => void }> = ({ ticker, score, onClick }) => {
+  const [noteObj, setNoteObj] = useState(() => NoteEngine.getNote(ticker));
+
+  const handleNoteChange = (val: string) => {
+    NoteEngine.saveNote(ticker, val);
+    setNoteObj({
+      symbol: ticker,
+      note: val,
+      lastUpdated: new Date().toLocaleDateString()
+    });
+  };
+
+  return (
+    <tr className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors">
+      <td className="p-4">
+        <button 
+          onClick={onClick}
+          className="font-mono font-bold text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
+        >
+          {ticker}
+        </button>
+      </td>
+      <td className="p-4 text-cyan-400 font-mono font-bold">{score}/100</td>
+      <td className="p-4 text-white/40 font-mono">{noteObj.lastUpdated}</td>
+      <td className="p-4">
+        <input
+          type="text"
+          value={noteObj.note}
+          onChange={(e) => handleNoteChange(e.target.value)}
+          placeholder="Why am I watching this company?"
+          className="bg-white/5 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 w-full"
+        />
+      </td>
+    </tr>
+  );
+};
 
 export const WatchlistPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
   const [smartWatchlists] = useState<SmartWatchlist[]>(() => SmartWatchlistEngine.getSmartWatchlists());
   const [selectedList, setSelectedList] = useState<string>(watchlists[0]?.id || "smart-0");
+
+  useEffect(() => {
+    const handleWatchlistChange = () => {
+      setWatchlists([...WatchlistEngine.getWatchlists()]);
+    };
+    window.addEventListener("watchlistchange", handleWatchlistChange);
+    return () => window.removeEventListener("watchlistchange", handleWatchlistChange);
+  }, []);
 
   return (
     <div className="w-full flex flex-col space-y-8 select-none bg-[#020304] text-white min-h-screen font-sans max-w-7xl mx-auto antialiased">
@@ -89,9 +132,9 @@ export const WatchlistPage: React.FC = () => {
               <thead>
                 <tr className="border-b border-white/5 text-white/40 font-medium">
                   <th className="p-4">Ticker</th>
-                  <th className="p-4">Quality Score</th>
+                  <th className="p-4">Score</th>
                   <th className="p-4">Last Update</th>
-                  <th className="p-4">Watch Reason</th>
+                  <th className="p-4">Why am I watching this?</th>
                 </tr>
               </thead>
               <tbody>
@@ -101,34 +144,14 @@ export const WatchlistPage: React.FC = () => {
                 ).map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
                   const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : 80;
-                  const noteObj = NoteEngine.getNote(ticker);
-                  const lastUpdate = noteObj.lastUpdated;
 
                   return (
-                    <tr 
+                    <WatchlistRow
                       key={ticker}
-                      className="border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors"
-                    >
-                      <td className="p-4">
-                        <button 
-                          onClick={() => navigateToStock({ ticker, mode: "push" })}
-                          className="font-mono font-bold text-white hover:text-cyan-400 text-left bg-transparent border-none cursor-pointer"
-                        >
-                          {ticker}
-                        </button>
-                      </td>
-                      <td className="p-4 text-cyan-400 font-mono font-bold">{score}/100</td>
-                      <td className="p-4 text-white/40 font-mono">{lastUpdate}</td>
-                      <td className="p-4">
-                        <input
-                          type="text"
-                          value={noteObj.note}
-                          onChange={(e) => NoteEngine.saveNote(ticker, e.target.value)}
-                          placeholder="Why are you watching this company?"
-                          className="bg-white/5 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-cyan-400 w-full"
-                        />
-                      </td>
-                    </tr>
+                      ticker={ticker}
+                      score={score}
+                      onClick={() => navigateToStock({ ticker, mode: "push" })}
+                    />
                   );
                 })}
               </tbody>

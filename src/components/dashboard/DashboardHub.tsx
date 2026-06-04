@@ -16,7 +16,7 @@ const marketSnapshots: SnapshotItem[] = [
   { index: "NIFTY 50", value: "22,821.40", change: "+1.15%", isPositive: true },
   { index: "SENSEX", value: "75,074.50", change: "+1.08%", isPositive: true },
   { index: "BANK NIFTY", value: "49,235.80", change: "-0.22%", isPositive: false },
-  { index: "INDIA VIX", value: "13.45", change: "-4.20%", isPositive: false } // VIX down is positive for risk-on, but raw change is negative
+  { index: "INDIA VIX", value: "13.45", change: "-4.20%", isPositive: false }
 ];
 
 interface Opportunity {
@@ -58,7 +58,6 @@ export const DashboardHub: React.FC = () => {
   const [recentResearch, setRecentResearch] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load recent research
     setRecentResearch(RecentSearchStore.getRecent());
 
     const handleWatchlistChange = () => {
@@ -77,7 +76,6 @@ export const DashboardHub: React.FC = () => {
 
   const handleCompanyClick = (symbol: string) => {
     RecentSearchStore.addTicker(symbol);
-    // Trigger update to recent research local state
     setRecentResearch(RecentSearchStore.getRecent());
 
     const params = new URLSearchParams(window.location.search);
@@ -94,7 +92,6 @@ export const DashboardHub: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
-  // Get followed tickers across all custom watchlists (maximum 5)
   const followedTickers = useMemo(() => {
     const unique = new Set<string>();
     watchlists.forEach(w => {
@@ -105,7 +102,7 @@ export const DashboardHub: React.FC = () => {
 
   return (
     <div className="w-full space-y-12 pb-16 text-white max-w-7xl mx-auto antialiased">
-      {/* Time-based Greeting Header */}
+      {/* 1. Time-based Greeting Header */}
       <section className="border-b border-white/5 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400 block mb-1">
@@ -120,37 +117,7 @@ export const DashboardHub: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 4: Market Snapshot (Compact Only) - Moved to top for quick reference */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-cyan-400" />
-          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-            Market Snapshot
-          </span>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {marketSnapshots.map((item) => (
-            <div 
-              key={item.index} 
-              className="bg-white/[0.01] border border-white/5 rounded-xl p-3 flex justify-between items-center"
-            >
-              <div>
-                <span className="text-[10px] font-medium text-white/50 block">{item.index}</span>
-                <span className="text-sm font-bold font-mono text-white mt-0.5 block">{item.value}</span>
-              </div>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                item.change.startsWith("+") 
-                  ? "text-emerald-400 bg-emerald-400/10" 
-                  : "text-rose-400 bg-rose-400/10"
-              }`}>
-                {item.change}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 1: Today’s Opportunities (Maximum 5 cards) */}
+      {/* 2. Today’s Opportunities (Maximum 5 cards) */}
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-amber-400" />
@@ -205,8 +172,9 @@ export const DashboardHub: React.FC = () => {
         </div>
       </section>
 
+      {/* Grid container for updates and research */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* SECTION 2: Watchlist Updates (Maximum 5 items) */}
+        {/* 3. Watchlist Updates (Maximum 5 items) */}
         <section className="space-y-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -270,7 +238,7 @@ export const DashboardHub: React.FC = () => {
           </div>
         </section>
 
-        {/* SECTION 3: Recent Research (Recently viewed companies) */}
+        {/* 4. Recent Research (Recently viewed companies) */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <RefreshCw className="w-4 h-4 text-violet-400" />
@@ -316,6 +284,36 @@ export const DashboardHub: React.FC = () => {
           </div>
         </section>
       </div>
+
+      {/* 5. Market Snapshot (Compact Only) */}
+      <section className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-cyan-400" />
+          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+            Market Snapshot
+          </span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {marketSnapshots.map((item) => (
+            <div 
+              key={item.index} 
+              className="bg-white/[0.01] border border-white/5 rounded-xl p-3 flex justify-between items-center"
+            >
+              <div>
+                <span className="text-[10px] font-medium text-white/50 block">{item.index}</span>
+                <span className="text-sm font-bold font-mono text-white mt-0.5 block">{item.value}</span>
+              </div>
+              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                item.change.startsWith("+") 
+                  ? "text-emerald-400 bg-emerald-400/10" 
+                  : "text-rose-400 bg-rose-400/10"
+              }`}>
+                {item.change}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };

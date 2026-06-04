@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { PortfolioSnapshotFactory } from "../services/portfolio/PortfolioSnapshotFactory";
-import { PersonalInsightsEngine } from "../services/portfolio/PersonalInsightsEngine";
-import { AlertEngine } from "../services/portfolio/AlertEngine";
 import { PortfolioEngine, UserHolding } from "../services/portfolio/PortfolioEngine";
-import { Plus, Upload, Trash2, Edit2, X, AlertCircle } from "lucide-react";
+import { Plus, Upload, Trash2, Edit2, X, AlertCircle, ArrowUpRight, ArrowDownRight, ShieldAlert } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 
@@ -93,15 +91,63 @@ export const PortfolioPage: React.FC = () => {
       return;
     }
 
-    // Append to existing
     parsed.forEach(h => PortfolioEngine.addHolding(h));
     setIsImportOpen(false);
     setCsvText("");
   };
 
-  const portfolioValue = snapshot.performance.currentValue;
-  const dayChange = "+0.45%"; // standard day change indicator
-  const totalReturn = snapshot.performance.totalGainPct;
+  // Perform dynamic calculations for "What needs attention?" metrics
+  const calculatedHoldings = useMemo(() => {
+    return snapshot.holdings.map(h => {
+      const info = StockRegistry.getStock(h.symbol);
+      const currentPrice = info?.fiftyTwoWeekRange.current || h.avgBuyPrice;
+      const totalValue = h.shares * currentPrice;
+      const costBasis = h.shares * h.avgBuyPrice;
+      const gainLossVal = totalValue - costBasis;
+      const gainLossPct = costBasis > 0 ? (gainLossVal / costBasis) * 100 : 0;
+      return {
+        ...h,
+        companyName: info?.companyName || h.symbol,
+        currentPrice,
+        totalValue,
+        gainLossVal,
+        gainLossPct,
+        sector: info?.sector || h.sector || "Other"
+      };
+    });
+  }, [snapshot.holdings]);
+
+  const totalPortfolioValue = useMemo(() => {
+    return calculatedHoldings.reduce((sum, h) => sum + h.totalValue, 0);
+  }, [calculatedHoldings]);
+
+  const bestPerformer = useMemo(() => {
+    if (calculatedHoldings.length === 0) return null;
+    return [...calculatedHoldings].sort((a, b) => b.gainLossPct - a.gainLossPct)[0];
+  }, [calculatedHoldings]);
+
+  const worstPerformer = useMemo(() => {
+    if (calculatedHoldings.length === 0) return null;
+    return [...calculatedHoldings].sort((a, b) => a.gainLossPct - b.gainLossPct)[0];
+  }, [calculatedHoldings]);
+
+  const riskConcentration = useMemo(() => {
+    if (calculatedHoldings.length === 0) return { sector: "None", pct: 0 };
+    const sectorValues: Record<string, number> = {};
+    calculatedHoldings.forEach(h => {
+      sectorValues[h.sector] = (sectorValues[h.sector] || 0) + h.totalValue;
+    });
+    let maxSector = "Other";
+    let maxValue = 0;
+    Object.entries(sectorValues).forEach(([sec, val]) => {
+      if (val > maxValue) {
+        maxValue = val;
+        maxSector = sec;
+      }
+    });
+    const pct = totalPortfolioValue > 0 ? (maxValue / totalPortfolioValue) * 100 : 0;
+    return { sector: maxSector, pct };
+  }, [calculatedHoldings, totalPortfolioValue]);
 
   return (
     <div className="w-full flex flex-col space-y-8 bg-[#020304] text-white min-h-screen font-sans relative max-w-7xl mx-auto antialiased">
@@ -114,8 +160,11 @@ export const PortfolioPage: React.FC = () => {
           <h2 className="text-3xl font-bold tracking-tight text-white font-sans">
             Portfolio Centre
           </h2>
+          <p className="text-xs text-white/40 mt-1">
+            Real-time exposure auditing. Total Value: ₹{totalPortfolioValue.toLocaleString("en-IN")}
+          </p>
         </div>
-        
+
         <div className="mt-4 md:mt-0 flex items-center gap-3">
           <button
             onClick={() => setIsAddOpen(true)}
@@ -132,25 +181,60 @@ export const PortfolioPage: React.FC = () => {
         </div>
       </div>
 
-      {/* TOP SUMMARY GRID */}
+      {/* V4 SUMMARY GRID: What needs attention? */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white/[0.01] border border-white/5 p-6 rounded-2xl">
-          <span className="text-[10px] uppercase text-white/40 font-bold block mb-1">Portfolio Value</span>
-          <span className="text-2xl font-mono font-bold text-white">
-            ₹{portfolioValue.toLocaleString("en-IN")}
-          </span>
+        {/* Best Performer */}
+        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0">
+            <ArrowUpRight className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="text-[9px] uppercase text-white/40 font-bold block tracking-wider">Best Performer</span>
+            {bestPerformer ? (
+              <div className="mt-0.5">
+                <span className="text-sm font-bold text-white block">{bestPerformer.symbol}</span>
+                <span className="text-xs font-mono font-bold text-emerald-400">+{bestPerformer.gainLossPct.toFixed(1)}% Return</span>
+              </div>
+            ) : (
+              <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
+            )}
+          </div>
         </div>
-        <div className="bg-white/[0.01] border border-white/5 p-6 rounded-2xl">
-          <span className="text-[10px] uppercase text-white/40 font-bold block mb-1">Day Change</span>
-          <span className="text-2xl font-mono font-bold text-emerald-400">
-            {dayChange}
-          </span>
+
+        {/* Worst Performer */}
+        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 shrink-0">
+            <ArrowDownRight className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="text-[9px] uppercase text-white/40 font-bold block tracking-wider">Worst Performer</span>
+            {worstPerformer ? (
+              <div className="mt-0.5">
+                <span className="text-sm font-bold text-white block">{worstPerformer.symbol}</span>
+                <span className="text-xs font-mono font-bold text-rose-400">{worstPerformer.gainLossPct.toFixed(1)}% Return</span>
+              </div>
+            ) : (
+              <span className="text-xs font-medium text-white/30 block mt-0.5">No holdings</span>
+            )}
+          </div>
         </div>
-        <div className="bg-white/[0.01] border border-white/5 p-6 rounded-2xl">
-          <span className="text-[10px] uppercase text-white/40 font-bold block mb-1">Total Return</span>
-          <span className={`text-2xl font-mono font-bold ${totalReturn >= 0 ? "text-emerald-400" : "text-rose-500"}`}>
-            {totalReturn >= 0 ? "+" : ""}{totalReturn.toFixed(2)}%
-          </span>
+
+        {/* Risk Concentration */}
+        <div className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 shrink-0">
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+          <div>
+            <span className="text-[9px] uppercase text-white/40 font-bold block tracking-wider">Risk Concentration</span>
+            {calculatedHoldings.length > 0 ? (
+              <div className="mt-0.5">
+                <span className="text-sm font-bold text-white block truncate max-w-[180px]">{riskConcentration.sector}</span>
+                <span className="text-xs font-mono font-bold text-cyan-400">{riskConcentration.pct.toFixed(1)}% Allocation</span>
+              </div>
+            ) : (
+              <span className="text-xs font-medium text-white/30 block mt-0.5">No exposure</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -169,11 +253,10 @@ export const PortfolioPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {snapshot.holdings.map((h) => {
-                const info = StockRegistry.getStock(h.symbol);
-                const holdingValue = h.shares * h.avgBuyPrice;
-                const allocationPct = ((holdingValue / (portfolioValue || 1)) * 100).toFixed(1);
-                const performanceReturn = "+2.4%"; // fallback return metrics
+              {calculatedHoldings.map((h) => {
+                const allocationPct = totalPortfolioValue > 0 
+                  ? ((h.totalValue / totalPortfolioValue) * 100).toFixed(1)
+                  : "0.0";
 
                 return (
                   <tr 
@@ -189,8 +272,10 @@ export const PortfolioPage: React.FC = () => {
                       </button>
                     </td>
                     <td className="p-4 text-white/70 font-mono">{allocationPct}%</td>
-                    <td className="p-4 text-white/80 font-mono">₹{holdingValue.toLocaleString("en-IN")}</td>
-                    <td className="p-4 font-mono font-bold text-emerald-400">{performanceReturn}</td>
+                    <td className="p-4 text-white/80 font-mono">₹{h.totalValue.toLocaleString("en-IN")}</td>
+                    <td className={`p-4 font-mono font-bold ${h.gainLossPct >= 0 ? "text-emerald-400" : "text-rose-450"}`}>
+                      {h.gainLossPct >= 0 ? "+" : ""}{h.gainLossPct.toFixed(1)}%
+                    </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button

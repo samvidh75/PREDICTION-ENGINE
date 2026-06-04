@@ -253,15 +253,15 @@ export const AlertCentrePage: React.FC = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-black/40 border border-white/5 p-4 rounded-xl">
                     <div>
-                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1">What Happened</span>
+                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1">What changed?</span>
                       <p className="text-gray-250 leading-relaxed">{content.whatHappened}</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1">Why It Matters</span>
+                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1">Why it matters?</span>
                       <p className="text-gray-250 leading-relaxed">{content.whyMatters}</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1 font-semibold text-cyan-400">Suggested Step</span>
+                      <span className="text-[9px] font-bold text-gray-500 uppercase font-mono block mb-1 font-semibold text-cyan-400">What should I do?</span>
                       <p 
                         onClick={() => content.linkId && handleNavigateToCompany(content.linkId)}
                         className={`text-cyan-400 leading-relaxed ${content.linkId ? 'cursor-pointer hover:underline font-semibold' : ''}`}
