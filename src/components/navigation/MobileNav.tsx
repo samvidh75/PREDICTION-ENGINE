@@ -49,7 +49,7 @@ export const MobileNav: React.FC = () => {
   return (
     <div className="md:hidden">
       {/* Bottom Tab Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-[90] bg-[#050505]/95 backdrop-blur-md border-t border-white/5 flex items-center justify-around h-16 px-2">
+      <div className="fixed bottom-0 left-0 right-0 z-[90] bg-[#0f0f0f]/95 backdrop-blur-xl border-t border-[#2a2e39] flex items-center justify-around h-16 px-2">
         {tabs.map(tab => {
           const isActive = tab.id === "search" ? false : currentView === tab.id;
           return (
@@ -57,7 +57,7 @@ export const MobileNav: React.FC = () => {
               key={tab.id}
               onClick={() => handleNav(tab.id)}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-all cursor-pointer ${
-                isActive ? "text-cyan-400" : "text-white/30"
+                isActive ? "text-[#2962ff]" : "text-[#787b86]"
               }`}
             >
               {tab.icon}
@@ -68,7 +68,7 @@ export const MobileNav: React.FC = () => {
         {/* Menu toggle */}
         <button
           onClick={toggleMenu}
-          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-white/30 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[#787b86] cursor-pointer"
         >
           <Menu className="w-5 h-5" />
           <span className="text-[9px] font-bold uppercase tracking-wider">More</span>
@@ -91,13 +91,13 @@ export const MobileNav: React.FC = () => {
               animate="open"
               exit="closed"
               variants={menuVariants}
-              className="fixed top-0 right-0 h-full w-[280px] bg-[#050505]/95 border-l border-l-white/10 z-[105] p-6 flex flex-col backdrop-blur-md shadow-2xl"
+              className="fixed top-0 right-0 h-full w-[280px] bg-[#131722]/98 border-l border-l-[#2a2e39] z-[105] p-6 flex flex-col backdrop-blur-xl shadow-2xl"
             >
               <div className="flex items-center justify-between mb-8 pt-4">
-                <div className="text-base font-bold tracking-widest text-white">
-                  STOCKSTORY<span className="text-cyan-500">.INDIA</span>
+                <div className="text-base font-bold tracking-widest text-[#f0f3fa]">
+                  STOCKSTORY<span className="text-[#2962ff]">.INDIA</span>
                 </div>
-                <button onClick={toggleMenu} className="p-1.5 rounded-lg bg-white/5 text-white/50 cursor-pointer">
+                <button onClick={toggleMenu} className="p-1.5 rounded-lg bg-[#1e222d] text-[#b2b5be] cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -111,11 +111,11 @@ export const MobileNav: React.FC = () => {
                       onClick={() => handleNav(link.id)}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all cursor-pointer ${
                         isActive
-                          ? "bg-white/5 text-white"
-                          : "text-white/40 hover:text-white hover:bg-white/[0.03]"
+                          ? "bg-[#2962ff]/15 text-[#f0f3fa]"
+                          : "text-[#b2b5be] hover:text-[#f0f3fa] hover:bg-[#1e222d]"
                       }`}
                     >
-                      <span className={isActive ? "text-cyan-400" : ""}>{link.icon}</span>
+                      <span className={isActive ? "text-[#2962ff]" : ""}>{link.icon}</span>
                       <span className="text-sm font-medium">{link.label}</span>
                     </button>
                   );

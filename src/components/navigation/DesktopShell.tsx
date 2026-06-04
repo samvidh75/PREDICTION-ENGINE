@@ -18,7 +18,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
   ];
 
   return (
-    <div className="hidden md:flex flex-col min-h-screen bg-[#020304] text-white font-mono">
+    <div className="hidden md:flex flex-col min-h-screen bg-[#0f0f0f] text-[#f0f3fa] font-mono">
       {/* 1. Opaque 72px Header System */}
       <header 
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 border-b"
@@ -34,7 +34,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
           onClick={() => NavigationCoordinator.navigateTo('dashboard')}
           className="flex items-center gap-3 cursor-pointer hover:opacity-85 transition-opacity"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-400 to-emerald-500 flex items-center justify-center font-bold text-black text-sm">
+          <div className="w-8 h-8 rounded-lg bg-[#2962ff] flex items-center justify-center font-bold text-white text-sm">
             S
           </div>
           <span className="text-sm font-bold tracking-widest text-white">STOCKSTORY.IN</span>
@@ -60,8 +60,8 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
                   onClick={() => NavigationCoordinator.navigateTo(item.route)}
                   className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all duration-300 ${
                     active 
-                      ? 'bg-white/10 text-cyan-400 border border-white/10' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                      ? 'bg-[#2962ff]/15 text-[#7da0ff] border border-[#2962ff]/30' 
+                      : 'text-[#b2b5be] hover:text-[#f0f3fa] hover:bg-[#1e222d] border border-transparent'
                   }`}
                 >
                   <item.icon className="w-3.5 h-3.5" />

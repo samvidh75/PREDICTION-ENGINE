@@ -32,9 +32,9 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-[240px] fixed top-18 bottom-0 left-0 bg-[#020304] border-r border-white/5 flex flex-col justify-between py-6 z-40 hidden md:flex select-none">
+    <aside className="w-[240px] fixed top-18 bottom-0 left-0 bg-[#0f0f0f] border-r border-[#2a2e39] flex flex-col justify-between py-6 z-40 hidden md:flex select-none">
       <nav className="flex-1 space-y-1.5 px-3 overflow-y-auto">
-        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/30 px-3 block mb-3 font-sans">Menu</span>
+        <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#787b86] px-3 block mb-3 font-sans">Menu</span>
         {links.map(link => {
           const isActive = link.id === "search" ? false : currentView === link.id;
           return (
@@ -43,12 +43,12 @@ export const Sidebar: React.FC = () => {
               onClick={() => handleNavClick(link.id)}
               className={`group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium transition-all duration-150 rounded-lg text-left cursor-pointer ${
                 isActive 
-                  ? "bg-white/5 text-cyan-400 font-semibold" 
-                  : "text-white/60 hover:bg-white/[0.02] hover:text-white"
+                  ? "bg-[#2962ff]/15 text-[#7da0ff] font-semibold" 
+                  : "text-[#b2b5be] hover:bg-[#1e222d] hover:text-[#f0f3fa]"
               }`}
             >
               <span className={`transition-colors duration-150 ${
-                isActive ? "text-cyan-400" : "text-white/40 group-hover:text-white/70"
+                isActive ? "text-[#2962ff]" : "text-[#787b86] group-hover:text-[#b2b5be]"
               }`}>
                 {link.icon}
               </span>
@@ -59,11 +59,11 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {isAuthenticated && (
-        <div className="px-3 border-t border-white/5 pt-4">
+        <div className="px-3 border-t border-[#2a2e39] pt-4">
           <button
             onClick={() => void logout()}
             disabled={isConnecting}
-            className="group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium text-white/60 hover:bg-white/[0.02] hover:text-white transition-all rounded-lg text-left disabled:opacity-50 cursor-pointer"
+            className="group w-full h-11 px-3 flex items-center space-x-3 text-[13px] font-medium text-[#b2b5be] hover:bg-[#1e222d] hover:text-[#f0f3fa] transition-all rounded-lg text-left disabled:opacity-50 cursor-pointer"
           >
             <LogOut className="w-4 h-4 text-white/40 group-hover:text-white/70" />
             <span>Sign out</span>

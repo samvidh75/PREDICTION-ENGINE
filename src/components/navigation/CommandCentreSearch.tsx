@@ -87,21 +87,21 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
-      <div className="w-full md:w-[700px] bg-[#090b0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
-        <div className="flex items-center gap-3.5 px-4 h-[52px] bg-white/[0.02] border-b border-white/10">
-          <Search className="w-4 h-4 text-white/60" />
+      <div className="w-full md:w-[700px] bg-[#131722] border border-[#2a2e39] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
+        <div className="flex items-center gap-3.5 px-4 h-[52px] bg-[#1e222d] border-b border-[#2a2e39]">
+          <Search className="w-4 h-4 text-[#b2b5be]" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(event) => handleSearch(event.target.value)}
             placeholder="Search Indian companies, tickers, or sectors..."
-            className="flex-1 bg-transparent text-white border-none outline-none text-[14px] placeholder-white/55 font-medium"
+            className="flex-1 bg-transparent text-[#f0f3fa] border-none outline-none text-[14px] placeholder-[#787b86] font-medium"
           />
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 hover:bg-white/5 rounded-full text-white/50 hover:text-white transition"
+            className="p-1.5 hover:bg-[#242731] rounded-full text-[#787b86] hover:text-[#f0f3fa] transition"
             aria-label="Close search"
           >
             <X className="w-4 h-4" />
@@ -115,7 +115,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
                 key={stock.symbol} 
                 className={`transition-all duration-150 rounded-xl ${
                   idx === activeIndex 
-                    ? "ring-2 ring-cyan-400 bg-white/[0.03]" 
+                    ? "ring-2 ring-[#2962ff] bg-[#2962ff]/10" 
                     : ""
                 }`}
               >
@@ -131,10 +131,10 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
               </div>
             ))
           ) : query.length >= 2 ? (
-            <div className="py-12 text-center text-xs text-white/45 uppercase tracking-widest font-mono">No matching companies found</div>
+            <div className="py-12 text-center text-xs text-[#787b86] uppercase tracking-widest font-mono">No matching companies found</div>
           ) : (
             <div className="py-8 px-1">
-              <div className="flex items-center gap-2 text-[11px] text-white/45 uppercase tracking-widest mb-4 font-mono">
+              <div className="flex items-center gap-2 text-[11px] text-[#787b86] uppercase tracking-widest mb-4 font-mono">
                 <Compass className="w-3.5 h-3.5" />
                 <span>Suggested searches</span>
               </div>
@@ -146,8 +146,8 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
                     onClick={() => handleSelect(symbol)}
                     className={`px-4 py-2 border rounded-full text-xs font-semibold transition font-mono cursor-pointer ${
                       idx === activeIndex
-                        ? "border-cyan-400 bg-cyan-400 text-black font-bold"
-                        : "border-white/5 bg-white/[0.02] hover:bg-white/[0.06] text-cyan-400 hover:text-white"
+                        ? "border-[#2962ff] bg-[#2962ff] text-white font-bold"
+                        : "border-[#2a2e39] bg-[#1e222d] hover:bg-[#242731] text-[#7da0ff] hover:text-[#f0f3fa]"
                     }`}
                   >
                     {symbol}
