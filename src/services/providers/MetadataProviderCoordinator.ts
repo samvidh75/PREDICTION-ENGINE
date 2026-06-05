@@ -43,7 +43,7 @@ export class MetadataProviderCoordinator {
     const registryEntry = this.registry.lookup(rawSymbol);
     if (registryEntry) {
       raw = {
-        symbol: rawSymbol,
+        symbol: registryEntry.nseSymbol || registryEntry.symbol,
         companyName: registryEntry.companyName,
         sector: registryEntry.sector,
         industry: registryEntry.industry,
@@ -51,6 +51,9 @@ export class MetadataProviderCoordinator {
         marketCap: registryEntry.marketCap,
         currency: registryEntry.currency || 'INR',
         website: registryEntry.website || '',
+        isin: registryEntry.isin ?? null,
+        bseCode: registryEntry.bseCode ?? null,
+        nseSymbol: registryEntry.nseSymbol ?? registryEntry.symbol,
       };
       enrichmentSource = 'registry';
     }
@@ -79,25 +82,40 @@ export class MetadataProviderCoordinator {
       enrichmentSource = 'fallback';
     }
 
-    // 4. Validate
-    const validation = this.validator.validate(raw);
+    // 4. Validate raw provider output
+    const rawValidation = this.validator.validate(raw);
 
     // 5. Enrich from registry if validation found gaps
-    let enriched = this.enrichFromRegistry(raw, validation);
+    let enriched = this.enrichFromRegistry(raw, rawValidation);
 
     // 6. Apply integrity normalisation (BSE codes, ISIN, ticker cleanup)
     enriched = this.integrity.normalise(enriched);
 
-    // 7. Build the enriched result
-    const registryMatch = this.registry.lookup(rawSymbol);
+    // 7. Build the enriched result from the final, normalised payload.
+    const registryMatch = this.registry.lookup(enriched.symbol) ?? this.registry.lookup(rawSymbol);
+    const finalMetadata: CompanyMetadata = {
+      ...enriched,
+      symbol: registryMatch?.nseSymbol ?? registryMatch?.symbol ?? enriched.symbol,
+      companyName: enriched.companyName || registryMatch?.companyName || '',
+      sector: enriched.sector || registryMatch?.sector || '',
+      industry: enriched.industry || registryMatch?.industry || '',
+      exchange: enriched.exchange || registryMatch?.exchange || 'NSE',
+      marketCap: enriched.marketCap ?? registryMatch?.marketCap,
+      currency: enriched.currency || registryMatch?.currency || 'INR',
+      website: enriched.website || registryMatch?.website || '',
+      isin: enriched.isin ?? registryMatch?.isin ?? null,
+      bseCode: enriched.bseCode ?? registryMatch?.bseCode ?? null,
+      nseSymbol: enriched.nseSymbol ?? registryMatch?.nseSymbol ?? registryMatch?.symbol ?? enriched.symbol,
+    };
+    const finalValidation = this.validator.validate(finalMetadata);
 
     return {
-      ...enriched,
-      isin: registryMatch?.isin ?? null,
-      bseCode: registryMatch?.bseCode ?? null,
-      nseSymbol: registryMatch?.nseSymbol ?? rawSymbol.replace(/\.(NS|BO|NSE|BSE)$/i, ''),
-      verificationStatus: validation.status,
-      verificationReasons: validation.reasons,
+      ...finalMetadata,
+      isin: finalMetadata.isin ?? null,
+      bseCode: finalMetadata.bseCode ?? null,
+      nseSymbol: finalMetadata.nseSymbol ?? rawSymbol.replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+      verificationStatus: finalValidation.status,
+      verificationReasons: finalValidation.reasons,
       enrichmentSource,
     };
   }
@@ -131,6 +149,9 @@ export class MetadataProviderCoordinator {
     if (validation.reasons.includes('missing_company_name') || enriched.companyName === enriched.symbol) {
       enriched.companyName = entry.companyName;
     }
+    if (validation.reasons.includes('raw_bse_code_as_symbol')) {
+      enriched.symbol = entry.nseSymbol || entry.symbol;
+    }
     if (validation.reasons.includes('missing_sector') || !enriched.sector) {
       enriched.sector = entry.sector;
     }
@@ -143,6 +164,11 @@ export class MetadataProviderCoordinator {
     if (!enriched.exchange) {
       enriched.exchange = entry.exchange;
     }
+    enriched.currency = enriched.currency || entry.currency || 'INR';
+    enriched.website = enriched.website || entry.website || '';
+    enriched.isin = enriched.isin ?? entry.isin ?? null;
+    enriched.bseCode = enriched.bseCode ?? entry.bseCode ?? null;
+    enriched.nseSymbol = enriched.nseSymbol ?? entry.nseSymbol ?? entry.symbol;
 
     return enriched;
   }
