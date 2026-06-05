@@ -1,200 +1,150 @@
-# Dead Field Root Cause Analysis — TRACK-11
+# Dead Field Root Cause — TRACK-11 Engine Activation Audit
 
 **Date:** 2026-06-06
-**Status:** Audit Complete
-**Methodology:** Full pipeline trace — provider output → ProviderCoordinator merge → EngineInputs mapping → every StockStory engine
+**Methodology:** Full pipeline trace — provider → ProviderCoordinator merge → DB → EngineInputs → all 8 engines
 
 ---
 
-## Executive Summary
+## Root Cause Answers: Why Each Field Is Disconnected
 
-Every dead field is **Category A: Collected but dropped before EngineInputs**. The providers supply these fields, the ProviderCoordinator propagates them through to `FinancialSnapshot`, but the `intelligence.ts` route map that builds `EngineInputs` has no mapping for them. They are present in the database column or provider output, but the Express route never reads them into the engine input object.
+### 1. Why is `roa` collected but not mapped?
 
-The root cause is a **schema gap** between the database `financial_snapshots` table and the `EngineInputs.financials` interface — both are typed but don't align, and the route-level mapper only populates fields it explicitly knows about.
+**Answer:** Schema mismatch between two separate type systems.
 
----
+| Layer | File | Status |
+|-------|------|--------|
+| UpstoxFundamentalsProvider | `src/services/providers/UpstoxFundamentalsProvider.ts:111,145` | Parses ROA from Upstox API, returns it as `roa` in the untyped `FinancialData` object |
+| ProviderCoordinator merge whitelist | `src/services/providers/ProviderCoordinator.ts:203` | `'roa'` is in `upstoxFields` set — coordinator merges it into `FinancialSnapshot` |
+| DB `financial_snapshots` | `src/backend/web/routes/intelligence.ts:820` | Uses `SELECT *` — if column exists, ROA is fetched |
+| EngineInputs.financials type | `src/stockstory/types.ts:51-72` | **NO `roa` field** — the typed interface does not declare it |
+| intelligence.ts EngineInputs builder | `src/backend/web/routes/intelligence.ts:838-854` | **NO `roa` mapping** — the mapper only copies fields that exist in the EngineInputs type |
 
-## FIELD-BY-FIELD TRACE
+**Root cause:** The `EngineInputs.financials` interface in `types.ts` was defined before ROA was added to the provider pipeline. When UpstoxFundamentalsProvider was integrated (track-7e/8e), ROA was added to the provider output and Coordinator whitelist, but **nobody updated the EngineInputs type or the route mapper**. This is a classic "provider added but type contract not updated" desync.
 
-### 1. `roa` (Return on Assets) — DEAD
+**Chain of evidence:**
+1. UpstoxFundamentalsProvider line 145: `roa,` — returned in the plain object
+2. ProviderCoordinator line 203: `'roa'` — explicitly in `upstoxFields` Set
+3. types.ts line 51-72: `roa` is absent from the interface
+4. intelligence.ts line 838-854: no line mapping `roa`
 
-**Classification: A — Collected but dropped before EngineInputs**
-
-| Stage | File | Line(s) | Has `roa`? |
-|-------|------|---------|------------|
-| Provider: UpstoxFundamentalsProvider | `src/services/providers/UpstoxFundamentalsProvider.ts` | 111, 145 | **YES** — parsed from Upstox `/v2/fundamentals/{isin}/key-ratios` API, returned as `roa` in FinancialData |
-| Provider: FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | — | **NO** — Finnhub `metric` endpoint does not return ROA |
-| ProviderCoordinator merge whitelist | `src/services/providers/ProviderCoordinator.ts` | 203 | **YES** — `'roa'` is in `upstoxFields` set (line 203), so Upstox `roa` is merged into the combined `FinancialSnapshot` |
-| EngineInputs financials type | `src/stockstory/types.ts` | 51-72 | **NO** — `financials` interface has no `roa` field |
-| intelligence.ts EngineInputs builder | `src/backend/web/routes/intelligence.ts` | 838-854 | **NO** — no `roa: fin?.roa...` mapping exists |
-| Any StockStory engine | All 8 engine files | — | **NO** — no engine ever accesses `financials.roa` |
-
-**Drop Point:** `src/backend/web/routes/intelligence.ts`, lines ~838-854 — the `financials:` object literal building EngineInputs. No `roa` line exists.
-
-**Was omission intentional?** NO. The ProviderCoordinator explicitly whitelists `roa` for Upstox (line 203), proving it was expected to flow through. The omission in the EngineInputs route mapper is an accidental gap.
-
-**Can an existing engine logically consume it?** YES — ROA directly measures asset efficiency. The **QualityEngine** already scores ROE, ROIC, gross margin, and operating margin. ROA is the natural 5th quality sub-score. It complements ROIC (measures returns inclusive of leverage effects) and would strengthen the quality signal.
-
-**Expected score impact if connected:** Moderate. ROA typically correlates with ROE and ROIC (r ≈ 0.6-0.8), so it wouldn't dramatically change the quality composive, but it would add a ~8-12% weighting contribution against the current 4-sub-score QualityEngine, especially differentiating between ROE-inflated (high leverage) and genuinely efficient companies.
+**Verdict:** Accidental omission — type definition never updated when provider was onboarded.
 
 ---
 
-### 2. `operatingMargin` — NOT DEAD (False Positive)
+### 2. Why is `operatingMargin` collected but not consumed?
 
-**Classification: C — Used but with negligible/indirect impact in some engines**
+**Answer:** This field is NOT disconnected. It is fully consumed by 5 engines.
 
-This field is fully alive:
+**Correction:** The original task incorrectly classified `operatingMargin` as dead.
 
-| Stage | File | Line | Has `operatingMargin`? |
-|-------|------|------|------------------------|
-| Provider: UpstoxFundamentalsProvider | `src/services/providers/UpstoxFundamentalsProvider.ts` | — | **NO** — Upstox does NOT return operating margin |
-| Provider: ScreenerProvider | `src/services/providers/ScreenerProvider.ts` | 48, 64, 77 | **YES** — parsed from "OPM %" and returned |
-| Provider: FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | 127 | **YES** — `m.operatingMarginTTM ?? m.operatingMargin` |
-| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts` | 216 | **YES** — in `screenerEnrichmentFields` set |
-| EngineInputs type | `src/stockstory/types.ts` | 70 | **YES** — `operatingMargin: number \| null` |
-| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts` | 854 | **YES** — `operatingMargin: fin?.operating_margin != null ? Number(fin.operating_margin) : null` |
-| QualityEngine | `src/stockstory/engines/QualityEngine.ts` | 65-73, 108 | **YES** — scored as sub-component, weighted at 2 |
-| AccountingEngine | `src/stockstory/engines/AccountingEngine.ts` | 81-84 | **YES** — used as red flag trigger |
-| RiskEngine | `src/stockstory/engines/RiskEngine.ts` | 61, 81 | **YES** — used in anomaly and stress checks |
-| StabilityEngine | `src/stockstory/engines/StabilityEngine.ts` | 64, 66, 86, 87 | **YES** — used in coverage score and interest coverage |
-| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts` | 21 | **YES** — in IMPORTANT_FIELDS set |
+| Engine | File | Lines | Usage |
+|--------|------|-------|-------|
+| QualityEngine | `src/stockstory/engines/QualityEngine.ts` | 65-73, 108 | Primary sub-score (weight 2) |
+| StabilityEngine | `src/stockstory/engines/StabilityEngine.ts` | 64, 66, 86, 87 | Coverage score + interest coverage proxy |
+| RiskEngine | `src/stockstory/engines/RiskEngine.ts` | 61, 81 | Anomaly check + cash flow stress modifier |
+| AccountingEngine | `src/stockstory/engines/AccountingEngine.ts` | 81-84 | Red flag trigger |
+| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts` | 21 | IMPORTANT field (weight=2) |
 
-**operatingMargin is NOT dead. It is actively collected, mapped, and consumed by 5 engines.**
+**operatingMargin is the single most consumed field in the entire engine system (5 engines). It should not appear in any activation audit.**
 
 ---
 
-### 3. `bookValue` (Book Value per Share) — DEAD
+### 3. Why is `bookValue` collected but ignored?
 
-**Classification: A — Collected but dropped before EngineInputs**
+**Answer:** Same schema mismatch as ROA — collected by ScreenerProvider, merged by Coordinator, but EngineInputs type was never updated.
 
-| Stage | File | Line(s) | Has `bookValue`? |
-|-------|------|---------|-------------------|
-| Provider: ScreenerProvider | `src/services/providers/ScreenerProvider.ts` | 51, 67, 80 | **YES** — extracted from Screener.in "Book Value" row, returned as `bookValue` |
-| Provider: UpstoxFundamentalsProvider | `src/services/providers/UpstoxFundamentalsProvider.ts` | — | **NO** |
-| Provider: FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | — | **NO** |
-| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts` | 219 | **YES** — `'bookValue'` in `screenerEnrichmentFields` |
-| EngineInputs type | `src/stockstory/types.ts` | 51-72 | **NO** — no `bookValue` field |
-| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts` | 838-854 | **NO** — no mapping |
-| Any engine | All 8 | — | **NO** — not referenced |
+| Layer | File | Status |
+|-------|------|--------|
+| ScreenerProvider | `src/services/providers/ScreenerProvider.ts:51,67,80` | Extracts "Book Value" from Screener.in HTML, returns as `bookValue` |
+| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts:219` | `'bookValue'` in `screenerEnrichmentFields` — merged |
+| EngineInputs.financials type | `src/stockstory/types.ts:51-72` | **NO `bookValue` field** |
+| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts:838-854` | **NO mapping** |
 
-**Drop Point:** Same as roa — `src/backend/web/routes/intelligence.ts`, lines ~838-854. No `bookValue` mapping exists.
+**Root cause:** Same as ROA — ScreenerProvider was onboarded as an enrichment provider (track-8f/9b), bookValue was tagged as an enrichment field, but the EngineInputs interface was never updated to receive it.
 
-**Was omission intentional?** NO. The Coordinator explicitly whitelists it as an enrichment field. The omission is an accident.
-
-**Can an existing engine logically consume it?** YES — Book Value is the denominator of P/B ratio. The **ValuationEngine** already scores P/B ratio (pbScore). Book Value per share provides a standalone metric for asset-based valuation (liquidation value floor). It could be used by a hypothetical asset-quality sub-score in QualityEngine, or as a supplementary normalization factor in ValuationEngine (e.g., detecting negative equity companies).
-
-**Expected score impact if connected:** Low. P/B already captures book-value-based valuation. Direct book-value-per-share adds limited new information unless used for Graham-style net-net screens, which no engine currently implements.
+**Why this matters less than ROA:** Book Value is the denominator of P/B ratio, which is already scored. The incremental information from raw book-value-per-share beyond what P/B already captures is marginal. This omission is still a bug, but a low-impact one.
 
 ---
 
-### 4. `eps` (Earnings Per Share) — NOT DEAD (False Positive)
+### 4. Why is `eps` collected but ignored?
 
-**Classification: B — Present in EngineInputs but only used by ConfidenceEngine**
+**Answer:** EPS is **not ignored** — it is collected, mapped into EngineInputs, and used. It's just used in a narrow way that's **architecturally correct**.
 
-| Stage | File | Line(s) | Has `eps`? |
-|-------|------|---------|------------|
-| Provider: FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | 120 | **YES** — `m.epsNormalizedAnnual ?? m.epsBasicExclExtraItemsTTM` |
-| Provider: YahooProvider | `src/services/providers/YahooProvider.ts` | 38 | **YES** — typed as optional |
-| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts` | 223 | **YES** — `'eps'` in fallback fields |
-| EngineInputs type | `src/stockstory/types.ts` | 54 | **YES** — `eps: number \| null` |
-| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts` | 838 | **YES** — `eps: fin?.eps != null ? Number(fin.eps) : null` |
-| GrowthEngine | `src/stockstory/engines/GrowthEngine.ts` | — | **NO** — uses `epsGrowth` (growth rate), not `eps` (absolute) |
-| QualityEngine | `src/stockstory/engines/QualityEngine.ts` | — | **NO** |
-| ValuationEngine | `src/stockstory/engines/ValuationEngine.ts` | — | **NO** |
-| StabilityEngine | `src/stockstory/engines/StabilityEngine.ts` | — | **NO** |
-| RiskEngine | `src/stockstory/engines/RiskEngine.ts` | — | **NO** |
-| AccountingEngine | `src/stockstory/engines/AccountingEngine.ts` | — | **NO** |
-| MomentumEngine | `src/stockstory/engines/MomentumEngine.ts` | — | **NO** |
-| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts` | 60 | **YES** — supplementary field (weight=1) for data completeness score |
+| Layer | File | Status |
+|-------|------|--------|
+| FinnhubProvider | `src/services/providers/FinnhubProvider.ts:120` | Returns EPS |
+| YahooProvider | `src/services/providers/YahooProvider.ts:38` | Typed as optional |
+| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts:223` | `'eps'` in fallback fields |
+| EngineInputs | `src/stockstory/types.ts:54` | **YES** — `eps: number \| null` |
+| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts:838` | **YES** — maps `fin.eps` |
+| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts:60` | Supplementary completeness field (weight=1) |
 
-**eps is not dead — it's present in EngineInputs and consumed by ConfidenceEngine as a supplementary completeness signal. It contributes ~1 weight point to the confidence data-completeness calculation.**
+**Why no scoring engine uses absolute EPS:** Absolute EPS is not comparable across companies. EPS of ₹120 for a ₹3500 stock (P/E=29) is very different from EPS of ₹120 for a ₹1200 stock (P/E=10). The engines correctly use:
+- `epsGrowth` — the rate of EPS change (GrowthEngine, RiskEngine, AccountingEngine)
+- `peRatio` — EPS normalized by price (ValuationEngine)
+
+**Verdict:** Architectural decision, not a bug. Absolute EPS is correctly restricted to data-completeness signalling only.
 
 ---
 
-### 5. `freeCashFlow` — PARTIALLY ALIVE
+### 5. Why is `freeCashFlow` collected but ignored?
 
-**Classification: B/C hybrid — Present in provider output but not in EngineInputs directly; consumed via `fcfYield` and `fcfGrowth`**
+**Answer:** Raw FCF is intentionally excluded at the Coordinator merge level. The derived ratios are used instead.
 
-| Stage | File | Line(s) | Has `freeCashFlow`? |
-|-------|------|---------|----------------------|
-| Provider: FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | 148 | **YES** — `freeCashFlow: fcfTTM` (raw dollar amount) |
-| Provider: YahooProvider | `src/services/providers/YahooProvider.ts` | 51 | **YES** — typed |
-| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts` | — | **NOT in any whitelist** — `freeCashFlow` is NOT in `upstoxFields`, `screenerEnrichmentFields`, or `fallbackFields` |
-| EngineInputs type | `src/stockstory/types.ts` | — | **NO** — no `freeCashFlow` field |
-| intelligence.ts mapper | — | — | **NO** |
-| Any engine | — | — | **NO** — no engine reads `freeCashFlow` |
+| Layer | File | Status |
+|-------|------|--------|
+| FinnhubProvider | `src/services/providers/FinnhubProvider.ts:148` | Returns `freeCashFlow: fcfTTM` |
+| YahooProvider | `src/services/providers/YahooProvider.ts:51` | Typed |
+| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts:195-225` | **NOT in any whitelist** — dropped at merge |
+| EngineInputs | `src/stockstory/types.ts` | **NO** `freeCashFlow` field |
 
-**But:** FCF is decomposed into:
-- `fcfYield` (FCF / Market Cap) — used extensively by ValuationEngine, RiskEngine, AccountingEngine
-- `fcfGrowth` — used by GrowthEngine
+**Why this is correct design:**
+- `fcfYield` = FCF / MarketCap → comparable across companies → used by ValuationEngine, RiskEngine, AccountingEngine
+- `fcfGrowth` = FCF growth rate → comparable → used by GrowthEngine
+- Raw `freeCashFlow` (absolute INR) → NOT comparable — ₹1000cr FCF means different things for a ₹10,000cr company vs a ₹1,00,000cr company
 
-**Drop Point for raw freeCashFlow:** `src/services/providers/ProviderCoordinator.ts` — not in any merge whitelist (line ~195-225). Even if a provider returns it, the merge function drops it.
-
-**Was omission intentional?** Partially. The raw FCF dollar amount was deliberately excluded because absolute FCF is not comparable across companies. FCF Yield (ratio) and FCF Growth (rate) capture the relevant signals. This is an intentional design decision.
-
-**Could an existing engine consume it?** The raw FCF dollar amount has limited standalone value. The engines already consume the derived ratios (fcfYield, fcfGrowth) which are the correct normalized forms. This field being "dead" is proper.
+**Verdict:** Intentional exclusion. The architecture is sound — raw dollar amounts should never enter cross-sectional scoring. The exclusion at the Coordinator level (not the EngineInputs level) is correct because it prevents the raw value from even reaching the DB.
 
 ---
 
-## WEAK FIELD ANALYSIS
+### 6. Why is `dividendYield` collected but not consumed by any scoring engine?
 
-### 6. `marketCap` — WEAK
+**Answer:** EngineInputs has the field, but no engine was ever written to score it. This is a genuine gap.
 
-**Current Status: Alive but underutilized**
+| Layer | File | Status |
+|-------|------|--------|
+| ScreenerProvider | `src/services/providers/ScreenerProvider.ts:50,65,78` | Extracts from Screener |
+| FinnhubProvider | `src/services/providers/FinnhubProvider.ts:152-154` | Returns from Finnhub |
+| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts:218` | In `screenerEnrichmentFields` |
+| EngineInputs | `src/stockstory/types.ts:55` | `dividendYield: number \| null` — **YES** |
+| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts:839` | **YES** — `dividendYield: fin?.dividend_yield != null ? Number(fin.dividend_yield) : null` |
+| **Any scoring engine** | All 8 | **NO engine reads `financials.dividendYield`** |
+| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts:60` | Supplementary completeness only (weight=1) |
 
-| Stage | File | Line(s) | Present? |
-|-------|------|---------|----------|
-| MetadataProviderCoordinator | `src/services/providers/MetadataProviderCoordinator.ts` | 51, 103, 161-162 | **YES** — enriched from registry |
-| ScreenerProvider | `src/services/providers/ScreenerProvider.ts` | 53, 68, 81 | **YES** — parsed and returned |
-| EngineInputs type | `src/stockstory/types.ts` | 57 | **YES** — `marketCap: number \| null` |
-| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts` | 841 | **YES** |
-| RiskEngine | `src/stockstory/engines/RiskEngine.ts` | 49 | **YES** — used in "negative earnings with high market cap" anomaly check |
-| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts` | 60 | **YES** — supplementary completeness field |
-
-**Issue:** marketCap is only used for one narrow anomaly check (negative PE + large cap = red flag) and as a confidence completeness tick. It is NOT used in any meaningful scoring or weighting. marketCap could logically serve as:
-- A position-sizing signal (larger caps → lower volatility expectation → stability boost)
-- A liquidity proxy (larger caps → tighter spreads → better execution quality)
-- A sector-relative size comparison
-
-**No engine produces a "size factor" sub-score.** This is a gap, not a bug.
+**Root cause:** The ValuationEngine has 4 sub-scores (PE, PB, EV/EBITDA, FCF Yield) but nobody added a 5th for dividend yield. The engine was written when only Finnhub returned it, and it was treated as "nice to have" metadata, never promoted to a scoring input.
 
 ---
 
-### 7. `dividendYield` — WEAK
+### 7. Why is `marketCap` present but barely used?
 
-**Current Status: Alive but underutilized**
+**Answer:** marketCap lives in two places (EngineInputs.financials AND CompanyMetadata), and its scoring role was never defined beyond one anomaly check.
 
-| Stage | File | Line(s) | Present? |
-|-------|------|---------|----------|
-| ScreenerProvider | `src/services/providers/ScreenerProvider.ts` | 50, 65, 78 | **YES** — extracted from "Dividend Yield" |
-| FinnhubProvider | `src/services/providers/FinnhubProvider.ts` | 152-154 | **YES** |
-| ProviderCoordinator merge | `src/services/providers/ProviderCoordinator.ts` | 218 | **YES** — in `screenerEnrichmentFields` |
-| EngineInputs type | `src/stockstory/types.ts` | 55 | **YES** — `dividendYield: number \| null` |
-| intelligence.ts mapper | `src/backend/web/routes/intelligence.ts` | 839 | **YES** |
-| ConfidenceEngine | `src/stockstory/engines/ConfidenceEngine.ts` | 60 | **YES** — supplementary completeness field |
-| Any scoring engine | — | — | **NO engine scores dividendYield** |
+**Current usage:**
+- RiskEngine line 49: `financials.marketCap > 10000` + negative PE → anomaly flag (narrow edge case)
+- ConfidenceEngine line 60: supplementary completeness (weight=1)
 
-**Issue:** Dividend yield is collected but no engine scores it. It could logically feed into:
-- **ValuationEngine** — as a supplementary yield-based value signal (dividend discount model input)
-- **StabilityEngine** — dividend-paying companies are generally more mature/stable
-- A new **IncomeEngine** (doesn't exist) for income-oriented investors
-
-**This is a clear gap — the field is collected but has zero scoring impact.**
+**Root cause:** marketCap was treated as metadata (display-only) rather than a scoring input. No "size factor" was ever designed. The field exists in EngineInputs because it's in the DB schema, but the engine architecture never assigned it a scoring role.
 
 ---
 
-## Summary Root Cause Table
+## Dead Field Classification Summary
 
-| Field | Classification | Drop Point File | Drop Point Line | Intentional? |
-|-------|---------------|-----------------|-----------------|--------------|
-| `roa` | A — Collected, dropped before EngineInputs | `src/backend/web/routes/intelligence.ts` | ~838-854 (missing mapping) | NO |
-| `bookValue` | A — Collected, dropped before EngineInputs | `src/backend/web/routes/intelligence.ts` | ~838-854 (missing mapping) | NO |
-| `eps` | B — Present but underutilized | N/A (present) | N/A | Partially — used only for confidence |
-| `freeCashFlow` | A — Collected, dropped at Coordinator merge | `src/services/providers/ProviderCoordinator.ts` | ~195-225 (not in any whitelist) | YES — intentional design (ratios preferred) |
-| `operatingMargin` | NOT DEAD — fully alive | N/A | N/A | N/A |
-| `marketCap` | C — Used but negligible impact | N/A | N/A | Partially — needs expansion |
-| `dividendYield` | B — Present but unused by any scoring engine | N/A | N/A | NO — gap, not design |
-
-**True dead fields (confirmed): `roa`, `bookValue`**
-**Misclassified as dead: `operatingMargin` (fully alive), `eps` (alive but underutilized), `freeCashFlow` (intentionally excluded — ratios preferred)**
-**Weak fields: `marketCap` (underutilized), `dividendYield` (collected but zero engine consumption)**
+| Field | Root Cause Category | Specific Reason |
+|-------|:-------------------|-----------------|
+| `roa` | Type/contract desync | EngineInputs interface not updated when UpstoxFundamentalsProvider was onboarded |
+| `operatingMargin` | **FALSE POSITIVE** | Fully consumed by 5 engines — should not be in this audit |
+| `bookValue` | Type/contract desync | EngineInputs interface not updated when ScreenerProvider was onboarded |
+| `eps` | **CORRECT DESIGN** | Absolute EPS not comparable; derived forms (epsGrowth, peRatio) preferred |
+| `freeCashFlow` | **INTENTIONAL EXCLUSION** | Raw FCF amounts dropped; ratios (fcfYield, fcfGrowth) are the correct forms |
+| `dividendYield` | Engine gap | Present in EngineInputs but no scoring engine was written to consume it |
+| `marketCap` | Engine gap | Treated as metadata; no size factor engine exists |
