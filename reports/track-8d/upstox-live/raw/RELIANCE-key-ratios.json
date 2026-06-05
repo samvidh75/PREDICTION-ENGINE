@@ -1,0 +1,43 @@
+{
+  "symbol": "RELIANCE",
+  "isin": "INE002A01018",
+  "kind": "key-ratios",
+  "url": "https://api.upstox.com/v2/fundamentals/INE002A01018/key-ratios",
+  "credentialUsed": "UPSTOX_API_KEY_AS_BEARER",
+  "status": 401,
+  "statusText": "Unauthorized",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "must-revalidate,no-cache,no-store",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a0714279ff3b5ef9-HYD",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:32:23 GMT",
+    "message": "request failed",
+    "pragma": "no-cache",
+    "reqid": "e6a02c39-b2b1-4e36-a5f7-48d1e9714e51",
+    "server": "cloudflare",
+    "set-cookie": "__cf_bm=7M6mHytpspqanbAOkCOEVLr14YC5l5ovP8oU1FbaonU-1780684343.3571565-1.0.1.1-cglu_gtAlDjaZmswIqalsYRry5qrL9mBv5hnjUydos1WqhV6XrcpohbA6nlICWrhuPHsWG8W6o6U_ZBha5ljoLJNi5vA_LsC7H7vxJ_3ZY2anTp8n7a56ZRbKXochbqB; HttpOnly; SameSite=None; Secure; Path=/; Domain=upstox.com; Expires=Fri, 05 Jun 2026 19:02:23 GMT",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "error",
+    "errors": [
+      {
+        "errorCode": "UDAPI100050",
+        "message": "Invalid token used to access API",
+        "propertyPath": null,
+        "invalidValue": null,
+        "error_code": "UDAPI100050",
+        "property_path": null,
+        "invalid_value": null
+      }
+    ]
+  }
+}

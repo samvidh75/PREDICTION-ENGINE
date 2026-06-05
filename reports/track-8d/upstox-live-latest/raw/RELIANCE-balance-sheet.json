@@ -1,0 +1,61 @@
+{
+  "symbol": "RELIANCE",
+  "isin": "INE002A01018",
+  "kind": "balance-sheet",
+  "url": "https://api.upstox.com/v2/fundamentals/INE002A01018/balance-sheet?type=consolidated",
+  "credentialUsed": "UPSTOX_ACCESS_TOKEN",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a07154134db92e96-HYD",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:44:24 GMT",
+    "expires": "0",
+    "pragma": "no-cache",
+    "reqid": "64e9f6bb-cc8c-439f-adf3-3c48eceb0860",
+    "requestid": "4339e53e-b9a2-4c49-9459-a136a5866f45",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [
+        {
+          "total_asset": 2178140,
+          "total_liability": 1092274,
+          "period": "Mar 2026"
+        },
+        {
+          "total_asset": 1950121,
+          "total_liability": 940495,
+          "period": "Mar 2025"
+        },
+        {
+          "total_asset": 1755986,
+          "total_liability": 830198,
+          "period": "Mar 2024"
+        },
+        {
+          "total_asset": 1607431,
+          "total_liability": 778550,
+          "period": "Mar 2023"
+        }
+      ],
+      "full_statement": null
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "symbol": "INFY",
+  "isin": "INE009A01021",
+  "kind": "balance-sheet",
+  "url": "https://api.upstox.com/v2/fundamentals/INE009A01021/balance-sheet?type=consolidated",
+  "credentialUsed": "UPSTOX_ACCESS_TOKEN",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a07150457ea15ef9-HYD",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:41:48 GMT",
+    "expires": "0",
+    "pragma": "no-cache",
+    "reqid": "e072d9f9-dc6b-49a5-b60c-d8ac0d5ce110",
+    "requestid": "81786545-fa52-417b-9b4f-9a11b340395e",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [
+        {
+          "total_asset": 155967,
+          "total_liability": 62670,
+          "period": "Mar 2026"
+        },
+        {
+          "total_asset": 148903,
+          "total_liability": 52700,
+          "period": "Mar 2025"
+        },
+        {
+          "total_asset": 137814,
+          "total_liability": 49353,
+          "period": "Mar 2024"
+        },
+        {
+          "total_asset": 125816,
+          "total_liability": 50021,
+          "period": "Mar 2023"
+        }
+      ],
+      "full_statement": null
+    }
+  }
+}

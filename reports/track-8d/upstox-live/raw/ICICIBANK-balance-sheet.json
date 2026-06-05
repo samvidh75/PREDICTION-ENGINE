@@ -1,0 +1,43 @@
+{
+  "symbol": "ICICIBANK",
+  "isin": "INE090A01021",
+  "kind": "balance-sheet",
+  "url": "https://api.upstox.com/v2/fundamentals/INE090A01021/balance-sheet?type=consolidated",
+  "credentialUsed": "UPSTOX_API_KEY_AS_BEARER",
+  "status": 401,
+  "statusText": "Unauthorized",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "must-revalidate,no-cache,no-store",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a071427caa295ef9-HYD",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:32:23 GMT",
+    "message": "request failed",
+    "pragma": "no-cache",
+    "reqid": "ab10293b-40c6-402f-b451-fd308d654333",
+    "server": "cloudflare",
+    "set-cookie": "__cf_bm=wDBwqkJC7ksByJd.IZSz7t62zdEK6xJK0uRSE8j6gJc-1780684343.7905765-1.0.1.1-A5XpqRmXGgwVCcD7WsDvM6LTebpjrIQs0.JjxaVuYTwEf_BqIMApAG3AtyocO0Ybu5F7oLiCPJ9zaBfsnN76KOMdu5Mns.Kz8QmEXSiMPB4gIMDMRRVKZzoXZLrCBy6I; HttpOnly; SameSite=None; Secure; Path=/; Domain=upstox.com; Expires=Fri, 05 Jun 2026 19:02:23 GMT",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "error",
+    "errors": [
+      {
+        "errorCode": "UDAPI100050",
+        "message": "Invalid token used to access API",
+        "propertyPath": null,
+        "invalidValue": null,
+        "error_code": "UDAPI100050",
+        "property_path": null,
+        "invalid_value": null
+      }
+    ]
+  }
+}

@@ -125,7 +125,7 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
         : new Date().toISOString().split('T')[0],
 
       // ── Valuation ──────────────────────────────────────
-      marketCap: entry?.marketCap,
+      marketCap: undefined,
       peRatio: pe,
       pbRatio: pb,
       evEbitda: evEbitda,

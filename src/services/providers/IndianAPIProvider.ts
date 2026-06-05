@@ -11,7 +11,7 @@ import { FinancialProvider, FinancialData } from './FinancialProvider';
 import { RetryPolicy } from './RetryPolicy';
 
 const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
-const API_BASE = 'https://stock.indianapi.in';
+const API_BASE = 'https://indianapi.in';
 
 export class IndianAPIProvider implements FinancialProvider {
   private apiKey: string;
@@ -25,13 +25,15 @@ export class IndianAPIProvider implements FinancialProvider {
 
   async getFinancials(symbol: string): Promise<FinancialData> {
     const clean = symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
-    const data = await this.fetchJson(`${API_BASE}/stock_fundamentals?name=${encodeURIComponent(clean)}`);
+    const data = await this.fetchJson(`${API_BASE}/stock?name=${encodeURIComponent(clean)}`);
     
     if (!data || data.error) {
       throw new Error(`IndianAPI: no fundamentals for ${clean}`);
     }
 
-    const f = data.fundamentals || data;
+    // CORRECT response shape from docs: financials + keyMetrics are top-level objects on data
+    const f = data.financials || data;
+    const m = data.keyMetrics || {};
     
     const n = (val: any): number | undefined => {
       if (val === null || val === undefined || val === '') return undefined;

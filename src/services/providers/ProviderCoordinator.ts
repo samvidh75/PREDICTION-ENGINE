@@ -11,7 +11,7 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { UpstoxProvider } from '../brokers/UpstoxProvider';
+import { UpstoxProvider } from './UpstoxProvider';
 import { IndianAPIProvider } from './IndianAPIProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
@@ -57,9 +57,13 @@ export class ProviderCoordinator {
     // ── Tier 1b: Upstox Fundamentals (primary for Indian equity financials) ──
     // Token is resolved lazily at fetch time — reads from localStorage.
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
-      if (typeof window === 'undefined') return null;
-      // Check localStorage for Upstox access token (set by broker auth flow)
-      return window.localStorage.getItem('upstox_access_token') ?? null;
+      if (typeof window !== 'undefined') {
+        return window.localStorage.getItem('upstox_access_token') ?? null;
+      }
+      if (typeof process !== 'undefined') {
+        return process.env.UPSTOX_ACCESS_TOKEN ?? process.env.VITE_UPSTOX_ACCESS_TOKEN ?? null;
+      }
+      return null;
     });
     const upstoxFundamentalsBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
     this.circuitBreakers.set(upstoxFundamentals, upstoxFundamentalsBreaker);

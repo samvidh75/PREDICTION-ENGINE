@@ -1,0 +1,61 @@
+{
+  "symbol": "HDFCBANK",
+  "isin": "INE040A01034",
+  "kind": "balance-sheet",
+  "url": "https://api.upstox.com/v2/fundamentals/INE040A01034/balance-sheet?type=consolidated",
+  "credentialUsed": "UPSTOX_ACCESS_TOKEN",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a07150461f4b5ef9-HYD",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:41:48 GMT",
+    "expires": "0",
+    "pragma": "no-cache",
+    "reqid": "54408ebc-9e89-45c6-acab-667b9d15c0d3",
+    "requestid": "5cc9e67e-7058-460a-9ee5-f0f4a49fead0",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [
+        {
+          "total_asset": 4392417.42,
+          "total_liability": 3854268.99,
+          "period": "Mar 2025"
+        },
+        {
+          "total_asset": 4030194.26,
+          "total_liability": 3560415.61,
+          "period": "Mar 2024"
+        },
+        {
+          "total_asset": 2530432.44,
+          "total_liability": 2240134.68,
+          "period": "Mar 2023"
+        },
+        {
+          "total_asset": 2122934.3,
+          "total_liability": 1874887.72,
+          "period": "Mar 2022"
+        }
+      ],
+      "full_statement": null
+    }
+  }
+}
