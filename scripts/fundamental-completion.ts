@@ -414,7 +414,7 @@ const engKeys: Array<keyof EngScore> = ['growth', 'quality', 'stability', 'valua
 const engLabels = ['Growth', 'Quality', 'Stability', 'Valuation', 'Momentum', 'Risk', 'Health'];
 let totalStdd = 0;
 for (let i = 0; i < engKeys.length; i++) {
-  const s = stats(lvScores.map(x => x[engKeys[i]]));
+  const s = stats(lvScores.map(x => Number(x[engKeys[i]]) || 0));
   const diff = s.std > 2.0 ? '✅ Yes' : '⚠️ Marginal';
   if (s.std > 2.0) totalStdd++;
   dispMd += `| ${engLabels[i]} | ${s.mean.toFixed(1)} | ${s.std.toFixed(1)} | ${s.min} | ${s.max} | ${s.max - s.min} | ${diff} |\n`;

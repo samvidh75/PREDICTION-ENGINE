@@ -4,7 +4,7 @@
  * TRACK-7H: Read-only portfolio ingestion interface.
  * No order placement, no trade execution, no broker actions.
  * 
- * Each broker implementation (Upstox, Zerodha, Angel One, Dhan)
+ * Each broker implementation (Upstox)
  * implements this interface to expose:
  *   - Portfolio holdings
  *   - Current positions (intraday + delivery)
@@ -54,7 +54,6 @@ export interface BrokerPortfolio {
  * 
  * Future implementations:
  *   - ZerodhaProvider (Kite Connect API)
- *   - DhanProvider
  *   - AngelOneProvider
  */
 export interface BrokerProvider {
