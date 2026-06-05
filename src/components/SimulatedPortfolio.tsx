@@ -120,7 +120,7 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
       {/* Holdings List table */}
       <div className="space-y-2">
         <span className="text-[10px] font-mono font-medium text-neutral-400 uppercase tracking-widest block">
-          Position Telemetry List
+          Position List
         </span>
         
         <div className="divide-y divide-[#E5E5E5] border-t border-[#E5E5E5]">

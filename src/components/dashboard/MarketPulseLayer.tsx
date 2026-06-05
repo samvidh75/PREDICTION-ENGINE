@@ -191,7 +191,7 @@ export default function MarketPulseLayer({ marketSnapshot, connectionStatus }: P
 
   const topLabel = useMemo(() => {
     if (connectionStatus === "connecting" || connectionStatus === "reconnecting") return "Reconnecting…";
-    if (connectionStatus === "disconnected") return "Telemetry offline";
+    if (connectionStatus === "disconnected") return "Market data offline";
     return state === "ELEVATED_RISK" ? "Volatility active" : state === "MOMENTUM_WEAKENING" ? "Momentum selective" : "Conditions stable";
   }, [connectionStatus, state]);
 

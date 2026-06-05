@@ -735,21 +735,28 @@ export class MasterCompanyRegistry {
    * Tries: symbol → BSE code → ISIN → null
    */
   lookup(id: string): RegistryEntry | null {
-    const clean = id.toUpperCase().trim();
+    let clean = id.toUpperCase().trim();
+
+    // Strip NSE:/BSE: prefix (e.g., "NSE:RELIANCE" → "RELIANCE")
+    const prefixMatch = clean.match(/^(NSE|BSE):(.+)$/);
+    if (prefixMatch) {
+      clean = prefixMatch[2];
+    }
 
     // Try direct symbol match
     const bySymbol = this.bySymbol.get(clean);
     if (bySymbol) return bySymbol;
 
-    // Try BSE code (5-6 digit numeric)
-    const byBse = this.byBseCode.get(clean);
+    // Try BSE code (5-6 digit numeric) — also check the original if it had a BSE: prefix
+    const bseLookup = prefixMatch?.[1] === 'BSE' ? clean : id;
+    const byBse = this.byBseCode.get(clean) ?? this.byBseCode.get(bseLookup);
     if (byBse) return byBse;
 
     // Try ISIN
     const byIsin = this.byIsin.get(clean);
     if (byIsin) return byIsin;
 
-    // Try without exchange suffix
+    // Try without exchange suffix (.NS, .BO, .NSE, .BSE)
     const stripped = clean.replace(/\.(NS|BO|NSE|BSE)$/i, '');
     if (stripped !== clean) {
       const byStripped = this.bySymbol.get(stripped);

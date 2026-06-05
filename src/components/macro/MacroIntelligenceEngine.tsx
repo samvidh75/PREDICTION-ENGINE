@@ -103,8 +103,8 @@ export default function MacroIntelligenceEngine({
     const worldInterfaceNarrativeBody = synthesis.narrative.cinematicBody.replace(/cinematic/gi, "calm");
     const worldInterfaceBody = `${compactText(worldInterfaceNarrativeBody, 280)} The interface is steady and clear: education-first, probabilistic, and emotionally comfortable.`;
 
-    const planetTelemetryTitle = "Planetary market telemetry system";
-    const planetTelemetryBody =
+    const marketFlowTitle = "Global market flow system";
+    const marketFlowBody =
       "A structured spatial rendering of global flow texture. It communicates pace, breadth, and liquidity conditioning—never news, fear, or outcomes.";
 
     const globalCoreCard: MacroSystemCardDef = {
@@ -115,11 +115,11 @@ export default function MacroIntelligenceEngine({
       glow: glow,
     };
 
-    const telemetryCard: MacroSystemCardDef = {
+    const marketFlowCard: MacroSystemCardDef = {
       key: "planet",
-      systemLabel: "PLANETARY MARKET TELEMETRY SYSTEM",
-      title: planetTelemetryTitle,
-      body: planetTelemetryBody,
+      systemLabel: "GLOBAL MARKET FLOW SYSTEM",
+      title: marketFlowTitle,
+      body: marketFlowBody,
       glow: theme.cyanGlow,
     };
 
@@ -189,7 +189,7 @@ export default function MacroIntelligenceEngine({
 
     const ordered: MacroSystemCardDef[] = [
       globalCoreCard,
-      telemetryCard,
+      marketFlowCard,
       ratesCard,
       inflationCard,
       currencyCard,
@@ -229,11 +229,11 @@ export default function MacroIntelligenceEngine({
           </div>
         </div>
 
-        {/* Planetary telemetry centerpiece */}
+        {/* Global market flow centerpiece */}
         <div className="mb-6">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Planetary Market Telemetry System</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-white/70">Global Market Flow System</div>
               <div className="mt-3 text-[18px] font-medium text-white/92">Spatial macro flow texture (educational)</div>
             </div>
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/45">calm • interconnected • non-alarmist</div>

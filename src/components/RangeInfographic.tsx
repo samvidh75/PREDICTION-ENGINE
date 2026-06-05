@@ -38,7 +38,7 @@ export const RangeInfographic: React.FC<RangeInfographicProps> = ({
       {/* 1. 52-Week Range Slider Bar */}
       <div className="bg-white border border-[#E5E5E5] p-6 rounded-none flex flex-col space-y-4">
         <span className="text-[11px] font-mono font-medium tracking-wider text-[#525252] uppercase block">
-          52-Week Pricing Telemetry Range
+          52-Week Price Range
         </span>
 
         {/* Dynamic Vector Line Slider */}

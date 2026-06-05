@@ -82,7 +82,7 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
         <div className="flex items-center space-x-2">
           <Search className="w-4.5 h-4.5 text-[#06B6D4]" />
           <span className="text-[13px] uppercase tracking-wider font-semibold text-[#0A0A0A]">
-            Watchlist Telemetry Feed
+            Watchlist Market Feed
           </span>
         </div>
         <span className="font-mono text-[9px] text-[#525252] bg-[#FAFAFA] border border-[#E5E5E5] px-2 py-0.5 rounded">

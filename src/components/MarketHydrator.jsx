@@ -8,7 +8,7 @@ interface MarketHydratorProps {
 }
 
 /**
- * MarketHydrator - Wraps dashboard with live telemetry capabilities
+ * MarketHydrator - Wraps dashboard with live market data status
  * Shows pulsing connection indicator that transitions from Slate to Cyan
  */
 const MarketHydrator: React.FC<MarketHydratorProps> = ({
@@ -34,7 +34,7 @@ const MarketHydrator: React.FC<MarketHydratorProps> = ({
 
   return (
     <div className="relative">
-      {/* Live Telemetry Indicator */}
+      {/* Live Data Indicator */}
       {enableLiveIndicator && isInitialized && (
         <div className="fixed top-[88px] right-8 z-40 flex items-center gap-2">
           {/* Pulsing Circle */}
@@ -56,7 +56,7 @@ const MarketHydrator: React.FC<MarketHydratorProps> = ({
 
           {/* Status Label */}
           <span className="font-mono text-[10px] font-medium text-[#525252] uppercase tracking-wider">
-            {isConnected ? 'Live Telemetry' : 'Connecting...'}
+            {isConnected ? 'Live Data' : 'Connecting...'}
           </span>
         </div>
       )}

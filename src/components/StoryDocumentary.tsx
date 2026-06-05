@@ -3,8 +3,8 @@ import { BookOpen, User, Sparkles, TrendingUp, Newspaper } from "lucide-react";
 
 export const StoryDocumentary: React.FC = () => {
   const corporateNews = [
-    { date: "May 2026", type: "PRODUCT", text: "Infosys integrates enterprise-grade secure AI nodes across cloud telemetry modules." },
-    { date: "April 2026", type: "PARTNERSHIP", text: "Global capital alliances expand cloud infrastructure capacities in European nodes." },
+    { date: "May 2026", type: "PRODUCT", text: "Infosys expands enterprise-grade secure cloud systems for global clients." },
+    { date: "April 2026", type: "PARTNERSHIP", text: "Global capital alliances expand cloud infrastructure capacity across Europe." },
     { date: "March 2026", type: "FINANCIAL", text: "Quarterly margin alignments exceed estimates, confirming high business quality." }
   ];
 
@@ -52,7 +52,7 @@ export const StoryDocumentary: React.FC = () => {
           <div>
             <h4 className="text-[14px] font-semibold text-neutral-900 mb-1">22nd-Century Strategic Autonomy // 2026</h4>
             <p>
-              Today, the enterprise commands a dominant market share in global enterprise cloud telemetry, steering automated software optimization loops for Fortune 500 corporations.
+              Today, the enterprise operates at global scale in cloud, consulting, and digital transformation services for large corporate clients.
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export const StoryDocumentary: React.FC = () => {
               Chief Executive Officer // Managing Director
             </span>
             <p className="text-[12px] leading-relaxed text-[#525252] mt-2">
-              Salil Parekh leads the strategic vision, steering cloud optimization telemetry and global software infrastructure alignment with over three decades of international experience.
+              Salil Parekh leads the strategic vision across cloud services, digital transformation, and global software delivery with over three decades of international experience.
             </p>
           </div>
         </div>

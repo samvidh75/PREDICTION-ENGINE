@@ -87,9 +87,9 @@ export const TodayIntelligenceBrief: React.FC = () => {
         </div>
       </div>
 
-      {/* Narrative Summary */}
+      {/* Explanation */}
       <div className="pt-4 border-t border-white/5">
-        <span className="text-[9px] uppercase tracking-widest text-cyan-400 font-bold block font-mono mb-2">Narrative Summary</span>
+        <span className="text-[9px] uppercase tracking-widest text-cyan-400 font-bold block font-mono mb-2">Explanation</span>
         <p className="text-xs leading-relaxed text-gray-300 font-vos-reading">
           {narrative}
         </p>

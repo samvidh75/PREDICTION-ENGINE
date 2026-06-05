@@ -83,7 +83,6 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "HEROMOTOCO", name: "Hero MotoCorp Limited", sector: "Automotive", industry: "Two-Wheelers" },
     { symbol: "HINDALCO", name: "Hindalco Industries Limited", sector: "Materials & Mining", industry: "Aluminum & Copper" },
     { symbol: "HINDCOPPER", name: "Hindustan Copper Limited", sector: "Materials & Mining", industry: "Copper Mining" },
-    { symbol: "HINDPETRO", name: "Hindustan Petroleum Corporation Limited", sector: "Energy & Oil", industry: "Refineries" },
     { symbol: "HINDUNILVR", name: "Hindustan Unilever Limited", sector: "Consumer Goods", industry: "FMCG" },
     { symbol: "HUDCO", name: "Housing & Urban Development Corporation Limited", sector: "Banking & Finance", industry: "Housing Finance" },
     { symbol: "ICICIGI", name: "ICICI Lombard General Insurance Company Limited", sector: "Banking & Finance", industry: "General Insurance" },

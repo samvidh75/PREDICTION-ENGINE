@@ -52,8 +52,8 @@ export class NarrativeEngine {
       `which offset headwinds like ${factors.explanations.topNegativeDrivers[0]?.toLowerCase() ?? "market friction"}. ` +
       `Furthermore, sector checks highlight a Sector Strength Score of ${factors.sectorStrengthFactor}/100, which reflects ` +
       `capital flows into the stock's broader industry group. Risk exposures (scored at ${factors.riskFactor}/100) show moderate characteristics, ` +
-      `suggesting low vulnerability to sudden market-wide corrections. In conclusion, StockStory recommends a balanced holding profile, ` +
-      `aligning with a factor-first asset allocation that prioritizes high quality and stable returns over speculative gains.`;
+      `suggesting low vulnerability to sudden market-wide corrections. StockStory classifies the current company health profile as balanced, ` +
+      `with the assessment focused on quality, stability, and risk context rather than investment advice.`;
 
     return {
       narrative50,
