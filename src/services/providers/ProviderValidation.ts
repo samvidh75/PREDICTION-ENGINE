@@ -1,6 +1,6 @@
 /**
  * ProviderValidation validates and reconciles quote accuracy across active
- * quote providers. AlphaVantage was removed during TRACK-8E.
+ * quote providers. Legacy removed providers are not part of this check.
  */
 
 import { YahooProvider } from './YahooProvider';
@@ -83,7 +83,7 @@ export class ProviderValidation {
     md += `\n## Provider Reliability Rankings\n\n`;
     md += `1. Yahoo Finance: active quote provider.\n`;
     md += `2. IndianMarket: active secondary quote provider where available.\n`;
-    md += `\nAlphaVantage was removed from the production provider set during TRACK-8E.\n`;
+    md += `\nLegacy removed providers are not part of the production provider set.\n`;
 
     return md;
   }

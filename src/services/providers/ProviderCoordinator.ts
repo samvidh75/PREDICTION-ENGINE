@@ -30,12 +30,7 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
  *   News:         Finnhub → Google News RSS
  *   Portfolio:    Upstox (via getHoldings/getPositions/getFunds)
  *
- * REMOVED (dead/verified non-working):
- *   AlphaVantage — empty NSE returns, 0/19 fields (DELETED)
- *   IndianAPI — wrong endpoints, unreachable (REMOVED)
- *   Dhan — broker-only, no fundamentals (never existed in codebase)
- *   TwelveData — never existed in codebase
- *   FMP — never existed in codebase
+ * Removed legacy integrations are not part of the runtime chain.
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];

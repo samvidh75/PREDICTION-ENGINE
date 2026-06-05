@@ -1,7 +1,7 @@
 /**
  * Market configuration.
  *
- * TRACK-8E removed legacy AlphaVantage/RapidAPI configuration. Live market
+ * TRACK-8E removed legacy provider configuration. Live market
  * data is routed through ProviderCoordinator and provider-specific services.
  */
 
