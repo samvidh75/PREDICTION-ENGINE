@@ -280,11 +280,72 @@ body {
 .ss-tv-app {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 8% -6%, rgba(41, 98, 255, 0.18), transparent 34%),
-    radial-gradient(circle at 86% 4%, rgba(143, 92, 255, 0.14), transparent 30%),
-    radial-gradient(circle at 50% 100%, rgba(34, 171, 148, 0.10), transparent 36%),
-    linear-gradient(180deg, #05070d 0%, #0b0e16 44%, #05070d 100%);
+    radial-gradient(circle at 0% 78%, rgba(41, 98, 255, 0.32), transparent 30%),
+    radial-gradient(circle at 100% 78%, rgba(255, 51, 153, 0.30), transparent 30%),
+    radial-gradient(circle at 50% 82%, rgba(143, 92, 255, 0.20), transparent 36%),
+    linear-gradient(180deg, #020204 0%, #050506 38%, #08090d 100%);
   color: var(--ss-text-primary);
+}
+
+.ss-tv-stage {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 0% 76%, rgba(41, 98, 255, 0.38), transparent 30%),
+    radial-gradient(circle at 100% 76%, rgba(255, 51, 153, 0.34), transparent 31%),
+    radial-gradient(circle at 55% 82%, rgba(255, 132, 64, 0.18), transparent 26%),
+    linear-gradient(180deg, #000 0%, #030305 48%, #07080d 100%);
+}
+
+.ss-tv-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 72%, rgba(255, 255, 255, 0.22), transparent 4%),
+    radial-gradient(circle at 20% 82%, rgba(41, 98, 255, 0.22), transparent 24%),
+    radial-gradient(circle at 82% 82%, rgba(255, 51, 153, 0.20), transparent 23%);
+  filter: blur(22px);
+  opacity: 0.78;
+}
+
+.ss-tv-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 1.3px),
+    linear-gradient(to right, rgba(120,123,134,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(120,123,134,0.07) 1px, transparent 1px);
+  background-size: 140px 140px, 78px 78px, 78px 78px;
+  opacity: 0.34;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 24%, black 88%, transparent 100%);
+}
+
+.ss-tv-giant-word {
+  position: absolute;
+  top: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+  color: rgba(255, 255, 255, 0.09);
+  font-size: clamp(80px, 17vw, 300px);
+  font-weight: 900;
+  letter-spacing: -0.085em;
+  line-height: 0.78;
+  white-space: nowrap;
+  pointer-events: none;
+  text-transform: lowercase;
+}
+
+.ss-tv-terminal-glow {
+  box-shadow:
+    -26px 0 70px rgba(41, 98, 255, 0.58),
+    26px 0 70px rgba(255, 51, 153, 0.56),
+    0 28px 95px rgba(143, 92, 255, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .ss-tv-app::selection {
@@ -297,7 +358,7 @@ body {
 .ss-tv-app [class*="bg-[#131722]"],
 .ss-tv-app [class*="bg-[#090b0e]"],
 .ss-tv-app [class*="bg-[#0b0d11]"] {
-  background-color: rgba(8, 10, 15, 0.82) !important;
+  background-color: rgba(14, 14, 18, 0.84) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.055),
     0 0 32px rgba(41, 98, 255, 0.06);
@@ -351,8 +412,9 @@ body {
 .ss-tv-panel {
   border: 1px solid rgba(120, 123, 134, 0.24);
   background:
-    radial-gradient(circle at 0% 0%, rgba(41, 98, 255, 0.10), transparent 34%),
-    rgba(8, 10, 15, 0.86);
+    radial-gradient(circle at 0% 0%, rgba(41, 98, 255, 0.13), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(255, 51, 153, 0.08), transparent 30%),
+    rgba(9, 10, 14, 0.88);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 0 42px rgba(41, 98, 255, 0.08);
@@ -369,11 +431,39 @@ body {
   pointer-events: none;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(41, 98, 255, 0.85), rgba(34, 171, 148, 0.38), rgba(143, 92, 255, 0.65), rgba(242, 54, 69, 0.32));
+  background: linear-gradient(135deg, rgba(41, 98, 255, 0.95), rgba(34, 171, 148, 0.42), rgba(143, 92, 255, 0.82), rgba(255, 51, 153, 0.72));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.55;
+}
+
+.ss-tv-chart-terminal {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: #0b0d10;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.ss-tv-chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #111217;
+  color: #b2b5be;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ss-tv-tool-pill {
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.045);
+  border-radius: 7px;
+  padding: 5px 8px;
 }
 
 .ss-tv-market-grid {
