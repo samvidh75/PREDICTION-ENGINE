@@ -44,7 +44,19 @@ export default function PersonalDashboard({
     // Fetch live db rankings
     fetch("/api/intelligence/discovery/rankings")
       .then(res => res.json())
-      .then(data => setRankings(data))
+      .then(data => {
+        if (data) {
+          const filterFn = (r: DiscoveryRank) => !/^\d{5,6}$/.test(r.symbol);
+          setRankings({
+            highestQuality: (data.highestQuality || []).filter(filterFn),
+            highestMomentum: (data.highestMomentum || []).filter(filterFn),
+            highestGrowth: (data.highestGrowth || []).filter(filterFn),
+            highestRisk: (data.highestRisk || []).filter(filterFn),
+            topImproving: (data.topImproving || []).filter(filterFn),
+            topDeteriorating: (data.topDeteriorating || []).filter(filterFn),
+          });
+        }
+      })
       .catch(() => {});
   }, []);
 

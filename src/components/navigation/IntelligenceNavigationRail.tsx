@@ -85,7 +85,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
       {
         id: "search",
         label: "Search",
-        page: "stock",
+        page: "search",
         description: "Command search",
       },
       {
@@ -223,7 +223,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
   if (isMobile) {
     const mobileNavItems = [
       { id: "dashboard", label: "Dashboard", page: "dashboard" as PageKey, path: "M4 4h6v8H4zm10 0h6v6h-6zm0 10h6v6h-6zm-10-6h6v8H4z" },
-      { id: "search", label: "Search", page: "stock" as PageKey, path: "M19 19l-3.5-3.5M17 10A7 7 0 113 10a7 7 0 0114 0z" },
+      { id: "search", label: "Search", page: "search" as PageKey, path: "M19 19l-3.5-3.5M17 10A7 7 0 113 10a7 7 0 0114 0z" },
       { id: "explore", label: "Markets", page: "explore" as PageKey, path: "M23 6l-9.5 9.5-5-5L1 18" },
       { id: "practice", label: "Watchlist", page: "practice" as PageKey, path: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
       { id: "assistant", label: "Assistant", page: "assistant" as PageKey, path: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" }
@@ -240,7 +240,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
               className="flex flex-col items-center justify-center gap-1 w-[60px] h-full text-white/55 active:scale-95 transition"
               onClick={() => {
                 if (item.id === "search") {
-                  window.dispatchEvent(new CustomEvent("ss:openSearchOverlay", { detail: { q: "" } }));
+                  navigateTo("search");
                   return;
                 }
                 navigateTo(item.page);
@@ -321,10 +321,6 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
                   boxShadow: active ? `0 0 60px ${glow.main}` : emphasize ? `0 0 40px ${glow.dim}` : "none",
                 }}
                 onClick={() => {
-                  if (item.id === "search") {
-                    window.dispatchEvent(new CustomEvent("ss:openSearchOverlay", { detail: { q: "" } }));
-                    return;
-                  }
                   navigateTo(item.page);
                 }}
                 whileHover={

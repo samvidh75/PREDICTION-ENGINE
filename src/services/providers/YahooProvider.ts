@@ -84,17 +84,9 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
         website: profile.website || '',
       };
     } catch {
-      // Fall back to chart meta for minimal metadata
-      const quote = await this.getQuote(symbol);
-      return {
-        symbol: quote.symbol,
-        companyName: quote.symbol,
-        sector: '',
-        industry: '',
-        exchange: quote.exchange,
-        marketCap: undefined,
-        currency: 'INR',
-      };
+      // quoteSummary failed — throw so ProviderCoordinator tries the next provider
+      // The MetadataProviderCoordinator will catch this and fall back to registry
+      throw new Error(`Yahoo: quoteSummary unavailable for ${symbol}`);
     }
   }
 

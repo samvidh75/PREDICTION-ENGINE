@@ -289,7 +289,8 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "ZYDUSLIFE", name: "Zydus Lifesciences Limited", sector: "Pharmaceuticals", industry: "Generics" }
   ];
 
-  // Map the array to ensure we return exactly 505 unique symbols
+  // Keep only real, display-safe symbols. Numeric BSE codes and synthetic fillers
+  // degrade search quality and leak into production UI as broken company records.
   const uniqueTickers = new Map<string, BaseStockCandidate>();
   for (const t of tickers) {
     uniqueTickers.set(t.symbol, {
@@ -300,41 +301,5 @@ export function generate500Stocks(): BaseStockCandidate[] {
       exchange: "NSE"
     });
   }
-
-  // Backfill with real tickers mapped to BSE if needed to hit exactly 505 unique real entities
-  const bseTickers = [
-    { symbol: "500325", name: "Reliance Industries Ltd (BSE)", sector: "Energy & Oil", industry: "Oil & Gas", exchange: "BSE" },
-    { symbol: "532540", name: "Tata Consultancy Services Ltd (BSE)", sector: "Information Technology", industry: "IT Services", exchange: "BSE" },
-    { symbol: "500209", name: "Infosys Ltd (BSE)", sector: "Information Technology", industry: "IT Services", exchange: "BSE" },
-    { symbol: "500180", name: "HDFC Bank Ltd (BSE)", sector: "Banking & Finance", industry: "Banking", exchange: "BSE" },
-    { symbol: "541154", name: "Hindustan Aeronautics Ltd (BSE)", sector: "Defence & Aerospace", industry: "Aerospace & Defence", exchange: "BSE" },
-    { symbol: "500049", name: "Bharat Electronics Ltd (BSE)", sector: "Defence & Aerospace", industry: "Defence Electronics", exchange: "BSE" },
-    { symbol: "543257", name: "Indian Railway Finance Corporation Ltd (BSE)", sector: "Banking & Finance", industry: "Financial Services", exchange: "BSE" },
-    { symbol: "532667", name: "Suzlon Energy Ltd (BSE)", sector: "Energy & Renewables", industry: "Wind Energy", exchange: "BSE" },
-    { symbol: "532482", name: "Granules India Ltd (BSE)", sector: "Pharmaceuticals", industry: "Active Ingredients", exchange: "BSE" },
-    { symbol: "500110", name: "Chennai Petroleum Corporation Ltd (BSE)", sector: "Energy & Oil", industry: "Refineries", exchange: "BSE" }
-  ];
-
-  for (const b of bseTickers) {
-    if (uniqueTickers.size >= 505) break;
-    uniqueTickers.set(b.symbol, b);
-  }
-
-  // If still under 505, add some other major BSE codes
-  let bseIndex = 500001;
-  while (uniqueTickers.size < 505) {
-    const symbolStr = bseIndex.toString();
-    if (!uniqueTickers.has(symbolStr)) {
-      uniqueTickers.set(symbolStr, {
-        symbol: symbolStr,
-        name: `BSE Listed Security Code ${symbolStr} Limited`,
-        sector: "Conglomerate & Diversified",
-        industry: "Diversified Operations",
-        exchange: "BSE"
-      });
-    }
-    bseIndex++;
-  }
-
-  return Array.from(uniqueTickers.values()).slice(0, 505);
+  return Array.from(uniqueTickers.values());
 }

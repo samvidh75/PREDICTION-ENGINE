@@ -158,9 +158,9 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
         {!compact && (
           <div className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-none p-3 mt-2">
             <p className="text-[9px] text-[#525252] leading-relaxed italic">
-              This probabilistic analysis represents a historical analytical trend derived from
+              This StockStory Health analysis represents a historical analytical trend derived from
               market volatility, liquidity, and structural indicators. It does not constitute
-              financial advice, investment recommendations, or predictions of future market
+              financial advice, investment research signals, or health classifications of future market
               movement. Always consult qualified financial advisors before making investment
               decisions.
             </p>

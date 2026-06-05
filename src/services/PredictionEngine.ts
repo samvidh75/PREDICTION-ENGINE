@@ -1,7 +1,7 @@
 /**
- * Prediction Engine Service
- * Bridges ICompanyTelemetry data with predictive analytics
- * Outputs SEBI-safe formatted predictions with confidence scores
+ * StockStory Health Engine Service
+ * Bridges ICompanyTelemetry data with StockStory Health / Research Signals
+ * Outputs SEBI-safe formatted health assessments with confidence scores
  */
 
 import {

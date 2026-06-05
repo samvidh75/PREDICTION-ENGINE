@@ -71,7 +71,7 @@ export default function ScoreExplanations({
         </div>
         <p className="mt-2 text-xs leading-relaxed text-white/65 font-vos-reading">
           {ticker} is scored to explain business quality, financial strength, growth, valuation,
-          and ownership behaviour. The score is a research aid, not a recommendation.
+          and ownership behaviour. The score is a research aid, not a Research Signal.
         </p>
       </div>
 

@@ -19,6 +19,11 @@ export interface CompanyMetadata {
   marketCap?: number;
   currency?: string;
   website?: string;
+  isin?: string | null;
+  bseCode?: string | null;
+  nseSymbol?: string | null;
+  verificationStatus?: 'VERIFIED' | 'PARTIAL' | 'INVALID';
+  verificationReasons?: string[];
   // Backward compat aliases used by some providers
   name?: string;
 }

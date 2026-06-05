@@ -27,10 +27,18 @@ export const DashboardHub: React.FC = () => {
           ...((data?.highestQuality || []).map((item: any) => ({ ...item, category: 'Quality' }))),
           ...((data?.highestMomentum || []).map((item: any) => ({ ...item, category: 'Momentum' }))),
         ].slice(0, 5);
-        setOpportunities(merged.map((item: any) => {
+        const validatedOpportunities = merged.map((item: any) => {
           const stock = StockRegistry.getStock(item.symbol);
           return { ...item, companyName: stock?.companyName || item.symbol, sector: stock?.sector || '—' };
-        }));
+        }).filter((item: any) => {
+          // Exclude raw BSE registry code entries or missing sector/symbol
+          if (/^\d{5,6}$/.test(item.symbol)) return false;
+          if (item.companyName.includes('BSE Listed Security Code')) return false;
+          if (item.companyName.toUpperCase() === item.symbol.toUpperCase()) return false;
+          if (!item.sector || item.sector === '—') return false;
+          return true;
+        });
+        setOpportunities(validatedOpportunities);
       })
       .catch(() => setOpportunities([]));
 
