@@ -1,0 +1,49 @@
+{
+  "source": "Upstox Fundamentals API (v2)",
+  "isin": "INE040A01034",
+  "keyRatios": [
+    {
+      "name": "P/E",
+      "company_value": "14.67",
+      "sector_value": "18.76"
+    },
+    {
+      "name": "P/B",
+      "company_value": "2.0",
+      "sector_value": "1.43"
+    },
+    {
+      "name": "ROA",
+      "company_value": "1.94%",
+      "sector_value": "0.92%"
+    },
+    {
+      "name": "ROE",
+      "company_value": "13.52%",
+      "sector_value": "7.56%"
+    }
+  ],
+  "balanceSheet": {
+    "total_asset": 4392417.42,
+    "total_liability": 3854268.99,
+    "period": "Mar 2025"
+  },
+  "ratioMap": {
+    "P/E": {
+      "company": 14.67,
+      "sector": 18.76
+    },
+    "P/B": {
+      "company": 2,
+      "sector": 1.43
+    },
+    "ROA": {
+      "company": 0.0194,
+      "sector": 0.0092
+    },
+    "ROE": {
+      "company": 0.1352,
+      "sector": 0.0756
+    }
+  }
+}

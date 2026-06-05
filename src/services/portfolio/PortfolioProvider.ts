@@ -1,33 +1,44 @@
 /**
- * PortfolioProvider — Portfolio data ingestion interface.
- * 
- * RC-UPSTOX-001: Abstraction layer for portfolio data import.
- * Converts broker-specific formats into StockStory's normalized types.
+ * PortfolioProvider imports read-only portfolio data from Upstox.
  */
 
 import type { PortfolioHolding, PortfolioPosition, PortfolioSnapshot } from './PortfolioSnapshot';
 import { PortfolioNormalizer } from './PortfolioNormalizer';
-import { upstoxProvider } from '../providers/UpstoxProvider';
-import type { UpstoxHolding, UpstoxPosition, UpstoxFunds } from '../providers/UpstoxProvider';
+import { UpstoxProvider } from '../brokers/UpstoxProvider';
+
+const upstoxProvider = new UpstoxProvider();
+
+function getAccessToken(): string {
+  if (typeof window !== 'undefined') {
+    const token = window.localStorage.getItem('upstox_access_token');
+    if (token) return token;
+  }
+  if (typeof process !== 'undefined' && process.env.UPSTOX_ACCESS_TOKEN) {
+    return process.env.UPSTOX_ACCESS_TOKEN;
+  }
+  throw new Error('Upstox portfolio import requires an active access token');
+}
 
 export class PortfolioProvider {
-  /**
-   * Import complete portfolio from Upstox.
-   * Returns a fully normalized PortfolioSnapshot.
-   */
-  static async importPortfolio(): Promise<PortfolioSnapshot> {
+  static async importPortfolio(accessToken = getAccessToken()): Promise<PortfolioSnapshot> {
     const [rawHoldings, rawPositions, rawFunds] = await Promise.all([
-      upstoxProvider.getHoldings(),
-      upstoxProvider.getPositions(),
-      upstoxProvider.getFunds(),
+      upstoxProvider.getHoldings(accessToken),
+      upstoxProvider.getPositions(accessToken),
+      upstoxProvider.getFunds(accessToken),
     ]);
 
     const holdings = PortfolioNormalizer.normalizeHoldings(rawHoldings);
     const positions = PortfolioNormalizer.normalizePositions(rawPositions);
     const funds = PortfolioNormalizer.normalizeFunds(rawFunds);
 
-    const totalMarketValue = holdings.reduce((s, h) => s + (h.lastPrice ?? h.averagePrice) * h.quantity, 0);
-    const totalCostBasis = holdings.reduce((s, h) => s + h.averagePrice * h.quantity, 0);
+    const totalMarketValue = holdings.reduce(
+      (sum, holding) => sum + (holding.lastPrice ?? holding.averagePrice) * holding.quantity,
+      0,
+    );
+    const totalCostBasis = holdings.reduce(
+      (sum, holding) => sum + holding.averagePrice * holding.quantity,
+      0,
+    );
 
     return {
       holdings,
@@ -35,26 +46,23 @@ export class PortfolioProvider {
       funds,
       totalMarketValue,
       totalCostBasis,
-      totalUnrealizedPnl: holdings.reduce((s, h) => s + (h.pnl ?? 0), 0),
+      totalUnrealizedPnl: holdings.reduce((sum, holding) => sum + (holding.pnl ?? 0), 0),
       timestamp: new Date().toISOString(),
     };
   }
 
-  /** Import holdings only */
-  static async importHoldings(): Promise<PortfolioHolding[]> {
-    const raw = await upstoxProvider.getHoldings();
+  static async importHoldings(accessToken = getAccessToken()): Promise<PortfolioHolding[]> {
+    const raw = await upstoxProvider.getHoldings(accessToken);
     return PortfolioNormalizer.normalizeHoldings(raw);
   }
 
-  /** Import positions only */
-  static async importPositions(): Promise<PortfolioPosition[]> {
-    const raw = await upstoxProvider.getPositions();
+  static async importPositions(accessToken = getAccessToken()): Promise<PortfolioPosition[]> {
+    const raw = await upstoxProvider.getPositions(accessToken);
     return PortfolioNormalizer.normalizePositions(raw);
   }
 
-  /** Import funds only */
-  static async importFunds() {
-    const raw = await upstoxProvider.getFunds();
+  static async importFunds(accessToken = getAccessToken()) {
+    const raw = await upstoxProvider.getFunds(accessToken);
     return PortfolioNormalizer.normalizeFunds(raw);
   }
 }

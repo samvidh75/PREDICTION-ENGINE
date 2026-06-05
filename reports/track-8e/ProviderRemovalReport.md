@@ -1,37 +1,22 @@
-# Provider Removal Report
-## TRACK-8E Phase 1 — Removal of Dead Providers
+# TRACK-8E Provider Removal Report
 
-**Generated**: 2026-06-06
+Generated: 2026-06-05T18:59:07.094Z
 
----
+## Removed from active source
 
-## Removed Files
+- AlphaVantage legacy fetcher deleted: src/core/data/AlphaVantageFetcher.ts
+- AlphaVantage runtime imports removed from DataAcquisitionCoordinator.
+- AlphaVantage reconciliation removed from ProviderValidation.
+- AlphaVantage/RapidAPI fields removed from MarketConfig.
+- ALPHA_VANTAGE_KEY removed from runtime env validation and local .env.
+- provider-live-test no longer requires or calls AlphaVantage.
 
-| File | Reason | Status |
-|------|--------|--------|
-| `src/services/providers/AlphaVantageProvider.ts` | Empty NSE returns, 0/19 fields. Free tier 25 req/day, NSE support limited. | ✅ DELETED |
-| `src/services/providers/IndianAPIProvider.ts` | Wrong base URL + endpoint path since inception. Unreachable in live tests. See TRACK-8D audit. | ✅ DELETED |
-| `src/services/providers/UpstoxProvider.ts` (duplicate) | Duplicate of `src/services/brokers/UpstoxProvider.ts`. Wrong location. | ✅ DELETED |
+## Not present as active providers
 
-## Providers That Never Existed (Confirmed Clean)
+- Dhan fundamentals integration: no active provider file found.
+- TwelveData provider: no active provider file found.
+- FMP provider: no active provider file found.
 
-| Provider | Status |
-|----------|--------|
-| DhanProvider | Never existed — no files found |
-| TwelveDataProvider | Never existed — no files found |
-| FMPProvider | Never existed — no files found |
+## Remaining historical artifacts
 
-## Import/Registration Cleanup
-
-- `ProviderCoordinator.ts`: Removed `IndianAPIProvider` import and instantiation
-- `ProviderCoordinator.ts`: Fixed `UpstoxProvider` import path (`../brokers/UpstoxProvider`)
-- All dead provider imports verified removed
-
-## Env Variable Cleanup
-
-Remaining in `.env` (kept for potential future use):
-- `FINNHUB_KEY` — currently returns 403 but kept for future reactivation
-- `ALPHA_VANTAGE_KEY` — kept for potential future quote usage
-- `INDIANAPI_KEY` — kept for potential future reactivation if API becomes reachable
-
-These env vars are harmless and don't impact the running system since the providers that use them are no longer wired.
+Historical reports under reports/track-8c and reports/track-8d were retained as audit history. They are not runtime code and are not imported by the application.

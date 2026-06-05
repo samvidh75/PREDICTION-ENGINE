@@ -145,9 +145,9 @@ async function main() {
     results: coordResults,
     traceLog: coordinator.getTraceLog(),
     chainOrder: {
-      quotes: 'Upstox -> Yahoo',
+      quotes: 'Yahoo',
       metadata: 'Yahoo -> Finnhub',
-      historical: 'Upstox -> Yahoo',
+      historical: 'Yahoo',
       financials: 'UpstoxFundamentals -> Finnhub -> Yahoo',
       news: 'Finnhub -> GoogleNewsRss',
     },

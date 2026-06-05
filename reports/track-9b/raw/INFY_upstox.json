@@ -1,0 +1,76 @@
+{
+  "source": "Upstox Fundamentals API (v2)",
+  "isin": "INE009A01021",
+  "keyRatios": [
+    {
+      "name": "P/E",
+      "company_value": "17.2",
+      "sector_value": "-47.32"
+    },
+    {
+      "name": "P/B",
+      "company_value": "5.75",
+      "sector_value": "7.56"
+    },
+    {
+      "name": "ROA",
+      "company_value": "28.0%",
+      "sector_value": "-41.2%"
+    },
+    {
+      "name": "ROE",
+      "company_value": "33.58%",
+      "sector_value": "9.04%"
+    },
+    {
+      "name": "ROCE",
+      "company_value": "40.83%",
+      "sector_value": "73.72%"
+    },
+    {
+      "name": "Quick Ratio",
+      "company_value": "1.98",
+      "sector_value": "5.42"
+    },
+    {
+      "name": "EV/EBITDA",
+      "company_value": "10.89",
+      "sector_value": "-236.93"
+    }
+  ],
+  "balanceSheet": {
+    "total_asset": 155967,
+    "total_liability": 62670,
+    "period": "Mar 2026"
+  },
+  "ratioMap": {
+    "P/E": {
+      "company": 17.2,
+      "sector": -47.32
+    },
+    "P/B": {
+      "company": 5.75,
+      "sector": 7.56
+    },
+    "ROA": {
+      "company": 0.28,
+      "sector": -0.41200000000000003
+    },
+    "ROE": {
+      "company": 0.3358,
+      "sector": 0.0904
+    },
+    "ROCE": {
+      "company": 0.4083,
+      "sector": 0.7372
+    },
+    "Quick Ratio": {
+      "company": 1.98,
+      "sector": 5.42
+    },
+    "EV/EBITDA": {
+      "company": 10.89,
+      "sector": -236.93
+    }
+  }
+}

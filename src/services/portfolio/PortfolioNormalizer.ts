@@ -1,79 +1,80 @@
 /**
- * PortfolioNormalizer — Converts broker data → StockStory canonical types.
- * RC-UPSTOX-001: NSE/BSE symbol cleanup, ISIN resolution, exchange normalization.
+ * PortfolioNormalizer converts broker data to StockStory canonical types.
  */
 
 import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
 import type { PortfolioHolding, PortfolioPosition, PortfolioFunds } from './PortfolioSnapshot';
-import type { UpstoxHolding, UpstoxPosition, UpstoxFunds } from '../providers/UpstoxProvider';
+import type {
+  PortfolioHolding as BrokerHolding,
+  PortfolioPosition as BrokerPosition,
+} from '../brokers/PortfolioTypes';
+import type { BrokerFundSummary } from '../brokers/BrokerProvider';
 
 export class PortfolioNormalizer {
   private static registry = MasterCompanyRegistry.getInstance();
 
-  /** Normalize Upstox holdings → PortfolioHolding[] */
-  static normalizeHoldings(raw: UpstoxHolding[]): PortfolioHolding[] {
-    return raw.map(h => {
-      const symbol = this.cleanSymbol(h.tradingSymbol);
-      const entry = this.registry.lookup(symbol);
+  static normalizeHoldings(raw: BrokerHolding[]): PortfolioHolding[] {
+    return raw
+      .map((holding) => {
+        const symbol = this.cleanSymbol(holding.symbol);
+        const entry = this.registry.lookup(symbol);
 
-      return {
-        symbol: entry?.nseSymbol ?? symbol,
-        isin: h.isin ?? entry?.isin ?? undefined,
-        exchange: this.normalizeExchange(h.exchange),
-        quantity: h.quantity,
-        averagePrice: h.averagePrice,
-        lastPrice: h.lastPrice,
-        pnl: h.pnl,
-        sector: entry?.sector ?? 'General',
-        marketCap: entry?.marketCap,
-      };
-    }).filter(h => h.quantity > 0);
+        return {
+          symbol: entry?.nseSymbol ?? symbol,
+          isin: holding.isin ?? entry?.isin ?? undefined,
+          exchange: this.normalizeExchange(holding.exchange),
+          quantity: holding.quantity,
+          averagePrice: holding.averagePrice,
+          lastPrice: holding.lastPrice,
+          pnl: holding.pnl,
+          pnlPercent: holding.pnlPercent,
+          sector: entry?.sector ?? holding.sector,
+          marketCap: entry?.marketCap ?? holding.marketCap,
+        };
+      })
+      .filter((holding) => holding.quantity > 0);
   }
 
-  /** Normalize Upstox positions → PortfolioPosition[] */
-  static normalizePositions(raw: UpstoxPosition[]): PortfolioPosition[] {
+  static normalizePositions(raw: BrokerPosition[]): PortfolioPosition[] {
     return raw
-      .filter(p => p.quantity !== 0)
-      .map(p => ({
-        symbol: this.cleanSymbol(p.tradingSymbol),
-        exchange: this.normalizeExchange(p.exchange),
-        quantity: p.quantity,
-        averagePrice: p.averagePrice,
-        lastPrice: p.lastPrice,
-        pnl: p.pnl,
-        product: p.product || 'DELIVERY',
+      .filter((position) => position.quantity !== 0)
+      .map((position) => ({
+        symbol: this.cleanSymbol(position.symbol),
+        exchange: this.normalizeExchange(position.exchange),
+        quantity: position.quantity,
+        averagePrice: position.averagePrice,
+        lastPrice: position.lastPrice,
+        pnl: position.pnl,
+        product: position.product || 'DELIVERY',
       }));
   }
 
-  /** Normalize Upstox funds → PortfolioFunds */
-  static normalizeFunds(raw: UpstoxFunds): PortfolioFunds {
+  static normalizeFunds(raw: BrokerFundSummary): PortfolioFunds {
     return {
-      availableCash: raw.availableMargin,
+      availableCash: raw.availableCash,
       usedMargin: raw.usedMargin,
-      totalMargin: raw.totalMargin,
+      totalMargin: raw.totalValue,
     };
   }
 
-  /** Clean broker symbols to StockStory format */
   static cleanSymbol(raw: string): string {
     return raw
       .replace(/-EQ$/i, '')
       .replace(/-BE$/i, '')
-      .replace(/\\.NS$/i, '')
-      .replace(/\\.BO$/i, '')
+      .replace(/\.NS$/i, '')
+      .replace(/\.BO$/i, '')
       .replace(/^NSE:/i, '')
       .replace(/^BSE:/i, '')
       .trim()
       .toUpperCase();
   }
 
-  /** Normalize exchange codes */
   static normalizeExchange(raw: string): string {
     const upper = raw.toUpperCase();
     if (upper.includes('BSE') || upper === 'BSE_EQ' || upper === 'BSE_BSE') return 'BSE';
     if (upper.includes('NSE') || upper === 'NSE_EQ' || upper === 'NSE_BSE') return 'NSE';
     if (upper.includes('NFO') || upper.includes('BFO')) return 'FNO';
     if (upper.includes('MCX')) return 'MCX';
-    return 'NSE'; // Default
+    return 'NSE';
   }
 }

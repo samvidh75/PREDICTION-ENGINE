@@ -12,9 +12,9 @@
 │ StockStory India — Provider Chain                            │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Quotes:       Upstox → Yahoo → Registry fallback           │
+│  Quotes:       Yahoo                                        │
 │  Metadata:     Registry → Finnhub → Yahoo                    │
-│  Historical:   Upstox → Yahoo                                │
+│  Historical:   Yahoo                                         │
 │  Financials:   UpstoxFundamentals → Finnhub → Yahoo          │
 │  News:         Finnhub → Google News RSS                     │
 │  Portfolio:    Upstox (getHoldings/getPositions/getFunds)    │

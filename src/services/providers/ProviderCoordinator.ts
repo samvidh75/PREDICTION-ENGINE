@@ -1,8 +1,5 @@
 // src/services/providers/ProviderCoordinator.ts
-// Orchestrates provider chain with failover, circuit breakers, and health monitoring.
-// 
-// RC-UPSTOX-001: Upstox is now Tier 1 for quotes, historical, portfolio, and fundamentals.
-// Yahoo remains fallback. Finnhub is Tier 2 for financials.
+// Orchestrates provider chains with failover, circuit breakers, and health monitoring.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -15,22 +12,25 @@ import { UpstoxProvider } from '../brokers/UpstoxProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
+import { ScreenerProvider } from './ScreenerProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 
 /**
- * ProviderCoordinator — the single entry point for all market data.
+ * ProviderCoordinator is the single entry point for market data.
  *
- * FINAL ARCHITECTURE (TRACK-8E):
- *   Quotes:       Upstox → Yahoo → Registry fallback
- *   Metadata:     Registry → Finnhub → Yahoo
- *   Historical:   Upstox → Yahoo
- *   Financials:   UpstoxFundamentals → Finnhub → Yahoo (fallback)
- *   News:         Finnhub → Google News RSS
- *   Portfolio:    Upstox (via getHoldings/getPositions/getFunds)
+ * TRACK-9B financial architecture:
+ *   Tier 1: UpstoxFundamentalsProvider
+ *   Tier 2: ScreenerProvider
+ *   Tier 3: FinnhubProvider
+ *   Tier 4: YahooProvider
  *
- * Removed legacy integrations are not part of the runtime chain.
+ * Financial providers are merged, not first-success returned:
+ *   - Upstox is primary for verified live ratios and balance-sheet fields.
+ *   - Screener can only enrich missing growth/liquidity/margin fields.
+ *   - Finnhub/Yahoo can only fill still-missing low-priority fields.
+ *   - No provider can overwrite a populated value from an earlier tier.
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -48,15 +48,9 @@ export class ProviderCoordinator {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
 
-    // ── Tier 1: Upstox (primary for quotes, historical, portfolio) ──
     this.upstox = new UpstoxProvider();
-    const upstoxBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-    this.circuitBreakers.set(this.upstox, upstoxBreaker);
-    this.priceProviders.push(this.upstox);
-    this.historicalProviders.push(this.upstox);
+    this.circuitBreakers.set(this.upstox, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
 
-    // ── Tier 1b: Upstox Fundamentals (primary for Indian equity financials) ──
-    // Token is resolved lazily at fetch time — reads from localStorage.
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
       if (typeof window !== 'undefined') {
         return window.localStorage.getItem('upstox_access_token') ?? null;
@@ -66,42 +60,36 @@ export class ProviderCoordinator {
       }
       return null;
     });
-    const upstoxFundamentalsBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-    this.circuitBreakers.set(upstoxFundamentals, upstoxFundamentalsBreaker);
-    // Prepend — Upstox Fundamentals is Tier 1, Finnhub/IndianAPI/Yahoo are fallbacks
-    this.financialProviders.unshift(upstoxFundamentals);
+    this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.financialProviders.push(upstoxFundamentals);
 
-    // ── Tier 2: Yahoo (fallback for quotes, historical) ─────
+    const screener = new ScreenerProvider();
+    this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.financialProviders.push(screener);
+
     const yahoo = new YahooProvider();
-    const yahooBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-    this.circuitBreakers.set(yahoo, yahooBreaker);
+    this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
 
-    // ── Tier 3: Finnhub (Tier 2 for financials, Tier 1 for news) ──────
     try {
       const finnhub = new FinnhubProvider();
-      const finnhubBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-      this.circuitBreakers.set(finnhub, finnhubBreaker);
+      this.circuitBreakers.set(finnhub, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
       this.metadataProviders.push(finnhub);
       this.financialProviders.push(finnhub);
       this.newsProviders.push(finnhub);
     } catch {
-      // API key missing – skip
+      // Finnhub is optional when no API key is configured.
     }
 
-    // ── Tier 3: Yahoo as FinancialProvider (fallback) ────
     this.financialProviders.push(yahoo);
 
-    // ── Tier 5: Google News RSS fallback for news ──────────
     const googleNews = new GoogleNewsRssProvider();
-    const googleNewsBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-    this.circuitBreakers.set(googleNews, googleNewsBreaker);
+    this.circuitBreakers.set(googleNews, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.newsProviders.push(googleNews);
   }
 
-  // ── Public façade ───────────────────────────────────────────
   async getQuote(symbol: string): Promise<StockQuote> {
     return this.invokeChain<StockQuote>(this.priceProviders, (p) => p.getQuote(symbol), 'price', symbol);
   }
@@ -119,15 +107,13 @@ export class ProviderCoordinator {
   }
 
   async getFinancials(symbol: string): Promise<FinancialSnapshot> {
-    return this.invokeChain<FinancialSnapshot>(this.financialProviders, (p) => p.getFinancials(symbol), 'financials', symbol);
+    return this.invokeFinancialsMerge(symbol);
   }
 
-  /** Expose trace log for reporting */
   getTraceLog() {
     return this.tracer.getLog();
   }
 
-  // ── Chain execution with circuit breaker + health monitor ──
   private async invokeChain<T>(
     providers: any[],
     fn: (provider: any) => Promise<T>,
@@ -137,6 +123,7 @@ export class ProviderCoordinator {
     if (providers.length === 0) {
       throw new Error(`No providers configured for ${category}`);
     }
+
     const errors: string[] = [];
     for (const provider of providers) {
       const status = this.healthMonitor.getStatus(provider);
@@ -144,21 +131,113 @@ export class ProviderCoordinator {
         errors.push(`${provider.constructor.name}: skipped (${status})`);
         continue;
       }
+
       const breaker = this.circuitBreakers.get(provider);
       try {
-        const result = breaker
-          ? await breaker.execute(() => fn(provider))
-          : await fn(provider);
+        const result = breaker ? await breaker.execute(() => fn(provider)) : await fn(provider);
         this.healthMonitor.recordSuccess(provider);
-        this.tracer?.recordUsage(symbol, category, provider.constructor.name, false);
+        this.tracer.recordUsage(symbol, category, provider.constructor.name, false);
         return result;
       } catch (err: any) {
-        const msg = err?.message || String(err);
-        errors.push(`${provider.constructor.name}: ${msg}`);
+        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
         this.healthMonitor.recordFailure(provider);
         this.tracer.recordUsage(symbol, category, provider.constructor.name, true);
       }
     }
+
     throw new Error(`All providers failed for ${category}(${symbol}): ${errors.join(' | ')}`);
+  }
+
+  private async invokeFinancialsMerge(symbol: string): Promise<FinancialSnapshot> {
+    const merged: Record<string, any> = {};
+    const sourceMap: Record<string, string> = {};
+    const errors: string[] = [];
+
+    for (const provider of this.financialProviders) {
+      const status = this.healthMonitor.getStatus(provider);
+      if (status === 'Unavailable' || status === 'RateLimited') {
+        errors.push(`${provider.constructor.name}: skipped (${status})`);
+        continue;
+      }
+
+      const breaker = this.circuitBreakers.get(provider);
+      try {
+        const result = breaker
+          ? await breaker.execute(() => provider.getFinancials(symbol))
+          : await provider.getFinancials(symbol);
+        this.healthMonitor.recordSuccess(provider);
+        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, false);
+        this.mergeFinancialFields(merged, result as Record<string, any>, provider.constructor.name, sourceMap);
+      } catch (err: any) {
+        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
+        this.healthMonitor.recordFailure(provider);
+        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, true);
+      }
+    }
+
+    if (Object.keys(merged).length === 0) {
+      throw new Error(`All providers failed for financials(${symbol}): ${errors.join(' | ')}`);
+    }
+
+    return {
+      symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+      periodEnd: merged.periodEnd ?? new Date().toISOString().split('T')[0],
+      ...merged,
+      _sources: sourceMap,
+      _providerErrors: errors,
+    } as FinancialSnapshot;
+  }
+
+  private mergeFinancialFields(
+    target: Record<string, any>,
+    source: Record<string, any>,
+    providerName: string,
+    sourceMap: Record<string, string>,
+  ): void {
+    const upstoxFields = new Set([
+      'symbol',
+      'periodEnd',
+      'peRatio',
+      'pbRatio',
+      'roe',
+      'roa',
+      'roic',
+      'evEbitda',
+      'debtToEquity',
+      'totalAssets',
+      'totalLiabilities',
+      'totalEquity',
+    ]);
+    const screenerEnrichmentFields = new Set([
+      'revenueGrowth',
+      'profitGrowth',
+      'epsGrowth',
+      'fcfGrowth',
+      'operatingMargin',
+      'currentRatio',
+      'dividendYield',
+      'bookValue',
+      'marketCap',
+    ]);
+    const fallbackFields = new Set([
+      'eps',
+      'beta',
+      'fcfYield',
+      'grossMargin',
+    ]);
+
+    const allowed = providerName === 'UpstoxFundamentalsProvider'
+      ? upstoxFields
+      : providerName === 'ScreenerProvider'
+        ? screenerEnrichmentFields
+        : fallbackFields;
+
+    for (const [field, value] of Object.entries(source)) {
+      if (field.startsWith('_') || !allowed.has(field)) continue;
+      if (value === undefined || value === null) continue;
+      if (target[field] !== undefined && target[field] !== null) continue;
+      target[field] = value;
+      sourceMap[field] = providerName;
+    }
   }
 }
