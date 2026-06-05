@@ -1,8 +1,8 @@
 // src/services/providers/ProviderCoordinator.ts
 // Orchestrates provider chain with failover, circuit breakers, and health monitoring.
 // 
-// RC-UPSTOX-001: Upstox is now Tier 1 for quotes, historical, and portfolio.
-// Yahoo remains fallback. Finnhub is primary for fundamentals.
+// RC-UPSTOX-001: Upstox is now Tier 1 for quotes, historical, portfolio, and fundamentals.
+// Yahoo remains fallback. Finnhub is Tier 2 for financials.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -11,10 +11,11 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { UpstoxProvider } from './UpstoxProvider';
+import { UpstoxProvider } from '../brokers/UpstoxProvider';
 import { IndianAPIProvider } from './IndianAPIProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
+import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
@@ -23,12 +24,12 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
  * ProviderCoordinator — the single entry point for all market data.
  *
  * RC-UPSTOX-001 Chain order:
- *   Quotes:      Upstox → Yahoo → Registry fallback
- *   Metadata:    Registry → Provider fallback
- *   Historical:  Upstox → Yahoo
- *   Financials:  Finnhub → IndianAPI → Yahoo (fallback)
- *   News:        Finnhub → Google News RSS
- *   Portfolio:   Upstox (via getHoldings/getPositions/getFunds)
+ *   Quotes:       Upstox → Yahoo → Registry fallback
+ *   Metadata:     Registry → Provider fallback
+ *   Historical:   Upstox → Yahoo
+ *   Financials:   Upstox (fundamentals) → Finnhub → IndianAPI → Yahoo (fallback)
+ *   News:         Finnhub → Google News RSS
+ *   Portfolio:    Upstox (via getHoldings/getPositions/getFunds)
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -53,6 +54,18 @@ export class ProviderCoordinator {
     this.priceProviders.push(this.upstox);
     this.historicalProviders.push(this.upstox);
 
+    // ── Tier 1b: Upstox Fundamentals (primary for Indian equity financials) ──
+    // Token is resolved lazily at fetch time — reads from localStorage.
+    const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
+      if (typeof window === 'undefined') return null;
+      // Check localStorage for Upstox access token (set by broker auth flow)
+      return window.localStorage.getItem('upstox_access_token') ?? null;
+    });
+    const upstoxFundamentalsBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
+    this.circuitBreakers.set(upstoxFundamentals, upstoxFundamentalsBreaker);
+    // Prepend — Upstox Fundamentals is Tier 1, Finnhub/IndianAPI/Yahoo are fallbacks
+    this.financialProviders.unshift(upstoxFundamentals);
+
     // ── Tier 2: Yahoo (fallback for quotes, historical) ─────
     const yahoo = new YahooProvider();
     const yahooBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
@@ -61,7 +74,7 @@ export class ProviderCoordinator {
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
 
-    // ── Tier 3: Finnhub (primary for financials, news) ──────
+    // ── Tier 3: Finnhub (Tier 2 for financials, Tier 1 for news) ──────
     try {
       const finnhub = new FinnhubProvider();
       const finnhubBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });

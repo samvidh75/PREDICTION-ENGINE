@@ -56,6 +56,11 @@ export class UpstoxProvider implements BrokerProvider {
     
     const result = await UpstoxOAuth.exchangeCode({ code, redirectUri, codeVerifier: verifier, uid });
     
+    // Persist access token for fundamentals API
+    if (typeof window !== 'undefined' && result.accessToken) {
+      window.localStorage.setItem('upstox_access_token', result.accessToken);
+    }
+    
     // Clean up session storage
     if (typeof window !== 'undefined') {
       window.sessionStorage.removeItem('upstox_code_verifier');
@@ -179,6 +184,10 @@ export class UpstoxProvider implements BrokerProvider {
     const uid = typeof window !== 'undefined'
       ? window.localStorage.getItem('ss_uid') || 'anonymous'
       : 'anonymous';
+    // Clean up persisted token (used by UpstoxFundamentalsProvider)
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('upstox_access_token');
+    }
     await UpstoxOAuth.revoke(accessToken, uid);
   }
 
