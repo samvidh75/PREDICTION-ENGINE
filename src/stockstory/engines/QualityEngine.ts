@@ -29,7 +29,23 @@ export class QualityEngine {
       }
     }
 
-    // ── Sub-score 2: ROIC ───────────────────────────────────────────
+    // ── Sub-score 2: ROA ────────────────────────────────────────────
+    let roaNormalized = 50;
+    if (financials.roa !== null) {
+      if (usePercentile) {
+        roaNormalized = SectorPercentileEngine.score(financials.roa, sectorName, 'roa');
+      } else {
+        const roa = financials.roa;
+        if (roa >= 0.15) roaNormalized = 95;
+        else if (roa >= 0.10) roaNormalized = 80;
+        else if (roa >= 0.07) roaNormalized = 65;
+        else if (roa >= 0.04) roaNormalized = 45;
+        else if (roa >= 0) roaNormalized = 30;
+        else roaNormalized = 10;
+      }
+    }
+
+    // ── Sub-score 3: ROIC ───────────────────────────────────────────
     let roicNormalized = 50;
     if (financials.roic !== null) {
       if (usePercentile) {
@@ -88,8 +104,9 @@ export class QualityEngine {
     const gmWeight = profile.useGrossMargin ? 2 : 0;
 
     const rawComposite = weightedAverage([
-      { score: roeNormalized, weight: 2.5 },
-      { score: roicNormalized, weight: 2.5 },
+      { score: roeNormalized, weight: 2.0 },
+      { score: roaNormalized, weight: 2.0 },
+      { score: roicNormalized, weight: 2.0 },
       { score: grossMarginScore, weight: gmWeight },
       { score: operatingMarginScore, weight: 2 },
       { score: efficiencyScore, weight: 1 },
@@ -102,6 +119,7 @@ export class QualityEngine {
 
     return {
       score: compositeScore,
+      roa: financials.roa ?? 0,
       roe: financials.roe ?? 0,
       roic: financials.roic ?? 0,
       grossMargin: financials.grossMargin ?? 0,

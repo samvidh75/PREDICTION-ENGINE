@@ -77,6 +77,7 @@ function buildInputs(entry: RegistryEntry): EngineInputs {
       freeFloat: bounded(seed + 109, 0.2, 0.85),
       fcfYield: bounded(seed + 113, -0.02, 0.09),
       evEbitda: bounded(seed + 127, 6, 30),
+      roa: bounded(seed + 128, 0.02, 0.22) * (0.7 + scale * 0.5),
       roe: bounded(seed + 131, 0.05, 0.35) * (0.7 + scale * 0.5),
       roic: bounded(seed + 137, 0.05, 0.28) * (0.7 + scale * 0.5),
       debtToEquity: bounded(seed + 139, 0.05, sector === 'Banking' ? 10 : 2.5),

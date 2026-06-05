@@ -842,6 +842,7 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
           freeFloat: fin?.free_float != null ? Number(fin.free_float) : null,
           fcfYield: fin?.fcf_yield != null ? Number(fin.fcf_yield) : null,
           evEbitda: fin?.ev_ebitda != null ? Number(fin.ev_ebitda) : null,
+          roa: fin?.roa != null ? Number(fin.roa) : null,
           roe: fin?.roe != null ? Number(fin.roe) : null,
           roic: fin?.roic != null ? Number(fin.roic) : null,
           debtToEquity: fin?.debt_to_equity != null ? Number(fin.debt_to_equity) : null,

@@ -31,6 +31,7 @@ type SectorDistributions = Record<PercentileMetric, MetricDistribution>;
  */
 const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
   BANKING: {
+    roa:              { p10: 0.002, p25: 0.004, p50: 0.008, p75: 0.011, p90: 0.014 },
     roe:              { p10: 0.02, p25: 0.06, p50: 0.11, p75: 0.15, p90: 0.18 },
     roic:             { p10: 0.01, p25: 0.04, p50: 0.08, p75: 0.12, p90: 0.15 },
     revenueGrowth:    { p10: -0.02, p25: 0.05, p50: 0.10, p75: 0.16, p90: 0.22 },
@@ -45,6 +46,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.12, p25: 0.18, p50: 0.25, p75: 0.35, p90: 0.45 },
   },
   IT: {
+    roa:              { p10: 0.04, p25: 0.08, p50: 0.14, p75: 0.18, p90: 0.24 },
     roe:              { p10: 0.08, p25: 0.15, p50: 0.22, p75: 0.28, p90: 0.35 },
     roic:             { p10: 0.08, p25: 0.14, p50: 0.20, p75: 0.26, p90: 0.32 },
     revenueGrowth:    { p10: 0.02, p25: 0.08, p50: 0.14, p75: 0.20, p90: 0.28 },
@@ -59,6 +61,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.15, p25: 0.20, p50: 0.28, p75: 0.38, p90: 0.50 },
   },
   FMCG: {
+    roa:              { p10: 0.06, p25: 0.10, p50: 0.15, p75: 0.20, p90: 0.26 },
     roe:              { p10: 0.12, p25: 0.20, p50: 0.28, p75: 0.35, p90: 0.45 },
     roic:             { p10: 0.12, p25: 0.18, p50: 0.25, p75: 0.32, p90: 0.40 },
     revenueGrowth:    { p10: 0.02, p25: 0.06, p50: 0.10, p75: 0.14, p90: 0.18 },
@@ -73,6 +76,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.12, p25: 0.16, p50: 0.20, p75: 0.28, p90: 0.35 },
   },
   PHARMA: {
+    roa:              { p10: 0.02, p25: 0.05, p50: 0.09, p75: 0.13, p90: 0.18 },
     roe:              { p10: 0.04, p25: 0.10, p50: 0.16, p75: 0.22, p90: 0.30 },
     roic:             { p10: 0.05, p25: 0.10, p50: 0.15, p75: 0.20, p90: 0.28 },
     revenueGrowth:    { p10: 0.00, p25: 0.06, p50: 0.12, p75: 0.18, p90: 0.25 },
@@ -87,6 +91,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.15, p25: 0.22, p50: 0.30, p75: 0.40, p90: 0.50 },
   },
   AUTO: {
+    roa:              { p10: 0.02, p25: 0.04, p50: 0.08, p75: 0.12, p90: 0.16 },
     roe:              { p10: 0.02, p25: 0.08, p50: 0.14, p75: 0.20, p90: 0.28 },
     roic:             { p10: 0.03, p25: 0.08, p50: 0.13, p75: 0.18, p90: 0.25 },
     revenueGrowth:    { p10: -0.05, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.25 },
@@ -101,6 +106,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.18, p25: 0.25, p50: 0.32, p75: 0.42, p90: 0.52 },
   },
   ENERGY: {
+    roa:              { p10: 0.01, p25: 0.03, p50: 0.07, p75: 0.11, p90: 0.15 },
     roe:              { p10: 0.02, p25: 0.06, p50: 0.12, p75: 0.18, p90: 0.24 },
     roic:             { p10: 0.02, p25: 0.06, p50: 0.10, p75: 0.15, p90: 0.20 },
     revenueGrowth:    { p10: -0.05, p25: 0.00, p50: 0.06, p75: 0.14, p90: 0.22 },
@@ -115,6 +121,7 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     volatility:       { p10: 0.15, p25: 0.20, p50: 0.28, p75: 0.38, p90: 0.50 },
   },
   GENERAL: {
+    roa:              { p10: 0.02, p25: 0.05, p50: 0.10, p75: 0.15, p90: 0.20 },
     roe:              { p10: 0.03, p25: 0.08, p50: 0.14, p75: 0.20, p90: 0.28 },
     roic:             { p10: 0.03, p25: 0.08, p50: 0.13, p75: 0.18, p90: 0.25 },
     revenueGrowth:    { p10: -0.03, p25: 0.03, p50: 0.10, p75: 0.16, p90: 0.24 },

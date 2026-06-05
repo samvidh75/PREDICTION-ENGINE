@@ -36,7 +36,7 @@ function makeInputs(overrides: Partial<EngineInputs> = {}): EngineInputs {
     financials: {
       peRatio: 18, pbRatio: 3.2, eps: 120, dividendYield: 1.8,
       beta: 1.1, marketCap: 500000, freeFloat: 45,
-      fcfYield: 0.04, evEbitda: 12, roe: 0.18, roic: 0.14,
+      fcfYield: 0.04, evEbitda: 12, roa: 0.12, roe: 0.18, roic: 0.14,
       debtToEquity: 0.5, currentRatio: 2.0,
       revenueGrowth: 0.12, profitGrowth: 0.15, epsGrowth: 0.14,
       fcfGrowth: 0.08, grossMargin: 0.45, operatingMargin: 0.22,
@@ -420,7 +420,7 @@ describe('StockStoryEngine (orchestrator)', () => {
       symbol: 'MINIMAL', tradeDate: '2026-06-05',
       features: { rsi: null, macd: null, macdSignal: null, macdHistogram: null, adx: null, atr: null, bollingerWidth: null, momentum: null, volatility: null, relativeStrength: null, movingAverageDistance: null, trendStrength: null },
       factors: { qualityFactor: 50, valueFactor: 50, growthFactor: 50, momentumFactor: 50, riskFactor: 50, sectorStrengthFactor: 50, factorScore: 50 },
-      financials: { peRatio: null, pbRatio: null, eps: null, dividendYield: null, beta: null, marketCap: null, freeFloat: null, fcfYield: null, evEbitda: null, roe: null, roic: null, debtToEquity: null, currentRatio: null, revenueGrowth: null, profitGrowth: null, epsGrowth: null, fcfGrowth: null, grossMargin: null, operatingMargin: null },
+      financials: { peRatio: null, pbRatio: null, eps: null, dividendYield: null, beta: null, marketCap: null, freeFloat: null, fcfYield: null, evEbitda: null, roa: null, roe: null, roic: null, debtToEquity: null, currentRatio: null, revenueGrowth: null, profitGrowth: null, epsGrowth: null, fcfGrowth: null, grossMargin: null, operatingMargin: null },
     };
     const result = engine.evaluate(inputs);
     expect(result.healthScore).toBeGreaterThanOrEqual(0);

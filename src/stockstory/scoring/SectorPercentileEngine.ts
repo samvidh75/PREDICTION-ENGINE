@@ -10,6 +10,7 @@ import type { SectorType } from '../sectors/SectorWeightEngine';
 
 /** Metric keys that have sector distributions */
 export type PercentileMetric =
+  | 'roa'
   | 'roe'
   | 'roic'
   | 'revenueGrowth'

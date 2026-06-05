@@ -58,6 +58,7 @@ export interface EngineInputs {
     freeFloat: number | null;
     fcfYield: number | null;
     evEbitda: number | null;
+    roa: number | null;
     roe: number | null;
     roic: number | null;
     debtToEquity: number | null;
@@ -98,6 +99,7 @@ export interface GrowthEngineOutput {
 
 export interface QualityEngineOutput {
   score: number;        // 0-100
+  roa: number;
   roe: number;
   roic: number;
   grossMargin: number;
