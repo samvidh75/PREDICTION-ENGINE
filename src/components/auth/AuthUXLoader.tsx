@@ -26,6 +26,8 @@ export interface AuthUXLoaderProps {
   isRedirecting?: boolean;
   /** Retry handler */
   onRetry?: () => void;
+  /** True when auth loading is artificially delayed for testing */
+  isSimulatingTimeout?: boolean;
 }
 
 type LoaderPhase = 'connecting' | 'loading' | 'slow' | 'timeout' | 'redirecting' | 'error';

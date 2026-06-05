@@ -1,7 +1,13 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut, type User } from "firebase/auth";
 import { firebaseAuth, firebasePersistenceReady } from "../config/firebase";
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "../services/auth/sessionStore";
+import {
+  logAuthState,
+  getSessionAgeMs,
+  recordSessionStart,
+  clearSessionStart,
+} from "../services/auth/AuthStateLogger";
 
 export interface AuthContextType {
   user: Pick<User, "uid" | "email" | "displayName"> | null;
@@ -15,6 +21,10 @@ export interface AuthContextType {
   encryptionToken: string;
   encryptionChannelToken: string;
   simulateTimeout: () => void;
+  isSessionExpired: boolean;
+  sessionAgeMs: number | null;
+  /** True when auth loading is artificially delayed for testing */
+  isSimulatingTimeout: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -29,6 +39,9 @@ const AuthContext = createContext<AuthContextType>({
   initializeSession: async () => {},
   logout: async () => {},
   simulateTimeout: () => {},
+  isSessionExpired: false,
+  sessionAgeMs: null,
+  isSimulatingTimeout: false,
 });
 
 function providerForUser(user: Pick<User, "providerData">): "google" | "email" {
@@ -51,6 +64,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isSimulatingTimeout, setIsSimulatingTimeout] = useState(false);
+  const [sessionAge, setSessionAge] = useState<number | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSessionAge(getSessionAgeMs());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const simulateTimeout = useCallback(() => {
+    setIsSimulatingTimeout(true);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -195,9 +221,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       encryptionChannelToken: "256-BIT",
       initializeSession,
       logout,
-      simulateTimeout: () => {},
+      simulateTimeout,
+      isSessionExpired: sessionAge !== null && sessionAge > 3600000,
+      sessionAgeMs: sessionAge,
+      isSimulatingTimeout,
     }),
-    [authError, initializeSession, isConnecting, loading, logout, user],
+    [authError, initializeSession, isConnecting, loading, logout, user, sessionAge, isSimulatingTimeout, simulateTimeout],
   );
 
   // Show children only when auth state has been resolved.

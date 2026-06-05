@@ -157,6 +157,11 @@ function AppContent(): JSX.Element {
     user,
     loading,
     isAuthenticated,
+    authError,
+    isSessionExpired,
+    sessionAgeMs,
+    isSimulatingTimeout,
+    simulateTimeout,
   } = useAuth();
   const { currentView } = useNavigation();
 
@@ -320,13 +325,39 @@ function AppContent(): JSX.Element {
 
   // ── Auth loading: context-aware loader with skeleton UI & timeout diagnostics ──
   if (isAuthLoading && !isPublicPage) {
-    return <AuthUXLoader targetPage={pageKey} isLoading={true} />;
+    return (
+      <AuthUXLoader
+        targetPage={pageKey}
+        isLoading={true}
+        authError={authError}
+        isSimulatingTimeout={isSimulatingTimeout}
+      />
+    );
+  }
+
+  // ── Session expired but we detected it before redirect: show expiry notice ──
+  if (!isAuthLoading && !isAuthed && protectedPages.includes(pageKey) && isSessionExpired) {
+    return (
+      <AuthUXLoader
+        targetPage={pageKey}
+        isLoading={false}
+        isRedirecting={true}
+        authError="Your session has expired. Please sign in again."
+      />
+    );
   }
 
   // ── Auth redirect: show redirecting state instead of blank screen ──
   const isRedirectingFromProtected = !isAuthLoading && !isAuthed && protectedPages.includes(pageKey);
   if (isRedirectingFromProtected) {
-    return <AuthUXLoader targetPage={pageKey} isLoading={false} isRedirecting={true} />;
+    return (
+      <AuthUXLoader
+        targetPage={pageKey}
+        isLoading={false}
+        isRedirecting={true}
+        authError={authError}
+      />
+    );
   }
 
   return (

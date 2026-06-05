@@ -18,7 +18,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     },
     {
       title: "Healthometer",
-      subtitle: "Simple company health and stability overview.",
+      subtitle: "Company health and stability overview from available data.",
     },
     {
       title: "Market Movers",
@@ -31,10 +31,10 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-transparent text-white">
       <div className="mx-auto max-w-[1600px] px-6 py-10 sm:px-10 lg:px-16">
         <div className="mb-10 flex flex-col gap-5">
-          <div className="inline-flex w-fit items-center rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-1 text-xs uppercase tracking-[0.28em] text-cyan-200">
+          <div className="inline-flex w-fit items-center rounded-full border border-[#2962ff]/25 bg-[#2962ff]/10 px-4 py-1 text-xs uppercase tracking-[0.28em] text-[#9bb5ff]">
             StockStory India
           </div>
 
@@ -45,13 +45,12 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
               </h1>
 
               <p className="mt-4 text-base leading-7 text-white/60 sm:text-lg">
-                Cleaner market intelligence with beginner-friendly stock analysis,
-                realtime dashboards, simplified health signals, and immersive stock tracking.
+                Real company search, market data, watchlists, alerts, and health signals in one trading-desk workspace.
               </p>
             </div>
 
-            <div className="w-full max-w-[480px] rounded-3xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur-xl">
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3">
+            <div className="ss-tv-chart-terminal w-full max-w-[480px] rounded-lg p-3">
+              <div className="flex items-center gap-3 rounded-full border border-white/10 bg-[#1e222d] px-4 py-3">
                 <div className="text-white/40">⌕</div>
 
                 <input
@@ -64,7 +63,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
                 {quickSearches.map((stock) => (
                   <button
                     key={stock}
-                    className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/70 transition hover:border-cyan-500/30 hover:text-cyan-200"
+                    className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/70 transition hover:border-[#2962ff]/40 hover:text-white"
                   >
                     {stock}
                   </button>
@@ -78,9 +77,9 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
           {sections.map((section) => (
             <div
               key={section.title}
-              className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl"
+              className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6"
             >
-              <div className="mb-3 text-sm uppercase tracking-[0.18em] text-cyan-200/80">
+              <div className="mb-3 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 {section.title}
               </div>
 
@@ -92,86 +91,86 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
+          <div className="ss-tv-chart-terminal rounded-lg p-6">
             <div className="mb-8 flex items-center justify-between gap-4">
               <div>
-                <div className="text-xs uppercase tracking-[0.2em] text-cyan-200/70">
-                  Reliance Industries · NSE
+                <div className="text-xs uppercase tracking-[0.2em] text-[#9bb5ff]">
+                  Open a company page for verified live quote data
                 </div>
 
                 <div className="mt-3 flex items-end gap-3">
                   <div className="text-3xl font-semibold text-white sm:text-4xl">
-                    ₹2,984.25
+                    Live market data
                   </div>
 
-                  <div className="pb-1 text-sm text-emerald-300">
-                    +1.84%
+                  <div className="pb-1 text-sm text-[#787b86]">
+                    No synthetic price shown
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-                Very Healthy
+              <div className="rounded-full border border-[#2962ff]/30 bg-[#2962ff]/10 px-4 py-2 text-sm text-[#9bb5ff]">
+                Data-backed
               </div>
             </div>
 
-            <div className="h-[320px] rounded-2xl border border-white/5 bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent" />
+            <div className="h-[320px] rounded-lg border border-white/5 bg-[linear-gradient(180deg,rgba(41,98,255,0.16),rgba(34,171,148,0.08),transparent)]" />
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-              <div className="mb-5 text-sm uppercase tracking-[0.18em] text-cyan-200/80">
+            <div className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6">
+              <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 Healthometer
               </div>
 
-              <div className="flex items-center justify-between gap-6 rounded-2xl border border-white/5 bg-black/20 px-5 py-4">
+              <div className="flex items-center justify-between gap-6 rounded-lg border border-white/5 bg-black/20 px-5 py-4">
                 <div>
-                  <div className="text-2xl font-semibold text-white">78%</div>
+                  <div className="text-2xl font-semibold text-white">Health Score</div>
 
                   <div className="mt-2 text-sm leading-6 text-white/55">
-                    Strong long-term market behaviour
+                    Uses company health only when market data is available.
                   </div>
                 </div>
 
-                <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
-                  Very Healthy
+                <div className="rounded-full border border-[#2962ff]/30 bg-[#2962ff]/10 px-4 py-2 text-sm text-[#9bb5ff]">
+                  Research Signal
                 </div>
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-              <div className="mb-5 text-sm uppercase tracking-[0.18em] text-cyan-200/80">
+            <div className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6">
+              <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 Quick Stats
               </div>
 
               <div className="space-y-5">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/55">Market Cap</span>
-                  <span className="text-white">₹20.1T</span>
+                  <span className="text-[#787b86]">Open company page</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/55">52W High</span>
-                  <span className="text-white">₹3,024.90</span>
+                  <span className="text-[#787b86]">Open company page</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/55">52W Low</span>
-                  <span className="text-white">₹2,220.30</span>
+                  <span className="text-[#787b86]">Open company page</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/55">Trend</span>
-                  <span className="text-emerald-300">Positive</span>
+                  <span className="text-[#787b86]">Live source required</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-xl">
-          <div className="mb-5 text-sm uppercase tracking-[0.18em] text-cyan-200/80">
-            Predictive Intelligence
+        <div className="ss-tv-panel ss-tv-neon-edge mt-10 rounded-lg p-6">
+          <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
+            Company Health
           </div>
           <PredictivePanel symbol="RELIANCE" />
         </div>
