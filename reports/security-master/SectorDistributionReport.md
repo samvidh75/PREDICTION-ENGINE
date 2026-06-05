@@ -1,8 +1,8 @@
 # Sector Distribution Report — Security Master
 
-**Generated:** 2026-06-05T09:04:18.167Z
-**Total companies:** 277
-**Companies with sector assignment:** 277
+**Generated:** 2026-06-05T09:40:07.481Z
+**Total companies:** 276
+**Companies with sector assignment:** 276
 **Unique sectors:** 21
 
 ---
@@ -18,8 +18,8 @@
 | Information Technology | 19 | No data | — |
 | Pharmaceuticals | 18 | No data | — |
 | Materials & Mining | 17 | No data | — |
-| Energy & Oil | 14 | ₹582300 Cr | — |
 | Chemicals | 14 | No data | — |
+| Energy & Oil | 13 | ₹582300 Cr | — |
 | Energy & Renewables | 12 | No data | — |
 | Financials | 7 | ₹550000 Cr | — |
 | Technology | 5 | ₹529360 Cr | — |

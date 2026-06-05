@@ -1,6 +1,6 @@
 # Duplicate Detection Audit — Security Master
 
-**Generated:** 2026-06-05T09:04:18.164Z
+**Generated:** 2026-06-05T09:40:07.479Z
 
 ---
 
@@ -9,8 +9,8 @@
 | Check | Total Unique | Duplicates Found | Status |
 |:------|:-------------|:-----------------|:-------|
 | ISIN | 48 | 0 | ✅ Clean |
-| Symbol | 281 | 0 | ✅ Clean |
-| Company Name | 280 | 1 | ❌ Issues |
+| Symbol | 280 | 0 | ✅ Clean |
+| Company Name | 280 | 0 | ✅ Clean |
 
 ---
 
@@ -22,19 +22,17 @@
 
 ✅ No duplicate symbols detected.
 
-## Duplicate Company Names
+## Company Name Check
 
-### hindustan petroleum corporation limited
-- HPCL (Energy & Oil)
-- HINDPETRO (Energy & Oil)
+✅ No duplicate company names detected.
 
 ---
 
 ## Observations
 
-- Registry size: **281** entries
-- Unique symbols: **281**
+- Registry size: **280** entries
+- Unique symbols: **280**
 - Unique ISINs: **48**
 - Unique company names: **280**
 - Entries with ISIN: **48**
-- Entries without ISIN: **233** (generated fallback)
+- Entries without ISIN: **232** (generated fallback)

@@ -1,8 +1,8 @@
 # Market Cap Validation — Security Master
 
-**Generated:** 2026-06-05T09:04:18.172Z
+**Generated:** 2026-06-05T09:40:07.483Z
 **Entries with market cap:** 48
-**Entries without market cap:** 233
+**Entries without market cap:** 232
 
 ---
 

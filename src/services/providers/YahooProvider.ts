@@ -19,7 +19,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   /** Map user-facing range strings to Yahoo chart API range params */
   private static RANGE_MAP: Record<string, string> = {
     '1D': '1d', '5D': '5d', '1M': '1mo', '3M': '3mo', '6M': '6mo',
-    '1Y': '1y', '3Y': '3y', '5Y': '5y', '10Y': '10y', 'MAX': 'max',
+    '1Y': '1y', '2Y': '2y', '3Y': '3y', '5Y': '5y', '10Y': '10y', 'MAX': 'max',
   };
 
   private normalizeSymbol(symbol: string): string {
