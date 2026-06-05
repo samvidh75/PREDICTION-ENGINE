@@ -30,7 +30,7 @@ const getHealthGradient = (status: HealthStatus): string => {
 };
 
 /**
- * HealthometerWidget - Holographic telemetry display
+ * HealthometerWidget - company health display
  * Animates company health status with spring transitions
  */
 const HealthometerWidget: React.FC<HealthometerWidgetProps> = ({
@@ -50,7 +50,7 @@ const HealthometerWidget: React.FC<HealthometerWidgetProps> = ({
     return (
       <div className={compact ? 'flex items-center gap-2' : 'flex flex-col gap-4'}>
         <div className="font-mono text-[11px] font-medium text-[#525252] uppercase">
-          Telemetry Loading...
+          Market Data Loading...
         </div>
         <div className="w-full h-2 bg-[#F5F5F5] rounded-none overflow-hidden">
           <motion.div

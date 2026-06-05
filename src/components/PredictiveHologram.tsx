@@ -102,10 +102,10 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
 
   return (
     <div className={`flex flex-col gap-4 ${compact ? '' : 'bg-white border border-[#E5E5E5] rounded-none p-4'}`}>
-      {/* Probability Distribution Chart */}
+      {/* Health classification range chart */}
       <div className="flex flex-col gap-2">
         <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase tracking-wider">
-          Probability Distribution
+          Health Classification Range
         </span>
 
         <svg
@@ -271,11 +271,11 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
         </div>
       </div>
 
-      {/* Trend Vector */}
+      {/* Market trend context */}
       <div className="flex items-center justify-between pt-3 border-t border-[#E5E5E5]">
         <div className="flex flex-col gap-1">
           <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase">
-            Trend Direction
+            Market Trend
           </span>
           <span
             className="font-mono text-sm font-bold uppercase"

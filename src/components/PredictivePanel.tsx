@@ -58,7 +58,7 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
           <div className="flex items-center gap-2">
             <Brain className="w-4 h-4 text-[#0A0A0A]" strokeWidth={2} />
             <span className="font-mono text-[11px] font-medium tracking-wider text-[#525252] uppercase">
-              Probabilistic Analysis Engine
+              Company Health Analysis
             </span>
           </div>
 
@@ -134,20 +134,20 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
 
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase">
-                Confidence Interval
+                Confidence
               </span>
               <p className="text-[11px] text-[#525252] leading-relaxed">
                 Engine indicates{' '}
                 <span style={{ color: confidenceColor }} className="font-semibold">
                   {Math.round(predictiveResult.confidenceScore * 100)}% confidence
                 </span>{' '}
-                in structural assessment. Historical analytical trend.
+                in this company health assessment.
               </p>
             </div>
           </div>
         )}
 
-        {/* Holographic Visualization */}
+        {/* Analysis visualization */}
         <PredictiveHologram
           result={predictiveResult}
           isLoading={isLoading}
@@ -158,11 +158,8 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
         {!compact && (
           <div className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-none p-3 mt-2">
             <p className="text-[9px] text-[#525252] leading-relaxed italic">
-              This StockStory Health analysis represents a historical analytical trend derived from
-              market volatility, liquidity, and structural indicators. It does not constitute
-              financial advice, investment research signals, or health classifications of future market
-              movement. Always consult qualified financial advisors before making investment
-              decisions.
+              StockStory provides research intelligence and health assessments.
+              It does not provide personalised investment advice.
             </p>
           </div>
         )}

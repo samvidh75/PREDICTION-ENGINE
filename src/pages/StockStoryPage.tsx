@@ -272,7 +272,7 @@ export const StockStoryPage: React.FC = () => {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent shadow-lg shadow-cyan-500/20"></div>
-            <span className="text-sm font-semibold tracking-wider text-cyan-400 uppercase animate-pulse">Orchestrating Analytical Engines...</span>
+            <span className="text-sm font-semibold tracking-wider text-cyan-400 uppercase animate-pulse">Loading company health analysis...</span>
           </div>
         </div>
       </div>
@@ -420,10 +420,14 @@ export const StockStoryPage: React.FC = () => {
 
         <div className="mt-5 border-t border-white/5 pt-4">
           <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400 mb-1 flex items-center gap-1.5">
-            <Activity className="h-3 w-3" /> Narrative Summary
+            <Activity className="h-3 w-3" /> Explanation
           </div>
           <p className="text-xs text-white/80 leading-relaxed max-w-5xl">
             {storyData.narrative}
+          </p>
+          <p className="mt-3 max-w-5xl rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-white/55">
+            StockStory provides research intelligence and health assessments.
+            It does not provide personalised investment advice.
           </p>
         </div>
       </section>
@@ -477,7 +481,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2 space-y-5 bg-white/[0.01] border border-white/5 rounded-xl p-5">
               <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-2 flex items-center gap-1.5">
-                <Trophy className="h-3.5 w-3.5" /> Factor Engine Scores
+                <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 {renderProgressBar("Growth Outlook", storyData.growth, "text-fuchsia-400")}
