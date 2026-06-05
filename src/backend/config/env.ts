@@ -24,7 +24,6 @@ export interface AppEnv {
     connectionString: string;
   };
   finnhubKey?: string;
-  alphaVantageKey?: string;
   indianApiKey?: string;
 }
 
@@ -53,7 +52,6 @@ console.log("COOKIE_SECRET present:", !!process.env.COOKIE_SECRET);
       ? { connectionString: process.env.DATABASE_URL }
       : undefined,
     finnhubKey: process.env.FINNHUB_KEY,
-    alphaVantageKey: process.env.ALPHA_VANTAGE_KEY,
     indianApiKey: process.env.INDIANAPI_KEY,
   };
 }

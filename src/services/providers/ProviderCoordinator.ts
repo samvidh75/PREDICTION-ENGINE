@@ -11,8 +11,7 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { UpstoxProvider } from './UpstoxProvider';
-import { IndianAPIProvider } from './IndianAPIProvider';
+import { UpstoxProvider } from '../brokers/UpstoxProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
@@ -23,13 +22,20 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 /**
  * ProviderCoordinator — the single entry point for all market data.
  *
- * RC-UPSTOX-001 Chain order:
+ * FINAL ARCHITECTURE (TRACK-8E):
  *   Quotes:       Upstox → Yahoo → Registry fallback
- *   Metadata:     Registry → Provider fallback
+ *   Metadata:     Registry → Finnhub → Yahoo
  *   Historical:   Upstox → Yahoo
- *   Financials:   Upstox (fundamentals) → Finnhub → IndianAPI → Yahoo (fallback)
+ *   Financials:   UpstoxFundamentals → Finnhub → Yahoo (fallback)
  *   News:         Finnhub → Google News RSS
  *   Portfolio:    Upstox (via getHoldings/getPositions/getFunds)
+ *
+ * REMOVED (dead/verified non-working):
+ *   AlphaVantage — empty NSE returns, 0/19 fields (DELETED)
+ *   IndianAPI — wrong endpoints, unreachable (REMOVED)
+ *   Dhan — broker-only, no fundamentals (never existed in codebase)
+ *   TwelveData — never existed in codebase
+ *   FMP — never existed in codebase
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -90,17 +96,7 @@ export class ProviderCoordinator {
       // API key missing – skip
     }
 
-        // ── Tier 3b: IndianAPI (Tier 2 financials — Indian equity fundamentals) ──
-    try {
-      const indianApi = new IndianAPIProvider();
-      const indianBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-      this.circuitBreakers.set(indianApi, indianBreaker);
-      this.financialProviders.push(indianApi);
-    } catch {
-      // API key missing – skip
-    }
-
-    // ── Tier 4: Yahoo as FinancialProvider (v8 fallback) ────
+    // ── Tier 3: Yahoo as FinancialProvider (fallback) ────
     this.financialProviders.push(yahoo);
 
     // ── Tier 5: Google News RSS fallback for news ──────────

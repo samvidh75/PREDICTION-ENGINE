@@ -23,6 +23,7 @@ import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
 
 const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
 const API_BASE = 'https://api.upstox.com/v2/fundamentals';
+const REQUEST_TIMEOUT_MS = 10_000;
 
 /** Access token provider — injected at construction so it's call-site agnostic */
 export type UpstoxTokenProvider = () => string | null;
@@ -60,6 +61,14 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
       this.fetchKeyRatios(isin, token),
       this.fetchBalanceSheet(isin, token),
     ]);
+
+    if (ratios.status === 'rejected' && balanceSheet.status === 'rejected') {
+      throw new Error(
+        `UpstoxFundamentals: all endpoints failed for ${clean}: ` +
+          `${ratios.reason?.message || ratios.reason}; ` +
+          `${balanceSheet.reason?.message || balanceSheet.reason}`,
+      );
+    }
 
     const ratioData = ratios.status === 'fulfilled' ? ratios.value : null;
     const bsData = balanceSheet.status === 'fulfilled' ? balanceSheet.value : null;
@@ -157,13 +166,8 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
   private async fetchKeyRatios(isin: string, token: string): Promise<any> {
     return RetryPolicy.execute(async () => {
       const url = `${API_BASE}/${isin}/key-ratios`;
-      const resp = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (resp.status === 401) throw new Error('UpstoxFundamentals: token expired (401)');
+      const resp = await this.fetchWithTimeout(url, token);
+      if (resp.status === 401 || resp.status === 403) throw new Error(`UpstoxFundamentals: token expired or unauthorized (${resp.status})`);
       if (resp.status === 404) throw new Error(`UpstoxFundamentals: no data for ISIN ${isin} (404)`);
       if (resp.status === 429) throw new Error('UpstoxFundamentals: rate limited (429)');
       if (!resp.ok) throw new Error(`UpstoxFundamentals HTTP ${resp.status}: ${resp.statusText}`);
@@ -174,18 +178,34 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
   private async fetchBalanceSheet(isin: string, token: string): Promise<any> {
     return RetryPolicy.execute(async () => {
       const url = `${API_BASE}/${isin}/balance-sheet?type=consolidated`;
-      const resp = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (resp.status === 401) throw new Error('UpstoxFundamentals: token expired (401)');
+      const resp = await this.fetchWithTimeout(url, token);
+      if (resp.status === 401 || resp.status === 403) throw new Error(`UpstoxFundamentals: token expired or unauthorized (${resp.status})`);
       if (resp.status === 404) throw new Error(`UpstoxFundamentals: no balance sheet for ISIN ${isin} (404)`);
       if (resp.status === 429) throw new Error('UpstoxFundamentals: rate limited (429)');
       if (!resp.ok) throw new Error(`UpstoxFundamentals HTTP ${resp.status}: ${resp.statusText}`);
       return resp.json();
     }, RETRY_OPTS);
+  }
+
+  private async fetchWithTimeout(url: string, token: string): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      return await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+    } catch (error: any) {
+      if (error?.name === 'AbortError') {
+        throw new Error(`UpstoxFundamentals: request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   /** Convert "Mar 2025" → "2025-03-31" (approximate period end) */

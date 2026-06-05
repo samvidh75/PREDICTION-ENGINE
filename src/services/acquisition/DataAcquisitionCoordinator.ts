@@ -1,6 +1,5 @@
 import { YahooProvider } from "../providers/YahooProvider";
 import { IndianMarketProvider } from "../providers/IndianMarketProvider";
-import { AlphaVantageProvider } from "../providers/AlphaVantageProvider";
 import { FinnhubProvider } from "../providers/FinnhubProvider";
 import { GoogleNewsRssProvider } from "../providers/GoogleNewsRssProvider";
 import type {
@@ -13,15 +12,14 @@ import type {
 // Simple singleton providers – in a real system these would be instantiated with API keys.
 const yahoo = new YahooProvider();
 const indian = new IndianMarketProvider();
-const alpha = new AlphaVantageProvider();
 const finnhub = new FinnhubProvider();
 const gnews = new GoogleNewsRssProvider();
 
 
 export class DataAcquisitionCoordinator {
-  /** Fetch quote using provider priority: Yahoo → Indian → AlphaVantage */
+  /** Fetch quote using provider priority: Yahoo then IndianMarket */
   static async fetchQuote(symbol: string): Promise<Quote> {
-    const providers = [yahoo, indian, alpha];
+    const providers = [yahoo, indian];
     for (const p of providers) {
       try {
         // each provider implements getQuote

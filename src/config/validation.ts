@@ -5,7 +5,6 @@ import { exit } from "process";
 dotenv.config();
 
 const required = [
-  "ALPHA_VANTAGE_KEY",
   "FINNHUB_KEY",
   "RAPIDAPI_NSE_KEY",
   "RAPIDAPI_NSE_HOST",
@@ -19,7 +18,6 @@ if (missing.length) {
 }
 
 export const config = {
-  alphaVantageKey: process.env.ALPHA_VANTAGE_KEY as string,
   finnhubKey: process.env.FINNHUB_KEY as string,
   rapidApiNseKey: process.env.RAPIDAPI_NSE_KEY as string,
   rapidApiNseHost: process.env.RAPIDAPI_NSE_HOST as string,
