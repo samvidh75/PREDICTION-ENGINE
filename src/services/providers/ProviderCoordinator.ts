@@ -12,6 +12,7 @@ import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
 import { UpstoxProvider } from './UpstoxProvider';
+import { IndianAPIProvider } from './IndianAPIProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
@@ -25,7 +26,7 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
  *   Quotes:      Upstox → Yahoo → Registry fallback
  *   Metadata:    Registry → Provider fallback
  *   Historical:  Upstox → Yahoo
- *   Financials:  Finnhub (primary)
+ *   Financials:  Finnhub → IndianAPI → Yahoo (fallback)
  *   News:        Finnhub → Google News RSS
  *   Portfolio:   Upstox (via getHoldings/getPositions/getFunds)
  */
@@ -68,6 +69,16 @@ export class ProviderCoordinator {
       this.metadataProviders.push(finnhub);
       this.financialProviders.push(finnhub);
       this.newsProviders.push(finnhub);
+    } catch {
+      // API key missing – skip
+    }
+
+        // ── Tier 3b: IndianAPI (Tier 2 financials — Indian equity fundamentals) ──
+    try {
+      const indianApi = new IndianAPIProvider();
+      const indianBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
+      this.circuitBreakers.set(indianApi, indianBreaker);
+      this.financialProviders.push(indianApi);
     } catch {
       // API key missing – skip
     }
