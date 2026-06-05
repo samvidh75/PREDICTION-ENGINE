@@ -8,8 +8,8 @@ type SettingsTab = "profile" | "notifications" | "appearance" | "security";
 export const SettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
-  const [name, setName] = useState(user?.displayName || "Samvidh");
-  const [email, setEmail] = useState(user?.email || "samvidh@stockstory.in");
+  const [name, setName] = useState(user?.displayName || "");
+  const [email] = useState(user?.email || "");
 
   const [alertCategories, setAlertCategories] = useState<Record<AlertCategory, boolean>>(() => ({
     Factor: AlertEngine.isCategoryEnabled("Factor"),

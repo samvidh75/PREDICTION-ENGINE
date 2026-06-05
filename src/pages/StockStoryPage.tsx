@@ -130,13 +130,13 @@ export const StockStoryPage: React.FC = () => {
     })
       .then(async (response) => {
         const body = await response.json().catch(() => null);
-        if (!response.ok) throw new Error(body?.error || `Metadata request failed with HTTP ${response.status}`);
+        if (!response.ok) throw new Error(body?.code || "METADATA_UNAVAILABLE");
         return body as CompanyMetadata;
       })
       .then((data) => setMetadata({ data, loading: false, error: null }))
       .catch((error: Error) => {
         if (controller.signal.aborted) return;
-        setMetadata({ data: null, loading: false, error: error.message });
+        setMetadata({ data: null, loading: false, error: "Company metadata is temporarily unavailable." });
       });
 
     return () => controller.abort();
@@ -153,7 +153,7 @@ export const StockStoryPage: React.FC = () => {
     })
       .then(async (response) => {
         const body = await response.json().catch(() => null);
-        if (!response.ok) throw new Error(body?.error || `StockStory request failed with HTTP ${response.status}`);
+        if (!response.ok) throw new Error(body?.code || "STOCKSTORY_UNAVAILABLE");
         return body;
       })
       .then((data) => {
@@ -162,7 +162,7 @@ export const StockStoryPage: React.FC = () => {
       })
       .catch((error: Error) => {
         if (controller.signal.aborted) return;
-        setStoryError(error.message);
+        setStoryError("Company health analysis is temporarily unavailable.");
         setStoryLoading(false);
       });
 
@@ -192,7 +192,7 @@ export const StockStoryPage: React.FC = () => {
   const currency = metadata.data?.currency || "INR";
   const quote = liveQuote.quote;
   const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
-  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : liveQuote.error || "Data unavailable";
+  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Data unavailable";
 
   const isInWatchlist = useMemo(() => {
     return watchlists.some((w) => w.tickers.includes(ticker));

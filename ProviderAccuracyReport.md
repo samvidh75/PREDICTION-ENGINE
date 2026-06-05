@@ -1,18 +1,37 @@
 # Provider Accuracy Report
 
-**Timestamp:** `2026-06-05T07:59:42.337Z`  
-**Target symbols:** RELIANCE, TCS, HDFCBANK, INFY, SBIN
+## Summary
 
-| Symbol | Yahoo Price (A) | IndianMarket Price (B) | AlphaVantage Price (C) | Variance (%) | Status |
-| --- | --- | --- | --- | --- | --- |
-| **RELIANCE** | ₹1290.40 | N/A | N/A | — | INCOMPLETE |
-| **TCS** | ₹2199.50 | N/A | N/A | — | INCOMPLETE |
-| **HDFCBANK** | ₹748.05 | N/A | N/A | — | INCOMPLETE |
-| **INFY** | ₹1200.30 | N/A | N/A | — | INCOMPLETE |
-| **SBIN** | ₹974.00 | N/A | N/A | — | INCOMPLETE |
+- Registry entries audited: 281
+- Verified: 48
+- Partial: 233
+- Invalid: 0
+- Search registry entries exposed in app: 277
+- Raw numeric BSE symbols in active stock registry: 0
 
-## Provider Reliability Rankings
+## Coverage
 
-1. **Provider A (Yahoo Finance)**: Primary tier. Extremely reliable for NIFTY-50 quotes with low latency and 100% uptime.
-2. **Provider B (Indian Market API)**: Secondary tier. Good direct NSE integration, reliable but slightly higher latency.
-3. **Provider C (AlphaVantage)**: Tertiary tier. Key rate-limits apply; useful for secondary verification.
+| Metric | Status |
+| --- | --- |
+| Company name | PASS |
+| Sector | PASS |
+| Industry | PASS |
+| Market cap | GAPS FOUND |
+| Raw BSE code leakage | PASS |
+
+## Common Issues
+
+- missing_market_cap: 233
+
+## Sample Verified Entries
+
+- RELIANCE: VERIFIED (Reliance Industries Ltd)
+- TCS: VERIFIED (Tata Consultancy Services Ltd)
+- INFY: VERIFIED (Infosys Ltd)
+- HDFCBANK: VERIFIED (HDFC Bank Ltd)
+- HAL: VERIFIED (Hindustan Aeronautics Ltd)
+- BEL: VERIFIED (Bharat Electronics Ltd)
+- IRFC: VERIFIED (Indian Railway Finance Corporation Ltd)
+- SUZLON: VERIFIED (Suzlon Energy Ltd)
+- GRANULES: VERIFIED (Granules India Ltd)
+- CHENNPETRO: VERIFIED (Chennai Petroleum Corporation Ltd)

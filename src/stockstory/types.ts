@@ -174,6 +174,15 @@ export interface StockStoryOutput {
     risk: RiskEngineOutput;
     confidence: ConfidenceEngineOutput;
   };
+  penaltyDetails: {
+    totalPenalty: number;
+    penalties: Array<{
+      id: string;
+      description: string;
+      points: number;
+      category: 'accounting' | 'debt' | 'volatility' | 'governance' | 'data';
+    }>;
+  };
   generatedAt: string;
   dataFreshness: 'Live' | 'Recent' | 'Stale' | 'Unavailable';
 }

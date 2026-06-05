@@ -263,7 +263,7 @@ const AcademyHub = () => {
         </svg>
         <p className="text-[11px] text-[#737373] leading-relaxed">
           <span className="font-semibold text-[#525252]">Educational content only.</span>{' '}
-          StockStory India does not provide investment advice, recommendations, or
+          StockStory India does not provide investment advice, research calls, or
           portfolio management services. All information is for learning purposes and
           should not be construed as financial guidance. Consult a SEBI-registered
           investment advisor before making any investment decisions.

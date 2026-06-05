@@ -253,7 +253,7 @@ const MarketStories = () => {
         <p className="text-[11px] text-[#737373] leading-relaxed">
           <span className="font-semibold text-[#525252]">Narrative research content only.</span>{' '}
           Stories presented here are historical case studies for educational analysis. They
-          do not constitute buy, sell, or hold recommendations. Past corporate performance
+          do not constitute buy, sell, or hold calls. Past corporate performance
           does not indicate future results. Always consult a SEBI-registered advisor.
         </p>
       </div>

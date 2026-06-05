@@ -222,7 +222,7 @@ const AnalysisHub = () => {
         <p className="text-[11px] text-[#737373] leading-relaxed">
           <span className="font-semibold text-[#525252]">Educational indicators only.</span>{' '}
           Healthometer scores are calculated status indicators derived from publicly available
-          financial data. They do not constitute investment advice, buy/sell recommendations,
+          financial data. They do not constitute investment advice, buy/sell calls,
           or portfolio guidance. Consult a SEBI-registered investment advisor before acting
           on any financial data.
         </p>

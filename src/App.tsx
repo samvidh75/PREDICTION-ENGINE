@@ -35,8 +35,9 @@ import AcademyHub from "./views/AcademyHub";
 
 import { buildTokenCssVars } from "./design-system/foundations/tokenCssVarMaps";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
-import type { MarketInputs } from "./services/intelligence/marketState";
+import { MarketInputs } from "./services/intelligence/marketState";
 import { loadUserProfile, saveUserProfile } from "./services/auth/userProfileStore";
+import { AuthUXLoader } from "./components/auth/AuthUXLoader";
 
 type PageKey =
   | "landing"
@@ -317,30 +318,15 @@ function AppContent(): JSX.Element {
     );
   }, [isAuthenticated, activePageKey, hasStockId, uid]);
 
-  // Hydration guard: avoids “random onboarding/dashboard flicker” during auth restoration.
+  // ── Auth loading: context-aware loader with skeleton UI & timeout diagnostics ──
   if (isAuthLoading && !isPublicPage) {
-    return (
-      <MotionController>
-        <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
-          <MasterMotionEngine enabled={false}>
-              <SpatialEnvironmentProvider enabled>
-                <SpatialTypographyRenderingEngine enabled>
-                  <SpatialInterfaceReconstructionEngine enabled={false} />
-                  <div className="min-h-screen w-full flex items-center justify-center bg-[#020304]">
-                    <div className="rounded-[28px] border border-white/10 bg-black/30 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)] max-w-[560px] w-[calc(100%-32px)]">
-                      <div className="text-[12px] uppercase tracking-[0.18em] text-white/55">Restoring secure session</div>
-                      <div className="mt-3 text-[18px] font-semibold text-white/92">Please wait—identity is being verified.</div>
-                      <div className="mt-3 text-[13px] leading-[1.7] text-white/75">
-                        This prevents accidental logouts and keeps your learning workspace connected.
-                      </div>
-                    </div>
-                  </div>
-                </SpatialTypographyRenderingEngine>
-              </SpatialEnvironmentProvider>
-          </MasterMotionEngine>
-        </ConfidenceEngine>
-      </MotionController>
-    );
+    return <AuthUXLoader targetPage={pageKey} isLoading={true} />;
+  }
+
+  // ── Auth redirect: show redirecting state instead of blank screen ──
+  const isRedirectingFromProtected = !isAuthLoading && !isAuthed && protectedPages.includes(pageKey);
+  if (isRedirectingFromProtected) {
+    return <AuthUXLoader targetPage={pageKey} isLoading={false} isRedirecting={true} />;
   }
 
   return (

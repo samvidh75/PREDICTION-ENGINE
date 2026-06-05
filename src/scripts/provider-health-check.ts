@@ -1,14 +1,14 @@
 /**
- * Daily Provider Health Check Script
- * Automatically checks 10 major Indian stocks across metadata & quote fields,
- * and generates DailyProviderHealthReport.md.
+ * Daily provider accuracy check.
+ *
+ * Verifies quote price, company name, sector, industry, market cap, volume,
+ * and updated timestamp for 10 major Indian stocks.
  */
 
+import { writeFileSync } from 'node:fs';
 import { MetadataProviderCoordinator } from '../services/providers/MetadataProviderCoordinator';
 import { ProviderCoordinator } from '../services/providers/ProviderCoordinator';
 import { DataIntegrityEngine } from '../services/data/DataIntegrityEngine';
-import * as fs from 'fs';
-import * as path from 'path';
 
 const TARGET_SYMBOLS = [
   'RELIANCE',
@@ -20,100 +20,104 @@ const TARGET_SYMBOLS = [
   'BHARTIARTL',
   'ITC',
   'HINDUNILVR',
-  'LT'
+  'LT',
 ];
 
-async function runHealthCheck() {
-  console.log('Starting Daily Provider Health Check...');
+function pass(value: boolean): 'PASS' | 'FAIL' {
+  return value ? 'PASS' : 'FAIL';
+}
+
+function formatMarketCap(value: number | null | undefined): string {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 'N/A';
+  return `Rs ${(value / 10_000_000).toFixed(0)} Cr`;
+}
+
+async function runHealthCheck(): Promise<void> {
   const coordinator = new ProviderCoordinator();
   const integrity = new DataIntegrityEngine();
-
   const results: any[] = [];
 
   for (const symbol of TARGET_SYMBOLS) {
-    console.log(`Checking health metrics for: ${symbol}`);
-    let namePassed = false;
-    let sectorPassed = false;
-    let industryPassed = false;
-    let marketCapPassed = false;
-    let quotePricePassed = false;
-    let volumePassed = false;
     let meta: any = null;
     let quote: any = null;
+    let metadataError: string | null = null;
+    let quoteError: string | null = null;
 
     try {
       meta = await MetadataProviderCoordinator.getMetadata(symbol);
-      namePassed = !!meta.companyName && meta.companyName !== symbol && !meta.companyName.includes('BSE Listed Security Code');
-      sectorPassed = !!meta.sector;
-      industryPassed = !!meta.industry;
-      marketCapPassed = meta.marketCap !== undefined && meta.marketCap > 0;
-    } catch (e) {
-      console.error(`Metadata check failed for ${symbol}:`, e);
+    } catch (error) {
+      metadataError = error instanceof Error ? error.message : 'Unknown metadata error';
     }
 
     try {
       quote = await coordinator.getQuote(symbol);
-      quotePricePassed = quote.price !== undefined && quote.price > 0;
-      volumePassed = quote.volume !== undefined && quote.volume >= 0;
-    } catch (e) {
-      console.error(`Quote check failed for ${symbol}:`, e);
+    } catch (error) {
+      quoteError = error instanceof Error ? error.message : 'Unknown quote error';
     }
 
-    // Integrity scoring status
-    const integrityStatus = meta ? integrity.scoreIntegrity(meta, meta.isin) : 'INVALID';
+    const checks = {
+      companyName: !!meta?.companyName && meta.companyName !== symbol && !meta.companyName.includes('BSE Listed Security Code'),
+      sector: !!meta?.sector,
+      industry: !!meta?.industry,
+      marketCap: typeof meta?.marketCap === 'number' && meta.marketCap > 0,
+      price: typeof quote?.price === 'number' && quote.price > 0,
+      volume: typeof quote?.volume === 'number' && quote.volume >= 0,
+      updatedAt: !!quote?.updatedAt && !Number.isNaN(new Date(quote.updatedAt).getTime()),
+    };
 
     results.push({
       symbol,
-      companyName: meta?.companyName || '—',
-      sector: meta?.sector || '—',
-      industry: meta?.industry || '—',
-      marketCap: meta?.marketCap || null,
-      price: quote?.price || null,
-      volume: quote?.volume || null,
-      checks: {
-        namePassed,
-        sectorPassed,
-        industryPassed,
-        marketCapPassed,
-        quotePricePassed,
-        volumePassed
-      },
-      integrityStatus
+      companyName: meta?.companyName || 'N/A',
+      sector: meta?.sector || 'N/A',
+      industry: meta?.industry || 'N/A',
+      marketCap: meta?.marketCap ?? null,
+      price: quote?.price ?? null,
+      volume: quote?.volume ?? null,
+      updatedAt: quote?.updatedAt || 'N/A',
+      integrityStatus: meta ? integrity.scoreIntegrity(meta, meta.isin) : 'INVALID',
+      checks,
+      metadataError,
+      quoteError,
     });
   }
 
-  // Generate DailyProviderHealthReport.md
   const timestamp = new Date().toISOString();
-  let md = `# Daily Provider Health Report\n\n`;
-  md += `**Execution Timestamp:** \`${timestamp}\`  \n`;
-  md += `**Tested Universe:** 10 Major Indian Blue-chips\n\n`;
-  md += `## Metric Verification Matrix\n\n`;
-  md += `| Symbol | Company Name | Sector | Industry | Market Cap (Cr) | Quote (₹) | Integrity Status |\n`;
-  md += `| --- | --- | --- | --- | --- | --- | --- |\n`;
+  const passedRows = results.filter((row) => Object.values(row.checks).every(Boolean)).length;
 
-  for (const r of results) {
-    const capCr = r.marketCap ? `₹${(r.marketCap / 10_000_000).toFixed(2)} Cr` : 'N/A';
-    const priceStr = r.price ? `₹${r.price.toFixed(2)}` : 'N/A';
-    const sectorDisplay = r.sector !== '—' ? r.sector : '🔴 MISSING';
-    const industryDisplay = r.industry !== '—' ? r.industry : '🔴 MISSING';
-    const nameDisplay = r.checks.namePassed ? r.companyName : `🔴 INVALID (${r.companyName})`;
-    
-    md += `| **${r.symbol}** | ${nameDisplay} | ${sectorDisplay} | ${industryDisplay} | ${capCr} | ${priceStr} | **${r.integrityStatus}** |\n`;
+  let md = `# Daily Provider Health Report\n\n`;
+  md += `Execution timestamp: ${timestamp}\n\n`;
+  md += `Tested universe: ${TARGET_SYMBOLS.length} major Indian stocks\n\n`;
+  md += `Overall result: ${passedRows}/${results.length} rows fully passed\n\n`;
+  md += `| Symbol | Name | Sector | Industry | Market Cap | Price | Volume | Updated | Integrity | Row |\n`;
+  md += `| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n`;
+
+  for (const row of results) {
+    const rowPassed = Object.values(row.checks).every(Boolean);
+    const price = typeof row.price === 'number' ? `Rs ${row.price.toFixed(2)}` : 'N/A';
+    const volume = typeof row.volume === 'number' ? row.volume.toLocaleString('en-IN') : 'N/A';
+    md += `| ${row.symbol} | ${row.companyName} | ${row.sector} | ${row.industry} | ${formatMarketCap(row.marketCap)} | ${price} | ${volume} | ${row.updatedAt} | ${row.integrityStatus} | ${pass(rowPassed)} |\n`;
   }
 
-  md += `\n## Test Summary\n\n`;
-  const passedCount = results.filter(r => r.integrityStatus === 'VALID' || r.integrityStatus === 'PARTIAL').length;
-  md += `- **Total Assets Checked:** ${results.length}\n`;
-  md += `- **Passed Integrity Checks (VALID/PARTIAL):** ${passedCount} / ${results.length}\n`;
-  md += `- **Failing Assets:** ${results.length - passedCount}\n\n`;
-  md += `*Report automatically generated by src/scripts/provider-health-check.ts.*\n`;
+  md += `\n## Field Checks\n\n`;
+  for (const row of results) {
+    md += `### ${row.symbol}\n`;
+    md += `- Company name: ${pass(row.checks.companyName)}\n`;
+    md += `- Sector: ${pass(row.checks.sector)}\n`;
+    md += `- Industry: ${pass(row.checks.industry)}\n`;
+    md += `- Market cap: ${pass(row.checks.marketCap)}\n`;
+    md += `- Quote price: ${pass(row.checks.price)}\n`;
+    md += `- Volume: ${pass(row.checks.volume)}\n`;
+    md += `- Updated time: ${pass(row.checks.updatedAt)}\n`;
+    if (row.metadataError) md += `- Metadata error: ${row.metadataError}\n`;
+    if (row.quoteError) md += `- Quote error: ${row.quoteError}\n`;
+    md += `\n`;
+  }
 
-  // Write report to the project root/current working directory
-  fs.writeFileSync('DailyProviderHealthReport.md', md, 'utf8');
-  console.log('DailyProviderHealthReport.md written successfully.');
+  writeFileSync('DailyProviderHealthReport.md', md, 'utf8');
+  console.log(`DailyProviderHealthReport.md written. Fully passed rows: ${passedRows}/${results.length}`);
 }
 
-runHealthCheck().catch(err => {
-  console.error('Error running daily health check suite:', err);
-  process.exit(1);
+runHealthCheck().catch((error) => {
+  console.error('Provider health check failed:', error);
+  process.exitCode = 1;
 });

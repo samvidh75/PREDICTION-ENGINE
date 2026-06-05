@@ -17,7 +17,8 @@ export const marketDataRoutes: FastifyPluginAsync = async (app) => {
         metadata,
       };
     } catch (err: any) {
-      reply.status(500).send({ error: err.message });
+      request.log.error({ err, symbol: sym }, "market data company request failed");
+      reply.status(502).send({ error: "Market data is temporarily unavailable.", code: "MARKET_DATA_UNAVAILABLE" });
     }
   });
 
@@ -29,7 +30,8 @@ export const marketDataRoutes: FastifyPluginAsync = async (app) => {
       const quote = await MarketDataGateway.getQuote(sym);
       return quote;
     } catch (err: any) {
-      reply.status(500).send({ error: err.message });
+      request.log.error({ err, symbol: sym }, "market data quote request failed");
+      reply.status(502).send({ error: "Quote data is temporarily unavailable.", code: "QUOTE_DATA_UNAVAILABLE" });
     }
   });
 
@@ -41,7 +43,8 @@ export const marketDataRoutes: FastifyPluginAsync = async (app) => {
       const metadata = await MarketDataGateway.getCompany(sym);
       return metadata;
     } catch (err: any) {
-      reply.status(500).send({ error: err.message });
+      request.log.error({ err, symbol: sym }, "market data metadata request failed");
+      reply.status(502).send({ error: "Company metadata is temporarily unavailable.", code: "METADATA_UNAVAILABLE" });
     }
   });
 };

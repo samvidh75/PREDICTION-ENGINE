@@ -24,17 +24,11 @@ export class PersonalisationEngine {
   }
 
   public static getPersonalizedGreeting(): string {
-    const hour = new Date().getHours();
     const activeSector = BehaviourCoordinator.getMostActiveSector();
-    
-    let greeting = 'Good day';
-    if (hour < 12) greeting = 'Good morning';
-    else if (hour < 18) greeting = 'Good afternoon';
-    else greeting = 'Good evening';
 
     if (activeSector && activeSector !== 'General') {
-      return `${greeting}! Markets are active. Checking trends in ${activeSector} for you.`;
+      return `Research context is focused on ${activeSector}.`;
     }
-    return `${greeting}! Explore your investment space today.`;
+    return 'Research context is ready.';
   }
 }

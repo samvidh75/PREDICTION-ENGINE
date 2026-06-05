@@ -153,6 +153,9 @@ export const SearchPage: React.FC = () => {
       </section>
 
       <section className="space-y-4">
+        <div className="text-xs text-[#787b86]">
+          Health Score and Research Signal are research aids based on available company data, not investment advice.
+        </div>
         {query.trim().length >= 2 ? (
           <>
             <div className="flex items-center justify-between gap-3">

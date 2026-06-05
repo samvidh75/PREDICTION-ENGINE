@@ -7,11 +7,7 @@ export interface TeamMember {
 }
 
 export class WorkspaceEngine {
-  private static members: TeamMember[] = [
-    { id: "m1", name: "Samvidh (You)", role: "Admin" },
-    { id: "m2", name: "Ananya", role: "Analyst" },
-    { id: "m3", name: "Rahul", role: "Viewer" },
-  ];
+  private static members: TeamMember[] = [];
 
   public static getMembers(): TeamMember[] {
     return this.members;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ExternalLink, ShieldAlert, ArrowRight } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 
 interface BrokerRedirectorProps {
   ticker: string;
@@ -18,10 +18,7 @@ export const BrokerRedirector: React.FC<BrokerRedirectorProps> = ({ ticker }) =>
 
     setTimeout(() => {
       setRedirecting(false);
-      // Pass the ticker safely to a mock external brokerage framework
-      const targetUrl = `https://terminal.mockbroker.in/trade?symbol=${ticker}&ref=stockstory`;
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
-    }, 1000);
+    }, 350);
   };
 
   return (
@@ -36,8 +33,7 @@ export const BrokerRedirector: React.FC<BrokerRedirectorProps> = ({ ticker }) =>
       </div>
 
       <p className="text-[12px] leading-relaxed text-[#525252]">
-        StockStory India operates as a pure, zero-commission educational analytics framework. 
-        We possess zero brokerage hooks, local order books, or execution processing capabilities inside our codebase.
+        StockStory India is a research platform. Brokerage execution is not connected in this app.
       </p>
 
       {/* Redirect Trigger */}
@@ -45,23 +41,20 @@ export const BrokerRedirector: React.FC<BrokerRedirectorProps> = ({ ticker }) =>
         <button
           type="button"
           onClick={handleRedirect}
-          disabled={redirecting}
+          disabled
           className="h-11 w-full rounded-none bg-neutral-950 hover:bg-neutral-900 text-white font-medium text-xs uppercase tracking-wider flex items-center justify-center space-x-2 active:scale-[0.98] transition-transform duration-100 ease-out select-none"
         >
           {redirecting ? (
-            <span>ROUTING TO SECURE TERMINAL...</span>
+            <span>Checking connection...</span>
           ) : (
-            <>
-              <span>Analyze via External Terminal</span>
-              <ExternalLink className="w-4 h-4" />
-            </>
+            <span>Broker execution unavailable</span>
           )}
         </button>
       </div>
 
       {/* Safety Notice Segment */}
       <div className="flex items-center justify-center space-x-1 font-mono text-[9px] text-neutral-400 uppercase tracking-widest pt-2 border-t border-neutral-100">
-        <span>BROKERAGE_ROUTING_SECURE // NO_TRANSACTION_ZONE</span>
+        <span>Research only. No order routing.</span>
       </div>
 
     </div>

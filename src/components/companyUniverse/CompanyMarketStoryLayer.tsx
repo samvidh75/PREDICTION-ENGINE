@@ -141,7 +141,7 @@ export default function CompanyMarketStoryLayer({
   const foundersBlock = useMemo(() => {
     const f0 = topFounders[0];
     const f1 = topFounders[1];
-    if (!f0) return "Founders: leadership intent is model-derived in this demo set.";
+    if (!f0) return "Founders: leadership data unavailable.";
     if (!f1) return `${f0.name}: ${f0.philosophy}`;
     return `${f0.name}: ${f0.philosophy} • ${f1.name}: ${f1.philosophy}`;
   }, [topFounders]);
@@ -149,7 +149,7 @@ export default function CompanyMarketStoryLayer({
   const leadershipBlock = useMemo(() => {
     const l0 = topLeadership[0];
     const l1 = topLeadership[1];
-    if (!l0) return "Leadership: leadership tone is model-derived in this demo set.";
+    if (!l0) return "Leadership: leadership data unavailable.";
     if (!l1) return `${l0.name}: ${l0.philosophy}`;
     return `${l0.name}: ${l0.philosophy} • ${l1.name}: ${l1.philosophy}`;
   }, [topLeadership]);

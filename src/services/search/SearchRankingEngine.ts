@@ -39,7 +39,7 @@ export class SearchRankingEngine {
       const partialNameB = nameB.includes(q) ? 1 : 0;
       if (partialNameA !== partialNameB) return partialNameB - partialNameA;
 
-      return b.healthScore - a.healthScore; // Fallback sorting by health score
+      return (b.healthScore ?? 0) - (a.healthScore ?? 0);
     });
   }
 }

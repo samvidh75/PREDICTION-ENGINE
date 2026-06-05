@@ -145,6 +145,10 @@ export class StockStoryEngine {
         risk,
         confidence,
       },
+      penaltyDetails: {
+        totalPenalty: penaltyResult.totalPenalty,
+        penalties: penaltyResult.penalties,
+      },
       generatedAt: new Date().toISOString(),
       dataFreshness,
     };

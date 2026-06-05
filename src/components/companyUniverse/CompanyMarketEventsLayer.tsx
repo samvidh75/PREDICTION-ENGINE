@@ -42,7 +42,6 @@ function labelForScannerCategory(category: NeuralScannerCard["category"]): strin
 }
 
 function normalizeTimelineText(entry: NeuralSynthesisTimelineEntry): string {
-  // In this demo set timeline text already represents educational market context.
   return entry.text;
 }
 

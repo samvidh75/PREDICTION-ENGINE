@@ -95,7 +95,7 @@ export const PublicLandingPage: React.FC = () => {
             {[
               {
                 title: "Buy/Sell Call Fatigue",
-                desc: "Conflicting recommendations from dozens of analysts create execution paralysis."
+                desc: "Conflicting research signals from dozens of analysts create execution paralysis."
               },
               {
                 title: "AI Chatbot Fluff",
@@ -130,7 +130,7 @@ export const PublicLandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                title: "No Recommendations",
+                title: "No Stock Calls",
                 desc: "No price targets. No calls. We provide unbiased diagnostics so you remain the decision maker."
               },
               {
@@ -328,8 +328,8 @@ export const PublicLandingPage: React.FC = () => {
                 a: "No. StockStory is purely a research platform. You cannot trade shares directly on our interface. We exist solely to help you understand what you are buying."
               },
               {
-                q: "Do you publish buy or sell recommendations?",
-                a: "No. We never publish buy or sell alerts, price targets, or trading calls. We believe that investors should build their own conviction based on structural parameters."
+                q: "Do you publish buy or sell calls?",
+                a: "No. We never publish buy or sell alerts, price targets, or trading calls. We provide company health and research signals so investors can build their own conviction from the underlying evidence."
               },
               {
                 q: "What data points do you analyze?",

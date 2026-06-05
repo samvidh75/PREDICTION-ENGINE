@@ -99,7 +99,7 @@ export default function CompanyPrimaryActionBar({
               ? "border-white/10 bg-black/25 text-white/85 hover:bg-black/35 hover:border-white/20"
               : "border-white/10 bg-black/15 text-white/35 cursor-not-allowed",
           ].join(" ")}
-          title={sectorAvailable ? `View sector: ${sectorLabel}` : "Sector environment unavailable in this demo set"}
+          title={sectorAvailable ? `View sector: ${sectorLabel}` : "Sector environment unavailable"}
         >
           View Sector
         </button>

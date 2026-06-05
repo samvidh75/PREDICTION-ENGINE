@@ -23,13 +23,13 @@ async function fetchLiveQuote(symbol: string, signal: AbortSignal): Promise<Stoc
     headers: { Accept: "application/json" },
   });
 
-  const body = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(body?.error || `Quote request failed with HTTP ${response.status}`);
+    throw new Error("QUOTE_UNAVAILABLE");
   }
+  const body = await response.json().catch(() => null);
 
   if (!body || typeof body.price !== "number" || !Number.isFinite(body.price) || body.price <= 0) {
-    throw new Error(`Quote response for ${symbol} did not include a valid live price`);
+    throw new Error("QUOTE_UNAVAILABLE");
   }
 
   return body as StockQuote;
@@ -74,11 +74,11 @@ export function useLiveQuotes(symbols: string[]): Record<string, LiveQuoteState>
             [symbol]: { quote, loading: false, error: null },
           }));
         })
-        .catch((error: Error) => {
+        .catch(() => {
           if (controller.signal.aborted) return;
           setStates((prev) => ({
             ...prev,
-            [symbol]: { quote: null, loading: false, error: error.message },
+            [symbol]: { quote: null, loading: false, error: "Quote data is temporarily unavailable." },
           }));
         });
     });
