@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "durationMs": 50,
+  "payload": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [
+        {
+          "total_asset": 88090.68,
+          "total_liability": 17692.74,
+          "period": "Mar 2025"
+        },
+        {
+          "total_asset": 91826.16,
+          "total_liability": 16936.19,
+          "period": "Mar 2024"
+        },
+        {
+          "total_asset": 85882.98,
+          "total_liability": 16344.19,
+          "period": "Mar 2023"
+        },
+        {
+          "total_asset": 77259.55,
+          "total_liability": 14437.68,
+          "period": "Mar 2022"
+        }
+      ],
+      "full_statement": null
+    }
+  }
+}

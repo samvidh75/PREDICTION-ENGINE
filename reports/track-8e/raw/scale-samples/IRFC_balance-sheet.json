@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "durationMs": 50,
+  "payload": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [],
+      "full_statement": null
+    }
+  }
+}
