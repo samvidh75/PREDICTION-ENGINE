@@ -1,6 +1,6 @@
 # Feature Coverage Report — Factor Quality Audit
 
-**Generated:** 2026-06-05T10:42:34.398Z
+**Generated:** 2026-06-05T11:09:43.318Z
 
 ---
 

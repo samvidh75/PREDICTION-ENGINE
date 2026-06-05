@@ -49,6 +49,7 @@ function providerForUser(user: Pick<User, "providerData">): "google" | "email" {
 }
 
 function persistFirebaseUser(user: User): void {
+  recordSessionStart();
   saveAuthSession({
     status: "authenticated",
     uid: user.uid,
@@ -65,32 +66,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isConnecting, setIsConnecting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSimulatingTimeout, setIsSimulatingTimeout] = useState(false);
-  const [sessionAge, setSessionAge] = useState<number | null>(null);
 
+  // Track session age for expiry detection
+  const [sessionAgeMs, setSessionAgeMs] = useState<number | null>(() => getSessionAgeMs());
+  const isSessionExpired = useRef(false);
+  const loadingStartMs = useRef(Date.now());
+  const simTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Periodically refresh session age
   useEffect(() => {
     const interval = setInterval(() => {
-      setSessionAge(getSessionAgeMs());
-    }, 1000);
+      setSessionAgeMs(getSessionAgeMs());
+    }, 10_000);
     return () => clearInterval(interval);
   }, []);
 
-  const simulateTimeout = useCallback(() => {
-    setIsSimulatingTimeout(true);
-  }, []);
+  // Loading timeout diagnostic (30s)
+  useEffect(() => {
+    if (!loading) return;
+
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        logAuthState({
+          phase: "loading_timeout",
+          elapsedMs: Date.now() - loadingStartMs.current,
+        });
+      }
+    }, 30_000);
+
+    return () => clearTimeout(timeoutId);
+  }, [loading]);
 
   useEffect(() => {
     let alive = true;
     let unsubscribe: (() => void) | undefined;
 
-    const restoreStoredSession = () => {
+    const restoreStoredSession = (): boolean => {
       const stored = loadAuthSession();
-      if (stored.status !== "authenticated" || !stored.uid) return false;
+      if (stored.status !== "authenticated" || !stored.uid) {
+        // Check if a previously valid session expired
+        const age = getSessionAgeMs();
+        if (age !== null && age > 7 * 24 * 60 * 60 * 1000) {
+          isSessionExpired.current = true;
+          logAuthState({
+            phase: "session_expired",
+            sessionAgeMs: age,
+            uid: stored.uid ?? undefined,
+          });
+        }
+        return false;
+      }
+
+      logAuthState({
+        phase: "session_restored",
+        uid: stored.uid,
+        sessionAgeMs: getSessionAgeMs() ?? undefined,
+      });
+
       setUser({
         uid: stored.uid,
         email: stored.email ?? null,
         displayName: stored.displayName ?? null,
       });
-      setLoading(false);
+      setSessionAgeMs(getSessionAgeMs());
       return true;
     };
 
@@ -100,28 +138,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         void getRedirectResult(firebaseAuth)
           .then((result) => {
             if (!alive || !result?.user) return;
+            logAuthState({
+              phase: "firebase_confirmed",
+              uid: result.user.uid,
+              provider: providerForUser(result.user),
+            });
             setUser(result.user);
             persistFirebaseUser(result.user);
             setAuthError(null);
             setLoading(false);
+            setSessionAgeMs(getSessionAgeMs());
             window.dispatchEvent(new Event("ss:auth-session-changed"));
           })
           .catch((error) => {
-            console.error("[AuthContext] Google redirect completion failed:", error);
-            if (alive) {
-              setAuthError(error instanceof Error ? error.message : "Google sign-in could not be completed.");
-            }
+            if (!alive) return;
+            const message = error instanceof Error ? error.message : "Google sign-in could not be completed.";
+            logAuthState({ phase: "redirect_result_error", error: message });
+            setAuthError(message);
           });
+
         unsubscribe = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
           if (!alive) return;
 
           setAuthError(null);
-          setUser(firebaseUser);
 
           if (firebaseUser) {
+            logAuthState({
+              phase: "firebase_confirmed",
+              uid: firebaseUser.uid,
+              provider: providerForUser(firebaseUser),
+            });
+            setUser(firebaseUser);
             persistFirebaseUser(firebaseUser);
           } else {
-            if (!restoreStoredSession()) clearAuthSession();
+            logAuthState({ phase: "firebase_null" });
+            if (!restoreStoredSession()) {
+              clearAuthSession();
+              clearSessionStart();
+              setUser(null);
+              setSessionAgeMs(null);
+            }
           }
 
           setLoading(false);
@@ -129,11 +185,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
       .catch((error) => {
         if (!alive) return;
-        console.error("[AuthContext] Persistence setup failed:", error);
-        setAuthError(error instanceof Error ? error.message : "Authentication persistence could not be initialized.");
+        const message = error instanceof Error ? error.message : "Authentication persistence could not be initialized.";
+        logAuthState({ phase: "persistence_error", error: message });
+        setAuthError(message);
         setUser(null);
         clearAuthSession();
+        clearSessionStart();
         setLoading(false);
+        setSessionAgeMs(null);
       });
 
     return () => {
@@ -151,8 +210,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: stored.email ?? null,
           displayName: stored.displayName ?? null,
         });
+        setSessionAgeMs(getSessionAgeMs());
       } else if (!firebaseAuth.currentUser) {
         setUser(null);
+        setSessionAgeMs(null);
       }
       setLoading(false);
     };
@@ -174,11 +235,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await firebaseAuth.currentUser.reload();
         persistFirebaseUser(firebaseAuth.currentUser);
         setUser(firebaseAuth.currentUser);
+        setSessionAgeMs(getSessionAgeMs());
+        logAuthState({
+          phase: "firebase_confirmed",
+          uid: firebaseAuth.currentUser.uid,
+          provider: providerForUser(firebaseAuth.currentUser),
+        });
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Session could not be initialized.";
+      logAuthState({ phase: "persistence_error", error: message });
       setAuthError(message);
-      console.error("[AuthContext] Session initialization error:", error);
     } finally {
       setIsConnecting(false);
     }
@@ -191,14 +258,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await firebaseSignOut(firebaseAuth);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Sign out could not be completed.";
+      logAuthState({ phase: "persistence_error", error: message });
       setAuthError(message);
-      console.error("[AuthContext] Logout error:", error);
     } finally {
-      // Always clear local state regardless of Firebase signOut success/failure
       clearAuthSession();
+      clearSessionStart();
       setUser(null);
+      setSessionAgeMs(null);
+      isSessionExpired.current = false;
       setIsConnecting(false);
-      // Force redirect to login page for clean session termination
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
         url.searchParams.set("page", "login");
@@ -207,6 +275,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         window.dispatchEvent(new Event("ss:auth-session-changed"));
       }
     }
+  }, []);
+
+  /**
+   * simulateTimeout — Artificially extend the loading state for testing.
+   *
+   * Calling this sets `isSimulatingTimeout=true` and extends `loading`
+   * by clearing the Firebase auth listener and holding the state open
+   * until the timeout is manually resolved (page refresh or timeout hit).
+   *
+   * This is for testing the AuthUXLoader's slow/timeout UI in dev.
+   */
+  const simulateTimeout = useCallback(() => {
+    if (simTimeoutRef.current) {
+      clearTimeout(simTimeoutRef.current);
+    }
+    setIsSimulatingTimeout(true);
+    setLoading(true);
+
+    // Hold loading state artificially for 45s (crosses both slow + timeout thresholds)
+    simTimeoutRef.current = setTimeout(() => {
+      setIsSimulatingTimeout(false);
+      setLoading(false);
+      simTimeoutRef.current = null;
+    }, 45_000);
+  }, []);
+
+  // Cleanup simulation on unmount
+  useEffect(() => {
+    return () => {
+      if (simTimeoutRef.current) {
+        clearTimeout(simTimeoutRef.current);
+      }
+    };
   }, []);
 
   const value = useMemo<AuthContextType>(
@@ -222,17 +323,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       initializeSession,
       logout,
       simulateTimeout,
-      isSessionExpired: sessionAge !== null && sessionAge > 3600000,
-      sessionAgeMs: sessionAge,
+      isSessionExpired: isSessionExpired.current,
+      sessionAgeMs,
       isSimulatingTimeout,
     }),
-    [authError, initializeSession, isConnecting, loading, logout, user, sessionAge, isSimulatingTimeout, simulateTimeout],
+    [user, loading, isConnecting, authError, initializeSession, logout, simulateTimeout, sessionAgeMs, isSimulatingTimeout],
   );
 
-  // Show children only when auth state has been resolved.
-  // The loading state is set to false once onAuthStateChanged fires.
-  // After initial load, loading stays false even during logout transitions
-  // because onAuthStateChanged sets firebaseUser=null and loading=false simultaneously.
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

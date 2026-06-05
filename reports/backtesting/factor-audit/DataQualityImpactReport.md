@@ -1,6 +1,6 @@
 # Data Quality Impact Report — Factor Quality Audit
 
-**Generated:** 2026-06-05T10:42:41.062Z
+**Generated:** 2026-06-05T11:09:49.907Z
 
 ---
 

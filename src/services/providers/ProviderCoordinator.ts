@@ -1,5 +1,8 @@
 // src/services/providers/ProviderCoordinator.ts
 // Orchestrates provider chain with failover, circuit breakers, and health monitoring.
+// 
+// RC-UPSTOX-001: Upstox is now Tier 1 for quotes, historical, and portfolio.
+// Yahoo remains fallback. Finnhub is primary for fundamentals.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -8,8 +11,7 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { IndianMarketProvider } from './IndianMarketProvider';
-import { AlphaVantageProvider } from './AlphaVantageProvider';
+import { UpstoxProvider } from './UpstoxProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
@@ -19,12 +21,13 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 /**
  * ProviderCoordinator — the single entry point for all market data.
  *
- * Chain order (as specified):
- *   Quotes:      Yahoo → IndianMarket → AlphaVantage
- *   Metadata:    Yahoo → Finnhub
- *   Historical:  Yahoo → IndianMarket → AlphaVantage
- *   Financials:  Finnhub → Yahoo (Yahoo doesn't have financials, but kept for future)
- *   News:        Finnhub → GNews (GNews not implemented yet, so Finnhub only)
+ * RC-UPSTOX-001 Chain order:
+ *   Quotes:      Upstox → Yahoo → Registry fallback
+ *   Metadata:    Registry → Provider fallback
+ *   Historical:  Upstox → Yahoo
+ *   Financials:  Finnhub (primary)
+ *   News:        Finnhub → Google News RSS
+ *   Portfolio:   Upstox (via getHoldings/getPositions/getFunds)
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -32,6 +35,7 @@ export class ProviderCoordinator {
   private historicalProviders: HistoricalProvider[] = [];
   private newsProviders: NewsProvider[] = [];
   private financialProviders: FinancialProvider[] = [];
+  public upstox: UpstoxProvider;
 
   private healthMonitor: ProviderHealthMonitor;
   private circuitBreakers: Map<any, ProviderCircuitBreaker> = new Map();
@@ -41,7 +45,14 @@ export class ProviderCoordinator {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
 
-    // ── Tier 1: Yahoo (always available, no API key) ──────
+    // ── Tier 1: Upstox (primary for quotes, historical, portfolio) ──
+    this.upstox = new UpstoxProvider();
+    const upstoxBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
+    this.circuitBreakers.set(this.upstox, upstoxBreaker);
+    this.priceProviders.push(this.upstox);
+    this.historicalProviders.push(this.upstox);
+
+    // ── Tier 2: Yahoo (fallback for quotes, historical) ─────
     const yahoo = new YahooProvider();
     const yahooBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
     this.circuitBreakers.set(yahoo, yahooBreaker);
@@ -49,29 +60,7 @@ export class ProviderCoordinator {
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
 
-    // ── Tier 2: Indian Market Provider (no key for NSE direct) ──
-    try {
-      const indian = new IndianMarketProvider();
-      const indianBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-      this.circuitBreakers.set(indian, indianBreaker);
-      this.priceProviders.push(indian);
-      this.historicalProviders.push(indian);
-    } catch (e) {
-      // Skip if initialization fails
-    }
-
-    // ── Tier 3: Alpha Vantage (requires API key) ──────────
-    try {
-      const alpha = new AlphaVantageProvider();
-      const alphaBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 120_000 });
-      this.circuitBreakers.set(alpha, alphaBreaker);
-      this.priceProviders.push(alpha);
-      this.historicalProviders.push(alpha);
-    } catch (e) {
-      // API key missing – skip
-    }
-
-    // ── Tier 4: Finnhub (requires API key) ────────────────
+    // ── Tier 3: Finnhub (primary for financials, news) ──────
     try {
       const finnhub = new FinnhubProvider();
       const finnhubBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
@@ -79,9 +68,12 @@ export class ProviderCoordinator {
       this.metadataProviders.push(finnhub);
       this.financialProviders.push(finnhub);
       this.newsProviders.push(finnhub);
-    } catch (e) {
+    } catch {
       // API key missing – skip
     }
+
+    // ── Tier 4: Yahoo as FinancialProvider (v8 fallback) ────
+    this.financialProviders.push(yahoo);
 
     // ── Tier 5: Google News RSS fallback for news ──────────
     const googleNews = new GoogleNewsRssProvider();

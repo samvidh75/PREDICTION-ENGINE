@@ -1,6 +1,6 @@
 # Feature Redundancy Report — Factor Quality Audit
 
-**Generated:** 2026-06-05T10:42:41.060Z
+**Generated:** 2026-06-05T11:09:49.902Z
 
 ---
 

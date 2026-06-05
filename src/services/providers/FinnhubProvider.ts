@@ -93,15 +93,104 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
       throw new Error(`Finnhub: no financial data for ${symbol}`);
     }
     const m = data.metric;
+
+    const mcapRaw = m.marketCapitalization
+      ? m.marketCapitalization * 1_000_000
+      : undefined;
+
+    const fcfTTM = m.freeCashFlowTTM
+      ? m.freeCashFlowTTM * 1_000_000
+      : m.freeCashFlowPerShareTTM
+        ? m.freeCashFlowPerShareTTM
+        : undefined;
+
+    const fcfYield = fcfTTM && mcapRaw && mcapRaw > 0
+      ? fcfTTM / mcapRaw
+      : undefined;
+
     return {
       symbol: ticker,
       periodEnd: new Date().toISOString().split('T')[0],
-      marketCap: m.marketCapitalization ? m.marketCapitalization * 1_000_000 : undefined,
+
+      // ── Valuation ───────────────────────────────────────
+      marketCap: mcapRaw,
       peRatio: m.peNormalizedAnnual ?? m.peBasicExclExtraTTM ?? undefined,
+      pbRatio: m.pbAnnual ?? m.priceToBookPerShareTTM ?? undefined,
+      evEbitda: m.enterpriseValueOverEBITDA ?? undefined,
       eps: m.epsNormalizedAnnual ?? m.epsBasicExclExtraItemsTTM ?? undefined,
-      dividendYield: m.dividendYieldIndicatedAnnual ?? undefined,
+      fcfYield,
+
+      // ── Profitability / Quality ─────────────────────────
+      roe: m.roeTTM ?? m.roeRfy ?? undefined,
+      roic: m.roicTTM ?? m.roicRfy ?? undefined,
+      grossMargin: m.grossMarginTTM ?? m.grossMargin ?? undefined,
+      operatingMargin: m.operatingMarginTTM ?? m.operatingMargin ?? undefined,
+      netMargin: m.netProfitMarginTTM ?? m.netProfitMargin ?? undefined,
+
+      // ── Growth ──────────────────────────────────────────
+      revenueGrowth: m.revenueGrowthTTMYoy ?? m.revenueGrowth3Y ?? undefined,
+      epsGrowth: m.epsGrowthTTMYoy ?? m.epsGrowth3Y ?? undefined,
+      fcfGrowth: m.freeCashFlowGrowthTTMYoy ?? undefined,
+      profitGrowth: m.netIncomeGrowthTTMYoy ?? m.netIncomeGrowth3Y ?? undefined,
+
+      // ── Stability ───────────────────────────────────────
+      debtToEquity: m.totalDebtOverTotalEquityTTM
+        ?? m.totalDebtOverTotalEquityQuarterly
+        ?? m.totalDebtOverTotalEquityAnnual
+        ?? undefined,
+      currentRatio: m.currentRatioTTM
+        ?? m.currentRatioQuarterly
+        ?? m.currentRatioAnnual
+        ?? undefined,
+      interestCoverage: m.interestCoverageTTM
+        ?? m.interestCoverageQuarterly
+        ?? undefined,
+      freeCashFlow: fcfTTM,
+
+      // ── Risk / Market ───────────────────────────────────
       beta: m.beta ?? undefined,
-      revenue: m.revenuePerShareTTM ?? undefined,
+      dividendYield: m.dividendYieldIndicatedAnnual
+        ?? m.dividendYieldTTM
+        ?? undefined,
+
+      // ── Raw metric map for diagnostics ──────────────────
+      _raw: {
+        peNormalizedAnnual: m.peNormalizedAnnual,
+        peBasicExclExtraTTM: m.peBasicExclExtraTTM,
+        pbAnnual: m.pbAnnual,
+        priceToBookPerShareTTM: m.priceToBookPerShareTTM,
+        enterpriseValueOverEBITDA: m.enterpriseValueOverEBITDA,
+        roeTTM: m.roeTTM,
+        roeRfy: m.roeRfy,
+        roicTTM: m.roicTTM,
+        roicRfy: m.roicRfy,
+        grossMarginTTM: m.grossMarginTTM,
+        operatingMarginTTM: m.operatingMarginTTM,
+        netProfitMarginTTM: m.netProfitMarginTTM,
+        revenueGrowthTTMYoy: m.revenueGrowthTTMYoy,
+        revenueGrowth3Y: m.revenueGrowth3Y,
+        epsGrowthTTMYoy: m.epsGrowthTTMYoy,
+        epsGrowth3Y: m.epsGrowth3Y,
+        freeCashFlowGrowthTTMYoy: m.freeCashFlowGrowthTTMYoy,
+        netIncomeGrowthTTMYoy: m.netIncomeGrowthTTMYoy,
+        netIncomeGrowth3Y: m.netIncomeGrowth3Y,
+        totalDebtOverTotalEquityTTM: m.totalDebtOverTotalEquityTTM,
+        totalDebtOverTotalEquityQuarterly: m.totalDebtOverTotalEquityQuarterly,
+        totalDebtOverTotalEquityAnnual: m.totalDebtOverTotalEquityAnnual,
+        currentRatioTTM: m.currentRatioTTM,
+        currentRatioQuarterly: m.currentRatioQuarterly,
+        currentRatioAnnual: m.currentRatioAnnual,
+        interestCoverageTTM: m.interestCoverageTTM,
+        interestCoverageQuarterly: m.interestCoverageQuarterly,
+        freeCashFlowTTM: m.freeCashFlowTTM,
+        freeCashFlowPerShareTTM: m.freeCashFlowPerShareTTM,
+        beta: m.beta,
+        dividendYieldIndicatedAnnual: m.dividendYieldIndicatedAnnual,
+        dividendYieldTTM: m.dividendYieldTTM,
+        marketCapitalization: m.marketCapitalization,
+        epsNormalizedAnnual: m.epsNormalizedAnnual,
+        epsBasicExclExtraItemsTTM: m.epsBasicExclExtraItemsTTM,
+      },
     };
   }
 }

@@ -1,474 +1,271 @@
-import type { ConfidenceState } from "../../components/intelligence/ConfidenceEngine";
-import type { MarketInputs } from "../..//services/intelligence/marketState";
+/**
+ * PortfolioIntelligenceEngine — Unified portfolio analytics engine.
+ * 
+ * TRACK-7H: Weighted multi-factor portfolio health model.
+ * 
+ * Calculates:
+ *   - Weighted Health Score (0-100)
+ *   - Risk Score (0-100)
+ *   - Quality Score (0-100) 
+ *   - Diversification Score (0-100)
+ *   - Sector Concentration Warnings
+ * 
+ * All scores are 0-100, higher = better (except Risk where higher = riskier).
+ */
 
-export type SectorId =
-  | "Banking"
-  | "IT"
-  | "Energy"
-  | "FMCG"
-  | "Pharma"
-  | "Defence"
-  | "Auto"
-  | "Infrastructure";
+import type { PortfolioSnapshot } from '../brokers/PortfolioTypes';
 
-export type PortfolioHolding = {
-  id: string;
-  company: string;
-  ticker: string;
-  sector: SectorId;
-  // 0..1
+// ── Backward-compatible types for existing consumers ──
+export type SectorId = string;
+
+/** @deprecated Legacy portfolio holding used by neuralMarketSynthesisEngine and PracticeReplayPanel */
+export interface LegacyPortfolioHolding {
+  id?: string;
+  symbol?: string;
+  company?: string;
+  ticker?: string;
+  sector?: string;
   weight: number;
-};
+  exchange?: string;
+  quantity?: number;
+  averagePrice?: number;
+  lastPrice?: number;
+  pnl?: number;
+  pnlPercent?: number;
+  marketCap?: number;
+}
+// Re-export for backward compat (old code imports PortfolioHolding from here)
+export type PortfolioHolding = LegacyPortfolioHolding;
 
-export type PortfolioEnvironmentState =
-  | "Structurally Balanced"
-  | "Concentration Increasing"
-  | "Defensive Alignment"
-  | "Momentum Sensitive"
-  | "Elevated Volatility Exposure";
-
-export type PortfolioHealth = {
-  environment: PortfolioEnvironmentState;
-  concentration: number; // 0..1
-  volatilitySensitivity: number; // 0..1
-  defensiveAlignment: number; // 0..1
-  concentrationTightening: number; // 0..1 (for orb pulse)
-};
-
-export type PortfolioNarrative = {
-  headline: string;
-  supporting: string;
-};
-
-export type SectorExposure = {
-  id: SectorId;
-  weightPct: number;
-  capsuleLabel: string;
-};
-
-export type WatchlistIntelligenceItem = {
-  id: string;
-  symbol: string;
-  identity: string;
-  narrativePreview: string;
-  confidenceEnvironment: string;
-  sectorMomentum: string;
-  volatilityCondition: string;
-  institutionalAlignment: string;
-};
-
-export type TimelineEntry = {
-  id: string;
-  when: string;
-  text: string;
-};
-
-export type ScenarioInterpretation = {
-  title: string;
-  bulletA: string;
-  bulletB: string;
-  riskFraming: string;
-};
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
+export interface PortfolioHealth {
+  score: number;
+  concentration: number;
+  volatilitySensitivity: number;
 }
 
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
-}
-
-function confidenceLabel(state: ConfidenceState): string {
-  switch (state) {
-    case "CONFIDENCE_RISING":
-      return "Confidence Rising";
-    case "STABLE_CONVICTION":
-      return "Stable Conviction";
-    case "NEUTRAL_ENVIRONMENT":
-      return "Balanced Environment";
-    case "MOMENTUM_WEAKENING":
-      return "Momentum Weakening";
-    case "ELEVATED_RISK":
-      return "Elevated Risk";
-  }
-}
-
-function orbColorKey(state: ConfidenceState): string {
-  // UI should map into glow tokens; keep engine generic.
-  if (state === "ELEVATED_RISK") return "warning";
-  if (state === "MOMENTUM_WEAKENING") return "magenta";
-  if (state === "CONFIDENCE_RISING") return "cyan";
-  return "deepBlue";
-}
-
-function sectorVolatilityFactor(sector: SectorId): number {
-  // Higher => more sensitive to volatility environments
-  switch (sector) {
-    case "IT":
-    case "Auto":
-      return 0.88;
-    case "Energy":
-    case "Banking":
-    case "Infrastructure":
-      return 0.72;
-    case "Pharma":
-    case "Defence":
-      return 0.55;
-    case "FMCG":
-    default:
-      return 0.42;
-  }
-}
-
-function sectorDefensiveFactor(sector: SectorId): number {
-  // Higher => more defensive posture
-  switch (sector) {
-    case "Defence":
-    case "Pharma":
-      return 0.82;
-    case "FMCG":
-      return 0.70;
-    case "Banking":
-      return 0.58;
-    case "Infrastructure":
-      return 0.50;
-    case "Energy":
-    case "IT":
-    case "Auto":
-    default:
-      return 0.42;
-  }
-}
-
-function pick<T>(arr: T[], seed: number): T {
-  const idx = Math.abs(Math.floor(seed)) % arr.length;
-  return arr[idx] ?? arr[0];
+export interface PortfolioIntelligence {
+  portfolioHealth: PortfolioHealth;
+  timeline?: Array<{ id: string; when?: string; whenLabel?: string; text: string }>;
 }
 
 /**
- * PortfolioIntelligenceEngine
- * - Pure deterministic “intelligence” generator (no advice, no certainty)
- * - Uses confidence/marketInputs to adapt environments
- * - Produces presentational strings for UI layers
+ * @deprecated Backward-compatible stub for neuralMarketSynthesisEngine.
+ * Use PortfolioIntelligenceEngine.evaluate() for real portfolio analysis.
  */
-export function buildPortfolioIntelligence(params: {
-  holdings: PortfolioHolding[];
-  confidenceState: ConfidenceState;
-  marketInputs: MarketInputs;
-  narrativeKey: number;
-}): {
-  health: PortfolioHealth;
-  narrative: PortfolioNarrative;
-  sectorExposure: SectorExposure[];
-  watchlist: WatchlistIntelligenceItem[];
-  timeline: TimelineEntry[];
-  scenario: ScenarioInterpretation;
-  orbPulseTightening: number;
-  orbColorKey: string;
-} {
-  const { holdings, confidenceState, marketInputs, narrativeKey } = params;
+export function buildPortfolioIntelligence(inputs: {
+  holdings: LegacyPortfolioHolding[];
+  confidenceState?: string;
+  marketInputs?: Record<string, number>;
+  narrativeKey?: number;
+}): PortfolioIntelligence {
+  const key = inputs.narrativeKey ?? 0;
+  const holdings = inputs.holdings ?? [];
+  const concentration = holdings.reduce((max, h) => Math.max(max, h.weight ?? 0), 0);
+  const score = Math.max(20, Math.min(90, 65 + (0.5 - concentration) * 40));
+  
+  return {
+    portfolioHealth: {
+      score: Math.round(score),
+      concentration: Math.round(concentration * 100),
+      volatilitySensitivity: 55,
+    },
+    timeline: [
+      { id: `pi_${key}_1`, whenLabel: 'Synthetic portfolio cue', text: 'Portfolio context remains educationally structured.' },
+      { id: `pi_${key}_2`, whenLabel: 'Liquidity lens', text: 'Liquidity conditioning stays calm and structural.' },
+    ],
+  };
+}
 
-  const normalizedHoldings = holdings
-    .map((h) => ({ ...h, weight: clamp01(h.weight) }))
-    .filter((h) => h.weight > 0);
+export interface PortfolioHealthResult {
+  healthScore: number;
+  riskScore: number;
+  qualityScore: number;
+  diversificationScore: number;
+  sectorConcentrationWarnings: string[];
+  healthClassification: 'Excellent' | 'Strong' | 'Healthy' | 'Stable' | 'Weakening' | 'At Risk';
+}
 
-  const weightSum = normalizedHoldings.reduce((acc, h) => acc + h.weight, 0) || 1;
-  const holdingsN = normalizedHoldings.map((h) => ({ ...h, weight: h.weight / weightSum }));
+export class PortfolioIntelligenceEngine {
+  static evaluate(snapshot: PortfolioSnapshot): PortfolioHealthResult {
+    const holdings = snapshot.holdings;
 
-  const concentration = holdingsN.reduce((max, h) => Math.max(max, h.weight), 0); // 0..1
+    const healthScore = holdings.length === 0 ? 50 : this.weightedHealthScore(holdings);
+    const riskScore = this.calculateRisk(holdings);
+    const qualityScore = this.calculateQuality(holdings);
+    const { diversificationScore, warnings } = this.calculateDiversification(holdings);
 
-  const volatilityEnv =
-    confidenceState === "ELEVATED_RISK"
-      ? 0.95
-      : confidenceState === "MOMENTUM_WEAKENING"
-        ? 0.70
-        : confidenceState === "NEUTRAL_ENVIRONMENT"
-          ? 0.55
-          : confidenceState === "CONFIDENCE_RISING"
-            ? 0.42
-            : 0.35;
-
-  const volatilitySensitivity =
-    holdingsN.reduce((acc, h) => acc + h.weight * sectorVolatilityFactor(h.sector), 0) * volatilityEnv;
-
-  const defensiveAlignmentRaw = holdingsN.reduce((acc, h) => acc + h.weight * sectorDefensiveFactor(h.sector), 0);
-  const defensiveAlignment = clamp01(defensiveAlignmentRaw);
-
-  const concentrationTightening = clamp01(lerp(0.25, 0.98, concentration));
-
-  const health: PortfolioHealth = (() => {
-    if (confidenceState === "ELEVATED_RISK" && concentration >= 0.34) {
-      return {
-        environment: "Elevated Volatility Exposure",
-        concentration,
-        volatilitySensitivity: clamp01(volatilitySensitivity),
-        defensiveAlignment,
-        concentrationTightening,
-      };
-    }
-
-    if (concentration >= 0.36) {
-      return {
-        environment: "Concentration Increasing",
-        concentration,
-        volatilitySensitivity: clamp01(volatilitySensitivity),
-        defensiveAlignment,
-        concentrationTightening,
-      };
-    }
-
-    const defensiveDominant = defensiveAlignment >= 0.64;
-    const momentumSensitive = confidenceState === "CONFIDENCE_RISING" || confidenceState === "NEUTRAL_ENVIRONMENT";
-
-    if (defensiveDominant) {
-      return {
-        environment: "Defensive Alignment",
-        concentration,
-        volatilitySensitivity: clamp01(volatilitySensitivity),
-        defensiveAlignment,
-        concentrationTightening,
-      };
-    }
-
-    if (momentumSensitive && marketInputs.sectorMomentum >= 0.62) {
-      return {
-        environment: "Momentum Sensitive",
-        concentration,
-        volatilitySensitivity: clamp01(volatilitySensitivity),
-        defensiveAlignment,
-        concentrationTightening,
-      };
-    }
+    const composite = (healthScore * 0.35) + (qualityScore * 0.30) + (diversificationScore * 0.20) - (riskScore * 0.15);
+    const classification = this.classify(composite);
 
     return {
-      environment: "Structurally Balanced",
-      concentration,
-      volatilitySensitivity: clamp01(volatilitySensitivity),
-      defensiveAlignment,
-      concentrationTightening,
+      healthScore: Math.round(healthScore),
+      riskScore: Math.round(riskScore),
+      qualityScore: Math.round(qualityScore),
+      diversificationScore: Math.round(diversificationScore),
+      sectorConcentrationWarnings: warnings,
+      healthClassification: classification,
     };
-  })();
-
-  const toneBank = {
-    headline: "",
-    supporting: "",
-  };
-
-  const narrativeTemplates: Record<ConfidenceState, { a: string; b: string }> = {
-    CONFIDENCE_RISING: {
-      a: "Portfolio positioning remains concentrated around structurally supported leadership.",
-      b: "Institutional alignment appears steady, while volatility conditions remain orderly enough for calm interpretation.",
-    },
-    STABLE_CONVICTION: {
-      a: "Portfolio structure reflects stable confidence with balanced participation across key sectors.",
-      b: "Confidence conditions hold as breadth remains supportive—interpretive clarity stays consistent without aggressive certainty framing.",
-    },
-    NEUTRAL_ENVIRONMENT: {
-      a: "Portfolio behaviour tracks an observational balance across market confidence conditions.",
-      b: "Liquidity and volatility reorganize gradually, shaping sensitivity more through timing than direction.",
-    },
-    MOMENTUM_WEAKENING: {
-      a: "Portfolio momentum appears increasingly selective within broader market participation.",
-      b: "Confirmation cycles lengthen slightly, suggesting a measured environment where liquidity conditioning matters.",
-    },
-    ELEVATED_RISK: {
-      a: "Elevated volatility conditions tighten interpretive margins for portfolio concentration.",
-      b: "Institutional signals persist, but sensitivity rises—narratives remain guarded and structurally focused.",
-    },
-  };
-
-  const tmpl = narrativeTemplates[confidenceState];
-  toneBank.headline = tmpl.a;
-  toneBank.supporting =
-    health.environment === "Concentration Increasing" || health.environment === "Elevated Volatility Exposure"
-      ? "Concentration is tightening the environmental pulse, so sector-level sensitivity becomes more meaningful under current market structure."
-      : "Diversification quality helps keep the intelligence environment stable, with confidence adapting calmly to market shifts.";
-
-  const bySector = new Map<SectorId, number>();
-  for (const h of holdingsN) {
-    bySector.set(h.sector, (bySector.get(h.sector) ?? 0) + h.weight);
   }
 
-  const sectorExposure: SectorExposure[] = ([
-    "Banking",
-    "IT",
-    "Energy",
-    "FMCG",
-    "Pharma",
-    "Defence",
-    "Auto",
-    "Infrastructure",
-  ] as SectorId[]).map((id) => {
-    const w = bySector.get(id) ?? 0;
-    const weightPct = Math.round(w * 100);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static weightedHealthScore(holdings: any[]): number {
+    let totalValue = 0;
+    let weightedScore = 0;
 
-    const capsuleLabel = (() => {
-      if (w === 0) return "Under-represented";
-      if (w >= 0.22) return "Elevated exposure";
-      if (w >= 0.12) return "Meaningful allocation";
-      return "Light contribution";
-    })();
+    for (const h of holdings) {
+      const value = ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+      totalValue += value;
+      const holdingScore = this.individualHoldingScore(h);
+      weightedScore += holdingScore * value;
+    }
 
-    return { id, weightPct, capsuleLabel };
-  }).sort((a, b) => b.weightPct - a.weightPct);
+    return totalValue > 0 ? weightedScore / totalValue : 50;
+  }
 
-  const watchlist = (() => {
-    const sectorFocus = sectorExposure.slice(0, 3).map((s) => s.id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static individualHoldingScore(holding: any): number {
+    let score = 60;
 
-    const candidates: Array<{ symbol: string; sector: SectorId; identity: string }> = [
-      { symbol: "HDFCBANK", sector: "Banking", identity: "Private banking allocation lens" },
-      { symbol: "INFY", sector: "IT", identity: "Technology leadership posture" },
-      { symbol: "RELIANCE", sector: "Energy", identity: "Energy breadth watch" },
-      { symbol: "HINDUNILVR", sector: "FMCG", identity: "Defensive consumer stability" },
-      { symbol: "SUNPHARMA", sector: "Pharma", identity: "Pharma confidence check" },
-      { symbol: "DRDO_LENS", sector: "Defence", identity: "Defence allocation calibration" },
-      { symbol: "TATAMOTORS", sector: "Auto", identity: "Auto rotation conditioning" },
-      { symbol: "LTI_INFRA", sector: "Infrastructure", identity: "Infrastructure participation lens" },
-    ];
+    if (holding.pnlPercent !== undefined) {
+      if (holding.pnlPercent > 20) score += 20;
+      else if (holding.pnlPercent > 10) score += 15;
+      else if (holding.pnlPercent > 0) score += 10;
+      else if (holding.pnlPercent > -10) score -= 10;
+      else if (holding.pnlPercent > -20) score -= 20;
+      else score -= 30;
+    }
 
-    const sectorRelevance = (s: SectorId) => (sectorFocus.includes(s) ? 0.85 : 0.55);
+    const defensiveSectors = ['FMCG', 'Pharma', 'IT', 'Insurance', 'Banking'];
+    const cyclicalSectors = ['Realty', 'Metals', 'Mining', 'Oil & Gas'];
+    
+    if (defensiveSectors.some(s => holding.sector?.includes(s))) score += 10;
+    if (cyclicalSectors.some(s => holding.sector?.includes(s))) score -= 5;
 
-    const envWord =
-      confidenceState === "ELEVATED_RISK"
-        ? "Elevated volatility-conditioned environment"
-        : confidenceState === "MOMENTUM_WEAKENING"
-          ? "Momentum selective environment"
-          : confidenceState === "NEUTRAL_ENVIRONMENT"
-            ? "Balanced observational environment"
-            : confidenceState === "CONFIDENCE_RISING"
-              ? "Constructive confidence environment"
-              : "Stable conviction environment";
+    return Math.max(0, Math.min(100, score));
+  }
 
-    const momentumWord =
-      confidenceState === "ELEVATED_RISK"
-        ? "Momentum sensitivity tightens"
-        : confidenceState === "MOMENTUM_WEAKENING"
-          ? "Follow-through becomes selective"
-          : "Leadership remains disciplined";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static calculateRisk(holdings: any[]): number {
+    if (holdings.length === 0) return 50;
 
-    const volatilityWord =
-      confidenceState === "ELEVATED_RISK"
-        ? "Volatility pressure broadens"
-        : confidenceState === "MOMENTUM_WEAKENING"
-          ? "Volatility stays present with pockets"
-          : "Volatility remains contained";
+    let totalValue = 0;
+    for (const h of holdings) {
+      totalValue += ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+    }
 
-    const instWord =
-      confidenceState === "ELEVATED_RISK"
-        ? "Institutional signals remain selective"
-        : confidenceState === "MOMENTUM_WEAKENING"
-          ? "Institutional posture stays steady"
-          : "Institutional alignment remains supportive";
+    const weights = holdings.map(h => {
+      const value = ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+      return totalValue > 0 ? value / totalValue : 0;
+    });
+    const maxWeight = Math.max(...weights);
 
-    const withRel = candidates
-      .map((c, idx) => {
-        const intensity = clamp01((sectorRelevance(c.sector) * 0.6 + (idx % 2 === 0 ? 0.1 : 0)) + (narrativeKey % 5) * 0.01);
-        const relevance = intensity;
-        return {
-          id: `wl_${c.symbol}_${idx}`,
-          symbol: c.symbol,
-          identity: c.identity,
-          narrativePreview:
-            intensity > 0.7
-              ? `Sector exposure aligns with ${envWord}; interpretation stays calm and structurally focused.`
-              : `Sector exposure remains secondary within ${envWord}; emphasis stays on confidence continuity.`,
-          confidenceEnvironment: confidenceLabel(confidenceState),
-          sectorMomentum: momentumWord,
-          volatilityCondition: volatilityWord,
-          institutionalAlignment: instWord,
-          relevance,
-        } as WatchlistIntelligenceItem & { relevance: number };
-      })
-      .sort((a, b) => b.relevance - a.relevance)
-      .slice(0, 5)
-      .map((x) => {
-        // strip relevance while keeping the type contract
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { relevance: _r, ...rest } = x;
-        return rest;
-      });
+    let riskScore = 30;
+    if (maxWeight > 0.4) riskScore += 30;
+    else if (maxWeight > 0.25) riskScore += 20;
+    else if (maxWeight > 0.15) riskScore += 10;
+    else riskScore -= 10;
 
-    return withRel;
-  })();
+    const sectorWeights = new Map<string, number>();
+    for (let i = 0; i < holdings.length; i++) {
+      const sector = holdings[i].sector || 'General';
+      sectorWeights.set(sector, (sectorWeights.get(sector) || 0) + weights[i]);
+    }
 
-  const timeline = (() => {
-    const seed = narrativeKey % 1000;
+    const maxSectorWeight = Math.max(...sectorWeights.values());
+    if (maxSectorWeight > 0.6) riskScore += 25;
+    else if (maxSectorWeight > 0.4) riskScore += 15;
+    else if (maxSectorWeight > 0.25) riskScore += 5;
 
-    const entries: TimelineEntry[] = [
-      {
-        id: `tl_${seed}_1`,
-        when: "Recent intelligence pulse",
-        text:
-          confidenceState === "ELEVATED_RISK"
-            ? "Confidence margins tighten as volatility-conditioned sensitivity becomes more meaningful across concentrated exposure."
-            : "Narrative continuity holds as confidence recalibrates calmly with structural market inputs.",
-      },
-      {
-        id: `tl_${seed}_2`,
-        when: "Sector allocation lens",
-        text:
-          health.environment === "Defensive Alignment"
-            ? "Defensive alignment supports steadier interpretive confidence across defensive segments."
-            : "Allocation terrain remains adaptive, with sector-level sensitivity responding to timing under current structure.",
-      },
-      {
-        id: `tl_${seed}_3`,
-        when: "Liquidity conditioning note",
-        text:
-          confidenceState === "MOMENTUM_WEAKENING"
-            ? "Liquidity conditioning becomes more important as follow-through remains selective."
-            : "Liquidity posture remains supportive enough to maintain calm interpretation.",
-      },
-      {
-        id: `tl_${seed}_4`,
-        when: "Institutional alignment update",
-        text:
-          confidenceState === "CONFIDENCE_RISING"
-            ? "Institutional alignment reads steady and constructive, supporting an engineered confidence rhythm."
-            : "Institutional posture remains composed, adjusting narrative focus without abrupt replacement.",
-      },
-    ];
+    return Math.min(100, Math.max(5, riskScore));
+  }
 
-    return entries;
-  })();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static calculateQuality(holdings: any[]): number {
+    if (holdings.length === 0) return 50;
 
-  const scenario = (() => {
-    const elevatedVol = health.environment === "Elevated Volatility Exposure" || confidenceState === "ELEVATED_RISK";
-    const concentrated = health.environment === "Concentration Increasing";
+    let largeCapCount = 0;
+    let knownSectorCount = 0;
 
-    const title = elevatedVol
-      ? "Volatility-conditioned portfolio sensitivity"
-      : concentrated
-        ? "Concentration-aware intelligence environment"
-        : "Structure-first portfolio interpretation";
+    for (const h of holdings) {
+      const mc = h.marketCap;
+      if (mc && mc > 200_000_000_000) largeCapCount++;
+      const sector = h.sector;
+      if (sector && sector !== 'General') knownSectorCount++;
+    }
 
-    const bulletA = elevatedVol
-      ? "Sensitivity rises most where allocation concentration and cyclical participation overlap; narratives stay guarded and structural."
-      : concentrated
-        ? "Concentration tightens the environmental pulse, so sector exposure becomes the primary interpretive lens for timing."
-        : "Diversification quality supports calmer confidence continuity; narratives remain context-aware under normal structure shifts.";
+    const largeCapRatio = largeCapCount / holdings.length;
+    const knownSectorRatio = knownSectorCount / holdings.length;
 
-    const bulletB = confidenceState === "MOMENTUM_WEAKENING"
-      ? "Momentum is treated as selective—liquidity conditioning and institutional posture become the stabilizing anchors."
-      : confidenceState === "NEUTRAL_ENVIRONMENT"
-        ? "Market structure evolves gradually—interpretations prioritize continuity over abrupt storyline replacements."
-        : "Institutional alignment helps keep confidence environments composed while market structure adapts.";
+    let score = 50;
+    score += largeCapRatio * 20;
+    score += knownSectorRatio * 15;
+    score += Math.min(holdings.length * 2, 15);
 
-    const riskFraming = elevatedVol
-      ? "This environment increases interpretation sensitivity; it does not assume outcomes—confidence remains probabilistic and measured."
-      : "Risk framing stays balanced: uncertainty is interpreted structurally, with calm confidence boundaries.";
+    return Math.min(100, Math.max(20, score));
+  }
 
-    return { title, bulletA, bulletB, riskFraming };
-  })();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static calculateDiversification(holdings: any[]): {
+    diversificationScore: number;
+    warnings: string[];
+  } {
+    const warnings: string[] = [];
 
-  return {
-    health,
-    narrative: { headline: toneBank.headline, supporting: toneBank.supporting },
-    sectorExposure,
-    watchlist,
-    timeline,
-    scenario,
-    orbPulseTightening: health.concentrationTightening,
-    orbColorKey: orbColorKey(confidenceState),
-  };
+    if (holdings.length === 0) {
+      return { diversificationScore: 0, warnings: ['Portfolio is empty'] };
+    }
+
+    const sectors = new Set(holdings.map(h => h.sector || 'General'));
+    const sectorCount = sectors.size;
+    const uniqueStocks = new Set(holdings.map(h => h.symbol));
+    const stockCount = uniqueStocks.size;
+
+    let score = 30;
+
+    if (sectorCount >= 5) score += 30;
+    else if (sectorCount >= 3) score += 20;
+    else if (sectorCount >= 2) score += 10;
+    else { score -= 10; warnings.push('Single sector concentration — diversify across sectors'); }
+
+    if (stockCount >= 15) score += 25;
+    else if (stockCount >= 10) score += 15;
+    else if (stockCount >= 5) score += 10;
+    else { score -= 10; warnings.push('Fewer than 5 unique stocks — consider adding positions'); }
+
+    let totalValue = 0;
+    for (const h of holdings) totalValue += ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+
+    for (const h of holdings) {
+      const value = ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+      const weight = totalValue > 0 ? (value / totalValue) * 100 : 0;
+      if (weight > 40) {
+        warnings.push(`${h.symbol} represents ${weight.toFixed(0)}% of portfolio — concentration risk`);
+      }
+    }
+
+    const sectorValues = new Map<string, number>();
+    for (const h of holdings) {
+      const value = ((h.lastPrice ?? h.averagePrice) ?? 0) * (h.quantity ?? 0);
+      const sector = h.sector || 'General';
+      sectorValues.set(sector, (sectorValues.get(sector) || 0) + value);
+    }
+
+    for (const [sector, value] of sectorValues) {
+      const weight = totalValue > 0 ? (value / totalValue) * 100 : 0;
+      if (weight > 50) {
+        warnings.push(`${sector} sector: ${weight.toFixed(0)}% allocation — excessive concentration`);
+      }
+    }
+
+    return { diversificationScore: Math.min(100, Math.max(10, score)), warnings };
+  }
+
+  private static classify(score: number): PortfolioHealthResult['healthClassification'] {
+    if (score >= 85) return 'Excellent';
+    if (score >= 70) return 'Strong';
+    if (score >= 55) return 'Healthy';
+    if (score >= 40) return 'Stable';
+    if (score >= 25) return 'Weakening';
+    return 'At Risk';
+  }
 }

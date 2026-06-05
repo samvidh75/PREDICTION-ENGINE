@@ -1,6 +1,6 @@
 # Factor Reconstruction Plan — Factor Quality Audit
 
-**Generated:** 2026-06-05T10:42:41.063Z
+**Generated:** 2026-06-05T11:09:49.911Z
 
 ---
 

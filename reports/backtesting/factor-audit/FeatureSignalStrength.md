@@ -1,6 +1,6 @@
 # Feature Signal Strength — Factor Quality Audit
 
-**Generated:** 2026-06-05T10:42:41.058Z
+**Generated:** 2026-06-05T11:09:49.897Z
 **Sample:** 28 companies with real price data
 
 ---

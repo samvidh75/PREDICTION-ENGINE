@@ -1,20 +1,66 @@
 // src/services/providers/YahooProvider.ts
 // Production Yahoo Finance provider — real HTTP requests, no mocks.
+// As of June 2026: Yahoo v10 quoteSummary returns 401 (blocked).
+// Yahoo v8 chart API works for price/volume data.
+// Fundamentals (PE, ROE, D/E, etc.) must come from Finnhub or other providers.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
+import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint } from '../data/types';
 import { RetryPolicy } from './RetryPolicy';
 
 const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
 
 /**
- * YahooProvider — Tier 1 provider.
- * Uses Yahoo Finance v8 chart API (public, no key required).
- * Supports quotes, metadata (via quoteSummary), and full OHLC historical data.
+ * YahooFinancials — structured output from Yahoo v8 chart API.
+ *
+ * NOTE: Yahoo v10 quoteSummary is currently blocked (401 Unauthorized).
+ * The v8 chart API provides price/volume only — no PE, ROE, D/E, etc.
+ *
+ * Fields that CAN be derived from v8:
+ *   - beta (from 2Y price history)
+ *   - marketCap approximation (price * avg volume — unreliable, prefer Registry)
+ *
+ * For real fundamentals, use FinnhubProvider or other financial providers.
  */
-export class YahooProvider implements PriceProvider, MetadataProvider, HistoricalProvider {
+export interface YahooFinancials {
+  symbol: string;
+  // From v8 meta
+  marketCap?: number;
+  // Derived from historical prices
+  beta?: number;
+  // These are NOT available from v8 — always null when Yahoo is sole provider
+  peRatio?: undefined;
+  pbRatio?: undefined;
+  evEbitda?: undefined;
+  eps?: undefined;
+  fcfYield?: undefined;
+  roe?: undefined;
+  roic?: undefined;
+  grossMargin?: undefined;
+  operatingMargin?: undefined;
+  revenueGrowth?: undefined;
+  epsGrowth?: undefined;
+  fcfGrowth?: undefined;
+  profitGrowth?: undefined;
+  debtToEquity?: undefined;
+  currentRatio?: undefined;
+  interestCoverage?: undefined;
+  freeCashFlow?: undefined;
+  dividendYield?: undefined;
+  _raw?: Record<string, unknown>;
+}
+
+/**
+ * YahooProvider — Tier 1 provider for price/volume/historical data.
+ * Uses Yahoo Finance v8 chart API (public, no key required).
+ *
+ * Financial fundamentals are NOT available via v8.
+ * ProviderCoordinator routes getFinancials() to Finnhub first.
+ */
+export class YahooProvider implements PriceProvider, MetadataProvider, HistoricalProvider, FinancialProvider {
 
   /** Map user-facing range strings to Yahoo chart API range params */
   private static RANGE_MAP: Record<string, string> = {
@@ -66,27 +112,23 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   // ── Metadata ──────────────────────────────────────────────
   async getMetadata(symbol: string): Promise<CompanyMetadata> {
     const ticker = this.normalizeSymbol(symbol);
-    // quoteSummary gives company profile data
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=assetProfile,price`;
+    // Use v8 chart API for name/exchange (v10 quoteSummary is blocked)
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`;
     try {
       const data = await this.fetchJson(url);
-      const result = data?.quoteSummary?.result?.[0];
-      const profile = result?.assetProfile ?? {};
-      const price = result?.price ?? {};
+      const meta = data?.chart?.result?.[0]?.meta ?? {};
       return {
         symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
-        companyName: price.longName || price.shortName || symbol,
-        sector: profile.sector || '',
-        industry: profile.industry || '',
-        exchange: price.exchangeName || 'NSE',
-        marketCap: price.marketCap?.raw ?? undefined,
-        currency: price.currency || 'INR',
-        website: profile.website || '',
+        companyName: meta.longName || meta.shortName || symbol,
+        sector: '',
+        industry: '',
+        exchange: meta.fullExchangeName === 'BSE' ? 'BSE' : (meta.fullExchangeName || 'NSE'),
+        marketCap: meta.marketCap ?? undefined,
+        currency: meta.currency || 'INR',
+        website: '',
       };
     } catch {
-      // quoteSummary failed — throw so ProviderCoordinator tries the next provider
-      // The MetadataProviderCoordinator will catch this and fall back to registry
-      throw new Error(`Yahoo: quoteSummary unavailable for ${symbol}`);
+      throw new Error(`Yahoo: chart unavailable for ${symbol}`);
     }
   }
 
@@ -118,5 +160,37 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
       adjustedClose: adj[i] ?? undefined,
     }));
     return points.filter(p => p.close !== null && p.close !== 0);
+  }
+
+  // ── Financials (v8 chart API only — fundamentals NOT available) ──
+  async getFinancials(symbol: string): Promise<YahooFinancials> {
+    const cleanSym = symbol.replace(/\.(NS|BO)$/i, '').toUpperCase();
+    const ticker = this.normalizeSymbol(symbol);
+
+    // Get 2Y historical data for beta derivation
+    let beta: number | undefined;
+    try {
+      const hist = await this.getHistorical(symbol, '2Y');
+      const prices = hist.map(p => p.adjustedClose ?? p.close).filter(p => p > 0);
+      if (prices.length >= 60) {
+        const returns: number[] = [];
+        for (let i = 1; i < prices.length; i++) {
+          returns.push(Math.log(prices[i] / prices[i - 1]));
+        }
+        const meanRet = returns.reduce((s, v) => s + v, 0) / returns.length;
+        const variance = returns.reduce((s, v) => s + (v - meanRet) ** 2, 0) / returns.length;
+        const annualVol = Math.sqrt(variance) * Math.sqrt(252);
+        // Rough beta: assume market vol ≈ 18% annualized
+        beta = Math.max(0.1, Math.min(annualVol / 0.18, 4.0));
+      }
+    } catch {
+      // Beta unavailable — caller should fall back
+    }
+
+    // v10 quoteSummary is blocked (401). v8 chart has no fundamental fields.
+    // Return what we can derive from v8; throw so ProviderCoordinator tries Finnhub.
+    throw new Error(
+      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (beta=${beta?.toFixed(2) ?? 'N/A'})`,
+    );
   }
 }
