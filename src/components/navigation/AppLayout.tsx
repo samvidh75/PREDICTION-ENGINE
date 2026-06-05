@@ -44,7 +44,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="ss-tv-app h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative bg-[#0f0f0f] text-[#f0f3fa]">
+    <div className="ss-tv-app ss-tv-stage h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative text-[#f0f3fa]">
       {/* Top Header - Desktop Viewport (h-18 / 72px) */}
       <div className="hidden md:block">
         <TopNav />
@@ -66,11 +66,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           h-[calc(100vh-72px)] 
           mt-[72px] 
           overflow-y-auto 
-          ss-tv-market-grid bg-[#0f0f0f]
+          ss-tv-market-grid bg-transparent
           md:ml-[240px]
           transition-all duration-300 ease-out
         ">
-          <div className="max-w-[1600px] mx-auto w-full px-4 md:px-8 py-8">
+          <div className="ss-tv-giant-word opacity-[0.26]">markets</div>
+          <div className="relative z-10 max-w-[1600px] mx-auto w-full px-4 md:px-8 py-8">
             {children}
           </div>
         </main>

@@ -27,7 +27,7 @@ export const MediumCard: React.FC<CardProps> = ({ children, className = "", onCl
     // Spacing: p-6 (24px)
     <Comp
       onClick={onClick}
-      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-xl p-6 transition-all hover:border-[#2962ff]/45 ${
+      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-lg p-6 transition-all hover:border-[#2962ff]/45 ${
         onClick ? "cursor-pointer hover:-translate-y-0.5 hover:bg-[#10131d]" : ""
       } ${className}`}
     >
@@ -42,7 +42,7 @@ export const LargeCard: React.FC<CardProps> = ({ children, className = "", onCli
     // Spacing: p-8 (32px)
     <Comp
       onClick={onClick}
-      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-2xl p-8 shadow-xl transition-all ${
+      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-lg p-8 shadow-xl transition-all ${
         onClick ? "cursor-pointer hover:-translate-y-0.5 hover:bg-[#10131d]" : ""
       } ${className}`}
     >
@@ -98,7 +98,7 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, primaryAction }) => {
   return (
     // Spacing: py-6 (24px) or py-8 (32px), mb-6 (24px)
-    <div className="ss-tv-panel rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between pb-5 mb-6 gap-4">
+    <div className="ss-tv-chart-terminal ss-tv-neon-edge rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between pb-5 mb-6 gap-4">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-[#f0f3fa]">{title}</h1>
         <p className="mt-2 text-xs text-[#787b86] font-medium">{subtitle}</p>
@@ -116,7 +116,7 @@ interface TableProps {
 
 export const CustomTable: React.FC<TableProps> = ({ headers, children, className = "" }) => {
   return (
-    <div className={`ss-tv-panel overflow-x-auto w-full rounded-2xl ${className}`}>
+    <div className={`ss-tv-panel overflow-x-auto w-full rounded-lg ${className}`}>
       <table className="w-full text-left text-xs border-collapse">
         <thead>
           <tr className="border-b border-[#2a2e39] text-[#787b86] font-semibold bg-[#1e222d]">

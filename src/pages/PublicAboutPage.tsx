@@ -87,10 +87,10 @@ function setPage(pageKey: string, id?: string): void {
 
 function NeonFrame({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    <div className="relative">
+    <div className="relative ss-tv-terminal-glow">
       <div className="absolute -inset-[1px] rounded-[32px] bg-[linear-gradient(135deg,rgba(41,98,255,0.9),rgba(34,171,148,0.55),rgba(143,92,255,0.8),rgba(242,54,69,0.55))] opacity-70 blur-sm" />
       <div className="absolute -inset-12 rounded-[44px] bg-[radial-gradient(circle_at_20%_20%,rgba(41,98,255,0.34),transparent_34%),radial-gradient(circle_at_82%_18%,rgba(143,92,255,0.26),transparent_32%),radial-gradient(circle_at_50%_100%,rgba(34,171,148,0.22),transparent_38%)] blur-3xl" />
-      <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[#080a0f]/95 shadow-[0_0_80px_rgba(41,98,255,0.18),0_0_120px_rgba(143,92,255,0.12)]">
+      <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080a0f]/95 shadow-[0_0_80px_rgba(41,98,255,0.18),0_0_120px_rgba(143,92,255,0.12)]">
         {children}
       </div>
     </div>
@@ -125,9 +125,10 @@ export const PublicAboutPage: React.FC = () => {
   };
 
   return (
-    <main className="ss-tv-app relative min-h-screen overflow-x-hidden bg-[#05070d] text-[#f0f3fa] font-sans antialiased">
+    <main className="ss-tv-app ss-tv-stage relative min-h-screen overflow-x-hidden bg-[#05070d] text-[#f0f3fa] font-sans antialiased">
       <TopNav />
       <MobileNav />
+      <div className="ss-tv-giant-word">markets</div>
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(120,123,134,0.13)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,123,134,0.10)_1px,transparent_1px)] bg-[size:78px_78px] opacity-35" />
@@ -138,44 +139,44 @@ export const PublicAboutPage: React.FC = () => {
       </div>
 
       <section className="relative z-10 mx-auto grid min-h-[860px] w-full max-w-7xl grid-cols-1 items-center gap-14 px-5 pb-24 pt-32 md:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:pt-36">
-        <div>
+        <div className="pt-8 text-center lg:text-left">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#b7c8ff] shadow-[0_0_34px_rgba(41,98,255,0.18)] backdrop-blur-xl">
             <Sparkles className="h-3.5 w-3.5 text-[#7da0ff]" />
             StockStory India market terminal
           </div>
 
-          <h1 className="max-w-4xl text-5xl font-black leading-[0.96] tracking-tight text-white md:text-7xl xl:text-8xl">
-            Where India studies stocks with conviction.
+          <h1 className="mx-auto max-w-4xl text-5xl font-black leading-[0.96] tracking-tight text-white md:text-7xl xl:text-8xl lg:mx-0">
+            Track Indian companies like a premium market desk.
           </h1>
 
-          <p className="mt-7 max-w-2xl text-base leading-8 text-[#c4c7d0] md:text-lg">
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-8 text-[#c4c7d0] md:text-lg lg:mx-0">
             StockStory India is a premium research workspace for Indian equities. Search companies, inspect live market data, build watchlists, monitor portfolios, and turn raw company information into a cleaner decision workflow.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
             <button
               type="button"
               onClick={() => setPage("signup")}
-              className="h-13 rounded-full bg-[#2962ff] px-8 text-sm font-bold text-white shadow-[0_0_34px_rgba(41,98,255,0.45)] transition hover:bg-[#1e53e5]"
+              className="h-[52px] rounded-full bg-[#2962ff] px-8 text-sm font-bold text-white shadow-[0_0_34px_rgba(41,98,255,0.45)] transition hover:bg-[#1e53e5]"
             >
               Launch StockStory
             </button>
             <button
               type="button"
               onClick={() => setPage("login")}
-              className="h-13 rounded-full border border-white/12 bg-white/[0.045] px-8 text-sm font-bold text-[#f0f3fa] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:bg-white/[0.08]"
+              className="h-[52px] rounded-full border border-white/12 bg-white/[0.045] px-8 text-sm font-bold text-[#f0f3fa] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:bg-white/[0.08]"
             >
               Sign in
             </button>
           </div>
 
-          <div className="mt-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 lg:mx-0">
             {[
               ["Built for", "Indian equities"],
               ["Interface", "Charts, lists, alerts"],
               ["Data rule", "Real or hidden"],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <div key={label} className="rounded-lg border border-white/10 bg-white/[0.04] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
                 <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#787b86]">{label}</div>
                 <div className="mt-2 text-sm font-bold text-white">{value}</div>
               </div>
@@ -184,7 +185,7 @@ export const PublicAboutPage: React.FC = () => {
         </div>
 
         <NeonFrame>
-          <div className="flex h-11 items-center justify-between border-b border-white/10 bg-[#10131d] px-4">
+          <div className="ss-tv-chart-toolbar px-4">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-[#f23645] shadow-[0_0_16px_rgba(242,54,69,0.75)]" />
               <span className="h-3 w-3 rounded-full bg-[#f0b90b] shadow-[0_0_16px_rgba(240,185,11,0.65)]" />
@@ -194,18 +195,18 @@ export const PublicAboutPage: React.FC = () => {
           </div>
 
           <div className="grid gap-4 p-4 lg:grid-cols-[1fr_230px]">
-            <div className="rounded-3xl border border-white/10 bg-[#0b0e16] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="ss-tv-chart-terminal rounded-lg p-4">
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#787b86]">NSE company intelligence</div>
                   <div className="mt-1 text-2xl font-black tracking-tight text-white">Reliance Industries</div>
                 </div>
-                <div className="rounded-2xl border border-[#2962ff]/35 bg-[#2962ff]/12 p-3 text-[#9bb5ff] shadow-[0_0_28px_rgba(41,98,255,0.22)]">
+                <div className="rounded-lg border border-[#2962ff]/35 bg-[#2962ff]/12 p-3 text-[#9bb5ff] shadow-[0_0_28px_rgba(41,98,255,0.22)]">
                   <Radar className="h-5 w-5" />
                 </div>
               </div>
 
-              <div className="relative h-[280px] overflow-hidden rounded-2xl border border-white/10 bg-[#05070d]">
+              <div className="relative h-[280px] overflow-hidden rounded-xl border border-white/10 bg-[#05070d]">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(120,123,134,0.15)_1px,transparent_1px),linear-gradient(to_bottom,rgba(120,123,134,0.13)_1px,transparent_1px)] bg-[size:54px_54px]" />
                 <svg viewBox="0 0 760 330" className="absolute inset-0 h-full w-full" role="img" aria-label="StockStory premium chart preview">
                   <defs>
@@ -229,7 +230,7 @@ export const PublicAboutPage: React.FC = () => {
 
                 <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-3">
                   {["Quality", "Valuation", "Risk"].map((label, index) => (
-                    <div key={label} className="rounded-2xl border border-white/10 bg-black/35 p-3 backdrop-blur-xl">
+                    <div key={label} className="rounded-lg border border-white/10 bg-black/35 p-3 backdrop-blur-xl">
                       <div className="text-[10px] uppercase tracking-[0.16em] text-[#787b86]">{label}</div>
                       <div className="mt-2 h-2 rounded-full bg-white/10">
                         <div
@@ -248,7 +249,7 @@ export const PublicAboutPage: React.FC = () => {
 
               <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
                 {["Search", "Watchlist", "Portfolio", "Alerts"].map((label) => (
-                  <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-3 text-xs font-bold text-[#c4c7d0]">
+                  <div key={label} className="rounded-lg border border-white/10 bg-white/[0.035] px-3 py-3 text-xs font-bold text-[#c4c7d0]">
                     {label}
                   </div>
                 ))}
@@ -256,7 +257,7 @@ export const PublicAboutPage: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-3xl border border-white/10 bg-[#0b0e16] p-4">
+              <div className="ss-tv-chart-terminal rounded-lg p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#787b86]">Live rail</div>
                   <Lock className="h-3.5 w-3.5 text-[#7da0ff]" />
@@ -271,7 +272,7 @@ export const PublicAboutPage: React.FC = () => {
                           key={row!.stock.symbol}
                           type="button"
                           onClick={() => setPage("company", row!.stock.symbol)}
-                          className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-3 text-left transition hover:border-[#2962ff]/45"
+                          className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.035] px-3 py-3 text-left transition hover:border-[#2962ff]/45"
                         >
                           <span>
                             <span className="block text-xs font-black text-white">{row!.stock.symbol}</span>
@@ -288,13 +289,13 @@ export const PublicAboutPage: React.FC = () => {
                     })}
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4 text-xs leading-6 text-[#9ca3af]">
+                  <div className="rounded-lg border border-white/10 bg-white/[0.025] p-4 text-xs leading-6 text-[#9ca3af]">
                     Live quote previews appear here only when the market-data API returns valid prices.
                   </div>
                 )}
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-[linear-gradient(145deg,rgba(41,98,255,0.16),rgba(143,92,255,0.12),rgba(34,171,148,0.08))] p-4 shadow-[0_0_34px_rgba(41,98,255,0.12)]">
+              <div className="rounded-lg border border-white/10 bg-[linear-gradient(145deg,rgba(41,98,255,0.16),rgba(143,92,255,0.12),rgba(34,171,148,0.08))] p-4 shadow-[0_0_34px_rgba(41,98,255,0.12)]">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#b7c8ff]">
                   <Zap className="h-3.5 w-3.5" />
                   Premium signal layer
@@ -315,7 +316,7 @@ export const PublicAboutPage: React.FC = () => {
             ["Data integrity", "Real quote data appears only after valid API responses"],
             ["Premium workflow", "Search, watchlists, portfolios, alerts, and research in one flow"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-3xl border border-white/10 bg-[#080a0f]/85 p-6 shadow-[0_0_40px_rgba(41,98,255,0.08)]">
+            <div key={label} className="rounded-lg border border-white/10 bg-[#080a0f]/85 p-6 shadow-[0_0_40px_rgba(41,98,255,0.08)]">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7da0ff]">{label}</div>
               <div className="mt-3 text-lg font-black leading-7 text-white">{value}</div>
             </div>
@@ -338,12 +339,12 @@ export const PublicAboutPage: React.FC = () => {
               key={feature.title}
               type="button"
               onClick={() => openFeature(feature.route)}
-              className="group relative min-h-[230px] overflow-hidden rounded-3xl border border-white/10 bg-[#080a0f] p-6 text-left shadow-[0_0_44px_rgba(41,98,255,0.08)] transition hover:-translate-y-1 hover:border-[#2962ff]/60 hover:shadow-[0_0_60px_rgba(41,98,255,0.18)]"
+                className="group relative min-h-[230px] overflow-hidden rounded-lg border border-white/10 bg-[#080a0f] p-6 text-left shadow-[0_0_44px_rgba(41,98,255,0.08)] transition hover:-translate-y-1 hover:border-[#2962ff]/60 hover:shadow-[0_0_60px_rgba(41,98,255,0.18)]"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(41,98,255,0.22),transparent_36%),radial-gradient(circle_at_90%_100%,rgba(143,92,255,0.16),transparent_36%)] opacity-80" />
               <div className="relative">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-2xl border border-[#2962ff]/35 bg-[#2962ff]/12 p-3 text-[#9bb5ff] shadow-[0_0_24px_rgba(41,98,255,0.18)]">{feature.icon}</span>
+                  <span className="rounded-lg border border-[#2962ff]/35 bg-[#2962ff]/12 p-3 text-[#9bb5ff] shadow-[0_0_24px_rgba(41,98,255,0.18)]">{feature.icon}</span>
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#787b86]">{feature.eyebrow}</span>
                 </div>
                 <h3 className="mt-8 text-2xl font-black tracking-tight text-white">{feature.title}</h3>
@@ -376,14 +377,14 @@ export const PublicAboutPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setPage("signup")}
-                className="h-13 rounded-full bg-white px-8 text-sm font-black text-black shadow-[0_0_34px_rgba(255,255,255,0.24)] transition hover:bg-[#dbe6ff]"
+                className="h-[52px] rounded-full bg-white px-8 text-sm font-black text-black shadow-[0_0_34px_rgba(255,255,255,0.24)] transition hover:bg-[#dbe6ff]"
               >
                 Create account
               </button>
               <button
                 type="button"
                 onClick={() => setPage("login")}
-                className="h-13 rounded-full border border-white/12 bg-white/[0.045] px-8 text-sm font-black text-white transition hover:bg-white/[0.08]"
+                className="h-[52px] rounded-full border border-white/12 bg-white/[0.045] px-8 text-sm font-black text-white transition hover:bg-white/[0.08]"
               >
                 Sign in
               </button>

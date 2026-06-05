@@ -22,7 +22,7 @@ export const TopNav: React.FC = () => {
 
   return (
     <>
-    <header className="ss-tv-neon-edge fixed top-0 left-0 right-0 z-50 flex h-[60px] items-center justify-between border-b border-white/10 bg-[#080a0f]/92 px-4 backdrop-blur-xl md:hidden">
+    <header className="ss-tv-neon-edge fixed top-0 left-0 right-0 z-50 flex h-[60px] items-center justify-between border-b border-white/10 bg-black/94 px-4 backdrop-blur-xl md:hidden">
       <button
         type="button"
         onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -35,7 +35,7 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={triggerSearch}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#b2b5be] shadow-[0_0_24px_rgba(41,98,255,0.14)]"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#1e222d] text-[#b2b5be] shadow-[0_0_24px_rgba(41,98,255,0.14)] transition hover:border-[#2962ff]/60 hover:text-white"
           aria-label="Open search"
         >
           <Search className="h-4 w-4" />
@@ -51,7 +51,7 @@ export const TopNav: React.FC = () => {
       )}
     </header>
 
-    <nav className="ss-tv-neon-edge fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-white/10 bg-[#080a0f]/92 px-8 backdrop-blur-xl md:flex">
+    <nav className="ss-tv-neon-edge fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-white/10 bg-black/94 px-8 backdrop-blur-xl md:flex">
       <div className="flex-shrink-0 w-[240px] flex items-center">
         <span 
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -63,14 +63,14 @@ export const TopNav: React.FC = () => {
 
       {isAuthenticated && user ? (
         <>
-          <div className="flex-1 flex justify-center max-w-[600px] mx-auto">
+          <div className="flex-1 flex justify-center max-w-[620px] mx-auto">
             <button
               onClick={triggerSearch}
-              className="w-full h-11 bg-white/[0.04] border border-white/10 hover:border-[#2962ff]/60 rounded-lg flex items-center px-4 gap-3 cursor-pointer text-left focus:outline-none transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_rgba(41,98,255,0.08)]"
+              className="w-full h-11 bg-[#1e222d] border border-white/10 hover:border-[#2962ff]/65 hover:bg-[#262b38] rounded-full flex items-center px-5 gap-3 cursor-pointer text-left focus:outline-none transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_rgba(41,98,255,0.08)]"
             >
               <Search className="w-4 h-4 text-[#787b86]" />
               <span className="text-xs text-[#787b86] font-normal">
-                Search stocks, companies or sectors (Cmd+K)...
+                Search stocks, companies or sectors (Ctrl+K)
               </span>
             </button>
           </div>
@@ -79,7 +79,7 @@ export const TopNav: React.FC = () => {
             <button
               type="button"
               onClick={() => setPage("alerts")}
-              className="h-11 w-11 rounded-lg bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] flex items-center justify-center transition-all cursor-pointer text-[#b2b5be] hover:text-[#f0f3fa] shadow-[0_0_24px_rgba(41,98,255,0.08)]"
+              className="h-11 w-11 rounded-full bg-[#1e222d] border border-white/10 hover:bg-[#262b38] hover:border-[#2962ff]/60 flex items-center justify-center transition-all cursor-pointer text-[#b2b5be] hover:text-[#f0f3fa] shadow-[0_0_24px_rgba(41,98,255,0.08)]"
             >
               <Bell className="w-4 h-4" />
             </button>
@@ -87,24 +87,30 @@ export const TopNav: React.FC = () => {
           </div>
         </>
       ) : (
-        <div className="flex-shrink-0 flex items-center gap-6 ml-auto">
+        <div className="flex-shrink-0 flex items-center gap-7 ml-auto">
           <button 
             onClick={() => setPage("about")}
-            className="text-xs font-semibold text-[#b2b5be] hover:text-[#f0f3fa] bg-transparent border-none cursor-pointer uppercase tracking-wider transition-colors"
+            className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
-            About
+            Products
+          </button>
+          <button 
+            onClick={() => setPage("landing")}
+            className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
+          >
+            Markets
           </button>
           <button 
             onClick={() => setPage("login")}
-            className="text-xs font-semibold text-[#b2b5be] hover:text-[#f0f3fa] bg-transparent border-none cursor-pointer uppercase tracking-wider transition-colors"
+            className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
             Sign in
           </button>
           <button 
             onClick={() => setPage("signup")}
-            className="px-5 py-2.5 bg-[#2962ff] text-white font-semibold rounded-full hover:bg-[#1e53e5] transition-all text-xs uppercase tracking-wider cursor-pointer"
+            className="px-5 py-2.5 bg-[#2962ff] text-white font-bold rounded-full hover:bg-[#1e53e5] transition-all text-sm cursor-pointer shadow-[0_0_28px_rgba(41,98,255,0.38)]"
           >
-            Create Account
+            Get started
           </button>
         </div>
       )}
