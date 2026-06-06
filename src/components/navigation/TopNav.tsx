@@ -92,13 +92,13 @@ export const TopNav: React.FC = () => {
             onClick={() => setPage("about")}
             className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
-            Products
+            About
           </button>
           <button 
             onClick={() => setPage("landing")}
             className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
-            Markets
+            Home
           </button>
           <button 
             onClick={() => setPage("login")}

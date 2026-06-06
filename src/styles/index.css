@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,31 +14,31 @@
   --ss-ui-space-scale: 1;
 
   /* StockStory India master design tokens (CSS variables) */
-  --ss-bg-primary: #0f0f0f;
-  --ss-bg-secondary: #131722;
-  --ss-bg-tertiary: #1e222d;
-  --ss-bg-elevated: #242731;
-  --ss-border: #2a2e39;
+  --ss-bg-primary: #05070A;
+  --ss-bg-secondary: #0A0F17;
+  --ss-bg-tertiary: #111827;
+  --ss-bg-elevated: #141C28;
+  --ss-border: rgba(255,255,255,0.08);
   --ss-border-strong: #363a45;
   --ss-text-primary: #f0f3fa;
   --ss-text-secondary: #b2b5be;
   --ss-text-muted: #787b86;
-  --ss-tv-blue: #2962ff;
-  --ss-tv-blue-hover: #1e53e5;
-  --ss-tv-green: #22ab94;
-  --ss-tv-red: #f23645;
-  --ss-tv-yellow: #f0b90b;
+  --ss-tv-blue: #00C8FF;
+  --ss-tv-blue-hover: #00FFE0;
+  --ss-tv-green: #00E676;
+  --ss-tv-red: #FF5252;
+  --ss-tv-yellow: #FFC857;
 
-  --ss-surface-2: #131722;
-  --ss-surface-3: #1e222d;
-  --ss-surface-4: #242731;
-  --ss-surface-tertiary: #2a2e39;
+  --ss-surface-2: #0A0F17;
+  --ss-surface-3: #111827;
+  --ss-surface-4: #141C28;
+  --ss-surface-tertiary: #1b2433;
 
-  --ss-accent-cyan: #2962ff;
-  --ss-accent-deep-cyan: #1e53e5;
-  --ss-accent-electric-blue-soft: #5b8cff;
-  --ss-accent-muted-magenta: #8f5cff;
-  --ss-accent-warning: #f0b90b;
+  --ss-accent-cyan: #00FFE0;
+  --ss-accent-deep-cyan: #00C8FF;
+  --ss-accent-electric-blue-soft: #00C8FF;
+  --ss-accent-muted-magenta: #7B61FF;
+  --ss-accent-warning: #FFC857;
 
   /* Glow propagation (intentionally restrained for premium calm) */
   --ss-glow-cyan: rgba(0, 255, 210, 0.18);
@@ -114,8 +116,8 @@
 
   /* Typography */
   /* Elite font pairing (from index.html): Geist Sans + Geist Mono */
-  --ss-font-ui: "Geist", "Geist Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --ss-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --ss-font-ui: "Inter", "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --ss-font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Hybrid semantic font-role variables:
      Active semantic vars (--font-display/heading/body/...) are selected via CSS below
@@ -280,10 +282,10 @@ body {
 .ss-tv-app {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 0% 78%, rgba(41, 98, 255, 0.32), transparent 30%),
-    radial-gradient(circle at 100% 78%, rgba(255, 51, 153, 0.30), transparent 30%),
-    radial-gradient(circle at 50% 82%, rgba(143, 92, 255, 0.20), transparent 36%),
-    linear-gradient(180deg, #020204 0%, #050506 38%, #08090d 100%);
+    radial-gradient(circle at 12% 18%, rgba(0, 200, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(123, 97, 255, 0.15), transparent 30%),
+    radial-gradient(circle at 58% 78%, rgba(0, 255, 224, 0.08), transparent 34%),
+    linear-gradient(180deg, #05070A 0%, #070b12 44%, #0A0F17 100%);
   color: var(--ss-text-primary);
 }
 
@@ -291,10 +293,10 @@ body {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at 0% 76%, rgba(41, 98, 255, 0.38), transparent 30%),
-    radial-gradient(circle at 100% 76%, rgba(255, 51, 153, 0.34), transparent 31%),
-    radial-gradient(circle at 55% 82%, rgba(255, 132, 64, 0.18), transparent 26%),
-    linear-gradient(180deg, #000 0%, #030305 48%, #07080d 100%);
+    radial-gradient(circle at 12% 16%, rgba(0, 200, 255, 0.20), transparent 30%),
+    radial-gradient(circle at 86% 14%, rgba(123, 97, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 50% 84%, rgba(0, 255, 224, 0.07), transparent 30%),
+    linear-gradient(180deg, #05070A 0%, #070A10 48%, #0A0F17 100%);
 }
 
 .ss-tv-stage::before {
@@ -303,11 +305,12 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 72%, rgba(255, 255, 255, 0.22), transparent 4%),
-    radial-gradient(circle at 20% 82%, rgba(41, 98, 255, 0.22), transparent 24%),
-    radial-gradient(circle at 82% 82%, rgba(255, 51, 153, 0.20), transparent 23%);
+    radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.10), transparent 3%),
+    radial-gradient(circle at 20% 78%, rgba(0, 200, 255, 0.14), transparent 24%),
+    radial-gradient(circle at 82% 76%, rgba(123, 97, 255, 0.13), transparent 23%);
   filter: blur(22px);
-  opacity: 0.78;
+  opacity: 0.52;
+  animation: ss-nebula-drift 28s ease-in-out infinite alternate;
 }
 
 .ss-tv-stage::after {
@@ -320,8 +323,64 @@ body {
     linear-gradient(to right, rgba(120,123,134,0.08) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(120,123,134,0.07) 1px, transparent 1px);
   background-size: 140px 140px, 78px 78px, 78px 78px;
-  opacity: 0.34;
+  opacity: 0.22;
   mask-image: linear-gradient(to bottom, transparent 0%, black 24%, black 88%, transparent 100%);
+}
+
+@keyframes ss-nebula-drift {
+  from { transform: translate3d(-1.5%, -0.5%, 0) scale(1); }
+  to { transform: translate3d(1.5%, 0.7%, 0) scale(1.04); }
+}
+
+.ss-premium-panel {
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)),
+    rgba(17, 24, 39, 0.86);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0,200,255,.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ss-premium-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 200, 255, 0.28);
+  background: linear-gradient(135deg, rgba(0, 200, 255, 0.98), rgba(0, 255, 224, 0.86));
+  color: #031017;
+  font-weight: 800;
+  letter-spacing: 0;
+  box-shadow: 0 0 20px rgba(0,200,255,.35);
+  transition: transform 160ms var(--ss-ease-primary), box-shadow 160ms var(--ss-ease-primary), border-color 160ms var(--ss-ease-primary);
+}
+
+.ss-premium-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(0,255,224,.25);
+}
+
+.ss-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(20, 28, 40, 0.72);
+  color: var(--ss-text-primary);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.ss-coming-soon {
+  cursor: not-allowed;
+  opacity: 0.62;
 }
 
 .ss-tv-giant-word {

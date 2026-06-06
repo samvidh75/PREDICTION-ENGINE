@@ -1,51 +1,66 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useNavigationMotion } from '../../hooks/useNavigationMotion';
+import React from "react";
+import { motion } from "framer-motion";
+import { useNavigationMotion } from "../../hooks/useNavigationMotion";
 
-const NAV_ITEMS = ['Dashboard', 'Discovery', 'Portfolio'];
+const NAV_ITEMS = [
+  { label: "Dashboard", page: "dashboard" },
+  { label: "Discovery", page: "discovery" },
+  { label: "Portfolio", page: "portfolio" },
+];
+
+function setPage(pageKey: string): void {
+  const params = new URLSearchParams(window.location.search);
+  params.set("page", pageKey);
+  params.delete("id");
+  window.history.pushState({}, "", `?${params.toString()}`);
+  window.dispatchEvent(new Event("urlchange"));
+}
 
 export const Navbar: React.FC = () => {
   const { controls, triggerTransition } = useNavigationMotion();
 
-  const handleNav = (item: string) => async () => {
-    await triggerTransition(item);
-    // routing integration point (e.g. react-router navigate) — intentionally decoupled
+  const handleNav = (item: (typeof NAV_ITEMS)[number]) => async () => {
+    await triggerTransition(item.label);
+    setPage(item.page);
   };
 
   return (
     <motion.header
       animate={controls}
       initial={{ opacity: 1 }}
-      className="fixed top-0 left-0 w-full z-50 bg-black/95 backdrop-blur-sm border-b border-neutral-800"
+      className="fixed left-0 top-0 z-50 w-full border-b border-white/10 bg-[#05070A]/95 backdrop-blur-xl"
     >
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <span className="text-white font-semibold text-lg tracking-wide">StockStory India</span>
-        </div>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+        <button
+          type="button"
+          onClick={() => setPage("dashboard")}
+          className="border-none bg-transparent p-0 text-left text-lg font-semibold tracking-wide text-white"
+        >
+          StockStory India
+        </button>
 
-        <nav className="hidden md:flex items-center space-x-2">
+        <nav className="hidden items-center space-x-2 md:flex">
           {NAV_ITEMS.map((item) => (
             <motion.button
-              key={item}
+              key={item.page}
               onClick={handleNav(item)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="text-neutral-200 hover:text-white px-3 py-2 rounded-md text-sm"
+              className="rounded-md px-3 py-2 text-sm text-neutral-200 hover:text-white"
             >
-              {item}
+              {item.label}
             </motion.button>
           ))}
         </nav>
 
-        <div className="flex items-center">
-          <motion.button
-            onClick={() => triggerTransition('init-session')}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-black px-3 py-2 rounded-md text-sm font-medium"
-          >
-            Sign in
-          </motion.button>
-        </div>
+        <motion.button
+          type="button"
+          onClick={() => setPage("login")}
+          whileHover={{ scale: 1.02 }}
+          className="rounded-md bg-gradient-to-r from-[#00C8FF] to-[#00FFE0] px-3 py-2 text-sm font-medium text-[#031017]"
+        >
+          Sign in
+        </motion.button>
       </div>
     </motion.header>
   );
