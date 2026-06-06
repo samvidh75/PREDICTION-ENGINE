@@ -18,13 +18,40 @@ import { ProviderHealthService, type ProviderHealthSnapshot } from './ProviderHe
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 
+const FIELD_PRECEDENCE: Record<string, string[]> = {
+  symbol: ['FinnhubProvider', 'ScreenerProvider', 'UpstoxFundamentalsProvider', 'YahooProvider'],
+  periodEnd: ['FinnhubProvider', 'ScreenerProvider', 'UpstoxFundamentalsProvider', 'YahooProvider'],
+  marketCap: ['FinnhubProvider', 'ScreenerProvider', 'YahooProvider'],
+  peRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'YahooProvider'],
+  pbRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'YahooProvider'],
+  evEbitda: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  eps: ['FinnhubProvider', 'ScreenerProvider', 'YahooProvider'],
+  fcfYield: ['FinnhubProvider', 'YahooProvider'],
+  roe: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  roa: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  roic: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  grossMargin: ['FinnhubProvider', 'YahooProvider'],
+  operatingMargin: ['ScreenerProvider', 'FinnhubProvider'],
+  revenueGrowth: ['ScreenerProvider', 'FinnhubProvider'],
+  profitGrowth: ['ScreenerProvider', 'FinnhubProvider'],
+  epsGrowth: ['FinnhubProvider', 'ScreenerProvider'],
+  fcfGrowth: ['FinnhubProvider', 'ScreenerProvider'],
+  debtToEquity: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  currentRatio: ['FinnhubProvider', 'ScreenerProvider'],
+  dividendYield: ['ScreenerProvider', 'FinnhubProvider'],
+  beta: ['FinnhubProvider', 'YahooProvider'],
+  bookValue: ['ScreenerProvider'],
+  interestCoverage: ['FinnhubProvider'],
+  freeCashFlow: ['FinnhubProvider'],
+  totalAssets: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  totalLiabilities: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+  totalEquity: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
+};
+
 /**
  * ProviderCoordinator is the single entry point for market data.
- *
- * Financial providers are merged, not first-success returned:
- *   - Existing provider order is preserved.
- *   - No later provider can overwrite an earlier populated field.
- *   - Missing values remain missing; no synthetic replacements are created.
+ * Financial values are resolved at field level so a lower-priority provider
+ * can fill gaps but cannot silently overwrite a preferred real value.
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -47,6 +74,20 @@ export class ProviderCoordinator {
     this.upstox = new UpstoxProvider();
     this.circuitBreakers.set(this.upstox, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
 
+    try {
+      const finnhub = new FinnhubProvider();
+      this.circuitBreakers.set(finnhub, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+      this.metadataProviders.push(finnhub);
+      this.financialProviders.push(finnhub);
+      this.newsProviders.push(finnhub);
+    } catch {
+      // Finnhub remains optional when no API key is configured.
+    }
+
+    const screener = new ScreenerProvider();
+    this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.financialProviders.push(screener);
+
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
       if (typeof window !== 'undefined') {
         return window.localStorage.getItem('upstox_access_token') ?? null;
@@ -59,26 +100,11 @@ export class ProviderCoordinator {
     this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.financialProviders.push(upstoxFundamentals);
 
-    const screener = new ScreenerProvider();
-    this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.financialProviders.push(screener);
-
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
-
-    try {
-      const finnhub = new FinnhubProvider();
-      this.circuitBreakers.set(finnhub, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-      this.metadataProviders.push(finnhub);
-      this.financialProviders.push(finnhub);
-      this.newsProviders.push(finnhub);
-    } catch {
-      // Finnhub is optional when no API key is configured.
-    }
-
     this.financialProviders.push(yahoo);
 
     const googleNews = new GoogleNewsRssProvider();
@@ -114,15 +140,8 @@ export class ProviderCoordinator {
     return this.providerHealthService.getAllSnapshots();
   }
 
-  private async invokeChain<T>(
-    providers: any[],
-    fn: (provider: any) => Promise<T>,
-    category: string,
-    symbol: string,
-  ): Promise<T> {
-    if (providers.length === 0) {
-      throw new Error(`No providers configured for ${category}`);
-    }
+  private async invokeChain<T>(providers: any[], fn: (provider: any) => Promise<T>, category: string, symbol: string): Promise<T> {
+    if (providers.length === 0) throw new Error(`No providers configured for ${category}`);
 
     const errors: string[] = [];
     for (const provider of providers) {
@@ -138,16 +157,14 @@ export class ProviderCoordinator {
       const startedAt = Date.now();
       try {
         const result = breaker ? await breaker.execute(() => fn(provider)) : await fn(provider);
-        const latencyMs = Date.now() - startedAt;
         this.healthMonitor.recordSuccess(provider);
-        this.providerHealthService.recordSuccess(providerName, latencyMs, this.estimateCompleteness(result));
+        this.providerHealthService.recordSuccess(providerName, Date.now() - startedAt, this.estimateCompleteness(result));
         this.tracer.recordUsage(symbol, category, providerName, false);
         return result;
       } catch (err: any) {
-        const latencyMs = Date.now() - startedAt;
         errors.push(`${providerName}: ${err?.message || String(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.providerHealthService.recordFailure(providerName, latencyMs, err);
+        this.providerHealthService.recordFailure(providerName, Date.now() - startedAt, err);
         this.tracer.recordUsage(symbol, category, providerName, true);
       }
     }
@@ -156,7 +173,7 @@ export class ProviderCoordinator {
   }
 
   private async invokeFinancialsMerge(symbol: string): Promise<FinancialSnapshot> {
-    const merged: Record<string, any> = {};
+    const candidates: Record<string, Array<{ provider: string; value: any }>> = {};
     const sourceMap: Record<string, string> = {};
     const errors: string[] = [];
 
@@ -172,96 +189,63 @@ export class ProviderCoordinator {
       const breaker = this.circuitBreakers.get(provider);
       const startedAt = Date.now();
       try {
-        const result = breaker
-          ? await breaker.execute(() => provider.getFinancials(symbol))
-          : await provider.getFinancials(symbol);
-        const latencyMs = Date.now() - startedAt;
+        const result = breaker ? await breaker.execute(() => provider.getFinancials(symbol)) : await provider.getFinancials(symbol);
         this.healthMonitor.recordSuccess(provider);
-        this.providerHealthService.recordSuccess(providerName, latencyMs, this.estimateCompleteness(result));
+        this.providerHealthService.recordSuccess(providerName, Date.now() - startedAt, this.estimateCompleteness(result));
         this.tracer.recordUsage(symbol, 'financials', providerName, false);
-        this.mergeFinancialFields(merged, result as Record<string, any>, providerName, sourceMap);
+        this.collectFinancialCandidates(candidates, result as Record<string, any>, providerName);
       } catch (err: any) {
-        const latencyMs = Date.now() - startedAt;
         errors.push(`${providerName}: ${err?.message || String(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.providerHealthService.recordFailure(providerName, latencyMs, err);
+        this.providerHealthService.recordFailure(providerName, Date.now() - startedAt, err);
         this.tracer.recordUsage(symbol, 'financials', providerName, true);
       }
     }
 
-    if (Object.keys(merged).length === 0) {
+    const resolved: Record<string, any> = {};
+    for (const [field, fieldCandidates] of Object.entries(candidates)) {
+      const chosen = this.resolveCandidate(field, fieldCandidates);
+      if (!chosen) continue;
+      resolved[field] = chosen.value;
+      sourceMap[field] = chosen.provider;
+    }
+
+    if (Object.keys(resolved).length === 0) {
       throw new Error(`All providers failed for financials(${symbol}): ${errors.join(' | ')}`);
     }
 
     return {
-      symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
-      periodEnd: merged.periodEnd ?? new Date().toISOString().split('T')[0],
-      ...merged,
+      symbol: String(resolved.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+      periodEnd: resolved.periodEnd ?? new Date().toISOString().split('T')[0],
+      ...resolved,
       _sources: sourceMap,
       _providerErrors: errors,
     } as FinancialSnapshot;
   }
 
+  private collectFinancialCandidates(candidates: Record<string, Array<{ provider: string; value: any }>>, source: Record<string, any>, providerName: string): void {
+    for (const [field, value] of Object.entries(source)) {
+      if (field.startsWith('_') || value === undefined || value === null) continue;
+      const precedence = FIELD_PRECEDENCE[field];
+      if (!precedence || !precedence.includes(providerName)) continue;
+      if (!candidates[field]) candidates[field] = [];
+      candidates[field].push({ provider: providerName, value });
+    }
+  }
+
+  private resolveCandidate(field: string, candidates: Array<{ provider: string; value: any }>): { provider: string; value: any } | undefined {
+    for (const providerName of FIELD_PRECEDENCE[field] ?? []) {
+      const match = candidates.find(candidate => candidate.provider === providerName);
+      if (match) return match;
+    }
+    return candidates[0];
+  }
+
   private estimateCompleteness(result: unknown): number {
     if (Array.isArray(result)) return result.length > 0 ? 1 : 0;
     if (!result || typeof result !== 'object') return result == null ? 0 : 1;
-    const entries = Object.entries(result as Record<string, unknown>)
-      .filter(([key]) => !key.startsWith('_'));
+    const entries = Object.entries(result as Record<string, unknown>).filter(([key]) => !key.startsWith('_'));
     if (entries.length === 0) return 0;
-    const populated = entries.filter(([, value]) => value !== null && value !== undefined).length;
-    return populated / entries.length;
-  }
-
-  private mergeFinancialFields(
-    target: Record<string, any>,
-    source: Record<string, any>,
-    providerName: string,
-    sourceMap: Record<string, string>,
-  ): void {
-    const upstoxFields = new Set([
-      'symbol',
-      'periodEnd',
-      'peRatio',
-      'pbRatio',
-      'roe',
-      'roa',
-      'roic',
-      'evEbitda',
-      'debtToEquity',
-      'totalAssets',
-      'totalLiabilities',
-      'totalEquity',
-    ]);
-    const screenerEnrichmentFields = new Set([
-      'revenueGrowth',
-      'profitGrowth',
-      'epsGrowth',
-      'fcfGrowth',
-      'operatingMargin',
-      'currentRatio',
-      'dividendYield',
-      'bookValue',
-      'marketCap',
-    ]);
-    const fallbackFields = new Set([
-      'eps',
-      'beta',
-      'fcfYield',
-      'grossMargin',
-    ]);
-
-    const allowed = providerName === 'UpstoxFundamentalsProvider'
-      ? upstoxFields
-      : providerName === 'ScreenerProvider'
-        ? screenerEnrichmentFields
-        : fallbackFields;
-
-    for (const [field, value] of Object.entries(source)) {
-      if (field.startsWith('_') || !allowed.has(field)) continue;
-      if (value === undefined || value === null) continue;
-      if (target[field] !== undefined && target[field] !== null) continue;
-      target[field] = value;
-      sourceMap[field] = providerName;
-    }
+    return entries.filter(([, value]) => value !== null && value !== undefined).length / entries.length;
   }
 }
