@@ -114,6 +114,7 @@ export interface StabilityEngineOutput {
   cashScore: number;
   volatilityScore: number;
   coverageScore: number;
+  marketCapSizeScore: number;
   commentary: string;
 }
 
@@ -122,6 +123,8 @@ export interface MomentumEngineOutput {
   momentumScore: number;
   trendScore: number;
   volatilityScore: number;
+  relativeStrengthScore: number;
+  volatilityRegimeScore: number;
   commentary: string;
 }
 
@@ -131,6 +134,7 @@ export interface ValuationEngineOutput {
   pbScore: number;
   evEbitdaScore: number;
   fcfYieldScore: number;
+  dividendYieldScore: number;
   commentary: string;
 }
 
