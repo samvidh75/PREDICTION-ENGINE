@@ -1,72 +1,119 @@
-# Synthetic Source Inventory — TRACK-18
+# TRACK-18 — Synthetic Source Inventory
 
-**Date:** 2026-06-06
+## Q1: All Synthetic Data Generators
 
-## CRITICAL SYNTHETIC DATA SOURCES (Data Pipeline)
+### 1. `expand-market-coverage.ts` — **SYNTHETIC (100%)**
 
-### 1. expand-market-coverage.ts — COMPLETE UNIVERSE DATA GENERATION 🔴
+| Aspect | Detail |
+|--------|--------|
+| **File** | `src/scripts/expand-market-coverage.ts` |
+| **Synthetic mechanism** | `Math.random()` generates all OHLCV candles for 500 stocks × ~1250 days |
+| **What's synthetic** | Every open, high, low, close, volume for every stock for every day. Features (RSI, MACD, etc.) computed from synthetic prices. Factors computed from synthetic features. |
+| **What's real** | Stock symbols and metadata from `generate500Stocks()` (505 real Indian tickers) |
+| **Classification** | **PRODUCTION REACHABLE** — if run, populates the production DB with synthetic data |
+| **Used by** | DB population (feature_snapshots, factor_snapshots, daily_prices, financial_snapshots) |
 
-**File:** `src/scripts/expand-market-coverage.ts`
-**Severity:** CRITICAL — generates ALL database content
+```typescript
+// Line ~62: Synthetic candle generation
+let price = 100.0 + Math.random() * 200;
+for (const date of dates) {
+  const change = (Math.random() - 0.49) * 2.0; // slight upward bias
+  price = Math.max(1.0, price + change);
+  // ... open, high, low, close all derived from Math.random()
+}
+```
 
-This script generates every row in all 5 core tables:
-- `symbols`: 500 symbols from generate500Stocks() (hardcoded registry, acceptable)
-- `financial_snapshots`: EVERY financial metric via Math.random() — P/E, ROE, ROIC, revenue growth, profit growth, D/E, gross margin, operating margin, etc. (22 metrics per stock, all synthetic)
-- `daily_prices`: ~625,000 rows of random-walk price candles (open/high/low/close/volume)
-- `feature_snapshots`: Computed from synthetic daily_prices by FeatureEngine
-- `factor_snapshots`: Computed from synthetic financials + features by FactorEngine
+---
 
-**This is the calibration data pipeline. 100% synthetic.**
+### 2. `generate-deliverables.ts` — **SYNTHETIC (100%)**
 
-### 2. generate-deliverables.ts — SYNTHETIC UNIVERSE GENERATOR 🔴
+| Aspect | Detail |
+|--------|--------|
+| **File** | `src/scripts/generate-deliverables.ts` |
+| **Synthetic mechanism** | `bounded(seed, min, max)` function — deterministic pseudo-random from symbol hash |
+| **What's synthetic** | ALL EngineInputs: features (RSI, MACD, ADX, etc.), factors (quality, value, growth, etc.), financials (PE, ROE, D/E, etc.), historical data |
+| **What's real** | Stock symbols from `MasterCompanyRegistry` (real tickers) |
+| **Classification** | **CALIBRATION** — generates Top20, Bottom20, FactorAttribution, PercentileValidation reports |
+| **Used by** | EngineCalibrationReport.md, PercentileValidationReport.md, Top20Report.md, Bottom20Report.md, FactorAttributionReport.md |
 
-**File:** `src/scripts/generate-deliverables.ts`
-**Severity:** CRITICAL — generates rankings from synthetic data
+```typescript
+// Line ~35: All data is synthetic
+function bounded(seed: number, min: number, max: number): number {
+  const span = max - min;
+  return Number((min + (seed % 1000) / 1000 * span).toFixed(3));
+}
 
-Uses `buildInputs()` function (line 55-109) which generates synthetic EngineInputs via `bounded(seed, min, max)` for:
-- All 12 technical features (RSI, MACD, ADX, ATR, momentum, volatility, etc.)
-- All 7 factor scores (quality, growth, value, momentum, risk, sectorStrength, factorScore)
-- All 20+ financial metrics (PE, PB, EPS, roe, roa, roic, D/E, revenueGrowth, profitGrowth, etc.)
-- Historical data (feature history, factor history, price history)
+// Every field uses bounded():
+rsi: bounded(seed + 11, 35, 68),      // Fake RSI
+roe: bounded(seed + 131, 0.05, 0.35), // Fake ROE
+peRatio: bounded(seed + 89, 8, 45),   // Fake PE
+```
 
-Produces: Top20Report.md, Bottom20Report.md, FactorAttributionReport.md, PercentileValidationReport.md — ALL synthetic.
+---
 
-### 3. calibrate.ts — READS SYNTHETIC DATA FROM DB 🔴
+### 3. `generate500Stocks.ts` — **REAL LIST, ALL DATA SYNTHETIC**
 
-**File:** `src/scripts/calibrate.ts`
-**Severity:** HIGH — consumes synthetic data, produces calibration report
+| Aspect | Detail |
+|--------|--------|
+| **File** | `src/services/stocks/generate500Stocks.ts` |
+| **What's real** | 505 Indian company tickers with correct names, sectors, and industries |
+| **What's synthetic** | All financial data, price data, features, and factors for these tickers come from `expand-market-coverage.ts` (synthetic candles) or `generate-deliverables.ts` (synthetic EngineInputs) |
+| **Classification** | **REAL SYMBOLS, SYNTHETIC DATA** |
 
-Reads from the database which was populated by expand-market-coverage.ts. All 505 companies in EngineCalibrationReport.md had synthetic fundamentals. The calibration conclusions (factor correlations, sector biases, engine score distributions) are VALID for synthetic data but NOT validated against real companies.
+---
 
-### 4. chartData.ts — SYNTHETIC CHART GENERATOR 🟡
+### 4. `SectorDistributionEngine.ts` — **HARDCODED REFERENCE DATA**
 
-**File:** `src/components/charts/chartData.ts`
-**Severity:** MEDIUM — generates deterministic synthetic OHLCV for demo/display
+| Aspect | Detail |
+|--------|--------|
+| **File** | `src/stockstory/analytics/SectorDistributionEngine.ts` |
+| **Synthetic mechanism** | Static hardcoded percentile distributions for 7 sectors × 13 metrics |
+| **Claimed source** | "Indian market empirical reference data (2024-2025)" |
+| **Actual implementation** | Hardcoded `{ p10, p25, p50, p75, p90 }` objects — no DB query, no live data |
+| **Classification** | **HARDCODED REFERENCE** — not synthetic per se, but not live either. Claims to be empirical. |
 
-`getSyntheticChartSeries(ticker, timeframe)` — generates candidate chart data from a seeded random. Used by:
-- CommandResultCard.tsx
-- Company52WeekRangeMini.tsx
-- IntelligenceMiniChart.tsx
+```typescript
+// Lines 30-38: Example Banking distribution
+BANKING: {
+  roa: { p10: 0.002, p25: 0.004, p50: 0.008, p75: 0.011, p90: 0.014 },
+  roe: { p10: 0.02, p25: 0.06, p50: 0.11, p75: 0.15, p90: 0.18 },
+  debtToEquity: { p10: 2.0, p25: 4.0, p50: 7.0, p75: 10.0, p90: 14.0 },
+  // ...
+}
+```
 
-Does NOT feed into the ranking pipeline. Used for UI display only.
+---
 
-### 5. MockDataFetcher.ts — DEMO MOCK DATA 🟡
+### 5. `run-research-validation.ts` — **REAL PROVIDER DATA**
 
-**File:** `src/components/telemetry/MockDataFetcher.ts`
-**Severity:** LOW — mock data for demo/testing only
+| Aspect | Detail |
+|--------|--------|
+| **File** | `src/scripts/run-research-validation.ts` |
+| **Synthetic mechanism** | **NONE** — fetches real data from YahooProvider via ProviderCoordinator |
+| **What's real** | 5-year price history, metadata for 7 symbols from Yahoo API |
+| **Classification** | **REAL** — fetches live provider data |
+| **Used by** | Research validation pipeline (ML benchmarks, factor backtests, feature importance) |
 
-Contains `MOCK_COMPANIES` with hardcoded telemetry for RELIANCE, TCS, INFY, HDFCBANK, ICICIBANK. Generates synthetic price movement. Does NOT feed into the ranking pipeline.
+---
 
-## NON-DATA Math.random() USAGE (Not Synthetic Data)
+### 6. Miscellaneous Math.random Usage
 
-| File | Purpose | Severity |
-| --- | --- | --- |
-| RetryPolicy.ts | Exponential backoff jitter | Not data — operational |
-| QueryClientConfig.ts | Cache query jitter | Not data — operational |
-| UpstoxOAuthService.ts | PKCE code verifier generation | Not data — security |
-| investorState.ts | ID generation | Not data — identifiers |
-| watchlistStore.ts | ID generation | Not data — identifiers |
+| Location | Context | Classification |
+|----------|---------|---------------|
+| Financial snapshots in `expand-market-coverage.ts` | Synthetic PE, EPS, margins, D/E | **PRODUCTION REACHABLE** |
+| ISIN generation in `expand-market-coverage.ts` | `INE${Math.random()...}` — fake ISIN codes | **PRODUCTION REACHABLE** |
 
-## VERDICT
+---
 
-**100% of calibration ranking data is synthetic.** The entire pipeline from symbols → financials → features → factors → engine scores → reports uses Math.random(). Zero real provider data feeds into any calibration or deliverable generation.
+## Inventory Summary
+
+| Generator | Synthetic % | Real % | Classification |
+|-----------|-------------|--------|----------------|
+| `expand-market-coverage.ts` | **100%** | 0% (uses real ticker list but all data synthetic) | **PRODUCTION REACHABLE** |
+| `generate-deliverables.ts` | **100%** | 0% | **CALIBRATION** |
+| `generate500Stocks.ts` | 0% (symbols real) | 100% (symbols only) | **REAL SYMBOLS** |
+| `SectorDistributionEngine.ts` | 0% | 0% (hardcoded reference) | **HARDCODED REFERENCE** |
+| `run-research-validation.ts` | 0% | 100% (provider data) | **REAL** |
+| `calibrate.ts` / `calibrate_v2.ts` | **100%** (reads synthetic DB) | 0% | **CALIBRATION (synthetic input)** |
+
+**Critical finding:** The `EngineCalibrationReport.md` displayed to users and used for TRACK-13/14 calibration was generated from `generate-deliverables.ts` which uses 100% synthetic data. The top 20, bottom 20, sector distributions, and factor attributions in that report are mathematically unsound.
