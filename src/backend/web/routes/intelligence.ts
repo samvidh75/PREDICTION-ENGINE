@@ -9,8 +9,6 @@ import { narrativeEngine } from "../../../services/NarrativeEngine";
 import { NewsCoordinator } from "../../../services/news/NewsCoordinator";
 import { intelligenceCache } from "../../../services/intelligence/IntelligenceCache";
 import { stockStoryEngine } from "../../../stockstory";
-import { ProviderCoordinator } from "../../../services/providers/ProviderCoordinator";
-import { TechnicalIndicatorEngine } from "../../../services/TechnicalIndicatorEngine";
 
 export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
   // GET /api/intelligence/company/:symbol
@@ -777,28 +775,25 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       let feat = featRes.rows[0];
       const fact = factRes.rows[0];
       const fin = finRes.rows[0];
-      const coordinator = new ProviderCoordinator();
 
       if (!feat || feat.rsi == null || feat.macd == null || feat.atr == null || feat.momentum == null || feat.volatility == null) {
-        const history = await coordinator.getHistory(sym, "1Y");
-        const liveFeat = TechnicalIndicatorEngine.latestComplete(sym, history);
-        if (liveFeat) {
-          feat = {
-            trade_date: liveFeat.tradeDate,
-            rsi: liveFeat.rsi,
-            macd: liveFeat.macd,
-            macd_signal: liveFeat.macdSignal,
-            macd_histogram: liveFeat.macdHistogram,
-            adx: liveFeat.adx,
-            atr: liveFeat.atr,
-            bollinger_width: liveFeat.bollingerWidth,
-            momentum: liveFeat.momentum,
-            volatility: liveFeat.volatility,
-            relative_strength: liveFeat.relativeStrength,
-            moving_average_distance: liveFeat.movingAverageDistance,
-            trend_strength: liveFeat.trendStrength,
-          };
-        }
+        // Feature snapshots unavailable — return null technical fields.
+        // No live indicator calculation. FeatureEngine is the sole source of truth.
+        feat = {
+          trade_date: new Date().toISOString().split("T")[0],
+          rsi: null,
+          macd: null,
+          macd_signal: null,
+          macd_histogram: null,
+          adx: null,
+          atr: null,
+          bollinger_width: null,
+          momentum: null,
+          volatility: null,
+          relative_strength: null,
+          moving_average_distance: null,
+          trend_strength: null,
+        };
       }
 
       // Build EngineInputs from database data
