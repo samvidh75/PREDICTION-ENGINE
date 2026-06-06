@@ -14,23 +14,17 @@ import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
 import { ScreenerProvider } from './ScreenerProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
+import { ProviderHealthService, type ProviderHealthSnapshot } from './ProviderHealthService';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 
 /**
  * ProviderCoordinator is the single entry point for market data.
  *
- * TRACK-9B financial architecture:
- *   Tier 1: UpstoxFundamentalsProvider
- *   Tier 2: ScreenerProvider
- *   Tier 3: FinnhubProvider
- *   Tier 4: YahooProvider
- *
  * Financial providers are merged, not first-success returned:
- *   - Upstox is primary for verified live ratios and balance-sheet fields.
- *   - Screener can only enrich missing growth/liquidity/margin fields.
- *   - Finnhub/Yahoo can only fill still-missing low-priority fields.
- *   - No provider can overwrite a populated value from an earlier tier.
+ *   - Existing provider order is preserved.
+ *   - No later provider can overwrite an earlier populated field.
+ *   - Missing values remain missing; no synthetic replacements are created.
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -41,11 +35,13 @@ export class ProviderCoordinator {
   public upstox: UpstoxProvider;
 
   private healthMonitor: ProviderHealthMonitor;
+  private providerHealthService: ProviderHealthService;
   private circuitBreakers: Map<any, ProviderCircuitBreaker> = new Map();
   private tracer: DataFlowTracer;
 
   constructor() {
     this.healthMonitor = new ProviderHealthMonitor();
+    this.providerHealthService = new ProviderHealthService();
     this.tracer = new DataFlowTracer();
 
     this.upstox = new UpstoxProvider();
@@ -114,6 +110,10 @@ export class ProviderCoordinator {
     return this.tracer.getLog();
   }
 
+  getProviderHealth(): ProviderHealthSnapshot[] {
+    return this.providerHealthService.getAllSnapshots();
+  }
+
   private async invokeChain<T>(
     providers: any[],
     fn: (provider: any) => Promise<T>,
@@ -126,22 +126,29 @@ export class ProviderCoordinator {
 
     const errors: string[] = [];
     for (const provider of providers) {
+      const providerName = provider.constructor.name;
       const status = this.healthMonitor.getStatus(provider);
-      if (status === 'Unavailable' || status === 'RateLimited') {
-        errors.push(`${provider.constructor.name}: skipped (${status})`);
+      const serviceStatus = this.providerHealthService.getStatus(providerName);
+      if (status === 'Unavailable' || status === 'RateLimited' || serviceStatus === 'Unavailable' || serviceStatus === 'RateLimited') {
+        errors.push(`${providerName}: skipped (${status}/${serviceStatus})`);
         continue;
       }
 
       const breaker = this.circuitBreakers.get(provider);
+      const startedAt = Date.now();
       try {
         const result = breaker ? await breaker.execute(() => fn(provider)) : await fn(provider);
+        const latencyMs = Date.now() - startedAt;
         this.healthMonitor.recordSuccess(provider);
-        this.tracer.recordUsage(symbol, category, provider.constructor.name, false);
+        this.providerHealthService.recordSuccess(providerName, latencyMs, this.estimateCompleteness(result));
+        this.tracer.recordUsage(symbol, category, providerName, false);
         return result;
       } catch (err: any) {
-        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
+        const latencyMs = Date.now() - startedAt;
+        errors.push(`${providerName}: ${err?.message || String(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.tracer.recordUsage(symbol, category, provider.constructor.name, true);
+        this.providerHealthService.recordFailure(providerName, latencyMs, err);
+        this.tracer.recordUsage(symbol, category, providerName, true);
       }
     }
 
@@ -154,24 +161,31 @@ export class ProviderCoordinator {
     const errors: string[] = [];
 
     for (const provider of this.financialProviders) {
+      const providerName = provider.constructor.name;
       const status = this.healthMonitor.getStatus(provider);
-      if (status === 'Unavailable' || status === 'RateLimited') {
-        errors.push(`${provider.constructor.name}: skipped (${status})`);
+      const serviceStatus = this.providerHealthService.getStatus(providerName);
+      if (status === 'Unavailable' || status === 'RateLimited' || serviceStatus === 'Unavailable' || serviceStatus === 'RateLimited') {
+        errors.push(`${providerName}: skipped (${status}/${serviceStatus})`);
         continue;
       }
 
       const breaker = this.circuitBreakers.get(provider);
+      const startedAt = Date.now();
       try {
         const result = breaker
           ? await breaker.execute(() => provider.getFinancials(symbol))
           : await provider.getFinancials(symbol);
+        const latencyMs = Date.now() - startedAt;
         this.healthMonitor.recordSuccess(provider);
-        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, false);
-        this.mergeFinancialFields(merged, result as Record<string, any>, provider.constructor.name, sourceMap);
+        this.providerHealthService.recordSuccess(providerName, latencyMs, this.estimateCompleteness(result));
+        this.tracer.recordUsage(symbol, 'financials', providerName, false);
+        this.mergeFinancialFields(merged, result as Record<string, any>, providerName, sourceMap);
       } catch (err: any) {
-        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
+        const latencyMs = Date.now() - startedAt;
+        errors.push(`${providerName}: ${err?.message || String(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, true);
+        this.providerHealthService.recordFailure(providerName, latencyMs, err);
+        this.tracer.recordUsage(symbol, 'financials', providerName, true);
       }
     }
 
@@ -186,6 +200,16 @@ export class ProviderCoordinator {
       _sources: sourceMap,
       _providerErrors: errors,
     } as FinancialSnapshot;
+  }
+
+  private estimateCompleteness(result: unknown): number {
+    if (Array.isArray(result)) return result.length > 0 ? 1 : 0;
+    if (!result || typeof result !== 'object') return result == null ? 0 : 1;
+    const entries = Object.entries(result as Record<string, unknown>)
+      .filter(([key]) => !key.startsWith('_'));
+    if (entries.length === 0) return 0;
+    const populated = entries.filter(([, value]) => value !== null && value !== undefined).length;
+    return populated / entries.length;
   }
 
   private mergeFinancialFields(
