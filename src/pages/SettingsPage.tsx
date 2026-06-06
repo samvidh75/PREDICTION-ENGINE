@@ -10,6 +10,7 @@ export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [name, setName] = useState(user?.displayName || "");
   const [email] = useState(user?.email || "");
+  const [saveNotice, setSaveNotice] = useState("");
 
   const [alertCategories, setAlertCategories] = useState<Record<AlertCategory, boolean>>(() => ({
     Factor: AlertEngine.isCategoryEnabled("Factor"),
@@ -82,7 +83,10 @@ export const SettingsPage: React.FC = () => {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setSaveNotice("");
+                    }}
                     className="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#2962ff]"
                   />
                 </div>
@@ -95,9 +99,16 @@ export const SettingsPage: React.FC = () => {
                     className="w-full bg-white/5 border border-white/5 rounded-xl p-3 text-xs text-white/40 cursor-not-allowed"
                   />
                 </div>
-                <button className="px-5 py-2.5 bg-[#2962ff] text-white font-semibold text-xs rounded-xl hover:bg-[#1e53e5] transition-all cursor-pointer">
+                <button
+                  type="button"
+                  onClick={() => setSaveNotice("Profile changes saved locally for this session.")}
+                  className="px-5 py-2.5 bg-[#2962ff] text-white font-semibold text-xs rounded-xl hover:bg-[#1e53e5] transition-all cursor-pointer"
+                >
                   Save Profile
                 </button>
+                {saveNotice && (
+                  <p className="text-[10px] font-mono text-[#00FFE0]">{saveNotice}</p>
+                )}
               </div>
             </div>
           )}
