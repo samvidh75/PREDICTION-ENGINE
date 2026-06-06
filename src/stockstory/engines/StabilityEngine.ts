@@ -99,12 +99,25 @@ export class StabilityEngine {
       }
     }
 
+    // ── Sub-score 6: Market-cap Size Score ──────────────────────────
+    let marketCapSizeScore = 50;
+    const marketCap = financials.marketCap;
+    if (marketCap !== null && Number.isFinite(marketCap) && marketCap > 0) {
+      if (marketCap >= 2_000_000_000_000) marketCapSizeScore = 95;
+      else if (marketCap >= 500_000_000_000) marketCapSizeScore = 85;
+      else if (marketCap >= 100_000_000_000) marketCapSizeScore = 75;
+      else if (marketCap >= 20_000_000_000) marketCapSizeScore = 60;
+      else if (marketCap >= 5_000_000_000) marketCapSizeScore = 45;
+      else marketCapSizeScore = 25;
+    }
+
     const rawComposite = weightedAverage([
       { score: debtScore, weight: 2.5 },
       { score: cashScore, weight: 2 },
       { score: volatilityScore, weight: 1.5 },
       { score: coverageScore, weight: 2 },
       { score: interestCoverageScore, weight: 2 },
+      { score: marketCapSizeScore, weight: 1 },
     ]);
 
     const factorAdjust = (factors.riskFactor - 50) * 0.2;
@@ -118,6 +131,7 @@ export class StabilityEngine {
       cashScore,
       volatilityScore,
       coverageScore,
+      marketCapSizeScore,
       commentary,
     };
   }
@@ -128,7 +142,7 @@ export class StabilityEngine {
     profile: ReturnType<typeof getSectorProfile>,
     usePercentile: boolean
   ): string {
-    const hasData = f.debtToEquity !== null || f.currentRatio !== null;
+    const hasData = f.debtToEquity !== null || f.currentRatio !== null || f.marketCap !== null;
     if (!hasData) return 'Insufficient stability data. Score reflects neutral baseline.';
 
     const method = usePercentile ? ` (sector-percentile vs ${profile.name} peers)` : '';
