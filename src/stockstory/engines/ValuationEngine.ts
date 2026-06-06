@@ -77,6 +77,19 @@ export class ValuationEngine {
       }
     }
 
+    // ── Sub-score 5: Dividend Yield Score ───────────────────────────
+    let dividendYieldScore = 50;
+    const dividendYield = financials.dividendYield;
+    if (dividendYield !== null) {
+      if (dividendYield < 0) dividendYieldScore = 20;
+      else if (dividendYield === 0) dividendYieldScore = 45;
+      else if (dividendYield <= 0.01) dividendYieldScore = 55;
+      else if (dividendYield <= 0.03) dividendYieldScore = 70;
+      else if (dividendYield <= 0.06) dividendYieldScore = 85;
+      else if (dividendYield <= 0.10) dividendYieldScore = 75;
+      else dividendYieldScore = 35;
+    }
+
     const peWeight = profile.primaryMetric === 'pe' ? 3 : 2;
     const pbWeight = profile.primaryMetric === 'pb' ? 3 : 2;
     const evWeight = profile.skipEvEbitda ? 0 : (profile.primaryMetric === 'evEbitda' ? 3 : 2);
@@ -86,6 +99,7 @@ export class ValuationEngine {
       { score: pbScore, weight: pbWeight },
       { score: evEbitdaScore, weight: evWeight },
       { score: fcfYieldScore, weight: 3 },
+      { score: dividendYieldScore, weight: 1.5 },
     ]);
 
     const factorAdjust = (factors.valueFactor - 50) * 0.2;
@@ -97,6 +111,7 @@ export class ValuationEngine {
       pbScore: clampScore(pbScore + factorAdjust * 0.5),
       evEbitdaScore: clampScore(evEbitdaScore + factorAdjust * 0.5),
       fcfYieldScore,
+      dividendYieldScore,
       commentary: this.generateCommentary(compositeScore, profile, usePercentile),
     };
   }
