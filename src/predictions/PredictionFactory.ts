@@ -6,6 +6,7 @@
  */
 import pool from '../db/index';
 import { stockStoryEngine } from '../stockstory';
+import { TemporalGuard } from '../validation/TemporalGuard';
 import type { CreatePredictionInput } from './types';
 
 export class PredictionFactory {
@@ -121,6 +122,28 @@ export class PredictionFactory {
       const fin = finRes.rows[0];
 
       if (!feat || !fact) return null;
+
+      // Temporal integrity: guard against future-dated factor data
+      const temporalResult = TemporalGuard.guardFactorInsert(
+        {
+          symbol,
+          tradeDate: fact.trade_date,
+          qualityFactor: Number(fact.quality_factor),
+          valueFactor: Number(fact.value_factor),
+          growthFactor: Number(fact.growth_factor),
+          momentumFactor: Number(fact.momentum_factor),
+          riskFactor: Number(fact.risk_factor),
+          sectorStrengthFactor: Number(fact.sector_strength_factor),
+          factorScore: Number(fact.factor_score),
+        },
+        tradeDate
+      );
+      if (!temporalResult.allowed) {
+        return null; // BLOCK: factor data is future-dated
+      }
+      if (temporalResult.violations.length > 0) {
+        console.warn(`[TemporalGuard] ${symbol}: ${temporalResult.summary}`);
+      }
 
       const engineInputs = {
         symbol,

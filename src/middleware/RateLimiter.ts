@@ -115,3 +115,11 @@ export function blockIp(ip: string, ms: number): void {
   blockedIps.set(ip, Date.now() + ms);
 }
 
+/**
+ * Check if an IP is currently blocked.
+ */
+export function isIpBlocked(ip: string): boolean {
+  return (blockedIps.get(ip) || 0) > Date.now();
+}
+
+export default rateLimiterPlugin;
