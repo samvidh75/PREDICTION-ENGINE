@@ -1,0 +1,42 @@
+{
+  "columns": [
+    "symbol",
+    "period_end",
+    "market_cap",
+    "pe_ratio",
+    "pb_ratio",
+    "eps",
+    "roe",
+    "roa",
+    "debt_to_equity",
+    "revenue_growth",
+    "earnings_growth",
+    "current_ratio",
+    "quick_ratio",
+    "gross_margins",
+    "operating_margins",
+    "profit_margins",
+    "dividend_yield",
+    "beta",
+    "forward_pe",
+    "regular_market_price",
+    "fifty_two_week_high",
+    "fifty_two_week_low",
+    "book_value",
+    "snapshot_date",
+    "roce",
+    "operating_margin",
+    "net_margin",
+    "profit_growth",
+    "fcf_yield",
+    "ev_ebitda"
+  ],
+  "before": 0,
+  "after": 30,
+  "target": 500,
+  "gap": 470,
+  "quality": {
+    "withROE": 0,
+    "withPE": 0
+  }
+}

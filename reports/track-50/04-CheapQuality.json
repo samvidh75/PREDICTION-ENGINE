@@ -1,0 +1,74 @@
+{
+  "cheap_quality_definition": {
+    "quality_factor_gt": 0.6,
+    "value_factor_gt": 0.55
+  },
+  "total_snapshots": 35640,
+  "cheap_quality_count": 35334,
+  "cheap_quality_pct": 99,
+  "persistence_score": 100,
+  "by_date": [
+    {
+      "date": "2026-05-25",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-05-26",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-05-27",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-05-28",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-05-29",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-06-01",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-06-02",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-06-03",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-06-04",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    },
+    {
+      "date": "2026-06-05",
+      "total": 30,
+      "cheap_quality": 30,
+      "pct": 100
+    }
+  ],
+  "verdict": "CHEAP QUALITY SIGNIFICANT",
+  "survival_check": "Quality persistence: 100% of CQ stocks maintain quality > 0.5"
+}

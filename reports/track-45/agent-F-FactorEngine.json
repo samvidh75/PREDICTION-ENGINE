@@ -1,0 +1,23 @@
+{
+  "factorSnapshots": 35640,
+  "factorColumns": [
+    "symbol",
+    "trade_date",
+    "quality_factor",
+    "growth_factor",
+    "value_factor",
+    "momentum_factor",
+    "risk_factor",
+    "sector_strength_factor",
+    "factor_score"
+  ],
+  "factors": {
+    "quality": "MISSING",
+    "value": "MISSING",
+    "growth": "MISSING",
+    "risk": "MISSING",
+    "momentum": "MISSING"
+  },
+  "rankings": 30,
+  "fundamentalLinkage": 0
+}

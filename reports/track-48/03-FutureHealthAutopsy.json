@@ -1,0 +1,22 @@
+{
+  "health_3m": {
+    "error": "insufficient data",
+    "n": 0
+  },
+  "health_6m": {
+    "error": "insufficient data",
+    "n": 0
+  },
+  "health_12m": {
+    "error": "insufficient data",
+    "n": 0
+  },
+  "confidence": {
+    "error": "insufficient data",
+    "n": 0
+  },
+  "trend": {
+    "error": "insufficient data",
+    "n": 0
+  }
+}

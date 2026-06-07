@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "durationMs": 52,
+  "payload": {
+    "status": "success",
+    "data": [
+      {
+        "name": "P/E",
+        "company_value": "32.94",
+        "sector_value": "24.66"
+      },
+      {
+        "name": "P/B",
+        "company_value": "3.85",
+        "sector_value": "4.07"
+      },
+      {
+        "name": "ROA",
+        "company_value": "7.71%",
+        "sector_value": "-20.98%"
+      },
+      {
+        "name": "ROE",
+        "company_value": "11.7%",
+        "sector_value": "-3.48%"
+      },
+      {
+        "name": "ROCE",
+        "company_value": "13.63%",
+        "sector_value": "6.46%"
+      },
+      {
+        "name": "EV/EBITDA",
+        "company_value": "16.92",
+        "sector_value": "15.43"
+      }
+    ]
+  }
+}

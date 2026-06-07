@@ -1,0 +1,322 @@
+[
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:22:59.339Z",
+    "durationMs": 261,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "RELIANCE",
+      "exchange": "NSE",
+      "price": 1313.2,
+      "change": -3.8999999999998636,
+      "changePercent": -0.31,
+      "volume": 1695000,
+      "updatedAt": "2026-06-03T04:57:11.000Z"
+    }
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:22:59.385Z",
+    "durationMs": 46,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "RELIANCE",
+      "companyName": "Reliance Industries",
+      "sector": "Oil & Gas Operations",
+      "industry": "Oil & Gas Operations",
+      "exchange": "NSE",
+      "marketCap": 17768900000000,
+      "currency": "INR",
+      "website": ""
+    }
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:22:59.656Z",
+    "durationMs": 271,
+    "success": true,
+    "recordsReturned": 22,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 1463.1,
+        "high": 1463.1,
+        "low": 1463.1,
+        "close": 1463.1,
+        "volume": 26893422
+      },
+      {
+        "date": "2026-05-05",
+        "open": 1463.6,
+        "high": 1463.6,
+        "low": 1463.6,
+        "close": 1463.6,
+        "volume": 24543159
+      }
+    ]
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:23:00.738Z",
+    "durationMs": 70,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "TCS",
+      "exchange": "NSE",
+      "price": 2241.7,
+      "change": -206.4000000000001,
+      "changePercent": -8.43,
+      "volume": 635000,
+      "updatedAt": "2026-06-03T04:58:42.000Z"
+    }
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:23:00.807Z",
+    "durationMs": 69,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "TCS",
+      "companyName": "Tata Consultancy Services",
+      "sector": "Software & Programming",
+      "industry": "Software & Programming",
+      "exchange": "NSE",
+      "marketCap": 8110666800000.001,
+      "currency": "INR",
+      "website": ""
+    }
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:23:01.013Z",
+    "durationMs": 206,
+    "success": true,
+    "recordsReturned": 22,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 2431.3,
+        "high": 2431.3,
+        "low": 2431.3,
+        "close": 2431.3,
+        "volume": 2958250
+      },
+      {
+        "date": "2026-05-05",
+        "open": 2427.3,
+        "high": 2427.3,
+        "low": 2427.3,
+        "close": 2427.3,
+        "volume": 3471696
+      }
+    ]
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:23:02.072Z",
+    "durationMs": 52,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "INFY",
+      "exchange": "NSE",
+      "price": 1160.9,
+      "change": 1.75,
+      "changePercent": 0.05,
+      "volume": 1328000,
+      "updatedAt": "2026-05-29T04:56:41.000Z"
+    }
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:23:02.121Z",
+    "durationMs": 49,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "INFY",
+      "companyName": "Infosys",
+      "sector": "Software & Programming",
+      "industry": "Software & Programming",
+      "exchange": "NSE",
+      "marketCap": 4703550200000,
+      "currency": "INR",
+      "website": ""
+    }
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:23:02.340Z",
+    "durationMs": 219,
+    "success": true,
+    "recordsReturned": 22,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 1168.4,
+        "high": 1168.4,
+        "low": 1168.4,
+        "close": 1168.4,
+        "volume": 8273730
+      },
+      {
+        "date": "2026-05-05",
+        "open": 1178.1,
+        "high": 1178.1,
+        "low": 1178.1,
+        "close": 1178.1,
+        "volume": 8507610
+      }
+    ]
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:23:03.408Z",
+    "durationMs": 53,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HDFCBANK",
+      "exchange": "NSE",
+      "price": 744.55,
+      "change": -13.950000000000045,
+      "changePercent": -1.81,
+      "volume": 3510000,
+      "updatedAt": "2026-05-29T04:57:18.000Z"
+    }
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:23:03.464Z",
+    "durationMs": 56,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HDFCBANK",
+      "companyName": "HDFC Bank",
+      "sector": "Regional Banks",
+      "industry": "Regional Banks",
+      "exchange": "NSE",
+      "marketCap": 11466418400000,
+      "currency": "INR",
+      "website": ""
+    }
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:23:03.677Z",
+    "durationMs": 213,
+    "success": true,
+    "recordsReturned": 22,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 779.4,
+        "high": 779.4,
+        "low": 779.4,
+        "close": 779.4,
+        "volume": 29726783
+      },
+      {
+        "date": "2026-05-05",
+        "open": 772.3,
+        "high": 772.3,
+        "low": 772.3,
+        "close": 772.3,
+        "volume": 39979123
+      }
+    ]
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:23:04.744Z",
+    "durationMs": 63,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HAL",
+      "exchange": "NSE",
+      "price": 4278.5,
+      "change": 22.300000000000182,
+      "changePercent": 0.5,
+      "volume": 146000,
+      "updatedAt": "2026-06-02T04:40:11.000Z"
+    }
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:23:04.795Z",
+    "durationMs": 51,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HAL",
+      "companyName": "Hindustan Aeronautics",
+      "sector": "Aerospace & Defense",
+      "industry": "Aerospace & Defense",
+      "exchange": "NSE",
+      "marketCap": 2860785300000.0005,
+      "currency": "INR",
+      "website": ""
+    }
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "IndianMarketProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:23:05.036Z",
+    "durationMs": 241,
+    "success": true,
+    "recordsReturned": 22,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 4559.5,
+        "high": 4559.5,
+        "low": 4559.5,
+        "close": 4559.5,
+        "volume": 3109208
+      },
+      {
+        "date": "2026-05-05",
+        "open": 4610.4,
+        "high": 4610.4,
+        "low": 4610.4,
+        "close": 4610.4,
+        "volume": 1612061
+      }
+    ]
+  }
+]

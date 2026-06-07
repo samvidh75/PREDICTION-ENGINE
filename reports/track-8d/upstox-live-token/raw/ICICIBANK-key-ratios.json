@@ -1,0 +1,55 @@
+{
+  "symbol": "ICICIBANK",
+  "isin": "INE090A01021",
+  "kind": "key-ratios",
+  "url": "https://api.upstox.com/v2/fundamentals/INE090A01021/key-ratios",
+  "credentialUsed": "UPSTOX_ACCESS_TOKEN",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a07150466f9c5ef9-HYD",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:41:48 GMT",
+    "expires": "0",
+    "pragma": "no-cache",
+    "reqid": "802e7a85-5755-4e23-9a20-430be74a7da6",
+    "requestid": "01bffdfe-a320-4db6-9466-14eb9764493e",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "success",
+    "data": [
+      {
+        "name": "P/E",
+        "company_value": "15.5",
+        "sector_value": "18.76"
+      },
+      {
+        "name": "P/B",
+        "company_value": "2.52",
+        "sector_value": "1.43"
+      },
+      {
+        "name": "ROA",
+        "company_value": "2.33%",
+        "sector_value": "0.92%"
+      },
+      {
+        "name": "ROE",
+        "company_value": "15.89%",
+        "sector_value": "7.56%"
+      }
+    ]
+  }
+}

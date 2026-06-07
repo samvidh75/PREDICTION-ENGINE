@@ -1,0 +1,69 @@
+{
+  "factor_correlations": {
+    "quality_value": -0.39,
+    "quality_growth": 0.38,
+    "quality_momentum": 0.27,
+    "value_growth": -0.56,
+    "value_momentum": -0.85
+  },
+  "candidates": [
+    {
+      "name": "Quality Only",
+      "factors": [
+        "q"
+      ],
+      "diversity": 1,
+      "risk": "Pure quality — low diversification",
+      "estimated_sharpe": 1.5,
+      "winner": ""
+    },
+    {
+      "name": "Value Only",
+      "factors": [
+        "v"
+      ],
+      "diversity": 0.8,
+      "risk": "Value may underperform in growth markets",
+      "estimated_sharpe": 1.5,
+      "winner": ""
+    },
+    {
+      "name": "Quality + Value (Cheap Quality)",
+      "factors": [
+        "q",
+        "v"
+      ],
+      "diversity": 0.9,
+      "risk": "Best documented alpha (TRACK-48), limited to value quality",
+      "estimated_sharpe": 1.5,
+      "winner": "RECOMMENDED — backed by TRACK-48 findings"
+    },
+    {
+      "name": "Quality + Value + Growth",
+      "factors": [
+        "q",
+        "v",
+        "g"
+      ],
+      "diversity": 0.85,
+      "risk": "Adds growth but quality-value dominates",
+      "estimated_sharpe": 1.3,
+      "winner": ""
+    },
+    {
+      "name": "All 5 Factors (Current SSI)",
+      "factors": [
+        "q",
+        "v",
+        "g",
+        "m",
+        "rk"
+      ],
+      "diversity": 1,
+      "risk": "Maximum diversification but noise from momentum & risk",
+      "estimated_sharpe": 1,
+      "winner": ""
+    }
+  ],
+  "recommendation": "Quality + Value (Cheap Quality) shows highest alpha with fewest factors"
+}

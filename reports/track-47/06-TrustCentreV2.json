@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-06-07T10:43:44.818Z",
+  "hitRates": [
+    {
+      "horizon": "30d",
+      "total": 34980,
+      "correct": 19248,
+      "hitRate": "55%"
+    },
+    {
+      "horizon": "90d",
+      "total": 33810,
+      "correct": 19614,
+      "hitRate": "58%"
+    },
+    {
+      "horizon": "365d",
+      "total": 28170,
+      "correct": 19667,
+      "hitRate": "69.8%"
+    }
+  ],
+  "sharpe": {
+    "30d": {
+      "sharpeRatio": "0.3781",
+      "meanReturn": "0.8962",
+      "volatility": "6.8702",
+      "n": 34980
+    },
+    "90d": {
+      "sharpeRatio": "0.3682",
+      "meanReturn": "2.4501",
+      "volatility": "11.1358",
+      "n": 33810
+    },
+    "365d": {
+      "sharpeRatio": "0.4696",
+      "meanReturn": "13.4464",
+      "volatility": "23.7898",
+      "n": 28170
+    }
+  },
+  "calibration": [
+    {
+      "prediction_horizon": 30,
+      "avg_score": 57.335423098913665,
+      "avg_return": 0.8962386716363085,
+      "avg_abs_return": 5.35983932432413,
+      "n": 34980,
+      "note": "Using ranking_score as proxy for prediction"
+    },
+    {
+      "prediction_horizon": 90,
+      "avg_score": 57.586211180124224,
+      "avg_return": 2.450085933476726,
+      "avg_abs_return": 8.920097789792603,
+      "n": 33810,
+      "note": "Using ranking_score as proxy for prediction"
+    },
+    {
+      "prediction_horizon": 365,
+      "avg_score": 57.23654952076678,
+      "avg_return": 13.446449628414445,
+      "avg_abs_return": 20.25746165454299,
+      "n": 28170,
+      "note": "Using ranking_score as proxy for prediction"
+    }
+  ],
+  "factorAttribution": {
+    "avg_quality_factor": 55.01649701264183,
+    "avg_growth_factor": 55.399758908527566,
+    "avg_value_factor": 48.88407975611963,
+    "avg_momentum_factor": 44.48776376684217,
+    "avg_risk_factor": 16.81641216895483
+  },
+  "methodology": {
+    "version": "V2",
+    "engines": [
+      "QualityEngine (Screener.in ROE/ROCE + sector-percentile)",
+      "ValuationEngine (yfinance PE/PB + TTM earnings)",
+      "FutureHealthEngine (multi-factor predictive scoring)",
+      "StabilityEngine (drawdown + volatility scoring)"
+    ],
+    "scoringMethod": "Sector-relative percentile ranking with z-score normalization",
+    "dataSources": {
+      "fundamentals": "Screener.in (ROE, ROCE, D/E, dividend yield) + yfinance (PE, PB, EPS, market cap)",
+      "marketData": "yfinance daily OHLCV",
+      "ownership": "SEBI shareholding pattern filings (quarterly)"
+    },
+    "validationProtocol": "Out-of-sample temporal walk-forward with 30d/90d/365d horizons",
+    "universeSize": "30 Nifty 100 stocks (quality_registry)",
+    "totalPredictions": "96,960 in alpha_research_registry"
+  },
+  "overallStats": {
+    "symbols": 30,
+    "total_predictions": 96960,
+    "earliest": "2021-08-17",
+    "latest": "2026-05-06"
+  }
+}

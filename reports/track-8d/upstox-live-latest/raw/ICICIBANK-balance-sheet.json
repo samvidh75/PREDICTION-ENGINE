@@ -1,0 +1,61 @@
+{
+  "symbol": "ICICIBANK",
+  "isin": "INE090A01021",
+  "kind": "balance-sheet",
+  "url": "https://api.upstox.com/v2/fundamentals/INE090A01021/balance-sheet?type=consolidated",
+  "credentialUsed": "UPSTOX_ACCESS_TOKEN",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "cf-ray": "a07154165ed12e96-HYD",
+    "connection": "keep-alive",
+    "content-encoding": "br",
+    "content-type": "application/json",
+    "date": "Fri, 05 Jun 2026 18:44:24 GMT",
+    "expires": "0",
+    "pragma": "no-cache",
+    "reqid": "f1973529-4f4d-41de-911a-76e6e495695c",
+    "requestid": "757cd45e-570b-43d2-b4c1-4d6077adc569",
+    "server": "cloudflare",
+    "strict-transport-security": "max-age=0; includeSubDomains",
+    "transfer-encoding": "chunked",
+    "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "0"
+  },
+  "json": {
+    "status": "success",
+    "data": {
+      "type": "consolidated",
+      "time_period": "yearly",
+      "units_in": "crore",
+      "history": [
+        {
+          "total_asset": 2642241.41,
+          "total_liability": 2313498.77,
+          "period": "Mar 2025"
+        },
+        {
+          "total_asset": 2364063.03,
+          "total_liability": 2094030.78,
+          "period": "Mar 2024"
+        },
+        {
+          "total_asset": 1958490.5,
+          "total_liability": 1737305.96,
+          "period": "Mar 2023"
+        },
+        {
+          "total_asset": 1752637.38,
+          "total_liability": 1564604,
+          "period": "Mar 2022"
+        }
+      ],
+      "full_statement": null
+    }
+  }
+}

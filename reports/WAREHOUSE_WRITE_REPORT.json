@@ -1,0 +1,57 @@
+[
+  {
+    "table": "symbols",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": ""
+  },
+  {
+    "table": "symbols",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": ""
+  },
+  {
+    "table": "symbols",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": ""
+  },
+  {
+    "table": "symbols",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": ""
+  },
+  {
+    "table": "symbols",
+    "rowsInserted": 0,
+    "status": "ERROR",
+    "error": ""
+  },
+  {
+    "table": "daily_prices",
+    "rowsInserted": 0,
+    "status": "OK"
+  },
+  {
+    "table": "daily_prices",
+    "rowsInserted": 0,
+    "status": "OK"
+  },
+  {
+    "table": "daily_prices",
+    "rowsInserted": 0,
+    "status": "OK"
+  },
+  {
+    "table": "daily_prices",
+    "rowsInserted": 0,
+    "status": "OK"
+  },
+  {
+    "table": "daily_prices",
+    "rowsInserted": 0,
+    "status": "OK"
+  }
+]

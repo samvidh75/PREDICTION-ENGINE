@@ -1,0 +1,10 @@
+{
+  "stocks": 30,
+  "sectors": [],
+  "diversification": "POOR",
+  "health": "RESILIENT",
+  "fragility": "HIGH",
+  "resilience": "MODERATE",
+  "avgQuality": 54.18,
+  "avgGrowth": 58.64
+}

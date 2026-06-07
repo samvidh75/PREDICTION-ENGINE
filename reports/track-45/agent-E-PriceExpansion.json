@@ -1,0 +1,17 @@
+{
+  "before": {
+    "rows": 37140,
+    "symbols": 30,
+    "dateRange": {
+      "min": "2021-06-07",
+      "max": "2026-06-05"
+    }
+  },
+  "target": 120000,
+  "gap": 82860,
+  "masterSecurityRegistry": 0,
+  "symbolsTable": 30,
+  "after": {
+    "rows": 37140
+  }
+}

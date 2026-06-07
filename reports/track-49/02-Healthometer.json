@@ -1,0 +1,16 @@
+{
+  "agent": "B",
+  "name": "SSI Healthometer",
+  "status": "STUB",
+  "api_support": true,
+  "data_availability": {
+    "factor_symbols": 30,
+    "predictions": {
+      "total": 0,
+      "outcomes": 0
+    },
+    "registries_online": 6
+  },
+  "component_file": null,
+  "generated_at": "2026-06-07T10:46:43.902Z"
+}

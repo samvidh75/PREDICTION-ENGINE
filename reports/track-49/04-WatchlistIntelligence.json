@@ -1,0 +1,16 @@
+{
+  "agent": "D",
+  "name": "Watchlist Intelligence",
+  "status": "EXISTS",
+  "api_support": true,
+  "data_availability": {
+    "factor_symbols": 30,
+    "predictions": {
+      "total": 0,
+      "outcomes": 0
+    },
+    "registries_online": 6
+  },
+  "component_file": "src/components/watchlist/WatchlistIntelligence.tsx",
+  "generated_at": "2026-06-07T10:46:43.908Z"
+}

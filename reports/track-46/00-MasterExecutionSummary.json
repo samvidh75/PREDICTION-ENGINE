@@ -1,0 +1,203 @@
+{
+  "timestamp": "2026-06-07T10:42:45.676Z",
+  "mode": "ALL",
+  "results": {
+    "A": {
+      "phase": "PHASE-2",
+      "engine": "Future Health Engine",
+      "row_count": 30,
+      "execution_time_sec": "0.0",
+      "sample": [
+        {
+          "symbol": "ASIANPAINT.NS",
+          "data_date": "2026-06-07",
+          "health_3m": 1,
+          "health_6m": 1,
+          "health_12m": 1,
+          "confidence": 0.75,
+          "trend": "IMPROVING (Quality-driven, Growth-positive, Momentum-favorable)"
+        },
+        {
+          "symbol": "AXISBANK.NS",
+          "data_date": "2026-06-07",
+          "health_3m": 1,
+          "health_6m": 1,
+          "health_12m": 1,
+          "confidence": 0.7,
+          "trend": "IMPROVING (Quality-driven, Growth-positive, Momentum-favorable)"
+        },
+        {
+          "symbol": "BAJAJFINSV.NS",
+          "data_date": "2026-06-07",
+          "health_3m": 1,
+          "health_6m": 1,
+          "health_12m": 1,
+          "confidence": 0.6,
+          "trend": "IMPROVING (Quality-driven, Growth-positive, Momentum-favorable)"
+        },
+        {
+          "symbol": "BAJFINANCE.NS",
+          "data_date": "2026-06-07",
+          "health_3m": 1,
+          "health_6m": 1,
+          "health_12m": 1,
+          "confidence": 0.55,
+          "trend": "IMPROVING (Quality-driven, Growth-positive, Momentum-favorable)"
+        },
+        {
+          "symbol": "BHARTIARTL.NS",
+          "data_date": "2026-06-07",
+          "health_3m": 1,
+          "health_6m": 1,
+          "health_12m": 1,
+          "confidence": 0.5,
+          "trend": "IMPROVING (Quality-driven, Growth-positive, Momentum-favorable)"
+        }
+      ]
+    },
+    "D": {
+      "phase": "PHASE-3",
+      "engine": "Quality Engine V4",
+      "row_count": 60,
+      "execution_time_sec": "0.0",
+      "grade_distribution": [
+        {
+          "quality_grade": "A",
+          "c": 1
+        },
+        {
+          "quality_grade": "A+",
+          "c": 59
+        }
+      ]
+    },
+    "E": {
+      "phase": "PHASE-4",
+      "engine": "Risk Engine",
+      "row_count": 60,
+      "execution_time_sec": "0.0",
+      "grade_distribution": [
+        {
+          "risk_grade": "LOW",
+          "c": 60
+        }
+      ]
+    },
+    "G": {
+      "phase": "PHASE-5",
+      "engine": "Explainability Engine",
+      "row_count": 250,
+      "execution_time_sec": "0.1",
+      "engine_breakdown": [
+        {
+          "engine": "COMPOSITE",
+          "c": 30
+        },
+        {
+          "engine": "FUTURE_HEALTH",
+          "c": 10
+        },
+        {
+          "engine": "GROWTH",
+          "c": 40
+        },
+        {
+          "engine": "INSTITUTIONAL",
+          "c": 10
+        },
+        {
+          "engine": "MOMENTUM",
+          "c": 40
+        },
+        {
+          "engine": "QUALITY",
+          "c": 40
+        },
+        {
+          "engine": "RISK",
+          "c": 40
+        },
+        {
+          "engine": "VALUE",
+          "c": 40
+        }
+      ]
+    },
+    "H": {
+      "phase": "PHASE-6",
+      "engine": "Portfolio Doctor",
+      "row_count": 2,
+      "execution_time_sec": "0.1",
+      "portfolio": {
+        "stock_count": 30,
+        "sector_count": 0,
+        "diversification_score": 0.3,
+        "portfolio_health": "EXCELLENT",
+        "portfolio_fragility": "HIGH",
+        "portfolio_resilience": "WEAK",
+        "factor_exposures": {
+          "quality": 54.18,
+          "growth": 58.64,
+          "value": 53.51,
+          "momentum": 37.33,
+          "risk": 19.54
+        }
+      }
+    },
+    "validation": {
+      "phase": "PHASE-7",
+      "type": "Engine Health Report",
+      "total_symbols_in_factor_snapshots": 30,
+      "total_factor_snapshots": 35640,
+      "latest_trade_date": "2026-06-05",
+      "registries": [
+        {
+          "registry": "future_health_registry",
+          "engine": "Future Health",
+          "row_count": 30,
+          "coverage_pct": 100,
+          "freshness": "2026-06-07",
+          "status": "EXCELLENT"
+        },
+        {
+          "registry": "quality_registry_v4",
+          "engine": "Quality V4",
+          "row_count": 60,
+          "coverage_pct": 200,
+          "freshness": "2026-06-07",
+          "status": "EXCELLENT"
+        },
+        {
+          "registry": "risk_registry",
+          "engine": "Risk",
+          "row_count": 60,
+          "coverage_pct": 200,
+          "freshness": "2026-06-07",
+          "status": "EXCELLENT"
+        },
+        {
+          "registry": "explainability_registry",
+          "engine": "Explainability",
+          "row_count": 250,
+          "coverage_pct": 833.33,
+          "freshness": "2026-06-07",
+          "status": "EXCELLENT"
+        },
+        {
+          "registry": "portfolio_doctor_registry",
+          "engine": "Portfolio Doctor",
+          "row_count": 2,
+          "coverage_pct": 100,
+          "freshness": "2026-06-07",
+          "status": "EXCELLENT"
+        }
+      ],
+      "all_engines_operational": true,
+      "coverage_above_90pct": true,
+      "certification": "TRACK-46 COMPLETE",
+      "execution_time_sec": "0.0"
+    }
+  },
+  "allOk": true,
+  "errors": []
+}

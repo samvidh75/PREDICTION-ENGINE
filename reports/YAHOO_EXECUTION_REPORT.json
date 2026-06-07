@@ -1,0 +1,322 @@
+[
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:21:14.246Z",
+    "durationMs": 212,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "RELIANCE",
+      "exchange": "NSE",
+      "price": 1313.2,
+      "change": -1.3999999999998636,
+      "changePercent": -0.10649627263044756,
+      "volume": 19990265,
+      "updatedAt": "2026-06-03T11:21:14.246Z"
+    }
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:16.036Z",
+    "durationMs": 1790,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "RELIANCE",
+      "companyName": "RELIANCE",
+      "sector": "",
+      "industry": "",
+      "exchange": "NSE",
+      "currency": "INR"
+    }
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:21:16.607Z",
+    "durationMs": 571,
+    "success": true,
+    "recordsReturned": 23,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 1433.4000244140625,
+        "high": 1467.4000244140625,
+        "low": 1433.4000244140625,
+        "close": 1463.0999755859375,
+        "volume": 24035700,
+        "adjustedClose": 1463.0999755859375
+      },
+      {
+        "date": "2026-05-05",
+        "open": 1460,
+        "high": 1473.4000244140625,
+        "low": 1450,
+        "close": 1463.5999755859375,
+        "volume": 23543341,
+        "adjustedClose": 1463.5999755859375
+      }
+    ]
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:21:17.246Z",
+    "durationMs": 125,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "TCS",
+      "exchange": "NSE",
+      "price": 2241.7,
+      "change": -205.20000000000027,
+      "changePercent": -8.386121214598074,
+      "volume": 15657862,
+      "updatedAt": "2026-06-03T11:21:17.246Z"
+    }
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:20.113Z",
+    "durationMs": 2867,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "TCS",
+      "companyName": "TCS",
+      "sector": "",
+      "industry": "",
+      "exchange": "NSE",
+      "currency": "INR"
+    }
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:21:20.243Z",
+    "durationMs": 130,
+    "success": true,
+    "recordsReturned": 23,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 2494,
+        "high": 2498.300048828125,
+        "low": 2425,
+        "close": 2431.300048828125,
+        "volume": 2632358,
+        "adjustedClose": 2398.77490234375
+      },
+      {
+        "date": "2026-05-05",
+        "open": 2430,
+        "high": 2460.39990234375,
+        "low": 2412.199951171875,
+        "close": 2427.300048828125,
+        "volume": 3385720,
+        "adjustedClose": 2394.828369140625
+      }
+    ]
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:21:20.853Z",
+    "durationMs": 102,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "INFY",
+      "exchange": "NSE",
+      "price": 1222.6,
+      "change": -48.200000000000045,
+      "changePercent": -3.792886370790057,
+      "volume": 18530359,
+      "updatedAt": "2026-06-03T11:21:20.853Z"
+    }
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:22.327Z",
+    "durationMs": 1474,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "INFY",
+      "companyName": "INFY",
+      "sector": "",
+      "industry": "",
+      "exchange": "NSE",
+      "currency": "INR"
+    }
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:21:22.460Z",
+    "durationMs": 133,
+    "success": true,
+    "recordsReturned": 23,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 1195,
+        "high": 1195,
+        "low": 1165.199951171875,
+        "close": 1168.4000244140625,
+        "volume": 7735811,
+        "adjustedClose": 1168.4000244140625
+      },
+      {
+        "date": "2026-05-05",
+        "open": 1169.5,
+        "high": 1185.199951171875,
+        "low": 1160.0999755859375,
+        "close": 1178.0999755859375,
+        "volume": 8164108,
+        "adjustedClose": 1178.0999755859375
+      }
+    ]
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:21:23.190Z",
+    "durationMs": 224,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HDFCBANK",
+      "exchange": "NSE",
+      "price": 753.65,
+      "change": 5.399999999999977,
+      "changePercent": 0.7216839291680557,
+      "volume": 36108071,
+      "updatedAt": "2026-06-03T11:21:23.190Z"
+    }
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:24.151Z",
+    "durationMs": 961,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HDFCBANK",
+      "companyName": "HDFCBANK",
+      "sector": "",
+      "industry": "",
+      "exchange": "NSE",
+      "currency": "INR"
+    }
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:21:24.406Z",
+    "durationMs": 255,
+    "success": true,
+    "recordsReturned": 23,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 772.5999755859375,
+        "high": 786.5999755859375,
+        "low": 772.5999755859375,
+        "close": 779.4000244140625,
+        "volume": 29028060,
+        "adjustedClose": 779.4000244140625
+      },
+      {
+        "date": "2026-05-05",
+        "open": 774.4000244140625,
+        "high": 776.9000244140625,
+        "low": 763.7000122070312,
+        "close": 772.2999877929688,
+        "volume": 38887657,
+        "adjustedClose": 772.2999877929688
+      }
+    ]
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getQuote",
+    "requestTime": "2026-06-03T11:21:25.013Z",
+    "durationMs": 95,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HAL",
+      "exchange": "NSE",
+      "price": 4264.1,
+      "change": -14.399999999999636,
+      "changePercent": -0.3365665536987177,
+      "volume": 1122251,
+      "updatedAt": "2026-06-03T11:21:25.013Z"
+    }
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:25.611Z",
+    "durationMs": 598,
+    "success": true,
+    "recordsReturned": 1,
+    "sample": {
+      "symbol": "HAL",
+      "companyName": "HAL",
+      "sector": "",
+      "industry": "",
+      "exchange": "NSE",
+      "currency": "INR"
+    }
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "YahooProvider",
+    "endpoint": "getHistorical",
+    "requestTime": "2026-06-03T11:21:25.711Z",
+    "durationMs": 100,
+    "success": true,
+    "recordsReturned": 23,
+    "sample": [
+      {
+        "date": "2026-05-04",
+        "open": 4356,
+        "high": 4590,
+        "low": 4318,
+        "close": 4559.5,
+        "volume": 2841170,
+        "adjustedClose": 4559.5
+      },
+      {
+        "date": "2026-05-05",
+        "open": 4559,
+        "high": 4677.5,
+        "low": 4534,
+        "close": 4610.39990234375,
+        "volume": 1476586,
+        "adjustedClose": 4610.39990234375
+      }
+    ]
+  }
+]

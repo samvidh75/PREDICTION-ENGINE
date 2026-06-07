@@ -1,0 +1,59 @@
+{
+  "total": 493200,
+  "columns": [
+    "id",
+    "prediction_id",
+    "horizon_days",
+    "actual_return",
+    "benchmark_return",
+    "alpha",
+    "hit",
+    "validated_at"
+  ],
+  "horizons": {
+    "7d": "ERROR: no such column: horizon",
+    "30d": "ERROR: no such column: horizon",
+    "90d": "ERROR: no such column: horizon",
+    "180d": "ERROR: no such column: horizon",
+    "365d": "ERROR: no such column: horizon"
+  },
+  "keyColumnPresence": {
+    "ending_price": "MISSING",
+    "absolute_return": "MISSING",
+    "benchmark_return": "PRESENT",
+    "excess_return": "MISSING",
+    "alpha": "PRESENT"
+  },
+  "sample": [
+    {
+      "id": 493201,
+      "prediction_id": "INFY.NS-2021-08-17-30",
+      "horizon_days": 7,
+      "actual_return": -1.1942725884393848,
+      "benchmark_return": 0.8416735888201927,
+      "alpha": -2.0359461772595777,
+      "hit": 0,
+      "validated_at": "2026-06-06 21:44:33"
+    },
+    {
+      "id": 493202,
+      "prediction_id": "INFY.NS-2021-08-17-30",
+      "horizon_days": 30,
+      "actual_return": -2.2622239750674202,
+      "benchmark_return": 6.1495024548594115,
+      "alpha": -8.411726429926832,
+      "hit": 0,
+      "validated_at": "2026-06-06 21:44:33"
+    },
+    {
+      "id": 493203,
+      "prediction_id": "INFY.NS-2021-08-17-30",
+      "horizon_days": 90,
+      "actual_return": 2.612465154433504,
+      "benchmark_return": 9.313367875859473,
+      "alpha": -6.700902721425969,
+      "hit": 1,
+      "validated_at": "2026-06-06 21:44:33"
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+{
+  "RELIANCE": [
+    {
+      "factor": "Quality Factor",
+      "correlation": -0.067,
+      "win_rate": 0.505,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": -0.04,
+      "win_rate": 0.512,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.009,
+      "win_rate": 0.53,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.125,
+      "win_rate": 0.567,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": 0.023,
+      "win_rate": 0.512,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.095,
+      "win_rate": 0.51,
+      "information_ratio": 0.296,
+      "sharpe_ratio": 0.296
+    }
+  ],
+  "TCS": [
+    {
+      "factor": "Quality Factor",
+      "correlation": 0.038,
+      "win_rate": 0.48,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": 0,
+      "win_rate": 0.472,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.02,
+      "win_rate": 0.45,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.121,
+      "win_rate": 0.518,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": 0.201,
+      "win_rate": 0.472,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.135,
+      "win_rate": 0.479,
+      "information_ratio": -0.513,
+      "sharpe_ratio": -0.513
+    }
+  ],
+  "INFY": [
+    {
+      "factor": "Quality Factor",
+      "correlation": -0.054,
+      "win_rate": 0.519,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": -0.017,
+      "win_rate": 0.524,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.024,
+      "win_rate": 0.486,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.153,
+      "win_rate": 0.564,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": 0.016,
+      "win_rate": 0.525,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.107,
+      "win_rate": 0.537,
+      "information_ratio": -0.347,
+      "sharpe_ratio": -0.347
+    }
+  ],
+  "HDFCBANK": [
+    {
+      "factor": "Quality Factor",
+      "correlation": 0.194,
+      "win_rate": 0.559,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": 0.108,
+      "win_rate": 0.533,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": -0.086,
+      "win_rate": 0.497,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": -0.03,
+      "win_rate": 0.527,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": 0.057,
+      "win_rate": 0.541,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.009,
+      "win_rate": 0.533,
+      "information_ratio": -0.127,
+      "sharpe_ratio": -0.127
+    }
+  ],
+  "HAL": [
+    {
+      "factor": "Quality Factor",
+      "correlation": -0.137,
+      "win_rate": 0.602,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": -0.096,
+      "win_rate": 0.622,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.084,
+      "win_rate": 0.661,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.151,
+      "win_rate": 0.646,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": -0.074,
+      "win_rate": 0.623,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.106,
+      "win_rate": 0.639,
+      "information_ratio": 1.426,
+      "sharpe_ratio": 1.426
+    }
+  ],
+  "BEL": [
+    {
+      "factor": "Quality Factor",
+      "correlation": -0.156,
+      "win_rate": 0.648,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": -0.122,
+      "win_rate": 0.665,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.083,
+      "win_rate": 0.674,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.135,
+      "win_rate": 0.695,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": -0.025,
+      "win_rate": 0.655,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.075,
+      "win_rate": 0.661,
+      "information_ratio": 1.657,
+      "sharpe_ratio": 1.657
+    }
+  ],
+  "IRFC": [
+    {
+      "factor": "Quality Factor",
+      "correlation": -0.269,
+      "win_rate": 0.445,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Value Factor",
+      "correlation": -0.222,
+      "win_rate": 0.479,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Growth Factor",
+      "correlation": 0.251,
+      "win_rate": 0.521,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Momentum Factor",
+      "correlation": 0.289,
+      "win_rate": 0.524,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Risk Factor",
+      "correlation": -0.026,
+      "win_rate": 0.487,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Sector Strength Factor",
+      "correlation": 0,
+      "win_rate": 0.5,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    },
+    {
+      "factor": "Factor Score",
+      "correlation": 0.235,
+      "win_rate": 0.479,
+      "information_ratio": 0.784,
+      "sharpe_ratio": 0.784
+    }
+  ]
+}

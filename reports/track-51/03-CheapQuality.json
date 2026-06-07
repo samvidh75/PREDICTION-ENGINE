@@ -1,0 +1,15 @@
+{
+  "candidates": [
+    {
+      "symbol": "COALINDIA.NS",
+      "roe": 28.5,
+      "roce": 35.3,
+      "pe_ratio": 9.36,
+      "dividend_yield": 5.61,
+      "book_value": 193
+    }
+  ],
+  "count": 1,
+  "historicalHitRate": "58.9%",
+  "historicalN": 1166
+}

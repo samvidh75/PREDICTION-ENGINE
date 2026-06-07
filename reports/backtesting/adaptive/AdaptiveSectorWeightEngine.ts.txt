@@ -1,0 +1,37 @@
+/**
+ * AdaptiveSectorWeightEngine — TRACK-6C
+ * Empirically calibrated sector-specific factor weights.
+ * Generated: 2026-06-05T10:35:39.215Z
+ *
+ * Replaces hardcoded intuition-based weights with data-driven calibration.
+ * Weights derived from correlation analysis of factor scores vs actual forward returns.
+ */
+
+import { mapSectorToType, type SectorWeights, type SectorType } from './SectorWeightEngine';
+
+export const ADAPTIVE_SECTOR_WEIGHTS: Record<SectorType, SectorWeights> = {
+  BANKING: { growth: 7, quality: 7, stability: 71, valuation: 7, momentum: 7 },
+  IT: { growth: 20, quality: 20, stability: 20, valuation: 20, momentum: 20 },
+  FMCG: { growth: 20, quality: 20, stability: 20, valuation: 20, momentum: 20 },
+  PHARMA: { growth: 7, quality: 71, stability: 7, valuation: 7, momentum: 7 },
+  AUTO: { growth: 20, quality: 20, stability: 20, valuation: 20, momentum: 20 },
+  ENERGY: { growth: 43, quality: 43, stability: 4, valuation: 4, momentum: 4 },
+  GENERAL: { growth: 25, quality: 25, stability: 20, valuation: 15, momentum: 15 },
+};
+
+export function getAdaptiveSectorWeights(sectorName: string): SectorWeights {
+  const type = mapSectorToType(sectorName);
+  return ADAPTIVE_SECTOR_WEIGHTS[type];
+}
+
+export function computeAdaptiveHealth(
+  scores: { growth: number; quality: number; stability: number; valuation: number; momentum: number },
+  sectorName: string,
+): number {
+  const w = getAdaptiveSectorWeights(sectorName);
+  const total = scores.growth * w.growth + scores.quality * w.quality + scores.stability * w.stability + scores.valuation * w.valuation + scores.momentum * w.momentum;
+  const tw = w.growth + w.quality + w.stability + w.valuation + w.momentum;
+  return Math.round(total / tw);
+}
+
+export default { getAdaptiveSectorWeights, computeAdaptiveHealth };

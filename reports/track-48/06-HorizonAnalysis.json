@@ -1,0 +1,55 @@
+{
+  "7d": {
+    "error": "insufficient",
+    "n": 0
+  },
+  "30d": {
+    "totalPredictions": 34980,
+    "hitRate": "55.03%",
+    "positiveRate": "55.0%",
+    "sharpe": "0.3781",
+    "meanReturn": "0.8962",
+    "volatility": "6.8702",
+    "factorCorrelations": {
+      "quality_factor": "-0.019658",
+      "momentum_factor": "-0.024797",
+      "value_factor": "0.051917",
+      "risk_factor": "0.031959",
+      "growth_factor": "-0.079787"
+    }
+  },
+  "90d": {
+    "totalPredictions": 33810,
+    "hitRate": "58.01%",
+    "positiveRate": "58.0%",
+    "sharpe": "0.3682",
+    "meanReturn": "2.4501",
+    "volatility": "11.1358",
+    "factorCorrelations": {
+      "quality_factor": "0.041902",
+      "momentum_factor": "-0.056441",
+      "value_factor": "0.070533",
+      "risk_factor": "0.013040",
+      "growth_factor": "-0.107114"
+    }
+  },
+  "180d": {
+    "error": "insufficient",
+    "n": 0
+  },
+  "365d": {
+    "totalPredictions": 28170,
+    "hitRate": "69.82%",
+    "positiveRate": "69.8%",
+    "sharpe": "0.4696",
+    "meanReturn": "13.4464",
+    "volatility": "23.7898",
+    "factorCorrelations": {
+      "quality_factor": "0.160476",
+      "momentum_factor": "-0.023999",
+      "value_factor": "0.042587",
+      "risk_factor": "-0.092426",
+      "growth_factor": "-0.059360"
+    }
+  }
+}

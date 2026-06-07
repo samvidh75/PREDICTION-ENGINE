@@ -1,0 +1,152 @@
+[
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:28.063Z",
+    "durationMs": 1840,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getFinancials",
+    "requestTime": "2026-06-03T11:21:29.308Z",
+    "durationMs": 1245,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "RELIANCE.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getNews",
+    "requestTime": "2026-06-03T11:21:31.105Z",
+    "durationMs": 1797,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:33.106Z",
+    "durationMs": 1488,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getFinancials",
+    "requestTime": "2026-06-03T11:21:35.275Z",
+    "durationMs": 2169,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "TCS.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getNews",
+    "requestTime": "2026-06-03T11:21:36.988Z",
+    "durationMs": 1713,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:39.256Z",
+    "durationMs": 1760,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getFinancials",
+    "requestTime": "2026-06-03T11:21:40.854Z",
+    "durationMs": 1598,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "INFY.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getNews",
+    "requestTime": "2026-06-03T11:21:42.621Z",
+    "durationMs": 1767,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:45.630Z",
+    "durationMs": 2497,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getFinancials",
+    "requestTime": "2026-06-03T11:21:47.422Z",
+    "durationMs": 1792,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HDFCBANK.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getNews",
+    "requestTime": "2026-06-03T11:21:49.626Z",
+    "durationMs": 2204,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getMetadata",
+    "requestTime": "2026-06-03T11:21:52.027Z",
+    "durationMs": 1897,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getFinancials",
+    "requestTime": "2026-06-03T11:21:53.591Z",
+    "durationMs": 1564,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  },
+  {
+    "symbol": "HAL.NS",
+    "provider": "FinnhubProvider",
+    "endpoint": "getNews",
+    "requestTime": "2026-06-03T11:21:55.761Z",
+    "durationMs": 2170,
+    "success": false,
+    "recordsReturned": 0,
+    "error": "Finnhub HTTP 403: Forbidden"
+  }
+]

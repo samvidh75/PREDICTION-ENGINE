@@ -1,0 +1,37 @@
+{
+  "individual": {
+    "roe": {
+      "correlation": "-0.031410",
+      "highValueHitRate": "54.5%",
+      "n": 34980
+    },
+    "roce": {
+      "correlation": "-0.038723",
+      "highValueHitRate": "54.1%",
+      "n": 34980
+    },
+    "pe_ratio": {
+      "correlation": "-0.000434",
+      "highValueHitRate": "54.4%",
+      "n": 34980
+    },
+    "dividend_yield": {
+      "correlation": "-0.016066",
+      "highValueHitRate": "NaN%",
+      "n": 34980
+    }
+  },
+  "combinations": {
+    "roe_roce_all": {
+      "highBothHitRate": "53.8%",
+      "lowBothHitRate": "N/A",
+      "roeHigh_n": 15158,
+      "roeLow_n": 0
+    },
+    "pe_roe": {
+      "cheapQualityHitRate": "59.0%",
+      "expensiveLowHitRate": "60.4%",
+      "cheapQuality_n": 2332
+    }
+  }
+}

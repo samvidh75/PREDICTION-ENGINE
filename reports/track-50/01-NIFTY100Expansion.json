@@ -1,0 +1,21 @@
+{
+  "current_state": {
+    "factor_symbols": 30,
+    "factor_rows": 35640,
+    "price_rows": 37140,
+    "price_symbols": 30,
+    "financial_rows": 60,
+    "financial_symbols": 30,
+    "master_registry_count": 0
+  },
+  "nifty100_populated": "ASIANPAINT.NS, AXISBANK.NS, BAJAJFINSV.NS, BAJFINANCE.NS, BHARTIARTL.NS, COALINDIA.NS, GRASIM.NS, HCLTECH.NS, HDFCBANK.NS, HINDUNILVR.NS, ICICIBANK.NS, INFY.NS, ITC.NS, JSWSTEEL.NS, KOTAKBANK.NS, LT.NS, MARUTI.NS, NESTLEIND.NS, NTPC.NS, ONGC.NS, POWERGRID.NS, RELIANCE.NS, SBIN.NS, SUNPHARMA.NS, TATASTEEL.NS, TCS.NS, TECHM.NS, TITAN.NS, ULTRACEMCO.NS, WIPRO.NS",
+  "nifty100_count": 30,
+  "expansion_targets": {
+    "target_symbols": 100,
+    "target_price_rows": "120,000+",
+    "target_financial_snapshots": "100+",
+    "gap": 70
+  },
+  "yfinance_coverage": 0,
+  "recommendation": "EXPAND REQUIRED"
+}

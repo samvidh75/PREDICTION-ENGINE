@@ -1,0 +1,1217 @@
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m11[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m          ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m13[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m            ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m19[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m                  ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m29[0m - [91merror[0m[90m TS1435: [0mUnknown keyword or identifier. Did you mean 'export'?
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m                            ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m36[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m                                   ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m36[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m                                   ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m249[0m:[93m45[0m - [91merror[0m[90m TS1351: [0mAn identifier or keyword cannot immediately follow a numeric literal.
+
+[7m249[0m let r2 = `# Score Integrity Report — TRACK-8B
+[7m   [0m [91m                                            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m251[0m:[93m12[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m251[0m **Generated:** ${new Date().toISOString()}
+[7m   [0m [91m           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m251[0m:[93m13[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m251[0m **Generated:** ${new Date().toISOString()}
+[7m   [0m [91m            ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m251[0m:[93m17[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m251[0m **Generated:** ${new Date().toISOString()}
+[7m   [0m [91m                ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m253[0m:[93m3[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m253[0m ---
+[7m   [0m [91m  ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m255[0m:[93m1[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m255[0m ## Provider Data Availability
+[7m   [0m [91m~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m255[0m:[93m2[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m255[0m ## Provider Data Availability
+[7m   [0m [91m ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m255[0m:[93m4[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m255[0m ## Provider Data Availability
+[7m   [0m [91m   ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m255[0m:[93m13[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m255[0m ## Provider Data Availability
+[7m   [0m [91m            ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m12[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m13[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m15[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m              ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m20[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                   ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m29[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                            ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m49[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m55[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                      ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m61[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                            ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m71[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                                      ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m80[0m - [91merror[0m[90m TS1228: [0mA type predicate is only allowed in return type position for functions and methods.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                                               ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m92[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                                                           [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m94[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                                                             [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m260[0m:[93m96[0m - [91merror[0m[90m TS1443: [0mModule declaration names may only use ' or " quoted strings.
+
+[7m260[0m   r2 += `**⚠️ Zero provider responses available.** No score integrity analysis is possible.\n\n`;
+[7m   [0m [91m                                                                                               ~~[0m
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m10[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m         ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m44[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                           ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m53[0m - [91merror[0m[90m TS1435: [0mUnknown keyword or identifier. Did you mean 'return'?
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                    ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m62[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                             ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m75[0m - [91merror[0m[90m TS1005: [0m'(' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                          ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m79[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m80[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                               ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m90[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                                         ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m99[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                                                  ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m116[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                                                                   [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m261[0m:[93m118[0m - [91merror[0m[90m TS1443: [0mModule declaration names may only use ' or " quoted strings.
+
+[7m261[0m   r2 += `The IndianAPI /stock_fundamentals endpoint returned failures for all ${COMPANIES.length} tested companies.\n`;
+[7m   [0m [91m                                                                                                                     ~~[0m
+[7m262[0m   r2 += `This means:\n`;
+[7m   [0m [91m~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m262[0m:[93m10[0m - [91merror[0m[90m TS1435: [0mUnknown keyword or identifier. Did you mean 'this'?
+
+[7m262[0m   r2 += `This means:\n`;
+[7m   [0m [91m         ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m262[0m:[93m21[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m262[0m   r2 += `This means:\n`;
+[7m   [0m [91m                    [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m263[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m263[0m   r2 += `- All PE values = fallback (20)\n`;
+[7m   [0m [91m               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m263[0m:[93m41[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m263[0m   r2 += `- All PE values = fallback (20)\n`;
+[7m   [0m [91m                                        [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m264[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m264[0m   r2 += `- All ROE values = fallback (0.12)\n`;
+[7m   [0m [91m               ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m264[0m:[93m44[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m264[0m   r2 += `- All ROE values = fallback (0.12)\n`;
+[7m   [0m [91m                                           [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m265[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m265[0m   r2 += `- All Revenue Growth values = fallback (0.08)\n`;
+[7m   [0m [91m               ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m265[0m:[93m24[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m265[0m   r2 += `- All Revenue Growth values = fallback (0.08)\n`;
+[7m   [0m [91m                       ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m265[0m:[93m55[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m265[0m   r2 += `- All Revenue Growth values = fallback (0.08)\n`;
+[7m   [0m [91m                                                      [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m266[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m266[0m   r2 += `- All Debt/Equity values = fallback (0.5)\n`;
+[7m   [0m [91m               ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m266[0m:[93m28[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m266[0m   r2 += `- All Debt/Equity values = fallback (0.5)\n`;
+[7m   [0m [91m                           ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m266[0m:[93m51[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m266[0m   r2 += `- All Debt/Equity values = fallback (0.5)\n`;
+[7m   [0m [91m                                                  [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m267[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m267[0m   r2 += `- All Beta values = fallback (1.0)\n\n`;
+[7m   [0m [91m               ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m267[0m:[93m44[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m267[0m   r2 += `- All Beta values = fallback (1.0)\n\n`;
+[7m   [0m [91m                                           [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m267[0m:[93m46[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m267[0m   r2 += `- All Beta values = fallback (1.0)\n\n`;
+[7m   [0m [91m                                             [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m23[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                      ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m33[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m42[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                         ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m59[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                          ~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m70[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                     ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m77[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                            ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m85[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                    ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m93[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                            ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m101[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                    ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m111[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                              ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m122[0m - [91merror[0m[90m TS1005: [0m'(' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                         ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m139[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                          ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m144[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                               ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m156[0m - [91merror[0m[90m TS1005: [0m'(' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                           ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m160[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                               ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m165[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                    ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m176[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                               ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m178[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                 ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m183[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                      ~~~~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m197[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                    ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m202[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                         ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m205[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                            ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m212[0m - [91merror[0m[90m TS1435: [0mUnknown keyword or identifier. Did you mean 'class ification'?
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                   ~~~~~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m227[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                                  ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m231[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                                      ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m242[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                                                 [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m244[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                                                   [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m268[0m:[93m246[0m - [91merror[0m[90m TS1443: [0mModule declaration names may only use ' or " quoted strings.
+
+[7m268[0m   r2 += `**StockStory currently operates on 100% fallback financials.** The scoring engines produce identical scores for companies in the same sector with the same market cap — they differentiate only by sector classification and market cap.\n\n`;
+[7m   [0m [91m                                                                                                                                                                                                                                                     ~~[0m
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m10[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m         ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m11[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m          ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m13[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m            ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m19[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m                  ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m42[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m                                         ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m51[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m                                                  ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m60[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m                                                           [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m269[0m:[93m62[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m269[0m   r2 += `## Score Component Trace (Using Fallback Defaults)\n\n`;
+[7m   [0m [91m                                                             [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m270[0m:[93m29[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m270[0m   r2 += `| Company | Growth Score | Driver | Quality Score | Driver | Stability Score | Driver | Valuation Score | Driver |\n`;
+[7m   [0m [91m                            ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m270[0m:[93m54[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m270[0m   r2 += `| Company | Growth Score | Driver | Quality Score | Driver | Stability Score | Driver | Valuation Score | Driver |\n`;
+[7m   [0m [91m                                                     ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m270[0m:[93m81[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m270[0m   r2 += `| Company | Growth Score | Driver | Quality Score | Driver | Stability Score | Driver | Valuation Score | Driver |\n`;
+[7m   [0m [91m                                                                                ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m270[0m:[93m108[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m270[0m   r2 += `| Company | Growth Score | Driver | Quality Score | Driver | Stability Score | Driver | Valuation Score | Driver |\n`;
+[7m   [0m [91m                                                                                                           ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m270[0m:[93m124[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m270[0m   r2 += `| Company | Growth Score | Driver | Quality Score | Driver | Stability Score | Driver | Valuation Score | Driver |\n`;
+[7m   [0m [91m                                                                                                                           [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m11[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m          ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m14[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m             ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m16[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m18[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                 ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m20[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                   ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m21[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m24[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                       ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m26[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                         ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m28[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                           ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m30[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                             ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m32[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m34[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                 ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m35[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                  ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m36[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                   ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m39[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                      ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m41[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                        ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m43[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                          ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m44[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m45[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m48[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m50[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                 ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m52[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                   ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m54[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                     ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m56[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                       ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m58[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                         ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m60[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m61[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m64[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m66[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                 ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m68[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                   ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m69[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m70[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                     ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m73[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                        ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m75[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                          ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m77[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                            ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m79[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                              ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m81[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m83[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                  ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m85[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m86[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                     ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m87[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                      ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m90[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                         ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m92[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                           ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m94[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                             ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m95[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m96[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                               ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m99[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                  ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m101[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                    ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m103[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                      ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m105[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                        ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m107[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                          ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m109[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                            ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m111[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m112[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                               ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m113[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m116[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                   ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m118[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                     ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m120[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m121[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                        ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m271[0m:[93m122[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m271[0m   r2 += `|:--------|:-------------|:-------|:--------------|:-------|:---------------|:-------|:---------------|:-------|\n`;
+[7m   [0m [91m                                                                                                                         [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m15[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m21[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m24[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m30[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                             ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                     ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m40[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m61[0m - [91merror[0m[90m TS1005: [0m')' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                            ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m74[0m - [91merror[0m[90m TS1005: [0m'(' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                         ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m77[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m79[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m82[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                 ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m88[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m97[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                ~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m111[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                              ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m117[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m124[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                           ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m136[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m142[0m - [91merror[0m[90m TS1109: [0mExpression expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                                             ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m149[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                                                    ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m159[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                                                              [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m291[0m:[93m161[0m - [91merror[0m[90m TS1443: [0mModule declaration names may only use ' or " quoted strings.
+
+[7m291[0m     r2 += `| ${sym} | ${s.g} | Sector: ${sector} (identical defaults for all) | ${s.q} | Sector thresholds | ${s.s} | Same defaults | ${s.v} | Same defaults |\n`;
+[7m   [0m [91m                                                                                                                                                                ~~[0m
+[7m292[0m   }
+[7m   [0m [91m~~~[0m
+[7m293[0m 
+[7m   [0m [91m[0m
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m10[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m         [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m10[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m         ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m11[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m          ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m12[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m13[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m            ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m15[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m              ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m22[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m                     [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m294[0m:[93m24[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m294[0m   r2 += `\n## Verdict\n\n`;
+[7m   [0m [91m                       [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m12[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m14[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m             ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m21[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                    ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m25[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                        ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m29[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                            ~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m40[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                       ~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m51[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                  ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m54[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                     ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m64[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                               ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m71[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                      ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m88[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                       ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m93[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                            ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m100[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                   ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m108[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                           ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m141[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                            ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m151[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                      ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m158[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                             ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m166[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                     ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m170[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                         ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m180[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                                   ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m187[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                                          ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m191[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                                              ~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m209[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                                                                [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m295[0m:[93m211[0m - [91merror[0m[90m TS1443: [0mModule declaration names may only use ' or " quoted strings.
+
+[7m295[0m   r2 += `**❌ Scores are NOT materially influenced by real data.** All companies in the same sector receive identical Growth, Stability, and Valuation scores because all financial inputs are fallback defaults.\n`;
+[7m   [0m [91m                                                                                                                                                                                                                  ~~[0m
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m10[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m         ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m18[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                 ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m25[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                        ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m32[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                               ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m37[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                    ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m53[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                    ~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m69[0m - [91merror[0m[90m TS1003: [0mIdentifier expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                    ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m74[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                         ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m81[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m89[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                        ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m96[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                               ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m104[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                                       ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m112[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                                               ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m296[0m:[93m127[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m296[0m   r2 += `Quality scores differ only by sector-level thresholds (e.g., IT stocks require higher margins → lower default score).\n`;
+[7m   [0m [91m                                                                                                                              [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m16[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m               ~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m23[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                      ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m29[0m - [91merror[0m[90m TS1228: [0mA type predicate is only allowed in return type position for functions and methods.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                            ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m32[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                               ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m36[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                   ~~~~~~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m73[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                        ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m78[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                             ~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m88[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                       ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m93[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                            ~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m98[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                                 ~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m101[0m - [91merror[0m[90m TS1435: [0mUnknown keyword or identifier. Did you mean 'let'?
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                                    ~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m107[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                                          ~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m111[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                                              ~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m297[0m:[93m128[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m297[0m   r2 += `**The Health Score is NOT institutionally defensible** without real financial data from at least one working provider.\n`;
+[7m   [0m [91m                                                                                                                               [0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m299[0m:[93m12[0m - [91merror[0m[90m TS1127: [0mInvalid character.
+
+[7m299[0m   r2 += `**✅ ${successCount}/${COMPANIES.length} companies returned data from IndianAPI.** Analysis below.\n`;
+[7m   [0m [91m           ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m299[0m:[93m14[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m299[0m   r2 += `**✅ ${successCount}/${COMPANIES.length} companies returned data from IndianAPI.** Analysis below.\n`;
+[7m   [0m [91m             ~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m299[0m:[93m29[0m - [91merror[0m[90m TS1161: [0mUnterminated regular expression literal.
+
+[7m299[0m   r2 += `**✅ ${successCount}/${COMPANIES.length} companies returned data from IndianAPI.** Analysis below.\n`;
+[7m   [0m [91m                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96mscripts/track-8b-score-integrity.ts[0m:[93m301[0m:[93m1[0m - [91merror[0m[90m TS1128: [0mDeclaration or statement expected.
+
+[7m301[0m }
+[7m   [0m [91m~[0m
+
+
+Found 240 errors in the same file, starting at: scripts/track-8b-score-integrity.ts[90m:249[0m
+

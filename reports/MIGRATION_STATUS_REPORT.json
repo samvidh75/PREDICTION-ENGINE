@@ -1,0 +1,11 @@
+{
+  "migrated": true,
+  "tables": {
+    "symbols": "OK",
+    "daily_prices": "OK",
+    "financial_snapshots": "OK",
+    "news_articles": "OK",
+    "provider_logs": "OK"
+  },
+  "timestamp": "2026-06-03T05:25:43.173Z"
+}

@@ -1,0 +1,26 @@
+{
+  "tables": {
+    "future_health_registry": {
+      "rows": 90,
+      "status": "POPULATED"
+    },
+    "quality_registry_v4": {
+      "rows": 0,
+      "status": "EMPTY"
+    },
+    "risk_registry": {
+      "rows": 0,
+      "status": "EMPTY"
+    },
+    "explainability_registry": {
+      "rows": 70,
+      "status": "POPULATED"
+    },
+    "portfolio_doctor_registry": {
+      "rows": 1,
+      "status": "POPULATED"
+    }
+  },
+  "allPopulated": false,
+  "summary": "3/5 operational"
+}

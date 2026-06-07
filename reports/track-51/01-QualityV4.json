@@ -1,0 +1,184 @@
+{
+  "weights": {
+    "pe": 0.35,
+    "roe": 0.3,
+    "roce": 0.2,
+    "dividend": 0.1,
+    "debt": 0.05
+  },
+  "empiricalHitRates": {
+    "roe": {
+      "thresholds": {
+        ">10": {
+          "hitRate": "55.0%",
+          "n": 32648,
+          "diff": "-0.4"
+        },
+        ">15": {
+          "hitRate": "54.5%",
+          "n": 20988,
+          "diff": "-1.3"
+        },
+        ">20": {
+          "hitRate": "53.3%",
+          "n": 11660,
+          "diff": "-2.7"
+        }
+      },
+      "n": 34980
+    },
+    "roce": {
+      "thresholds": {
+        ">10": {
+          "hitRate": "54.3%",
+          "n": 25652,
+          "diff": "-2.6"
+        },
+        ">15": {
+          "hitRate": "54.1%",
+          "n": 16324,
+          "diff": "-1.7"
+        },
+        ">20": {
+          "hitRate": "53.1%",
+          "n": 12826,
+          "diff": "-3.0"
+        }
+      },
+      "n": 34980
+    },
+    "pe_ratio": {
+      "thresholds": {
+        "<10": {
+          "hitRate": "57.8%",
+          "n": 2332,
+          "diff": "2.4"
+        },
+        "<15": {
+          "hitRate": "58.4%",
+          "n": 4664,
+          "diff": "2.1"
+        },
+        "<20": {
+          "hitRate": "54.5%",
+          "n": 16324,
+          "diff": "-0.6"
+        },
+        "<25": {
+          "hitRate": "54.4%",
+          "n": 18656,
+          "diff": "0.9"
+        }
+      },
+      "n": 34980
+    },
+    "dividend_yield": {
+      "thresholds": {},
+      "n": 34980
+    }
+  },
+  "cheapQualityHitRate": "59.0%",
+  "cheapQualityN": 2332,
+  "top10": [
+    {
+      "symbol": "COALINDIA.NS",
+      "quality_v4_score": 0.9499999999999998,
+      "raw": {
+        "pe": 9.36,
+        "roe": 28.5,
+        "roce": 35.3,
+        "div": 5.61
+      }
+    },
+    {
+      "symbol": "INFY.NS",
+      "quality_v4_score": 0.9240740740740739,
+      "raw": {
+        "pe": 16.2,
+        "roe": 31.9,
+        "roce": 40,
+        "div": 4.01
+      }
+    },
+    {
+      "symbol": "TCS.NS",
+      "quality_v4_score": 0.9181447368421053,
+      "raw": {
+        "pe": 15.2,
+        "roe": 51.8,
+        "roce": 63,
+        "div": 2.91
+      }
+    },
+    {
+      "symbol": "ITC.NS",
+      "quality_v4_score": 0.9125,
+      "raw": {
+        "pe": 16.8,
+        "roe": 29.3,
+        "roce": 38.9,
+        "div": 5.17
+      }
+    },
+    {
+      "symbol": "HCLTECH.NS",
+      "quality_v4_score": 0.8916666666666667,
+      "raw": {
+        "pe": 18,
+        "roe": 24,
+        "roce": 30.6,
+        "div": 4.68
+      }
+    },
+    {
+      "symbol": "WIPRO.NS",
+      "quality_v4_score": 0.8079784810126581,
+      "raw": {
+        "pe": 15.8,
+        "roe": 15.5,
+        "roce": 17.9,
+        "div": 5.55
+      }
+    },
+    {
+      "symbol": "ONGC.NS",
+      "quality_v4_score": 0.7391,
+      "raw": {
+        "pe": 7.99,
+        "roe": 11.7,
+        "roce": 14.2,
+        "div": 4.63
+      }
+    },
+    {
+      "symbol": "POWERGRID.NS",
+      "quality_v4_score": 0.71854125748503,
+      "raw": {
+        "pe": 16.7,
+        "roe": 16.5,
+        "roce": 9.74,
+        "div": 3.15
+      }
+    },
+    {
+      "symbol": "TECHM.NS",
+      "quality_v4_score": 0.7152123711340206,
+      "raw": {
+        "pe": 29.1,
+        "roe": 17.6,
+        "roce": 23.1,
+        "div": 3.44
+      }
+    },
+    {
+      "symbol": "HINDUNILVR.NS",
+      "quality_v4_score": 0.7088004587155964,
+      "raw": {
+        "pe": 32.7,
+        "roe": 31,
+        "roce": 28.4,
+        "div": 1.93
+      }
+    }
+  ]
+}

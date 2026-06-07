@@ -1,0 +1,5 @@
+{
+  "status": "RETIRED",
+  "reason": "TRACK-48: health_3m/6m/12m near-zero corr with returns",
+  "replacement": "Use quality trend + cheap quality persistence — needs quarterly data"
+}

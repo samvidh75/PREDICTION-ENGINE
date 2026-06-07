@@ -1,0 +1,14 @@
+{
+  "directional365d": {
+    "claim": "~70% directional accuracy over 365 days",
+    "validated": true,
+    "rate": "69.82%",
+    "n": 28170
+  },
+  "cheapQuality": {
+    "claim": "Cheap Quality (PE<15, ROE>15) ~59% hit rate at 30d",
+    "validated": true,
+    "rate": "59.05%",
+    "n": 2332
+  }
+}

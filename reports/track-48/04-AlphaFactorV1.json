@@ -1,0 +1,22 @@
+{
+  "methodology": "Equal-weight composite of factors with strongest empirical correlation to 30d/90d returns",
+  "weights": {
+    "quality_factor": 0.07401200000000001,
+    "growth_factor": 0.082087,
+    "value_factor": 0.05501233333333333,
+    "momentum_factor": 0.035079,
+    "risk_factor": 0.04580833333333333
+  },
+  "normalizedWeights": {
+    "quality_factor": "25.3%",
+    "growth_factor": "28.1%",
+    "value_factor": "18.8%",
+    "momentum_factor": "12.0%",
+    "risk_factor": "15.7%"
+  },
+  "strongestFactor": [
+    "growth_factor",
+    0.082087
+  ],
+  "removedFactors": []
+}
