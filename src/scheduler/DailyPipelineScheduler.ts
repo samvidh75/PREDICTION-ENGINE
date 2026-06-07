@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { predictionFactory } from '../predictions/PredictionFactory';
 import { outcomeValidator } from '../validation/OutcomeValidator';
+import { pipelineAlertService } from '../services/PipelineAlertService';
 import pool from '../db/index';
 
 const LOCK_FILE = path.join(process.cwd(), 'data', '.pipeline_lock');
@@ -138,6 +139,19 @@ export class DailyPipelineScheduler {
 
     const completedAt = new Date().toISOString();
     console.log(`[SCHEDULER] Pipeline ${runId} complete — ${overallSuccess ? 'SUCCESS' : 'PARTIAL'}`);
+
+    // Dispatch alerts for any failed phases
+    const failedPhases = phases.filter(p => p.status === 'failed');
+    if (failedPhases.length > 0) {
+      try {
+        await pipelineAlertService.sendAlert(
+          'WARNING', 'DailyPipelineScheduler',
+          `${failedPhases.length} phase(s) failed in run ${runId}: ${failedPhases.map(p => p.phase).join(', ')}`
+        );
+      } catch (e: unknown) {
+        console.error(`[SCHEDULER] Alert dispatch failed: ${(e as Error).message}`);
+      }
+    }
 
     return { runId, startedAt, completedAt, phases, success: overallSuccess };
   }

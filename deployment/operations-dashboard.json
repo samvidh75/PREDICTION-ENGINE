@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-06-07T12:41:43.537Z",
+  "scheduler": {
+    "status": "ACTIVE",
+    "totalRuns": 84
+  },
+  "freshness": {
+    "overallStatus": "healthy",
+    "checks": [
+      {
+        "table": "daily_prices",
+        "latest": "2026-06-07",
+        "daysStale": 0,
+        "status": "OK"
+      },
+      {
+        "table": "quality_registry",
+        "latest": "2026-06-06",
+        "daysStale": 1,
+        "status": "OK"
+      },
+      {
+        "table": "prediction_registry",
+        "latest": "2026-06-07",
+        "daysStale": 0,
+        "status": "OK"
+      }
+    ]
+  },
+  "predictions": {
+    "today": 90,
+    "total": 107010
+  },
+  "validations": {
+    "totalValidated": 97080,
+    "outcomeV2": 97080
+  },
+  "failures": {
+    "errors": 0
+  },
+  "alerts": {
+    "count": 0
+  },
+  "universe": {
+    "qualitySymbols": 30,
+    "priceSymbols": 128,
+    "nifty100Target": 100
+  }
+}

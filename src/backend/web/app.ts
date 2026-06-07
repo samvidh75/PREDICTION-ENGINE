@@ -5,6 +5,7 @@ import cookie from "@fastify/cookie";
 import routes from "./routes";
 import { errorHandlerPlugin } from "../monitoring/errorHandler";
 import { requestIdPlugin } from "../monitoring/requestIdPlugin";
+import { rateLimiterPlugin } from "../../middleware/RateLimiter";
 import { envPlugin } from "../config/envPlugin";
 import { postgresPlugin } from "../persistence/postgres/postgresPlugin";
 import { persistencePlugin } from "../persistence/persistencePlugin";
@@ -64,6 +65,9 @@ export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
 
   // Cache hierarchy for stale-while-revalidate continuity
   await app.register(cachePlugin, { encapsulate: false } as any);
+
+  // Rate limiting — protects all public endpoints
+  await app.register(rateLimiterPlugin);
 
   // Structured error isolation (keeps failures safe + consistent)
   await app.register(errorHandlerPlugin);
