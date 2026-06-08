@@ -2,27 +2,67 @@
  * SQLiteAdapter — Zero-configuration database adapter.
  * Implements the same interface as pg Pool: query(sql, params?) => { rows[], rowCount }
  * Used as fallback when PostgreSQL is unavailable.
+ *
+ * TASK 2: DB path is injectable via SQLITE_DB_PATH env var.
+ *         closeSQLite() closes the singleton.
+ *         resetForTest() allows tests to isolate to a separate DB path.
  */
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const DB_PATH = process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
+/**
+ * Returns the effective SQLite DB path, resolving the SQLITE_DB_PATH env var
+ * or defaulting to data/stockstory.db relative to cwd.
+ */
+function resolveDbPath(): string {
+  return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
+}
 
 let _db: Database.Database | null = null;
+let _dbPath: string = resolveDbPath();
 
-function ensureDir() {
-  const dir = path.dirname(DB_PATH);
+function ensureDir(): void {
+  const dir = path.dirname(_dbPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 function getDb(): Database.Database {
   if (_db) return _db;
+  _dbPath = resolveDbPath();
   ensureDir();
-  _db = new Database(DB_PATH);
+  _db = new Database(_dbPath);
   _db.pragma('journal_mode = WAL');
   _db.pragma('foreign_keys = ON');
   return _db;
+}
+
+/**
+ * Close the SQLite singleton and null it out.
+ * After calling this, the next call to getDb() will re-create the connection.
+ */
+export function closeSQLite(): void {
+  if (_db) {
+    try { _db.close(); } catch { /* ignore close errors */ }
+    _db = null;
+  }
+}
+
+/**
+ * Reset the SQLite adapter for testing.
+ * Closes the existing connection, optionally sets a new DB path (by updating
+ * process.env.SQLITE_DB_PATH), and nulls the singleton so the next getDb()
+ * opens a fresh connection at the new path.
+ *
+ * @param dbPath — Optional new path for SQLITE_DB_PATH. If not provided,
+ *                 the existing env value is left unchanged.
+ */
+export function resetForTest(dbPath?: string): void {
+  closeSQLite();
+  if (dbPath !== undefined) {
+    process.env.SQLITE_DB_PATH = dbPath;
+  }
+  _dbPath = resolveDbPath();
 }
 
 const SQLITE_TO_PG_TYPES: Record<string, string> = {
@@ -100,7 +140,7 @@ function translateSQL(sql: string): string {
 }
 
 interface SQLiteResult {
-  rows: Record<string, any>[];
+  rows: Record<string, unknown>[];
   rowCount: number;
 }
 
@@ -112,7 +152,7 @@ class SQLitePool {
     this.ensureTables();
   }
 
-  private ensureTables() {
+  private ensureTables(): void {
     // Create core tables if they don't exist
     const tables = [
       `CREATE TABLE IF NOT EXISTS master_security_registry (
@@ -195,11 +235,11 @@ class SQLitePool {
       )`,
     ];
     for (const sql of tables) {
-      try { this.db.exec(sql); } catch {}
+      try { this.db.exec(sql); } catch { /* table already exists or similar */ }
     }
   }
 
-  async query(text: string, params?: any[]): Promise<SQLiteResult> {
+  async query(text: string, params?: unknown[]): Promise<SQLiteResult> {
     const translated = translateSQL(text);
 
     try {
@@ -210,7 +250,7 @@ class SQLitePool {
       if (isSelect || isReturning) {
         const stmt = this.db.prepare(translated);
         const rows = params ? stmt.all(...params) : stmt.all();
-        return { rows: rows as Record<string, any>[], rowCount: (rows as any[]).length };
+        return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
       }
 
       // For INSERT/UPDATE/DELETE — use run
@@ -221,36 +261,32 @@ class SQLitePool {
       // For INSERT with RETURNING, re-query the inserted row
       if (isReturning && translated.includes('INSERT')) {
         const lastId = result.lastInsertRowid;
-        // Try to get the inserted row
         if (lastId && lastId > 0) {
           return { rows: [{ id: Number(lastId) }], rowCount };
         }
       }
 
       return { rows: [], rowCount };
-    } catch (err: any) {
+    } catch (err: unknown) {
       // If translation fails, try raw SQL
       try {
         const stmt = this.db.prepare(text.replace(/\$\d+/g, '?'));
         const isSelect = /^\s*SELECT/i.test(text);
         if (isSelect) {
           const rows = params ? stmt.all(...params) : stmt.all();
-          return { rows: rows as Record<string, any>[], rowCount: (rows as any[]).length };
+          return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
         }
         const result = params ? stmt.run(...params) : stmt.run();
         return { rows: [], rowCount: result.changes };
-      } catch (e2: any) {
-        // Return empty — don't crash
-        throw new Error(`SQLite query failed: ${e2.message}\nSQL: ${text.substring(0, 200)}`);
+      } catch (e2: unknown) {
+        const msg = e2 instanceof Error ? e2.message : String(e2);
+        throw new Error(`SQLite query failed: ${msg}\nSQL: ${text.substring(0, 200)}`);
       }
     }
   }
 
-  async end() {
-    if (_db) {
-      try { _db.close(); } catch {}
-      _db = null;
-    }
+  async end(): Promise<void> {
+    closeSQLite();
   }
 }
 
@@ -259,4 +295,4 @@ const pool = new SQLitePool();
 
 export default pool;
 export { pool, SQLitePool };
-export const query = (text: string, params?: any[]) => pool.query(text, params);
+export const query = (text: string, params?: unknown[]) => pool.query(text, params);

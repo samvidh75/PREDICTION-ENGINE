@@ -34,13 +34,29 @@ export function loadDatabasePolicy(
 
   // Requested adapter
   const rawAdapter = (env.DB_ADAPTER ?? '').toLowerCase();
-  let requestedAdapter: RequestedDbAdapter = 'auto';
-  if (rawAdapter === 'postgres' || rawAdapter === 'sqlite') {
-    requestedAdapter = rawAdapter;
+  let requestedAdapter: RequestedDbAdapter;
+  if (isProduction) {
+    // Production: default to postgres
+    requestedAdapter = rawAdapter === 'sqlite' ? 'sqlite' : 'postgres';
+  } else if (nodeEnv === 'test') {
+    // Test: require explicit selection
+    if (rawAdapter === 'postgres' || rawAdapter === 'sqlite') {
+      requestedAdapter = rawAdapter;
+    } else {
+      throw new Error(
+        'DB_ADAPTER must be explicitly set to "postgres" or "sqlite" in test environment.'
+      );
+    }
+  } else {
+    // Development: default to auto
+    requestedAdapter = (rawAdapter === 'postgres' || rawAdapter === 'sqlite') ? rawAdapter : 'auto';
   }
 
   // SQLite fallback
-  const allowSqliteFallback = env.ALLOW_SQLITE_FALLBACK !== 'false';
+  const allowSqliteFallback =
+    isProduction
+      ? env.ALLOW_SQLITE_FALLBACK === 'true'
+      : env.ALLOW_SQLITE_FALLBACK !== 'false';
 
   // SQLite in production
   const allowSqliteInProduction = env.ALLOW_SQLITE_IN_PRODUCTION === 'true';

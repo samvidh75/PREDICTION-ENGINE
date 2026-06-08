@@ -81,3 +81,6 @@ export function getTokenVerifier(): TokenVerifier {
 export function resetTokenVerifier(): void {
   _injectedVerifier = null;
 }
+
+/** Type for a Firebase token verification function. */
+export type VerifyTokenFn = (token: string) => Promise<{ uid: string; email?: string }>;
