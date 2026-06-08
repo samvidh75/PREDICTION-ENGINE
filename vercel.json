@@ -5,7 +5,15 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/:path*",
+      "destination": "https://stockstory-api.onrender.com/api/:path*"
+    },
+    {
+      "source": "/healthz",
+      "destination": "https://stockstory-api.onrender.com/healthz"
+    },
+    {
+      "source": "/((?!api|healthz).*)",
       "destination": "/index.html"
     }
   ]

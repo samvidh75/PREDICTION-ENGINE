@@ -118,7 +118,10 @@ function AppContent(): JSX.Element {
     };
   }, []);
 
-  const isPublicPage = pageKey === "landing" || pageKey === "about" || pageKey === "login" || pageKey === "signup";
+  const isPublicPage =
+    pageKey === "landing" || pageKey === "about" || pageKey === "login" || pageKey === "signup" ||
+    pageKey === "trust" || pageKey === "methodology" || pageKey === "validation" ||
+    pageKey === "predictions" || pageKey === "rankings";
   const isAuthLoading = loading;
   const isAuthed = isAuthenticated && !!user;
   const activePageKey = !isPublicPage && !isAuthed ? "login" : pageKey;

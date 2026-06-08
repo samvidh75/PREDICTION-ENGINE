@@ -1,0 +1,316 @@
+{
+  "track": "TRACK-86",
+  "title": "User Retention & Conversion Audit",
+  "date": "2026-06-08",
+  "site": "www.stockstory-india.com",
+  "scores": {
+    "trust": 62,
+    "retention": 41,
+    "virality": 28,
+    "monetisation": 55,
+    "overall_product": 47
+  },
+  "thirty_day_retention_estimate": {
+    "percentage": "12-18%",
+    "raw_likely": "120-180 of 1,000",
+    "reasoning": "No email drip, no daily digest, no push notifications, no community, no portfolio tracking, no alerts. Users visit once, see a prediction, and have no reason to return. The product is a 'look-up tool' not a 'daily habit.' Compare: Zerodha Varsity (60%+ 30d retention via progress tracking), Tickertape (~35% via watchlist alerts), Moneycontrol (~25% via news push). SSI currently has zero retention mechanics beyond manual revisits."
+  },
+  "homepage_audit": {
+    "score": 6,
+    "what_it_does": "Clear: 'AI-native Indian equity intelligence', 'transforms thousands of signals into actionable stock intelligence'",
+    "why_different": "Partially clear: methodology transparency, provider-driven data, no paid rankings — but the 5-second elevator pitch is buried in hero copy",
+    "why_trustworthy": "Shown via trust signals banner (provider-driven, no manual picks, confidence scores) but no live numbers or social proof",
+    "issues": [
+      "No live metrics (e.g. '124 companies tracked today', 'Hit rate: 68%') — all claims are unverified on page",
+      "No social proof: no testimonials, no user count, no logos of users/institutions",
+      "CTA 'Open workspace' is intimidating — first visit should be 'See RELIANCE analysis' with one click",
+      "Terminal mockup is static SVG, not interactive — loses the 'aha' moment",
+      "Trust banner items are bullet points, not verifiable stats"
+    ]
+  },
+  "stock_page_audit": {
+    "score": 7,
+    "reliance": {
+      "prediction": "Health Score 50/100 shown with radial gauge — but the score is the same default for all stocks with missing API data",
+      "confidence": "Shown as badge (Medium/High/Very High) with confidence engine scores for data completeness, signal agreement, risk consistency, historical stability",
+      "rationale": "Narrative text explains composite health, engine breakdowns show individual factor contributions",
+      "expected_return": "NOT SHOWN — no forward return projection, no alpha estimate, no price target",
+      "risk": "Risk engine with 4 sub-scores (accounting anomalies, leverage stress, cash flow strains, volatility risk) and red flag count"
+    },
+    "issues": [
+      "Health Score defaults to 50 when API data is unavailable — misleading, should show 'Calculating...' or last known score with age indicator",
+      "No expected return or price target — a prediction product without predicted returns is fundamentally incomplete",
+      "No comparison to sector peers on same page — user must manually search each peer",
+      "No historical prediction accuracy shown on the stock page itself"
+    ]
+  },
+  "trust_centre_audit": {
+    "score": 6,
+    "hit_rates": "Shown as fallback values: Alpha 0.12, Hit Rate 68%, Sharpe 1.85 — but these are static defaults, not live computed values",
+    "validation_history": "Reports section links to 6 JSON/MD validation reports — but links likely broken in production (relative paths)",
+    "methodology": "Well documented: factor decomposition, quality engine v4, risk engine, explainability, sector-neutral ranking",
+    "prediction_archive": "NOT PRESENT — no searchable prediction history, no date-filtered archive, no CSV export",
+    "issues": [
+      "Key metrics are static fallback values, not live — undermines the entire 'verify us' premise",
+      "No filterable prediction archive by company/date/horizon",
+      "No performance vs benchmark over time chart",
+      "Validation report links are relative paths that fail on the SPA",
+      "Limitations section says '30 covered companies' — but we have 130 now — outdated copy"
+    ]
+  },
+  "competitive_comparison": {
+    "screener_in": {
+      "advantages": [
+        "Raw financial data at your fingertips — balance sheet, P&L, cash flow",
+        "10+ years of historical quarterly data",
+        "Peer comparison tables built-in",
+        "Fast, simple, no login required",
+        "Trusted by serious fundamental investors for years"
+      ],
+      "disadvantages": [
+        "No predictive analytics — pure data, no intelligence layer",
+        "No risk scoring, no health score, no factor decomposition",
+        "No confidence metrics or data freshness transparency",
+        "No narrative/explanations — raw numbers only",
+        "Dated UI"
+      ]
+    },
+    "tickertape": {
+      "advantages": [
+        "Modern UI with visual scoring (Scorecard, MMI)",
+        "Built-in watchlist and portfolio tracking",
+        "News integration and event calendar",
+        "Brokerage integration (Zerodha, Upstox)",
+        "Strong community features (Smallcases)"
+      ],
+      "disadvantages": [
+        "Opaque scoring methodology — 'black box' scores",
+        "No factor decomposition or engine transparency",
+        "No confidence calibration shown to users",
+        "Heavy upselling to Smallcase products",
+        "Data freshness not prominently displayed"
+      ]
+    },
+    "trendlyne": {
+      "advantages": [
+        "Forensic accounting checks (red flags)",
+        "Insider trading and bulk deal tracking",
+        "Technical analysis overlays",
+        "Backtesting for screeners",
+        "Strong institutional research features"
+      ],
+      "disadvantages": [
+        "Complex, overwhelming UI for retail investors",
+        "No unified health score — scattered metrics",
+        "Paywalled premium features limit free tier",
+        "No prediction confidence metrics",
+        "No narrative/explanatory layer"
+      ]
+    },
+    "ssi_unique_advantages": [
+      "Transparent factor decomposition with engine-level breakdowns",
+      "Confidence calibration shown on every prediction",
+      "Data freshness tracked per provider",
+      "Narrative explanations alongside quantitative scores",
+      "Anti-cheating auditor and prediction registry (immutable record)"
+    ],
+    "ssi_disadvantages": [
+      "No portfolio tracking or P&L (Screener/Tickertape have this)",
+      "No watchlist alerts or price notifications",
+      "No mobile app (all competitors have apps)",
+      "No community or social features",
+      "No brokerage integration",
+      "No expected return / price target on predictions",
+      "Smaller coverage universe (130 vs 5000+ for Screener)",
+      "Static fallback data when APIs fail — undermines trust"
+    ]
+  },
+  "retention_analysis": {
+    "strong_reasons": [
+      "Factor decomposition is genuinely unique — no competitor shows engine-level transparency",
+      "Confidence calibration appeals to analytical investors who distrust black boxes",
+      "Data freshness monitoring gives reason to check if data is 'fresh' today"
+    ],
+    "weak_reasons": [
+      "No email digest or daily brief — zero outbound re-engagement",
+      "No watchlist alerts — if RELIANCE health changes, user never knows",
+      "No portfolio tracking — users can't see their holdings vs predictions",
+      "No notification system (push/email/in-app)",
+      "No 'what changed today' summary — user must manually scan all stocks"
+    ],
+    "missing_reasons": [
+      "Daily Brief email: 'Your watchlist health changed today'",
+      "Push notifications: 'TCS health score dropped from 78 to 62'",
+      "Weekly prediction accuracy report: 'Last week's predictions: 71% hit rate'",
+      "Portfolio import and tracking against predictions",
+      "Streak/progress system: 'You've checked RELIANCE 5 days in a row'",
+      "Mobile app with widgets for watchlist scores",
+      "Market open/close briefings on key movers"
+    ]
+  },
+  "virality_analysis": {
+    "would_share_to_friends": "UNLIKELY — no 'share this stock analysis' button, no referral incentive, no social preview cards",
+    "would_share_to_whatsapp": "UNLIKELY — no WhatsApp-optimized share cards, no one-tap sharing, prediction images not optimized for messaging",
+    "would_share_to_communities": "POSSIBLE for ValuePickr/TradingQnA — if prediction accuracy stats were compelling, but currently no easily shareable proof",
+    "why_not": [
+      "No social sharing buttons anywhere on stock pages",
+      "No 'Share this prediction' with auto-generated image card",
+      "No referral program (invite friends, unlock premium)",
+      "No prediction leaderboard or 'top calls' public page",
+      "No embeddable widgets for bloggers/finfluencers",
+      "No API for third-party integrations"
+    ],
+    "what_would_make_it_viral": [
+      "Shareable prediction cards: 'SSI predicts TCS will outperform Nifty by 3.2%' with a beautiful card",
+      "Public prediction leaderboard: top 10 most accurate predictions this month",
+      "Challenge mode: 'Can you beat the SSI engine? Predict next week's RELIANCE score'",
+      "WhatsApp bot: send a stock name, get the health score back",
+      "Prediction accuracy brag: 'Our 90-day predictions were 74% accurate last quarter — share this'"
+    ]
+  },
+  "monetisation_analysis": {
+    "free_features": [
+      "Stock health score (basic)",
+      "Factor breakdown (growth, quality, stability, momentum, valuation)",
+      "Narrative explanation",
+      "Basic trust centre metrics",
+      "Company search and discovery"
+    ],
+    "premium_worthy_features": [
+      "Prediction accuracy history per company (₹99 tier)",
+      "Expected returns and price targets (₹299 tier)",
+      "Watchlist with health change alerts (₹99 tier)",
+      "Portfolio tracking with prediction overlay (₹299 tier)",
+      "Daily brief email with watchlist updates (₹99 tier)",
+      "API access for algo trading (₹999 tier)",
+      "Priority data freshness (real-time vs EOD) (₹999 tier)",
+      "Custom factor weight configuration (₹999 tier)",
+      "Backtesting engine access (₹999 tier)",
+      "Sector rotation signals and institutional flow data (₹999 tier)"
+    ],
+    "recommended_pricing": {
+      "rs_99": {
+        "name": "Individual Investor",
+        "features": "Watchlist alerts, daily brief email, prediction accuracy history, 5 watchlists",
+        "target": "Retail investors checking 5-10 stocks",
+        "monthly_revenue_potential": "At 1,000 users: ₹99,000/month"
+      },
+      "rs_299": {
+        "name": "Serious Investor",
+        "features": "Everything in ₹99 + portfolio tracking, expected returns, peer comparison, custom watchlists, CSV export",
+        "target": "Active investors managing their own portfolio",
+        "monthly_revenue_potential": "At 300 users: ₹89,700/month"
+      },
+      "rs_999": {
+        "name": "Professional / Algo Trader",
+        "features": "Everything in ₹299 + API access, real-time data, backtesting, custom factor weights, priority support",
+        "target": "Algo traders, RIAs, small funds",
+        "monthly_revenue_potential": "At 50 users: ₹49,950/month"
+      }
+    }
+  },
+  "top_15_product_issues": [
+    {
+      "severity": "CRITICAL",
+      "issue": "Static fallback data shown when APIs fail",
+      "impact": "Health scores default to 50/100 — users see the same score for every stock and lose all trust",
+      "fix": "Show last known score with a 'Data age: X days' badge. Only show fallback when no prior data exists."
+    },
+    {
+      "severity": "CRITICAL",
+      "issue": "No expected return or price target on predictions",
+      "impact": "A prediction product without predicted returns is incomplete — users have no actionable insight",
+      "fix": "Add forward return projection based on factor trajectory and momentum decay models (already described in methodology)"
+    },
+    {
+      "severity": "CRITICAL",
+      "issue": "No email drip, daily digest, or push notifications",
+      "impact": "Zero outbound re-engagement — users visit once and never return",
+      "fix": "Implement daily brief email with watchlist health changes; add push notifications for score shifts"
+    },
+    {
+      "severity": "CRITICAL",
+      "issue": "No social sharing or referral mechanics",
+      "impact": "Zero organic growth — every user must be acquired via paid channels",
+      "fix": "Add 'Share this prediction' button with auto-generated card; implement referral program"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "Trust centre shows static fallback metrics, not live data",
+      "impact": "Undermines the entire 'verify us' premise — savvy investors will spot this immediately",
+      "fix": "Wire trust centre to live prediction_registry queries showing real-time hit rate, alpha, and calibration"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "No mobile app",
+      "impact": "Indian retail investors are mobile-first — 85%+ of Screener/Tickertape traffic is mobile",
+      "fix": "Build React Native app or optimize PWA with home screen install prompt and push notifications"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "No portfolio tracking or P&L overlay",
+      "impact": "Users can't see how predictions relate to their actual holdings — reduces utility to pure research",
+      "fix": "Add portfolio import (CSV/broker API) and overlay predictions on holdings"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "Homepage CTA is 'Open workspace' instead of one-click demo",
+      "impact": "First-time visitors hit a signup wall before seeing any value",
+      "fix": "Change primary CTA to 'See RELIANCE analysis →' with guest access; signup as secondary action"
+    },
+    {
+      "severity": "HIGH",
+      "issue": "No prediction accuracy history visible on stock pages",
+      "impact": "Users can't gauge if past predictions were accurate for this specific stock",
+      "fix": "Add 'Historical Accuracy' section showing last 10 predictions vs actual outcomes"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Terminal mockup on homepage is static SVG, not interactive",
+      "impact": "Loses the 'wow' moment — feels like a marketing page, not a real product",
+      "fix": "Make it a live ticker showing real-time health scores cycling through top 10 stocks"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "No 'what changed today' summary",
+      "impact": "Even returning users must manually scan all stocks — no curated entry point",
+      "fix": "Add 'Today's Movers' section on dashboard: health score changes >5 points, new predictions, confidence shifts"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "No community or discussion features",
+      "impact": "No network effect — users can't discuss predictions or share insights within the platform",
+      "fix": "Add comment/discussion threads per stock prediction (moderated, SEBI-compliant research discussion only)"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Trust centre limitations says '30 covered companies' — actually 130",
+      "impact": "Makes the product look smaller and less credible than it actually is",
+      "fix": "Update copy to reflect actual coverage; make this a live-updating number"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "No prediction archive or CSV export",
+      "impact": "Power users can't export data for their own analysis — limits utility",
+      "fix": "Add prediction history page with date range filter, CSV/JSON export"
+    },
+    {
+      "severity": "LOW",
+      "issue": "No brokerage integration",
+      "impact": "Users must switch between SSI and their trading platform — adds friction",
+      "fix": "Integrate with Zerodha/Upstox APIs for one-click order placement from prediction page"
+    }
+  ],
+  "final_question": {
+    "question": "If launched today to 1,000 investors, how many would still be active after 30 days?",
+    "answer": "12-18% (120-180 users)",
+    "reasoning": [
+      "First-visit retention (~30%): 300 users will return for a second visit out of curiosity about another stock",
+      "Week-1 retention (~50% of returnees): 150 users will actively use it for a week — checking multiple stocks, exploring factor breakdowns",
+      "Week-4 retention (~80% of week-1): 120 users form a habit of checking before market open or during research",
+      "WHY SO LOW: No push/email re-engagement, no portfolio tracking, no alerts, no community, no mobile app, no daily digest. The product is a 'lookup tool' not a 'daily destination.'",
+      "COMPARISON: Good SaaS products retain 40-60% at 30 days. Fintech products with habit loops (Zerodha, Groww) retain 70%+. SSI's current feature set is closer to a content site (~10-20% retention).",
+      "QUICKEST FIX: Add watchlist email digest + health change alerts. This alone could boost 30-day retention to 30-35%."
+    ]
+  }
+}

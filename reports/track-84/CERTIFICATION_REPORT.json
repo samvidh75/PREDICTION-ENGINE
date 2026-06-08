@@ -1,0 +1,275 @@
+{
+  "track": "TRACK-84",
+  "generated_at": "2026-06-08T09:38:05.187Z",
+  "date": "2026-06-08",
+  "phases": {
+    "phase1_coverage": {
+      "total_symbols": 145,
+      "daily_prices_symbols": 142,
+      "factor_symbols": 124,
+      "feature_symbols": 124,
+      "prediction_symbols_total": 124,
+      "prediction_symbols_today": 124,
+      "excluded_count": 0,
+      "added_via_fix": 0,
+      "predictions_created": 0,
+      "success": true
+    },
+    "phase2_constraint": {
+      "unique_index_created": true,
+      "duplicate_count": 0,
+      "duplicates": [],
+      "success": true
+    },
+    "phase3_pipeline": {
+      "runs": [
+        {
+          "run": 1,
+          "run_id": "cert-1",
+          "duration_ms": 102,
+          "success": true,
+          "phases": [
+            {
+              "phase": "data_refresh",
+              "status": "success",
+              "latest_date": "2026-06-07",
+              "age_days": 1
+            },
+            {
+              "phase": "factor_refresh",
+              "status": "success",
+              "symbol_count": 124
+            },
+            {
+              "phase": "prediction_generation",
+              "status": "success",
+              "symbols_processed": 124,
+              "created": 0,
+              "skipped": 372
+            },
+            {
+              "phase": "outcome_validation",
+              "status": "success",
+              "validated_count": 97080
+            },
+            {
+              "phase": "trust_metrics",
+              "status": "success",
+              "total_predictions": 107664
+            },
+            {
+              "phase": "daily_feed",
+              "status": "success",
+              "today_predictions": 372
+            }
+          ]
+        },
+        {
+          "run": 2,
+          "run_id": "cert-2",
+          "duration_ms": 108,
+          "success": true,
+          "phases": [
+            {
+              "phase": "data_refresh",
+              "status": "success",
+              "latest_date": "2026-06-07",
+              "age_days": 1
+            },
+            {
+              "phase": "factor_refresh",
+              "status": "success",
+              "symbol_count": 124
+            },
+            {
+              "phase": "prediction_generation",
+              "status": "success",
+              "symbols_processed": 124,
+              "created": 0,
+              "skipped": 372
+            },
+            {
+              "phase": "outcome_validation",
+              "status": "success",
+              "validated_count": 97080
+            },
+            {
+              "phase": "trust_metrics",
+              "status": "success",
+              "total_predictions": 107664
+            },
+            {
+              "phase": "daily_feed",
+              "status": "success",
+              "today_predictions": 372
+            }
+          ]
+        },
+        {
+          "run": 3,
+          "run_id": "cert-3",
+          "duration_ms": 88,
+          "success": true,
+          "phases": [
+            {
+              "phase": "data_refresh",
+              "status": "success",
+              "latest_date": "2026-06-07",
+              "age_days": 1
+            },
+            {
+              "phase": "factor_refresh",
+              "status": "success",
+              "symbol_count": 124
+            },
+            {
+              "phase": "prediction_generation",
+              "status": "success",
+              "symbols_processed": 124,
+              "created": 0,
+              "skipped": 372
+            },
+            {
+              "phase": "outcome_validation",
+              "status": "success",
+              "validated_count": 97080
+            },
+            {
+              "phase": "trust_metrics",
+              "status": "success",
+              "total_predictions": 107664
+            },
+            {
+              "phase": "daily_feed",
+              "status": "success",
+              "today_predictions": 372
+            }
+          ]
+        },
+        {
+          "run": 4,
+          "run_id": "cert-4",
+          "duration_ms": 113,
+          "success": true,
+          "phases": [
+            {
+              "phase": "data_refresh",
+              "status": "success",
+              "latest_date": "2026-06-07",
+              "age_days": 1
+            },
+            {
+              "phase": "factor_refresh",
+              "status": "success",
+              "symbol_count": 124
+            },
+            {
+              "phase": "prediction_generation",
+              "status": "success",
+              "symbols_processed": 124,
+              "created": 0,
+              "skipped": 372
+            },
+            {
+              "phase": "outcome_validation",
+              "status": "success",
+              "validated_count": 97080
+            },
+            {
+              "phase": "trust_metrics",
+              "status": "success",
+              "total_predictions": 107664
+            },
+            {
+              "phase": "daily_feed",
+              "status": "success",
+              "today_predictions": 372
+            }
+          ]
+        },
+        {
+          "run": 5,
+          "run_id": "cert-5",
+          "duration_ms": 79,
+          "success": true,
+          "phases": [
+            {
+              "phase": "data_refresh",
+              "status": "success",
+              "latest_date": "2026-06-07",
+              "age_days": 1
+            },
+            {
+              "phase": "factor_refresh",
+              "status": "success",
+              "symbol_count": 124
+            },
+            {
+              "phase": "prediction_generation",
+              "status": "success",
+              "symbols_processed": 124,
+              "created": 0,
+              "skipped": 372
+            },
+            {
+              "phase": "outcome_validation",
+              "status": "success",
+              "validated_count": 97080
+            },
+            {
+              "phase": "trust_metrics",
+              "status": "success",
+              "total_predictions": 107664
+            },
+            {
+              "phase": "daily_feed",
+              "status": "success",
+              "today_predictions": 372
+            }
+          ]
+        }
+      ],
+      "pass_rate": "5/5",
+      "success": true
+    },
+    "phase4_integrity": {
+      "violations": [],
+      "total_violations": 0,
+      "success": true
+    },
+    "phase5_protection": {
+      "helmet": true,
+      "compression": true,
+      "cors": true,
+      "rate_limiter": true,
+      "active_in_server": true,
+      "success": true
+    },
+    "phase6_recovery": {
+      "lock_exists": false,
+      "lock_age_minutes": null,
+      "stale_lock": false,
+      "stuck_phases": 0,
+      "failed_phases": 0,
+      "alert_triggered": false,
+      "recovered": false,
+      "success": true
+    },
+    "phase7_metrics": {
+      "symbols": 145,
+      "price_rows": 39494,
+      "factor_rows": 39024,
+      "feature_rows": 35734,
+      "prediction_rows": 107664,
+      "prediction_symbols": 124,
+      "outcome_rows": 97080,
+      "pipeline_runs": 9,
+      "scheduler_pass_rate": "5/5",
+      "integrity_violations": 0,
+      "api_protection": "ACTIVE",
+      "recovery_status": "HEALTHY"
+    }
+  },
+  "verdict": "✅ PUBLIC BETA",
+  "passed_phases": "6/6"
+}

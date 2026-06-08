@@ -24,6 +24,10 @@ export type PageKey =
   | "compare"
   | "journal"
   | "trust"
+  | "methodology"
+  | "validation"
+  | "predictions"
+  | "rankings"
   | "workspace"
   | "daily-feed"
   | "portfolio-doctor";

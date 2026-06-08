@@ -38,11 +38,27 @@ interface PageRendererProps {
 }
 
 export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
-  // Unauthenticated pages
-  if (!isAuthenticated) {
+  // Public pages accessible without authentication
+  const publicOnlyPages: Record<string, boolean> = {
+    landing: true, about: true, login: true, signup: true,
+    trust: true, methodology: true, validation: true,
+    predictions: true, rankings: true,
+  };
+
+  if (!isAuthenticated && publicOnlyPages[pageKey]) {
     if (pageKey === "about") return <PublicAboutPage />;
     if (pageKey === "login") return <LoginPage />;
     if (pageKey === "signup") return <SignupPage />;
+    if (pageKey === "trust" || pageKey === "methodology" || pageKey === "validation") {
+      return <TrustCentrePage />;
+    }
+    if (pageKey === "predictions") return <PublicPredictionsPage />;
+    if (pageKey === "rankings") return <PublicRankingsPage />;
+    return <PublicLandingPage />;
+  }
+
+  // Unauthenticated — show landing with value proposition
+  if (!isAuthenticated) {
     return <PublicLandingPage />;
   }
 
