@@ -28,6 +28,7 @@ export type PageKey =
   | "validation"
   | "predictions"
   | "rankings"
+  | "leaderboard"
   | "workspace"
   | "daily-feed"
   | "portfolio-doctor";

@@ -105,7 +105,7 @@ export class SubscriptionService {
          VALUES (?, 'plan_investor_99', 'trial', ?, ?, 0)`
       ).run(userId, startedAt, expiresAt);
 
-      return this.getUserSubscription(userId);
+      return this.getUserSubscription(userId) || this.getDefaultFreeSubscription(userId);
     } finally { db.close(); }
   }
 

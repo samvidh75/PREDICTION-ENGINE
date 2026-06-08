@@ -8,6 +8,8 @@ import type { PageKey } from "./router";
 // Public pages
 import PublicLandingPage from "../pages/PublicLandingPage";
 import PublicAboutPage from "../pages/PublicAboutPage";
+import PublicPredictionsPage from "../pages/PublicPredictionsPage";
+import PublicRankingsPage from "../pages/PublicRankingsPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 

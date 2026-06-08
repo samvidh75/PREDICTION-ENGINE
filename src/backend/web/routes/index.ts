@@ -10,6 +10,7 @@ import { userProfileRoutes } from "./userProfile";
 import { investorStateRoutes } from "./investorState";
 import { authRoutes } from "./auth";
 import opsRoutes from "./ops";
+import { retentionRoutes } from "./retention";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
@@ -22,6 +23,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(investorStateRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(authRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(opsRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(retentionRoutes as unknown as never, { encapsulate: false } as never);
 };
 
 export default routes;
