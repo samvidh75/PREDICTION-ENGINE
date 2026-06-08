@@ -45,3 +45,7 @@ vite.config.ts.timestamp-*
 .cache/
 tmp/
 temp/
+
+# Local artifact archive
+archive/local-artifacts/
+temp_*.ps1
