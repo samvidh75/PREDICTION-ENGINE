@@ -21,8 +21,8 @@ services:
     # Render injects PORT automatically — startServer.js reads process.env.PORT
     startCommand: npm start
 
-    # Health check — Render uses this to confirm the service is healthy
-    healthCheckPath: /healthz
+    # Health check — Render uses /readyz to confirm DB + migrations are ready
+    healthCheckPath: /readyz
 
     # Auto-deploy on every push to main
     autoDeploy: true

@@ -1,17 +1,18 @@
 /**
- * TRACK-P4B-P2 — Investor State Routes (HARDENED)
- * 
+ * TRACK-P4B-P3D — Investor State Routes (userDb-migrated)
+ *
  * UID comes ONLY from verified Firebase ID token via Authorization header.
- * NEVER accepts x-user-uid, ?uid=, loadAuthSession(), or "anonymous".
- * NEVER shares state between users.
+ * Private user data uses app.userDb (PostgreSQL-only, never SQLite).
+ * Missing app.userDb returns HTTP 503.
  */
 import type { FastifyPluginAsync } from 'fastify';
 import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
 
 export const investorStateRoutes: FastifyPluginAsync = async (app) => {
-  // PERSISTENCE UNAVAILABLE CHECK
+  const getUserDb = () => (app as any).userDb as { query: (text: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }> } | undefined;
+
   function checkPersistence(reply: any): boolean {
-    if (!(app as any).postgres) {
+    if (!getUserDb()) {
       reply.status(503).send({
         code: 'PERSISTENCE_UNAVAILABLE',
         error: 'Investor state persistence is currently unavailable.',
@@ -26,7 +27,8 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
     const uid = request.authenticatedUser!.uid;
     if (!checkPersistence(reply)) return;
 
-    const res = await (app as any).postgres.query(
+    const userDb = getUserDb()!;
+    const res = await userDb.query(
       `SELECT watchlists, alerts, memory, dashboard_preferences FROM investor_state WHERE user_id = $1`,
       [uid]
     );
@@ -50,7 +52,8 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
     const body = (request.body as Record<string, unknown>) || {};
     if (!checkPersistence(reply)) return;
 
-    await (app as any).postgres.query(
+    const userDb = getUserDb()!;
+    await userDb.query(
       `INSERT INTO investor_state (user_id, watchlists, alerts, memory, dashboard_preferences)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (user_id) DO UPDATE SET
