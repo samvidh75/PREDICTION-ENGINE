@@ -9,7 +9,7 @@
  * Every prediction shown anywhere in the platform is explainable via this endpoint.
  */
 import type { FastifyPluginAsync } from 'fastify';
-import { predictionExplanationEngine } from '../../../intelligence/PredictionExplanationEngine';
+import { predictionExplanationEngine } from '../../../../intelligence/PredictionExplanationEngine';
 
 export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/predictions/explain/:symbol', async (request, reply) => {

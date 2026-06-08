@@ -95,7 +95,7 @@ export class SubscriptionService {
       const existing = db.prepare(
         'SELECT * FROM user_subscriptions WHERE user_id = ? AND status != ?'
       ).get(userId, 'cancelled') as any;
-      if (existing) return this.getUserSubscription(userId);
+      if (existing) return this.getUserSubscription(userId) || this.getDefaultFreeSubscription(userId);
 
       const startedAt = new Date().toISOString();
       const expiresAt = new Date(Date.now() + 14 * 86400000).toISOString();
@@ -126,7 +126,7 @@ export class SubscriptionService {
          WHERE invited_user_id = ? AND status = 'signed_up'`
       ).run(userId);
 
-      return this.getUserSubscription(userId);
+      return this.getUserSubscription(userId) || this.getDefaultFreeSubscription(userId);
     } finally { db.close(); }
   }
 

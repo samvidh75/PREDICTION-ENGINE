@@ -7,7 +7,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'stockstory.db');
+const DB_PATH = process.env.STOCKSTORY_SQLITE_PATH || path.join(process.cwd(), 'data', 'stockstory.db');
 
 let _db: Database.Database | null = null;
 
@@ -45,6 +45,7 @@ const SQLITE_TO_PG_TYPES: Record<string, string> = {
 
 function translateSQL(sql: string): string {
   // Replace PostgreSQL-specific with SQLite-compatible
+  const hasDoNothing = /ON CONFLICT\s*\([^)]+\)\s*DO NOTHING/i.test(sql);
   let translated = sql
     .replace(/SERIAL/gi, 'INTEGER')
     .replace(/BIGSERIAL/gi, 'INTEGER')
@@ -53,14 +54,14 @@ function translateSQL(sql: string): string {
     .replace(/::(bigint|integer|float|text|boolean|timestamp|date|numeric|decimal|varchar\S*)/gi, '')
     .replace(/GENERATED ALWAYS AS IDENTITY/gi, 'AUTOINCREMENT')
     .replace(/RETURNING \*/gi, '')
-    .replace(/ON CONFLICT \(([^)]+)\) DO NOTHING/gi, 'OR IGNORE')
+    .replace(/ON CONFLICT\s*\([^)]+\)\s*DO NOTHING/gi, '')
     .replace(/ON CONFLICT \(([^)]+)\) DO UPDATE SET/gi, 'ON CONFLICT($1) DO UPDATE SET')
     .replace(/INFORMATION_SCHEMA\.TABLES/g, 'sqlite_master')
     .replace(/table_schema = 'public'/g, "type = 'table'")
     .replace(/information_schema\.columns/gi, 'pragma_table_info');
 
   // Handle INSERT ... ON CONFLICT DO UPDATE (upsert) → INSERT OR REPLACE or ignore
-  if (/ON CONFLICT.*DO UPDATE/i.test(translated)) {
+  if (false && /ON CONFLICT.*DO UPDATE/i.test(translated)) {
     translated = translated.replace(/INSERT INTO/i, 'INSERT OR REPLACE INTO');
     translated = translated.replace(/ON CONFLICT.*DO UPDATE SET/gi, 'WHERE NOT EXISTS (SELECT 1 FROM same_table WHERE conflict) THEN UPDATE SET');
     // Simplify: just strip ON CONFLICT DO UPDATE clauses — use INSERT OR REPLACE
@@ -68,6 +69,14 @@ function translateSQL(sql: string): string {
     if (translated.includes('INSERT INTO') && !translated.includes('INSERT OR')) {
       translated = translated.replace('INSERT INTO', 'INSERT OR REPLACE INTO');
     }
+  }
+
+  if (hasDoNothing) {
+    translated = translated.replace(/INSERT INTO/i, 'INSERT OR IGNORE INTO');
+  }
+
+  if (/ON CONFLICT.*DO UPDATE/i.test(translated)) {
+    translated = translated.replace(/([a-zA-Z_][\w]*)\s*=\s*\?/g, '$1=excluded.$1');
   }
 
   // Replace pg-specific functions
@@ -106,6 +115,7 @@ interface SQLiteResult {
 
 class SQLitePool {
   private db: Database.Database;
+  readonly kind = 'sqlite' as const;
 
   constructor() {
     this.db = getDb();
@@ -139,20 +149,38 @@ class SQLitePool {
         PRIMARY KEY (symbol, period_end)
       )`,
       `CREATE TABLE IF NOT EXISTS factor_snapshots (
-        symbol TEXT NOT NULL, snapshot_date TEXT NOT NULL,
-        factor_score REAL, growth_score REAL, quality_score REAL, value_score REAL,
-        momentum_score REAL, risk_score REAL, sector_score REAL, confidence_score REAL,
-        ranking_score REAL, classification TEXT, PRIMARY KEY (symbol, snapshot_date)
+        symbol TEXT NOT NULL,
+        trade_date TEXT NOT NULL,
+        quality_factor REAL,
+        value_factor REAL,
+        growth_factor REAL,
+        momentum_factor REAL,
+        risk_factor REAL,
+        sector_strength_factor REAL,
+        factor_score REAL,
+        explanations TEXT,
+        PRIMARY KEY (symbol, trade_date)
       )`,
       `CREATE TABLE IF NOT EXISTS feature_snapshots (
-        symbol TEXT NOT NULL, snapshot_date TEXT NOT NULL,
-        momentum_score REAL, volatility REAL, returns_1m REAL, returns_3m REAL, returns_6m REAL,
-        returns_1y REAL, ma_trend TEXT, relative_strength REAL,
-        PRIMARY KEY (symbol, snapshot_date)
+        symbol TEXT NOT NULL,
+        trade_date TEXT NOT NULL,
+        rsi REAL,
+        macd REAL,
+        macd_signal REAL,
+        macd_histogram REAL,
+        adx REAL,
+        atr REAL,
+        bollinger_width REAL,
+        momentum REAL,
+        volatility REAL,
+        relative_strength REAL,
+        moving_average_distance REAL,
+        trend_strength REAL,
+        PRIMARY KEY (symbol, trade_date)
       )`,
       `CREATE TABLE IF NOT EXISTS prediction_registry (
         id INTEGER PRIMARY KEY AUTOINCREMENT, symbol TEXT, prediction_date TEXT,
-        ranking_score REAL, classification TEXT, confidence_score REAL,
+        ranking_score REAL, classification TEXT, confidence_score REAL, confidence_level TEXT,
         quality_score REAL, growth_score REAL, value_score REAL, momentum_score REAL,
         risk_score REAL, sector_score REAL, price_at_prediction REAL, benchmark_level REAL,
         prediction_horizon INTEGER, validation_status TEXT DEFAULT 'pending',
@@ -171,6 +199,58 @@ class SQLitePool {
     for (const sql of tables) {
       try { this.db.exec(sql); } catch {}
     }
+    this.alignLegacyTables();
+  }
+
+  private getColumns(table: string): string[] {
+    return this.db.prepare(`PRAGMA table_info(${table})`).all().map((row: any) => String(row.name));
+  }
+
+  private alignLegacyTables() {
+    const rebuilds = [
+      {
+        table: 'feature_snapshots',
+        required: ['symbol', 'trade_date', 'rsi', 'macd', 'macd_signal', 'macd_histogram', 'adx', 'atr', 'bollinger_width', 'momentum', 'volatility', 'relative_strength', 'moving_average_distance', 'trend_strength'],
+        create: `CREATE TABLE feature_snapshots_new (
+          symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
+          rsi REAL, macd REAL, macd_signal REAL, macd_histogram REAL,
+          adx REAL, atr REAL, bollinger_width REAL, momentum REAL, volatility REAL,
+          relative_strength REAL, moving_average_distance REAL, trend_strength REAL,
+          PRIMARY KEY (symbol, trade_date)
+        )`,
+      },
+      {
+        table: 'factor_snapshots',
+        required: ['symbol', 'trade_date', 'quality_factor', 'value_factor', 'growth_factor', 'momentum_factor', 'risk_factor', 'sector_strength_factor', 'factor_score', 'explanations'],
+        create: `CREATE TABLE factor_snapshots_new (
+          symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
+          quality_factor REAL, value_factor REAL, growth_factor REAL, momentum_factor REAL,
+          risk_factor REAL, sector_strength_factor REAL, factor_score REAL, explanations TEXT,
+          PRIMARY KEY (symbol, trade_date)
+        )`,
+      },
+    ];
+
+    for (const spec of rebuilds) {
+      const columns = this.getColumns(spec.table);
+      if (spec.required.every((column) => columns.includes(column))) continue;
+
+      this.db.exec(spec.create);
+      const copyColumns = spec.required.filter((column) => columns.includes(column) && column !== 'trade_date');
+      const dateExpression = columns.includes('trade_date') ? 'trade_date' : columns.includes('snapshot_date') ? 'snapshot_date' : null;
+      if (columns.includes('symbol') && dateExpression) {
+        const insertColumns = ['symbol', 'trade_date', ...copyColumns.filter((column) => column !== 'symbol')];
+        const selectColumns = ['symbol', `${dateExpression} AS trade_date`, ...copyColumns.filter((column) => column !== 'symbol')];
+        this.db.exec(`INSERT OR IGNORE INTO ${spec.table}_new (${insertColumns.join(', ')}) SELECT ${selectColumns.join(', ')} FROM ${spec.table}`);
+      }
+      this.db.exec(`DROP TABLE ${spec.table}`);
+      this.db.exec(`ALTER TABLE ${spec.table}_new RENAME TO ${spec.table}`);
+    }
+
+    const predictionColumns = this.getColumns('prediction_registry');
+    if (!predictionColumns.includes('confidence_level')) {
+      this.db.exec(`ALTER TABLE prediction_registry ADD COLUMN confidence_level TEXT`);
+    }
   }
 
   async query(text: string, params?: any[]): Promise<SQLiteResult> {
@@ -179,7 +259,7 @@ class SQLitePool {
     try {
       const isSelect = /^\s*SELECT/i.test(translated) || /^\s*PRAGMA/i.test(translated) ||
         /^\s*WITH\s/i.test(translated);
-      const isReturning = /RETURNING/i.test(translated);
+      const isReturning = /RETURNING/i.test(text);
 
       if (isSelect || isReturning) {
         const stmt = this.db.prepare(translated);
@@ -225,6 +305,19 @@ class SQLitePool {
       try { _db.close(); } catch {}
       _db = null;
     }
+  }
+
+  async ping(): Promise<{ ok: boolean; detail: string | null }> {
+    try {
+      const result = await this.query('SELECT 1 AS one');
+      return { ok: result.rows.length === 1, detail: null };
+    } catch (err: any) {
+      return { ok: false, detail: err?.message ?? 'SQLITE_PING_FAILED' };
+    }
+  }
+
+  async shutdown() {
+    await this.end();
   }
 }
 

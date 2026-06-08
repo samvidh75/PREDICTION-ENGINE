@@ -1,5 +1,4 @@
 import type { FastifyPluginAsync } from "fastify";
-import pool from "../../../db/index";
 import { normalizePredictionSymbol, predictionSymbolWhereExpression } from "./SymbolNormalizer";
 
 type PredictionRegistryRow = {
@@ -91,7 +90,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
     const normalizedExpression = predictionSymbolWhereExpression("symbol");
 
     try {
-      const exists = await pool.query(
+      const exists = await app.db!.query(
         `SELECT COUNT(*) AS symbol_count
          FROM prediction_registry
          WHERE ${normalizedExpression} = $1`,
@@ -105,7 +104,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         });
       }
 
-      const latest = await pool.query(
+      const latest = await app.db!.query(
         `SELECT
            symbol,
            prediction_date,

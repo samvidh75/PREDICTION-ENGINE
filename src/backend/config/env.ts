@@ -31,11 +31,16 @@ export function loadEnv(): AppEnv {
   const nodeEnv = (process.env.NODE_ENV ?? "development") as AppEnv["nodeEnv"];
   const isProduction = nodeEnv === "production";
 
-  const allowedOrigins: string[] = [PROD_ORIGIN];
+  const extraOrigins = (process.env.EXTRA_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  const allowedOrigins: string[] = [PROD_ORIGIN, ...extraOrigins];
   if (!isProduction) {
     allowedOrigins.push(...DEV_ORIGINS);
   }
-console.log("COOKIE_SECRET present:", !!process.env.COOKIE_SECRET);
+
   // In production fail hard if cookie secret is not set
   const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
   if (isProduction && !cookieSecret) {
@@ -46,7 +51,7 @@ console.log("COOKIE_SECRET present:", !!process.env.COOKIE_SECRET);
   return {
     nodeEnv,
     isProduction,
-    allowedOrigins,
+    allowedOrigins: [...new Set(allowedOrigins)],
     cookieSecret,
     postgres: process.env.DATABASE_URL
       ? { connectionString: process.env.DATABASE_URL }

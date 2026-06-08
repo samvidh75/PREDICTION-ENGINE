@@ -7,7 +7,7 @@
  * Zero synthetic generation.
  */
 import type { FastifyPluginAsync } from "fastify";
-import { attentionEngine } from "../../../intelligence/AttentionEngine";
+import { attentionEngine } from "../../../../intelligence/AttentionEngine";
 
 export const attentionRoutes: FastifyPluginAsync = async (app) => {
   app.get("/api/intelligence/attention", async (request, reply) => {

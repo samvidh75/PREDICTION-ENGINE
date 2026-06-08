@@ -4,6 +4,7 @@ import type { PostgresClient } from "../persistence/postgres/postgresClient";
 import type { PersistenceCoordinator } from "../persistence/persistenceCoordinator";
 import type { MigrationManager } from "../persistence/migrations/migrationManager";
 import type { CacheHierarchyEngine } from "../persistence/cache/cacheHierarchyEngine";
+import type { DatabaseAdapter } from "../../db/index";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -18,6 +19,7 @@ declare module "fastify" {
   interface FastifyInstance {
     env?: AppEnv;
     postgres?: PostgresClient;
+    db?: DatabaseAdapter;
 
     persistence?: PersistenceCoordinator;
     migrations?: MigrationManager | null;

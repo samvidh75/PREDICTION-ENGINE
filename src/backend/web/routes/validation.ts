@@ -13,9 +13,9 @@
  * No synthetic numbers.
  */
 import type { FastifyPluginAsync } from 'fastify';
-import { accuracyEngine } from '../../validation/PredictionAccuracyEngine';
-import { modelHealthEngine } from '../../validation/ModelHealthEngine';
-import { sectorDriftEngine } from '../../validation/SectorDriftEngine';
+import { accuracyEngine } from '../../../validation/PredictionAccuracyEngine';
+import { modelHealthEngine } from '../../../validation/ModelHealthEngine';
+import { sectorDriftEngine } from '../../../validation/SectorDriftEngine';
 
 export const validationRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/validation/performance', async (_request, reply) => {

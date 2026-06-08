@@ -110,8 +110,11 @@ export class PredictionExplanationEngine {
     todayDate?: string;
     previousDate?: string;
   }): Promise<ExplanationOutput> {
-    const today = options?.todayDate ?? new Date().toISOString().split('T')[0];
     const upperSymbol = symbol.toUpperCase().trim();
+    const today = options?.todayDate ?? await this.getLatestDate(upperSymbol);
+    if (!today) {
+      throw new Error(`No prediction found for ${upperSymbol}`);
+    }
 
     // Fetch today's snapshot
     const todaySnap = await this.fetchSnapshot(upperSymbol, today);
@@ -216,6 +219,22 @@ export class PredictionExplanationEngine {
         riskScore: Number(r.risk_score),
         sectorScore: Number(r.sector_score),
       };
+    } catch {
+      return null;
+    }
+  }
+
+  private async getLatestDate(symbol: string): Promise<string | null> {
+    try {
+      const result = await pool.query(
+        `SELECT prediction_date FROM prediction_registry
+         WHERE symbol = $1 AND prediction_horizon = 30
+         ORDER BY prediction_date DESC LIMIT 1`,
+        [symbol]
+      );
+      const d = result.rows[0]?.prediction_date;
+      if (!d) return null;
+      return d instanceof Date ? d.toISOString().split('T')[0] : String(d).split('T')[0];
     } catch {
       return null;
     }

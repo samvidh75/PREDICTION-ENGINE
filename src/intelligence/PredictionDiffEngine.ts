@@ -119,7 +119,15 @@ export class PredictionDiffEngine {
   async generateSignals(
     options: { limit?: number; symbol?: string; severity?: string } = {}
   ): Promise<PredictionDiffResult> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = await this.getLatestSnapshotDate(options.symbol);
+    if (!today) {
+      return {
+        signals: [],
+        generatedAt: new Date().toISOString(),
+        snapshotDate: "",
+        symbolsAnalyzed: 0,
+      };
+    }
 
     // 1. Fetch today's predictions (all symbols, horizon=30)
     const todayRows = await this.fetchPredictions(today, options.symbol);
@@ -215,6 +223,24 @@ export class PredictionDiffEngine {
     } catch (err) {
       console.error('[PredictionDiffEngine] fetchPredictions error:', err);
       return [];
+    }
+  }
+
+  private async getLatestSnapshotDate(symbol?: string): Promise<string | null> {
+    let query = `SELECT prediction_date FROM prediction_registry WHERE prediction_horizon = 30`;
+    const params: any[] = [];
+    if (symbol) {
+      query += ` AND symbol = $1`;
+      params.push(symbol.toUpperCase());
+    }
+    query += ` ORDER BY prediction_date DESC LIMIT 1`;
+    try {
+      const result = await pool.query(query, params);
+      const d = result.rows[0]?.prediction_date;
+      if (!d) return null;
+      return d instanceof Date ? d.toISOString().split('T')[0] : String(d).split('T')[0];
+    } catch {
+      return null;
     }
   }
 

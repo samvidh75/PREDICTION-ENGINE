@@ -13,10 +13,16 @@ import { postgresPlugin } from "../persistence/postgres/postgresPlugin";
 import { persistencePlugin } from "../persistence/persistencePlugin";
 import { cachePlugin } from "../persistence/cache/cachePlugin";
 import { loadEnv } from "../config/env";
+import { getDatabaseAdapter } from "../../db/index";
 
 export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
   const env = loadEnv();
   const app = Fastify({ logger: false });
+  const db = await getDatabaseAdapter();
+  app.decorate("db", db);
+  app.addHook("onClose", async () => {
+    await db.shutdown();
+  });
 
   // ── CORS ─────────────────────────────────────────────────────────────────
   // In production: only the canonical domain is allowed.

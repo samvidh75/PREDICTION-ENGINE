@@ -14,7 +14,6 @@ import { retentionRoutes } from "./retention";
 import { stockstoryRoutes } from "./stockstory";
 import { predictionSignalsRoutes } from "./predictions/signals";
 import { predictionExplainRoutes } from "./predictions/explain";
-import companyRoutes from "./company";
 import { validationRoutes } from "./validation";
 
 const routes: FastifyPluginAsync = async (app) => {
@@ -32,7 +31,6 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(stockstoryRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(predictionSignalsRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(predictionExplainRoutes as unknown as never, { encapsulate: false } as never);
-  await app.register(companyRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(validationRoutes as unknown as never, { encapsulate: false } as never);
 };
 

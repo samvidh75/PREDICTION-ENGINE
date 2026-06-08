@@ -1,16 +1,25 @@
 // src/db/index.ts
-// Production database configuration — PostgreSQL with SQLite fallback.
-// ESM-compatible: uses dynamic import() instead of require().
+// Canonical database adapter: PostgreSQL first, SQLite fallback, explicit health state.
 
 import dotenv from "dotenv";
 dotenv.config();
 
-let pool: any;
+export type DatabaseKind = "postgres" | "sqlite" | "unavailable";
 
-// Try PostgreSQL first via dynamic import
-const pgUrl = process.env.DATABASE_URL;
+export interface DatabaseAdapter {
+  kind: DatabaseKind;
+  query<T = any>(text: string, params?: any[]): Promise<{ rows: T[]; rowCount?: number }>;
+  ping(): Promise<{ ok: boolean; detail: string | null }>;
+  shutdown(): Promise<void>;
+}
+
+let pool: any;
+let activeKind: DatabaseKind = "unavailable";
+let lastDetail: string | null = null;
 
 async function initPool(): Promise<any> {
+  const pgUrl = process.env.DATABASE_URL;
+
   if (pgUrl) {
     try {
       const { default: pg } = await import("pg");
@@ -21,47 +30,50 @@ async function initPool(): Promise<any> {
         idleTimeoutMillis: 30000,
         max: 20,
       });
-      console.log("✅ Database: PostgreSQL configured");
+      activeKind = "postgres";
+      lastDetail = null;
+      console.log("[db] PostgreSQL configured");
       return pool;
     } catch (err: any) {
-      console.warn(`⚠️ PostgreSQL pool creation failed: ${err.message}. Falling back to SQLite.`);
+      activeKind = "unavailable";
+      lastDetail = err?.message ?? "POSTGRES_POOL_CREATION_FAILED";
+      console.warn(`[db] PostgreSQL pool creation failed: ${lastDetail}. Falling back to SQLite.`);
     }
   } else {
-    console.log("ℹ️  DATABASE_URL not set. Using SQLite fallback.");
+    console.log("[db] DATABASE_URL not set. Using SQLite fallback.");
   }
 
-  // Fall back to SQLite via dynamic import
   try {
     const { pool: sqlitePool } = await import("./SQLiteAdapter.js");
     pool = sqlitePool;
-    console.log("✅ Database: SQLite fallback active (data/stockstory.db)");
+    activeKind = "sqlite";
+    lastDetail = null;
+    console.log("[db] SQLite fallback active");
     return pool;
   } catch (err: any) {
-    console.error(`❌ SQLite fallback failed: ${err.message}`);
-    // Create a no-op pool that logs errors but doesn't crash
+    activeKind = "unavailable";
+    lastDetail = err?.message ?? "SQLITE_FALLBACK_FAILED";
+    console.error(`[db] SQLite fallback failed: ${lastDetail}`);
     pool = {
-      query: async (text: string, params?: any[]) => {
-        console.error(`❌ No database available. Query rejected: ${text.substring(0, 100)}`);
-        return { rows: [], rowCount: 0 };
+      query: async (text: string) => {
+        throw new Error(`NO_DATABASE_AVAILABLE: ${text.substring(0, 100)}`);
       },
       end: async () => {},
+      ping: async () => ({ ok: false, detail: lastDetail ?? "NO_DATABASE_AVAILABLE" }),
+      shutdown: async () => {},
     };
     return pool;
   }
 }
 
-// Initialize synchronously-equivalent async
-// For imports, we provide the pool synchronously via a top-level await wrapper
-const _initPromise = initPool();
+const initPromise = initPool();
 
-// Wrap the pool so that query() works even before init completes
-// (pool.query is set once initPromise resolves)
 const lazyPool = new Proxy({} as any, {
   get(_target, prop) {
-    if (prop === 'then') return undefined; // prevent await confusion
+    if (prop === "then") return undefined;
     return async (...args: any[]) => {
-      const realPool = await _initPromise;
-      if (typeof realPool[prop] === 'function') {
+      const realPool = await initPromise;
+      if (typeof realPool[prop] === "function") {
         return realPool[prop](...args);
       }
       return realPool[prop];
@@ -70,8 +82,29 @@ const lazyPool = new Proxy({} as any, {
 });
 
 export const query = async (text: string, params?: any[]) => {
-  const p = await _initPromise;
+  const p = await initPromise;
   return p.query(text, params);
+};
+
+export const getDatabaseAdapter = async (): Promise<DatabaseAdapter> => {
+  const p = await initPromise;
+  return {
+    kind: activeKind,
+    query: (text: string, params?: any[]) => p.query(text, params),
+    ping: async () => {
+      if (typeof p.ping === "function") return p.ping();
+      try {
+        await p.query("select 1 as one");
+        return { ok: true, detail: null };
+      } catch (err: any) {
+        return { ok: false, detail: err?.message ?? lastDetail ?? "DATABASE_PING_FAILED" };
+      }
+    },
+    shutdown: async () => {
+      if (typeof p.shutdown === "function") return p.shutdown();
+      if (typeof p.end === "function") return p.end();
+    },
+  };
 };
 
 export default lazyPool;

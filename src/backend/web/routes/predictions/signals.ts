@@ -10,9 +10,8 @@
  * No pseudo scoring.
  */
 import type { FastifyPluginAsync } from 'fastify';
-import { predictionDiffEngine } from '../../../intelligence/PredictionDiffEngine';
-import { signalValidator } from '../../../intelligence/SignalValidationEngine';
-import { PredictionExplanationEngine } from '../../../intelligence/PredictionExplanationEngine';
+import { predictionDiffEngine } from '../../../../intelligence/PredictionDiffEngine';
+import { signalValidator } from '../../../../intelligence/SignalValidationEngine';
 
 export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/predictions/signals', async (request, reply) => {

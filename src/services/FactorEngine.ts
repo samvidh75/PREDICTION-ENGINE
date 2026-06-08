@@ -90,7 +90,9 @@ export class FactorEngine {
 
     for (let i = 0; i < n; i++) {
       const feat = features[i];
-      const date = feat.trade_date.toISOString().split("T")[0];
+      const date = feat.trade_date instanceof Date
+        ? feat.trade_date.toISOString().split("T")[0]
+        : String(feat.trade_date).split("T")[0];
 
       // Find matching price record for calculations
       const priceRec = prices.find(p => p.date === date) || prices[prices.length - 1];
