@@ -1,31 +1,34 @@
 /**
- * TRACK-P4B-P2 — User Profile Routes (HARDENED)
- * 
+ * TRACK-P4B-P3D — User Profile Routes (userDb-migrated)
+ *
  * UID comes ONLY from verified Firebase ID token via Authorization header.
- * NEVER accepts x-user-uid, ?uid=, loadAuthSession(), or "anonymous".
+ * Private user data uses app.userDb (PostgreSQL-only, never SQLite).
+ * Missing app.userDb returns HTTP 503.
  */
 import type { FastifyPluginAsync } from 'fastify';
 import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
 
 export const userProfileRoutes: FastifyPluginAsync = async (app) => {
+  const getUserDb = () => (app as any).userDb as { query: (text: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }> } | undefined;
+
   // GET /api/user/profile
   app.get('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
     const uid = request.authenticatedUser!.uid;
+    const userDb = getUserDb();
 
-    if (!(app as any).postgres) {
+    if (!userDb) {
       return reply.status(503).send({
         code: 'PERSISTENCE_UNAVAILABLE',
         error: 'User profile persistence is currently unavailable.',
       });
     }
 
-    const res = await app.postgres.query(
+    const res = await userDb.query(
       `SELECT payload FROM user_profiles WHERE uid = $1`,
       [uid]
     );
 
     if (res.rows.length === 0) {
-      // No profile yet — return documented empty state
       return { uid, profile: {} };
     }
 
@@ -36,16 +39,16 @@ export const userProfileRoutes: FastifyPluginAsync = async (app) => {
   app.post('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
     const uid = request.authenticatedUser!.uid;
     const payload = (request.body as Record<string, unknown>) ?? {};
+    const userDb = getUserDb();
 
-    if (!app.postgres) {
+    if (!userDb) {
       return reply.status(503).send({
         code: 'PERSISTENCE_UNAVAILABLE',
         error: 'User profile persistence is currently unavailable.',
       });
     }
 
-    // UID comes ONLY from the verified token — caller cannot select another UID
-    await app.postgres.query(
+    await userDb.query(
       `INSERT INTO user_profiles (uid, payload)
        VALUES ($1, $2)
        ON CONFLICT (uid) DO UPDATE SET payload = EXCLUDED.payload`,
