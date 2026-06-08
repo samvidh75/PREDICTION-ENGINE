@@ -32,10 +32,19 @@ export function loadEnv(): AppEnv {
   const isProduction = nodeEnv === "production";
 
   const allowedOrigins: string[] = [PROD_ORIGIN];
+
+  const extraOrigins = (process.env.EXTRA_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter((o) => o.length > 0 && o !== PROD_ORIGIN);
+
+  // Deduplicate
+  const seen = new Set(extraOrigins);
+  for (const o of seen) allowedOrigins.push(o);
+
   if (!isProduction) {
     allowedOrigins.push(...DEV_ORIGINS);
   }
-console.log("COOKIE_SECRET present:", !!process.env.COOKIE_SECRET);
   // In production fail hard if cookie secret is not set
   const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
   if (isProduction && !cookieSecret) {
