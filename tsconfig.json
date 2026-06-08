@@ -32,6 +32,7 @@
     "src/views/PracticeTerminal.jsx",
     "src/scripts/calibrate.ts",
     "src/scripts/calibrate_v2.ts",
-    "src/scripts/run-explainability-pipeline.ts"
+    "src/scripts/run-explainability-pipeline.ts",
+    "src/intelligence"
   ]
 }

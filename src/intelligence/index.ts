@@ -1,28 +1,34 @@
 /**
- * StockStory Intelligence Layer — TRACK-46B
- *
- * Three engines built on top of the existing factor/prediction infrastructure:
- *
- * 1. ExplainabilityEngine — answers WHY for every score
- *    Factor contribution breakdowns, positive/negative drivers, no black boxes.
- *
- * 2. NarrativeEngine — converts quantitative signals into readable stories
- *    Strengthening/weakening narratives, trend detection, risk assessment.
- *
- * 3. FutureHealthEngine — projects factor trajectories forward
- *    3m/6m/12m health outlook with confidence intervals.
+ * Intelligence module barrel.
+ * Single entry point for all intelligence engines, predictions, narratives, and scoring.
+ * 
+ * Consolidates: src/intelligence/, src/engine/, src/engines/, src/stockstory/engines/, src/stockstory/scoring/
  */
 
-export { ExplainabilityEngine, explainabilityEngine } from './ExplainabilityEngine';
-export type {
-  ExplainabilityOutput,
-  ScoreExplanation,
-  FactorContribution,
-} from './ExplainabilityEngine';
+// Explainability & Narratives
+export { ExplainabilityEngine } from "./ExplainabilityEngine";
+export { NarrativeEngine } from "./NarrativeEngine";
 
-export { NarrativeEngine, narrativeEngine } from './NarrativeEngine';
-export type {
-  NarrativeOutput,
-  NarrativeStory,
-  NarrativeSignal,
-} from './NarrativeEngine';
+// Prediction engines (originally from src/engine/ and src/engines/)
+export { PredictionEngineAdapter, predictionEngineAdapter } from "./prediction/PredictionEngineAdapter";
+export type { PredictiveEngineOutput, HealthVector } from "./prediction/PredictionEngineAdapter";
+export { DerivedMetricsEngine } from "./prediction/DerivedMetricsEngine";
+export type { DerivedMetricsInput, DerivedMetricsOutput } from "./prediction/DerivedMetricsEngine";
+
+// Stock analysis engines (originally from stockstory/engines/)
+export { AccountingEngine } from "./scoring/AccountingEngine";
+export { ConfidenceEngine } from "./scoring/ConfidenceEngine";
+export { GrowthEngine } from "./scoring/GrowthEngine";
+export { MomentumEngine } from "./scoring/MomentumEngine";
+export { QualityEngine, qualityEngine } from "./scoring/QualityEngine";
+export { RiskEngine } from "./scoring/RiskEngine";
+export { StabilityEngine } from "./scoring/StabilityEngine";
+export { ValuationEngine } from "./scoring/ValuationEngine";
+
+// Scoring utilities
+export { scoreBands, scoreBandsDescending, scoreRanges } from "./scoring/BandScorer";
+export type { ScoreBand, BandConfig, RangeScore } from "./scoring/BandScorer";
+export { applyPenalties, createPenalty } from "./scoring/PenaltyScorer";
+export type { Penalty, PenaltyResult } from "./scoring/PenaltyScorer";
+export { PercentileEngine } from "./scoring/PercentileEngine";
+export { SectorPercentileEngine } from "./scoring/SectorPercentileEngine";

@@ -9,7 +9,7 @@ import { laserGuidedChartInteraction } from "../../services/charting/LaserGuided
 import type { ChartSeriesKey } from "../../services/charting/live/ChartSeriesProvider";
 import { useChartViewport } from "../../hooks/useChartViewport";
 import useBeginnerIntelligenceCalibration from "../../hooks/useBeginnerIntelligenceCalibration";
-import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
 import { useAdaptiveRenderQuality } from "../../performance/useAdaptiveRenderQuality";
 import { usePremiumAccess } from "../../services/premium/usePremiumAccess";
 import {
