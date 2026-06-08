@@ -7,6 +7,7 @@
  */
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { getTokenVerifier } from './firebaseAdmin';
+import type { TokenVerifier } from './firebaseAdmin';
 
 export interface AuthenticatedUser {
   uid: string;
@@ -72,4 +73,53 @@ export async function requireAuthenticatedUser(
       error: 'The provided token is invalid, expired, or revoked.',
     });
   }
+}
+
+/**
+ * Factory that creates a requireAuth preHandler with an injected TokenVerifier.
+ * Used in tests to inject mock verifiers without calling real Firebase.
+ */
+export function createRequireAuth(verifier: TokenVerifier): (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => Promise<void> {
+  return async function requireAuth(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      return reply.status(401).send({
+        code: 'AUTH_MISSING',
+        error: 'Authorization header is required.',
+      });
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      return reply.status(401).send({
+        code: 'AUTH_INVALID_SCHEME',
+        error: 'Bearer token is required.',
+      });
+    }
+
+    const token = authHeader.slice(7).trim();
+
+    if (!token) {
+      return reply.status(401).send({
+        code: 'AUTH_EMPTY_TOKEN',
+        error: 'Token is required.',
+      });
+    }
+
+    try {
+      const decoded = await verifier.verifyIdToken(token);
+      request.authenticatedUser = {
+        uid: decoded.uid,
+        email: decoded.email,
+      };
+    } catch {
+      return reply.status(403).send({
+        code: 'AUTH_INVALID_TOKEN',
+        error: 'The provided token is invalid, expired, or revoked.',
+      });
+    }
+  };
 }
