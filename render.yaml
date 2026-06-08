@@ -57,6 +57,29 @@ services:
       - key: INDIANAPI_KEY
         sync: false
 
+      # ── Database Policy ────────────────────────────────────────────────
+      - key: DB_ADAPTER
+        value: postgres
+
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "false"
+
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "false"
+
+      # ── Firebase Admin ─────────────────────────────────────────────────
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+
+      - key: FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS
+        sync: false
+
       # ── CORS — allow Vercel frontend ───────────────────────────────────
       # Already hardcoded in env.ts as https://stockstory-india.com
       # Set this if you need to add extra origins at runtime

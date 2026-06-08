@@ -285,6 +285,14 @@ class SQLitePool {
     }
   }
 
+  /**
+   * Execute a multi-statement SQL script using db.exec().
+   * Safe for migration scripts. Do NOT use for parameterized application queries.
+   */
+  async executeScript(sql: string): Promise<void> {
+    this.db.exec(sql);
+  }
+
   async end(): Promise<void> {
     closeSQLite();
   }

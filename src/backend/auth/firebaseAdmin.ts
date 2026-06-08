@@ -1,13 +1,16 @@
 /**
- * TRACK-P4B-P2 — Server-side Firebase Admin authentication.
- * 
+ * TRACK-P4B-P3D — Firebase Admin Authentication (production-hardened)
+ *
  * Single source of truth for verifying Firebase ID tokens.
  * Never uses frontend VITE_ values. Never exposes private credentials.
- * 
+ *
+ * Production requires explicit credentials — no silent unsafe fallback.
+ *
  * Environment variables (backend only):
  *   FIREBASE_PROJECT_ID
  *   FIREBASE_CLIENT_EMAIL
  *   FIREBASE_PRIVATE_KEY    (escaped with \n)
+ *   FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS  (set to "true" for ADC)
  */
 import { initializeApp, cert, getApps, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
@@ -24,20 +27,40 @@ function getFirebaseApp(): App {
     return _app;
   }
 
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  const isProduction = nodeEnv === 'production';
+
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const useAdc = process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === 'true';
 
+  // Service account credentials
   if (projectId && clientEmail && privateKey) {
     _app = initializeApp({
       projectId,
       credential: cert({ projectId, clientEmail, privateKey }),
     });
-  } else {
-    // Development/CI fallback: application default credentials or no-op
-    _app = initializeApp({ projectId: projectId ?? 'stockstory-dev' });
+    return _app;
   }
 
+  // Application Default Credentials
+  if (useAdc) {
+    _app = initializeApp({ projectId: projectId ?? 'stockstory' });
+    return _app;
+  }
+
+  // Production — fail if no credentials configured
+  if (isProduction) {
+    throw new Error(
+      'Firebase Admin credentials are required in production. ' +
+      'Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY, ' +
+      'or set FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=true.'
+    );
+  }
+
+  // Development/CI fallback
+  _app = initializeApp({ projectId: projectId ?? 'stockstory-dev' });
   return _app;
 }
 

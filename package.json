@@ -27,6 +27,7 @@
     "test:coverage": "vitest run --coverage",
     "preview": "vite preview",
     "validate:schema": "tsx scripts/validate-schema-contract.ts",
+    "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",
     "validate:distributions": "tsx scripts/validate-sector-distributions.ts",
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
