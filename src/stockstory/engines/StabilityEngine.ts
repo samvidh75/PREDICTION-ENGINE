@@ -1,22 +1,45 @@
 /**
  * Engine 3: Stability Engine (RC-ENGINE-004 — Percentile Migration)
+ * 
+ * TRACK-P1: Per-metric percentile readiness, marketCapSizeScore activated.
+ * 
+ * STABILITY_WEIGHTS (documented):
+ *   debt: 2.5, liquidity: 2.0, volatility: 1.5, coverage: 2.0,
+ *   interestCoverage: 2.0, marketCapSize: 1.0
+ * 
+ * marketCapSize weight (1.0) chosen because:
+ *   - visible but not dominant (7% of total)
+ *   - mega-cap to microcap difference bounded at ~7 points
+ *   - null marketCap → neutral 50, no distortion
  */
 
 import { EngineInputs, StabilityEngineOutput, clampScore, weightedAverage } from '../types';
 import { getSectorProfile } from '../SectorAdapter';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
 
+const STABILITY_WEIGHTS = {
+  debt: 2.5,
+  liquidity: 2.0,
+  volatility: 1.5,
+  coverage: 2.0,
+  interestCoverage: 2.0,
+  marketCapSize: 1.0,
+} as const;
+
 export class StabilityEngine {
   evaluate(inputs: EngineInputs): StabilityEngineOutput {
     const { financials, features, factors, sector } = inputs;
     const profile = getSectorProfile(sector?.name ?? 'General');
     const sectorName = sector?.name ?? 'General';
-    const usePercentile = SectorPercentileEngine.hasSufficientData(sectorName, 'debtToEquity');
+
+    const percentileDTE = SectorPercentileEngine.hasSufficientData(sectorName, 'debtToEquity');
+    const percentileCR = SectorPercentileEngine.hasSufficientData(sectorName, 'currentRatio');
+    const percentileVol = SectorPercentileEngine.hasSufficientData(sectorName, 'volatility');
 
     // ── Sub-score 1: Debt Score ─────────────────────────────────────
     let debtScore = 50;
     if (financials.debtToEquity !== null) {
-      if (usePercentile) {
+      if (percentileDTE) {
         debtScore = SectorPercentileEngine.score(financials.debtToEquity, sectorName, 'debtToEquity');
       } else {
         const dte = financials.debtToEquity;
@@ -33,7 +56,7 @@ export class StabilityEngine {
     let cashScore = 50;
     const currentRatio = financials.currentRatio;
     if (currentRatio !== null) {
-      if (usePercentile) {
+      if (percentileCR) {
         cashScore = SectorPercentileEngine.score(currentRatio, sectorName, 'currentRatio');
       } else {
         if (currentRatio >= profile.crHealthy) cashScore = 90;
@@ -48,7 +71,7 @@ export class StabilityEngine {
     let volatilityScore = 50;
     if (features.volatility !== null) {
       const vol = features.volatility;
-      if (usePercentile) {
+      if (percentileVol) {
         volatilityScore = SectorPercentileEngine.score(vol, sectorName, 'volatility');
       } else {
         if (vol <= 0.15) volatilityScore = 90;
@@ -111,18 +134,21 @@ export class StabilityEngine {
       else marketCapSizeScore = 15;                         // Micro cap
     }
 
+    // ── Composite: INCLUDES marketCapSizeScore (TRACK-P1 fix) ───────
     const rawComposite = weightedAverage([
-      { score: debtScore, weight: 2.5 },
-      { score: cashScore, weight: 2 },
-      { score: volatilityScore, weight: 1.5 },
-      { score: coverageScore, weight: 2 },
-      { score: interestCoverageScore, weight: 2 },
+      { score: debtScore, weight: STABILITY_WEIGHTS.debt },
+      { score: cashScore, weight: STABILITY_WEIGHTS.liquidity },
+      { score: volatilityScore, weight: STABILITY_WEIGHTS.volatility },
+      { score: coverageScore, weight: STABILITY_WEIGHTS.coverage },
+      { score: interestCoverageScore, weight: STABILITY_WEIGHTS.interestCoverage },
+      { score: marketCapSizeScore, weight: STABILITY_WEIGHTS.marketCapSize },
     ]);
 
     const factorAdjust = (factors.riskFactor - 50) * 0.2;
     const compositeScore = clampScore(rawComposite + factorAdjust);
 
-    const commentary = this.generateCommentary(compositeScore, financials, profile, usePercentile);
+    const anyPercentile = percentileDTE || percentileCR || percentileVol;
+    const commentary = this.generateCommentary(compositeScore, financials, profile, anyPercentile);
 
     return {
       score: compositeScore,

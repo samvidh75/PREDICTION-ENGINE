@@ -1,6 +1,10 @@
 /**
  * StockStory Engine — Orchestrator (RC-ENGINE-003)
  * 
+ * TRACK-P1: Single risk dampening policy.
+ * Risk dampening applied exactly once: preAdjustHealth → stretch → dampen → classify directly.
+ * classify() no longer re-applies risk dampening.
+ * 
  * Integrates:
  * - SectorWeightEngine for sector-aware factor weighting
  * - Penalty Framework (Accounting, Debt, Volatility, Governance)
@@ -72,7 +76,7 @@ export class StockStoryEngine {
       sectorName
     );
 
-    // ── Continuous risk dampening ───────────────────────────────────
+    // ── Continuous risk dampening (once only) ───────────────────────
     const stretchCenter = 58;
     const stretchFactor = 1.7;
     const stretchedHealth = clampScore(
@@ -92,8 +96,8 @@ export class StockStoryEngine {
     const { finalScore: adjustedHealth, result: penaltyResult } =
       applyPenalties(dampenedHealth, allPenalties);
 
-    // ── Classification ──────────────────────────────────────────────
-    const classification = this.classify(adjustedHealth, risk.score);
+    // ── Classification (no second risk dampening) ───────────────────
+    const classification = this.classify(adjustedHealth);
 
     // ── Confidence (independent from health score) ──────────────────
     const confidence = confidenceEngine.evaluate(inputs, {
@@ -154,16 +158,17 @@ export class StockStoryEngine {
     };
   }
 
-  private classify(
-    healthScore: number,
-    riskScore: number
-  ): CompanyClassification {
-    const riskAdjusted = healthScore - Math.max(0, (riskScore - 15) * this.riskDampeningCoefficient);
-
-    if (riskAdjusted >= 80) return 'Excellent';
-    if (riskAdjusted >= 65) return 'Healthy';
-    if (riskAdjusted >= 45) return 'Stable';
-    if (riskAdjusted >= 30) return 'Weakening';
+  /**
+   * TRACK-P1: classify() uses adjustedHealth directly.
+   * Risk dampening has already been applied once upstream.
+   * Penalties have already been deducted.
+   * No second risk adjustment.
+   */
+  private classify(adjustedHealth: number): CompanyClassification {
+    if (adjustedHealth >= 80) return 'Excellent';
+    if (adjustedHealth >= 65) return 'Healthy';
+    if (adjustedHealth >= 45) return 'Stable';
+    if (adjustedHealth >= 30) return 'Weakening';
     return 'At Risk';
   }
 

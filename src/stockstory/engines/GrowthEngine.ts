@@ -1,10 +1,10 @@
 /**
  * Engine 1: Growth Engine (RC-ENGINE-004 — Percentile Migration)
  * 
- * Inputs: Revenue Growth, EPS Growth, FCF Growth, Profit Growth
+ * TRACK-P1: Per-metric percentile readiness, correct metric mappings.
+ * fcfGrowth → fcfGrowth, profitGrowth → profitGrowth.
  * 
- * Uses sector-percentile scoring when sector data is available.
- * Falls back to static thresholds when insufficient peer data.
+ * Inputs: Revenue Growth, EPS Growth, FCF Growth, Profit Growth
  */
 
 import { EngineInputs, GrowthEngineOutput, clampScore, weightedAverage } from '../types';
@@ -14,12 +14,16 @@ export class GrowthEngine {
   evaluate(inputs: EngineInputs): GrowthEngineOutput {
     const { financials, sector } = inputs;
     const sectorName = sector?.name ?? 'General';
-    const usePercentile = SectorPercentileEngine.hasSufficientData(sectorName, 'revenueGrowth');
+
+    const percentileRvG = SectorPercentileEngine.hasSufficientData(sectorName, 'revenueGrowth');
+    const percentileEpsG = SectorPercentileEngine.hasSufficientData(sectorName, 'epsGrowth');
+    const percentileFcfG = SectorPercentileEngine.hasSufficientData(sectorName, 'fcfGrowth');
+    const percentileProfitG = SectorPercentileEngine.hasSufficientData(sectorName, 'profitGrowth');
 
     // ── Sub-score 1: Revenue Growth (0-100) ─────────────────────────
     let revenueGrowthScore = 50;
     if (financials.revenueGrowth !== null) {
-      if (usePercentile) {
+      if (percentileRvG) {
         revenueGrowthScore = SectorPercentileEngine.score(
           financials.revenueGrowth, sectorName, 'revenueGrowth'
         );
@@ -38,7 +42,7 @@ export class GrowthEngine {
     // ── Sub-score 2: EPS Growth (0-100) ─────────────────────────────
     let epsGrowthScore = 50;
     if (financials.epsGrowth !== null) {
-      if (usePercentile) {
+      if (percentileEpsG) {
         epsGrowthScore = SectorPercentileEngine.score(
           financials.epsGrowth, sectorName, 'epsGrowth'
         );
@@ -57,9 +61,9 @@ export class GrowthEngine {
     // ── Sub-score 3: FCF Growth (0-100) ─────────────────────────────
     let fcfGrowthScore = 50;
     if (financials.fcfGrowth !== null) {
-      if (usePercentile) {
+      if (percentileFcfG) {
         fcfGrowthScore = SectorPercentileEngine.score(
-          financials.fcfGrowth, sectorName, 'fcfYield'
+          financials.fcfGrowth, sectorName, 'fcfGrowth'
         );
       } else {
         const fg = financials.fcfGrowth;
@@ -75,9 +79,9 @@ export class GrowthEngine {
     // ── Sub-score 4: Profit Growth (0-100) ──────────────────────────
     let profitGrowthScore = 50;
     if (financials.profitGrowth !== null) {
-      if (usePercentile) {
+      if (percentileProfitG) {
         profitGrowthScore = SectorPercentileEngine.score(
-          financials.profitGrowth, sectorName, 'epsGrowth'
+          financials.profitGrowth, sectorName, 'profitGrowth'
         );
       } else {
         const pg = financials.profitGrowth;
@@ -102,7 +106,8 @@ export class GrowthEngine {
     const factorAdjust = (inputs.factors.growthFactor - 50) * 0.3;
     const compositeScore = clampScore(rawComposite + factorAdjust);
 
-    const commentary = this.generateCommentary(compositeScore, financials, usePercentile, sectorName);
+    const anyPercentile = percentileRvG || percentileEpsG || percentileFcfG || percentileProfitG;
+    const commentary = this.generateCommentary(compositeScore, financials, anyPercentile, sectorName);
 
     return {
       score: compositeScore,

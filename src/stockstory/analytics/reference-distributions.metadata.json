@@ -1,0 +1,33 @@
+{
+  "version": "1.1.0-track-p1",
+  "generatedAt": "2026-06-08T18:38:00.000Z",
+  "sourceDescription": "Indian market (NSE-listed) sector reference distributions derived from 2024-2025 empirical data.",
+  "sourceDataset": "Original raw dataset not committed; values treated as provisional reference calibration.",
+  "sourcePeriod": "2024-2025",
+  "sectorMappingVersion": "TRACK-P1",
+  "winsorizationPolicy": "None applied at distribution level; percentile references are direct observations.",
+  "nullPolicy": "Null values return neutral score 50 with method 'neutral_missing_value'.",
+  "minimumPeerCount": 3,
+  "approximatePeerCountPerReferenceDistribution": 100,
+  "metrics": [
+    "roa", "roe", "roic",
+    "revenueGrowth", "epsGrowth", "profitGrowth", "fcfGrowth",
+    "grossMargin", "operatingMargin",
+    "debtToEquity", "currentRatio",
+    "peRatio", "pbRatio", "evEbitda", "fcfYield", "volatility"
+  ],
+  "inverseMetrics": [
+    "debtToEquity", "peRatio", "pbRatio", "evEbitda", "volatility"
+  ],
+  "sectors": [
+    "BANKING", "IT", "FMCG", "PHARMA", "AUTO", "ENERGY", "GENERAL"
+  ],
+  "newMetricsAddedInTrackP1": ["profitGrowth", "fcfGrowth", "grossMargin"],
+  "limitations": [
+    "profitGrowth, fcfGrowth, grossMargin distributions are provisional and derived from related metric patterns rather than direct empirical observation.",
+    "Peer count of 100 is approximate; actual NSE sector populations vary from 15-200+.",
+    "Sector distributions do not account for sub-sector nuances (e.g., private vs PSU banks).",
+    "Volatility distributions are based on annualized daily volatility estimates.",
+    "Reference data may not reflect post-March 2025 market conditions."
+  ]
+}

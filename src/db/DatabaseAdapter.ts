@@ -131,6 +131,40 @@ export class DatabaseAdapter {
   }
 
   /**
+   * Get a client connection (for transactions).
+   * Works for PostgreSQL; SQLite uses a simplified wrapper.
+   */
+  async connect(): Promise<{
+    query: (text: string, params?: unknown[]) => Promise<DbQueryResult>;
+    release: () => void;
+  }> {
+    if (!this._initialized) {
+      await this.initialize();
+    }
+
+    if (this._kind === "postgres" && this.pool) {
+      const client = await this.pool.connect();
+      return {
+        query: async (text: string, params?: unknown[]) => {
+          const result = await client.query(text, params as unknown[]);
+          return { rows: result.rows as Record<string, unknown>[], rowCount: result.rowCount ?? 0 };
+        },
+        release: () => client.release(),
+      };
+    }
+
+    // SQLite fallback: no real transactions, but provide compatible interface
+    if (this._kind === "sqlite" && this.sqlitePool) {
+      return {
+        query: async (text: string, params?: unknown[]) => this.sqlitePool!.query(text, params as unknown[]),
+        release: () => {},
+      };
+    }
+
+    throw new Error("DATABASE_UNAVAILABLE: Cannot get client connection");
+  }
+
+  /**
    * Gracefully close all connections.
    */
   async shutdown(): Promise<void> {

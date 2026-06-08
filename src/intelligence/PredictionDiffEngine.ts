@@ -1,11 +1,14 @@
 /**
- * TRACK-95O — Prediction Diff Engine
+ * TRACK-P1 — Prediction Diff Engine
  * 
- * Compares prediction_registry snapshots (today vs previous) for every symbol.
+ * TRACK-P1 fixes:
+ * - Defect 9: Explicit rank maps instead of Set insertion order
+ * - Defect 10: Latest snapshot from prediction_registry, not server UTC date
+ * - Deterministic tie-breaker: ranking_score DESC, symbol ASC
+ * 
+ * Compares prediction_registry snapshots (latest vs previous) for every symbol.
  * Computes classification, confidence, health, quality, growth, momentum,
  * risk, and valuation deltas.
- * 
- * No synthetic data. No inferred events. Only real snapshot-to-snapshot changes.
  */
 import pool from '../db/index';
 
@@ -38,7 +41,7 @@ export interface SymbolDiff {
   symbol: string;
   today: PredictionSnapshot;
   previous: PredictionSnapshot | null;
-  classificationDelta: number;       // rank-order delta (Exceptional=5, Critical=0)
+  classificationDelta: number;
   classificationFrom: string | null;
   classificationTo: string;
   confidenceDelta: number;
@@ -67,7 +70,6 @@ export interface IntelligenceSignal {
   delta: number | string;
   explanation: string;
   snapshotDate: string;
-  // Validation data appended by SignalValidationEngine hook
   validation?: {
     historicalSuccessRate: number | null;
     sampleSize: number | null;
@@ -113,29 +115,40 @@ const SCORE_FIELDS = ['qualityScore', 'growthScore', 'valueScore', 'momentumScor
 export class PredictionDiffEngine {
 
   /**
-   * Generate all signals by diffing today's prediction_registry rows
+   * Generate all signals by diffing latest prediction_registry rows
    * against the most recent previous snapshot for each symbol.
+   * 
+   * TRACK-P1: Uses latest snapshot from prediction_registry, not server UTC.
    */
   async generateSignals(
     options: { limit?: number; symbol?: string; severity?: string } = {}
   ): Promise<PredictionDiffResult> {
-    const today = new Date().toISOString().split('T')[0];
-
-    // 1. Fetch today's predictions (all symbols, horizon=30)
-    const todayRows = await this.fetchPredictions(today, options.symbol);
-    if (todayRows.length === 0) {
+    // 1. Get latest snapshot date from prediction_registry (not server UTC)
+    const latestDate = await this.getLatestSnapshotDate();
+    if (!latestDate) {
       return {
         signals: [],
         generatedAt: new Date().toISOString(),
-        snapshotDate: today,
+        snapshotDate: '',
         symbolsAnalyzed: 0,
       };
     }
 
-    // 2. Get the previous snapshot date (most recent date < today with data)
-    const previousDate = await this.getPreviousSnapshotDate(today);
+    // 2. Fetch latest predictions (all symbols, horizon=30)
+    const todayRows = await this.fetchPredictions(latestDate, options.symbol);
+    if (todayRows.length === 0) {
+      return {
+        signals: [],
+        generatedAt: new Date().toISOString(),
+        snapshotDate: latestDate,
+        symbolsAnalyzed: 0,
+      };
+    }
 
-    // 3. Fetch previous predictions
+    // 3. Get the previous snapshot date (most recent date < latestDate with data)
+    const previousDate = await this.getPreviousSnapshotDate(latestDate);
+
+    // 4. Fetch previous predictions
     const previousRows = previousDate
       ? await this.fetchPredictions(previousDate, options.symbol)
       : [];
@@ -144,20 +157,20 @@ export class PredictionDiffEngine {
       prevMap.set(row.symbol, row);
     }
 
-    // 4. Compute diffs
+    // 5. Compute diffs
     const diffs: SymbolDiff[] = [];
     for (const todayRow of todayRows) {
       const prev = prevMap.get(todayRow.symbol) ?? null;
       diffs.push(this.computeDiff(todayRow, prev));
     }
 
-    // 5. Determine ranking changes (top-10 enter/leave)
+    // 6. Determine ranking changes using explicit rank maps
     this.annotateRankingChanges(diffs, todayRows, previousRows);
 
-    // 6. Generate signals from diffs
-    let signals = this.diffsToSignals(diffs, today, previousDate);
+    // 7. Generate signals from diffs
+    let signals = this.diffsToSignals(diffs, latestDate, previousDate);
 
-    // 7. Apply filters
+    // 8. Apply filters
     if (options.severity) {
       signals = signals.filter(s => s.severity === options.severity);
     }
@@ -168,7 +181,7 @@ export class PredictionDiffEngine {
     return {
       signals,
       generatedAt: new Date().toISOString(),
-      snapshotDate: today,
+      snapshotDate: latestDate,
       symbolsAnalyzed: todayRows.length,
     };
   }
@@ -176,6 +189,27 @@ export class PredictionDiffEngine {
   // -----------------------------------------------------------------------
   // Data fetching
   // -----------------------------------------------------------------------
+
+  /**
+   * TRACK-P1: Get the latest snapshot date from prediction_registry.
+   * Uses MAX(prediction_date) instead of new Date().
+   */
+  private async getLatestSnapshotDate(): Promise<string | null> {
+    try {
+      const result = await pool.query(
+        `SELECT MAX(prediction_date) AS latest_prediction_date
+         FROM prediction_registry
+         WHERE prediction_horizon = 30`
+      );
+      if (result.rows.length > 0 && result.rows[0].latest_prediction_date) {
+        const d = result.rows[0].latest_prediction_date;
+        return d instanceof Date ? d.toISOString().split('T')[0] : String(d);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
 
   private async fetchPredictions(date: string, symbol?: string): Promise<PredictionSnapshot[]> {
     let query = `
@@ -193,7 +227,8 @@ export class PredictionDiffEngine {
       params.push(symbol.toUpperCase());
     }
 
-    query += ` ORDER BY ranking_score DESC`;
+    // Deterministic tie-breaker: ranking_score DESC, symbol ASC
+    query += ` ORDER BY ranking_score DESC, symbol ASC`;
 
     try {
       const result = await pool.query(query, params);
@@ -218,13 +253,13 @@ export class PredictionDiffEngine {
     }
   }
 
-  private async getPreviousSnapshotDate(today: string): Promise<string | null> {
+  private async getPreviousSnapshotDate(latestDate: string): Promise<string | null> {
     try {
       const result = await pool.query(
         `SELECT prediction_date FROM prediction_registry
          WHERE prediction_date < $1
          ORDER BY prediction_date DESC LIMIT 1`,
-        [today]
+        [latestDate]
       );
       if (result.rows.length > 0) {
         const d = result.rows[0].prediction_date;
@@ -279,7 +314,7 @@ export class PredictionDiffEngine {
   }
 
   // -----------------------------------------------------------------------
-  // Ranking annotation
+  // Ranking annotation — TRACK-P1: explicit rank maps
   // -----------------------------------------------------------------------
 
   private annotateRankingChanges(
@@ -287,30 +322,34 @@ export class PredictionDiffEngine {
     todayRows: PredictionSnapshot[],
     previousRows: PredictionSnapshot[]
   ): void {
-    // Today's top 10 by ranking_score
-    const todayTop10 = new Set(
-      [...todayRows]
-        .sort((a, b) => b.rankingScore - a.rankingScore)
-        .slice(0, 10)
-        .map(r => r.symbol)
+    // Sort deterministic: ranking_score DESC, symbol ASC
+    const todaySorted = [...todayRows].sort(
+      (a, b) => b.rankingScore - a.rankingScore || a.symbol.localeCompare(b.symbol)
+    );
+    const previousSorted = [...previousRows].sort(
+      (a, b) => b.rankingScore - a.rankingScore || a.symbol.localeCompare(b.symbol)
     );
 
-    // Previous top 10
-    const prevTop10 = new Set(
-      [...previousRows]
-        .sort((a, b) => b.rankingScore - a.rankingScore)
-        .slice(0, 10)
-        .map(r => r.symbol)
-    );
+    // Build explicit rank maps
+    const todayRankMap = new Map<string, number>();
+    todaySorted.forEach((row, index) => todayRankMap.set(row.symbol, index + 1));
+
+    const previousRankMap = new Map<string, number>();
+    previousSorted.forEach((row, index) => previousRankMap.set(row.symbol, index + 1));
+
+    // Top 10 membership using explicit sorted arrays
+    const todayTop10 = new Set(todaySorted.slice(0, 10).map(r => r.symbol));
+    const prevTop10 = new Set(previousSorted.slice(0, 10).map(r => r.symbol));
 
     for (const diff of diffs) {
+      diff.currentRank = todayRankMap.get(diff.symbol) ?? null;
+      diff.previousRank = previousRankMap.get(diff.symbol) ?? null;
+
       if (todayTop10.has(diff.symbol) && !prevTop10.has(diff.symbol)) {
         diff.enteredTop10 = true;
-        diff.currentRank = [...todayTop10].indexOf(diff.symbol) + 1;
       }
       if (!todayTop10.has(diff.symbol) && prevTop10.has(diff.symbol)) {
         diff.leftTop10 = true;
-        diff.previousRank = [...prevTop10].indexOf(diff.symbol) + 1;
       }
     }
   }
@@ -327,7 +366,7 @@ export class PredictionDiffEngine {
     const signals: IntelligenceSignal[] = [];
 
     for (const d of diffs) {
-      if (!d.previous) continue; // No previous data = no signal possible
+      if (!d.previous) continue;
 
       // --- Classification changes ---
       if (d.classificationDelta > 0) {
@@ -338,7 +377,7 @@ export class PredictionDiffEngine {
           previousValue: d.classificationFrom ?? 'Unknown',
           currentValue: d.classificationTo,
           delta: `+${d.classificationDelta} tier(s)`,
-          explanation: `${d.symbol} upgraded from ${d.classificationFrom} → ${d.classificationTo}`,
+          explanation: `${d.symbol} upgraded from ${d.classificationFrom} → ${d.classificationTo} (rank #${d.currentRank})`,
           snapshotDate,
         });
       } else if (d.classificationDelta < 0) {
@@ -349,7 +388,7 @@ export class PredictionDiffEngine {
           previousValue: d.classificationFrom ?? 'Unknown',
           currentValue: d.classificationTo,
           delta: `${d.classificationDelta} tier(s)`,
-          explanation: `${d.symbol} downgraded from ${d.classificationFrom} → ${d.classificationTo}`,
+          explanation: `${d.symbol} downgraded from ${d.classificationFrom} → ${d.classificationTo} (was #${d.previousRank})`,
           snapshotDate,
         });
       }
@@ -369,7 +408,7 @@ export class PredictionDiffEngine {
         });
       }
 
-      // --- Factor changes (significant ones: |delta| >= 10) ---
+      // --- Factor changes ---
       const significantFactors = d.allFactorDeltas.filter(f => Math.abs(f.delta) >= 10);
       if (significantFactors.length > 0) {
         const factorDetails = significantFactors
@@ -397,7 +436,7 @@ export class PredictionDiffEngine {
           previousValue: 'Outside Top 10',
           currentValue: `#${d.currentRank}`,
           delta: `Entered Top 10`,
-          explanation: `${d.symbol} entered Top 10 rankings at position #${d.currentRank}`,
+          explanation: `${d.symbol} entered Top 10 rankings at position #${d.currentRank} (rank #${d.previousRank} → #${d.currentRank})`,
           snapshotDate,
         });
       }
@@ -409,7 +448,7 @@ export class PredictionDiffEngine {
           previousValue: `#${d.previousRank}`,
           currentValue: 'Outside Top 10',
           delta: `Left Top 10`,
-          explanation: `${d.symbol} dropped out of Top 10 rankings (was #${d.previousRank})`,
+          explanation: `${d.symbol} dropped out of Top 10 rankings (was #${d.previousRank}, now #${d.currentRank})`,
           snapshotDate,
         });
       }

@@ -1,6 +1,7 @@
 /**
  * Engine 5: Valuation Engine (RC-ENGINE-004 — Percentile Migration)
  * TRACK-22: Added DividendYieldScore (Task 14)
+ * TRACK-P1: Per-metric percentile readiness.
  */
 
 import { EngineInputs, ValuationEngineOutput, clampScore, weightedAverage } from '../types';
@@ -12,13 +13,17 @@ export class ValuationEngine {
     const { financials, factors, sector } = inputs;
     const profile = getSectorProfile(sector?.name ?? 'General');
     const sectorName = sector?.name ?? 'General';
-    const usePercentile = SectorPercentileEngine.hasSufficientData(sectorName, 'peRatio');
+
+    const percentilePE = SectorPercentileEngine.hasSufficientData(sectorName, 'peRatio');
+    const percentilePB = SectorPercentileEngine.hasSufficientData(sectorName, 'pbRatio');
+    const percentileEV = SectorPercentileEngine.hasSufficientData(sectorName, 'evEbitda');
+    const percentileFCFY = SectorPercentileEngine.hasSufficientData(sectorName, 'fcfYield');
 
     // ── Sub-score 1: PE Score ───────────────────────────────────────
     let peScore = 50;
     const pe = financials.peRatio;
     if (pe !== null) {
-      if (usePercentile) {
+      if (percentilePE) {
         peScore = SectorPercentileEngine.score(pe, sectorName, 'peRatio');
       } else {
         if (pe <= 0) peScore = 20;
@@ -34,7 +39,7 @@ export class ValuationEngine {
     let pbScore = 50;
     const pb = financials.pbRatio;
     if (pb !== null) {
-      if (usePercentile) {
+      if (percentilePB) {
         pbScore = SectorPercentileEngine.score(pb, sectorName, 'pbRatio');
       } else {
         if (pb <= 0) pbScore = 15;
@@ -49,7 +54,7 @@ export class ValuationEngine {
     // ── Sub-score 3: EV/EBITDA Score ────────────────────────────────
     let evEbitdaScore = 50;
     if (!profile.skipEvEbitda && financials.evEbitda !== null) {
-      if (usePercentile) {
+      if (percentileEV) {
         evEbitdaScore = SectorPercentileEngine.score(financials.evEbitda, sectorName, 'evEbitda');
       } else {
         const ev = financials.evEbitda;
@@ -66,7 +71,7 @@ export class ValuationEngine {
     let fcfYieldScore = 50;
     const fcfYield = financials.fcfYield;
     if (fcfYield !== null) {
-      if (usePercentile) {
+      if (percentileFCFY) {
         fcfYieldScore = SectorPercentileEngine.score(fcfYield, sectorName, 'fcfYield');
       } else {
         if (fcfYield >= 0.08) fcfYieldScore = 95;
@@ -105,6 +110,8 @@ export class ValuationEngine {
     const factorAdjust = (factors.valueFactor - 50) * 0.2;
     const compositeScore = clampScore(rawComposite + factorAdjust);
 
+    const anyPercentile = percentilePE || percentilePB || percentileEV || percentileFCFY;
+
     return {
       score: compositeScore,
       peScore: clampScore(peScore + factorAdjust * 0.5),
@@ -112,7 +119,7 @@ export class ValuationEngine {
       evEbitdaScore: clampScore(evEbitdaScore + factorAdjust * 0.5),
       fcfYieldScore,
       dividendYieldScore,
-      commentary: this.generateCommentary(compositeScore, profile, usePercentile),
+      commentary: this.generateCommentary(compositeScore, profile, anyPercentile),
     };
   }
 

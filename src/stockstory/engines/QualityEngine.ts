@@ -1,5 +1,8 @@
 /**
  * Engine 2: Quality Engine (RC-ENGINE-004 — Percentile Migration)
+ * 
+ * TRACK-P1: Per-metric percentile readiness, correct grossMargin mapping.
+ * grossMargin → grossMargin (NOT operatingMargin).
  */
 
 import { EngineInputs, QualityEngineOutput, clampScore, weightedAverage } from '../types';
@@ -11,12 +14,17 @@ export class QualityEngine {
     const { financials, factors, sector } = inputs;
     const profile = getSectorProfile(sector?.name ?? 'General');
     const sectorName = sector?.name ?? 'General';
-    const usePercentile = SectorPercentileEngine.hasSufficientData(sectorName, 'roe');
+
+    const percentileROE = SectorPercentileEngine.hasSufficientData(sectorName, 'roe');
+    const percentileROA = SectorPercentileEngine.hasSufficientData(sectorName, 'roa');
+    const percentileROIC = SectorPercentileEngine.hasSufficientData(sectorName, 'roic');
+    const percentileGM = SectorPercentileEngine.hasSufficientData(sectorName, 'grossMargin');
+    const percentileOM = SectorPercentileEngine.hasSufficientData(sectorName, 'operatingMargin');
 
     // ── Sub-score 1: ROE ────────────────────────────────────────────
     let roeNormalized = 50;
     if (financials.roe !== null) {
-      if (usePercentile) {
+      if (percentileROE) {
         roeNormalized = SectorPercentileEngine.score(financials.roe, sectorName, 'roe');
       } else {
         const roe = financials.roe;
@@ -32,7 +40,7 @@ export class QualityEngine {
     // ── Sub-score 2: ROA ────────────────────────────────────────────
     let roaNormalized = 50;
     if (financials.roa !== null) {
-      if (usePercentile) {
+      if (percentileROA) {
         roaNormalized = SectorPercentileEngine.score(financials.roa, sectorName, 'roa');
       } else {
         const roa = financials.roa;
@@ -48,7 +56,7 @@ export class QualityEngine {
     // ── Sub-score 3: ROIC ───────────────────────────────────────────
     let roicNormalized = 50;
     if (financials.roic !== null) {
-      if (usePercentile) {
+      if (percentileROIC) {
         roicNormalized = SectorPercentileEngine.score(financials.roic, sectorName, 'roic');
       } else {
         const roic = financials.roic;
@@ -61,11 +69,11 @@ export class QualityEngine {
       }
     }
 
-    // ── Sub-score 3: Gross Margin ───────────────────────────────────
+    // ── Sub-score 4: Gross Margin ───────────────────────────────────
     let grossMarginScore = 50;
     if (profile.useGrossMargin && financials.grossMargin !== null) {
-      if (usePercentile) {
-        grossMarginScore = SectorPercentileEngine.score(financials.grossMargin, sectorName, 'operatingMargin');
+      if (percentileGM) {
+        grossMarginScore = SectorPercentileEngine.score(financials.grossMargin, sectorName, 'grossMargin');
       } else {
         const gm = financials.grossMargin;
         if (gm >= profile.gmPremium) grossMarginScore = 95;
@@ -76,10 +84,10 @@ export class QualityEngine {
       }
     }
 
-    // ── Sub-score 4: Operating Margin ───────────────────────────────
+    // ── Sub-score 5: Operating Margin ───────────────────────────────
     let operatingMarginScore = 50;
     if (financials.operatingMargin !== null) {
-      if (usePercentile) {
+      if (percentileOM) {
         operatingMarginScore = SectorPercentileEngine.score(financials.operatingMargin, sectorName, 'operatingMargin');
       } else {
         const om = financials.operatingMargin;
@@ -91,7 +99,7 @@ export class QualityEngine {
       }
     }
 
-    // ── Sub-score 5: Efficiency Score ───────────────────────────────
+    // ── Sub-score 6: Efficiency Score ───────────────────────────────
     const hasEfficiencyData = financials.roe !== null && financials.grossMargin !== null;
     let efficiencyScore = 50;
     if (hasEfficiencyData && profile.useGrossMargin) {
@@ -115,7 +123,8 @@ export class QualityEngine {
     const factorAdjust = (factors.qualityFactor - 50) * 0.2;
     const compositeScore = clampScore(rawComposite + factorAdjust);
 
-    const commentary = this.generateCommentary(compositeScore, financials, profile, usePercentile);
+    const anyPercentile = percentileROE || percentileROA || percentileROIC || percentileGM || percentileOM;
+    const commentary = this.generateCommentary(compositeScore, financials, profile, anyPercentile);
 
     return {
       score: compositeScore,
