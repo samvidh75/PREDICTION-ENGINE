@@ -62,6 +62,7 @@ export default function TodaysChangesPanel(): JSX.Element {
     confidenceIncreases: number; confidenceDecreases: number;
     watchlistMonitored: number; totalSignals: number;
   } | null>(null);
+  const [dataSource, setDataSource] = useState<"backend" | "unavailable">("unavailable");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -75,6 +76,7 @@ export default function TodaysChangesPanel(): JSX.Element {
         if (!cancelled) {
           setSignals(result.signals);
           setSummary(result.summary);
+          setDataSource(result.dataSource);
         }
       } catch (err: any) {
         if (!cancelled) setError(err?.message ?? "Failed to load signals");
@@ -103,6 +105,31 @@ export default function TodaysChangesPanel(): JSX.Element {
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", padding: "20px 0", textAlign: "center" }}>
           Analysing market signals...
         </div>
+      </div>
+    );
+  }
+
+  // ── Backend unavailable — honest state ──
+  if (dataSource === "unavailable") {
+    return (
+      <div style={{
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(255,255,255,0.06)",
+        borderRadius: 16,
+        padding: 20,
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.18em", color: "rgba(255,255,255,0.45)", marginBottom: 12 }}>
+          Today's Intelligence
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "16px 0", textAlign: "center", lineHeight: 1.6 }}>
+          Prediction engine backend unavailable.<br />
+          Signals will appear when the data pipeline is active.
+        </div>
+        {summary && summary.watchlistMonitored > 0 && (
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textAlign: "center", paddingTop: 8 }}>
+            {summary.watchlistMonitored} watchlist stocks monitored
+          </div>
+        )}
       </div>
     );
   }
@@ -142,7 +169,7 @@ export default function TodaysChangesPanel(): JSX.Element {
     );
   }
 
-  // ── Empty state ──
+  // ── Empty state — backend available, no signals ──
   if (signals.length === 0) {
     return (
       <div style={{
@@ -157,6 +184,11 @@ export default function TodaysChangesPanel(): JSX.Element {
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", padding: "12px 0", textAlign: "center" }}>
           No significant changes detected today. Markets are stable.
         </div>
+        {summary && summary.watchlistMonitored > 0 && (
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textAlign: "center", paddingTop: 8 }}>
+            {summary.watchlistMonitored} watchlist stocks monitored
+          </div>
+        )}
       </div>
     );
   }
