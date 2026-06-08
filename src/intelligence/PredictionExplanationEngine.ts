@@ -110,8 +110,18 @@ export class PredictionExplanationEngine {
     todayDate?: string;
     previousDate?: string;
   }): Promise<ExplanationOutput> {
-    const today = options?.todayDate ?? new Date().toISOString().split('T')[0];
     const upperSymbol = symbol.toUpperCase().trim();
+
+    // TRACK-P4B: Default to the latest stored prediction_date for this symbol and horizon=30.
+    // Do not default to new Date() — that fabricates a date when no prediction exists.
+    if (!options?.todayDate) {
+      const latestDate = await this.getLatestDate(upperSymbol);
+      if (!latestDate) {
+        throw new Error(`No prediction found for ${upperSymbol} (prediction_registry is empty for horizon=30)`);
+      }
+      options = { ...options, todayDate: latestDate };
+    }
+    const today = options.todayDate!;
 
     // Fetch today's snapshot
     const todaySnap = await this.fetchSnapshot(upperSymbol, today);
@@ -216,6 +226,24 @@ export class PredictionExplanationEngine {
         riskScore: Number(r.risk_score),
         sectorScore: Number(r.sector_score),
       };
+    } catch {
+      return null;
+    }
+  }
+
+  private async getLatestDate(symbol: string): Promise<string | null> {
+    try {
+      const result = await pool.query(
+        `SELECT prediction_date FROM prediction_registry
+         WHERE symbol = $1 AND prediction_horizon = 30
+         ORDER BY prediction_date DESC LIMIT 1`,
+        [symbol]
+      );
+      if (result.rows.length > 0) {
+        const d = result.rows[0].prediction_date;
+        return d instanceof Date ? d.toISOString().split('T')[0] : String(d);
+      }
+      return null;
     } catch {
       return null;
     }
