@@ -16,7 +16,7 @@ import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { loadDatabasePolicy, buildDiagnostics } from '../../../db/DatabasePolicy';
 import { dbAdapter } from '../../../db/DatabaseAdapter';
 import { MigrationRunner } from '../../../db/MigrationRunner';
-import type { MigrationDbAdapter } from '../../../db/MigrationRunner';
+import type { MigrationExecutionAdapter } from '../../../db/MigrationRunner';
 import { join } from 'path';
 
 const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
@@ -57,7 +57,7 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     try {
       if (diag.ready && diag.kind !== 'unavailable') {
         const runner = new MigrationRunner(
-          dbAdapter as unknown as MigrationDbAdapter,
+          dbAdapter as unknown as MigrationExecutionAdapter,
           join(process.cwd(), 'src', 'db', 'migrations'),
         );
         const status = await runner.status();
