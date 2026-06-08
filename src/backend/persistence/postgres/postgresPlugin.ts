@@ -22,7 +22,4 @@ export const postgresPlugin: FastifyPluginAsync = async (app) => {
   // userDb is PostgreSQL-only. Never SQLite.
   // Private routes return HTTP 503 when this is unavailable.
   app.decorate("userDb", client);
-
-  // Legacy alias — remove after all references are migrated
-  app.decorate("postgres", client);
 };
