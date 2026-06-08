@@ -7,7 +7,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'stockstory.db');
+const DB_PATH = process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
 
 let _db: Database.Database | null = null;
 
@@ -154,13 +154,35 @@ class SQLitePool {
         PRIMARY KEY (symbol, trade_date)
       )`,
       `CREATE TABLE IF NOT EXISTS prediction_registry (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, symbol TEXT, prediction_date TEXT,
-        ranking_score REAL, classification TEXT, confidence_score REAL,
-        confidence_level TEXT, quality_score REAL, growth_score REAL,
-        value_score REAL, momentum_score REAL, risk_score REAL, sector_score REAL,
-        price_at_prediction REAL, benchmark_level REAL,
-        prediction_horizon INTEGER, validation_status TEXT DEFAULT 'pending',
-        validated_at TEXT, future_return REAL, benchmark_return REAL, alpha REAL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        symbol TEXT NOT NULL,
+        prediction_date TEXT NOT NULL,
+        ranking_score REAL NOT NULL,
+        classification TEXT NOT NULL
+          CHECK (classification IN ('Exceptional', 'Excellent', 'Good', 'Fair', 'Weak', 'Critical')),
+        confidence_score REAL NOT NULL,
+        confidence_level TEXT NOT NULL
+          CHECK (confidence_level IN ('Very High', 'High', 'Medium', 'Low')),
+        quality_score REAL NOT NULL,
+        growth_score REAL NOT NULL,
+        value_score REAL NOT NULL,
+        momentum_score REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        sector_score REAL NOT NULL,
+        price_at_prediction REAL,
+        benchmark_level REAL,
+        prediction_horizon INTEGER NOT NULL DEFAULT 30
+          CHECK (prediction_horizon IN (7, 30, 90, 180, 365)),
+        validation_status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (validation_status IN ('pending', 'in_progress', 'validated', 'expired')),
+        validated_at TEXT,
+        future_return REAL,
+        benchmark_return REAL,
+        alpha REAL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        created_by TEXT NOT NULL DEFAULT 'DailyPredictionCapture'
+          CHECK (created_by IN ('DailyPredictionCapture', 'ManualSnapshot')),
+        UNIQUE(symbol, prediction_date, prediction_horizon)
       )`,
       `CREATE TABLE IF NOT EXISTS benchmark_observations (
         date TEXT PRIMARY KEY, nifty50 REAL, nifty100 REAL, nifty500 REAL,
