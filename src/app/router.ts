@@ -64,6 +64,13 @@ export function getPageKeyFromUrl(): PageKey {
       "compare": "compare",
       "journal": "journal",
       "trust": "trust",
+      "methodology": "methodology",
+      "validation": "validation",
+      "validation-dashboard": "validation-dashboard",
+      "predictions": "predictions",
+      "rankings": "rankings",
+      "leaderboard": "leaderboard",
+      "onboarding": "onboarding",
       "workspace": "workspace",
       "daily-feed": "daily-feed",
       "portfolio-doctor": "portfolio-doctor",
@@ -119,11 +126,21 @@ export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup",
 ];
 
-/** Check whether a stock/company ID is present in the URL. */
+/** Check whether a stock/company ID is present in the URL.
+ * Supports multiple parameter name aliases used across the codebase:
+ *   id, symbol, ticker, companyId
+ */
 export function hasStockId(): boolean {
   if (typeof window === "undefined") return false;
   const params = new URLSearchParams(window.location.search);
-  return params.has("id");
+  return params.has("id") || params.has("symbol") || params.has("ticker") || params.has("companyId");
+}
+
+/** Get the stock/company identifier from URL, normalizing across param aliases. */
+export function getStockTicker(): string {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("id") ?? params.get("symbol") ?? params.get("ticker") ?? params.get("companyId") ?? "").toUpperCase().trim();
 }
 
 /** Map a PageKey to a subsystem identifier for error boundaries. */

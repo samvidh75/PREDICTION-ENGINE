@@ -7,6 +7,7 @@ export {
   getRouteSignatureFromUrl,
   getRouteSubsystem,
   hasStockId,
+  getStockTicker,
   notifyUrlChange,
   PROTECTED_PAGES,
   PUBLIC_PAGES,

@@ -35,15 +35,36 @@ export default function PublicRankingsPage(): JSX.Element {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {RANKINGS.map((r) => (
-          <div key={r.symbol} style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 12,
-            padding: "14px 20px",
-            display: "flex",
-            alignItems: "center",
-            gap: 20,
-          }}>
+          <a
+            key={r.symbol}
+            href={`/?page=stock&symbol=${r.symbol}`}
+            onClick={(e) => {
+              e.preventDefault();
+              window.history.pushState({}, "", `/?page=stock&symbol=${r.symbol}`);
+              window.dispatchEvent(new Event("urlchange"));
+            }}
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 12,
+              padding: "14px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: 20,
+              textDecoration: "none",
+              color: "inherit",
+              cursor: "pointer",
+              transition: "background 150ms, border-color 150ms",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)";
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.16)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.03)";
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.08)";
+            }}
+          >
             <div style={{
               width: 32, height: 32, borderRadius: 8,
               background: "rgba(255,255,255,0.06)",
@@ -68,7 +89,7 @@ export default function PublicRankingsPage(): JSX.Element {
             }}>
               {r.change.startsWith("+") ? "↑" : r.change.startsWith("-") ? "↓" : "→"} {r.change}
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
