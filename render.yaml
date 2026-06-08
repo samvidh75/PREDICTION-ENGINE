@@ -22,7 +22,7 @@ services:
     startCommand: npm start
 
     # Health check — Render uses this to confirm the service is healthy
-    healthCheckPath: /healthz
+    healthCheckPath: /readyz
 
     # Auto-deploy on every push to main
     autoDeploy: true
@@ -36,6 +36,16 @@ services:
 
       - key: PORT
         value: 4001
+
+      # ── Database Policy ────────────────────────────────────────────────
+      - key: DB_ADAPTER
+        value: postgres
+
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "false"
+
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "false"
 
       # ── Database (Neon PostgreSQL) ──────────────────────────────────────
       # Set in Dashboard: postgresql://user:pass@host/db?sslmode=require
