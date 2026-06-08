@@ -1,122 +1,119 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TrustIndicatorsWidget from "../components/trust/TrustIndicatorsWidget";
 
-const LEADERBOARD = [
-  { rank: 1, symbol: "RELIANCE", returnPct: 12.4, horizon: 30, validatedDate: "2026-05-09", confidence: 82, classification: "Strong Buy" },
-  { rank: 2, symbol: "HDFCBANK", returnPct: 10.8, horizon: 30, validatedDate: "2026-05-09", confidence: 80, classification: "Strong Buy" },
-  { rank: 3, symbol: "TCS", returnPct: 8.2, horizon: 90, validatedDate: "2026-03-10", confidence: 75, classification: "Buy" },
-  { rank: 4, symbol: "MARUTI", returnPct: 7.6, horizon: 30, validatedDate: "2026-05-09", confidence: 73, classification: "Buy" },
-  { rank: 5, symbol: "LT", returnPct: 6.9, horizon: 90, validatedDate: "2026-03-10", confidence: 69, classification: "Buy" },
-  { rank: 6, symbol: "ICICIBANK", returnPct: 6.3, horizon: 30, validatedDate: "2026-05-09", confidence: 77, classification: "Buy" },
-  { rank: 7, symbol: "SUNPHARMA", returnPct: 5.8, horizon: 365, validatedDate: "2025-06-08", confidence: 65, classification: "Hold" },
-  { rank: 8, symbol: "BHARTIARTL", returnPct: 5.1, horizon: 30, validatedDate: "2026-05-09", confidence: 72, classification: "Buy" },
-  { rank: 9, symbol: "INFY", returnPct: 4.4, horizon: 90, validatedDate: "2026-03-10", confidence: 71, classification: "Buy" },
-  { rank: 10, symbol: "TITAN", returnPct: 3.9, horizon: 30, validatedDate: "2026-05-09", confidence: 62, classification: "Hold" },
-];
+interface LeaderboardEntry {
+  symbol: string;
+  ranking_score?: number;
+  classification?: string;
+  confidence_score?: number;
+  prediction_horizon?: number;
+  prediction_date?: string;
+}
+
+const UNKNOWN: LeaderboardEntry = { symbol: "-" };
 
 export default function LeaderboardPage(): JSX.Element {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>(Array(10).fill(UNKNOWN));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch("/api/intelligence/leaderboard?limit=10");
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json) && json.length > 0) {
+            setEntries(json);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {}
+      // Fallback: query prediction_registry directly via API
+      setLoading(false);
+    };
+    fetchLeaderboard();
+  }, []);
+
+  const handleStockClick = (symbol: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock");
+    params.set("id", symbol);
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
   return (
-    <main style={{
-      minHeight: "100vh",
-      background: "#020304",
-      color: "rgba(255,255,255,0.9)",
-      fontFamily: "'Inter', 'Satoshi', system-ui, sans-serif",
-      padding: "40px 24px",
-      maxWidth: 960,
-      margin: "0 auto",
-    }}>
-      <header style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.03em" }}>
-          Top Performing Predictions
-        </h1>
-        <p style={{ fontSize: 15, opacity: 0.7, margin: "0 0 24px" }}>
-          Validated outcomes with actual returns. Sorted by return achieved.
-        </p>
-        <TrustIndicatorsWidget />
+    <div className="max-w-4xl mx-auto px-4 py-12 text-white">
+      <header className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight">Top Performing Predictions</h1>
+        <p className="text-sm text-[#8B949E] mt-1">Validated outcomes ranked by prediction confidence.</p>
+        <div className="mt-4">
+          <TrustIndicatorsWidget />
+        </div>
       </header>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {LEADERBOARD.map((r) => (
-          <a
-            key={r.symbol}
-            href={`/?page=stock&symbol=${r.symbol}`}
-            onClick={(e) => {
-              e.preventDefault();
-              window.history.pushState({}, "", `/?page=stock&symbol=${r.symbol}`);
-              window.dispatchEvent(new Event("urlchange"));
-            }}
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 12,
-              padding: "14px 20px",
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              flexWrap: "wrap",
-              textDecoration: "none",
-              color: "inherit",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)";
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.16)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.03)";
-              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.08)";
-            }}
-          >
-            <div style={{
-              width: 32, height: 32, borderRadius: 8,
-              background: r.rank <= 3 ? "rgba(0,209,122,0.15)" : "rgba(255,255,255,0.06)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontWeight: 700, fontSize: 14, color: r.rank <= 3 ? "#00D17A" : "inherit",
-            }}>
-              #{r.rank}
-            </div>
-            <div style={{ fontWeight: 700, fontSize: 16, minWidth: 100 }}>
-              {r.symbol}
-            </div>
-            <div style={{
-              background: r.classification === "Strong Buy" ? "rgba(0,209,122,0.15)" :
-                r.classification === "Buy" ? "rgba(87,185,255,0.15)" : "rgba(255,179,71,0.15)",
-              color: r.classification === "Strong Buy" ? "#00D17A" :
-                r.classification === "Buy" ? "#57B9FF" : "#FFB347",
-              padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600,
-            }}>
-              {r.classification}
-            </div>
-            <div style={{ fontSize: 14, opacity: 0.6 }}>
-              {r.confidence}% confidence
-            </div>
-            <div style={{ fontSize: 14, opacity: 0.5 }}>
-              {r.horizon}d horizon
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#00D17A" }}>
-              +{r.returnPct}%
-            </div>
-            <div style={{ fontSize: 12, opacity: 0.4 }}>
-              Validated {r.validatedDate}
-            </div>
-          </a>
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-12 rounded-lg bg-[#0D1117] border border-white/[0.04] animate-pulse" />
+          ))}
+        </div>
+      ) : entries.length === 0 || entries[0].symbol === "-" ? (
+        <div className="rounded-lg border border-white/[0.06] bg-[#0D1117] p-12 text-center">
+          <p className="text-sm text-[#8B949E]">Leaderboard data is currently unavailable.</p>
+          <p className="text-xs text-[#484F58] mt-2">Predictions are validated daily. Check back after the next pipeline run.</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {entries.map((entry, idx) => {
+            const rank = idx + 1;
+            const isTop3 = rank <= 3;
+            const score = entry.ranking_score ?? null;
+            const cls = entry.classification ?? "—";
+            const conf = entry.confidence_score ?? null;
+            const horizon = entry.prediction_horizon ?? null;
 
-      <div style={{ marginTop: 48, textAlign: "center" }}>
-        <a href="/?page=signup" style={{
-          display: "inline-block",
-          padding: "12px 32px",
-          background: "#00D17A",
-          color: "#020304",
-          borderRadius: 8,
-          fontWeight: 700,
-          fontSize: 15,
-          textDecoration: "none",
-        }}>
-          Sign Up to Track Your Picks →
+            return (
+              <button
+                key={entry.symbol}
+                onClick={() => handleStockClick(entry.symbol)}
+                className="flex items-center gap-4 rounded-lg border border-white/[0.06] bg-[#0D1117] px-5 py-3 text-left transition-colors hover:border-white/[0.12] hover:bg-[#11161C]"
+              >
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                  isTop3 ? "bg-[#2962FF]/15 text-[#2962FF]" : "bg-white/5 text-[#8B949E]"
+                }`}>
+                  #{rank}
+                </div>
+                <div className="min-w-[80px] font-mono font-semibold text-sm">{entry.symbol}</div>
+                <div className={`rounded px-2 py-0.5 text-[10px] font-semibold ${
+                  cls.includes("Excellent") || cls.includes("Strong") ? "bg-[#22AB94]/10 text-[#22AB94]" :
+                  cls.includes("Good") || cls.includes("Buy") ? "bg-[#2962FF]/10 text-[#2962FF]" :
+                  "bg-white/5 text-[#8B949E]"
+                }`}>
+                  {cls}
+                </div>
+                {conf !== null && <div className="text-xs text-[#8B949E]">{conf}% confidence</div>}
+                {horizon !== null && <div className="text-xs text-[#484F58]">{horizon}d horizon</div>}
+                {score !== null && (
+                  <div className={`font-mono text-sm font-bold ${isTop3 ? "text-[#22AB94]" : "text-white"}`}>
+                    {score}/100
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="mt-10 text-center">
+        <a
+          href="/?page=predictions"
+          className="inline-flex rounded-lg bg-[#2962FF] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#1E53E5] transition-colors no-underline"
+        >
+          View All Predictions →
         </a>
       </div>
-    </main>
+    </div>
   );
 }

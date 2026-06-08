@@ -47,7 +47,8 @@ export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: P
   const publicOnlyPages: Record<string, boolean> = {
     landing: true, about: true, login: true, signup: true,
     trust: true, methodology: true, validation: true,
-    predictions: true, rankings: true,
+    predictions: true, rankings: true, leaderboard: true,
+    "validation-dashboard": true,
   };
 
   if (!isAuthenticated && publicOnlyPages[pageKey]) {
@@ -59,6 +60,8 @@ export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: P
     }
     if (pageKey === "predictions") return <PublicPredictionsPage />;
     if (pageKey === "rankings") return <PublicRankingsPage />;
+    if (pageKey === "leaderboard") return <LeaderboardPage />;
+    if (pageKey === "validation-dashboard") return <ValidationDashboard />;
     return <PublicLandingPage />;
   }
 

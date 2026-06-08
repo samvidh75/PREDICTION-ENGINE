@@ -53,21 +53,33 @@ export class PredictionFactory {
             continue;
           }
 
+          // TRACK-94 FIX: Recalibrate confidence based on factor-derived predictive strength.
+          // Historical audit showed inverse calibration — lower confidence buckets had higher hit rates.
+          // New formula: confidence = weighted sum of predictive factors (risk*0.35, value*0.25, growth*0.20, momentum*0.15, quality*0.05)
+          // Normalized to 50-95 range (avoiding extremes)
+          const calibratedConfidence = Math.min(95, Math.max(50, Math.round(
+            (engineResult.risk * 0.35) +
+            (engineResult.valuation * 0.25) +
+            (engineResult.growth * 0.20) +
+            (engineResult.momentum * 0.15) +
+            (engineResult.quality * 0.05)
+          )));
+
           const input: CreatePredictionInput = {
             symbol,
             predictionDate: today,
             rankingScore: engineResult.healthScore,
             classification: engineResult.classification,
-            confidenceScore: engineResult.engineDetails.confidence.score,
-            confidenceLevel: engineResult.engineDetails.confidence.level,
+            confidenceScore: calibratedConfidence,
+            confidenceLevel: calibratedConfidence >= 80 ? 'High' : calibratedConfidence >= 65 ? 'Medium' : 'Low',
             qualityScore: engineResult.quality,
             growthScore: engineResult.growth,
             valueScore: engineResult.valuation,
             momentumScore: engineResult.momentum,
             riskScore: engineResult.risk,
-            sectorScore: 50,
-            priceAtPrediction: 0,
-            benchmarkLevel: 0,
+            sectorScore: engineResult.sectorStrength ?? null as any,
+            priceAtPrediction: null as any,
+            benchmarkLevel: null as any,
             predictionHorizon: horizon,
             createdBy: `PredictionFactory-${this.modelVersion}`,
           };

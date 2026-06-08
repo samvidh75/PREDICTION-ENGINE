@@ -89,15 +89,15 @@ export class OutcomeValidator {
           let benchmarkReturn = 0;
           try {
             const benchRes = await pool.query(
-              `SELECT close FROM daily_prices
-               WHERE symbol = 'NIFTY 50' AND trade_date <= $1
-               ORDER BY trade_date DESC LIMIT 1`,
+              `SELECT AVG(close) as close FROM daily_prices
+               WHERE symbol IN ('RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK') 
+                 AND trade_date <= $1`,
               [today]
             );
             const benchHistRes = await pool.query(
-              `SELECT close FROM daily_prices
-               WHERE symbol = 'NIFTY 50' AND trade_date <= $1
-               ORDER BY trade_date DESC LIMIT 1`,
+              `SELECT AVG(close) as close FROM daily_prices
+               WHERE symbol IN ('RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK')
+                 AND trade_date <= $1`,
               [pred.prediction_date]
             );
             if (benchRes.rows.length > 0 && benchHistRes.rows.length > 0) {

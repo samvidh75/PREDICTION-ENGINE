@@ -30,7 +30,7 @@ export function buildSpacingCssVars(): Record<string, string> {
 export function buildTypographyCssVars(): Record<string, string> {
   return {
     "--ss-font-ui": typography.fonts.primary.join(", "),
-    "--ss-font-mono": typography.fonts.mono,
+    "--ss-font-mono": typography.fonts.mono.join(", "),
 
     // Display hero
     "--ss-ty-hero-title-size": `${typography.displayHero.size}px`,

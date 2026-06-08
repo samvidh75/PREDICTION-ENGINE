@@ -8,36 +8,36 @@ interface TrustIndicators {
   hitRate: string;
 }
 
-const MOCK_TRUST: TrustIndicators = {
-  predictionsToday: 372,
-  symbolsCovered: 124,
-  outcomesValidated: 97080,
-  lastPipelineRun: new Date().toISOString(),
-  hitRate: "62.4%",
+const DEFAULT_UNAVAILABLE: TrustIndicators = {
+  predictionsToday: 0,
+  symbolsCovered: 0,
+  outcomesValidated: 0,
+  lastPipelineRun: "",
+  hitRate: "Unavailable",
 };
 
 export default function TrustIndicatorsWidget(): JSX.Element {
-  const [data, setData] = useState<TrustIndicators>(MOCK_TRUST);
-  const [refreshing, setRefreshing] = useState(false);
+  const [data, setData] = useState<TrustIndicators>(DEFAULT_UNAVAILABLE);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Attempt real API, fall back to mock
     const fetchData = async () => {
       try {
         const res = await fetch("/api/ops/health");
         if (res.ok) {
           const json = await res.json();
           setData({
-            predictionsToday: json.metrics?.predictions_today ?? MOCK_TRUST.predictionsToday,
-            symbolsCovered: json.metrics?.symbols_covered ?? MOCK_TRUST.symbolsCovered,
-            outcomesValidated: MOCK_TRUST.outcomesValidated,
-            lastPipelineRun: new Date().toISOString(),
-            hitRate: json.metrics?.hit_rate ?? MOCK_TRUST.hitRate,
+            predictionsToday: json.metrics?.predictions_today ?? 0,
+            symbolsCovered: json.metrics?.symbols_covered ?? 0,
+            outcomesValidated: json.metrics?.outcomes_validated ?? 0,
+            lastPipelineRun: json.metrics?.last_pipeline_run ?? "",
+            hitRate: json.metrics?.hit_rate ? `${json.metrics.hit_rate}%` : "Unavailable",
           });
         }
       } catch {
-        // Keep mock data
+        // Show unavailable state
       }
+      setLoading(false);
     };
     fetchData();
   }, []);

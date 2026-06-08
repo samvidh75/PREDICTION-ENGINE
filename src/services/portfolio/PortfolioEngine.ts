@@ -12,13 +12,7 @@ export interface UserHolding {
 
 const STORAGE_KEY_PREFIX = "stockstory_portfolio_holdings_v1";
 
-const DEFAULT_HOLDINGS: UserHolding[] = [
-  { symbol: "RELIANCE", shares: 10, avgBuyPrice: 2450, sector: "Energy" },
-  { symbol: "HAL", shares: 15, avgBuyPrice: 3200, sector: "Defence" },
-  { symbol: "BEL", shares: 50, avgBuyPrice: 180, sector: "Defence" },
-  { symbol: "HDFCBANK", shares: 25, avgBuyPrice: 1450, sector: "Banking" },
-  { symbol: "INFY", shares: 20, avgBuyPrice: 1520, sector: "IT" },
-];
+const DEFAULT_HOLDINGS: UserHolding[] = [];
 
 export class PortfolioEngine {
   private static isInitialSyncStarted = false;

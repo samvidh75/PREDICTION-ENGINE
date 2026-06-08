@@ -33,11 +33,7 @@ function resolveStorageKey(uid?: string): string {
   return `${STORAGE_KEY_PREFIX}_${u}`;
 }
 
-const DEFAULT_WATCHLISTS: CustomWatchlist[] = [
-  { id: "1", name: "Long Term", tickers: ["RELIANCE", "INFY"], isArchived: false, isFavourite: true, order: 0 },
-  { id: "2", name: "Defence", tickers: ["HAL"], isArchived: false, isFavourite: true, order: 1 },
-  { id: "3", name: "High Conviction", tickers: ["HDFCBANK"], isArchived: false, isFavourite: false, order: 2 },
-];
+const DEFAULT_WATCHLISTS: CustomWatchlist[] = [];
 
 let isInitialSyncStarted = false;
 

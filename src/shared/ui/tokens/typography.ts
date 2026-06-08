@@ -1,60 +1,92 @@
 /**
- * Unified typography tokens — merged from design/, design-system/, designSystem/.
+ * TRACK-95H — Institutional typography.
+ * Single font family. Clean hierarchy. No experimental weights.
  */
 export const typography = {
   fonts: {
-    primary: ["Inter", "Satoshi", "Geist", "ui-sans-serif", "system-ui", "Segoe UI", "Roboto", "Arial"] as const,
-    secondary: '"IBM Plex Sans", "Inter", ui-sans-serif, system-ui, sans-serif' as const,
-    mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' as const,
+    primary: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'] as const,
+    mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'] as const,
   },
 
-  // Display scales
-  displayHero: {
-    size: 56,
+  h1: {
+    size: 32,
     weight: 600,
-    lineHeight: "1.05",
-    letterSpacing: "-0.04em",
+    lineHeight: '1.2',
+    letterSpacing: '-0.02em',
   },
-
-  primaryHeadline: {
-    size: 42,
+  h2: {
+    size: 24,
     weight: 600,
-    lineHeight: "1.1",
-    letterSpacing: "-0.04em",
+    lineHeight: '1.25',
+    letterSpacing: '-0.01em',
   },
-
-  sectionTitle: {
-    size: 22,
+  h3: {
+    size: 18,
+    weight: 600,
+    lineHeight: '1.3',
+    letterSpacing: '0',
+  },
+  body: {
+    size: 14,
+    weight: 400,
+    lineHeight: '1.6',
+  },
+  bodySmall: {
+    size: 13,
+    weight: 400,
+    lineHeight: '1.5',
+  },
+  caption: {
+    size: 11,
     weight: 500,
-    lineHeight: "1.2",
-    letterSpacing: "-0.02em",
+    lineHeight: '1.4',
+  },
+  label: {
+    size: 10,
+    weight: 600,
+    lineHeight: '1.3',
+    letterSpacing: '0.08em',
   },
 
+  // Legacy compatibility — kept for existing component references
+  displayHero: {
+    size: 48,
+    weight: 600,
+    lineHeight: '1.1',
+    letterSpacing: '-0.025em',
+  },
+  primaryHeadline: {
+    size: 36,
+    weight: 600,
+    lineHeight: '1.15',
+    letterSpacing: '-0.02em',
+  },
+  sectionTitle: {
+    size: 20,
+    weight: 600,
+    lineHeight: '1.25',
+    letterSpacing: '-0.01em',
+  },
   narrativeText: {
-    size: 15,
-    lineHeight: "1.8",
+    size: 14,
+    lineHeight: '1.7',
     weight: 400,
   },
-
   microLabel: {
-    size: 11,
+    size: 10,
     uppercase: true,
-    trackingEm: "0.18em",
-    weight: 500,
+    trackingEm: '0.08em',
+    weight: 600,
   },
-
-  // Weights
   weight: {
     body: 400,
     bodyStrong: 500,
-    headline: 700,
-    display: 800,
+    headline: 600,
+    display: 700,
   },
-
-  // Letter spacing presets
   letterSpacing: {
-    normal: "0",
-    label: "0.14em",
+    normal: '0',
+    label: '0.08em',
   },
 } as const;
 

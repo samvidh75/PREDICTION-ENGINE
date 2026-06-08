@@ -4,37 +4,74 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "Satoshi", "Geist", "ui-sans-serif", "system-ui", "Segoe UI", "Roboto", "Arial"],
+        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
-        canvas: "#FAFAFA",
-        surface: "#FFFFFF",
-        "ink-primary": "#0A0A0A",
-        "ink-secondary": "#525252",
-        "telemetry-cyan": "#06B6D4",
-        "telemetry-magenta": "#D946EF",
-        "border-grid": "#E5E5E5",
+        // Background scale
+        background: {
+          DEFAULT: "#080C10",
+          secondary: "#11161C",
+          panel: "#161B22",
+          elevated: "#1C2128",
+          hover: "#1F242B",
+        },
+        // Surface scale
+        surface: {
+          card: "#0D1117",
+          input: "#161B22",
+          tooltip: "#1C2128",
+          modal: "#0D1117",
+        },
+        // Accent — single primary blue
+        accent: {
+          primary: "#2962FF",
+          hover: "#1E53E5",
+          muted: "rgba(41, 98, 255, 0.12)",
+          success: "#22AB94",
+          danger: "#F23645",
+          warning: "#EF9A09",
+        },
+        // Border scale
+        border: {
+          DEFAULT: "rgba(255, 255, 255, 0.06)",
+          subtle: "rgba(255, 255, 255, 0.04)",
+          focus: "rgba(41, 98, 255, 0.40)",
+          divider: "rgba(255, 255, 255, 0.05)",
+        },
+        // Text scale
+        text: {
+          primary: "#E6EDF3",
+          secondary: "#8B949E",
+          muted: "#484F58",
+          inverse: "#0D1117",
+        },
+        // Legacy brand colours — kept for component compatibility
         brand: {
-          void: "#030303",
-          surface: "#ffffff",
-          magenta: "#ff007f",
-          cyan: "#00f0ff",
-          emerald: "#00ff66",
-          amber: "#ffaa00",
-          crimson: "#ff3333",
-          muted: "#666666",
+          void: "#080C10",
+          surface: "#0D1117",
+          magenta: "#D16BA5",
+          cyan: "#43D9BD",
+          emerald: "#22AB94",
+          amber: "#EF9A09",
+          crimson: "#F23645",
+          muted: "#8B949E",
         },
       },
       boxShadow: {
-        orb: "0 0 60px rgba(0,255,210,0.10)",
-        lockCard: "0 4px 20px rgba(0,0,0,0.03)",
-        "hologram-cyan": "0 0 20px rgba(0, 240, 255, 0.15)",
-        "hologram-magenta": "0 0 20px rgba(255, 0, 127, 0.15)",
-        "premium-card": "0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+        none: "none",
+        sm: "0 1px 2px rgba(0, 0, 0, 0.30)",
+        md: "0 2px 6px rgba(0, 0, 0, 0.35)",
+        lg: "0 4px 12px rgba(0, 0, 0, 0.40)",
+        xl: "0 8px 24px rgba(0, 0, 0, 0.50)",
+        panel: "0 1px 3px rgba(0, 0, 0, 0.30), 0 4px 16px rgba(0, 0, 0, 0.35)",
+        elevated: "0 2px 8px rgba(0, 0, 0, 0.40), 0 8px 32px rgba(0, 0, 0, 0.45)",
       },
-      backgroundImage: {
-        "planetary-haze": "radial-gradient(circle at 50% -20%, rgba(0, 240, 255, 0.08), transparent 70%)",
-        "magenta-glow": "radial-gradient(circle at 80% 20%, rgba(255, 0, 127, 0.05), transparent 50%)",
+      borderRadius: {
+        sm: "4px",
+        md: "6px",
+        lg: "8px",
+        xl: "12px",
       },
       screens: {
         xs: "420px",
