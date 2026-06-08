@@ -274,7 +274,7 @@ export class CorporateActionsEngine {
       const yfModule = await import('yfinance');
       const yf = yfModule.default ?? yfModule;
 
-      const ticker = yf.Ticker(symbol);
+      const ticker = (yf as any).Ticker(symbol);
 
       // Fetch dividends
       let dividends: { date: string; amount: number }[] = [];

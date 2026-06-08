@@ -1,0 +1,175 @@
+# TRACK-70 Agent C — GitHub Actions Execution Proof
+
+**Generated:** 2026-06-07T13:23:52.563Z
+
+## Workflow File
+
+- **Exists:** ✓ YES
+- **Path:** `.github/workflows/daily-pipeline.yml`
+- **Name:** SSI Daily Pipeline
+- **Triggers:** `schedule:
+    # Runs every day at 05:00 IST (23:30 UTC) — 6 phases over 1.75 hours
+    - cron: '30 23 * * *'
+  workflow_dispatch:
+    inputs:
+      force_full_run:
+        description: 'Run all phases even if data is fresh'
+        type: boolean
+        default: false
+
+jobs:
+  daily-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install yfinance pandas numpy
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Copy production env
+        run: cp .env.production.example .env.production
+
+      # ═══ Phase 1: Data Refresh (05:00 IST) ═══
+      - name: Phase 1 — Data Refresh
+        id: phase1
+        continue-on-error: true
+        run: |
+          echo "=== Phase 1: Data Refresh ==="
+          python scripts/yfinance_bridge.py historical RELIANCE.NS 1d
+          echo "Data refresh completed"
+        timeout-minutes: 15
+
+      - name: Alert on Phase 1 failure
+        if: steps.phase1.outcome == 'failure'
+        run: |
+          echo "WARNING: Data refresh phase failed"
+          # Alerting handled by PipelineAlertService in next phase
+
+      # ═══ Phase 2: Factor Refresh (05:30 IST) ═══
+      - name: Phase 2 — Factor Refresh
+        id: phase2
+        continue-on-error: true
+        run: |
+          echo "=== Phase 2: Factor Refresh ==="
+          npx tsx src/scripts/run-factor-refresh.ts
+          echo "Factor refresh completed"
+        timeout-minutes: 15
+
+      - name: Alert on Phase 2 failure
+        if: steps.phase2.outcome == 'failure'
+        run: echo "WARNING: Factor refresh phase failed"
+
+      # ═══ Phase 3: Prediction Generation (06:00 IST) ═══
+      - name: Phase 3 — Prediction Generation
+        id: phase3
+        run: |
+          echo "=== Phase 3: Prediction Generation ==="
+          npx tsx src/scheduler/run-prediction-generation.ts
+          echo "Predictions generated"
+        timeout-minutes: 20
+
+      - name: Alert on Phase 3 failure
+        if: steps.phase3.outcome == 'failure'
+        run: echo "CRITICAL: Prediction generation failed"
+
+      # ═══ Phase 4: Outcome Validation (06:15 IST) ═══
+      - name: Phase 4 — Outcome Validation
+        id: phase4
+        run: |
+          echo "=== Phase 4: Outcome Validation ==="
+          npx tsx src/scheduler/run-outcome-validation.ts
+          echo "Outcomes validated"
+        timeout-minutes: 20
+
+      - name: Alert on Phase 4 failure
+        if: steps.phase4.outcome == 'failure'
+        run: echo "CRITICAL: Outcome validation failed"
+
+      # ═══ Phase 5: Trust Metrics (06:30 IST) ═══
+      - name: Phase 5 — Trust Metrics Refresh
+        id: phase5
+        run: |
+          echo "=== Phase 5: Trust Metrics ==="
+          npx tsx src/scheduler/run-trust-metrics.ts
+          echo "Trust metrics updated"
+        timeout-minutes: 10
+
+      # ═══ Phase 6: Daily Feed (06:45 IST) ═══
+      - name: Phase 6 — Daily Feed Generation
+        id: phase6
+        run: |
+          echo "=== Phase 6: Daily Feed ==="
+          npx tsx src/scheduler/run-daily-feed.ts
+          echo "Daily feed generated"
+        timeout-minutes: 10
+
+      # ═══ Health Check & Alerting ═══
+      - name: Pipeline Health Check
+        if: always()
+        run: |
+          echo "=== Pipeline Health Report ==="
+          echo "Phase 1 (Data Refresh):     ${{ steps.phase1.outcome }}"
+          echo "Phase 2 (Factor Refresh):   ${{ steps.phase2.outcome }}"
+          echo "Phase 3 (Prediction Gen):   ${{ steps.phase3.outcome }}"
+          echo "Phase 4 (Outcome Validate): ${{ steps.phase4.outcome }}"
+          echo "Phase 5 (Trust Metrics):    ${{ steps.phase5.outcome }}"
+          echo "Phase 6 (Daily Feed):       ${{ steps.phase6.outcome }}"
+          npx tsx src/scheduler/run-pipeline-health.ts || echo "Health check script not yet deployed"
+
+      # ═══ Commit updated metrics ═══  
+      - name: Commit trust metrics update
+        if: steps.phase5.outcome == 'success'
+        run: |
+          git config user.name "SSI Daily Pipeline Bot"
+          git config user.email "pipeline@stockstory.in"
+          git add public/trust/live-metrics.json
+          git diff --staged --quiet || (git commit -m "Daily trust metrics update $(date +%Y-%m-%d)" && git push)
+        continue-on-error: true
+
+      - name: Pipeline Complete
+        if: always()
+        run: echo "SSI Daily Pipeline completed at $(date)"`
+- **Jobs defined:** on, schedule, workflow_dispatch, jobs
+
+## Execution History
+
+GitHub CLI (`gh`) is NOT available in this environment. Cannot inspect actual execution history.
+
+**To check manually:**
+```bash
+gh run list --workflow=daily-pipeline.yml --limit 10
+```
+
+
+## Key Questions
+
+1. **Has daily-pipeline ever run?** CANNOT CONFIRM — no execution evidence available
+2. **How many successful runs?** UNKNOWN
+3. **Last successful run?** UNKNOWN
+4. **Failed jobs?** UNKNOWN — inspect individual run logs
+
+## Verdict
+
+Workflow file EXISTS but execution history is UNCONFIRMED
+
+**Action: Run `gh run list --workflow=daily-pipeline.yml` in a GitHub-authenticated environment to verify.**

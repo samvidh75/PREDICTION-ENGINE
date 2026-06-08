@@ -1,6 +1,8 @@
 import Fastify from "fastify";
 import websocketPlugin from "@fastify/websocket";
 import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import compress from "@fastify/compress";
 import cookie from "@fastify/cookie";
 import routes from "./routes";
 import { errorHandlerPlugin } from "../monitoring/errorHandler";
@@ -35,6 +37,15 @@ export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   });
+
+  // ── Security headers (TRACK-71) ─────────────────────────────────────────
+  await app.register(helmet, {
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  });
+
+  // ── Response compression (TRACK-71) ──────────────────────────────────────
+  await app.register(compress, { threshold: 1024 });
 
   // ── Cookie support ────────────────────────────────────────────────────────
   await app.register(cookie, {

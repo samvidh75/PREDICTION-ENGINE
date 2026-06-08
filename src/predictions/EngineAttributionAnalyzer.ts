@@ -20,7 +20,7 @@ import type { EngineAttribution } from './types';
 import { predictionRegistry } from './PredictionRegistry';
 
 /** Engine names and their corresponding field on PredictionRecord */
-const ENGINES: { name: string; field: keyof EngineScoreFields }[] = [
+const ENGINES: { name: string; field: string }[] = [
   { name: 'quality', field: 'quality_score' },
   { name: 'growth', field: 'growth_score' },
   { name: 'value', field: 'value_score' },

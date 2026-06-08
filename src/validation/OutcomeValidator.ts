@@ -6,6 +6,7 @@
  * Idempotent, restart-safe, fully automated.
  */
 import pool from '../db/index';
+import { outcomeRepository } from '../data/OutcomeRepository';
 
 export interface ValidationRunResult {
   horizonDays: number;
@@ -110,16 +111,12 @@ export class OutcomeValidator {
 
           const alpha = futureReturn - benchmarkReturn;
 
-          await pool.query(
-            `UPDATE prediction_registry
-             SET validation_status = 'validated',
-                 validated_at = NOW(),
-                 future_return = $2,
-                 benchmark_return = $3,
-                 alpha = $4
-             WHERE id = $1`,
-            [pred.id, futureReturn, benchmarkReturn, alpha]
-          );
+          await outcomeRepository.recordOutcome({
+            predictionId: pred.id,
+            futureReturn,
+            benchmarkReturn,
+            alpha,
+          });
 
           validated++;
         } catch (err: any) {

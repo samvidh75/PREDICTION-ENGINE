@@ -83,7 +83,7 @@ export class NarrativeEngine {
 
     // Use historical data to compute changes if available
     const hist = inputs.historical?.factorHistory;
-    const prev = hist && hist.length >= 2 ? hist[hist.length - 2] : null;
+    const prev: any = hist && hist.length >= 2 ? hist[hist.length - 2] : null;
 
     signals.push(
       this.makeSignal('Quality', d.quality.score, prev?.qualityFactor ?? null, d.quality.commentary),
@@ -277,10 +277,10 @@ export class NarrativeEngine {
     return 'Outlook is neutral. Mixed signals with no clear directional bias. Stable factors dominate.';
   }
 
-  private classifySignals(signals: NarrativeSignal[]) {
+  private classifySignals(signals: NarrativeSignal[]): { strengthening: NarrativeSignal[]; weakening: NarrativeSignal[]; contradictory: NarrativeSignal[] } {
     const strengthening = signals.filter(s => s.direction === 'improving');
     const weakening = signals.filter(s => s.direction === 'deteriorating');
-    const contradictory = [];
+    const contradictory: NarrativeSignal[] = [];
 
     // Contradictory: strong improving + strong deteriorating simultaneously
     if (strengthening.some(s => s.strength === 'strong') && weakening.some(s => s.strength === 'strong')) {

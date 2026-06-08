@@ -1,0 +1,316 @@
+src/backend/web/routes/intelligence.ts(284,46): error TS7006: Parameter 'h' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(286,35): error TS7006: Parameter 'curr' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(346,45): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(376,35): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(423,29): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(853,48): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(860,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(899,37): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backend/web/routes/intelligence.ts(914,33): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backend/web/routes/system.ts(7,43): error TS2307: Cannot find module 'express' or its corresponding type declarations.
+src/backend/web/routes/system.ts(8,10): error TS2724: '"../../../ops/SystemHealthEngine"' has no exported member named 'getSystemHealthEngine'. Did you mean 'SystemHealthEngine'?
+src/backend/web/routes/system.ts(11,10): error TS2724: '"../../../explainability/RankingExplanationEngine"' has no exported member named 'getRankingExplanationEngine'. Did you mean 'RankingExplanationEngine'?
+src/backtest/BenchmarkEngine.ts(146,38): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/backtest/PortfolioSimulator.ts(57,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/backtest/PortfolioSimulator.ts(202,51): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/calibration/DynamicWeightEngine.ts(111,41): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/calibration/EngineCalibrationEngine.ts(114,20): error TS2488: Type 'Promise<CalibrationIssue[]>' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/calibration/EngineCalibrationEngine.ts(307,43): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/calibration/EngineCalibrationEngine.ts(313,46): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/calibration/EngineCalibrationEngine.ts(313,51): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/monitoring/RankingHealthMonitor.ts(46,28): error TS2552: Cannot find name 'averageScore'. Did you mean 'avgScore'?
+src/portfolio/PortfolioConstructionEngine.ts(95,51): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/portfolio/PortfolioConstructionEngine.ts(150,48): error TS7006: Parameter 'sym' implicitly has an 'any' type.
+src/predictions/BenchmarkTracker.ts(85,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/predictions/DailyPredictionCapture.ts(143,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/predictions/EngineAttributionAnalyzer.ts(24,22): error TS2322: Type '"quality_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(25,21): error TS2322: Type '"growth_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(26,20): error TS2322: Type '"value_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(27,23): error TS2322: Type '"momentum_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(28,19): error TS2322: Type '"risk_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(29,21): error TS2322: Type '"sector_score"' is not assignable to type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"'.
+src/predictions/EngineAttributionAnalyzer.ts(64,23): error TS7053: Element implicitly has an 'any' type because expression of type 'number | unique symbol | "repeat" | "charAt" | "charCodeAt" | "concat" | "indexOf" | "lastIndexOf" | "localeCompare" | "match" | "replace" | "search" | "slice" | "split" | "substring" | ... 35 more ... | "valueOf"' can't be used to index type 'PredictionRecord'.
+  No index signature with a parameter of type 'number' was found on type 'PredictionRecord'.
+src/predictions/HistoricalRankingRebuilder.ts(158,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/predictions/PredictionFactory.ts(33,40): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/predictions/PredictionRegistry.ts(292,28): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/providers/yfinance/CorporateActionsEngine.ts(274,37): error TS7016: Could not find a declaration file for module 'yfinance'. 'C:/Users/Samvidh/OneDrive/Desktop/STOCKSTORY/node_modules/yfinance/dist/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/yfinance` if it exists or add a new declaration (.d.ts) file containing `declare module 'yfinance';`
+src/providers/yfinance/DailyMarketUpdater.ts(8,16): error TS7016: Could not find a declaration file for module 'yfinance'. 'C:/Users/Samvidh/OneDrive/Desktop/STOCKSTORY/node_modules/yfinance/dist/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/yfinance` if it exists or add a new declaration (.d.ts) file containing `declare module 'yfinance';`
+src/providers/yfinance/DailyMarketUpdater.ts(128,57): error TS2576: Property 'toYahooSymbol' does not exist on type 'IndianSymbolMapper'. Did you mean to access the static member 'IndianSymbolMapper.toYahooSymbol' instead?
+src/providers/yfinance/DailyMarketUpdater.ts(135,32): error TS2576: Property 'toYahooSymbol' does not exist on type 'IndianSymbolMapper'. Did you mean to access the static member 'IndianSymbolMapper.toYahooSymbol' instead?
+src/providers/yfinance/DailyMarketUpdater.ts(373,33): error TS2339: Property 'getUniverseSymbols' does not exist on type 'IndianSymbolMapper'.
+src/providers/yfinance/DailyMarketUpdater.ts(374,39): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/providers/yfinance/DailyMarketUpdater.ts(374,57): error TS2576: Property 'toYahooSymbol' does not exist on type 'IndianSymbolMapper'. Did you mean to access the static member 'IndianSymbolMapper.toYahooSymbol' instead?
+src/providers/yfinance/HistoricalUniversePopulator.ts(64,33): error TS2554: Expected 2 arguments, but got 0.
+src/providers/yfinance/HistoricalUniversePopulator.ts(200,44): error TS2339: Property 'downloadBatch' does not exist on type 'YFinanceBatchProvider'.
+src/providers/yfinance/HistoricalUniversePopulator.ts(233,11): error TS2322: Type 'BackfillSymbolResult' is not assignable to type 'number'.
+src/providers/yfinance/HistoricalUniversePopulator.ts(233,65): error TS2345: Argument of type 'any[]' is not assignable to parameter of type '"1D" | "1W" | "1M" | "3M" | "1Y" | "5Y" | "6M" | "Max"'.
+src/providers/yfinance/HistoricalUniversePopulator.ts(245,53): error TS2339: Property 'computeQualityScore' does not exist on type 'MarketDataIntegrityEngine'.
+src/providers/yfinance/YFinanceBatchProvider.ts(12,16): error TS7016: Could not find a declaration file for module 'yfinance'. 'C:/Users/Samvidh/OneDrive/Desktop/STOCKSTORY/node_modules/yfinance/dist/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/yfinance` if it exists or add a new declaration (.d.ts) file containing `declare module 'yfinance';`
+src/providers/yfinance/YFinanceProvider.ts(11,16): error TS7016: Could not find a declaration file for module 'yfinance'. 'C:/Users/Samvidh/OneDrive/Desktop/STOCKSTORY/node_modules/yfinance/dist/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/yfinance` if it exists or add a new declaration (.d.ts) file containing `declare module 'yfinance';`
+src/scripts/calibrate.ts(78,52): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate.ts(87,50): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate.ts(96,56): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate.ts(151,23): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate.ts(152,17): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate.ts(153,20): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate.ts(154,27): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate.ts(157,19): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/calibrate.ts(157,45): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/calibrate.ts(158,20): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/calibrate.ts(158,47): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/calibrate.ts(159,26): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/calibrate.ts(159,60): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/calibrate.ts(160,29): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/calibrate.ts(160,66): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/calibrate.ts(161,19): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/calibrate.ts(161,45): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/calibrate.ts(162,19): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/calibrate.ts(162,45): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/calibrate.ts(163,30): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/calibrate.ts(163,68): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/calibrate.ts(164,24): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/calibrate.ts(164,55): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/calibrate.ts(165,26): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/calibrate.ts(165,59): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/calibrate.ts(166,32): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/calibrate.ts(166,72): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/calibrate.ts(167,37): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/calibrate.ts(167,83): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/calibrate.ts(168,29): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/calibrate.ts(168,66): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/calibrate.ts(171,36): error TS2339: Property 'quality_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(172,34): error TS2339: Property 'value_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(173,35): error TS2339: Property 'growth_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(174,37): error TS2339: Property 'momentum_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(175,33): error TS2339: Property 'risk_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(176,43): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(177,34): error TS2339: Property 'factor_score' does not exist on type '{}'.
+src/scripts/calibrate.ts(180,22): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(180,52): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(181,22): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(181,52): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(182,18): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/calibrate.ts(182,43): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/calibrate.ts(183,28): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/calibrate.ts(183,64): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/calibrate.ts(184,19): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/calibrate.ts(184,45): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/calibrate.ts(185,24): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/calibrate.ts(185,56): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/calibrate.ts(186,24): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/calibrate.ts(186,56): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/calibrate.ts(187,23): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/calibrate.ts(187,54): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/calibrate.ts(188,23): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/calibrate.ts(188,54): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/calibrate.ts(189,18): error TS2339: Property 'roa' does not exist on type '{}'.
+src/scripts/calibrate.ts(189,43): error TS2339: Property 'roa' does not exist on type '{}'.
+src/scripts/calibrate.ts(190,18): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/calibrate.ts(190,43): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/calibrate.ts(191,19): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/calibrate.ts(191,45): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/calibrate.ts(192,27): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/calibrate.ts(192,63): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/calibrate.ts(193,27): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(193,62): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/calibrate.ts(194,28): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(194,64): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(195,27): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(195,62): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(196,24): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(196,56): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(197,24): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(197,56): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/calibrate.ts(198,26): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/calibrate.ts(198,60): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/calibrate.ts(199,30): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/calibrate.ts(199,68): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/calibrate.ts(219,30): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/calibrate.ts(219,75): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(102,52): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate_v2.ts(111,50): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate_v2.ts(120,56): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/calibrate_v2.ts(172,23): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(173,17): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(174,20): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(175,27): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(178,19): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(178,45): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(179,20): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(179,47): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(180,26): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(180,60): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(181,29): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(181,66): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(182,19): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(182,45): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(183,19): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(183,45): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(184,30): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(184,68): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(185,24): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(185,55): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(186,26): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(186,59): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(187,32): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(187,72): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(188,37): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(188,83): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(189,29): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(189,66): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(192,36): error TS2339: Property 'quality_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(193,34): error TS2339: Property 'value_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(194,35): error TS2339: Property 'growth_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(195,37): error TS2339: Property 'momentum_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(196,33): error TS2339: Property 'risk_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(197,43): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(198,34): error TS2339: Property 'factor_score' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(201,22): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(201,52): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(202,22): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(202,52): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(203,18): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(203,43): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(204,28): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(204,64): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(205,19): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(205,45): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(206,24): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(206,56): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(207,24): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(207,56): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(208,23): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(208,54): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(209,23): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(209,54): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(210,18): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(210,43): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(211,19): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(211,45): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(212,27): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(212,63): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(213,27): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(213,62): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(214,28): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(214,64): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(215,27): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(215,62): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(216,24): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(216,56): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(217,24): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(217,56): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(218,26): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(218,60): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(219,30): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(219,68): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(239,30): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/calibrate_v2.ts(239,75): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(30,52): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/run-explainability-pipeline.ts(39,50): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/run-explainability-pipeline.ts(48,56): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/run-explainability-pipeline.ts(100,23): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(101,17): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(102,20): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(103,27): error TS2339: Property 'trade_date' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(106,19): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(106,45): error TS2339: Property 'rsi' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(107,20): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(107,47): error TS2339: Property 'macd' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(108,26): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(108,60): error TS2339: Property 'macd_signal' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(109,29): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(109,66): error TS2339: Property 'macd_histogram' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(110,19): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(110,45): error TS2339: Property 'adx' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(111,19): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(111,45): error TS2339: Property 'atr' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(112,30): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(112,68): error TS2339: Property 'bollinger_width' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(113,24): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(113,55): error TS2339: Property 'momentum' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(114,26): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(114,59): error TS2339: Property 'volatility' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(115,32): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(115,72): error TS2339: Property 'relative_strength' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(116,37): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(116,83): error TS2339: Property 'moving_average_distance' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(117,29): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(117,66): error TS2339: Property 'trend_strength' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(120,36): error TS2339: Property 'quality_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(121,34): error TS2339: Property 'value_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(122,35): error TS2339: Property 'growth_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(123,37): error TS2339: Property 'momentum_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(124,33): error TS2339: Property 'risk_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(125,43): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(126,34): error TS2339: Property 'factor_score' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(129,22): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(129,52): error TS2339: Property 'pe_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(130,22): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(130,52): error TS2339: Property 'pb_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(131,18): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(131,43): error TS2339: Property 'eps' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(132,28): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(132,64): error TS2339: Property 'dividend_yield' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(133,19): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(133,45): error TS2339: Property 'beta' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(134,24): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(134,56): error TS2339: Property 'market_cap' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(135,24): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(135,56): error TS2339: Property 'free_float' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(136,23): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(136,54): error TS2339: Property 'fcf_yield' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(137,23): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(137,54): error TS2339: Property 'ev_ebitda' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(138,18): error TS2339: Property 'roa' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(138,43): error TS2339: Property 'roa' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(139,18): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(139,43): error TS2339: Property 'roe' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(140,19): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(140,45): error TS2339: Property 'roic' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(141,27): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(141,63): error TS2339: Property 'debt_to_equity' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(142,27): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(142,62): error TS2339: Property 'current_ratio' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(143,28): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(143,64): error TS2339: Property 'revenue_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(144,27): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(144,62): error TS2339: Property 'profit_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(145,24): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(145,56): error TS2339: Property 'eps_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(146,24): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(146,56): error TS2339: Property 'fcf_growth' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(147,26): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(147,60): error TS2339: Property 'gross_margin' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(148,30): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(148,68): error TS2339: Property 'operating_margin' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(168,30): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/run-explainability-pipeline.ts(168,75): error TS2339: Property 'sector_strength_factor' does not exist on type '{}'.
+src/scripts/run-research-validation.ts(147,16): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/scripts/run-research-validation.ts(160,30): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/scripts/run-research-validation.ts(177,19): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/services/FactorBacktestEngine.ts(55,21): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/services/FactorBacktestEngine.ts(55,24): error TS7006: Parameter 'idx' implicitly has an 'any' type.
+src/services/FactorEngine.ts(96,36): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(65,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(66,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(67,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(68,27): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(69,29): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(70,30): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(210,35): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(210,38): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(211,39): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(211,42): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(248,36): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/services/FeatureEngine.ts(248,39): error TS7006: Parameter 'b' implicitly has an 'any' type.
+src/services/FeatureImportanceEngine.ts(52,21): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/services/FeatureImportanceEngine.ts(52,24): error TS7006: Parameter 'idx' implicitly has an 'any' type.
+src/services/MarketIntelligenceEngine.ts(70,7): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/statements/TTMCalculator.ts(91,35): error TS7006: Parameter 'q' implicitly has an 'any' type.
+src/statements/TTMCalculator.ts(91,57): error TS7006: Parameter 'v' implicitly has an 'any' type.
+

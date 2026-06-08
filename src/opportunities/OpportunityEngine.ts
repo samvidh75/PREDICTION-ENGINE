@@ -93,17 +93,8 @@ export class OpportunityEngine {
       }
     }
 
-    // Persist opportunities
-    try {
-      for (const o of opps) {
-        await pool.query(
-          `INSERT INTO prediction_registry (id, symbol, prediction_date, ranking_score, classification, created_by)
-           VALUES ($1, $2, CURRENT_DATE, $3, $4, $5)
-           ON CONFLICT (symbol, prediction_date, prediction_horizon) DO NOTHING`,
-          [crypto.randomUUID(), o.symbol, o.score, 'Fair', `opportunity:${o.category}`]
-        );
-      }
-    } catch { /* best-effort persistence */ }
+    // TRACK-71: Opportunities are returned to caller.
+    // No prediction_registry writes — that is PredictionRegistry's responsibility.
 
     return opps;
   }

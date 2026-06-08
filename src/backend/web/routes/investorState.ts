@@ -124,10 +124,10 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
       `SELECT watchlists FROM investor_state WHERE user_id = $1`,
       [uid]
     );
-    let watchlists = [];
+    let watchlists: any[] = [];
     if (stateRes.rows.length > 0) {
       const w = stateRes.rows[0].watchlists;
-      watchlists = typeof w === "string" ? JSON.parse(w) : w;
+      watchlists = typeof w === "string" ? JSON.parse(w) : (w as any[]);
     }
 
     const nextWatchlist = {
@@ -233,10 +233,10 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
       `SELECT alerts FROM investor_state WHERE user_id = $1`,
       [uid]
     );
-    let alerts = [];
+    let alerts: any[] = [];
     if (stateRes.rows.length > 0) {
       const a = stateRes.rows[0].alerts;
-      alerts = typeof a === "string" ? JSON.parse(a) : a;
+      alerts = typeof a === "string" ? JSON.parse(a) : (a as any[]);
     }
 
     const nextAlert = {

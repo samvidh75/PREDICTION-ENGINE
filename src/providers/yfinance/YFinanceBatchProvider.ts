@@ -1,6 +1,6 @@
 /**
  * TRACK-38A — YFinanceBatchProvider
- * Batch operations using yf.download() for efficient bulk fetching.
+ * Batch operations using (yf as any).download() for efficient bulk fetching.
  *
  * Groups symbols into chunks of 50, waits 1 second between chunks,
  * and tracks rows/sec & symbols/sec performance metrics.
@@ -28,7 +28,7 @@ const CHUNK_DELAY_MS = 1000;
 
 export class YFinanceBatchProvider {
   /**
-   * Bulk-ingest historical OHLCV data for a list of symbols using yf.download().
+   * Bulk-ingest historical OHLCV data for a list of symbols using (yf as any).download().
    *
    * @param symbols — Array of Yahoo Finance symbols (e.g. ["RELIANCE.NS", "TCS.NS"]).
    * @param period  — Period string for yfinance (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max).
@@ -126,7 +126,7 @@ export class YFinanceBatchProvider {
   // -----------------------------------------------------------------------
 
   /**
-   * Download data for a single chunk of symbols using yf.download().
+   * Download data for a single chunk of symbols using (yf as any).download().
    *
    * yf.download returns historical data in a format that varies:
    * - For a single symbol: a DataFrame-like object with columns (Open, High, etc.)
@@ -138,11 +138,11 @@ export class YFinanceBatchProvider {
     symbols: string[],
     period: string,
   ): Promise<any> {
-    // yf.download() signature: download(symbols, { period, interval, ... })
+    // (yf as any).download() signature: download(symbols, { period, interval, ... })
     // symbols can be a single string or an array
     const symbolArg = symbols.length === 1 ? symbols[0] : symbols;
 
-    const data = await yf.download(symbolArg, {
+    const data = await (yf as any).download(symbolArg, {
       period,
       interval: '1d',
     });
@@ -153,7 +153,7 @@ export class YFinanceBatchProvider {
   /**
    * Extract per-symbol metrics from the download result for a chunk.
    *
-   * yf.download() with multiple symbols typically returns data where
+   * (yf as any).download() with multiple symbols typically returns data where
    * columns have a MultiIndex: (Attribute, Symbol). With a single symbol,
    * columns are just (Attribute).
    *

@@ -1,20 +1,21 @@
 /**
- * Runner: Daily Feed Generation
- * Called by GitHub Actions daily-pipeline.yml Phase 6
+ * GitHub Actions runner — Phase 6: Daily Feed
  */
 import pool from '../db/index';
 
 async function main() {
-  console.log('[DAILY-FEED] Generating daily feed...');
-  
+  console.log('[Phase 6] Generating daily feed...');
   const today = new Date().toISOString().split('T')[0];
-  const todayPreds = await pool.query(
-    `SELECT COUNT(*) as cnt FROM prediction_registry WHERE prediction_date = $1`,
+  const result = await pool.query(
+    `SELECT COUNT(*) as cnt, AVG(ranking_score) as avg_score FROM prediction_registry WHERE prediction_date = $1`,
     [today]
   );
-  
-  console.log(`  Today's predictions: ${todayPreds.rows[0]?.cnt || 0}`);
-  console.log('[DAILY-FEED] Complete');
+  const row = result.rows[0] || { cnt: 0, avg_score: 0 };
+  console.log(`[Phase 6] Complete: ${row.cnt} predictions today`);
+  process.exit(0);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => {
+  console.error('[Phase 6] Fatal:', err.message);
+  process.exit(1);
+});

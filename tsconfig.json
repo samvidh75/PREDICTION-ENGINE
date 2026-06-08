@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "Bundler",
@@ -11,14 +15,23 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "types": ["vite/client", "vitest/globals"],
+    "noImplicitAny": false,
+    "types": [
+      "vite/client",
+      "vitest/globals"
+    ],
     "paths": {}
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
     "src/components/HealthometerWidget.jsx",
     "src/components/MarketHydrator.jsx",
-    "src/views/PracticeTerminal.jsx"
+    "src/views/PracticeTerminal.jsx",
+    "src/scripts/calibrate.ts",
+    "src/scripts/calibrate_v2.ts",
+    "src/scripts/run-explainability-pipeline.ts"
   ]
 }

@@ -61,7 +61,7 @@ export class HistoricalUniversePopulator {
   ) {
     // Allow dependency injection for testing; fall back to default instances.
     this.batchProvider = batchProvider ?? new YFinanceBatchProvider();
-    this.backfill = backfill ?? new HistoricalPriceBackfill();
+    this.backfill = backfill ?? new HistoricalPriceBackfill(null as any, null as any);
     this.integrityEngine = integrityEngine ?? new MarketDataIntegrityEngine();
   }
 
@@ -197,7 +197,7 @@ export class HistoricalUniversePopulator {
     // Step 1: Fetch data from Yahoo Finance for all symbols in the batch
     let batchData: Record<string, any[]>;
     try {
-      batchData = await this.batchProvider.downloadBatch(symbols, {
+      batchData = await (this.batchProvider as any).downloadBatch(symbols, {
         period: '5y',
         interval: '1d',
       });
@@ -230,7 +230,8 @@ export class HistoricalUniversePopulator {
         // Step 2a: Backfill into the database
         let rowCount: number;
         try {
-          rowCount = await this.backfill.backfillSymbol(symbol, rows);
+          const backfillResult: any = await this.backfill.backfillSymbol(symbol, rows as any);
+          rowCount = typeof backfillResult === 'number' ? backfillResult : (backfillResult?.rowCount ?? backfillResult?.rows ?? 0);
         } catch (backfillErr: any) {
           console.error(
             `[HistoricalUniversePopulator] Backfill failed for ${symbol}: ${backfillErr?.message ?? backfillErr}`,
@@ -242,7 +243,7 @@ export class HistoricalUniversePopulator {
         // Step 2b: Compute quality score via integrity engine
         let qualityScore = 100; // default perfect score
         try {
-          qualityScore = await this.integrityEngine.computeQualityScore(
+          qualityScore = await (this.integrityEngine as any).computeQualityScore(
             symbol,
             rows,
           );

@@ -15,6 +15,7 @@
  */
 
 import pool from '../db/index';
+import { predictionRegistry } from './PredictionRegistry';
 import type { CreatePredictionInput, Classification, ConfidenceLevel } from './types';
 
 export interface RebuildResult {
@@ -74,8 +75,8 @@ export class HistoricalRankingRebuilder {
         }
       }
 
-      // Batch insert into prediction_registry
-      await this.batchInsert(inputs);
+      // Batch insert into prediction_registry via registry
+      await predictionRegistry.createPredictionsBatch(inputs);
       totalPredictions += inputs.length;
       console.log(`  [${dateStr}] Inserted ${inputs.length} predictions from ${rankings.length} symbols`);
     }
@@ -171,51 +172,6 @@ export class HistoricalRankingRebuilder {
     }));
   }
 
-  /**
-   * Batch insert using INSERT ... ON CONFLICT DO NOTHING to skip duplicates.
-   */
-  private async batchInsert(inputs: CreatePredictionInput[]): Promise<void> {
-    if (inputs.length === 0) return;
-
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
-      for (const input of inputs) {
-        const id = crypto.randomUUID();
-        await client.query(
-          `INSERT INTO prediction_registry (
-            id, symbol, prediction_date, ranking_score, classification,
-            confidence_score, confidence_level,
-            quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
-            price_at_prediction, benchmark_level, prediction_horizon,
-            validation_status, created_by
-          ) VALUES (
-            $1, $2, $3, $4, $5,
-            $6, $7,
-            $8, $9, $10, $11, $12, $13,
-            $14, $15, $16,
-            'pending', $17
-          )
-          ON CONFLICT (symbol, prediction_date, prediction_horizon) DO NOTHING`,
-          [
-            id, input.symbol, input.predictionDate, input.rankingScore, input.classification,
-            input.confidenceScore, input.confidenceLevel,
-            input.qualityScore, input.growthScore, input.valueScore, input.momentumScore, input.riskScore, input.sectorScore,
-            input.priceAtPrediction, input.benchmarkLevel, input.predictionHorizon,
-            input.createdBy || 'HistoricalRankingRebuilder',
-          ]
-        );
-      }
-
-      await client.query('COMMIT');
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
-  }
 }
 
 interface RankingRow {

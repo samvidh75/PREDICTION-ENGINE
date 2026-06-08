@@ -1,35 +1,30 @@
 /**
- * Runner: Trust Metrics Refresh
- * Called by GitHub Actions daily-pipeline.yml Phase 5
+ * GitHub Actions runner — Phase 5: Trust Metrics Refresh
  */
-import pool from '../db/index';
+import { outcomeRepository } from '../data/OutcomeRepository';
+import fs from 'fs';
+import path from 'path';
 
 async function main() {
-  console.log('[TRUST-METRICS] Computing trust metrics...');
-  
-  const validated = await pool.query(
-    `SELECT COUNT(*) as cnt FROM prediction_registry WHERE validation_status = 'validated'`
-  );
-  const total = await pool.query(`SELECT COUNT(*) as cnt FROM prediction_registry`);
-  
-  console.log(`  Validated: ${validated.rows[0]?.cnt || 0}`);
-  console.log(`  Total: ${total.rows[0]?.cnt || 0}`);
-  
-  // Compute hit rates by horizon
-  const hitRates = await pool.query(`
-    SELECT prediction_horizon,
-           SUM(CASE WHEN alpha > 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as hit_rate,
-           COUNT(*) as n
-    FROM prediction_registry
-    WHERE validation_status = 'validated' AND alpha IS NOT NULL
-    GROUP BY prediction_horizon
-    ORDER BY prediction_horizon
-  `);
-  
-  console.log('  Hit rates by horizon:');
-  hitRates.rows.forEach((r: any) => console.log(`    ${r.prediction_horizon}d: ${parseFloat(r.hit_rate).toFixed(1)}% (n=${r.n})`));
-  
-  console.log('[TRUST-METRICS] Complete');
+  console.log('[Phase 5] Computing trust metrics...');
+  const summaries = await outcomeRepository.getAllSummaries();
+  const totalValidated = await outcomeRepository.countValidated();
+  const metrics: any = { generatedAt: new Date().toISOString(), totalValidatedPredictions: totalValidated, horizons: {} };
+  for (const s of summaries) {
+    metrics.horizons[`${s.horizonDays}d`] = {
+      total: s.totalPredictions, validated: s.validatedCount,
+      hitRate: s.hitRate, meanAlpha: s.meanAlpha, sharpeRatio: s.sharpeRatio,
+      ci95: s.ci95Low !== null ? [s.ci95Low, s.ci95High] : null,
+    };
+  }
+  const trustDir = path.join(process.cwd(), 'public', 'trust');
+  if (!fs.existsSync(trustDir)) fs.mkdirSync(trustDir, { recursive: true });
+  fs.writeFileSync(path.join(trustDir, 'live-metrics.json'), JSON.stringify(metrics, null, 2), 'utf-8');
+  console.log(`[Phase 5] Complete: ${totalValidated} validated predictions`);
+  process.exit(0);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => {
+  console.error('[Phase 5] Fatal:', err.message);
+  process.exit(1);
+});

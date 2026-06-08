@@ -43,7 +43,7 @@ export class RankingHealthMonitor {
       avgScore = r.rows[0]?.av ? Math.round(parseFloat(r.rows[0].av) * 100) / 100 : null;
     } catch {}
 
-    if (symbolCount > 0 && averageScore != null) {
+    if (symbolCount > 0 && avgScore != null) {
       return { status: 'ONLINE', lastRankingDate, symbolCount, avgScore, warnings };
     }
     if (symbolCount > 0) {

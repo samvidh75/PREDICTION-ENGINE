@@ -193,7 +193,7 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
   // GET /api/intelligence/portfolio
   app.get("/api/intelligence/portfolio", async (request, reply) => {
     const query = request.query as any;
-    let positions = [];
+    let positions: Array<{ symbol: string; weight: number }> = [];
     if (query.positions) {
       try {
         positions = typeof query.positions === "string" ? JSON.parse(query.positions) : query.positions;
@@ -715,8 +715,6 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       }
 
       return catalysts.slice(0, 4);
-<<<<<<< HEAD
-=======
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
@@ -878,251 +876,12 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       const storyResult = stockStoryEngine.evaluate(engineInputs);
       intelligenceCache.set(cacheKey, storyResult);
       return storyResult;
->>>>>>> f673e8a2b71d5a35ac171e4be581dab2204d19d2
     } catch (err: any) {
       reply.status(500).send({ error: err.message });
     }
   });
 
-<<<<<<< HEAD
-  // GET /api/stockstory/:symbol
-  // Full StockStory 7-engine evaluation
-  app.get("/api/stockstory/:symbol", async (request, reply) => {
-    const { symbol } = request.params as { symbol: string };
-    const sym = symbol.toUpperCase().trim();
-
-    const cacheKey = `stockstory:${sym}`;
-    const cached = intelligenceCache.get(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    try {
-      // Fetch symbol metadata
-      const symInfo = await pool.query(
-        `SELECT sector FROM symbols WHERE symbol = $1`,
-        [sym]
-      );
-      const sector = symInfo.rows[0]?.sector || "Technology";
-
-      // Fetch latest features
-      const featRes = await pool.query(
-        `SELECT * FROM feature_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 1`,
-        [sym]
-      );
-
-      // Fetch latest factors
-      const factRes = await pool.query(
-        `SELECT * FROM factor_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 1`,
-        [sym]
-      );
-
-      // Fetch financial data
-      const finRes = await pool.query(
-        `SELECT * FROM financial_snapshots WHERE symbol = $1 ORDER BY period_end DESC LIMIT 1`,
-        [sym]
-      );
-
-      // Fetch historical features for trend analysis (last 30)
-      const histFeatRes = await pool.query(
-        `SELECT trade_date, rsi, macd_histogram, adx, volatility
-         FROM feature_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 30`,
-        [sym]
-      );
-
-      // Fetch historical factors for stability analysis (last 15)
-      const histFactRes = await pool.query(
-        `SELECT trade_date, factor_score, quality_factor, risk_factor, growth_factor
-         FROM factor_snapshots WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 15`,
-        [sym]
-      );
-
-      let feat = featRes.rows[0];
-      const fact = factRes.rows[0];
-      const fin = finRes.rows[0];
-
-      if (!feat || feat.rsi == null || feat.macd == null || feat.atr == null || feat.momentum == null || feat.volatility == null) {
-        // Feature snapshots unavailable — return null technical fields.
-        // No live indicator calculation. FeatureEngine is the sole source of truth.
-        feat = {
-          trade_date: new Date().toISOString().split("T")[0],
-          rsi: null,
-          macd: null,
-          macd_signal: null,
-          macd_histogram: null,
-          adx: null,
-          atr: null,
-          bollinger_width: null,
-          momentum: null,
-          volatility: null,
-          relative_strength: null,
-          moving_average_distance: null,
-          trend_strength: null,
-        };
-      }
-
-      // Build EngineInputs from database data
-      const engineInputs = {
-        symbol: sym,
-        tradeDate: fact?.trade_date
-          ? (fact.trade_date instanceof Date
-              ? fact.trade_date.toISOString().split("T")[0]
-              : String(fact.trade_date).split("T")[0])
-          : new Date().toISOString().split("T")[0],
-        features: {
-          rsi: feat?.rsi != null ? Number(feat.rsi) : null,
-          macd: feat?.macd != null ? Number(feat.macd) : null,
-          macdSignal: feat?.macd_signal != null ? Number(feat.macd_signal) : null,
-          macdHistogram: feat?.macd_histogram != null ? Number(feat.macd_histogram) : null,
-          adx: feat?.adx != null ? Number(feat.adx) : null,
-          atr: feat?.atr != null ? Number(feat.atr) : null,
-          bollingerWidth: feat?.bollinger_width != null ? Number(feat.bollinger_width) : null,
-          momentum: feat?.momentum != null ? Number(feat.momentum) : null,
-          volatility: feat?.volatility != null ? Number(feat.volatility) : null,
-          relativeStrength: feat?.relative_strength != null ? Number(feat.relative_strength) : null,
-          movingAverageDistance: feat?.moving_average_distance != null ? Number(feat.moving_average_distance) : null,
-          trendStrength: feat?.trend_strength != null ? Number(feat.trend_strength) : null,
-        },
-        factors: {
-          qualityFactor: fact ? Number(fact.quality_factor) : 50,
-          valueFactor: fact ? Number(fact.value_factor) : 50,
-          growthFactor: fact ? Number(fact.growth_factor) : 50,
-          momentumFactor: fact ? Number(fact.momentum_factor) : 50,
-          riskFactor: fact ? Number(fact.risk_factor) : 50,
-          sectorStrengthFactor: fact ? Number(fact.sector_strength_factor) : 50,
-          factorScore: fact ? Number(fact.factor_score) : 50,
-        },
-        financials: {
-          peRatio: fin?.pe_ratio != null ? Number(fin.pe_ratio) : null,
-          pbRatio: fin?.pb_ratio != null ? Number(fin.pb_ratio) : null,
-          eps: fin?.eps != null ? Number(fin.eps) : null,
-          dividendYield: fin?.dividend_yield != null ? Number(fin.dividend_yield) : null,
-          beta: fin?.beta != null ? Number(fin.beta) : null,
-          marketCap: fin?.market_cap != null ? Number(fin.market_cap) : null,
-          freeFloat: fin?.free_float != null ? Number(fin.free_float) : null,
-          fcfYield: fin?.fcf_yield != null ? Number(fin.fcf_yield) : null,
-          evEbitda: fin?.ev_ebitda != null ? Number(fin.ev_ebitda) : null,
-          roa: fin?.roa != null ? Number(fin.roa) : null,
-          roe: fin?.roe != null ? Number(fin.roe) : null,
-          roic: fin?.roic != null ? Number(fin.roic) : null,
-          debtToEquity: fin?.debt_to_equity != null ? Number(fin.debt_to_equity) : null,
-          currentRatio: fin?.current_ratio != null ? Number(fin.current_ratio) : null,
-          revenueGrowth: fin?.revenue_growth != null ? Number(fin.revenue_growth) : null,
-          profitGrowth: fin?.profit_growth != null ? Number(fin.profit_growth) : null,
-          epsGrowth: fin?.eps_growth != null ? Number(fin.eps_growth) : null,
-          fcfGrowth: fin?.fcf_growth != null ? Number(fin.fcf_growth) : null,
-          grossMargin: fin?.gross_margin != null ? Number(fin.gross_margin) : null,
-          operatingMargin: fin?.operating_margin != null ? Number(fin.operating_margin) : null,
-        },
-        historical: {
-          featureHistory: histFeatRes.rows.map(r => ({
-            tradeDate: r.trade_date instanceof Date ? r.trade_date.toISOString().split("T")[0] : String(r.trade_date).split("T")[0],
-            rsi: r.rsi != null ? Number(r.rsi) : 50,
-            macdHistogram: r.macd_histogram != null ? Number(r.macd_histogram) : 0,
-            adx: r.adx != null ? Number(r.adx) : 25,
-            volatility: r.volatility != null ? Number(r.volatility) : 0.25,
-          })),
-          factorHistory: histFactRes.rows.map(r => ({
-            tradeDate: r.trade_date instanceof Date ? r.trade_date.toISOString().split("T")[0] : String(r.trade_date).split("T")[0],
-            factorScore: Number(r.factor_score),
-            qualityFactor: Number(r.quality_factor),
-            riskFactor: Number(r.risk_factor),
-            growthFactor: Number(r.growth_factor),
-          })),
-        },
-        sector: {
-          name: sector,
-          sectorStrength: fact?.sector_strength_factor != null ? Number(fact.sector_strength_factor) : 50,
-          sectorMomentum: "Steady" as const,
-        },
-      };
-
-      // Run the StockStory engine
-      const storyResult = stockStoryEngine.evaluate(engineInputs);
-      intelligenceCache.set(cacheKey, storyResult);
-      return storyResult;
-    } catch (err: any) {
-      reply.status(500).send({ error: err.message });
-    }
-  });
-
-    // GET /api/predictions/journal
-  // Returns all prediction records with optional symbol filter
-  app.get("/api/predictions/journal", async (request, reply) => {
-    try {
-      const query = request.query as any;
-      let sql = `SELECT * FROM prediction_registry WHERE 1=1`;
-      const params: any[] = [];
-
-      if (query.symbol) {
-        params.push(query.symbol.toUpperCase().trim());
-        sql += ` AND symbol = $${params.length}`;
-      }
-
-      sql += ` ORDER BY prediction_date DESC LIMIT 100`;
-      const result = await pool.query(sql, params);
-
-      return result.rows.map(row => ({
-        id: row.id,
-        symbol: row.symbol,
-        prediction_date: row.prediction_date instanceof Date ? row.prediction_date.toISOString().split('T')[0] : String(row.prediction_date),
-        ranking_score: Number(row.ranking_score),
-        classification: row.classification,
-        confidence_score: Number(row.confidence_score),
-        confidence_level: row.confidence_level,
-        quality_score: Number(row.quality_score),
-        growth_score: Number(row.growth_score),
-        value_score: Number(row.value_score),
-        momentum_score: Number(row.momentum_score),
-        risk_score: Number(row.risk_score),
-        sector_score: Number(row.sector_score),
-        price_at_prediction: row.price_at_prediction ? Number(row.price_at_prediction) : 0,
-        benchmark_level: row.benchmark_level ? Number(row.benchmark_level) : 0,
-        prediction_horizon: row.prediction_horizon,
-        validation_status: row.validation_status,
-        future_return: row.future_return !== null ? Number(row.future_return) : null,
-        benchmark_return: row.benchmark_return !== null ? Number(row.benchmark_return) : null,
-        alpha: row.alpha !== null ? Number(row.alpha) : null,
-        created_at: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
-      }));
-    } catch (err: any) {
-      reply.status(500).send({ error: err.message });
-    }
-  });
-
-  // GET /api/stockstory/:symbol/predictions
-  // Returns predictions for a specific symbol
-  app.get("/api/stockstory/:symbol/predictions", async (request, reply) => {
-    const { symbol } = request.params as { symbol: string };
-    const sym = symbol.toUpperCase().trim();
-    try {
-      const result = await pool.query(
-        `SELECT * FROM prediction_registry WHERE symbol = $1 ORDER BY prediction_date DESC LIMIT 30`,
-        [sym]
-      );
-
-      return result.rows.map(row => ({
-        id: row.id,
-        symbol: row.symbol,
-        prediction_date: row.prediction_date instanceof Date ? row.prediction_date.toISOString().split('T')[0] : String(row.prediction_date),
-        ranking_score: Number(row.ranking_score),
-        classification: row.classification,
-        confidence_score: Number(row.confidence_score),
-        confidence_level: row.confidence_level,
-        validation_status: row.validation_status,
-        price_at_prediction: row.price_at_prediction ? Number(row.price_at_prediction) : 0,
-        future_return: row.future_return !== null ? Number(row.future_return) : null,
-        alpha: row.alpha !== null ? Number(row.alpha) : null,
-      }));
-    } catch (err: any) {
-      reply.status(500).send({ error: err.message });
-    }
-  });
-
-// GET /api/company/:symbol/timeline
-=======
   // GET /api/company/:symbol/timeline
->>>>>>> f673e8a2b71d5a35ac171e4be581dab2204d19d2
   // Source: corporate_timeline table (populated from structured corporate action data)
   // Falls back to news_articles if timeline table is empty
   app.get("/api/company/:symbol/timeline", async (request, reply) => {

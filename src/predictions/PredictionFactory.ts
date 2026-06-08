@@ -7,6 +7,7 @@
 import pool from '../db/index';
 import { stockStoryEngine } from '../stockstory';
 import { TemporalGuard } from '../validation/TemporalGuard';
+import { predictionRegistry } from './PredictionRegistry';
 import type { CreatePredictionInput } from './types';
 
 export class PredictionFactory {
@@ -71,28 +72,8 @@ export class PredictionFactory {
             createdBy: `PredictionFactory-${this.modelVersion}`,
           };
 
-          const client = await pool.connect();
-          try {
-            const id = crypto.randomUUID();
-            await client.query(
-              `INSERT INTO prediction_registry (
-                id, symbol, prediction_date, ranking_score, classification,
-                confidence_score, confidence_level,
-                quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
-                price_at_prediction, benchmark_level, prediction_horizon,
-                validation_status, created_by
-              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 'pending', $17)`,
-              [id, symbol, today, input.rankingScore, input.classification,
-               input.confidenceScore, input.confidenceLevel,
-               input.qualityScore, input.growthScore, input.valueScore,
-               input.momentumScore, input.riskScore, input.sectorScore,
-               input.priceAtPrediction, input.benchmarkLevel, horizon,
-               input.createdBy]
-            );
-            created++;
-          } finally {
-            client.release();
-          }
+          await predictionRegistry.createPrediction(input);
+          created++;
         } catch (err: any) {
           errors.push(`${symbol}:${horizon} — ${err.message}`);
         }
@@ -143,6 +124,16 @@ export class PredictionFactory {
       }
       if (temporalResult.violations.length > 0) {
         console.warn(`[TemporalGuard] ${symbol}: ${temporalResult.summary}`);
+      }
+
+      // TRACK-71 AGENT E: Temporal integrity — guard quality data
+      const qualityDate = fin?.period_end || null;
+      const qualityGuardResult = TemporalGuard.guardQualityAgainstPrediction(
+        qualityDate, tradeDate, symbol
+      );
+      if (!qualityGuardResult.allowed) {
+        console.warn(`[TemporalGuard-Quality] ${symbol}: ${qualityGuardResult.summary}`);
+        return null; // BLOCK: quality data is future-dated
       }
 
       const engineInputs = {

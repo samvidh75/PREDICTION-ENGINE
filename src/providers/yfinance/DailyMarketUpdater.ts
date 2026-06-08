@@ -68,11 +68,6 @@ const dateRange = (start: string, end: string): string[] => {
 // ---------------------------------------------------------------------------
 
 export class DailyMarketUpdater {
-  private mapper: IndianSymbolMapper;
-
-  constructor(mapper?: IndianSymbolMapper) {
-    this.mapper = mapper ?? new IndianSymbolMapper();
-  }
 
   // ---- detectMissingDays --------------------------------------------------
 
@@ -125,14 +120,14 @@ export class DailyMarketUpdater {
 
     // yfinance download returns an object keyed by symbol → array of rows.
     // The exact shape depends on yfinance@0.1.3 — we handle it defensively.
-    const yahooSymbols = symbols.map((s) => this.mapper.toYahooSymbol(s));
-    const data: any = await yf.download(yahooSymbols, {
+    const yahooSymbols = symbols.map((s) => IndianSymbolMapper.toYahooSymbol(s));
+    const data: any = await (yf as any).download(yahooSymbols, {
       period: '5d',
       interval: '1d',
     });
 
     for (const sym of symbols) {
-      const ySym = this.mapper.toYahooSymbol(sym);
+      const ySym = IndianSymbolMapper.toYahooSymbol(sym);
       const rows: any[] = data?.[ySym] ?? data?.ticker?.[ySym] ?? [];
 
       for (const row of rows) {
@@ -370,8 +365,8 @@ export class DailyMarketUpdater {
     const t0 = Date.now();
 
     // 1. Resolve symbols for the universe.
-    const symbols = this.mapper.getUniverseSymbols(universe);
-    const yahooSymbols = symbols.map((s) => this.mapper.toYahooSymbol(s));
+    const symbols = IndianSymbolMapper.getUniverse(universe);
+    const yahooSymbols = symbols.map((s: string) => IndianSymbolMapper.toYahooSymbol(s));
 
     // 2. Fetch latest candles.
     const records = await this.fetchLatestCandles(symbols);

@@ -111,7 +111,7 @@ export class EngineCalibrationEngine {
     issues.push(...this.detectScoreCompression(withReturns));
 
     // 4. Check sector drift
-    issues.push(...this.detectSectorDrift(withReturns));
+    for (const d of await this.detectSectorDrift(withReturns)) { issues.push(d); }
 
     // Build recommendations based on correlations
     const recommendations = this.buildRecommendations(engineStats, withReturns);

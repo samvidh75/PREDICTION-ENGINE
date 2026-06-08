@@ -1,17 +1,19 @@
 /**
- * Runner: Outcome Validation
- * Called by GitHub Actions daily-pipeline.yml Phase 4
+ * GitHub Actions runner — Phase 4: Outcome Validation
  */
 import { outcomeValidator } from '../validation/OutcomeValidator';
 
 async function main() {
-  console.log('[OUTCOME-VAL] Starting outcome validation...');
+  console.log('[Phase 4] Starting outcome validation...');
   const results = await outcomeValidator.validateAll([30, 90, 180, 365]);
   await outcomeValidator.logRun(results);
-  results.forEach(r => console.log(`  ${r.horizonDays}d: ${r.validated} validated, ${r.skipped} skipped, ${r.errors} errors`));
-  const hasErrors = results.some(r => r.errors > 0);
-  console.log(`[OUTCOME-VAL] Complete — ${hasErrors ? 'PARTIAL' : 'SUCCESS'}`);
-  if (hasErrors) process.exit(1);
+  const totalValidated = results.reduce((sum, r) => sum + r.validated, 0);
+  const totalErrors = results.reduce((sum, r) => sum + r.errors, 0);
+  console.log(`[Phase 4] Complete: ${totalValidated} validated, ${totalErrors} errors`);
+  process.exit(totalErrors > 0 ? 1 : 0);
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => {
+  console.error('[Phase 4] Fatal:', err.message);
+  process.exit(1);
+});

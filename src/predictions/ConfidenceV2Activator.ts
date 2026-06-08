@@ -10,6 +10,8 @@
 
 import pool from '../db/index';
 import { ConfidenceEngineV2 } from '../quality/ConfidenceEngineV2';
+// TRACK-71: This file UPDATEs confidence_score metadata only.
+// Engine scores remain append-only immutable. For outcome writes, use OutcomeRepository.
 
 export class ConfidenceV2Activator {
   private readonly engine = new ConfidenceEngineV2();

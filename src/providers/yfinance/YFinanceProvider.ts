@@ -138,7 +138,7 @@ export class YFinanceProvider implements MarketDataProvider {
 
     try {
       const result = await this.withRetry(async () => {
-        const ticker = yf.Ticker(symbol);
+        const ticker = (yf as any).Ticker(symbol);
         const raw = await ticker.history(period, interval);
         return raw;
       });
@@ -198,7 +198,7 @@ export class YFinanceProvider implements MarketDataProvider {
 
     try {
       const result = await this.withRetry(async () => {
-        const ticker = yf.Ticker(symbol);
+        const ticker = (yf as any).Ticker(symbol);
         // Fetch 5 days to ensure we get the latest trading day
         const raw = await ticker.history('5d', '1d');
         return raw;
@@ -261,7 +261,7 @@ export class YFinanceProvider implements MarketDataProvider {
     try {
       await this.bucket.waitAndConsume();
 
-      const ticker = yf.Ticker(symbol);
+      const ticker = (yf as any).Ticker(symbol);
 
       // Fetch dividends and splits separately — each may fail independently
       let dividendsData: any = null;
@@ -343,7 +343,7 @@ export class YFinanceProvider implements MarketDataProvider {
 
     try {
       const result = await this.withRetry(async () => {
-        const ticker = yf.Ticker(symbol);
+        const ticker = (yf as any).Ticker(symbol);
         const info = await ticker.info();
         return info;
       });
