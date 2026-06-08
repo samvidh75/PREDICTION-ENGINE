@@ -28,6 +28,9 @@ type SectorDistributions = Record<PercentileMetric, MetricDistribution>;
  * Indian market reference distributions.
  * These are empirically derived from NSE-listed company data (2024-2025).
  * Used as fallback when live database queries are unavailable.
+ * 
+ * profitGrowth, fcfGrowth, grossMargin added in TRACK-P1 as provisional values.
+ * SourceDataset: "Original raw dataset not committed; values treated as provisional reference calibration."
  */
 const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
   BANKING: {
@@ -36,6 +39,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.01, p25: 0.04, p50: 0.08, p75: 0.12, p90: 0.15 },
     revenueGrowth:    { p10: -0.02, p25: 0.05, p50: 0.10, p75: 0.16, p90: 0.22 },
     epsGrowth:        { p10: -0.05, p25: 0.03, p50: 0.12, p75: 0.20, p90: 0.30 },
+    profitGrowth:     { p10: -0.08, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.28 },
+    fcfGrowth:        { p10: -0.15, p25: -0.05, p50: 0.05, p75: 0.15, p90: 0.25 },
+    grossMargin:      { p10: 0.40, p25: 0.50, p50: 0.60, p75: 0.70, p90: 0.80 },
     debtToEquity:     { p10: 2.0, p25: 4.0, p50: 7.0, p75: 10.0, p90: 14.0 },
     operatingMargin:  { p10: 0.10, p25: 0.18, p50: 0.25, p75: 0.32, p90: 0.40 },
     currentRatio:     { p10: 0.6, p25: 0.8, p50: 1.0, p75: 1.1, p90: 1.2 },
@@ -51,6 +57,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.08, p25: 0.14, p50: 0.20, p75: 0.26, p90: 0.32 },
     revenueGrowth:    { p10: 0.02, p25: 0.08, p50: 0.14, p75: 0.20, p90: 0.28 },
     epsGrowth:        { p10: -0.02, p25: 0.06, p50: 0.12, p75: 0.18, p90: 0.25 },
+    profitGrowth:     { p10: -0.05, p25: 0.04, p50: 0.10, p75: 0.16, p90: 0.22 },
+    fcfGrowth:        { p10: -0.10, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.25 },
+    grossMargin:      { p10: 0.20, p25: 0.30, p50: 0.40, p75: 0.55, p90: 0.70 },
     debtToEquity:     { p10: 0.0, p25: 0.05, p50: 0.15, p75: 0.40, p90: 0.80 },
     operatingMargin:  { p10: 0.12, p25: 0.18, p50: 0.22, p75: 0.28, p90: 0.35 },
     currentRatio:     { p10: 1.0, p25: 1.5, p50: 2.0, p75: 2.8, p90: 3.5 },
@@ -66,6 +75,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.12, p25: 0.18, p50: 0.25, p75: 0.32, p90: 0.40 },
     revenueGrowth:    { p10: 0.02, p25: 0.06, p50: 0.10, p75: 0.14, p90: 0.18 },
     epsGrowth:        { p10: 0.00, p25: 0.05, p50: 0.10, p75: 0.15, p90: 0.22 },
+    profitGrowth:     { p10: -0.02, p25: 0.04, p50: 0.10, p75: 0.15, p90: 0.20 },
+    fcfGrowth:        { p10: -0.05, p25: 0.02, p50: 0.08, p75: 0.14, p90: 0.20 },
+    grossMargin:      { p10: 0.30, p25: 0.40, p50: 0.50, p75: 0.60, p90: 0.70 },
     debtToEquity:     { p10: 0.0, p25: 0.02, p50: 0.10, p75: 0.30, p90: 0.60 },
     operatingMargin:  { p10: 0.10, p25: 0.15, p50: 0.20, p75: 0.25, p90: 0.30 },
     currentRatio:     { p10: 0.8, p25: 1.2, p50: 1.5, p75: 2.0, p90: 2.5 },
@@ -81,6 +93,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.05, p25: 0.10, p50: 0.15, p75: 0.20, p90: 0.28 },
     revenueGrowth:    { p10: 0.00, p25: 0.06, p50: 0.12, p75: 0.18, p90: 0.25 },
     epsGrowth:        { p10: -0.03, p25: 0.04, p50: 0.12, p75: 0.20, p90: 0.28 },
+    profitGrowth:     { p10: -0.05, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.25 },
+    fcfGrowth:        { p10: -0.10, p25: 0.00, p50: 0.08, p75: 0.15, p90: 0.22 },
+    grossMargin:      { p10: 0.40, p25: 0.50, p50: 0.60, p75: 0.70, p90: 0.80 },
     debtToEquity:     { p10: 0.0, p25: 0.05, p50: 0.20, p75: 0.50, p90: 1.0 },
     operatingMargin:  { p10: 0.10, p25: 0.16, p50: 0.22, p75: 0.28, p90: 0.35 },
     currentRatio:     { p10: 0.8, p25: 1.2, p50: 1.8, p75: 2.5, p90: 3.0 },
@@ -96,6 +111,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.03, p25: 0.08, p50: 0.13, p75: 0.18, p90: 0.25 },
     revenueGrowth:    { p10: -0.05, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.25 },
     epsGrowth:        { p10: -0.10, p25: 0.00, p50: 0.10, p75: 0.20, p90: 0.30 },
+    profitGrowth:     { p10: -0.12, p25: 0.00, p50: 0.08, p75: 0.18, p90: 0.28 },
+    fcfGrowth:        { p10: -0.15, p25: -0.05, p50: 0.05, p75: 0.12, p90: 0.20 },
+    grossMargin:      { p10: 0.20, p25: 0.28, p50: 0.35, p75: 0.42, p90: 0.50 },
     debtToEquity:     { p10: 0.0, p25: 0.10, p50: 0.40, p75: 0.80, p90: 1.5 },
     operatingMargin:  { p10: 0.04, p25: 0.08, p50: 0.12, p75: 0.16, p90: 0.22 },
     currentRatio:     { p10: 0.6, p25: 0.9, p50: 1.2, p75: 1.5, p90: 2.0 },
@@ -111,6 +129,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.02, p25: 0.06, p50: 0.10, p75: 0.15, p90: 0.20 },
     revenueGrowth:    { p10: -0.05, p25: 0.00, p50: 0.06, p75: 0.14, p90: 0.22 },
     epsGrowth:        { p10: -0.10, p25: -0.02, p50: 0.06, p75: 0.15, p90: 0.25 },
+    profitGrowth:     { p10: -0.15, p25: -0.05, p50: 0.05, p75: 0.12, p90: 0.22 },
+    fcfGrowth:        { p10: -0.15, p25: -0.05, p50: 0.05, p75: 0.12, p90: 0.20 },
+    grossMargin:      { p10: 0.20, p25: 0.30, p50: 0.40, p75: 0.50, p90: 0.60 },
     debtToEquity:     { p10: 0.2, p25: 0.5, p50: 1.0, p75: 2.0, p90: 3.5 },
     operatingMargin:  { p10: 0.06, p25: 0.12, p50: 0.18, p75: 0.25, p90: 0.32 },
     currentRatio:     { p10: 0.5, p25: 0.8, p50: 1.2, p75: 1.5, p90: 2.0 },
@@ -126,6 +147,9 @@ const REFERENCE_DISTRIBUTIONS: Record<SectorType, SectorDistributions> = {
     roic:             { p10: 0.03, p25: 0.08, p50: 0.13, p75: 0.18, p90: 0.25 },
     revenueGrowth:    { p10: -0.03, p25: 0.03, p50: 0.10, p75: 0.16, p90: 0.24 },
     epsGrowth:        { p10: -0.05, p25: 0.02, p50: 0.10, p75: 0.18, p90: 0.28 },
+    profitGrowth:     { p10: -0.10, p25: 0.00, p50: 0.08, p75: 0.15, p90: 0.25 },
+    fcfGrowth:        { p10: -0.15, p25: -0.02, p50: 0.06, p75: 0.14, p90: 0.22 },
+    grossMargin:      { p10: 0.15, p25: 0.25, p50: 0.35, p75: 0.50, p90: 0.65 },
     debtToEquity:     { p10: 0.0, p25: 0.10, p50: 0.40, p75: 1.0, p90: 2.0 },
     operatingMargin:  { p10: 0.05, p25: 0.10, p50: 0.16, p75: 0.22, p90: 0.30 },
     currentRatio:     { p10: 0.6, p25: 1.0, p50: 1.5, p75: 2.0, p90: 3.0 },

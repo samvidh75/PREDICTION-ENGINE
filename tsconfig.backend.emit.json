@@ -3,8 +3,8 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM"],
-    "outDir": "dist",
+    "lib": ["ES2022"],
+    "outDir": "dist/backend",
     "rootDir": "src",
     "strict": true,
     "noImplicitAny": false,
@@ -15,8 +15,8 @@
     "checkJs": false,
     "declaration": false,
     "sourceMap": true,
-    "jsx": "react-jsx",
-    "types": ["vite/client", "node"]
+    "noEmit": false,
+    "types": ["node"]
   },
   "include": [
     "src/backend/**/*",
@@ -31,13 +31,38 @@
     "src/services/FactorEngine.ts",
     "src/services/ExplanationEngine.ts",
     "src/middleware/RateLimiter.ts",
+    "src/symbols/SymbolCanonicalizer.ts",
+    "src/shared/symbols/SymbolNormalizer.ts",
+    "src/predictions/PredictionFactory.ts",
+    "src/predictions/PredictionSafetyGuard.ts",
+    "src/validation/OutcomeValidator.ts",
     "src/validation/PredictionAccuracyEngine.ts",
     "src/validation/ModelHealthEngine.ts",
-    "src/validation/SectorDriftEngine.ts"
+    "src/validation/SectorDriftEngine.ts",
+    "src/portfolio/PortfolioOutcomeEngine.ts",
+    "src/discovery/SectorRegistry.ts",
+    "src/monitoring/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/components",
+    "src/pages",
+    "src/app",
+    "src/shared/ui",
+    "src/integrations/tradingview",
+    "src/providers/coverage",
+    "src/providers/screener",
+    "src/providers/upstox",
+    "src/providers/yahoo",
+    "src/quality",
+    "src/startup",
+    "src/views",
+    "src/scripts",
+    "src/services/retention",
+    "src/services/company",
+    "src/services/portfolio"
   ]
 }

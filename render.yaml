@@ -15,10 +15,10 @@ services:
     plan: starter              # $7/mo — upgrade to standard for production load
     branch: main
 
-    buildCommand: npm ci && npm run build:backend
+    buildCommand: npm ci && npm run compile:backend && npm run build
 
-    # Start: run backend via tsx (TypeScript execute — no pre-compile step needed)
-    # Render injects PORT automatically — startServer.ts reads process.env.PORT
+    # Start: run compiled JavaScript (production-optimized, no tsx needed at runtime)
+    # Render injects PORT automatically — startServer.js reads process.env.PORT
     startCommand: npm start
 
     # Health check — Render uses this to confirm the service is healthy

@@ -2,22 +2,23 @@ import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 
 const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   app.get("/healthz", async () => {
-    const db = app.postgres ? await app.postgres.ping() : null;
+    // Use the canonical database adapter that all routes use
+    const dbAdapter = (app as unknown as { db?: { ping: () => Promise<{ ok: boolean; detail?: string }>; kind: string } }).db;
+    const dbPing = dbAdapter ? await dbAdapter.ping() : { ok: false, detail: "ADAPTER_NOT_INITIALIZED" };
+
     const cacheEngine = (await import("../../persistence/cache/cachePlugin")).getCacheEngine();
     const cache = cacheEngine ? cacheEngine.stats() : null;
 
     return {
       ok: true,
       service: "stockstory-backend",
-      at: Date.now(),
-      db,
-      cache,
-      _debug: {
-        hasCache: cacheEngine != null,
-        cacheType: cacheEngine ? "CacheHierarchyEngine" : "undefined",
-        hasPostgres: app.postgres != null,
-        postgresType: app.postgres ? "PostgresClient" : "undefined",
+      database: {
+        kind: dbAdapter?.kind ?? "unavailable",
+        ok: dbPing.ok,
+        detail: dbPing.detail ?? null,
       },
+      cache,
+      at: Date.now(),
     };
   });
 };

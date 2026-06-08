@@ -13,10 +13,22 @@ import { postgresPlugin } from "../persistence/postgres/postgresPlugin";
 import { persistencePlugin } from "../persistence/persistencePlugin";
 import { cachePlugin } from "../persistence/cache/cachePlugin";
 import { loadEnv } from "../config/env";
+import { dbAdapter } from "../../db/DatabaseAdapter";
+
+declare module "fastify" {
+  interface FastifyInstance {
+    db: typeof dbAdapter;
+  }
+}
 
 export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
   const env = loadEnv();
+
+  // Initialize the canonical database adapter before the server starts
+  await dbAdapter.initialize();
+
   const app = Fastify({ logger: false });
+  app.decorate("db", dbAdapter);
 
   // ── CORS ─────────────────────────────────────────────────────────────────
   // In production: only the canonical domain is allowed.

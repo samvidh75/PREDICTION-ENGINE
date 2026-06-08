@@ -139,22 +139,26 @@ class SQLitePool {
         PRIMARY KEY (symbol, period_end)
       )`,
       `CREATE TABLE IF NOT EXISTS factor_snapshots (
-        symbol TEXT NOT NULL, snapshot_date TEXT NOT NULL,
-        factor_score REAL, growth_score REAL, quality_score REAL, value_score REAL,
-        momentum_score REAL, risk_score REAL, sector_score REAL, confidence_score REAL,
-        ranking_score REAL, classification TEXT, PRIMARY KEY (symbol, snapshot_date)
+        symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
+        quality_factor REAL, value_factor REAL, growth_factor REAL,
+        momentum_factor REAL, risk_factor REAL, sector_strength_factor REAL,
+        factor_score REAL, explanations TEXT,
+        PRIMARY KEY (symbol, trade_date)
       )`,
       `CREATE TABLE IF NOT EXISTS feature_snapshots (
-        symbol TEXT NOT NULL, snapshot_date TEXT NOT NULL,
-        momentum_score REAL, volatility REAL, returns_1m REAL, returns_3m REAL, returns_6m REAL,
-        returns_1y REAL, ma_trend TEXT, relative_strength REAL,
-        PRIMARY KEY (symbol, snapshot_date)
+        symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
+        rsi REAL, macd REAL, macd_signal REAL, macd_histogram REAL,
+        adx REAL, atr REAL, bollinger_width REAL, momentum REAL,
+        volatility REAL, relative_strength REAL, moving_average_distance REAL,
+        trend_strength REAL,
+        PRIMARY KEY (symbol, trade_date)
       )`,
       `CREATE TABLE IF NOT EXISTS prediction_registry (
         id INTEGER PRIMARY KEY AUTOINCREMENT, symbol TEXT, prediction_date TEXT,
         ranking_score REAL, classification TEXT, confidence_score REAL,
-        quality_score REAL, growth_score REAL, value_score REAL, momentum_score REAL,
-        risk_score REAL, sector_score REAL, price_at_prediction REAL, benchmark_level REAL,
+        confidence_level TEXT, quality_score REAL, growth_score REAL,
+        value_score REAL, momentum_score REAL, risk_score REAL, sector_score REAL,
+        price_at_prediction REAL, benchmark_level REAL,
         prediction_horizon INTEGER, validation_status TEXT DEFAULT 'pending',
         validated_at TEXT, future_return REAL, benchmark_return REAL, alpha REAL
       )`,
