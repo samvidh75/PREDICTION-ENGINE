@@ -1,0 +1,84 @@
+name: Release Gate
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: stockstory
+          POSTGRES_PASSWORD: stockstory
+          POSTGRES_DB: stockstory_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
+      NODE_ENV: test
+      COOKIE_SECRET: test-only-ci-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck all
+        run: npx tsc -p tsconfig.all.json --noEmit
+
+      - name: Unit tests
+        run: npx vitest run
+
+      - name: Frontend build
+        run: npx vite build
+
+      - name: Backend compile
+        run: npx tsc -p tsconfig.backend.emit.json
+
+      - name: Schema validation
+        run: npx tsx scripts/validate-schema-contract.ts
+
+      - name: Distribution validation
+        run: npx tsx scripts/validate-sector-distributions.ts
+
+      - name: Build Docker image
+        run: docker build -t stockstory-api:test .
+
+      - name: Docker smoke test
+        run: |
+          docker run -d \
+            --name stockstory-api-test \
+            -p 4001:4001 \
+            -e NODE_ENV=production \
+            -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            stockstory-api:test
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4001/healthz; then
+              echo "Container ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs stockstory-api-test
+          exit 1
+
+      - name: Clean up Docker
+        if: always()
+        run: docker rm -f stockstory-api-test || true
+
+      - name: Release gate report
+        run: npx tsx scripts/release-gate.ts

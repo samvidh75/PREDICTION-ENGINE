@@ -1,0 +1,46 @@
+name: Docker Smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stockstory-api:test .
+
+      - name: Start container
+        run: |
+          docker run -d \
+            --name stockstory-api-test \
+            -p 4001:4001 \
+            -e NODE_ENV=production \
+            -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            stockstory-api:test
+
+      - name: Wait for readiness
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4001/healthz; then
+              echo "Container ready after ${i} attempts"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container failed to become ready"
+          docker logs stockstory-api-test
+          exit 1
+
+      - name: Show container logs
+        if: always()
+        run: docker logs stockstory-api-test
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f stockstory-api-test || true
