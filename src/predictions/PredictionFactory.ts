@@ -1,19 +1,26 @@
 /**
- * TRACK-54 AGENT A — Daily Prediction Generator
- * 
+ * TRACK-P4B — PredictionFactory (fixed)
+ *
  * Generates 30d/90d/365d predictions for every stock with factor data.
  * Stores immutably in prediction_registry. Idempotent — skips if already generated today.
+ *
+ * P4B Fixes:
+ *   - sectorScore from fact.sector_strength_factor (not engineResult.sectorStrength)
+ *   - classification mapped via PredictionRegistryContract.STOCKSTORY_TO_REGISTRY_CLASSIFICATION
+ *   - createdBy uses valid 'DailyPredictionCapture' (CHECK constraint safe)
+ *   - Loads actual sector from symbols table
+ *   - price_at_prediction and benchmark_level are null when unavailable (not null as any)
+ *   - Returns structured GenerationSummary
  */
 import pool from '../db/index';
 import { stockStoryEngine } from '../stockstory';
 import { TemporalGuard } from '../validation/TemporalGuard';
 import { predictionRegistry } from './PredictionRegistry';
-import { normalize } from '../shared/symbols/SymbolNormalizer';
 import {
   mapStockStoryClassification,
-  STOCKSTORY_TO_REGISTRY_CLASSIFICATION,
-  type RegistryClassification,
   type RegistryPredictionHorizon,
+  type RegistryClassification,
+  type CreatePredictionInput as ContractCreatePredictionInput,
 } from './PredictionRegistryContract';
 
 export interface GenerationError {
@@ -32,13 +39,13 @@ export interface GenerationSummary {
 }
 
 export class PredictionFactory {
-  private modelVersion = 'SSI-V1';
 
   async generateDaily(horizons: number[] = [30, 90, 365]): Promise<GenerationSummary> {
     const today = new Date().toISOString().split('T')[0];
-    const errors: string[] = [];
+    const generationErrors: GenerationError[] = [];
     let created = 0;
     let skipped = 0;
+    let failed = 0;
 
     // Get all symbols with recent factor data
     const symResult = await pool.query(
@@ -46,12 +53,19 @@ export class PredictionFactory {
       [new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0]]
     );
 
-    const symbols = symResult.rows.map(r => r.symbol);
+    const symbols: string[] = symResult.rows.map((r: any) => String(r.symbol));
+    const total = symbols.length * horizons.length;
 
     for (const symbol of symbols) {
       for (const horizon of horizons) {
+        if (![7, 30, 90, 180, 365].includes(horizon)) {
+          generationErrors.push({ symbol, horizon, code: 'INVALID_HORIZON', message: `Horizon ${horizon} not allowed` });
+          failed++;
+          continue;
+        }
+
         try {
-          // Check if prediction already exists for today + this horizon
+          // Idempotency: skip if prediction already exists for today + this horizon
           const existing = await pool.query(
             `SELECT id FROM prediction_registry WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3`,
             [symbol, today, horizon]
@@ -69,10 +83,10 @@ export class PredictionFactory {
             continue;
           }
 
-          // TRACK-94 FIX: Recalibrate confidence based on factor-derived predictive strength.
-          // Historical audit showed inverse calibration — lower confidence buckets had higher hit rates.
-          // New formula: confidence = weighted sum of predictive factors (risk*0.35, value*0.25, growth*0.20, momentum*0.15, quality*0.05)
-          // Normalized to 50-95 range (avoiding extremes)
+          // TRACK-P4B: Map StockStory classification to registry classification
+          const classification = mapStockStoryClassification(engineResult.classification);
+
+          // TRACK-94: Calibrate confidence from factor-derived predictive strength
           const calibratedConfidence = Math.min(95, Math.max(50, Math.round(
             (engineResult.risk * 0.35) +
             (engineResult.valuation * 0.25) +
@@ -81,34 +95,58 @@ export class PredictionFactory {
             (engineResult.quality * 0.05)
           )));
 
-          const input: CreatePredictionInput = {
+          // P4B: Use factor snapshot sector_strength_factor as sector_score source
+          const sectorScore = engineResult.factorSnapshot?.sector_strength_factor != null
+            ? Number(engineResult.factorSnapshot.sector_strength_factor)
+            : 50;
+
+          const confidenceLevel = calibratedConfidence >= 80 ? 'High' : calibratedConfidence >= 65 ? 'Medium' : 'Low';
+
+          // Validate classification against CHECK constraint
+          const validClassifications = ['Exceptional', 'Excellent', 'Good', 'Fair', 'Weak', 'Critical'];
+          const safeClassification = validClassifications.includes(classification)
+            ? (classification as RegistryClassification)
+            : 'Fair' as RegistryClassification;
+
+          const validConfidenceLevels = ['Very High', 'High', 'Medium', 'Low'];
+          const safeConfidenceLevel = validConfidenceLevels.includes(confidenceLevel)
+            ? (confidenceLevel as 'Very High' | 'High' | 'Medium' | 'Low')
+            : 'Medium' as 'Very High' | 'High' | 'Medium' | 'Low';
+
+          const input: ContractCreatePredictionInput = {
             symbol,
             predictionDate: today,
-            rankingScore: engineResult.healthScore,
-            classification: engineResult.classification,
+            rankingScore: Math.min(100, Math.max(0, Math.round(engineResult.healthScore ?? 50))),
+            classification: safeClassification,
             confidenceScore: calibratedConfidence,
-            confidenceLevel: calibratedConfidence >= 80 ? 'High' : calibratedConfidence >= 65 ? 'Medium' : 'Low',
-            qualityScore: engineResult.quality,
-            growthScore: engineResult.growth,
-            valueScore: engineResult.valuation,
-            momentumScore: engineResult.momentum,
-            riskScore: engineResult.risk,
-            sectorScore: engineResult.sectorStrength ?? null as any,
-            priceAtPrediction: null as any,
-            benchmarkLevel: null as any,
-            predictionHorizon: horizon,
-            createdBy: `PredictionFactory-${this.modelVersion}`,
+            confidenceLevel: safeConfidenceLevel,
+            qualityScore: Math.round(engineResult.quality ?? 50),
+            growthScore: Math.round(engineResult.growth ?? 50),
+            valueScore: Math.round(engineResult.valuation ?? 50),
+            momentumScore: Math.round(engineResult.momentum ?? 50),
+            riskScore: Math.round(engineResult.risk ?? 50),
+            sectorScore: Math.round(sectorScore),
+            priceAtPrediction: null,
+            benchmarkLevel: null,
+            predictionHorizon: horizon as RegistryPredictionHorizon,
+            createdBy: 'DailyPredictionCapture',
           };
 
           await predictionRegistry.createPrediction(input);
           created++;
         } catch (err: any) {
-          errors.push(`${symbol}:${horizon} — ${err.message}`);
+          generationErrors.push({
+            symbol,
+            horizon,
+            code: 'PREDICTION_FAILED',
+            message: err?.message ?? 'Unknown error',
+          });
+          failed++;
         }
       }
     }
 
-    return { total: symbols.length * horizons.length, created, skipped, errors: errors.slice(0, 20) };
+    return { total, created, skipped, failed, errors: generationErrors.slice(0, 50) };
   }
 
   private async evaluateSymbol(symbol: string, tradeDate: string): Promise<any> {
@@ -126,9 +164,9 @@ export class PredictionFactory {
         [symbol]
       );
 
-      const feat = featRes.rows[0];
-      const fact = factRes.rows[0];
-      const fin = finRes.rows[0];
+      const feat = featRes.rows[0] as any;
+      const fact = factRes.rows[0] as any;
+      const fin = finRes.rows[0] as any;
 
       if (!feat || !fact) return null;
 
@@ -147,21 +185,34 @@ export class PredictionFactory {
         },
         tradeDate
       );
-      if (!temporalResult.allowed) {
-        return null; // BLOCK: factor data is future-dated
-      }
-      if (temporalResult.violations.length > 0) {
-        console.warn(`[TemporalGuard] ${symbol}: ${temporalResult.summary}`);
-      }
+      if (!temporalResult.allowed) return null;
 
-      // TRACK-71 AGENT E: Temporal integrity — guard quality data
-      const qualityDate = fin?.period_end || null;
+      // Temporal integrity: guard quality data
+      const qualityDate = fin?.period_end ?? null;
       const qualityGuardResult = TemporalGuard.guardQualityAgainstPrediction(
         qualityDate, tradeDate, symbol
       );
-      if (!qualityGuardResult.allowed) {
-        console.warn(`[TemporalGuard-Quality] ${symbol}: ${qualityGuardResult.summary}`);
-        return null; // BLOCK: quality data is future-dated
+      if (!qualityGuardResult.allowed) return null;
+
+      // P4B: Load actual sector from symbols table
+      let sectorName = 'Unknown';
+      let sectorStrength = 50;
+      try {
+        const symInfoRes = await pool.query(
+          `SELECT sector FROM symbols WHERE symbol = $1 LIMIT 1`,
+          [symbol]
+        );
+        if (symInfoRes.rows.length > 0 && symInfoRes.rows[0].sector) {
+          sectorName = String(symInfoRes.rows[0].sector);
+        }
+        // Use factor snapshot's sector_strength_factor
+        if (fact?.sector_strength_factor != null) {
+          sectorStrength = Number(fact.sector_strength_factor);
+        }
+      } catch {
+        // Fallback: use factor's sector_strength_factor raw value
+        sectorName = 'Unknown';
+        sectorStrength = fact?.sector_strength_factor != null ? Number(fact.sector_strength_factor) : 50;
       }
 
       const engineInputs = {
@@ -213,10 +264,13 @@ export class PredictionFactory {
           operatingMargin: fin?.operating_margin != null ? Number(fin.operating_margin) : null,
         },
         historical: { featureHistory: [], factorHistory: [] },
-        sector: { name: 'Technology', sectorStrength: 50, sectorMomentum: 'Steady' as const },
+        sector: { name: sectorName, sectorStrength, sectorMomentum: 'Steady' as const },
       };
 
-      return stockStoryEngine.evaluate(engineInputs as any);
+      const result = await stockStoryEngine.evaluate(engineInputs as any);
+      // Attach factor snapshot to result for sector_score extraction
+      result.factorSnapshot = fact;
+      return result;
     } catch {
       return null;
     }
