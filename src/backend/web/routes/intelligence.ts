@@ -720,9 +720,8 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  // GET /api/stockstory/:symbol
-  // Full StockStory 7-engine evaluation
-  app.get("/api/stockstory/:symbol", async (request, reply) => {
+  // Legacy full StockStory 7-engine evaluation retained off the production API path.
+  app.get("/api/legacy-stockstory/:symbol", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
 

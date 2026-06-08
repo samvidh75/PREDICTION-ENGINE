@@ -1,3 +1,8 @@
+// src/components/companyUniverse/formatCompanyFinance.ts
+// TRACK-96A: Deterministic finance generation removed.
+// Only pure formatting utilities remain.
+// Use useCompanyFinancials hook from services/company/ for real data.
+
 function formatCompactRupees(value: number): string {
   const abs = Math.abs(value);
   if (abs >= 1e12) {
@@ -59,20 +64,5 @@ export function formatDebtRatio(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-export function hashStringToSeed(input: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < input.length; i += 1) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
-export function deriveDeterministicFinance(ticker: string, healthSeed: number): { marketCap: number; pe: number; industryPe: number; fiveYearPeAvg: number } {
-  return {
-    marketCap: 0,
-    pe: NaN,
-    industryPe: NaN,
-    fiveYearPeAvg: NaN,
-  };
-}
+// TRACK-96A: deriveDeterministicFinance and hashStringToSeed have been removed.
+// Financial data must come from GET /api/company/{ticker}/financials via useCompanyFinancials.

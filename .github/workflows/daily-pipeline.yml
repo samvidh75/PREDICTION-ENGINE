@@ -117,6 +117,26 @@ jobs:
           echo "Daily feed generated"
         timeout-minutes: 10
 
+      # ═══ Phase 7: Performance Assessment (06:50 IST) ═══
+      - name: Phase 7 — Performance Assessment
+        id: phase7
+        run: |
+          echo "=== Phase 7: Performance Assessment ==="
+          mkdir -p reports/validation
+          npx tsx src/scripts/generate-performance-certification.ts
+          echo "Performance reports generated"
+        timeout-minutes: 10
+
+      # ═══ Commit performance reports ═══
+      - name: Commit performance reports
+        if: steps.phase7.outcome == 'success'
+        run: |
+          git config user.name "SSI Daily Pipeline Bot"
+          git config user.email "pipeline@stockstory.in"
+          git add reports/validation/performance.json reports/validation/calibration.json reports/validation/drift.json
+          git diff --staged --quiet || (git commit -m "Daily performance certification $(date +%Y-%m-%d)" && git push)
+        continue-on-error: true
+
       # ═══ Health Check & Alerting ═══
       - name: Pipeline Health Check
         if: always()

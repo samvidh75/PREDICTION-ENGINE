@@ -2,9 +2,13 @@ import React, { createContext, useContext, useMemo } from "react";
 import type { CompanyHealthState, HealthTheme, FinancialTelemetryPoint } from "../../types/CompanyUniverse";
 import type { InfographicTempo } from "./useInfographicTempo";
 import { useInfographicTempo } from "./useInfographicTempo";
-import { deriveDeterministicFinance, formatMarketCap, formatPE, hashStringToSeed } from "../companyUniverse/formatCompanyFinance";
+import { useCompanyFinancials, formatPE, formatMarketCap } from "../../services/company/useCompanyFinancials";
 
-type FinanceDerived = ReturnType<typeof deriveDeterministicFinance> & {
+type FinanceDerived = {
+  marketCap: number | null;
+  pe: number | null;
+  industryPe: number | null;
+  fiveYearPeAvg: number | null;
   marketCapExact: string;
   marketCapWords: string;
   peFormatted: string;
@@ -19,10 +23,10 @@ export type MasterInfographicContextValue = {
 
   financialTelemetry: FinancialTelemetryPoint[];
 
-  // Derived finance (deterministic: no execution / no claims)
+  // Finance sourced from real API (TRACK-96A): no deterministic generation
   finance: FinanceDerived;
 
-  // Primary glow tone for “emotional pacing” + focus guidance.
+  // Primary glow tone for "emotional pacing" + focus guidance.
   toneGlow: string;
   toneEdgeGlow: string;
 };
@@ -33,10 +37,6 @@ export function useMasterInfographics(): MasterInfographicContextValue {
   const ctx = useContext(MasterInfographicContext);
   if (!ctx) throw new Error("useMasterInfographics must be used within <MasterInfographicEngine />");
   return ctx;
-}
-
-function clamp(n: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, n));
 }
 
 function toneForHealth(healthState: CompanyHealthState, healthTheme: HealthTheme): { toneGlow: string; toneEdgeGlow: string } {
@@ -74,21 +74,48 @@ export default function MasterInfographicEngine({
 }): JSX.Element {
   const tempo = useInfographicTempo(enabled);
 
-  const finance = useMemo<FinanceDerived>(() => {
-    // Use deterministic seed to keep the visualization stable across renders.
-    const seed = hashStringToSeed(`${ticker}_${healthState}_${financialTelemetry.length}`);
-    const base = deriveDeterministicFinance(ticker, seed);
+  // TRACK-96A: Real financial data from API, not deterministic generation
+  const financialsState = useCompanyFinancials(ticker);
 
-    const m = formatMarketCap(base.marketCap);
-    const peText = formatPE(base.pe);
+  const finance = useMemo<FinanceDerived>(() => {
+    if (financialsState.kind === "loading" || financialsState.kind === "idle") {
+      return {
+        marketCap: null,
+        pe: null,
+        industryPe: null,
+        fiveYearPeAvg: null,
+        marketCapExact: "Loading financials...",
+        marketCapWords: "",
+        peFormatted: "—",
+      };
+    }
+
+    if (financialsState.kind === "error" || financialsState.kind === "unavailable") {
+      return {
+        marketCap: null,
+        pe: null,
+        industryPe: null,
+        fiveYearPeAvg: null,
+        marketCapExact: "Financial data unavailable",
+        marketCapWords: "",
+        peFormatted: "—",
+      };
+    }
+
+    const { data } = financialsState;
+    const m = formatMarketCap(data.market_cap ?? undefined);
+    const peText = formatPE(data.pe_ratio);
 
     return {
-      ...base,
+      marketCap: data.market_cap ?? null,
+      pe: data.pe_ratio ?? null,
+      industryPe: null,
+      fiveYearPeAvg: null,
       marketCapExact: m.exact,
       marketCapWords: m.words,
       peFormatted: peText,
     };
-  }, [ticker, healthState, financialTelemetry.length]);
+  }, [financialsState]);
 
   const { toneGlow, toneEdgeGlow } = useMemo(() => toneForHealth(healthState, healthTheme), [healthState, healthTheme]);
 

@@ -3,7 +3,7 @@ import type { CompanyHealthState, FinancialTelemetryPoint, HealthTheme } from ".
 import type { ConfidenceState, ConfidenceTheme } from "../intelligence/ConfidenceEngine";
 import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
 import { CompanyUniverseCard } from "./CompanyUniverseSectionFrame";
-import { deriveDeterministicFinance, formatMarketCap, formatPE, hashStringToSeed } from "./formatCompanyFinance";
+import { useCompanyFinancials, formatPE, formatMarketCap } from "../../services/company/useCompanyFinancials";
 import CompanyDebtRatioCorridor from "./CompanyDebtRatioCorridor";
 import CompanyFinancialInfographicEcosystem from "./CompanyFinancialInfographicEcosystem";
 import VolumetricFinancialTowers from "../infographics/VolumetricFinancialTowers";
@@ -68,17 +68,37 @@ export default function CompanyProgressiveFinancialAnalysis({
   confidenceTheme: ConfidenceTheme;
   beginner?: boolean;
 }): JSX.Element {
+  // TRACK-96A: Real financial data from API, not deterministic generation
+  const financialsState = useCompanyFinancials(ticker);
+
   const finance = useMemo(() => {
-    const seed = hashStringToSeed(`${ticker}_${healthState}_${points.length}`);
-    const base = deriveDeterministicFinance(ticker, seed);
-    const mc = formatMarketCap(base.marketCap);
+    if (financialsState.kind === "loading" || financialsState.kind === "idle") {
+      return {
+        marketCapExact: "Loading financials...",
+        peFormatted: "—",
+        industryPe: null as number | null,
+        fiveYearPeAvg: null as number | null,
+      };
+    }
+
+    if (financialsState.kind === "error" || financialsState.kind === "unavailable") {
+      return {
+        marketCapExact: "Financial data unavailable",
+        peFormatted: "—",
+        industryPe: null as number | null,
+        fiveYearPeAvg: null as number | null,
+      };
+    }
+
+    const { data } = financialsState;
+    const mc = formatMarketCap(data.market_cap ?? undefined);
     return {
       marketCapExact: mc.exact,
-      peFormatted: formatPE(base.pe),
-      industryPe: base.industryPe,
-      fiveYearPeAvg: base.fiveYearPeAvg,
+      peFormatted: formatPE(data.pe_ratio),
+      industryPe: null as number | null,
+      fiveYearPeAvg: null as number | null,
     };
-  }, [ticker, healthState, points.length]);
+  }, [financialsState]);
 
   const snapshot = useMemo(() => {
     const first = points[0];
@@ -190,9 +210,9 @@ export default function CompanyProgressiveFinancialAnalysis({
             <div className="mt-4 text-[14px] leading-[1.9] text-white/80">
               Current PE (context): <span className="text-white/92 font-semibold">{finance.peFormatted}x</span>
               <br />
-              Industry PE: <span className="text-white/92 font-semibold">{finance.industryPe.toFixed(1)}x</span>
+              Industry PE: <span className="text-white/92 font-semibold">{finance.industryPe !== null ? finance.industryPe.toFixed(1) : "Unavailable"}x</span>
               <br />
-              5Y avg PE (bounded): <span className="text-white/92 font-semibold">{finance.fiveYearPeAvg.toFixed(1)}x</span>
+              5Y avg PE (bounded): <span className="text-white/92 font-semibold">{finance.fiveYearPeAvg !== null ? finance.fiveYearPeAvg.toFixed(1) : "Unavailable"}x</span>
             </div>
 
             <div className="mt-5 text-[12px] uppercase tracking-[0.18em] text-white/45">

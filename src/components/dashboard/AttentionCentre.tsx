@@ -1,70 +1,93 @@
 /**
- * TRACK-95N — Attention Centre
+ * TRACK-95O — Attention Centre
  * Top of dashboard. Shows ONLY what needs user attention today.
  * Max 3 Critical + 5 Important. No spam.
  * 
- * Powered by: SignalValidationEngine, prediction_registry, watchlists.
+ * Powered by: PredictionDiffEngine via GET /api/predictions/signals,
+ * SignalValidationEngine, prediction_registry, watchlists.
+ * 
+ * Priority: Watchlist + Critical > Watchlist + Important > Critical > Important > Monitor
  */
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface AttentionItem {
   id: string;
-  severity: "critical" | "important";
+  severity: "critical" | "important" | "monitor";
   symbol: string;
   title: string;
   detail: string;
   action: string;
   actionUrl: string;
   timestamp: string;
+  // Validation data
+  validation?: {
+    historicalSuccessRate: number | null;
+    sampleSize: number | null;
+    avgAlpha: number | null;
+  };
 }
 
 interface AttentionCentreProps {
-  /** List of watchlist symbols to filter for */
   watchlistSymbols?: string[];
-  /** Max items to show before "Show more" */
   limit?: number;
 }
 
 const MAX_CRITICAL = 3;
 const MAX_IMPORTANT = 5;
 
+const SEVERITY_ICON: Record<string, string> = {
+  critical: '🔴',
+  important: '🟠',
+  monitor: '⚪',
+};
+
 export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRITICAL + MAX_IMPORTANT }: AttentionCentreProps): JSX.Element {
   const [items, setItems] = useState<AttentionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchAttention = async () => {
       try {
-        const res = await fetch("/api/intelligence/attention?limit=15");
-        if (res.ok) {
-          const data = await res.json();
-          let attentionItems: AttentionItem[] = (data.items ?? []).map((i: any) => ({
-            id: i.id ?? crypto.randomUUID(),
-            severity: i.severity ?? "important",
-            symbol: i.symbol ?? "",
-            title: i.title ?? i.signalType ?? "",
-            detail: i.detail ?? i.reason ?? "",
-            action: i.action ?? "View stock",
-            actionUrl: i.actionUrl ?? `/?page=stock&id=${encodeURIComponent(i.symbol)}`,
-            timestamp: i.timestamp ?? new Date().toISOString(),
-          }));
+        setLoading(true);
+        setError(false);
+        const res = await fetch("/api/predictions/signals?limit=50");
+        if (!res.ok) throw new Error("unavailable");
 
-          // Prioritize: watchlist items first, then by severity
-          if (watchlistSymbols.length > 0) {
-            attentionItems = attentionItems.sort((a, b) => {
-              const aInWatchlist = watchlistSymbols.includes(a.symbol) ? 0 : 1;
-              const bInWatchlist = watchlistSymbols.includes(b.symbol) ? 0 : 1;
-              if (aInWatchlist !== bInWatchlist) return aInWatchlist - bInWatchlist;
-              if (a.severity === "critical" && b.severity !== "critical") return -1;
-              if (b.severity === "critical" && a.severity !== "critical") return 1;
-              return 0;
-            });
-          }
+        const data = await res.json();
+        const signals = data.signals ?? [];
 
-          setItems(attentionItems.slice(0, limit));
+        // Map PredictionDiffEngine signals to AttentionItems
+        let attentionItems: AttentionItem[] = signals.map((s: any) => ({
+          id: `${s.symbol}:${s.type}:${Date.now()}`,
+          severity: s.severity ?? "monitor",
+          symbol: s.symbol ?? "",
+          title: formatTitle(s),
+          detail: s.explanation ?? "",
+          action: "View stock",
+          actionUrl: `/?page=stock&id=${encodeURIComponent(s.symbol)}`,
+          timestamp: new Date().toISOString(),
+          validation: s.validation ?? undefined,
+        }));
+
+        // Priority sort: Watchlist items first, then by severity
+        if (watchlistSymbols.length > 0) {
+          attentionItems = attentionItems.sort((a, b) => {
+            const aInWatchlist = watchlistSymbols.includes(a.symbol) ? 0 : 1;
+            const bInWatchlist = watchlistSymbols.includes(b.symbol) ? 0 : 1;
+            if (aInWatchlist !== bInWatchlist) return aInWatchlist - bInWatchlist;
+
+            const severityRank = { critical: 0, important: 1, monitor: 2 };
+            return severityRank[a.severity] - severityRank[b.severity];
+          });
+        } else {
+          const severityRank = { critical: 0, important: 1, monitor: 2 };
+          attentionItems.sort((a, b) => severityRank[a.severity] - severityRank[b.severity]);
         }
+
+        setItems(attentionItems.slice(0, limit));
       } catch {
-        // Fallback: no attention items
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -75,6 +98,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
   const critical = items.filter(i => i.severity === "critical").slice(0, MAX_CRITICAL);
   const important = items.filter(i => i.severity === "important").slice(0, MAX_IMPORTANT);
 
+  // Loading state
   if (loading) {
     return (
       <div className="space-y-3">
@@ -88,12 +112,24 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-[#0D1117] border border-red-500/10 rounded-xl p-6 text-center">
+        <div className="text-2xl mb-2">⚠️</div>
+        <div className="text-[#E6EDF3] text-sm font-medium">Signal data unavailable</div>
+        <div className="text-white/30 text-xs mt-1">Prediction engine backend may be offline. Check back after the daily pipeline runs.</div>
+      </div>
+    );
+  }
+
+  // Empty state
   if (items.length === 0) {
     return (
       <div className="bg-[#0D1117] border border-white/[0.06] rounded-xl p-8 text-center">
         <div className="text-3xl mb-3">✅</div>
         <div className="text-[#E6EDF3] text-sm font-medium">Nothing needs attention</div>
-        <div className="text-white/30 text-xs mt-1">All watchlist stocks are stable today</div>
+        <div className="text-white/30 text-xs mt-1">No significant prediction changes detected today</div>
       </div>
     );
   }
@@ -117,11 +153,20 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-[#E6EDF3]">{item.symbol}</span>
                   <span className="text-xs bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full font-medium">
-                    {item.severity}
+                    critical
                   </span>
                 </div>
                 <div className="mt-1.5 text-sm text-[#E6EDF3] font-medium">{item.title}</div>
                 <div className="mt-1 text-xs text-white/50">{item.detail}</div>
+                {item.validation && item.validation.historicalSuccessRate !== null && (
+                  <div className="mt-2 flex items-center gap-3 text-[10px] text-white/30">
+                    <span>Historical: {item.validation.historicalSuccessRate}% success</span>
+                    <span>n={item.validation.sampleSize}</span>
+                    {item.validation.avgAlpha !== null && (
+                      <span>α={item.validation.avgAlpha > 0 ? '+' : ''}{item.validation.avgAlpha}%</span>
+                    )}
+                  </div>
+                )}
                 <div className="mt-2 text-xs text-[#2962FF] group-hover:underline">{item.action} →</div>
               </a>
             ))}
@@ -148,6 +193,12 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
                 </div>
                 <div className="mt-1 text-sm text-[#E6EDF3]/80">{item.title}</div>
                 <div className="mt-1 text-xs text-white/40">{item.detail}</div>
+                {item.validation && item.validation.historicalSuccessRate !== null && (
+                  <div className="mt-1.5 flex items-center gap-3 text-[10px] text-white/25">
+                    <span>{item.validation.historicalSuccessRate}% success</span>
+                    <span>n={item.validation.sampleSize}</span>
+                  </div>
+                )}
                 <div className="mt-1.5 text-xs text-[#2962FF] group-hover:underline">{item.action} →</div>
               </a>
             ))}
@@ -160,9 +211,22 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
           type="button"
           className="w-full text-center text-xs text-white/30 hover:text-white/50 py-2 transition-colors"
         >
-          +{items.length - critical.length - important.length} more items
+          +{items.length - critical.length - important.length} more monitoring signals
         </button>
       )}
     </div>
   );
+}
+
+/** Format signal type into human-readable title */
+function formatTitle(signal: any): string {
+  const typeMap: Record<string, string> = {
+    classification_upgrade: 'Classification Upgrade',
+    classification_downgrade: 'Classification Downgrade',
+    confidence_increase: 'Confidence Increase',
+    confidence_decrease: 'Confidence Decrease',
+    factor_change: 'Factor Change',
+    ranking_change: 'Ranking Change',
+  };
+  return typeMap[signal.type] ?? signal.type ?? 'Signal';
 }

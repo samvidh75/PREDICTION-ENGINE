@@ -1,8 +1,10 @@
 /**
- * TRACK-95L — Dashboard Command Centre Reconstruction
+ * TRACK-95O — Dashboard Command Centre
  * Bloomberg/Liquid-style institutional workspace.
- * 3-column layout: Watchlist | Signals | Portfolio Snapshot.
- * Dense, actionable, no decorative sections.
+ * 3-column layout: Watchlist | Signals (real prediction diffs) | Portfolio Snapshot.
+ * 
+ * Signals are now powered by GET /api/predictions/signals — real
+ * prediction_registry snapshot diffs, not synthetic rankings.
  */
 import React, { useMemo, useState, useEffect } from 'react';
 import { ArrowRight, Bell, TrendingUp, TrendingDown, Activity, Layers, Plus, Star, Eye, AlertTriangle } from 'lucide-react';
@@ -10,7 +12,6 @@ import { StockRegistry } from '../../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
 import { PortfolioEngine } from '../../services/portfolio/PortfolioEngine';
 import { RecentSearchStore } from '../../services/search/RecentSearchStore';
-import { attentionEngine, AttentionItem } from '../../intelligence/AttentionEngine';
 
 function navigate(pageKey: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -28,7 +29,14 @@ function openCompany(symbol: string): void {
   window.dispatchEvent(new Event('urlchange'));
 }
 
-/** Compact dashboard row — no giant cards, no large padding */
+interface SignalItem {
+  symbol: string;
+  type: string;
+  severity: 'critical' | 'important' | 'monitor';
+  explanation: string;
+  delta: number | string;
+}
+
 const Row: React.FC<{ children: React.ReactNode; className?: string; onClick?: () => void }> = ({ children, className, onClick }) => (
   <button onClick={onClick} className={`flex w-full items-center gap-3 p-2 text-left text-xs
     border-b border-white/[0.04] last:border-0 bg-transparent cursor-pointer
@@ -37,10 +45,28 @@ const Row: React.FC<{ children: React.ReactNode; className?: string; onClick?: (
   </button>
 );
 
+const SEVERITY_DOT = {
+  critical: 'bg-[#F23645]',
+  important: 'bg-[#EF9A09]',
+  monitor: 'bg-[#484F58]',
+} as const;
+
+const TYPE_LABEL: Record<string, string> = {
+  classification_upgrade: 'Upgrade',
+  classification_downgrade: 'Downgrade',
+  confidence_increase: 'Conf ↑',
+  confidence_decrease: 'Conf ↓',
+  factor_change: 'Factor',
+  ranking_change: 'Ranking',
+};
+
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [recentResearch, setRecentResearch] = useState<string[]>([]);
-  const [signals, setSignals] = useState<any[]>([]);
+  const [signals, setSignals] = useState<SignalItem[]>([]);
+  const [signalsLoading, setSignalsLoading] = useState(true);
+  const [signalsError, setSignalsError] = useState(false);
+  const [symbolsAnalyzed, setSymbolsAnalyzed] = useState(0);
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -50,17 +76,29 @@ export const DashboardHub: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetch('/api/intelligence/discovery/rankings')
-      .then(r => r.json())
-      .then(data => {
-        const merged = [
-          ...(data?.topImproving || []).map((i: any) => ({ ...i, kind: 'improving' })),
-          ...(data?.highestMomentum || []).map((i: any) => ({ ...i, kind: 'momentum' })),
-          ...(data?.highestQuality || []).map((i: any) => ({ ...i, kind: 'quality' })),
-        ];
-        setSignals(merged.slice(0, 10));
+    setSignalsLoading(true);
+    setSignalsError(false);
+    fetch('/api/predictions/signals?limit=20')
+      .then(r => {
+        if (!r.ok) throw new Error('unavailable');
+        return r.json();
       })
-      .catch(() => setSignals([]));
+      .then(data => {
+        const items: SignalItem[] = (data.signals ?? []).map((s: any) => ({
+          symbol: s.symbol,
+          type: s.type,
+          severity: s.severity,
+          explanation: s.explanation ?? '',
+          delta: s.delta ?? '',
+        }));
+        setSignals(items);
+        setSymbolsAnalyzed(data.symbolsAnalyzed ?? 0);
+      })
+      .catch(() => {
+        setSignalsError(true);
+        setSignals([]);
+      })
+      .finally(() => setSignalsLoading(false));
   }, []);
 
   const followedTickers = useMemo(() => {
@@ -74,7 +112,7 @@ export const DashboardHub: React.FC = () => {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 font-sans text-white antialiased">
-      {/* Top bar: compact title + quick actions */}
+      {/* Top bar */}
       <div className="mb-4 flex items-center justify-between border-b border-white/[0.06] pb-3">
         <div className="flex items-center gap-3">
           <Activity className="h-4 w-4 text-[#2962FF]" />
@@ -92,7 +130,7 @@ export const DashboardHub: React.FC = () => {
 
       {/* 3-column grid */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        {/* COL A: Watchlist Intelligence */}
+        {/* COL A: Watchlist */}
         <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
             <div className="flex items-center gap-2">
@@ -128,36 +166,52 @@ export const DashboardHub: React.FC = () => {
           )}
         </section>
 
-        {/* COL B: Market Signals + Today's Priorities */}
+        {/* COL B: Real Prediction Signals (TRACK-95O) */}
         <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-3.5 w-3.5 text-[#22AB94]" />
               <h2 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Signals</h2>
             </div>
-            <span className="text-[10px] text-[#484F58] font-mono">{signals.length}</span>
+            <span className="text-[10px] text-[#484F58] font-mono">
+              {signalsLoading ? '...' : signalsError ? 'err' : `${signals.length}/${symbolsAnalyzed}`}
+            </span>
           </div>
-          {signals.length === 0 ? (
+
+          {signalsLoading ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
-              <p>No signals detected today.</p>
-              <p className="mt-1 text-[10px]">Signals update after the daily pipeline run.</p>
+              <p>Loading signals from prediction registry...</p>
+            </div>
+          ) : signalsError ? (
+            <div className="px-3 py-4 text-center text-xs text-[#484F58]">
+              <AlertTriangle className="h-4 w-4 text-[#EF9A09] mx-auto mb-1" />
+              <p>Signal data is currently unavailable.</p>
+              <p className="mt-1 text-[10px]">Check back after the daily pipeline runs.</p>
+            </div>
+          ) : signals.length === 0 ? (
+            <div className="px-3 py-4 text-center text-xs text-[#484F58]">
+              <p>No significant changes detected today.</p>
+              <p className="mt-1 text-[10px]">
+                {symbolsAnalyzed > 0
+                  ? `${symbolsAnalyzed} symbols analyzed — markets are stable.`
+                  : 'Signals update after the daily pipeline run.'}
+              </p>
             </div>
           ) : (
-            signals.slice(0, 8).map((s: any) => (
-              <Row key={s.symbol} onClick={() => openCompany(s.symbol)}>
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                  s.kind === 'improving' ? 'bg-[#22AB94]' : s.kind === 'momentum' ? 'bg-[#EF9A09]' : 'bg-[#2962FF]'
-                }`} />
+            signals.map((s, i) => (
+              <Row key={`${s.symbol}:${s.type}:${i}`} onClick={() => openCompany(s.symbol)}>
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${SEVERITY_DOT[s.severity]}`} />
                 <span className="font-mono font-semibold text-xs min-w-[60px]">{s.symbol}</span>
-                <span className="text-[10px] text-[#484F58] uppercase">{s.kind}</span>
-                <span className="flex-1 text-[10px] text-[#8B949E] truncate">{s.companyName || ''}</span>
+                <span className="text-[10px] text-[#484F58] uppercase">{TYPE_LABEL[s.type] ?? s.type}</span>
+                <span className="flex-1 text-[10px] text-[#8B949E] truncate">{s.explanation}</span>
                 <span className="text-[10px] text-[#484F58]">→</span>
               </Row>
             ))
           )}
+
           {signals.length > 0 && (
             <div className="border-t border-white/[0.06] px-3 py-2">
-              <button onClick={() => navigate('discovery')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+              <button onClick={() => navigate('signals')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
                 View all signals <ArrowRight className="h-3 w-3" />
               </button>
             </div>
@@ -173,7 +227,6 @@ export const DashboardHub: React.FC = () => {
             </div>
           </div>
 
-          {/* Holdings summary */}
           {holdings.length === 0 ? (
             <div className="px-3 py-3 text-center text-xs text-[#484F58] border-b border-white/[0.04]">
               <p>No holdings tracked.</p>
@@ -196,7 +249,6 @@ export const DashboardHub: React.FC = () => {
             </>
           )}
 
-          {/* Recent research */}
           <div className="border-t border-white/[0.06] px-3 py-2">
             <div className="flex items-center gap-2 mb-2">
               <Eye className="h-3 w-3 text-[#484F58]" />
@@ -216,7 +268,6 @@ export const DashboardHub: React.FC = () => {
             )}
           </div>
 
-          {/* Alerts count */}
           <div className="border-t border-white/[0.06] px-3 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Bell className="h-3 w-3 text-[#EF9A09]" />

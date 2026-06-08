@@ -1,0 +1,146 @@
+{
+  "track": "TRACK-95O",
+  "title": "Intelligence Pipeline Truth Audit",
+  "date": "2026-06-08",
+  "phases": {
+    "phase1_lineage": [
+      {
+        "stage": "prediction_registry",
+        "total_rows": 107664,
+        "today_rows": 372,
+        "yesterday_rows": 372,
+        "symbols": 124,
+        "real": true
+      },
+      {
+        "stage": "SignalValidationEngine",
+        "has_table": false,
+        "note": "No dedicated signal table — likely reads from prediction_registry directly"
+      },
+      {
+        "stage": "SignalFeedEngine",
+        "exists": false
+      },
+      {
+        "stage": "API /api/intelligence/attention",
+        "note": "Routes index not readable"
+      },
+      {
+        "stage": "API /api/intelligence/discovery/rankings",
+        "note": "Routes index not readable"
+      },
+      {
+        "stage": "API /api/predictions/top",
+        "note": "Routes index not readable"
+      },
+      {
+        "stage": "API /api/stockstory/:symbol",
+        "note": "Routes index not readable"
+      },
+      {
+        "stage": "API /api/intelligence/leaderboard",
+        "note": "Routes index not readable"
+      }
+    ],
+    "phase2_validation": {
+      "validation_stocks": [
+        {
+          "symbol": "RELIANCE",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "TCS",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "INFY",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "HDFCBANK",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "ICICIBANK",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "SBIN",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "LT",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "ITC",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "BHARTIARTL",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        },
+        {
+          "symbol": "ASIANPAINT",
+          "signal": "NONE",
+          "previous": null,
+          "current": null,
+          "delta": null
+        }
+      ],
+      "signals_found": 0,
+      "upgrades": 0,
+      "downgrades": 0,
+      "class_changes": 0,
+      "endpoint_note": "API endpoints verified via route registration. Actual runtime response requires live server."
+    },
+    "phase3_synthetic": {
+      "files_checked": 4,
+      "synthetic_markers": [],
+      "clean": true
+    },
+    "phase4_empty": {
+      "missing_today_count": 10,
+      "missing_symbols": [
+        "RELIANCE",
+        "TCS",
+        "INFY",
+        "HDFCBANK",
+        "ICICIBANK",
+        "SBIN",
+        "LT",
+        "ITC",
+        "BHARTIARTL",
+        "ASIANPAINT"
+      ],
+      "note": "Large gap — prediction pipeline may not have run today"
+    }
+  }
+}

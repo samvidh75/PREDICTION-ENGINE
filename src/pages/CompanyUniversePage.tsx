@@ -51,12 +51,7 @@ import useCompanyLiveTelemetry, { formatINRPrice } from "../components/companyUn
 import type { CompanyHealthState } from "../types/CompanyUniverse";
 import type { CompanyTelemetrySnapshot } from "../components/companyUniverse/useCompanyLiveTelemetry";
 
-import {
-  deriveDeterministicFinance,
-  formatMarketCap,
-  formatPE,
-  hashStringToSeed,
-} from "../components/companyUniverse/formatCompanyFinance";
+import { useCompanyFinancials, formatPE, formatMarketCap } from "../services/company/useCompanyFinancials";
 
 import type { CompanyHealthState as CompanyHealthStateType } from "../types/CompanyUniverse";
 import useBeginnerIntelligenceCalibration from "../hooks/useBeginnerIntelligenceCalibration";
@@ -95,8 +90,8 @@ function confidenceLabel(state: ConfidenceState): string {
   }
 }
 
-function signFmt(pct: number): string {
-  if (!Number.isFinite(pct)) return "—";
+function signFmt(pct: number | null): string {
+  if (pct === null || !Number.isFinite(pct)) return "—";
   const sign = pct >= 0 ? "+" : "";
   return `${sign}${pct.toFixed(2)}%`;
 }
@@ -117,21 +112,48 @@ function confidenceToneGlow(state: ConfidenceState, theme: ConfidenceTheme): str
   }
 }
 
+/**
+ * TRACK-96A: Replaces deterministic/seed-based finance with real API data.
+ * All financial metrics now come from GET /api/company/{ticker}/financials.
+ * Loading → "Loading financials..."
+ * Error / unavailable → "Financial data unavailable"
+ * Never returns synthetic 0, NaN, or derived values.
+ */
 function useHeroFinance(args: { ticker: string; healthState: CompanyHealthStateType; financialTelemetryLength: number }) {
-  const { ticker, healthState, financialTelemetryLength } = args;
+  const { ticker } = args;
+  const state = useCompanyFinancials(ticker);
 
   return useMemo(() => {
-    const seed = hashStringToSeed(`${ticker}_${healthState}_${financialTelemetryLength}`);
-    const base = deriveDeterministicFinance(ticker, seed);
-    const mc = formatMarketCap(base.marketCap);
+    if (state.kind === "loading" || state.kind === "idle") {
+      return {
+        marketCapExact: "Loading financials...",
+        marketCapWords: "",
+        pe: "—",
+        fiveYearPeAvg: null as number | null,
+        industryPe: null as number | null,
+      };
+    }
+
+    if (state.kind === "error" || state.kind === "unavailable") {
+      return {
+        marketCapExact: "Financial data unavailable",
+        marketCapWords: "",
+        pe: "—",
+        fiveYearPeAvg: null as number | null,
+        industryPe: null as number | null,
+      };
+    }
+
+    const { data } = state;
+    const mc = formatMarketCap(data.market_cap ?? undefined);
     return {
       marketCapExact: mc.exact,
       marketCapWords: mc.words,
-      pe: formatPE(base.pe),
-      fiveYearPeAvg: base.fiveYearPeAvg,
-      industryPe: base.industryPe,
+      pe: formatPE(data.pe_ratio),
+      fiveYearPeAvg: null as number | null,
+      industryPe: null as number | null,
     };
-  }, [ticker, healthState, financialTelemetryLength]);
+  }, [state, ticker]);
 }
 
 function useHeroTelemetry(args: { ticker: string; companyHealthState: CompanyHealthState; confidenceState: ConfidenceState; enabled: boolean }) {
@@ -329,6 +351,7 @@ export default function CompanyUniversePage(): JSX.Element {
     return () => window.clearTimeout(t);
   }, [qaForcePremium, prefersReducedMotion]);
 
+  // TRACK-96A: Hero finance now sourced from real API, not deterministic generation
   const heroFinance = useHeroFinance({
     ticker: model.ticker,
     healthState: model.healthState,
@@ -377,7 +400,7 @@ export default function CompanyUniversePage(): JSX.Element {
               {model.narrative.body}
             </div>
 
-            {/* Live telemetry micro HUD */}
+            {/* Live telemetry micro HUD — TRACK-96A: real API finance data */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-[520px]">
               <div className="rounded-[22px] border border-white/10 bg-black/25 backdrop-blur-2xl p-4">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative model price</div>

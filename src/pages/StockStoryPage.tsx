@@ -7,6 +7,7 @@ import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
+import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 
 function localFormatPercent(value?: number | null): string {
   if (value === undefined || value === null) return "N/A";
@@ -53,7 +54,7 @@ const getConfidenceStyle = (conf: string) => {
   }
 };
 
-type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | "documents";
+type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | "documents" | "whychange";
 
 type MetadataState = {
   data: CompanyMetadata | null;
@@ -61,7 +62,7 @@ type MetadataState = {
   error: string | null;
 };
 
-const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents"];
+const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents", "whychange"];
 
 function readTickerFromUrl(): string {
   if (typeof window === "undefined") return "RELIANCE";
@@ -99,6 +100,59 @@ function EmptyState({ label }: { label: string }) {
       {label} is not available from the connected data providers yet.
     </div>
   );
+}
+
+function scoreFromLineage(factor: any): number {
+  if (!factor || typeof factor.score !== "number" || !Number.isFinite(factor.score)) {
+    throw new Error("STOCKSTORY_FACTOR_LINEAGE_MISSING");
+  }
+  return factor.score;
+}
+
+function adaptStockStoryResponse(data: any) {
+  if (!data || data.status === "unavailable") {
+    throw new Error("STOCKSTORY_SNAPSHOT_UNAVAILABLE");
+  }
+
+  const factors = data.factors;
+  if (!factors) throw new Error("STOCKSTORY_FACTORS_MISSING");
+
+  const growth = scoreFromLineage(factors.growth);
+  const quality = scoreFromLineage(factors.quality);
+  const stability = scoreFromLineage(factors.stability);
+  const momentum = scoreFromLineage(factors.momentum);
+  const valuation = scoreFromLineage(factors.value);
+  const risk = scoreFromLineage(factors.risk);
+  const confidenceScore = data.confidence?.score;
+
+  return {
+    ...data,
+    confidence: data.confidence?.level,
+    growth,
+    quality,
+    stability,
+    valuation,
+    momentum,
+    risk,
+    financials: {},
+    engineDetails: {
+      growth: { score: growth, revenueGrowth: null, epsGrowth: null, fcfGrowth: null, profitGrowth: null, commentary: `Source: ${factors.growth.source} (${factors.growth.snapshotDate}).` },
+      quality: { score: quality, roe: null, roic: null, grossMargin: null, operatingMargin: null, efficiencyScore: quality, commentary: `Source: ${factors.quality.source} (${factors.quality.snapshotDate}).` },
+      stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: `Source: ${factors.stability.source} (${factors.stability.snapshotDate}).` },
+      momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: `Source: ${factors.momentum.source} (${factors.momentum.snapshotDate}).` },
+      valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: `Source: ${factors.value.source} (${factors.value.snapshotDate}).` },
+      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: risk >= 65 ? 1 : 0, commentary: `Source: ${factors.risk.source} (${factors.risk.snapshotDate}).` },
+      confidence: {
+        level: data.confidence?.level,
+        score: typeof confidenceScore === "number" ? confidenceScore : null,
+        dataCompleteness: typeof confidenceScore === "number" ? confidenceScore : null,
+        signalAgreement: typeof confidenceScore === "number" ? confidenceScore : null,
+        riskConsistency: typeof confidenceScore === "number" ? confidenceScore : null,
+        historicalStability: typeof confidenceScore === "number" ? confidenceScore : null,
+        commentary: `Source: ${data.confidence?.source} (${data.confidence?.snapshotDate}).`,
+      },
+    },
+  };
 }
 
 export const StockStoryPage: React.FC = () => {
@@ -157,7 +211,7 @@ export const StockStoryPage: React.FC = () => {
         return body;
       })
       .then((data) => {
-        setStory(data);
+        setStory(adaptStockStoryResponse(data));
         setStoryLoading(false);
       })
       .catch((error: Error) => {
@@ -236,27 +290,7 @@ export const StockStoryPage: React.FC = () => {
     window.history.replaceState({}, "", `?${params.toString()}`);
   };
 
-  const storyData = story || {
-    healthScore: 50,
-    classification: "Stable",
-    confidence: "Medium",
-    growth: 50,
-    quality: 50,
-    stability: 50,
-    valuation: 50,
-    momentum: 50,
-    risk: 50,
-    narrative: "Analytical engines are still processing this company. Basic data is shown below.",
-    engineDetails: {
-      growth: { score: 50, revenueGrowth: 0, epsGrowth: 0, fcfGrowth: 0, profitGrowth: 0, commentary: "Pending calculation." },
-      quality: { score: 50, roe: 0, roic: 0, grossMargin: 0, operatingMargin: 0, efficiencyScore: 50, commentary: "Pending calculation." },
-      stability: { score: 50, debtScore: 50, cashScore: 50, volatilityScore: 50, coverageScore: 50, commentary: "Pending calculation." },
-      momentum: { score: 50, momentumScore: 50, trendScore: 50, volatilityScore: 50, commentary: "Pending calculation." },
-      valuation: { score: 50, peScore: 50, pbScore: 50, evEbitdaScore: 50, fcfYieldScore: 50, commentary: "Pending calculation." },
-      risk: { score: 50, accountingAnomalyScore: 50, debtStressScore: 50, cashFlowStressScore: 50, volatilityRiskScore: 50, redFlagCount: 0, commentary: "Pending calculation." },
-      confidence: { level: "Medium", score: 50, dataCompleteness: 50, signalAgreement: 50, riskConsistency: 50, historicalStability: 50, commentary: "Pending calculation." }
-    }
-  };
+  const storyData = story;
 
   if (storyLoading) {
     return (
@@ -279,16 +313,36 @@ export const StockStoryPage: React.FC = () => {
     );
   }
 
+  if (!storyData) {
+    return (
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
+        <button
+          onClick={() => navigateToPage("dashboard")}
+          className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
+        </button>
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-8">
+          <h1 className="text-xl font-extrabold text-white">Company health analysis unavailable</h1>
+          <p className="mt-3 text-sm leading-6 text-white/60">
+            StockStory could not find a production prediction_registry snapshot for {ticker}. No fallback scores are shown.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (storyData.healthScore / 100) * circumference;
 
-  const renderProgressBar = (label: string, score: number, colorClass: string) => {
+  const renderProgressBar = (label: string, score: number | null, colorClass: string) => {
+    const hasScore = typeof score === "number" && Number.isFinite(score);
     return (
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
           <span className="text-white/60">{label}</span>
-          <span className={colorClass}>{score}/100</span>
+          <span className={colorClass}>{hasScore ? `${score}/100` : "N/A"}</span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
           <div
@@ -300,7 +354,7 @@ export const StockStoryPage: React.FC = () => {
               colorClass.includes("amber") ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" :
               colorClass.includes("rose") ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" : "bg-white/40"
             }`}
-            style={{ width: `${score}%` }}
+            style={{ width: hasScore ? `${score}%` : "0%" }}
           />
         </div>
       </div>
@@ -741,6 +795,16 @@ export const StockStoryPage: React.FC = () => {
                 {storyData.engineDetails.confidence.commentary}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* === TAB 7: WHY IT CHANGED === */}
+        {activeTab === "whychange" && (
+          <div>
+            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
+              <Activity className="h-4 w-4 text-emerald-400" /> Why It Changed
+            </div>
+            <WhyItChangedTab symbol={ticker} />
           </div>
         )}
 

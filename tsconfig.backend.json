@@ -20,7 +20,10 @@
   },
   "include": [
     "src/backend/**/*",
-    "src/db/**/*"
+    "src/db/**/*",
+    "src/intelligence/SignalValidationEngine.ts",
+    "src/intelligence/PredictionDiffEngine.ts",
+    "src/intelligence/AttentionEngine.ts"
   ],
   "exclude": [
     "node_modules",

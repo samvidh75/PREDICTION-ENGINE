@@ -25,6 +25,18 @@ export { RiskEngine } from "./scoring/RiskEngine";
 export { StabilityEngine } from "./scoring/StabilityEngine";
 export { ValuationEngine } from "./scoring/ValuationEngine";
 
+// TRACK-95O — Prediction Diff Engine (real signal generation)
+export { PredictionDiffEngine, predictionDiffEngine } from "./PredictionDiffEngine";
+
+// TRACK-96A — Data Freshness Engine
+export { DataFreshnessEngine, dataFreshnessEngine } from "./DataFreshnessEngine";
+export type { FreshnessStatus } from "./DataFreshnessEngine";
+export type { IntelligenceSignal, PredictionDiffResult, SymbolDiff, FactorDelta, PredictionSnapshot } from "./PredictionDiffEngine";
+
+// TRACK-95T — Prediction Explainability Engine
+export { PredictionExplanationEngine, predictionExplanationEngine } from "./PredictionExplanationEngine";
+export type { ExplanationOutput, ExplanationDriver, FactorContribution, HistoricalReliability } from "./PredictionExplanationEngine";
+
 // Scoring utilities
 export { scoreBands, scoreBandsDescending, scoreRanges } from "./scoring/BandScorer";
 export type { ScoreBand, BandConfig, RangeScore } from "./scoring/BandScorer";

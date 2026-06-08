@@ -8,6 +8,7 @@ import pool from '../db/index';
 import { stockStoryEngine } from '../stockstory';
 import { TemporalGuard } from '../validation/TemporalGuard';
 import { predictionRegistry } from './PredictionRegistry';
+import { normalize } from '../shared/symbols/SymbolNormalizer';
 import type { CreatePredictionInput } from './types';
 
 export class PredictionFactory {
