@@ -1,21 +1,22 @@
 /**
- * TRACK-P4B — Health & Readiness Routes
+ * TRACK-P4B-P3 — Health & Readiness Routes
  *
- * /healthz — Liveness probe: process is alive. Always 200.
- * /readyz — Readiness probe: production dependencies are ready.
- *   Returns 200 when all required deps are up.
- *   Returns 503 when required DB or dependencies are unavailable.
+ * /healthz — Liveness probe: process is alive. Always HTTP 200.
+ * /readyz — Readiness probe: uses DatabasePolicy, dbAdapter.diagnostics(),
+ *           and MigrationRunner.status() for truthful status reporting.
  *
- * SQLite fallback is governed by ALLOW_SQLITE_FALLBACK env var:
- *   - development: true (default)
- *   - test: explicit
- *   - production: false (default)
- * When production PostgreSQL fails and ALLOW_SQLITE_FALLBACK=false:
- *   /readyz returns 503 — no silent SQLite degradation.
+ * Returns HTTP 503 when:
+ *   - PostgreSQL is required but unavailable
+ *   - Checksum mismatch detected in migrations
+ *   - Required dependencies are not ready
+ *
+ * No secrets in response. No local env var parsing.
  */
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
-
-const ALLOW_SQLITE_FALLBACK = process.env.ALLOW_SQLITE_FALLBACK !== 'false';
+import { loadDatabasePolicy, buildDiagnostics } from '../../../db/DatabasePolicy';
+import { dbAdapter } from '../../../db/DatabaseAdapter';
+import { MigrationRunner } from '../../../db/MigrationRunner';
+import { join } from 'path';
 
 const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   // ── /healthz — Liveness only ──────────────────────────────────
@@ -29,80 +30,94 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
   // ── /readyz — Readiness probe ─────────────────────────────────
   app.get('/readyz', async (_request, reply) => {
-    const appDb = (app as unknown as {
-      db?: {
-        ping: () => Promise<{ ok: boolean; detail?: string }>;
-        kind: string;
-      };
-    }).db;
+    const policy = loadDatabasePolicy();
+    const diag = dbAdapter.diagnostics();
 
     // Database readiness
-    let dbOk = false;
-    let dbKind = 'unavailable';
-    let dbDetail: string | null = null;
+    const dbOk = diag.ready && diag.kind !== 'unavailable';
 
-    if (appDb) {
-      dbKind = appDb.kind;
-      try {
-        const pingResult = await appDb.ping();
-        dbOk = pingResult.ok;
-        dbDetail = pingResult.detail ?? null;
-      } catch (err: any) {
-        dbOk = false;
-        dbDetail = err?.message ?? 'Ping failed';
-      }
-    }
+    // Migration status
+    let migrationStatus: {
+      ok: boolean;
+      latestAppliedId: string | null;
+      appliedCount: number;
+      pendingCount: number;
+      checksumMismatch: boolean;
+      detail: string | null;
+    } = {
+      ok: false,
+      latestAppliedId: null,
+      appliedCount: 0,
+      pendingCount: 0,
+      checksumMismatch: false,
+      detail: 'Migration status unavailable — db not initialized',
+    };
 
-    // SQLite fallback check
-    if (dbKind === 'sqlite' && !ALLOW_SQLITE_FALLBACK) {
-      dbOk = false;
-      dbDetail = 'SQLite fallback is disabled in this environment. PostgreSQL is required.';
-    }
-
-    // Migration version
-    let migrationOk = false;
-    let migrationVersion: string | null = null;
     try {
-      if (appDb) {
-        const migRes = await (appDb as any).query?.(
-          `SELECT version FROM schema_migrations ORDER BY applied_at DESC LIMIT 1`
+      if (diag.ready && diag.kind !== 'unavailable') {
+        const runner = new MigrationRunner(
+          dbAdapter as unknown as import('../../../db/MigrationRunner').MigrationDbAdapter,
+          join(process.cwd(), 'src', 'db', 'migrations'),
         );
-        if (migRes?.rows?.length > 0) {
-          migrationVersion = String(migRes.rows[0].version);
-          migrationOk = true;
-        }
+        const status = await runner.status();
+        migrationStatus = {
+          ok: status.ready && status.pendingCount === 0,
+          latestAppliedId: status.latestAppliedId,
+          appliedCount: status.appliedCount,
+          pendingCount: status.pendingCount,
+          checksumMismatch: status.checksumMismatch,
+          detail: status.detail,
+        };
       }
-    } catch {
-      migrationOk = false;
-      migrationVersion = null;
+    } catch (err: unknown) {
+      migrationStatus = {
+        ok: false,
+        latestAppliedId: null,
+        appliedCount: 0,
+        pendingCount: 0,
+        checksumMismatch: false,
+        detail: `Migration status check failed: ${err instanceof Error ? err.message : String(err)}`,
+      };
     }
 
-    // Cache readiness — deferred until cache engine is wired through app
+    // Cache — explicitly optional
     const cacheOk = true;
+    const cacheRequired = false;
 
-    // Configuration readiness
-    const configOk = !!process.env.DATABASE_URL || dbKind === 'sqlite';
+    // Configuration
+    const configOk = diag.kind !== 'unavailable' || diag.requestedAdapter === 'sqlite';
 
-    // Overall readiness: DB required, others optional-but-reported
-    const overallOk = dbOk && configOk;
+    // Overall readiness
+    const overallOk = dbOk && migrationStatus.ok;
 
     const body = {
       ok: overallOk,
       service: 'stockstory-backend',
       database: {
-        kind: dbKind,
+        kind: diag.kind,
+        requestedAdapter: diag.requestedAdapter,
+        fallbackUsed: diag.fallbackUsed,
+        fallbackAllowed: diag.fallbackAllowed,
+        sqliteProductionAllowed: policy.sqliteProductionAllowed,
         ok: dbOk,
-        detail: dbDetail,
+        detail: diag.detail,
       },
       migrations: {
-        ok: migrationOk,
-        version: migrationVersion,
+        ok: migrationStatus.ok,
+        latestAppliedId: migrationStatus.latestAppliedId,
+        appliedCount: migrationStatus.appliedCount,
+        pendingCount: migrationStatus.pendingCount,
+        checksumMismatch: migrationStatus.checksumMismatch,
+        detail: migrationStatus.detail,
       },
       cache: {
+        required: cacheRequired,
         ok: cacheOk,
+        detail: null,
       },
       configuration: {
         ok: configOk,
+        detail: null,
       },
       at: Date.now(),
     };
