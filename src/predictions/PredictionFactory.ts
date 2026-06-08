@@ -9,17 +9,32 @@ import { stockStoryEngine } from '../stockstory';
 import { TemporalGuard } from '../validation/TemporalGuard';
 import { predictionRegistry } from './PredictionRegistry';
 import { normalize } from '../shared/symbols/SymbolNormalizer';
-import type { CreatePredictionInput } from './types';
+import {
+  mapStockStoryClassification,
+  STOCKSTORY_TO_REGISTRY_CLASSIFICATION,
+  type RegistryClassification,
+  type RegistryPredictionHorizon,
+} from './PredictionRegistryContract';
+
+export interface GenerationError {
+  symbol: string;
+  horizon: number;
+  code: string;
+  message: string;
+}
+
+export interface GenerationSummary {
+  total: number;
+  created: number;
+  skipped: number;
+  failed: number;
+  errors: GenerationError[];
+}
 
 export class PredictionFactory {
   private modelVersion = 'SSI-V1';
 
-  async generateDaily(horizons: number[] = [30, 90, 365]): Promise<{
-    total: number;
-    created: number;
-    skipped: number;
-    errors: string[];
-  }> {
+  async generateDaily(horizons: number[] = [30, 90, 365]): Promise<GenerationSummary> {
     const today = new Date().toISOString().split('T')[0];
     const errors: string[] = [];
     let created = 0;
