@@ -313,3 +313,4 @@ export function errorResponse<T>(
       freshness: 'unknown',
     }),
   });
+}
