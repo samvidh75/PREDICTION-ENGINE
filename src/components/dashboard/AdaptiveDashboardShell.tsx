@@ -5,9 +5,9 @@ import type { ConfidenceState, ConfidenceTheme } from "../intelligence/Confidenc
 import type { NeuralMarketSynthesis } from "../../services/synthesis/neuralMarketSynthesisTypes";
 import type { MarketComposite, MarketConnectionStatus } from "../../services/market/marketService";
 
-import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
-import PremiumCard from "../../designSystem/PremiumCard";
-import { BodyText, MicroLabel, SectionTitle } from "../../designSystem/TypographyIntelligence";
+import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
+import PremiumCard from "../../shared/ui/components/PremiumCard";
+import { BodyText, MicroLabel, SectionTitle } from "../../shared/ui/components/TypographyIntelligence";
 import DashboardCommandSearchBar from "./DashboardCommandSearchBar";
 import MobileSwipeDeck from "./MobileSwipeDeck";
 import DashboardKeyIntelligenceCards from "./DashboardKeyIntelligenceCards";

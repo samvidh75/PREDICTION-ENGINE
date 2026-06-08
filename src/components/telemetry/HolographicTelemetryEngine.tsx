@@ -3,7 +3,7 @@ import { useConfidenceEngine, type ConfidenceState } from "../intelligence/Confi
 import { useHolographicTelemetryModel } from "./useHolographicTelemetryModel";
 import HolographicTelemetryCanvas from "./HolographicTelemetryCanvas";
 import type { TelemetryReadout } from "./telemetryTypes";
-import { ModuleKicker, ModuleTitle, MetricLabel, MetricSubValue, NavLabel } from "../../designSystem/PremiumTypography";
+import { ModuleKicker, ModuleTitle, MetricLabel, MetricSubValue, NavLabel } from "../../shared/ui/components/PremiumTypography";
 
 function labelForConfidenceState(state: ConfidenceState): string {
   switch (state) {

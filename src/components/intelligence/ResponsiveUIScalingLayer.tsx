@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useSpatialEnvironment } from "../spatial/SpatialEnvironmentContext";
-import { typography } from "../../design-system/tokens/typography";
+import { typography } from "../../shared/ui/tokens/typography";
 
 type Props = {
   children: React.ReactNode;

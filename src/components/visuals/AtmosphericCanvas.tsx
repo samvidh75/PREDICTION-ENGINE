@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { marketStateCoordinator, GlobalMarketMood } from '../../services/realtime/MarketStateCoordinator';
-import { ThemeCoordinator } from '../../designSystem/theme/ThemeCoordinator';
+import { ThemeCoordinator } from '../../shared/ui/components/theme/ThemeCoordinator';
 
 export const AtmosphericCanvas: React.FC = () => {
   const [mood, setMood] = useState<GlobalMarketMood>(() => marketStateCoordinator.getMood());

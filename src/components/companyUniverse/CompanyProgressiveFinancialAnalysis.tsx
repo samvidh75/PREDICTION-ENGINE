@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import type { CompanyHealthState, FinancialTelemetryPoint, HealthTheme } from "../../types/CompanyUniverse";
 import type { ConfidenceState, ConfidenceTheme } from "../intelligence/ConfidenceEngine";
-import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
 import { CompanyUniverseCard } from "./CompanyUniverseSectionFrame";
 import { deriveDeterministicFinance, formatMarketCap, formatPE, hashStringToSeed } from "./formatCompanyFinance";
 import CompanyDebtRatioCorridor from "./CompanyDebtRatioCorridor";

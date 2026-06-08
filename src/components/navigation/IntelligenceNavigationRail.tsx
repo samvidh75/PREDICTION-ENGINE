@@ -6,7 +6,7 @@ import { loadDiscoveryMemory } from "../../services/discovery/discoveryMemory";
 import { getDiscoveryIndex } from "../../services/discovery/discoveryIndex";
 import type { DiscoveryEntityKind } from "../../services/discovery/discoveryTypes";
 import { navigate, navigateToExplore, navigateToStock, type PageKey } from "../../architecture/navigation/routeCoordinator";
-import { NavLabel } from "../../designSystem/PremiumTypography";
+import { NavLabel } from "../../shared/ui/components/PremiumTypography";
 
 type NavItem = {
   id: string;

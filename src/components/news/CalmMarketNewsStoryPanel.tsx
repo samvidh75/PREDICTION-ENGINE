@@ -3,9 +3,9 @@ import type { ConfidenceState, ConfidenceTheme } from "../intelligence/Confidenc
 import type { NeuralMarketSynthesis } from "../../services/synthesis/neuralMarketSynthesisTypes";
 import type { CompanyUniverseModel } from "../../types/CompanyUniverse";
 
-import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
 import { NewsEventCard } from "./NewsEventCard";
-import { CardBody, CardLabel, MicroLabel, SectionTitle } from "../../designSystem/TypographyIntelligence";
+import { CardBody, CardLabel, MicroLabel, SectionTitle } from "../../shared/ui/components/TypographyIntelligence";
 import SSGlassCard from "../ui/SSGlassCard";
 
 import { buildNewsStory } from "../../services/news/newsStoryEngine";

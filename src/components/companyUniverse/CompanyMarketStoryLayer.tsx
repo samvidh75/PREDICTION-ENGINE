@@ -3,7 +3,7 @@ import type { CompanyHealthState, FinancialTelemetryPoint, LeaderProfile } from 
 import type { HealthTheme } from "../../types/CompanyUniverse";
 import type { NeuralMarketSynthesis } from "../../services/synthesis/neuralMarketSynthesisTypes";
 import type { ConfidenceState, ConfidenceTheme } from "../intelligence/ConfidenceEngine";
-import ProgressiveDisclosure from "../../designSystem/ProgressiveDisclosure";
+import ProgressiveDisclosure from "../../shared/ui/components/ProgressiveDisclosure";
 import { CompanyUniverseCard, CompanyUniverseSectionHeader } from "./CompanyUniverseSectionFrame";
 
 function healthUXLabel(state: CompanyHealthState): "Strong" | "Stable" | "Improving" | "Weakening" | "High Risk" {

@@ -1,5 +1,5 @@
 import React from "react";
-import PremiumCard from "../../designSystem/PremiumCard";
+import PremiumCard from "../../shared/ui/components/PremiumCard";
 
 type Props = {
   children: React.ReactNode;

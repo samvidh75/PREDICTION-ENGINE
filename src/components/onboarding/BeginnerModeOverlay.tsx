@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { OnboardingSeedSelection } from "../../services/onboarding/onboardingFirstRunMemory";
-import { BodyText, MicroLabel, SectionTitle, CardHeading } from "../../designSystem/TypographyIntelligence";
+import { BodyText, MicroLabel, SectionTitle, CardHeading } from "../../shared/ui/components/TypographyIntelligence";
 
 type Props = {
   visible: boolean;

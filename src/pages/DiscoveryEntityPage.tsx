@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useConfidenceEngine, type ConfidenceState } from "../components/intelligence/ConfidenceEngine";
-import { getSpatialFrameClassNames } from "../designSystem/SpatialFrame";
+import { getSpatialFrameClassNames } from "../shared/ui/components/SpatialFrame";
 import { useMotionController } from "../components/motion/MotionController";
 import type { DiscoveryEntity, DiscoveryEntityKind } from "../services/discovery/discoveryTypes";
 import { getDiscoveryIndex } from "../services/discovery/discoveryIndex";

@@ -12,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTelemetryRow,
-} from "../../../designSystem/IntelligenceCardAnatomy";
+} from "../../../shared/ui/components/IntelligenceCardAnatomy";
 import { getCompanySectorMapping } from "../../companyUniverse/getCompanySectorMapping";
 import { resolveExchangeAndTicker } from "../../../services/market/exchangeResolver";
 import { getCompanyNameFromTicker } from "../../../services/company/companyNameFromTicker";

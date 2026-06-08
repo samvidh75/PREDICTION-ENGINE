@@ -8,15 +8,15 @@ import type {
   ConfidenceTheme,
 } from "../intelligence/ConfidenceEngine";
 
-import PremiumCard from "../../designSystem/PremiumCard";
+import PremiumCard from "../../shared/ui/components/PremiumCard";
 import {
   CardBody,
   MicroLabel,
-} from "../../designSystem/TypographyIntelligence";
+} from "../../shared/ui/components/TypographyIntelligence";
 import {
   CardHeader,
   CardBody as CardBodyRegion,
-} from "../../designSystem/IntelligenceCardAnatomy";
+} from "../../shared/ui/components/IntelligenceCardAnatomy";
 
 type Props = {
   marketSnapshot: MarketComposite;
