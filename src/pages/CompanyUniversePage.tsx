@@ -276,7 +276,17 @@ export default function CompanyUniversePage(): JSX.Element {
     const exploreId = sectorMapping.exploreId;
     if (!exploreId) return;
 
-    navigateToExplore("sector", exploreId, { mode: "hard", preserveParamKeys: ["skipOnboarding"] });
+    // Build the URL manually to include ref params for back-navigation context
+    const url = new URL(window.location.href);
+    url.searchParams.set("page", "explore");
+    url.searchParams.set("kind", "sector");
+    url.searchParams.set("id", exploreId);
+    url.searchParams.set("ref", "company");
+    url.searchParams.set("stockId", model.ticker);
+    url.searchParams.set("companyName", model.companyName);
+
+    window.history.pushState({}, "", url.toString());
+    window.dispatchEvent(new Event("urlchange"));
   };
 
   const { state: confidenceState, theme: confidenceTheme } = useConfidenceEngine();

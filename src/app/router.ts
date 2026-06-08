@@ -29,6 +29,8 @@ export type PageKey =
   | "predictions"
   | "rankings"
   | "leaderboard"
+  | "onboarding"
+  | "validation-dashboard"
   | "workspace"
   | "daily-feed"
   | "portfolio-doctor";
@@ -109,6 +111,7 @@ export function notifyUrlChange(): void {
 export const PROTECTED_PAGES: PageKey[] = [
   "dashboard", "search", "discovery", "stock", "company",
   "watchlist", "portfolio", "alerts", "settings",
+  "explore", "workspace", "daily-feed", "portfolio-doctor",
 ];
 
 /** Public pages that don't require authentication. */

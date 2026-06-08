@@ -10,6 +10,9 @@ import PublicLandingPage from "../pages/PublicLandingPage";
 import PublicAboutPage from "../pages/PublicAboutPage";
 import PublicPredictionsPage from "../pages/PublicPredictionsPage";
 import PublicRankingsPage from "../pages/PublicRankingsPage";
+import LeaderboardPage from "../pages/LeaderboardPage";
+import OnboardingWizard from "../pages/OnboardingWizard";
+import ValidationDashboard from "../pages/ValidationDashboard";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 
@@ -89,6 +92,10 @@ export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: P
       {pageKey === "workspace" && <WorkspacePage />}
       {pageKey === "daily-feed" && <DailyFeed />}
       {pageKey === "portfolio-doctor" && <PortfolioDoctor />}
+      {pageKey === "explore" && <DiscoveryPage />}
+      {pageKey === "leaderboard" && <LeaderboardPage />}
+      {pageKey === "onboarding" && <OnboardingWizard />}
+      {pageKey === "validation-dashboard" && <ValidationDashboard />}
       {(pageKey === "landing" || pageKey === "login" || pageKey === "signup") && <DashboardHub />}
     </AppLayout>
   );

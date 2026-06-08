@@ -178,8 +178,34 @@ export default function DiscoveryEntityPage(): JSX.Element {
   }, [entity]);
 
   const onBack = () => {
-    const next = "?page=stock";
-    window.history.pushState({}, "", next);
+    const params = new URLSearchParams(window.location.search);
+    const currentKind = params.get("kind") ?? "";
+    const currentId = params.get("id") ?? "";
+
+    // Preserve the exploration context — go back to discovery with kind preserved
+    const ref = params.get("ref") ?? "";
+    const stockId = params.get("stockId") ?? "";
+
+    if (ref === "company" && stockId) {
+      // Coming from a company page — return to that company with preserved id
+      const next = new URL(window.location.href);
+      next.searchParams.set("page", "company");
+      next.searchParams.set("id", stockId);
+      next.searchParams.delete("ref");
+      next.searchParams.delete("stockId");
+      window.history.pushState({}, "", next.toString());
+    } else if (currentKind && currentId) {
+      // Return to explore overview for this kind
+      const next = new URL(window.location.href);
+      next.searchParams.set("page", "explore");
+      next.searchParams.set("kind", currentKind);
+      next.searchParams.delete("id");
+      window.history.pushState({}, "", next.toString());
+    } else {
+      // Go back to discovery
+      window.history.back();
+    }
+
     window.dispatchEvent(new Event("urlchange"));
   };
 
