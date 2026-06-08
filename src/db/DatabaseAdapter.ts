@@ -38,6 +38,7 @@ export interface DbQueryResult {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SQLitePoolLike = {
   query: (text: string, params?: any[]) => Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
+  executeScript?: (sql: string) => Promise<void>;
   end?: () => Promise<void>;
 };
 
@@ -254,6 +255,31 @@ export class DatabaseAdapter {
     }
 
     throw new Error("DATABASE_UNAVAILABLE: Cannot get client connection");
+  }
+
+  /**
+   * Execute a multi-statement SQL script (for migrations).
+   * SQLite delegates to db.exec(); PostgreSQL delegates to pool.query().
+   * Throws when adapter is unavailable.
+   */
+  async executeScript(sql: string): Promise<void> {
+    if (!this._initialized) {
+      await this.initialize();
+    }
+
+    if (this._kind === "sqlite" && this.sqlitePool?.executeScript) {
+      await this.sqlitePool.executeScript(sql);
+      return;
+    }
+
+    if (this._kind === "postgres" && this.pool) {
+      await this.pool.query(sql);
+      return;
+    }
+
+    throw new Error(
+      "DATABASE_UNAVAILABLE: Cannot execute migration script"
+    );
   }
 
   /**
