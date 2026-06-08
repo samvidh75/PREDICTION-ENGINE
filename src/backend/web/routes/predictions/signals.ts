@@ -1,18 +1,29 @@
 /**
- * TRACK-95O — Prediction Signals API
+ * TRACK-P2 — Prediction Signals API with Analytical Envelope
  * GET /api/predictions/signals
- * 
- * Replaces synthetic/intelligence-looking signals with fully traceable
- * prediction_registry-driven intelligence.
- * 
+ *
  * Every signal is the result of a real diff between today's snapshot
  * and the previous snapshot. No synthetic events. No inferred upgrades.
  * No pseudo scoring.
+ *
+ * Envelope logic:
+ *   - Empty signals + blank snapshotDate → SNAPSHOT_NOT_GENERATED → unavailableResponse
+ *   - Empty signals + present snapshotDate → NO_SIGNIFICANT_SIGNALS → emptyResponse / realResponse(empty)
+ *   - Signals present → realResponse with lineage, freshness, reason codes
  */
 import type { FastifyPluginAsync } from 'fastify';
-import { predictionDiffEngine } from '../../../intelligence/PredictionDiffEngine';
-import { signalValidator } from '../../../intelligence/SignalValidationEngine';
-import { PredictionExplanationEngine } from '../../../intelligence/PredictionExplanationEngine';
+import { predictionDiffEngine } from '../../../../intelligence/PredictionDiffEngine';
+import { signalValidator } from '../../../../intelligence/SignalValidationEngine';
+import {
+  realResponse,
+  emptyResponse,
+  unavailableResponse,
+  errorResponse,
+  AnalyticalReasonCode,
+  DataLineageEntry,
+  AnalyticalResponse,
+} from '../../../../shared/data/AnalyticalResponse';
+import { assessPredictionSnapshotFreshness } from '../../../../shared/data/DataFreshness';
 
 export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/predictions/signals', async (request, reply) => {
@@ -40,18 +51,118 @@ export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
         severity: severity as 'critical' | 'important' | 'monitor' | undefined,
       });
 
+      // ──────────────────────────────────────────────────────────
+      // Check for SNAPSHOT_NOT_GENERATED
+      // When snapshotDate is empty/blank and signals are empty,
+      // the snapshot has not been generated at all.
+      // ──────────────────────────────────────────────────────────
+      const hasSnapshotDate = !!result.snapshotDate && result.snapshotDate.trim() !== '';
+
+      if (result.signals.length === 0 && !hasSnapshotDate) {
+        return unavailableResponse(
+          'SNAPSHOT_NOT_GENERATED',
+          'Prediction snapshot has not been generated yet. No signals available.',
+          ['prediction_snapshot']
+        );
+      }
+
+      // ──────────────────────────────────────────────────────────
       // Attach validation data to each signal where available
+      // ──────────────────────────────────────────────────────────
       const signalsWithValidation = await attachValidation(result.signals);
 
-      return reply.send({
+      // ──────────────────────────────────────────────────────────
+      // Compute completeness for the signals payload
+      // ──────────────────────────────────────────────────────────
+      const requiredFields = ['snapshotDate', 'symbolsAnalyzed', 'signals'];
+      const availableFields = [
+        hasSnapshotDate ? 'snapshotDate' : null,
+        result.symbolsAnalyzed > 0 ? 'symbolsAnalyzed' : null,
+        signalsWithValidation.length >= 0 ? 'signals' : null,
+      ].filter(Boolean).length;
+      const completenessScore = requiredFields.length > 0
+        ? Math.round((availableFields / requiredFields.length) * 100)
+        : 100;
+
+      // ──────────────────────────────────────────────────────────
+      // Assess freshness from snapshot date
+      // ──────────────────────────────────────────────────────────
+      const freshnessResult = assessPredictionSnapshotFreshness(
+        hasSnapshotDate ? result.snapshotDate : null
+      );
+
+      // ──────────────────────────────────────────────────────────
+      // Build lineage
+      // ──────────────────────────────────────────────────────────
+      const lineage: DataLineageEntry[] = [
+        {
+          sourceTable: 'prediction_registry',
+          sourceField: 'classification',
+          asOf: hasSnapshotDate ? result.snapshotDate : null,
+          retrievedAt: new Date().toISOString(),
+          isFallback: false,
+          isSynthetic: false,
+          notes: hasSnapshotDate
+            ? `Snapshot from ${result.snapshotDate}`
+            : 'No snapshot date available',
+        },
+        {
+          sourceTable: 'prediction_registry',
+          sourceField: 'health_score',
+          asOf: hasSnapshotDate ? result.snapshotDate : null,
+          retrievedAt: new Date().toISOString(),
+          isFallback: false,
+          isSynthetic: false,
+        },
+        {
+          sourceTable: 'prediction_registry',
+          sourceField: 'factors',
+          asOf: hasSnapshotDate ? result.snapshotDate : null,
+          retrievedAt: new Date().toISOString(),
+          isFallback: false,
+          isSynthetic: false,
+          notes: `Symbols analyzed: ${result.symbolsAnalyzed}`,
+        },
+      ];
+
+      // ──────────────────────────────────────────────────────────
+      // Determine reason code
+      // ──────────────────────────────────────────────────────────
+      if (result.signals.length === 0 && hasSnapshotDate) {
+        // Empty signals but snapshot exists → NO_SIGNIFICANT_SIGNALS
+        return emptyResponse(
+          'NO_SIGNIFICANT_SIGNALS',
+          `Snapshot from ${result.snapshotDate} generated successfully but no significant signals were detected across ${result.symbolsAnalyzed} symbols analyzed.`,
+          freshnessResult.freshness,
+          result.snapshotDate,
+          lineage
+        );
+      }
+
+      // ──────────────────────────────────────────────────────────
+      // Signals present → wrap in realResponse
+      // ──────────────────────────────────────────────────────────
+      const payload = {
         signals: signalsWithValidation,
         generatedAt: result.generatedAt,
         snapshotDate: result.snapshotDate,
         symbolsAnalyzed: result.symbolsAnalyzed,
-      });
+      };
+
+      return realResponse(
+        payload,
+        freshnessResult.freshness,
+        result.snapshotDate || null,
+        completenessScore,
+        lineage,
+        'OK'
+      );
     } catch (err: any) {
       console.error('[predictions/signals] Error:', err);
-      return reply.status(500).send({ error: 'Failed to generate prediction signals.' });
+      return errorResponse(
+        'BACKEND_UNAVAILABLE',
+        `Failed to generate prediction signals: ${err.message}`
+      );
     }
   });
 };

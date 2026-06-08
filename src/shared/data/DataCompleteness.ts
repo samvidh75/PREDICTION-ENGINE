@@ -8,43 +8,74 @@
 import type { DataCompleteness, DataAvailability, CompletenessInput } from './AnalyticalResponse';
 
 // ---------------------------------------------------------------------------
-// Assess Completeness
+// Assess Completeness — overloaded for flexible usage
 // ---------------------------------------------------------------------------
 
 /**
- * Assess completeness of a dataset.
- * 
- * - requiredFields: all fields expected to be present
- * - values: actual data map (field name → value or null/undefined)
- * - criticalFields: subset of required fields that MUST be present; a single
- *   missing critical field can force availability to 'partial' or 'unavailable'
- * - neutralizedFields: fields that had null values replaced with neutral defaults
- * 
- * Returns:
- * - completeness score (0-100)
- * - missing field names
- * - neutralized field names
- * - confidence impact (how much to reduce confidence)
- * - availability recommendation
+ * Primary: full input object.
  */
-export function assessCompleteness(input: CompletenessInput): {
-  completeness: DataCompleteness;
-  availabilityRecommendation: DataAvailability;
-} {
-  const {
-    requiredFields,
-    values,
-    criticalFields = [],
-    neutralizedFields: inputNeutralized = [],
-  } = input;
+export function assessCompleteness(input: CompletenessInput): DataCompleteness;
+
+/**
+ * Convenience: (requiredFields: string[], availableFields: string[], neutralizedFields?: string[]).
+ */
+export function assessCompleteness(
+  requiredFields: string[],
+  availableFields: string[],
+  neutralizedFields?: string[]
+): DataCompleteness;
+
+/**
+ * Convenience: (requiredFields: string[], values: Record<string, any>, criticalFields?: string[]).
+ */
+export function assessCompleteness(
+  requiredFields: string[],
+  values: Record<string, number | string | null | undefined>,
+  criticalFields?: string[]
+): DataCompleteness;
+
+export function assessCompleteness(
+  arg1: CompletenessInput | string[],
+  arg2?: string[] | Record<string, number | string | null | undefined>,
+  arg3?: string[]
+): DataCompleteness {
+  let requiredFields: string[];
+  let values: Record<string, number | string | null | undefined>;
+  let criticalFields: string[] = [];
+  let neutralizedFields: string[] = [];
+
+  // Detect which overload was used
+  if (Array.isArray(arg1) && Array.isArray(arg2)) {
+    // Overload: (requiredFields, availableFields, neutralizedFields?)
+    requiredFields = arg1;
+    const availableFields = arg2;
+    neutralizedFields = arg3 ?? [];
+    values = {};
+    for (const f of requiredFields) {
+      values[f] = availableFields.includes(f) ? 1 : null;
+    }
+  } else if (Array.isArray(arg1) && typeof arg2 === 'object' && arg2 !== null && !Array.isArray(arg2)) {
+    // Overload: (requiredFields, values, criticalFields?)
+    requiredFields = arg1;
+    values = arg2;
+    criticalFields = arg3 ?? [];
+  } else if (typeof arg1 === 'object' && !Array.isArray(arg1)) {
+    // Overload: CompletenessInput
+    requiredFields = arg1.requiredFields;
+    values = arg1.values;
+    criticalFields = arg1.criticalFields ?? [];
+    neutralizedFields = arg1.neutralizedFields ?? [];
+  } else {
+    // Fallback
+    requiredFields = Array.isArray(arg1) ? arg1 : [];
+    values = {};
+  }
 
   const missingFields: string[] = [];
-  const neutralizedFields: string[] = [...inputNeutralized];
   let availableCount = 0;
 
   for (const field of requiredFields) {
     const val = values[field];
-    // null, undefined, or empty string = missing
     if (val === null || val === undefined || val === '') {
       missingFields.push(field);
     } else {
@@ -52,7 +83,6 @@ export function assessCompleteness(input: CompletenessInput): {
     }
   }
 
-  // Compute completeness score
   const total = requiredFields.length;
   const score = total > 0 ? Math.round((availableCount / total) * 100) : 100;
 
@@ -62,9 +92,6 @@ export function assessCompleteness(input: CompletenessInput): {
   const availableCritical = criticalCount - missingCritical.length;
 
   // Determine confidence impact (0-100)
-  // Missing optional fields: 5% each
-  // Missing critical fields: 15% each
-  // Neutralized fields: 3% each
   const optionalMissing = missingFields.filter(f => !criticalFields.includes(f));
   let confidenceImpact = Math.min(100,
     optionalMissing.length * 5 +
@@ -72,37 +99,31 @@ export function assessCompleteness(input: CompletenessInput): {
     neutralizedFields.length * 3
   );
 
-  // Determine availability recommendation
+  // Availability recommendation
   let availabilityRecommendation: DataAvailability = 'available';
 
   if (total === 0) {
     availabilityRecommendation = 'unavailable';
     confidenceImpact = 100;
   } else if (missingCritical.length > 0) {
-    // If any critical field is missing, mark as partial
     availabilityRecommendation = 'partial';
   }
-  // If ALL critical fields are missing, mark as unavailable
   if (criticalCount > 0 && availableCritical === 0) {
     availabilityRecommendation = 'unavailable';
     confidenceImpact = 100;
   }
-  // If more than 50% of all required fields are missing
   if (total > 0 && availableCount / total < 0.5) {
     availabilityRecommendation = 'unavailable';
     if (confidenceImpact < 80) confidenceImpact = 80;
   }
 
   return {
-    completeness: {
-      score,
-      requiredFields: total,
-      availableFields: availableCount,
-      missingFields,
-      neutralizedFields,
-      confidenceImpact,
-    },
-    availabilityRecommendation,
+    score,
+    requiredFields: total,
+    availableFields: availableCount,
+    missingFields,
+    neutralizedFields,
+    confidenceImpact,
   };
 }
 

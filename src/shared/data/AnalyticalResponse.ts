@@ -1,8 +1,12 @@
 /**
  * TRACK-P2 — Shared Analytical Response Contract
- * 
+ *
  * Central types for honest data states, lineage, freshness, and completeness.
  * Every production analytical API must use or be compatible with this contract.
+ *
+ * DESIGN NOTE: reason codes are typed as `string` (not a narrow union) so routes
+ * can add new codes without updating this contract. The known codes are documented
+ * here as the canonical set but the type system does not restrict them.
  */
 
 // ---------------------------------------------------------------------------
@@ -37,25 +41,30 @@ export type ResponseStatus =
   | 'demo';
 
 /**
- * Reason codes for analytical responses.
- * Distinguishes between empty, unavailable, error, and demo states.
+ * Known reason codes used across routes.
+ * The type is `string` to allow routes to add new codes without contract changes.
+ *
+ * Canonical codes:
+ *   BACKEND_UNAVAILABLE    — backend process or runtime is down
+ *   DATABASE_UNAVAILABLE   — database connection failure
+ *   SNAPSHOT_NOT_GENERATED — prediction/feature/factor snapshots never generated
+ *   FEATURE_SNAPSHOT_MISSING
+ *   FACTOR_SNAPSHOT_MISSING
+ *   FINANCIAL_SNAPSHOT_MISSING
+ *   FEATURE_OR_FACTOR_SNAPSHOT_MISSING
+ *   PREDICTION_NOT_FOUND   — symbol exists but no prediction_registry row
+ *   EMPTY_PORTFOLIO        — user supplied no positions
+ *   ALL_POSITIONS_REJECTED — all positions invalid
+ *   NO_SIGNIFICANT_SIGNALS — snapshot exists but no meaningful diffs
+ *   DEMO_MODE              — explicit demo request
+ *   STALE_DATA
+ *   PARTIAL_DATA
+ *   VALIDATION_LIMITED     — sample size too small for reliability claims
+ *   INTERNAL_ERROR         — unexpected server error
+ *   INVALID_POSITIONS_FORMAT
+ *   OK                     — healthy production-real response
  */
-export type AnalyticalReasonCode =
-  | 'BACKEND_UNAVAILABLE'
-  | 'DATABASE_UNAVAILABLE'
-  | 'SNAPSHOT_NOT_GENERATED'
-  | 'FEATURE_SNAPSHOT_MISSING'
-  | 'FACTOR_SNAPSHOT_MISSING'
-  | 'FINANCIAL_SNAPSHOT_MISSING'
-  | 'FEATURE_OR_FACTOR_SNAPSHOT_MISSING'
-  | 'PREDICTION_NOT_FOUND'
-  | 'EMPTY_PORTFOLIO'
-  | 'NO_SIGNIFICANT_SIGNALS'
-  | 'DEMO_MODE'
-  | 'STALE_DATA'
-  | 'PARTIAL_DATA'
-  | 'VALIDATION_LIMITED'
-  | 'OK';
+export type AnalyticalReasonCode = string;
 
 // ---------------------------------------------------------------------------
 // Lineage
@@ -63,12 +72,19 @@ export type AnalyticalReasonCode =
 
 export interface DataLineageEntry {
   sourceTable: string;
-  sourceField?: string;
+  /** Field name within the source table, or null if not applicable. */
+  sourceField?: string | null;
+  /** Data provider name, or null if unknown / internal pipeline. */
   provider?: string | null;
+  /** Timestamp of the source data (ISO string or null). */
   asOf?: string | null;
+  /** When the data was retrieved (ISO string or null). */
   retrievedAt?: string | null;
+  /** True if this entry was produced by a fallback path. */
   isFallback: boolean;
+  /** Must be false — synthetic data is not allowed in production responses. */
   isSynthetic: false;
+  /** Optional human-readable notes. */
   notes?: string | null;
 }
 
@@ -127,7 +143,7 @@ export interface AnalyticalResponse<T = unknown> {
   status: ResponseStatus;
   mode: ResponseMode;
   data: T | null;
-  reason: AnalyticalReasonCode | null;
+  reason: string | null;
   message: string | null;
   generatedAt: string;
   dataState: DataState;
@@ -161,7 +177,7 @@ export function buildAnalyticalResponse<T>(params: {
   status: ResponseStatus;
   mode: ResponseMode;
   data?: T | null;
-  reason?: AnalyticalReasonCode | null;
+  reason?: string | null;
   message?: string | null;
   dataState: DataState;
 }): AnalyticalResponse<T> {
@@ -177,13 +193,36 @@ export function buildAnalyticalResponse<T>(params: {
 }
 
 /**
+ * Convenience: extract the freshness string from a DataFreshnessResult.
+ */
+export function freshnessFrom(fr: { freshness: DataFreshness }): DataFreshness {
+  return fr.freshness;
+}
+
+/**
+ * Convenience: extract the asOf from a DataFreshnessResult.
+ */
+export function asOfFrom(fr: { asOf: string | null }): string | null {
+  return fr.asOf;
+}
+
+/**
  * Create an unavailable response with the appropriate reason code.
  */
 export function unavailableResponse<T>(
-  reason: AnalyticalReasonCode,
+  reason: string,
   message: string,
-  missingInputs: string[] = []
+  missingInputs?: string[] | Record<string, unknown>
 ): AnalyticalResponse<T> {
+  const inputs: string[] = [];
+  if (Array.isArray(missingInputs)) {
+    inputs.push(...missingInputs);
+  } else if (missingInputs && typeof missingInputs === 'object') {
+    for (const [k, v] of Object.entries(missingInputs)) {
+      inputs.push(v ? k : k); // include key name
+    }
+  }
+
   return buildAnalyticalResponse<T>({
     status: 'unavailable',
     mode: 'production_unavailable',
@@ -192,7 +231,7 @@ export function unavailableResponse<T>(
     dataState: buildDataState({
       availability: 'unavailable',
       freshness: 'unknown',
-      missingInputs,
+      missingInputs: inputs,
     }),
   });
 }
@@ -201,7 +240,7 @@ export function unavailableResponse<T>(
  * Create a partial response.
  */
 export function partialResponse<T>(
-  reason: AnalyticalReasonCode,
+  reason: string,
   message: string,
   data: T,
   missingInputs: string[],
@@ -228,29 +267,35 @@ export function partialResponse<T>(
 
 /**
  * Create a successful real-data response.
+ * Accepts DataFreshnessResult OR plain DataFreshness string for convenience.
  */
 export function realResponse<T>(
   data: T,
-  freshness: DataFreshness,
+  freshness: DataFreshness | DataFreshnessResult,
   asOf: string | null,
   completenessScore: number,
   lineage: DataLineageEntry[],
-  reason: AnalyticalReasonCode = 'OK',
-  neutralizedFields: string[] = []
+  reason?: string,
+  neutralizedFields?: string[]
 ): AnalyticalResponse<T> {
+  const fresh: DataFreshness =
+    typeof freshness === 'string' ? freshness : freshness.freshness;
+  const effectiveAsOf: string | null =
+    typeof freshness === 'string' ? asOf : (freshness.asOf ?? asOf);
+
   return buildAnalyticalResponse<T>({
     status: 'ok',
     mode: 'production_real',
-    reason,
+    reason: reason ?? 'OK',
     data,
     message: null,
     dataState: buildDataState({
       availability: 'available',
-      freshness,
-      asOf: asOf ?? null,
+      freshness: fresh,
+      asOf: effectiveAsOf,
       completenessScore,
       lineage,
-      neutralizedFields,
+      neutralizedFields: neutralizedFields ?? [],
     }),
   });
 }
@@ -276,12 +321,17 @@ export function demoResponse<T>(data: T, message?: string): AnalyticalResponse<T
  * Create an empty (valid) response.
  */
 export function emptyResponse<T>(
-  reason: AnalyticalReasonCode,
+  reason: string,
   message: string,
-  freshness: DataFreshness = 'unknown',
+  freshness?: DataFreshness | DataFreshnessResult,
   asOf?: string | null,
   lineage?: DataLineageEntry[]
 ): AnalyticalResponse<T> {
+  const fresh: DataFreshness =
+    typeof freshness === 'string' ? freshness : (freshness?.freshness ?? 'unknown');
+  const effectiveAsOf: string | null =
+    typeof freshness === 'string' ? (asOf ?? null) : (freshness?.asOf ?? asOf ?? null);
+
   return buildAnalyticalResponse<T>({
     status: 'empty',
     mode: 'production_real',
@@ -289,8 +339,8 @@ export function emptyResponse<T>(
     message,
     dataState: buildDataState({
       availability: 'available',
-      freshness,
-      asOf: asOf ?? null,
+      freshness: fresh,
+      asOf: effectiveAsOf,
       lineage: lineage ?? [],
     }),
   });
@@ -300,7 +350,7 @@ export function emptyResponse<T>(
  * Create an error response.
  */
 export function errorResponse<T>(
-  reason: AnalyticalReasonCode,
+  reason: string,
   message: string
 ): AnalyticalResponse<T> {
   return buildAnalyticalResponse<T>({

@@ -19,8 +19,8 @@ import {
   errorResponse,
   AnalyticalReasonCode,
   DataLineageEntry,
-} from '../../shared/data/AnalyticalResponse';
-import { assessPredictionSnapshotFreshness } from '../../shared/data/DataFreshness';
+} from '../../../shared/data/AnalyticalResponse';
+import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFreshness';
 
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
