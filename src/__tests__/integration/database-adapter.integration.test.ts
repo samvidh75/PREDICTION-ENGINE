@@ -70,6 +70,7 @@ describe('DatabaseAdapter SQLite integration', () => {
       const ping = await dbAdapter.ping();
       expect(ping.ok).toBe(true);
     } finally {
+      await dbAdapter.reset();
       cleanupDb(dbPath);
     }
   });
@@ -115,6 +116,7 @@ describe('DatabaseAdapter SQLite integration', () => {
       );
       expect(result.rows.length).toBe(1);
     } finally {
+      await dbAdapter.reset();
       cleanupDb(dbPath);
     }
   });

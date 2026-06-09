@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { resetForTest } from '../../db/SQLiteAdapter';
 import { MigrationRunner } from '../../db/MigrationRunner';
 
 // ---------------------------------------------------------------------------

@@ -92,6 +92,7 @@ async function main(): Promise<void> {
 
     // Clear any existing SQLite singleton in the module
     // The SQLiteAdapter uses a module-level singleton; we need to reset it
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
 
     // Step 3: Dynamically import SQLiteAdapter — triggers schema init
