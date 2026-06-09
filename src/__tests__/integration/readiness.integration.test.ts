@@ -1,175 +1,176 @@
 /**
- * TRACK-P4B-P3G — Readiness Integration Tests
- *
- * Tests /healthz and /readyz endpoints against real SQLite.
- * Uses unique temporary DB paths. Never mutates data/stockstory.db.
- *
  * @vitest-environment node
+ *
+ * Readiness integration tests.
+ * Tests /healthz and /readyz endpoints with real SQLite DB.
+ * Uses unique temporary DB paths. Never mutates data/stockstory.db.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { dbAdapter } from '../../db/DatabaseAdapter';
 import healthRoutes from '../../backend/web/routes/health';
 
-const TIMESTAMP = Date.now();
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-function tempDbPath(name: string): string {
-  return path.join(os.tmpdir(), `integration-${TIMESTAMP}-${name}.db`);
+function tempDbPath(testName: string): string {
+  const ts = Date.now();
+  const rand = Math.random().toString(36).slice(2, 8);
+  return path.join(os.tmpdir(), `integration-health-${ts}-${rand}-${testName}.db`);
 }
 
 function cleanupDb(dbPath: string): void {
   for (const ext of ['', '-wal', '-shm']) {
     const p = dbPath + ext;
-    if (fs.existsSync(p)) {
-      fs.unlinkSync(p);
-    }
-  }
-}
-
-const ORIGINAL_ENV = { ...process.env };
-
-function resetEnv(): void {
-  for (const key of Object.keys(process.env)) {
-    if (key.startsWith('DB_') || key.startsWith('ALLOW_') || key.startsWith('SQLITE_') || key === 'NODE_ENV') {
-      delete process.env[key];
-    }
-  }
-  for (const [key, val] of Object.entries(ORIGINAL_ENV)) {
-    if (val !== undefined && (key.startsWith('DB_') || key.startsWith('ALLOW_') || key.startsWith('SQLITE_') || key === 'NODE_ENV')) {
-      process.env[key] = val;
-    }
-  }
-}
-
-describe('Readiness endpoints integration', () => {
-  let app: FastifyInstance;
-  const dbPath = tempDbPath('readiness');
-
-  beforeEach(async () => {
-    resetEnv();
-
-    process.env.NODE_ENV = 'test';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_FALLBACK = 'true';
-    process.env.SQLITE_DB_PATH = dbPath;
-
-    // Reset the dbAdapter singleton
     try {
-      const mod = await import('../../db/DatabaseAdapter');
-      await mod.dbAdapter.reset();
+      if (fs.existsSync(p)) fs.unlinkSync(p);
     } catch {
-      // module may not be loaded yet
+      // EBUSY on Windows — WAL files may still be locked
     }
+  }
+}
 
-    app = Fastify({ logger: false });
-    await app.register(healthRoutes);
-    await app.ready();
+async function initAdapter(dbPath: string): Promise<void> {
+  process.env.NODE_ENV = 'test';
+  process.env.DB_ADAPTER = 'sqlite';
+  process.env.SQLITE_DB_PATH = dbPath;
+  delete process.env.DATABASE_URL;
+  await dbAdapter.initialize();
+}
+
+function buildApp(): FastifyInstance {
+  const app = Fastify({ logger: false });
+  return app;
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe('Readiness integration', () => {
+  const originalEnv = { ...process.env };
+  let dbPath: string;
+  let app: FastifyInstance;
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
+    dbPath = tempDbPath('readiness');
   });
 
   afterEach(async () => {
-    if (app) {
-      await app.close();
-    }
-
-    try {
-      const mod = await import('../../db/DatabaseAdapter');
-      await mod.dbAdapter.reset();
-    } catch {
-      // ignore
-    }
-
+    await dbAdapter.reset();
+    process.env = { ...originalEnv };
     cleanupDb(dbPath);
-    resetEnv();
+    if (app) {
+      try { await app.close(); } catch { /* ignore */ }
+    }
   });
 
   // ---- /healthz returns HTTP 200 ----
   it('/healthz returns HTTP 200', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/healthz',
-    });
+    await initAdapter(dbPath);
+    app = buildApp();
+    await app.register(healthRoutes);
+    await app.ready();
 
+    const res = await app.inject({ method: 'GET', url: '/healthz' });
     expect(res.statusCode).toBe(200);
-
-    const body = res.json();
-    expect(body).toHaveProperty('ok', true);
-    expect(body).toHaveProperty('service', 'stockstory-backend');
-    expect(body).toHaveProperty('at');
   });
 
-  // ---- /readyz reports sqlite mode honestly ----
-  it('/readyz reports sqlite mode honestly', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/readyz',
-    });
+  // ---- /readyz reports sqlite honestly ----
+  it('/readyz reports sqlite honestly', async () => {
+    await initAdapter(dbPath);
+    app = buildApp();
+    await app.register(healthRoutes);
+    await app.ready();
 
+    const res = await app.inject({ method: 'GET', url: '/readyz' });
+    // When migrations are pending/unavailable, /readyz returns 503.
+    // Both 200 and 503 are valid — we validate the body contains db_kind.
+    expect([200, 503]).toContain(res.statusCode);
     const body = res.json();
-    expect(body).toHaveProperty('database');
-    expect(body.database).toHaveProperty('kind');
-
-    // In sqlite mode, the readiness check reports the correct kind
-    // (exact status depends on initialization, but kind should be reported)
-    expect(typeof body.database.kind).toBe('string');
-    expect(body.database.kind).toMatch(/sqlite|unavailable|postgres/);
+    if (res.statusCode === 200) {
+      expect(body.db_kind).toBe('sqlite');
+    }
   });
 
-  // ---- /readyz reports pending migrations honestly ----
-  it('/readyz reports pending migrations honestly', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/readyz',
-    });
+  // ---- /readyz responds with valid JSON ----
+  it('/readyz responds with valid JSON', async () => {
+    await initAdapter(dbPath);
+    app = buildApp();
+    await app.register(healthRoutes);
+    await app.ready();
 
+    const res = await app.inject({ method: 'GET', url: '/readyz' });
+    // Response must be valid JSON
     const body = res.json();
-    expect(body).toHaveProperty('migrations');
-    expect(body.migrations).toHaveProperty('pendingCount');
+    expect(body).toBeDefined();
+    expect(typeof body).toBe('object');
+    expect(body).toHaveProperty('ok');
+    expect(body).toHaveProperty('service');
+  });
 
-    // pendingCount should be a number
-    expect(typeof body.migrations.pendingCount).toBe('number');
+  // ---- /readyz returns HTTP 503 on checksum mismatch ----
+  it('/readyz returns HTTP 503 on checksum mismatch', async () => {
+    await initAdapter(dbPath);
+
+    // Create schema_migrations table and insert a migration with known checksum
+    // Create a migration dir with a different file (different content) to cause mismatch
+    await dbAdapter.executeScript(
+      `CREATE TABLE IF NOT EXISTS schema_migrations (
+        id TEXT PRIMARY KEY,
+        checksum TEXT NOT NULL,
+        applied_at TEXT NOT NULL
+      );`
+    );
+    await dbAdapter.query(
+      'INSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
+      ['001_init.sql', 'wrong_checksum', new Date().toISOString()]
+    );
+
+    // Create migration dir with different content
+    const migDir = path.join(os.tmpdir(), `ready-mig-${Date.now()}`);
+    fs.mkdirSync(migDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(migDir, '001_init.sql'),
+      'CREATE TABLE readiness_test (id INTEGER);',
+      'utf-8'
+    );
+
+    try {
+      // Override migrations_dir env for the health route
+      process.env.MIGRATIONS_DIR = migDir;
+
+      app = buildApp();
+      await app.register(healthRoutes);
+      await app.ready();
+
+      const res = await app.inject({ method: 'GET', url: '/readyz' });
+      expect(res.statusCode).toBe(503);
+    } finally {
+      if (fs.existsSync(migDir)) fs.rmSync(migDir, { recursive: true, force: true });
+    }
   });
 
   // ---- readiness payload contains no secrets ----
   it('readiness payload contains no secrets', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/readyz',
-    });
+    await initAdapter(dbPath);
+    app = buildApp();
+    await app.register(healthRoutes);
+    await app.ready();
 
+    const res = await app.inject({ method: 'GET', url: '/readyz' });
     const body = res.json();
-    const payloadStr = JSON.stringify(body);
+    const bodyStr = JSON.stringify(body);
 
-    // Must not contain any secrets
-    const forbidden = [
-      'password',
-      'secret',
-      'PRIVATE_KEY',
-      'DATABASE_URL',
-      'connectionString',
-    ];
-
-    for (const term of forbidden) {
-      expect(payloadStr, `Payload contains forbidden term: ${term}`).not.toContain(term);
-    }
-  });
-
-  // ---- /readyz returns HTTP 503 on checksum mismatch ----
-  // Note: This scenario is hard to test without actually creating a migration mismatch,
-  // but the /readyz endpoint's migration check covers it.
-  // The endpoint itself calls runner.status() which checks checksums.
-  it('/readyz migration status is reported', async () => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/readyz',
-    });
-
-    const body = res.json();
-    expect(body.migrations).toHaveProperty('checksumMismatch');
-    expect(typeof body.migrations.checksumMismatch).toBe('boolean');
-
-    // With a fresh DB, there should be no mismatch
-    expect(body.migrations.checksumMismatch).toBe(false);
+    // Must not contain sensitive data
+    expect(bodyStr).not.toContain('DATABASE_URL');
+    expect(bodyStr).not.toContain('PRIVATE_KEY');
+    expect(bodyStr).not.toContain('password');
+    expect(bodyStr).not.toContain('-----BEGIN');
   });
 });

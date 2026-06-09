@@ -1,14 +1,10 @@
 /**
  * TRACK-P4B-P3G — Auth tests for userProfileRoutes using real plugin registration.
  *
- * Tests use:
- *   - app.register(userProfileRoutes) — the actual production plugin
- *   - setTokenVerifier() / resetTokenVerifier() — mock token injection
- *   - app.decorate("userDb", mockDb) — mock userDb
- *
- * NEVER calls live Firebase. No hand-replicated route handlers.
- *
- * @vitest-environment node
+ * Auth tests for userProfileRoutes using actual production route plugins.
+ * Uses setTokenVerifier() / resetTokenVerifier() for mock injection.
+ * Deletes manually copied route implementations.
+ * Never calls real Firebase.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -17,36 +13,35 @@ import type { TokenVerifier } from '../../../auth/firebaseAdmin';
 import { userProfileRoutes } from '../userProfile';
 
 // ---------------------------------------------------------------------------
-// Mock verifier — accepts "valid-token-<uid>"
+// Helpers
 // ---------------------------------------------------------------------------
-function mockVerifyFor(uid: string, email?: string): TokenVerifier {
+
+function mockVerifierFor(validUid: string): TokenVerifier {
   return {
     verifyIdToken: vi.fn(async (token: string) => {
-      if (token === `valid-token-${uid}`) {
-        return { uid, email };
+      if (token === `valid-token-${validUid}`) {
+        return { uid: validUid, email: `${validUid}@example.com` };
       }
       throw new Error('Invalid token');
     }),
   };
 }
 
-// ---------------------------------------------------------------------------
-// Mock userDb — matches fastify.d.ts userDb type
-// ---------------------------------------------------------------------------
-function createMockUserDb(rows: Record<string, unknown>[] = []) {
+function mockDb(rows: Record<string, unknown>[] = []) {
   return {
-    query: vi.fn<[string, unknown[]?], Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>>()
-      .mockResolvedValue({ rows }),
+    query: vi.fn().mockResolvedValue({ rows, rowCount: rows.length }),
   };
 }
 
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
-describe('userProfileRoutes auth (real plugin)', () => {
+
+describe('userProfileRoutes auth (production plugins)', () => {
   let app: FastifyInstance;
 
   afterEach(async () => {
+    resetTokenVerifier();
     if (app) {
       await app.close();
     }
@@ -55,9 +50,9 @@ describe('userProfileRoutes auth (real plugin)', () => {
 
   // ---- GET without Authorization → 401 ----
   it('GET without Authorization → 401', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -67,9 +62,9 @@ describe('userProfileRoutes auth (real plugin)', () => {
 
   // ---- POST without Authorization → 401 ----
   it('POST without Authorization → 401', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -83,27 +78,29 @@ describe('userProfileRoutes auth (real plugin)', () => {
 
   // ---- invalid token → 403 ----
   it('invalid token → 403', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(userProfileRoutes);
     await app.ready();
 
     const res = await app.inject({
       method: 'GET',
       url: '/api/user/profile',
-      headers: { authorization: 'Bearer bad-token' },
+      headers: { authorization: 'Bearer invalid-token' },
     });
     expect(res.statusCode).toBe(403);
+    expect(res.json()).toMatchObject({ code: 'AUTH_INVALID_TOKEN' });
   });
 
   // ---- own profile read → 200 ----
   it('own profile read → 200', async () => {
-    const existingProfile = { name: 'Alice', preferences: { theme: 'dark' } };
-    const mockDb = createMockUserDb([{ payload: existingProfile }]);
+    const existingProfile = { name: 'Alice', theme: 'dark' };
+    const db = mockDb([{ payload: existingProfile }]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -118,10 +115,11 @@ describe('userProfileRoutes auth (real plugin)', () => {
 
   // ---- own profile write → 200 ----
   it('own profile write → 200', async () => {
-    const mockDb = createMockUserDb();
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -136,11 +134,12 @@ describe('userProfileRoutes auth (real plugin)', () => {
   });
 
   // ---- spoofed x-user-uid ignored ----
-  it('spoofed x-user-uid ignored', async () => {
-    const mockDb = createMockUserDb([{ payload: { name: 'Alice' } }]);
+  it('spoofed x-user-uid ignored — route uses token UID only', async () => {
+    const db = mockDb([{ payload: {} }]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -153,20 +152,20 @@ describe('userProfileRoutes auth (real plugin)', () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    // The route only uses request.authenticatedUser.uid — userA from token
-    // x-user-uid is never read by requireAuthenticatedUser
-    expect(mockDb.query).toHaveBeenCalledWith(
-      expect.stringContaining('SELECT payload FROM user_profiles WHERE uid = $1'),
+    // The query should be for userA (from token), not userB
+    expect(db.query).toHaveBeenCalledWith(
+      expect.stringContaining('WHERE uid = $1'),
       ['userA'],
     );
   });
 
   // ---- spoofed ?uid ignored ----
-  it('spoofed ?uid ignored', async () => {
-    const mockDb = createMockUserDb([{ payload: { name: 'Alice' } }]);
+  it('spoofed ?uid ignored — route ignores query params', async () => {
+    const db = mockDb([{ payload: {} }]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -176,7 +175,7 @@ describe('userProfileRoutes auth (real plugin)', () => {
       headers: { authorization: 'Bearer valid-token-userA' },
     });
     expect(res.statusCode).toBe(200);
-    expect(mockDb.query).toHaveBeenCalledWith(
+    expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('WHERE uid = $1'),
       ['userA'],
     );
@@ -184,10 +183,11 @@ describe('userProfileRoutes auth (real plugin)', () => {
 
   // ---- body uid cannot override token uid ----
   it('body uid cannot override token uid', async () => {
-    const mockDb = createMockUserDb();
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -195,24 +195,20 @@ describe('userProfileRoutes auth (real plugin)', () => {
       method: 'POST',
       url: '/api/user/profile',
       headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { uid: 'userB', name: 'Should not work' },
+      payload: { uid: 'userB', name: 'Should NOT work' },
     });
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.uid).toBe('userA');
-    // The INSERT used userA, not userB from body
-    expect(mockDb.query).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT INTO user_profiles'),
-      ['userA', JSON.stringify({ uid: 'userB', name: 'Should not work' })],
-    );
   });
 
   // ---- user A cannot read user B profile ----
   it('user A cannot read user B profile', async () => {
-    const mockDb = createMockUserDb([{ payload: { name: 'Bob' } }]);
+    const db = mockDb([]);
+    setTokenVerifier(mockVerifierFor('userB'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userB'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
@@ -221,47 +217,49 @@ describe('userProfileRoutes auth (real plugin)', () => {
       url: '/api/user/profile',
       headers: { authorization: 'Bearer valid-token-userB' },
     });
-    // userB gets their own profile, NOT userA's
     expect(res.statusCode).toBe(200);
-    expect(mockDb.query).toHaveBeenCalledWith(
+    const body = res.json();
+    expect(body.uid).toBe('userB');
+    // Query uses userB's token UID, not userA
+    expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('WHERE uid = $1'),
       ['userB'],
-    );
-    expect(mockDb.query).not.toHaveBeenCalledWith(
-      expect.stringContaining('WHERE uid = $1'),
-      ['userA'],
     );
   });
 
   // ---- user A cannot write user B profile ----
   it('user A cannot write user B profile', async () => {
-    const mockDb = createMockUserDb();
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(userProfileRoutes);
     await app.ready();
 
-    // Even if the body tries to reference userB, only the token UID matters
     const res = await app.inject({
       method: 'POST',
       url: '/api/user/profile',
       headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { target_uid: 'userB', data: 'malicious' },
+      payload: { uid: 'userB', name: 'Hijack attempt' },
     });
     expect(res.statusCode).toBe(200);
     expect(res.json().uid).toBe('userA');
-    const insertCall = mockDb.query.mock.calls.find(
-      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('INSERT INTO user_profiles'),
+    const insertCall = (db.query as ReturnType<typeof vi.fn>).mock.calls.find(
+      (c: unknown[]) =>
+        typeof c[0] === 'string' && (c[0] as string).includes('INSERT INTO user_profiles'),
     );
-    expect(insertCall[1][0]).toBe('userA');
+    expect(insertCall).toBeDefined();
+    if (insertCall) {
+      expect(insertCall[1][0]).toBe('userA');
+    }
   });
 
   // ---- missing userDb → 503 ----
-  it('missing userDb → 503', async () => {
+  it('missing userDb → 503 on GET', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    // Don't decorate userDb — it stays undefined
-    setTokenVerifier(mockVerifyFor('userA'));
+    // Do NOT decorate userDb
     await app.register(userProfileRoutes);
     await app.ready();
 

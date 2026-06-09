@@ -65,7 +65,7 @@ const mockVerifyToken: VerifyTokenFn = vi.fn(async (token: string) => {
 // ---------------------------------------------------------------------------
 
 describe('createRequireAuth / requireAuthenticatedUser', () => {
-  const preHandler = createRequireAuth(mockVerifyToken);
+  const preHandler = createRequireAuth({ verifyIdToken: mockVerifyToken });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -215,7 +215,7 @@ describe('createRequireAuth / requireAuthenticatedUser', () => {
     const throwingVerify: VerifyTokenFn = vi.fn(async () => {
       throw 'just a string'; // not an Error instance
     });
-    const handler = createRequireAuth(throwingVerify);
+    const handler = createRequireAuth({ verifyIdToken: throwingVerify });
 
     const request = mockRequest({
       headers: { authorization: 'Bearer anything' },

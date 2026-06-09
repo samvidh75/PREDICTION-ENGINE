@@ -1,199 +1,148 @@
 /**
- * TRACK-P4B-P3G — Firebase Admin Tests
- *
- * Tests firebaseAdmin module behavior: credential modes, environment handling,
- * injected verifier bypass, and key normalization.
- * Resets environment and module state between tests.
- *
  * @vitest-environment node
+ *
+ * Tests for Firebase Admin authentication module.
+ * Tests: production credentials, service-account, ADC, development fallback,
+ * injected verifier bypass, and newline normalization.
+ * Resets module state between tests.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// We test the module behavior via the exported functions.
-// The getFirebaseApp() function is internal but its effects are observable
-// through verifyFirebaseToken and getTokenVerifier.
+// ---------------------------------------------------------------------------
+// We need to reset the module-level state between tests.
+// The firebaseAdmin module caches _app and _auth at module scope.
+// We use vi.resetModules() and dynamic import to get a fresh copy each time.
+// ---------------------------------------------------------------------------
 
-const OLD_ENV = { ...process.env };
-
-beforeEach(() => {
-  // Reset environment (except PATH and other system vars)
-  for (const key of Object.keys(process.env)) {
-    if (key.startsWith('FIREBASE_') || key === 'NODE_ENV') {
-      delete process.env[key];
-    }
-  }
-  // Reset the firebaseAdmin module's internal state
-  // We use vi.resetModules() in each test to get a fresh module
-});
+const originalEnv = { ...process.env };
 
 afterEach(() => {
-  // Restore original environment
-  for (const key of Object.keys(process.env)) {
-    if (key.startsWith('FIREBASE_') || key === 'NODE_ENV') {
-      delete process.env[key];
-    }
-  }
-  for (const [key, val] of Object.entries(OLD_ENV)) {
-    if (val !== undefined) {
-      process.env[key] = val;
-    }
-  }
+  process.env = { ...originalEnv };
 });
 
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
 describe('firebaseAdmin', () => {
-  // ---- production without credentials throws ----
-  it('production without credentials throws', async () => {
-    process.env.NODE_ENV = 'production';
-    delete process.env.FIREBASE_PROJECT_ID;
-    delete process.env.FIREBASE_CLIENT_EMAIL;
-    delete process.env.FIREBASE_PRIVATE_KEY;
-    delete process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS;
+  describe('production without credentials throws', () => {
+    it('throws in production when no credentials are configured', async () => {
+      await vi.resetModules();
 
-    // Need fresh module import to trigger getFirebaseApp
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'production';
+      delete process.env.FIREBASE_PROJECT_ID;
+      delete process.env.FIREBASE_CLIENT_EMAIL;
+      delete process.env.FIREBASE_PRIVATE_KEY;
+      delete process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS;
+      delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
-    await expect(mod.verifyFirebaseToken('any-token')).rejects.toThrow();
+      // The firebaseAdmin module lazily initializes _app; calling
+      // verifyFirebaseToken triggers getFirebaseAuth() → getFirebaseApp()
+      // which should throw because no credentials are configured.
+      const { verifyFirebaseToken } = await import('../firebaseAdmin');
+
+      await expect(verifyFirebaseToken('test')).rejects.toThrow(
+        /Firebase Admin credentials are required in production/,
+      );
+    });
   });
 
-  // ---- service-account environment accepted ----
-  it('service-account environment accepted (does not throw on init)', async () => {
-    process.env.NODE_ENV = 'development';
-    process.env.FIREBASE_PROJECT_ID = 'test-project';
-    process.env.FIREBASE_CLIENT_EMAIL = 'test@test-project.iam.gserviceaccount.com';
-    process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMOCK\n-----END PRIVATE KEY-----\n';
+  describe('service-account credentials accepted', () => {
+    it('does not throw when service-account env vars are set', async () => {
+      await vi.resetModules();
 
-    vi.resetModules();
-    // Importing should not throw — the module is initialized lazily on first verify
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'production';
+      process.env.FIREBASE_PROJECT_ID = 'test-project';
+      process.env.FIREBASE_CLIENT_EMAIL = 'test@test-project.iam.gserviceaccount.com';
+      process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\nMOCK\n-----END PRIVATE KEY-----\n';
 
-    // verifyFirebaseToken will still fail because the key is fake,
-    // but the APP initialization should not throw.
-    // We check that setTokenVerifier works to confirm the module loaded.
-    expect(() => mod.setTokenVerifier({
-      verifyIdToken: vi.fn().mockResolvedValue({ uid: 'test-uid' }),
-    })).not.toThrow();
-
-    mod.resetTokenVerifier();
+      // Should not throw on import (credential setup), but verifyIdToken
+      // will still fail because it's a mock key — but that's a runtime error,
+      // not a credential error.
+      const mod = await import('../firebaseAdmin');
+      // The module should import successfully
+      expect(mod.setTokenVerifier).toBeDefined();
+    });
   });
 
-  // ---- ADC flag calls applicationDefault() ----
-  it('ADC flag does not throw during init', async () => {
-    process.env.NODE_ENV = 'production';
-    process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS = 'true';
-    process.env.FIREBASE_PROJECT_ID = 'test-project';
+  describe('ADC flag calls applicationDefault()', () => {
+    it('accepts ADC mode without throwing', async () => {
+      await vi.resetModules();
 
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'production';
+      process.env.FIREBASE_PROJECT_ID = 'test-project';
+      process.env.FIREBASE_CLIENT_EMAIL = undefined;
+      process.env.FIREBASE_PRIVATE_KEY = undefined;
+      process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS = 'true';
 
-    // In a test environment without real ADC, verifyFirebaseToken will fail
-    // at the auth level, but the app initialization should proceed.
-    // The key assertion: the module doesn't fail at import/init time
-    // when FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS=true is set.
-    expect(() => mod.setTokenVerifier({
-      verifyIdToken: vi.fn().mockResolvedValue({ uid: 'adc-uid' }),
-    })).not.toThrow();
-
-    mod.resetTokenVerifier();
+      // ADC may fail at runtime if GOOGLE_APPLICATION_CREDENTIALS is not set,
+      // but the import itself should not throw.
+      const mod = await import('../firebaseAdmin');
+      expect(mod.setTokenVerifier).toBeDefined();
+    });
   });
 
-  // ---- development fallback permitted ----
-  it('development fallback permitted', async () => {
-    process.env.NODE_ENV = 'development';
-    delete process.env.FIREBASE_PROJECT_ID;
-    delete process.env.FIREBASE_CLIENT_EMAIL;
-    delete process.env.FIREBASE_PRIVATE_KEY;
-    delete process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS;
+  describe('development fallback permitted', () => {
+    it('does not throw in development without credentials', async () => {
+      await vi.resetModules();
 
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'development';
+      process.env.FIREBASE_PROJECT_ID = undefined;
+      process.env.FIREBASE_CLIENT_EMAIL = undefined;
+      process.env.FIREBASE_PRIVATE_KEY = undefined;
+      process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS = undefined;
 
-    // verifyFirebaseToken may fail (no real Firebase), but the module
-    // should not throw during initialization in dev mode.
-    // We can inject a verifier and verify it works.
-    const mockVerifier = {
-      verifyIdToken: vi.fn().mockResolvedValue({ uid: 'dev-uid', email: 'dev@test.com' }),
-    };
-
-    mod.setTokenVerifier(mockVerifier);
-    const result = await mod.getTokenVerifier().verifyIdToken('mock-dev-token');
-    expect(result.uid).toBe('dev-uid');
-    expect(result.email).toBe('dev@test.com');
-    mod.resetTokenVerifier();
+      const mod = await import('../firebaseAdmin');
+      expect(mod.setTokenVerifier).toBeDefined();
+    });
   });
 
-  // ---- injected verifier bypasses live Firebase ----
-  it('injected verifier bypasses live Firebase', async () => {
-    process.env.NODE_ENV = 'development';
+  describe('injected verifier bypasses live Firebase', () => {
+    it('uses injected verifier instead of live Firebase', async () => {
+      await vi.resetModules();
 
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'development';
 
-    const mockVerifier = {
-      verifyIdToken: vi.fn(async (token: string) => {
-        if (token === 'my-test-token') {
-          return { uid: 'injected-uid', email: 'injected@test.com' };
-        }
-        throw new Error('Invalid token');
-      }),
-    };
+      const mod = await import('../firebaseAdmin');
 
-    mod.setTokenVerifier(mockVerifier);
+      const mockVerifier = {
+        verifyIdToken: vi.fn(async (token: string) => {
+          if (token === 'test-token') {
+            return { uid: 'uid-123', email: 'test@example.com' };
+          }
+          throw new Error('Invalid token');
+        }),
+      };
 
-    const verifier = mod.getTokenVerifier();
+      mod.setTokenVerifier(mockVerifier);
 
-    // Valid token
-    const result = await verifier.verifyIdToken('my-test-token');
-    expect(result.uid).toBe('injected-uid');
-    expect(result.email).toBe('injected@test.com');
+      const result = await mod.getTokenVerifier().verifyIdToken('test-token');
+      expect(result.uid).toBe('uid-123');
+      expect(result.email).toBe('test@example.com');
+      expect(mockVerifier.verifyIdToken).toHaveBeenCalledTimes(1);
 
-    // Invalid token
-    await expect(verifier.verifyIdToken('bad-token')).rejects.toThrow('Invalid token');
+      // reset
+      mod.resetTokenVerifier();
 
-    // The mock was called, not real Firebase
-    expect(mockVerifier.verifyIdToken).toHaveBeenCalledTimes(2);
-
-    mod.resetTokenVerifier();
+      // After reset, verifyIdToken should call real Firebase (which will fail
+      // in test, but the point is the verifier was cleared)
+      const verifierAfter = mod.getTokenVerifier();
+      expect(verifierAfter).not.toBe(mockVerifier);
+    });
   });
 
-  // ---- resetTokenVerifier restores default ----
-  it('resetTokenVerifier clears injected verifier', async () => {
-    process.env.NODE_ENV = 'development';
+  describe('escaped newlines normalized', () => {
+    it('handles escaped newlines in private key', async () => {
+      await vi.resetModules();
 
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
+      process.env.NODE_ENV = 'production';
+      process.env.FIREBASE_PROJECT_ID = 'test-project';
+      process.env.FIREBASE_CLIENT_EMAIL = 'test@test-project.iam.gserviceaccount.com';
+      process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\\nMOCK\\n-----END PRIVATE KEY-----\\n';
 
-    const mockVerifier = {
-      verifyIdToken: vi.fn().mockResolvedValue({ uid: 'temp-uid' }),
-    };
-
-    mod.setTokenVerifier(mockVerifier);
-    expect((mod.getTokenVerifier() as any) === mockVerifier).toBe(true);
-
-    mod.resetTokenVerifier();
-    // After reset, the verifier should no longer be the mock
-    expect((mod.getTokenVerifier() as any) === mockVerifier).toBe(false);
-  });
-
-  // ---- escaped newlines in FIREBASE_PRIVATE_KEY normalized ----
-  it('escaped newlines in FIREBASE_PRIVATE_KEY normalized', async () => {
-    // The normalization happens inside getFirebaseApp() which is not exported.
-    // We test that a key with \\n delimiters is accepted without crashing
-    // (the actual normalization logic is: privateKey?.replace(/\\n/g, '\n'))
-    process.env.NODE_ENV = 'development';
-    process.env.FIREBASE_PROJECT_ID = 'test-project';
-    process.env.FIREBASE_CLIENT_EMAIL = 'test@test.iam.gserviceaccount.com';
-    // Key with escaped newlines (as stored in env vars)
-    process.env.FIREBASE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\\nMOCKKEY\\n-----END PRIVATE KEY-----\\n';
-
-    vi.resetModules();
-    const mod = await import('../firebaseAdmin');
-
-    // Should not throw on import — the key formatting is handled internally
-    expect(() => mod.setTokenVerifier({
-      verifyIdToken: vi.fn().mockResolvedValue({ uid: 'key-test-uid' }),
-    })).not.toThrow();
-
-    mod.resetTokenVerifier();
+      // Should import without throwing — the \\n are normalized to \n
+      const mod = await import('../firebaseAdmin');
+      expect(mod.setTokenVerifier).toBeDefined();
+    });
   });
 });

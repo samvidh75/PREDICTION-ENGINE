@@ -100,10 +100,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
       - key: DATABASE_URL
         sync: false
 
-      # ── Database Policy — explicit, no fallback ─────────────────────
       - key: DB_ADAPTER
         value: postgres
 

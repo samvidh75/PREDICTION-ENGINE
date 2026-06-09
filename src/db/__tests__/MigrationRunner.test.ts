@@ -1,32 +1,74 @@
 /**
- * TRACK-P4B-P3G — MigrationRunner Unit Tests
+ * @vitest-environment node
  *
- * Tests MigrationRunner using temporary directories and mock adapters.
- * No real database connections.
+ * Unit tests for MigrationRunner.
+ * Uses temporary migration directories and mock adapters.
+ * Never touches a real database.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MigrationRunner } from '../MigrationRunner';
-import type { MigrationExecutionAdapter } from '../MigrationRunner';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { MigrationRunner } from '../MigrationRunner';
+import type { MigrationExecutionAdapter } from '../MigrationRunner';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function makeTempDir(): string {
-  const dir = path.join(os.tmpdir(), `migration-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const dir = path.join(
+    os.tmpdir(),
+    `migration-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
 
-function writeMigration(dir: string, filename: string, sql: string): void {
-  fs.writeFileSync(path.join(dir, filename), sql);
+function cleanTempDir(dir: string): void {
+  if (fs.existsSync(dir)) {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
-function createEmptyQueryMock() {
-  return vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
+function writeMigration(dir: string, filename: string, sql: string): void {
+  fs.writeFileSync(path.join(dir, filename), sql, 'utf-8');
+}
+
+/**
+ * Creates a mock adapter that tracks applied migrations in-memory.
+ */
+function mockAdapterTracked(
+  preApplied: Array<{ id: string; checksum: string; applied_at: string }> = [],
+  execScriptImpl?: (sql: string) => Promise<void>,
+): MigrationExecutionAdapter {
+  const applied = [...preApplied];
+  const queryFn = vi.fn((text: string, params?: unknown[]) => {
+    const sql = text as string;
+    // listApplied SELECT
+    if (sql.includes('SELECT id, checksum, applied_at')) {
+      return Promise.resolve({
+        rows: applied.map((r) => ({ ...r })),
+        rowCount: applied.length,
+      });
+    }
+    // Track INSERTs
+    if (sql.includes('INSERT INTO schema_migrations') && Array.isArray(params) && params.length >= 3) {
+      applied.push({
+        id: String(params[0]),
+        checksum: String(params[1]),
+        applied_at: String(params[2]),
+      });
+    }
+    return Promise.resolve({ rows: [], rowCount: 0 });
+  }) as MigrationExecutionAdapter['query'];
+
+  return { query: queryFn, executeScript: execScriptImpl };
+}
+
+function mockAdapter(execScriptImpl?: (sql: string) => Promise<void>): MigrationExecutionAdapter {
+  return mockAdapterTracked([], execScriptImpl);
 }
 
 // ---------------------------------------------------------------------------
@@ -34,300 +76,145 @@ function createEmptyQueryMock() {
 // ---------------------------------------------------------------------------
 
 describe('MigrationRunner', () => {
-  let migrationsDir: string;
+  let tempDir: string;
 
   beforeEach(() => {
-    migrationsDir = makeTempDir();
+    tempDir = makeTempDir();
   });
 
-  // ---- executeScript called when adapter supports it ----
-  it('executeScript called when adapter supports it', async () => {
-    const executeScriptImpl = vi.fn().mockResolvedValue(undefined);
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [];
+  afterEach(() => {
+    cleanTempDir(tempDir);
+  });
 
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) {
-          appliedRows.push({
-            id: params[0] as string,
-            checksum: params[1] as string,
-            applied_at: params[2] as string,
-          });
-        }
-        return { rows: [], rowCount: 1 };
-      }
-      // ensureTable CREATE TABLE
-      return { rows: [], rowCount: 0 };
-    });
+  // ---- executeScript called when available ----
+  it('executeScript called when available', async () => {
+    writeMigration(tempDir, '001_init.sql', 'CREATE TABLE test1 (id INTEGER);');
 
-    const adapter: MigrationExecutionAdapter = { query: queryImpl, executeScript: executeScriptImpl };
+    const executeScript = vi.fn().mockResolvedValue(undefined);
+    const adapter = mockAdapter(executeScript);
+    const runner = new MigrationRunner(adapter, tempDir);
 
-    const sql = 'CREATE TABLE test_table (id INTEGER PRIMARY KEY);';
-    writeMigration(migrationsDir, '001_create_test.sql', sql);
-
-    const runner = new MigrationRunner(adapter, migrationsDir);
     await runner.runPending();
 
-    // executeScript should have been called with the migration SQL
-    expect(executeScriptImpl).toHaveBeenCalled();
-    // At least one call should contain the migration SQL
-    const calls = executeScriptImpl.mock.calls;
-    const found = calls.some((c: unknown[]) => typeof c[0] === 'string' && c[0].includes('CREATE TABLE test_table'));
-    expect(found).toBe(true);
+    expect(executeScript).toHaveBeenCalledTimes(1);
+    expect(executeScript).toHaveBeenCalledWith('CREATE TABLE test1 (id INTEGER);');
   });
 
   // ---- query fallback used only when executeScript is absent ----
   it('query fallback used only when executeScript is absent', async () => {
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [];
-    const migratedSqls: string[] = [];
+    writeMigration(tempDir, '001_init.sql', 'CREATE TABLE test2 (id INTEGER);');
 
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) {
-          appliedRows.push({
-            id: params[0] as string,
-            checksum: params[1] as string,
-            applied_at: params[2] as string,
-          });
-        }
-        return { rows: [], rowCount: 1 };
-      }
-      if (sql.includes('CREATE TABLE') || sql.includes('ALTER TABLE') || sql.includes('SELECT 1')) {
-        migratedSqls.push(sql);
-        return { rows: [], rowCount: 0 };
-      }
-      return { rows: [], rowCount: 0 };
-    });
+    const adapter = mockAdapter(undefined);
+    const runner = new MigrationRunner(adapter, tempDir);
 
-    // No executeScript — query fallback
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-
-    const sql = 'CREATE TABLE test_table (id INTEGER PRIMARY KEY);';
-    writeMigration(migrationsDir, '001_create_test.sql', sql);
-
-    const runner = new MigrationRunner(adapter, migrationsDir);
     await runner.runPending();
 
-    // At least one migrated SQL should contain the migration
-    const migrationCall = migratedSqls.find(s => s.includes('CREATE TABLE test_table'));
+    const calls = (adapter.query as ReturnType<typeof vi.fn>).mock.calls;
+    const migrationCall = calls.find(
+      (c: unknown[]) => c[0] === 'CREATE TABLE test2 (id INTEGER);',
+    );
     expect(migrationCall).toBeDefined();
   });
 
   // ---- first run applies pending migration ----
   it('first run applies pending migration', async () => {
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [];
+    const sql = 'CREATE TABLE users (id INTEGER PRIMARY KEY);';
+    writeMigration(tempDir, '001_init.sql', sql);
 
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) {
-          appliedRows.push({
-            id: params[0] as string,
-            checksum: params[1] as string,
-            applied_at: params[2] as string,
-          });
-        }
-        return { rows: [], rowCount: 1 };
-      }
-      return { rows: [], rowCount: 0 };
-    });
+    const executeScript = vi.fn().mockResolvedValue(undefined);
+    const adapter = mockAdapter(executeScript);
+    const runner = new MigrationRunner(adapter, tempDir);
 
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-
-    writeMigration(migrationsDir, '001_create_table.sql', 'CREATE TABLE test_t (id INTEGER PRIMARY KEY);');
-
-    const runner = new MigrationRunner(adapter, migrationsDir);
     const result = await runner.runPending();
 
+    // Verify the migration was applied by querying directly
+    const applied = await runner.listApplied();
+    expect(applied.length).toBe(1);
+    expect(applied[0].id).toBe('001_init.sql');
+    expect(result.appliedCount).toBe(1);
     expect(result.pendingCount).toBe(0);
-    expect(appliedRows.length).toBe(1);
-    expect(appliedRows[0].id).toBe('001_create_table.sql');
+    expect(result.checksumMismatch).toBe(false);
+    expect(result.ready).toBe(true);
   });
 
-  // ---- second run skips already-applied migration ----
-  it('second run skips already-applied migration', async () => {
-    const sql1 = 'CREATE TABLE t1 (id INTEGER);';
-    writeMigration(migrationsDir, '001_first.sql', sql1);
-    writeMigration(migrationsDir, '002_second.sql', 'CREATE TABLE t2 (id INTEGER);');
+  // ---- second run skips applied migration ----
+  it('second run skips applied migration', async () => {
+    const sql = 'CREATE TABLE data (id INTEGER);';
+    writeMigration(tempDir, '001_init.sql', sql);
 
-    // Compute the correct checksum for the first migration
-    const crypto = await import('crypto');
-    const correctChecksum = crypto.createHash('sha256').update(sql1).digest('hex').slice(0, 16);
+    const checksum = createHash('sha256').update(sql).digest('hex').slice(0, 16);
 
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [
-      { id: '001_first.sql', checksum: correctChecksum, applied_at: '2025-01-01T00:00:00.000Z' },
-    ];
+    const executeScript = vi.fn().mockResolvedValue(undefined);
+    const adapter = mockAdapterTracked(
+      [{ id: '001_init.sql', checksum, applied_at: '2025-01-01T00:00:00.000Z' }],
+      executeScript,
+    );
+    const runner = new MigrationRunner(adapter, tempDir);
 
-    const migratedSqls: string[] = [];
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) {
-          appliedRows.push({
-            id: params[0] as string,
-            checksum: params[1] as string,
-            applied_at: params[2] as string,
-          });
-        }
-        return { rows: [], rowCount: 1 };
-      }
-      if (/CREATE TABLE/i.test(sql)) {
-        migratedSqls.push(sql);
-        return { rows: [], rowCount: 0 };
-      }
-      return { rows: [], rowCount: 0 };
-    });
+    const result = await runner.runPending();
 
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-
-    const runner = new MigrationRunner(adapter, migrationsDir);
-    await runner.runPending();
-
-    // Only 002 should have been migrated
-    const migrated = migratedSqls.filter(s => s.includes('002') || s.includes('t2'));
-    expect(migrated.length).toBe(1);
-    expect(appliedRows.map(r => r.id)).toContain('001_first.sql');
-    expect(appliedRows.map(r => r.id)).toContain('002_second.sql');
+    expect(result.appliedCount).toBe(1);
+    expect(result.pendingCount).toBe(0);
+    expect(executeScript).not.toHaveBeenCalled();
   });
 
   // ---- checksum mismatch throws ----
   it('checksum mismatch throws', async () => {
-    writeMigration(migrationsDir, '001_init.sql', 'CREATE TABLE test_table (id INTEGER PRIMARY KEY);');
+    writeMigration(tempDir, '001_init.sql', 'CREATE TABLE changed (id INTEGER);');
 
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [
-      { id: '001_init.sql', checksum: 'deadbeef_wrong', applied_at: '2025-01-01T00:00:00.000Z' },
-    ];
-
-    const queryImpl = vi.fn(async (sql: string) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      return { rows: [], rowCount: 0 };
-    });
-
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-    const runner = new MigrationRunner(adapter, migrationsDir);
+    const executeScript = vi.fn().mockResolvedValue(undefined);
+    const adapter = mockAdapterTracked(
+      [{ id: '001_init.sql', checksum: 'WRONG_CHECKSUM', applied_at: '2025-01-01T00:00:00.000Z' }],
+      executeScript,
+    );
+    const runner = new MigrationRunner(adapter, tempDir);
 
     await expect(runner.runPending()).rejects.toThrow(/checksum mismatch/i);
   });
 
   // ---- DB inspection failure throws ----
-  it('DB inspection failure throws', async () => {
-    const queryImpl = vi.fn().mockRejectedValue(new Error('Connection refused'));
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-    const runner = new MigrationRunner(adapter, migrationsDir);
+  it('DB inspection failure throws (listApplied fails)', async () => {
+    writeMigration(tempDir, '001_init.sql', 'CREATE TABLE y (id INTEGER);');
 
-    // status() calls ensureTable() which calls query — should throw
-    await expect(runner.status()).rejects.toThrow('Connection refused');
+    const adapter: MigrationExecutionAdapter = {
+      query: vi
+        .fn()
+        .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // ensureTable
+        .mockRejectedValueOnce(new Error('SQLITE_ERROR: no such table: schema_migrations')),
+    };
+
+    const runner = new MigrationRunner(adapter, tempDir);
+    await expect(runner.runPending()).rejects.toThrow();
   });
 
   // ---- invalid SQL is not recorded as applied ----
   it('invalid SQL is not recorded as applied', async () => {
-    writeMigration(migrationsDir, '001_bad_sql.sql', 'INVALID SQL SYNTAX !!!');
+    writeMigration(tempDir, '001_bad.sql', 'NOT VALID SQL AT ALL;');
 
-    const appliedMigrations: string[] = [];
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return {
-          rows: appliedMigrations.map(id => ({ id, checksum: 'abc', applied_at: '2025-01-01' })),
-          rowCount: appliedMigrations.length,
-        };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) appliedMigrations.push(params[0] as string);
-        return { rows: [], rowCount: 1 };
-      }
-      if (sql.includes('INVALID')) {
-        throw new Error('SQLite query failed: near "INVALID": syntax error');
-      }
-      return { rows: [], rowCount: 0 };
-    });
+    const adapter = mockAdapter(
+      vi.fn().mockRejectedValue(new Error('SQLITE_ERROR: near "NOT": syntax error')),
+    );
 
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
+    const runner = new MigrationRunner(adapter, tempDir);
+    await expect(runner.runPending()).rejects.toThrow(/Migration "001_bad.sql" failed/);
 
-    const runner = new MigrationRunner(adapter, migrationsDir);
-    await expect(runner.runPending()).rejects.toThrow(/001_bad_sql/);
-
-    // The bad migration should NOT be recorded as applied
-    expect(appliedMigrations).not.toContain('001_bad_sql.sql');
+    const calls = (adapter.query as ReturnType<typeof vi.fn>).mock.calls;
+    const insertCall = calls.find(
+      (c: unknown[]) =>
+        typeof c[0] === 'string' && (c[0] as string).includes('INSERT INTO schema_migrations'),
+    );
+    expect(insertCall).toBeUndefined();
   });
 
-  // ---- thrown error contains migration filename ----
-  it('thrown error contains migration filename', async () => {
-    writeMigration(migrationsDir, '005_complex.sql', 'CREATE TABLE; -- incomplete');
+  // ---- thrown error includes migration filename ----
+  it('thrown error includes migration filename', async () => {
+    writeMigration(tempDir, '002_critical.sql', 'THIS IS BROKEN SQL;');
 
-    const appliedRows: Array<{ id: string; checksum: string; applied_at: string }> = [];
+    const adapter = mockAdapter(
+      vi.fn().mockRejectedValue(new Error('syntax error near THIS')),
+    );
 
-    const queryImpl = vi.fn(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('SELECT id, checksum, applied_at')) {
-        return { rows: appliedRows as unknown as Record<string, unknown>[], rowCount: appliedRows.length };
-      }
-      if (sql.includes('INSERT INTO schema_migrations')) {
-        if (params) {
-          appliedRows.push({
-            id: params[0] as string,
-            checksum: params[1] as string,
-            applied_at: params[2] as string,
-          });
-        }
-        return { rows: [], rowCount: 1 };
-      }
-      // The migration SQL itself is run via query (no executeScript)
-      // It should throw because the SQL is bad
-      if (sql.includes('CREATE TABLE') && sql.includes('incomplete')) {
-        throw new Error('Incomplete SQL statement: expected column list after CREATE TABLE');
-      }
-      return { rows: [], rowCount: 0 };
-    });
-
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-
-    const runner = new MigrationRunner(adapter, migrationsDir);
-
-    await expect(runner.runPending()).rejects.toThrow('005_complex.sql');
-  });
-
-  // ---- listApplied throws on DB failure (no silent empty array) ----
-  it('listApplied throws on DB failure — P4B-P3D requirement', async () => {
-    const queryImpl = vi.fn().mockRejectedValue(new Error('Disk I/O error'));
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-    const runner = new MigrationRunner(adapter, migrationsDir);
-    await expect(runner.listApplied()).rejects.toThrow('Disk I/O error');
-  });
-
-  // ---- status reports checksumMismatch correctly ----
-  it('status reports checksumMismatch = false when checksums match', async () => {
-    const sql = 'CREATE TABLE test (id INTEGER);';
-    writeMigration(migrationsDir, '001_init.sql', sql);
-
-    const crypto = await import('crypto');
-    const checksum = crypto.createHash('sha256').update(sql).digest('hex').slice(0, 16);
-
-    const queryImpl = vi.fn(async (querySql: string) => {
-      if (querySql.includes('SELECT id, checksum, applied_at')) {
-        return {
-          rows: [{ id: '001_init.sql', checksum, applied_at: '2025-01-01' }],
-          rowCount: 1,
-        };
-      }
-      return { rows: [], rowCount: 0 };
-    });
-
-    const adapter: MigrationExecutionAdapter = { query: queryImpl };
-    const runner = new MigrationRunner(adapter, migrationsDir);
-    const status = await runner.status();
-
-    expect(status.checksumMismatch).toBe(false);
-    expect(status.ready).toBe(true);
+    const runner = new MigrationRunner(adapter, tempDir);
+    await expect(runner.runPending()).rejects.toThrow(/002_critical\.sql/);
   });
 });

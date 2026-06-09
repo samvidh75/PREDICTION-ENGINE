@@ -9,54 +9,58 @@ import type { FastifyPluginAsync } from 'fastify';
 import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
 
 export const userProfileRoutes: FastifyPluginAsync = async (app) => {
-  const getUserDb = () => app.userDb;
-
   // GET /api/user/profile
-  app.get('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
-    const uid = request.authenticatedUser!.uid;
-    const userDb = getUserDb();
+  app.get(
+    '/api/user/profile',
+    { preHandler: [requireAuthenticatedUser] },
+    async (request, reply) => {
+      const uid = request.authenticatedUser!.uid;
 
-    if (!userDb) {
-      return reply.status(503).send({
-        code: 'PERSISTENCE_UNAVAILABLE',
-        error: 'User profile persistence is currently unavailable.',
-      });
-    }
+      if (!app.userDb) {
+        return reply.status(503).send({
+          code: 'PERSISTENCE_UNAVAILABLE',
+          error: 'User profile persistence is currently unavailable.',
+        });
+      }
 
-    const res = await userDb.query(
-      `SELECT payload FROM user_profiles WHERE uid = $1`,
-      [uid]
-    );
+      const res = await app.userDb.query(
+        `SELECT payload FROM user_profiles WHERE uid = $1`,
+        [uid],
+      );
 
-    if (res.rows.length === 0) {
-      return { uid, profile: {} };
-    }
+      if (res.rows.length === 0) {
+        return { uid, profile: {} };
+      }
 
-    return res.rows[0].payload;
-  });
+      return (res.rows[0] as { payload: unknown }).payload;
+    },
+  );
 
   // POST /api/user/profile
-  app.post('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
-    const uid = request.authenticatedUser!.uid;
-    const payload = (request.body as Record<string, unknown>) ?? {};
-    const userDb = getUserDb();
+  app.post(
+    '/api/user/profile',
+    { preHandler: [requireAuthenticatedUser] },
+    async (request, reply) => {
+      const uid = request.authenticatedUser!.uid;
+      const payload = (request.body as Record<string, unknown>) ?? {};
 
-    if (!userDb) {
-      return reply.status(503).send({
-        code: 'PERSISTENCE_UNAVAILABLE',
-        error: 'User profile persistence is currently unavailable.',
-      });
-    }
+      if (!app.userDb) {
+        return reply.status(503).send({
+          code: 'PERSISTENCE_UNAVAILABLE',
+          error: 'User profile persistence is currently unavailable.',
+        });
+      }
 
-    await userDb.query(
-      `INSERT INTO user_profiles (uid, payload)
+      await app.userDb.query(
+        `INSERT INTO user_profiles (uid, payload)
        VALUES ($1, $2)
        ON CONFLICT (uid) DO UPDATE SET payload = EXCLUDED.payload`,
-      [uid, JSON.stringify(payload)]
-    );
+        [uid, JSON.stringify(payload)],
+      );
 
-    return { status: 'ok', uid };
-  });
+      return { status: 'ok', uid };
+    },
+  );
 };
 
 export default userProfileRoutes;
