@@ -95,9 +95,10 @@ export class PredictionFactory {
             (engineResult.quality * 0.05)
           )));
 
-          // P4B: Use factor snapshot sector_strength_factor as sector_score source
-          const sectorScore = engineResult.factorSnapshot?.sector_strength_factor != null
-            ? Number(engineResult.factorSnapshot.sector_strength_factor)
+          // P4B: Use factor snapshot sector_strength_factor as sector_score source.
+          // We get this from the evaluateSymbol's return, which includes the fact snapshot.
+          const sectorScore = (engineResult._sectorStrengthFactor != null)
+            ? Number(engineResult._sectorStrengthFactor)
             : 50;
 
           const confidenceLevel = calibratedConfidence >= 80 ? 'High' : calibratedConfidence >= 65 ? 'Medium' : 'Low';
@@ -268,8 +269,8 @@ export class PredictionFactory {
       };
 
       const result = await stockStoryEngine.evaluate(engineInputs as any);
-      // Attach factor snapshot to result for sector_score extraction
-      result.factorSnapshot = fact;
+      // P4B: Pass sector_strength_factor through the result for extraction upstream
+      (result as any)._sectorStrengthFactor = fact?.sector_strength_factor ?? 50;
       return result;
     } catch {
       return null;

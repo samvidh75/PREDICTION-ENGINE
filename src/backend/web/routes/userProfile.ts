@@ -1,41 +1,61 @@
-// src/backend/web/routes/userProfile.ts
-import type { FastifyPluginAsync } from "fastify";
-import { loadAuthSession } from "../../../services/auth/sessionStore"; // adjust import as needed
-
 /**
- * Simple JSON blob storage for user-specific data (watchlists, alerts, memory).
- * Data is stored per UID in the PostgreSQL table `user_profiles` with a JSONB column `payload`.
+ * TRACK-P4B-P3D — User Profile Routes (userDb-migrated)
+ *
+ * UID comes ONLY from verified Firebase ID token via Authorization header.
+ * Private user data uses app.userDb (PostgreSQL-only, never SQLite).
+ * Missing app.userDb returns HTTP 503.
  */
+import type { FastifyPluginAsync } from 'fastify';
+import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
+
 export const userProfileRoutes: FastifyPluginAsync = async (app) => {
-  // GET profile data
-  app.get("/api/user/profile", async (request, reply) => {
-    const uid = (request.headers["x-user-uid"] as string) || (request.query as any)?.uid || loadAuthSession().uid || "anonymous";
-    if (!app.postgres) return {};
-    
-    const res = await app.postgres.query<any>(
+  const getUserDb = () => app.userDb;
+
+  // GET /api/user/profile
+  app.get('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
+    const uid = request.authenticatedUser!.uid;
+    const userDb = getUserDb();
+
+    if (!userDb) {
+      return reply.status(503).send({
+        code: 'PERSISTENCE_UNAVAILABLE',
+        error: 'User profile persistence is currently unavailable.',
+      });
+    }
+
+    const res = await userDb.query(
       `SELECT payload FROM user_profiles WHERE uid = $1`,
       [uid]
     );
+
     if (res.rows.length === 0) {
-      // Return empty object if no profile yet
-      return {};
+      return { uid, profile: {} };
     }
+
     return res.rows[0].payload;
   });
 
-  // POST profile data (replace whole payload)
-  app.post("/api/user/profile", async (request, reply) => {
-    const uid = (request.headers["x-user-uid"] as string) || (request.query as any)?.uid || loadAuthSession().uid || "anonymous";
-    const payload = (request.body as any) ?? {};
-    if (!app.postgres) return { status: "ok" };
+  // POST /api/user/profile
+  app.post('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {
+    const uid = request.authenticatedUser!.uid;
+    const payload = (request.body as Record<string, unknown>) ?? {};
+    const userDb = getUserDb();
 
-    await app.postgres.query(
+    if (!userDb) {
+      return reply.status(503).send({
+        code: 'PERSISTENCE_UNAVAILABLE',
+        error: 'User profile persistence is currently unavailable.',
+      });
+    }
+
+    await userDb.query(
       `INSERT INTO user_profiles (uid, payload)
        VALUES ($1, $2)
        ON CONFLICT (uid) DO UPDATE SET payload = EXCLUDED.payload`,
-      [uid, payload]
+      [uid, JSON.stringify(payload)]
     );
-    return { status: "ok" };
+
+    return { status: 'ok', uid };
   });
 };
 

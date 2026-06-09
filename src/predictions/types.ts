@@ -23,8 +23,8 @@ export interface CreatePredictionInput {
   momentumScore: number;
   riskScore: number;
   sectorScore: number;
-  priceAtPrediction: number;
-  benchmarkLevel: number;
+  priceAtPrediction: number | null;
+  benchmarkLevel: number | null;
   predictionHorizon: number;
   createdBy?: string;
 }

@@ -125,6 +125,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
       // ──────────────────────────────────────────────────────────
       // Build lineage
       // ──────────────────────────────────────────────────────────
+      // TRACK-P4B: Use CANONICAL column names in lineage
       const lineage: DataLineageEntry[] = [
         {
           sourceTable: 'prediction_registry',
@@ -136,7 +137,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
         },
         {
           sourceTable: 'prediction_registry',
-          sourceField: 'health_score',
+          sourceField: 'ranking_score',
           asOf: predictionDate,
           retrievedAt: new Date().toISOString(),
           isFallback: false,
@@ -144,7 +145,15 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
         },
         {
           sourceTable: 'prediction_registry',
-          sourceField: 'factors',
+          sourceField: 'confidence_score',
+          asOf: predictionDate,
+          retrievedAt: new Date().toISOString(),
+          isFallback: false,
+          isSynthetic: false,
+        },
+        {
+          sourceTable: 'prediction_registry',
+          sourceField: 'quality_score, growth_score, value_score, momentum_score, risk_score, sector_score',
           asOf: predictionDate,
           retrievedAt: new Date().toISOString(),
           isFallback: false,
