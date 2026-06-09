@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npx tsc -p tsconfig.json --noEmit && vite build",
+    "build:vercel": "npm run typecheck:vercel && vite build",
     "build:backend": "tsc -p tsconfig.backend.json --noEmit",
     "build:all": "npm run build && npm run build:backend",
     "compile:backend": "tsc -p tsconfig.backend.emit.json",

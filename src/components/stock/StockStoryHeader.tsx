@@ -13,6 +13,13 @@ type Props = {
   companyHealthState: CompanyHealthState;
 };
 
+function formatNumberOrUnavailable(
+  value: number | null | undefined,
+  formatter: (value: number) => string
+): string {
+  return value == null ? "—" : formatter(value);
+}
+
 function labelForConfidence(state: ConfidenceState): string {
   switch (state) {
     case "CONFIDENCE_RISING":
@@ -28,17 +35,30 @@ function labelForConfidence(state: ConfidenceState): string {
   }
 }
 
-function pillForMove(pct: number, theme: ConfidenceTheme): { fg: string; glow: string } {
-  if (!Number.isFinite(pct)) return { fg: "rgba(255,255,255,0.85)", glow: theme.deepBlueGlow };
+function pillForMove(pct: number | null, theme: ConfidenceTheme): { fg: string; glow: string } {
+  if (pct == null || !Number.isFinite(pct)) return { fg: "rgba(255,255,255,0.85)", glow: theme.deepBlueGlow };
   if (pct > 0.01) return { fg: "rgba(0,255,210,0.95)", glow: theme.cyanGlow };
   if (pct < -0.01) return { fg: "rgba(209,107,165,0.95)", glow: theme.magentaGlow };
   return { fg: "rgba(200,215,255,0.85)", glow: theme.deepBlueGlow };
 }
 
-function formatSignedPct(pct: number): string {
-  if (!Number.isFinite(pct)) return "—";
+function formatSignedPct(pct: number | null): string {
+  if (pct == null || !Number.isFinite(pct)) return "—";
   const sign = pct >= 0 ? "+" : "";
   return `${sign}${pct.toFixed(2)}%`;
+}
+
+/**
+ * Guard null-safe comparisons: returns the branch for "data unavailable" when value is null,
+ * otherwise delegates to the comparison chain.
+ */
+function guardCompare<T extends number | null>(
+  value: T,
+  unavailable: () => React.ReactNode,
+  compare: (v: number) => React.ReactNode,
+): React.ReactNode {
+  if (value == null) return unavailable();
+  return compare(value);
 }
 
 export default function StockStoryHeader({
@@ -101,31 +121,49 @@ export default function StockStoryHeader({
         <div className="hidden md:grid grid-cols-3 gap-3 mt-auto">
           <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Market Activity</div>
-            <div className="mt-2 text-[15px] font-semibold text-white/92">{Math.round(snap.liquidityParticipation * 100)}%</div>
+            <div className="mt-2 text-[15px] font-semibold text-white/92">
+              {formatNumberOrUnavailable(snap.liquidityParticipation, (v) => `${Math.round(v * 100)}%`)}
+            </div>
             <div className="mt-2 text-[12px] leading-[1.7] text-white/75">
-              {snap.liquidityParticipation >= 0.62
-                ? "Strong depth supporting stable trends."
-                : snap.liquidityParticipation >= 0.48
-                  ? "Moderate activity levels."
-                  : "Lower activity—pacing increases."}
+              {guardCompare(
+                snap.liquidityParticipation,
+                () => "Market activity data is currently unavailable.",
+                (v) =>
+                  v >= 0.62
+                    ? "Strong depth supporting stable trends."
+                    : v >= 0.48
+                      ? "Moderate activity levels."
+                      : "Lower activity—pacing increases.",
+              )}
             </div>
           </div>
 
           <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Market Outlook</div>
-            <div className="mt-2 text-[15px] font-semibold text-white/92">{Math.round(snap.volatilityEnvironment * 100)}%</div>
+            <div className="mt-2 text-[15px] font-semibold text-white/92">
+              {formatNumberOrUnavailable(snap.volatilityEnvironment, (v) => `${Math.round(v * 100)}%`)}
+            </div>
             <div className="mt-2 text-[12px] leading-[1.7] text-white/75">
-              {snap.volatilityEnvironment >= 0.72
-                ? "Elevated movement—observe stability signs."
-                : snap.volatilityEnvironment >= 0.55
-                  ? "Moderate movement."
-                  : "Calm and steady movement."}
+              {guardCompare(
+                snap.volatilityEnvironment,
+                () => "Volatility data is currently unavailable.",
+                (v) =>
+                  v >= 0.72
+                    ? "Elevated movement—observe stability signs."
+                    : v >= 0.55
+                      ? "Moderate movement."
+                      : "Calm and steady movement.",
+              )}
             </div>
           </div>
 
           <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
             <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Volume</div>
-            <div className="mt-2 text-[15px] font-semibold text-white/92">{snap.volume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+            <div className="mt-2 text-[15px] font-semibold text-white/92">
+              {formatNumberOrUnavailable(snap.volume, (v) =>
+                v.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+              )}
+            </div>
             <div className="mt-2 text-[12px] leading-[1.7] text-white/75">Volume measures total shares traded during the active session.</div>
           </div>
         </div>
