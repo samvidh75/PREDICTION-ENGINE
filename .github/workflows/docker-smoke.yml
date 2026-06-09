@@ -9,33 +9,99 @@ on:
 jobs:
   docker-smoke:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: stockstory
+          POSTGRES_PASSWORD: stockstory
+          POSTGRES_DB: stockstory_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run migrations
+        run: npm run migrate
+        env:
+          NODE_ENV: test
+          DB_ADAPTER: postgres
+          ALLOW_SQLITE_FALLBACK: "false"
+          ALLOW_SQLITE_IN_PRODUCTION: "false"
+          DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
+
+      - name: Seed CI fixtures
+        run: npm run seed:ci
+        env:
+          NODE_ENV: test
+          DB_ADAPTER: postgres
+          ALLOW_SQLITE_FALLBACK: "false"
+          DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
 
       - name: Build Docker image
         run: docker build -t stockstory-api:test .
 
-      - name: Start container
+      - name: Start container with PostgreSQL
         run: |
           docker run -d \
             --name stockstory-api-test \
             -p 4001:4001 \
             -e NODE_ENV=production \
+            -e DB_ADAPTER=postgres \
+            -e ALLOW_SQLITE_FALLBACK=false \
+            -e ALLOW_SQLITE_IN_PRODUCTION=false \
+            -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            --add-host=host.docker.internal:host-gateway \
             stockstory-api:test
 
-      - name: Wait for readiness
+      - name: Wait for /healthz
         run: |
-          for i in {1..30}; do
+          for i in $(seq 1 30); do
             if curl -fsS http://localhost:4001/healthz; then
-              echo "Container ready after ${i} attempts"
-              exit 0
+              echo "Container /healthz ready after ${i} attempts"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: Container /healthz never became ready"
+              docker logs stockstory-api-test
+              exit 1
             fi
             sleep 2
           done
-          echo "Container failed to become ready"
-          docker logs stockstory-api-test
-          exit 1
+
+      - name: Wait for /readyz
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4001/readyz; then
+              echo "Container /readyz ready after ${i} attempts"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: Container /readyz never became ready"
+              docker logs stockstory-api-test
+              exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Validate API states against Docker
+        run: |
+          npx wait-on http://localhost:4001/readyz -t 15000
+          API_BASE_URL=http://localhost:4001 npm run validate:api-states
 
       - name: Show container logs
         if: always()

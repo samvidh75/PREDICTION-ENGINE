@@ -13,5 +13,13 @@ export default defineConfig({
       'coverage/**',
     ],
     testTimeout: 30000,
+    // Run integration tests sequentially to avoid shared-state conflicts
+    // with the global dbAdapter singleton and SQLite file-based databases.
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   },
 });

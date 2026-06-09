@@ -24,8 +24,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
       NODE_ENV: test
+      DB_ADAPTER: postgres
+      ALLOW_SQLITE_FALLBACK: "false"
+      ALLOW_SQLITE_IN_PRODUCTION: "false"
+      DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
       COOKIE_SECRET: test-only-ci-secret
     steps:
       - uses: actions/checkout@v4
@@ -49,6 +52,15 @@ jobs:
       - name: Backend compile
         run: npx tsc -p tsconfig.backend.emit.json
 
+      - name: Run migrations
+        run: npx tsx src/db/migrate.ts
+
+      - name: Seed CI fixtures
+        run: npm run seed:ci
+
+      - name: PostgreSQL integration tests
+        run: npm run test:integration:postgres
+
       - name: Schema validation
         run: npx tsx scripts/validate-schema-contract.ts
 
@@ -58,23 +70,36 @@ jobs:
       - name: Build Docker image
         run: docker build -t stockstory-api:test .
 
-      - name: Docker smoke test
+      - name: Start container with PostgreSQL
         run: |
           docker run -d \
             --name stockstory-api-test \
             -p 4001:4001 \
             -e NODE_ENV=production \
+            -e DB_ADAPTER=postgres \
+            -e ALLOW_SQLITE_FALLBACK=false \
+            -e ALLOW_SQLITE_IN_PRODUCTION=false \
+            -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            --add-host=host.docker.internal:host-gateway \
             stockstory-api:test
-          for i in {1..30}; do
-            if curl -fsS http://localhost:4001/healthz; then
-              echo "Container ready"
+
+      - name: Verify /readyz
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4001/healthz && curl -fsS http://localhost:4001/readyz; then
+              echo "Container ready with /healthz + /readyz after ${i} attempts"
               exit 0
             fi
             sleep 2
           done
           docker logs stockstory-api-test
           exit 1
+        shell: bash
+
+      - name: Validate API states against Docker
+        run: |
+          API_BASE_URL=http://localhost:4001 npx tsx scripts/smoke-test-api.ts
 
       - name: Clean up Docker
         if: always()
