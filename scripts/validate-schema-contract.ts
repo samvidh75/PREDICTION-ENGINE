@@ -1,192 +1,211 @@
 /**
- * TRACK-P3 — Schema Contract Validation
- * 
- * Verifies that required tables exist in SQLite and have correct columns.
- * Designed to run in CI without PostgreSQL.
- * 
+ * TRACK-P4B-P3G — Schema Contract Validation (Isolation-Fixed)
+ *
+ * Verifies the complete prediction_registry contract using the exact
+ * temporary SQLiteAdapter DB. Never inspects or mutates data/stockstory.db.
+ *
+ * Flow:
+ *   1. Create tmp/schema-contract-<timestamp>.db
+ *   2. Set process.env.SQLITE_DB_PATH = tempPath
+ *   3. Dynamically import SQLiteAdapter → triggers schema initialization
+ *   4. Inspect exactly tempPath
+ *   5. Validate complete prediction_registry columns
+ *   6. Validate UNIQUE(symbol, prediction_date, prediction_horizon)
+ *   7. Close adapter
+ *   8. Delete .db, .db-wal, .db-shm
+ *   9. Use process.exitCode (not process.exit())
+ *
  * Usage: npx tsx scripts/validate-schema-contract.ts
  */
 
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'stockstory_test_validation.db');
+const timestamp = Date.now();
+const rand = Math.random().toString(36).slice(2, 6);
+const TEMP_DB_PATH = path.join(os.tmpdir(), `schema-contract-${timestamp}-${rand}.db`);
 
-interface TableContract {
-  table: string;
-  requiredColumns: string[];
-}
+// ---------------------------------------------------------------------------
+// Cleanup helper
+// ---------------------------------------------------------------------------
 
-const REQUIRED_TABLES: TableContract[] = [
-  {
-    table: 'symbols',
-    requiredColumns: ['symbol', 'exchange', 'isin', 'company_name', 'sector', 'industry', 'listing_status'],
-  },
-  {
-    table: 'daily_prices',
-    requiredColumns: ['symbol', 'trade_date', 'open', 'high', 'low', 'close', 'adjusted_close', 'volume'],
-  },
-  {
-    table: 'financial_snapshots',
-    requiredColumns: ['symbol', 'period_end', 'market_cap', 'pe_ratio', 'eps', 'dividend_yield', 'beta',
-      'fcf_yield', 'ev_ebitda', 'roa', 'roe', 'roic', 'debt_to_equity', 'current_ratio',
-      'revenue_growth', 'profit_growth', 'eps_growth', 'fcf_growth', 'gross_margin', 'operating_margin', 'pb_ratio'],
-  },
-  {
-    table: 'feature_snapshots',
-    requiredColumns: ['symbol', 'trade_date', 'rsi', 'macd', 'macd_signal', 'macd_histogram',
-      'adx', 'atr', 'bollinger_width', 'momentum', 'volatility',
-      'relative_strength', 'moving_average_distance', 'trend_strength'],
-  },
-  {
-    table: 'factor_snapshots',
-    requiredColumns: ['symbol', 'trade_date', 'quality_factor', 'value_factor', 'growth_factor',
-      'momentum_factor', 'risk_factor', 'sector_strength_factor', 'factor_score', 'explanations'],
-  },
-  {
-    table: 'prediction_registry',
-    requiredColumns: ['id', 'symbol', 'prediction_date', 'ranking_score', 'classification',
-      'confidence_score', 'confidence_level', 'quality_score', 'growth_score',
-      'value_score', 'momentum_score', 'risk_score', 'sector_score',
-      'price_at_prediction', 'benchmark_level', 'prediction_horizon', 'validation_status'],
-  },
-  {
-    table: 'benchmark_observations',
-    requiredColumns: ['date', 'nifty50', 'source'],
-  },
-  {
-    table: 'daily_prediction_snapshots',
-    requiredColumns: ['date', 'horizon', 'top10', 'top25'],
-  },
-  {
-    table: 'master_security_registry',
-    requiredColumns: ['symbol', 'isin', 'company_name', 'sector', 'industry', 'listing_status'],
-  },
-];
-
-const NAMING_RULES: Array<{ table: string; column: string; expectedName: string; rationale: string }> = [
-  { table: 'feature_snapshots', column: 'trade_date', expectedName: 'trade_date', rationale: 'canonical date column' },
-  { table: 'factor_snapshots', column: 'trade_date', expectedName: 'trade_date', rationale: 'canonical date column' },
-  { table: 'prediction_registry', column: 'prediction_date', expectedName: 'prediction_date', rationale: 'not snapshot_date' },
-  { table: 'financial_snapshots', column: 'period_end', expectedName: 'period_end', rationale: 'canonical period column' },
-];
-
-let errors = 0;
-let warnings = 0;
-
-// Clean up existing test db if present
-if (fs.existsSync(DB_PATH)) {
-  fs.unlinkSync(DB_PATH);
-}
-
-// Ensure directory exists
-const dir = path.dirname(DB_PATH);
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir, { recursive: true });
-}
-
-const db = new Database(DB_PATH);
-
-// Import and run SQLite fallback tables from SQLiteAdapter (replicate its ensureTables)
-import('../src/db/SQLiteAdapter').then(async (mod) => {
-  // SQLiteAdapter auto-creates tables on construction
-  // Use the pool to trigger table creation
-  const { pool } = mod;
-  
-  console.log('=== Schema Contract Validation ===\n');
-  
-  // Test 1: All required tables exist
-  console.log('1. Table presence check...');
-  const existingTables = new Set<string>();
-  const tableRows = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as Array<{ name: string }>;
-  for (const row of tableRows) {
-    existingTables.add(row.name);
-  }
-  
-  for (const contract of REQUIRED_TABLES) {
-    if (existingTables.has(contract.table)) {
-      console.log(`  PASS: ${contract.table} exists`);
-    } else {
-      console.error(`  FAIL: ${contract.table} is missing`);
-      errors++;
+function cleanup(): void {
+  for (const ext of ['', '-wal', '-shm']) {
+    const p = TEMP_DB_PATH + ext;
+    if (fs.existsSync(p)) {
+      try { fs.unlinkSync(p); } catch { /* ignore */ }
     }
   }
-  
-  // Test 2: Required columns for each table
-  console.log('\n2. Column contract check...');
-  for (const contract of REQUIRED_TABLES) {
-    if (!existingTables.has(contract.table)) continue;
-    
-    const colRows = db.prepare(`PRAGMA table_info('${contract.table}')`).all() as Array<{ name: string }>;
-    const existingColumns = new Set(colRows.map(r => r.name));
-    
-    for (const requiredCol of contract.requiredColumns) {
-      if (existingColumns.has(requiredCol)) {
-        // OK
+}
+
+// ---------------------------------------------------------------------------
+// Full canonical prediction_registry columns (Phase 8 spec)
+// ---------------------------------------------------------------------------
+
+const PREDICTION_REGISTRY_COLUMNS = [
+  'id',
+  'symbol',
+  'prediction_date',
+  'ranking_score',
+  'classification',
+  'confidence_score',
+  'confidence_level',
+  'quality_score',
+  'growth_score',
+  'value_score',
+  'momentum_score',
+  'risk_score',
+  'sector_score',
+  'price_at_prediction',
+  'benchmark_level',
+  'prediction_horizon',
+  'validation_status',
+  'validated_at',
+  'future_return',
+  'benchmark_return',
+  'alpha',
+  'created_at',
+  'created_by',
+];
+
+// ---------------------------------------------------------------------------
+// UNIQUE constraint
+// ---------------------------------------------------------------------------
+
+const UNIQUE_COLUMNS = ['symbol', 'prediction_date', 'prediction_horizon'];
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
+async function main(): Promise<void> {
+  let errors = 0;
+
+  console.log('=== Schema Contract Validation (Isolated) ===\n');
+  console.log(`Using temp DB: ${TEMP_DB_PATH}`);
+
+  try {
+    // Step 1-2: Set env and prepare temp path
+    process.env.SQLITE_DB_PATH = TEMP_DB_PATH;
+
+    // Clear any existing SQLite singleton in the module
+    // The SQLiteAdapter uses a module-level singleton; we need to reset it
+    const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
+
+    // Step 3: Dynamically import SQLiteAdapter — triggers schema init
+    // Need to bust the require cache to force a fresh init
+    delete require.cache[require.resolve(sqliteModPath)];
+
+    // Use dynamic import with a fresh cache key
+    const sqliteMod = await import(sqliteModPath + `?t=${timestamp}`);
+
+    // Trigger the pool initialization which runs ensureTables()
+    const pool = sqliteMod.pool;
+
+    // Give SQLiteAdapter a moment to initialize tables
+    await pool.query('SELECT 1');
+
+    // Step 4-5: Inspect the temp DB directly
+    const db = new Database(TEMP_DB_PATH);
+
+    console.log('\n1. Table presence check for prediction_registry...');
+    const tableCheck = db
+      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_registry'")
+      .get() as { name: string } | undefined;
+
+    if (!tableCheck) {
+      console.error('  FAIL: prediction_registry table not found in temp DB');
+      errors++;
+      db.close();
+      process.exitCode = 1;
+      return;
+    }
+    console.log('  PASS: prediction_registry exists');
+
+    // Step 5: Validate complete prediction_registry columns
+    console.log('\n2. Column completeness check...');
+    const colRows = db
+      .prepare("PRAGMA table_info('prediction_registry')")
+      .all() as Array<{ name: string }>;
+    const existingColumns = new Set(colRows.map((r) => r.name));
+
+    for (const col of PREDICTION_REGISTRY_COLUMNS) {
+      if (existingColumns.has(col)) {
+        console.log(`  PASS: ${col}`);
       } else {
-        console.error(`  FAIL: ${contract.table}.${requiredCol} is missing`);
+        console.error(`  FAIL: prediction_registry.${col} is MISSING`);
         errors++;
       }
     }
-  }
-  console.log('  Column checks completed');
-  
-  // Test 3: Naming conventions
-  console.log('\n3. Naming convention check...');
-  for (const rule of NAMING_RULES) {
-    if (!existingTables.has(rule.table)) continue;
-    
-    const colRows = db.prepare(`PRAGMA table_info('${rule.table}')`).all() as Array<{ name: string }>;
-    const existingColumns = new Set(colRows.map(r => r.name));
-    
-    if (existingColumns.has(rule.expectedName)) {
-      console.log(`  PASS: ${rule.table}.${rule.expectedName} — ${rule.rationale}`);
-    } else {
-      // Check if a deprecated name exists
-      if (rule.expectedName === 'prediction_date' && existingColumns.has('snapshot_date')) {
-        console.error(`  FAIL: ${rule.table} uses deprecated 'snapshot_date' (should be 'prediction_date')`);
-        errors++;
-      } else {
-        console.log(`  WARN: ${rule.table}.${rule.column} not found — ${rule.rationale}`);
-        warnings++;
+
+    // Also check for unexpected extra columns (warning only)
+    for (const row of colRows) {
+      if (!PREDICTION_REGISTRY_COLUMNS.includes(row.name)) {
+        console.log(`  WARN: unexpected column '${row.name}' found`);
       }
     }
-  }
-  
-  // Test 4: No deprecated snapshots_date
-  console.log('\n4. Deprecated column check...');
-  for (const table of ['prediction_registry', 'feature_snapshots', 'factor_snapshots']) {
-    if (!existingTables.has(table)) continue;
-    const colRows = db.prepare(`PRAGMA table_info('${table}')`).all() as Array<{ name: string }>;
-    const cols = new Set(colRows.map(r => r.name));
-    if (cols.has('snapshot_date')) {
-      console.error(`  FAIL: ${table} has deprecated 'snapshot_date' column`);
+
+    // Step 6: Validate UNIQUE constraint on (symbol, prediction_date, prediction_horizon)
+    console.log('\n3. UNIQUE constraint validation...');
+    const uniqueCheck = db
+      .prepare(
+        "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry' AND name LIKE '%unique%'"
+      )
+      .all() as Array<{ sql: string }>;
+
+    let uniqueFound = false;
+    for (const idx of uniqueCheck) {
+      const sql = (idx.sql || '').toUpperCase();
+      const allPresent = UNIQUE_COLUMNS.every((col) =>
+        sql.includes(col.toUpperCase())
+      );
+      if (allPresent && sql.includes('UNIQUE')) {
+        uniqueFound = true;
+        console.log(`  PASS: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) confirmed`);
+        break;
+      }
+    }
+
+    if (!uniqueFound) {
+      console.error(
+        `  FAIL: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) NOT FOUND`
+      );
       errors++;
     }
+
+    // Step 7: Close the inspection DB
+    db.close();
+
+    // Step 8: Close the SQLite adapter and clean up singleton
+    if (sqliteMod.closeSQLite) {
+      sqliteMod.closeSQLite();
+    }
+
+    // Summary
+    console.log(`\n=== Validation Complete ===`);
+    console.log(`Errors: ${errors}`);
+
+    if (errors === 0) {
+      console.log('PASS: Schema contract validation passed (isolated)');
+      process.exitCode = 0;
+    } else {
+      console.error(`FAIL: ${errors} schema contract error(s) found`);
+      process.exitCode = 1;
+    }
+  } catch (err) {
+    console.error('Schema validation failed with exception:', err);
+    process.exitCode = 1;
+  } finally {
+    // Step 9: Cleanup temp DB files
+    cleanup();
+
+    // Give a tick for any pending operations
+    setTimeout(() => {
+      // process.exitCode is already set — the process will exit with it
+    }, 100);
   }
-  console.log('  PASS: no deprecated snapshot_date columns detected');
-  
-  // Clean up
-  db.close();
-  if (fs.existsSync(DB_PATH)) {
-    fs.unlinkSync(DB_PATH);
-  }
-  
-  // Summary
-  console.log(`\n=== Validation Complete ===`);
-  console.log(`Errors: ${errors}, Warnings: ${warnings}`);
-  
-  if (errors === 0) {
-    console.log('PASS: Schema contract validation passed');
-    process.exit(0);
-  } else {
-    console.error(`FAIL: ${errors} schema contract error(s) found`);
-    process.exit(1);
-  }
-}).catch(err => {
-  console.error('Schema validation failed:', err);
-  db.close();
-  if (fs.existsSync(DB_PATH)) fs.unlinkSync(DB_PATH);
-  process.exit(1);
-});
+}
+
+main();

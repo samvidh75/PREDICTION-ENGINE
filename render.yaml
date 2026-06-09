@@ -100,5 +100,15 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
       - key: DATABASE_URL
         sync: false
+
+      - key: DB_ADAPTER
+        value: postgres
+
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "false"
+
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "false"
