@@ -222,7 +222,11 @@ describe('investorStateRoutes auth (production plugins)', () => {
         typeof c[0] === 'string' &&
         (c[0] as string).includes('INSERT INTO investor_state'),
     );
-    expect(insertCall[1][0]).toBe('userA');
+    expect(insertCall).toBeDefined();
+    if (insertCall) {
+      const params = insertCall[1] as unknown[];
+      expect(params[0]).toBe('userA');
+    }
   });
 
   // ---- user A cannot read user B state ----
