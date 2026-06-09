@@ -296,6 +296,14 @@ class SQLitePool {
   async end(): Promise<void> {
     closeSQLite();
   }
+
+  /**
+   * Reset the database reference so subsequent calls use a fresh connection.
+   * Used by resetForTest() to swap DB paths without creating a new pool.
+   */
+  resetConnection(): void {
+    this.db = getDb();
+  }
 }
 
 // The exported pool — works like pg Pool

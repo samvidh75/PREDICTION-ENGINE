@@ -36,6 +36,7 @@
     "validate:hygiene": "tsx scripts/validate-repository-hygiene.ts",
     "release:gate": "tsx scripts/release-gate.ts",
     "test:providers": "tsx src/scripts/provider-live-test.ts",
+    "seed:ci": "tsx scripts/seed-ci-fixtures.ts",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix"
   },
