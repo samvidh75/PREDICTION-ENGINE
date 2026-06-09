@@ -7,21 +7,22 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-function signFmt(pct: number): string {
-  if (!Number.isFinite(pct)) return "—";
+function signFmt(pct: number | null): string {
+  if (pct == null || !Number.isFinite(pct)) return "—";
   const v = pct;
   const sign = v >= 0 ? "+" : "";
   return `${sign}${v.toFixed(2)}%`;
 }
 
-function toneForMove(pct: number, theme: ConfidenceTheme): { glow: string; fg: string } {
+function toneForMove(pct: number | null, theme: ConfidenceTheme): { glow: string; fg: string } {
+  if (pct == null) return { glow: theme.deepBlueGlow, fg: "rgba(200,215,255,0.85)" };
   if (pct > 0.01) return { glow: theme.cyanGlow, fg: "rgba(0,255,210,0.95)" };
   if (pct < -0.01) return { glow: theme.magentaGlow, fg: "rgba(209,107,165,0.95)" };
   return { glow: theme.deepBlueGlow, fg: "rgba(200,215,255,0.85)" };
 }
 
-function pctBarStyle(value01: number, glow: string): React.CSSProperties {
-  const v = clamp(value01, 0, 1);
+function pctBarStyle(value01: number | null, glow: string): React.CSSProperties {
+  const v = clamp(value01 ?? 0, 0, 1);
   return {
     width: `${v * 100}%`,
     background: glow,
@@ -63,8 +64,9 @@ export default function CompanyTelemetryCore({
   const depthAskGlow = theme.magentaGlow;
 
   const containerBoxShadow = useMemo(() => {
-    const vol = snap.volatilityEnvironment;
-    return `0 0 90px ${snap.dailyChangePct >= 0 ? theme.cyanGlow : theme.magentaGlow}, 0 0 ${Math.round(50 + vol * 80)}px rgba(0,0,0,0)`;
+    const vol = snap.volatilityEnvironment ?? 0;
+    const dailyChange = snap.dailyChangePct ?? 0;
+    return `0 0 90px ${dailyChange >= 0 ? theme.cyanGlow : theme.magentaGlow}, 0 0 ${Math.round(50 + vol * 80)}px rgba(0,0,0,0)`;
   }, [snap.dailyChangePct, snap.volatilityEnvironment, theme]);
 
   return (
@@ -100,19 +102,19 @@ export default function CompanyTelemetryCore({
             <div className={isMobile ? "" : "lg:col-span-4"}>
               <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative model price</div>
               <div className="mt-3 text-[34px] font-semibold leading-[1.05] text-white/92">
-                {snap.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                {snap.price != null ? snap.price.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "—"}
               </div>
               <div className="mt-3 text-[13px] leading-[1.8] text-white/80">
                 Volume participation:{" "}
-                <span className="text-white/92 font-semibold">{Math.round(snap.liquidityParticipation * 100)}%</span> |
+                <span className="text-white/92 font-semibold">{snap.liquidityParticipation != null ? `${Math.round(snap.liquidityParticipation * 100)}%` : "—"}</span> |
                 Volatility posture:{" "}
-                <span className="text-white/92 font-semibold">{Math.round(snap.volatilityEnvironment * 100)}%</span>
+                <span className="text-white/92 font-semibold">{snap.volatilityEnvironment != null ? `${Math.round(snap.volatilityEnvironment * 100)}%` : "—"}</span>
               </div>
 
               <div className="mt-5 rounded-[22px] border border-white/10 bg-black/25 p-4">
                 <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Illustrative volume</div>
                 <div className="mt-2 text-[18px] font-semibold text-white/92">
-                  {snap.volume.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  {snap.volume != null ? snap.volume.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—"}
                 </div>
                 <div className="mt-2 text-[12px] leading-[1.6] text-white/65">
                   Liquidity affects how quickly context translates into confidence behaviour.
@@ -129,7 +131,7 @@ export default function CompanyTelemetryCore({
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <div className="text-[12px] text-white/80">Bid</div>
-                    <div className="text-[12px] text-white/92 font-semibold">{Math.round(snap.bidDepth * 100)}%</div>
+                    <div className="text-[12px] text-white/92 font-semibold">{snap.bidDepth != null ? `${Math.round(snap.bidDepth * 100)}%` : "—"}</div>
                   </div>
                 </div>
 
@@ -140,7 +142,7 @@ export default function CompanyTelemetryCore({
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <div className="text-[12px] text-white/80">Ask</div>
-                    <div className="text-[12px] text-white/92 font-semibold">{Math.round(snap.askDepth * 100)}%</div>
+                    <div className="text-[12px] text-white/92 font-semibold">{snap.askDepth != null ? `${Math.round(snap.askDepth * 100)}%` : "—"}</div>
                   </div>
                 </div>
               </div>
@@ -149,22 +151,26 @@ export default function CompanyTelemetryCore({
                 <div className="rounded-[22px] border border-white/10 bg-black/25 p-4">
                   <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Liquidity participation</div>
                   <div className="mt-3 text-[14px] leading-[1.8] text-white/85">
-                    {snap.liquidityParticipation >= 0.62
-                      ? "Depth is supportive for calmer interpretive pacing."
-                      : snap.liquidityParticipation >= 0.48
-                        ? "Liquidity is moderate—interpretation can remain steady but needs context."
-                        : "Liquidity is thin—interpretation becomes more sensitive to timing texture."}
+                    {snap.liquidityParticipation != null
+                      ? snap.liquidityParticipation >= 0.62
+                        ? "Depth is supportive for calmer interpretive pacing."
+                        : snap.liquidityParticipation >= 0.48
+                          ? "Liquidity is moderate—interpretation can remain steady but needs context."
+                          : "Liquidity is thin—interpretation becomes more sensitive to timing texture."
+                      : "Liquidity data is currently unavailable."}
                   </div>
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-black/25 p-4">
                   <div className="text-[10px] uppercase tracking-[0.18em] text-white/55">Volatility environment</div>
                   <div className="mt-3 text-[14px] leading-[1.8] text-white/85">
-                    {snap.volatilityEnvironment >= 0.72
-                      ? "Volatility posture is elevated—confidence margin tightens into educational caution."
-                      : snap.volatilityEnvironment >= 0.55
-                        ? "Volatility posture is mixed—pacing stays measurable and calm."
-                        : "Volatility posture is restrained—interpretation stays continuity-first."}
+                    {snap.volatilityEnvironment != null
+                      ? snap.volatilityEnvironment >= 0.72
+                        ? "Volatility posture is elevated—confidence margin tightens into educational caution."
+                        : snap.volatilityEnvironment >= 0.55
+                          ? "Volatility posture is mixed—pacing stays measurable and calm."
+                          : "Volatility posture is restrained—interpretation stays continuity-first."
+                      : "Volatility data is currently unavailable."}
                   </div>
                 </div>
               </div>

@@ -15,9 +15,10 @@ export default function MarketCapPositioningRail(): JSX.Element {
   const { tempo, finance, toneGlow, toneEdgeGlow } = useMasterInfographics();
 
   const rail = useMemo(() => {
-    // Deterministic bounds around the current market cap for “52-week” feel.
-    const m = Math.max(1, finance.marketCap);
-    const seed01 = clamp(((finance.marketCap * 0.0000001) % 1) + 0.33, 0.08, 0.92);
+    // Deterministic bounds around the current market cap for "52-week" feel.
+    const marketCap = finance.marketCap ?? 0;
+    const m = Math.max(1, marketCap);
+    const seed01 = clamp(((marketCap * 0.0000001) % 1) + 0.33, 0.08, 0.92);
 
     const low = m * (0.74 + seed01 * 0.06); // ~0.74..0.80
     const high = m * (1.18 + (1 - seed01) * 0.10); // ~1.18..1.28
@@ -54,11 +55,12 @@ export default function MarketCapPositioningRail(): JSX.Element {
   );
 
   const peVisualPayload = useMemo<ConceptVisualPayload>(() => {
-    const avg = Math.max(1, finance.fiveYearPeAvg);
+    const avg = Math.max(1, finance.fiveYearPeAvg ?? 1);
     const low = avg * 0.75;
     const high = avg * 1.25;
 
-    const pos01 = clamp((finance.pe - low) / Math.max(1e-9, high - low), 0, 1);
+    const pe = finance.pe ?? 1;
+    const pos01 = clamp((pe - low) / Math.max(1e-9, high - low), 0, 1);
 
     return {
       kind: "gauge",
