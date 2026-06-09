@@ -1,5 +1,4 @@
 import type { FastifyInstance } from "fastify";
-import type { PostgresClient } from "../postgres/postgresClient";
 
 export type MigrationStatus = "pending" | "applied" | "failed";
 
@@ -9,10 +8,17 @@ type MigrationRecord = {
   appliedAt?: number;
 };
 
-export class MigrationManager {
-  private db: PostgresClient;
+type UserDb = {
+  query(
+    text: string,
+    params?: unknown[],
+  ): Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>;
+};
 
-  constructor(db: PostgresClient) {
+export class MigrationManager {
+  private db: UserDb;
+
+  constructor(db: UserDb) {
     this.db = db;
   }
 
@@ -32,11 +38,11 @@ export class MigrationManager {
   }
 
   async listAppliedMigrations(): Promise<Set<string>> {
-    const { rows } = await this.db.query<{ id: string }>(
+    const { rows } = await this.db.query(
       `select id from schema_migrations;`,
     );
 
-    return new Set(rows.map((r) => r.id));
+    return new Set(rows.map((r) => String(r.id)));
   }
 
   /**

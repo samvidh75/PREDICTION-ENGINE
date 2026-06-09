@@ -251,7 +251,10 @@ describe('userProfileRoutes auth (production plugins)', () => {
       (c: unknown[]) =>
         typeof c[0] === 'string' && (c[0] as string).includes('INSERT INTO user_profiles'),
     );
-    expect(insertCall[1][0]).toBe('userA');
+    expect(insertCall).toBeDefined();
+    if (insertCall) {
+      expect(insertCall[1][0]).toBe('userA');
+    }
   });
 
   // ---- missing userDb → 503 ----

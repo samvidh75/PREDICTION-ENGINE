@@ -11,7 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { dbAdapter } from '../../db/DatabaseAdapter';
-import { healthRoutes } from '../../backend/web/routes/health';
+import healthRoutes from '../../backend/web/routes/health';
 
 // ---------------------------------------------------------------------------
 // Helpers
