@@ -6,13 +6,27 @@
  *   - postgresClient.ts provided a separate Fastify-decorated PostgresClient
  *   - /healthz checked one adapter while routes used another
  *
+ * TASK 1: Uses DatabasePolicy to make adapter selection explicit and auditable.
+ *         No silent fallback when policy disallows it.
+ *
  * Usage:
  *   const db = adapter.query(sql, params)
  *   const ok = await adapter.ping()
  *   await adapter.shutdown()
  *   adapter.kind // "postgres" | "sqlite" | "unavailable"
+ *   adapter.diagnostics() // DatabaseDiagnostics
+ *   adapter.reset() // for tests
  */
 import type * as pg from "pg";
+import {
+  loadDatabasePolicy,
+  resolveAdapter,
+  buildDiagnostics,
+} from "./DatabasePolicy";
+import type {
+  DatabasePolicy,
+  DatabaseDiagnostics,
+} from "./DatabasePolicy";
 
 export type DbKind = "postgres" | "sqlite" | "unavailable";
 
@@ -22,29 +36,81 @@ export interface DbQueryResult {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SQLitePoolLike = { query: (text: string, params?: any[]) => Promise<{ rows: Record<string, unknown>[]; rowCount: number }>; end?: () => Promise<void> };
+type SQLitePoolLike = {
+  query: (text: string, params?: any[]) => Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
+  executeScript?: (sql: string) => Promise<void>;
+  end?: () => Promise<void>;
+};
 
 export class DatabaseAdapter {
   private _kind: DbKind = "unavailable";
   private pool: pg.Pool | null = null;
   private sqlitePool: SQLitePoolLike | null = null;
   private _initialized = false;
+  private _diagnostics: DatabaseDiagnostics = {
+    kind: "unavailable",
+    requestedAdapter: "auto",
+    fallbackUsed: false,
+    fallbackAllowed: true,
+    ready: false,
+    detail: "Not initialized",
+  };
+  private _policy: DatabasePolicy | null = null;
 
   get kind(): DbKind {
     return this._kind;
   }
 
   /**
-   * Initialize the adapter. Prefers PostgreSQL when DATABASE_URL is set and
-   * a connection can be established. Falls back to SQLite otherwise.
+   * Diagnostics describing the current adapter state.
+   */
+  diagnostics(): DatabaseDiagnostics {
+    return { ...this._diagnostics };
+  }
+
+  /**
+   * Reset the adapter for testing.
+   * Closes connections and clears initialization state.
+   */
+  async reset(): Promise<void> {
+    await this.shutdown();
+    this._initialized = false;
+    this._diagnostics = {
+      kind: "unavailable",
+      requestedAdapter: "auto",
+      fallbackUsed: false,
+      fallbackAllowed: true,
+      ready: false,
+      detail: "Reset for testing",
+    };
+    this._policy = null;
+  }
+
+  /**
+   * Initialize the adapter using DatabasePolicy.
+   * No longer silently falls back to SQLite when policy disallows it.
+   * Never logs connection strings or secrets.
    */
   async initialize(): Promise<void> {
     if (this._initialized) return;
     this._initialized = true;
 
+    // Load policy
+    const policy = loadDatabasePolicy();
+    this._policy = policy;
+
     const pgUrl = process.env.DATABASE_URL;
 
-    if (pgUrl) {
+    // Determine if PostgreSQL should be attempted:
+    // - Explicit sqlite requested → skip PostgreSQL
+    // - No DATABASE_URL → skip PostgreSQL
+    const shouldTryPostgres =
+      policy.requestedAdapter !== "sqlite" && !!pgUrl;
+
+    let postgresAvailable = false;
+    let postgresError: string | null = null;
+
+    if (shouldTryPostgres) {
       try {
         const { default: pgMod } = await import("pg");
         const { Pool } = pgMod;
@@ -57,31 +123,81 @@ export class DatabaseAdapter {
         // Verify connectivity
         const res = await this.pool.query("SELECT 1 AS one");
         if (res.rows.length === 1) {
-          this._kind = "postgres";
-          console.log("[db] Canonical adapter: PostgreSQL connected");
-          return;
+          postgresAvailable = true;
         }
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        console.warn(`[db] PostgreSQL unavailable: ${msg}. Falling back to SQLite.`);
+        postgresError = err instanceof Error ? err.message : String(err);
+        // Close the failed pool if it was created
         if (this.pool) {
-          try { await this.pool.end(); } catch {}
+          try { await this.pool.end(); } catch { /* ignore */ }
           this.pool = null;
         }
       }
     }
 
-    // SQLite fallback
-    try {
-      const sqliteMod = await import("./SQLiteAdapter");
-      this.sqlitePool = sqliteMod.pool;
-      this._kind = "sqlite";
-      console.log("[db] Canonical adapter: SQLite fallback active");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[db] SQLite fallback failed: ${msg}`);
-      this._kind = "unavailable";
+    // Use the policy to resolve which adapter to actually use
+    const resolved = resolveAdapter(policy, postgresAvailable, postgresError);
+
+    this._kind = resolved.kind;
+
+    // If resolution says sqlite but we don't have a SQLite pool yet, create one
+    if (resolved.kind === "sqlite") {
+      try {
+        const sqliteMod = await import("./SQLiteAdapter");
+        this.sqlitePool = sqliteMod.pool;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        // SQLite failed — treat as unavailable
+        this._kind = "unavailable";
+        this._diagnostics = buildDiagnostics(policy, "unavailable", false, `SQLite failed: ${msg}`);
+        return;
+      }
     }
+
+    // Clean up PostgreSQL pool if we're not using it
+    if (resolved.kind !== "postgres" && this.pool) {
+      try { await this.pool.end(); } catch { /* ignore */ }
+      this.pool = null;
+    }
+
+    // Build diagnostics
+    this._diagnostics = buildDiagnostics(policy, resolved.kind, resolved.fallbackUsed, resolved.detail);
+
+    if (this._kind === "postgres") {
+      console.log("[db] Canonical adapter: PostgreSQL connected");
+    } else if (this._kind === "sqlite") {
+      if (resolved.fallbackUsed) {
+        console.warn(`[db] Canonical adapter: SQLite fallback (${resolved.detail ?? "PostgreSQL unavailable"})`);
+      } else {
+        console.log("[db] Canonical adapter: SQLite configured");
+      }
+    } else {
+      console.error(`[db] Canonical adapter: unavailable (${resolved.detail ?? "No database available"})`);
+    }
+  }
+
+  /**
+   * Execute a multi-statement SQL script on the active database.
+   * SQLite delegates to db.exec(). PostgreSQL delegates to pool.query().
+   * Unavailable mode throws. Never silently falls back during script execution.
+   * Never logs credentials or connection strings.
+   */
+  async executeScript(sql: string): Promise<void> {
+    if (!this._initialized) {
+      await this.initialize();
+    }
+
+    if (this._kind === "sqlite" && this.sqlitePool?.executeScript) {
+      await this.sqlitePool.executeScript(sql);
+      return;
+    }
+
+    if (this._kind === "postgres" && this.pool) {
+      await this.pool.query(sql);
+      return;
+    }
+
+    throw new Error("DATABASE_UNAVAILABLE: Cannot execute migration script");
   }
 
   /**
@@ -156,8 +272,9 @@ export class DatabaseAdapter {
     // SQLite fallback: no real transactions, but provide compatible interface
     if (this._kind === "sqlite" && this.sqlitePool) {
       return {
-        query: async (text: string, params?: unknown[]) => this.sqlitePool!.query(text, params as unknown[]),
-        release: () => {},
+        query: async (text: string, params?: unknown[]) =>
+          this.sqlitePool!.query(text, params as unknown[]),
+        release: () => { /* no-op for SQLite */ },
       };
     }
 
@@ -169,11 +286,11 @@ export class DatabaseAdapter {
    */
   async shutdown(): Promise<void> {
     if (this.pool) {
-      try { await this.pool.end(); } catch {}
+      try { await this.pool.end(); } catch { /* ignore */ }
       this.pool = null;
     }
     if (this.sqlitePool) {
-      try { await (this.sqlitePool as { end?: () => Promise<void> }).end?.(); } catch {}
+      try { await (this.sqlitePool as { end?: () => Promise<void> }).end?.(); } catch { /* ignore */ }
       this.sqlitePool = null;
     }
     this._kind = "unavailable";

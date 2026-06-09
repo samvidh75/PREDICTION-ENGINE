@@ -21,8 +21,8 @@ services:
     # Render injects PORT automatically — startServer.js reads process.env.PORT
     startCommand: npm start
 
-    # Health check — Render uses this to confirm the service is healthy
-    healthCheckPath: /healthz
+    # Health check — Render uses /readyz to confirm DB + migrations are ready
+    healthCheckPath: /readyz
 
     # Auto-deploy on every push to main
     autoDeploy: true
@@ -57,6 +57,29 @@ services:
       - key: INDIANAPI_KEY
         sync: false
 
+      # ── Database Policy ────────────────────────────────────────────────
+      - key: DB_ADAPTER
+        value: postgres
+
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "false"
+
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "false"
+
+      # ── Firebase Admin ─────────────────────────────────────────────────
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+
+      - key: FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS
+        sync: false
+
       # ── CORS — allow Vercel frontend ───────────────────────────────────
       # Already hardcoded in env.ts as https://stockstory-india.com
       # Set this if you need to add extra origins at runtime
@@ -79,3 +102,13 @@ services:
         value: production
       - key: DATABASE_URL
         sync: false
+
+      # ── Database Policy — explicit, no fallback ─────────────────────
+      - key: DB_ADAPTER
+        value: postgres
+
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "false"
+
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "false"

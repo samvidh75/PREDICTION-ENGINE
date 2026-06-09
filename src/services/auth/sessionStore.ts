@@ -1,3 +1,8 @@
+/**
+ * FRONTEND ONLY. Backend routes must NOT import this module.
+ * Backend identity: src/backend/auth/requireAuthenticatedUser.ts (Firebase Admin verified tokens).
+ * Server-side code has no window / localStorage context.
+ */
 export type AuthSessionStatus = "anonymous" | "authenticated";
 
 export type AuthSession = {

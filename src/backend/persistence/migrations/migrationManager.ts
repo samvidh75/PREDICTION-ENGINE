@@ -1,5 +1,14 @@
 import type { FastifyInstance } from "fastify";
-import type { PostgresClient } from "../postgres/postgresClient";
+
+export interface UserDbClient {
+  query(
+    text: string,
+    params?: unknown[],
+  ): Promise<{
+    rows: Record<string, unknown>[];
+    rowCount?: number;
+  }>;
+}
 
 export type MigrationStatus = "pending" | "applied" | "failed";
 
@@ -10,9 +19,9 @@ type MigrationRecord = {
 };
 
 export class MigrationManager {
-  private db: PostgresClient;
+  private db: UserDbClient;
 
-  constructor(db: PostgresClient) {
+  constructor(db: UserDbClient) {
     this.db = db;
   }
 
@@ -32,11 +41,11 @@ export class MigrationManager {
   }
 
   async listAppliedMigrations(): Promise<Set<string>> {
-    const { rows } = await this.db.query<{ id: string }>(
+    const { rows } = await this.db.query(
       `select id from schema_migrations;`,
     );
 
-    return new Set(rows.map((r) => r.id));
+    return new Set((rows as Array<{ id: string }>).map((r) => r.id));
   }
 
   /**
@@ -59,9 +68,10 @@ export class MigrationManager {
 
 /**
  * Helper for app integration.
+ * Uses app.userDb — PostgreSQL-only, never SQLite fallback.
  */
 export function createMigrationManager(app: FastifyInstance): MigrationManager | null {
-  const db = app.postgres;
+  const db = app.userDb;
   if (!db) return null;
   return new MigrationManager(db);
 }
