@@ -1,76 +1,68 @@
 /**
- * TRACK-P4B-P3G — SQLite Registry Integration Tests
- *
- * Validates prediction_registry schema contract against real SQLite.
- * Uses unique temporary DB paths. Never mutates data/stockstory.db.
- * Each test uses a fresh SQLite adapter + unique DB path to avoid singleton conflicts.
- *
  * @vitest-environment node
+ *
+ * SQLite prediction_registry integration tests.
+ * Validates the complete registry schema contract.
+ * Uses unique temporary DB paths. Never mutates data/stockstory.db.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
-const TIMESTAMP = Date.now();
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-function tempDbPath(name: string): string {
-  return path.join(os.tmpdir(), `integration-${TIMESTAMP}-${name}-reg.db`);
+function tempDbPath(testName: string): string {
+  const ts = Date.now();
+  const rand = Math.random().toString(36).slice(2, 8);
+  return path.join(os.tmpdir(), `integration-registry-${ts}-${rand}-${testName}.db`);
 }
 
 function cleanupDb(dbPath: string): void {
   for (const ext of ['', '-wal', '-shm']) {
     const p = dbPath + ext;
-    if (fs.existsSync(p)) {
-      try { fs.unlinkSync(p); } catch { /* ignore */ }
-    }
+    if (fs.existsSync(p)) fs.unlinkSync(p);
   }
 }
 
-const ORIGINAL_ENV = { ...process.env };
+async function initAdapter(dbPath: string): Promise<void> {
+  process.env.NODE_ENV = 'test';
+  process.env.DB_ADAPTER = 'sqlite';
+  process.env.SQLITE_DB_PATH = dbPath;
+  delete process.env.DATABASE_URL;
+  await dbAdapter.initialize();
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 describe('SQLite prediction_registry integration', () => {
-  const dbPath = tempDbPath('sqlite-registry');
+  const originalEnv = { ...process.env };
+  let dbPath: string;
 
-  beforeEach(async () => {
-    // Reset env to known state
-    delete process.env.DB_ADAPTER;
-    delete process.env.SQLITE_DB_PATH;
-    process.env.NODE_ENV = 'test';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_FALLBACK = 'true';
-    process.env.SQLITE_DB_PATH = dbPath;
-    process.env.DATABASE_URL = '';
-
-    // Reset module state for fresh singleton
-    vi.resetModules();
-
-    // Clear any existing temp DB
-    cleanupDb(dbPath);
+  beforeEach(() => {
+    process.env = { ...originalEnv };
+    dbPath = tempDbPath('registry');
   });
 
   afterEach(async () => {
-    // Reset module and cleanup
-    vi.resetModules();
-
-    try {
-      // Also reset dbAdapter if module is loaded
-      const mod = await import('../../db/DatabaseAdapter');
-      await mod.dbAdapter.reset();
-    } catch { /* ignore */ }
-
+    await dbAdapter.reset();
+    process.env = { ...originalEnv };
     cleanupDb(dbPath);
   });
 
   // ---- complete registry columns exist ----
   it('complete registry columns exist', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
-    const cols = await dbAdapter.query("PRAGMA table_info('prediction_registry')");
-    const colNames = cols.rows.map((r: Record<string, unknown>) => String(r.name));
+    const res = await dbAdapter.query("SELECT * FROM prediction_registry LIMIT 0");
 
-    const required = [
+    // All canonical columns
+    const expectedColumns = [
       'id', 'symbol', 'prediction_date', 'ranking_score', 'classification',
       'confidence_score', 'confidence_level', 'quality_score', 'growth_score',
       'value_score', 'momentum_score', 'risk_score', 'sector_score',
@@ -79,177 +71,185 @@ describe('SQLite prediction_registry integration', () => {
       'alpha', 'created_at', 'created_by',
     ];
 
-    for (const col of required) {
-      expect(colNames, `Missing column: ${col}`).toContain(col);
+    for (const col of expectedColumns) {
+      // The query returns rows with these columns if the table exists correctly
+      // We verify by checking that the table definition includes each column
+      // Since we can't introspect columnar output from empty result,
+      // we check pragma_table_info
+      const infoRes = await dbAdapter.query(
+        `SELECT name FROM pragma_table_info('prediction_registry') WHERE name = ?`,
+        [col],
+      );
+      expect(infoRes.rows.length).toBe(1);
     }
-
-    await dbAdapter.reset();
   });
 
   // ---- created_at populated by default ----
   it('created_at populated by default', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
     await dbAdapter.query(
       `INSERT INTO prediction_registry
-       (symbol, prediction_date, ranking_score, classification,
-        confidence_score, confidence_level, quality_score, growth_score,
-        value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-       VALUES ('TEST_CAT', '2025-01-01', 80, 'Good', 0.75, 'Medium',
-       70, 60, 80, 50, 40, 65, 30)`
+       (symbol, prediction_date, ranking_score, classification, confidence_score,
+        confidence_level, quality_score, growth_score, value_score,
+        momentum_score, risk_score, sector_score, prediction_horizon)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['RELIANCE', '2025-06-09', 85, 'Excellent', 90, 'Very High',
+       80, 75, 70, 85, 15, 65, 30],
     );
 
-    const rows = await dbAdapter.query(
-      "SELECT created_at FROM prediction_registry WHERE symbol = 'TEST_CAT'"
+    const res = await dbAdapter.query(
+      "SELECT created_at FROM prediction_registry WHERE symbol = 'RELIANCE'"
     );
-    expect(rows.rows.length).toBe(1);
-    expect(rows.rows[0].created_at).toBeTruthy();
-    expect(typeof rows.rows[0].created_at).toBe('string');
-    expect((rows.rows[0].created_at as string).length).toBeGreaterThan(0);
-
-    await dbAdapter.reset();
+    expect(res.rows.length).toBe(1);
+    expect(res.rows[0].created_at).toBeTruthy();
   });
 
   // ---- created_by defaults to DailyPredictionCapture ----
   it('created_by defaults to DailyPredictionCapture', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
     await dbAdapter.query(
       `INSERT INTO prediction_registry
-       (symbol, prediction_date, ranking_score, classification,
-        confidence_score, confidence_level, quality_score, growth_score,
-        value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-       VALUES ('TEST_CB', '2025-01-02', 70, 'Fair', 0.6, 'Low',
-       60, 50, 70, 40, 30, 55, 7)`
+       (symbol, prediction_date, ranking_score, classification, confidence_score,
+        confidence_level, quality_score, growth_score, value_score,
+        momentum_score, risk_score, sector_score, prediction_horizon)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['TATASTEEL', '2025-06-09', 70, 'Good', 75, 'High',
+       65, 60, 55, 70, 25, 50, 30],
     );
 
-    const rows = await dbAdapter.query(
-      "SELECT created_by FROM prediction_registry WHERE symbol = 'TEST_CB'"
+    const res = await dbAdapter.query(
+      "SELECT created_by FROM prediction_registry WHERE symbol = 'TATASTEEL'"
     );
-    expect(rows.rows[0].created_by).toBe('DailyPredictionCapture');
-
-    await dbAdapter.reset();
+    expect(res.rows.length).toBe(1);
+    expect(res.rows[0].created_by).toBe('DailyPredictionCapture');
   });
 
   // ---- UNIQUE(symbol, prediction_date, prediction_horizon) enforced ----
   it('UNIQUE(symbol, prediction_date, prediction_horizon) enforced', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
-    const insert = (sym: string) =>
+    const insertRow = () =>
       dbAdapter.query(
         `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-         VALUES ($1, '2025-01-03', 80, 'Good', 0.75, 'Medium',
-         70, 60, 80, 50, 40, 65, 30)`,
-        [sym]
+         (symbol, prediction_date, ranking_score, classification, confidence_score,
+          confidence_level, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score, prediction_horizon)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ['HDFC', '2025-06-09', 92, 'Exceptional', 95, 'Very High',
+         90, 85, 80, 60, 10, 75, 30],
       );
 
-    await insert('UNIQUE_TEST');
+    // First insert should succeed
+    await insertRow();
 
-    await expect(insert('UNIQUE_TEST')).rejects.toThrow();
-
-    await dbAdapter.reset();
+    // Second insert with same (symbol, date, horizon) should fail
+    await expect(insertRow()).rejects.toThrow(
+      /UNIQUE constraint failed/
+    );
   });
 
   // ---- valid insert succeeds ----
   it('valid insert succeeds', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
-    await expect(
-      dbAdapter.query(
-        `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-         VALUES ('VALID_TEST', '2025-06-01', 85, 'Exceptional', 0.9, 'Very High',
-         90, 85, 75, 70, 20, 80, 365)`
-      )
-    ).resolves.toBeDefined();
+    await dbAdapter.query(
+      `INSERT INTO prediction_registry
+       (symbol, prediction_date, ranking_score, classification, confidence_score,
+        confidence_level, quality_score, growth_score, value_score,
+        momentum_score, risk_score, sector_score, prediction_horizon)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['INFY', '2025-06-09', 88, 'Excellent', 92, 'Very High',
+       82, 78, 72, 80, 12, 68, 90],
+    );
 
-    await dbAdapter.reset();
+    const res = await dbAdapter.query(
+      "SELECT * FROM prediction_registry WHERE symbol = 'INFY'"
+    );
+    expect(res.rows.length).toBe(1);
+    expect(res.rows[0].symbol).toBe('INFY');
+    expect(res.rows[0].classification).toBe('Excellent');
   });
 
   // ---- duplicate insert deterministic ----
-  it('duplicate insert throws deterministically', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+  it('duplicate insert deterministic — fails predictably', async () => {
+    await initAdapter(dbPath);
 
-    const doInsert = () =>
+    const params = ['TCS', '2025-06-09', 90, 'Exceptional', 93, 'Very High',
+      85, 80, 75, 65, 10, 70, 30];
+
+    // First insert succeeds
+    await dbAdapter.query(
+      `INSERT INTO prediction_registry
+       (symbol, prediction_date, ranking_score, classification, confidence_score,
+        confidence_level, quality_score, growth_score, value_score,
+        momentum_score, risk_score, sector_score, prediction_horizon)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      params,
+    );
+
+    // Duplicate insert fails with UNIQUE constraint
+    await expect(
       dbAdapter.query(
         `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-         VALUES ('DUP_TEST', '2025-07-01', 75, 'Excellent', 0.8, 'High',
-         80, 70, 65, 60, 30, 70, 90)`
-      );
-
-    await doInsert();
-    await expect(doInsert()).rejects.toThrow();
-
-    await dbAdapter.reset();
+         (symbol, prediction_date, ranking_score, classification, confidence_score,
+          confidence_level, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score, prediction_horizon)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        params,
+      )
+    ).rejects.toThrow(/UNIQUE constraint failed/);
   });
 
   // ---- invalid classification rejected ----
   it('invalid classification rejected', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
     await expect(
       dbAdapter.query(
         `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-         VALUES ('CLASS_TEST', '2025-08-01', 75, 'InvalidClass', 0.8, 'High',
-         80, 70, 65, 60, 30, 70, 7)`
+         (symbol, prediction_date, ranking_score, classification, confidence_score,
+          confidence_level, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score, prediction_horizon)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ['WIPRO', '2025-06-09', 50, 'INVALID_CLASS', 60, 'Medium',
+         45, 40, 35, 30, 50, 25, 30],
       )
-    ).rejects.toThrow();
-
-    await dbAdapter.reset();
+    ).rejects.toThrow(/CHECK constraint failed/);
   });
 
   // ---- invalid horizon rejected ----
   it('invalid horizon rejected', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
     await expect(
       dbAdapter.query(
         `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon)
-         VALUES ('HZN_TEST', '2025-09-01', 75, 'Good', 0.8, 'High',
-         80, 70, 65, 60, 30, 70, 999)`
+         (symbol, prediction_date, ranking_score, classification, confidence_score,
+          confidence_level, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score, prediction_horizon)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ['WIPRO', '2025-06-09', 50, 'Good', 60, 'Medium',
+         45, 40, 35, 30, 50, 25, 999],
       )
-    ).rejects.toThrow();
-
-    await dbAdapter.reset();
+    ).rejects.toThrow(/CHECK constraint failed/);
   });
 
   // ---- invalid created_by rejected ----
   it('invalid created_by rejected', async () => {
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+    await initAdapter(dbPath);
 
     await expect(
       dbAdapter.query(
         `INSERT INTO prediction_registry
-         (symbol, prediction_date, ranking_score, classification,
-          confidence_score, confidence_level, quality_score, growth_score,
-          value_score, momentum_score, risk_score, sector_score, prediction_horizon, created_by)
-         VALUES ('CB_TEST', '2025-10-01', 75, 'Good', 0.8, 'High',
-         80, 70, 65, 60, 30, 70, 7, 'InvalidSource')`
+         (symbol, prediction_date, ranking_score, classification, confidence_score,
+          confidence_level, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score, prediction_horizon, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ['WIPRO', '2025-06-10', 50, 'Good', 60, 'Medium',
+         45, 40, 35, 30, 50, 25, 30, 'InvalidSource'],
       )
-    ).rejects.toThrow();
-
-    await dbAdapter.reset();
+    ).rejects.toThrow(/CHECK constraint failed/);
   });
 });

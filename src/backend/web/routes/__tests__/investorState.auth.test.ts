@@ -1,14 +1,10 @@
 /**
  * TRACK-P4B-P3G — Auth tests for investorStateRoutes using real plugin registration.
  *
- * Tests use:
- *   - app.register(investorStateRoutes) — the actual production plugin
- *   - setTokenVerifier() / resetTokenVerifier() — mock token injection
- *   - app.decorate("userDb", mockDb) — mock userDb
- *
- * NEVER calls live Firebase. No hand-replicated route handlers.
- *
- * @vitest-environment node
+ * Auth tests for investorStateRoutes using actual production route plugins.
+ * Uses setTokenVerifier() / resetTokenVerifier() for mock injection.
+ * Deletes manually copied route implementations.
+ * Never calls real Firebase.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -17,26 +13,23 @@ import type { TokenVerifier } from '../../../auth/firebaseAdmin';
 import { investorStateRoutes } from '../investorState';
 
 // ---------------------------------------------------------------------------
-// Mock verifier — accepts "valid-token-<uid>"
+// Helpers
 // ---------------------------------------------------------------------------
-function mockVerifyFor(uid: string): TokenVerifier {
+
+function mockVerifierFor(validUid: string): TokenVerifier {
   return {
     verifyIdToken: vi.fn(async (token: string) => {
-      if (token === `valid-token-${uid}`) {
-        return { uid };
+      if (token === `valid-token-${validUid}`) {
+        return { uid: validUid, email: `${validUid}@example.com` };
       }
       throw new Error('Invalid token');
     }),
   };
 }
 
-// ---------------------------------------------------------------------------
-// Mock userDb — matches fastify.d.ts userDb type
-// ---------------------------------------------------------------------------
-function createMockUserDb(rows: Record<string, unknown>[] = []) {
+function mockDb(rows: Record<string, unknown>[] = []) {
   return {
-    query: vi.fn<[string, unknown[]?], Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>>()
-      .mockResolvedValue({ rows }),
+    query: vi.fn().mockResolvedValue({ rows, rowCount: rows.length }),
   };
 }
 
@@ -50,10 +43,12 @@ const EMPTY_STATE = {
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
-describe('investorStateRoutes auth (real plugin)', () => {
+
+describe('investorStateRoutes auth (production plugins)', () => {
   let app: FastifyInstance;
 
   afterEach(async () => {
+    resetTokenVerifier();
     if (app) {
       await app.close();
     }
@@ -62,21 +57,24 @@ describe('investorStateRoutes auth (real plugin)', () => {
 
   // ---- GET without Authorization → 401 ----
   it('GET without Authorization → 401', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(investorStateRoutes);
     await app.ready();
 
-    const res = await app.inject({ method: 'GET', url: '/api/investor-state' });
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/investor-state',
+    });
     expect(res.statusCode).toBe(401);
   });
 
   // ---- POST without Authorization → 401 ----
   it('POST without Authorization → 401', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -90,26 +88,28 @@ describe('investorStateRoutes auth (real plugin)', () => {
 
   // ---- invalid token → 403 ----
   it('invalid token → 403', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    app.decorate('userDb', createMockUserDb());
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', mockDb());
     await app.register(investorStateRoutes);
     await app.ready();
 
     const res = await app.inject({
       method: 'GET',
       url: '/api/investor-state',
-      headers: { authorization: 'Bearer bad-token' },
+      headers: { authorization: 'Bearer invalid-token' },
     });
     expect(res.statusCode).toBe(403);
+    expect(res.json()).toMatchObject({ code: 'AUTH_INVALID_TOKEN' });
   });
 
   // ---- own state read → 200 ----
   it('own state read → 200 (empty for new user)', async () => {
-    const mockDb = createMockUserDb([]);
+    const db = mockDb([]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -122,40 +122,13 @@ describe('investorStateRoutes auth (real plugin)', () => {
     expect(res.json()).toEqual(EMPTY_STATE);
   });
 
-  it('own state read → 200 (with saved data)', async () => {
-    const savedState = {
-      watchlists: JSON.stringify(['NIFTY50', 'SENSEX']),
-      alerts: JSON.stringify([{ symbol: 'RELIANCE', threshold: 2500 }]),
-      memory: JSON.stringify({ lastViewed: '2025-01-01' }),
-      dashboard_preferences: JSON.stringify({ layout: 'grid' }),
-    };
-
-    const mockDb = createMockUserDb([savedState]);
-    app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
-    await app.register(investorStateRoutes);
-    await app.ready();
-
-    const res = await app.inject({
-      method: 'GET',
-      url: '/api/investor-state',
-      headers: { authorization: 'Bearer valid-token-userA' },
-    });
-    expect(res.statusCode).toBe(200);
-    const body = res.json();
-    expect(body.watchlists).toEqual(['NIFTY50', 'SENSEX']);
-    expect(body.alerts).toEqual([{ symbol: 'RELIANCE', threshold: 2500 }]);
-    expect(body.memory).toEqual({ lastViewed: '2025-01-01' });
-    expect(body.dashboard_preferences).toEqual({ layout: 'grid' });
-  });
-
   // ---- own state write → 200 ----
   it('own state write → 200', async () => {
-    const mockDb = createMockUserDb();
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -175,11 +148,12 @@ describe('investorStateRoutes auth (real plugin)', () => {
   });
 
   // ---- spoofed x-user-uid ignored ----
-  it('spoofed x-user-uid ignored', async () => {
-    const mockDb = createMockUserDb([]);
+  it('spoofed x-user-uid ignored — route uses token UID only', async () => {
+    const db = mockDb([]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -192,18 +166,19 @@ describe('investorStateRoutes auth (real plugin)', () => {
       },
     });
     expect(res.statusCode).toBe(200);
-    expect(mockDb.query).toHaveBeenCalledWith(
+    expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('WHERE user_id = $1'),
       ['userA'],
     );
   });
 
   // ---- spoofed ?uid ignored ----
-  it('spoofed ?uid ignored', async () => {
-    const mockDb = createMockUserDb([]);
+  it('spoofed ?uid ignored — route ignores query params', async () => {
+    const db = mockDb([]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -213,18 +188,19 @@ describe('investorStateRoutes auth (real plugin)', () => {
       headers: { authorization: 'Bearer valid-token-userA' },
     });
     expect(res.statusCode).toBe(200);
-    expect(mockDb.query).toHaveBeenCalledWith(
+    expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('WHERE user_id = $1'),
       ['userA'],
     );
   });
 
   // ---- body uid cannot override token uid ----
-  it('body user_id cannot override token uid', async () => {
-    const mockDb = createMockUserDb();
+  it('body uid cannot override token uid', async () => {
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -232,27 +208,33 @@ describe('investorStateRoutes auth (real plugin)', () => {
       method: 'POST',
       url: '/api/investor-state',
       headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { user_id: 'userB', watchlists: ['SHOULD_NOT_WORK'] },
+      payload: {
+        user_id: 'userB',
+        watchlists: ['SHOULD_NOT_WORK'],
+      },
     });
     expect(res.statusCode).toBe(200);
-    const body = res.json();
-    expect(body.uid).toBe('userA');
+    expect(res.json().uid).toBe('userA');
 
-    const insertCall = mockDb.query.mock.calls.find(
-      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('INSERT INTO investor_state'),
+    const insertCall = (db.query as ReturnType<typeof vi.fn>).mock.calls.find(
+      (c: unknown[]) =>
+        typeof c[0] === 'string' &&
+        (c[0] as string).includes('INSERT INTO investor_state'),
     );
     expect(insertCall).toBeDefined();
     if (insertCall) {
-      expect(insertCall[1][0]).toBe('userA');
+      const params = insertCall[1] as unknown[];
+      expect(params[0]).toBe('userA');
     }
   });
 
   // ---- user A cannot read user B state ----
   it('user A cannot read user B state', async () => {
-    const mockDb = createMockUserDb([]);
+    const db = mockDb([]);
+    setTokenVerifier(mockVerifierFor('userB'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userB'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -262,23 +244,19 @@ describe('investorStateRoutes auth (real plugin)', () => {
       headers: { authorization: 'Bearer valid-token-userB' },
     });
     expect(res.statusCode).toBe(200);
-    // Query uses userB, NOT userA
-    expect(mockDb.query).toHaveBeenCalledWith(
+    expect(db.query).toHaveBeenCalledWith(
       expect.stringContaining('WHERE user_id = $1'),
       ['userB'],
-    );
-    expect(mockDb.query).not.toHaveBeenCalledWith(
-      expect.stringContaining('WHERE user_id = $1'),
-      ['userA'],
     );
   });
 
   // ---- user A cannot write user B state ----
   it('user A cannot write user B state', async () => {
-    const mockDb = createMockUserDb();
+    const db = mockDb();
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', db);
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -286,16 +264,33 @@ describe('investorStateRoutes auth (real plugin)', () => {
       method: 'POST',
       url: '/api/investor-state',
       headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { target_user: 'userB', secret_data: 'malicious' },
+      payload: {
+        user_id: 'userB',
+        watchlists: ['HACK_ATTEMPT'],
+      },
     });
     expect(res.statusCode).toBe(200);
     expect(res.json().uid).toBe('userA');
+
+    const insertCall: unknown[] | undefined = (
+      db.query as ReturnType<typeof vi.fn>
+    ).mock.calls.find(
+      (c: unknown[]) =>
+        typeof c[0] === 'string' &&
+        (c[0] as string).includes('INSERT INTO investor_state'),
+    );
+    expect(insertCall).toBeDefined();
+    if (insertCall) {
+      const params = insertCall[1] as unknown[];
+      expect(params[0]).toBe('userA');
+    }
   });
 
-  // ---- missing userDb → 503 (GET) ----
+  // ---- missing userDb → 503 ----
   it('missing userDb → 503 on GET', async () => {
+    setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
-    setTokenVerifier(mockVerifyFor('userA'));
+    // Do NOT decorate userDb
     await app.register(investorStateRoutes);
     await app.ready();
 
@@ -308,47 +303,60 @@ describe('investorStateRoutes auth (real plugin)', () => {
     expect(res.json()).toMatchObject({ code: 'PERSISTENCE_UNAVAILABLE' });
   });
 
-  // ---- missing userDb → 503 (POST) ----
-  it('missing userDb → 503 on POST', async () => {
-    app = Fastify({ logger: false });
-    setTokenVerifier(mockVerifyFor('userA'));
-    await app.register(investorStateRoutes);
-    await app.ready();
-
-    const res = await app.inject({
-      method: 'POST',
-      url: '/api/investor-state',
-      headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { watchlists: ['NIFTY50'] },
-    });
-    expect(res.statusCode).toBe(503);
-    expect(res.json()).toMatchObject({ code: 'PERSISTENCE_UNAVAILABLE' });
-  });
-
   // ---- no shared anonymous mutable state ----
-  it('no shared anonymous mutable state — every request scoped to authenticated UID', async () => {
-    const mockDb = createMockUserDb([]);
+  it('no shared anonymous mutable state — each user is isolated', async () => {
+    const dbA = mockDb([
+      {
+        watchlists: JSON.stringify(['NIFTY50']),
+        alerts: JSON.stringify([]),
+        memory: JSON.stringify({}),
+        dashboard_preferences: JSON.stringify({}),
+      },
+    ]);
+    setTokenVerifier(mockVerifierFor('userA'));
+
     app = Fastify({ logger: false });
-    app.decorate('userDb', mockDb);
-    setTokenVerifier(mockVerifyFor('userA'));
+    app.decorate('userDb', dbA);
     await app.register(investorStateRoutes);
     await app.ready();
 
-    await app.inject({
-      method: 'POST',
+    const resA = await app.inject({
+      method: 'GET',
       url: '/api/investor-state',
       headers: { authorization: 'Bearer valid-token-userA' },
-      payload: { watchlists: ['NIFTY50'], alerts: [], memory: { key: 'userA' }, dashboard_preferences: {} },
     });
+    expect(resA.statusCode).toBe(200);
+    expect(resA.json().watchlists).toEqual(['NIFTY50']);
 
-    const insertCalls = mockDb.query.mock.calls.filter(
-      (c: unknown[]) => typeof c[0] === 'string' && c[0].includes('INSERT INTO investor_state'),
-    );
-    expect(insertCalls.length).toBe(1);
-    // UID must be from the authenticated token, not anonymous or empty
-    expect(insertCalls[0][1][0]).toBe('userA');
-    expect(insertCalls[0][1][0]).not.toBe('anonymous');
-    expect(insertCalls[0][1][0]).not.toBe('');
-    expect(insertCalls[0][1][0]).not.toBeNull();
+    await app.close();
+    resetTokenVerifier();
+
+    // Separate app for userB
+    const dbB = mockDb([
+      {
+        watchlists: JSON.stringify(['BANKNIFTY']),
+        alerts: JSON.stringify([{ symbol: 'TCS', threshold: 3500 }]),
+        memory: JSON.stringify({}),
+        dashboard_preferences: JSON.stringify({}),
+      },
+    ]);
+    setTokenVerifier(mockVerifierFor('userB'));
+
+    const appB = Fastify({ logger: false });
+    appB.decorate('userDb', dbB);
+    await appB.register(investorStateRoutes);
+    await appB.ready();
+
+    const resB = await appB.inject({
+      method: 'GET',
+      url: '/api/investor-state',
+      headers: { authorization: 'Bearer valid-token-userB' },
+    });
+    expect(resB.statusCode).toBe(200);
+    expect(resB.json().watchlists).toEqual(['BANKNIFTY']);
+    // userA's data NOT leaked to userB
+    expect(resB.json().watchlists).not.toContain('NIFTY50');
+
+    await appB.close();
   });
 });

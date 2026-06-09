@@ -1,128 +1,142 @@
 /**
- * TRACK-P4B-P3G — Database Adapter Integration Tests
- *
- * Uses unique temporary DB paths. Never mutates data/stockstory.db.
- * Cleans .db, .db-wal, .db-shm after each test.
- * Uses fresh module imports in each test to avoid singleton conflicts.
- *
  * @vitest-environment node
+ *
+ * SQLite DatabaseAdapter integration tests.
+ * Uses unique temporary DB paths. Never mutates data/stockstory.db.
+ * Cleans up .db, .db-wal, .db-shm after each test.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
-const TIMESTAMP = Date.now();
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-function tempDbPath(name: string): string {
-  return path.join(os.tmpdir(), `integration-${TIMESTAMP}-${name}-adapter.db`);
+function tempDbPath(testName: string): string {
+  const ts = Date.now();
+  const rand = Math.random().toString(36).slice(2, 8);
+  return path.join(os.tmpdir(), `integration-${ts}-${rand}-${testName}.db`);
 }
 
 function cleanupDb(dbPath: string): void {
   for (const ext of ['', '-wal', '-shm']) {
     const p = dbPath + ext;
-    if (fs.existsSync(p)) {
-      try { fs.unlinkSync(p); } catch { /* ignore */ }
-    }
+    if (fs.existsSync(p)) fs.unlinkSync(p);
   }
 }
 
-describe('DatabaseAdapter integration', () => {
-  const dbPath = tempDbPath('database-adapter');
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
-  beforeEach(async () => {
-    // Reset module cache for fresh singleton
-    vi.resetModules();
-    cleanupDb(dbPath);
+describe('DatabaseAdapter SQLite integration', () => {
+  const originalEnv = { ...process.env };
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
   });
 
   afterEach(async () => {
-    vi.resetModules();
-    try {
-      // Clean up the adapter singleton
-      const mod = await import('../../db/DatabaseAdapter');
-      await mod.dbAdapter.reset();
-    } catch { /* module may not be loaded */ }
+    await dbAdapter.reset();
+    process.env = { ...originalEnv };
+  });
 
-    cleanupDb(dbPath);
-
-    // Clean up env
+  // ---- NODE_ENV=test requires explicit DB_ADAPTER ----
+  it('NODE_ENV=test requires explicit DB_ADAPTER', async () => {
+    process.env.NODE_ENV = 'test';
     delete process.env.DB_ADAPTER;
-    delete process.env.SQLITE_DB_PATH;
-    delete process.env.NODE_ENV;
+    delete process.env.DATABASE_URL;
+
+    await expect(dbAdapter.initialize()).rejects.toThrow(
+      /DB_ADAPTER must be explicitly set/
+    );
   });
 
   // ---- DB_ADAPTER=sqlite activates SQLite ----
   it('DB_ADAPTER=sqlite activates SQLite', async () => {
-    process.env.NODE_ENV = 'test';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_FALLBACK = 'true';
-    process.env.SQLITE_DB_PATH = dbPath;
-    delete process.env.DATABASE_URL;
+    const dbPath = tempDbPath('adapter-sqlite-activates');
+    try {
+      process.env.NODE_ENV = 'test';
+      process.env.DB_ADAPTER = 'sqlite';
+      process.env.SQLITE_DB_PATH = dbPath;
+      delete process.env.DATABASE_URL;
 
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+      await dbAdapter.initialize();
+      expect(dbAdapter.kind).toBe('sqlite');
 
-    const diag = dbAdapter.diagnostics();
-    expect(diag.kind).toBe('sqlite');
-
-    await dbAdapter.reset();
+      const ping = await dbAdapter.ping();
+      expect(ping.ok).toBe(true);
+    } finally {
+      await dbAdapter.reset();
+      cleanupDb(dbPath);
+    }
   });
 
   // ---- diagnostics.kind === "sqlite" ----
-  it('diagnostics.kind === "sqlite" when SQLite is active', async () => {
-    process.env.NODE_ENV = 'test';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_FALLBACK = 'true';
-    process.env.SQLITE_DB_PATH = dbPath;
-    delete process.env.DATABASE_URL;
+  it('diagnostics.kind === "sqlite"', async () => {
+    const dbPath = tempDbPath('adapter-diag');
+    try {
+      process.env.NODE_ENV = 'test';
+      process.env.DB_ADAPTER = 'sqlite';
+      process.env.SQLITE_DB_PATH = dbPath;
+      delete process.env.DATABASE_URL;
 
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
-
-    const diag = dbAdapter.diagnostics();
-    expect(diag.kind).toBe('sqlite');
-    expect(diag.ready).toBe(true);
-
-    await dbAdapter.reset();
+      await dbAdapter.initialize();
+      const diag = dbAdapter.diagnostics();
+      expect(diag.kind).toBe('sqlite');
+      expect(diag.ready).toBe(true);
+    } finally {
+      cleanupDb(dbPath);
+    }
   });
 
-  // ---- DatabaseAdapter.executeScript delegates to SQLitePool.executeScript ----
-  it('DatabaseAdapter.executeScript delegates to SQLitePool.executeScript', async () => {
-    process.env.NODE_ENV = 'test';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_FALLBACK = 'true';
-    process.env.SQLITE_DB_PATH = dbPath;
-    delete process.env.DATABASE_URL;
+  // ---- DatabaseAdapter.executeScript delegates correctly ----
+  it('DatabaseAdapter.executeScript delegates correctly', async () => {
+    const dbPath = tempDbPath('adapter-exec-script');
+    try {
+      process.env.NODE_ENV = 'test';
+      process.env.DB_ADAPTER = 'sqlite';
+      process.env.SQLITE_DB_PATH = dbPath;
+      delete process.env.DATABASE_URL;
 
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
+      await dbAdapter.initialize();
+      expect(dbAdapter.kind).toBe('sqlite');
 
-    expect(dbAdapter.kind).toBe('sqlite');
+      // executeScript should work
+      await dbAdapter.executeScript(
+        'CREATE TABLE exec_test (id INTEGER PRIMARY KEY, name TEXT);'
+      );
 
-    await dbAdapter.executeScript('CREATE TABLE IF NOT EXISTS test_exec_adapter (id INTEGER PRIMARY KEY, name TEXT);');
-
-    const result = await dbAdapter.query("SELECT name FROM sqlite_master WHERE type='table' AND name='test_exec_adapter'");
-    expect(result.rows.length).toBe(1);
-
-    await dbAdapter.reset();
+      // Verify table was created
+      const result = await dbAdapter.query(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='exec_test'"
+      );
+      expect(result.rows.length).toBe(1);
+    } finally {
+      await dbAdapter.reset();
+      cleanupDb(dbPath);
+    }
   });
 
   // ---- production SQLite rejected without explicit flags ----
   it('production SQLite rejected without explicit flags', async () => {
-    process.env.NODE_ENV = 'production';
-    process.env.DB_ADAPTER = 'sqlite';
-    process.env.ALLOW_SQLITE_IN_PRODUCTION = 'false';
-    process.env.SQLITE_DB_PATH = dbPath;
-    delete process.env.ALLOW_SQLITE_FALLBACK;
-    delete process.env.DATABASE_URL;
+    const dbPath = tempDbPath('adapter-prod-reject');
+    try {
+      process.env.NODE_ENV = 'production';
+      process.env.DB_ADAPTER = 'sqlite';
+      process.env.SQLITE_DB_PATH = dbPath;
+      process.env.ALLOW_SQLITE_IN_PRODUCTION = 'false';
+      delete process.env.DATABASE_URL;
 
-    const { dbAdapter } = await import('../../db/DatabaseAdapter');
-    await dbAdapter.initialize();
-
-    const diag = dbAdapter.diagnostics();
-    expect(diag.kind).not.toBe('sqlite');
-
-    await dbAdapter.reset();
+      await dbAdapter.initialize();
+      expect(dbAdapter.kind).toBe('unavailable');
+      const diag = dbAdapter.diagnostics();
+      expect(diag.ready).toBe(false);
+    } finally {
+      cleanupDb(dbPath);
+    }
   });
 });

@@ -1,15 +1,5 @@
 import type { FastifyInstance } from "fastify";
 
-export interface UserDbClient {
-  query(
-    text: string,
-    params?: unknown[],
-  ): Promise<{
-    rows: Record<string, unknown>[];
-    rowCount?: number;
-  }>;
-}
-
 export type MigrationStatus = "pending" | "applied" | "failed";
 
 type MigrationRecord = {
@@ -18,10 +8,17 @@ type MigrationRecord = {
   appliedAt?: number;
 };
 
-export class MigrationManager {
-  private db: UserDbClient;
+type UserDb = {
+  query(
+    text: string,
+    params?: unknown[],
+  ): Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>;
+};
 
-  constructor(db: UserDbClient) {
+export class MigrationManager {
+  private db: UserDb;
+
+  constructor(db: UserDb) {
     this.db = db;
   }
 
@@ -45,7 +42,7 @@ export class MigrationManager {
       `select id from schema_migrations;`,
     );
 
-    return new Set((rows as Array<{ id: string }>).map((r) => r.id));
+    return new Set(rows.map((r) => String(r.id)));
   }
 
   /**

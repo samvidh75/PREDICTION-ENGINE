@@ -47,8 +47,8 @@ function getFirebaseApp(): App {
   // Application Default Credentials — explicitly uses applicationDefault()
   if (useAdc) {
     _app = initializeApp({
-      projectId: projectId ?? 'stockstory',
       credential: applicationDefault(),
+      projectId: projectId ?? 'stockstory',
     });
     return _app;
   }

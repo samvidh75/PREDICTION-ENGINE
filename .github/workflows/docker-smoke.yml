@@ -9,8 +9,47 @@ on:
 jobs:
   docker-smoke:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: stockstory
+          POSTGRES_PASSWORD: stockstory
+          POSTGRES_DB: stockstory_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run migrations
+        env:
+          NODE_ENV: test
+          DB_ADAPTER: postgres
+          ALLOW_SQLITE_FALLBACK: "false"
+          ALLOW_SQLITE_IN_PRODUCTION: "false"
+          DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
+        run: npm run migrate
+
+      - name: Seed deterministic fixtures
+        env:
+          CI_FIXTURE_SEED: "true"
+          NODE_ENV: test
+          DB_ADAPTER: postgres
+          ALLOW_SQLITE_FALLBACK: "false"
+          DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
+        run: npm run seed:ci
 
       - name: Build Docker image
         run: docker build -t stockstory-api:test .
@@ -19,23 +58,45 @@ jobs:
         run: |
           docker run -d \
             --name stockstory-api-test \
+            --add-host=host.docker.internal:host-gateway \
             -p 4001:4001 \
             -e NODE_ENV=production \
+            -e DB_ADAPTER=postgres \
+            -e ALLOW_SQLITE_FALLBACK=false \
+            -e ALLOW_SQLITE_IN_PRODUCTION=false \
+            -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
             stockstory-api:test
 
-      - name: Wait for readiness
+      - name: Wait for /healthz (liveness)
         run: |
           for i in {1..30}; do
             if curl -fsS http://localhost:4001/healthz; then
-              echo "Container ready after ${i} attempts"
-              exit 0
+              echo "Container /healthz ready after ${i} attempts"
+              break
             fi
             sleep 2
           done
-          echo "Container failed to become ready"
-          docker logs stockstory-api-test
-          exit 1
+          RESPONSE=$(curl -fsS http://localhost:4001/healthz)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['ok']==True, 'healthz ok is not true'; print('PASS: /healthz')"
+
+      - name: Wait for /readyz (readiness)
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4001/readyz; then
+              echo "Container /readyz ready after ${i} attempts"
+              break
+            fi
+            sleep 2
+          done
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4001/readyz)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "FAIL: /readyz returned HTTP ${HTTP_CODE}, expected 200"
+            docker logs stockstory-api-test
+            exit 1
+          fi
+          RESPONSE=$(curl -fsS http://localhost:4001/readyz)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['database']['kind']=='postgres', f'expected postgres, got {d[\"database\"][\"kind\"]}'; assert d['database']['fallbackUsed']==False, 'fallbackUsed should be false'; print('PASS: /readyz confirms postgres with no fallback')"
 
       - name: Show container logs
         if: always()
