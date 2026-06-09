@@ -26,6 +26,9 @@ jobs:
     env:
       DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
       NODE_ENV: test
+      DB_ADAPTER: postgres
+      ALLOW_SQLITE_FALLBACK: "false"
+      ALLOW_SQLITE_IN_PRODUCTION: "false"
       COOKIE_SECRET: test-only-ci-secret
     steps:
       - uses: actions/checkout@v4
@@ -37,11 +40,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run migrations
+        run: npm run migrate
+
+      - name: Seed deterministic fixtures
+        run: CI_FIXTURE_SEED=true npm run seed:ci
+
       - name: Typecheck all
         run: npx tsc -p tsconfig.all.json --noEmit
 
       - name: Unit tests
         run: npx vitest run
+
+      - name: PostgreSQL integration tests
+        run: npm run test:integration:postgres
 
       - name: Frontend build
         run: npx vite build
@@ -62,19 +74,38 @@ jobs:
         run: |
           docker run -d \
             --name stockstory-api-test \
+            --add-host=host.docker.internal:host-gateway \
             -p 4001:4001 \
             -e NODE_ENV=production \
+            -e DB_ADAPTER=postgres \
+            -e ALLOW_SQLITE_FALLBACK=false \
+            -e ALLOW_SQLITE_IN_PRODUCTION=false \
+            -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
             stockstory-api:test
+          echo "Waiting for /healthz..."
           for i in {1..30}; do
             if curl -fsS http://localhost:4001/healthz; then
-              echo "Container ready"
-              exit 0
+              echo "Container /healthz ready after ${i} attempts"
+              break
             fi
             sleep 2
           done
-          docker logs stockstory-api-test
-          exit 1
+          echo "Waiting for /readyz..."
+          for i in {1..30}; do
+            if curl -fsS http://localhost:4001/readyz; then
+              echo "Container /readyz ready after ${i} attempts"
+              break
+            fi
+            sleep 2
+          done
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4001/readyz)
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "FAIL: /readyz returned HTTP ${HTTP_CODE}, expected 200"
+            docker logs stockstory-api-test
+            exit 1
+          fi
+          echo "PASS: Docker container is live and ready with PostgreSQL"
 
       - name: Clean up Docker
         if: always()
