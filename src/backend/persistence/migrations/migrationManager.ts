@@ -61,7 +61,7 @@ export class MigrationManager {
  * Helper for app integration.
  */
 export function createMigrationManager(app: FastifyInstance): MigrationManager | null {
-  const db = app.postgres;
+  const db = app.userDb;
   if (!db) return null;
   return new MigrationManager(db);
 }

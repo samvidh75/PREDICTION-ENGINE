@@ -1,5 +1,4 @@
 import type { FastifyInstance } from "fastify";
-import type { PostgresClient } from "./postgres/postgresClient";
 
 /**
  * PersistenceCoordinator
@@ -7,13 +6,30 @@ import type { PostgresClient } from "./postgres/postgresClient";
  * - strict separation: repositories must not reach into scheduling/realtime/render.
  */
 export class PersistenceCoordinator {
-  private db: PostgresClient | null;
+  private db: {
+    query(
+      text: string,
+      params?: unknown[]
+    ): Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>;
+  } | null;
 
-  constructor(db: PostgresClient | null) {
+  constructor(
+    db: {
+      query(
+        text: string,
+        params?: unknown[]
+      ): Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>;
+    } | null
+  ) {
     this.db = db;
   }
 
-  getPostgres(): PostgresClient | null {
+  getUserDb(): {
+    query(
+      text: string,
+      params?: unknown[]
+    ): Promise<{ rows: Record<string, unknown>[]; rowCount?: number }>;
+  } | null {
     return this.db;
   }
 }
@@ -21,6 +37,8 @@ export class PersistenceCoordinator {
 /**
  * Builds coordinator from Fastify instance decorations.
  */
-export function createPersistenceCoordinator(app: FastifyInstance): PersistenceCoordinator {
-  return new PersistenceCoordinator(app.postgres ?? null);
+export function createPersistenceCoordinator(
+  app: FastifyInstance
+): PersistenceCoordinator {
+  return new PersistenceCoordinator(app.userDb ?? null);
 }
