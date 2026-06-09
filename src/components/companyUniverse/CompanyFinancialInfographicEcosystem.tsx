@@ -165,7 +165,7 @@ export default function CompanyFinancialInfographicEcosystem({
           </div>
 
           <div className="mt-4 text-[13px] leading-[1.8] text-white/80">
-            Industry PE (5y avg, contextual): <span className="text-white/92 font-semibold">{finance.fiveYearPeAvg.toFixed(1)}x</span>
+            Industry PE (5y avg, contextual): <span className="text-white/92 font-semibold">{finance.fiveYearPeAvg != null ? `${finance.fiveYearPeAvg.toFixed(1)}x` : "—"}</span>
           </div>
 
           <div className="mt-4 space-y-3">

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
@@ -13,7 +13,11 @@
       "destination": "https://stockstory-api.onrender.com/healthz"
     },
     {
-      "source": "/((?!api|healthz).*)",
+      "source": "/readyz",
+      "destination": "https://stockstory-api.onrender.com/readyz"
+    },
+    {
+      "source": "/((?!api|healthz|readyz).*)",
       "destination": "/index.html"
     }
   ]
