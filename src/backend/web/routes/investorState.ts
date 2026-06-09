@@ -5,13 +5,13 @@
  * Private user data uses app.userDb (PostgreSQL-only, never SQLite).
  * Missing app.userDb returns HTTP 503.
  */
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync, FastifyReply } from 'fastify';
 import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
 
 export const investorStateRoutes: FastifyPluginAsync = async (app) => {
-  const getUserDb = () => (app as any).userDb as { query: (text: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }> } | undefined;
+  const getUserDb = () => app.userDb;
 
-  function checkPersistence(reply: any): boolean {
+  function checkPersistence(reply: FastifyReply): boolean {
     if (!getUserDb()) {
       reply.status(503).send({
         code: 'PERSISTENCE_UNAVAILABLE',

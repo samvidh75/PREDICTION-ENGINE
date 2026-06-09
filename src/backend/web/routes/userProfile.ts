@@ -9,7 +9,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { requireAuthenticatedUser } from '../../auth/requireAuthenticatedUser';
 
 export const userProfileRoutes: FastifyPluginAsync = async (app) => {
-  const getUserDb = () => (app as any).userDb as { query: (text: string, params?: unknown[]) => Promise<{ rows: Record<string, unknown>[] }> } | undefined;
+  const getUserDb = () => app.userDb;
 
   // GET /api/user/profile
   app.get('/api/user/profile', { preHandler: [requireAuthenticatedUser] }, async (request, reply) => {

@@ -12,7 +12,7 @@
  *   FIREBASE_PRIVATE_KEY    (escaped with \n)
  *   FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS  (set to "true" for ADC)
  */
-import { initializeApp, cert, getApps, type App } from 'firebase-admin/app';
+import { initializeApp, cert, applicationDefault, getApps, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 
 let _app: App | null = null;
@@ -44,9 +44,12 @@ function getFirebaseApp(): App {
     return _app;
   }
 
-  // Application Default Credentials
+  // Application Default Credentials — explicitly uses applicationDefault()
   if (useAdc) {
-    _app = initializeApp({ projectId: projectId ?? 'stockstory' });
+    _app = initializeApp({
+      projectId: projectId ?? 'stockstory',
+      credential: applicationDefault(),
+    });
     return _app;
   }
 
