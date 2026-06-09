@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { resetForTest } from '../../db/SQLiteAdapter';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -41,6 +42,7 @@ describe('DatabaseAdapter SQLite integration', () => {
 
   afterEach(async () => {
     await dbAdapter.reset();
+    resetForTest();
     process.env = { ...originalEnv };
   });
 

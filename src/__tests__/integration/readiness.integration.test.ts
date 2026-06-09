@@ -11,6 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { resetForTest } from '../../db/SQLiteAdapter';
 import healthRoutes from '../../backend/web/routes/health';
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ describe('Readiness integration', () => {
 
   afterEach(async () => {
     await dbAdapter.reset();
+    resetForTest();
     process.env = { ...originalEnv };
     cleanupDb(dbPath);
     if (app) {
