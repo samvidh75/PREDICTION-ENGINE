@@ -98,6 +98,9 @@ jobs:
           RESPONSE=$(curl -fsS http://localhost:4001/readyz)
           echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['database']['kind']=='postgres', f'expected postgres, got {d[\"database\"][\"kind\"]}'; assert d['database']['fallbackUsed']==False, 'fallbackUsed should be false'; print('PASS: /readyz confirms postgres with no fallback')"
 
+      - name: Strict API smoke test
+        run: API_BASE_URL=http://localhost:4001 npm run smoke:api
+
       - name: Show container logs
         if: always()
         run: docker logs stockstory-api-test

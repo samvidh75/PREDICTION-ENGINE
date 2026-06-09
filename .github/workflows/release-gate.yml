@@ -47,25 +47,25 @@ jobs:
         run: CI_FIXTURE_SEED=true npm run seed:ci
 
       - name: Typecheck all
-        run: npx tsc -p tsconfig.all.json --noEmit
+        run: npm run typecheck:all
 
       - name: Unit tests
-        run: npx vitest run
+        run: npm run test:unit
 
       - name: PostgreSQL integration tests
-        run: npm run test:integration:postgres
+        run: npm run test:integration:postgres:ci
 
       - name: Frontend build
-        run: npx vite build
+        run: npm run build:vercel
 
       - name: Backend compile
-        run: npx tsc -p tsconfig.backend.emit.json
+        run: npm run compile:backend
 
       - name: Schema validation
-        run: npx tsx scripts/validate-schema-contract.ts
+        run: npm run validate:schema
 
       - name: Distribution validation
-        run: npx tsx scripts/validate-sector-distributions.ts
+        run: npm run validate:distributions
 
       - name: Build Docker image
         run: docker build -t stockstory-api:test .
