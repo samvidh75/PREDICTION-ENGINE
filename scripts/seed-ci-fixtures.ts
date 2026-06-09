@@ -133,7 +133,6 @@ async function seed(): Promise<void> {
   }
 
   console.log(`[seed:ci] Fixture seeding complete. Symbol: ${FIXTURE_SYMBOL}, Date: ${FIXED_DATE}`);
-  await dbAdapter.shutdown();
 }
 
 (async () => {
@@ -143,5 +142,7 @@ async function seed(): Promise<void> {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`[seed:ci] FAILED: ${msg}`);
     process.exitCode = 1;
+  } finally {
+    await dbAdapter.shutdown();
   }
 })();
