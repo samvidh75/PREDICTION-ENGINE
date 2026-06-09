@@ -30,15 +30,20 @@ describe('firebaseAdmin', () => {
       await vi.resetModules();
 
       process.env.NODE_ENV = 'production';
-      process.env.FIREBASE_PROJECT_ID = undefined;
-      process.env.FIREBASE_CLIENT_EMAIL = undefined;
-      process.env.FIREBASE_PRIVATE_KEY = undefined;
-      process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS = undefined;
+      delete process.env.FIREBASE_PROJECT_ID;
+      delete process.env.FIREBASE_CLIENT_EMAIL;
+      delete process.env.FIREBASE_PRIVATE_KEY;
+      delete process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS;
+      delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
-      // The module eagerly initializes on import; we check it throws.
-      await expect(
-        import('../firebaseAdmin').then((m) => m.verifyFirebaseToken('test'))
-      ).rejects.toThrow(/Firebase Admin credentials are required in production/);
+      // The firebaseAdmin module lazily initializes _app; calling
+      // verifyFirebaseToken triggers getFirebaseAuth() → getFirebaseApp()
+      // which should throw because no credentials are configured.
+      const { verifyFirebaseToken } = await import('../firebaseAdmin');
+
+      await expect(verifyFirebaseToken('test')).rejects.toThrow(
+        /Firebase Admin credentials are required in production/,
+      );
     });
   });
 
