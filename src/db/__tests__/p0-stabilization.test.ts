@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import Database from 'better-sqlite3';
+import { resetForTest, closeSQLite, pool } from '../SQLiteAdapter';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -19,17 +19,16 @@ import os from 'os';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createTempDb(): { db: Database.Database; path: string } {
+async function createTempPool(): Promise<{ dbPath: string }> {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'p0-test-'));
   const dbPath = path.join(dir, 'test.db');
-  const db = new Database(dbPath);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  return { db, path: dbPath };
+  process.env.SQLITE_DB_PATH = dbPath;
+  await resetForTest(dbPath);
+  return { dbPath };
 }
 
-function runCanonicalSchema(db: Database.Database) {
-  db.exec(`CREATE TABLE IF NOT EXISTS feature_snapshots (
+async function runCanonicalSchema(): Promise<void> {
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS feature_snapshots (
     symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
     rsi REAL, macd REAL, macd_signal REAL, macd_histogram REAL,
     adx REAL, atr REAL, bollinger_width REAL, momentum REAL,
@@ -38,7 +37,7 @@ function runCanonicalSchema(db: Database.Database) {
     PRIMARY KEY (symbol, trade_date)
   )`);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS factor_snapshots (
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS factor_snapshots (
     symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
     quality_factor REAL, value_factor REAL, growth_factor REAL,
     momentum_factor REAL, risk_factor REAL, sector_strength_factor REAL,
@@ -46,7 +45,7 @@ function runCanonicalSchema(db: Database.Database) {
     PRIMARY KEY (symbol, trade_date)
   )`);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS prediction_registry (
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS prediction_registry (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol TEXT, prediction_date TEXT,
     ranking_score REAL, classification TEXT, confidence_score REAL,
@@ -58,13 +57,13 @@ function runCanonicalSchema(db: Database.Database) {
     validated_at TEXT, future_return REAL, benchmark_return REAL, alpha REAL
   )`);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS daily_prices (
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS daily_prices (
     symbol TEXT NOT NULL, trade_date TEXT NOT NULL,
     open REAL, high REAL, low REAL, close REAL, adjusted_close REAL, volume REAL,
     PRIMARY KEY (symbol, trade_date)
   )`);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS financial_snapshots (
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS financial_snapshots (
     symbol TEXT NOT NULL, period_end TEXT NOT NULL,
     market_cap REAL, pe_ratio REAL, eps REAL, dividend_yield REAL, beta REAL,
     free_float REAL, fcf_yield REAL, ev_ebitda REAL, roa REAL, roe REAL, roic REAL,
@@ -74,7 +73,7 @@ function runCanonicalSchema(db: Database.Database) {
     PRIMARY KEY (symbol, period_end)
   )`);
 
-  db.exec(`CREATE TABLE IF NOT EXISTS symbols (
+  await pool.executeScript(`CREATE TABLE IF NOT EXISTS symbols (
     symbol TEXT PRIMARY KEY, exchange TEXT, isin TEXT, company_name TEXT,
     sector TEXT, industry TEXT, listing_status TEXT DEFAULT 'Active'
   )`);
@@ -85,24 +84,22 @@ function runCanonicalSchema(db: Database.Database) {
 // ---------------------------------------------------------------------------
 
 describe('GROUP A — SQLite Schema Contract', () => {
-  let db: Database.Database;
-  let dbDir: string;
+  let dbPath: string;
 
-  beforeAll(() => {
-    const tmp = createTempDb();
-    db = tmp.db;
-    dbDir = path.dirname(tmp.path);
-    runCanonicalSchema(db);
+  beforeAll(async () => {
+    const tmp = await createTempPool();
+    dbPath = tmp.dbPath;
+    await runCanonicalSchema();
   });
 
-  afterAll(() => {
-    db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+  afterAll(async () => {
+    await closeSQLite();
+    try { fs.rmSync(path.dirname(dbPath), { recursive: true }); } catch {}
   });
 
-  it('feature_snapshots contains all canonical columns', () => {
-    const cols = db.prepare("PRAGMA table_info('feature_snapshots')").all() as { name: string }[];
-    const colNames = cols.map(c => c.name);
+  it('feature_snapshots contains all canonical columns', async () => {
+    const r = await pool.query("PRAGMA table_info('feature_snapshots')");
+    const colNames = (r.rows as { name: string }[]).map(c => c.name);
     const required = [
       'symbol', 'trade_date', 'rsi', 'macd', 'macd_signal', 'macd_histogram',
       'adx', 'atr', 'bollinger_width', 'momentum', 'volatility',
@@ -111,9 +108,9 @@ describe('GROUP A — SQLite Schema Contract', () => {
     for (const col of required) expect(colNames).toContain(col);
   });
 
-  it('feature_snapshots does NOT have deprecated columns', () => {
-    const cols = db.prepare("PRAGMA table_info('feature_snapshots')").all() as { name: string }[];
-    const colNames = cols.map(c => c.name);
+  it('feature_snapshots does NOT have deprecated columns', async () => {
+    const r = await pool.query("PRAGMA table_info('feature_snapshots')");
+    const colNames = (r.rows as { name: string }[]).map(c => c.name);
     expect(colNames).not.toContain('snapshot_date');
     expect(colNames).not.toContain('returns_1m');
     expect(colNames).not.toContain('returns_3m');
@@ -123,9 +120,9 @@ describe('GROUP A — SQLite Schema Contract', () => {
     expect(colNames).not.toContain('momentum_score');
   });
 
-  it('factor_snapshots contains all canonical columns', () => {
-    const cols = db.prepare("PRAGMA table_info('factor_snapshots')").all() as { name: string }[];
-    const colNames = cols.map(c => c.name);
+  it('factor_snapshots contains all canonical columns', async () => {
+    const r = await pool.query("PRAGMA table_info('factor_snapshots')");
+    const colNames = (r.rows as { name: string }[]).map(c => c.name);
     const required = [
       'symbol', 'trade_date', 'quality_factor', 'value_factor', 'growth_factor',
       'momentum_factor', 'risk_factor', 'sector_strength_factor',
@@ -134,18 +131,18 @@ describe('GROUP A — SQLite Schema Contract', () => {
     for (const col of required) expect(colNames).toContain(col);
   });
 
-  it('factor_snapshots does NOT have deprecated columns', () => {
-    const cols = db.prepare("PRAGMA table_info('factor_snapshots')").all() as { name: string }[];
-    const colNames = cols.map(c => c.name);
+  it('factor_snapshots does NOT have deprecated columns', async () => {
+    const r = await pool.query("PRAGMA table_info('factor_snapshots')");
+    const colNames = (r.rows as { name: string }[]).map(c => c.name);
     expect(colNames).not.toContain('snapshot_date');
     expect(colNames).not.toContain('confidence_score');
     expect(colNames).not.toContain('ranking_score');
     expect(colNames).not.toContain('classification');
   });
 
-  it('prediction_registry contains confidence_level', () => {
-    const cols = db.prepare("PRAGMA table_info('prediction_registry')").all() as { name: string }[];
-    const colNames = cols.map(c => c.name);
+  it('prediction_registry contains confidence_level', async () => {
+    const r = await pool.query("PRAGMA table_info('prediction_registry')");
+    const colNames = (r.rows as { name: string }[]).map(c => c.name);
     expect(colNames).toContain('confidence_level');
     expect(colNames).toContain('prediction_date');
     expect(colNames).toContain('classification');
@@ -153,9 +150,9 @@ describe('GROUP A — SQLite Schema Contract', () => {
     expect(colNames).toContain('prediction_horizon');
   });
 
-  it('prediction_registry does NOT use snapshot_date', () => {
-    const cols = db.prepare("PRAGMA table_info('prediction_registry')").all() as { name: string }[];
-    expect(cols.map(c => c.name)).not.toContain('snapshot_date');
+  it('prediction_registry does NOT use snapshot_date', async () => {
+    const r = await pool.query("PRAGMA table_info('prediction_registry')");
+    expect((r.rows as { name: string }[]).map(c => c.name)).not.toContain('snapshot_date');
   });
 });
 
@@ -164,19 +161,13 @@ describe('GROUP A — SQLite Schema Contract', () => {
 // ---------------------------------------------------------------------------
 
 describe('GROUP B — Feature Engine Write Test', () => {
-  let db: Database.Database;
-  let dbDir: string;
+  let dbPath: string;
 
-  beforeAll(() => {
-    const tmp = createTempDb();
-    db = tmp.db;
-    dbDir = path.dirname(tmp.path);
-    runCanonicalSchema(db);
+  beforeAll(async () => {
+    const tmp = await createTempPool();
+    dbPath = tmp.dbPath;
+    await runCanonicalSchema();
 
-    const insert = db.prepare(
-      `INSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    );
     const baseDate = new Date('2025-01-02');
     let price = 2500;
     for (let i = 0; i < 60; i++) {
@@ -185,42 +176,46 @@ describe('GROUP B — Feature Engine Write Test', () => {
       if (date.getDay() === 0 || date.getDay() === 6) continue;
       const dateStr = date.toISOString().split('T')[0];
       price = Math.max(price + (Math.random() - 0.48) * 50, 100);
-      insert.run('RELIANCE', dateStr, price - 5, price + 10, price - 8, price, price, 1000000);
+      await pool.query(
+        `INSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        ['RELIANCE', dateStr, price - 5, price + 10, price - 8, price, price, 1000000]
+      );
     }
   });
 
-  afterAll(() => {
-    db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+  afterAll(async () => {
+    await closeSQLite();
+    try { fs.rmSync(path.dirname(dbPath), { recursive: true }); } catch {}
   });
 
-  it('can insert a feature_snapshot with canonical columns', () => {
-    const result = db.prepare(
+  it('can insert a feature_snapshot with canonical columns', async () => {
+    const r = await pool.query(
       `INSERT INTO feature_snapshots (
         symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
         adx, atr, bollinger_width, momentum, volatility, relative_strength,
         moving_average_distance, trend_strength
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run('RELIANCE', '2025-03-15', 55.5, 1.2, 0.8, 0.4, 25.0, 15.5, 0.05, 0.03, 0.25, 0.01, 0.02, 0.015);
-    expect(result.changes).toBe(1);
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+      ['RELIANCE', '2025-03-15', 55.5, 1.2, 0.8, 0.4, 25.0, 15.5, 0.05, 0.03, 0.25, 0.01, 0.02, 0.015]
+    );
+    expect(r.rowCount).toBe(1);
   });
 
-  it('trade_date is populated', () => {
-    const rows = db.prepare("SELECT * FROM feature_snapshots WHERE symbol = 'RELIANCE'").all() as Record<string, unknown>[];
-    expect(rows.length).toBeGreaterThanOrEqual(1);
-    expect(rows[0].trade_date).toBe('2025-03-15');
+  it('trade_date is populated', async () => {
+    const r = await pool.query("SELECT * FROM feature_snapshots WHERE symbol = $1", ['RELIANCE']);
+    expect(r.rows.length).toBeGreaterThanOrEqual(1);
+    expect((r.rows[0] as Record<string, unknown>).trade_date).toBe('2025-03-15');
   });
 
-  it('primary key (symbol, trade_date) enforces uniqueness', () => {
-    expect(() => {
-      db.prepare(
-        `INSERT INTO feature_snapshots (
-          symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
-          adx, atr, bollinger_width, momentum, volatility, relative_strength,
-          moving_average_distance, trend_strength
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      ).run('RELIANCE', '2025-03-15', 60.0, 1.5, 1.0, 0.5, 30.0, 20.0, 0.06, 0.04, 0.30, 0.02, 0.03, 0.02);
-    }).toThrow();
+  it('primary key (symbol, trade_date) enforces uniqueness', async () => {
+    await expect(pool.query(
+      `INSERT INTO feature_snapshots (
+        symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
+        adx, atr, bollinger_width, momentum, volatility, relative_strength,
+        moving_average_distance, trend_strength
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+      ['RELIANCE', '2025-03-15', 60.0, 1.5, 1.0, 0.5, 30.0, 20.0, 0.06, 0.04, 0.30, 0.02, 0.03, 0.02]
+    )).rejects.toThrow();
   });
 });
 
@@ -229,63 +224,73 @@ describe('GROUP B — Feature Engine Write Test', () => {
 // ---------------------------------------------------------------------------
 
 describe('GROUP C — Factor Engine Write Test', () => {
-  let db: Database.Database;
-  let dbDir: string;
+  let dbPath: string;
 
-  beforeAll(() => {
-    const tmp = createTempDb();
-    db = tmp.db;
-    dbDir = path.dirname(tmp.path);
-    runCanonicalSchema(db);
+  beforeAll(async () => {
+    const tmp = await createTempPool();
+    dbPath = tmp.dbPath;
+    await runCanonicalSchema();
 
-    db.prepare(`INSERT OR IGNORE INTO symbols (symbol, exchange, company_name, sector, industry)
-      VALUES (?, ?, ?, ?, ?)`).run('RELIANCE', 'NSE', 'Reliance Industries Ltd', 'Energy', 'Oil & Gas');
-    db.prepare(`INSERT OR IGNORE INTO financial_snapshots
-      (symbol, period_end, pe_ratio, dividend_yield, beta, eps)
-      VALUES (?, ?, ?, ?, ?, ?)`).run('RELIANCE', '2025-03-31', 25.0, 1.5, 1.2, 100);
-    db.prepare(`INSERT OR IGNORE INTO feature_snapshots (
-      symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
-      adx, atr, bollinger_width, momentum, volatility, relative_strength,
-      moving_average_distance, trend_strength
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run('RELIANCE', '2025-03-15', 55.0, 1.2, 0.8, 0.4, 25.0, 15.0, 0.05, 0.03, 0.25, 0.01, 0.02, 0.015);
-    db.prepare(`INSERT OR IGNORE INTO daily_prices
-      (symbol, trade_date, open, high, low, close, volume)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`).run('RELIANCE', '2025-03-15', 2500, 2520, 2480, 2510, 1000000);
+    await pool.query(
+      `INSERT OR IGNORE INTO symbols (symbol, exchange, company_name, sector, industry)
+       VALUES ($1,$2,$3,$4,$5)`,
+      ['RELIANCE', 'NSE', 'Reliance Industries Ltd', 'Energy', 'Oil & Gas']
+    );
+    await pool.query(
+      `INSERT OR IGNORE INTO financial_snapshots (symbol, period_end, pe_ratio, dividend_yield, beta, eps)
+       VALUES ($1,$2,$3,$4,$5,$6)`,
+      ['RELIANCE', '2025-03-31', 25.0, 1.5, 1.2, 100]
+    );
+    await pool.query(
+      `INSERT OR IGNORE INTO feature_snapshots (
+        symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
+        adx, atr, bollinger_width, momentum, volatility, relative_strength,
+        moving_average_distance, trend_strength
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+      ['RELIANCE', '2025-03-15', 55.0, 1.2, 0.8, 0.4, 25.0, 15.0, 0.05, 0.03, 0.25, 0.01, 0.02, 0.015]
+    );
+    await pool.query(
+      `INSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      ['RELIANCE', '2025-03-15', 2500, 2520, 2480, 2510, 1000000]
+    );
   });
 
-  afterAll(() => {
-    db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+  afterAll(async () => {
+    await closeSQLite();
+    try { fs.rmSync(path.dirname(dbPath), { recursive: true }); } catch {}
   });
 
-  it('can insert a factor_snapshot with canonical columns', () => {
-    const result = db.prepare(
+  it('can insert a factor_snapshot with canonical columns', async () => {
+    const r = await pool.query(
       `INSERT INTO factor_snapshots (
         symbol, trade_date, quality_factor, value_factor, growth_factor,
         momentum_factor, risk_factor, sector_strength_factor, factor_score, explanations
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run('RELIANCE', '2025-03-15', 72, 65, 58, 70, 60, 55, 63,
-      JSON.stringify({ topPositiveDrivers: ['Quality', 'Momentum'], topNegativeDrivers: ['Sector'] }));
-    expect(result.changes).toBe(1);
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+      ['RELIANCE', '2025-03-15', 72, 65, 58, 70, 60, 55, 63,
+        JSON.stringify({ topPositiveDrivers: ['Quality', 'Momentum'], topNegativeDrivers: ['Sector'] })]
+    );
+    expect(r.rowCount).toBe(1);
   });
 
-  it('factor_snapshots columns are populated correctly', () => {
-    const rows = db.prepare("SELECT * FROM factor_snapshots WHERE symbol = 'RELIANCE'").all() as Record<string, unknown>[];
+  it('factor_snapshots columns are populated correctly', async () => {
+    const r = await pool.query("SELECT * FROM factor_snapshots WHERE symbol = $1", ['RELIANCE']);
+    const rows = r.rows as Record<string, unknown>[];
     expect(rows.length).toBe(1);
     expect(rows[0].trade_date).toBe('2025-03-15');
     expect(rows[0].quality_factor).toBe(72);
     expect(rows[0].momentum_factor).toBe(70);
   });
 
-  it('explanations are persisted', () => {
-    const rows = db.prepare("SELECT explanations FROM factor_snapshots WHERE symbol = 'RELIANCE'").all() as { explanations: string }[];
-    const parsed = JSON.parse(rows[0].explanations);
+  it('explanations are persisted', async () => {
+    const r = await pool.query("SELECT explanations FROM factor_snapshots WHERE symbol = $1", ['RELIANCE']);
+    const parsed = JSON.parse((r.rows[0] as { explanations: string }).explanations);
     expect(parsed.topPositiveDrivers).toContain('Quality');
   });
 
-  it('factors are numeric', () => {
-    const rows = db.prepare("SELECT * FROM factor_snapshots WHERE symbol = 'RELIANCE'").all() as Record<string, unknown>[];
+  it('factors are numeric', async () => {
+    const r = await pool.query("SELECT * FROM factor_snapshots WHERE symbol = $1", ['RELIANCE']);
+    const rows = r.rows as Record<string, unknown>[];
     expect(typeof rows[0].quality_factor).toBe('number');
     expect(typeof rows[0].factor_score).toBe('number');
   });
