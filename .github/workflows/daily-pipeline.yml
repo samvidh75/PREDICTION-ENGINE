@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Copy production env
-        run: cp .env.production.example .env.production
+        run: node -e "require('fs').copyFileSync('.env.production.example','.env.production')"
 
       # ═══ Phase 1: Data Refresh (05:00 IST) ═══
       - name: Phase 1 — Data Refresh
