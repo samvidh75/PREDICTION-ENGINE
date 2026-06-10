@@ -117,6 +117,7 @@ export class DatabaseAdapter {
     if (shouldTryPostgres) {
       try {
         const { default: pgMod } = await import("pg");
+        pgMod.types.setTypeParser(1082, (val) => val); // Return DATE as string (same as SQLite)
         const { Pool } = pgMod;
         this.pool = new Pool({
           connectionString: pgUrl,
@@ -197,7 +198,22 @@ export class DatabaseAdapter {
     }
 
     if (this._kind === "postgres" && this.pool) {
-      await this.pool.query(sql);
+      // Translate SQLite dialect to PostgreSQL on the fly
+      let pgSql = sql
+        .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, "SERIAL PRIMARY KEY")
+        .replace(/datetime\('now'\)/g, "CURRENT_TIMESTAMP")
+        .replace(/date\('now'\)/g, "CURRENT_DATE")
+        .replace(/INSERT OR IGNORE INTO (\w+)/gi, "INSERT INTO $1");
+
+      if (sql.includes("INSERT OR IGNORE INTO subscription_plans")) {
+        pgSql = pgSql.replace(/;\s*$/, " ON CONFLICT (id) DO NOTHING;");
+      }
+
+      if (sql.includes("CREATE TABLE IF NOT EXISTS financial_snapshots")) {
+        pgSql = "DROP TABLE IF EXISTS financial_snapshots CASCADE;\n" + pgSql;
+      }
+
+      await this.pool.query(pgSql);
       return;
     }
 

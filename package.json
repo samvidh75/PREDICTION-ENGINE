@@ -15,7 +15,7 @@
     "build:render": "npm run compile:backend",
     "build:docker": "npm run compile:backend && npm run build:frontend",
     "build:all": "npm run build && npm run build:backend",
-    "compile:backend": "tsc -p tsconfig.backend.emit.json",
+    "compile:backend": "tsc -p tsconfig.backend.emit.json && node scripts/fix-esm-imports.js",
     "start": "node dist/backend/backend/startServer.js",
     "start:dev": "tsx src/backend/startServer.ts",
     "migrate": "tsx src/db/migrate.ts",

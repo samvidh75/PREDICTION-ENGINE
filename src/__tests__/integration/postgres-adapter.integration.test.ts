@@ -5,7 +5,7 @@
  * Requires: DATABASE_URL, DB_ADAPTER=postgres, ALLOW_SQLITE_FALLBACK=false.
  * Skips gracefully if DATABASE_URL is not set.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { dbAdapter } from '../../db/DatabaseAdapter';
 
 // ---------------------------------------------------------------------------
@@ -30,6 +30,10 @@ describe('PostgreSQL adapter integration', () => {
     if (!process.env.DATABASE_URL) {
       console.warn('[postgres-adapter test] DATABASE_URL not set — skipping PostgreSQL tests');
     }
+  });
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
   });
 
   afterAll(async () => {

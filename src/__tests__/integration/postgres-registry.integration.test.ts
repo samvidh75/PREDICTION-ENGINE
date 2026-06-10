@@ -6,7 +6,7 @@
  * Validates the complete registry schema contract against PostgreSQL.
  * Uses deterministic cleanup of inserted fixture rows — never drops the entire DB.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { dbAdapter } from '../../db/DatabaseAdapter';
 
 // ---------------------------------------------------------------------------
@@ -41,7 +41,7 @@ const VALID_INSERT_SQL = `
     (symbol, prediction_date, ranking_score, classification, confidence_score,
      confidence_level, quality_score, growth_score, value_score,
      momentum_score, risk_score, sector_score, prediction_horizon)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 `;
 
 // ---------------------------------------------------------------------------
@@ -55,6 +55,11 @@ describe('PostgreSQL prediction_registry integration', () => {
     if (!process.env.DATABASE_URL) {
       console.warn('[postgres-registry test] DATABASE_URL not set — skipping PostgreSQL tests');
     }
+  });
+
+  beforeEach(async () => {
+    process.env = { ...originalEnv };
+    await cleanupTestRows();
   });
 
   afterAll(async () => {

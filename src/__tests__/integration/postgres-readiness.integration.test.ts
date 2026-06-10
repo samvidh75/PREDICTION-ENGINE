@@ -6,9 +6,10 @@
  * Tests /healthz and /readyz endpoints against a real PostgreSQL database.
  * Uses deterministic cleanup — never drops the entire database.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { MigrationRunner } from '../../db/MigrationRunner';
 import healthRoutes from '../../backend/web/routes/health';
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,10 @@ describe('PostgreSQL readiness integration', () => {
     if (!process.env.DATABASE_URL) {
       console.warn('[postgres-readiness test] DATABASE_URL not set — skipping PostgreSQL tests');
     }
+  });
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
   });
 
   afterAll(async () => {
@@ -75,14 +80,10 @@ describe('PostgreSQL readiness integration', () => {
 
     await dbAdapter.initialize();
 
-    // Ensure schema_migrations table exists
-    await dbAdapter.query(
-      `CREATE TABLE IF NOT EXISTS schema_migrations (
-        id TEXT PRIMARY KEY,
-        checksum TEXT NOT NULL,
-        applied_at TEXT NOT NULL
-      )`
-    );
+    // Run pending migrations so the status shows 0 pending
+    const { join } = await import('path');
+    const runner = new MigrationRunner(dbAdapter, join(process.cwd(), 'src', 'db', 'migrations'));
+    await runner.runPending();
 
     app = buildApp();
     await app.register(healthRoutes);
