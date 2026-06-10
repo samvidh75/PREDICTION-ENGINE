@@ -44,8 +44,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
       const wl = await watchlistService.createWatchlist(uid, name);
-      if (tickers && Array.isArray(tickers)) await watchlistService.updateWatchlist(wl.id, name, tickers);
-      return reply.send(await watchlistService.getWatchlistById(wl.id));
+      if (tickers && Array.isArray(tickers)) await watchlistService.updateWatchlist(uid, wl.id, name, tickers);
+      return reply.send(await watchlistService.getWatchlistById(uid, wl.id));
     },
   );
 
@@ -56,7 +56,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
       const uid = request.authenticatedUser!.uid;
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
-      const result = await watchlistService.updateWatchlist(request.params.id, name, tickers || []);
+      const result = await watchlistService.updateWatchlist(uid, request.params.id, name, tickers || []);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -66,7 +66,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      await watchlistService.deleteWatchlist(request.params.id);
+      const uid = request.authenticatedUser!.uid;
+      const success = await watchlistService.deleteWatchlist(uid, request.params.id);
+      if (!success) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send({ success: true });
     },
   );
@@ -75,9 +77,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id/tickers',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
+      const uid = request.authenticatedUser!.uid;
       const { ticker } = request.body || {};
       if (!ticker) return reply.status(400).send({ error: 'ticker is required' });
-      const result = await watchlistService.addTicker(request.params.id, ticker);
+      const result = await watchlistService.addTicker(uid, request.params.id, ticker);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -87,7 +90,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id/tickers/:ticker',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      const result = await watchlistService.removeTicker(request.params.id, request.params.ticker);
+      const uid = request.authenticatedUser!.uid;
+      const result = await watchlistService.removeTicker(uid, request.params.id, request.params.ticker);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -119,7 +123,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/alerts/:alertId/read',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      await userAlertEngine.markAsRead(parseInt(request.params.alertId));
+      const uid = request.authenticatedUser!.uid;
+      const success = await userAlertEngine.markAsRead(uid, parseInt(request.params.alertId));
+      if (!success) return reply.status(404).send({ error: 'alert not found' });
       return reply.send({ success: true });
     },
   );
