@@ -37,7 +37,7 @@ check('platform marker', () => {
 
 console.log('');
 console.log('-- Native --');
-check('better-sqlite3', () => `v${await import('sql.js/package.json').version}`);
+check(sql.js, () => `v${await import('sql.js/package.json').version}`);
 check('esbuild', () => `v${require('esbuild/package.json').version}`);
 check('rollup', () => `v${require('rollup/package.json').version}`);
 check('vite', () => `v${require('vite/package.json').version}`);
