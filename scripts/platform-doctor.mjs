@@ -37,7 +37,7 @@ check('platform marker', () => {
 
 console.log('');
 console.log('-- Native --');
-check('better-sqlite3', () => `v${require('better-sqlite3/package.json').version}`);
+check('better-sqlite3', () => `v${await import('sql.js/package.json').version}`);
 check('esbuild', () => `v${require('esbuild/package.json').version}`);
 check('rollup', () => `v${require('rollup/package.json').version}`);
 check('vite', () => `v${require('vite/package.json').version}`);
@@ -47,7 +47,7 @@ console.log('-- SQLite --');
 check('SQLite CRUD', () => {
   const tmp = join(ROOT, 'tmp'); if (!existsSync(tmp)) mkdirSync(tmp, { recursive: true });
   const p = join(tmp, `doctor-${Date.now()}.db`);
-  const db = new (require('better-sqlite3'))(p);
+  const db = new (await import('sql.js'))(p);
   db.exec('CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)');
   db.prepare('INSERT INTO t(v) VALUES(?)').run('ok');
   const r = db.prepare('SELECT v FROM t WHERE id=1').get();

@@ -18,7 +18,7 @@ function test(label, fn) {
 }
 
 test('better-sqlite3: load + in-memory CRUD', () => {
-  const Database = require('better-sqlite3');
+  const Database = await import('sql.js');
   const db = new Database(':memory:');
   db.exec('CREATE TABLE v (id INTEGER PRIMARY KEY, data TEXT)');
   db.prepare('INSERT INTO v (data) VALUES (?)').run('native-verified');

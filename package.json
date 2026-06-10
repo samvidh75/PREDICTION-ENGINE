@@ -44,7 +44,7 @@
     "verify:no-native-app-deps": "node scripts/assert-no-native-app-deps.mjs",
     "validate:import-case": "node scripts/audit-import-case.mjs",
     "validate:temp-cleanup": "node scripts/validate-temp-cleanup.mjs",
-    "validate:portability": "npm run validate:import-case && npm run validate:temp-cleanup && npm run doctor:platform",
+    "validate:portability": "npm run verify:no-native-app-deps && npm run verify:install-platform && npm run verify:native && npm run validate:import-case && npm run validate:temp-cleanup && npm run doctor:platform",
     "validate:distributions": "tsx scripts/validate-sector-distributions.ts",
     "smoke:api": "tsx scripts/smoke-test-api.ts",
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
@@ -74,7 +74,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "redis": "^5.12.1",
-    "better-sqlite3": "^12.10.0"
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
