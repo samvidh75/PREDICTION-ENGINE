@@ -209,8 +209,22 @@ export class DatabaseAdapter {
         pgSql = pgSql.replace(/;\s*$/, " ON CONFLICT (id) DO NOTHING;");
       }
 
+      // NON-DESTRUCTIVE COMPATIBILITY: Historical migration 009 attempts to create indices on
+      // snapshot_date, roce, and net_margin columns on financial_snapshots table. However, since
+      // financial_snapshots was already created in migration 001, CREATE TABLE IF NOT EXISTS in 009 is a no-op,
+      // leaving these columns missing. To avoid migration failure without modifying historical migrations
+      // 001-011 or using destructive DROP TABLE, we add these missing columns non-destructively on the fly.
       if (sql.includes("CREATE TABLE IF NOT EXISTS financial_snapshots")) {
-        pgSql = "DROP TABLE IF EXISTS financial_snapshots CASCADE;\n" + pgSql;
+        const tableCheck = await this.pool.query(`
+          SELECT 1 FROM information_schema.tables WHERE table_name = 'financial_snapshots'
+        `);
+        if (tableCheck.rows.length > 0) {
+          await this.pool.query(`
+            ALTER TABLE financial_snapshots ADD COLUMN IF NOT EXISTS snapshot_date DATE DEFAULT CURRENT_DATE;
+            ALTER TABLE financial_snapshots ADD COLUMN IF NOT EXISTS roce NUMERIC(8,4);
+            ALTER TABLE financial_snapshots ADD COLUMN IF NOT EXISTS net_margin NUMERIC(8,4);
+          `);
+        }
       }
 
       await this.pool.query(pgSql);
