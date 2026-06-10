@@ -1,35 +1,18 @@
 /**
- * TRACK-P4B-P3G — Schema Contract Validation (Isolation-Fixed)
+ * TRACK-P4B-P3G — Schema Contract Validation (sql.js)
  *
- * Verifies the complete prediction_registry contract using the exact
- * temporary SQLiteAdapter DB. Never inspects or mutates data/stockstory.db.
- *
- * Flow:
- *   1. Create tmp/schema-contract-<timestamp>.db
- *   2. Set process.env.SQLITE_DB_PATH = tempPath
- *   3. Dynamically import SQLiteAdapter → triggers schema initialization
- *   4. Inspect exactly tempPath
- *   5. Validate complete prediction_registry columns
- *   6. Validate UNIQUE(symbol, prediction_date, prediction_horizon)
- *   7. Close adapter
- *   8. Delete .db, .db-wal, .db-shm
- *   9. Use process.exitCode (not process.exit())
+ * Verifies prediction_registry contract using the sql.js-backed SQLiteAdapter.
+ * Never imports better-sqlite3. Uses temp DB via resetForTest.
  *
  * Usage: npx tsx scripts/validate-schema-contract.ts
  */
-import Database from 'better-sqlite3';
-import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { fileURLToPath } from 'node:url';
+import path from 'path';
 
 const timestamp = Date.now();
 const rand = Math.random().toString(36).slice(2, 6);
 const TEMP_DB_PATH = path.join(os.tmpdir(), `schema-contract-${timestamp}-${rand}.db`);
-
-// ---------------------------------------------------------------------------
-// Cleanup helper
-// ---------------------------------------------------------------------------
 
 function cleanup(): void {
   for (const ext of ['', '-wal', '-shm']) {
@@ -40,97 +23,47 @@ function cleanup(): void {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Full canonical prediction_registry columns (Phase 8 spec)
-// ---------------------------------------------------------------------------
-
 const PREDICTION_REGISTRY_COLUMNS = [
-  'id',
-  'symbol',
-  'prediction_date',
-  'ranking_score',
-  'classification',
-  'confidence_score',
-  'confidence_level',
-  'quality_score',
-  'growth_score',
-  'value_score',
-  'momentum_score',
-  'risk_score',
-  'sector_score',
-  'price_at_prediction',
-  'benchmark_level',
-  'prediction_horizon',
-  'validation_status',
-  'validated_at',
-  'future_return',
-  'benchmark_return',
-  'alpha',
-  'created_at',
-  'created_by',
+  'id', 'symbol', 'prediction_date', 'ranking_score', 'classification',
+  'confidence_score', 'confidence_level', 'quality_score', 'growth_score',
+  'value_score', 'momentum_score', 'risk_score', 'sector_score',
+  'price_at_prediction', 'benchmark_level', 'prediction_horizon',
+  'validation_status', 'validated_at', 'future_return', 'benchmark_return',
+  'alpha', 'created_at', 'created_by',
 ];
-
-// ---------------------------------------------------------------------------
-// UNIQUE constraint
-// ---------------------------------------------------------------------------
 
 const UNIQUE_COLUMNS = ['symbol', 'prediction_date', 'prediction_horizon'];
 
-// ---------------------------------------------------------------------------
-// Main
-// ---------------------------------------------------------------------------
-
 async function main(): Promise<void> {
   let errors = 0;
-
-  console.log('=== Schema Contract Validation (Isolated) ===\n');
+  console.log('=== Schema Contract Validation (sql.js) ===\n');
   console.log(`Using temp DB: ${TEMP_DB_PATH}`);
 
   try {
-    // Step 1-2: Set env and prepare temp path
     process.env.SQLITE_DB_PATH = TEMP_DB_PATH;
+    const sqliteMod = await import('../src/db/SQLiteAdapter');
+    if (sqliteMod.resetForTest) sqliteMod.resetForTest(TEMP_DB_PATH);
 
-    // Clear any existing SQLite singleton in the module
-    // The SQLiteAdapter uses a module-level singleton; we need to reset it
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
-
-    // Step 3: Dynamically import SQLiteAdapter — triggers schema init
-    // Use resetForTest to force a fresh connection to the temp DB path
-    const sqliteMod = await import(sqliteModPath);
-    if (sqliteMod.resetForTest) {
-      sqliteMod.resetForTest(TEMP_DB_PATH);
-    }
-
-    // Trigger the pool initialization which runs ensureTables()
     const pool = sqliteMod.pool;
+    await pool.query('SELECT 1 AS one');
 
-    // Give SQLiteAdapter a moment to initialize tables
-    await pool.query('SELECT 1');
-
-    // Step 4-5: Inspect the temp DB directly
-    const db = new Database(TEMP_DB_PATH);
-
-    console.log('\n1. Table presence check for prediction_registry...');
-    const tableCheck = db
-      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_registry'")
-      .get() as { name: string } | undefined;
-
-    if (!tableCheck) {
-      console.error('  FAIL: prediction_registry table not found in temp DB');
+    console.log('\n1. Table check: prediction_registry...');
+    const tableResult = await pool.query(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=$1",
+      ['prediction_registry']
+    );
+    if (tableResult.rows.length === 0) {
+      console.error('  FAIL: prediction_registry not found');
       errors++;
-      db.close();
+      if (sqliteMod.closeSQLite) sqliteMod.closeSQLite();
       process.exitCode = 1;
       return;
     }
     console.log('  PASS: prediction_registry exists');
 
-    // Step 5: Validate complete prediction_registry columns
-    console.log('\n2. Column completeness check...');
-    const colRows = db
-      .prepare("PRAGMA table_info('prediction_registry')")
-      .all() as Array<{ name: string }>;
-    const existingColumns = new Set(colRows.map((r) => r.name));
+    console.log('\n2. Column completeness...');
+    const colResult = await pool.query("PRAGMA table_info('prediction_registry')");
+    const existingColumns = new Set(colResult.rows.map((r: any) => r.name));
 
     for (const col of PREDICTION_REGISTRY_COLUMNS) {
       if (existingColumns.has(col)) {
@@ -141,71 +74,48 @@ async function main(): Promise<void> {
       }
     }
 
-    // Also check for unexpected extra columns (warning only)
-    for (const row of colRows) {
-      if (!PREDICTION_REGISTRY_COLUMNS.includes(row.name)) {
-        console.log(`  WARN: unexpected column '${row.name}' found`);
+    for (const row of colResult.rows) {
+      if (!PREDICTION_REGISTRY_COLUMNS.includes(row.name as string)) {
+        console.log(`  WARN: unexpected column '${row.name}'`);
       }
     }
 
-    // Step 6: Validate UNIQUE constraint on (symbol, prediction_date, prediction_horizon)
-    console.log('\n3. UNIQUE constraint validation...');
-    const uniqueCheck = db
-      .prepare(
-        "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry' AND name LIKE '%unique%'"
-      )
-      .all() as Array<{ sql: string }>;
-
+    console.log('\n3. UNIQUE constraint...');
+    const idxResult = await pool.query(
+      "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry' AND name LIKE $1",
+      ['%unique%']
+    );
     let uniqueFound = false;
-    for (const idx of uniqueCheck) {
-      const sql = (idx.sql || '').toUpperCase();
-      const allPresent = UNIQUE_COLUMNS.every((col) =>
-        sql.includes(col.toUpperCase())
-      );
+    for (const row of idxResult.rows) {
+      const sql = ((row.sql as string) || '').toUpperCase();
+      const allPresent = UNIQUE_COLUMNS.every(c => sql.includes(c.toUpperCase()));
       if (allPresent && sql.includes('UNIQUE')) {
         uniqueFound = true;
-        console.log(`  PASS: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) confirmed`);
+        console.log(`  PASS: UNIQUE on (${UNIQUE_COLUMNS.join(', ')})`);
         break;
       }
     }
-
     if (!uniqueFound) {
-      console.error(
-        `  FAIL: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) NOT FOUND`
-      );
+      console.error(`  FAIL: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) NOT FOUND`);
       errors++;
     }
 
-    // Step 7: Close the inspection DB
-    db.close();
+    if (sqliteMod.closeSQLite) sqliteMod.closeSQLite();
 
-    // Step 8: Close the SQLite adapter and clean up singleton
-    if (sqliteMod.closeSQLite) {
-      sqliteMod.closeSQLite();
-    }
-
-    // Summary
     console.log(`\n=== Validation Complete ===`);
     console.log(`Errors: ${errors}`);
-
     if (errors === 0) {
-      console.log('PASS: Schema contract validation passed (isolated)');
+      console.log('PASS: Schema contract validation passed');
       process.exitCode = 0;
     } else {
-      console.error(`FAIL: ${errors} schema contract error(s) found`);
+      console.error(`FAIL: ${errors} schema contract error(s)`);
       process.exitCode = 1;
     }
   } catch (err) {
-    console.error('Schema validation failed with exception:', err);
+    console.error('Schema validation exception:', err);
     process.exitCode = 1;
   } finally {
-    // Step 9: Cleanup temp DB files
     cleanup();
-
-    // Give a tick for any pending operations
-    setTimeout(() => {
-      // process.exitCode is already set — the process will exit with it
-    }, 100);
   }
 }
 
