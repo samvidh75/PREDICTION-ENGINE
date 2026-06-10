@@ -6,6 +6,7 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "npm@10",
   "scripts": {
     "dev": "vite",
     "build": "npx tsc -p tsconfig.json --noEmit && vite build",
@@ -34,8 +35,12 @@
     "validate:schema": "tsx scripts/validate-schema-contract.ts",
     "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",
+    "write:install-marker": "node scripts/write-install-marker.mjs",
+    "verify:install-platform": "node scripts/detect-stale-install.mjs",
     "doctor:platform": "node scripts/platform-doctor.mjs",
     "verify:native": "node scripts/verify-native-modules.mjs",
+    "clean:install": "node scripts/clean-install.mjs",
+    "bootstrap:dev": "node scripts/bootstrap-dev.mjs",
     "verify:no-native-app-deps": "node scripts/assert-no-native-app-deps.mjs",
     "validate:import-case": "node scripts/audit-import-case.mjs",
     "validate:temp-cleanup": "node scripts/validate-temp-cleanup.mjs",
@@ -69,7 +74,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "redis": "^5.12.1",
-    "sql.js": "^1.14.1"
+    "better-sqlite3": "^12.10.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

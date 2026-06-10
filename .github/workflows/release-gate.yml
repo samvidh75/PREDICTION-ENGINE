@@ -40,6 +40,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify no native app deps
+        run: npm run verify:no-native-app-deps
+
+      - name: Validate portability
+        run: npm run validate:portability
+
       - name: Run migrations
         run: npm run migrate
 
