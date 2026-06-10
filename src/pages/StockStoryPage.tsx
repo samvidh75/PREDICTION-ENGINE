@@ -65,9 +65,9 @@ type MetadataState = {
 const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents", "whychange"];
 
 function readTickerFromUrl(): string {
-  if (typeof window === "undefined") return "RELIANCE";
+  if (typeof window === "undefined") return "";
   const params = new URLSearchParams(window.location.search);
-  return (params.get("id") ?? params.get("ticker") ?? "RELIANCE").toUpperCase().trim() || "RELIANCE";
+  return (params.get("id") ?? params.get("ticker") ?? "").toUpperCase().trim();
 }
 
 function readTabFromUrl(): TabKey {

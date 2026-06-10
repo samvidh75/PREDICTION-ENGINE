@@ -226,19 +226,16 @@ class SQLitePool {
 
       return { rows: [], rowCount };
     } catch (err: unknown) {
-      try {
-        const stmt = db.prepare(text.replace(/$\d+/g, '?'));
-        const isSelect = /^\s*SELECT/i.test(text);
-        if (isSelect) {
-          const rows = params ? stmt.all(...params) : stmt.all();
-          return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
-        }
-        const r = params ? stmt.run(...params) : stmt.run();
-        return { rows: [], rowCount: r.changes };
-      } catch (e2: unknown) {
-        const msg = e2 instanceof Error ? e2.message : String(e2);
-        throw new Error(`SQLite query failed: ${msg}\nSQL: ${text.substring(0, 200)}`);
-      }
+      const msg = err instanceof Error ? err.message : String(err);
+      const safeText = text.substring(0, 200);
+      const translatedText = translated.substring(0, 200);
+      const paramCount = Array.isArray(params) ? params.length : 0;
+      throw new Error(
+        `SQLite query failed: ${msg}\n` +
+        `Original SQL: ${safeText}\n` +
+        `Translated SQL: ${translatedText}\n` +
+        `Parameter count: ${paramCount}`
+      );
     }
   }
 

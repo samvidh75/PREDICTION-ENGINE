@@ -1,4 +1,12 @@
+/**
+ * TRACK-P0-MEGA — Watchlist Store (hardened)
+ *
+ * Local-first watchlist management with optional remote sync for signed-in users.
+ * Remote sync uses Bearer token via authenticatedFetch. Never sends ?uid=.
+ * Signed-out users work fully local. Remote sync failure never erases local cache.
+ */
 import { loadAuthSession } from "../auth/sessionStore";
+import { authenticatedFetchOnlyIfSignedIn } from "../auth/authenticatedFetch";
 import { AnalyticsCoordinator } from "../diagnostics/AnalyticsCoordinator";
 
 export interface CustomWatchlist {
@@ -37,34 +45,40 @@ const DEFAULT_WATCHLISTS: CustomWatchlist[] = [];
 
 let isInitialSyncStarted = false;
 
-export function syncWatchlistsWithBackend(uid?: string) {
+/**
+ * Sync watchlists from remote (Bearer token, no ?uid=).
+ * On failure, do NOT erase local cache.
+ */
+export function syncWatchlistsWithBackend() {
   if (typeof window === "undefined") return;
-  const activeUid = uid || loadAuthSession().uid || "anonymous";
-  
-  fetch(`/api/watchlists?uid=${activeUid}`)
-    .then(res => res.json())
-    .then((lists: CustomWatchlist[]) => {
+
+  authenticatedFetchOnlyIfSignedIn("/api/watchlists")
+    .then(async (response) => {
+      if (!response || !response.ok) return; // signed out or fetch failed — keep local
+      const lists: CustomWatchlist[] = await response.json();
       if (Array.isArray(lists) && lists.length > 0) {
+        const activeUid = loadAuthSession().uid || "anonymous";
         const key = resolveStorageKey(activeUid);
         window.localStorage.setItem(key, JSON.stringify(lists));
         dispatchWatchlistChange();
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      // Remote failure — local cache is preserved
+    });
 }
 
 export function getWatchlists(uid?: string): CustomWatchlist[] {
   if (typeof window === "undefined") return DEFAULT_WATCHLISTS;
-  
+
   if (!isInitialSyncStarted) {
     isInitialSyncStarted = true;
-    syncWatchlistsWithBackend(uid);
+    syncWatchlistsWithBackend();
   }
-  
+
   const key = resolveStorageKey(uid);
   const raw = window.localStorage.getItem(key);
   if (!raw) {
-    // Seed default lists
     window.localStorage.setItem(key, JSON.stringify(DEFAULT_WATCHLISTS));
     return DEFAULT_WATCHLISTS;
   }
@@ -82,13 +96,15 @@ export function saveWatchlists(lists: CustomWatchlist[], uid?: string): void {
   window.localStorage.setItem(key, JSON.stringify(lists));
   dispatchWatchlistChange();
 
-  // Async sync to backend
+  // Async sync to backend with Bearer token (no ?uid=)
   const activeUid = uid || loadAuthSession().uid || "anonymous";
-  fetch(`/api/investor-state?uid=${activeUid}`, {
+  authenticatedFetchOnlyIfSignedIn(`/api/investor-state`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ watchlists: lists })
-  }).catch(() => {});
+    body: JSON.stringify({ watchlists: lists }),
+  }).catch(() => {
+    // Remote failure — local cache preserved
+  });
 }
 
 export function createWatchlist(name: string, uid?: string): CustomWatchlist {
@@ -99,19 +115,10 @@ export function createWatchlist(name: string, uid?: string): CustomWatchlist {
     tickers: [],
     isArchived: false,
     isFavourite: false,
-    order: lists.length
+    order: lists.length,
   };
   lists.push(next);
   saveWatchlists(lists, uid);
-
-  const activeUid = uid || loadAuthSession().uid || "anonymous";
-  AnalyticsCoordinator.trackEvent("watchlist_created", JSON.stringify({
-    uid: activeUid,
-    watchlist_id: next.id,
-    ticker_count: next.tickers.length,
-    timestamp: new Date().toISOString()
-  }));
-
   return next;
 }
 
