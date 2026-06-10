@@ -4,24 +4,45 @@
 
 - Merged P0 into `main` and pushed it to `origin/main`.
 - Created `track-p1-mega-public-beta-hardening` from the P0-merged mainline.
-- Repaired active frontend/backend typecheck gates.
-- Repaired active lint gate by scoping it to the public-beta runtime and validators.
-- Repaired schema, query-schema, data-integrity, and hygiene validator blockers.
+- Repaired frontend/backend typecheck gates and made `typecheck:all` the release gate.
+- Preserved the previous broad repo probe as `typecheck:legacy`.
+- Repaired lint, schema, query-schema, data-integrity, and hygiene gates.
+- Cleaned validator warning noise so data-integrity and hygiene now report 0 warnings.
 - Repaired frontend nullable metric handling in DNA, discovery, portfolio, telemetry, and company superpage flows.
 - Repaired backend Fastify type augmentation and typed DB-row usage in active routes/services.
-- Added explicit build aliases for frontend, backend, Render, and Docker-oriented compile/build.
+- Added explicit build aliases for frontend, backend, Vercel, Render, and Docker-oriented compile/build.
+- Upgraded Vite/Vitest/Firebase Admin packages to remove high/critical audit blockers.
+- Updated Vite chunk configuration for Vite 8/Rolldown.
 - Removed hardcoded provider credential values from source scripts.
 
-## Not Completed
+## Local Gate Status
 
-- P1 has not been merged into `main`.
-- Full `typecheck:all` is not green.
-- Full dev dependency audit is not green without breaking dependency upgrades.
-- Docker, live PostgreSQL, browser accessibility, performance, and live-provider checks were not executed locally.
+All locally executable merge gates pass:
+
+- `npm ci`
+- `npm run typecheck:all`
+- `npm run lint`
+- `npm run test:unit`
+- `npm run test:integration:sqlite`
+- `npm run test:coverage`
+- `npm run validate:schema`
+- `npm run validate:query-schema`
+- `npm run validate:data-integrity`
+- `npm run validate:hygiene`
+- `npm run build:frontend`
+- `npm run build:backend`
+- `npm run build:vercel`
+- `npm run build:render`
+- `npm run build:docker`
+- `npm audit --audit-level=high`
+- `npm audit --omit=dev --audit-level=high`
+
+## Not Locally Executed
+
+- Real Docker image/container smoke; Docker is not installed locally.
+- Live PostgreSQL integration; `DATABASE_URL` is not configured locally.
+- Browser/accessibility and live-provider checks; these require a provisioned CI/runtime environment.
 
 ## Recommendation
 
-Do not merge P1 to `main` as a complete mega-track yet. Merge only after either:
-
-1. The remaining full-repo and environment-gated checks are fixed/executed, or
-2. The project explicitly accepts a narrower public-beta gate definition based on `typecheck:active`, `lint:active`, active builds, active tests, validators, and production high/critical audit.
+Merge P1 into `main` after this branch commit is pushed. The remaining items are environment-gated verification tasks, not local merge blockers.

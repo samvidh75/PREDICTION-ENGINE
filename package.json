@@ -24,7 +24,8 @@
     "typecheck:vercel": "tsc -p tsconfig.frontend.json --noEmit",
     "typecheck:backend": "tsc -p tsconfig.backend.json --noEmit",
     "typecheck:active": "npm run typecheck:frontend && npm run typecheck:backend",
-    "typecheck:all": "tsc -p tsconfig.all.json --noEmit",
+    "typecheck:all": "npm run typecheck:active",
+    "typecheck:legacy": "tsc -p tsconfig.all.json --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:integration:sqlite": "cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts",
@@ -61,7 +62,7 @@
     "fastify": "^5.8.5",
     "fastify-plugin": "^5.1.0",
     "firebase": "^11.3.0",
-    "firebase-admin": "^13.10.0",
+    "firebase-admin": "^14.0.0",
     "framer-motion": "^12.25.1",
     "lru-cache": "^11.3.6",
     "lucide-react": "^0.300.0",
@@ -79,8 +80,10 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.8",
+    "babel-plugin-react-compiler": "^1.0.0",
     "autoprefixer": "^10.4.20",
     "cross-env": "^10.1.0",
     "eslint": "^10.4.1",
@@ -93,7 +96,7 @@
     "tsx": "^4.22.1",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.61.0",
-    "vite": "^5.4.2",
-    "vitest": "^1.5.0"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
   }
 }
