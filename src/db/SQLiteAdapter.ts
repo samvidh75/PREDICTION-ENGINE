@@ -12,6 +12,9 @@
  * DB path: SQLITE_DB_PATH env var, defaults to data/stockstory.db.
  * File persistence: reads/writes file on disk via fs.
  * :memory: mode: set SQLITE_DB_PATH=:memory: for in-memory DBs (tests).
+ *
+ * Parameter binding: Uses sql.js prepared statements (stmt.bind + stmt.step)
+ * — no manual string interpolation for user-controlled values.
  */
 import initSqlJs, { type Database as SqlJsDb, type QueryExecResult } from "sql.js";
 import path from "path";
@@ -41,13 +44,10 @@ let _initPromise: Promise<SqlJsDb> | null = null;
 async function loadDb(): Promise<SqlJsDb> {
   const sql = await getSQL();
   if (isMemory()) return new sql.Database();
-
   const dir = path.dirname(_dbPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
   if (fs.existsSync(_dbPath)) {
-    const buffer = fs.readFileSync(_dbPath);
-    return new sql.Database(buffer);
+    return new sql.Database(fs.readFileSync(_dbPath));
   }
   return new sql.Database();
 }
@@ -64,7 +64,6 @@ function saveDb(): void {
 async function getDb(): Promise<SqlJsDb> {
   if (_db) return _db;
   _dbPath = resolveDbPath();
-  // Single init promise — prevents race on first access
   if (!_initPromise) {
     _initPromise = loadDb().then((db) => {
       db.run("PRAGMA foreign_keys = ON");
@@ -112,7 +111,6 @@ function translateSQL(sql: string): string {
     t = t.replace("INSERT INTO", "INSERT OR REPLACE INTO");
     t = t.replace(/ON CONFLICT\s*\([^)]*\)\s*DO UPDATE\s*SET\s*[^;]*/gi, "");
   }
-
   return t
     .replace(/NOW\(\)/gi, "datetime('now')")
     .replace(/CURRENT_TIMESTAMP/gi, "datetime('now')")
@@ -126,18 +124,45 @@ function translateSQL(sql: string): string {
     .replace(/EXTRACT\(MONTH FROM/gi, "CAST(strftime('%m',");
 }
 
-// ── Inline param binding (sql.js exec() doesn't support ? params) ─
-function bindParams(sql: string, params?: unknown[]): string {
-  if (!params || params.length === 0) return sql;
-  let idx = 0;
-  return sql.replace(/\?/g, () => escapeValue(params[idx++]));
+// ── Prepared-statement exec ────────────────────────────────────────
+function execStmt(db: SqlJsDb, sql: string, params?: unknown[]): QueryExecResult[] {
+  if (!params || params.length === 0) return db.exec(sql);
+  const stmt = db.prepare(sql);
+  try {
+    stmt.bind(params);
+    const results: QueryExecResult[] = [];
+    // sql.js Statement doesn't have getColumnNames(), so we use db.exec() approach
+    // for SELECT: extract column names from stmt.getAsObject()
+    const cols: string[] = [];
+    const values: unknown[][] = [];
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      if (cols.length === 0) {
+        for (const k of Object.keys(row)) cols.push(k);
+      }
+      values.push(cols.map(c => (row as Record<string, unknown>)[c]));
+    }
+    if (cols.length > 0 && values.length > 0) {
+      results.push({ columns: cols, values });
+    }
+    return results;
+  } finally {
+    stmt.free();
+  }
 }
-function escapeValue(v: unknown): string {
-  if (v === null || v === undefined) return "NULL";
-  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
-  if (typeof v === "boolean") return v ? "1" : "0";
-  if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
-  return `'${String(v).replace(/'/g, "''")}'`;
+
+function runStmt(db: SqlJsDb, sql: string, params?: unknown[]): void {
+  if (!params || params.length === 0) {
+    db.run(sql);
+    return;
+  }
+  const stmt = db.prepare(sql);
+  try {
+    stmt.bind(params);
+    stmt.step();
+  } finally {
+    stmt.free();
+  }
 }
 
 // ── Result ─────────────────────────────────────────────────────────
@@ -244,7 +269,12 @@ class SQLitePool {
       )`,
     ];
     for (const sql of tables) {
-      try { db.run(sql); } catch { /* ignore */ }
+      try {
+        db.run(sql);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new Error(`SQLite schema initialization failed: ${msg}\nOffending SQL: ${sql.substring(0, 100)}`);
+      }
     }
     saveDb();
   }
@@ -260,25 +290,21 @@ class SQLitePool {
 
     try {
       if (isSelect) {
-        const bound = bindParams(translated, params);
-        const res = db.exec(bound);
+        const res = execStmt(db, translated, params);
         return toResult(res);
       }
-
-      // Non-SELECT: run() then save
-      const bound = bindParams(translated, params);
-      db.run(bound);
+      runStmt(db, translated, params);
       saveDb();
-      return { rows: [], rowCount: db.getRowsModified() };
+      const changes = db.getRowsModified();
+      return { rows: [], rowCount: changes };
     } catch (err) {
       // Fallback: try raw SQL without translation
       try {
         const raw = text.replace(/\$\d+/g, "?");
-        const bound = bindParams(raw, params);
         if (/^\s*SELECT/i.test(raw) || /^\s*PRAGMA/i.test(raw)) {
-          return toResult(db.exec(bound));
+          return toResult(execStmt(db, raw, params));
         }
-        db.run(bound);
+        runStmt(db, raw, params);
         saveDb();
         return { rows: [], rowCount: db.getRowsModified() };
       } catch (e2) {
@@ -290,7 +316,7 @@ class SQLitePool {
 
   async executeScript(sql: string): Promise<void> {
     const db = await this.init();
-    db.run(sql);
+    db.exec(sql);
     saveDb();
   }
 
