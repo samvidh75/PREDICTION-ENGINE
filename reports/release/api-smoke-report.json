@@ -1,0 +1,181 @@
+{
+  "generatedAt": "2026-06-10T21:07:40.231Z",
+  "baseUrl": "http://localhost:4001",
+  "summary": {
+    "total": 14,
+    "passed": 14,
+    "failed": 0,
+    "mandatoryFailed": 0,
+    "diagnosticFailed": 0
+  },
+  "checks": [
+    {
+      "name": "GET /healthz — liveness",
+      "method": "GET",
+      "endpoint": "/healthz",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 17,
+      "error": null
+    },
+    {
+      "name": "GET /readyz — readiness with PostgreSQL",
+      "method": "GET",
+      "endpoint": "/readyz",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 19,
+      "error": null
+    },
+    {
+      "name": "GET /api/stockstory/TESTIT?horizon=30",
+      "method": "GET",
+      "endpoint": "/api/stockstory/TESTIT?horizon=30",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 9,
+      "error": null
+    },
+    {
+      "name": "GET /api/stockstory/UNKNOWNTEST?horizon=30",
+      "method": "GET",
+      "endpoint": "/api/stockstory/UNKNOWNTEST?horizon=30",
+      "mandatory": true,
+      "expectedStatus": 404,
+      "actualStatus": 404,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "name": "GET /api/predictions/signals?limit=5",
+      "method": "GET",
+      "endpoint": "/api/predictions/signals?limit=5",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 20,
+      "error": null
+    },
+    {
+      "name": "GET /api/predictions/explain/TESTIT",
+      "method": "GET",
+      "endpoint": "/api/predictions/explain/TESTIT",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 4,
+      "error": null
+    },
+    {
+      "name": "GET /api/intelligence/company/TESTIT",
+      "method": "GET",
+      "endpoint": "/api/intelligence/company/TESTIT",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "name": "POST /api/intelligence/portfolio (empty)",
+      "method": "POST",
+      "endpoint": "/api/intelligence/portfolio",
+      "mandatory": true,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "name": "GET /api/user/profile (no auth)",
+      "method": "GET",
+      "endpoint": "/api/user/profile",
+      "mandatory": true,
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 1,
+      "error": null
+    },
+    {
+      "name": "GET /api/investor-state (no auth)",
+      "method": "GET",
+      "endpoint": "/api/investor-state",
+      "mandatory": true,
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "name": "GET /api/watchlists (no auth)",
+      "method": "GET",
+      "endpoint": "/api/watchlists",
+      "mandatory": true,
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "name": "POST /healthz — invalid method",
+      "method": "POST",
+      "endpoint": "/healthz",
+      "mandatory": true,
+      "expectedStatus": 404,
+      "actualStatus": 404,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 0,
+      "error": null
+    },
+    {
+      "name": "POST /api/intelligence/portfolio — malformed JSON",
+      "method": "POST",
+      "endpoint": "/api/intelligence/portfolio",
+      "mandatory": true,
+      "expectedStatus": 400,
+      "actualStatus": 400,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 2,
+      "error": null
+    },
+    {
+      "name": "GET /api/plans — diagnostic",
+      "method": "GET",
+      "endpoint": "/api/plans",
+      "mandatory": false,
+      "expectedStatus": 200,
+      "actualStatus": 200,
+      "contentType": "application/json; charset=utf-8",
+      "passed": true,
+      "durationMs": 2,
+      "error": null
+    }
+  ]
+}
