@@ -1,0 +1,629 @@
+
+> prediction-engine@0.1.0 typecheck:all
+> tsc -p tsconfig.all.json --noEmit
+
+scripts/adaptive-calibration.ts(91,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/backtesting-framework.ts(124,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/factor-quality-audit.ts(235,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/fundamental-completion.ts(381,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/fundamental-integration.ts(191,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/fundamental-integration.ts(329,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/institutional-backtesting.ts(83,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/institutional-backtesting.ts(453,22): error TS18048: 'top' is possibly 'undefined'.
+scripts/institutional-backtesting.ts(453,38): error TS18048: 'bottom' is possibly 'undefined'.
+scripts/institutional-backtesting.ts(454,42): error TS18048: 'top' is possibly 'undefined'.
+scripts/institutional-backtesting.ts(454,89): error TS18048: 'bottom' is possibly 'undefined'.
+scripts/institutional-backtesting.ts(605,45): error TS18047: 'p.ret' is possibly 'null'.
+scripts/institutional-backtesting.ts(607,55): error TS18047: 'p.ret' is possibly 'null'.
+scripts/institutional-backtesting.ts(607,100): error TS18047: 'p.ret' is possibly 'null'.
+scripts/institutional-ranking-validator.ts(124,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/production_gate.ts(32,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+scripts/production_gate.ts(47,57): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+scripts/production_gate.ts(65,57): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+scripts/production_gate.ts(81,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+scripts/production_gate.ts(92,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+scripts/production_gate.ts(107,26): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+scripts/rc-upstox-001.ts(214,21): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(214,81): error TS2304: Cannot find name 'cleanSym'.
+scripts/rc-upstox-001.ts(219,53): error TS2304: Cannot find name 'cleanSym'.
+scripts/rc-upstox-001.ts(252,21): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(252,77): error TS2304: Cannot find name 'cleanSym'.
+scripts/rc-upstox-001.ts(252,90): error TS2304: Cannot find name 'from'.
+scripts/rc-upstox-001.ts(252,98): error TS2304: Cannot find name 'to'.
+scripts/rc-upstox-001.ts(257,58): error TS2304: Cannot find name 'cleanSym'.
+scripts/rc-upstox-001.ts(280,21): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(280,80): error TS2304: Cannot find name 'cleanSym'.
+scripts/rc-upstox-001.ts(295,45): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(303,45): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(312,45): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(324,45): error TS2304: Cannot find name 'UPSTOX_API'.
+scripts/rc-upstox-001.ts(333,46): error TS2304: Cannot find name 'uid'.
+scripts/rc-upstox-001.ts(347,39): error TS2304: Cannot find name 'token'.
+scripts/rc-upstox-001.ts(359,41): error TS2304: Cannot find name 'resp'.
+scripts/rc-upstox-001.ts(359,57): error TS2304: Cannot find name 'resp'.
+scripts/rc-upstox-001.ts(493,16): error TS2304: Cannot find name 'UPSTOX_AUTH'.
+scripts/rc-upstox-001.ts(493,31): error TS2304: Cannot find name 'params'.
+scripts/rc-upstox-001.ts(534,55): error TS2304: Cannot find name 'response'.
+scripts/rc-upstox-001.ts(534,76): error TS2304: Cannot find name 'errorText'.
+scripts/rc-upstox-001.ts(562,38): error TS2304: Cannot find name 'TOKEN_PROXY'.
+scripts/rc-upstox-001.ts(572,54): error TS2304: Cannot find name 'response'.
+scripts/rc-upstox-001.ts(588,21): error TS2304: Cannot find name 'TOKEN_PROXY'.
+scripts/rc-upstox-001.ts(602,36): error TS2304: Cannot find name 'UPSTOX_AUTH'.
+scripts/rc-upstox-001.ts(603,48): error TS2304: Cannot find name 'accessToken'.
+scripts/rc-upstox-001.ts(836,55): error TS2304: Cannot find name 'category'.
+scripts/rc-upstox-001.ts(842,25): error TS2304: Cannot find name 'provider'.
+scripts/rc-upstox-001.ts(855,25): error TS2304: Cannot find name 'provider'.
+scripts/rc-upstox-001.ts(855,55): error TS2304: Cannot find name 'msg'.
+scripts/rc-upstox-001.ts(860,50): error TS2304: Cannot find name 'category'.
+scripts/rc-upstox-001.ts(860,62): error TS2304: Cannot find name 'symbol'.
+scripts/rc-upstox-001.ts(860,74): error TS2304: Cannot find name 'errors'.
+scripts/real-backtesting-framework.ts(129,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/real-backtesting-framework.ts(503,22): error TS18048: 'topRow' is possibly 'undefined'.
+scripts/real-backtesting-framework.ts(503,41): error TS18048: 'bottomRow' is possibly 'undefined'.
+scripts/real-backtesting-framework.ts(504,67): error TS18048: 'topRow' is possibly 'undefined'.
+scripts/real-backtesting-framework.ts(504,117): error TS18048: 'bottomRow' is possibly 'undefined'.
+scripts/real-backtesting-framework.ts(519,11): error TS18048: 'topRow' is possibly 'undefined'.
+scripts/real-backtesting-framework.ts(519,30): error TS18048: 'bottomRow' is possibly 'undefined'.
+scripts/real-financial-integration.ts(460,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/real-financial-integration.ts(482,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/reproduce_all_claims.ts(24,5): error TS18046: 'r365' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(25,17): error TS18046: 'r365' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(25,26): error TS18046: 'r365' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(31,5): error TS18046: 'r30' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(32,17): error TS18046: 'r30' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(32,25): error TS18046: 'r30' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(38,5): error TS18046: 'cq' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(39,17): error TS18046: 'cq' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(39,24): error TS18046: 'cq' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(45,89): error TS18046: 'total' is of type 'unknown'.
+scripts/reproduce_all_claims.ts(45,135): error TS18046: 'total' is of type 'unknown'.
+scripts/revalidation-backtest.ts(122,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number; pbRatio: number; eps: number; dividendYield: number; beta: number; marketCap: number; freeFloat: number; fcfYield: number; evEbitda: number; roe: number; roic: number; debtToEquity: number; ... 6 more ...; operatingMargin: number; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/track-7e-live-fundamental-activation.ts(170,61): error TS2304: Cannot find name 'statusText'.
+scripts/track-7e-live-fundamental-activation.ts(171,70): error TS2304: Cannot find name 'symbol'.
+scripts/track-7e-live-fundamental-activation.ts(437,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number; fcfYield: number | null; ... 10 more ...; operatingMargin: number | null; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/track-7e-live-fundamental-activation.ts(739,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number; fcfYield: number | null; ... 10 more ...; operatingMargin: number | null; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/track-7g-yahoo-fundamentals.ts(405,7): error TS2741: Property 'roa' is missing in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number; fcfYield: number | null; ... 10 more ...; operatingMargin: number | null; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/track-7g-yahoo-fundamentals.ts(559,5): error TS2741: Property 'roa' is missing in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number; fcfYield: number | null; ... 10 more ...; operatingMargin: number | null; }' but required in type '{ peRatio: number | null; pbRatio: number | null; eps: number | null; dividendYield: number | null; beta: number | null; marketCap: number | null; freeFloat: number | null; fcfYield: number | null; ... 11 more ...; operatingMargin: number | null; }'.
+scripts/track-7h-portfolio-intelligence.ts(483,16): error TS2532: Object is possibly 'undefined'.
+scripts/track-7h-portfolio-intelligence.ts(483,38): error TS2304: Cannot find name 'params'.
+scripts/track-7h-portfolio-intelligence.ts(520,57): error TS2304: Cannot find name 'response'.
+scripts/track-7h-portfolio-intelligence.ts(520,78): error TS2304: Cannot find name 'error'.
+scripts/track-7h-portfolio-intelligence.ts(546,38): error TS2532: Object is possibly 'undefined'.
+scripts/track-7h-portfolio-intelligence.ts(556,56): error TS2304: Cannot find name 'response'.
+scripts/track-7h-portfolio-intelligence.ts(571,21): error TS2532: Object is possibly 'undefined'.
+scripts/track-7h-portfolio-intelligence.ts(607,21): error TS2304: Cannot find name 'STORAGE_PREFIX'.
+scripts/track-7h-portfolio-intelligence.ts(607,38): error TS2304: Cannot find name 'token'.
+scripts/track-7h-portfolio-intelligence.ts(607,54): error TS2304: Cannot find name 'token'.
+scripts/track-7h-portfolio-intelligence.ts(621,21): error TS2304: Cannot find name 'STORAGE_PREFIX'.
+scripts/track-7h-portfolio-intelligence.ts(621,38): error TS2304: Cannot find name 'broker'.
+scripts/track-7h-portfolio-intelligence.ts(621,48): error TS2304: Cannot find name 'uid'.
+scripts/track-7h-portfolio-intelligence.ts(655,21): error TS2304: Cannot find name 'STORAGE_PREFIX'.
+scripts/track-7h-portfolio-intelligence.ts(655,38): error TS2304: Cannot find name 'broker'.
+scripts/track-7h-portfolio-intelligence.ts(655,48): error TS2304: Cannot find name 'uid'.
+scripts/track-7h-portfolio-intelligence.ts(668,64): error TS2304: Cannot find name 'uid'.
+scripts/track-7h-portfolio-intelligence.ts(686,64): error TS2304: Cannot find name 'uid'.
+scripts/track-7h-portfolio-intelligence.ts(850,38): error TS2304: Cannot find name 'UPSTOX_API_BASE'.
+scripts/track-7h-portfolio-intelligence.ts(852,37): error TS2304: Cannot find name 'accessToken'.
+scripts/track-7h-portfolio-intelligence.ts(861,38): error TS2304: Cannot find name 'response'.
+scripts/track-7h-portfolio-intelligence.ts(861,58): error TS2304: Cannot find name 'response'.
+scripts/track-7h-portfolio-intelligence.ts(1577,27): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1577,50): error TS2304: Cannot find name 'weight'.
+scripts/track-7h-portfolio-intelligence.ts(1592,27): error TS2304: Cannot find name 'sector'.
+scripts/track-7h-portfolio-intelligence.ts(1592,45): error TS2304: Cannot find name 'weight'.
+scripts/track-7h-portfolio-intelligence.ts(1755,21): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1755,35): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1755,68): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1755,83): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1755,101): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1764,21): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1764,34): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1764,67): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1764,82): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1764,100): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1794,24): error TS2304: Cannot find name 'h'.
+scripts/track-7h-portfolio-intelligence.ts(1794,58): error TS2304: Cannot find name 'weight'.
+scripts/track-7h-portfolio-intelligence.ts(1833,51): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1834,41): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1835,30): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1836,41): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1837,75): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1838,62): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-7h-portfolio-intelligence.ts(1841,75): error TS2304: Cannot find name 'holdingCount'.
+scripts/track-8a-fundamentals.ts(129,43): error TS2304: Cannot find name 'API_BASE'.
+scripts/track-8a-fundamentals.ts(129,98): error TS2304: Cannot find name 'clean'.
+scripts/track-8a-fundamentals.ts(132,58): error TS2304: Cannot find name 'clean'.
+scripts/track-8a-fundamentals.ts(212,44): error TS2304: Cannot find name 'resp'.
+scripts/track-8a-fundamentals.ts(212,60): error TS2304: Cannot find name 'resp'.
+scripts/track-9a-fundamental-influence.ts(206,10): error TS2352: Conversion of type '{ symbol: string; tradeDate: string; sector: { name: string; }; classificationData: any; financials: { symbol: string; periodEnd: string; marketCap: number; }; currentPrice: number; priceChange1Y: undefined; ... 10 more ...; bollingerLower: undefined; }' to type 'EngineInputs' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ symbol: string; tradeDate: string; sector: { name: string; }; classificationData: any; financials: { symbol: string; periodEnd: string; marketCap: number; }; currentPrice: number; priceChange1Y: undefined; ... 10 more ...; bollingerLower: undefined; }' is missing the following properties from type 'EngineInputs': features, factors
+src/backend/monitoring/requestIdPlugin.ts(15,9): error TS2339: Property 'requestId' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/backend/monitoring/requestIdPlugin.ts(23,38): error TS2339: Property 'requestId' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/backend/persistence/cache/cachePlugin.ts(19,19): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/persistence/postgres/postgresPlugin.ts(14,12): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/persistence/postgres/postgresPlugin.ts(20,41): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/web/app.ts(20,5): error TS2687: All declarations of 'db' must have identical modifiers.
+src/backend/web/routes/ops.ts(49,37): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/backend/web/routes/retention.ts(39,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Body: WatchlistBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Body: WatchlistBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Body: WatchlistBody; }'.
+            Types of property 'Body' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistBody'.
+src/backend/web/routes/retention.ts(52,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; Body: WatchlistBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; Body: WatchlistBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; Body: WatchlistBody; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(65,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(74,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; Body: TickerBody; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(86,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams & { ticker: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams & { ticker: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams & { ticker: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams & { ticker: string; }'.
+                Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(118,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: AlertIdParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: AlertIdParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: AlertIdParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'AlertIdParams'.
+src/backend/web/routes/retention.ts(151,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Querystring: ShareQuery; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Querystring: ShareQuery; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Querystring: ShareQuery; }'.
+            Types of property 'Querystring' are incompatible.
+              Type 'unknown' is not assignable to type 'ShareQuery'.
+src/backend/web/routes/retention.ts(198,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: ReferralCodeParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: ReferralCodeParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: ReferralCodeParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'ReferralCodeParams'.
+src/backend/web/routes/retention.ts(224,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: { featureKey: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { featureKey: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { featureKey: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ featureKey: string; }'.
+src/backend/web/routes/retention.ts(244,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Body: SubscribeBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Body: SubscribeBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Body: SubscribeBody; }'.
+            Types of property 'Body' are incompatible.
+              Type 'unknown' is not assignable to type 'SubscribeBody'.
+src/backtest/BenchmarkEngine.ts(78,18): error TS2571: Object is of type 'unknown'.
+src/backtest/BenchmarkEngine.ts(79,32): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/BenchmarkEngine.ts(146,9): error TS2322: Type 'unknown[]' is not assignable to type 'string[]'.
+  Type 'unknown' is not assignable to type 'string'.
+src/backtest/PortfolioSimulator.ts(57,5): error TS2322: Type '{ symbol: unknown; name: unknown; sector: {} | null; healthScore: number; classification: string; confidence: "High"; growth: number; quality: number; stability: number; valuation: number; momentum: number; risk: number; factorScore: number; forwardReturn: number; }[]' is not assignable to type 'BacktestStockSnapshot[]'.
+  Type '{ symbol: unknown; name: unknown; sector: {} | null; healthScore: number; classification: string; confidence: "High"; growth: number; quality: number; stability: number; valuation: number; momentum: number; risk: number; factorScore: number; forwardReturn: number; }' is not assignable to type 'BacktestStockSnapshot'.
+    Types of property 'symbol' are incompatible.
+      Type 'unknown' is not assignable to type 'string'.
+src/backtest/PortfolioSimulator.ts(61,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(62,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(64,26): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(65,27): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(67,29): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(68,28): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(69,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(70,31): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(104,58): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(105,24): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(105,52): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(105,83): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/backtest/PortfolioSimulator.ts(203,7): error TS18046: 'r.trade_date' is of type 'unknown'.
+src/calibration/DynamicWeightEngine.ts(111,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/calibration/EngineCalibrationEngine.ts(309,33): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/calibration/EngineCalibrationEngine.ts(310,25): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/components/discovery/MarketExplorer.tsx(11,37): error TS18047: 's.peRatio' is possibly 'null'.
+src/components/discovery/MarketExplorer.tsx(11,54): error TS18047: 's.peRatio' is possibly 'null'.
+src/data/OutcomeRepository.ts(130,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(131,22): error TS18046: 'row.mean_sq_return' is of type 'unknown'.
+src/data/OutcomeRepository.ts(131,44): error TS18046: 'meanReturn' is of type 'unknown'.
+src/data/OutcomeRepository.ts(131,57): error TS18046: 'meanReturn' is of type 'unknown'.
+src/data/OutcomeRepository.ts(133,10): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(133,10): error TS18048: 'meanReturn' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(139,28): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(139,28): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(139,43): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(139,43): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(140,17): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(140,17): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(141,18): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(141,18): error TS2365: Operator '+' cannot be applied to types '{}' and 'number'.
+src/data/OutcomeRepository.ts(146,34): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(148,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(149,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(150,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(151,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(217,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/intelligence/prediction/PredictionEngineAdapter.ts(239,30): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/intelligence/PredictionExplanationEngine.ts(215,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/intelligence/PredictionExplanationEngine.ts(219,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/monitoring/DataCoverageMonitor.ts(36,35): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/DataCoverageMonitor.ts(37,38): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/RankingHealthMonitor.ts(32,30): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/RankingHealthMonitor.ts(42,7): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/monitoring/RankingHealthMonitor.ts(43,56): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/SnapshotFreshnessMonitor.ts(45,63): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/monitoring/SnapshotFreshnessMonitor.ts(47,32): error TS2322: Type '{}' is not assignable to type 'string'.
+src/opportunities/OpportunityEngine.ts(35,11): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/opportunities/OpportunityEngine.ts(44,21): error TS2538: Type 'unknown' cannot be used as an index type.
+src/opportunities/OpportunityEngine.ts(47,21): error TS2538: Type 'unknown' cannot be used as an index type.
+src/opportunities/OpportunityEngine.ts(48,29): error TS2538: Type 'unknown' cannot be used as an index type.
+src/opportunities/OpportunityEngine.ts(50,28): error TS2538: Type 'unknown' cannot be used as an index type.
+src/opportunities/OpportunityEngine.ts(53,13): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/opportunities/OpportunityEngine.ts(64,11): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/opportunities/OpportunityEngine.ts(74,28): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/opportunities/OpportunityEngine.ts(74,67): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/opportunities/OpportunityEngine.ts(76,13): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/opportunities/OpportunityEngine.ts(78,51): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/opportunities/OpportunityEngine.ts(88,11): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/ops/SystemHealthEngine.ts(50,56): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/ops/SystemHealthEngine.ts(68,56): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/ops/SystemHealthEngine.ts(84,26): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(92,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(136,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(142,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(151,32): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(181,36): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PortfolioConstructionEngine.ts(200,21): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/portfolio/PositionSizingEngine.ts(86,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PositionSizingEngine.ts(129,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PositionSizingEngine.ts(130,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PositionSizingEngine.ts(177,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PositionSizingEngine.ts(193,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/portfolio/PositionSizingEngine.ts(194,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/AntiCheatingAuditor.ts(34,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/AntiCheatingAuditor.ts(55,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/AntiCheatingAuditor.ts(75,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/AntiCheatingAuditor.ts(116,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/AntiCheatingAuditor.ts(135,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/BenchmarkTracker.ts(39,16): error TS2538: Type 'unknown' cannot be used as an index type.
+src/predictions/ConfidenceV2Activator.ts(65,32): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/predictions/DailyPredictionCapture.ts(143,5): error TS2322: Type '{ symbol: unknown; quality_factor: number; value_factor: number; growth_factor: number; momentum_factor: number; risk_factor: number; sector_strength_factor: number; factor_score: number; confidence_score: number; confidence_level: unknown; classification: unknown; close_price: number; }[]' is not assignable to type 'RankingRow[]'.
+  Type '{ symbol: unknown; quality_factor: number; value_factor: number; growth_factor: number; momentum_factor: number; risk_factor: number; sector_strength_factor: number; factor_score: number; confidence_score: number; confidence_level: unknown; classification: unknown; close_price: number; }' is not assignable to type 'RankingRow'.
+    Types of property 'symbol' are incompatible.
+      Type 'unknown' is not assignable to type 'string'.
+src/predictions/HistoricalRankingRebuilder.ts(158,5): error TS2322: Type '{ symbol: unknown; trade_date: unknown; quality_factor: number; growth_factor: number; value_factor: number; momentum_factor: number; risk_factor: number; sector_strength_factor: number; factor_score: number; confidence_score: number; confidence_level: {}; close_price: number; benchmark_level: number | null; }[]' is not assignable to type 'RankingRow[]'.
+  Type '{ symbol: unknown; trade_date: unknown; quality_factor: number; growth_factor: number; value_factor: number; momentum_factor: number; risk_factor: number; sector_strength_factor: number; factor_score: number; confidence_score: number; confidence_level: {}; close_price: number; benchmark_level: number | null; }' is not assignable to type 'RankingRow'.
+    Types of property 'symbol' are incompatible.
+      Type 'unknown' is not assignable to type 'string'.
+src/predictions/OutcomeValidationEngine.ts(183,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/PredictionLedger.ts(143,11): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/predictions/PredictionLedger.ts(144,11): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/predictions/PredictionLedger.ts(147,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/predictions/PredictionLedger.ts(148,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/predictions/PredictionLedger.ts(149,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+src/predictions/PredictionRegistry.ts(217,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/PredictionRegistry.ts(292,5): error TS2322: Type '{ date: string; top10: any; top25: any; top50: any; bottom10: any; bottom25: any; benchmark_level: number; n_symbols_ranked: unknown; }[]' is not assignable to type 'PredictionSlice[]'.
+  Type '{ date: string; top10: any; top25: any; top50: any; bottom10: any; bottom25: any; benchmark_level: number; n_symbols_ranked: unknown; }' is not assignable to type 'PredictionSlice'.
+    Types of property 'n_symbols_ranked' are incompatible.
+      Type 'unknown' is not assignable to type 'number'.
+src/providers/coverage/ProviderCoverageEngine.ts(44,31): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/providers/coverage/ProviderCoverageEngine.ts(52,33): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/providers/coverage/ProviderCoverageEngine.ts(60,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/providers/coverage/ProviderCoverageEngine.ts(78,33): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/providers/coverage/ProviderCoverageEngine.ts(94,33): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/providers/coverage/ProviderCoverageEngine.ts(101,9): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/providers/yfinance/HistoricalPriceBackfill.ts(254,7): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/providers/yfinance/HistoricalPriceBackfill.ts(255,7): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/quality/DataFreshnessEngine.ts(34,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null'.
+src/quality/DataFreshnessEngine.ts(35,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null'.
+src/quality/DataFreshnessEngine.ts(36,31): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null'.
+src/quality/DataFreshnessEngine.ts(37,31): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string | null'.
+src/quality/DataIntegrityEngine.ts(50,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(51,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(53,38): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/quality/DataIntegrityEngine.ts(64,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(65,140): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(81,65): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/quality/DataIntegrityEngine.ts(95,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(96,162): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(103,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(103,166): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(106,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(106,164): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(109,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/quality/DataIntegrityEngine.ts(109,172): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/scripts/expand-market-coverage.ts(169,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/generate-live-report.ts(79,56): error TS2345: Argument of type '{ symbol: unknown; tradeDate: unknown; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/generate-live-report.ts(80,74): error TS2345: Argument of type '{ symbol: unknown; tradeDate: unknown; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/generate-live-report.ts(81,79): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/scripts/generate-live-report.ts(82,62): error TS2345: Argument of type '{ symbol: unknown; tradeDate: unknown; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/generate-live-report.ts(111,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/ingest-news.ts(40,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/metadata-verification-runner.ts(35,45): error TS2345: Argument of type '{ symbol: unknown; companyName: unknown; sector: unknown; industry: unknown; exchange: unknown; marketCap: number; }' is not assignable to parameter of type 'CompanyMetadata'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/metadata-verification-runner.ts(78,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/populate-real-universe.ts(479,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/run-engine-validation.ts(163,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/run-factor-refresh.ts(14,55): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/scripts/run-intelligence-validation.ts(75,20): error TS18046: 'feat.trade_date' is of type 'unknown'.
+src/scripts/run-intelligence-validation.ts(92,20): error TS18046: 'fact.trade_date' is of type 'unknown'.
+src/scripts/run-intelligence-validation.ts(104,58): error TS2345: Argument of type '{ symbol: unknown; tradeDate: any; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/run-intelligence-validation.ts(107,76): error TS2345: Argument of type '{ symbol: unknown; tradeDate: any; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/run-intelligence-validation.ts(114,64): error TS2345: Argument of type '{ symbol: unknown; tradeDate: any; rsi: number | null; macd: number | null; macdSignal: number | null; macdHistogram: number | null; adx: number | null; atr: number | null; bollingerWidth: number | null; ... 4 more ...; trendStrength: number | null; }' is not assignable to parameter of type 'StockFeatureSnapshot'.
+  Types of property 'symbol' are incompatible.
+    Type 'unknown' is not assignable to type 'string'.
+src/scripts/run-intelligence-validation.ts(137,16): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/run-research-validation.ts(148,23): error TS2538: Type 'unknown' cannot be used as an index type.
+src/scripts/run-research-validation.ts(148,47): error TS2538: Type 'unknown' cannot be used as an index type.
+src/scripts/run-research-validation.ts(149,18): error TS2538: Type 'unknown' cannot be used as an index type.
+src/scripts/run-research-validation.ts(202,17): error TS2571: Object is of type 'unknown'.
+src/scripts/run-research-validation.ts(292,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/test-direct.ts(27,16): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/scripts/warehouse-verification.ts(165,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/scripts/warehouse-verification.ts(174,14): error TS2339: Property 'end' does not exist on type 'DatabaseAdapter'.
+src/services/data/MasterCompanyRegistryV2.ts(56,32): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/services/data/MasterCompanyRegistryV2.ts(60,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/data/MasterCompanyRegistryV2.ts(61,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/data/MasterCompanyRegistryV2.ts(62,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/data/MasterCompanyRegistryV2.ts(63,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/data/MasterCompanyRegistryV2.ts(64,9): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
+src/services/data/MasterCompanyRegistryV2.ts(67,9): error TS2322: Type 'unknown' is not assignable to type 'string | null | undefined'.
+src/services/data/MasterCompanyRegistryV2.ts(69,9): error TS2322: Type 'unknown' is not assignable to type 'string | null | undefined'.
+src/services/data/MasterCompanyRegistryV2.ts(83,27): error TS2345: Argument of type '(r: { symbol: string; }) => string' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => string'.
+  Types of parameters 'r' and 'value' are incompatible.
+    Property 'symbol' is missing in type 'Record<string, unknown>' but required in type '{ symbol: string; }'.
+src/services/data/SymbolNormalizationEngine.ts(83,9): error TS2322: Type 'unknown' is not assignable to type 'string | null'.
+src/services/DataFreshnessMonitor.ts(59,57): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/services/DataFreshnessMonitor.ts(66,23): error TS2322: Type '{}' is not assignable to type 'string'.
+src/services/discovery/DiscoveryEngine.ts(25,22): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(25,39): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(31,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(31,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(31,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(31,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(39,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(39,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(39,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/discovery/DiscoveryEngine.ts(39,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(12,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(12,19): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(14,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(14,28): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(16,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(11,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(13,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(13,28): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(15,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(15,26): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/RiskEngine.ts(10,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(12,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(14,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(11,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(11,19): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(13,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/FactorBacktestEngine.ts(56,51): error TS2339: Property 'toISOString' does not exist on type '{}'.
+src/services/FactorBacktestEngine.ts(68,25): error TS18046: 'f.trade_date' is of type 'unknown'.
+src/services/FactorEngine.ts(42,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FactorEngine.ts(86,63): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/services/FactorEngine.ts(93,20): error TS18046: 'feat.trade_date' is of type 'unknown'.
+src/services/FactorEngine.ts(101,23): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(101,49): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(102,18): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(103,11): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(104,24): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(104,64): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(105,44): error TS18048: 'feat.rsi' is possibly 'undefined'.
+src/services/FactorEngine.ts(105,44): error TS2365: Operator '>=' cannot be applied to types '{}' and 'number'.
+src/services/FactorEngine.ts(105,62): error TS18048: 'feat.rsi' is possibly 'undefined'.
+src/services/FactorEngine.ts(105,62): error TS2365: Operator '<=' cannot be applied to types '{}' and 'number'.
+src/services/FactorEngine.ts(110,23): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(111,43): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(113,26): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(113,75): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(135,73): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/services/FeatureEngine.ts(36,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FeatureEngine.ts(241,45): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FeatureEngine.ts(270,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/FeatureImportanceEngine.ts(53,51): error TS2339: Property 'toISOString' does not exist on type '{}'.
+src/services/FeatureImportanceEngine.ts(65,25): error TS18046: 'f.trade_date' is of type 'unknown'.
+src/services/PipelineAlertService.ts(131,35): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/services/PipelineAlertService.ts(150,37): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/services/PipelineRecoveryService.ts(57,36): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/PipelineRecoveryService.ts(60,41): error TS2339: Property 'split' does not exist on type '{}'.
+src/services/PipelineRecoveryService.ts(61,11): error TS2322: Type 'unknown' is not assignable to type 'string | null'.
+src/services/PipelineRecoveryService.ts(62,11): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/services/PipelineRecoveryService.ts(146,34): error TS2339: Property 'split' does not exist on type '{}'.
+src/services/PipelineRecoveryService.ts(158,11): error TS2322: Type 'unknown' is not assignable to type 'string | null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(34,22): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(34,39): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/retention/SubscriptionService.ts(98,21): error TS2322: Type 'UserSubscription | null' is not assignable to type 'UserSubscription'.
+  Type 'null' is not assignable to type 'UserSubscription'.
+src/services/retention/SubscriptionService.ts(129,7): error TS2322: Type 'UserSubscription | null' is not assignable to type 'UserSubscription'.
+  Type 'null' is not assignable to type 'UserSubscription'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(16,54): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(19,66): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(22,58): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(25,55): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/universe/MasterSymbolUniverse.ts(26,26): error TS2352: Conversion of type 'Record<string, unknown>' to type 'SymbolRecord' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'SymbolRecord': id, symbol, exchange, isin, and 6 more.
+src/services/universe/MasterSymbolUniverse.ts(36,10): error TS2352: Conversion of type 'Record<string, unknown>[]' to type 'SymbolRecord[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'Record<string, unknown>' is missing the following properties from type 'SymbolRecord': id, symbol, exchange, isin, and 6 more.
+src/statements/TTMCalculator.ts(91,104): error TS2345: Argument of type '{}' is not assignable to parameter of type 'number'.
+src/statements/TTMCalculator.ts(93,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/statements/TTMCalculator.ts(93,28): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(callbackfn: (previousValue: unknown, currentValue: unknown, currentIndex: number, array: unknown[]) => unknown, initialValue: unknown): unknown', gave the following error.
+    Argument of type '(a: number, b: number) => number' is not assignable to parameter of type '(previousValue: unknown, currentValue: unknown, currentIndex: number, array: unknown[]) => unknown'.
+      Types of parameters 'a' and 'previousValue' are incompatible.
+        Type 'unknown' is not assignable to type 'number'.
+  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: unknown, currentIndex: number, array: unknown[]) => number, initialValue: number): number', gave the following error.
+    Argument of type '(a: number, b: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: unknown, currentIndex: number, array: unknown[]) => number'.
+      Types of parameters 'b' and 'currentValue' are incompatible.
+        Type 'unknown' is not assignable to type 'number'.
+src/statements/TTMCalculator.ts(114,59): error TS2365: Operator '>' cannot be applied to types '{}' and 'number'.
+src/statements/TTMCalculator.ts(115,31): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/statements/TTMCalculator.ts(147,7): error TS2322: Type '{}' is not assignable to type 'string'.
+src/statements/TTMCalculator.ts(161,7): error TS2322: Type '{} | null' is not assignable to type 'number | null'.
+  Type '{}' is not assignable to type 'number'.
+src/stockstory/registry/RegistryVerificationJob.ts(111,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(126,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(146,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(162,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(183,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(197,30): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/stockstory/registry/RegistryVerificationJob.ts(198,31): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/validation/OutcomeValidator.ts(115,13): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/validation/RankingInputValidator.ts(66,33): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/validation/RankingInputValidator.ts(80,61): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/views/CompanySuperpage.tsx(114,40): error TS2322: Type 'number | null' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.
+src/watchlists/WatchlistMonitoringEngine.ts(36,32): error TS2538: Type 'unknown' cannot be used as an index type.
+src/watchlists/WatchlistMonitoringEngine.ts(37,17): error TS2538: Type 'unknown' cannot be used as an index type.

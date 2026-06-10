@@ -234,7 +234,8 @@ class SQLitePool {
         `SQLite query failed: ${msg}\n` +
         `Original SQL: ${safeText}\n` +
         `Translated SQL: ${translatedText}\n` +
-        `Parameter count: ${paramCount}`
+        `Parameter count: ${paramCount}`,
+        { cause: err },
       );
     }
   }

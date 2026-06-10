@@ -1,27 +1,27 @@
 // src/services/dna/GrowthEngine.ts
 import { RegisteredStock } from "../stocks/StockRegistry";
 import { DNAStatus } from "./BusinessQualityEngine";
+import { finitePeRatio, rangeProximity } from "./dnaInputs";
 
 export class GrowthEngine {
   public static evaluate(stock: RegisteredStock): { score: number; status: DNAStatus } {
     let score = 65; // Base score
 
     // High PE implies growth expectations
-    const pe = stock.peRatio;
-    if (pe > 35) {
+    const pe = finitePeRatio(stock);
+    if (pe !== null && pe > 35) {
       score += 20; // Hyper-growth expectations
-    } else if (pe >= 20 && pe <= 35) {
+    } else if (pe !== null && pe >= 20 && pe <= 35) {
       score += 10; // Steady expansion
-    } else if (pe > 0 && pe < 20) {
+    } else if (pe !== null && pe > 0 && pe < 20) {
       score -= 5; // Muted growth / value territory
     }
 
     // Proximity to high boundaries implies current momentum and expansion velocity
-    const range = stock.fiftyTwoWeekRange;
-    const Proximity = (range.current - range.low) / (range.high - range.low || 1);
-    if (Proximity > 0.7) {
+    const proximity = rangeProximity(stock);
+    if (proximity !== null && proximity > 0.7) {
       score += 15;
-    } else if (Proximity < 0.3) {
+    } else if (proximity !== null && proximity < 0.3) {
       score -= 15;
     }
 

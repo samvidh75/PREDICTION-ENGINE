@@ -16,7 +16,16 @@ export type { DbKind, DbQueryResult } from "./DatabaseAdapter";
 // Re-export query for backward compatibility with code that does:
 //   import { query } from "../db/index"
 import { dbAdapter } from "./DatabaseAdapter";
-export const query = (text: string, params?: unknown[]) => dbAdapter.query(text, params);
+export async function query<T extends Record<string, unknown> = Record<string, unknown>>(
+  text: string,
+  params?: unknown[],
+): Promise<{ rows: T[]; rowCount: number }> {
+  const result = await dbAdapter.query(text, params);
+  return {
+    rows: result.rows as T[],
+    rowCount: result.rowCount,
+  };
+}
 
 // Re-export pool-like interface for backward compatibility
 // Code that does `import pool from "../db/index"` gets dbAdapter

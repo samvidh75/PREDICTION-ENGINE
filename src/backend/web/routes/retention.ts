@@ -6,7 +6,7 @@
  * via requireAuthenticatedUser preHandler. No ?uid=, x-user-uid, body.uid,
  * or 'anonymous' fallback is trusted. Public routes: /api/plans, /api/share/:token.
  */
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { requireAuthenticatedUser } from '../../../backend/auth/requireAuthenticatedUser';
 import { watchlistService } from '../../../services/retention/WatchlistService';
 import { userAlertEngine } from '../../../services/retention/UserAlertEngine';
@@ -36,10 +36,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.post(
+  app.post<{ Body: WatchlistBody }>(
     '/api/watchlists',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Body: WatchlistBody }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
@@ -49,10 +49,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.put(
+  app.put<{ Params: WatchlistIdParams; Body: WatchlistBody }>(
     '/api/watchlists/:id',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: WatchlistIdParams; Body: WatchlistBody }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
@@ -62,19 +62,19 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.delete(
+  app.delete<{ Params: WatchlistIdParams }>(
     '/api/watchlists/:id',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: WatchlistIdParams }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       watchlistService.deleteWatchlist(request.params.id);
       return reply.send({ success: true });
     },
   );
 
-  app.post(
+  app.post<{ Params: WatchlistIdParams; Body: TickerBody }>(
     '/api/watchlists/:id/tickers',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const { ticker } = request.body || {};
       if (!ticker) return reply.status(400).send({ error: 'ticker is required' });
       const result = watchlistService.addTicker(request.params.id, ticker);
@@ -83,10 +83,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.delete(
+  app.delete<{ Params: WatchlistIdParams & { ticker: string } }>(
     '/api/watchlists/:id/tickers/:ticker',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: WatchlistIdParams & { ticker: string } }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const result = watchlistService.removeTicker(request.params.id, request.params.ticker);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
@@ -115,10 +115,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.post(
+  app.post<{ Params: AlertIdParams }>(
     '/api/alerts/:alertId/read',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: AlertIdParams }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       userAlertEngine.markAsRead(parseInt(request.params.alertId));
       return reply.send({ success: true });
     },
@@ -148,12 +148,12 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
 
   // ── Sharing ─────────────────────────────────────────────────────
 
-  app.get(
+  app.get<{ Querystring: ShareQuery }>(
     '/api/share',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Querystring: ShareQuery }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const q = request.query as any;
+      const q = request.query;
       const share = sharingService.createShareLink(
         uid,
         q.symbol,
@@ -166,9 +166,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   );
 
   // PUBLIC: shared prediction token
-  app.get(
+  app.get<{ Params: ShareTokenParams }>(
     '/api/share/:token',
-    async (request: FastifyRequest<{ Params: ShareTokenParams }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const data = sharingService.getSharedPrediction(request.params.token);
       if (!data) return reply.status(404).send({ error: 'shared prediction not found' });
       return reply.send(data);
@@ -195,10 +195,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.post(
+  app.post<{ Params: ReferralCodeParams }>(
     '/api/referral/:code',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: ReferralCodeParams }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const success = sharingService.trackReferral(request.params.code, uid);
       return reply.send({ success });
@@ -221,10 +221,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.get(
+  app.get<{ Params: { featureKey: string } }>(
     '/api/subscription/feature/:featureKey',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Params: { featureKey: string } }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const hasAccess = subscriptionService.checkFeatureAccess(uid, request.params.featureKey);
       return reply.send({ feature: request.params.featureKey, accessible: hasAccess });
@@ -241,10 +241,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
-  app.post(
+  app.post<{ Body: SubscribeBody }>(
     '/api/subscription/subscribe',
     { preHandler: [requireAuthenticatedUser] },
-    async (request: FastifyRequest<{ Body: SubscribeBody }>, reply: FastifyReply) => {
+    async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const { plan_id } = request.body || {};
       if (!plan_id) return reply.status(400).send({ error: 'plan_id is required' });

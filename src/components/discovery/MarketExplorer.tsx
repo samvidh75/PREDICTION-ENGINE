@@ -8,7 +8,7 @@ export const MarketExplorer: React.FC = () => {
 
   // Categories
   const trending = all.slice(0, 4);
-  const leaders = all.filter((s) => s.peRatio > 0 && s.peRatio < 25).slice(0, 4);
+  const leaders = all.filter((s) => typeof s.peRatio === "number" && s.peRatio > 0 && s.peRatio < 25).slice(0, 4);
   const highestHealth = all.filter((s) => s.healthStatus === "veryHealthy").slice(0, 4);
 
   const renderStockRow = (stock: RegisteredStock) => (

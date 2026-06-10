@@ -111,7 +111,7 @@ export const CompanySuperpage: React.FC = () => {
           </div>
         </div>
 
-        <VOSChart ticker={data.symbol} basePrice={data.fiftyTwoWeekRange?.current} />
+        <VOSChart ticker={data.symbol} basePrice={data.fiftyTwoWeekRange?.current ?? undefined} />
       </section>
 
       {/* EXECUTIVE SUMMARY */}

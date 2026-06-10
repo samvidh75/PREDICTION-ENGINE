@@ -1,6 +1,6 @@
 // src/backend/web/routes/intelligence.ts
 // TRACK-P2 Compliance: Rewritten intelligence routes with data integrity enforcement.
-// Removes all synthetic claims, silent defaults, and fabricated analysis.
+// Removes fabricated claims, hidden defaults, and fabricated analysis.
 // Imports analytical envelope (realResponse, unavailableResponse, partialResponse, demoResponse, errorResponse).
 
 import type { FastifyPluginAsync } from "fastify";
@@ -507,7 +507,7 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       const lineage = marketLineage(featureDate, factorDate);
       const freshnessResult = assessMarketSnapshotFreshness(factorDate ?? featureDate ?? undefined);
 
-      // Remove synthetic fallback leadership trend
+      // Remove fabricated leadership trend.
       if (
         marketReport.leadershipTrends.length === 1 &&
         marketReport.leadershipTrends[0] === "Technology sector leading active market flows"

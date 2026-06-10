@@ -26,7 +26,7 @@ export class DailyDigestGenerator {
     const rows = db.prepare('SELECT tickers FROM user_watchlists WHERE user_id = ? AND is_archived = 0').all(userId) as any[];
     const watchedTickers = new Set<string>();
     for (const r of rows) {
-      try { JSON.parse(r.tickers || '[]').forEach((t: string) => watchedTickers.add(t)); } catch {}
+      try { JSON.parse(r.tickers || '[]').forEach((t: string) => watchedTickers.add(t)); } catch { /* ignore malformed archived watchlist payload */ }
     }
 
     // Get today's predictions for watched tickers

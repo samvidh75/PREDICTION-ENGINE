@@ -5,6 +5,40 @@
 import { query } from "../db/index";
 import { ExplanationEngine } from "./ExplanationEngine";
 
+interface SectorMomentumRow extends Record<string, unknown> {
+  date: string;
+  avg_return: number | string | null;
+}
+
+interface FeatureSnapshotRow extends Record<string, unknown> {
+  trade_date: Date | string;
+  rsi: number | string | null;
+  macd_histogram: number | string | null;
+  atr: number | string | null;
+  momentum: number | string | null;
+  volatility: number | string | null;
+  moving_average_distance: number | string | null;
+  trend_strength: number | string | null;
+}
+
+interface DailyPriceRow extends Record<string, unknown> {
+  date: string;
+  close: number | string;
+  volume: number | string;
+}
+
+interface SymbolRow extends Record<string, unknown> {
+  sector: string | null;
+  industry?: string | null;
+}
+
+interface FinancialSnapshotRow extends Record<string, unknown> {
+  pe_ratio: number | string | null;
+  dividend_yield: number | string | null;
+  beta: number | string | null;
+  eps?: number | string | null;
+}
+
 export interface StockFactorSnapshot {
   symbol: string;
   tradeDate: string;
@@ -29,7 +63,7 @@ export class FactorEngine {
     let prom = this.sectorPromises.get(sector);
     if (!prom) {
       prom = (async () => {
-        const sectorMomentumRes = await query(
+        const sectorMomentumRes = await query<SectorMomentumRow>(
           `SELECT dp.trade_date::text as date, AVG((dp.close - dp.open)/dp.open) as avg_return
            FROM daily_prices dp
            JOIN symbols s ON dp.symbol = s.symbol
@@ -50,22 +84,22 @@ export class FactorEngine {
 
   async calculateAndStoreFactors(symbol: string): Promise<StockFactorSnapshot[]> {
     // 1. Fetch features and prices from DB
-    const featuresRes = await query(
+    const featuresRes = await query<FeatureSnapshotRow>(
       `SELECT * FROM feature_snapshots WHERE symbol = $1 ORDER BY trade_date ASC`,
       [symbol]
     );
 
-    const pricesRes = await query(
+    const pricesRes = await query<DailyPriceRow>(
       `SELECT trade_date::text as date, close, volume FROM daily_prices WHERE symbol = $1 ORDER BY trade_date ASC`,
       [symbol]
     );
 
-    const symbolRes = await query(
+    const symbolRes = await query<SymbolRow>(
       `SELECT sector, industry FROM symbols WHERE symbol = $1`,
       [symbol]
     );
 
-    const financialsRes = await query(
+    const financialsRes = await query<FinancialSnapshotRow>(
       `SELECT * FROM financial_snapshots WHERE symbol = $1 ORDER BY period_end DESC LIMIT 1`,
       [symbol]
     );
@@ -81,6 +115,9 @@ export class FactorEngine {
     }
 
     const sector = symbolInfo.sector || "Technology";
+    const peRatio = Number(financial.pe_ratio);
+    const dividendYield = Number(financial.dividend_yield);
+    const beta = Number(financial.beta);
 
     // Fetch average market and sector momentum to calculate Sector Strength and Relative factors
     const sectorMomentumMap = await this.getSectorMomentumMap(sector);
@@ -90,7 +127,9 @@ export class FactorEngine {
 
     for (let i = 0; i < n; i++) {
       const feat = features[i];
-      const date = feat.trade_date.toISOString().split("T")[0];
+      const date = feat.trade_date instanceof Date
+        ? feat.trade_date.toISOString().split("T")[0]
+        : String(feat.trade_date).split("T")[0];
 
       // Find matching price record for calculations
       const priceRec = prices.find(p => p.date === date) || prices[prices.length - 1];
@@ -98,19 +137,20 @@ export class FactorEngine {
 
       // ── 1. Quality Factor (Profitability & Safety) ────────────────
       // Base on PE ratio stability, dividend yield, and MA distance safety
-      const peScore = financial.pe_ratio > 0 && financial.pe_ratio < 40
-        ? 100 - (financial.pe_ratio / 40) * 50
-        : financial.pe_ratio > 40 ? 25 : 50;
-      const divScore = financial.dividend_yield > 0 ? Math.min(financial.dividend_yield * 15, 100) : 30;
-      const rsiTerm = feat.rsi !== null ? (feat.rsi >= 30 && feat.rsi <= 70 ? 80 : 40) : 50;
+      const peScore = peRatio > 0 && peRatio < 40
+        ? 100 - (peRatio / 40) * 50
+        : peRatio > 40 ? 25 : 50;
+      const divScore = dividendYield > 0 ? Math.min(dividendYield * 15, 100) : 30;
+      const rsi = feat.rsi === null ? null : Number(feat.rsi);
+      const rsiTerm = rsi !== null ? (rsi >= 30 && rsi <= 70 ? 80 : 40) : 50;
       const qualityFactor = Math.round(peScore * 0.4 + divScore * 0.3 + rsiTerm * 0.3);
 
       // ── 2. Value Factor (Undervaluation) ──────────────────────────
       // Lower PE and positive dividend yield represent high value score
-      const peValue = financial.pe_ratio > 0
-        ? Math.max(10, Math.min(90, 100 - financial.pe_ratio * 1.5))
+      const peValue = peRatio > 0
+        ? Math.max(10, Math.min(90, 100 - peRatio * 1.5))
         : 40;
-      const yieldValue = financial.dividend_yield > 0 ? Math.min(90, 30 + financial.dividend_yield * 10) : 40;
+      const yieldValue = dividendYield > 0 ? Math.min(90, 30 + dividendYield * 10) : 40;
       const maDistanceValue = feat.moving_average_distance !== null
         ? Math.max(10, Math.min(90, 50 - Number(feat.moving_average_distance) * 100))
         : 50;
@@ -124,7 +164,7 @@ export class FactorEngine {
 
       // ── 4. Momentum Factor (Price Trend Velocity) ──────────────────
       // Blend of RSI, MACD Histogram, and 10-day rate of change
-      const rsiMom = feat.rsi !== null ? Number(feat.rsi) : 50;
+      const rsiMom = rsi !== null ? rsi : 50;
       const macdHistMom = feat.macd_histogram !== null ? Math.min(100, Math.max(0, 50 + Number(feat.macd_histogram) * 5)) : 50;
       const changeMom = feat.momentum !== null ? Math.min(100, Math.max(0, 50 + Number(feat.momentum) * 400)) : 50;
       const momentumFactor = Math.round(rsiMom * 0.3 + macdHistMom * 0.3 + changeMom * 0.4);
@@ -132,7 +172,7 @@ export class FactorEngine {
       // ── 5. Risk Factor (Safety / Low Volatility) ───────────────────
       // High score means lower risk. Inverse of Volatility, Beta, and ADX strength.
       const volRisk = feat.volatility !== null ? Math.max(10, Math.min(90, 100 - Number(feat.volatility) * 150)) : 50;
-      const betaRisk = financial.beta ? Math.max(10, Math.min(90, 100 - financial.beta * 40)) : 50;
+      const betaRisk = Number.isFinite(beta) ? Math.max(10, Math.min(90, 100 - beta * 40)) : 50;
       const atrRisk = feat.atr !== null ? Math.max(10, Math.min(90, 100 - (Number(feat.atr) / close) * 1500)) : 50;
       const riskFactor = Math.round(volRisk * 0.4 + betaRisk * 0.4 + atrRisk * 0.2);
 

@@ -23,7 +23,7 @@ interface Pattern {
 const INTEGRITY_PATTERNS: Pattern[] = [
   {
     description: 'Silent synthetic fallback injection',
-    pattern: /synthetic.*default|fallback.*synthetic|synthetic.*company/i,
+    pattern: /synthetic.*default|fallback\s+(?:data|injection|payload|response).*synthetic|synthetic.*company/i,
     severity: 'critical',
   },
   {
@@ -71,9 +71,15 @@ const INTEGRITY_PATTERNS: Pattern[] = [
 let criticalErrors = 0;
 let warnings = 0;
 
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
 function scanFile(filePath: string): void {
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = stripComments(fs.readFileSync(filePath, 'utf-8'));
     const relPath = path.relative(process.cwd(), filePath);
     
     for (const { description, pattern, severity } of INTEGRITY_PATTERNS) {

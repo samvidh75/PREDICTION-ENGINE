@@ -1,0 +1,66 @@
+
+> prediction-engine@0.1.0 build:vercel
+> npm run typecheck:vercel && vite build
+
+
+> prediction-engine@0.1.0 typecheck:vercel
+> tsc -p tsconfig.frontend.json --noEmit
+
+src/components/discovery/MarketExplorer.tsx(11,37): error TS18047: 's.peRatio' is possibly 'null'.
+src/components/discovery/MarketExplorer.tsx(11,54): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(12,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(12,19): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(14,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(14,28): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(16,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/BusinessQualityEngine.ts(24,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(11,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(13,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(13,28): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(15,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(15,26): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/GrowthEngine.ts(21,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/RiskEngine.ts(10,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(12,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(14,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/RiskEngine.ts(19,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/SentimentEngine.ts(11,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(11,9): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(11,19): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(13,16): error TS18047: 'pe' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,24): error TS18047: 'range.current' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,40): error TS18047: 'range.low' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,54): error TS18047: 'range.high' is possibly 'null'.
+src/services/dna/StabilityEngine.ts(19,67): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(27,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(34,22): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(34,39): error TS18047: 's.peRatio' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,28): error TS18047: 'range.current' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,44): error TS18047: 'range.low' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,58): error TS18047: 'range.high' is possibly 'null'.
+src/services/portfolio/SmartWatchlistEngine.ts(41,71): error TS18047: 'range.low' is possibly 'null'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(16,54): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(19,66): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(22,58): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/services/telemetry/TelemetrySnapshotFactory.ts(25,55): error TS2345: Argument of type 'number | null' is not assignable to parameter of type 'number'.
+  Type 'null' is not assignable to type 'number'.
+src/views/CompanySuperpage.tsx(114,40): error TS2322: Type 'number | null' is not assignable to type 'number | undefined'.
+  Type 'null' is not assignable to type 'number | undefined'.

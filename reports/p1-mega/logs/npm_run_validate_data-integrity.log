@@ -1,0 +1,18 @@
+
+> prediction-engine@0.1.0 validate:data-integrity
+> tsx scripts/validate-data-integrity.ts
+
+=== Data Integrity Validation ===
+
+  CRITICAL: src/backend/web/routes/intelligence.ts — Silent synthetic fallback injection
+  WARN: src/backend/web/routes/intelligence.ts — Demo-to-production cache leakage risk
+  WARN: src/components/company/SuperpageV8.tsx — Fabricated "live" claim without evidence
+  WARN: src/intelligence/ExplainabilityEngine.ts — Fabricated "live" claim without evidence
+  CRITICAL: src/services/CompanyIntelligenceEngine.ts — Silent synthetic fallback injection
+  WARN: src/shared/data/DataFreshness.ts — Fabricated "live" claim without evidence
+  WARN: src/stockstory/types.ts — Fabricated "live" claim without evidence
+
+=== Data Integrity Complete ===
+Critical errors: 2
+Warnings: 5
+FAIL: Data integrity violations found

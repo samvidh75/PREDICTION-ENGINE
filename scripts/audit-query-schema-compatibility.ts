@@ -25,6 +25,25 @@ let warnings = 0;
 
 console.log('=== Query-Schema Compatibility Audit ===\n');
 
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+function sqlLikeFragments(source: string): string[] {
+  const withoutComments = stripComments(source);
+  const fragments: string[] = [];
+  const stringLiteralPattern = /`([\s\S]*?)`|'([^'\\]*(?:\\.[^'\\]*)*)'|"([^"\\]*(?:\\.[^"\\]*)*)"/g;
+  for (const match of withoutComments.matchAll(stringLiteralPattern)) {
+    const fragment = match[1] ?? match[2] ?? match[3] ?? '';
+    if (/\b(SELECT|INSERT|UPDATE|DELETE|FROM|JOIN|WHERE|ORDER BY)\b/i.test(fragment)) {
+      fragments.push(fragment);
+    }
+  }
+  return fragments;
+}
+
 for (const filePath of ACTIVE_FILES) {
   const fullPath = path.join(process.cwd(), filePath);
   if (!fs.existsSync(fullPath)) {
@@ -34,11 +53,13 @@ for (const filePath of ACTIVE_FILES) {
   }
 
   const content = fs.readFileSync(fullPath, 'utf-8');
+  const searchableSql = sqlLikeFragments(content).join('\n');
 
-  // Check for obsolete column names
+  // Check active query text for obsolete column names.
   const foundObsolete: string[] = [];
   for (const obsolete of OBSOLETE_COLUMNS) {
-    if (content.includes(obsolete)) {
+    const pattern = new RegExp(`\\b${obsolete}\\b`);
+    if (pattern.test(searchableSql)) {
       foundObsolete.push(obsolete);
     }
   }

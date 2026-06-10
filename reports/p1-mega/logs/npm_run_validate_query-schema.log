@@ -1,0 +1,18 @@
+
+> prediction-engine@0.1.0 validate:query-schema
+> tsx scripts/audit-query-schema-compatibility.ts
+
+=== Query-Schema Compatibility Audit ===
+
+  FAIL: src/backend/web/routes/stockstory.ts references obsolete columns: health_score, predicted_at, factors, sample_size
+  PASS: src/backend/web/routes/predictions/explain.ts — no obsolete column references
+  PASS: src/intelligence/PredictionDiffEngine.ts — no obsolete column references
+  FAIL: src/intelligence/PredictionExplanationEngine.ts references obsolete columns: factors
+  PASS: src/predictions/PredictionRegistry.ts — no obsolete column references
+  FAIL: src/predictions/PredictionFactory.ts references obsolete columns: factors
+  PASS: Migration 008 has all 23 canonical columns
+  PASS: SQLiteAdapter prediction_registry has canonical columns
+
+=== Compatibility Audit Complete ===
+Errors: 3, Warnings: 0
+FAIL: Schema compatibility issues found

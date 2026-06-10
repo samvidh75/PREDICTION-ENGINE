@@ -11,7 +11,7 @@
  * Backed by: prediction_registry deltas + SignalValidationEngine results.
  * No opaque scores. No unexplained upgrades. No black-box classifications.
  */
-import pool from '../db/index';
+import { query } from '../db/index';
 import { signalValidator, type SignalAccuracyResult } from './SignalValidationEngine';
 
 // ---------------------------------------------------------------------------
@@ -200,7 +200,19 @@ export class PredictionExplanationEngine {
 
   private async fetchSnapshot(symbol: string, date: string): Promise<PredictionSnapshot | null> {
     try {
-      const result = await pool.query(
+      const result = await query<{
+        symbol: string;
+        prediction_date: Date | string;
+        classification: string;
+        ranking_score: number | string;
+        confidence_score: number | string;
+        quality_score: number | string;
+        growth_score: number | string;
+        value_score: number | string;
+        momentum_score: number | string;
+        risk_score: number | string;
+        sector_score: number | string;
+      }>(
         `SELECT symbol, prediction_date, classification, ranking_score,
          confidence_score, quality_score, growth_score, value_score,
          momentum_score, risk_score, sector_score
@@ -233,7 +245,7 @@ export class PredictionExplanationEngine {
 
   private async getLatestDate(symbol: string): Promise<string | null> {
     try {
-      const result = await pool.query(
+      const result = await query(
         `SELECT prediction_date FROM prediction_registry
          WHERE symbol = $1 AND prediction_horizon = 30
          ORDER BY prediction_date DESC LIMIT 1`,
@@ -251,7 +263,7 @@ export class PredictionExplanationEngine {
 
   private async getPreviousDate(symbol: string, today: string): Promise<string | null> {
     try {
-      const result = await pool.query(
+      const result = await query(
         `SELECT prediction_date FROM prediction_registry
          WHERE symbol = $1 AND prediction_date < $2 AND prediction_horizon = 30
          ORDER BY prediction_date DESC LIMIT 1`,

@@ -21,7 +21,7 @@ const __dirname = path.dirname(__filename);
 const OUT = path.resolve(__dirname, '..', 'reports', 'track-8d');
 if (!fs.existsSync(OUT)) fs.mkdirSync(OUT, { recursive: true });
 
-const API_KEY = 'sk-live-oYJvcSXqvVD4PbWLceN7fHHpaXQjq0pHADLuEbDj';
+const API_KEY = process.env.INDIANAPI_KEY ?? '';
 
 const log: string[] = [];
 function l(s: string) { console.log(s); log.push(s); }

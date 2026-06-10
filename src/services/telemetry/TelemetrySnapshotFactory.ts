@@ -10,16 +10,21 @@ export class TelemetrySnapshotFactory {
    * our standardized, SEBI-safe, high-fidelity TelemetrySnapshot structure.
    */
   public static create(data: CompanyTelemetry): TelemetrySnapshot {
-    const range = data.fiftyTwoWeekRange || { low: 0, high: 1, current: 0.5 };
+    const range = {
+      low: data.fiftyTwoWeekRange?.low ?? 0,
+      high: data.fiftyTwoWeekRange?.high ?? 1,
+      current: data.fiftyTwoWeekRange?.current ?? 0.5,
+    };
+    const peRatio = data.peRatio ?? 0;
     
     // 1. Calculate Health score
-    const health = HealthScoreEngine.calculateHealth(data.peRatio, range.current, range);
+    const health = HealthScoreEngine.calculateHealth(peRatio, range.current, range);
 
     // 2. Calculate Confidence score
-    const confidence = ConfidenceScoreEngine.calculateConfidence(data.peRatio, data.symbol);
+    const confidence = ConfidenceScoreEngine.calculateConfidence(peRatio, data.symbol);
 
     // 3. Calculate Valuation score
-    const valuation = ValuationEngine.calculateValuation(data.peRatio);
+    const valuation = ValuationEngine.calculateValuation(peRatio);
 
     // 4. Calculate Momentum score
     const momentum = MomentumEngine.calculateMomentum(range.current, range);

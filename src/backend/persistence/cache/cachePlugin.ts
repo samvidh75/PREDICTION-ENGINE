@@ -9,12 +9,6 @@ export function getCacheEngine(): CacheHierarchyEngine | null {
   return cacheEngineSingleton;
 }
 
-declare module "fastify" {
-  interface FastifyInstance {
-    cache?: CacheHierarchyEngine;
-  }
-}
-
 export const cachePlugin: FastifyPluginAsync = async (app) => {
   const env = app.env ?? loadEnv();
 

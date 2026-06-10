@@ -1,0 +1,105 @@
+
+> prediction-engine@0.1.0 test:integration:sqlite
+> cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts
+
+
+ RUN  v1.6.0 /Users/samvidhmehta/Desktop/PREDICTION-ENGINE
+
+ ↓ src/__tests__/integration/postgres-registry.integration.test.ts  (9 tests | 9 skipped)
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration
+[postgres-adapter test] DATABASE_URL not set — skipping PostgreSQL tests
+
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration > missing DATABASE_URL produces unavailable state
+[db] Canonical adapter: unavailable (PostgreSQL is required but unavailable)
+
+ ↓ src/__tests__/integration/postgres-migration.integration.test.ts  (6 tests | 6 skipped)
+ ✓ src/__tests__/integration/postgres-adapter.integration.test.ts  (7 tests | 5 skipped) 19ms
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration > PostgreSQL outage does not silently activate SQLite
+[db] Canonical adapter: unavailable ()
+
+ ✓ src/__tests__/integration/database-adapter.integration.test.ts  (5 tests) 20ms
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > DB_ADAPTER=sqlite activates SQLite
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > diagnostics.kind === "sqlite"
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > DatabaseAdapter.executeScript delegates correctly
+[db] Canonical adapter: SQLite configured
+
+stderr | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > production SQLite rejected without explicit flags
+[db] Canonical adapter: unavailable (SQLite is not allowed in production)
+
+stderr | src/__tests__/integration/postgres-readiness.integration.test.ts > PostgreSQL readiness integration
+[postgres-readiness test] DATABASE_URL not set — skipping PostgreSQL tests
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > multi-statement migration executes via executeScript
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > executeScript path exercised through dbAdapter
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > replay skips applied migration
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > checksum mismatch throws
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > invalid SQL not recorded as applied
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/sqlite-migration.integration.test.ts  (5 tests) 23ms
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > complete registry columns exist
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > created_at populated by default
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > created_by defaults to DailyPredictionCapture
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > UNIQUE(symbol, prediction_date, prediction_horizon) enforced
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > valid insert succeeds
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > duplicate insert deterministic — fails predictably
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid classification rejected
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid horizon rejected
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid created_by rejected
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/sqlite-registry.integration.test.ts  (9 tests) 34ms
+stderr | src/__tests__/integration/postgres-readiness.integration.test.ts > PostgreSQL readiness integration > /readyz returns HTTP 503 when DB is unavailable
+[db] Canonical adapter: unavailable ()
+
+ ✓ src/__tests__/integration/postgres-readiness.integration.test.ts  (6 tests | 5 skipped) 46ms
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /healthz returns HTTP 200
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz reports sqlite honestly
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz responds with valid JSON
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz returns HTTP 503 on checksum mismatch
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > readiness payload contains no secrets
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/readiness.integration.test.ts  (5 tests) 72ms
+
+ Test Files  6 passed | 2 skipped (8)
+      Tests  27 passed | 25 skipped (52)
+   Start at  23:34:39
+   Duration  323ms (transform 271ms, setup 0ms, collect 454ms, tests 214ms, environment 1ms, prepare 443ms)
+

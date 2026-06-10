@@ -1,17 +1,17 @@
 // src/services/dna/SentimentEngine.ts
 import { RegisteredStock } from "../stocks/StockRegistry";
 import { DNAStatus } from "./BusinessQualityEngine";
+import { rangeProximity } from "./dnaInputs";
 
 export class SentimentEngine {
   public static evaluate(stock: RegisteredStock): { score: number; status: DNAStatus } {
     let score = 70; // Base sentiment
 
     // Proximity to high boundaries indicates aggressive buying sentiment
-    const range = stock.fiftyTwoWeekRange;
-    const Proximity = (range.current - range.low) / (range.high - range.low || 1);
-    if (Proximity > 0.8) {
+    const proximity = rangeProximity(stock);
+    if (proximity !== null && proximity > 0.8) {
       score += 20; // Bullish sentiment
-    } else if (Proximity < 0.25) {
+    } else if (proximity !== null && proximity < 0.25) {
       score -= 25; // Bearish sentiment
     }
 

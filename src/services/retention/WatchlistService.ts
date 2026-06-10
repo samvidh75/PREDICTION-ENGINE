@@ -86,7 +86,7 @@ export class WatchlistService {
     const rows = db.prepare('SELECT DISTINCT tickers FROM user_watchlists WHERE is_archived = 0').all() as any[];
     const all = new Set<string>();
     for (const r of rows) {
-      try { JSON.parse(r.tickers || '[]').forEach((t: string) => all.add(t)); } catch {}
+      try { JSON.parse(r.tickers || '[]').forEach((t: string) => all.add(t)); } catch { /* ignore malformed archived watchlist payload */ }
     }
     return [...all];
   }
