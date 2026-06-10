@@ -17,7 +17,7 @@ function test(label, fn) {
   catch (e) { console.log(`FAIL ${label}: ${e.message}`); ok = false; }
 }
 
-test('better-sqlite3: load + in-memory CRUD', () => {
+test(sql.js: load + in-memory CRUD', () => {
   const Database = await import('sql.js');
   const db = new Database(':memory:');
   db.exec('CREATE TABLE v (id INTEGER PRIMARY KEY, data TEXT)');
