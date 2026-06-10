@@ -1,142 +1,162 @@
 /**
  * TRACK-87 — SubscriptionService
- * Subscription plan management and feature gating.
+ * Manages user subscriptions, plan definitions, and feature access.
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
 export interface SubscriptionPlan {
-  id: string;
+  plan_id: string;
   name: string;
-  tier: string;
-  price_monthly_inr: number;
+  price_monthly: number;
   features: string[];
-  is_active: boolean;
+  is_trial_eligible: boolean;
 }
 
 export interface UserSubscription {
-  userId: string;
-  planId: string;
-  status: string;
-  startedAt: string;
-  expiresAt: string | null;
-  autoRenew: boolean;
-  plan?: SubscriptionPlan;
+  user_id: string;
+  plan_id: string;
+  status: 'trial' | 'active' | 'expired' | 'cancelled';
+  trial_start: string | null;
+  trial_end: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  created_at: string;
 }
 
-const FEATURE_HIERARCHY: Record<string, string[]> = {
-  free: ['stock_health_basic', 'factor_breakdown', 'narrative', 'basic_search', '1_watchlist'],
-  investor: ['stock_health_basic', 'factor_breakdown', 'narrative', 'basic_search', 'unlimited_watchlists', 'watchlist_alerts', 'daily_digest_email', 'prediction_accuracy_history'],
-  pro: ['stock_health_basic', 'factor_breakdown', 'narrative', 'advanced_search', 'unlimited_watchlists', 'watchlist_alerts', 'daily_digest_email', 'prediction_accuracy_history', 'expected_returns', 'peer_comparison', 'csv_export', 'portfolio_tracking'],
-  professional: ['stock_health_basic', 'factor_breakdown', 'narrative', 'advanced_search', 'unlimited_watchlists', 'watchlist_alerts', 'daily_digest_email', 'prediction_accuracy_history', 'expected_returns', 'peer_comparison', 'csv_export', 'portfolio_tracking', 'api_access', 'realtime_data', 'custom_factors', 'priority_support', 'backtesting']
+interface SubDbRow {
+  user_id: string;
+  plan_id: string;
+  status: string;
+  trial_start: string | null;
+  trial_end: string | null;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  created_at: string;
+}
+
+interface PlanDbRow {
+  plan_id: string;
+  name: string;
+  price_monthly: number;
+  features: string;
+  is_trial_eligible: number;
+}
+
+interface CountResult {
+  cnt: number;
+}
+
+const DEFAULT_FEATURES: Record<string, string[]> = {
+  free: ['watchlists', 'basic_alerts', 'daily_digest'],
+  pro: ['watchlists', 'basic_alerts', 'daily_digest', 'advanced_predictions', 'export_csv', 'priority_support'],
+  enterprise: ['watchlists', 'basic_alerts', 'daily_digest', 'advanced_predictions', 'export_csv', 'priority_support', 'api_access', 'custom_models']
 };
 
 export class SubscriptionService {
-  getPlans(): SubscriptionPlan[] {
-    const db = new Database(DB_PATH);
-    try {
-      const rows = db.prepare('SELECT * FROM subscription_plans WHERE is_active = 1 ORDER BY price_monthly_inr ASC').all() as any[];
-      return rows.map(r => ({ ...r, features: JSON.parse(r.features || '[]'), is_active: !!r.is_active }));
-    } finally { db.close(); }
+  /** Return all defined plans (hardcoded + DB-backed) */
+  async getPlans(): Promise<SubscriptionPlan[]> {
+    const result = await dbAdapter.query(
+      'SELECT * FROM subscription_plans'
+    );
+    const dbPlans = (result.rows as unknown as PlanDbRow[]) || [];
+
+    if (dbPlans.length > 0) {
+      return dbPlans.map(p => ({
+        plan_id: p.plan_id,
+        name: p.name,
+        price_monthly: Number(p.price_monthly),
+        features: JSON.parse(p.features || '[]'),
+        is_trial_eligible: !!p.is_trial_eligible
+      }));
+    }
+
+    // Fallback to built-in plans
+    return [
+      { plan_id: 'free', name: 'Free', price_monthly: 0, features: DEFAULT_FEATURES.free, is_trial_eligible: false },
+      { plan_id: 'pro', name: 'Pro', price_monthly: 499, features: DEFAULT_FEATURES.pro, is_trial_eligible: true },
+      { plan_id: 'enterprise', name: 'Enterprise', price_monthly: 1999, features: DEFAULT_FEATURES.enterprise, is_trial_eligible: false }
+    ];
   }
 
-  getUserSubscription(userId: string): UserSubscription | null {
-    const db = new Database(DB_PATH);
-    try {
-      const sub = db.prepare(
-        'SELECT * FROM user_subscriptions WHERE user_id = ? ORDER BY started_at DESC LIMIT 1'
-      ).get(userId) as any;
-      if (!sub) return this.getDefaultFreeSubscription(userId);
-
-      const plan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(sub.plan_id) as any;
+  async getUserSubscription(userId: string): Promise<UserSubscription | null> {
+    const result = await dbAdapter.query(
+      `SELECT user_id, plan_id, status, trial_start, trial_end,
+              current_period_start, current_period_end, created_at
+       FROM user_subscriptions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [userId]
+    );
+    const rows = result.rows as unknown as SubDbRow[];
+    if (rows.length === 0) {
+      // No subscription row: treat as free
       return {
-        userId: sub.user_id,
-        planId: sub.plan_id,
-        status: sub.status,
-        startedAt: sub.started_at,
-        expiresAt: sub.expires_at,
-        autoRenew: !!sub.auto_renew,
-        plan: plan ? { ...plan, features: JSON.parse(plan.features || '[]'), is_active: !!plan.is_active } : undefined
+        user_id: userId,
+        plan_id: 'free',
+        status: 'active',
+        trial_start: null,
+        trial_end: null,
+        current_period_start: null,
+        current_period_end: null,
+        created_at: new Date().toISOString()
       };
-    } finally { db.close(); }
-  }
-
-  private getDefaultFreeSubscription(userId: string): UserSubscription {
+    }
+    const r = rows[0];
     return {
-      userId,
-      planId: 'plan_free',
-      status: 'active',
-      startedAt: new Date().toISOString(),
-      expiresAt: null,
-      autoRenew: false,
-      plan: {
-        id: 'plan_free',
-        name: 'Free',
-        tier: 'free',
-        price_monthly_inr: 0,
-        features: FEATURE_HIERARCHY.free,
-        is_active: true
-      }
+      user_id: r.user_id,
+      plan_id: r.plan_id,
+      status: r.status as UserSubscription['status'],
+      trial_start: r.trial_start,
+      trial_end: r.trial_end,
+      current_period_start: r.current_period_start,
+      current_period_end: r.current_period_end,
+      created_at: r.created_at
     };
   }
 
-  checkFeatureAccess(userId: string, featureKey: string): boolean {
-    const sub = this.getUserSubscription(userId);
-    if (!sub?.plan) return false;
-    return sub.plan.features.includes(featureKey);
+  async checkFeatureAccess(userId: string, featureKey: string): Promise<boolean> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return DEFAULT_FEATURES.free.includes(featureKey);
+
+    const plans = await this.getPlans();
+    const plan = plans.find(p => p.plan_id === sub.plan_id);
+    if (!plan) return DEFAULT_FEATURES.free.includes(featureKey);
+
+    return plan.features.includes(featureKey);
   }
 
-  assignTrial(userId: string): UserSubscription {
-    const db = new Database(DB_PATH);
-    try {
-      // Check if already has a trial or paid subscription
-      const existing = db.prepare(
-        'SELECT * FROM user_subscriptions WHERE user_id = ? AND status != ?'
-      ).get(userId, 'cancelled') as any;
-      if (existing) return this.getUserSubscription(userId);
+  async assignTrial(userId: string): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing && existing.status !== 'expired') {
+      // Already has an active subscription or trial
+      return;
+    }
 
-      const startedAt = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 14 * 86400000).toISOString();
+    const now = new Date().toISOString();
+    const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-      db.prepare(
-        `INSERT OR REPLACE INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
-         VALUES (?, 'plan_investor_99', 'trial', ?, ?, 0)`
-      ).run(userId, startedAt, expiresAt);
-
-      return this.getUserSubscription(userId) || this.getDefaultFreeSubscription(userId);
-    } finally { db.close(); }
+    await dbAdapter.query(
+      `INSERT INTO user_subscriptions (user_id, plan_id, status, trial_start, trial_end, current_period_start, current_period_end, created_at)
+       VALUES ($1, 'pro', 'trial', $2, $3, $4, $5, $6)`,
+      [userId, now, trialEnd, now, trialEnd, now]
+    );
   }
 
-  subscribe(userId: string, planId: string): UserSubscription {
-    const db = new Database(DB_PATH);
-    try {
-      const startedAt = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
+  async subscribe(userId: string, planId: string): Promise<void> {
+    const now = new Date().toISOString();
+    const periodEnd = planId === 'pro'
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
-      db.prepare(
-        `INSERT OR REPLACE INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
-         VALUES (?, ?, 'active', ?, ?, 1)`
-      ).run(userId, planId, startedAt, expiresAt);
+    // Cancel any existing active subscriptions
+    await dbAdapter.query(
+      `UPDATE user_subscriptions SET status = 'cancelled' WHERE user_id = $1 AND status IN ('active','trial')`,
+      [userId]
+    );
 
-      // If this came via a referral, mark it as converted
-      db.prepare(
-        `UPDATE referrals SET status = 'converted', converted_at = datetime('now')
-         WHERE invited_user_id = ? AND status = 'signed_up'`
-      ).run(userId);
-
-      return this.getUserSubscription(userId);
-    } finally { db.close(); }
-  }
-
-  cancelSubscription(userId: string): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare(
-        `UPDATE user_subscriptions SET status = 'cancelled', auto_renew = 0 WHERE user_id = ? AND status IN ('active', 'trial')`
-      ).run(userId);
-    } finally { db.close(); }
+    await dbAdapter.query(
+      `INSERT INTO user_subscriptions (user_id, plan_id, status, trial_start, trial_end, current_period_start, current_period_end, created_at)
+       VALUES ($1, $2, 'active', NULL, NULL, $3, $4, $5)`,
+      [userId, planId, now, periodEnd, now]
+    );
   }
 }
 

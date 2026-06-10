@@ -2,11 +2,8 @@
  * TRACK-87 — SharingService
  * Prediction sharing (social cards) and referral tracking.
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
+import { dbAdapter } from '../../db/DatabaseAdapter';
 import crypto from 'crypto';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
 
 export interface ShareResult {
   shareUrl: string;
@@ -23,127 +20,165 @@ export interface ReferralStats {
   code: string;
 }
 
+interface PredictionSnapshot {
+  symbol: string;
+  ranking_score: number;
+  classification: string;
+  confidence_level: string;
+  prediction_horizon: number;
+}
+
+interface SharedPredictionRow {
+  id: string;
+  symbol: string;
+  prediction_date: string;
+  prediction_horizon: number;
+  shared_by_user_id: string;
+  share_token: string;
+  view_count: number;
+  created_at: string;
+}
+
+interface CountRow {
+  cnt: number;
+}
+
+interface ReferralRow {
+  referrer_user_id: string;
+  referral_code: string;
+  invited_user_id: string;
+  status: string;
+  created_at: string;
+}
+
 export class SharingService {
-  createShareLink(userId: string, symbol: string, predictionDate: string, horizon: number): ShareResult | null {
-    const db = new Database(DB_PATH);
-    try {
-      const token = crypto.randomBytes(8).toString('hex');
-      const id = `share_${Date.now()}_${token.substring(0, 6)}`;
+  async createShareLink(userId: string, symbol: string, predictionDate: string, horizon: number): Promise<ShareResult | null> {
+    const token = crypto.randomBytes(8).toString('hex');
+    const id = `share_${Date.now()}_${token.substring(0, 6)}`;
 
-      // Get prediction data for OG tags
-      const pred = db.prepare(
-        `SELECT symbol, ranking_score, classification, confidence_level, prediction_horizon
-         FROM prediction_registry
-         WHERE symbol = ? AND prediction_date = ? AND prediction_horizon = ?
-         ORDER BY created_at DESC LIMIT 1`
-      ).get(symbol, predictionDate, horizon) as any;
+    // Get prediction data for OG tags
+    const predResult = await dbAdapter.query(
+      `SELECT symbol, ranking_score, classification, confidence_level, prediction_horizon
+       FROM prediction_registry
+       WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
+       ORDER BY created_at DESC LIMIT 1`,
+      [symbol, predictionDate, horizon]
+    );
+    const predRows = predResult.rows as unknown as PredictionSnapshot[];
+    const pred = predRows[0] || null;
 
-      db.prepare(
-        `INSERT INTO shared_predictions (id, symbol, prediction_date, prediction_horizon, shared_by_user_id, share_token, view_count, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'))`
-      ).run(id, symbol, predictionDate, horizon, userId, token);
+    await dbAdapter.query(
+      `INSERT INTO shared_predictions (id, symbol, prediction_date, prediction_horizon, shared_by_user_id, share_token, view_count, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, 0, datetime('now'))`,
+      [id, symbol, predictionDate, horizon, userId, token]
+    );
 
-      const score = pred ? Number(pred.ranking_score).toFixed(0) : 'N/A';
-      const cls = pred?.classification || 'Pending';
-      const conf = pred?.confidence_level || 'N/A';
+    const score = pred ? Number(pred.ranking_score).toFixed(0) : 'N/A';
+    const cls = pred?.classification || 'Pending';
+    const conf = pred?.confidence_level || 'N/A';
 
-      return {
-        shareUrl: `/share/${token}`,
-        shareToken: token,
-        ogTitle: `${symbol} Health Score: ${score}/100 — ${cls}`,
-        ogDescription: `StockStory predicts ${symbol} as ${cls} with ${conf} confidence. View the full breakdown on StockStory India.`,
-        ogImageFallback: `/api/og/${symbol}?score=${score}&classification=${encodeURIComponent(cls)}`
-      };
-    } finally { db.close(); }
+    return {
+      shareUrl: `/share/${token}`,
+      shareToken: token,
+      ogTitle: `${symbol} Health Score: ${score}/100 — ${cls}`,
+      ogDescription: `StockStory predicts ${symbol} as ${cls} with ${conf} confidence. View the full breakdown on StockStory India.`,
+      ogImageFallback: `/api/og/${symbol}?score=${score}&classification=${encodeURIComponent(cls)}`
+    };
   }
 
-  getSharedPrediction(token: string): any | null {
-    const db = new Database(DB_PATH);
-    try {
-      // Increment view count
-      db.prepare('UPDATE shared_predictions SET view_count = view_count + 1 WHERE share_token = ?').run(token);
+  async getSharedPrediction(token: string): Promise<any | null> {
+    // Increment view count
+    await dbAdapter.query(
+      'UPDATE shared_predictions SET view_count = view_count + 1 WHERE share_token = $1',
+      [token]
+    );
 
-      const share = db.prepare(
-        'SELECT * FROM shared_predictions WHERE share_token = ?'
-      ).get(token) as any;
-      if (!share) return null;
+    const shareResult = await dbAdapter.query(
+      'SELECT * FROM shared_predictions WHERE share_token = $1',
+      [token]
+    );
+    const shareRows = shareResult.rows as unknown as SharedPredictionRow[];
+    const share = shareRows[0] || null;
+    if (!share) return null;
 
-      const pred = db.prepare(
-        `SELECT * FROM prediction_registry
-         WHERE symbol = ? AND prediction_date = ? AND prediction_horizon = ?
-         ORDER BY created_at DESC LIMIT 1`
-      ).get(share.symbol, share.prediction_date, share.prediction_horizon) as any;
+    const predResult = await dbAdapter.query(
+      `SELECT * FROM prediction_registry
+       WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
+       ORDER BY created_at DESC LIMIT 1`,
+      [share.symbol, share.prediction_date, share.prediction_horizon]
+    );
+    const pred = predResult.rows[0] || null;
 
-      return {
-        share,
-        prediction: pred || null,
-        viewCount: (share?.view_count || 0) + 1
-      };
-    } finally { db.close(); }
+    return {
+      share,
+      prediction: pred || null,
+      viewCount: (share?.view_count || 0) + 1
+    };
   }
 
-  generateReferralCode(userId: string): { code: string; link: string } {
-    const db = new Database(DB_PATH);
-    try {
-      const code = crypto.randomBytes(4).toString('hex').toUpperCase();
-      db.prepare(
-        `INSERT INTO referrals (referrer_user_id, referral_code, invited_user_id, status, created_at)
-         VALUES (?, ?, NULL, 'pending', datetime('now'))`
-      ).run(userId, code);
-      return { code, link: `/invite/${code}` };
-    } finally { db.close(); }
+  async generateReferralCode(userId: string): Promise<{ code: string; link: string }> {
+    const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    await dbAdapter.query(
+      `INSERT INTO referrals (referrer_user_id, referral_code, invited_user_id, status, created_at)
+       VALUES ($1, $2, NULL, 'pending', datetime('now'))`,
+      [userId, code]
+    );
+    return { code, link: `/invite/${code}` };
   }
 
-  trackReferral(code: string, invitedUserId: string): boolean {
-    const db = new Database(DB_PATH);
-    try {
-      const referral = db.prepare('SELECT * FROM referrals WHERE referral_code = ? AND status = ?')
-        .get(code, 'pending') as any;
-      if (!referral) return false;
+  async trackReferral(code: string, invitedUserId: string): Promise<boolean> {
+    const refResult = await dbAdapter.query(
+      `SELECT * FROM referrals WHERE referral_code = $1 AND status = $2`,
+      [code, 'pending']
+    );
+    const refRows = refResult.rows as unknown as ReferralRow[];
+    if (refRows.length === 0) return false;
 
-      db.prepare(
-        `UPDATE referrals SET invited_user_id = ?, status = 'signed_up' WHERE referral_code = ?`
-      ).run(invitedUserId, code);
-      return true;
-    } finally { db.close(); }
+    await dbAdapter.query(
+      `UPDATE referrals SET invited_user_id = $1, status = 'signed_up' WHERE referral_code = $2`,
+      [invitedUserId, code]
+    );
+    return true;
   }
 
-  markReferralConverted(code: string): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare(
-        `UPDATE referrals SET status = 'converted', converted_at = datetime('now') WHERE referral_code = ?`
-      ).run(code);
-    } finally { db.close(); }
+  async markReferralConverted(code: string): Promise<void> {
+    await dbAdapter.query(
+      `UPDATE referrals SET status = 'converted', converted_at = datetime('now') WHERE referral_code = $1`,
+      [code]
+    );
   }
 
-  getReferralStats(userId: string): ReferralStats {
-    const db = new Database(DB_PATH);
-    try {
-      const total = db.prepare(
-        'SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = ?'
-      ).get(userId) as any;
+  async getReferralStats(userId: string): Promise<ReferralStats> {
+    const totalResult = await dbAdapter.query(
+      'SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = $1',
+      [userId]
+    );
+    const total = (totalResult.rows as unknown as CountRow[])[0]?.cnt ?? 0;
 
-      const signedUp = db.prepare(
-        "SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = ? AND status IN ('signed_up','converted')"
-      ).get(userId) as any;
+    const signedUpResult = await dbAdapter.query(
+      "SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = $1 AND status IN ('signed_up','converted')",
+      [userId]
+    );
+    const signedUp = (signedUpResult.rows as unknown as CountRow[])[0]?.cnt ?? 0;
 
-      const converted = db.prepare(
-        'SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = ? AND status = ?'
-      ).get(userId, 'converted') as any;
+    const convertedResult = await dbAdapter.query(
+      'SELECT COUNT(*) as cnt FROM referrals WHERE referrer_user_id = $1 AND status = $2',
+      [userId, 'converted']
+    );
+    const converted = (convertedResult.rows as unknown as CountRow[])[0]?.cnt ?? 0;
 
-      // Get user's primary referral code (most recently created)
-      const codeRow = db.prepare(
-        'SELECT referral_code FROM referrals WHERE referrer_user_id = ? ORDER BY created_at DESC LIMIT 1'
-      ).get(userId) as any;
+    // Get user's primary referral code (most recently created)
+    const codeResult = await dbAdapter.query(
+      'SELECT referral_code FROM referrals WHERE referrer_user_id = $1 ORDER BY created_at DESC LIMIT 1',
+      [userId]
+    );
 
-      return {
-        totalInvites: total?.cnt ?? 0,
-        signedUp: signedUp?.cnt ?? 0,
-        converted: converted?.cnt ?? 0,
-        code: codeRow?.referral_code || ''
-      };
-    } finally { db.close(); }
+    return {
+      totalInvites: total,
+      signedUp,
+      converted,
+      code: ((codeResult.rows as unknown as { referral_code: string }[])[0]?.referral_code) || ''
+    };
   }
 }
 

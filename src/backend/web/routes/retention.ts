@@ -23,7 +23,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   // ── Watchlists ──────────────────────────────────────────────────
   app.get('/api/watchlists', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    const lists = watchlistService.getUserWatchlists(uid);
+    const lists = await watchlistService.getUserWatchlists(uid);
     return reply.send(lists);
   });
 
@@ -31,34 +31,34 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     const uid = (req.query as any).uid || 'anonymous';
     const { name, tickers } = req.body || {};
     if (!name) return reply.status(400).send({ error: 'name is required' });
-    const wl = watchlistService.createWatchlist(uid, name);
-    if (tickers && Array.isArray(tickers)) watchlistService.updateWatchlist(wl.id, name, tickers);
-    return reply.send(watchlistService.getWatchlistById(wl.id));
+    const wl = await watchlistService.createWatchlist(uid, name);
+    if (tickers && Array.isArray(tickers)) await watchlistService.updateWatchlist(wl.id, name, tickers);
+    return reply.send(await watchlistService.getWatchlistById(wl.id));
   });
 
   app.put('/api/watchlists/:id', async (req: FastifyRequest<{ Params: WatchlistIdParams; Querystring: UidParams; Body: WatchlistBody }>, reply: FastifyReply) => {
     const { name, tickers } = req.body || {};
     if (!name) return reply.status(400).send({ error: 'name is required' });
-    const result = watchlistService.updateWatchlist(req.params.id, name, tickers || []);
+    const result = await watchlistService.updateWatchlist(req.params.id, name, tickers || []);
     if (!result) return reply.status(404).send({ error: 'watchlist not found' });
     return reply.send(result);
   });
 
   app.delete('/api/watchlists/:id', async (req: FastifyRequest<{ Params: WatchlistIdParams }>, reply: FastifyReply) => {
-    watchlistService.deleteWatchlist(req.params.id);
+    await watchlistService.deleteWatchlist(req.params.id);
     return reply.send({ success: true });
   });
 
   app.post('/api/watchlists/:id/tickers', async (req: FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody }>, reply: FastifyReply) => {
     const { ticker } = req.body || {};
     if (!ticker) return reply.status(400).send({ error: 'ticker is required' });
-    const result = watchlistService.addTicker(req.params.id, ticker);
+    const result = await watchlistService.addTicker(req.params.id, ticker);
     if (!result) return reply.status(404).send({ error: 'watchlist not found' });
     return reply.send(result);
   });
 
   app.delete('/api/watchlists/:id/tickers/:ticker', async (req: FastifyRequest<{ Params: WatchlistIdParams & { ticker: string } }>, reply: FastifyReply) => {
-    const result = watchlistService.removeTicker(req.params.id, req.params.ticker);
+    const result = await watchlistService.removeTicker(req.params.id, req.params.ticker);
     if (!result) return reply.status(404).send({ error: 'watchlist not found' });
     return reply.send(result);
   });
@@ -66,31 +66,31 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   // ── Alerts ──────────────────────────────────────────────────────
   app.get('/api/alerts', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    const alerts = userAlertEngine.getUserAlerts(uid);
-    const unread = userAlertEngine.getUnreadCount(uid);
+    const alerts = await userAlertEngine.getUserAlerts(uid);
+    const unread = await userAlertEngine.getUnreadCount(uid);
     return reply.send({ alerts, unreadCount: unread });
   });
 
   app.get('/api/alerts/unread', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    return reply.send({ unreadCount: userAlertEngine.getUnreadCount(uid) });
+    return reply.send({ unreadCount: await userAlertEngine.getUnreadCount(uid) });
   });
 
   app.post('/api/alerts/:alertId/read', async (req: FastifyRequest<{ Params: AlertIdParams }>, reply: FastifyReply) => {
-    userAlertEngine.markAsRead(parseInt(req.params.alertId));
+    await userAlertEngine.markAsRead(parseInt(req.params.alertId));
     return reply.send({ success: true });
   });
 
   app.post('/api/alerts/read-all', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    userAlertEngine.markAllAsRead(uid);
+    await userAlertEngine.markAllAsRead(uid);
     return reply.send({ success: true });
   });
 
   // ── Daily Digest ────────────────────────────────────────────────
   app.get('/api/digest', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    const digest = dailyDigestGenerator.generateForUser(uid);
+    const digest = await dailyDigestGenerator.generateForUser(uid);
     return reply.send(digest);
   });
 
@@ -98,13 +98,13 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/share', async (req: FastifyRequest<{ Querystring: ShareQuery }>, reply: FastifyReply) => {
     const q = req.query as any;
     const uid = q.uid || 'anonymous';
-    const share = sharingService.createShareLink(uid, q.symbol, q.prediction_date || new Date().toISOString().split('T')[0], parseInt(q.horizon || '30'));
+    const share = await sharingService.createShareLink(uid, q.symbol, q.prediction_date || new Date().toISOString().split('T')[0], parseInt(q.horizon || '30'));
     if (!share) return reply.status(404).send({ error: 'prediction not found' });
     return reply.send(share);
   });
 
   app.get('/api/share/:token', async (req: FastifyRequest<{ Params: ShareTokenParams }>, reply: FastifyReply) => {
-    const data = sharingService.getSharedPrediction(req.params.token);
+    const data = await sharingService.getSharedPrediction(req.params.token);
     if (!data) return reply.status(404).send({ error: 'shared prediction not found' });
     return reply.send(data);
   });
@@ -112,47 +112,47 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   // ── Referrals ───────────────────────────────────────────────────
   app.get('/api/referral/generate', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    return reply.send(sharingService.generateReferralCode(uid));
+    return reply.send(await sharingService.generateReferralCode(uid));
   });
 
   app.get('/api/referral/stats', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    return reply.send(sharingService.getReferralStats(uid));
+    return reply.send(await sharingService.getReferralStats(uid));
   });
 
   app.post('/api/referral/:code', async (req: FastifyRequest<{ Params: ReferralCodeParams; Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    const success = sharingService.trackReferral(req.params.code, uid);
+    const success = await sharingService.trackReferral(req.params.code, uid);
     return reply.send({ success });
   });
 
   // ── Subscriptions / Plans ───────────────────────────────────────
   app.get('/api/plans', async (_req: FastifyRequest, reply: FastifyReply) => {
-    return reply.send(subscriptionService.getPlans());
+    return reply.send(await subscriptionService.getPlans());
   });
 
   app.get('/api/subscription', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    return reply.send(subscriptionService.getUserSubscription(uid));
+    return reply.send(await subscriptionService.getUserSubscription(uid));
   });
 
   app.get('/api/subscription/feature/:featureKey', async (req: FastifyRequest<{ Params: { featureKey: string }; Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    const hasAccess = subscriptionService.checkFeatureAccess(uid, req.params.featureKey);
+    const hasAccess = await subscriptionService.checkFeatureAccess(uid, req.params.featureKey);
     return reply.send({ feature: req.params.featureKey, accessible: hasAccess });
   });
 
   app.post('/api/subscription/trial', async (req: FastifyRequest<{ Querystring: UidParams }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
-    subscriptionService.assignTrial(uid);
-    return reply.send(subscriptionService.getUserSubscription(uid));
+    await subscriptionService.assignTrial(uid);
+    return reply.send(await subscriptionService.getUserSubscription(uid));
   });
 
   app.post('/api/subscription/subscribe', async (req: FastifyRequest<{ Querystring: UidParams; Body: SubscribeBody }>, reply: FastifyReply) => {
     const uid = (req.query as any).uid || 'anonymous';
     const { plan_id } = req.body || {};
     if (!plan_id) return reply.status(400).send({ error: 'plan_id is required' });
-    subscriptionService.subscribe(uid, plan_id);
-    return reply.send(subscriptionService.getUserSubscription(uid));
+    await subscriptionService.subscribe(uid, plan_id);
+    return reply.send(await subscriptionService.getUserSubscription(uid));
   });
 }
