@@ -153,7 +153,7 @@ export class NightlyPopulationOrchestrator {
       console.log(`Active symbols: ${activeSymbols.length}`);
 
       // Filter out already-completed symbols (from previous crash recovery)
-      let workingSymbols = this.checkpoint.getRemainingSymbols(activeSymbols);
+      const workingSymbols = this.checkpoint.getRemainingSymbols(activeSymbols);
       console.log(`Remaining to process: ${workingSymbols.length}/${activeSymbols.length}`);
 
       // ── Stage 2: Financials + Statements ───────────────
@@ -163,7 +163,7 @@ export class NightlyPopulationOrchestrator {
         this.checkpoint.recordStageCompletion('financials', true);
       });
 
-      let finSuccess = workingSymbols.length;
+      const finSuccess = workingSymbols.length;
       stages['2_financials'] = {
         success: true,
         durationMs: Date.now() - stageStart,

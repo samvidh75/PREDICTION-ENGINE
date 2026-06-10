@@ -143,7 +143,7 @@ function extractFromRegistryAndPrices(
     beta = Math.round((annualVol / 0.18) * 100) / 100;
   }
 
-  let eps: number | null = null;
+  const eps: number | null = null;
   if (history.length > 0) {
     const latestPrice = history[history.length - 1].adjustedClose ?? history[history.length - 1].close;
     // We don't know PE, so EPS can't be accurately derived without financials

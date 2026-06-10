@@ -19,7 +19,7 @@ export const requestIdPlugin: FastifyPluginAsync = async (app) => {
   });
 
   app.addHook("onSend", async (req, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+     
     reply.header("x-request-id", req.requestId ?? "");
   });
 };

@@ -154,7 +154,7 @@ const p1Md = `# Finnhub Connectivity Report — TRACK-7E
 || Tier | Limit | Impact |
 ||:-----|:------|:-------|
 || Free | 60 API calls/minute | 60 companies/min for full-universe scoring |
-|| Basic (\$89/mo) | 300 calls/minute | 300 companies/min |
+|| Basic ($89/mo) | 300 calls/minute | 300 companies/min |
 || Premium | 600+ calls/minute | Full universe in seconds |
 
 ${apiRateLimitRemaining.includes('RATE LIMITED') ? '⚠️ The API returned a 429 (rate limit) during the connectivity test. The free tier limit (60 calls/min) has been hit. Consider adding a throttle delay between calls.' : 'Free tier limit is 60 calls/min. The test passed within this limit.'}
@@ -167,8 +167,8 @@ ${apiRateLimitRemaining.includes('RATE LIMITED') ? '⚠️ The API returned a 42
 |:---------|:---------|
 | No API key | Throws \`Error('Finnhub API key not set (FINNHUB_KEY)')\` |
 | HTTP 429 | Throws \`Error('Finnhub: rate limited (429)')\` → triggers retry |
-| HTTP non-200 | Throws \`Error(\`Finnhub HTTP \${status}: \${statusText}\`)\` |
-| No metric data | Throws \`Error(\`Finnhub: no financial data for \${symbol}\`)\` |
+| HTTP non-200 | Throws \`Error(\`Finnhub HTTP ${status}: ${statusText}\`)\` |
+| No metric data | Throws \`Error(\`Finnhub: no financial data for ${symbol}\`)\` |
 | Missing individual field | Returns \`undefined\` for that field (graceful degradation) |
 | Network timeout | Caught by fetch + retry policy |
 
@@ -934,7 +934,7 @@ console.log('\n📋 PHASE 7: Final Report');
 const overallRealPct = (universeReal / totalFields * 100);
 const totalRealFields = ALL_FINANCIAL_FIELDS.length;
 
-let p7Md = `# Live Fundamental Activation Report — TRACK-7E
+const p7Md = `# Live Fundamental Activation Report — TRACK-7E
 
 **Generated:** ${new Date().toISOString()}
 **Execution Time:** ${((Date.now() - phase1Start) / 1000).toFixed(0)}s

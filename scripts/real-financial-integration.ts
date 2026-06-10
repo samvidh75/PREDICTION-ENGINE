@@ -570,7 +570,7 @@ console.log('   ✅ EngineInputValidation.md');
 // ── PHASE 6: SCORE DISPERSION ─────────────────────────────────
 console.log('📋 Phase 6: Score Dispersion');
 
-let dispMd = `# Score Dispersion Report — Before vs After Real Data Integration
+const dispMd = `# Score Dispersion Report — Before vs After Real Data Integration
 
 **Generated:** ${new Date().toISOString()}
 **Sample:** ${beforeScores.length} companies

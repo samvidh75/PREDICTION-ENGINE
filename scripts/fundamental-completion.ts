@@ -473,7 +473,7 @@ console.log('📋 Phase 7: Final Report');
 
 const realPct = (totalReal / (totalReal + totalFallback) * 100);
 
-let finalMd = `# Fundamental Completion Report — TRACK-7D
+const finalMd = `# Fundamental Completion Report — TRACK-7D
 
 **Generated:** ${new Date().toISOString()}
 **Sample:** ${TEST_SYMBOLS.length} test symbols

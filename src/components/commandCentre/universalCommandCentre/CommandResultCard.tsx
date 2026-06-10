@@ -92,7 +92,7 @@ export default function CommandResultCard({
     title.length > 0 &&
     title.length <= 10 &&
     title === title.toUpperCase() &&
-    /^[A-Z0-9.\-]+$/.test(title)
+    /^[A-Z0-9.-]+$/.test(title)
       ? title
       : "";
 

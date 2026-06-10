@@ -9,11 +9,7 @@ const fs = require('fs');
 
 const DB_PATH = path.join(__dirname, '..', 'data', 'stockstory.db');
 const BRIDGE = path.join(__dirname, 'yfinance_bridge.py');
-<<<<<<< HEAD
-const PYTHON = 'C:\\Users\\Samvidh\\AppData\\Local\\Programs\\Python\\Python312\\python.exe';
-=======
-const PYTHON = 'python3';
->>>>>>> f673e8a2b71d5a35ac171e4be581dab2204d19d2
+const PYTHON = process.env.PYTHON_BIN || 'python3';
 
 const NIFTY50 = [
   'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS',

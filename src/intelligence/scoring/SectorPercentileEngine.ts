@@ -6,7 +6,9 @@
  */
 
 import { PercentileEngine, type Distribution, STANDARD_SCORE_MAP, INVERSE_SCORE_MAP } from './PercentileEngine';
-import type { SectorType } from '../sectors/SectorWeightEngine';
+
+/** Sector type — string union alias for distribution registration keys. */
+export type SectorType = string;
 
 /** Metric keys that have sector distributions */
 export type PercentileMetric =

@@ -310,7 +310,7 @@ for (const { profile: p, output: o } of results) {
   }
 }
 
-let phase3 = `# Ranking Sanity Check — Institutional Validation
+const phase3 = `# Ranking Sanity Check — Institutional Validation
 
 **Generated:** ${new Date().toISOString()}
 

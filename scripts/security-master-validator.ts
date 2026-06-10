@@ -603,7 +603,7 @@ if (withMCap < allEntries.length * 0.5) {
   risks.push(`**MEDIUM** — Only ${withMCap} / ${allEntries.length} entries have market cap data. Rankings may be incomplete.`);
 }
 
-let phase6Md = `# Security Master Validation Report — StockStory India
+const phase6Md = `# Security Master Validation Report — StockStory India
 
 **Generated:** ${new Date().toISOString()}
 **Validator:** TRACK-1C Automated Audit

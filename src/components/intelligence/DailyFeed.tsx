@@ -1,7 +1,7 @@
 /**
  * TRACK-49 Agent I — Daily Intelligence Feed
  * Displays daily intelligence updates with improvers and decliners.
- * Falls back to mock data when API returns empty.
+ * Empty and failed API responses render honest unavailable states.
  */
 import React, { useState, useEffect } from 'react';
 
@@ -18,29 +18,6 @@ interface FetchState {
   decliners: IntelligenceItem[];
   loading: boolean;
   error: string;
-}
-
-function generateMockData(): { improvers: IntelligenceItem[]; decliners: IntelligenceItem[] } {
-  const symbols = ['RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS', 'HINDUNILVR.NS', 'SBIN.NS', 'BHARTIARTL.NS', 'KOTAKBANK.NS', 'BAJFINANCE.NS', 'LT.NS', 'ASIANPAINT.NS', 'MARUTI.NS', 'TITAN.NS', 'SUNPHARMA.NS'];
-  const adjectives = ['Strong momentum', 'Valuation expansion', 'Quality improvement', 'Risk reduction', 'Growth acceleration', 'Earnings beat', 'Sector tailwind', 'Technical breakout', 'Fundamental shift', 'Sentiment improvement'];
-
-  const shuffled = [...symbols].sort(() => Math.random() - 0.5);
-  return {
-    improvers: shuffled.slice(0, 5).map(s => ({
-      symbol: s,
-      health_delta: Math.round((Math.random() * 0.15 + 0.01) * 100) / 100,
-      risk_delta: Math.round(-(Math.random() * 0.08) * 100) / 100,
-      future_health_delta: Math.round((Math.random() * 0.12 + 0.01) * 100) / 100,
-      narrative_change: adjectives[Math.floor(Math.random() * adjectives.length)],
-    })),
-    decliners: shuffled.slice(5, 10).map(s => ({
-      symbol: s,
-      health_delta: Math.round(-(Math.random() * 0.12 + 0.01) * 100) / 100,
-      risk_delta: Math.round((Math.random() * 0.1 + 0.01) * 100) / 100,
-      future_health_delta: Math.round(-(Math.random() * 0.08 + 0.01) * 100) / 100,
-      narrative_change: ['Margin pressure', 'Sector headwind', 'Quality deterioration', 'Risk increase', 'Growth slowdown'][Math.floor(Math.random() * 5)],
-    })),
-  };
 }
 
 function Delta({ value, suffix = '', abs = false }: { value: number; suffix?: string; abs?: boolean }) {
@@ -73,26 +50,25 @@ function Card({ item, type }: { item: IntelligenceItem; type: 'improver' | 'decl
 
 export default function DailyFeed() {
   const [state, setState] = useState<FetchState>({ improvers: [], decliners: [], loading: true, error: '' });
-  const [usingMock, setUsingMock] = useState(false);
 
   useEffect(() => {
     fetch('/api/intelligence/discovery/rankings')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('DAILY_FEED_UNAVAILABLE');
+        return res.json();
+      })
       .then((json: { topImproving?: IntelligenceItem[]; topDeteriorating?: IntelligenceItem[] }) => {
         const improvers = json.topImproving || [];
         const decliners = json.topDeteriorating || [];
-        if (improvers.length === 0 && decliners.length === 0) {
-          const mock = generateMockData();
-          setUsingMock(true);
-          setState({ improvers: mock.improvers, decliners: mock.decliners, loading: false, error: '' });
-        } else {
-          setState({ improvers, decliners, loading: false, error: '' });
-        }
+        setState({ improvers, decliners, loading: false, error: '' });
       })
       .catch(() => {
-        const mock = generateMockData();
-        setUsingMock(true);
-        setState({ improvers: mock.improvers, decliners: mock.decliners, loading: false, error: '' });
+        setState({
+          improvers: [],
+          decliners: [],
+          loading: false,
+          error: 'Daily intelligence is unavailable from the backend right now.',
+        });
       });
   }, []);
 
@@ -114,11 +90,7 @@ export default function DailyFeed() {
             <h2 className="font-extrabold text-2xl uppercase tracking-wider">📊 Daily Intelligence</h2>
             <p className="text-sm font-bold mt-1">Since yesterday</p>
           </div>
-          {usingMock && (
-            <span className="text-xs bg-white border-2 border-black px-3 py-1 font-bold uppercase">
-              DEMO DATA
-            </span>
-          )}
+          {state.error && <span className="text-xs bg-white border-2 border-black px-3 py-1 font-bold uppercase">Unavailable</span>}
         </div>
       </div>
 
@@ -149,8 +121,10 @@ export default function DailyFeed() {
       {/* EMPTY STATE */}
       {state.improvers.length === 0 && state.decliners.length === 0 && (
         <div className="p-8 border-4 border-dashed border-black bg-gray-50 text-center">
-          <p className="font-extrabold text-xl">No changes today</p>
-          <p className="text-sm text-gray-600 mt-1">All tracked companies are stable. Check back tomorrow for intelligence updates.</p>
+          <p className="font-extrabold text-xl">{state.error ? 'Daily intelligence unavailable' : 'No changes available'}</p>
+          <p className="text-sm text-gray-600 mt-1">
+            {state.error || 'No prediction-registry changes were returned by the backend for this feed.'}
+          </p>
         </div>
       )}
 

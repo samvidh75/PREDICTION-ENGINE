@@ -26,8 +26,8 @@ export class ExchangeNormalizer {
     const ticker = (raw.symbol || raw.bseCode || "UNKNOWN").toUpperCase();
     const companyName = raw.name || raw.company || "Unknown Company";
     
-    let price = raw.lastPrice || raw.price || 0;
-    let change = raw.pctChange || raw.change || 0;
+    const price = raw.lastPrice || raw.price || 0;
+    const change = raw.pctChange || raw.change || 0;
 
     let health: NormalizedStockData["health"] = "Stable";
     const score = raw.healthScore;

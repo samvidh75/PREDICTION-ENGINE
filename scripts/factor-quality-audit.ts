@@ -331,7 +331,7 @@ console.log('   ✅ FeatureSignalStrength.md');
 // ── Phase 4: Feature Redundancy ────────────────────────────────
 console.log('📋 Phase 4: Feature Redundancy');
 
-let redMd = `# Feature Redundancy Report — Factor Quality Audit
+const redMd = `# Feature Redundancy Report — Factor Quality Audit
 
 **Generated:** ${new Date().toISOString()}
 
@@ -366,7 +366,7 @@ console.log('   ✅ FeatureRedundancyReport.md');
 // ── Phase 5: Missing Data Impact ──────────────────────────────
 console.log('📋 Phase 5: Data Quality Impact');
 
-let dqMd = `# Data Quality Impact Report — Factor Quality Audit
+const dqMd = `# Data Quality Impact Report — Factor Quality Audit
 
 **Generated:** ${new Date().toISOString()}
 
@@ -415,7 +415,7 @@ console.log('   ✅ DataQualityImpactReport.md');
 // ── Phase 6: Reconstruction Proposals ─────────────────────────
 console.log('📋 Phase 6: Reconstruction Plan');
 
-let reconMd = `# Factor Reconstruction Plan — Factor Quality Audit
+const reconMd = `# Factor Reconstruction Plan — Factor Quality Audit
 
 **Generated:** ${new Date().toISOString()}
 
@@ -473,7 +473,7 @@ console.log('   ✅ FactorReconstructionPlan.md');
 // ── Phase 7: Final Report ─────────────────────────────────────
 console.log('📋 Phase 7: Final Report');
 
-let finalMd = `# Feature Quality Audit — TRACK-6D
+const finalMd = `# Feature Quality Audit — TRACK-6D
 
 **Generated:** ${new Date().toISOString()}
 

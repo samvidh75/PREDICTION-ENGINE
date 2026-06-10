@@ -155,9 +155,9 @@ const p2Md = `# Provider Chain Integration — TRACK-7G
 
 | Priority | Provider | Status | Access | Cost |
 |:---------|:---------|:-------|:-------|:-----|
-| 1 (Tier 1) | **Yahoo Finance quoteSummary** | ✅ Active | Public HTTP, no key required | \$0/mo |
+| 1 (Tier 1) | **Yahoo Finance quoteSummary** | ✅ Active | Public HTTP, no key required | $0/mo |
 | 2 (Tier 2) | Finnhub stock/metric | ⚠️ Conditional | Requires FINNHUB_KEY | Free tier / Premium |
-| 3 (Tier 3) | MasterCompanyRegistry | ✅ Always | Local JSON | \$0 (always active) |
+| 3 (Tier 3) | MasterCompanyRegistry | ✅ Always | Local JSON | $0 (always active) |
 
 ### How It Works
 
@@ -765,7 +765,7 @@ let p7Md = `# Yahoo Fundamentals Integration Report — TRACK-7G
 - **10 fields** are directly available from summaryDetail, financialData, defaultKeyStatistics
 - **7 fields** are derived from income statement, balance sheet, and cashflow history
 - **3 fields** (interestCoverage, fcfGrowth, fcfYield) may be null for some companies
-- **API cost:** \$0/mo (public API, no key required)
+- **API cost:** $0/mo (public API, no key required)
 - **No rate limits observed** on Yahoo Finance public endpoints
 
 ---

@@ -633,19 +633,19 @@ getFinancials('RELIANCE')
   let totalCost = 0;
   if (bestProvider) {
     const cost = bestProvider === 'Finnhub' ? 89 : bestProvider === 'IndianAPI' ? 6 : 0;
-    r3 += `| ${bestProvider} | Primary | \$${cost}/mo |\n`;
+    r3 += `| ${bestProvider} | Primary | $${cost}/mo |\n`;
     costTracker.add(bestProvider);
     totalCost += cost;
   }
   if (secondBest && !costTracker.has(secondBest[0])) {
     const cost = secondBest[0] === 'Finnhub' ? 89 : secondBest[0] === 'IndianAPI' ? 6 : 0;
-    r3 += `| ${secondBest[0]} | Fallback | \$${cost}/mo |\n`;
+    r3 += `| ${secondBest[0]} | Fallback | $${cost}/mo |\n`;
     costTracker.add(secondBest[0]);
     totalCost += cost;
   }
-  r3 += `| MasterCompanyRegistry | Registry | \$0/mo |\n`;
-  r3 += `| Yahoo v8 | Derived | \$0/mo |\n`;
-  r3 += `| **Total** | | **\$${totalCost}/mo** |\n`;
+  r3 += `| MasterCompanyRegistry | Registry | $0/mo |\n`;
+  r3 += `| Yahoo v8 | Derived | $0/mo |\n`;
+  r3 += `| **Total** | | **$${totalCost}/mo** |\n`;
 
   r3 += `
 ---
@@ -737,7 +737,7 @@ getFinancials('RELIANCE')
     r4 += `- Yahoo v10 quoteSummary is blocked (401)\n`;
     r4 += `- IndianAPI returns limited fundamentals\n`;
     r4 += `- Alpha Vantage fundamentals are US-only\n`;
-    r4 += `- FMP requires \$149/mo Ultimate tier for Indian coverage\n`;
+    r4 += `- FMP requires $149/mo Ultimate tier for Indian coverage\n`;
     r4 += `- Upstox and Dhan have no fundamentals endpoints\n\n`;
     r4 += `### Resolution Path\n\n`;
     r4 += `1. **Acquire Finnhub premium key** — unlocks /stock/metric → 18/19 fields\n`;
@@ -807,16 +807,16 @@ getFinancials('RELIANCE')
 
   r5 += `| Item | Cost |\n`;
   r5 += `|:-----|:-----|\n`;
-  if (bestProvider === 'Finnhub') r5 += `| Finnhub Basic (primary) | \$89/mo |\n`;
-  else if (bestProvider === 'IndianAPI') r5 += `| IndianAPI Starter (primary) | ₹499/mo (~\$6) |\n`;
-  else r5 += `| Primary provider | \$0 (none viable) |\n`;
-  r5 += `| MasterCompanyRegistry | \$0/mo |\n`;
-  r5 += `| Yahoo Finance v8 | \$0/mo |\n`;
+  if (bestProvider === 'Finnhub') r5 += `| Finnhub Basic (primary) | $89/mo |\n`;
+  else if (bestProvider === 'IndianAPI') r5 += `| IndianAPI Starter (primary) | ₹499/mo (~$6) |\n`;
+  else r5 += `| Primary provider | $0 (none viable) |\n`;
+  r5 += `| MasterCompanyRegistry | $0/mo |\n`;
+  r5 += `| Yahoo Finance v8 | $0/mo |\n`;
 
   if (costEstimate > 0) {
-    r5 += `| **Total** | **\$${costEstimate}/mo** |\n`;
+    r5 += `| **Total** | **$${costEstimate}/mo** |\n`;
   } else {
-    r5 += `| **Total** | **\$0/mo (but insufficient coverage)** |\n`;
+    r5 += `| **Total** | **$0/mo (but insufficient coverage)** |\n`;
   }
 
   r5 += `
@@ -863,7 +863,7 @@ getFinancials('RELIANCE')
     r5 += `**Yes — StockStory is still blocked by data.**\n\n`;
     r5 += `No free-tier provider returns sufficient Indian equity fundamentals. The infrastructure (ProviderCoordinator, all providers, engine chain) is complete and tested. Only the data source is missing.\n\n`;
     r5 += `**The fastest path to unblocking:**\n`;
-    r5 += `1. Acquire Finnhub premium key (\$89/mo) → 18/19 fields instantly\n`;
+    r5 += `1. Acquire Finnhub premium key ($89/mo) → 18/19 fields instantly\n`;
     r5 += `2. Enable in ProviderCoordinator (already coded — just add the key)\n`;
     r5 += `3. Run track-7e validation script to verify all engines receive real data\n`;
     r5 += `4. StockStory is live with real fundamentals\n\n`;

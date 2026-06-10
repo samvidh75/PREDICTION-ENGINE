@@ -29,7 +29,7 @@ export class CacheHierarchyEngine {
   // Redis skeleton fields (optional)
   // We intentionally keep redis wiring out until integration begins.
   // Later: add per-domain cache namespaces + invalidation strategies.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   private redisEnabled: boolean;
 
   constructor(args: { env: AppEnv }) {

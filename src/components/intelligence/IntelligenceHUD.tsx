@@ -563,7 +563,7 @@ export default function IntelligenceHUD(): JSX.Element {
     if (r.kind === "stock") {
       const parsedTicker =
         r.ticker ??
-        (r.title.length > 0 && r.title.length <= 6 && r.title === r.title.toUpperCase() && /^[A-Z0-9.\-]+$/.test(r.title)
+(r.title.length > 0 && r.title.length <= 6 && r.title === r.title.toUpperCase() && /^[A-Z0-9.-]+$/.test(r.title)
           ? r.title
           : "");
 

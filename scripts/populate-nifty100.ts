@@ -80,7 +80,7 @@ async function main() {
 
   let symbolsInserted = 0;
   let pricesInserted = 0;
-  let failures: string[] = [];
+  const failures: string[] = [];
 
   const insertTx = db.transaction(() => {
     for (const ticker of NIFTY100) {

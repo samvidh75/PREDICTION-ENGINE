@@ -211,7 +211,7 @@ export const DashboardHub: React.FC = () => {
 
           {signals.length > 0 && (
             <div className="border-t border-white/[0.06] px-3 py-2">
-              <button onClick={() => navigate('signals')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+              <button onClick={() => navigate('daily-feed')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
                 View all signals <ArrowRight className="h-3 w-3" />
               </button>
             </div>
