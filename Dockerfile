@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: build ───────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
@@ -18,7 +18,7 @@ RUN npm run build
 RUN npm run compile:backend
 
 # ── Stage 2: production runtime ───────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 RUN mkdir -p data
 
@@ -36,9 +36,6 @@ COPY --from=builder /app/dist/backend ./dist/backend
 
 # Copy database migrations (may be needed at runtime)
 COPY --from=builder /app/src/db/migrations ./src/db/migrations
-
-# Copy database files (needed for SQLite retention services)
-COPY --from=builder /app/data ./data
 
 # ── Expose ────────────────────────────────────────────────────────────────────
 # 4001 = Fastify API

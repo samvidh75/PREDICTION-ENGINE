@@ -1,13 +1,10 @@
 /**
- * TRACK-87 — UserAlertEngine
+ * TRACK-87 — UserAlertEngine (async version)
  * Generates stock-level alerts for watchlist users by comparing
  * today's predictions against yesterday's.
  * Runs as part of the daily pipeline (after prediction generation).
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
 const CLASSIFICATION_RANK: Record<string, number> = {
   Critical: 1, Weak: 2, Fair: 3, Good: 4, Excellent: 5, Exceptional: 6
@@ -27,40 +24,48 @@ export class UserAlertEngine {
    * Generate alerts for all users by comparing today vs yesterday predictions.
    * Should be called once per day after prediction generation.
    */
-  generateDailyAlerts(): GeneratedAlert[] {
-    const db = new Database(DB_PATH);
+  async generateDailyAlerts(): Promise<GeneratedAlert[]> {
     const alerts: GeneratedAlert[] = [];
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     try {
       // Get all users with watchlists
-      const users = db.prepare('SELECT DISTINCT user_id FROM user_watchlists WHERE is_archived = 0').all() as any[];
-      if (users.length === 0) { db.close(); return alerts; }
+      const usersRes = await dbAdapter.query('SELECT DISTINCT user_id FROM user_watchlists WHERE is_archived = 0');
+      const users = usersRes.rows as any[];
+      if (users.length === 0) return alerts;
 
       for (const user of users) {
         const userId = user.user_id;
         // Get user's watchlisted tickers
-        const rows = db.prepare('SELECT tickers FROM user_watchlists WHERE user_id = ? AND is_archived = 0').all(userId) as any[];
+        const rowsRes = await dbAdapter.query('SELECT tickers FROM user_watchlists WHERE user_id = $1 AND is_archived = 0', [userId]);
+        const rows = rowsRes.rows as any[];
         const watchedTickers = new Set<string>();
         for (const r of rows) {
-          try { JSON.parse(r.tickers || '[]').forEach((t: string) => watchedTickers.add(t)); } catch { /* ignore malformed archived watchlist payload */ }
+          try {
+            const tickers = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
+            tickers.forEach((t: string) => watchedTickers.add(t));
+          } catch { /* ignore malformed archived watchlist payload */ }
         }
         if (watchedTickers.size === 0) continue;
 
-        const placeholders = [...watchedTickers].map(() => '?').join(',');
+        const placeholders = [...watchedTickers].map((_, idx) => `$${idx + 2}`).join(',');
         const params = [...watchedTickers];
 
         // Compare today vs yesterday predictions
-        const todayPreds = db.prepare(
+        const todayPredsRes = await dbAdapter.query(
           `SELECT symbol, prediction_horizon, ranking_score, classification, confidence_score, confidence_level
-           FROM prediction_registry WHERE prediction_date = ? AND symbol IN (${placeholders})`
-        ).all(today, ...params) as any[];
+           FROM prediction_registry WHERE prediction_date = $1 AND symbol IN (${placeholders})`,
+          [today, ...params]
+        );
+        const todayPreds = todayPredsRes.rows as any[];
 
-        const yesterdayPreds = db.prepare(
+        const yesterdayPredsRes = await dbAdapter.query(
           `SELECT symbol, prediction_horizon, ranking_score, classification, confidence_score, confidence_level
-           FROM prediction_registry WHERE prediction_date = ? AND symbol IN (${placeholders})`
-        ).all(yesterday, ...params) as any[];
+           FROM prediction_registry WHERE prediction_date = $1 AND symbol IN (${placeholders})`,
+          [yesterday, ...params]
+        );
+        const yesterdayPreds = yesterdayPredsRes.rows as any[];
 
         const yesterdayMap = new Map<string, any>();
         for (const p of yesterdayPreds) {
@@ -85,7 +90,7 @@ export class UserAlertEngine {
               body,
               metadata: { oldScore: Number(yesterdayP.ranking_score), newScore: Number(todayP.ranking_score), delta: scoreDelta, horizon: todayP.prediction_horizon }
             };
-            this.insertAlert(db, alert);
+            await this.insertAlert(alert);
             alerts.push(alert);
           }
 
@@ -101,7 +106,7 @@ export class UserAlertEngine {
               body: `${todayP.symbol} classification upgraded from ${yesterdayP.classification} to ${todayP.classification}. Horizon: ${todayP.prediction_horizon}d. Score: ${todayP.ranking_score}/100.`,
               metadata: { oldClass: yesterdayP.classification, newClass: todayP.classification, horizon: todayP.prediction_horizon }
             };
-            this.insertAlert(db, alert);
+            await this.insertAlert(alert);
             alerts.push(alert);
           } else if (todayRank < yesterdayRank) {
             const alert = {
@@ -112,7 +117,7 @@ export class UserAlertEngine {
               body: `${todayP.symbol} classification downgraded from ${yesterdayP.classification} to ${todayP.classification}. Horizon: ${todayP.prediction_horizon}d. Score: ${todayP.ranking_score}/100.`,
               metadata: { oldClass: yesterdayP.classification, newClass: todayP.classification, horizon: todayP.prediction_horizon }
             };
-            this.insertAlert(db, alert);
+            await this.insertAlert(alert);
             alerts.push(alert);
           }
 
@@ -126,27 +131,31 @@ export class UserAlertEngine {
               body: `${todayP.symbol} confidence level changed from ${yesterdayP.confidence_level} to ${todayP.confidence_level}.`,
               metadata: { oldConf: yesterdayP.confidence_level, newConf: todayP.confidence_level }
             };
-            this.insertAlert(db, alert);
+            await this.insertAlert(alert);
             alerts.push(alert);
           }
         }
 
         // New opportunity: symbols with high factor_score NOT in user's watchlist
         const opportunityParams = [...watchedTickers];
-        const oppPlaceholders = [...watchedTickers].map(() => '?').join(',');
         if (opportunityParams.length > 0) {
-          const candidates = db.prepare(
+          const oppPlaceholders = opportunityParams.map((_, idx) => `$${idx + 2}`).join(',');
+          const candidatesRes = await dbAdapter.query(
             `SELECT DISTINCT pr.symbol, pr.ranking_score, pr.classification
              FROM prediction_registry pr
-             WHERE pr.prediction_date = ? AND pr.ranking_score >= 85 AND pr.symbol NOT IN (${oppPlaceholders})
-             LIMIT 5`
-          ).all(today, ...opportunityParams) as any[];
+             WHERE pr.prediction_date = $1 AND pr.ranking_score >= 85 AND pr.symbol NOT IN (${oppPlaceholders})
+             LIMIT 5`,
+            [today, ...opportunityParams]
+          );
+          const candidates = candidatesRes.rows as any[];
 
           for (const c of candidates) {
             // Only generate if not already alerted for this symbol today
-            const already = db.prepare(
-              `SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = ? AND symbol = ? AND alert_type = 'new_opportunity' AND created_at >= date(?)`
-            ).get(userId, c.symbol, today) as any;
+            const alreadyRes = await dbAdapter.query(
+              `SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = $1 AND symbol = $2 AND alert_type = 'new_opportunity' AND created_at >= date($3)`,
+              [userId, c.symbol, today]
+            );
+            const already = alreadyRes.rows[0] as any;
             if (already?.cnt > 0) continue;
 
             const alert = {
@@ -157,64 +166,55 @@ export class UserAlertEngine {
               body: `${c.symbol} shows a strong ${c.classification} rating (${c.ranking_score}/100). Not in your watchlists. Consider reviewing.`,
               metadata: { score: c.ranking_score, classification: c.classification }
             };
-            this.insertAlert(db, alert);
+            await this.insertAlert(alert);
             alerts.push(alert);
           }
         }
       }
     } catch (err: any) {
       console.error('[UserAlertEngine] Error generating alerts:', err.message);
-    } finally {
-      db.close();
     }
 
     return alerts;
   }
 
-  private insertAlert(db: any, alert: GeneratedAlert): void {
+  private async insertAlert(alert: GeneratedAlert): Promise<void> {
     try {
-      db.prepare(
+      await dbAdapter.query(
         `INSERT INTO user_alerts (user_id, symbol, alert_type, title, body, metadata, is_read, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'))`
-      ).run(alert.userId, alert.symbol, alert.type, alert.title, alert.body, JSON.stringify(alert.metadata));
+         VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP)`,
+        [alert.userId, alert.symbol, alert.type, alert.title, alert.body, JSON.stringify(alert.metadata)]
+      );
     } catch (err: any) {
       console.error('[UserAlertEngine] Failed to insert alert:', err.message);
     }
   }
 
   /** Get unread count for a user */
-  getUnreadCount(userId: string): number {
-    const db = new Database(DB_PATH);
-    try {
-      const row = db.prepare('SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = ? AND is_read = 0').get(userId) as any;
-      return row?.cnt ?? 0;
-    } finally { db.close(); }
+  async getUnreadCount(userId: string): Promise<number> {
+    const res = await dbAdapter.query('SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = $1 AND is_read = 0', [userId]);
+    const row = res.rows[0] as any;
+    return row?.cnt ?? 0;
   }
 
   /** Get alerts for a user, newest first */
-  getUserAlerts(userId: string, limit = 50): any[] {
-    const db = new Database(DB_PATH);
-    try {
-      return db.prepare(
-        'SELECT * FROM user_alerts WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'
-      ).all(userId, limit);
-    } finally { db.close(); }
+  async getUserAlerts(userId: string, limit = 50): Promise<any[]> {
+    const res = await dbAdapter.query(
+      'SELECT * FROM user_alerts WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2',
+      [userId, limit]
+    );
+    return res.rows;
   }
 
   /** Mark an alert as read */
-  markAsRead(alertId: number): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare('UPDATE user_alerts SET is_read = 1 WHERE id = ?').run(alertId);
-    } finally { db.close(); }
+  async markAsRead(userId: string, alertId: number): Promise<boolean> {
+    const res = await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE id = $1 AND user_id = $2', [alertId, userId]);
+    return res.rowCount > 0;
   }
 
   /** Mark all alerts as read for a user */
-  markAllAsRead(userId: string): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare('UPDATE user_alerts SET is_read = 1 WHERE user_id = ? AND is_read = 0').run(userId);
-    } finally { db.close(); }
+  async markAllAsRead(userId: string): Promise<void> {
+    await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE user_id = $1 AND is_read = 0', [userId]);
   }
 }
 

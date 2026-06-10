@@ -202,15 +202,20 @@ export class DatabaseAdapter {
       let pgSql = sql
         .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, "SERIAL PRIMARY KEY")
         .replace(/datetime\('now'\)/g, "CURRENT_TIMESTAMP")
-        .replace(/date\('now'\)/g, "CURRENT_DATE")
-        .replace(/INSERT OR IGNORE INTO (\w+)/gi, "INSERT INTO $1");
+        .replace(/date\('now'\)/g, "CURRENT_DATE");
 
-      if (sql.includes("INSERT OR IGNORE INTO subscription_plans")) {
-        pgSql = pgSql.replace(/;\s*$/, " ON CONFLICT (id) DO NOTHING;");
-      }
-
-      if (sql.includes("CREATE TABLE IF NOT EXISTS financial_snapshots")) {
-        pgSql = "DROP TABLE IF EXISTS financial_snapshots CASCADE;\n" + pgSql;
+      // Convert INSERT OR IGNORE to INSERT INTO ... ON CONFLICT DO NOTHING
+      if (/INSERT OR IGNORE/i.test(pgSql)) {
+        pgSql = pgSql.replace(/INSERT OR IGNORE INTO/gi, "INSERT INTO");
+        const statements = pgSql.split(";");
+        const processed = statements.map((stmt) => {
+          const trimmed = stmt.trim();
+          if (/^INSERT INTO/i.test(trimmed) && !/ON CONFLICT/i.test(trimmed)) {
+            return stmt + " ON CONFLICT DO NOTHING";
+          }
+          return stmt;
+        });
+        pgSql = processed.join(";");
       }
 
       await this.pool.query(pgSql);
