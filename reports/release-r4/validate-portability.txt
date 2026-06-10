@@ -1,0 +1,33 @@
+=== VALIDATE-PORTABILITY ===
+
+> prediction-engine@0.1.0 validate:portability
+> npm run verify:no-native-app-deps && npm run verify:install-platform && npm run verify:native && npm run validate:import-case && npm run validate:temp-cleanup && npm run doctor:platform
+
+
+> prediction-engine@0.1.0 verify:no-native-app-deps
+> node scripts/assert-no-native-app-deps.mjs
+
+✅ No native application dependencies detected.
+
+> prediction-engine@0.1.0 verify:install-platform
+> node scripts/detect-stale-install.mjs
+
+OK: node_modules matches darwin/arm64 (Node 20)
+
+> prediction-engine@0.1.0 verify:native
+> node scripts/verify-native-modules.mjs
+
+file:///Users/samvidhmehta/Desktop/PREDICTION-ENGINE/scripts/verify-native-modules.mjs:20
+test(sql.js: load + in-memory CRUD', () => {
+         ^^
+
+SyntaxError: missing ) after argument list
+    at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
+    at #translate (node:internal/modules/esm/loader:497:12)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:544:27)
+    at async ModuleJob._link (node:internal/modules/esm/module_job:148:19)
+
+Node.js v20.19.5
+EXIT CODE: 1
+

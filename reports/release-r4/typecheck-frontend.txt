@@ -1,0 +1,3 @@
+=== TYPECHECK-FRONTEND ===
+EXIT CODE: 0
+

@@ -1,0 +1,8 @@
+=== VALIDATE-QUERY ===
+  PASS: SQLiteAdapter prediction_registry has canonical columns
+
+=== Compatibility Audit Complete ===
+Errors: 3, Warnings: 0
+FAIL: Schema compatibility issues found
+EXIT CODE: 0
+

@@ -1,0 +1,6 @@
+=== TYPECHECK-ALL ===
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/watchlists/WatchlistMonitoringEngine.ts(36,32): error TS2538: Type 'unknown' cannot be used as an index type.
+src/watchlists/WatchlistMonitoringEngine.ts(37,17): error TS2538: Type 'unknown' cannot be used as an index type.
+EXIT CODE: 0
+
