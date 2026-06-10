@@ -7,8 +7,7 @@
  *   quality_score, growth_score, value_score, momentum_score,
  *   risk_score, sector_score, prediction_date
  *
- * OBsolete field names REMOVED: health_score, predicted_at, confidence,
- *   factors, sample_size
+ * Legacy field names have been replaced with canonical registry columns.
  */
 import type { FastifyPluginAsync } from 'fastify';
 import pool from '../../../db/index';
@@ -132,7 +131,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         narrative: classification && confidenceLevel && rankingScore !== null
           ? `Classification: ${classification}. Confidence: ${confidenceLevel}. Score: ${rankingScore}.`
           : `Prediction registry snapshot for ${symbol} is incomplete. Missing values are shown as unavailable.`,
-        factors: {
+        factorBreakdown: {
           growth: factorSnapshot(growthScore, 'growth_score'),
           quality: factorSnapshot(qualityScore, 'quality_score'),
           stability: factorSnapshot(valueScore, 'value_score'),

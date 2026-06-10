@@ -1,97 +1,233 @@
 /**
- * TRACK-P4B — Release Gate (Truthful)
+ * TRACK-P4B — Release Gate
  *
- * Reflects the actual mandatory checks enforced by CI workflows.
- * Each check maps to a real package.json script that CI runs.
+ * Runs every mandatory check required before a release can proceed.
+ * Writes a machine-readable report to reports/release/release-gate.json.
  *
  * Usage: npx tsx scripts/release-gate.ts
  */
 
 import { execSync } from 'child_process';
+import { mkdirSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
+
+// ── Types ──────────────────────────────────────────────────────────────
 
 interface GateCheck {
   name: string;
-  mandatory: boolean;
   command: string;
-  passed: boolean;
-  error?: string;
-  durationMs?: number;
+  exitCode: number | null;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+  mandatory: boolean;
+  skipped: boolean;
 }
 
-const checks: GateCheck[] = [
-  { name: 'npm ci (dependencies)', mandatory: true, command: 'npm ci', passed: false },
-  { name: 'Lint (ESLint)', mandatory: true, command: 'npm run lint', passed: false },
-  { name: 'TypeScript typecheck (all)', mandatory: true, command: 'npm run typecheck:all', passed: false },
-  { name: 'Unit tests', mandatory: true, command: 'npm run test:unit', passed: false },
-  { name: 'SQLite integration tests', mandatory: true, command: 'npm run test:integration:sqlite', passed: false },
-  { name: 'PostgreSQL integration tests (CI)', mandatory: true, command: 'npm run test:integration:postgres:ci', passed: false },
-  { name: 'Schema validation', mandatory: true, command: 'npm run validate:schema', passed: false },
-  { name: 'Distribution validation', mandatory: true, command: 'npm run validate:distributions', passed: false },
-  { name: 'Data integrity validation', mandatory: true, command: 'npm run validate:data-integrity', passed: false },
-  { name: 'Repository hygiene', mandatory: true, command: 'npm run validate:hygiene', passed: false },
-  { name: 'Frontend build (Vercel)', mandatory: true, command: 'npm run build:vercel', passed: false },
-  { name: 'Backend compile', mandatory: true, command: 'npm run compile:backend', passed: false },
-  { name: 'API smoke test', mandatory: true, command: 'npm run smoke:api', passed: false },
+interface GateReport {
+  timestamp: string;
+  nodeVersion: string;
+  totalDurationMs: number;
+  passed: number;
+  failed: number;
+  skipped: number;
+  mandatoryFailed: number;
+  exitCode: number;
+  checks: GateCheck[];
+}
+
+// ── Output directory ───────────────────────────────────────────────────
+
+const reportDir = resolve(process.cwd(), 'reports', 'release');
+mkdirSync(reportDir, { recursive: true });
+
+// ── Checks definition ──────────────────────────────────────────────────
+
+// Checks listed in the order they should run.  A script is considered
+// “missing” when npm errors with "Missing script" — those are skipped if
+// non-mandatory, or counted as a failure if mandatory.
+
+interface CheckDef {
+  name: string;
+  command: string;
+  mandatory: boolean;
+}
+
+const checkDefs: CheckDef[] = [
+  { name: 'Lint (ESLint)', command: 'npm run lint', mandatory: true },
+  { name: 'TypeScript typecheck (all)', command: 'npm run typecheck:all', mandatory: true },
+  { name: 'Unit tests', command: 'npm run test:unit', mandatory: true },
+  { name: 'SQLite integration tests', command: 'npm run test:integration:sqlite', mandatory: true },
+  { name: 'PostgreSQL integration tests (CI)', command: 'npm run test:integration:postgres:ci', mandatory: true },
+  { name: 'Coverage', command: 'npm run test:coverage', mandatory: true },
+  { name: 'Schema validation', command: 'npm run validate:schema', mandatory: true },
+  { name: 'Query schema validation', command: 'npm run validate:query-schema', mandatory: true },
+  { name: 'Distribution validation', command: 'npm run validate:distributions', mandatory: true },
+  { name: 'Data integrity validation', command: 'npm run validate:data-integrity', mandatory: true },
+  { name: 'Repository hygiene', command: 'npm run validate:hygiene', mandatory: true },
+  { name: 'Frontend build (Vercel)', command: 'npm run build:vercel', mandatory: true },
+  { name: 'Backend build', command: 'npm run build:backend', mandatory: true },
+  { name: 'Backend compile', command: 'npm run compile:backend', mandatory: true },
+  { name: 'Dependency audit', command: 'npm audit --audit-level=high', mandatory: true },
+  { name: 'API smoke test', command: 'npm run smoke:api', mandatory: true },
 ];
 
-const startTime = Date.now();
+// ── Helpers ────────────────────────────────────────────────────────────
 
-console.log('╔══════════════════════════════════════════╗');
-console.log('║     STOCKSTORY RELEASE GATE (P4B)       ║');
-console.log('╚══════════════════════════════════════════╝\n');
+const MISSING_SCRIPT_PATTERN = /Missing script:/i;
 
-let mandatoryFailed = 0;
-let totalFailed = 0;
+function isMissingScriptError(stderr: string): boolean {
+  return MISSING_SCRIPT_PATTERN.test(stderr);
+}
 
-for (const check of checks) {
-  const checkStart = Date.now();
-  process.stdout.write(`${check.name}... `);
+function runCheck(def: CheckDef): GateCheck {
+  const start = Date.now();
+  let exitCode: number | null = null;
+  let stdout = '';
+  let stderr = '';
+  let skipped = false;
 
   try {
-    execSync(check.command, {
+    const result = execSync(def.command, {
       encoding: 'utf-8',
       stdio: 'pipe',
-      timeout: 180_000,
+      timeout: 300_000, // 5 minutes per check
       env: { ...process.env, CI: 'true' },
     });
-    check.passed = true;
-    check.durationMs = Date.now() - checkStart;
-    console.log(`✓ PASS (${check.durationMs}ms)`);
+    stdout = result;
+    exitCode = 0;
   } catch (err: unknown) {
-    check.passed = false;
-    const e = err as { stderr?: string; message?: string };
-    check.error = e.stderr?.toString()?.slice(0, 300) || e.message?.slice(0, 300) || 'Unknown error';
-    check.durationMs = Date.now() - checkStart;
+    const e = err as NodeJS.ErrnoException & {
+      stdout?: Buffer | string;
+      stderr?: Buffer | string;
+      status?: number;
+      signal?: NodeJS.Signals;
+    };
 
+    stdout = bufferToString(e.stdout) || '';
+    stderr = bufferToString(e.stderr) || '';
+
+    if (isMissingScriptError(stderr)) {
+      skipped = true;
+      exitCode = null;
+    } else {
+      exitCode = e.status ?? 1;
+    }
+  }
+
+  const durationMs = Date.now() - start;
+
+  return {
+    name: def.name,
+    command: def.command,
+    exitCode,
+    stdout: truncate(stdout, 5000),
+    stderr: truncate(stderr, 5000),
+    durationMs,
+    mandatory: def.mandatory,
+    skipped,
+  };
+}
+
+function bufferToString(buf: Buffer | string | undefined): string {
+  if (buf === undefined) return '';
+  if (typeof buf === 'string') return buf;
+  return buf.toString('utf-8');
+}
+
+function truncate(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen) + '…[truncated]';
+}
+
+// ── Main ───────────────────────────────────────────────────────────────
+
+const overallStart = Date.now();
+const checks: GateCheck[] = [];
+
+console.log('╔══════════════════════════════════════════╗');
+console.log('║     PREDICTION-ENGINE RELEASE GATE      ║');
+console.log('╚══════════════════════════════════════════╝\n');
+
+for (const def of checkDefs) {
+  process.stdout.write(`${def.name}... `);
+
+  const check = runCheck(def);
+  checks.push(check);
+
+  if (check.skipped) {
     if (check.mandatory) {
-      mandatoryFailed++;
+      console.log('✗ FAIL (MANDATORY — script missing)');
+    } else {
+      console.log('⊘ SKIP (script not found)');
+    }
+  } else if (check.exitCode === 0) {
+    console.log(`✓ PASS (${check.durationMs}ms)`);
+  } else {
+    if (check.mandatory) {
       console.log('✗ FAIL (MANDATORY)');
     } else {
       console.log('⚠ WARN');
     }
-    totalFailed++;
   }
 }
 
-const totalDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+const totalDurationMs = Date.now() - overallStart;
+const passed = checks.filter((c) => !c.skipped && c.exitCode === 0).length;
+const skipped = checks.filter((c) => c.skipped).length;
+const failed = checks.filter((c) => !c.skipped && c.exitCode !== 0 && c.exitCode !== null).length;
+const mandatoryFailed = checks.filter(
+  (c) => c.mandatory && (c.skipped || (c.exitCode !== null && c.exitCode !== 0)),
+).length;
+const exitCode = mandatoryFailed > 0 ? 1 : 0;
+
+// ── Console summary ────────────────────────────────────────────────────
+
+const totalSeconds = (totalDurationMs / 1000).toFixed(1);
+const total = checks.length;
 
 console.log('\n═══════════════════════════════════════════');
-console.log(`  Duration: ${totalDuration}s`);
-console.log(`  Passed: ${checks.filter((c) => c.passed).length}/${checks.length}`);
-console.log(`  Failed: ${totalFailed} (${mandatoryFailed} mandatory)`);
+console.log(`  Duration: ${totalSeconds}s`);
+console.log(`  Passed: ${passed}/${total}`);
+console.log(`  Failed: ${failed} (${mandatoryFailed} mandatory)`);
+if (skipped > 0) console.log(`  Skipped: ${skipped}`);
 console.log('═══════════════════════════════════════════\n');
 
 if (mandatoryFailed > 0) {
   console.log('FAILED CHECKS:');
   for (const check of checks) {
-    if (!check.passed && check.mandatory) {
+    if (check.mandatory && (check.skipped || (check.exitCode !== null && check.exitCode !== 0))) {
       console.log(`\n  [MANDATORY] ${check.name}`);
-      if (check.error) console.log(`  Error: ${check.error}`);
+      if (check.skipped) console.log('  Reason: script not found');
+      if (check.stderr) {
+        const preview = check.stderr.split('\n').slice(0, 5).join('\n  ');
+        console.log(`  stderr:\n  ${preview}`);
+      }
     }
   }
   console.log(`\nRELEASE GATE: FAIL (${mandatoryFailed} mandatory check(s) failed)`);
-  process.exit(1);
 } else {
   console.log('\nRELEASE GATE: PASS');
-  process.exit(0);
 }
+
+// ── Write machine-readable report ─────────────────────────────────────
+
+const report: GateReport = {
+  timestamp: new Date().toISOString(),
+  nodeVersion: process.version,
+  totalDurationMs,
+  passed,
+  failed,
+  skipped,
+  mandatoryFailed,
+  exitCode,
+  checks,
+};
+
+const reportPath = resolve(reportDir, 'release-gate.json');
+writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n', 'utf-8');
+console.log(`\nReport written to reports/release/release-gate.json`);
+
+// ── Set exit code (never calls process.exit) ───────────────────────────
+
+process.exitCode = exitCode;

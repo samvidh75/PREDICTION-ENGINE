@@ -90,16 +90,14 @@ async function main(): Promise<void> {
     process.env.SQLITE_DB_PATH = TEMP_DB_PATH;
 
     // Clear any existing SQLite singleton in the module
-    // The SQLiteAdapter uses a module-level singleton; we need to reset it
-    const __dirname = path.dirname(new URL(import.meta.url).pathname);
-    const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
+    // Use resetForTest to force a fresh connection to the temp DB path
+    const sqliteModPath = '../src/db/SQLiteAdapter';
 
     // Step 3: Dynamically import SQLiteAdapter — triggers schema init
-    // Need to bust the require cache to force a fresh init
-    delete require.cache[require.resolve(sqliteModPath)];
-
-    // Use dynamic import with a fresh cache key
-    const sqliteMod = await import(sqliteModPath + `?t=${timestamp}`);
+    const sqliteMod = await import(sqliteModPath);
+    if (sqliteMod.resetForTest) {
+      sqliteMod.resetForTest(TEMP_DB_PATH);
+    }
 
     // Trigger the pool initialization which runs ensureTables()
     const pool = sqliteMod.pool;
