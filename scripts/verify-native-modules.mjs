@@ -1,41 +1,72 @@
 #!/usr/bin/env node
-import { platform, arch, version as nodeVersion } from 'node:process';
-import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url);
+import process from 'node:process';
 
-console.log('══ Native Module Verifier ══');
-console.log(`  Platform:    ${platform}`);
-console.log(`  Architecture: ${arch}`);
-console.log(`  Node.js:     ${nodeVersion}`);
+console.log('══ Portable Dependency Verifier ══');
+console.log(`Platform: ${process.platform}`);
+console.log(`Architecture: ${process.arch}`);
+console.log(`Node.js: ${process.version}`);
 console.log('');
 
-let ok = true;
+let failed = 0;
 
-function test(label, fn) {
-  try { fn(); console.log(`PASS ${label}`); }
-  catch (e) { console.log(`FAIL ${label}: ${e.message}`); ok = false; }
+async function test(label, fn) {
+  try {
+    await fn();
+    console.log(`PASS  ${label}`);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
+    console.error(`FAIL  ${label}: ${message}`);
+    failed += 1;
+  }
 }
 
-test(sql.js: load + in-memory CRUD', () => {
-  const Database = await import('sql.js');
-  const db = new Database(':memory:');
-  db.exec('CREATE TABLE v (id INTEGER PRIMARY KEY, data TEXT)');
-  db.prepare('INSERT INTO v (data) VALUES (?)').run('native-verified');
-  const row = db.prepare('SELECT data FROM v WHERE id = 1').get();
-  if (!row || row.data !== 'native-verified') throw new Error('Data mismatch');
+await test('sql.js WASM load + in-memory CRUD', async () => {
+  const module = await import('sql.js');
+  const initSqlJs = module.default;
+  const SQL = await initSqlJs();
+
+  const db = new SQL.Database();
+
+  db.run('CREATE TABLE portable_test (id INTEGER PRIMARY KEY, value TEXT)');
+  db.run('INSERT INTO portable_test (value) VALUES (?)', ['verified']);
+
+  const result = db.exec(
+    'SELECT value FROM portable_test WHERE id = 1',
+  );
+
+  const value = result[0]?.values[0]?.[0];
+
+  if (value !== 'verified') {
+    throw new Error(`Expected verified, received ${String(value)}`);
+  }
+
+  const exported = db.export();
+
+  if (!(exported instanceof Uint8Array) || exported.length === 0) {
+    throw new Error('sql.js export did not return bytes');
+  }
+
   db.close();
 });
 
-test('esbuild: import', () => {
-  require('esbuild');
-  console.log(`   esbuild v${require('esbuild/package.json').version}`);
+await test('esbuild import', async () => {
+  await import('esbuild');
 });
 
-test('rollup: import', () => {
-  console.log(`   rollup v${require('rollup/package.json').version}`);
+await test('rollup import', async () => {
+  await import('rollup');
 });
 
 console.log('');
-if (ok) { console.log('RESULT: PASS'); process.exit(0); }
-else { console.log('RESULT: FAIL'); process.exit(1); }
+
+if (failed > 0) {
+  console.error(`RESULT: FAIL (${failed})`);
+  process.exitCode = 1;
+} else {
+  console.log('RESULT: PASS');
+}

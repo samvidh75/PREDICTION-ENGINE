@@ -1,71 +1,186 @@
 #!/usr/bin/env node
-import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
+
+import { execFileSync } from 'node:child_process';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { platform, arch, version as nodeVersion } from 'node:process';
 import { join, resolve } from 'node:path';
-import { cwd } from 'node:process';
-import { createRequire } from 'node:module';
+import process from 'node:process';
 
-const require = createRequire(import.meta.url);
-const ROOT = resolve(cwd());
-let failures = 0;
+const root = resolve(process.cwd());
+let failed = 0;
 
-function check(label, fn) {
-  try { console.log(`PASS  ${label}: ${fn()}`); }
-  catch (e) { console.log(`FAIL  ${label}: ${e.message}`); failures++; }
+async function check(label, fn) {
+  try {
+    const result = await fn();
+    console.log(`PASS  ${label}: ${String(result)}`);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
+    console.error(`FAIL  ${label}: ${message}`);
+    failed += 1;
+  }
 }
 
 console.log('══ Platform Doctor ══');
 console.log('');
-check('OS', () => platform);
-check('Arch', () => arch);
-check('Node', () => nodeVersion);
-let npmV = 'unknown'; try { npmV = execSync('npm --version', { encoding: 'utf8' }).trim(); } catch {}
-check('npm', () => npmV);
+
+await check('OS', async () => process.platform);
+await check('Arch', async () => process.arch);
+await check('Node', async () => process.version);
+await check('npm', async () =>
+  execFileSync('npm', ['--version'], {
+    encoding: 'utf8',
+  }).trim(),
+);
 
 console.log('');
 console.log('-- Files --');
-check('package.json', () => existsSync(join(ROOT, 'package.json')) ? 'yes' : 'no');
-check('package-lock.json', () => existsSync(join(ROOT, 'package-lock.json')) ? 'yes' : 'no');
-check('node_modules', () => existsSync(join(ROOT, 'node_modules')) ? 'yes' : 'no');
-check('platform marker', () => {
-  const m = join(ROOT, 'node_modules', '.stockstory-platform.json');
-  if (!existsSync(m)) throw new Error('missing — run npm run clean:install');
-  return JSON.parse(readFileSync(m, 'utf8')).platform;
+
+await check('package.json', async () =>
+  existsSync(join(root, 'package.json'))
+    ? 'yes'
+    : Promise.reject(new Error('missing')),
+);
+
+await check('package-lock.json', async () =>
+  existsSync(join(root, 'package-lock.json'))
+    ? 'yes'
+    : Promise.reject(new Error('missing')),
+);
+
+await check('node_modules', async () =>
+  existsSync(join(root, 'node_modules'))
+    ? 'yes'
+    : Promise.reject(new Error('missing — run npm ci')),
+);
+
+await check('platform marker', async () => {
+  const markerPath = join(
+    root,
+    'node_modules',
+    '.stockstory-platform.json',
+  );
+
+  if (!existsSync(markerPath)) {
+    throw new Error('missing — run npm run write:install-marker');
+  }
+
+  const marker = JSON.parse(
+    readFileSync(markerPath, 'utf8'),
+  );
+
+  return `${marker.platform}/${marker.arch}`;
 });
 
 console.log('');
-console.log('-- Native --');
-check(sql.js, () => `v${await import('sql.js/package.json').version}`);
-check('esbuild', () => `v${require('esbuild/package.json').version}`);
-check('rollup', () => `v${require('rollup/package.json').version}`);
-check('vite', () => `v${require('vite/package.json').version}`);
+console.log('-- Portable SQLite --');
 
-console.log('');
-console.log('-- SQLite --');
-check('SQLite CRUD', () => {
-  const tmp = join(ROOT, 'tmp'); if (!existsSync(tmp)) mkdirSync(tmp, { recursive: true });
-  const p = join(tmp, `doctor-${Date.now()}.db`);
-  const db = new (await import('sql.js'))(p);
-  db.exec('CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)');
-  db.prepare('INSERT INTO t(v) VALUES(?)').run('ok');
-  const r = db.prepare('SELECT v FROM t WHERE id=1').get();
-  if (!r || r.v !== 'ok') throw new Error('mismatch');
+await check('sql.js WASM CRUD', async () => {
+  const module = await import('sql.js');
+  const initSqlJs = module.default;
+  const SQL = await initSqlJs();
+
+  const db = new SQL.Database();
+
+  db.run('CREATE TABLE doctor_test (id INTEGER PRIMARY KEY, value TEXT)');
+  db.run('INSERT INTO doctor_test (value) VALUES (?)', ['ok']);
+
+  const result = db.exec(
+    'SELECT value FROM doctor_test WHERE id = 1',
+  );
+
+  const value = result[0]?.values[0]?.[0];
+
+  if (value !== 'ok') {
+    throw new Error(`Expected ok, received ${String(value)}`);
+  }
+
   db.close();
-  unlinkSync(p); try { unlinkSync(p + '-wal'); } catch {} try { unlinkSync(p + '-shm'); } catch {}
+
   return 'ok';
 });
 
 console.log('');
-console.log('-- FS --');
-check('tmp writable', () => {
-  const f = join(tmpdir(), `doc-${Date.now()}.txt`);
-  writeFileSync(f, 'p'); const c = readFileSync(f, 'utf8'); unlinkSync(f);
-  if (c !== 'p') throw new Error('mismatch');
+console.log('-- Build Tools --');
+
+await check('esbuild', async () => {
+  await import('esbuild');
+  return 'available';
+});
+
+await check('rollup', async () => {
+  await import('rollup');
+  return 'available';
+});
+
+await check('vite', async () => {
+  await import('vite');
+  return 'available';
+});
+
+console.log('');
+console.log('-- Filesystem --');
+
+await check('project tmp writable', async () => {
+  const dir = join(root, 'tmp');
+
+  if (!existsSync(dir)) {
+    mkdirSync(dir, {
+      recursive: true,
+    });
+  }
+
+  const file = join(
+    dir,
+    `platform-doctor-${Date.now()}.txt`,
+  );
+
+  writeFileSync(file, 'ok', 'utf8');
+
+  const value = readFileSync(file, 'utf8');
+
+  unlinkSync(file);
+
+  if (value !== 'ok') {
+    throw new Error('project tmp read/write mismatch');
+  }
+
+  return dir;
+});
+
+await check('OS tmp writable', async () => {
+  const file = join(
+    tmpdir(),
+    `platform-doctor-${Date.now()}.txt`,
+  );
+
+  writeFileSync(file, 'ok', 'utf8');
+
+  const value = readFileSync(file, 'utf8');
+
+  unlinkSync(file);
+
+  if (value !== 'ok') {
+    throw new Error('OS tmp read/write mismatch');
+  }
+
   return tmpdir();
 });
 
 console.log('');
-if (failures === 0) { console.log('RESULT: PASS'); process.exit(0); }
-else { console.log(`RESULT: FAIL (${failures})`); process.exit(1); }
+
+if (failed > 0) {
+  console.error(`RESULT: FAIL (${failed})`);
+  process.exitCode = 1;
+} else {
+  console.log('RESULT: PASS');
+}
