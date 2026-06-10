@@ -21,6 +21,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { fileURLToPath } from 'node:url';
 
 const timestamp = Date.now();
 const rand = Math.random().toString(36).slice(2, 6);
@@ -91,15 +92,15 @@ async function main(): Promise<void> {
 
     // Clear any existing SQLite singleton in the module
     // The SQLiteAdapter uses a module-level singleton; we need to reset it
-    const __dirname = path.dirname(new URL(import.meta.url).pathname);
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
 
     // Step 3: Dynamically import SQLiteAdapter — triggers schema init
-    // Need to bust the require cache to force a fresh init
-    delete require.cache[require.resolve(sqliteModPath)];
-
-    // Use dynamic import with a fresh cache key
-    const sqliteMod = await import(sqliteModPath + `?t=${timestamp}`);
+    // Use resetForTest to force a fresh connection to the temp DB path
+    const sqliteMod = await import(sqliteModPath);
+    if (sqliteMod.resetForTest) {
+      sqliteMod.resetForTest(TEMP_DB_PATH);
+    }
 
     // Trigger the pool initialization which runs ensureTables()
     const pool = sqliteMod.pool;

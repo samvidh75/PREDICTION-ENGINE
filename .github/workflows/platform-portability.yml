@@ -1,0 +1,42 @@
+name: Platform Portability
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  platform-matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run doctor:platform
+
+      - run: npm run verify:native
+
+      - run: npm run validate:import-case
+
+      - run: npm run validate:temp-cleanup
+
+      - run: npm run typecheck:vercel
+
+      - run: npm run build:vercel
+
+      - run: npm run test:unit
+
+      - run: npm run test:integration:sqlite
+
+      - run: npm run validate:schema
