@@ -1,11 +1,8 @@
 /**
- * TRACK-87 — DailyDigestGenerator
+ * TRACK-87 — DailyDigestGenerator (async version)
  * Generates personalised HTML/plain-text daily digest per user.
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
 export interface DigestData {
   userId: string;
@@ -17,49 +14,55 @@ export interface DigestData {
 }
 
 export class DailyDigestGenerator {
-  generateForUser(userId: string): DigestData {
-    const db = new Database(DB_PATH);
+  async generateForUser(userId: string): Promise<DigestData> {
     const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     // Get user's watchlist tickers
-    const rows = db.prepare('SELECT tickers FROM user_watchlists WHERE user_id = ? AND is_archived = 0').all(userId) as any[];
+    const rowsRes = await dbAdapter.query('SELECT tickers FROM user_watchlists WHERE user_id = $1 AND is_archived = 0', [userId]);
+    const rows = rowsRes.rows as any[];
     const watchedTickers = new Set<string>();
     for (const r of rows) {
-      try { JSON.parse(r.tickers || '[]').forEach((t: string) => watchedTickers.add(t)); } catch { /* ignore malformed archived watchlist payload */ }
+      try {
+        const tickers = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
+        tickers.forEach((t: string) => watchedTickers.add(t));
+      } catch { /* ignore malformed archived watchlist payload */ }
     }
 
     // Get today's predictions for watched tickers
-    const placeholders = [...watchedTickers].map(() => '?').join(',');
     let watchlistPredictions: any[] = [];
     if (watchedTickers.size > 0) {
-      watchlistPredictions = db.prepare(
+      const placeholders = [...watchedTickers].map((_, idx) => `$${idx + 2}`).join(',');
+      const watchlistPredsRes = await dbAdapter.query(
         `SELECT symbol, prediction_horizon, ranking_score, classification, confidence_level
-         FROM prediction_registry WHERE prediction_date = ? AND symbol IN (${placeholders})
-         ORDER BY ranking_score DESC`
-      ).all(today, ...[...watchedTickers]) as any[];
+         FROM prediction_registry WHERE prediction_date = $1 AND symbol IN (${placeholders})
+         ORDER BY ranking_score DESC`,
+        [today, ...[...watchedTickers]]
+      );
+      watchlistPredictions = watchlistPredsRes.rows as any[];
     }
 
     // Get today's alerts for user
-    const todayAlerts = db.prepare(
-      `SELECT * FROM user_alerts WHERE user_id = ? AND created_at >= date(?)
-       ORDER BY created_at DESC LIMIT 20`
-    ).all(userId, today) as any[];
+    const todayAlertsRes = await dbAdapter.query(
+      `SELECT * FROM user_alerts WHERE user_id = $1 AND created_at >= date($2)
+       ORDER BY created_at DESC LIMIT 20`,
+      [userId, today]
+    );
+    const todayAlerts = todayAlertsRes.rows as any[];
 
     // Get top market movers (by score change absolute value, across all symbols)
-    const topMovers = db.prepare(
+    const topMoversRes = await dbAdapter.query(
       `SELECT symbol, ranking_score, classification, confidence_level
-       FROM prediction_registry WHERE prediction_date = ?
-       ORDER BY ranking_score DESC LIMIT 5`
-    ).all(today) as any[];
+       FROM prediction_registry WHERE prediction_date = $1
+       ORDER BY ranking_score DESC LIMIT 5`,
+      [today]
+    );
+    const topMovers = topMoversRes.rows as any[];
 
     const topChanges = todayAlerts.slice(0, 10).map((a: any) => ({
       symbol: a.symbol,
       change: a.alert_type.replace(/_/g, ' '),
       detail: a.body
     }));
-
-    db.close();
 
     // Build HTML
     const dateStr = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -163,28 +166,28 @@ export class DailyDigestGenerator {
   }
 
   /** Generate digests for all users and store in DB */
-  generateForAllUsers(): DigestData[] {
-    const db = new Database(DB_PATH);
-    const users = db.prepare('SELECT DISTINCT user_id FROM user_watchlists WHERE is_archived = 0').all() as any[];
-    db.close();
+  async generateForAllUsers(): Promise<DigestData[]> {
+    const usersRes = await dbAdapter.query('SELECT DISTINCT user_id FROM user_watchlists WHERE is_archived = 0');
+    const users = usersRes.rows as any[];
 
     const results: DigestData[] = [];
     for (const u of users) {
-      const digest = this.generateForUser(u.user_id);
-      this.storeDigest(digest);
+      const digest = await this.generateForUser(u.user_id);
+      await this.storeDigest(digest);
       results.push(digest);
     }
     return results;
   }
 
-  private storeDigest(digest: DigestData): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare(
-        `INSERT OR REPLACE INTO daily_digests (user_id, digest_date, content, email_sent, created_at)
-         VALUES (?, ?, ?, 0, datetime('now'))`
-      ).run(digest.userId, digest.date, JSON.stringify({ subject: digest.subject, html: digest.html, text: digest.text, topChanges: digest.topChanges }));
-    } finally { db.close(); }
+  private async storeDigest(digest: DigestData): Promise<void> {
+    await dbAdapter.query(
+      `INSERT INTO daily_digests (user_id, digest_date, content, email_sent, created_at)
+       VALUES ($1, $2, $3, 0, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id, digest_date) DO UPDATE SET
+         content = EXCLUDED.content,
+         created_at = EXCLUDED.created_at`,
+      [digest.userId, digest.date, JSON.stringify({ subject: digest.subject, html: digest.html, text: digest.text, topChanges: digest.topChanges })]
+    );
   }
 }
 
