@@ -23,10 +23,17 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           // Split vendor chunks for better caching
-          manualChunks: {
-            react: ["react", "react-dom"],
-            framer: ["framer-motion"],
-            firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+          manualChunks(id) {
+            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
+              return "react";
+            }
+            if (id.includes("node_modules/framer-motion")) {
+              return "framer";
+            }
+            if (id.includes("node_modules/firebase")) {
+              return "firebase";
+            }
+            return undefined;
           },
         },
       },

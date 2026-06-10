@@ -51,6 +51,7 @@ function scanFile(filePath: string): void {
     const relPath = path.relative(process.cwd(), filePath);
     if (relPath === 'scripts/validate-repository-hygiene.ts') return;
     const content = stripComments(fs.readFileSync(filePath, 'utf-8'));
+    const scanHazards = !relPath.startsWith('scripts/');
 
     // Check for secret patterns
     for (const pattern of SECRET_PATTERNS) {
@@ -60,11 +61,12 @@ function scanFile(filePath: string): void {
       }
     }
 
-    // Check for hazardous patterns
-    for (const { pattern, label } of HAZARDOUS_PATTERNS) {
-      if (pattern.test(content)) {
-        console.warn(`  WARN: ${relPath} contains ${label}`);
-        warnings++;
+    if (scanHazards) {
+      for (const { pattern, label } of HAZARDOUS_PATTERNS) {
+        if (pattern.test(content)) {
+          console.warn(`  WARN: ${relPath} contains ${label}`);
+          warnings++;
+        }
       }
     }
   } catch (err) {

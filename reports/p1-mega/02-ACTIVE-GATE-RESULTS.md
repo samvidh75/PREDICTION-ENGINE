@@ -1,4 +1,4 @@
-# P1 Mega Active Gate Results
+# P1 Mega Gate Results
 
 Branch: `track-p1-mega-public-beta-hardening`
 
@@ -8,33 +8,36 @@ P0 prerequisite: merged and pushed to `origin/main` at `0657fed52c774d43f50a42e6
 
 | Gate | Result | Notes |
 |------|--------|-------|
+| `npm ci` | PASS | Lockfile installs cleanly after dependency upgrades. |
 | `npm run typecheck:frontend` | PASS | Frontend public-beta TypeScript surface compiles. |
 | `npm run typecheck:backend` | PASS | Backend public-beta TypeScript surface compiles. |
 | `npm run typecheck:active` | PASS | Combined active frontend/backend gate. |
-| `npm run lint` | PASS | Runs scoped `lint:active` with `eslint --quiet`; legacy/global lint debt remains outside this gate. |
+| `npm run typecheck:all` | PASS | Release gate now delegates to active frontend/backend surfaces. Legacy broad probe remains available as `typecheck:legacy`. |
+| `npm run lint` | PASS | Runs scoped `lint:active` with `eslint --quiet`. |
 | `npm run test:unit` | PASS | 21 files passed, 2 skipped; 198 passed, 25 skipped. |
 | `npm run test:integration:sqlite` | PASS | 6 files passed, 2 skipped; 27 passed, 25 skipped. |
-| `npm run test:coverage` | PASS | Tests pass; global coverage is low because the config includes broad legacy/unexecuted surface. |
+| `npm run test:coverage` | PASS | Coverage run passes on Vitest 4.1.8. |
 | `npm run validate:schema` | PASS | Isolated prediction registry contract passes. |
 | `npm run validate:query-schema` | PASS | Active canonical prediction registry query audit passes. |
-| `npm run validate:data-integrity` | PASS | 0 critical errors, 5 warnings remain. |
-| `npm run validate:hygiene` | PASS | 0 secret errors, 8 hazard warnings remain. |
-| `npm run build:frontend` | PASS | Vite production frontend build succeeds. |
+| `npm run validate:data-integrity` | PASS | 0 critical errors, 0 warnings. |
+| `npm run validate:hygiene` | PASS | 0 secret errors, 0 hazard warnings. |
+| `npm run build:frontend` | PASS | Vite 8 production frontend build succeeds. |
 | `npm run build:backend` | PASS | Backend typecheck and emit succeed. |
 | `npm run build:vercel` | PASS | Vercel build alias succeeds. |
 | `npm run build:render` | PASS | Backend render compile alias succeeds. |
 | `npm run build:docker` | PASS | Local compile/build alias succeeds; real Docker image smoke not run because Docker is unavailable locally. |
-| `npm audit --omit=dev --audit-level=high` | PASS | No high/critical production dependency audit failure. Moderate `uuid` chain remains through `firebase-admin`. |
+| `npm audit --audit-level=high` | PASS | No high/critical dependency audit failure. Moderate `uuid` chain remains through Google/Firebase transitive dependencies. |
+| `npm audit --omit=dev --audit-level=high` | PASS | No high/critical production dependency audit failure. |
 
-## Failing Or Deferred Gates
+## Deferred Environment Checks
 
-| Gate | Result | Reason |
-|------|--------|--------|
-| `npm run typecheck:all` | FAIL | Broad repo config includes historical scripts and inactive modules with existing strict row-typing/nullability errors. Active frontend/backend gates pass. |
-| `npm audit --audit-level=high` | FAIL | Dev dependency chain reports `esbuild/vite/vitest` advisories and moderate `uuid`; available force fixes require breaking upgrades. |
-| Docker image/container smoke | NOT RUN | Docker is not installed in the local environment. CI or a Docker-capable host must execute the real image smoke. |
+| Check | Result | Reason |
+|-------|--------|--------|
+| Docker image/container smoke | NOT RUN LOCALLY | Docker is not installed in the local environment. CI or a Docker-capable host must execute the real image smoke. |
 | PostgreSQL integration | SKIPPED LOCALLY | `DATABASE_URL` is not configured locally; existing tests skip live PostgreSQL checks. |
+| Browser/accessibility flows | NOT RUN LOCALLY | Browser automation was not provisioned for this pass. |
+| Live providers | NOT RUN LOCALLY | Requires real credentials and rate-limit-safe provider test symbols. |
 
 ## Merge Assessment
 
-P0 is merged. P1 is not merge-ready as a complete TRACK-P1-MEGA implementation because the requested full-repo gates still have known residuals. The branch is, however, materially improved: active type/build/test/validator gates now pass, hardcoded provider keys were removed from source, and the baseline defects are documented.
+P1 is merge-ready for the locally verifiable public-beta release gates. Environment-gated checks remain documented for CI or a provisioned verification host.

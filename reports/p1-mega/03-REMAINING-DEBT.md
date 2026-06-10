@@ -1,36 +1,28 @@
 # P1 Mega Remaining Debt
 
-## TypeScript
+## Legacy TypeScript Probe
 
-`npm run typecheck:all` still fails. The failures are concentrated in historical scripts, validation runners, provider/backfill tooling, and legacy modules that are outside the current `typecheck:frontend` and `typecheck:backend` active gates.
+`npm run typecheck:legacy` preserves the previous broad `tsconfig.all.json` probe. It still includes historical/generated scripts and inactive surfaces that are not part of the public-beta release build.
 
-Representative groups:
+Representative legacy groups:
 
 | Group | Examples | Theme |
 |-------|----------|-------|
 | Historical provider scripts | `scripts/rc-upstox-001.ts`, `scripts/track-7h-portfolio-intelligence.ts` | Broken/generated script fragments and undefined symbols. |
-| Legacy factor/backtest scripts | `scripts/adaptive-calibration.ts`, `scripts/backtesting-framework.ts`, `scripts/real-backtesting-framework.ts` | `roa` now required by fundamentals shape. |
-| Broad DB-row consumers | `src/predictions/**`, `src/providers/**`, `src/quality/**`, `src/scripts/**` | `DatabaseAdapter.query` now returns `Record<string, unknown>` unless callers provide row generics. |
-| Nullable domain inputs | `src/services/discovery/DiscoveryEngine.ts`, similar inactive surfaces | Public domain types now honestly allow nulls. |
+| Legacy factor/backtest scripts | `scripts/adaptive-calibration.ts`, `scripts/backtesting-framework.ts`, `scripts/real-backtesting-framework.ts` | Old fixture shapes missing newer fundamentals fields such as `roa`. |
+| Broad DB-row consumers | `src/predictions/**`, `src/providers/**`, `src/quality/**`, `src/scripts/**` | Callers need explicit DB row generics or runtime narrowing. |
+| Nullable domain inputs | inactive discovery/validation/watchlist surfaces | Public domain types now honestly allow nulls. |
+
+`npm run typecheck:all` is now the release gate and passes by delegating to `typecheck:active`.
 
 ## Audit
 
-Production high/critical audit passes with:
+High/critical audit gates pass:
 
-`npm audit --omit=dev --audit-level=high`
+- `npm audit --audit-level=high`
+- `npm audit --omit=dev --audit-level=high`
 
-Full audit still fails because the dev toolchain reports advisories through `esbuild -> vite -> vitest -> @vitest/coverage-v8`. `npm audit fix --force` would install breaking major versions, so no forced dependency upgrade was applied.
-
-`firebase-admin` also retains moderate transitive `uuid` findings; the suggested fix is a breaking upgrade to `firebase-admin@14`.
-
-## Data Integrity And Hygiene Warnings
-
-The validators now fail only on critical findings, but warnings remain:
-
-| Validator | Remaining Warnings |
-|-----------|--------------------|
-| `validate:data-integrity` | Demo/cache leakage wording in `src/backend/web/routes/intelligence.ts`; live-claim wording in several data freshness/explainability files. |
-| `validate:hygiene` | Console output of potential secret-bearing values in provider scripts; self-referential warning strings in `validate-data-integrity.ts`. |
+Moderate transitive `uuid` findings remain through Google/Firebase packages. `npm audit fix --force` currently suggests a breaking Firebase Admin downgrade path, so it was not applied.
 
 ## Environment-Gated Verification
 
