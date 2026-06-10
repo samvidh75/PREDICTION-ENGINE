@@ -233,7 +233,7 @@ export class PredictionFactory {
           movingAverageDistance: feat.moving_average_distance != null ? Number(feat.moving_average_distance) : null,
           trendStrength: feat.trend_strength != null ? Number(feat.trend_strength) : null,
         },
-        factors: {
+        factorBreakdown: {
           qualityFactor: Number(fact.quality_factor),
           valueFactor: Number(fact.value_factor),
           growthFactor: Number(fact.growth_factor),

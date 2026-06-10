@@ -37,14 +37,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install
         run: npm ci
 
-      - name: Run migrations
-        run: npm run migrate
-
-      - name: Seed deterministic fixtures
-        run: CI_FIXTURE_SEED=true npm run seed:ci
+      - name: Lint
+        run: npm run lint
 
       - name: Typecheck all
         run: npm run typecheck:all
@@ -52,25 +49,52 @@ jobs:
       - name: Unit tests
         run: npm run test:unit
 
-      - name: PostgreSQL integration tests
+      - name: SQLite integration
+        run: npm run test:integration:sqlite
+
+      - name: Run migrations
+        run: npm run migrate
+
+      - name: Seed fixtures
+        run: CI_FIXTURE_SEED=true npm run seed:ci
+
+      - name: PostgreSQL integration
         run: npm run test:integration:postgres:ci
+
+      - name: Coverage
+        run: npm run test:coverage
+
+      - name: Schema
+        run: npm run validate:schema
+
+      - name: Query schema
+        run: npm run validate:query-schema
+
+      - name: Distributions
+        run: npm run validate:distributions
+
+      - name: Data integrity
+        run: npm run validate:data-integrity
+
+      - name: Hygiene
+        run: npm run validate:hygiene
 
       - name: Frontend build
         run: npm run build:vercel
 
+      - name: Backend build
+        run: npm run build:backend
+
       - name: Backend compile
         run: npm run compile:backend
 
-      - name: Schema validation
-        run: npm run validate:schema
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
 
-      - name: Distribution validation
-        run: npm run validate:distributions
-
-      - name: Build Docker image
+      - name: Build Docker
         run: docker build -t stockstory-api:test .
 
-      - name: Docker smoke test
+      - name: Start Docker
         run: |
           docker run -d \
             --name stockstory-api-test \
@@ -83,7 +107,9 @@ jobs:
             -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
             stockstory-api:test
-          echo "Waiting for /healthz..."
+
+      - name: Wait for /healthz
+        run: |
           for i in {1..30}; do
             if curl -fsS http://localhost:4001/healthz; then
               echo "Container /healthz ready after ${i} attempts"
@@ -91,7 +117,9 @@ jobs:
             fi
             sleep 2
           done
-          echo "Waiting for /readyz..."
+
+      - name: Wait for /readyz
+        run: |
           for i in {1..30}; do
             if curl -fsS http://localhost:4001/readyz; then
               echo "Container /readyz ready after ${i} attempts"
@@ -105,11 +133,18 @@ jobs:
             docker logs stockstory-api-test
             exit 1
           fi
-          echo "PASS: Docker container is live and ready with PostgreSQL"
 
-      - name: Clean up Docker
+      - name: Strict API smoke
+        run: API_BASE_URL=http://localhost:4001 npm run validate:api-states
+
+      - name: Docker logs
+        if: always()
+        run: docker logs stockstory-api-test
+
+      - name: Clean up
         if: always()
         run: docker rm -f stockstory-api-test || true
 
       - name: Release gate report
+        if: always()
         run: npx tsx scripts/release-gate.ts

@@ -1,0 +1,11 @@
+{
+  "timestamp": "",
+  "nodeVersion": "",
+  "totalDurationMs": 0,
+  "passed": 0,
+  "failed": 0,
+  "skipped": 0,
+  "mandatoryFailed": 0,
+  "exitCode": 0,
+  "checks": []
+}

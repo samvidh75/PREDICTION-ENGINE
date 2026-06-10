@@ -2,7 +2,7 @@
  * TRACK-95T — Prediction Explanation Engine
  * 
  * Every prediction, score change, upgrade, downgrade, and alert must answer:
- * "Why did this score change? What factors contributed? What changed since yesterday?
+ * "Why did this score change? What drivers contributed? What changed since yesterday?
  *  How accurate has this signal been historically?"
  * 
  * Input: Two prediction_registry snapshots (today + previous) for a symbol.

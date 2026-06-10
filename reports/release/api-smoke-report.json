@@ -1,0 +1,90 @@
+{
+  "timestamp": "2025-01-01T00:00:00.000Z",
+  "baseUrl": "http://localhost:4001",
+  "summary": {
+    "total": 7,
+    "passed": 0,
+    "failed": 7,
+    "mandatoryFailed": 7,
+    "durationMs": 0
+  },
+  "checks": [
+    {
+      "name": "/healthz",
+      "endpoint": "/healthz",
+      "method": "GET",
+      "exactStatus": 200,
+      "requiredFields": ["ok", "service"],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/readyz (postgres + no fallback)",
+      "endpoint": "/readyz",
+      "method": "GET",
+      "exactStatus": 200,
+      "requiredFields": ["database"],
+      "validations": ["database.kind === "postgres"", "database.fallbackUsed === false"],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/stockstory/TESTIT",
+      "endpoint": "/api/stockstory/TESTIT",
+      "method": "GET",
+      "exactStatus": 200,
+      "requiredFields": ["symbol"],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/predictions/signals",
+      "endpoint": "/api/predictions/signals?limit=5",
+      "method": "GET",
+      "exactStatus": 200,
+      "requiredFields": ["signals", "generatedAt"],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/stockstory/UNKNOWNTEST (unknown symbol)",
+      "endpoint": "/api/stockstory/UNKNOWNTEST",
+      "method": "GET",
+      "exactStatus": 200,
+      "requiredFields": ["symbol"],
+      "validations": ["symbol === "UNKNOWNTEST""],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/intelligence/portfolio (POST)",
+      "endpoint": "/api/intelligence/portfolio",
+      "method": "POST",
+      "exactStatus": 200,
+      "requiredFields": [],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/user/profile (no token → 401)",
+      "endpoint": "/api/user/profile",
+      "method": "GET",
+      "exactStatus": 401,
+      "requiredFields": ["code", "error"],
+      "validations": ["code === "AUTH_MISSING""],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    },
+    {
+      "name": "/api/investor-state (no token → 401)",
+      "endpoint": "/api/investor-state",
+      "method": "GET",
+      "exactStatus": 401,
+      "requiredFields": ["code", "error"],
+      "validations": ["code === "AUTH_MISSING""],
+      "passed": false,
+      "error": "Placeholder — run smoke:api to populate"
+    }
+  ],
+  "conclusion": "FAIL"
+}
