@@ -19,7 +19,7 @@ function splitPrefixedTicker(ticker: string): { exchange: ExchangeVenue; cleanTi
   // - "NSE:RELIANCE"
   // - "BSE:500114"
   // - "SME:XYZ"
-  const m = String(ticker).trim().match(/^(NSE|BSE|SME)\s*:\s*([A-Z0-9.\-]+)$/i);
+const m = String(ticker).trim().match(/^(NSE|BSE|SME)\s*:\s*([A-Z0-9.-]+)$/i);
   if (!m) return { exchange: "UNKNOWN", cleanTicker: String(ticker).trim() };
 
   const ex = normalizeExchange(m[1]);

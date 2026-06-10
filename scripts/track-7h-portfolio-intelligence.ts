@@ -480,7 +480,7 @@ export class UpstoxOAuth {
       code_challenge: options.codeChallenge,
       code_challenge_method: 'S256',
     });
-    return \`\${this.AUTHORIZE_URL}?\${params.toString()}\`;
+    return \`${this.AUTHORIZE_URL}?${params.toString()}\`;
   }
 
   /**
@@ -517,7 +517,7 @@ export class UpstoxOAuth {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(\`Upstox token exchange failed: \${response.status} — \${error}\`);
+      throw new Error(\`Upstox token exchange failed: ${response.status} — ${error}\`);
     }
 
     const data = await response.json();
@@ -543,7 +543,7 @@ export class UpstoxOAuth {
     refreshToken?: string;
     expiresAt: number;
   }> {
-    const response = await fetch(\`\${this.PROXY_URL}/refresh\`, {
+    const response = await fetch(\`${this.PROXY_URL}/refresh\`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -553,7 +553,7 @@ export class UpstoxOAuth {
     });
 
     if (!response.ok) {
-      throw new Error(\`Upstox token refresh failed: \${response.status}\`);
+      throw new Error(\`Upstox token refresh failed: ${response.status}\`);
     }
 
     const data = await response.json();
@@ -568,7 +568,7 @@ export class UpstoxOAuth {
    * Revoke Upstox access (disconnect broker).
    */
   static async revoke(accessToken: string, uid: string): Promise<void> {
-    await fetch(\`\${this.PROXY_URL}/revoke\`, {
+    await fetch(\`${this.PROXY_URL}/revoke\`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ access_token: accessToken, uid }),
@@ -604,7 +604,7 @@ export class TokenStore {
   static save(token: StoredBrokerToken): void {
     if (typeof window === 'undefined') return;
     
-    const key = \`\${STORAGE_PREFIX}\${token.broker}_\${token.uid}\`;
+    const key = \`${STORAGE_PREFIX}${token.broker}_${token.uid}\`;
     const payload = JSON.stringify(token);
     
     // Basic obfuscation — not true encryption but prevents casual inspection
@@ -618,7 +618,7 @@ export class TokenStore {
   static load(broker: string, uid: string): StoredBrokerToken | null {
     if (typeof window === 'undefined') return null;
     
-    const key = \`\${STORAGE_PREFIX}\${broker}_\${uid}\`;
+    const key = \`${STORAGE_PREFIX}${broker}_${uid}\`;
     const encoded = window.localStorage.getItem(key);
     if (!encoded) return null;
     
@@ -652,7 +652,7 @@ export class TokenStore {
   /** Remove broker tokens */
   static remove(broker: string, uid: string): void {
     if (typeof window === 'undefined') return;
-    const key = \`\${STORAGE_PREFIX}\${broker}_\${uid}\`;
+    const key = \`${STORAGE_PREFIX}${broker}_${uid}\`;
     window.localStorage.removeItem(key);
     window.dispatchEvent(new CustomEvent('ss:broker-token-removed', { detail: { broker } }));
   }
@@ -665,7 +665,7 @@ export class TokenStore {
     const keysToRemove: string[] = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const key = window.localStorage.key(i);
-      if (key?.startsWith(STORAGE_PREFIX) && key.endsWith(\`_\${uid}\`)) {
+      if (key?.startsWith(STORAGE_PREFIX) && key.endsWith(\`_${uid}\`)) {
         keysToRemove.push(key);
       }
     }
@@ -683,7 +683,7 @@ export class TokenStore {
     
     for (let i = 0; i < window.localStorage.length; i++) {
       const key = window.localStorage.key(i);
-      if (key?.startsWith(STORAGE_PREFIX) && key.endsWith(\`_\${uid}\`)) {
+      if (key?.startsWith(STORAGE_PREFIX) && key.endsWith(\`_${uid}\`)) {
         const broker = key.substring(prefixLength, key.lastIndexOf('_'));
         brokers.push(broker);
       }
@@ -847,9 +847,9 @@ export class UpstoxProvider implements BrokerProvider {
   readonly brokerName = 'upstox';
 
   private static async apiGet<T>(path: string, accessToken: string): Promise<T> {
-    const response = await fetch(\`\${UPSTOX_API_BASE}\${path}\`, {
+    const response = await fetch(\`${UPSTOX_API_BASE}${path}\`, {
       headers: {
-        'Authorization': \`Bearer \${accessToken}\`,
+        'Authorization': \`Bearer ${accessToken}\`,
         'Accept': 'application/json',
       },
     });
@@ -858,7 +858,7 @@ export class UpstoxProvider implements BrokerProvider {
       throw new Error('Upstox token expired');
     }
     if (!response.ok) {
-      throw new Error(\`Upstox API \${response.status}: \${response.statusText}\`);
+      throw new Error(\`Upstox API ${response.status}: ${response.statusText}\`);
     }
 
     return response.json() as Promise<T>;
@@ -1574,7 +1574,7 @@ export class PortfolioIntelligenceEngine {
       const value = (h.lastPrice ?? h.averagePrice) * h.quantity;
       const weight = totalValue > 0 ? (value / totalValue) * 100 : 0;
       if (weight > 40) {
-        warnings.push(\`\${h.symbol} represents \${weight.toFixed(0)}% of portfolio — concentration risk\`);
+        warnings.push(\`${h.symbol} represents ${weight.toFixed(0)}% of portfolio — concentration risk\`);
       }
     }
 
@@ -1589,7 +1589,7 @@ export class PortfolioIntelligenceEngine {
     for (const [sector, value] of sectorValues) {
       const weight = totalValue > 0 ? (value / totalValue) * 100 : 0;
       if (weight > 50) {
-        warnings.push(\`\${sector} sector: \${weight.toFixed(0)}% allocation — excessive concentration\`);
+        warnings.push(\`${sector} sector: ${weight.toFixed(0)}% allocation — excessive concentration\`);
       }
     }
 
@@ -1752,7 +1752,7 @@ export class PortfolioExplanationEngine {
       .filter(h => h.pnlPercent !== undefined)
       .sort((a, b) => (b.pnlPercent ?? 0) - (a.pnlPercent ?? 0))
       .slice(0, count)
-      .map(h => \`\${h.symbol}: +\${h.pnlPercent?.toFixed(1)}% (₹\${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})\`);
+      .map(h => \`${h.symbol}: +${h.pnlPercent?.toFixed(1)}% (₹${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})\`);
   }
 
   /** Find weakest holdings (worst PnL%) */
@@ -1761,7 +1761,7 @@ export class PortfolioExplanationEngine {
       .filter(h => h.pnlPercent !== undefined)
       .sort((a, b) => (a.pnlPercent ?? 0) - (b.pnlPercent ?? 0))
       .slice(0, count)
-      .map(h => \`\${h.symbol}: \${h.pnlPercent?.toFixed(1)}% (₹\${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})\`);
+      .map(h => \`${h.symbol}: ${h.pnlPercent?.toFixed(1)}% (₹${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})\`);
   }
 
   /** Identify top risks */
@@ -1791,7 +1791,7 @@ export class PortfolioExplanationEngine {
       const value = (h.lastPrice ?? h.averagePrice) * h.quantity;
       const weight = totalValue > 0 ? value / totalValue : 0;
       if (weight > 0.35) {
-        risks.push(\`\${h.symbol} dominates portfolio (\${(weight * 100).toFixed(0)}%) — a 10% drop would significantly impact overall returns\`);
+        risks.push(\`${h.symbol} dominates portfolio (${(weight * 100).toFixed(0)}%) — a 10% drop would significantly impact overall returns\`);
       }
     }
 
@@ -1830,15 +1830,15 @@ export class PortfolioExplanationEngine {
   /** Generate one-line summary */
   private static generateSummary(health: PortfolioHealthResult, holdingCount: number): string {
     const map: Record<string, string> = {
-      'Excellent': \`Exceptional portfolio with \${holdingCount} holdings — well-diversified, quality-focused, and showing strong performance.\`,
-      'Strong': \`Strong portfolio of \${holdingCount} holdings with good diversification and quality.\`,
-      'Healthy': \`Healthy \${holdingCount}-stock portfolio. Consider addressing mild concentration to strengthen further.\`,
-      'Stable': \`Stable portfolio of \${holdingCount} holdings with room for diversification improvement.\`,
-      'Weakening': \`Portfolio shows signs of concentration risk across \${holdingCount} holdings — diversification and quality improvements recommended.\`,
-      'At Risk': \`Portfolio exhibits elevated risk across \${holdingCount} holdings — urgent diversification and quality review needed.\`,
+      'Excellent': \`Exceptional portfolio with ${holdingCount} holdings — well-diversified, quality-focused, and showing strong performance.\`,
+      'Strong': \`Strong portfolio of ${holdingCount} holdings with good diversification and quality.\`,
+      'Healthy': \`Healthy ${holdingCount}-stock portfolio. Consider addressing mild concentration to strengthen further.\`,
+      'Stable': \`Stable portfolio of ${holdingCount} holdings with room for diversification improvement.\`,
+      'Weakening': \`Portfolio shows signs of concentration risk across ${holdingCount} holdings — diversification and quality improvements recommended.\`,
+      'At Risk': \`Portfolio exhibits elevated risk across ${holdingCount} holdings — urgent diversification and quality review needed.\`,
     };
 
-    return map[health.healthClassification] || \`Portfolio analysis for \${holdingCount} holdings.\`;
+    return map[health.healthClassification] || \`Portfolio analysis for ${holdingCount} holdings.\`;
   }
 }
 `;

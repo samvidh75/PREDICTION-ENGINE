@@ -10,7 +10,7 @@ import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 
 function localFormatPercent(value?: number | null): string {
-  if (value === undefined || value === null) return "N/A";
+  if (value === undefined || value === null) return "Unavailable";
   if (Math.abs(value) < 1.0 && value !== 0) {
     return `${(value * 100).toFixed(2)}%`;
   }
@@ -18,7 +18,7 @@ function localFormatPercent(value?: number | null): string {
 }
 
 function formatNumber(value?: number | null, decimals: number = 2): string {
-  if (value === undefined || value === null) return "N/A";
+  if (value === undefined || value === null) return "Unavailable";
   return value.toFixed(decimals);
 }
 
@@ -102,9 +102,9 @@ function EmptyState({ label }: { label: string }) {
   );
 }
 
-function scoreFromLineage(factor: any): number {
+function scoreFromLineage(factor: any): number | null {
   if (!factor || typeof factor.score !== "number" || !Number.isFinite(factor.score)) {
-    throw new Error("STOCKSTORY_FACTOR_LINEAGE_MISSING");
+    return null;
   }
   return factor.score;
 }
@@ -114,7 +114,8 @@ function adaptStockStoryResponse(data: any) {
     throw new Error("STOCKSTORY_SNAPSHOT_UNAVAILABLE");
   }
 
-  const factors = data.factors;
+  const payload = data.data ?? data;
+  const factors = payload.factors;
   if (!factors) throw new Error("STOCKSTORY_FACTORS_MISSING");
 
   const growth = scoreFromLineage(factors.growth);
@@ -123,11 +124,13 @@ function adaptStockStoryResponse(data: any) {
   const momentum = scoreFromLineage(factors.momentum);
   const valuation = scoreFromLineage(factors.value);
   const risk = scoreFromLineage(factors.risk);
-  const confidenceScore = data.confidence?.score;
+  const confidenceScore = payload.confidence?.score ?? payload.confidenceScore ?? null;
 
   return {
-    ...data,
-    confidence: data.confidence?.level,
+    ...payload,
+    apiStatus: data.status ?? "ok",
+    dataState: data.dataState ?? null,
+    confidence: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable",
     growth,
     quality,
     stability,
@@ -141,15 +144,15 @@ function adaptStockStoryResponse(data: any) {
       stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: `Source: ${factors.stability.source} (${factors.stability.snapshotDate}).` },
       momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: `Source: ${factors.momentum.source} (${factors.momentum.snapshotDate}).` },
       valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: `Source: ${factors.value.source} (${factors.value.snapshotDate}).` },
-      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: risk >= 65 ? 1 : 0, commentary: `Source: ${factors.risk.source} (${factors.risk.snapshotDate}).` },
+      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: typeof risk === "number" && risk >= 65 ? 1 : 0, commentary: `Source: ${factors.risk.source} (${factors.risk.snapshotDate}).` },
       confidence: {
-        level: data.confidence?.level,
+        level: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable",
         score: typeof confidenceScore === "number" ? confidenceScore : null,
         dataCompleteness: typeof confidenceScore === "number" ? confidenceScore : null,
         signalAgreement: typeof confidenceScore === "number" ? confidenceScore : null,
         riskConsistency: typeof confidenceScore === "number" ? confidenceScore : null,
         historicalStability: typeof confidenceScore === "number" ? confidenceScore : null,
-        commentary: `Source: ${data.confidence?.source} (${data.confidence?.snapshotDate}).`,
+        commentary: `Source: ${payload.confidence?.source ?? "prediction_registry"} (${payload.confidence?.snapshotDate ?? payload.predictionDate ?? "Unavailable"}).`,
       },
     },
   };
@@ -334,7 +337,10 @@ export const StockStoryPage: React.FC = () => {
 
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (storyData.healthScore / 100) * circumference;
+  const healthScore = typeof storyData.healthScore === "number" && Number.isFinite(storyData.healthScore)
+    ? storyData.healthScore
+    : null;
+  const strokeDashoffset = circumference - ((healthScore ?? 0) / 100) * circumference;
 
   const renderProgressBar = (label: string, score: number | null, colorClass: string) => {
     const hasScore = typeof score === "number" && Number.isFinite(score);
@@ -342,7 +348,7 @@ export const StockStoryPage: React.FC = () => {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
           <span className="text-white/60">{label}</span>
-          <span className={colorClass}>{hasScore ? `${score}/100` : "N/A"}</span>
+          <span className={colorClass}>{hasScore ? `${score}/100` : "Unavailable"}</span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
           <div
@@ -362,7 +368,7 @@ export const StockStoryPage: React.FC = () => {
   };
 
   const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span className="text-white/30">N/A</span>;
+    if (val === null || val === undefined) return <span className="text-white/30">Unavailable</span>;
     const isPos = val >= 0;
     return (
       <span className={`font-mono font-bold ${isPos ? "text-emerald-400" : "text-rose-400"}`}>
@@ -426,7 +432,7 @@ export const StockStoryPage: React.FC = () => {
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-3xl font-extrabold tracking-tight text-white">{storyData.healthScore}</span>
+                <span className="text-2xl font-extrabold tracking-tight text-white">{healthScore ?? "Unavailable"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-cyan-400">Score</span>
               </div>
             </div>
@@ -443,7 +449,7 @@ export const StockStoryPage: React.FC = () => {
               
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
-                  {storyData.classification}
+                  {storyData.classification ?? "Unavailable"}
                 </span>
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${getConfidenceStyle(storyData.confidence)}`}>
                   {storyData.confidence} Confidence
@@ -683,19 +689,19 @@ export const StockStoryPage: React.FC = () => {
               <dl className="space-y-3 text-xs">
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/E Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.peRatio ? formatNumber(storyData.financials.peRatio, 2) : "N/A"}</dd>
+                  <dd className="font-mono text-white font-bold">{storyData.financials.peRatio ? formatNumber(storyData.financials.peRatio, 2) : "Unavailable"}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/B Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.pbRatio ? formatNumber(storyData.financials.pbRatio, 2) : "N/A"}</dd>
+                  <dd className="font-mono text-white font-bold">{storyData.financials.pbRatio ? formatNumber(storyData.financials.pbRatio, 2) : "Unavailable"}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">EV/EBITDA</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.evEbitda ? formatNumber(storyData.financials.evEbitda, 2) : "N/A"}</dd>
+                  <dd className="font-mono text-white font-bold">{storyData.financials.evEbitda ? formatNumber(storyData.financials.evEbitda, 2) : "Unavailable"}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-white/50">FCF Yield</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.fcfYield ? (storyData.financials.fcfYield * 100).toFixed(2) + "%" : "N/A"}</dd>
+                  <dd className="font-mono text-white font-bold">{storyData.financials.fcfYield ? (storyData.financials.fcfYield * 100).toFixed(2) + "%" : "Unavailable"}</dd>
                 </div>
               </dl>
             </div>

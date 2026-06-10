@@ -11,17 +11,17 @@ import {
 } from 'lucide-react';
 
 interface CompareResult {
-  healthScore: number;
+  healthScore: number | null;
   classification: string;
-  growth: number;
-  quality: number;
-  stability: number;
-  valuation: number;
-  momentum: number;
-  risk: number;
-  futureHealth3m: number;
-  futureHealth6m: number;
-  futureHealth12m: number;
+  growth: number | null;
+  quality: number | null;
+  stability: number | null;
+  valuation: number | null;
+  momentum: number | null;
+  risk: number | null;
+  futureHealth3m: number | null;
+  futureHealth6m: number | null;
+  futureHealth12m: number | null;
   narrative: string;
   hitRate: number | null;
   avgAlpha: number | null;
@@ -35,25 +35,49 @@ interface CategoryResult {
   diff: number;
 }
 
+function finiteScore(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function weightedScore(parts: Array<[number | null, number]>): number | null {
+  if (parts.some(([score]) => score === null)) return null;
+  return Math.round(parts.reduce((sum, [score, weight]) => sum + (score as number) * weight, 0));
+}
+
 function fetchCompareResult(symbol: string): Promise<CompareResult> {
   return fetch(`/api/stockstory/${encodeURIComponent(symbol)}`)
     .then(r => r.json())
-    .then(data => ({
-      healthScore: data.healthScore ?? 50,
-      classification: data.classification ?? 'Stable',
-      growth: data.growth ?? 50,
-      quality: data.quality ?? 50,
-      stability: data.stability ?? 50,
-      valuation: data.valuation ?? 50,
-      momentum: data.momentum ?? 50,
-      risk: data.risk ?? 50,
-      futureHealth3m: Math.round(((data.growth ?? 50) * 0.4) + ((data.momentum ?? 50) * 0.35) + ((data.quality ?? 50) * 0.25)),
-      futureHealth6m: Math.round(((data.growth ?? 50) * 0.35) + ((data.quality ?? 50) * 0.35) + ((data.stability ?? 50) * 0.3)),
-      futureHealth12m: Math.round(((data.quality ?? 50) * 0.4) + ((data.stability ?? 50) * 0.35) + ((data.growth ?? 50) * 0.25)),
-      narrative: data.narrative ?? 'Analysis pending.',
-      hitRate: null,
-      avgAlpha: null,
-    }));
+    .then(data => {
+      if (!data || data.status === 'unavailable') {
+        throw new Error(data?.reason ?? 'STOCKSTORY_UNAVAILABLE');
+      }
+      const payload = data.data ?? data;
+      const growth = finiteScore(payload.growth);
+      const quality = finiteScore(payload.quality);
+      const stability = finiteScore(payload.stability);
+      const valuation = finiteScore(payload.valuation);
+      const momentum = finiteScore(payload.momentum);
+      const risk = finiteScore(payload.risk);
+
+      return {
+        healthScore: finiteScore(payload.healthScore ?? payload.rankingScore),
+        classification: payload.classification ?? 'Unavailable',
+        growth,
+        quality,
+        stability,
+        valuation,
+        momentum,
+        risk,
+        futureHealth3m: weightedScore([[growth, 0.4], [momentum, 0.35], [quality, 0.25]]),
+        futureHealth6m: weightedScore([[growth, 0.35], [quality, 0.35], [stability, 0.3]]),
+        futureHealth12m: weightedScore([[quality, 0.4], [stability, 0.35], [growth, 0.25]]),
+        narrative: payload.narrative ?? 'Analysis unavailable from current source data.',
+        hitRate: null,
+        avgAlpha: null,
+      };
+    });
 }
 
 function fetchPredictionsCompare(symbol: string): Promise<{ hitRate: number | null; avgAlpha: number | null }> {
@@ -137,19 +161,25 @@ export const StockCompare: React.FC = () => {
     }).catch(() => setLoading(false));
   };
 
+  const buildCategory = (category: string, companyA: number | null, companyB: number | null, lowerIsBetter = false): CategoryResult | null => {
+    if (companyA === null || companyB === null) return null;
+    const winner = lowerIsBetter
+      ? companyA < companyB ? 'A' : companyA > companyB ? 'B' : 'tie'
+      : companyA > companyB ? 'A' : companyA < companyB ? 'B' : 'tie';
+    return { category, companyA, companyB, winner, diff: Math.abs(companyA - companyB) };
+  };
+
   const categories: CategoryResult[] = dataA && dataB ? [
-    { category: 'Health Score', companyA: dataA.healthScore, companyB: dataB.healthScore, winner: dataA.healthScore > dataB.healthScore ? 'A' : dataA.healthScore < dataB.healthScore ? 'B' : 'tie', diff: Math.abs(dataA.healthScore - dataB.healthScore) },
-    { category: 'Business Quality', companyA: dataA.quality, companyB: dataB.quality, winner: dataA.quality > dataB.quality ? 'A' : dataA.quality < dataB.quality ? 'B' : 'tie', diff: Math.abs(dataA.quality - dataB.quality) },
-    { category: 'Growth Outlook', companyA: dataA.growth, companyB: dataB.growth, winner: dataA.growth > dataB.growth ? 'A' : dataA.growth < dataB.growth ? 'B' : 'tie', diff: Math.abs(dataA.growth - dataB.growth) },
-    { category: 'Financial Stability', companyA: dataA.stability, companyB: dataB.stability, winner: dataA.stability > dataB.stability ? 'A' : dataA.stability < dataB.stability ? 'B' : 'tie', diff: Math.abs(dataA.stability - dataB.stability) },
-    { category: 'Valuation', companyA: dataA.valuation, companyB: dataB.valuation, winner: dataA.valuation > dataB.valuation ? 'A' : dataA.valuation < dataB.valuation ? 'B' : 'tie', diff: Math.abs(dataA.valuation - dataB.valuation) },
-    { category: 'Risk (Lower = Better)', companyA: 100 - dataA.risk, companyB: 100 - dataB.risk, winner: dataA.risk < dataB.risk ? 'A' : dataA.risk > dataB.risk ? 'B' : 'tie', diff: Math.abs(dataA.risk - dataB.risk) },
-    { category: '3M Future Health', companyA: dataA.futureHealth3m, companyB: dataB.futureHealth3m, winner: dataA.futureHealth3m > dataB.futureHealth3m ? 'A' : dataA.futureHealth3m < dataB.futureHealth3m ? 'B' : 'tie', diff: Math.abs(dataA.futureHealth3m - dataB.futureHealth3m) },
-    { category: '12M Future Health', companyA: dataA.futureHealth12m, companyB: dataB.futureHealth12m, winner: dataA.futureHealth12m > dataB.futureHealth12m ? 'A' : dataA.futureHealth12m < dataB.futureHealth12m ? 'B' : 'tie', diff: Math.abs(dataA.futureHealth12m - dataB.futureHealth12m) },
-    ...(dataA.hitRate !== null && dataB.hitRate !== null ? [
-      { category: 'Prediction Hit Rate', companyA: dataA.hitRate, companyB: dataB.hitRate, winner: (dataA.hitRate > dataB.hitRate ? 'A' : dataA.hitRate < dataB.hitRate ? 'B' : 'tie') as 'A' | 'B' | 'tie', diff: Math.abs(dataA.hitRate - dataB.hitRate) },
-    ] : []),
-  ] : [];
+    buildCategory('Health Score', dataA.healthScore, dataB.healthScore),
+    buildCategory('Business Quality', dataA.quality, dataB.quality),
+    buildCategory('Growth Outlook', dataA.growth, dataB.growth),
+    buildCategory('Financial Stability', dataA.stability, dataB.stability),
+    buildCategory('Valuation', dataA.valuation, dataB.valuation),
+    buildCategory('Risk (Lower = Better)', dataA.risk, dataB.risk, true),
+    buildCategory('3M Future Health', dataA.futureHealth3m, dataB.futureHealth3m),
+    buildCategory('12M Future Health', dataA.futureHealth12m, dataB.futureHealth12m),
+    buildCategory('Prediction Hit Rate', dataA.hitRate, dataB.hitRate),
+  ].filter((item): item is CategoryResult => item !== null) : [];
 
   const aWins = categories.filter(c => c.winner === 'A').length;
   const bWins = categories.filter(c => c.winner === 'B').length;

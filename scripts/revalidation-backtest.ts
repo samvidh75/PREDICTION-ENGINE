@@ -164,7 +164,7 @@ for (const lb of SNAPS) {
 console.log(`   ✅ ${allR.length} snapshots\n`);
 
 // ── PHASE 1: INPUT AUDIT ─────────────────────────────────────
-let aMd = `# Backtest Input Audit — TRACK-7C
+const aMd = `# Backtest Input Audit — TRACK-7C
 **Sample:** ${UNIVERSE.length} companies × ${SNAPS.length} snapshots
 
 | Category | Real | % |
@@ -283,7 +283,7 @@ for (const factor of factors) {
   const lo = boots[Math.floor(boots.length * .025)], hi = boots[Math.floor(boots.length * .975)];
   if (lo > 0 || hi < 0) mcStable++;
 }
-let mcMd = `# Monte Carlo Validation V2
+const mcMd = `# Monte Carlo Validation V2
 **Iterations:** ${MC_ITERS} | **Tests:** ${mcTotal}
 
 | Metric | TRACK-6B | TRACK-7C | Change |
@@ -307,7 +307,7 @@ fs.writeFileSync(path.join(OUT, 'ConfidenceValidationV2.md'), cMd);
 console.log('✅ P8: Confidence');
 
 // ── PHASE 9: COMPARISON ──────────────────────────────────────
-let iMd = `# Improvement Report — TRACK-6B vs TRACK-7C
+const iMd = `# Improvement Report — TRACK-6B vs TRACK-7C
 
 | Metric | TRACK-6B | TRACK-7C | Change |
 |:--|:--|:--|:--|
@@ -323,7 +323,7 @@ console.log('✅ P9: Comparison');
 
 // ── PHASE 10: FINAL REPORT ───────────────────────────────────
 const confScore = (topW / totalQ > .55 ? 3 : topW / totalQ > .48 ? 1 : 0) + (snW / snT > .55 ? 3 : snW / snT > .48 ? 1 : 0) + (mcStable > 0 ? 3 : mcStable > 0 ? 1 : 0);
-let fRep = `# Backtesting Revalidation Report — TRACK-7C
+const fRep = `# Backtesting Revalidation Report — TRACK-7C
 
 **Generated:** ${new Date().toISOString()}
 **Universe:** ${UNIVERSE.length} companies | **Snapshots:** ${SNAPS.length} × ${HORIZONS.length} horizons

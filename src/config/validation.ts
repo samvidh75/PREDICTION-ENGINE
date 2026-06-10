@@ -1,6 +1,5 @@
 // src/config/validation.ts
 import dotenv from "dotenv";
-import { exit } from "process";
 
 dotenv.config();
 

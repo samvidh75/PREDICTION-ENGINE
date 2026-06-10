@@ -54,7 +54,7 @@ export const AlertCentrePage: React.FC = () => {
   };
 
   const filtered = useMemo(() => {
-    let list = filter === 'all' ? alerts : alerts.filter(a => a.category === filter);
+    const list = filter === 'all' ? alerts : alerts.filter(a => a.category === filter);
     return list.sort((a, b) => (a.isRead ? 1 : 0) - (b.isRead ? 1 : 0));
   }, [alerts, filter]);
 

@@ -126,10 +126,10 @@ export class IndianAPIProvider implements FinancialProvider {
     const clean = symbol.toUpperCase().replace(/\\.(NS|BO|NSE|BSE)$/i, '');
     
     // Fetch fundamentals
-    const data = await this.fetchJson(\`\${API_BASE}/stock_fundamentals?name=\${encodeURIComponent(clean)}\`);
+    const data = await this.fetchJson(\`${API_BASE}/stock_fundamentals?name=${encodeURIComponent(clean)}\`);
     
     if (!data || data.error) {
-      throw new Error(\`IndianAPI: no fundamentals for \${clean}\`);
+      throw new Error(\`IndianAPI: no fundamentals for ${clean}\`);
     }
 
     const f = data.fundamentals || data;
@@ -209,7 +209,7 @@ export class IndianAPIProvider implements FinancialProvider {
         throw new Error('IndianAPI: rate limited (429)');
       }
       if (!resp.ok) {
-        throw new Error(\`IndianAPI HTTP \${resp.status}: \${resp.statusText}\`);
+        throw new Error(\`IndianAPI HTTP ${resp.status}: ${resp.statusText}\`);
       }
       return resp.json();
     }, RETRY_OPTS);
@@ -664,8 +664,8 @@ const prodMd = `# Production Readiness Report — TRACK-8A
 |:---------|:-------------|:-------|:---------|
 | Finnhub | Free (60 calls/min) | 18 fields | Large caps |
 | IndianAPI | ₹499/month | 14 fields | Indian equities |
-| MasterCompanyRegistry | \$0 | marketCap, sector | Always available |
-| **Total** | **₹499/month (~\$6)** | **19 fields** | **95%+ coverage** |
+| MasterCompanyRegistry | $0 | marketCap, sector | Always available |
+| **Total** | **₹499/month (~$6)** | **19 fields** | **95%+ coverage** |
 
 ---
 
@@ -695,5 +695,5 @@ console.log('   📄 src/services/providers/IndianAPIProvider.ts');
 console.log('   📄 src/services/providers/ProviderCoordinator.ts (updated)');
 console.log('   📄 src/services/data/FinancialCompletenessEngine.ts');
 console.log('');
-console.log(`💰 Monthly API Cost: ₹499 (IndianAPI) + \$0 (Finnhub free tier) = ~\$6/month`);
+console.log(`💰 Monthly API Cost: ₹499 (IndianAPI) + $0 (Finnhub free tier) = ~$6/month`);
 console.log('');

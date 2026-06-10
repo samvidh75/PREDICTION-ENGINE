@@ -59,7 +59,7 @@ function translateSQL(sql: string): string {
   let translated = sql
     .replace(/SERIAL/gi, 'INTEGER')
     .replace(/BIGSERIAL/gi, 'INTEGER')
-    .replace(/\$\d+/g, '?')
+    .replace(/$\d+/g, '?')
     .replace(/public\./gi, '')
     .replace(/::(bigint|integer|float|text|boolean|timestamp|date|numeric|decimal|varchar\S*)/gi, '')
     .replace(/GENERATED ALWAYS AS IDENTITY/gi, 'AUTOINCREMENT')
@@ -227,7 +227,7 @@ class SQLitePool {
       return { rows: [], rowCount };
     } catch (err: unknown) {
       try {
-        const stmt = db.prepare(text.replace(/\$\d+/g, '?'));
+        const stmt = db.prepare(text.replace(/$\d+/g, '?'));
         const isSelect = /^\s*SELECT/i.test(text);
         if (isSelect) {
           const rows = params ? stmt.all(...params) : stmt.all();

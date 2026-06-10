@@ -97,7 +97,7 @@ export class HistoricalRankingRebuilder {
     const startDate = new Date(start);
     const endDate = new Date(end);
 
-    let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
     while (current <= endDate) {
       // Last day of current month
       const lastDay = new Date(current.getFullYear(), current.getMonth() + 1, 0);

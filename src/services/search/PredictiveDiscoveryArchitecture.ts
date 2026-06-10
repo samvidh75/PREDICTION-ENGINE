@@ -16,7 +16,7 @@ import type { DiscoveryEntity } from "../discovery/discoveryTypes";
 import type { PredictionSuggestion } from "../../types/SearchTypes";
 import { SearchResultType } from "../../types/SearchTypes";
 
-const TICKER_REGEX = /^[A-Z0-9.\-]{2,10}$/;
+const TICKER_REGEX = /^[A-Z0-9.-]{2,10}$/;
 
 function isLikelyTickerToken(cleanedUpper: string): boolean {
   // Conservative heuristic:
@@ -24,7 +24,7 @@ function isLikelyTickerToken(cleanedUpper: string): boolean {
   // - longer tokens only count if they include digits or punctuation (. or -)
   if (!TICKER_REGEX.test(cleanedUpper)) return false;
 
-  const hasDigitOrPunct = /[0-9.\-]/.test(cleanedUpper);
+  const hasDigitOrPunct = /[0-9.-]/.test(cleanedUpper);
   if (cleanedUpper.length <= 4) return true;
   return hasDigitOrPunct;
 }

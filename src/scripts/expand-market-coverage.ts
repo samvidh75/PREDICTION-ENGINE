@@ -79,7 +79,7 @@ async function main() {
   console.log("Generating 5 years of daily candles for 500 symbols...");
   // Gather dates (approx. 1250 trading days)
   const dates: string[] = [];
-  let currentDate = new Date("2021-06-01");
+  const currentDate = new Date("2021-06-01");
   const endDate = new Date("2026-06-03");
 
   while (currentDate <= endDate) {

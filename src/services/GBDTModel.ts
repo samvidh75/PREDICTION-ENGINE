@@ -186,7 +186,7 @@ export class GBDTModel {
       this.baseValue = y.reduce((a, b) => a + b, 0) / Math.max(1, n);
     }
 
-    let F = new Array(n).fill(this.baseValue);
+    const F = new Array(n).fill(this.baseValue);
 
     for (let m = 0; m < this.opts.nEstimators; m++) {
       let residuals: number[];

@@ -10,7 +10,7 @@ export class PersonalisationEngine {
     const allStocks = StockRegistry.getAllStocks();
     
     // Filter out stocks already recently viewed, prioritize the most active sector
-    let suggestions = allStocks.filter(
+    const suggestions = allStocks.filter(
       (s) => !recentlyViewed.includes(s.symbol)
     );
 

@@ -67,7 +67,7 @@ class AIAssistedVisualAnalysis {
     const minVolatility = Math.min(...recentVolatility);
 
     let summary = '';
-    let confidence = 0.8;
+    const confidence = 0.8;
     const visualCues: string[] = [];
 
     if (avgVolatility > 0.7) {
@@ -118,7 +118,7 @@ class AIAssistedVisualAnalysis {
     const avgVolume = data.reduce((sum, d) => sum + d.volume, 0) / data.length;
 
     let summary = '';
-    let confidence = 0.75;
+    const confidence = 0.75;
     const visualCues: string[] = [];
 
     if (avgLiquidity > 0.7) {
@@ -173,7 +173,7 @@ class AIAssistedVisualAnalysis {
     );
 
     let summary = '';
-    let confidence = 0.7;
+    const confidence = 0.7;
     const visualCues: string[] = [];
 
     if (macroImpact.length > 0) {
@@ -224,7 +224,7 @@ class AIAssistedVisualAnalysis {
     const institutionalTrend = recentInstitutional.slice(-5).reduce((a, b) => a + b, 0) / 5;
 
     let summary = '';
-    let confidence = 0.65;
+    const confidence = 0.65;
     const visualCues: string[] = [];
 
     if (avgInstitutional > 0.7) {
@@ -281,7 +281,7 @@ class AIAssistedVisualAnalysis {
     const trendChange = (recentAvg - earlierAvg) / earlierAvg;
 
     let summary = '';
-    let confidence = 0.8;
+    const confidence = 0.8;
     const visualCues: string[] = [];
 
     if (trendChange > 0.05) {

@@ -25,7 +25,8 @@
  *   - Range-clamps outputs
  */
 
-import { ALL_FINANCIAL_FIELDS, FinancialField } from '../providers/v2/ProviderCapabilityRegistry';
+// ProviderCapabilityRegistry types are not currently needed —
+// field resolution uses string-based dispatch in computeField().
 
 export interface DerivedMetricsInput {
   // Balance Sheet

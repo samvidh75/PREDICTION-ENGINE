@@ -24,6 +24,7 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:integration:sqlite": "cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts",
+    "test:e2e:uiux": "vitest run tests/e2e/uiux",
     "test:integration:postgres": "cross-env NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts",
     "test:integration:postgres:ci": "cross-env REQUIRE_POSTGRES_INTEGRATION=true NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts",
     "seed:ci": "tsx scripts/seed-ci-fixtures.ts",

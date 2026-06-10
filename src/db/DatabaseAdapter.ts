@@ -35,7 +35,7 @@ export interface DbQueryResult {
   rowCount: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type SQLitePoolLike = {
   query: (text: string, params?: any[]) => Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
 

@@ -211,12 +211,12 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
       throw new Error('Upstox: not authenticated — connect Upstox first');
     }
 
-    const url = \`\${UPSTOX_API}/market-quote/quotes?symbol=\${encodeURIComponent(cleanSym)}&exchange=NSE\`;
+    const url = \`${UPSTOX_API}/market-quote/quotes?symbol=${encodeURIComponent(cleanSym)}&exchange=NSE\`;
     const data = await this.apiGet<any>(url, token);
 
     const quote = data?.data?.[0] ?? data?.data;
     if (!quote?.last_price && !quote?.lastPrice) {
-      throw new Error(\`Upstox: no quote data for \${cleanSym}\`);
+      throw new Error(\`Upstox: no quote data for ${cleanSym}\`);
     }
 
     const price = Number(quote.last_price ?? quote.lastPrice ?? 0);
@@ -249,12 +249,12 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     const from = this.rangeToDate(range, now);
     const to = now.toISOString().split('T')[0];
 
-    const url = \`\${UPSTOX_API}/historical-candle-data/\${encodeURIComponent(cleanSym)}/\${from}/\${to}/day/NSE\`;
+    const url = \`${UPSTOX_API}/historical-candle-data/${encodeURIComponent(cleanSym)}/${from}/${to}/day/NSE\`;
     const data = await this.apiGet<any>(url, token);
 
     const candles: UpstoxCandle[] = data?.data?.candles ?? data?.data ?? [];
     if (!Array.isArray(candles) || candles.length === 0) {
-      throw new Error(\`Upstox: no historical data for \${cleanSym}\`);
+      throw new Error(\`Upstox: no historical data for ${cleanSym}\`);
     }
 
     return candles
@@ -277,7 +277,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
       throw new Error('Upstox: not authenticated');
     }
 
-    const url = \`\${UPSTOX_API}/market-quote/depth?symbol=\${encodeURIComponent(cleanSym)}&exchange=NSE\`;
+    const url = \`${UPSTOX_API}/market-quote/depth?symbol=${encodeURIComponent(cleanSym)}&exchange=NSE\`;
     const data = await this.apiGet<any>(url, token);
 
     const depth = data?.data;
@@ -292,7 +292,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     const token = this.getToken();
     if (!token) throw new Error('Upstox: not authenticated');
 
-    const data = await this.apiGet<any>(\`\${UPSTOX_API}/portfolio/long-term-holdings\`, token);
+    const data = await this.apiGet<any>(\`${UPSTOX_API}/portfolio/long-term-holdings\`, token);
     return Array.isArray(data?.data) ? data.data : [];
   }
 
@@ -300,7 +300,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     const token = this.getToken();
     if (!token) throw new Error('Upstox: not authenticated');
 
-    const data = await this.apiGet<any>(\`\${UPSTOX_API}/portfolio/positions\`, token);
+    const data = await this.apiGet<any>(\`${UPSTOX_API}/portfolio/positions\`, token);
     const positions = Array.isArray(data?.data) ? data.data : [];
     return positions.filter((p: any) => (p.quantity ?? 0) !== 0);
   }
@@ -309,7 +309,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     const token = this.getToken();
     if (!token) throw new Error('Upstox: not authenticated');
 
-    const data = await this.apiGet<any>(\`\${UPSTOX_API}/user/funds-and-margin\`, token);
+    const data = await this.apiGet<any>(\`${UPSTOX_API}/user/funds-and-margin\`, token);
     return {
       availableMargin: data?.data?.available_margin ?? data?.data?.availableMargin ?? 0,
       usedMargin: data?.data?.used_margin ?? data?.data?.usedMargin ?? 0,
@@ -321,7 +321,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     const token = this.getToken();
     if (!token) throw new Error('Upstox: not authenticated');
 
-    const data = await this.apiGet<any>(\`\${UPSTOX_API}/order/history\`, token);
+    const data = await this.apiGet<any>(\`${UPSTOX_API}/order/history\`, token);
     return Array.isArray(data?.data) ? data.data.slice(0, 50) : [];
   }
 
@@ -330,7 +330,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     if (typeof window === 'undefined') return null;
     try {
       const uid = window.localStorage.getItem('ss_uid') || 'anonymous';
-      const key = \`ss_broker_token_upstox_\${uid}\`;
+      const key = \`ss_broker_token_upstox_${uid}\`;
       const encoded = window.localStorage.getItem(key);
       if (!encoded) return null;
       const token = JSON.parse(atob(encoded));
@@ -344,7 +344,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
     return RetryPolicy.execute(async () => {
       const resp = await fetch(url, {
         headers: {
-          'Authorization': \`Bearer \${token}\`,
+          'Authorization': \`Bearer ${token}\`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -356,7 +356,7 @@ export class UpstoxProvider implements PriceProvider, HistoricalProvider {
         throw new Error('Upstox: token expired — reconnect Upstox');
       }
       if (!resp.ok) {
-        throw new Error(\`Upstox HTTP \${resp.status}: \${resp.statusText}\`);
+        throw new Error(\`Upstox HTTP ${resp.status}: ${resp.statusText}\`);
       }
       return resp.json() as Promise<T>;
     }, RETRY_OPTS);
@@ -490,7 +490,7 @@ export class UpstoxOAuthService {
       code_challenge_method: 'S256',
     });
 
-    return \`\${UPSTOX_AUTH}?\${params.toString()}\`;
+    return \`${UPSTOX_AUTH}?${params.toString()}\`;
   }
 
   /** Exchange authorization code for tokens (proxied through backend) */
@@ -531,7 +531,7 @@ export class UpstoxOAuthService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(\`Token exchange failed (HTTP \${response.status}): \${errorText}\`);
+      throw new Error(\`Token exchange failed (HTTP ${response.status}): ${errorText}\`);
     }
 
     const data = await response.json();
@@ -559,7 +559,7 @@ export class UpstoxOAuthService {
     refreshToken: string;
     expiresAt: number;
   }> {
-    const response = await fetch(\`\${TOKEN_PROXY}/refresh\`, {
+    const response = await fetch(\`${TOKEN_PROXY}/refresh\`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -569,7 +569,7 @@ export class UpstoxOAuthService {
     });
 
     if (!response.ok) {
-      throw new Error(\`Token refresh failed (HTTP \${response.status})\`);
+      throw new Error(\`Token refresh failed (HTTP ${response.status})\`);
     }
 
     const data = await response.json();
@@ -585,7 +585,7 @@ export class UpstoxOAuthService {
     accessToken: string;
     uid: string;
   }): Promise<void> {
-    await fetch(\`\${TOKEN_PROXY}/revoke\`, {
+    await fetch(\`${TOKEN_PROXY}/revoke\`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ access_token: options.accessToken, uid: options.uid }),
@@ -599,8 +599,8 @@ export class UpstoxOAuthService {
     lastSync: string;
   }> {
     try {
-      const resp = await fetch(\`\${UPSTOX_AUTH.replace('/authorization/dialog', '')}/user/profile\`, {
-        headers: { 'Authorization': \`Bearer \${accessToken}\` },
+      const resp = await fetch(\`${UPSTOX_AUTH.replace('/authorization/dialog', '')}/user/profile\`, {
+        headers: { 'Authorization': \`Bearer ${accessToken}\` },
       });
       const profile = await resp.json();
       return {
@@ -833,13 +833,13 @@ export class ProviderCoordinator {
     symbol: string,
   ): Promise<T> {
     if (providers.length === 0) {
-      throw new Error(\`No providers configured for \${category}\`);
+      throw new Error(\`No providers configured for ${category}\`);
     }
     const errors: string[] = [];
     for (const provider of providers) {
       const status = this.healthMonitor.getStatus(provider);
       if (status === 'Unavailable' || status === 'RateLimited') {
-        errors.push(\`\${provider.constructor.name}: skipped (\${status})\`);
+        errors.push(\`${provider.constructor.name}: skipped (${status})\`);
         continue;
       }
       const breaker = this.circuitBreakers.get(provider);
@@ -852,12 +852,12 @@ export class ProviderCoordinator {
         return result;
       } catch (err: any) {
         const msg = err?.message || String(err);
-        errors.push(\`\${provider.constructor.name}: \${msg}\`);
+        errors.push(\`${provider.constructor.name}: ${msg}\`);
         this.healthMonitor.recordFailure(provider);
         this.tracer.recordUsage(symbol, category, provider.constructor.name, true);
       }
     }
-    throw new Error(\`All providers failed for \${category}(\${symbol}): \${errors.join(' | ')}\`);
+    throw new Error(\`All providers failed for ${category}(${symbol}): ${errors.join(' | ')}\`);
   }
 }
 `;
@@ -877,38 +877,38 @@ const p3Md = `# Provider Priority Report — RC-UPSTOX-001
 
 | Priority | Provider | Fallback Trigger | Cost |
 |:---------|:---------|:-----------------|:-----|
-| Tier 1 | **UpstoxProvider** | 401 (token expired), 429 (rate limited), timeout | \$0 (with trading account) |
-| Tier 2 | YahooProvider | 429, timeout, API outage | \$0 |
-| Tier 3 | Registry | All providers failed — returns last known price | \$0 |
+| Tier 1 | **UpstoxProvider** | 401 (token expired), 429 (rate limited), timeout | $0 (with trading account) |
+| Tier 2 | YahooProvider | 429, timeout, API outage | $0 |
+| Tier 3 | Registry | All providers failed — returns last known price | $0 |
 
 ### Historical Data
 
 | Priority | Provider | Range Support | Cost |
 |:---------|:---------|:--------------|:-----|
-| Tier 1 | **UpstoxProvider** | 1D through 5Y (daily candles) | \$0 |
-| Tier 2 | YahooProvider | 1D through 10Y (v8 chart API) | \$0 |
+| Tier 1 | **UpstoxProvider** | 1D through 5Y (daily candles) | $0 |
+| Tier 2 | YahooProvider | 1D through 10Y (v8 chart API) | $0 |
 
 ### Fundamentals
 
 | Priority | Provider | Coverage | Cost |
 |:---------|:---------|:---------|:-----|
 | Tier 1 | FinnhubProvider | 21 financial fields | Free tier (60 calls/min) |
-| Tier 2 | Yahoo (v8) | Beta derivation only | \$0 |
-| Future | IndianAPI | +10% India coverage | ~\$12/mo |
+| Tier 2 | Yahoo (v8) | Beta derivation only | $0 |
+| Future | IndianAPI | +10% India coverage | ~$12/mo |
 
 ### Metadata
 
 | Priority | Provider | Priority | Cost |
 |:---------|:---------|:---------|:-----|
-| Tier 1 | MasterCompanyRegistry | Local JSON, always available | \$0 |
-| Tier 2 | YahooProvider | v8 chart meta (name, exchange) | \$0 |
+| Tier 1 | MasterCompanyRegistry | Local JSON, always available | $0 |
+| Tier 2 | YahooProvider | v8 chart meta (name, exchange) | $0 |
 | Tier 3 | FinnhubProvider | profile2 endpoint | Free tier |
 
 ### Portfolio
 
 | Priority | Provider | Data | Cost |
 |:---------|:---------|:-----|:-----|
-| Tier 1 | **UpstoxProvider** | Holdings, positions, funds, orders | \$0 |
+| Tier 1 | **UpstoxProvider** | Holdings, positions, funds, orders | $0 |
 
 ---
 

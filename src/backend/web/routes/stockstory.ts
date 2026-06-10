@@ -14,6 +14,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import pool from '../../../db/index';
 import {
   realResponse,
+  partialResponse,
   unavailableResponse,
   errorResponse,
   AnalyticalReasonCode,
@@ -25,6 +26,11 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
     const { ticker } = request.params as { ticker: string };
     const symbol = ticker.toUpperCase().trim();
+    const asFiniteNumber = (value: unknown): number | null => {
+      if (value === null || value === undefined || value === '') return null;
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
 
     try {
       // Step 1 — Check if symbol exists in the symbols table
@@ -80,30 +86,69 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         ? (pred.prediction_date as Date).toISOString().split('T')[0]
         : String(pred.prediction_date ?? '');
 
-      const rankingScore = Number(pred.ranking_score ?? 50);
-      const classification = String(pred.classification ?? 'Fair');
-      const confidenceScore = Number(pred.confidence_score ?? 50);
-      const confidenceLevel = String(pred.confidence_level ?? 'Medium');
+      const rankingScore = asFiniteNumber(pred.ranking_score);
+      const classification = pred.classification ? String(pred.classification) : null;
+      const confidenceScore = asFiniteNumber(pred.confidence_score);
+      const confidenceLevel = pred.confidence_level ? String(pred.confidence_level) : null;
+      const qualityScore = asFiniteNumber(pred.quality_score);
+      const growthScore = asFiniteNumber(pred.growth_score);
+      const valueScore = asFiniteNumber(pred.value_score);
+      const momentumScore = asFiniteNumber(pred.momentum_score);
+      const riskScore = asFiniteNumber(pred.risk_score);
+      const sectorScore = asFiniteNumber(pred.sector_score);
+
+      const factorSnapshot = (score: number | null, sourceField: string) => ({
+        score,
+        source: 'prediction_registry',
+        sourceField,
+        snapshotDate: predictionDate || null,
+      });
 
       // Step 3 — Assemble the StockStory-like response from registry data
       const storyResult = {
+        symbol,
+        predictionDate,
+        predictionHorizon: asFiniteNumber(pred.prediction_horizon),
+        rankingScore,
         healthScore: rankingScore,
         classification,
-        confidence: confidenceLevel,
-        growth: Number(pred.growth_score ?? 50),
-        quality: Number(pred.quality_score ?? 50),
-        stability: Number(pred.value_score ?? 50),
-        valuation: Number(pred.value_score ?? 50),
-        momentum: Number(pred.momentum_score ?? 50),
-        risk: Number(pred.risk_score ?? 50),
-        narrative: `Classification: ${classification}. Confidence: ${confidenceLevel}. Score: ${rankingScore}.`,
+        confidence: {
+          level: confidenceLevel,
+          score: confidenceScore,
+          source: 'prediction_registry',
+          sourceField: 'confidence_score',
+          snapshotDate: predictionDate || null,
+        },
+        confidenceLevel,
+        confidenceScore,
+        dataFreshness: null,
+        sector,
+        growth: growthScore,
+        quality: qualityScore,
+        stability: valueScore,
+        valuation: valueScore,
+        momentum: momentumScore,
+        risk: riskScore,
+        narrative: classification && confidenceLevel && rankingScore !== null
+          ? `Classification: ${classification}. Confidence: ${confidenceLevel}. Score: ${rankingScore}.`
+          : `Prediction registry snapshot for ${symbol} is incomplete. Missing values are shown as unavailable.`,
+        factors: {
+          growth: factorSnapshot(growthScore, 'growth_score'),
+          quality: factorSnapshot(qualityScore, 'quality_score'),
+          stability: factorSnapshot(valueScore, 'value_score'),
+          value: factorSnapshot(valueScore, 'value_score'),
+          momentum: factorSnapshot(momentumScore, 'momentum_score'),
+          risk: factorSnapshot(riskScore, 'risk_score'),
+          sector: factorSnapshot(sectorScore, 'sector_score'),
+        },
         engineDetails: {
-          growth: { score: Number(pred.growth_score ?? 50) },
-          quality: { score: Number(pred.quality_score ?? 50) },
-          valuation: { score: Number(pred.value_score ?? 50) },
-          momentum: { score: Number(pred.momentum_score ?? 50) },
-          risk: { score: Number(pred.risk_score ?? 50) },
-          sector: { score: Number(pred.sector_score ?? 50) },
+          growth: { score: growthScore },
+          quality: { score: qualityScore },
+          stability: { score: valueScore },
+          valuation: { score: valueScore },
+          momentum: { score: momentumScore },
+          risk: { score: riskScore },
+          sector: { score: sectorScore },
         },
       };
 
@@ -118,6 +163,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         const v = pred[f];
         return v !== null && v !== undefined && v !== '';
       });
+      const missingFields = requiredFields.filter(f => !availableFields.includes(f));
       const completenessScore = Math.round((availableFields.length / requiredFields.length) * 100);
 
       // Step 6 — Build honest lineage
@@ -159,10 +205,22 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
       ];
 
       // Step 7 — Determine reason code
-      let reasonCode: AnalyticalReasonCode = 'OK';
+      const reasonCode: AnalyticalReasonCode = 'OK';
+
+      if (missingFields.length > 0) {
+        return partialResponse(
+          'PARTIAL_DATA',
+          `Prediction registry snapshot for ${symbol} is missing: ${missingFields.join(', ')}.`,
+          storyResult,
+          missingFields,
+          completenessScore,
+          lineage,
+          predictionDate
+        );
+      }
 
       return realResponse(
-        storyResult,
+        { ...storyResult, dataFreshness: freshnessResult.freshness },
         freshnessResult.freshness,
         predictionDate,
         completenessScore,

@@ -1,19 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const RANKINGS = [
-  { rank: 1, symbol: "RELIANCE", score: 87, change: "+2", sector: "Energy" },
-  { rank: 2, symbol: "HDFCBANK", score: 85, change: "+1", sector: "Financial" },
-  { rank: 3, symbol: "ICICIBANK", score: 80, change: "+3", sector: "Financial" },
-  { rank: 4, symbol: "TCS", score: 78, change: "0", sector: "Technology" },
-  { rank: 5, symbol: "MARUTI", score: 75, change: "-1", sector: "Auto" },
-  { rank: 6, symbol: "BHARTIARTL", score: 74, change: "+4", sector: "Telecom" },
-  { rank: 7, symbol: "INFY", score: 72, change: "-2", sector: "Technology" },
-  { rank: 8, symbol: "LT", score: 71, change: "+1", sector: "Infrastructure" },
-  { rank: 9, symbol: "SUNPHARMA", score: 68, change: "0", sector: "Pharma" },
-  { rank: 10, symbol: "TITAN", score: 66, change: "-1", sector: "Consumer" },
-];
+interface RankingEntry {
+  symbol: string;
+  ranking_score?: number;
+  classification?: string;
+  sector?: string;
+}
 
 export default function PublicRankingsPage(): JSX.Element {
+  const [rankings, setRankings] = useState<RankingEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/intelligence/leaderboard?limit=10", { headers: { Accept: "application/json" } })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("LEADERBOARD_UNAVAILABLE");
+        const body = await response.json();
+        return Array.isArray(body) ? body : [];
+      })
+      .then((body) => {
+        if (!active) return;
+        setRankings(body);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setRankings([]);
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <main style={{
       minHeight: "100vh",
@@ -33,8 +53,22 @@ export default function PublicRankingsPage(): JSX.Element {
         </p>
       </header>
 
+      {loading ? (
+        <div style={{ opacity: 0.6, fontSize: 14 }}>Loading rankings...</div>
+      ) : rankings.length === 0 ? (
+        <div style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 12,
+          padding: 24,
+          fontSize: 14,
+          color: "rgba(255,255,255,0.65)",
+        }}>
+          Rankings are unavailable from the prediction registry right now. No sample rankings are shown.
+        </div>
+      ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {RANKINGS.map((r) => (
+        {rankings.map((r, index) => (
           <a
             key={r.symbol}
             href={`/?page=stock&symbol=${r.symbol}`}
@@ -71,27 +105,21 @@ export default function PublicRankingsPage(): JSX.Element {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontWeight: 700, fontSize: 14,
             }}>
-              #{r.rank}
+              #{index + 1}
             </div>
             <div style={{ fontWeight: 700, fontSize: 16, minWidth: 110 }}>
               {r.symbol}
             </div>
             <div style={{ fontSize: 13, opacity: 0.5, minWidth: 90 }}>
-              {r.sector}
+              {r.sector ?? "Unavailable"}
             </div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "#00D17A" }}>
-              {r.score}
-            </div>
-            <div style={{
-              fontSize: 13,
-              color: r.change.startsWith("+") ? "#00D17A" : r.change.startsWith("-") ? "#FF5B6E" : "#fff",
-              opacity: 0.7,
-            }}>
-              {r.change.startsWith("+") ? "↑" : r.change.startsWith("-") ? "↓" : "→"} {r.change}
+              {typeof r.ranking_score === "number" ? r.ranking_score : "Unavailable"}
             </div>
           </a>
         ))}
       </div>
+      )}
 
       <div style={{ marginTop: 48, textAlign: "center" }}>
         <a

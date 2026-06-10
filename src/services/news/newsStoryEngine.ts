@@ -23,7 +23,7 @@ function mulberry32(seed: number): () => number {
 function pick<T>(arr: T[], rnd: () => number): T {
   const safe = arr.length ? arr : [];
   if (!safe.length) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+     
     return undefined as T;
   }
   const idx = Math.floor(rnd() * safe.length);

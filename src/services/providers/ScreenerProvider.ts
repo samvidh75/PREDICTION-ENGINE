@@ -166,6 +166,6 @@ export class ScreenerProvider implements FinancialProvider {
   }
 
   private escape(value: string): string {
-    return value.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }
