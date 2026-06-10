@@ -1,44 +1,86 @@
 /**
- * SQLiteAdapter — Zero-configuration database adapter.
- * Implements the same interface as pg Pool: query(sql, params?) => { rows[], rowCount }
- * Used as fallback when PostgreSQL is unavailable.
+ * SQLiteAdapter — Portable zero-configuration database adapter.
+ * Uses sql.js (pure JavaScript/WASM) — no native addon, no node-gyp.
+ * Works identically on macOS, Linux, and Windows.
  *
- * TASK 2: DB path is injectable via SQLITE_DB_PATH env var.
- *         closeSQLite() closes the singleton.
- *         resetForTest() allows tests to isolate to a separate DB path.
+ * Preserves the same public interface:
+ *   query(sql, params?) => { rows[], rowCount }
+ *   executeScript(sql) => void
+ *   end() => void
+ *   resetConnection() => void
  *
- * TRACK-P4B-P3I: Lazy reconnection via getConnection().
+ * DB path: SQLITE_DB_PATH env var, defaults to data/stockstory.db.
+ * File persistence: reads/writes file on disk via fs.
+ * :memory: mode: set SQLITE_DB_PATH=:memory: for in-memory DBs (tests).
  */
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
+import initSqlJs, { type Database as SqlJsDb, type QueryExecResult } from "sql.js";
+import path from "path";
+import fs from "fs";
 
+// ── DB path ────────────────────────────────────────────────────────
 function resolveDbPath(): string {
-  return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
+  return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), "data", "stockstory.db");
+}
+let _dbPath: string = resolveDbPath();
+function isMemory(): boolean {
+  return _dbPath === ":memory:" || _dbPath.startsWith(":memory:");
 }
 
-let _db: Database.Database | null = null;
-let _dbPath: string = resolveDbPath();
+// ── WASM initialisation (memoised) ─────────────────────────────────
+let _SQL: Awaited<ReturnType<typeof initSqlJs>> | null = null;
+async function getSQL() {
+  if (_SQL) return _SQL;
+  _SQL = await initSqlJs();
+  return _SQL;
+}
 
-function ensureDir(): void {
+// ── DB singleton ───────────────────────────────────────────────────
+let _db: SqlJsDb | null = null;
+let _initPromise: Promise<SqlJsDb> | null = null;
+
+async function loadDb(): Promise<SqlJsDb> {
+  const sql = await getSQL();
+  if (isMemory()) return new sql.Database();
+
   const dir = path.dirname(_dbPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+  if (fs.existsSync(_dbPath)) {
+    const buffer = fs.readFileSync(_dbPath);
+    return new sql.Database(buffer);
+  }
+  return new sql.Database();
 }
 
-function getDb(): Database.Database {
-  if (_db && _db.open) return _db;
+function saveDb(): void {
+  if (_db && !isMemory()) {
+    const data = _db.export();
+    const dir = path.dirname(_dbPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(_dbPath, Buffer.from(data));
+  }
+}
+
+async function getDb(): Promise<SqlJsDb> {
+  if (_db) return _db;
   _dbPath = resolveDbPath();
-  ensureDir();
-  _db = new Database(_dbPath);
-  _db.pragma('journal_mode = WAL');
-  _db.pragma('foreign_keys = ON');
+  // Single init promise — prevents race on first access
+  if (!_initPromise) {
+    _initPromise = loadDb().then((db) => {
+      db.run("PRAGMA foreign_keys = ON");
+      return db;
+    });
+  }
+  _db = await _initPromise;
   return _db;
 }
 
 export function closeSQLite(): void {
   if (_db) {
+    saveDb();
     try { _db.close(); } catch { /* ignore */ }
     _db = null;
+    _initPromise = null;
   }
 }
 
@@ -46,73 +88,90 @@ let _poolRef: SQLitePool | null = null;
 
 export function resetForTest(dbPath?: string): void {
   closeSQLite();
-  if (dbPath !== undefined) {
-    process.env.SQLITE_DB_PATH = dbPath;
-  }
+  if (dbPath !== undefined) process.env.SQLITE_DB_PATH = dbPath;
   _dbPath = resolveDbPath();
-  if (_poolRef) {
-    _poolRef.resetConnection();
-  }
+  if (_poolRef) _poolRef.resetConnection();
 }
 
+// ── SQL translation (PostgreSQL → SQLite) ─────────────────────────
 function translateSQL(sql: string): string {
-  let translated = sql
-    .replace(/SERIAL/gi, 'INTEGER')
-    .replace(/BIGSERIAL/gi, 'INTEGER')
-    .replace(/$\d+/g, '?')
-    .replace(/public\./gi, '')
-    .replace(/::(bigint|integer|float|text|boolean|timestamp|date|numeric|decimal|varchar\S*)/gi, '')
-    .replace(/GENERATED ALWAYS AS IDENTITY/gi, 'AUTOINCREMENT')
-    .replace(/RETURNING \*/gi, '')
-    .replace(/ON CONFLICT \(([^)]+)\) DO NOTHING/gi, 'OR IGNORE')
-    .replace(/INFORMATION_SCHEMA\.TABLES/g, 'sqlite_master')
+  let t = sql
+    .replace(/SERIAL/gi, "INTEGER")
+    .replace(/BIGSERIAL/gi, "INTEGER")
+    .replace(/\$\d+/g, "?")
+    .replace(/public\./gi, "")
+    .replace(/::(bigint|integer|float|text|boolean|timestamp|date|numeric|decimal|varchar\S*)/gi, "")
+    .replace(/GENERATED ALWAYS AS IDENTITY/gi, "AUTOINCREMENT")
+    .replace(/RETURNING \*/gi, "")
+    .replace(/ON CONFLICT \(([^)]+)\) DO NOTHING/gi, "OR IGNORE")
+    .replace(/INFORMATION_SCHEMA\.TABLES/g, "sqlite_master")
     .replace(/table_schema = 'public'/g, "type = 'table'")
-    .replace(/information_schema\.columns/gi, 'pragma_table_info');
+    .replace(/information_schema\.columns/gi, "pragma_table_info");
 
-  if (/ON CONFLICT.*DO UPDATE/i.test(translated)) {
-    translated = translated.replace('INSERT INTO', 'INSERT OR REPLACE INTO');
-    translated = translated.replace(/ON CONFLICT\s*\([^)]*\)\s*DO UPDATE\s*SET\s*[^;]*/gi, '');
+  if (/ON CONFLICT.*DO UPDATE/i.test(t)) {
+    t = t.replace("INSERT INTO", "INSERT OR REPLACE INTO");
+    t = t.replace(/ON CONFLICT\s*\([^)]*\)\s*DO UPDATE\s*SET\s*[^;]*/gi, "");
   }
 
-  translated = translated
+  return t
     .replace(/NOW\(\)/gi, "datetime('now')")
     .replace(/CURRENT_TIMESTAMP/gi, "datetime('now')")
-    .replace(/IS NOT TRUE/gi, '= 0')
-    .replace(/IS TRUE/gi, '= 1')
-    .replace(/ILIKE/gi, 'LIKE')
-    .replace(/NULLS LAST/gi, '')
-    .replace(/NULLS FIRST/gi, '')
-    .replace(/::(int|text|float|boolean)/gi, '')
+    .replace(/IS NOT TRUE/gi, "= 0")
+    .replace(/IS TRUE/gi, "= 1")
+    .replace(/ILIKE/gi, "LIKE")
+    .replace(/NULLS LAST/gi, "")
+    .replace(/NULLS FIRST/gi, "")
+    .replace(/::(int|text|float|boolean)/gi, "")
     .replace(/EXTRACT\(YEAR FROM/gi, "CAST(strftime('%Y',")
     .replace(/EXTRACT\(MONTH FROM/gi, "CAST(strftime('%m',");
-
-  return translated;
 }
 
+// ── Inline param binding (sql.js exec() doesn't support ? params) ─
+function bindParams(sql: string, params?: unknown[]): string {
+  if (!params || params.length === 0) return sql;
+  let idx = 0;
+  return sql.replace(/\?/g, () => escapeValue(params[idx++]));
+}
+function escapeValue(v: unknown): string {
+  if (v === null || v === undefined) return "NULL";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
+  if (typeof v === "boolean") return v ? "1" : "0";
+  if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
+  return `'${String(v).replace(/'/g, "''")}'`;
+}
+
+// ── Result ─────────────────────────────────────────────────────────
 interface SQLiteResult {
   rows: Record<string, unknown>[];
   rowCount: number;
 }
+function toResult(execResult: QueryExecResult[]): SQLiteResult {
+  if (execResult.length === 0) return { rows: [], rowCount: 0 };
+  const { columns, values } = execResult[0];
+  const rows = values.map(row => {
+    const obj: Record<string, unknown> = {};
+    columns.forEach((c, i) => { obj[c] = row[i] ?? null; });
+    return obj;
+  });
+  return { rows, rowCount: rows.length };
+}
 
+// ── SQLitePool ─────────────────────────────────────────────────────
 class SQLitePool {
-  private db: Database.Database | null = null;
+  private _db: SqlJsDb | null = null;
+  private _initialised = false;
 
-  constructor() {
-    this.getConnection();
-  }
-
-  private getConnection(): Database.Database {
-    if (!this.db || !this.db.open) {
-      this.db = getDb();
-      this.ensureTables();
-    }
-    return this.db;
+  private async init(): Promise<SqlJsDb> {
+    if (this._initialised && this._db) return this._db;
+    this._db = await getDb();
+    this.ensureTables();
+    this._initialised = true;
+    return this._db;
   }
 
   private ensureTables(): void {
-    const db = this.db;
-    if (!db) throw new Error('SQLite connection unavailable during schema init');
-
+    const db = this._db;
+    if (!db) throw new Error("SQLite connection unavailable during schema init");
     const tables = [
       `CREATE TABLE IF NOT EXISTS master_security_registry (
         symbol TEXT PRIMARY KEY, isin TEXT, company_name TEXT, nse_symbol TEXT, bse_symbol TEXT,
@@ -154,33 +213,24 @@ class SQLitePool {
       )`,
       `CREATE TABLE IF NOT EXISTS prediction_registry (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        symbol TEXT NOT NULL,
-        prediction_date TEXT NOT NULL,
+        symbol TEXT NOT NULL, prediction_date TEXT NOT NULL,
         ranking_score REAL NOT NULL,
         classification TEXT NOT NULL
-          CHECK (classification IN ('Exceptional', 'Excellent', 'Good', 'Fair', 'Weak', 'Critical')),
+          CHECK (classification IN ('Exceptional','Excellent','Good','Fair','Weak','Critical')),
         confidence_score REAL NOT NULL,
         confidence_level TEXT NOT NULL
-          CHECK (confidence_level IN ('Very High', 'High', 'Medium', 'Low')),
-        quality_score REAL NOT NULL,
-        growth_score REAL NOT NULL,
-        value_score REAL NOT NULL,
-        momentum_score REAL NOT NULL,
-        risk_score REAL NOT NULL,
-        sector_score REAL NOT NULL,
-        price_at_prediction REAL,
-        benchmark_level REAL,
+          CHECK (confidence_level IN ('Very High','High','Medium','Low')),
+        quality_score REAL NOT NULL, growth_score REAL NOT NULL, value_score REAL NOT NULL,
+        momentum_score REAL NOT NULL, risk_score REAL NOT NULL, sector_score REAL NOT NULL,
+        price_at_prediction REAL, benchmark_level REAL,
         prediction_horizon INTEGER NOT NULL DEFAULT 30
-          CHECK (prediction_horizon IN (7, 30, 90, 180, 365)),
+          CHECK (prediction_horizon IN (7,30,90,180,365)),
         validation_status TEXT NOT NULL DEFAULT 'pending'
-          CHECK (validation_status IN ('pending', 'in_progress', 'validated', 'expired')),
-        validated_at TEXT,
-        future_return REAL,
-        benchmark_return REAL,
-        alpha REAL,
+          CHECK (validation_status IN ('pending','in_progress','validated','expired')),
+        validated_at TEXT, future_return REAL, benchmark_return REAL, alpha REAL,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         created_by TEXT NOT NULL DEFAULT 'DailyPredictionCapture'
-          CHECK (created_by IN ('DailyPredictionCapture', 'ManualSnapshot')),
+          CHECK (created_by IN ('DailyPredictionCapture','ManualSnapshot')),
         UNIQUE(symbol, prediction_date, prediction_horizon)
       )`,
       `CREATE TABLE IF NOT EXISTS benchmark_observations (
@@ -194,48 +244,44 @@ class SQLitePool {
       )`,
     ];
     for (const sql of tables) {
-      try { db.exec(sql); } catch { /* ignore */ }
+      try { db.run(sql); } catch { /* ignore */ }
     }
+    saveDb();
   }
 
   async query(text: string, params?: unknown[]): Promise<SQLiteResult> {
-    const db = this.getConnection();
+    const db = await this.init();
     const translated = translateSQL(text);
 
+    const isSelect =
+      /^\s*SELECT/i.test(translated) ||
+      /^\s*PRAGMA/i.test(translated) ||
+      /^\s*WITH\s/i.test(translated);
+
     try {
-      const isSelect = /^\s*SELECT/i.test(translated) || /^\s*PRAGMA/i.test(translated) ||
-        /^\s*WITH\s/i.test(translated);
-      const isReturning = /RETURNING/i.test(translated);
-
-      if (isSelect || isReturning) {
-        const stmt = db.prepare(translated);
-        const rows = params ? stmt.all(...params) : stmt.all();
-        return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
+      if (isSelect) {
+        const bound = bindParams(translated, params);
+        const res = db.exec(bound);
+        return toResult(res);
       }
 
-      const stmt = db.prepare(translated);
-      const result = params ? stmt.run(...params) : stmt.run();
-      const rowCount = result.changes;
-
-      if (isReturning && translated.includes('INSERT')) {
-        const lastId = result.lastInsertRowid;
-        if (lastId && lastId > 0) {
-          return { rows: [{ id: Number(lastId) }], rowCount };
-        }
-      }
-
-      return { rows: [], rowCount };
-    } catch (err: unknown) {
+      // Non-SELECT: run() then save
+      const bound = bindParams(translated, params);
+      db.run(bound);
+      saveDb();
+      return { rows: [], rowCount: db.getRowsModified() };
+    } catch (err) {
+      // Fallback: try raw SQL without translation
       try {
-        const stmt = db.prepare(text.replace(/$\d+/g, '?'));
-        const isSelect = /^\s*SELECT/i.test(text);
-        if (isSelect) {
-          const rows = params ? stmt.all(...params) : stmt.all();
-          return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
+        const raw = text.replace(/\$\d+/g, "?");
+        const bound = bindParams(raw, params);
+        if (/^\s*SELECT/i.test(raw) || /^\s*PRAGMA/i.test(raw)) {
+          return toResult(db.exec(bound));
         }
-        const r = params ? stmt.run(...params) : stmt.run();
-        return { rows: [], rowCount: r.changes };
-      } catch (e2: unknown) {
+        db.run(bound);
+        saveDb();
+        return { rows: [], rowCount: db.getRowsModified() };
+      } catch (e2) {
         const msg = e2 instanceof Error ? e2.message : String(e2);
         throw new Error(`SQLite query failed: ${msg}\nSQL: ${text.substring(0, 200)}`);
       }
@@ -243,17 +289,21 @@ class SQLitePool {
   }
 
   async executeScript(sql: string): Promise<void> {
-    const db = this.getConnection();
-    db.exec(sql);
+    const db = await this.init();
+    db.run(sql);
+    saveDb();
   }
 
   async end(): Promise<void> {
     closeSQLite();
-    this.db = null;
+    this._db = null;
+    this._initialised = false;
   }
 
   resetConnection(): void {
-    this.db = null;
+    this._db = null;
+    this._initialised = false;
+    _initPromise = null;
   }
 }
 

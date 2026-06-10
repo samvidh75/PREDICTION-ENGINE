@@ -34,6 +34,9 @@
     "validate:schema": "tsx scripts/validate-schema-contract.ts",
     "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",
+    "doctor:platform": "node scripts/platform-doctor.mjs",
+    "verify:native": "node scripts/verify-native-modules.mjs",
+    "verify:no-native-app-deps": "node scripts/assert-no-native-app-deps.mjs",
     "validate:import-case": "node scripts/audit-import-case.mjs",
     "validate:temp-cleanup": "node scripts/validate-temp-cleanup.mjs",
     "validate:portability": "npm run validate:import-case && npm run validate:temp-cleanup && npm run doctor:platform",
@@ -53,7 +56,6 @@
     "@fastify/helmet": "^13.0.2",
     "@fastify/websocket": "^11.2.0",
     "@tanstack/react-query": "^5.101.0",
-    "better-sqlite3": "^12.10.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
@@ -66,13 +68,13 @@
     "pg": "^8.21.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "redis": "^5.12.1"
+    "redis": "^5.12.1",
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.8.0",
     "@types/pg": "^8.20.0",
     "@types/react": "^18.3.3",
