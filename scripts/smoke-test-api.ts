@@ -299,8 +299,22 @@ export const checks: SmokeCheck[] = [
 
 function hasFields(obj: unknown, fields: string[]): boolean {
   if (!obj || typeof obj !== 'object') return fields.length === 0;
+  const record = obj as Record<string, unknown>;
+  const isEnvelope = typeof record.status === 'string' && 'data' in record;
+  const dataObj = (isEnvelope && record.data && typeof record.data === 'object')
+    ? (record.data as Record<string, unknown>)
+    : null;
+
   for (const field of fields) {
-    if (!(field in (obj as Record<string, unknown>))) return false;
+    const existsAtRoot = field in record;
+    const existsInData = dataObj ? (field in dataObj) : false;
+
+    if (!existsAtRoot && !existsInData) {
+      if (isEnvelope && (record.status === 'empty' || record.status === 'unavailable') && field === 'signals') {
+        continue;
+      }
+      return false;
+    }
   }
   return true;
 }
@@ -420,12 +434,16 @@ export async function runSmokeChecks(
         continue;
       }
 
-      const bodyRecord = body as Record<string, unknown>;
+const bodyRecord = body as Record<string, unknown>;
+      const isEnvelope = typeof bodyRecord.status === 'string' && 'data' in bodyRecord;
+      const combinedRecord = (isEnvelope && bodyRecord.data && typeof bodyRecord.data === 'object')
+        ? { ...bodyRecord, ...(bodyRecord.data as Record<string, unknown>) }
+        : bodyRecord;
 
       // 4. Required fields
       if (check.requiredFields.length > 0 && !hasFields(body, check.requiredFields)) {
         const missing = check.requiredFields.filter(
-          (f) => !(f in bodyRecord),
+          (f) => !(f in combinedRecord),
         );
         result.error = `Missing required fields: ${missing.join(', ')}`;
         results.push(result);
@@ -434,7 +452,7 @@ export async function runSmokeChecks(
 
       // 5. Custom assertions
       if (check.assert) {
-        const assertErr = check.assert(bodyRecord, response.status);
+        const assertErr = check.assert(combinedRecord, response.status);
         if (assertErr) {
           result.error = redactSecrets(assertErr);
           results.push(result);

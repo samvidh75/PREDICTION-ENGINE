@@ -388,17 +388,26 @@ describe('GROUP H — Env Configuration', () => {
   });
 
   it('cookie secret falls back to dev default when unset in development', () => {
-    const isProduction = false;
-    const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
-    expect(cookieSecret).toBe("dev-secret-changeme");
+    const origSecret = process.env.COOKIE_SECRET;
+    delete process.env.COOKIE_SECRET;
+    try {
+      const isProduction = false;
+      const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
+      expect(cookieSecret).toBe("dev-secret-changeme");
+    } finally {
+      if (origSecret !== undefined) process.env.COOKIE_SECRET = origSecret;
+    }
   });
 
   it('production without COOKIE_SECRET triggers empty string (error path)', () => {
-    const isProduction = true;
-    const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
-    if (isProduction && !cookieSecret) {
+    const origSecret = process.env.COOKIE_SECRET;
+    delete process.env.COOKIE_SECRET;
+    try {
+      const isProduction = true;
+      const cookieSecret = process.env.COOKIE_SECRET ?? (isProduction ? "" : "dev-secret-changeme");
       expect(cookieSecret).toBe("");
+    } finally {
+      if (origSecret !== undefined) process.env.COOKIE_SECRET = origSecret;
     }
-    expect(cookieSecret).toBe("");
   });
 });

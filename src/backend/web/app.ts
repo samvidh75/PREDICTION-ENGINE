@@ -4,7 +4,7 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import compress from "@fastify/compress";
 import cookie from "@fastify/cookie";
-import routes from "./routes";
+import routes from "./routes/index.js";
 import { errorHandlerPlugin } from "../monitoring/errorHandler";
 import { requestIdPlugin } from "../monitoring/requestIdPlugin";
 import { rateLimiterPlugin } from "../../middleware/RateLimiter";

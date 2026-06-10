@@ -72,7 +72,7 @@ interface GateReport {
 // CONFIG
 // ──────────────────────────────────────────────────────────────
 
-const REQUIRE_FULL = process.env.REQUIRE_FULL_RELEASE_GATE === 'true';
+const REQUIRE_FULL = () => process.env.REQUIRE_FULL_RELEASE_GATE === 'true';
 const REPORT_PATH = process.env.RELEASE_GATE_REPORT_PATH ?? resolve('reports', 'release', 'release-gate.json');
 const API_BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:4001';
 const EXEC_TIMEOUT = 180_000;
@@ -176,7 +176,7 @@ export function defineChecks(): GateCheck[] {
     {
       name: 'PostgreSQL integration tests (CI)',
       category: 'environment-required',
-      mandatory: REQUIRE_FULL,
+      mandatory: REQUIRE_FULL(),
       command: 'npm run test:integration:postgres:ci',
       probe: probePostgres,
       status: 'PASS', exitCode: null, stdout: null, stderr: null, durationMs: 0,
@@ -184,8 +184,8 @@ export function defineChecks(): GateCheck[] {
     {
       name: 'API smoke test',
       category: 'environment-required',
-      mandatory: REQUIRE_FULL,
-      command: 'npm run smoke:api',
+      mandatory: REQUIRE_FULL(),
+      command: 'npm run migrate && cross-env CI_FIXTURE_SEED=true npm run seed:ci && npm run smoke:api',
       probe: probeApiServer,
       status: 'PASS', exitCode: null, stdout: null, stderr: null, durationMs: 0,
     },
@@ -264,7 +264,7 @@ export async function runGateChecks(checksToRun: GateCheck[]): Promise<{ checks:
     } else {
       check.status = 'FAIL';
       totalFailed++;
-      if (check.mandatory || REQUIRE_FULL) mandatoryFailed++;
+      if (check.mandatory || REQUIRE_FULL()) mandatoryFailed++;
       console.log(`✗ FAIL (${check.durationMs}ms, exit ${result.exitCode})`);
     }
   }
@@ -288,7 +288,7 @@ export async function runGateChecks(checksToRun: GateCheck[]): Promise<{ checks:
   if (mandatoryFailed > 0) {
     overallResult = 'FAIL';
     console.log('RELEASE GATE: FAIL');
-  } else if (notExecuted > 0 && !REQUIRE_FULL) {
+  } else if (notExecuted > 0 && !REQUIRE_FULL()) {
     overallResult = 'INCOMPLETE_ENVIRONMENT_PROOF';
     console.log('RELEASE GATE: INCOMPLETE_ENVIRONMENT_PROOF');
   } else {
@@ -311,7 +311,7 @@ export function generateGateReport(checksToRun: GateCheck[]): GateReport {
 
   return {
     generatedAt: new Date().toISOString(),
-    requireFullReleaseGate: REQUIRE_FULL,
+    requireFullReleaseGate: REQUIRE_FULL(),
     summary: {
       total: checksToRun.length,
       passed,
@@ -351,7 +351,7 @@ async function main(): Promise<void> {
 
   console.log('╔══════════════════════════════════════════╗');
   console.log('║   STOCKSTORY RELEASE GATE (MEGA)        ║');
-  console.log(`║   Full gate: ${REQUIRE_FULL ? 'YES (CI MODE)' : 'no (local mode)'}${' '.repeat(Math.max(0, 17 - (REQUIRE_FULL ? 8 : 12)))}║`);
+  console.log(`║   Full gate: ${REQUIRE_FULL() ? 'YES (CI MODE)' : 'no (local mode)'}${' '.repeat(Math.max(0, 17 - (REQUIRE_FULL() ? 8 : 12)))}║`);
   console.log('╚══════════════════════════════════════════╝\n');
 
   try {

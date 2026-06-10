@@ -6,7 +6,7 @@
  * Tests MigrationRunner with real PostgreSQL.
  * Uses deterministic cleanup — drops test tables/migrations, never drops the database.
  */
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -59,6 +59,11 @@ describe('PostgreSQL migration integration', () => {
     if (!process.env.DATABASE_URL) {
       console.warn('[postgres-migration test] DATABASE_URL not set — skipping PostgreSQL tests');
     }
+  });
+
+  beforeEach(async () => {
+    process.env = { ...originalEnv };
+    await cleanupTestTables();
   });
 
   afterAll(async () => {
