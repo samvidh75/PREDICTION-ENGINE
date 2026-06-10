@@ -20,26 +20,63 @@ export const attentionRoutes: FastifyPluginAsync = async (app) => {
     const userId = query.userId?.trim() || "";
 
     try {
-      let items;
       if (userId) {
-        items = attentionEngine.generate(userId);
-      } else {
-        items = attentionEngine.generateMarketWide();
+        const profile = await attentionEngine.getAttentionProfile(userId);
+        const dormantUsers = await attentionEngine.getDormantUsers(7);
+        const isDormant = dormantUsers.includes(userId);
+
+        const items = [{
+          symbol: userId,
+          priority: isDormant ? 'critical' : profile.needsNudge ? 'important' : 'monitor',
+          title: `User ${userId} Attention Profile`,
+          reason: `Attention score: ${profile.attentionScore}/100. ${profile.needsNudge ? 'Needs re-engagement.' : 'Active user.'}`,
+          delta: profile.attentionScore,
+          confidence: 0.8,
+          source: 'AttentionEngine.getAttentionProfile',
+          destinationUrl: '/dashboard',
+        }];
+
+        return reply.send({
+          generatedAt: new Date().toISOString(),
+          totalSymbolsAnalyzed: items.length,
+          critical: items.filter(i => i.priority === 'critical').slice(0, 3).map(serialize),
+          important: items.filter(i => i.priority === 'important').slice(0, 5).map(serialize),
+          monitor: items.filter(i => i.priority === 'monitor').slice(0, limit).map(serialize),
+        });
       }
 
-      // Split by priority
-      const critical = items
-        .filter((i) => i.priority === "critical")
-        .slice(0, 3)
-        .map(serialize);
-      const important = items
-        .filter((i) => i.priority === "important")
-        .slice(0, 5)
-        .map(serialize);
-      const monitor = items
-        .filter((i) => i.priority === "monitor")
-        .slice(0, Math.max(0, limit - critical.length - important.length))
-        .map(serialize);
+      // Market-wide: get dormant user count and daily engagement snapshot
+      const [dormantUsers, snapshot] = await Promise.all([
+        attentionEngine.getDormantUsers(7),
+        attentionEngine.getDailyEngagementSnapshot(),
+      ]);
+
+      const items = [
+        {
+          symbol: 'MARKET',
+          priority: dormantUsers.length > 10 ? 'critical' : dormantUsers.length > 3 ? 'important' : 'monitor',
+          title: `${dormantUsers.length} dormant users`,
+          reason: `${dormantUsers.length} users inactive for 7+ days. ${snapshot.activeUsers} active today.`,
+          delta: dormantUsers.length,
+          confidence: 0.9,
+          source: 'AttentionEngine.getDormantUsers',
+          destinationUrl: '/admin/users',
+        },
+        {
+          symbol: 'ENGAGEMENT',
+          priority: snapshot.avgSessionMinutes < 2 ? 'important' : 'monitor',
+          title: `Avg session: ${snapshot.avgSessionMinutes} min`,
+          reason: `${snapshot.activeUsers} active users today, avg session ${snapshot.avgSessionMinutes} min. ${snapshot.newWatchlistsCreated} watchlists created, ${snapshot.alertsTriggered} alerts triggered, ${snapshot.predictionsGenerated} predictions generated.`,
+          delta: snapshot.avgSessionMinutes,
+          confidence: 0.85,
+          source: 'AttentionEngine.getDailyEngagementSnapshot',
+          destinationUrl: '/admin/analytics',
+        },
+      ];
+
+      const critical = items.filter(i => i.priority === 'critical').slice(0, 3).map(serialize);
+      const important = items.filter(i => i.priority === 'important').slice(0, 5).map(serialize);
+      const monitor = items.filter(i => i.priority === 'monitor').slice(0, Math.max(0, limit - critical.length - important.length)).map(serialize);
 
       return reply.send({
         generatedAt: new Date().toISOString(),

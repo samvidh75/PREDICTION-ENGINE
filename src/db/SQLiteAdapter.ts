@@ -163,22 +163,15 @@ export class SQLitePool {
           return { rows: [], rowCount: db.getRowsModified() };
         }
       } finally { stmt.free(); }
-    } catch {
-      // Fallback: use db.run / db.exec for compatibility
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `SQLite query failed: ${message}\n` +
+        `Original SQL: ${text.substring(0, 200)}\n` +
+        `Translated SQL: ${translated.substring(0, 200)}\n` +
+        `Parameter count: ${params?.length ?? 0}`
+      );
     }
-
-    if (isSelect) {
-      try {
-        const result = db.exec(translated);
-        const cols = result[0]?.columns || [];
-        const vals = result[0]?.values || [];
-        const rows = vals.map((r: any[]) => { const obj: any = {}; cols.forEach((c: string, i: number) => obj[c] = r[i]); return obj; });
-        return { rows, rowCount: vals.length };
-      } catch { /* final fallback */ }
-    } else {
-      try { db.run(translated); return { rows: [], rowCount: db.getRowsModified() }; } catch { /* final fallback */ }
-    }
-    throw new Error(`SQLite query failed: ${text.substring(0, 200)}`);
   }
 
   async executeScript(sql: string): Promise<void> {
