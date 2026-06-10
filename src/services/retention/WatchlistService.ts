@@ -1,5 +1,5 @@
 /**
- * TRACK-87 — WatchlistService (async version)
+ * TRACK-87 — WatchlistService (async version with authz/IDOR fixes)
  * Server-side watchlist CRUD backed by dbAdapter.
  * Syncs with client-side localStorage via API.
  */
@@ -31,8 +31,8 @@ export class WatchlistService {
     }));
   }
 
-  async getWatchlistById(id: string): Promise<WatchlistRow | null> {
-    const res = await dbAdapter.query('SELECT * FROM user_watchlists WHERE id = $1', [id]);
+  async getWatchlistById(userId: string, id: string): Promise<WatchlistRow | null> {
+    const res = await dbAdapter.query('SELECT * FROM user_watchlists WHERE id = $1 AND user_id = $2', [id, userId]);
     const row = res.rows[0] as any;
     if (!row) return null;
     return {
@@ -49,40 +49,42 @@ export class WatchlistService {
     const tickers = '[]';
     await dbAdapter.query(
       `INSERT INTO user_watchlists (id, user_id, name, tickers, is_archived, is_favourite, sort_order, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, 0, 0, (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM user_watchlists WHERE user_id = $2), $5, $5)`,
-      [id, userId, name, tickers, now]
+       VALUES ($1, $2, $3, $4, 0, 0, (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM user_watchlists WHERE user_id = $5), $6, $7)`,
+      [id, userId, name, tickers, userId, now, now]
     );
-    return (await this.getWatchlistById(id))!;
+    return (await this.getWatchlistById(userId, id))!;
   }
 
-  async updateWatchlist(id: string, name: string, tickers: string[]): Promise<WatchlistRow | null> {
+  async updateWatchlist(userId: string, id: string, name: string, tickers: string[]): Promise<WatchlistRow | null> {
     const now = new Date().toISOString();
-    await dbAdapter.query(
-      `UPDATE user_watchlists SET name = $1, tickers = $2, updated_at = $3 WHERE id = $4`,
-      [name, JSON.stringify(tickers), now, id]
+    const res = await dbAdapter.query(
+      `UPDATE user_watchlists SET name = $1, tickers = $2, updated_at = $3 WHERE id = $4 AND user_id = $5`,
+      [name, JSON.stringify(tickers), now, id, userId]
     );
-    return this.getWatchlistById(id);
+    if (res.rowCount === 0) return null;
+    return this.getWatchlistById(userId, id);
   }
 
-  async deleteWatchlist(id: string): Promise<void> {
-    await dbAdapter.query(
-      `UPDATE user_watchlists SET is_archived = 1, updated_at = $1 WHERE id = $2`,
-      [new Date().toISOString(), id]
+  async deleteWatchlist(userId: string, id: string): Promise<boolean> {
+    const res = await dbAdapter.query(
+      `UPDATE user_watchlists SET is_archived = 1, updated_at = $1 WHERE id = $2 AND user_id = $3`,
+      [new Date().toISOString(), id, userId]
     );
+    return res.rowCount > 0;
   }
 
-  async addTicker(id: string, ticker: string): Promise<WatchlistRow | null> {
-    const wl = await this.getWatchlistById(id);
+  async addTicker(userId: string, id: string, ticker: string): Promise<WatchlistRow | null> {
+    const wl = await this.getWatchlistById(userId, id);
     if (!wl) return null;
     const tickers = wl.tickers.includes(ticker.toUpperCase()) ? wl.tickers : [...wl.tickers, ticker.toUpperCase()];
-    return this.updateWatchlist(id, wl.name, tickers);
+    return this.updateWatchlist(userId, id, wl.name, tickers);
   }
 
-  async removeTicker(id: string, ticker: string): Promise<WatchlistRow | null> {
-    const wl = await this.getWatchlistById(id);
+  async removeTicker(userId: string, id: string, ticker: string): Promise<WatchlistRow | null> {
+    const wl = await this.getWatchlistById(userId, id);
     if (!wl) return null;
     const tickers = wl.tickers.filter(t => t !== ticker.toUpperCase());
-    return this.updateWatchlist(id, wl.name, tickers);
+    return this.updateWatchlist(userId, id, wl.name, tickers);
   }
 
   /** Get all tickers across all watchlists for a user */

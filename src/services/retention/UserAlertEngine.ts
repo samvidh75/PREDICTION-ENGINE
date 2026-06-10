@@ -207,8 +207,9 @@ export class UserAlertEngine {
   }
 
   /** Mark an alert as read */
-  async markAsRead(alertId: number): Promise<void> {
-    await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE id = $1', [alertId]);
+  async markAsRead(userId: string, alertId: number): Promise<boolean> {
+    const res = await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE id = $1 AND user_id = $2', [alertId, userId]);
+    return res.rowCount > 0;
   }
 
   /** Mark all alerts as read for a user */

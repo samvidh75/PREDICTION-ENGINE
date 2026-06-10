@@ -10,7 +10,18 @@ BEGIN
   END IF;
 
   -- 2. Backfill existing rows: set period_end to snapshot_date if null
-  UPDATE financial_snapshots SET period_end = snapshot_date WHERE period_end IS NULL;
+  UPDATE financial_snapshots SET period_end = CAST(snapshot_date AS DATE) WHERE period_end IS NULL;
+
+  -- 2b. Detect duplicate (symbol, period_end) rows and fail loudly
+  IF EXISTS (
+    SELECT 1 FROM (
+      SELECT symbol, period_end FROM financial_snapshots
+      GROUP BY symbol, period_end
+      HAVING COUNT(*) > 1
+    ) dupes
+  ) THEN
+    RAISE EXCEPTION 'MIGRATION_COLLISION_DETECTED: Duplicate keys (symbol, period_end) exist in financial_snapshots before applying new Primary Key constraint';
+  END IF;
 
   -- 3. Make period_end NOT NULL
   ALTER TABLE financial_snapshots ALTER COLUMN period_end SET NOT NULL;
