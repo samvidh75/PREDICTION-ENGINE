@@ -70,10 +70,15 @@ jobs:
 
       - name: Wait for /healthz (liveness)
         run: |
-          for i in {1..30}; do
+          for i in $(seq 1 30); do
             if curl -fsS http://localhost:4001/healthz; then
               echo "Container /healthz ready after ${i} attempts"
               break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: /healthz did not become ready after 30 attempts"
+              docker logs stockstory-api-test
+              exit 1
             fi
             sleep 2
           done
@@ -82,10 +87,15 @@ jobs:
 
       - name: Wait for /readyz (readiness)
         run: |
-          for i in {1..30}; do
+          for i in $(seq 1 30); do
             if curl -fsS http://localhost:4001/readyz; then
               echo "Container /readyz ready after ${i} attempts"
               break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: /readyz did not become ready after 30 attempts"
+              docker logs stockstory-api-test
+              exit 1
             fi
             sleep 2
           done
@@ -100,6 +110,14 @@ jobs:
 
       - name: Strict API smoke test
         run: API_BASE_URL=http://localhost:4001 npm run smoke:api
+
+      - name: Upload API smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-smoke-report-docker
+          path: reports/release/api-smoke-report.json
+          if-no-files-found: warn
 
       - name: Show container logs
         if: always()
