@@ -20,6 +20,8 @@ interface GateCheck {
 
 const checks: GateCheck[] = [
   { name: 'npm ci (dependencies)', mandatory: true, command: 'npm ci', passed: false },
+  { name: 'Verify no native app deps', mandatory: true, command: 'npm run verify:no-native-app-deps', passed: false },
+  { name: 'Validate portability', mandatory: true, command: 'npm run validate:portability', passed: false },
   { name: 'Lint (ESLint)', mandatory: true, command: 'npm run lint', passed: false },
   { name: 'TypeScript typecheck (all)', mandatory: true, command: 'npm run typecheck:all', passed: false },
   { name: 'Unit tests', mandatory: true, command: 'npm run test:unit', passed: false },
