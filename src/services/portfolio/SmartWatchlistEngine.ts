@@ -1,5 +1,6 @@
 // src/services/portfolio/SmartWatchlistEngine.ts
 import { StockRegistry, RegisteredStock } from "../stocks/StockRegistry";
+import { rangeProximity } from "../dna/dnaInputs";
 
 export interface SmartWatchlist {
   name: string;
@@ -23,23 +24,21 @@ export class SmartWatchlistEngine {
 
     const momentumLeaders = all
       .filter((s) => {
-        const range = s.fiftyTwoWeekRange;
-        const proximity = (range.current - range.low) / (range.high - range.low || 1);
-        return proximity > 0.75;
+        const proximity = rangeProximity(s);
+        return proximity !== null && proximity > 0.75;
       })
       .map((s) => s.symbol)
       .slice(0, 5);
 
     const sectorLeaders = all
-      .filter((s) => s.peRatio > 0 && s.peRatio < 20)
+      .filter((s) => typeof s.peRatio === "number" && s.peRatio > 0 && s.peRatio < 20)
       .map((s) => s.symbol)
       .slice(0, 5);
 
     const turnarounds = all
       .filter((s) => {
-        const range = s.fiftyTwoWeekRange;
-        const proximity = (range.current - range.low) / (range.high - range.low || 1);
-        return proximity >= 0.25 && proximity <= 0.50; // base formation
+        const proximity = rangeProximity(s);
+        return proximity !== null && proximity >= 0.25 && proximity <= 0.50; // base formation
       })
       .map((s) => s.symbol)
       .slice(0, 5);

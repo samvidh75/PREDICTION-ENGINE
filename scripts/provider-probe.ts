@@ -184,7 +184,7 @@ async function probe(
 
 // 1. FINNHUB — stock/metric (already implemented, free tier key)
 async function testFinnhub(sym: string) {
-  const key = process.env.FINNHUB_KEY || 'd8fhq1hr01qn443a1sigd8fhq1hr01qn443a1sj0';
+  const key = process.env.FINNHUB_KEY ?? '';
   const r = await fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${sym}.NS&metric=all&token=${key}`);
   const data = await r.json();
   return { status: r.status, data };
@@ -192,7 +192,7 @@ async function testFinnhub(sym: string) {
 
 // 2. INDIANAPI — /stock_fundamentals
 async function testIndianAPIFundamentals(sym: string) {
-  const key = process.env.INDIANAPI_KEY || 'sk-live-oYJvcSXqvVD4PbWLceN7fHHpaXQjq0pHADLuEbDj';
+  const key = process.env.INDIANAPI_KEY ?? '';
   const r = await fetch(`https://stock.indianapi.in/stock_fundamentals?name=${sym}`, {
     headers: { 'X-Api-Key': key, 'Accept': 'application/json' },
   });

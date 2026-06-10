@@ -15,12 +15,6 @@ import { cachePlugin } from "../persistence/cache/cachePlugin";
 import { loadEnv } from "../config/env";
 import { dbAdapter } from "../../db/DatabaseAdapter";
 
-declare module "fastify" {
-  interface FastifyInstance {
-    db: typeof dbAdapter;
-  }
-}
-
 export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
   const env = loadEnv();
 

@@ -1,0 +1,33 @@
+
+> prediction-engine@0.1.0 validate:hygiene
+> tsx scripts/validate-repository-hygiene.ts
+
+=== Repository Hygiene Scan ===
+
+  WARN: src/backend/web/routes/intelligence.ts contains synthetic fallback marker
+  SECRET: src/db/DatabasePolicy.ts — matches credential pattern
+  SECRET: src/db/__tests__/p0-stabilization.test.ts — matches credential pattern
+  WARN: scripts/fundamental-completion.ts contains console.log of potential secret
+  WARN: scripts/fundamental-integration.ts contains console.log of potential secret
+  WARN: scripts/provider-probe.ts contains console.log of potential secret
+  WARN: scripts/track-7e-live-fundamental-activation.ts contains console.log of potential secret
+  SECRET: scripts/track-7h-a-validation.ts — matches credential pattern
+  WARN: scripts/track-7h-a-validation.ts contains console.log of potential secret
+  SECRET: scripts/track-8b-score-integrity.ts — matches credential pattern
+  WARN: scripts/track-8b-score-integrity.ts contains console.log of potential secret
+  SECRET: scripts/track-8d-indianapi-audit.ts — matches credential pattern
+  WARN: scripts/validate-data-integrity.ts contains synthetic fallback marker
+  WARN: scripts/validate-data-integrity.ts contains silent demo injection
+  WARN: scripts/validate-repository-hygiene.ts contains .only() test focus
+  WARN: scripts/validate-repository-hygiene.ts contains describe.only()
+  WARN: scripts/validate-repository-hygiene.ts contains it.only()
+  WARN: scripts/validate-repository-hygiene.ts contains test.only()
+  WARN: scripts/validate-repository-hygiene.ts contains debugger statement
+  WARN: scripts/validate-repository-hygiene.ts contains console.log of potential secret
+  WARN: scripts/validate-repository-hygiene.ts contains synthetic fallback marker
+  WARN: scripts/validate-repository-hygiene.ts contains silent demo injection
+
+=== Hygiene Scan Complete ===
+Errors (secrets): 5
+Warnings (hazards): 17
+FAIL: Potential secrets detected

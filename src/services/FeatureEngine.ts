@@ -3,6 +3,20 @@
 
 import { query } from "../db/index";
 
+interface MarketAverageRow extends Record<string, unknown> {
+  date: string;
+  avg_return: number | string | null;
+}
+
+interface DailyPriceRow extends Record<string, unknown> {
+  date: string;
+  open: number | string;
+  high: number | string;
+  low: number | string;
+  close: number | string;
+  volume: number | string;
+}
+
 export interface StockFeatureSnapshot {
   symbol: string;
   tradeDate: string;
@@ -26,7 +40,7 @@ export class FeatureEngine {
   private getMarketAvgMap(): Promise<Map<string, number>> {
     if (!this.marketAvgPromise) {
       this.marketAvgPromise = (async () => {
-        const marketAvgRes = await query(
+        const marketAvgRes = await query<MarketAverageRow>(
           `SELECT trade_date::text as date, AVG((close - open) / open) as avg_return
            FROM daily_prices
            GROUP BY trade_date`
@@ -47,7 +61,7 @@ export class FeatureEngine {
    */
   async calculateAndStoreFeatures(symbol: string): Promise<StockFeatureSnapshot[]> {
     // 1. Fetch historical prices from DB ordered by trade_date ascending
-    const priceRes = await query(
+    const priceRes = await query<DailyPriceRow>(
       `SELECT trade_date::text as date, open, high, low, close, volume
        FROM daily_prices
        WHERE symbol = $1

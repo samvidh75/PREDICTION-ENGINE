@@ -97,7 +97,7 @@ describe('GROUP A — SQLite Schema Contract', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+    try { fs.rmSync(dbDir, { recursive: true }); } catch { /* temp test cleanup best effort */ }
   });
 
   it('feature_snapshots contains all canonical columns', () => {
@@ -191,7 +191,7 @@ describe('GROUP B — Feature Engine Write Test', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+    try { fs.rmSync(dbDir, { recursive: true }); } catch { /* temp test cleanup best effort */ }
   });
 
   it('can insert a feature_snapshot with canonical columns', () => {
@@ -256,7 +256,7 @@ describe('GROUP C — Factor Engine Write Test', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch {}
+    try { fs.rmSync(dbDir, { recursive: true }); } catch { /* temp test cleanup best effort */ }
   });
 
   it('can insert a factor_snapshot with canonical columns', () => {
@@ -298,7 +298,9 @@ describe('GROUP C — Factor Engine Write Test', () => {
 describe('GROUP G — Database Adapter Health Check', () => {
   it('DatabaseAdapter initializes to sqlite kind when DATABASE_URL is not set', async () => {
     const origUrl = process.env.DATABASE_URL;
+    const origAdapter = process.env.DB_ADAPTER;
     delete process.env.DATABASE_URL;
+    process.env.DB_ADAPTER = 'sqlite';
     try {
       const { dbAdapter } = await import('../DatabaseAdapter');
       (dbAdapter as unknown as { _initialized: boolean })._initialized = false;
@@ -310,19 +312,29 @@ describe('GROUP G — Database Adapter Health Check', () => {
       await dbAdapter.shutdown();
     } finally {
       if (origUrl) process.env.DATABASE_URL = origUrl;
+      else delete process.env.DATABASE_URL;
+      if (origAdapter) process.env.DB_ADAPTER = origAdapter;
+      else delete process.env.DB_ADAPTER;
     }
   });
 
   it('DatabaseAdapter reports kind honestly', async () => {
+    const origAdapter = process.env.DB_ADAPTER;
+    process.env.DB_ADAPTER = 'sqlite';
     const { dbAdapter } = await import('../DatabaseAdapter');
-    if ((dbAdapter as unknown as { _initialized: boolean })._initialized) {
+    try {
+      if ((dbAdapter as unknown as { _initialized: boolean })._initialized) {
+        await dbAdapter.shutdown();
+      }
+      (dbAdapter as unknown as { _initialized: boolean })._initialized = false;
+      (dbAdapter as unknown as { _kind: string })._kind = 'unavailable';
+      await dbAdapter.initialize();
+      expect(['sqlite', 'postgres', 'unavailable']).toContain(dbAdapter.kind);
       await dbAdapter.shutdown();
+    } finally {
+      if (origAdapter) process.env.DB_ADAPTER = origAdapter;
+      else delete process.env.DB_ADAPTER;
     }
-    (dbAdapter as unknown as { _initialized: boolean })._initialized = false;
-    (dbAdapter as unknown as { _kind: string })._kind = 'unavailable';
-    await dbAdapter.initialize();
-    expect(['sqlite', 'postgres', 'unavailable']).toContain(dbAdapter.kind);
-    await dbAdapter.shutdown();
   });
 
   it('DatabaseAdapter ping reports false when unavailable', async () => {

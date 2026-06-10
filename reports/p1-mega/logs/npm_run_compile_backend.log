@@ -1,0 +1,281 @@
+
+> prediction-engine@0.1.0 compile:backend
+> tsc -p tsconfig.backend.emit.json
+
+src/backend/monitoring/dbDiagnostics.ts(13,14): error TS2304: Cannot find name 'window'.
+src/backend/monitoring/dbDiagnostics.ts(15,13): error TS2304: Cannot find name 'window'.
+src/backend/monitoring/requestIdPlugin.ts(15,9): error TS2339: Property 'requestId' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/backend/monitoring/requestIdPlugin.ts(23,38): error TS2339: Property 'requestId' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/backend/persistence/cache/cachePlugin.ts(19,19): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/persistence/postgres/postgresPlugin.ts(14,12): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/persistence/postgres/postgresPlugin.ts(20,41): error TS2339: Property 'env' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+src/backend/web/app.ts(20,5): error TS2687: All declarations of 'db' must have identical modifiers.
+src/backend/web/routes/healthometer.ts(8,55): error TS6142: Module '../../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/backend/web/routes/ops.ts(49,37): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/backend/web/routes/retention.ts(39,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Body: WatchlistBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Body: WatchlistBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Body: WatchlistBody; }'.
+            Types of property 'Body' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistBody'.
+src/backend/web/routes/retention.ts(52,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; Body: WatchlistBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; Body: WatchlistBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; Body: WatchlistBody; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(65,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(74,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams; Body: TickerBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams; Body: TickerBody; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(86,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: WatchlistIdParams & { ticker: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: WatchlistIdParams & { ticker: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: WatchlistIdParams & { ticker: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'WatchlistIdParams & { ticker: string; }'.
+                Type 'unknown' is not assignable to type 'WatchlistIdParams'.
+src/backend/web/routes/retention.ts(118,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: AlertIdParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: AlertIdParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: AlertIdParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'AlertIdParams'.
+src/backend/web/routes/retention.ts(151,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Querystring: ShareQuery; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Querystring: ShareQuery; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Querystring: ShareQuery; }'.
+            Types of property 'Querystring' are incompatible.
+              Type 'unknown' is not assignable to type 'ShareQuery'.
+src/backend/web/routes/retention.ts(198,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: ReferralCodeParams; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: ReferralCodeParams; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: ReferralCodeParams; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type 'ReferralCodeParams'.
+src/backend/web/routes/retention.ts(224,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Params: { featureKey: string; }; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Params: { featureKey: string; }; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Params: { featureKey: string; }; }'.
+            Types of property 'Params' are incompatible.
+              Type 'unknown' is not assignable to type '{ featureKey: string; }'.
+src/backend/web/routes/retention.ts(244,7): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }, handler?: WebsocketHandler<...> | undefined): FastifyInstance<...>', gave the following error.
+    Argument of type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' is not assignable to parameter of type 'RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger> & { ...; }'.
+      Property 'websocket' is missing in type '{ preHandler: ((request: FastifyRequest, reply: FastifyReply) => Promise<void>)[]; }' but required in type '{ websocket: true; }'.
+  Overload 2 of 4, '(path: string, opts: RouteShorthandOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>, handler: RouteHandlerMethod<...>): FastifyInstance<...>', gave the following error.
+    Argument of type '(request: FastifyRequest<{ Body: SubscribeBody; }>, reply: FastifyReply) => Promise<never>' is not assignable to parameter of type 'RouteHandlerMethod<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, RouteGenericInterface, unknown, FastifySchema, FastifyTypeProviderDefault, FastifyBaseLogger>'.
+      Types of parameters 'request' and 'request' are incompatible.
+        Type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>' is not assignable to type 'FastifyRequest<{ Body: SubscribeBody; }, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+          Type 'RouteGenericInterface' is not assignable to type '{ Body: SubscribeBody; }'.
+            Types of property 'Body' are incompatible.
+              Type 'unknown' is not assignable to type 'SubscribeBody'.
+src/backend/web/routes/search.ts(5,38): error TS6142: Module '../../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/data/OutcomeRepository.ts(130,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(131,22): error TS18046: 'row.mean_sq_return' is of type 'unknown'.
+src/data/OutcomeRepository.ts(131,44): error TS18046: 'meanReturn' is of type 'unknown'.
+src/data/OutcomeRepository.ts(131,57): error TS18046: 'meanReturn' is of type 'unknown'.
+src/data/OutcomeRepository.ts(133,10): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(133,10): error TS18048: 'meanReturn' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(139,28): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(139,28): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(139,43): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(139,43): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(140,17): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/data/OutcomeRepository.ts(140,17): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(141,18): error TS18048: 'hitRate' is possibly 'undefined'.
+src/data/OutcomeRepository.ts(141,18): error TS2365: Operator '+' cannot be applied to types '{}' and 'number'.
+src/data/OutcomeRepository.ts(146,34): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(148,30): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/data/OutcomeRepository.ts(149,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(150,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(151,7): error TS2322: Type 'unknown' is not assignable to type 'number | null'.
+src/data/OutcomeRepository.ts(217,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/intelligence/PredictionExplanationEngine.ts(215,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/intelligence/PredictionExplanationEngine.ts(219,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/intelligence/SignalFeedEngine.ts(72,16): error TS2304: Cannot find name 'window'.
+src/intelligence/SignalFeedEngine.ts(83,18): error TS2304: Cannot find name 'window'.
+src/intelligence/SignalFeedEngine.ts(99,11): error TS2322: Type 'unknown' is not assignable to type 'SignalsApiResponse'.
+src/monitoring/DataCoverageMonitor.ts(36,35): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/DataCoverageMonitor.ts(37,38): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/RankingHealthMonitor.ts(32,30): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/RankingHealthMonitor.ts(42,7): error TS2322: Type '{} | null' is not assignable to type 'string | null'.
+  Type '{}' is not assignable to type 'string'.
+src/monitoring/RankingHealthMonitor.ts(43,56): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/monitoring/SnapshotFreshnessMonitor.ts(45,63): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(value: string | number | Date): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number | Date'.
+  Overload 2 of 4, '(value: string | number): Date', gave the following error.
+    Argument of type '{}' is not assignable to parameter of type 'string | number'.
+src/monitoring/SnapshotFreshnessMonitor.ts(47,32): error TS2322: Type '{}' is not assignable to type 'string'.
+src/predictions/PredictionRegistry.ts(217,21): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/predictions/PredictionRegistry.ts(292,5): error TS2322: Type '{ date: string; top10: any; top25: any; top50: any; bottom10: any; bottom25: any; benchmark_level: number; n_symbols_ranked: unknown; }[]' is not assignable to type 'PredictionSlice[]'.
+  Type '{ date: string; top10: any; top25: any; top50: any; bottom10: any; bottom25: any; benchmark_level: number; n_symbols_ranked: unknown; }' is not assignable to type 'PredictionSlice'.
+    Types of property 'n_symbols_ranked' are incompatible.
+      Type 'unknown' is not assignable to type 'number'.
+src/services/auth/authenticatedFetch.ts(63,27): error TS2339: Property 'code' does not exist on type '{}'.
+src/services/auth/authenticatedFetch.ts(65,3): error TS2322: Type 'unknown' is not assignable to type 'T'.
+  'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
+src/services/auth/authenticatedFetch.ts(99,3): error TS2322: Type 'unknown' is not assignable to type 'T'.
+  'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
+src/services/auth/sessionStore.ts(23,14): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(28,17): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(55,14): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(58,5): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(60,5): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(67,14): error TS2304: Cannot find name 'window'.
+src/services/auth/sessionStore.ts(70,5): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxOAuth.ts(99,20): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(100,21): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(101,32): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(102,18): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(103,21): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(134,20): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(135,21): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxOAuth.ts(136,32): error TS18046: 'data' is of type 'unknown'.
+src/services/brokers/UpstoxProvider.ts(40,16): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(41,7): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(42,7): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(45,34): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/services/brokers/UpstoxProvider.ts(50,29): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(51,9): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(53,24): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(54,9): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(60,16): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(61,7): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(65,16): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(66,7): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(67,7): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(74,24): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(75,9): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(184,24): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(185,9): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(188,16): error TS2304: Cannot find name 'window'.
+src/services/brokers/UpstoxProvider.ts(189,7): error TS2304: Cannot find name 'window'.
+src/services/data/cache/DataCache.ts(16,18): error TS2304: Cannot find name 'window'.
+src/services/data/cache/DataCache.ts(40,18): error TS2304: Cannot find name 'window'.
+src/services/data/cache/DataCache.ts(51,18): error TS2304: Cannot find name 'window'.
+src/services/data/cache/DataCache.ts(62,18): error TS2304: Cannot find name 'window'.
+src/services/discovery/discoveryTypes.ts(1,38): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/services/earnings/earningsNarrativeEngine.ts(3,38): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/services/earnings/earningsTypes.ts(1,38): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/services/FactorEngine.ts(42,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FactorEngine.ts(86,63): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string'.
+src/services/FactorEngine.ts(93,20): error TS18046: 'feat.trade_date' is of type 'unknown'.
+src/services/FactorEngine.ts(101,23): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(101,49): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(102,18): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(103,11): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(104,24): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(104,64): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(105,44): error TS18048: 'feat.rsi' is possibly 'undefined'.
+src/services/FactorEngine.ts(105,44): error TS2365: Operator '>=' cannot be applied to types '{}' and 'number'.
+src/services/FactorEngine.ts(105,62): error TS18048: 'feat.rsi' is possibly 'undefined'.
+src/services/FactorEngine.ts(105,62): error TS2365: Operator '<=' cannot be applied to types '{}' and 'number'.
+src/services/FactorEngine.ts(110,23): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(111,43): error TS18046: 'financial.pe_ratio' is of type 'unknown'.
+src/services/FactorEngine.ts(113,26): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(113,75): error TS18046: 'financial.dividend_yield' is of type 'unknown'.
+src/services/FactorEngine.ts(135,73): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/services/FeatureEngine.ts(36,19): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FeatureEngine.ts(241,45): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/services/FeatureEngine.ts(270,9): error TS2322: Type 'unknown' is not assignable to type 'string'.
+src/services/healthometer/healthometerDiagnostics.ts(24,14): error TS2304: Cannot find name 'window'.
+src/services/healthometer/healthometerDiagnostics.ts(25,13): error TS2304: Cannot find name 'window'.
+src/services/healthometer/healthometerEngine.ts(3,38): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/services/market/marketDiagnostics.ts(16,14): error TS2304: Cannot find name 'window'.
+src/services/market/marketDiagnostics.ts(18,13): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(128,7): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(147,24): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(171,31): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(178,5): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(212,33): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(261,31): error TS2304: Cannot find name 'window'.
+src/services/market/marketService.ts(293,11): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(21,47): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/services/market/websocketManager.ts(70,7): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(77,5): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(80,26): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(83,23): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(90,24): error TS2304: Cannot find name 'window'.
+src/services/market/websocketManager.ts(172,7): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(25,14): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(26,3): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(30,14): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(33,3): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(35,5): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(53,14): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(58,13): error TS2322: Type 'unknown' is not assignable to type 'CustomWatchlist[]'.
+src/services/portfolio/watchlistStore.ts(62,9): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(72,14): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(80,15): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(82,5): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(94,14): error TS2304: Cannot find name 'window'.
+src/services/portfolio/watchlistStore.ts(96,3): error TS2304: Cannot find name 'window'.
+src/services/providers/ProviderCoordinator.ts(55,18): error TS2304: Cannot find name 'window'.
+src/services/providers/ProviderCoordinator.ts(56,16): error TS2304: Cannot find name 'window'.
+src/services/retention/SubscriptionService.ts(98,21): error TS2322: Type 'UserSubscription | null' is not assignable to type 'UserSubscription'.
+  Type 'null' is not assignable to type 'UserSubscription'.
+src/services/retention/SubscriptionService.ts(129,7): error TS2322: Type 'UserSubscription | null' is not assignable to type 'UserSubscription'.
+  Type 'null' is not assignable to type 'UserSubscription'.
+src/services/synthesis/neuralMarketSynthesisEngine.ts(6,55): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/services/synthesis/neuralMarketSynthesisEngine.ts(32,51): error TS2366: Function lacks ending return statement and return type does not include 'undefined'.
+src/services/synthesis/neuralMarketSynthesisTypes.ts(1,55): error TS6142: Module '../../components/intelligence/ConfidenceEngine' was resolved to '/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/src/components/intelligence/ConfidenceEngine.tsx', but '--jsx' is not set.
+src/validation/OutcomeValidator.ts(115,13): error TS2322: Type 'unknown' is not assignable to type 'string'.

@@ -4,7 +4,11 @@
  */
 import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { loadEnv } from "../../config/env";
-import pool from "../../../db/index";
+import { query } from "../../../db/index";
+
+interface FreshnessRow extends Record<string, unknown> {
+  latest: Date | string | number | null;
+}
 
 const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   const env = loadEnv();
@@ -16,7 +20,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     // Predictions today
     try {
       const today = new Date().toISOString().split("T")[0];
-      const predRes = await pool.query(
+      const predRes = await query(
         "SELECT COUNT(DISTINCT symbol) as symbols, COUNT(*) as total FROM prediction_registry WHERE prediction_date = $1",
         [today]
       );
@@ -29,7 +33,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
     // Hit rate (validated predictions with alpha > 0)
     try {
-      const hitRes = await pool.query(
+      const hitRes = await query(
         "SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE alpha > 0) as hits FROM prediction_registry WHERE validation_status = 'validated'"
       );
       const total = Number(hitRes.rows[0]?.total ?? 1);
@@ -41,11 +45,11 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
     // Data freshness
     try {
-      const freshRes = await pool.query(
+      const freshRes = await query<FreshnessRow>(
         "SELECT MAX(trade_date) as latest FROM daily_prices"
       );
       const latest = freshRes.rows[0]?.latest;
-      if (latest) {
+      if (latest !== null && latest !== undefined) {
         const latestDate = new Date(latest);
         const daysAgo = Math.floor((Date.now() - latestDate.getTime()) / 86400000);
         metrics.pipeline_freshness = `${daysAgo}d ago`;
@@ -58,7 +62,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
     // Scheduler health
     try {
-      const schedRes = await pool.query(
+      const schedRes = await query(
         "SELECT status, phase FROM pipeline_health ORDER BY started_at DESC LIMIT 6"
       );
       const phases = schedRes.rows.map((r: any) => `${r.phase}:${r.status}`);
@@ -69,7 +73,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
     // DB health
     try {
-      await pool.query("SELECT 1");
+      await query("SELECT 1");
       metrics.db_health = "connected";
     } catch {
       metrics.db_health = "error";

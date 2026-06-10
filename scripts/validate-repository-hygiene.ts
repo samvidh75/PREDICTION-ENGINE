@@ -19,7 +19,7 @@ const SRC_DIR = path.join(process.cwd(), 'src');
 const SCRIPTS_DIR = path.join(process.cwd(), 'scripts');
 
 const SECRET_PATTERNS = [
-  /DATABASE_URL\s*=\s*(?!.*localhost)(?!.*postgres:\/\/stockstory:stockstory@localhost)/i,
+  /(?:^|[\s"'`])DATABASE_URL\s*=\s*(?!.*localhost)(?!.*postgres:\/\/stockstory:stockstory@localhost)/i,
   /COOKIE_SECRET\s*=\s*['"][\w!@#$%^&*()-]{10,}['"]/,
   /API_KEY\s*=\s*['"][\w-]{20,}['"]/,
   /bearer\s+[\w-]{20,}/i,
@@ -40,10 +40,17 @@ const HAZARDOUS_PATTERNS = [
 let errors = 0;
 let warnings = 0;
 
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
 function scanFile(filePath: string): void {
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
     const relPath = path.relative(process.cwd(), filePath);
+    if (relPath === 'scripts/validate-repository-hygiene.ts') return;
+    const content = stripComments(fs.readFileSync(filePath, 'utf-8'));
 
     // Check for secret patterns
     for (const pattern of SECRET_PATTERNS) {

@@ -20,10 +20,10 @@ const OUT = path.resolve(__dirname, '..', 'reports', 'track-7h-a');
 const SRC = path.resolve(__dirname, '..', 'src');
 if (!fs.existsSync(OUT)) fs.mkdirSync(OUT, { recursive: true });
 
-const CLIENT_ID = 'a16839aa-ef23-4d8d-acf2-e3f900327331';
-const REDIRECT_URI = 'http://localhost:5173/auth/upstox/callback';
-const CLIENT_SECRET = '12w5j6s6fh';
-const API_KEY = 'a16839aa-ef23-4d8d-acf2-e3f900327331';
+const CLIENT_ID = process.env.VITE_UPSTOX_CLIENT_ID ?? '';
+const REDIRECT_URI = process.env.VITE_UPSTOX_REDIRECT_URI ?? 'http://localhost:5173/auth/upstox/callback';
+const CLIENT_SECRET = process.env.UPSTOX_CLIENT_SECRET ?? '';
+const API_KEY = process.env.UPSTOX_API_KEY ?? '';
 
 console.log('═'.repeat(72));
 console.log('  TRACK-7H-A: UPSTOX OAUTH VALIDATION & PORTFOLIO IMPORT');

@@ -1,0 +1,155 @@
+
+> prediction-engine@0.1.0 test:coverage
+> vitest run --coverage
+
+
+ RUN  v1.6.0 /Users/samvidhmehta/Desktop/PREDICTION-ENGINE
+      Coverage enabled with v8
+
+ ✓ src/stockstory/__tests__/PercentileEngine.test.ts  (19 tests) 9ms
+ ✓ src/stockstory/__tests__/StockStoryEngine.test.ts  (41 tests) 12ms
+ ❯ src/db/__tests__/p0-stabilization.test.ts  (21 tests | 2 failed) 33ms
+   ❯ src/db/__tests__/p0-stabilization.test.ts > GROUP G — Database Adapter Health Check > DatabaseAdapter initializes to sqlite kind when DATABASE_URL is not set
+     → DB_ADAPTER must be explicitly set to "postgres" or "sqlite" in test environment.
+   ❯ src/db/__tests__/p0-stabilization.test.ts > GROUP G — Database Adapter Health Check > DatabaseAdapter reports kind honestly
+     → DB_ADAPTER must be explicitly set to "postgres" or "sqlite" in test environment.
+ ✓ src/stockstory/__tests__/RegistryValidation.test.ts  (5 tests) 23ms
+ ✓ src/stockstory/__tests__/ScoringIntegrity.test.ts  (26 tests) 27ms
+ ✓ src/backend/web/routes/__tests__/userProfile.auth.test.ts  (11 tests) 90ms
+ ✓ src/pages/SearchRouteTests.test.tsx  (2 tests) 67ms
+ ✓ src/backend/web/routes/__tests__/investorState.auth.test.ts  (12 tests) 91ms
+ ↓ src/__tests__/integration/postgres-registry.integration.test.ts  (9 tests | 9 skipped)
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > complete registry columns exist
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > created_at populated by default
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > created_by defaults to DailyPredictionCapture
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > UNIQUE(symbol, prediction_date, prediction_horizon) enforced
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > valid insert succeeds
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > duplicate insert deterministic — fails predictably
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid classification rejected
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid horizon rejected
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-registry.integration.test.ts > SQLite prediction_registry integration > invalid created_by rejected
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/sqlite-registry.integration.test.ts  (9 tests) 31ms
+ ✓ src/components/PredictiveHologram.test.tsx  (2 tests) 23ms
+ ↓ src/__tests__/integration/postgres-migration.integration.test.ts  (6 tests | 6 skipped)
+ ✓ src/db/__tests__/MigrationRunner.test.ts  (8 tests) 8ms
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > multi-statement migration executes via executeScript
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > executeScript path exercised through dbAdapter
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > replay skips applied migration
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > checksum mismatch throws
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/sqlite-migration.integration.test.ts > SQLite migration integration > invalid SQL not recorded as applied
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/sqlite-migration.integration.test.ts  (5 tests) 21ms
+stderr | src/__tests__/integration/postgres-readiness.integration.test.ts > PostgreSQL readiness integration
+[postgres-readiness test] DATABASE_URL not set — skipping PostgreSQL tests
+
+ ✓ src/backend/auth/__tests__/requireAuthenticatedUser.test.ts  (12 tests) 6ms
+stderr | src/__tests__/integration/postgres-readiness.integration.test.ts > PostgreSQL readiness integration > /readyz returns HTTP 503 when DB is unavailable
+[db] Canonical adapter: unavailable ()
+
+ ✓ src/backend/auth/__tests__/firebaseAdmin.test.ts  (6 tests) 100ms
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration
+[postgres-adapter test] DATABASE_URL not set — skipping PostgreSQL tests
+
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration > missing DATABASE_URL produces unavailable state
+[db] Canonical adapter: unavailable (PostgreSQL is required but unavailable)
+
+ ✓ src/__tests__/integration/postgres-readiness.integration.test.ts  (6 tests | 5 skipped) 64ms
+stderr | src/__tests__/integration/postgres-adapter.integration.test.ts > PostgreSQL adapter integration > PostgreSQL outage does not silently activate SQLite
+[db] Canonical adapter: unavailable ()
+
+ ✓ src/__tests__/integration/postgres-adapter.integration.test.ts  (7 tests | 5 skipped) 26ms
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > DB_ADAPTER=sqlite activates SQLite
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > diagnostics.kind === "sqlite"
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > DatabaseAdapter.executeScript delegates correctly
+[db] Canonical adapter: SQLite configured
+
+stderr | src/__tests__/integration/database-adapter.integration.test.ts > DatabaseAdapter SQLite integration > production SQLite rejected without explicit flags
+[db] Canonical adapter: unavailable (SQLite is not allowed in production)
+
+ ✓ src/__tests__/integration/database-adapter.integration.test.ts  (5 tests) 14ms
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /healthz returns HTTP 200
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz reports sqlite honestly
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz responds with valid JSON
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > /readyz returns HTTP 503 on checksum mismatch
+[db] Canonical adapter: SQLite configured
+
+stdout | src/__tests__/integration/readiness.integration.test.ts > Readiness integration > readiness payload contains no secrets
+[db] Canonical adapter: SQLite configured
+
+ ✓ src/__tests__/integration/readiness.integration.test.ts  (5 tests) 66ms
+ ✓ src/stockstory/__tests__/SearchRouting.test.ts  (2 tests) 3ms
+ ✓ src/services/data/CompanyDataValidator.test.ts  (2 tests) 2ms
+ ✓ src/services/stocks/StockRegistry.test.ts  (2 tests) 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/db/__tests__/p0-stabilization.test.ts > GROUP G — Database Adapter Health Check > DatabaseAdapter initializes to sqlite kind when DATABASE_URL is not set
+Error: DB_ADAPTER must be explicitly set to "postgres" or "sqlite" in test environment.
+ ❯ Module.loadDatabasePolicy src/db/DatabasePolicy.ts:46:13
+     44|       requestedAdapter = rawAdapter;
+     45|     } else {
+     46|       throw new Error(
+       |             ^
+     47|         'DB_ADAPTER must be explicitly set to "postgres" or "sqlite" i…
+     48|       );
+ ❯ DatabaseAdapter.initialize src/db/DatabaseAdapter.ts:103:20
+ ❯ src/db/__tests__/p0-stabilization.test.ts:306:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/db/__tests__/p0-stabilization.test.ts > GROUP G — Database Adapter Health Check > DatabaseAdapter reports kind honestly
+Error: DB_ADAPTER must be explicitly set to "postgres" or "sqlite" in test environment.
+ ❯ Module.loadDatabasePolicy src/db/DatabasePolicy.ts:46:13
+     44|       requestedAdapter = rawAdapter;
+     45|     } else {
+     46|       throw new Error(
+       |             ^
+     47|         'DB_ADAPTER must be explicitly set to "postgres" or "sqlite" i…
+     48|       );
+ ❯ DatabaseAdapter.initialize src/db/DatabaseAdapter.ts:103:20
+ ❯ src/db/__tests__/p0-stabilization.test.ts:323:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed | 20 passed | 2 skipped (23)
+      Tests  2 failed | 196 passed | 25 skipped (223)
+   Start at  23:34:41
+   Duration  1.50s (transform 486ms, setup 1ms, collect 1.58s, tests 718ms, environment 5.97s, prepare 1.62s)
+

@@ -126,10 +126,12 @@ export class MigrationRunner {
           `INSERT INTO schema_migrations (id, checksum, applied_at) VALUES ($1, $2, $3)`,
           [migration.id, migration.checksum, new Date().toISOString()]
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
         throw new Error(
-          `Migration "${migration.id}" failed: ${err.message || 'Unknown error'}. ` +
-          `No migrations have been applied after this failure.`
+          `Migration "${migration.id}" failed: ${message}. ` +
+          `No migrations have been applied after this failure.`,
+          { cause: err },
         );
       }
     }

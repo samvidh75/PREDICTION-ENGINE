@@ -20,7 +20,7 @@ console.log('='.repeat(72));
 console.log('  TRACK-8B: FUNDAMENTAL ACCURACY & SCORE INTEGRITY AUDIT');
 console.log('='.repeat(72));
 
-const INDIANAPI_KEY = 'sk-live-oYJvcSXqvVD4PbWLceN7fHHpaXQjq0pHADLuEbDj';
+const INDIANAPI_KEY = process.env.INDIANAPI_KEY ?? '';
 const COMPANIES = ['RELIANCE', 'TCS', 'HDFCBANK', 'ICICIBANK', 'INFY', 'SBIN', 'ITC', 'HINDUNILVR', 'LT', 'ASIANPAINT'];
 
 // PHASE 1: Raw Provider Validation

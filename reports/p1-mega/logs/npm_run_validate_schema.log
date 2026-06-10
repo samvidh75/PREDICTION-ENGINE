@@ -1,0 +1,13 @@
+
+> prediction-engine@0.1.0 validate:schema
+> tsx scripts/validate-schema-contract.ts
+
+=== Schema Contract Validation (Isolated) ===
+
+Using temp DB: /var/folders/fl/l0gp8hnj0jgcrrd7qpc3_p8h0000gn/T/schema-contract-1781114680584-ke7y.db
+Schema validation failed with exception: ReferenceError: require is not defined
+    at main (/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/scripts/validate-schema-contract.ts:99:5)
+    at <anonymous> (/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/scripts/validate-schema-contract.ts:211:1)
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)

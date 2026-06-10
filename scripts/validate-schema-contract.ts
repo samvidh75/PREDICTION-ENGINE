@@ -89,16 +89,11 @@ async function main(): Promise<void> {
     // Step 1-2: Set env and prepare temp path
     process.env.SQLITE_DB_PATH = TEMP_DB_PATH;
 
-    // Clear any existing SQLite singleton in the module
-    // The SQLiteAdapter uses a module-level singleton; we need to reset it
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
 
     // Step 3: Dynamically import SQLiteAdapter — triggers schema init
-    // Need to bust the require cache to force a fresh init
-    delete require.cache[require.resolve(sqliteModPath)];
-
-    // Use dynamic import with a fresh cache key
+    // Use dynamic import with a fresh cache key.
     const sqliteMod = await import(sqliteModPath + `?t=${timestamp}`);
 
     // Trigger the pool initialization which runs ensureTables()
@@ -149,19 +144,19 @@ async function main(): Promise<void> {
 
     // Step 6: Validate UNIQUE constraint on (symbol, prediction_date, prediction_horizon)
     console.log('\n3. UNIQUE constraint validation...');
-    const uniqueCheck = db
-      .prepare(
-        "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry' AND name LIKE '%unique%'"
-      )
-      .all() as Array<{ sql: string }>;
+    const uniqueIndexes = db
+      .prepare("PRAGMA index_list('prediction_registry')")
+      .all() as Array<{ name: string; unique: number }>;
 
     let uniqueFound = false;
-    for (const idx of uniqueCheck) {
-      const sql = (idx.sql || '').toUpperCase();
-      const allPresent = UNIQUE_COLUMNS.every((col) =>
-        sql.includes(col.toUpperCase())
-      );
-      if (allPresent && sql.includes('UNIQUE')) {
+    for (const idx of uniqueIndexes.filter((index) => index.unique === 1)) {
+      const indexColumns = db
+        .prepare(`PRAGMA index_info(${JSON.stringify(idx.name)})`)
+        .all() as Array<{ name: string; seqno: number }>;
+      const orderedColumns = indexColumns
+        .sort((a, b) => a.seqno - b.seqno)
+        .map((col) => col.name);
+      if (JSON.stringify(orderedColumns) === JSON.stringify(UNIQUE_COLUMNS)) {
         uniqueFound = true;
         console.log(`  PASS: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) confirmed`);
         break;

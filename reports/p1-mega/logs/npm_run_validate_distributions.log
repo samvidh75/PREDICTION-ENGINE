@@ -1,0 +1,37 @@
+
+> prediction-engine@0.1.0 validate:distributions
+> tsx scripts/validate-sector-distributions.ts
+
+=== Sector Distribution Validation ===
+
+1. Sector completeness check...
+  PASS: BANKING - all 16 metrics present
+  PASS: IT - all 16 metrics present
+  PASS: FMCG - all 16 metrics present
+  PASS: PHARMA - all 16 metrics present
+  PASS: AUTO - all 16 metrics present
+  PASS: ENERGY - all 16 metrics present
+  PASS: GENERAL - all 16 metrics present
+
+2. Monotonicity check...
+  PASS: all distributions monotonic
+
+3. NaN check...
+  PASS: no NaN values
+
+4. Peer count check...
+  PASS: all sectors have sufficient peer counts
+
+5. Score range check...
+  PASS: all scores within 0-100 range, null returns 50
+
+6. Inverse metric verification...
+  PASS: inverse metrics behave correctly
+
+=== Validation Complete ===
+PASS: 7 sectors validated
+PASS: all percentile metrics present
+PASS: all distributions monotonic
+PASS: p10 <= p25 <= p50 <= p75 <= p90
+PASS: no NaN values
+PASS: no undefined metrics

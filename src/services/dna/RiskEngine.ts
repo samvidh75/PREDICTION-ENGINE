@@ -1,23 +1,23 @@
 // src/services/dna/RiskEngine.ts
 import { RegisteredStock } from "../stocks/StockRegistry";
 import { DNAStatus } from "./BusinessQualityEngine";
+import { finitePeRatio, rangeProximity } from "./dnaInputs";
 
 export class RiskEngine {
   public static evaluate(stock: RegisteredStock): { score: number; status: DNAStatus } {
     let score = 40; // Risk score - lower is safer, but we scale it such that high score means highly robust/low risk.
 
-    const pe = stock.peRatio;
-    if (pe > 50) {
+    const pe = finitePeRatio(stock);
+    if (pe !== null && pe > 50) {
       score += 35; // Extreme pricing multiple risk
-    } else if (pe > 30) {
+    } else if (pe !== null && pe > 30) {
       score += 15;
-    } else if (pe < 0) {
+    } else if (pe !== null && pe < 0) {
       score += 40; // Loss-making is high risk
     }
 
-    const range = stock.fiftyTwoWeekRange;
-    const Proximity = (range.current - range.low) / (range.high - range.low || 1);
-    if (Proximity < 0.20) {
+    const proximity = rangeProximity(stock);
+    if (proximity !== null && proximity < 0.20) {
       score += 20; // Proximity to lows signifies negative price channels / stress
     }
 
