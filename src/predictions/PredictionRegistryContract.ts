@@ -183,7 +183,11 @@ export function isValidHorizon(v: number): v is RegistryPredictionHorizon {
 }
 
 export function mapStockStoryClassification(ssClassification: string): RegistryClassification {
-  return STOCKSTORY_TO_REGISTRY_CLASSIFICATION[ssClassification] ?? 'Fair';
+  const mapped = STOCKSTORY_TO_REGISTRY_CLASSIFICATION[ssClassification];
+  if (!mapped) {
+    throw new Error(`UNKNOWN_STOCKSTORY_CLASSIFICATION: ${ssClassification}`);
+  }
+  return mapped;
 }
 
 export function mapToRegistryInput(

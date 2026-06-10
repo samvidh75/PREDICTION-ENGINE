@@ -43,10 +43,12 @@ export interface TelemetrySnapshot {
 
 export interface CompanyTelemetry {
   symbol: string;
-  marketCap: { numeric: number; formatted: string };
-  peRatio: number;
-  fiftyTwoWeekRange: { low: number; high: number; current: number };
+  marketCap: { numeric: number | null; formatted: string; availability?: 'real' | 'unavailable' };
+  peRatio: number | null;
+  fiftyTwoWeekRange: { low: number | null; high: number | null; current: number | null };
   healthStatus: HealthStatus;
-  lastUpdated: string;
+  lastUpdated: string | null;
+  availability?: 'real' | 'registry-only' | 'unavailable';
+  source?: 'provider' | 'registry-only' | 'unavailable';
   telemetrySnapshot?: TelemetrySnapshot;
 }

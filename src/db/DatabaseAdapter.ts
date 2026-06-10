@@ -286,31 +286,6 @@ export class DatabaseAdapter {
   }
 
   /**
-   * Execute a multi-statement SQL script.
-   * SQLite delegates to db.exec(). PostgreSQL delegates to pool.query().
-   * Unavailable mode throws — no silent fallback.
-   */
-  async executeScript(sql: string): Promise<void> {
-    if (!this._initialized) {
-      await this.initialize();
-    }
-
-    if (this._kind === "sqlite" && this.sqlitePool?.executeScript) {
-      await this.sqlitePool.executeScript(sql);
-      return;
-    }
-
-    if (this._kind === "postgres" && this.pool) {
-      await this.pool.query(sql);
-      return;
-    }
-
-    throw new Error(
-      "DATABASE_UNAVAILABLE: Cannot execute migration script"
-    );
-  }
-
-  /**
    * Gracefully close all connections.
    */
   async shutdown(): Promise<void> {

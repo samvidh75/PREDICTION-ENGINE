@@ -25,7 +25,16 @@ import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFres
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
     const { ticker } = request.params as { ticker: string };
+    const query = request.query as { horizon?: string };
     const symbol = ticker.toUpperCase().trim();
+    const VALID_HORIZONS = [7, 30, 90, 180, 365];
+    const horizon = query.horizon ? parseInt(query.horizon, 10) : 30;
+    if (!VALID_HORIZONS.includes(horizon)) {
+      return reply.status(400).send({
+        code: 'INVALID_PREDICTION_HORIZON',
+        message: `Horizon ${query.horizon} is not valid. Allowed: ${VALID_HORIZONS.join(', ')}`,
+      });
+    }
     const asFiniteNumber = (value: unknown): number | null => {
       if (value === null || value === undefined || value === '') return null;
       const parsed = Number(value);
@@ -49,7 +58,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
 
       const sector = symInfo.rows[0].sector || 'Unknown';
 
-      // Step 2 — Query prediction_registry with CANONICAL column names
+      // Step 2 — Query prediction_registry with horizon filter
       const predRes = await pool.query(
         `SELECT 
            symbol,
@@ -69,9 +78,10 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
            prediction_horizon
          FROM prediction_registry
          WHERE symbol = $1
+           AND prediction_horizon = $2
          ORDER BY prediction_date DESC
          LIMIT 1`,
-        [symbol]
+        [symbol, horizon]
       );
 
       if (predRes.rows.length === 0) {
@@ -125,7 +135,8 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         sector,
         growth: growthScore,
         quality: qualityScore,
-        stability: valueScore,
+        stability: null,
+        stabilityAvailability: 'unavailable',
         valuation: valueScore,
         momentum: momentumScore,
         risk: riskScore,
@@ -135,7 +146,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         factors: {
           growth: factorSnapshot(growthScore, 'growth_score'),
           quality: factorSnapshot(qualityScore, 'quality_score'),
-          stability: factorSnapshot(valueScore, 'value_score'),
+          stability: { score: null, source: 'prediction_registry', sourceField: 'stability', snapshotDate: predictionDate || null, availability: 'unavailable' as const },
           value: factorSnapshot(valueScore, 'value_score'),
           momentum: factorSnapshot(momentumScore, 'momentum_score'),
           risk: factorSnapshot(riskScore, 'risk_score'),
@@ -144,7 +155,7 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         engineDetails: {
           growth: { score: growthScore },
           quality: { score: qualityScore },
-          stability: { score: valueScore },
+          stability: { score: null, availability: 'unavailable' as const },
           valuation: { score: valueScore },
           momentum: { score: momentumScore },
           risk: { score: riskScore },

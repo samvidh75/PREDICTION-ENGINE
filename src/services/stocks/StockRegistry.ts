@@ -23,13 +23,16 @@ for (const stock of dynamicList) {
     exchange: (registryEntry?.exchange || stock.exchange) as any,
     sector: registryEntry?.sector || stock.sector,
     marketCap: {
-      numeric: marketCap ?? 0,
+      numeric: marketCap ?? null,
       formatted: marketCap ? formatIndianMarketCap(marketCap) : "Data unavailable",
+      availability: marketCap ? 'real' as const : 'unavailable' as const,
     },
-    peRatio: 0,
-    fiftyTwoWeekRange: { low: 0, high: 0, current: 0 },
+    peRatio: null,
+    fiftyTwoWeekRange: { low: null, high: null, current: null },
     healthStatus: "stable",
-    lastUpdated: new Date().toISOString()
+    lastUpdated: null,
+    availability: 'registry-only' as const,
+    source: 'registry-only' as const,
   };
 }
 
