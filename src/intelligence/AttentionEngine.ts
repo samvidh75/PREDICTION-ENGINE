@@ -1,15 +1,12 @@
 /**
- * TRACK-95N — Attention Engine
+ * TRACK-95N — Attention Engine (async version)
  * Transforms raw prediction data into prioritized actionable intelligence.
  * "Here is what deserves your attention right now."
  * 
  * Inputs: prediction_registry (today vs yesterday), UserAlertEngine, watchlists, portfolio
  * Outputs: Prioritized AttentionItems (critical → important → monitor)
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
+import { dbAdapter } from '../db/DatabaseAdapter';
 
 export interface AttentionItem {
   symbol: string;
@@ -46,42 +43,45 @@ export class AttentionEngine {
    * Generate prioritized attention items for a user.
    * Returns: top 3 critical, top 5 important, top 10 monitor.
    */
-  generate(userId: string): AttentionItem[] {
-    const db = new Database(DB_PATH);
+  async generate(userId: string): Promise<AttentionItem[]> {
     const items: AttentionItem[] = [];
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     try {
       // 1. Get user's watchlist/portfolio tickers
-      const watchlistTickers = this.getWatchlistTickers(db, userId);
-      const portfolioTickers = this.getPortfolioTickers(db, userId);
+      const watchlistTickers = await this.getWatchlistTickers(userId);
+      const portfolioTickers = await this.getPortfolioTickers(userId);
       const allTickers = new Set([...watchlistTickers, ...portfolioTickers]);
 
-      if (allTickers.size === 0) { db.close(); return items; }
+      if (allTickers.size === 0) return items;
 
       const symbolList = [...allTickers];
-      const placeholders = symbolList.map(() => '?').join(',');
+      const placeholders = symbolList.map((_, idx) => `$${idx + 2}`).join(',');
 
       // 2. Fetch today's predictions
-      const todayPreds = db.prepare(
+      const todayPredsRes = await dbAdapter.query(
         `SELECT symbol, ranking_score, classification, confidence_score,
          quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
          prediction_horizon
          FROM prediction_registry
-         WHERE prediction_date = ? AND symbol IN (${placeholders})
-         ORDER BY ranking_score DESC`
-      ).all(today, ...symbolList) as TodayPrediction[];
+         WHERE prediction_date = $1 AND symbol IN (${placeholders})
+         ORDER BY ranking_score DESC`,
+        [today, ...symbolList]
+      );
+      const todayPreds = todayPredsRes.rows as unknown as TodayPrediction[];
 
       // 3. Fetch yesterday's predictions
-      const yesterdayPreds = db.prepare(
+      const yesterdayPredsRes = await dbAdapter.query(
         `SELECT symbol, ranking_score, classification, confidence_score,
          quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
          prediction_horizon
          FROM prediction_registry
-         WHERE prediction_date = ? AND symbol IN (${placeholders})
-         ORDER BY ranking_score DESC`
-      ).all(yesterday, ...symbolList) as TodayPrediction[];
+         WHERE prediction_date = $1 AND symbol IN (${placeholders})
+         ORDER BY ranking_score DESC`,
+        [yesterday, ...symbolList]
+      );
+      const yesterdayPreds = yesterdayPredsRes.rows as unknown as TodayPrediction[];
 
       const yesterdayMap = new Map<string, TodayPrediction>();
       for (const p of yesterdayPreds) {
@@ -151,7 +151,9 @@ export class AttentionEngine {
           source,
         });
       }
-    } finally { db.close(); }
+    } catch (err: any) {
+      console.error('[AttentionEngine] Error generating user attention items:', err.message);
+    }
 
     // Sort by priority then by absolute score delta
     const priorityRank = { critical: 0, important: 1, monitor: 2 };
@@ -165,27 +167,30 @@ export class AttentionEngine {
   }
 
   /** Generate market-wide attention items (not user-specific) */
-  generateMarketWide(): AttentionItem[] {
-    const db = new Database(DB_PATH);
+  async generateMarketWide(): Promise<AttentionItem[]> {
     const items: AttentionItem[] = [];
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     try {
-      const todayPreds = db.prepare(
+      const todayPredsRes = await dbAdapter.query(
         `SELECT symbol, ranking_score, classification, confidence_score,
          quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
          prediction_horizon
-         FROM prediction_registry WHERE prediction_date = ?
-         ORDER BY ranking_score DESC LIMIT 200`
-      ).all(today) as TodayPrediction[];
+         FROM prediction_registry WHERE prediction_date = $1
+         ORDER BY ranking_score DESC LIMIT 200`,
+        [today]
+      );
+      const todayPreds = todayPredsRes.rows as unknown as TodayPrediction[];
 
-      const yesterdayPreds = db.prepare(
+      const yesterdayPredsRes = await dbAdapter.query(
         `SELECT symbol, ranking_score, classification, confidence_score,
          quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
          prediction_horizon
-         FROM prediction_registry WHERE prediction_date = ?`
-      ).all(yesterday) as TodayPrediction[];
+         FROM prediction_registry WHERE prediction_date = $1`,
+        [yesterday]
+      );
+      const yesterdayPreds = yesterdayPredsRes.rows as unknown as TodayPrediction[];
 
       const yesterdayMap = new Map<string, TodayPrediction>();
       for (const p of yesterdayPreds) {
@@ -224,7 +229,9 @@ export class AttentionEngine {
           source: 'market',
         });
       }
-    } finally { db.close(); }
+    } catch (err: any) {
+      console.error('[AttentionEngine] Error generating market attention items:', err.message);
+    }
 
     const priorityRank = { critical: 0, important: 1, monitor: 2 };
     items.sort((a, b) => {
@@ -236,27 +243,35 @@ export class AttentionEngine {
     return items.slice(0, 18);
   }
 
-  private getWatchlistTickers(db: any, userId: string): string[] {
+  private async getWatchlistTickers(userId: string): Promise<string[]> {
     try {
-      const rows = db.prepare(
-        'SELECT tickers FROM user_watchlists WHERE user_id = ? AND is_archived = 0'
-      ).all(userId) as any[];
+      const res = await dbAdapter.query(
+        'SELECT tickers FROM user_watchlists WHERE user_id = $1 AND is_archived = 0',
+        [userId]
+      );
       const tickers = new Set<string>();
-      for (const r of rows) {
-        try { JSON.parse(r.tickers || '[]').forEach((t: string) => tickers.add(t)); } catch {}
+      for (const r of res.rows as any[]) {
+        try {
+          const tick = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
+          tick.forEach((t: string) => tickers.add(t));
+        } catch {}
       }
       return [...tickers];
     } catch { return []; }
   }
 
-  private getPortfolioTickers(db: any, userId: string): string[] {
+  private async getPortfolioTickers(userId: string): Promise<string[]> {
     try {
-      const rows = db.prepare(
-        "SELECT tickers FROM user_watchlists WHERE user_id = ? AND name = 'My Portfolio' AND is_archived = 0"
-      ).all(userId) as any[];
+      const res = await dbAdapter.query(
+        "SELECT tickers FROM user_watchlists WHERE user_id = $1 AND name = 'My Portfolio' AND is_archived = 0",
+        [userId]
+      );
       const tickers = new Set<string>();
-      for (const r of rows) {
-        try { JSON.parse(r.tickers || '[]').forEach((t: string) => tickers.add(t)); } catch {}
+      for (const r of res.rows as any[]) {
+        try {
+          const tick = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
+          tick.forEach((t: string) => tickers.add(t));
+        } catch {}
       }
       return [...tickers];
     } catch { return []; }
