@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.12.0 <23"
   },
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
     "build:render": "npm run compile:backend",
     "build:docker": "npm run compile:backend && npm run build:frontend",
     "build:all": "npm run build && npm run build:backend",
-    "compile:backend": "tsc -p tsconfig.backend.emit.json",
+    "compile:backend": "tsc -p tsconfig.backend.emit.json && node scripts/fix-esm-imports.js",
     "start": "node dist/backend/backend/startServer.js",
     "start:dev": "tsx src/backend/startServer.ts",
     "migrate": "tsx src/db/migrate.ts",
@@ -44,6 +44,8 @@
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
     "validate:hygiene": "tsx scripts/validate-repository-hygiene.ts",
     "release:gate": "tsx scripts/release-gate.ts",
+    "test:smoke": "vitest run scripts/__tests__/smoke-test-api.test.ts",
+    "test:release-gate": "vitest run scripts/__tests__/release-gate.test.ts",
     "test:providers": "tsx src/scripts/provider-live-test.ts",
     "lint": "npm run lint:active",
     "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",

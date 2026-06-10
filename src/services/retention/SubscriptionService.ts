@@ -1,11 +1,8 @@
 /**
- * TRACK-87 — SubscriptionService
+ * TRACK-87 — SubscriptionService (async version)
  * Subscription plan management and feature gating.
  */
-import Database from 'better-sqlite3';
-import { join } from 'path';
-
-const DB_PATH = join(process.cwd(), 'data', 'stockstory.db');
+import { dbAdapter } from '../../db/DatabaseAdapter';
 
 export interface SubscriptionPlan {
   id: string;
@@ -34,33 +31,38 @@ const FEATURE_HIERARCHY: Record<string, string[]> = {
 };
 
 export class SubscriptionService {
-  getPlans(): SubscriptionPlan[] {
-    const db = new Database(DB_PATH);
-    try {
-      const rows = db.prepare('SELECT * FROM subscription_plans WHERE is_active = 1 ORDER BY price_monthly_inr ASC').all() as any[];
-      return rows.map(r => ({ ...r, features: JSON.parse(r.features || '[]'), is_active: !!r.is_active }));
-    } finally { db.close(); }
+  async getPlans(): Promise<SubscriptionPlan[]> {
+    const res = await dbAdapter.query('SELECT * FROM subscription_plans WHERE is_active = 1 ORDER BY price_monthly_inr ASC');
+    return res.rows.map((r: any) => ({
+      ...r,
+      features: typeof r.features === 'string' ? JSON.parse(r.features || '[]') : r.features,
+      is_active: !!r.is_active
+    }));
   }
 
-  getUserSubscription(userId: string): UserSubscription | null {
-    const db = new Database(DB_PATH);
-    try {
-      const sub = db.prepare(
-        'SELECT * FROM user_subscriptions WHERE user_id = ? ORDER BY started_at DESC LIMIT 1'
-      ).get(userId) as any;
-      if (!sub) return this.getDefaultFreeSubscription(userId);
+  async getUserSubscription(userId: string): Promise<UserSubscription> {
+    const subRes = await dbAdapter.query(
+      'SELECT * FROM user_subscriptions WHERE user_id = $1 ORDER BY started_at DESC LIMIT 1',
+      [userId]
+    );
+    const sub = subRes.rows[0] as any;
+    if (!sub) return this.getDefaultFreeSubscription(userId);
 
-      const plan = db.prepare('SELECT * FROM subscription_plans WHERE id = ?').get(sub.plan_id) as any;
-      return {
-        userId: sub.user_id,
-        planId: sub.plan_id,
-        status: sub.status,
-        startedAt: sub.started_at,
-        expiresAt: sub.expires_at,
-        autoRenew: !!sub.auto_renew,
-        plan: plan ? { ...plan, features: JSON.parse(plan.features || '[]'), is_active: !!plan.is_active } : undefined
-      };
-    } finally { db.close(); }
+    const planRes = await dbAdapter.query('SELECT * FROM subscription_plans WHERE id = $1', [sub.plan_id]);
+    const plan = planRes.rows[0] as any;
+    return {
+      userId: sub.user_id,
+      planId: sub.plan_id,
+      status: sub.status,
+      startedAt: sub.started_at,
+      expiresAt: sub.expires_at,
+      autoRenew: !!sub.auto_renew,
+      plan: plan ? {
+        ...plan,
+        features: typeof plan.features === 'string' ? JSON.parse(plan.features || '[]') : plan.features,
+        is_active: !!plan.is_active
+      } : undefined
+    };
   }
 
   private getDefaultFreeSubscription(userId: string): UserSubscription {
@@ -82,61 +84,71 @@ export class SubscriptionService {
     };
   }
 
-  checkFeatureAccess(userId: string, featureKey: string): boolean {
-    const sub = this.getUserSubscription(userId);
+  async checkFeatureAccess(userId: string, featureKey: string): Promise<boolean> {
+    const sub = await this.getUserSubscription(userId);
     if (!sub?.plan) return false;
     return sub.plan.features.includes(featureKey);
   }
 
-  assignTrial(userId: string): UserSubscription {
-    const db = new Database(DB_PATH);
-    try {
-      // Check if already has a trial or paid subscription
-      const existing = db.prepare(
-        'SELECT * FROM user_subscriptions WHERE user_id = ? AND status != ?'
-      ).get(userId, 'cancelled') as any;
-      if (existing) return this.getUserSubscription(userId) ?? this.getDefaultFreeSubscription(userId);
+  async assignTrial(userId: string): Promise<UserSubscription> {
+    // Check if already has a trial or paid subscription
+    const existingRes = await dbAdapter.query(
+      'SELECT * FROM user_subscriptions WHERE user_id = $1 AND status != $2',
+      [userId, 'cancelled']
+    );
+    const existing = existingRes.rows[0];
+    if (existing) return (await this.getUserSubscription(userId)) ?? this.getDefaultFreeSubscription(userId);
 
-      const startedAt = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 14 * 86400000).toISOString();
+    const startedAt = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + 14 * 86400000).toISOString();
 
-      db.prepare(
-        `INSERT OR REPLACE INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
-         VALUES (?, 'plan_investor_99', 'trial', ?, ?, 0)`
-      ).run(userId, startedAt, expiresAt);
+    await dbAdapter.query(
+      `INSERT INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
+       VALUES ($1, 'plan_investor_99', 'trial', $2, $3, 0)
+       ON CONFLICT (user_id) DO UPDATE SET
+         plan_id = EXCLUDED.plan_id,
+         status = EXCLUDED.status,
+         started_at = EXCLUDED.started_at,
+         expires_at = EXCLUDED.expires_at,
+         auto_renew = EXCLUDED.auto_renew`,
+      [userId, startedAt, expiresAt]
+    );
 
-      return this.getUserSubscription(userId) || this.getDefaultFreeSubscription(userId);
-    } finally { db.close(); }
+    return (await this.getUserSubscription(userId)) || this.getDefaultFreeSubscription(userId);
   }
 
-  subscribe(userId: string, planId: string): UserSubscription {
-    const db = new Database(DB_PATH);
-    try {
-      const startedAt = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
+  async subscribe(userId: string, planId: string): Promise<UserSubscription> {
+    const startedAt = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + 30 * 86400000).toISOString();
 
-      db.prepare(
-        `INSERT OR REPLACE INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
-         VALUES (?, ?, 'active', ?, ?, 1)`
-      ).run(userId, planId, startedAt, expiresAt);
+    await dbAdapter.query(
+      `INSERT INTO user_subscriptions (user_id, plan_id, status, started_at, expires_at, auto_renew)
+       VALUES ($1, $2, 'active', $3, $4, 1)
+       ON CONFLICT (user_id) DO UPDATE SET
+         plan_id = EXCLUDED.plan_id,
+         status = EXCLUDED.status,
+         started_at = EXCLUDED.started_at,
+         expires_at = EXCLUDED.expires_at,
+         auto_renew = EXCLUDED.auto_renew`,
+      [userId, planId, startedAt, expiresAt]
+    );
 
-      // If this came via a referral, mark it as converted
-      db.prepare(
-        `UPDATE referrals SET status = 'converted', converted_at = datetime('now')
-         WHERE invited_user_id = ? AND status = 'signed_up'`
-      ).run(userId);
+    // If this came via a referral, mark it as converted
+    await dbAdapter.query(
+      `UPDATE referrals SET status = 'converted', converted_at = CURRENT_TIMESTAMP
+       WHERE invited_user_id = $1 AND status = 'signed_up'`,
+      [userId]
+    );
 
-      return this.getUserSubscription(userId) ?? this.getDefaultFreeSubscription(userId);
-    } finally { db.close(); }
+    return (await this.getUserSubscription(userId)) ?? this.getDefaultFreeSubscription(userId);
   }
 
-  cancelSubscription(userId: string): void {
-    const db = new Database(DB_PATH);
-    try {
-      db.prepare(
-        `UPDATE user_subscriptions SET status = 'cancelled', auto_renew = 0 WHERE user_id = ? AND status IN ('active', 'trial')`
-      ).run(userId);
-    } finally { db.close(); }
+  async cancelSubscription(userId: string): Promise<void> {
+    await dbAdapter.query(
+      `UPDATE user_subscriptions SET status = 'cancelled', auto_renew = 0
+       WHERE user_id = $1 AND status IN ('active', 'trial')`,
+      [userId]
+    );
   }
 }
 

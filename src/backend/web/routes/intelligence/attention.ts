@@ -22,9 +22,9 @@ export const attentionRoutes: FastifyPluginAsync = async (app) => {
     try {
       let items;
       if (userId) {
-        items = attentionEngine.generate(userId);
+        items = await attentionEngine.generate(userId);
       } else {
-        items = attentionEngine.generateMarketWide();
+        items = await attentionEngine.generateMarketWide();
       }
 
       // Split by priority

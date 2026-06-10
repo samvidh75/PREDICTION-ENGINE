@@ -31,7 +31,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const lists = watchlistService.getUserWatchlists(uid);
+      const lists = await watchlistService.getUserWatchlists(uid);
       return reply.send(lists);
     },
   );
@@ -43,9 +43,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
       const uid = request.authenticatedUser!.uid;
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
-      const wl = watchlistService.createWatchlist(uid, name);
-      if (tickers && Array.isArray(tickers)) watchlistService.updateWatchlist(wl.id, name, tickers);
-      return reply.send(watchlistService.getWatchlistById(wl.id));
+      const wl = await watchlistService.createWatchlist(uid, name);
+      if (tickers && Array.isArray(tickers)) await watchlistService.updateWatchlist(uid, wl.id, name, tickers);
+      return reply.send(await watchlistService.getWatchlistById(uid, wl.id));
     },
   );
 
@@ -56,7 +56,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
       const uid = request.authenticatedUser!.uid;
       const { name, tickers } = request.body || {};
       if (!name) return reply.status(400).send({ error: 'name is required' });
-      const result = watchlistService.updateWatchlist(request.params.id, name, tickers || []);
+      const result = await watchlistService.updateWatchlist(uid, request.params.id, name, tickers || []);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -66,7 +66,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      watchlistService.deleteWatchlist(request.params.id);
+      const uid = request.authenticatedUser!.uid;
+      const success = await watchlistService.deleteWatchlist(uid, request.params.id);
+      if (!success) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send({ success: true });
     },
   );
@@ -75,9 +77,10 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id/tickers',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
+      const uid = request.authenticatedUser!.uid;
       const { ticker } = request.body || {};
       if (!ticker) return reply.status(400).send({ error: 'ticker is required' });
-      const result = watchlistService.addTicker(request.params.id, ticker);
+      const result = await watchlistService.addTicker(uid, request.params.id, ticker);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -87,7 +90,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/watchlists/:id/tickers/:ticker',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      const result = watchlistService.removeTicker(request.params.id, request.params.ticker);
+      const uid = request.authenticatedUser!.uid;
+      const result = await watchlistService.removeTicker(uid, request.params.id, request.params.ticker);
       if (!result) return reply.status(404).send({ error: 'watchlist not found' });
       return reply.send(result);
     },
@@ -100,8 +104,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const alerts = userAlertEngine.getUserAlerts(uid);
-      const unread = userAlertEngine.getUnreadCount(uid);
+      const alerts = await userAlertEngine.getUserAlerts(uid);
+      const unread = await userAlertEngine.getUnreadCount(uid);
       return reply.send({ alerts, unreadCount: unread });
     },
   );
@@ -111,7 +115,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      return reply.send({ unreadCount: userAlertEngine.getUnreadCount(uid) });
+      return reply.send({ unreadCount: await userAlertEngine.getUnreadCount(uid) });
     },
   );
 
@@ -119,7 +123,9 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     '/api/alerts/:alertId/read',
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
-      userAlertEngine.markAsRead(parseInt(request.params.alertId));
+      const uid = request.authenticatedUser!.uid;
+      const success = await userAlertEngine.markAsRead(uid, parseInt(request.params.alertId));
+      if (!success) return reply.status(404).send({ error: 'alert not found' });
       return reply.send({ success: true });
     },
   );
@@ -129,7 +135,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      userAlertEngine.markAllAsRead(uid);
+      await userAlertEngine.markAllAsRead(uid);
       return reply.send({ success: true });
     },
   );
@@ -141,7 +147,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const digest = dailyDigestGenerator.generateForUser(uid);
+      const digest = await dailyDigestGenerator.generateForUser(uid);
       return reply.send(digest);
     },
   );
@@ -154,7 +160,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       const q = request.query;
-      const share = sharingService.createShareLink(
+      const share = await sharingService.createShareLink(
         uid,
         q.symbol,
         q.prediction_date || new Date().toISOString().split('T')[0],
@@ -169,7 +175,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
   app.get<{ Params: ShareTokenParams }>(
     '/api/share/:token',
     async (request, reply: FastifyReply) => {
-      const data = sharingService.getSharedPrediction(request.params.token);
+      const data = await sharingService.getSharedPrediction(request.params.token);
       if (!data) return reply.status(404).send({ error: 'shared prediction not found' });
       return reply.send(data);
     },
@@ -182,7 +188,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      return reply.send(sharingService.generateReferralCode(uid));
+      return reply.send(await sharingService.generateReferralCode(uid));
     },
   );
 
@@ -191,7 +197,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      return reply.send(sharingService.getReferralStats(uid));
+      return reply.send(await sharingService.getReferralStats(uid));
     },
   );
 
@@ -200,7 +206,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const success = sharingService.trackReferral(request.params.code, uid);
+      const success = await sharingService.trackReferral(request.params.code, uid);
       return reply.send({ success });
     },
   );
@@ -209,7 +215,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
 
   // PUBLIC: plans
   app.get('/api/plans', async (_req: FastifyRequest, reply: FastifyReply) => {
-    return reply.send(subscriptionService.getPlans());
+    return reply.send(await subscriptionService.getPlans());
   });
 
   app.get(
@@ -217,7 +223,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      return reply.send(subscriptionService.getUserSubscription(uid));
+      return reply.send(await subscriptionService.getUserSubscription(uid));
     },
   );
 
@@ -226,7 +232,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const hasAccess = subscriptionService.checkFeatureAccess(uid, request.params.featureKey);
+      const hasAccess = await subscriptionService.checkFeatureAccess(uid, request.params.featureKey);
       return reply.send({ feature: request.params.featureKey, accessible: hasAccess });
     },
   );
@@ -236,8 +242,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      subscriptionService.assignTrial(uid);
-      return reply.send(subscriptionService.getUserSubscription(uid));
+      await subscriptionService.assignTrial(uid);
+      return reply.send(await subscriptionService.getUserSubscription(uid));
     },
   );
 
@@ -248,8 +254,8 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
       const uid = request.authenticatedUser!.uid;
       const { plan_id } = request.body || {};
       if (!plan_id) return reply.status(400).send({ error: 'plan_id is required' });
-      subscriptionService.subscribe(uid, plan_id);
-      return reply.send(subscriptionService.getUserSubscription(uid));
+      await subscriptionService.subscribe(uid, plan_id);
+      return reply.send(await subscriptionService.getUserSubscription(uid));
     },
   );
 }

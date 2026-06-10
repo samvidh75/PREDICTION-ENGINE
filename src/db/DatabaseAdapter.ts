@@ -117,6 +117,7 @@ export class DatabaseAdapter {
     if (shouldTryPostgres) {
       try {
         const { default: pgMod } = await import("pg");
+        pgMod.types.setTypeParser(1082, (val) => val); // Return DATE as string (same as SQLite)
         const { Pool } = pgMod;
         this.pool = new Pool({
           connectionString: pgUrl,
@@ -197,7 +198,27 @@ export class DatabaseAdapter {
     }
 
     if (this._kind === "postgres" && this.pool) {
-      await this.pool.query(sql);
+      // Translate SQLite dialect to PostgreSQL on the fly
+      let pgSql = sql
+        .replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, "SERIAL PRIMARY KEY")
+        .replace(/datetime\('now'\)/g, "CURRENT_TIMESTAMP")
+        .replace(/date\('now'\)/g, "CURRENT_DATE");
+
+      // Convert INSERT OR IGNORE to INSERT INTO ... ON CONFLICT DO NOTHING
+      if (/INSERT OR IGNORE/i.test(pgSql)) {
+        pgSql = pgSql.replace(/INSERT OR IGNORE INTO/gi, "INSERT INTO");
+        const statements = pgSql.split(";");
+        const processed = statements.map((stmt) => {
+          const trimmed = stmt.trim();
+          if (/^INSERT INTO/i.test(trimmed) && !/ON CONFLICT/i.test(trimmed)) {
+            return stmt + " ON CONFLICT DO NOTHING";
+          }
+          return stmt;
+        });
+        pgSql = processed.join(";");
+      }
+
+      await this.pool.query(pgSql);
       return;
     }
 
