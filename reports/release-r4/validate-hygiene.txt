@@ -1,0 +1,8 @@
+=== VALIDATE-HYGIENE ===
+
+=== Hygiene Scan Complete ===
+Errors (secrets): 5
+Warnings (hazards): 17
+FAIL: Potential secrets detected
+EXIT CODE: 0
+

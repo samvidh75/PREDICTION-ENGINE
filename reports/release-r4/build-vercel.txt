@@ -1,0 +1,6 @@
+=== BUILD-VERCEL ===
+dist/assets/firebase-C5_fxTjv.js  285.26 kB │ gzip:  67.66 kB
+dist/assets/index-DzrbMlrD.js     490.90 kB │ gzip: 119.12 kB
+✓ built in 2.12s
+EXIT CODE: 0
+

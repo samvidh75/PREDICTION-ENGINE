@@ -1,0 +1,8 @@
+=== VALIDATE-SCHEMA ===
+    at Hooks.resolve (node:internal/modules/esm/hooks:306:30) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v20.19.5
+EXIT CODE: 0
+

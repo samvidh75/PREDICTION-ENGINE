@@ -1,0 +1,8 @@
+=== SQLITE-INTEGRATION ===
+ Test Files  1 failed | 5 passed | 2 skipped (8)
+      Tests  8 failed | 19 passed | 25 skipped (52)
+   Start at  21:17:06
+   Duration  344ms (transform 216ms, setup 0ms, collect 399ms, tests 335ms, environment 1ms, prepare 659ms)
+
+EXIT CODE: 0
+

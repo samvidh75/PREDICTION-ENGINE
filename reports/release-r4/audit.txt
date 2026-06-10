@@ -1,0 +1,13 @@
+=== AUDIT ===
+    Depends on vulnerable versions of teeny-request
+    node_modules/retry-request
+
+8 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+EXIT CODE: 0
+

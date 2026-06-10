@@ -1,0 +1,6 @@
+=== TEST-UNIT ===
+   Start at  21:17:03
+   Duration  1.79s (transform 583ms, setup 2ms, collect 1.84s, tests 936ms, environment 7.40s, prepare 1.44s)
+
+EXIT CODE: 0
+
