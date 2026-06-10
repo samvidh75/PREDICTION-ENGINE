@@ -290,10 +290,11 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
         intelligenceCache.set(cacheKeyReal, resp);
         return reply.send(resp);
       } catch (error: any) {
+        console.error("[intelligence] Error generating company intelligence:", error);
         if (error?.code === "ECONNREFUSED" || error?.code === "57P01" || error?.code === "08006") {
           return reply.send(errorResponse("DATABASE_UNAVAILABLE", "The database is currently unreachable."));
         }
-        return reply.send(errorResponse("INTERNAL_ERROR", "An unexpected error occurred while generating company intelligence."));
+        return reply.send(errorResponse("INTERNAL_ERROR", `An unexpected error occurred while generating company intelligence: ${error.message}`));
       }
     }
   );

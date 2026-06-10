@@ -5,12 +5,12 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: build ───────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile
+RUN apk add --no-cache python3 make g++ && npm ci --frozen-lockfile
 
 # Copy source and build
 COPY . .
@@ -18,14 +18,15 @@ RUN npm run build
 RUN npm run compile:backend
 
 # ── Stage 2: production runtime ───────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
+RUN mkdir -p data
 
 ENV NODE_ENV=production
 
 # Only install production dependencies
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile --omit=dev
+RUN apk add --no-cache python3 make g++ && npm ci --frozen-lockfile --omit=dev && apk del python3 make g++
 
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist

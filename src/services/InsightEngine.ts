@@ -141,8 +141,21 @@ export class InsightEngine {
   ): MarketInsight {
     const { dataFreshness, dataCompleteness, lineage } = options ?? {};
 
-    const positiveDrivers: string[] = [...factors.explanations.topPositiveDrivers];
-    const negativeDrivers: string[] = [...factors.explanations.topNegativeDrivers];
+    const explanations = (factors as any).explanations;
+    let explanationsObj: any = {};
+    if (explanations) {
+      try {
+        explanationsObj = typeof explanations === 'string' ? JSON.parse(explanations) : explanations;
+      } catch {
+        explanationsObj = {};
+      }
+    }
+    const positiveDrivers: string[] = Array.isArray(explanationsObj?.topPositiveDrivers)
+      ? [...explanationsObj.topPositiveDrivers]
+      : [];
+    const negativeDrivers: string[] = Array.isArray(explanationsObj?.topNegativeDrivers)
+      ? [...explanationsObj.topNegativeDrivers]
+      : [];
 
     // Evaluate base confidence based on data consistency and factor score deviations
     const scoreDeviation = Math.abs(factors.factorScore - 50);

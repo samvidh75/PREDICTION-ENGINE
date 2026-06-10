@@ -59,7 +59,7 @@ function translateSQL(sql: string): string {
   let translated = sql
     .replace(/SERIAL/gi, 'INTEGER')
     .replace(/BIGSERIAL/gi, 'INTEGER')
-    .replace(/$\d+/g, '?')
+    .replace(/\$\d+/g, '?')
     .replace(/public\./gi, '')
     .replace(/::(bigint|integer|float|text|boolean|timestamp|date|numeric|decimal|varchar\S*)/gi, '')
     .replace(/GENERATED ALWAYS AS IDENTITY/gi, 'AUTOINCREMENT')
@@ -130,6 +130,7 @@ class SQLitePool {
       )`,
       `CREATE TABLE IF NOT EXISTS financial_snapshots (
         symbol TEXT NOT NULL, period_end TEXT NOT NULL,
+        snapshot_date TEXT NOT NULL DEFAULT (date('now')),
         market_cap REAL, pe_ratio REAL, eps REAL, dividend_yield REAL, beta REAL, free_float REAL,
         fcf_yield REAL, ev_ebitda REAL, roa REAL, roe REAL, roic REAL,
         debt_to_equity REAL, current_ratio REAL,

@@ -180,11 +180,21 @@ export class NarrativeEngine {
           ? "bearish pressure"
           : "sideways consolidation";
 
+    const explanations = (factors as any).explanations;
+    let explanationsObj: any = {};
+    if (explanations) {
+      try {
+        explanationsObj = typeof explanations === 'string' ? JSON.parse(explanations) : explanations;
+      } catch {
+        explanationsObj = {};
+      }
+    }
+
     // ── 50 Words Narrative ──────────────────────────────────────────
     const narrative50 =
       `${symbol} represents a structural factor profile scoring ${score}/100, pointing toward ${direction}. ` +
       `Profitability indicators remain ${factors.qualityFactor >= 55 ? "strong" : "stable"}, while valuation indices are ranked at ${factors.valueFactor}/100. ` +
-      `Positive drivers include ${factors.explanations.topPositiveDrivers[0]?.toLowerCase().slice(0, 45) ?? "stable trend lines"}. Risk profiles are fully moderate.`;
+      `Positive drivers include ${explanationsObj.topPositiveDrivers?.[0]?.toLowerCase().slice(0, 45) ?? "stable trend lines"}. Risk profiles are fully moderate.`;
 
     // ── 100 Words Narrative ─────────────────────────────────────────
     const narrative100 =
@@ -192,8 +202,8 @@ export class NarrativeEngine {
       `A review of the technical features reveals an RSI of ${features.rsi ? Math.round(Number(features.rsi)) : "N/A"}, ` +
       `coupled with a moving average distance of ${features.movingAverageDistance ? Math.round(Number(features.movingAverageDistance) * 100) : 0}%. ` +
       `Fundamentally, Quality scores ${factors.qualityFactor}/100 and Value scores ${factors.valueFactor}/100. ` +
-      `The top driving factor is ${factors.explanations.topPositiveDrivers[0]?.toLowerCase() ?? "technical support"}. ` +
-      `Conversely, the primary headwind relates to ${factors.explanations.topNegativeDrivers[0]?.toLowerCase() ?? "valuation limits"}. ` +
+      `The top driving factor is ${explanationsObj.topPositiveDrivers?.[0]?.toLowerCase() ?? "technical support"}. ` +
+      `Conversely, the primary headwind relates to ${explanationsObj.topNegativeDrivers?.[0]?.toLowerCase() ?? "valuation limits"}. ` +
       `Overall risk is managed, supporting steady portfolios.`;
 
     // ── 250 Words Narrative ─────────────────────────────────────────
@@ -206,8 +216,8 @@ export class NarrativeEngine {
       `the underlying momentum and trend parameters.\n\n` +
       `From a factor perspective, the Quality Score of ${factors.qualityFactor}/100 confirms robust company margins and return profiles, ` +
       `while the Value Score of ${factors.valueFactor}/100 represents whether the asset trades at a premium or discount. ` +
-      `Our Explanation Engine confirms that the key catalyst propelling the rating is ${factors.explanations.topPositiveDrivers[0]?.toLowerCase() ?? "technical strength"}, ` +
-      `which offset headwinds like ${factors.explanations.topNegativeDrivers[0]?.toLowerCase() ?? "market friction"}. ` +
+      `Our Explanation Engine confirms that the key catalyst propelling the rating is ${explanationsObj.topPositiveDrivers?.[0]?.toLowerCase() ?? "technical strength"}, ` +
+      `which offset headwinds like ${explanationsObj.topNegativeDrivers?.[0]?.toLowerCase() ?? "market friction"}. ` +
       `Furthermore, sector checks highlight a Sector Strength Score of ${factors.sectorStrengthFactor}/100, which reflects ` +
       `capital flows into the stock's broader industry group. Risk exposures (scored at ${factors.riskFactor}/100) show moderate characteristics, ` +
       `suggesting low vulnerability to sudden market-wide corrections. StockStory classifies the current company health profile as balanced, ` +

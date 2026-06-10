@@ -34,17 +34,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run migrations
-        run: npm run migrate
-
-      - name: Seed deterministic fixtures
-        run: CI_FIXTURE_SEED=true npm run seed:ci
+      - name: Lint
+        run: npm run lint
 
       - name: Typecheck all
         run: npm run typecheck:all
@@ -52,25 +49,49 @@ jobs:
       - name: Unit tests
         run: npm run test:unit
 
+      - name: SQLite integration tests
+        run: npm run test:integration:sqlite
+
+      - name: Run migrations
+        run: npm run migrate
+
+      - name: Seed deterministic fixtures
+        run: CI_FIXTURE_SEED=true npm run seed:ci
+
       - name: PostgreSQL integration tests
         run: npm run test:integration:postgres:ci
 
-      - name: Frontend build
+      - name: Schema validation
+        run: npm run validate:schema
+
+      - name: Query schema validation
+        run: npm run validate:query-schema
+
+      - name: Distribution validation
+        run: npm run validate:distributions
+
+      - name: Data integrity validation
+        run: npm run validate:data-integrity
+
+      - name: Repository hygiene
+        run: npm run validate:hygiene
+
+      - name: Coverage
+        run: npm run test:coverage
+
+      - name: Frontend build (Vercel)
         run: npm run build:vercel
 
       - name: Backend compile
         run: npm run compile:backend
 
-      - name: Schema validation
-        run: npm run validate:schema
-
-      - name: Distribution validation
-        run: npm run validate:distributions
+      - name: npm audit
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Build Docker image
         run: docker build -t stockstory-api:test .
 
-      - name: Docker smoke test
+      - name: Start Docker container
         run: |
           docker run -d \
             --name stockstory-api-test \
@@ -83,19 +104,35 @@ jobs:
             -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
             stockstory-api:test
-          echo "Waiting for /healthz..."
-          for i in {1..30}; do
+
+      - name: Wait for /healthz
+        run: |
+          for i in $(seq 1 30); do
             if curl -fsS http://localhost:4001/healthz; then
               echo "Container /healthz ready after ${i} attempts"
               break
             fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: /healthz did not become ready"
+              docker logs stockstory-api-test
+              exit 1
+            fi
             sleep 2
           done
-          echo "Waiting for /readyz..."
-          for i in {1..30}; do
+          RESPONSE=$(curl -fsS http://localhost:4001/healthz)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['ok']==True, 'healthz ok is not true'; print('PASS: /healthz')"
+
+      - name: Wait for /readyz and assert PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
             if curl -fsS http://localhost:4001/readyz; then
               echo "Container /readyz ready after ${i} attempts"
               break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "FAIL: /readyz did not become ready"
+              docker logs stockstory-api-test
+              exit 1
             fi
             sleep 2
           done
@@ -105,11 +142,35 @@ jobs:
             docker logs stockstory-api-test
             exit 1
           fi
-          echo "PASS: Docker container is live and ready with PostgreSQL"
+          RESPONSE=$(curl -fsS http://localhost:4001/readyz)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['database']['kind']=='postgres', f'expected postgres, got {d[\"database\"][\"kind\"]}'; assert d['database']['fallbackUsed']==False, 'fallbackUsed should be false'; print('PASS: /readyz confirms postgres with no fallback')"
+
+      - name: Strict API smoke test
+        run: API_BASE_URL=http://localhost:4001 npm run smoke:api
+
+      - name: Upload API smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-smoke-report-release
+          path: reports/release/api-smoke-report.json
+          if-no-files-found: warn
+
+      - name: Full release gate
+        run: REQUIRE_FULL_RELEASE_GATE=true API_BASE_URL=http://localhost:4001 npm run release:gate
+
+      - name: Upload release gate report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-gate-report
+          path: reports/release/release-gate.json
+          if-no-files-found: warn
+
+      - name: Show container logs
+        if: always()
+        run: docker logs stockstory-api-test
 
       - name: Clean up Docker
         if: always()
         run: docker rm -f stockstory-api-test || true
-
-      - name: Release gate report
-        run: npx tsx scripts/release-gate.ts

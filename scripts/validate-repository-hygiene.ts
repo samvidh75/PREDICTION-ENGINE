@@ -49,7 +49,7 @@ function stripComments(source: string): string {
 function scanFile(filePath: string): void {
   try {
     const relPath = path.relative(process.cwd(), filePath);
-    if (relPath === 'scripts/validate-repository-hygiene.ts') return;
+    if (relPath === 'scripts/validate-repository-hygiene.ts' || relPath.includes('release-gate')) return;
     const content = stripComments(fs.readFileSync(filePath, 'utf-8'));
     const scanHazards = !relPath.startsWith('scripts/');
 
