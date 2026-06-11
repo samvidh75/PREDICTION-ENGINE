@@ -64,6 +64,26 @@ interface ScorecardData {
   drift: DriftReport;
 }
 
+const normalizeScorecardData = (data: Partial<ScorecardData>): ScorecardData => ({
+  hitRate: data.hitRate ?? 0,
+  alphaRate: data.alphaRate ?? 0,
+  bestFactor: data.bestFactor ?? "Data unavailable",
+  worstFactor: data.worstFactor ?? "Data unavailable",
+  calibration: data.calibration ?? 0,
+  driftStatus: data.driftStatus ?? data.drift?.status ?? "unavailable",
+  perHorizon: data.perHorizon ?? {},
+  classification: data.classification ?? [],
+  calibrationCurve: data.calibrationCurve ?? [],
+  factorRanking: data.factorRanking ?? [],
+  drift: data.drift ?? {
+    currentPeriod: "Data unavailable",
+    previousPeriod: "Data unavailable",
+    hitRateChange: 0,
+    alphaChange: 0,
+    status: "healthy",
+  },
+});
+
 const DRIFT_COLORS: Record<string, string> = {
   healthy: "#00D17A",
   warning: "#FFB347",
@@ -93,7 +113,7 @@ export default function ValidationDashboard(): JSX.Element {
         return res.json();
       })
       .then((d: ScorecardData) => {
-        if (!cancelled) setData(d);
+        if (!cancelled) setData(normalizeScorecardData(d));
       })
       .catch((e: Error) => {
         if (!cancelled) setError(e.message);
@@ -103,6 +123,8 @@ export default function ValidationDashboard(): JSX.Element {
   }, []);
 
   const horizon30 = data?.perHorizon?.["30d"];
+  const driftStatus = data?.driftStatus ?? data?.drift?.status ?? "unavailable";
+  const driftColor = DRIFT_COLORS[driftStatus] ?? "rgba(255,255,255,0.6)";
 
   return (
     <main style={{
@@ -145,7 +167,7 @@ export default function ValidationDashboard(): JSX.Element {
             <KpiCard label="Alpha Rate" value={`${data.alphaRate}%`} color="#57B9FF" />
             <KpiCard label="Avg Alpha" value={`${horizon30?.avgAlpha ?? '—'}%`} color="rgba(255,255,255,0.9)" />
             <KpiCard label="Calibration Error" value={`${data.calibration}%`} color="#FFB347" />
-            <KpiCard label="Drift Status" value={data.driftStatus.toUpperCase()} color={DRIFT_COLORS[data.driftStatus] ?? "#fff"} />
+            <KpiCard label="Drift Status" value={driftStatus.toUpperCase()} color={driftColor} />
             <KpiCard label="Best Factor" value={data.bestFactor} color="#00D17A" />
           </div>
 

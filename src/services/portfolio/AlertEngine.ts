@@ -25,6 +25,11 @@ function dispatchAlertChange(): void {
   window.dispatchEvent(new Event(ALERT_EVENT_NAME));
 }
 
+function hasAuthenticatedSession(): boolean {
+  const session = loadAuthSession();
+  return session.status === "authenticated" && Boolean(session.uid);
+}
+
 function logRemoteSyncFailure(operation: string, detail: { status?: number; code?: string }): void {
   console.warn("[AlertEngine] remote_sync_failed", {
     component: "AlertEngine",
@@ -42,7 +47,7 @@ function alertTimestamp(alert: SmartAlert): number {
 function normalizeAlerts(value: unknown): SmartAlert[] {
   if (!Array.isArray(value)) return [];
   return value.filter((alert): alert is SmartAlert => {
-    const candidate = alert as Partial<SmartAlert>;
+    const candidate = adaptRemoteAlert(alert);
     return (
       typeof candidate.id === "string" &&
       typeof candidate.category === "string" &&
@@ -52,7 +57,33 @@ function normalizeAlerts(value: unknown): SmartAlert[] {
       typeof candidate.symbol === "string" &&
       typeof candidate.isRead === "boolean"
     );
-  });
+  }).map(adaptRemoteAlert);
+}
+
+function adaptRemoteAlert(alert: unknown): SmartAlert {
+  const candidate = alert as Partial<SmartAlert> & {
+    alert_type?: string;
+    created_at?: string;
+    is_read?: boolean | number;
+  };
+  return {
+    id: String(candidate.id ?? ""),
+    category: normalizeCategory(candidate.category ?? candidate.alert_type),
+    title: String(candidate.title ?? ""),
+    body: String(candidate.body ?? ""),
+    timestamp: String(candidate.timestamp ?? candidate.created_at ?? ""),
+    symbol: String(candidate.symbol ?? ""),
+    isRead: typeof candidate.isRead === "boolean" ? candidate.isRead : Boolean(candidate.is_read),
+  };
+}
+
+function normalizeCategory(value: unknown): AlertCategory {
+  const raw = String(value ?? "").toLowerCase();
+  if (raw.includes("risk")) return "Risk";
+  if (raw.includes("momentum")) return "Momentum";
+  if (raw.includes("news")) return "News";
+  if (raw.includes("market")) return "Market";
+  return "Factor";
 }
 
 function mergeAlertsByTimestamp(localAlerts: SmartAlert[], remoteAlerts: SmartAlert[]): SmartAlert[] {
@@ -84,16 +115,17 @@ export class AlertEngine {
 
   private static syncAlertsWithBackend(): void {
     if (typeof window === "undefined") return;
+    if (!hasAuthenticatedSession()) return;
 
-    authenticatedFetchOnlyIfSignedIn("/api/investor-state")
+    authenticatedFetchOnlyIfSignedIn("/api/alerts")
       .then(async response => {
         if (!response) return;
         if (!response.ok) {
           logRemoteSyncFailure("load", { status: response.status });
           return;
         }
-        const state = await response.json();
-        const remoteAlerts = normalizeAlerts(state?.alerts);
+        const payload = await response.json();
+        const remoteAlerts = normalizeAlerts(payload?.alerts);
         if (remoteAlerts.length === 0) return;
         const localAlerts = this.readLocalAlerts();
         const merged = mergeAlertsByTimestamp(localAlerts, remoteAlerts);
@@ -134,17 +166,7 @@ export class AlertEngine {
     window.localStorage.setItem(key, JSON.stringify(normalizedAlerts));
     dispatchAlertChange();
 
-    authenticatedFetchOnlyIfSignedIn("/api/investor-state", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ alerts: normalizedAlerts }),
-    }).then(response => {
-      if (response && !response.ok) {
-        logRemoteSyncFailure("save", { status: response.status });
-      }
-    }).catch(error => {
-      logRemoteSyncFailure("save", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" });
-    });
+    // Bulk local saves remain local-first. Remote writes use canonical alert mutation endpoints.
   }
 
   public static generateAlert(category: AlertCategory, symbol: string, title: string, body: string): void {
@@ -161,6 +183,7 @@ export class AlertEngine {
     };
     alerts.unshift(next);
     this.saveAlerts(alerts);
+    this.createRemoteAlert(next);
 
     const uid = loadAuthSession().uid || "anonymous";
     AnalyticsCoordinator.trackEvent("alert_created", JSON.stringify({
@@ -176,6 +199,7 @@ export class AlertEngine {
     if (found) {
       found.isRead = true;
       this.saveAlerts(alerts);
+      this.markRemoteAlertAsRead(id);
     }
   }
 
@@ -183,12 +207,61 @@ export class AlertEngine {
     const alerts = this.getAlerts();
     alerts.forEach(a => { a.isRead = true; });
     this.saveAlerts(alerts);
+    this.markAllRemoteAlertsAsRead();
   }
 
   public static deleteAlert(id: string): void {
     const alerts = this.getAlerts();
     const next = alerts.filter(a => a.id !== id);
     this.saveAlerts(next);
+    this.deleteRemoteAlert(id);
+  }
+
+  private static createRemoteAlert(alert: SmartAlert): void {
+    if (!hasAuthenticatedSession()) return;
+    authenticatedFetchOnlyIfSignedIn("/api/alerts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: alert.category,
+        title: alert.title,
+        body: alert.body,
+        symbol: alert.symbol,
+      }),
+    }).then(response => {
+      if (response && !response.ok) logRemoteSyncFailure("create", { status: response.status });
+    }).catch(error => {
+      logRemoteSyncFailure("create", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" });
+    });
+  }
+
+  private static markRemoteAlertAsRead(id: string): void {
+    if (!hasAuthenticatedSession()) return;
+    if (!/^\d+$/.test(id)) return;
+    authenticatedFetchOnlyIfSignedIn(`/api/alerts/${id}/read`, { method: "POST" })
+      .then(response => {
+        if (response && !response.ok) logRemoteSyncFailure("mark_read", { status: response.status });
+      })
+      .catch(error => logRemoteSyncFailure("mark_read", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" }));
+  }
+
+  private static markAllRemoteAlertsAsRead(): void {
+    if (!hasAuthenticatedSession()) return;
+    authenticatedFetchOnlyIfSignedIn("/api/alerts/read-all", { method: "POST" })
+      .then(response => {
+        if (response && !response.ok) logRemoteSyncFailure("mark_all_read", { status: response.status });
+      })
+      .catch(error => logRemoteSyncFailure("mark_all_read", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" }));
+  }
+
+  private static deleteRemoteAlert(id: string): void {
+    if (!hasAuthenticatedSession()) return;
+    if (!/^\d+$/.test(id)) return;
+    authenticatedFetchOnlyIfSignedIn(`/api/alerts/${id}`, { method: "DELETE" })
+      .then(response => {
+        if (response && !response.ok) logRemoteSyncFailure("delete", { status: response.status });
+      })
+      .catch(error => logRemoteSyncFailure("delete", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" }));
   }
 
   // Enable/Disable category channels

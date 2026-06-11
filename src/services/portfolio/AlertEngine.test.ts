@@ -73,26 +73,30 @@ describe("AlertEngine authenticated persistence", () => {
     expect(AlertEngine.getAlerts()).toEqual([localOlder]);
     await flushPromises();
 
-    expect(mockedAuthenticatedFetch).toHaveBeenCalledWith("/api/investor-state");
+    expect(mockedAuthenticatedFetch).toHaveBeenCalledWith("/api/alerts");
     const merged = AlertEngine.getAlerts();
     expect(merged.map(item => item.id)).toEqual(["remote-only", "shared"]);
     expect(merged.find(item => item.id === "shared")?.title).toBe("remote newer");
   });
 
-  it("saves authenticated alerts through the auth helper without UID query parameters", async () => {
+  it("creates authenticated alerts through the auth helper without UID query parameters", async () => {
     setSession("user-a");
     mockedAuthenticatedFetch.mockResolvedValue({ ok: true } as Response);
-    const saved = alert({ id: "save-1" });
 
-    AlertEngine.saveAlerts([saved]);
+    AlertEngine.generateAlert("Risk", "TCS", "Risk changed", "Risk moved");
     await flushPromises();
 
-    expect(mockedAuthenticatedFetch).toHaveBeenCalledTimes(1);
-    const [url, options] = mockedAuthenticatedFetch.mock.calls[0];
-    expect(url).toBe("/api/investor-state");
+    const createCall = mockedAuthenticatedFetch.mock.calls.find(call => call[0] === "/api/alerts" && call[1]?.method === "POST");
+    expect(createCall).toBeTruthy();
+    const [url, options] = createCall!;
     expect(String(url)).not.toContain("uid=");
     expect(JSON.stringify(options)).not.toContain("user-a");
-    expect(JSON.parse(String(options?.body))).toEqual({ alerts: [saved] });
+    expect(JSON.parse(String(options?.body))).toEqual({
+      category: "Risk",
+      title: "Risk changed",
+      body: "Risk moved",
+      symbol: "TCS",
+    });
   });
 
   it("keeps unauthenticated users local-only", async () => {
@@ -104,18 +108,18 @@ describe("AlertEngine authenticated persistence", () => {
     await flushPromises();
 
     expect(AlertEngine.getAlerts()).toEqual([localAlert]);
-    expect(mockedAuthenticatedFetch).toHaveBeenCalledWith("/api/investor-state", expect.any(Object));
+    expect(mockedAuthenticatedFetch).not.toHaveBeenCalled();
   });
 
   it("does not trust a forged local UID for remote identity", async () => {
     setSession("forged-user-b");
     mockedAuthenticatedFetch.mockResolvedValue({ ok: true } as Response);
 
-    AlertEngine.saveAlerts([alert({ id: "forged-attempt" })]);
+    AlertEngine.generateAlert("Risk", "TCS", "Forged attempt", "Body");
     await flushPromises();
 
-    const [url, options] = mockedAuthenticatedFetch.mock.calls[0];
-    expect(url).toBe("/api/investor-state");
+    const [url, options] = mockedAuthenticatedFetch.mock.calls.find(call => call[0] === "/api/alerts" && call[1]?.method === "POST")!;
+    expect(url).toBe("/api/alerts");
     expect(String(url)).not.toContain("forged-user-b");
     expect(JSON.stringify(options)).not.toContain("forged-user-b");
   });
@@ -149,5 +153,34 @@ describe("AlertEngine authenticated persistence", () => {
       operation: "load",
       status: 503,
     }));
+  });
+
+  it("parses canonical backend alert response shape", async () => {
+    setSession("user-a");
+    mockedAuthenticatedFetch.mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        alerts: [{
+          id: 42,
+          alert_type: "risk",
+          title: "Backend alert",
+          body: "Backend body",
+          created_at: "2026-06-11T10:00:00.000Z",
+          symbol: "TCS",
+          is_read: 0,
+        }],
+        unreadCount: 1,
+      }),
+    } as unknown as Response);
+
+    expect(AlertEngine.getAlerts()).toEqual([]);
+    await flushPromises();
+
+    expect(AlertEngine.getAlerts()).toEqual([expect.objectContaining({
+      id: "42",
+      category: "Risk",
+      title: "Backend alert",
+      isRead: false,
+    })]);
   });
 });
