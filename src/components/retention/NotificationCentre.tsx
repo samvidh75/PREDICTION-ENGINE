@@ -4,6 +4,7 @@
  */
 import React, { useEffect, useState, useCallback } from 'react';
 import { Bell, X, AlertTriangle, TrendingUp, TrendingDown, Activity, Zap, Sparkles } from 'lucide-react';
+import { authenticatedFetchOnlyIfSignedIn } from '../../services/auth/authenticatedFetch';
 
 interface Alert {
   id: number;
@@ -16,7 +17,15 @@ interface Alert {
   created_at: string;
 }
 
-export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'anonymous' }) => {
+function logNotificationSyncFailure(operation: string, status?: number): void {
+  console.warn('[NotificationCentre] remote_sync_failed', {
+    component: 'NotificationCentre',
+    operation,
+    status,
+  });
+}
+
+export const NotificationCentre: React.FC<{ userId?: string }> = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -25,13 +34,25 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
   const fetchAlerts = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/alerts?uid=${encodeURIComponent(userId)}`);
+      const res = await authenticatedFetchOnlyIfSignedIn('/api/alerts');
+      if (!res) {
+        setAlerts([]);
+        setUnreadCount(0);
+        return;
+      }
+      if (!res.ok) {
+        logNotificationSyncFailure('load', res.status);
+        return;
+      }
       const data = await res.json();
       setAlerts(data.alerts || []);
       setUnreadCount(data.unreadCount || 0);
-    } catch {}
-    setLoading(false);
-  }, [userId]);
+    } catch {
+      logNotificationSyncFailure('load');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchAlerts();
@@ -40,12 +61,14 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
   }, [fetchAlerts]);
 
   const markAsRead = async (alertId: number) => {
-    await fetch(`/api/alerts/${alertId}/read`, { method: 'POST' });
+    const res = await authenticatedFetchOnlyIfSignedIn(`/api/alerts/${alertId}/read`, { method: 'POST' });
+    if (res && !res.ok) logNotificationSyncFailure('mark_read', res.status);
     fetchAlerts();
   };
 
   const markAllAsRead = async () => {
-    await fetch(`/api/alerts/read-all?uid=${encodeURIComponent(userId)}`, { method: 'POST' });
+    const res = await authenticatedFetchOnlyIfSignedIn('/api/alerts/read-all', { method: 'POST' });
+    if (res && !res.ok) logNotificationSyncFailure('mark_all_read', res.status);
     fetchAlerts();
   };
 

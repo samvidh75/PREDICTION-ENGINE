@@ -16,6 +16,9 @@ import { generateSignalFeed } from "../../../intelligence/SignalFeedEngine";
 // ── TRACK-P2 Analytical Envelope imports ──────────────────────────────
 import {
   DataLineageEntry,
+  AnalyticalResponse,
+  buildAnalyticalResponse,
+  buildDataState,
   realResponse,
   unavailableResponse,
   partialResponse,
@@ -112,6 +115,21 @@ function portfolioLineage(): DataLineageEntry[] {
   ];
 }
 
+function calendarLineage(asOf: string | null): DataLineageEntry[] {
+  if (!asOf) return [];
+  return [
+    {
+      sourceTable: "corporate_timeline",
+      sourceField: null,
+      provider: "exchange_filings",
+      asOf,
+      retrievedAt: new Date().toISOString(),
+      isFallback: false,
+      isSynthetic: false,
+    },
+  ];
+}
+
 /** Helper to extract date string from a DB row field. */
 function extractDate(val: unknown): string | null {
   if (!val) return null;
@@ -119,11 +137,203 @@ function extractDate(val: unknown): string | null {
   return String(val).split("T")[0];
 }
 
+type TrustMetricValue = number | null;
+
+interface TrustMetricsData {
+  alpha: TrustMetricValue;
+  hit_rate: TrustMetricValue;
+  sharpe_ratio: TrustMetricValue;
+  calibration_score: TrustMetricValue;
+  total_predictions: TrustMetricValue;
+  total_outcomes: TrustMetricValue;
+}
+
+type TrustMetricsEnvelope = AnalyticalResponse<TrustMetricsData> & {
+  asOf: string | null;
+  lineage: DataLineageEntry[];
+  missingInputs: string[];
+  isSynthetic: false;
+  isFallback: false;
+};
+
+function trustMetricsLineage(asOf: string | null): DataLineageEntry[] {
+  return [
+    {
+      sourceTable: "prediction_registry",
+      sourceField: "validation_status, alpha, confidence_score, future_return, validated_at",
+      provider: "internal_prediction_registry",
+      asOf,
+      retrievedAt: new Date().toISOString(),
+      isFallback: false,
+      isSynthetic: false,
+    },
+  ];
+}
+
+function withTrustTopLevelFields(response: AnalyticalResponse<TrustMetricsData>): TrustMetricsEnvelope {
+  const lineage = response.dataState.lineage ?? [];
+  const missingInputs = response.dataState.missingInputs ?? [];
+  return {
+    ...response,
+    asOf: response.dataState.asOf,
+    lineage,
+    missingInputs,
+    isSynthetic: false,
+    isFallback: false,
+  };
+}
+
+function roundMetric(value: number, digits = 2): number {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function standardDeviation(values: number[]): number | null {
+  if (values.length < 2) return null;
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (values.length - 1);
+  return Math.sqrt(variance);
+}
+
 // ──────────────────────────────────────────────────────────────────────
 // PLUGIN
 // ──────────────────────────────────────────────────────────────────────
 
 export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
+  // ──────────────────────────────────────────────────────────────────
+  // TRUST METRICS – GET /api/intelligence/trust-metrics
+  // F0A: Honest analytical envelope. Never fabricates performance values.
+  // ──────────────────────────────────────────────────────────────────
+  app.get("/api/intelligence/trust-metrics", async (_request, reply) => {
+    const emptyMetrics: TrustMetricsData = {
+      alpha: null,
+      hit_rate: null,
+      sharpe_ratio: null,
+      calibration_score: null,
+      total_predictions: null,
+      total_outcomes: null,
+    };
+
+    try {
+      const [predictionsResult, outcomesResult] = await Promise.all([
+        query<{ total_predictions: string | number | null }>(
+          "SELECT COUNT(*) AS total_predictions FROM prediction_registry"
+        ),
+        query<{
+          alpha: string | number | null;
+          confidence_score: string | number | null;
+          future_return: string | number | null;
+          validated_at: string | Date | null;
+        }>(
+          `SELECT alpha, confidence_score, future_return, validated_at
+           FROM prediction_registry
+           WHERE validation_status = 'validated'`
+        ),
+      ]);
+
+      const totalPredictionsRaw = predictionsResult.rows[0]?.total_predictions;
+      const totalPredictions =
+        totalPredictionsRaw === null || totalPredictionsRaw === undefined
+          ? null
+          : Number(totalPredictionsRaw);
+
+      const outcomes = outcomesResult.rows;
+      const totalOutcomes = outcomes.length;
+      const alphaValues = outcomes
+        .map(row => row.alpha)
+        .filter((value): value is string | number => value !== null && value !== undefined)
+        .map(Number)
+        .filter(Number.isFinite);
+      const calibrationPairs = outcomes
+        .map(row => ({
+          confidence: row.confidence_score === null || row.confidence_score === undefined ? null : Number(row.confidence_score),
+          futureReturn: row.future_return === null || row.future_return === undefined ? null : Number(row.future_return),
+        }))
+        .filter(pair => pair.confidence !== null && pair.futureReturn !== null && Number.isFinite(pair.confidence) && Number.isFinite(pair.futureReturn));
+
+      const meanAlpha = alphaValues.length > 0
+        ? alphaValues.reduce((sum, value) => sum + value, 0) / alphaValues.length
+        : null;
+      const alphaStdDev = standardDeviation(alphaValues);
+      const asOf = outcomes
+        .map(row => extractDate(row.validated_at))
+        .filter((value): value is string => Boolean(value))
+        .sort()
+        .at(-1) ?? null;
+
+      const data: TrustMetricsData = {
+        alpha: meanAlpha === null ? null : roundMetric(meanAlpha * 100, 2),
+        hit_rate: alphaValues.length === 0
+          ? null
+          : roundMetric((alphaValues.filter(value => value > 0).length / alphaValues.length) * 100, 2),
+        sharpe_ratio: meanAlpha === null || alphaStdDev === null || alphaStdDev === 0
+          ? null
+          : roundMetric(meanAlpha / alphaStdDev, 2),
+        calibration_score: calibrationPairs.length === 0
+          ? null
+          : roundMetric(
+              100 -
+              calibrationPairs.reduce((sum, pair) => {
+                const confidence = pair.confidence! > 1 ? pair.confidence! / 100 : pair.confidence!;
+                const actual = pair.futureReturn! > 0 ? 1 : 0;
+                return sum + Math.abs(confidence - actual);
+              }, 0) / calibrationPairs.length * 100,
+              2
+            ),
+        total_predictions: totalPredictions,
+        total_outcomes: totalOutcomes,
+      };
+
+      const missingInputs = Object.entries(data)
+        .filter(([, value]) => value === null)
+        .map(([key]) => key);
+      if (totalOutcomes === 0) missingInputs.push("validated_prediction_outcomes");
+
+      const lineage = trustMetricsLineage(asOf);
+      const completenessScore = roundMetric(((Object.keys(data).length - missingInputs.filter((value, index, arr) => arr.indexOf(value) === index).length) / Object.keys(data).length) * 100, 2);
+      const availability = missingInputs.length === 0 ? "available" : totalPredictions === null && totalOutcomes === 0 ? "unavailable" : "partial";
+      const status = availability === "available" ? "ok" : availability === "partial" ? "partial" : "unavailable";
+      const mode = availability === "available" ? "production_real" : availability === "partial" ? "production_partial" : "production_unavailable";
+
+      const response = buildAnalyticalResponse<TrustMetricsData>({
+        status,
+        mode,
+        data,
+        reason: availability === "available" ? "OK" : availability === "partial" ? "PARTIAL_TRUST_METRICS" : "TRUST_METRICS_UNAVAILABLE",
+        message: availability === "available"
+          ? "Trust metrics calculated from validated prediction outcomes."
+          : "Trust metrics are incomplete because required prediction outcome evidence is missing.",
+        dataState: buildDataState({
+          availability,
+          freshness: asOf ? "recent" : "unknown",
+          asOf,
+          missingInputs: [...new Set(missingInputs)],
+          completenessScore,
+          lineage,
+        }),
+      });
+
+      return reply.send(withTrustTopLevelFields(response));
+    } catch (error: any) {
+      const response = errorResponse<TrustMetricsData>(
+        error?.code === "ECONNREFUSED" || error?.code === "57P01" || error?.code === "08006"
+          ? "DATABASE_UNAVAILABLE"
+          : "INTERNAL_ERROR",
+        "Trust metrics are unavailable because the validated prediction evidence could not be read."
+      );
+      response.data = emptyMetrics;
+      response.dataState.missingInputs = [
+        "prediction_registry",
+        "alpha",
+        "confidence_score",
+        "future_return",
+        "validated_at",
+      ];
+      response.dataState.lineage = [];
+      return reply.send(withTrustTopLevelFields(response));
+    }
+  });
+
   // ──────────────────────────────────────────────────────────────────
   // COMPANY INTELLIGENCE – GET /api/intelligence/company/:symbol
   // TRACK-P2: No synthetic fallback. Real/Partial/Unavailable envelope.
@@ -298,6 +508,76 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
       }
     }
   );
+
+  // ──────────────────────────────────────────────────────────────────
+  // CORPORATE CALENDAR – GET /api/intelligence/calendar
+  // ──────────────────────────────────────────────────────────────────
+  app.get("/api/intelligence/calendar", async (_request, reply) => {
+    try {
+      const result = await query(
+        `SELECT
+           event_id,
+           event_date,
+           symbol,
+           event_type,
+           event_title,
+           event_detail,
+           source_url
+         FROM corporate_timeline
+         WHERE event_date >= CURRENT_DATE - INTERVAL '30 days'
+         ORDER BY event_date ASC
+         LIMIT 24`
+      );
+
+      const events = result.rows.map((row: any, index: number) => {
+        const date = extractDate(row.event_date);
+        return {
+          id: String(row.event_id ?? `${row.symbol ?? "event"}-${date ?? index}`),
+          date,
+          ticker: row.symbol ?? null,
+          type: row.event_type === "Dividend"
+            ? "Dividend"
+            : row.event_type === "Results"
+              ? "Results"
+              : row.event_type === "Split"
+                ? "Split"
+                : row.event_type ? "Corporate Event" : "Other",
+          details: row.event_detail ?? row.event_title ?? null,
+          source: row.source_url ?? "corporate_timeline",
+          asOf: date,
+        };
+      });
+
+      if (events.length === 0) {
+        return reply.send(emptyResponse(
+          "NO_SOURCED_CORPORATE_EVENTS",
+          "No sourced filings, results, dividends, or corporate events are available.",
+          "recent",
+          null,
+          []
+        ));
+      }
+
+      const asOf = events.map((event: any) => event.asOf).filter(Boolean).sort().at(-1) ?? null;
+      return reply.send(realResponse(
+        { events },
+        assessMarketSnapshotFreshness(asOf ?? undefined),
+        asOf ?? new Date().toISOString().split("T")[0],
+        1,
+        calendarLineage(asOf),
+        "Corporate calendar generated from sourced corporate timeline rows."
+      ));
+    } catch (error: any) {
+      if (error?.code === "42P01" || /no such table/i.test(String(error?.message))) {
+        return reply.send(unavailableResponse(
+          "CORPORATE_TIMELINE_UNAVAILABLE",
+          "Corporate timeline source table is unavailable.",
+          ["corporate_timeline"]
+        ));
+      }
+      return reply.send(errorResponse("CORPORATE_CALENDAR_ERROR", "Corporate calendar could not be generated."));
+    }
+  });
 
   // ──────────────────────────────────────────────────────────────────
   // PORTFOLIO INTELLIGENCE – GET /api/intelligence/portfolio

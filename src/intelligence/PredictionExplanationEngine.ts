@@ -13,6 +13,7 @@
  */
 import { query } from '../db/index';
 import { signalValidator, type SignalAccuracyResult } from './SignalValidationEngine';
+import { DEFAULT_PREDICTION_HORIZON, type PredictionHorizon } from '../shared/predictions/horizons';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -28,6 +29,7 @@ export interface ExplanationDriver {
 }
 
 export interface ExplanationOutput {
+  horizonDays: PredictionHorizon;
   summary: string;
   drivers: ExplanationDriver[];
   positives: string[];
@@ -76,6 +78,7 @@ export interface PredictionSnapshot {
   momentumScore: number;
   riskScore: number;
   sectorScore: number;
+  predictionHorizon: PredictionHorizon;
 }
 
 // ---------------------------------------------------------------------------
@@ -109,29 +112,31 @@ export class PredictionExplanationEngine {
   async explain(symbol: string, options?: {
     todayDate?: string;
     previousDate?: string;
+    horizonDays?: PredictionHorizon;
   }): Promise<ExplanationOutput> {
     const upperSymbol = symbol.toUpperCase().trim();
+    const horizonDays = options?.horizonDays ?? DEFAULT_PREDICTION_HORIZON;
 
-    // TRACK-P4B: Default to the latest stored prediction_date for this symbol and horizon=30.
+    // TRACK-P4B/F0C: Default to the latest stored prediction_date for this symbol and selected horizon.
     // Do not default to new Date() — that fabricates a date when no prediction exists.
     if (!options?.todayDate) {
-      const latestDate = await this.getLatestDate(upperSymbol);
+      const latestDate = await this.getLatestDate(upperSymbol, horizonDays);
       if (!latestDate) {
-        throw new Error(`No prediction found for ${upperSymbol} (prediction_registry is empty for horizon=30)`);
+        throw new Error(`No prediction found for ${upperSymbol} (prediction_registry is empty for horizon=${horizonDays})`);
       }
       options = { ...options, todayDate: latestDate };
     }
     const today = options.todayDate!;
 
     // Fetch today's snapshot
-    const todaySnap = await this.fetchSnapshot(upperSymbol, today);
+    const todaySnap = await this.fetchSnapshot(upperSymbol, today, horizonDays);
     if (!todaySnap) {
-      throw new Error(`No prediction found for ${upperSymbol} on ${today}`);
+      throw new Error(`No prediction found for ${upperSymbol} on ${today} at ${horizonDays}d horizon`);
     }
 
     // Fetch previous (most recent before today)
-    const previousDate = options?.previousDate ?? await this.getPreviousDate(upperSymbol, today);
-    const previousSnap = previousDate ? await this.fetchSnapshot(upperSymbol, previousDate) : null;
+    const previousDate = options?.previousDate ?? await this.getPreviousDate(upperSymbol, today, horizonDays);
+    const previousSnap = previousDate ? await this.fetchSnapshot(upperSymbol, previousDate, horizonDays) : null;
 
     // Compute factor contributions
     const factorContributions = this.computeFactorContributions(todaySnap, previousSnap);
@@ -172,9 +177,10 @@ export class PredictionExplanationEngine {
     const summary = this.buildSummary(upperSymbol, todaySnap, previousSnap, drivers, classificationChanged);
 
     // Historical reliability
-    const historicalReliability = await this.fetchHistoricalReliability(upperSymbol, todaySnap, previousSnap);
+    const historicalReliability = await this.fetchHistoricalReliability(upperSymbol, todaySnap, previousSnap, horizonDays);
 
     return {
+      horizonDays,
       summary,
       drivers,
       positives,
@@ -198,7 +204,7 @@ export class PredictionExplanationEngine {
   // Data fetching
   // -----------------------------------------------------------------------
 
-  private async fetchSnapshot(symbol: string, date: string): Promise<PredictionSnapshot | null> {
+  private async fetchSnapshot(symbol: string, date: string, horizonDays: PredictionHorizon): Promise<PredictionSnapshot | null> {
     try {
       const result = await query<{
         symbol: string;
@@ -212,14 +218,15 @@ export class PredictionExplanationEngine {
         momentum_score: number | string;
         risk_score: number | string;
         sector_score: number | string;
+        prediction_horizon: number | string;
       }>(
         `SELECT symbol, prediction_date, classification, ranking_score,
          confidence_score, quality_score, growth_score, value_score,
-         momentum_score, risk_score, sector_score
+         momentum_score, risk_score, sector_score, prediction_horizon
          FROM prediction_registry
-         WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = 30
+         WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
          LIMIT 1`,
-        [symbol, date]
+        [symbol, date, horizonDays]
       );
       if (result.rows.length === 0) return null;
       const r = result.rows[0];
@@ -237,19 +244,20 @@ export class PredictionExplanationEngine {
         momentumScore: Number(r.momentum_score),
         riskScore: Number(r.risk_score),
         sectorScore: Number(r.sector_score),
+        predictionHorizon: Number(r.prediction_horizon) as PredictionHorizon,
       };
     } catch {
       return null;
     }
   }
 
-  private async getLatestDate(symbol: string): Promise<string | null> {
+  private async getLatestDate(symbol: string, horizonDays: PredictionHorizon): Promise<string | null> {
     try {
       const result = await query(
         `SELECT prediction_date FROM prediction_registry
-         WHERE symbol = $1 AND prediction_horizon = 30
+         WHERE symbol = $1 AND prediction_horizon = $2
          ORDER BY prediction_date DESC LIMIT 1`,
-        [symbol]
+        [symbol, horizonDays]
       );
       if (result.rows.length > 0) {
         const d = result.rows[0].prediction_date;
@@ -261,13 +269,13 @@ export class PredictionExplanationEngine {
     }
   }
 
-  private async getPreviousDate(symbol: string, today: string): Promise<string | null> {
+  private async getPreviousDate(symbol: string, today: string, horizonDays: PredictionHorizon): Promise<string | null> {
     try {
       const result = await query(
         `SELECT prediction_date FROM prediction_registry
-         WHERE symbol = $1 AND prediction_date < $2 AND prediction_horizon = 30
+         WHERE symbol = $1 AND prediction_date < $2 AND prediction_horizon = $3
          ORDER BY prediction_date DESC LIMIT 1`,
-        [symbol, today]
+        [symbol, today, horizonDays]
       );
       if (result.rows.length > 0) {
         const d = result.rows[0].prediction_date;
@@ -389,13 +397,14 @@ export class PredictionExplanationEngine {
   private async fetchHistoricalReliability(
     symbol: string,
     today: PredictionSnapshot,
-    previous: PredictionSnapshot | null
+    previous: PredictionSnapshot | null,
+    horizonDays: PredictionHorizon
   ): Promise<HistoricalReliability | null> {
     if (!previous) return null;
 
     try {
       // Try to match the exact classification transition
-      const classificationResults = await signalValidator.validateClassificationChanges();
+      const classificationResults = await signalValidator.validateClassificationChanges(horizonDays);
       const transitionKey = `${previous.classification} → ${today.classification}`;
       const match = classificationResults.find(r => r.signalType === transitionKey);
 
@@ -410,13 +419,13 @@ export class PredictionExplanationEngine {
       }
 
       // Fallback: return aggregate confidence-based reliability
-      const confidenceResults = await signalValidator.validateConfidenceChanges();
+      const confidenceResults = await signalValidator.validateConfidenceChanges(horizonDays);
       const absDiff = Math.abs(today.confidenceScore - previous.confidenceScore);
       let bucket = 'small (5-10pts)';
       if (absDiff > 20) bucket = 'large (21+pts)';
       else if (absDiff > 10) bucket = 'medium (11-20pts)';
 
-      const confMatch = confidenceResults.find(r => r.signalType.includes(bucket));
+      const confMatch = confidenceResults.find(r => r.signalType.includes(bucket) && r.horizonDays === horizonDays);
       if (confMatch) {
         return {
           signalType: `Confidence Δ ${bucket}`,

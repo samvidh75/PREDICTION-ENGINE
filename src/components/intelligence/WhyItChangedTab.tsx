@@ -31,6 +31,7 @@ interface HistoricalReliability {
 
 interface ExplanationData {
   symbol: string;
+  horizon?: number;
   classification: { from: string | null; to: string; changed: boolean };
   healthScore: { from: number | null; to: number; delta: number | null };
   summary: string;
@@ -66,9 +67,10 @@ const DRIVER_COLORS: Record<number, string> = {
 
 interface WhyItChangedTabProps {
   symbol: string;
+  horizon: number;
 }
 
-export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.Element {
+export default function WhyItChangedTab({ symbol, horizon }: WhyItChangedTabProps): JSX.Element {
   const [data, setData] = useState<ExplanationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +80,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
     setLoading(true);
     setError(null);
 
-    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}`)
+    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${horizon}`)
       .then(async (res) => {
         if (!res.ok) {
           const body = await res.json().catch(() => null);
@@ -86,8 +88,9 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
         }
         return res.json();
       })
-      .then((explanation: ExplanationData) => {
-        if (!cancelled) setData(explanation);
+      .then((explanation: ExplanationData | { data?: ExplanationData }) => {
+        const parsed = explanation && "data" in explanation ? explanation.data ?? null : explanation;
+        if (!cancelled) setData(parsed as ExplanationData | null);
       })
       .catch((err: Error) => {
         if (!cancelled) setError(err.message);
@@ -97,7 +100,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
       });
 
     return () => { cancelled = true; };
-  }, [symbol]);
+  }, [symbol, horizon]);
 
   // Loading state
   if (loading) {
@@ -172,6 +175,9 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
       }}>
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>
           What Changed
+        </div>
+        <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(6,182,212,0.75)", marginBottom: 6 }}>
+          {horizon} day horizon
         </div>
         <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.9)", lineHeight: 1.6 }}>
           {data.summary}

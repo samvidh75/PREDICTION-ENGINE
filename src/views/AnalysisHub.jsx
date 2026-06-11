@@ -75,6 +75,23 @@ const MARKET_CAP_RANGES = {
   MICRO: (cap) => cap < 500,
 };
 
+const SCREENER_FILTER_STORAGE_KEY = 'ss_saved_screener_filters_v1';
+
+function loadSavedFilters() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(SCREENER_FILTER_STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSavedFilters(saved) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(SCREENER_FILTER_STORAGE_KEY, JSON.stringify(saved));
+}
+
 const evaluateHealthSafe = (status) => {
   const upper = (status || '').toUpperCase().trim();
   return ['VERY HEALTHY', 'HEALTHY', 'STABLE', 'WEAKENING', 'UNHEALTHY'].includes(upper)
@@ -92,6 +109,8 @@ const AnalysisHub = () => {
     sortBy: 'MARKET_CAP_DESC',
   });
   const [headerVisible, setHeaderVisible] = useState(false);
+  const [savedFilters, setSavedFilters] = useState(() => loadSavedFilters());
+  const [filterName, setFilterName] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setHeaderVisible(true), 80);
@@ -101,6 +120,27 @@ const AnalysisHub = () => {
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
   }, []);
+
+  const saveCurrentFilter = useCallback(() => {
+    const name = filterName.trim();
+    if (!name) return;
+    const next = [
+      ...savedFilters.filter((item) => item.name.toLowerCase() !== name.toLowerCase()),
+      { id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, name, filters, savedAt: new Date().toISOString() },
+    ].slice(-8);
+    setSavedFilters(next);
+    saveSavedFilters(next);
+    setFilterName('');
+  }, [filterName, filters, savedFilters]);
+
+  const activeFilterSummary = useMemo(() => {
+    const active = [];
+    if (filters.sector !== 'All Sectors') active.push(`Sector: ${filters.sector}`);
+    if (filters.exchange !== 'ALL') active.push(`Exchange: ${filters.exchange}`);
+    if (filters.marketCap !== 'ALL') active.push(`Market cap: ${filters.marketCap}`);
+    if (filters.healthState !== 'ALL') active.push(`Health: ${filters.healthState}`);
+    return active;
+  }, [filters]);
 
   // Apply filters and sorting
   const filteredStocks = useMemo(() => {
@@ -199,9 +239,46 @@ const AnalysisHub = () => {
           Healthometer & Diagnostic Screener
         </h1>
         <p className="text-[12px] text-[#737373] max-w-xl leading-relaxed">
-          Multi-exchange structural health scanner processing ~150 diagnostic parameters
-          across NSE, BSE, and SME segments. All outputs are non-advisory status readings.
+          Multi-exchange structural health scanner with configurable saved filters.
+          Empty states show when selected filters have no matching registry entries.
         </p>
+      </div>
+
+      <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="text-[10px] font-mono font-bold uppercase tracking-[0.18em] text-[#525252]">Saved Screeners</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {savedFilters.length > 0 ? savedFilters.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setFilters(item.filters)}
+                  className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-[10px] font-bold uppercase text-[#525252] hover:border-[#06B6D4] hover:text-[#06B6D4]"
+                >
+                  {item.name}
+                </button>
+              )) : (
+                <span className="text-[11px] text-[#737373]">No saved screeners yet.</span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={filterName}
+              onChange={(event) => setFilterName(event.target.value)}
+              placeholder="Name this screener"
+              className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs text-[#0A0A0A] outline-none focus:border-[#06B6D4]"
+            />
+            <button
+              type="button"
+              onClick={saveCurrentFilter}
+              className="rounded-lg bg-[#06B6D4] px-4 py-2 text-[10px] font-bold uppercase text-white disabled:opacity-40"
+              disabled={!filterName.trim()}
+            >
+              Save
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* SEBI Compliance Banner */}
@@ -351,7 +428,9 @@ const AnalysisHub = () => {
                   NO MATCHING ENTITIES FOUND
                 </span>
                 <span className="text-[10px] text-[#A3A3A3]">
-                  Adjust screener filters to broaden the diagnostic scan
+                  {activeFilterSummary.length > 0
+                    ? `No registry entries match ${activeFilterSummary.join(' • ')}.`
+                    : 'No registry entries match the current diagnostic scan.'}
                 </span>
               </div>
             )}

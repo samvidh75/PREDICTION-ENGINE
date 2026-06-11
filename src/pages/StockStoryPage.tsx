@@ -8,6 +8,15 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
+import ResearchExtensionsPanel from "../components/stock/ResearchExtensionsPanel";
+import {
+  DEFAULT_PREDICTION_HORIZON,
+  SUPPORTED_PREDICTION_HORIZONS,
+  type PredictionHorizon,
+} from "../shared/predictions/horizons";
+
+export { SUPPORTED_PREDICTION_HORIZONS };
+const stockStoryResponseCache = new Map<string, any>();
 
 function localFormatPercent(value?: number | null): string {
   if (value === undefined || value === null) return "Unavailable";
@@ -74,6 +83,28 @@ function readTabFromUrl(): TabKey {
   if (typeof window === "undefined") return "overview";
   const tab = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
   return tab && tabs.includes(tab) ? tab : "overview";
+}
+
+export function readHorizonFromUrl(): PredictionHorizon {
+  if (typeof window === "undefined") return DEFAULT_PREDICTION_HORIZON;
+  const raw = new URLSearchParams(window.location.search).get("horizon");
+  const parsed = raw ? Number(raw) : DEFAULT_PREDICTION_HORIZON;
+  return SUPPORTED_PREDICTION_HORIZONS.includes(parsed as PredictionHorizon)
+    ? parsed as PredictionHorizon
+    : DEFAULT_PREDICTION_HORIZON;
+}
+
+export function makeStockStoryCacheKey(ticker: string, horizon: PredictionHorizon): string {
+  return `stockstory:${ticker.toUpperCase().trim()}:horizon:${horizon}`;
+}
+
+export function clearStockStoryResponseCacheForTests(): void {
+  stockStoryResponseCache.clear();
+}
+
+function formatExchange(metadataExchange?: string | null, quoteExchange?: string | null): string {
+  const exchange = metadataExchange || quoteExchange;
+  return exchange && exchange.trim().length > 0 ? exchange : "Data unavailable";
 }
 
 function formatLargeINR(value?: number | null): string {
@@ -163,6 +194,7 @@ export const StockStoryPage: React.FC = () => {
   const registryStock = useMemo(() => StockRegistry.getStock(ticker), [ticker]);
   const liveQuote = useLiveQuote(ticker);
   const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
+  const [selectedHorizon, setSelectedHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [noteText, setNoteText] = useState(() => NoteEngine.getNote(ticker).note);
   const [metadata, setMetadata] = useState<MetadataState>({ data: null, loading: true, error: null });
@@ -176,6 +208,17 @@ export const StockStoryPage: React.FC = () => {
   useEffect(() => {
     RecentSearchStore.addTicker(ticker);
   }, [ticker]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("horizon") === String(selectedHorizon)) return;
+    params.set("page", "stock");
+    params.set("id", ticker);
+    params.set("horizon", String(selectedHorizon));
+    if (activeTab !== "overview") params.set("tab", activeTab);
+    window.history.replaceState({}, "", `?${params.toString()}`);
+  }, [activeTab, selectedHorizon, ticker]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -203,8 +246,15 @@ export const StockStoryPage: React.FC = () => {
     const controller = new AbortController();
     setStoryLoading(true);
     setStoryError(null);
+    const cacheKey = makeStockStoryCacheKey(ticker, selectedHorizon);
+    const cached = stockStoryResponseCache.get(cacheKey);
+    if (cached) {
+      setStory(cached);
+      setStoryLoading(false);
+      return () => controller.abort();
+    }
 
-    fetch(`/api/stockstory/${encodeURIComponent(ticker)}`, {
+    fetch(`/api/stockstory/${encodeURIComponent(ticker)}?horizon=${selectedHorizon}`, {
       signal: controller.signal,
       headers: { Accept: "application/json" },
     })
@@ -214,7 +264,9 @@ export const StockStoryPage: React.FC = () => {
         return body;
       })
       .then((data) => {
-        setStory(adaptStockStoryResponse(data));
+        const adapted = adaptStockStoryResponse(data);
+        stockStoryResponseCache.set(cacheKey, adapted);
+        setStory(adapted);
         setStoryLoading(false);
       })
       .catch((error: Error) => {
@@ -224,7 +276,7 @@ export const StockStoryPage: React.FC = () => {
       });
 
     return () => controller.abort();
-  }, [ticker]);
+  }, [ticker, selectedHorizon]);
 
   useEffect(() => {
     fetch(`/api/company/${encodeURIComponent(ticker)}/ownership`)
@@ -244,7 +296,7 @@ export const StockStoryPage: React.FC = () => {
       : registryStock?.companyName || ticker;
   const sector = metadata.data?.sector || registryStock?.sector || "Data unavailable";
   const industry = metadata.data?.industry || "Data unavailable";
-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || "NSE";
+  const exchange = formatExchange(metadata.data?.exchange, liveQuote.quote?.exchange);
   const marketCap = formatLargeINR(metadata.data?.marketCap);
   const currency = metadata.data?.currency || "INR";
   const quote = liveQuote.quote;
@@ -290,6 +342,16 @@ export const StockStoryPage: React.FC = () => {
     params.set("page", "stock");
     params.set("id", ticker);
     params.set("tab", tab);
+    window.history.replaceState({}, "", `?${params.toString()}`);
+  };
+
+  const selectHorizon = (horizon: PredictionHorizon) => {
+    setSelectedHorizon(horizon);
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock");
+    params.set("id", ticker);
+    params.set("horizon", String(horizon));
+    if (activeTab !== "overview") params.set("tab", activeTab);
     window.history.replaceState({}, "", `?${params.toString()}`);
   };
 
@@ -494,6 +556,21 @@ export const StockStoryPage: React.FC = () => {
 
       {/* --- QUICK ACTION CONTROLS --- */}
       <section className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.02] p-1" aria-label="Prediction horizon">
+          {SUPPORTED_PREDICTION_HORIZONS.map((horizon) => (
+            <button
+              key={horizon}
+              onClick={() => selectHorizon(horizon)}
+              className={`h-8 rounded-md px-3 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+                selectedHorizon === horizon
+                  ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                  : "border border-transparent text-white/45 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              {horizon} days
+            </button>
+          ))}
+        </div>
         <button
           onClick={handleToggleWatchlist}
           className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${
@@ -517,6 +594,8 @@ export const StockStoryPage: React.FC = () => {
           className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
         />
       </div>
+
+      <ResearchExtensionsPanel symbol={ticker} companyName={companyName} story={storyData} />
 
       {/* --- TABS --- */}
       <div className="flex gap-2 overflow-x-auto border-b border-white/5">
@@ -810,7 +889,7 @@ export const StockStoryPage: React.FC = () => {
             <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
               <Activity className="h-4 w-4 text-emerald-400" /> Why It Changed
             </div>
-            <WhyItChangedTab symbol={ticker} />
+            <WhyItChangedTab symbol={ticker} horizon={selectedHorizon} />
           </div>
         )}
 
