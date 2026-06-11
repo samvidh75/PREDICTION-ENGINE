@@ -1,0 +1,794 @@
+diff --git a/src/pages/StockStoryPage.tsx b/src/pages/StockStoryPage.tsx
+index 933fc48..0000000 100644
+--- a/src/pages/StockStoryPage.tsx
++++ b/src/pages/StockStoryPage.tsx
+@@ -78,6 +78,16 @@ function readTabFromUrl(): TabKey {
+   return tab && tabs.includes(tab) ? tab : "overview";
+ }
+ 
++const horizonOptions = [7, 30, 90, 180, 365] as const;
++type PredictionHorizon = (typeof horizonOptions)[number];
++
++function readHorizonFromUrl(): PredictionHorizon {
++  if (typeof window === "undefined") return 30;
++  const raw = new URLSearchParams(window.location.search).get("horizon");
++  const parsed = Number.parseInt(raw ?? "", 10) as PredictionHorizon;
++  return horizonOptions.includes(parsed) ? parsed : 30;
++}
++
+ function formatLargeINR(value?: number | null): string {
+   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return "Data unavailable";
+   const crore = value / 10_000_000;
+@@ -165,6 +175,7 @@ export const StockStoryPage: React.FC = () => {
+   const registryStock = useMemo(() => StockRegistry.getStock(ticker), [ticker]);
+   const liveQuote = useLiveQuote(ticker);
+   const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
++  const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
+   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
+   const [noteText, setNoteText] = useState(() => NoteEngine.getNote(ticker).note);
+   const [metadata, setMetadata] = useState<MetadataState>({ data: null, loading: true, error: null });
+@@ -206,7 +217,7 @@ export const StockStoryPage: React.FC = () => {
+     setStoryLoading(true);
+     setStoryError(null);
+ 
+-    fetch(`/api/stockstory/${encodeURIComponent(ticker)}`, {
++    fetch(`/api/stockstory/${encodeURIComponent(ticker)}?horizon=${horizon}`, {
+       signal: controller.signal,
+       headers: { Accept: "application/json" },
+     })
+@@ -226,7 +237,7 @@ export const StockStoryPage: React.FC = () => {
+       });
+ 
+     return () => controller.abort();
+-  }, [ticker]);
++  }, [ticker, horizon]);
+ 
+   useEffect(() => {
+     fetch(`/api/company/${encodeURIComponent(ticker)}/ownership`)
+@@ -246,7 +257,7 @@ export const StockStoryPage: React.FC = () => {
+       : registryStock?.companyName || ticker;
+   const sector = metadata.data?.sector || registryStock?.sector || "Data unavailable";
+   const industry = metadata.data?.industry || "Data unavailable";
+-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || "NSE";
++  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || "Data unavailable";
+   const marketCap = formatLargeINR(metadata.data?.marketCap);
+   const currency = metadata.data?.currency || "INR";
+   const quote = liveQuote.quote;
+@@ -294,6 +305,15 @@ export const StockStoryPage: React.FC = () => {
+     window.history.replaceState({}, "", `?${params.toString()}`);
+   };
+ 
++  const selectHorizon = (nextHorizon: PredictionHorizon) => {
++    setHorizon(nextHorizon);
++    const params = new URLSearchParams(window.location.search);
++    params.set("page", "stock");
++    params.set("id", ticker);
++    params.set("horizon", String(nextHorizon));
++    window.history.replaceState({}, "", `?${params.toString()}`);
++  };
++
+   const storyData = story;
+ 
+   if (storyLoading) {
+@@ -509,6 +529,25 @@ export const StockStoryPage: React.FC = () => {
+         </button>
+       </section>
+ 
++      {/* --- PREDICTION HORIZON --- */}
++      <section className="flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2" aria-label="Prediction horizon">
++        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-white/45">Horizon</span>
++        {horizonOptions.map((option) => (
++          <button
++            key={option}
++            type="button"
++            onClick={() => selectHorizon(option)}
++            aria-pressed={horizon === option}
++            className={`rounded-md px-2 py-1 text-[10px] font-bold transition-colors ${
++              horizon === option
++                ? "bg-cyan-500/20 text-cyan-300"
++                : "text-white/45 hover:text-white"
++            }`}
++          >
++            {option}D
++          </button>
++        ))}
++      </section>
++
+       {/* --- RESEARCH NOTE --- */}
+       <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5">
+         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">My Research Notes</div>
+@@ -812,7 +851,7 @@ export const StockStoryPage: React.FC = () => {
+             <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
+               <Activity className="h-4 w-4 text-emerald-400" /> Why It Changed
+             </div>
+-            <WhyItChangedTab symbol={ticker} />
++            <WhyItChangedTab symbol={ticker} horizon={horizon} />
+           </div>
+         )}
+ 
+diff --git a/src/components/intelligence/WhyItChangedTab.tsx b/src/components/intelligence/WhyItChangedTab.tsx
+index cf380c5..0000000 100644
+--- a/src/components/intelligence/WhyItChangedTab.tsx
++++ b/src/components/intelligence/WhyItChangedTab.tsx
+@@ -50,6 +50,13 @@ interface ExplanationData {
+   generatedAt: string;
+ }
+ 
++interface ExplanationEnvelope {
++  status: 'ok' | 'partial' | 'unavailable' | 'empty' | 'error' | 'demo';
++  data: ExplanationData | null;
++  message?: string | null;
++  reason?: string | null;
++}
++
+ const PREDICTIVE_POWER_COLORS: Record<string, string> = {
+   Strong: "#00D17A",
+   Moderate: "#FFB347",
+@@ -68,9 +75,10 @@ const DRIVER_COLORS: Record<number, string> = {
+ 
+ interface WhyItChangedTabProps {
+   symbol: string;
++  horizon: number;
+ }
+ 
+-export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.Element {
++export default function WhyItChangedTab({ symbol, horizon }: WhyItChangedTabProps): JSX.Element {
+   const [data, setData] = useState<ExplanationData | null>(null);
+   const [loading, setLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
+@@ -80,16 +88,19 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.El
+     setLoading(true);
+     setError(null);
+ 
+-    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}`)
++    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${horizon}`)
+       .then(async (res) => {
+         if (!res.ok) {
+           const body = await res.json().catch(() => null);
+-          throw new Error(body?.error ?? 'Failed to load explanation');
++          throw new Error(body?.message ?? body?.reason ?? body?.error ?? 'Failed to load explanation');
+         }
+-        return res.json();
++        return res.json() as Promise<ExplanationEnvelope>;
+       })
+-      .then((explanation: ExplanationData) => {
+-        if (!cancelled) setData(explanation);
++      .then((envelope) => {
++        if (!envelope.data || envelope.status === 'unavailable' || envelope.status === 'error') {
++          throw new Error(envelope.message ?? envelope.reason ?? 'Failed to load explanation');
++        }
++        if (!cancelled) setData(envelope.data);
+       })
+       .catch((err: Error) => {
+         if (!cancelled) setError(err.message);
+@@ -99,7 +110,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.El
+       });
+ 
+     return () => { cancelled = true; };
+-  }, [symbol]);
++  }, [symbol, horizon]);
+ 
+   // Loading state
+   if (loading) {
+diff --git a/src/backend/web/routes/predictions/explain.ts b/src/backend/web/routes/predictions/explain.ts
+index 6a02c63..0000000 100644
+--- a/src/backend/web/routes/predictions/explain.ts
++++ b/src/backend/web/routes/predictions/explain.ts
+@@ -36,10 +36,20 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
+     const query = request.query as {
+       today?: string;
+       previous?: string;
++      horizon?: string;
+     };
+ 
+     const ticker = symbol.toUpperCase().trim();
++    const validHorizons = [7, 30, 90, 180, 365];
++    const horizon = query.horizon ? Number.parseInt(query.horizon, 10) : 30;
++
++    if (!validHorizons.includes(horizon)) {
++      return reply.status(400).send({
++        code: 'INVALID_PREDICTION_HORIZON',
++        message: `Horizon ${query.horizon} is not valid. Allowed: ${validHorizons.join(', ')}`,
++      });
++    }
+ 
+     if (!ticker || ticker.length === 0) {
+       return reply.status(400).send({
+@@ -51,6 +61,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
+       const explanation = await predictionExplanationEngine.explain(ticker, {
+         todayDate: query.today,
+         previousDate: query.previous,
++        horizon,
+       });
+ 
+       // ──────────────────────────────────────────────────────────
+@@ -77,9 +88,9 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
+       try {
+         const pdRes = await pool.query(
+           `SELECT prediction_date FROM prediction_registry
+-           WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = 30
++           WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
+            LIMIT 1`,
+-          [ticker, today]
++          [ticker, today, horizon]
+         );
+         if (pdRes.rows.length > 0) {
+           const pd = pdRes.rows[0].prediction_date;
+@@ -224,6 +235,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
+               }
+             : {}),
+         } : null,
++        predictionHorizon: horizon,
+         generatedAt: new Date().toISOString(),
+       };
+ 
+diff --git a/src/intelligence/PredictionExplanationEngine.ts b/src/intelligence/PredictionExplanationEngine.ts
+index 8a69ab3..0000000 100644
+--- a/src/intelligence/PredictionExplanationEngine.ts
++++ b/src/intelligence/PredictionExplanationEngine.ts
+@@ -111,29 +111,31 @@ export class PredictionExplanationEngine {
+   async explain(symbol: string, options?: {
+     todayDate?: string;
+     previousDate?: string;
++    horizon?: number;
+   }): Promise<ExplanationOutput> {
+     const upperSymbol = symbol.toUpperCase().trim();
++    const horizon = options?.horizon ?? 30;
+ 
+-    // TRACK-P4B: Default to the latest stored prediction_date for this symbol and horizon=30.
++    // TRACK-P4B: Default to the latest stored prediction_date for this symbol and selected horizon.
+     // Do not default to new Date() — that fabricates a date when no prediction exists.
+     if (!options?.todayDate) {
+-      const latestDate = await this.getLatestDate(upperSymbol);
++      const latestDate = await this.getLatestDate(upperSymbol, horizon);
+       if (!latestDate) {
+-        throw new Error(`No prediction found for ${upperSymbol} (prediction_registry is empty for horizon=30)`);
++        throw new Error(`No prediction found for ${upperSymbol} (prediction_registry is empty for horizon=${horizon})`);
+       }
+       options = { ...options, todayDate: latestDate };
+     }
+     const today = options.todayDate!;
+ 
+     // Fetch today's snapshot
+-    const todaySnap = await this.fetchSnapshot(upperSymbol, today);
++    const todaySnap = await this.fetchSnapshot(upperSymbol, today, horizon);
+     if (!todaySnap) {
+       throw new Error(`No prediction found for ${upperSymbol} on ${today}`);
+     }
+ 
+     // Fetch previous (most recent before today)
+-    const previousDate = options?.previousDate ?? await this.getPreviousDate(upperSymbol, today);
+-    const previousSnap = previousDate ? await this.fetchSnapshot(upperSymbol, previousDate) : null;
++    const previousDate = options?.previousDate ?? await this.getPreviousDate(upperSymbol, today, horizon);
++    const previousSnap = previousDate ? await this.fetchSnapshot(upperSymbol, previousDate, horizon) : null;
+@@ -200,7 +202,7 @@ export class PredictionExplanationEngine {
+   // Data fetching
+   // -----------------------------------------------------------------------
+ 
+-  private async fetchSnapshot(symbol: string, date: string): Promise<PredictionSnapshot | null> {
++  private async fetchSnapshot(symbol: string, date: string, horizon: number): Promise<PredictionSnapshot | null> {
+     try {
+       const result = await query<{
+         symbol: string;
+@@ -219,9 +221,9 @@ export class PredictionExplanationEngine {
+          confidence_score, quality_score, growth_score, value_score,
+          momentum_score, risk_score, sector_score
+          FROM prediction_registry
+-         WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = 30
++         WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
+          LIMIT 1`,
+-        [symbol, date]
++        [symbol, date, horizon]
+       );
+       if (result.rows.length === 0) return null;
+@@ -245,13 +247,13 @@ export class PredictionExplanationEngine {
+     }
+   }
+ 
+-  private async getLatestDate(symbol: string): Promise<string | null> {
++  private async getLatestDate(symbol: string, horizon: number): Promise<string | null> {
+     try {
+       const result = await query(
+         `SELECT prediction_date FROM prediction_registry
+-         WHERE symbol = $1 AND prediction_horizon = 30
++         WHERE symbol = $1 AND prediction_horizon = $2
+          ORDER BY prediction_date DESC LIMIT 1`,
+-        [symbol]
++        [symbol, horizon]
+       );
+       if (result.rows.length > 0) {
+@@ -263,14 +265,14 @@ export class PredictionExplanationEngine {
+     }
+   }
+ 
+-  private async getPreviousDate(symbol: string, today: string): Promise<string | null> {
++  private async getPreviousDate(symbol: string, today: string, horizon: number): Promise<string | null> {
+     try {
+       const result = await query(
+         `SELECT prediction_date FROM prediction_registry
+-         WHERE symbol = $1 AND prediction_date < $2 AND prediction_horizon = 30
++         WHERE symbol = $1 AND prediction_date < $2 AND prediction_horizon = $3
+          ORDER BY prediction_date DESC LIMIT 1`,
+-        [symbol, today]
++        [symbol, today, horizon]
+       );
+       if (result.rows.length > 0) {
+diff --git a/package.json b/package.json
+index 89fd82a..0000000 100644
+--- a/package.json
++++ b/package.json
+@@ -32,6 +32,8 @@
+     "test:unit": "vitest run",
+     "test:integration:sqlite": "cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts",
+     "test:e2e:uiux": "vitest run tests/e2e/uiux",
++    "test:e2e:playwright": "playwright test",
++    "test:ci": "npm run lint && npm run typecheck && npm run test:unit && npm run build:all && npm run test:e2e:playwright",
+     "test:integration:postgres": "cross-env NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts",
+     "test:integration:postgres:ci": "cross-env REQUIRE_POSTGRES_INTEGRATION=true NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts",
+     "seed:ci": "tsx scripts/seed-ci-fixtures.ts",
+diff --git a/src/pages/__tests__/TrustCentrePage.test.tsx b/src/pages/__tests__/TrustCentrePage.test.tsx
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/src/pages/__tests__/TrustCentrePage.test.tsx
+@@ -0,0 +1,64 @@
++import '@testing-library/jest-dom/vitest';
++import React from 'react';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { render, screen } from '@testing-library/react';
++import TrustCentrePage from '../TrustCentrePage';
++
++afterEach(() => {
++  vi.unstubAllGlobals();
++});
++
++describe('TrustCentrePage regression states', () => {
++  it('renders audited outcomes as unavailable instead of invented zero values', async () => {
++    vi.stubGlobal('fetch', vi.fn(async () => ({
++      ok: true,
++      json: async () => ({
++        status: 'partial',
++        message: 'Only registry-backed trust metrics are available.',
++        data: {
++          alpha: null,
++          hit_rate: null,
++          sharpe_ratio: null,
++          calibration_score: null,
++          total_predictions: 125,
++          total_outcomes: null,
++        },
++        dataState: {
++          availability: 'partial',
++          asOf: '2026-06-11',
++          missingInputs: ['audited_outcomes.alpha'],
++          completenessScore: 17,
++        },
++      }),
++    })) as unknown as typeof fetch);
++
++    render(<TrustCentrePage />);
++
++    expect(await screen.findByText(/Trust metrics status: partial/i)).toBeInTheDocument();
++    expect(screen.getAllByText('Data unavailable').length).toBeGreaterThanOrEqual(5);
++    expect(screen.queryByText('0.00')).not.toBeInTheDocument();
++    expect(screen.getByText('125')).toBeInTheDocument();
++  });
++
++  it('renders an explicit error state when the metrics service fails', async () => {
++    vi.stubGlobal('fetch', vi.fn(async () => ({
++      ok: false,
++      json: async () => ({ message: 'Trust metrics are temporarily unavailable.' }),
++    })) as unknown as typeof fetch);
++
++    render(<TrustCentrePage />);
++
++    expect(await screen.findByText(/Trust metrics status: error/i)).toBeInTheDocument();
++    expect(screen.getByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
++    expect(screen.getAllByText('Data unavailable').length).toBeGreaterThan(0);
++  });
++});
+diff --git a/src/backend/web/routes/__tests__/trustMetrics.regression.test.ts b/src/backend/web/routes/__tests__/trustMetrics.regression.test.ts
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/src/backend/web/routes/__tests__/trustMetrics.regression.test.ts
+@@ -0,0 +1,54 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import Fastify from 'fastify';
++
++const { queryMock } = vi.hoisted(() => ({ queryMock: vi.fn() }));
++
++vi.mock('../../../../db/index', () => ({
++  default: { query: queryMock },
++}));
++
++import { trustMetricsRoutes } from '../trustMetrics';
++
++afterEach(() => {
++  queryMock.mockReset();
++});
++
++describe('trust metrics regression contract', () => {
++  it('returns partial lineage-backed metrics with unaudited performance values left null', async () => {
++    queryMock.mockResolvedValue({ rows: [{ total_predictions: 125, as_of: '2026-06-11' }] });
++    const app = Fastify({ logger: false });
++    await app.register(trustMetricsRoutes);
++    await app.ready();
++
++    const response = await app.inject({ method: 'GET', url: '/api/intelligence/trust-metrics' });
++    expect(response.statusCode).toBe(200);
++    const body = response.json();
++    expect(body.status).toBe('partial');
++    expect(body.data.total_predictions).toBe(125);
++    expect(body.data.alpha).toBeNull();
++    expect(body.data.hit_rate).toBeNull();
++    expect(body.data.sharpe_ratio).toBeNull();
++    expect(body.data.calibration_score).toBeNull();
++    expect(body.dataState.lineage[0]).toMatchObject({
++      sourceTable: 'prediction_registry',
++      sourceField: 'COUNT(*)',
++      isFallback: false,
++      isSynthetic: false,
++    });
++    await app.close();
++  });
++
++  it('returns a 503 unavailable envelope when the registry query fails', async () => {
++    queryMock.mockRejectedValue(new Error('database offline'));
++    const app = Fastify({ logger: false });
++    await app.register(trustMetricsRoutes);
++    await app.ready();
++
++    const response = await app.inject({ method: 'GET', url: '/api/intelligence/trust-metrics' });
++    expect(response.statusCode).toBe(503);
++    expect(response.json()).toMatchObject({ status: 'error', reason: 'TRUST_METRICS_UNAVAILABLE' });
++    await app.close();
++  });
++});
+diff --git a/src/backend/web/routes/__tests__/alerts.authenticated.integration.test.ts b/src/backend/web/routes/__tests__/alerts.authenticated.integration.test.ts
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/src/backend/web/routes/__tests__/alerts.authenticated.integration.test.ts
+@@ -0,0 +1,160 @@
++import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
++import Fastify, { type FastifyInstance } from 'fastify';
++import { setTokenVerifier, resetTokenVerifier, type TokenVerifier } from '../../../auth/firebaseAdmin';
++import { dbAdapter } from '../../../../db/DatabaseAdapter';
++import { retentionRoutes } from '../retention';
++
++function verifierFor(validUid: string): TokenVerifier {
++  return {
++    verifyIdToken: vi.fn(async (token: string) => {
++      if (token === 'valid-token-' + validUid) return { uid: validUid, email: validUid + '@example.com' };
++      throw new Error('Invalid token');
++    }),
++  };
++}
++
++describe('authenticated alert integration', () => {
++  let app: FastifyInstance;
++
++  beforeAll(async () => {
++    process.env.DB_ADAPTER = 'sqlite';
++    process.env.SQLITE_DB_PATH = ':memory:';
++    await dbAdapter.reset();
++    await dbAdapter.initialize();
++    await dbAdapter.executeScript(`
++      CREATE TABLE IF NOT EXISTS user_alerts (
++        id INTEGER PRIMARY KEY AUTOINCREMENT,
++        user_id TEXT NOT NULL,
++        symbol TEXT NOT NULL,
++        alert_type TEXT NOT NULL,
++        title TEXT NOT NULL,
++        body TEXT NOT NULL,
++        metadata TEXT DEFAULT '{}',
++        is_read INTEGER NOT NULL DEFAULT 0,
++        created_at TEXT
++      );
++    `);
++  });
++
++  beforeEach(async () => {
++    await dbAdapter.query('DELETE FROM user_alerts');
++  });
++
++  afterEach(async () => {
++    resetTokenVerifier();
++    if (app) await app.close();
++  });
++
++  async function openFor(uid: string): Promise<void> {
++    setTokenVerifier(verifierFor(uid));
++    app = Fastify({ logger: false });
++    await app.register(retentionRoutes);
++    await app.ready();
++  }
++
++  async function insertAlert(uid: string, symbol: string): Promise<number> {
++    await dbAdapter.query(
++      `INSERT INTO user_alerts (user_id, symbol, alert_type, title, body, created_at)
++       VALUES ($1, $2, $3, $4, $5, $6)`,
++      [uid, symbol, 'health_change', symbol + ' alert', 'Body', '2026-06-11'],
++    );
++    const result = await dbAdapter.query('SELECT id FROM user_alerts WHERE user_id = $1 AND symbol = $2', [uid, symbol]);
++    return Number((result.rows[0] as { id: number }).id);
++  }
++
++  it('lists only alerts owned by the verified user and returns their unread count', async () => {
++    await insertAlert('user-a', 'RELIANCE');
++    await insertAlert('user-b', 'TCS');
++    await openFor('user-a');
++
++    const list = await app.inject({
++      method: 'GET',
++      url: '/api/alerts',
++      headers: { authorization: 'Bearer valid-token-user-a' },
++    });
++    expect(list.statusCode).toBe(200);
++    expect(list.json().alerts).toHaveLength(1);
++    expect(list.json().alerts[0].symbol).toBe('RELIANCE');
++    expect(list.json().unreadCount).toBe(1);
++
++    const unread = await app.inject({
++      method: 'GET',
++      url: '/api/alerts/unread',
++      headers: { authorization: 'Bearer valid-token-user-a' },
++    });
++    expect(unread.json()).toEqual({ unreadCount: 1 });
++  });
++
++  it('prevents one authenticated user from dismissing another users alert', async () => {
++    const alertId = await insertAlert('user-a', 'RELIANCE');
++    await openFor('user-b');
++
++    const forbidden = await app.inject({
++      method: 'DELETE',
++      url: '/api/alerts/' + alertId,
++      headers: { authorization: 'Bearer valid-token-user-b' },
++    });
++    expect(forbidden.statusCode).toBe(404);
++    await app.close();
++
++    await openFor('user-a');
++    const removed = await app.inject({
++      method: 'DELETE',
++      url: '/api/alerts/' + alertId,
++      headers: { authorization: 'Bearer valid-token-user-a' },
++    });
++    expect(removed.statusCode).toBe(200);
++    expect(removed.json()).toEqual({ success: true });
++  });
++
++  it('marks all alerts as read only for the verified user', async () => {
++    await insertAlert('user-a', 'RELIANCE');
++    await insertAlert('user-b', 'TCS');
++    await openFor('user-a');
++
++    const response = await app.inject({
++      method: 'POST',
++      url: '/api/alerts/read-all',
++      headers: { authorization: 'Bearer valid-token-user-a' },
++    });
++    expect(response.statusCode).toBe(200);
++
++    const rows = await dbAdapter.query('SELECT user_id, is_read FROM user_alerts ORDER BY user_id');
++    expect(rows.rows).toEqual([
++      { user_id: 'user-a', is_read: 1 },
++      { user_id: 'user-b', is_read: 0 },
++    ]);
++  });
++});
+diff --git a/playwright.config.ts b/playwright.config.ts
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/playwright.config.ts
+@@ -0,0 +1,18 @@
++import { defineConfig } from '@playwright/test';
++
++export default defineConfig({
++  testDir: './tests/playwright',
++  fullyParallel: true,
++  retries: process.env.CI ? 1 : 0,
++  workers: process.env.CI ? 1 : undefined,
++  reporter: process.env.CI ? [['html', { open: 'never' }], ['list']] : 'list',
++  use: {
++    baseURL: 'http://127.0.0.1:4173',
++    trace: 'on-first-retry',
++  },
++  webServer: {
++    command: 'npm run dev -- --host 127.0.0.1 --port 4173',
++    url: 'http://127.0.0.1:4173',
++    reuseExistingServer: !process.env.CI,
++  },
++});
+diff --git a/tests/playwright/f0-closure.spec.ts b/tests/playwright/f0-closure.spec.ts
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/tests/playwright/f0-closure.spec.ts
+@@ -0,0 +1,170 @@
++import { expect, test } from '@playwright/test';
++
++const partialTrustEnvelope = {
++  status: 'partial',
++  message: 'Only registry-backed trust metrics are available.',
++  data: {
++    alpha: null,
++    hit_rate: null,
++    sharpe_ratio: null,
++    calibration_score: null,
++    total_predictions: 125,
++    total_outcomes: null,
++  },
++  dataState: {
++    availability: 'partial',
++    asOf: '2026-06-11',
++    missingInputs: ['audited_outcomes.alpha'],
++    completenessScore: 17,
++  },
++};
++
++const stockStoryEnvelope = {
++  status: 'ok',
++  data: {
++    symbol: 'RELIANCE',
++    predictionDate: '2026-06-11',
++    healthScore: 71,
++    classification: 'Healthy',
++    confidence: { level: 'High', score: 82, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++    narrative: 'Registry-backed health snapshot.',
++    factors: {
++      growth: { score: 70, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++      quality: { score: 75, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++      stability: { score: null, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++      momentum: { score: 68, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++      value: { score: 66, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++      risk: { score: 30, source: 'prediction_registry', snapshotDate: '2026-06-11' },
++    },
++  },
++};
++
++function restoreBrowserSession(): void {
++  window.localStorage.setItem('ss_auth_session_v1', JSON.stringify({
++    status: 'authenticated',
++    uid: 'browser-user',
++    createdAtMs: Date.now(),
++  }));
++}
++
++test('Trust Centre shows partial evidence and unavailable audited metrics', async ({ page }) => {
++  await page.route('**/api/intelligence/trust-metrics', async (route) => {
++    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(partialTrustEnvelope) });
++  });
++  await page.goto('/?page=trust');
++  await expect(page.getByRole('heading', { name: /Trust Centre/i })).toBeVisible();
++  await expect(page.getByText(/Trust metrics status: partial/i)).toBeVisible();
++  await expect(page.getByText('Data unavailable').first()).toBeVisible();
++});
++
++test('StockStory horizon is URL-backed and reaches both snapshot and explanation APIs', async ({ page }) => {
++  const stockHorizons: string[] = [];
++  const explanationHorizons: string[] = [];
++  await page.addInitScript(restoreBrowserSession);
++  await page.route('**/api/**', async (route) => {
++    await route.fulfill({ contentType: 'application/json', body: '{}' });
++  });
++  await page.route('**/api/stockstory/RELIANCE**', async (route) => {
++    stockHorizons.push(new URL(route.request().url()).searchParams.get('horizon') || '');
++    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(stockStoryEnvelope) });
++  });
++  await page.route('**/api/market-data/metadata/RELIANCE', async (route) => {
++    await route.fulfill({
++      contentType: 'application/json',
++      body: JSON.stringify({ companyName: 'Reliance Industries', sector: 'Energy', industry: 'Conglomerate', currency: 'INR' }),
++    });
++  });
++  await page.route('**/api/company/RELIANCE/ownership', async (route) => {
++    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ categories: [], comment: 'Data unavailable' }) });
++  });
++  await page.route('**/api/company/RELIANCE/timeline', async (route) => {
++    await route.fulfill({ contentType: 'application/json', body: '[]' });
++  });
++  await page.route('**/api/predictions/explain/RELIANCE**', async (route) => {
++    explanationHorizons.push(new URL(route.request().url()).searchParams.get('horizon') || '');
++    await route.fulfill({
++      contentType: 'application/json',
++      body: JSON.stringify({
++        status: 'ok',
++        data: {
++          symbol: 'RELIANCE',
++          classification: { from: null, to: 'Healthy', changed: false },
++          healthScore: { from: null, to: 71, delta: null },
++          summary: 'First prediction.',
++          drivers: [], positives: [], negatives: [], factorContributions: [], historicalReliability: null,
++          generatedAt: '2026-06-11T00:00:00.000Z',
++        },
++      }),
++    });
++  });
++
++  await page.goto('/?page=stock&id=RELIANCE&horizon=90');
++  await expect(page.getByRole('button', { name: '90D' })).toHaveAttribute('aria-pressed', 'true');
++  await page.getByRole('button', { name: '365D' }).click();
++  await expect(page).toHaveURL(/horizon=365/);
++  await expect.poll(() => stockHorizons).toContain('365');
++  await page.getByRole('button', { name: 'whychange' }).click();
++  await expect.poll(() => explanationHorizons).toContain('365');
++  await expect(page.getByText('First Prediction')).toBeVisible();
++});
++
++test('authenticated alert journey hydrates and dismisses a remote alert', async ({ page }) => {
++  let dismissed = false;
++  await page.addInitScript(restoreBrowserSession);
++  await page.route('**/api/alerts', async (route) => {
++    await route.fulfill({
++      contentType: 'application/json',
++      body: JSON.stringify({
++        unreadCount: 1,
++        alerts: [{ id: 42, alert_type: 'health_change', title: 'RELIANCE score changed', body: 'Review the latest factors.', symbol: 'RELIANCE', created_at: '2026-06-11' }],
++      }),
++    });
++  });
++  await page.route('**/api/alerts/42', async (route) => {
++    dismissed = route.request().method() === 'DELETE';
++    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ success: true }) });
++  });
++  await page.goto('/?page=alerts');
++  await expect(page.getByText('RELIANCE score changed')).toBeVisible();
++  await page.getByRole('button', { name: 'Dismiss' }).click();
++  await expect(page.getByText('RELIANCE score changed')).toHaveCount(0);
++  await expect.poll(() => dismissed).toBe(true);
++});
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/.github/workflows/ci.yml
+@@ -0,0 +1,59 @@
++name: CI
++
++on:
++  pull_request:
++  push:
++    branches:
++      - main
++      - track-f0-closure-truth-browser
++
++permissions:
++  contents: read
++
++jobs:
++  quality:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 22
++          cache: npm
++      - run: npm ci
++      - run: npm run lint
++      - run: npm run typecheck
++      - run: npm run test:unit
++      - run: npm run build:all
++
++  browser:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 22
++          cache: npm
++      - run: npm ci
++      - run: npx playwright install --with-deps chromium
++      - run: npm run test:e2e:playwright
++      - name: Upload Playwright report on failure
++        if: failure()
++        uses: actions/upload-artifact@v4
++        with:
++          name: playwright-report
++          path: playwright-report
++          if-no-files-found: ignore
