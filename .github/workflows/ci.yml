@@ -49,8 +49,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run test:e2e:browser:install
-      - run: npm run test:e2e:browser
+      - run: npm run test:e2e:playwright:install
+      - run: npm run test:e2e:playwright:ci
 
   integration-tests-sqlite:
     runs-on: ubuntu-latest
@@ -185,3 +185,45 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm audit --omit=dev --audit-level=high
+
+  f0-closure-gate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: stockstory
+          POSTGRES_PASSWORD: stockstory
+          POSTGRES_DB: stockstory_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://stockstory:stockstory@localhost:5432/stockstory_test
+      NODE_ENV: test
+      DB_ADAPTER: postgres
+      ALLOW_SQLITE_FALLBACK: "false"
+      ALLOW_SQLITE_IN_PRODUCTION: "false"
+      COOKIE_SECRET: test-only-ci-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run test:integration:sqlite
+      - run: npm run migrate
+      - run: CI_FIXTURE_SEED=true npm run seed:ci
+      - run: npm run test:integration:postgres:ci
+      - run: npm run build:all
+      - run: npm run smoke:api
+      - run: npm run test:e2e:playwright:install
+      - run: npm run test:e2e:playwright:ci

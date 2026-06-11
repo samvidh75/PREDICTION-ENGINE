@@ -325,4 +325,53 @@ describe('retentionRoutes authz & IDOR tests', () => {
     expect(titles).toContain('User A Alert');
     expect(titles).not.toContain('User B Alert');
   });
+
+  it('creates and deletes alerts only for authenticated owner', async () => {
+    setTokenVerifier(mockVerifierFor('user-a'));
+    app = Fastify({ logger: false });
+    await app.register(retentionRoutes);
+    await app.ready();
+
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/api/alerts',
+      headers: { authorization: 'Bearer valid-token-user-a' },
+      payload: {
+        category: 'Risk',
+        symbol: 'TCS',
+        title: 'TCS Risk',
+        body: 'Risk moved',
+        uid: 'user-b',
+      },
+    });
+    expect(createRes.statusCode).toBe(200);
+    const createdId = createRes.json().alert.id;
+    await app.close();
+
+    setTokenVerifier(mockVerifierFor('user-b'));
+    app = Fastify({ logger: false });
+    await app.register(retentionRoutes);
+    await app.ready();
+
+    const deleteAsB = await app.inject({
+      method: 'DELETE',
+      url: `/api/alerts/${createdId}`,
+      headers: { authorization: 'Bearer valid-token-user-b' },
+    });
+    expect(deleteAsB.statusCode).toBe(404);
+    await app.close();
+
+    setTokenVerifier(mockVerifierFor('user-a'));
+    app = Fastify({ logger: false });
+    await app.register(retentionRoutes);
+    await app.ready();
+
+    const deleteAsA = await app.inject({
+      method: 'DELETE',
+      url: `/api/alerts/${createdId}`,
+      headers: { authorization: 'Bearer valid-token-user-a' },
+    });
+    expect(deleteAsA.statusCode).toBe(200);
+    expect(deleteAsA.json()).toEqual({ success: true });
+  });
 });

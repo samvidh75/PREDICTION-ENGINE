@@ -3,7 +3,6 @@ import { Trophy, Sparkles, Flame, TrendingUp, PlusCircle } from 'lucide-react';
 import { StockRegistry } from '../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../services/portfolio/WatchlistEngine';
 import { PageHeader } from '../components/ui/DesignSystem';
-import { analyseIpoCandidate, loadIpoCandidates, saveIpoCandidates, type IpoCandidate } from '../services/discovery/ipoDiscovery';
 
 interface DiscoverCompany {
   symbol: string;
@@ -15,10 +14,6 @@ export const DiscoveryPage: React.FC = () => {
   const [rails, setRails] = useState<{ title: string; icon: React.ReactNode; companies: DiscoverCompany[] }[]>([]);
   const [loading, setLoading] = useState(true);
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
-  const [ipoCandidates, setIpoCandidates] = useState<IpoCandidate[]>(() => loadIpoCandidates());
-  const [ipoSymbol, setIpoSymbol] = useState('');
-  const [ipoName, setIpoName] = useState('');
-  const [ipoSource, setIpoSource] = useState('');
 
   useEffect(() => {
     const handleChange = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
@@ -67,27 +62,6 @@ export const DiscoveryPage: React.FC = () => {
     if (isWatched(ticker)) WatchlistEngine.removeTicker(defaultList.id, ticker);
     else WatchlistEngine.addTicker(defaultList.id, ticker);
     setWatchlists([...WatchlistEngine.getWatchlists()]);
-  };
-
-  const addIpoCandidate = () => {
-    const symbol = ipoSymbol.toUpperCase().trim();
-    const companyName = ipoName.trim();
-    if (!symbol || !companyName) return;
-    const next = [
-      ...ipoCandidates.filter(candidate => candidate.symbol !== symbol),
-      {
-        symbol,
-        companyName,
-        status: 'upcoming' as const,
-        source: ipoSource.trim() || null,
-        riskNotes: ipoSource.trim() ? [] : ['Source document missing'],
-      },
-    ];
-    setIpoCandidates(next);
-    saveIpoCandidates(next);
-    setIpoSymbol('');
-    setIpoName('');
-    setIpoSource('');
   };
 
   return (
@@ -139,34 +113,6 @@ export const DiscoveryPage: React.FC = () => {
         </div>
       )}
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-lg font-bold text-white">IPO Discovery</h2>
-          <p className="mt-1 text-xs text-white/45">Track IPO candidates only when you attach a source or clearly mark the source as unavailable.</p>
-        </div>
-        <div className="grid gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-4 md:grid-cols-[120px_1fr_1fr_auto]">
-          <input value={ipoSymbol} onChange={e => setIpoSymbol(e.target.value)} placeholder="SYMBOL" className="rounded-lg border border-white/10 bg-white/5 p-2 text-xs text-white" />
-          <input value={ipoName} onChange={e => setIpoName(e.target.value)} placeholder="Company name" className="rounded-lg border border-white/10 bg-white/5 p-2 text-xs text-white" />
-          <input value={ipoSource} onChange={e => setIpoSource(e.target.value)} placeholder="Source URL or filing ref" className="rounded-lg border border-white/10 bg-white/5 p-2 text-xs text-white" />
-          <button onClick={addIpoCandidate} className="rounded-lg bg-[#2962ff] px-4 py-2 text-xs font-bold text-white">Add IPO</button>
-        </div>
-        {ipoCandidates.length === 0 ? (
-          <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5 text-sm text-white/40">No sourced IPO candidates saved yet.</div>
-        ) : (
-          <div className="grid gap-3 md:grid-cols-2">
-            {ipoCandidates.map(candidate => (
-              <div key={candidate.symbol} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-white">{candidate.symbol}</span>
-                  <span className="text-[10px] uppercase text-cyan-300">{candidate.status}</span>
-                </div>
-                <p className="mt-1 text-xs text-white/65">{candidate.companyName}</p>
-                <p className="mt-3 text-[11px] leading-5 text-white/45">{analyseIpoCandidate(candidate)}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 };

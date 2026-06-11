@@ -190,6 +190,27 @@ export class UserAlertEngine {
     }
   }
 
+  async createUserAlert(userId: string, alert: Omit<GeneratedAlert, 'userId' | 'type'> & { type?: string }): Promise<any | null> {
+    const res = await dbAdapter.query(
+      `INSERT INTO user_alerts (user_id, symbol, alert_type, title, body, metadata, is_read, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, 0, CURRENT_TIMESTAMP)`,
+      [
+        userId,
+        alert.symbol,
+        alert.type ?? 'user_alert',
+        alert.title,
+        alert.body,
+        JSON.stringify(alert.metadata ?? {}),
+      ],
+    );
+    if (res.rowCount <= 0) return null;
+    const created = await dbAdapter.query(
+      `SELECT * FROM user_alerts WHERE user_id = $1 ORDER BY id DESC LIMIT 1`,
+      [userId],
+    );
+    return created.rows[0] ?? null;
+  }
+
   /** Get unread count for a user */
   async getUnreadCount(userId: string): Promise<number> {
     const res = await dbAdapter.query('SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = $1 AND is_read = 0', [userId]);
@@ -215,6 +236,11 @@ export class UserAlertEngine {
   /** Mark all alerts as read for a user */
   async markAllAsRead(userId: string): Promise<void> {
     await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE user_id = $1 AND is_read = 0', [userId]);
+  }
+
+  async deleteAlert(userId: string, alertId: number): Promise<boolean> {
+    const res = await dbAdapter.query('DELETE FROM user_alerts WHERE id = $1 AND user_id = $2', [alertId, userId]);
+    return res.rowCount > 0;
   }
 }
 

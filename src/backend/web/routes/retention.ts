@@ -18,6 +18,7 @@ interface WatchlistBody { name?: string; tickers?: string[] }
 interface WatchlistIdParams { id: string }
 interface TickerBody { ticker: string }
 interface AlertIdParams { alertId: string }
+interface AlertBody { category?: string; title?: string; body?: string; symbol?: string; metadata?: Record<string, unknown> }
 interface ShareQuery { symbol: string; prediction_date: string; horizon: string }
 interface ShareTokenParams { token: string }
 interface ReferralCodeParams { code: string }
@@ -110,6 +111,27 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     },
   );
 
+  app.post<{ Body: AlertBody }>(
+    '/api/alerts',
+    { preHandler: [requireAuthenticatedUser] },
+    async (request, reply: FastifyReply) => {
+      const uid = request.authenticatedUser!.uid;
+      const { category, title, body, symbol, metadata } = request.body || {};
+      if (!title || !body || !symbol) {
+        return reply.status(400).send({ error: 'title, body, and symbol are required' });
+      }
+      const created = await userAlertEngine.createUserAlert(uid, {
+        symbol: String(symbol).toUpperCase().trim(),
+        type: String(category || 'user_alert'),
+        title,
+        body,
+        metadata: metadata ?? {},
+      });
+      if (!created) return reply.status(500).send({ error: 'alert could not be created' });
+      return reply.send({ alert: created });
+    },
+  );
+
   app.get(
     '/api/alerts/unread',
     { preHandler: [requireAuthenticatedUser] },
@@ -136,6 +158,17 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       await userAlertEngine.markAllAsRead(uid);
+      return reply.send({ success: true });
+    },
+  );
+
+  app.delete<{ Params: AlertIdParams }>(
+    '/api/alerts/:alertId',
+    { preHandler: [requireAuthenticatedUser] },
+    async (request, reply: FastifyReply) => {
+      const uid = request.authenticatedUser!.uid;
+      const success = await userAlertEngine.deleteAlert(uid, parseInt(request.params.alertId));
+      if (!success) return reply.status(404).send({ error: 'alert not found' });
       return reply.send({ success: true });
     },
   );

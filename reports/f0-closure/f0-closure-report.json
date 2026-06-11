@@ -1,0 +1,70 @@
+{
+  "track": "TRACK-F0-CLOSURE",
+  "generatedAt": "2026-06-11T22:20:00+05:30",
+  "requirements": {
+    "trustCentreTruthfulness": {
+      "implemented": true,
+      "tested": true,
+      "browser_verified": true,
+      "deployed_verified": false,
+      "blocked": false,
+      "notes": "Static fallback performance and scale values are removed; API failure renders Data unavailable."
+    },
+    "alertAuthentication": {
+      "implemented": true,
+      "tested": true,
+      "browser_verified": true,
+      "deployed_verified": false,
+      "blocked": false,
+      "notes": "Frontend AlertEngine uses authenticated fetch and local-only signed-out behavior; live production auth journey not certified."
+    },
+    "horizonSelection": {
+      "implemented": true,
+      "tested": true,
+      "browser_verified": true,
+      "deployed_verified": false,
+      "blocked": false,
+      "notes": "Visible horizon selector updates URL, request, cache key, and visible analysis."
+    },
+    "honestExchangeDisplay": {
+      "implemented": true,
+      "tested": true,
+      "browser_verified": true,
+      "deployed_verified": false,
+      "blocked": false,
+      "notes": "Missing exchange renders Data unavailable; no stock page path invents NSE."
+    },
+    "playwrightBrowserProof": {
+      "implemented": true,
+      "tested": true,
+      "browser_verified": true,
+      "deployed_verified": false,
+      "blocked": false,
+      "notes": "Playwright CI command passed locally with 6 browser journeys."
+    },
+    "ciAndDeploymentProof": {
+      "implemented": true,
+      "tested": false,
+      "browser_verified": false,
+      "deployed_verified": false,
+      "blocked": true,
+      "notes": "Workflow is wired, but live GitHub Actions/Railway/production smoke certification was not verifiable. Local API smoke failed because PostgreSQL readiness and seeded TESTIT data were unavailable."
+    }
+  },
+  "commands": [
+    { "command": "npm ci", "status": "passed", "notes": "npm reported 7 audit findings: 6 moderate, 1 high." },
+    { "command": "npm run lint", "status": "passed" },
+    { "command": "npm run typecheck", "status": "passed" },
+    { "command": "npm run test:unit", "status": "passed", "notes": "28 files, 256 tests." },
+    { "command": "npm run test:integration:sqlite", "status": "passed" },
+    { "command": "npm run test:integration:postgres:ci", "status": "passed", "notes": "Command exited 0; PostgreSQL-specific tests skip when DATABASE_URL is unavailable." },
+    { "command": "npm run build:all", "status": "passed", "notes": "Vite emitted a chunk-size warning." },
+    { "command": "npm run smoke:api", "status": "failed", "notes": "8/14 passed. PostgreSQL readiness and seeded fixture contracts failed." },
+    { "command": "npm run test:e2e:playwright:ci", "status": "passed", "notes": "6 browser journeys passed." }
+  ],
+  "blockers": [
+    "Local backend reports PostgreSQL unavailable, so strict /readyz and seeded TESTIT smoke contracts fail.",
+    "Railway deployment status and production smoke checks were not verifiable from the local workspace.",
+    "A GitHub Actions run for this branch was not verified during this pass."
+  ]
+}

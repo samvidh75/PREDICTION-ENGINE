@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { User, Bell, Shield, Lock, Eye, Trash2 } from "lucide-react";
+import { User, Bell, Lock, Eye, Trash2 } from "lucide-react";
 import { AlertEngine, AlertCategory } from "../services/portfolio/AlertEngine";
 import { useAuth } from "../context/AuthContext";
 import { loadUiPreferences, saveUiPreferences, type UiPreferences } from "../services/ui/uiPreferences";
-import { loadAccessPreferences, saveAccessPreferences, type AccessPreferences, type FamilyRole } from "../services/access/familyAccess";
 
-type SettingsTab = "profile" | "notifications" | "appearance" | "security" | "access";
+type SettingsTab = "profile" | "notifications" | "appearance" | "security";
 
 export const SettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -14,9 +13,6 @@ export const SettingsPage: React.FC = () => {
   const [email] = useState(user?.email || "");
   const [saveNotice, setSaveNotice] = useState("");
   const [uiPrefs, setUiPrefs] = useState<UiPreferences>(() => loadUiPreferences());
-  const [accessPrefs, setAccessPrefs] = useState<AccessPreferences>(() => loadAccessPreferences());
-  const [memberName, setMemberName] = useState("");
-  const [memberRole, setMemberRole] = useState<FamilyRole>("viewer");
 
   const [alertCategories, setAlertCategories] = useState<Record<AlertCategory, boolean>>(() => ({
     Factor: AlertEngine.isCategoryEnabled("Factor"),
@@ -35,25 +31,6 @@ export const SettingsPage: React.FC = () => {
   const updateUiPrefs = (next: UiPreferences) => {
     setUiPrefs(next);
     saveUiPreferences(next);
-  };
-
-  const updateAccessPrefs = (next: AccessPreferences) => {
-    setAccessPrefs(next);
-    saveAccessPreferences(next);
-  };
-
-  const addFamilyMember = () => {
-    const nameValue = memberName.trim();
-    if (!nameValue) return;
-    updateAccessPrefs({
-      ...accessPrefs,
-      familyMembers: [
-        ...accessPrefs.familyMembers,
-        { id: `${Date.now()}`, name: nameValue, role: memberRole },
-      ],
-    });
-    setMemberName("");
-    setMemberRole("viewer");
   };
 
   const [resetSent, setResetSent] = useState(false);
@@ -89,8 +66,7 @@ export const SettingsPage: React.FC = () => {
             { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
             { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
             { id: "appearance", label: "Appearance", icon: <Eye className="w-4 h-4" /> },
-            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> },
-            { id: "access", label: "Access", icon: <Shield className="w-4 h-4" /> }
+            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -246,54 +222,6 @@ export const SettingsPage: React.FC = () => {
             </div>
           )}
 
-          {activeTab === "access" && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-bold text-white mb-1">Family, Bharat Lite & API Access</h2>
-                <p className="text-xs text-gray-400">Configure household roles and companion access boundaries.</p>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-3">
-                {[
-                  ["bharatLite", "Bharat Lite", "Simpler UI density and lower-bandwidth companion mode."],
-                  ["whatsappCompanionEnabled", "WhatsApp Companion", "Enable companion workflow state. Messages still require verified backend integration."],
-                  ["externalApiAccess", "External API Access", "Allow API key provisioning workflow. No key is displayed until backend issuance exists."],
-                ].map(([key, label, description]) => (
-                  <button
-                    key={key}
-                    onClick={() => updateAccessPrefs({ ...accessPrefs, [key]: !accessPrefs[key as keyof AccessPreferences] } as AccessPreferences)}
-                    className={`rounded-xl border p-4 text-left ${accessPrefs[key as keyof AccessPreferences] ? "border-[#00C8FF] bg-[#00C8FF]/10" : "border-white/5 bg-white/[0.01]"}`}
-                  >
-                    <span className="text-xs font-bold text-white block">{label}</span>
-                    <span className="mt-1 block text-[10px] leading-4 text-gray-500">{description}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
-                <h3 className="text-sm font-bold text-white">Family Roles</h3>
-                <div className="mt-3 grid gap-2 md:grid-cols-[1fr_140px_auto]">
-                  <input value={memberName} onChange={e => setMemberName(e.target.value)} placeholder="Family member name" className="rounded-lg border border-white/10 bg-white/5 p-2 text-xs text-white" />
-                  <select value={memberRole} onChange={e => setMemberRole(e.target.value as FamilyRole)} className="rounded-lg border border-white/10 bg-[#0c0e14] p-2 text-xs text-white">
-                    <option value="viewer">Viewer</option>
-                    <option value="adult">Adult</option>
-                    <option value="owner">Owner</option>
-                  </select>
-                  <button onClick={addFamilyMember} className="rounded-lg bg-[#2962ff] px-4 py-2 text-xs font-bold text-white">Add</button>
-                </div>
-                <div className="mt-4 space-y-2">
-                  {accessPrefs.familyMembers.length === 0 ? (
-                    <div className="text-xs text-white/40">No family members added.</div>
-                  ) : accessPrefs.familyMembers.map(member => (
-                    <div key={member.id} className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-3 text-xs">
-                      <span className="text-white">{member.name}</span>
-                      <span className="uppercase text-white/45">{member.role}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

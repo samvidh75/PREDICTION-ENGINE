@@ -51,7 +51,10 @@
     "test:providers": "tsx src/scripts/provider-live-test.ts",
     "lint": "npm run lint:active",
     "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test:e2e:playwright": "playwright test",
+    "test:e2e:playwright:ci": "playwright test --reporter=github,json",
+    "test:e2e:playwright:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

@@ -8,7 +8,6 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
-import ResearchExtensionsPanel from "../components/stock/ResearchExtensionsPanel";
 import {
   DEFAULT_PREDICTION_HORIZON,
   SUPPORTED_PREDICTION_HORIZONS,
@@ -594,8 +593,6 @@ export const StockStoryPage: React.FC = () => {
           className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
         />
       </div>
-
-      <ResearchExtensionsPanel symbol={ticker} companyName={companyName} story={storyData} />
 
       {/* --- TABS --- */}
       <div className="flex gap-2 overflow-x-auto border-b border-white/5">

@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut, type User } from "firebase/auth";
 import { firebaseAuth, firebasePersistenceReady } from "../config/firebase";
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "../services/auth/sessionStore";
+import { registerTokenProvider } from "../services/auth/authenticatedFetch";
 import {
   logAuthState,
   getSessionAgeMs,
@@ -72,6 +73,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isSessionExpired = useRef(false);
   const loadingStartMs = useRef(Date.now());
   const simTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    registerTokenProvider(async () => {
+      const current = firebaseAuth.currentUser;
+      if (!current) throw new Error("AUTH_MISSING: Firebase user is not signed in");
+      return current.getIdToken();
+    });
+  }, []);
 
   // Periodically refresh session age
   useEffect(() => {
