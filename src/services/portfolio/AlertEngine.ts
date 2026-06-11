@@ -1,4 +1,5 @@
 import { loadAuthSession } from "../auth/sessionStore";
+import { authenticatedFetchOnlyIfSignedIn } from "../auth/authenticatedFetch";
 import { AnalyticsCoordinator } from "../diagnostics/AnalyticsCoordinator";
 
 export type AlertCategory = "Factor" | "Risk" | "Momentum" | "News" | "Market";
@@ -15,8 +16,58 @@ export interface SmartAlert {
 
 const STORAGE_KEY_PREFIX = "stockstory_alerts_v2";
 const SETTINGS_KEY_PREFIX = "stockstory_alert_settings_v1";
+const ALERT_EVENT_NAME = "alertchange";
 
 const EMPTY_ALERTS: SmartAlert[] = [];
+
+function dispatchAlertChange(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(ALERT_EVENT_NAME));
+}
+
+function logRemoteSyncFailure(operation: string, detail: { status?: number; code?: string }): void {
+  console.warn("[AlertEngine] remote_sync_failed", {
+    component: "AlertEngine",
+    operation,
+    status: detail.status,
+    code: detail.code,
+  });
+}
+
+function alertTimestamp(alert: SmartAlert): number {
+  const parsed = Date.parse(alert.timestamp);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeAlerts(value: unknown): SmartAlert[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((alert): alert is SmartAlert => {
+    const candidate = alert as Partial<SmartAlert>;
+    return (
+      typeof candidate.id === "string" &&
+      typeof candidate.category === "string" &&
+      typeof candidate.title === "string" &&
+      typeof candidate.body === "string" &&
+      typeof candidate.timestamp === "string" &&
+      typeof candidate.symbol === "string" &&
+      typeof candidate.isRead === "boolean"
+    );
+  });
+}
+
+function mergeAlertsByTimestamp(localAlerts: SmartAlert[], remoteAlerts: SmartAlert[]): SmartAlert[] {
+  const byId = new Map<string, SmartAlert>();
+  for (const alert of localAlerts) {
+    byId.set(alert.id, alert);
+  }
+  for (const alert of remoteAlerts) {
+    const existing = byId.get(alert.id);
+    if (!existing || alertTimestamp(alert) >= alertTimestamp(existing)) {
+      byId.set(alert.id, alert);
+    }
+  }
+  return Array.from(byId.values()).sort((a, b) => alertTimestamp(b) - alertTimestamp(a));
+}
 
 export class AlertEngine {
   private static getStorageKey(): string {
@@ -33,19 +84,36 @@ export class AlertEngine {
 
   private static syncAlertsWithBackend(): void {
     if (typeof window === "undefined") return;
-    const uid = loadAuthSession().uid || "anonymous";
-    
-    fetch(`/api/alerts?uid=${uid}`)
-      .then(res => res.json())
-      .then((lists: SmartAlert[]) => {
-        if (Array.isArray(lists) && lists.length > 0) {
-          const key = this.getStorageKey();
-          window.localStorage.setItem(key, JSON.stringify(lists));
-          // Dispatch a custom event to notify listening pages
-          window.dispatchEvent(new Event("alertchange"));
+
+    authenticatedFetchOnlyIfSignedIn("/api/investor-state")
+      .then(async response => {
+        if (!response) return;
+        if (!response.ok) {
+          logRemoteSyncFailure("load", { status: response.status });
+          return;
         }
+        const state = await response.json();
+        const remoteAlerts = normalizeAlerts(state?.alerts);
+        if (remoteAlerts.length === 0) return;
+        const localAlerts = this.readLocalAlerts();
+        const merged = mergeAlertsByTimestamp(localAlerts, remoteAlerts);
+        window.localStorage.setItem(this.getStorageKey(), JSON.stringify(merged));
+        dispatchAlertChange();
       })
-      .catch(() => {});
+      .catch(error => {
+        logRemoteSyncFailure("load", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" });
+      });
+  }
+
+  private static readLocalAlerts(): SmartAlert[] {
+    if (typeof window === "undefined") return [...EMPTY_ALERTS];
+    const raw = window.localStorage.getItem(this.getStorageKey());
+    if (!raw) return [...EMPTY_ALERTS];
+    try {
+      return normalizeAlerts(JSON.parse(raw));
+    } catch {
+      return [...EMPTY_ALERTS];
+    }
   }
 
   public static getAlerts(): SmartAlert[] {
@@ -56,38 +124,34 @@ export class AlertEngine {
       this.syncAlertsWithBackend();
     }
 
-    const key = this.getStorageKey();
-    const raw = window.localStorage.getItem(key);
-    if (!raw) {
-      return [...EMPTY_ALERTS];
-    }
-    try {
-      return JSON.parse(raw) as SmartAlert[];
-    } catch {
-      return [...EMPTY_ALERTS];
-    }
+    return this.readLocalAlerts();
   }
 
   public static saveAlerts(alerts: SmartAlert[]): void {
     if (typeof window === "undefined") return;
+    const normalizedAlerts = normalizeAlerts(alerts);
     const key = this.getStorageKey();
-    window.localStorage.setItem(key, JSON.stringify(alerts));
-    window.dispatchEvent(new Event("alertchange"));
+    window.localStorage.setItem(key, JSON.stringify(normalizedAlerts));
+    dispatchAlertChange();
 
-    // Async sync to backend
-    const uid = loadAuthSession().uid || "anonymous";
-    fetch(`/api/investor-state?uid=${uid}`, {
+    authenticatedFetchOnlyIfSignedIn("/api/investor-state", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ alerts })
-    }).catch(() => {});
+      body: JSON.stringify({ alerts: normalizedAlerts }),
+    }).then(response => {
+      if (response && !response.ok) {
+        logRemoteSyncFailure("save", { status: response.status });
+      }
+    }).catch(error => {
+      logRemoteSyncFailure("save", { code: error instanceof Error ? error.name : "UNKNOWN_ERROR" });
+    });
   }
 
   public static generateAlert(category: AlertCategory, symbol: string, title: string, body: string): void {
     if (!this.isCategoryEnabled(category)) return;
     const alerts = this.getAlerts();
     const next: SmartAlert = {
-      id: Date.now().toString(36),
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       category,
       title,
       body,
@@ -100,7 +164,7 @@ export class AlertEngine {
 
     const uid = loadAuthSession().uid || "anonymous";
     AnalyticsCoordinator.trackEvent("alert_created", JSON.stringify({
-      uid,
+      account_state: uid === "anonymous" ? "anonymous" : "authenticated",
       alert_type: category,
       timestamp: new Date().toISOString()
     }));

@@ -8,6 +8,7 @@
  * No synthetic data. No estimates.
  */
 import pool from '../db/index';
+import { DEFAULT_PREDICTION_HORIZON, SUPPORTED_PREDICTION_HORIZONS, type PredictionHorizon } from '../shared/predictions/horizons';
 
 export interface SignalAccuracyResult {
   signalType: string;
@@ -35,7 +36,7 @@ export interface FactorChangeAccuracy {
  * Validate classification changes.
  * For each transition (e.g. Healthy → Excellent), checks what return followed.
  */
-export async function validateClassificationChanges(): Promise<SignalAccuracyResult[]> {
+export async function validateClassificationChanges(horizon: PredictionHorizon = DEFAULT_PREDICTION_HORIZON): Promise<SignalAccuracyResult[]> {
   const results: SignalAccuracyResult[] = [];
 
   // Get pairs of consecutive predictions for same symbol, different dates
@@ -46,7 +47,7 @@ export async function validateClassificationChanges(): Promise<SignalAccuracyRes
       FROM prediction_registry
       WHERE validation_status = 'validated'
         AND future_return IS NOT NULL
-        AND prediction_horizon = 30
+        AND prediction_horizon = $1
     )
     SELECT prev_classification, classification, 
            COUNT(*) as count,
@@ -62,7 +63,7 @@ export async function validateClassificationChanges(): Promise<SignalAccuracyRes
   `;
 
   try {
-    const rows = (await pool.query(query)).rows;
+    const rows = (await pool.query(query, [horizon])).rows;
     for (const row of rows) {
       const successRate = (Number(row.wins) / Number(row.count)) * 100;
       let predictivePower: SignalAccuracyResult['predictivePower'] = 'Not Predictive';
@@ -79,7 +80,7 @@ export async function validateClassificationChanges(): Promise<SignalAccuracyRes
         avgAlphaPct: Number(row.avg_alpha_pct),
         predictivePower,
         sampleSize: Number(row.count),
-        horizonDays: 30,
+        horizonDays: horizon,
       });
     }
   } catch (e) {
@@ -93,10 +94,10 @@ export async function validateClassificationChanges(): Promise<SignalAccuracyRes
  * Validate confidence changes by bucket magnitude.
  * Groups confidence changes into: small (1-10pts), medium (11-20pts), large (21+pts).
  */
-export async function validateConfidenceChanges(): Promise<SignalAccuracyResult[]> {
+export async function validateConfidenceChanges(horizon?: PredictionHorizon): Promise<SignalAccuracyResult[]> {
   const results: SignalAccuracyResult[] = [];
 
-  for (const horizon of [30, 90, 365]) {
+  for (const horizonDays of horizon ? [horizon] : SUPPORTED_PREDICTION_HORIZONS) {
     const query = `
       WITH ranked AS (
         SELECT symbol, prediction_date, confidence_score, future_return, alpha,
@@ -104,7 +105,7 @@ export async function validateConfidenceChanges(): Promise<SignalAccuracyResult[
         FROM prediction_registry
         WHERE validation_status = 'validated'
           AND future_return IS NOT NULL
-          AND prediction_horizon = ${horizon}
+          AND prediction_horizon = $1
       ),
       changes AS (
         SELECT *,
@@ -129,7 +130,7 @@ export async function validateConfidenceChanges(): Promise<SignalAccuracyResult[
     `;
 
     try {
-      const rows = (await pool.query(query)).rows;
+      const rows = (await pool.query(query, [horizonDays])).rows;
       for (const row of rows) {
         const successRate = (Number(row.wins) / Number(row.count)) * 100;
         let predictivePower: SignalAccuracyResult['predictivePower'] = 'Not Predictive';
@@ -138,7 +139,7 @@ export async function validateConfidenceChanges(): Promise<SignalAccuracyResult[
         else if (successRate > 50) predictivePower = 'Weak';
 
         results.push({
-          signalType: `Confidence Δ ${row.bucket} (${horizon}d)`,
+          signalType: `Confidence Δ ${row.bucket} (${horizonDays}d)`,
           totalSignals: Number(row.count),
           outcomesValidated: Number(row.count),
           successRate: Math.round(successRate * 10) / 10,
@@ -146,11 +147,11 @@ export async function validateConfidenceChanges(): Promise<SignalAccuracyResult[
           avgAlphaPct: Number(row.avg_alpha_pct),
           predictivePower,
           sampleSize: Number(row.count),
-          horizonDays: horizon,
+          horizonDays,
         });
       }
     } catch (e) {
-      console.error(`[SignalValidation] Confidence ${horizon}d query failed:`, e);
+      console.error(`[SignalValidation] Confidence ${horizonDays}d query failed:`, e);
     }
   }
 

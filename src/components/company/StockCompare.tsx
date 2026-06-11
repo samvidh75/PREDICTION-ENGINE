@@ -25,6 +25,10 @@ interface CompareResult {
   narrative: string;
   hitRate: number | null;
   avgAlpha: number | null;
+  asOf: string | null;
+  lineage: Array<{ sourceTable?: string | null; provider?: string | null; asOf?: string | null; isFallback?: boolean; isSynthetic?: boolean }>;
+  missingInputs: string[];
+  evidenceState: 'available' | 'partial' | 'unavailable';
 }
 
 interface CategoryResult {
@@ -60,6 +64,13 @@ function fetchCompareResult(symbol: string): Promise<CompareResult> {
       const valuation = finiteScore(payload.valuation);
       const momentum = finiteScore(payload.momentum);
       const risk = finiteScore(payload.risk);
+      const lineage = Array.isArray(data.dataState?.lineage) ? data.dataState.lineage : Array.isArray(data.lineage) ? data.lineage : [];
+      const missingInputs = Array.isArray(data.dataState?.missingInputs)
+        ? data.dataState.missingInputs
+        : Array.isArray(data.missingInputs) ? data.missingInputs : [];
+      const evidenceState = lineage.length > 0 && missingInputs.length === 0
+        ? 'available'
+        : lineage.length > 0 ? 'partial' : 'unavailable';
 
       return {
         healthScore: finiteScore(payload.healthScore ?? payload.rankingScore),
@@ -76,6 +87,10 @@ function fetchCompareResult(symbol: string): Promise<CompareResult> {
         narrative: payload.narrative ?? 'Analysis unavailable from current source data.',
         hitRate: null,
         avgAlpha: null,
+        asOf: data.asOf ?? data.dataState?.asOf ?? null,
+        lineage,
+        missingInputs,
+        evidenceState,
       };
     });
 }
@@ -101,6 +116,34 @@ function WinnerBadge({ winner }: { winner: 'A' | 'B' | 'tie' }) {
     }`}>
       {winner === 'A' ? '▲' : '▼'}
     </span>
+  );
+}
+
+function EvidenceBadge({ data }: { data: CompareResult }) {
+  const label = data.evidenceState === 'available'
+    ? 'Evidence available'
+    : data.evidenceState === 'partial'
+      ? 'Partial evidence'
+      : 'Evidence unavailable';
+  const sourceLabel = data.lineage
+    .map(entry => entry.sourceTable || entry.provider)
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(', ');
+
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.025] px-3 py-2 text-[10px] text-white/45">
+      <div className="font-bold uppercase tracking-wider text-white/60">{label}</div>
+      <div className="mt-1">
+        As of: <span className="font-mono text-white/70">{data.asOf || 'Data unavailable'}</span>
+      </div>
+      <div>
+        Source: <span className="font-mono text-white/70">{sourceLabel || 'Data unavailable'}</span>
+      </div>
+      {data.missingInputs.length > 0 && (
+        <div>Missing: {data.missingInputs.slice(0, 3).join(', ')}</div>
+      )}
+    </div>
   );
 }
 
@@ -189,8 +232,6 @@ export const StockCompare: React.FC = () => {
     <div className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-16">
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.015] p-6">
-        <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute -right-20 -bottom-20 h-40 w-40 rounded-full bg-fuchsia-500/10 blur-3xl" />
         <div className="relative text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Scale className="h-5 w-5 text-cyan-400" />
@@ -285,6 +326,11 @@ export const StockCompare: React.FC = () => {
                 {ties > 0 ? ` (${ties} tied)` : ''}
               </div>
             </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <EvidenceBadge data={dataA} />
+            <EvidenceBadge data={dataB} />
           </div>
 
           {/* Category Cards */}

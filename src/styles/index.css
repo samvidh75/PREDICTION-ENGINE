@@ -7,7 +7,7 @@
 
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Responsive UI scaling (adaptive typography + spacing) */
   --ss-ui-type-scale: 1;
@@ -231,6 +231,96 @@
   --ss-ty-metric-label-color: rgba(255,255,255,0.60);
   --ss-ty-metric-label-weight: 600;
   --ss-ty-metric-label-line-height: 1.2;
+}
+
+.ss-app-theme {
+  color-scheme: light;
+  background: var(--ss-bg-primary);
+  color: var(--ss-text-primary);
+  font-family: var(--ss-font-ui);
+  --ss-bg-primary: #f7f9fc;
+  --ss-bg-secondary: #ffffff;
+  --ss-bg-tertiary: #eef3f8;
+  --ss-bg-elevated: #ffffff;
+  --ss-border: rgba(15, 23, 42, 0.10);
+  --ss-border-strong: rgba(15, 23, 42, 0.22);
+  --ss-text-primary: #0f172a;
+  --ss-text-secondary: #334155;
+  --ss-text-muted: #64748b;
+  --ss-glass-bg: rgba(255,255,255,0.86);
+  --ss-glass-bg-2: rgba(248,250,252,0.92);
+  --ss-glass-border: rgba(15,23,42,0.12);
+  --ss-ty-body-color: rgba(15,23,42,0.86);
+  --ss-ty-section-title-color: rgba(15,23,42,0.94);
+  --ss-ty-card-heading-color: rgba(15,23,42,0.94);
+  --ss-ty-card-body-color: rgba(15,23,42,0.80);
+  --ss-ty-micro-label-color: rgba(15,23,42,0.56);
+}
+
+.ss-app-theme[data-ss-theme="dark"] {
+  color-scheme: dark;
+  --ss-bg-primary: #05070A;
+  --ss-bg-secondary: #0A0F17;
+  --ss-bg-tertiary: #111827;
+  --ss-bg-elevated: #141C28;
+  --ss-border: rgba(255,255,255,0.08);
+  --ss-border-strong: #363a45;
+  --ss-text-primary: #f0f3fa;
+  --ss-text-secondary: #b2b5be;
+  --ss-text-muted: #787b86;
+  --ss-glass-bg: rgba(19, 23, 34, 0.72);
+  --ss-glass-bg-2: rgba(30, 34, 45, 0.84);
+  --ss-glass-border: rgba(120, 123, 134, 0.22);
+  --ss-ty-body-color: rgba(255,255,255,0.84);
+  --ss-ty-section-title-color: rgba(255,255,255,0.92);
+  --ss-ty-card-heading-color: rgba(255,255,255,0.92);
+  --ss-ty-card-body-color: rgba(255,255,255,0.80);
+  --ss-ty-micro-label-color: rgba(255,255,255,0.50);
+}
+
+.ss-app-theme[data-ss-density="simple"] {
+  --ss-density-detail-display: none;
+  --ss-density-gap: 20px;
+}
+
+.ss-app-theme[data-ss-density="pro"] {
+  --ss-density-detail-display: initial;
+  --ss-density-gap: 12px;
+}
+
+.ss-type-display {
+  font-family: var(--font-display, var(--ss-font-ui));
+  font-size: var(--ss-ty-hero-title-size);
+  line-height: var(--ss-ty-hero-title-line-height);
+  font-weight: var(--ss-ty-hero-title-weight);
+  letter-spacing: 0;
+}
+
+.ss-type-heading {
+  font-family: var(--font-heading, var(--ss-font-ui));
+  font-size: var(--ss-ty-section-title-size);
+  line-height: var(--ss-ty-section-title-line-height);
+  font-weight: var(--ss-ty-section-title-weight);
+  letter-spacing: 0;
+  color: var(--ss-ty-section-title-color);
+}
+
+.ss-type-body {
+  font-family: var(--font-body, var(--ss-font-ui));
+  font-size: var(--ss-ty-body-size);
+  line-height: var(--ss-ty-body-line-height);
+  font-weight: var(--ss-ty-body-weight);
+  color: var(--ss-ty-body-color);
+}
+
+.ss-type-label {
+  font-family: var(--font-command, var(--ss-font-ui));
+  font-size: var(--ss-ty-micro-label-size);
+  line-height: 1.2;
+  font-weight: var(--ss-ty-micro-label-weight);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ss-ty-micro-label-color);
 }
 
 /* Active font-role selection (desktop/mobile orchestration)

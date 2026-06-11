@@ -4,7 +4,8 @@
  * Cartoon brutalist styling.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { PortfolioEngine } from '../../services/portfolio/PortfolioEngine';
 
 interface FactorExposure {
   quality?: number;
@@ -32,6 +33,16 @@ interface PortfolioData {
 }
 
 type FetchState = 'loading' | 'loaded' | 'error' | 'empty';
+type PortfolioGoal = 'capital_preservation' | 'balanced' | 'growth' | 'income';
+
+const GOAL_STORAGE_KEY = 'stockstory_portfolio_goal_v1';
+
+const GOALS: Array<{ id: PortfolioGoal; label: string; description: string }> = [
+  { id: 'capital_preservation', label: 'Preserve Capital', description: 'Lower drawdown sensitivity and stronger resilience matter most.' },
+  { id: 'balanced', label: 'Balanced', description: 'Blend diversification, resilience, and factor breadth.' },
+  { id: 'growth', label: 'Growth', description: 'Accepts more volatility when growth and momentum exposure are supported.' },
+  { id: 'income', label: 'Income', description: 'Prefers stability and lower concentration over aggressive factor exposure.' },
+];
 
 const STATUS_COLORS: Record<string, string> = {
   EXCELLENT: 'bg-green-400',
@@ -63,6 +74,68 @@ function parseIfString<T>(val: T | string): T {
   return val;
 }
 
+function loadGoal(): PortfolioGoal {
+  if (typeof window === 'undefined') return 'balanced';
+  const stored = window.localStorage.getItem(GOAL_STORAGE_KEY) as PortfolioGoal | null;
+  return GOALS.some((goal) => goal.id === stored) ? stored as PortfolioGoal : 'balanced';
+}
+
+function saveGoal(goal: PortfolioGoal): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(GOAL_STORAGE_KEY, goal);
+}
+
+function extractPortfolioData(json: any): PortfolioData | null {
+  const payload = json?.data?.intelligence ?? json?.intelligence ?? json?.data ?? json;
+  if (!payload) return null;
+  return {
+    diversification_score: Number(payload.diversification_score ?? payload.diversificationScore ?? 0),
+    concentration_score: Number(payload.concentration_score ?? payload.concentrationScore ?? 0),
+    factor_exposure: payload.factor_exposure ?? payload.factorExposure ?? {},
+    risk_exposure: payload.risk_exposure ?? payload.riskExposure ?? {},
+    portfolio_health: String(payload.portfolio_health ?? payload.portfolioHealth ?? 'Data unavailable'),
+    portfolio_fragility: String(payload.portfolio_fragility ?? payload.portfolioFragility ?? 'Data unavailable'),
+    portfolio_resilience: String(payload.portfolio_resilience ?? payload.portfolioResilience ?? 'Data unavailable'),
+    stock_count: Number(payload.stock_count ?? payload.holdingsCount ?? json?.data?.holdingsCount ?? 0),
+    sector_count: Number(payload.sector_count ?? payload.sectorCount ?? 0),
+  };
+}
+
+function goalFit(goal: PortfolioGoal, data: PortfolioData, factors: FactorExposure, risk: RiskExposure): { label: string; detail: string; tone: string } {
+  const aggregateRisk = risk.aggregate_risk ?? 0.5;
+  const concentration = data.concentration_score ?? 0;
+  const diversification = data.diversification_score ?? 0;
+  const growth = factors.growth ?? 0;
+  const momentum = factors.momentum ?? 0;
+  const quality = factors.quality ?? 0;
+
+  if (goal === 'capital_preservation') {
+    const fits = aggregateRisk <= 0.45 && concentration <= 0.35 && data.portfolio_resilience === 'STRONG';
+    return fits
+      ? { label: 'Goal aligned', detail: 'Risk, concentration, and resilience currently fit a preservation objective.', tone: 'bg-green-100 text-green-900' }
+      : { label: 'Goal mismatch', detail: 'Preservation needs lower concentration, lower aggregate risk, or stronger resilience evidence.', tone: 'bg-amber-100 text-amber-900' };
+  }
+
+  if (goal === 'growth') {
+    const fits = growth >= 0.55 && momentum >= 0.45 && quality >= 0.45;
+    return fits
+      ? { label: 'Goal aligned', detail: 'Growth, momentum, and quality exposure currently support a growth objective.', tone: 'bg-green-100 text-green-900' }
+      : { label: 'Goal watch', detail: 'Growth objective lacks enough growth, momentum, or quality support in current factor evidence.', tone: 'bg-amber-100 text-amber-900' };
+  }
+
+  if (goal === 'income') {
+    const fits = aggregateRisk <= 0.5 && concentration <= 0.4 && quality >= 0.5;
+    return fits
+      ? { label: 'Goal aligned', detail: 'Current risk, concentration, and quality evidence fit a steadier income-oriented profile.', tone: 'bg-green-100 text-green-900' }
+      : { label: 'Goal watch', detail: 'Income objective needs steadier risk, less concentration, or stronger quality evidence.', tone: 'bg-amber-100 text-amber-900' };
+  }
+
+  const fits = diversification >= 0.45 && aggregateRisk <= 0.65;
+  return fits
+    ? { label: 'Goal aligned', detail: 'Diversification and aggregate risk currently fit a balanced objective.', tone: 'bg-green-100 text-green-900' }
+    : { label: 'Goal watch', detail: 'Balanced objective needs more diversification or lower aggregate risk.', tone: 'bg-amber-100 text-amber-900' };
+}
+
 function Bar({ label, value, color = 'bg-blue-500' }: { label: string; value: number; color?: string }) {
   const pct = Math.min(100, Math.round(value * 100));
   return (
@@ -85,18 +158,42 @@ export default function PortfolioDoctor() {
   const [state, setState] = useState<FetchState>('loading');
   const [data, setData] = useState<PortfolioData | null>(null);
   const [error, setError] = useState('');
+  const [goal, setGoal] = useState<PortfolioGoal>(() => loadGoal());
+
+  const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
 
   useEffect(() => {
-    fetch('/api/intelligence/portfolio')
+    if (holdings.length === 0) {
+      setState('empty');
+      return;
+    }
+
+    const totalCost = holdings.reduce((sum, holding) => sum + holding.shares * holding.avgBuyPrice, 0);
+    const positions = holdings.map((holding) => ({
+      symbol: holding.symbol,
+      weight: totalCost > 0 ? Number(((holding.shares * holding.avgBuyPrice) / totalCost).toFixed(4)) : 0,
+    })).filter((position) => position.weight > 0);
+
+    if (positions.length === 0) {
+      setState('empty');
+      return;
+    }
+
+    fetch('/api/intelligence/portfolio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ positions, goal }),
+    })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((json: PortfolioData) => {
-        if (!json || (json.stock_count === 0 && json.sector_count === 0 && !json.portfolio_health)) {
+      .then((json: any) => {
+        const parsed = extractPortfolioData(json);
+        if (!parsed || (parsed.stock_count === 0 && parsed.sector_count === 0 && !parsed.portfolio_health)) {
           setState('empty');
         } else {
-          setData(json);
+          setData(parsed);
           setState('loaded');
         }
       })
@@ -104,7 +201,13 @@ export default function PortfolioDoctor() {
         setError(e.message);
         setState('error');
       });
-  }, []);
+  }, [goal, holdings]);
+
+  const handleGoalChange = (nextGoal: PortfolioGoal) => {
+    setGoal(nextGoal);
+    saveGoal(nextGoal);
+    setState('loading');
+  };
 
   const generateExplanation = (d: PortfolioData): string => {
     const parts: string[] = [];
@@ -154,7 +257,7 @@ export default function PortfolioDoctor() {
       <div className="p-8 border-4 border-dashed border-black bg-gray-50 text-center" style={{ boxShadow: '6px 6px 0px #000' }}>
         <p className="font-extrabold text-2xl mb-2">No Portfolio Data</p>
         <p className="text-sm text-gray-600">
-          Add stocks to your portfolio to see the Doctor's analysis.
+          Add stocks to your portfolio and choose a goal to see goal-linked diagnostics.
         </p>
       </div>
     );
@@ -164,15 +267,36 @@ export default function PortfolioDoctor() {
   const riskExp = parseIfString<RiskExposure>(data.risk_exposure);
   const factors = factorExp || {};
   const factorEntries = Object.entries(factors) as [string, number][];
+  const fit = goalFit(goal, data, factors, riskExp || {});
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div className="border-4 border-black bg-yellow-300 p-4" style={{ boxShadow: '6px 6px 0px #000' }}>
         <h2 className="font-extrabold text-2xl uppercase tracking-wider">
-          🏥 Portfolio Doctor
+          Portfolio Doctor
         </h2>
         <p className="text-sm font-bold mt-1">{generateExplanation(data)}</p>
+      </div>
+
+      <div className="border-4 border-black bg-white p-4" style={{ boxShadow: '6px 6px 0px #000' }}>
+        <h3 className="font-extrabold text-lg uppercase mb-3">Goal Link</h3>
+        <div className="grid gap-2 sm:grid-cols-4">
+          {GOALS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleGoalChange(item.id)}
+              className={`border-2 border-black p-3 text-left ${goal === item.id ? 'bg-cyan-200' : 'bg-gray-50'}`}
+            >
+              <div className="text-xs font-extrabold uppercase">{item.label}</div>
+              <div className="mt-1 text-[10px] font-semibold text-gray-600">{item.description}</div>
+            </button>
+          ))}
+        </div>
+        <div className={`mt-4 border-2 border-black p-3 text-sm font-bold ${fit.tone}`}>
+          {fit.label}: <span className="font-semibold">{fit.detail}</span>
+        </div>
       </div>
 
       {/* SCORE CARDS */}

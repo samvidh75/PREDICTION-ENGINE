@@ -21,18 +21,18 @@ import {
   DataLineageEntry,
 } from '../../../shared/data/AnalyticalResponse';
 import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFreshness';
+import { parsePredictionHorizon, SUPPORTED_PREDICTION_HORIZONS } from '../../../shared/predictions/horizons';
 
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
     const { ticker } = request.params as { ticker: string };
     const query = request.query as { horizon?: string };
     const symbol = ticker.toUpperCase().trim();
-    const VALID_HORIZONS = [7, 30, 90, 180, 365];
-    const horizon = query.horizon ? parseInt(query.horizon, 10) : 30;
-    if (!VALID_HORIZONS.includes(horizon)) {
+    const horizon = parsePredictionHorizon(query.horizon);
+    if (horizon === null) {
       return reply.status(400).send({
         code: 'INVALID_PREDICTION_HORIZON',
-        message: `Horizon ${query.horizon} is not valid. Allowed: ${VALID_HORIZONS.join(', ')}`,
+        message: `Horizon ${query.horizon} is not valid. Allowed: ${SUPPORTED_PREDICTION_HORIZONS.join(', ')}`,
       });
     }
     const asFiniteNumber = (value: unknown): number | null => {

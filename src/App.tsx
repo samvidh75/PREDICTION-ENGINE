@@ -41,6 +41,7 @@ import { AuthUXLoader } from "./components/auth/AuthUXLoader";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import { MarketInputs } from "./services/intelligence/marketState";
 import { loadUserProfile } from "./services/auth/userProfileStore";
+import { loadUiPreferences, subscribeUiPreferences } from "./services/ui/uiPreferences";
 
 // Config
 import { IS_DEV_ENVIRONMENT } from "./config/domain";
@@ -85,6 +86,7 @@ function AppContent(): JSX.Element {
   const [draftProfile, setDraftProfile] = useState<UserProfile | null>(null);
   const [pageKey, setPageKey] = useState<PageKey>(getPageKeyFromUrl);
   const [routeSignature, setRouteSignature] = useState<string>(getRouteSignatureFromUrl);
+  const [uiPreferences, setUiPreferences] = useState(loadUiPreferences);
 
   // URL sync
   useEffect(() => {
@@ -117,6 +119,8 @@ function AppContent(): JSX.Element {
       window.history.replaceState = origReplace;
     };
   }, []);
+
+  useEffect(() => subscribeUiPreferences(setUiPreferences), []);
 
   const isPublicPage =
     pageKey === "landing" || pageKey === "about" || pageKey === "login" || pageKey === "signup" ||
@@ -202,7 +206,7 @@ function AppContent(): JSX.Element {
 
   // ── Main app shell ──
   return (
-    <TokenProvider tokenVars={buildTokenCssVars()}>
+    <TokenProvider tokenVars={buildTokenCssVars()} theme={uiPreferences.theme} density={uiPreferences.density}>
       <MotionController>
         <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
           <MasterMotionEngine enabled={true}>

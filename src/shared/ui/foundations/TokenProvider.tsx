@@ -14,6 +14,8 @@ function mergeVars(...list: Array<TokenCssVars | undefined>): TokenCssVars {
 type Props = {
   children: React.ReactNode;
   tokenVars?: TokenCssVars;
+  theme?: "light" | "dark";
+  density?: "simple" | "pro";
 };
 
 /**
@@ -24,17 +26,20 @@ type Props = {
  * NOTE: We intentionally do NOT remove existing :root variables yet.
  * Migration can be incremental while maintaining visuals.
  */
-export default function TokenProvider({ children, tokenVars }: Props): JSX.Element {
+export default function TokenProvider({ children, tokenVars, theme = "light", density = "simple" }: Props): JSX.Element {
   const vars = tokenVars ?? {};
 
   return (
     <div
       style={
         {
-          display: "contents",
+          minHeight: "100vh",
           ...vars,
         } as React.CSSProperties
       }
+      data-ss-theme={theme}
+      data-ss-density={density}
+      className="ss-app-theme"
     >
       {children}
     </div>

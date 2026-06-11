@@ -27,6 +27,7 @@ import {
   DataLineageEntry,
 } from '../../../../shared/data/AnalyticalResponse';
 import { assessPredictionSnapshotFreshness } from '../../../../shared/data/DataFreshness';
+import { parsePredictionHorizon, SUPPORTED_PREDICTION_HORIZONS } from '../../../../shared/predictions/horizons';
 
 export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/predictions/explain/:symbol', async (request, reply) => {
@@ -34,6 +35,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
     const query = request.query as {
       today?: string;
       previous?: string;
+      horizon?: string;
     };
 
     const ticker = symbol.toUpperCase().trim();
@@ -44,11 +46,19 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
         error: 'Symbol parameter is required.',
       });
     }
+    const horizon = parsePredictionHorizon(query.horizon);
+    if (horizon === null) {
+      return reply.status(400).send({
+        code: 'INVALID_PREDICTION_HORIZON',
+        message: `Horizon ${query.horizon} is not valid. Allowed: ${SUPPORTED_PREDICTION_HORIZONS.join(', ')}`,
+      });
+    }
 
     try {
       const explanation = await predictionExplanationEngine.explain(ticker, {
         todayDate: query.today,
         previousDate: query.previous,
+        horizonDays: horizon,
       });
 
       // ──────────────────────────────────────────────────────────
@@ -75,9 +85,9 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
       try {
         const pdRes = await pool.query(
           `SELECT prediction_date FROM prediction_registry
-           WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = 30
+           WHERE symbol = $1 AND prediction_date = $2 AND prediction_horizon = $3
            LIMIT 1`,
-          [ticker, today]
+          [ticker, today, horizon]
         );
         if (pdRes.rows.length > 0) {
           const pd = pdRes.rows[0].prediction_date;
@@ -134,6 +144,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
           retrievedAt: new Date().toISOString(),
           isFallback: false,
           isSynthetic: false,
+          notes: `Horizon: ${horizon}d`,
         },
         {
           sourceTable: 'prediction_registry',
@@ -142,6 +153,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
           retrievedAt: new Date().toISOString(),
           isFallback: false,
           isSynthetic: false,
+          notes: `Horizon: ${horizon}d`,
         },
         {
           sourceTable: 'prediction_registry',
@@ -150,6 +162,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
           retrievedAt: new Date().toISOString(),
           isFallback: false,
           isSynthetic: false,
+          notes: `Horizon: ${horizon}d`,
         },
         {
           sourceTable: 'prediction_registry',
@@ -159,8 +172,8 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
           isFallback: false,
           isSynthetic: false,
           notes: explanation.historicalReliability
-            ? `Validation sample size: ${explanation.historicalReliability.sampleSize}`
-            : 'No historical validation available',
+            ? `Validation sample size: ${explanation.historicalReliability.sampleSize}; horizon: ${horizon}d`
+            : `No historical validation available for horizon: ${horizon}d`,
         },
       ];
 
@@ -178,6 +191,7 @@ export const predictionExplainRoutes: FastifyPluginAsync = async (app) => {
       // ──────────────────────────────────────────────────────────
       const payload = {
         symbol: ticker,
+        horizon,
         classification: {
           from: explanation.classification.from,
           to: explanation.classification.to,

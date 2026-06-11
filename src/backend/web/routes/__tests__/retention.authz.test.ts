@@ -298,4 +298,31 @@ describe('retentionRoutes authz & IDOR tests', () => {
     expect(resBody.statusCode).toBe(200);
     expect(resBody.json().user_id).toBe('user-a');
   });
+
+  it('spoofed alert uid query is ignored and token uid owns alert reads', async () => {
+    await dbAdapter.query(
+      `INSERT INTO user_alerts (user_id, symbol, alert_type, title, body, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6), ($7, $8, $9, $10, $11, $12)`,
+      [
+        'user-a', 'TCS', 'risk', 'User A Alert', 'A body', '2026-06-11',
+        'user-b', 'INFY', 'risk', 'User B Alert', 'B body', '2026-06-11',
+      ],
+    );
+
+    setTokenVerifier(mockVerifierFor('user-a'));
+    app = Fastify({ logger: false });
+    await app.register(retentionRoutes);
+    await app.ready();
+
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/alerts?uid=user-b',
+      headers: { authorization: 'Bearer valid-token-user-a' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const titles = res.json().alerts.map((item: { title: string }) => item.title);
+    expect(titles).toContain('User A Alert');
+    expect(titles).not.toContain('User B Alert');
+  });
 });
