@@ -13,7 +13,7 @@ import opsRoutes from "./ops";
 import { retentionRoutes } from "./retention";
 import { stockstoryRoutes } from "./stockstory";
 import { predictionSignalsRoutes } from "./predictions/signals";
-import { predictionExplainRoutes } from "./predictions/explain";
+import { predictionExplainF0Routes } from "./predictions/explainF0";
 import companyRoutes from "./company";
 import { validationRoutes } from "./validation";
 import { trustMetricsRoutes } from "./trustMetrics";
@@ -32,7 +32,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(retentionRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(stockstoryRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(predictionSignalsRoutes as unknown as never, { encapsulate: false } as never);
-  await app.register(predictionExplainRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(predictionExplainF0Routes as unknown as never, { encapsulate: false } as never);
   await app.register(companyRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(validationRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(trustMetricsRoutes as unknown as never, { encapsulate: false } as never);
