@@ -16,6 +16,7 @@ import { predictionSignalsRoutes } from "./predictions/signals";
 import { predictionExplainRoutes } from "./predictions/explain";
 import companyRoutes from "./company";
 import { validationRoutes } from "./validation";
+import { trustMetricsRoutes } from "./trustMetrics";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
@@ -34,6 +35,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(predictionExplainRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(companyRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(validationRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(trustMetricsRoutes as unknown as never, { encapsulate: false } as never);
 };
 
 export default routes;
