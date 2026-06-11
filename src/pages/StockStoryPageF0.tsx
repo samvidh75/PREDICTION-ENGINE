@@ -26,7 +26,7 @@ function appendHorizon(input: RequestInfo | URL, horizon: PredictionHorizon): Re
 
 async function withHonestExchangeFallback(response: Response): Promise<Response> {
   if (!response.ok) return response;
-  const body = await response.clone().json().catch(() => null);
+  const body = await response.clone().json().catch(() => null) as Record<string, unknown> | null;
   if (!body || typeof body !== "object" || body.exchange) return response;
 
   const headers = new Headers(response.headers);
@@ -38,13 +38,38 @@ async function withHonestExchangeFallback(response: Response): Promise<Response>
   });
 }
 
+async function unwrapExplanationEnvelope(response: Response): Promise<Response> {
+  if (!response.ok) return response;
+  const body = await response.clone().json().catch(() => null) as {
+    status?: string;
+    data?: unknown;
+    message?: string | null;
+    reason?: string | null;
+  } | null;
+
+  if (!body || typeof body !== "object" || !("status" in body) || !("data" in body)) return response;
+
+  if (!body.data) {
+    return new Response(JSON.stringify({ error: body.message || body.reason || "Explanation unavailable" }), {
+      status: 503,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
+  return new Response(JSON.stringify(body.data), {
+    status: response.status,
+    statusText: response.statusText,
+    headers: { "content-type": "application/json" },
+  });
+}
+
 /**
  * F0 compatibility boundary for the existing StockStory page.
  *
  * The legacy page remains intact while this wrapper provides the URL-backed
  * horizon selector, forwards the selected horizon to StockStory and explanation
- * requests, and prevents a missing exchange from silently becoming an invented
- * NSE label.
+ * requests, adapts the analytical explanation envelope for the legacy tab, and
+ * prevents a missing exchange from silently becoming an invented NSE label.
  */
 export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
@@ -53,12 +78,12 @@ export default function StockStoryPageF0(): JSX.Element {
     const originalFetch = window.fetch.bind(window);
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
       const raw = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
-      const nextInput = appendHorizon(input, horizon);
-      const response = await originalFetch(nextInput, init);
       const url = new URL(raw, window.location.origin);
-      return url.pathname.startsWith("/api/market-data/metadata/")
-        ? withHonestExchangeFallback(response)
-        : response;
+      const response = await originalFetch(appendHorizon(input, horizon), init);
+
+      if (url.pathname.startsWith("/api/market-data/metadata/")) return withHonestExchangeFallback(response);
+      if (url.pathname.startsWith("/api/predictions/explain/")) return unwrapExplanationEnvelope(response);
+      return response;
     };
 
     return () => {
