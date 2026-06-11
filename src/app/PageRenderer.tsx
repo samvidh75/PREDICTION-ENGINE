@@ -19,7 +19,7 @@ import SignupPage from "../pages/SignupPage";
 // Authenticated pages
 import DashboardHub from "../views/DashboardHub";
 import SearchPage from "../pages/SearchPage";
-import StockStoryPage from "../pages/StockStoryPage";
+import StockStoryPage from "../pages/StockStoryPageF0";
 import PortfolioPage from "../pages/PortfolioPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import AlertCentrePage from "../pages/AlertCentrePage";
