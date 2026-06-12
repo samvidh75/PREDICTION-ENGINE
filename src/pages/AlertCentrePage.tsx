@@ -67,11 +67,14 @@ export const AlertCentrePage: React.FC = () => {
     window.dispatchEvent(new Event('urlchange'));
   };
 
+  const symbolScopedAlerts = useMemo(() => {
+    return focusedSymbol ? alerts.filter(alert => alert.symbol.toUpperCase() === focusedSymbol) : alerts;
+  }, [alerts, focusedSymbol]);
+
   const filtered = useMemo(() => {
-    const symbolScoped = focusedSymbol ? alerts.filter(alert => alert.symbol.toUpperCase() === focusedSymbol) : alerts;
-    const list = filter === 'all' ? symbolScoped : symbolScoped.filter(a => a.category === filter);
+    const list = filter === 'all' ? symbolScopedAlerts : symbolScopedAlerts.filter(alert => alert.category === filter);
     return [...list].sort((a, b) => (a.isRead ? 1 : 0) - (b.isRead ? 1 : 0));
-  }, [alerts, filter, focusedSymbol]);
+  }, [symbolScopedAlerts, filter]);
 
   const unreadCount = alerts.filter(a => !a.isRead).length;
   const categories: AlertCategory[] = ['Factor', 'Risk', 'Momentum', 'News', 'Market'];
@@ -116,7 +119,7 @@ export const AlertCentrePage: React.FC = () => {
             filter === 'all' ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
           }`}
         >
-          All ({filtered.length})
+          All ({symbolScopedAlerts.length})
         </button>
         {categories.map(cat => (
           <button
@@ -126,7 +129,7 @@ export const AlertCentrePage: React.FC = () => {
               filter === cat ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
             }`}
           >
-            {cat}
+            {cat} ({symbolScopedAlerts.filter(alert => alert.category === cat).length})
           </button>
         ))}
       </div>
