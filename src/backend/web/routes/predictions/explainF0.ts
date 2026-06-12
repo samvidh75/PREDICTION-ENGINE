@@ -30,6 +30,21 @@ function finite(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function validScore(value: unknown): boolean {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100;
+}
+
+function invalidPredictionReason(row: Record<string, unknown>): string | null {
+  for (const [field] of SCORE_FIELDS) {
+    if (!validScore(row[field])) return `${field} outside [0, 100]`;
+  }
+  if (!validScore(row.ranking_score)) return 'ranking_score outside [0, 100]';
+  if (!validScore(row.confidence_score)) return 'confidence_score outside [0, 100]';
+  if (Number(row.growth_score) <= -100) return 'growth_score sentinel value';
+  return null;
+}
+
 function dateOnly(value: Date | string): string {
   return value instanceof Date ? value.toISOString().split('T')[0] : String(value).split('T')[0];
 }
@@ -104,16 +119,22 @@ export const predictionExplainF0Routes: FastifyPluginAsync = async (app) => {
     }
 
     try {
+      const params: unknown[] = [ticker, horizon];
+      let where = 'WHERE symbol = $1 AND prediction_horizon = $2';
+      if (query.today) {
+        params.push(query.today);
+        where += ` AND prediction_date <= $${params.length}`;
+      }
+
       const rows = await pool.query(
         `SELECT symbol, prediction_date, ranking_score, classification,
                 confidence_score, quality_score, growth_score, value_score,
                 momentum_score, risk_score, sector_score
          FROM prediction_registry
-         WHERE symbol = $1 AND prediction_horizon = $2
-           AND ($3::date IS NULL OR prediction_date <= $3::date)
+         ${where}
          ORDER BY prediction_date DESC
          LIMIT 2`,
-        [ticker, horizon, query.today ?? null],
+        params,
       );
 
       if (rows.rows.length === 0) {
@@ -125,7 +146,18 @@ export const predictionExplainF0Routes: FastifyPluginAsync = async (app) => {
       }
 
       const current = rows.rows[0] as PredictionRow;
-      const previous = (rows.rows[1] as PredictionRow | undefined) ?? null;
+      const currentInvalidReason = invalidPredictionReason(current);
+      if (currentInvalidReason) {
+        return reply.send(unavailableResponse(
+          'PREDICTION_INVALID',
+          `The latest ${horizon}-day prediction for ${ticker} is unavailable because ${currentInvalidReason}.`,
+          ['prediction_registry'],
+        ));
+      }
+
+      const previousCandidate = (rows.rows[1] as PredictionRow | undefined) ?? null;
+      const previousInvalidReason = previousCandidate ? invalidPredictionReason(previousCandidate) : null;
+      const previous = previousInvalidReason ? null : previousCandidate;
       const predictionDate = dateOnly(current.prediction_date);
       const lineage: DataLineageEntry[] = [{
         sourceTable: 'prediction_registry',
@@ -134,7 +166,9 @@ export const predictionExplainF0Routes: FastifyPluginAsync = async (app) => {
         retrievedAt: new Date().toISOString(),
         isFallback: false,
         isSynthetic: false,
-        notes: `Horizon: ${horizon} days`,
+        notes: previousInvalidReason
+          ? `Horizon: ${horizon} days. Previous comparison unavailable: ${previousInvalidReason}.`
+          : `Horizon: ${horizon} days`,
       }];
       const freshness = assessPredictionSnapshotFreshness(predictionDate);
       return reply.send(realResponse(buildExplanation(ticker, horizon, current, previous), freshness, predictionDate, 100, lineage, 'VALIDATION_LIMITED'));
