@@ -1,0 +1,60 @@
+name: Provider Health
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: Comma-separated NSE symbols without .NS suffix
+        required: false
+        default: RELIANCE,TCS,INFY
+      include_yfinance:
+        description: Run the optional yfinance Python bridge
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  provider-health:
+    runs-on: ubuntu-latest
+    env:
+      FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
+      INDIANAPI_KEY: ${{ secrets.INDIANAPI_KEY }}
+      YFINANCE_ENABLED: ${{ inputs.include_yfinance }}
+      YFINANCE_CACHE_PATH: tmp/yfinance-cache.json
+      YFINANCE_CACHE_SECONDS: "3600"
+      YFINANCE_REQUEST_CACHE_ENABLED: "true"
+      YFINANCE_REQUEST_CACHE_NAME: tmp/yfinance-http-cache
+      YFINANCE_BATCH_SIZE: "40"
+      YFINANCE_DOWNLOAD_TIMEOUT_SECONDS: "15"
+      YFINANCE_MIN_DELAY_SECONDS: "0.75"
+      YFINANCE_MAX_DELAY_SECONDS: "1.75"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - name: Install optional yfinance dependencies
+        if: ${{ inputs.include_yfinance }}
+        run: python3 -m pip install -r requirements-yfinance.txt
+      - name: Validate configured providers without printing secrets
+        run: >-
+          npx tsx scripts/provider-healthcheck.ts
+          --symbols=${{ inputs.symbols }}
+          --providers=finnhub,indianapi,yfinance
+          --require=finnhub,indianapi
+          --strict
+      - name: Upload redacted provider health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: provider-health-report
+          path: tmp/provider-health/latest.json
+          if-no-files-found: warn
