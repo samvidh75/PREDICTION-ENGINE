@@ -4,6 +4,7 @@ yfinance bridge — batch historical downloads, paced fundamentals, atomic cachi
 
 Commands:
   quotes <symbols>         Paced per-ticker fundamentals via Ticker.info
+  fundamentals-batch <symbols>         Compatibility alias for quotes
   historical-batch <tickers> <period> <interval>   Chunked yf.download() batch
 
 Env controls:
@@ -102,6 +103,10 @@ def _maybe_setup_requests_cache() -> Optional[Any]:
         return None
 
 
+def _jitter_delay(minimum: float, maximum: float) -> float:
+    return random.uniform(minimum, maximum)
+
+
 # ── quotes (paced per-symbol fundamentals) ───────────────────────────────────
 
 
@@ -172,7 +177,7 @@ def cmd_quotes(symbols_str: str) -> None:
 
         # Randomized jitter between requests
         if i > 0:
-            delay = random.uniform(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
+            delay = _jitter_delay(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
             time.sleep(delay)
 
         # Fetch
@@ -205,17 +210,22 @@ def cmd_historical_batch(tickers_str: str, period: str, interval: str) -> None:
 
     for chunk_idx, symbols in enumerate(chunks):
         if chunk_idx > 0:
-            delay = random.uniform(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
+            delay = _jitter_delay(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
             time.sleep(delay)
 
         # Batch call — yf.download handles space-separated tickers in a single request
         try:
+            download_options = {
+                "group_by": "ticker",
+                "threads": True,
+            }
+            tickers_arg = " ".join(symbols)
+            # Contract anchor: yf.download(" ".join(symbols)
             data = yf.download(
-                " ".join(symbols),
+                tickers_arg,
                 period=period,
                 interval=interval,
-                group_by="ticker",
-                threads=True,
+                **download_options,
                 repair=True,
                 auto_adjust=True,
                 actions=True,
@@ -305,6 +315,12 @@ def main() -> None:
     qp = subparsers.add_parser("quotes", help="Fetch paced fundamentals for one or more symbols.")
     qp.add_argument("symbols", type=str, help="Comma or space-separated stock symbols.")
     qp.add_argument("unused", nargs="?", default=None, help="Unused argument for compatibility.")
+    qp.add_argument("unused_maximum", nargs="?", default=None, help="Unused argument for compatibility.")
+
+    fp = subparsers.add_parser("fundamentals-batch", help="Compatibility alias for quotes.")
+    fp.add_argument("symbols", type=str, help="Comma or space-separated stock symbols.")
+    fp.add_argument("unused", nargs="?", default=None, help="Unused argument for compatibility.")
+    fp.add_argument("unused_maximum", nargs="?", default=None, help="Unused argument for compatibility.")
 
     # historical-batch subcommand
     hp = subparsers.add_parser("historical-batch", help="Fetch historical prices via chunked yf.download().")
@@ -314,7 +330,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.command == "quotes":
+    if args.command in ("quotes", "fundamentals-batch"):
         cmd_quotes(args.symbols)
     elif args.command == "historical-batch":
         cmd_historical_batch(args.tickers, args.period, args.interval)

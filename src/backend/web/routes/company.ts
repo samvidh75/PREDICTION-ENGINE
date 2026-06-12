@@ -13,7 +13,6 @@ type FinancialsRow = {
   roe: number | null;
   roa: number | null;
   roic: number | null;
-  roce: number | null;
   operating_margin: number | null;
   net_margin: number | null;
   revenue_growth: number | null;
@@ -84,16 +83,15 @@ export const companyRoutes: FastifyPluginAsync = async (app) => {
            pe_ratio,
            pb_ratio,
            roe,
-           NULL AS roa,
-           NULL AS roic,
-           roce,
+           roa,
+           roic,
            operating_margin,
-           net_margin,
+           NULL AS net_margin,
            revenue_growth,
-           NULL AS earnings_growth,
+           eps_growth AS earnings_growth,
            debt_to_equity,
            current_ratio,
-           NULL AS beta,
+           beta,
            fcf_yield,
            ev_ebitda,
            market_cap,
