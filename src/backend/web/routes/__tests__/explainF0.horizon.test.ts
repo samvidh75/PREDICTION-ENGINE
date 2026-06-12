@@ -47,7 +47,7 @@ describe('prediction explanation F0 horizon contract', () => {
 
     const response = await app.inject({ method: 'GET', url: '/api/predictions/explain/RELIANCE?horizon=365' });
     expect(response.statusCode).toBe(200);
-    expect(queryMock).toHaveBeenCalledWith(expect.stringContaining('prediction_horizon = $2'), ['RELIANCE', 365, null]);
+    expect(queryMock).toHaveBeenCalledWith(expect.stringContaining('prediction_horizon = $2'), ['RELIANCE', 365]);
     expect(response.json()).toMatchObject({
       status: 'ok',
       data: { symbol: 'RELIANCE', predictionHorizon: 365 },

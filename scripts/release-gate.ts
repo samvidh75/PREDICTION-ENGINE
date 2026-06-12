@@ -185,7 +185,7 @@ export function defineChecks(): GateCheck[] {
       name: 'API smoke test',
       category: 'environment-required',
       mandatory: REQUIRE_FULL(),
-      command: 'npm run migrate && cross-env CI_FIXTURE_SEED=true npm run seed:ci && npm run smoke:api',
+      command: 'tsx scripts/run-api-smoke-gate.ts',
       probe: probeApiServer,
       status: 'PASS', exitCode: null, stdout: null, stderr: null, durationMs: 0,
     },

@@ -24,8 +24,17 @@ function formatNumber(value?: number | null, decimals: number = 2): string {
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
+    case "Exceptional":
     case "Excellent":
       return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+    case "Good":
+      return "bg-cyan-500/10 border-cyan-500/30 text-cyan-400";
+    case "Fair":
+      return "bg-amber-500/10 border-amber-500/30 text-amber-400";
+    case "Weak":
+      return "bg-orange-500/10 border-orange-500/30 text-orange-400";
+    case "Critical":
+      return "bg-rose-500/10 border-rose-500/30 text-rose-400";
     case "Healthy":
       return "bg-cyan-500/10 border-cyan-500/30 text-cyan-400";
     case "Stable":
@@ -110,11 +119,44 @@ function scoreFromLineage(factor: any): number | null {
 }
 
 function adaptStockStoryResponse(data: any) {
-  if (!data || data.status === "unavailable") {
+  if (!data) {
     throw new Error("STOCKSTORY_SNAPSHOT_UNAVAILABLE");
   }
 
   const payload = data.data ?? data;
+  if (data.status === "unavailable" || !payload) {
+    return {
+      apiStatus: "unavailable",
+      unavailableReason: data.reason ?? data.code ?? "PREDICTION_NOT_FOUND",
+      unavailableMessage: data.message ?? "No production prediction snapshot is available for this company.",
+      dataState: data.dataState ?? null,
+      confidence: "Unavailable",
+      healthScore: null,
+      rankingScore: null,
+      classification: null,
+      growth: null,
+      quality: null,
+      stability: null,
+      valuation: null,
+      momentum: null,
+      risk: null,
+      narrative: data.message ?? "No production prediction snapshot is available for this company.",
+      factors: {},
+      financials: {},
+      engineDetails: {
+        confidence: {
+          level: "Unavailable",
+          score: null,
+          dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null,
+          signalAgreement: null,
+          riskConsistency: null,
+          historicalStability: null,
+          commentary: "No confidence score is shown because the prediction registry did not provide a usable production snapshot.",
+        },
+      },
+    };
+  }
+
   const factors = payload.factors;
   if (!factors) throw new Error("STOCKSTORY_FACTORS_MISSING");
 
@@ -148,10 +190,10 @@ function adaptStockStoryResponse(data: any) {
       confidence: {
         level: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable",
         score: typeof confidenceScore === "number" ? confidenceScore : null,
-        dataCompleteness: typeof confidenceScore === "number" ? confidenceScore : null,
-        signalAgreement: typeof confidenceScore === "number" ? confidenceScore : null,
-        riskConsistency: typeof confidenceScore === "number" ? confidenceScore : null,
-        historicalStability: typeof confidenceScore === "number" ? confidenceScore : null,
+        dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null,
+        signalAgreement: null,
+        riskConsistency: null,
+        historicalStability: null,
         commentary: `Source: ${payload.confidence?.source ?? "prediction_registry"} (${payload.confidence?.snapshotDate ?? payload.predictionDate ?? "Unavailable"}).`,
       },
     },
@@ -250,6 +292,8 @@ export const StockStoryPage: React.FC = () => {
   const quote = liveQuote.quote;
   const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
   const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Data unavailable";
+  const storyData = story;
+  const storyUnavailable = storyData?.apiStatus === "unavailable";
 
   const isInWatchlist = useMemo(() => {
     return watchlists.some((w) => w.tickers.includes(ticker));
@@ -293,8 +337,6 @@ export const StockStoryPage: React.FC = () => {
     window.history.replaceState({}, "", `?${params.toString()}`);
   };
 
-  const storyData = story;
-
   if (storyLoading) {
     return (
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
@@ -316,20 +358,106 @@ export const StockStoryPage: React.FC = () => {
     );
   }
 
-  if (!storyData) {
+  if (!storyData || storyUnavailable) {
+    const missingInputs = Array.isArray(storyData?.dataState?.missingInputs)
+      ? storyData.dataState.missingInputs.filter(Boolean)
+      : [];
     return (
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
-        <button
-          onClick={() => navigateToPage("dashboard")}
-          className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
-        </button>
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-8">
-          <h1 className="text-xl font-extrabold text-white">Company health analysis unavailable</h1>
-          <p className="mt-3 text-sm leading-6 text-white/60">
-            StockStory could not find a production prediction_registry snapshot for {ticker}. No fallback scores are shown.
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <button
+            onClick={() => navigateToPage("dashboard")}
+            className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
+          </button>
+          <button
+            onClick={() => navigateToPage("discovery")}
+            className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-white/60 transition-colors hover:text-white"
+          >
+            <Compass className="h-3.5 w-3.5" /> Discovery
+          </button>
+        </div>
+
+        <section className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
+            <div className="min-w-0">
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/45">
+                <span>{ticker}</span>
+                <span>•</span>
+                <span>{exchange}</span>
+                <span>•</span>
+                <span>{currency}</span>
+              </div>
+              <h1 className="max-w-2xl truncate text-2xl font-extrabold tracking-tight text-white md:text-3xl">{companyName}</h1>
+              <div className="mt-3 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+                Prediction unavailable
+              </div>
+            </div>
+
+            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-white/5 bg-white/[0.02] p-3.5">
+              <div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Live Price</div>
+                <div className="mt-1 font-mono text-xl font-bold text-white">{priceLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                  {changeLabel}
+                </div>
+              </div>
+              <div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Volume</div>
+                <div className="mt-1 font-mono text-xl font-bold text-white">
+                  {quote?.volume ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+                </div>
+                <div className="mt-0.5 font-mono text-[9px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Registry Status</div>
+              <div className="mt-2 text-sm font-semibold text-white">{storyData?.unavailableReason ?? "Unavailable"}</div>
+            </div>
+            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Score Shown</div>
+              <div className="mt-2 text-sm font-semibold text-white">None</div>
+            </div>
+            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Data Policy</div>
+              <div className="mt-2 text-sm font-semibold text-emerald-300">No fallback score</div>
+            </div>
+          </div>
+
+          <p className="mt-5 max-w-4xl text-sm leading-6 text-white/65">
+            {storyData?.unavailableMessage ?? storyError ?? `StockStory could not find a usable production prediction snapshot for ${ticker}.`}
           </p>
+
+          {missingInputs.length > 0 && (
+            <div className="mt-4 rounded-lg border border-white/5 bg-white/[0.015] p-4">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/35">Missing Inputs</div>
+              <div className="flex flex-wrap gap-2">
+                {missingInputs.map((input: string) => (
+                  <span key={input} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold text-white/60">
+                    {input}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="mt-4 max-w-4xl rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-white/55">
+            The page keeps live market data visible, but prediction, confidence, and factor scores are hidden until the backend has a valid registry row with real source price and valid factor domains.
+          </p>
+        </section>
+
+        <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">My Research Notes</div>
+          <textarea
+            value={noteText}
+            onChange={(event) => handleSaveNote(event.target.value)}
+            placeholder="Add your own research notes for this company..."
+            className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
+          />
         </div>
       </div>
     );
@@ -551,7 +679,7 @@ export const StockStoryPage: React.FC = () => {
                 {renderProgressBar("Value & Margins", storyData.valuation, "text-amber-400")}
               </div>
               <div className="text-[9px] text-white/35 leading-normal mt-3 pt-3 border-t border-white/5">
-                * Composite health score is weighted as: Growth (25%), Quality (25%), Stability (20%), Momentum (15%), Valuation (15%), and adjusted by the risk engine.
+                * Composite score is the average of available real factor scores from the prediction registry. Missing factors are shown as unavailable, not filled.
               </div>
             </div>
 
