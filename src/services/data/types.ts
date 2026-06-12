@@ -7,7 +7,10 @@ export interface StockQuote {
   change: number;
   changePercent: number;
   volume?: number;
-  updatedAt: string;
+  /** Source market timestamp when the provider exposes one. */
+  updatedAt?: string;
+  /** Local retrieval timestamp. Must not be presented as a market update time. */
+  retrievedAt?: string;
 }
 
 export interface CompanyMetadata {
