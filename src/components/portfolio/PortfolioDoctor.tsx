@@ -4,7 +4,7 @@
  * Cartoon brutalist styling.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface FactorExposure {
   quality?: number;
@@ -31,7 +31,7 @@ interface PortfolioData {
   sector_count: number;
 }
 
-type FetchState = 'loading' | 'loaded' | 'error' | 'empty';
+type FetchState = 'loading' | 'loaded' | 'error' | 'empty' | 'unavailable';
 
 const STATUS_COLORS: Record<string, string> = {
   EXCELLENT: 'bg-green-400',
@@ -56,15 +56,76 @@ const STATUS_TEXT: Record<string, string> = {
   ELEVATED: 'text-amber-900',
 };
 
-function parseIfString<T>(val: T | string): T {
-  if (typeof val === 'string') {
-    try { return JSON.parse(val) as T; } catch { return val as unknown as T; }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
-  return val;
+  return null;
+}
+
+function toStatus(value: unknown): string {
+  return typeof value === 'string' && value.trim() !== '' ? value : 'UNAVAILABLE';
+}
+
+function parseExposure<T extends Record<string, unknown>>(value: unknown): Partial<T> {
+  if (typeof value === 'string') {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      return isRecord(parsed) ? parsed as Partial<T> : {};
+    } catch {
+      return {};
+    }
+  }
+  return isRecord(value) ? value as Partial<T> : {};
+}
+
+function unwrapPortfolioPayload(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  return 'data' in value ? value.data : value;
+}
+
+function normalizePortfolioData(value: unknown): PortfolioData | null {
+  if (!isRecord(value)) return null;
+
+  const diversificationScore = toFiniteNumber(value.diversification_score);
+  const concentrationScore = toFiniteNumber(value.concentration_score);
+  const stockCount = toFiniteNumber(value.stock_count);
+  const sectorCount = toFiniteNumber(value.sector_count);
+
+  if (
+    diversificationScore === null ||
+    concentrationScore === null ||
+    stockCount === null ||
+    sectorCount === null
+  ) {
+    return null;
+  }
+
+  return {
+    diversification_score: diversificationScore,
+    concentration_score: concentrationScore,
+    factor_exposure: typeof value.factor_exposure === 'string' || isRecord(value.factor_exposure)
+      ? value.factor_exposure as string | FactorExposure
+      : {},
+    risk_exposure: typeof value.risk_exposure === 'string' || isRecord(value.risk_exposure)
+      ? value.risk_exposure as string | RiskExposure
+      : {},
+    portfolio_health: toStatus(value.portfolio_health),
+    portfolio_fragility: toStatus(value.portfolio_fragility),
+    portfolio_resilience: toStatus(value.portfolio_resilience),
+    stock_count: Math.max(0, Math.round(stockCount)),
+    sector_count: Math.max(0, Math.round(sectorCount)),
+  };
 }
 
 function Bar({ label, value, color = 'bg-blue-500' }: { label: string; value: number; color?: string }) {
-  const pct = Math.min(100, Math.round(value * 100));
+  const pct = Math.min(100, Math.max(0, Math.round(value * 100)));
   return (
     <div className="mb-3">
       <div className="flex justify-between text-xs font-bold uppercase mb-1">
@@ -90,15 +151,28 @@ export default function PortfolioDoctor() {
     fetch('/api/intelligence/portfolio')
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
+        return res.json() as Promise<unknown>;
       })
-      .then((json: PortfolioData) => {
-        if (!json || (json.stock_count === 0 && json.sector_count === 0 && !json.portfolio_health)) {
+      .then((json: unknown) => {
+        if (isRecord(json) && json.status === 'empty') {
           setState('empty');
-        } else {
-          setData(json);
-          setState('loaded');
+          return;
         }
+
+        const normalized = normalizePortfolioData(unwrapPortfolioPayload(json));
+        if (!normalized) {
+          setError('Portfolio analysis is unavailable because the latest snapshot is incomplete.');
+          setState('unavailable');
+          return;
+        }
+
+        if (normalized.stock_count === 0 && normalized.sector_count === 0) {
+          setState('empty');
+          return;
+        }
+
+        setData(normalized);
+        setState('loaded');
       })
       .catch((e: Error) => {
         setError(e.message);
@@ -149,6 +223,15 @@ export default function PortfolioDoctor() {
     );
   }
 
+  if (state === 'unavailable') {
+    return (
+      <div className="p-8 border-4 border-black bg-amber-100 text-center" style={{ boxShadow: '6px 6px 0px #000' }}>
+        <p className="font-extrabold text-2xl mb-2">Portfolio Analysis Unavailable</p>
+        <p className="text-sm text-amber-900">{error}</p>
+      </div>
+    );
+  }
+
   if (state === 'empty' || !data) {
     return (
       <div className="p-8 border-4 border-dashed border-black bg-gray-50 text-center" style={{ boxShadow: '6px 6px 0px #000' }}>
@@ -160,10 +243,12 @@ export default function PortfolioDoctor() {
     );
   }
 
-  const factorExp = parseIfString<FactorExposure>(data.factor_exposure);
-  const riskExp = parseIfString<RiskExposure>(data.risk_exposure);
-  const factors = factorExp || {};
-  const factorEntries = Object.entries(factors) as [string, number][];
+  const factors = parseExposure<FactorExposure>(data.factor_exposure);
+  const riskExp = parseExposure<RiskExposure>(data.risk_exposure);
+  const factorEntries = Object.entries(factors)
+    .filter((entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]));
+  const riskLevel = typeof riskExp.risk_level === 'string' ? riskExp.risk_level : 'N/A';
+  const aggregateRisk = toFiniteNumber(riskExp.aggregate_risk) ?? 0.5;
 
   return (
     <div className="space-y-6">
@@ -211,12 +296,12 @@ export default function PortfolioDoctor() {
         <h3 className="font-extrabold text-lg uppercase mb-4">Risk Exposure</h3>
         <div className="flex items-center gap-4">
           <div
-            className={`px-4 py-2 border-2 border-black font-extrabold text-lg uppercase ${STATUS_COLORS[riskExp.risk_level || 'MODERATE'] || 'bg-gray-300'} ${STATUS_TEXT[riskExp.risk_level || 'MODERATE'] || 'text-gray-900'}`}
+            className={`px-4 py-2 border-2 border-black font-extrabold text-lg uppercase ${STATUS_COLORS[riskLevel] || 'bg-gray-300'} ${STATUS_TEXT[riskLevel] || 'text-gray-900'}`}
           >
-            {riskExp.risk_level || 'N/A'}
+            {riskLevel}
           </div>
           <div>
-            <p className="text-sm font-bold">Aggregate Risk: {Math.round((riskExp.aggregate_risk || 0.5) * 100)}%</p>
+            <p className="text-sm font-bold">Aggregate Risk: {Math.round(aggregateRisk * 100)}%</p>
           </div>
         </div>
       </div>
@@ -227,7 +312,7 @@ export default function PortfolioDoctor() {
 }
 
 function ScoreCard({ label, value, color = 'blue' }: { label: string; value: number; color?: string }) {
-  const pct = Math.round(value * 100);
+  const pct = Math.min(100, Math.max(0, Math.round(value * 100)));
   const barColor = color === 'amber' ? 'bg-amber-400' : 'bg-blue-500';
   return (
     <div className="border-4 border-black bg-white p-3 text-center" style={{ boxShadow: '4px 4px 0px #000' }}>
