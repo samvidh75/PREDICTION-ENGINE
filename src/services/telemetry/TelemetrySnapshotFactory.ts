@@ -4,19 +4,29 @@ import { ConfidenceScoreEngine } from './ConfidenceScoreEngine';
 import { ValuationEngine } from './ValuationEngine';
 import { MomentumEngine } from './MomentumEngine';
 
+function positiveNumber(value: unknown): number | null {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 export class TelemetrySnapshotFactory {
   /**
-   * Transforms raw fundamental/technical CompanyTelemetry data into
-   * our standardized, SEBI-safe, high-fidelity TelemetrySnapshot structure.
+   * Transforms source-backed fundamental and technical telemetry into a
+   * standardized snapshot. Missing PE or 52-week range inputs make the snapshot
+   * unavailable; they are never replaced with neutral-looking placeholder values.
    */
-  public static create(data: CompanyTelemetry): TelemetrySnapshot {
-    const range = {
-      low: data.fiftyTwoWeekRange?.low ?? 0,
-      high: data.fiftyTwoWeekRange?.high ?? 1,
-      current: data.fiftyTwoWeekRange?.current ?? 0.5,
-    };
-    const peRatio = data.peRatio ?? 0;
-    
+  public static create(data: CompanyTelemetry): TelemetrySnapshot | null {
+    const peRatio = positiveNumber(data.peRatio);
+    const low = positiveNumber(data.fiftyTwoWeekRange?.low);
+    const high = positiveNumber(data.fiftyTwoWeekRange?.high);
+    const current = positiveNumber(data.fiftyTwoWeekRange?.current);
+
+    if (peRatio === null || low === null || high === null || current === null || high <= low) {
+      return null;
+    }
+
+    const range = { low, high, current };
+
     // 1. Calculate Health score
     const health = HealthScoreEngine.calculateHealth(peRatio, range.current, range);
 
@@ -32,17 +42,17 @@ export class TelemetrySnapshotFactory {
     return {
       healthScore: health.score,
       healthStatus: health.status,
-      
+
       confidenceScore: confidence.score,
       confidenceStatus: confidence.status,
-      
+
       valuationScore: valuation.score,
       valuationStatus: valuation.status,
-      
+
       momentumScore: momentum.score,
       momentumStatus: momentum.status,
-      
-      lastUpdated: new Date().toISOString()
+
+      lastUpdated: data.lastUpdated ?? new Date().toISOString(),
     };
   }
 }
