@@ -108,7 +108,7 @@ export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
         },
         {
           sourceTable: 'prediction_registry',
-          sourceField: 'health_score',
+          sourceField: 'ranking_score',
           asOf: hasSnapshotDate ? result.snapshotDate : null,
           retrievedAt: new Date().toISOString(),
           isFallback: false,
