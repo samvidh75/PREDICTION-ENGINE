@@ -7,6 +7,31 @@ import type {
   SectorMover,
 } from '../../services/market/MarketActionService';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * The dashboard consumes a backend envelope, not arbitrary JSON. Validate the
+ * structural fields before committing state so partial outages and test stubs
+ * render an honest unavailable panel instead of crashing the dashboard shell.
+ */
+export function isMarketActionResponse(value: unknown): value is MarketActionResponse {
+  if (!isRecord(value)) return false;
+  if (value.status !== 'real' && value.status !== 'partial' && value.status !== 'unavailable') return false;
+  if (typeof value.message !== 'string') return false;
+  if (!isRecord(value.data) || !isRecord(value.dataState)) return false;
+
+  const data = value.data;
+  const dataState = value.dataState;
+  if (!Array.isArray(data.gainers) || !Array.isArray(data.losers)) return false;
+  if (!Array.isArray(data.volumeLeaders) || !Array.isArray(data.sectorMovers)) return false;
+  if (!Array.isArray(data.scannerPresets)) return false;
+  if (!Array.isArray(dataState.sourceTables) || !Array.isArray(dataState.missingInputs)) return false;
+  if (typeof dataState.rowsAnalyzed !== 'number' || typeof dataState.rowsWithComparisons !== 'number') return false;
+  return true;
+}
+
 function formatPrice(value: number): string {
   return `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 }
@@ -126,7 +151,8 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
       headers: { Accept: 'application/json' },
     })
       .then(async (response) => {
-        const body = await response.json() as MarketActionResponse;
+        const body: unknown = await response.json();
+        if (!isMarketActionResponse(body)) throw new Error('MALFORMED_MARKET_ACTION_RESPONSE');
         if (!response.ok && body.status !== 'unavailable') throw new Error('MARKET_ACTION_UNAVAILABLE');
         return body;
       })
