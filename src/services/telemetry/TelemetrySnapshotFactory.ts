@@ -52,7 +52,7 @@ export class TelemetrySnapshotFactory {
       momentumScore: momentum.score,
       momentumStatus: momentum.status,
 
-      lastUpdated: data.lastUpdated ?? new Date().toISOString(),
+      lastUpdated: data.lastUpdated ?? 'Data unavailable',
     };
   }
 }
