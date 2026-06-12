@@ -27,7 +27,7 @@ test('desktop sidebar exposes grouped product workflows', async ({ page }) => {
 
   await expect(sidebar.getByText('Market', { exact: true })).toBeVisible();
   await expect(sidebar.getByText('Research', { exact: true })).toBeVisible();
-  await expect(sidebar.getByText('Portfolio', { exact: true })).toBeVisible();
+  await expect(sidebar.getByText('Portfolio', { exact: true }).first()).toBeVisible();
   await expect(sidebar.getByText('System', { exact: true })).toBeVisible();
 
   await sidebar.getByRole('button', { name: 'Daily feed' }).click();
