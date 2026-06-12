@@ -1,334 +1,323 @@
-"""TRACK-38 — YFinance Python Bridge
-Provides JSON output for Node.js consumption.
-
-Usage: python yfinance_bridge.py <command> <args>
-Commands:
-  historical <symbol> [period]
-  historical-batch <symbols_csv> [period] [interval]
-  quotes <symbols_csv> [min_delay_seconds] [max_delay_seconds]
-  fundamentals-batch <symbols_csv> [min_delay_seconds] [max_delay_seconds]
-  dividends <symbol>
-  splits <symbol>
-
-Safety and reliability controls:
-  - Historical candles use yf.download() in bounded batches.
-  - Ticker.info fundamentals remain per-symbol and use randomized pacing.
-  - Results are cached on disk to avoid repeated requests during the TTL window.
-  - requests-cache is used when installed and compatible; JSON cache remains the fallback.
+#!/usr/bin/env python3
 """
-import hashlib
+yfinance bridge — batch historical downloads, paced fundamentals, atomic caching.
+
+Commands:
+  quotes <symbols>         Paced per-ticker fundamentals via Ticker.info
+  historical-batch <tickers> <period> <interval>   Chunked yf.download() batch
+
+Env controls:
+  YFINANCE_CACHE_PATH=tmp/yfinance-cache.json
+  YFINANCE_CACHE_SECONDS=3600
+  YFINANCE_REQUEST_CACHE_ENABLED=true
+  YFINANCE_REQUEST_CACHE_NAME=tmp/yfinance-http-cache
+  YFINANCE_BATCH_SIZE=40
+  YFINANCE_DOWNLOAD_TIMEOUT_SECONDS=15
+  YFINANCE_MIN_DELAY_SECONDS=0.75
+  YFINANCE_MAX_DELAY_SECONDS=1.75
+"""
+
+import argparse
 import json
 import os
 import random
 import sys
+import tempfile
 import time
-from typing import Any, Dict, Iterable, List, Optional
+from datetime import datetime, timedelta
+from typing import Any, Optional, Union
 
-try:
-    import yfinance as yf
-except Exception:  # pragma: no cover - depends on optional local runtime
-    yf = None
+import yfinance as yf
 
-try:
-    import requests_cache
-except Exception:  # pragma: no cover - optional compatibility layer
-    requests_cache = None
+# ── helpers ──────────────────────────────────────────────────────────────────
 
-
-def ensure_yfinance():
-    if yf is None:
-        raise RuntimeError("Python package yfinance is required. Install requirements-yfinance.txt.")
+_ENV_CACHE_TTL = int(os.environ.get("YFINANCE_CACHE_SECONDS", "3600"))
+_ENV_CACHE_PATH = os.environ.get("YFINANCE_CACHE_PATH", "tmp/yfinance-cache.json")
+_ENV_BATCH_SIZE = max(1, min(100, int(os.environ.get("YFINANCE_BATCH_SIZE", "40"))))
+_ENV_DOWNLOAD_TIMEOUT = int(os.environ.get("YFINANCE_DOWNLOAD_TIMEOUT_SECONDS", "15"))
+_ENV_MIN_DELAY = float(os.environ.get("YFINANCE_MIN_DELAY_SECONDS", "2.0"))
+_ENV_MAX_DELAY = float(os.environ.get("YFINANCE_MAX_DELAY_SECONDS", "4.0"))
+_ENV_REQUEST_CACHE_ENABLED = os.environ.get("YFINANCE_REQUEST_CACHE_ENABLED", "false").lower() in ("1", "true", "yes")
+_ENV_REQUEST_CACHE_NAME = os.environ.get("YFINANCE_REQUEST_CACHE_NAME", "tmp/yfinance-http-cache")
 
 
-def env_int(name: str, default: int, minimum: int = 1, maximum: int = 500) -> int:
+def _load_cache() -> dict[str, Any]:
+    """Load atomic JSON cache. Returns {symbol: {data, cached_at}}."""
     try:
-        value = int(os.environ.get(name, str(default)))
-    except ValueError:
-        value = default
-    return max(minimum, min(maximum, value))
-
-
-def env_float(name: str, default: float, minimum: float = 0.0, maximum: float = 60.0) -> float:
-    try:
-        value = float(os.environ.get(name, str(default)))
-    except ValueError:
-        value = default
-    return max(minimum, min(maximum, value))
-
-
-def cache_settings():
-    path = os.environ.get("YFINANCE_CACHE_PATH", "tmp/yfinance-cache.json")
-    ttl_seconds = env_int("YFINANCE_CACHE_SECONDS", 3600, 1, 604800)
-    return path, ttl_seconds
-
-
-def load_cache() -> Dict[str, Any]:
-    path, _ = cache_settings()
-    if not os.path.exists(path):
+        with open(_ENV_CACHE_PATH, "r") as fh:
+            return json.load(fh)
+    except (FileNotFoundError, json.JSONDecodeError):
         return {}
+
+
+def _save_cache(cache: dict[str, Any]) -> None:
+    """Atomically write JSON cache via temp file + os.replace(temp_path, path)."""
+    path = _ENV_CACHE_PATH
+    temp_path = tempfile.mkstemp(suffix=".json", dir=os.path.dirname(path) or ".")[1]
     try:
-        with open(path, "r", encoding="utf-8") as handle:
-            data = json.load(handle)
-            return data if isinstance(data, dict) else {}
+        with open(temp_path, "w") as fh:
+            json.dump(cache, fh, indent=2)
+        os.replace(temp_path, path)
     except Exception:
-        return {}
+        try:
+            os.unlink(temp_path)
+        except Exception:
+            pass
+        raise
 
 
-def save_cache(cache: Dict[str, Any]):
-    path, _ = cache_settings()
-    directory = os.path.dirname(path)
-    if directory:
-        os.makedirs(directory, exist_ok=True)
-    temp_path = f"{path}.tmp"
-    with open(temp_path, "w", encoding="utf-8") as handle:
-        json.dump(cache, handle, separators=(",", ":"))
-    os.replace(temp_path, path)
+def _cache_key(symbol: str) -> str:
+    return symbol.upper().replace(".", "_")
 
 
-def cache_key(namespace: str, *parts: str) -> str:
-    digest = hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
-    return f"{namespace}:{digest}"
-
-
-def get_cached(cache: Dict[str, Any], key: str):
-    _, ttl_seconds = cache_settings()
-    entry = cache.get(key)
-    if not isinstance(entry, dict):
+def _cached_or_stale(cache: dict[str, Any], symbol: str) -> Optional[dict[str, Any]]:
+    entry = cache.get(_cache_key(symbol))
+    if entry is None:
         return None
-    if time.time() - float(entry.get("cachedAt", 0)) > ttl_seconds:
+    cached_at = entry.get("cached_at", 0)
+    if time.time() - cached_at > _ENV_CACHE_TTL:
         return None
     return entry.get("data")
 
 
-def put_cached(cache: Dict[str, Any], key: str, data: Any):
-    cache[key] = {"cachedAt": time.time(), "data": data}
+def _set_cache(cache: dict[str, Any], symbol: str, data: dict[str, Any]) -> None:
+    cache[_cache_key(symbol)] = {"data": data, "cached_at": time.time()}
 
 
-def make_cached_session():
-    if requests_cache is None:
+def _maybe_setup_requests_cache() -> Optional[Any]:
+    """Optionally install requests-cache session for yfinance HTTP calls."""
+    if not _ENV_REQUEST_CACHE_ENABLED:
         return None
-    enabled = os.environ.get("YFINANCE_REQUEST_CACHE_ENABLED", "true").strip().lower()
-    if enabled not in {"1", "true", "yes"}:
-        return None
-    path, ttl_seconds = cache_settings()
-    cache_name = os.environ.get("YFINANCE_REQUEST_CACHE_NAME", f"{path}.http")
     try:
-        return requests_cache.CachedSession(cache_name=cache_name, backend="sqlite", expire_after=ttl_seconds)
+        import requests_cache
+
+        session = requests_cache.CachedSession(
+            cache_name=_ENV_REQUEST_CACHE_NAME,
+            backend="sqlite",
+            expire_after=timedelta(seconds=_ENV_CACHE_TTL),
+        )
+        return session
     except Exception:
+        # requests_cache not installed or incompatible — fall back silently
         return None
 
 
-def ticker_for(symbol: str):
-    ensure_yfinance()
-    session = make_cached_session()
-    if session is not None:
+# ── quotes (paced per-symbol fundamentals) ───────────────────────────────────
+
+
+def _fetch_quote(symbol: str, session: Optional[Any]) -> dict[str, Any]:
+    """Fetch a single ticker's info with pacing delay and retry logic."""
+    max_retries = 3
+    for attempt in range(max_retries):
         try:
-            return yf.Ticker(symbol, session=session)
-        except Exception:
-            pass
-    return yf.Ticker(symbol)
+            ticker = yf.Ticker(symbol, session=session) if session else yf.Ticker(symbol)
+            info = ticker.info
+            if not info or info.get("quoteType") == "MUTUALFUND":
+                return {"symbol": symbol, "error": f"No data found for symbol {symbol} or it is a mutual fund."}
+            break
+        except Exception as e:
+            if attempt == max_retries - 1:
+                return {"symbol": symbol, "error": f"Failed after {max_retries} attempts: {str(e)}"}
+            # Exponential backoff: 2^attempt seconds
+            backoff = min(2 ** attempt, 10)
+            time.sleep(backoff)
 
-
-def chunks(items: List[str], size: int) -> Iterable[List[str]]:
-    for index in range(0, len(items), size):
-        yield items[index:index + size]
-
-
-def safe_float(value: Any) -> Optional[float]:
-    if value is None:
-        return None
-    try:
-        parsed = float(value)
-    except (TypeError, ValueError):
-        return None
-    if parsed != parsed or parsed in (float("inf"), float("-inf")):
-        return None
-    return parsed
-
-
-def get_historical(symbol: str, period: str = "5y"):
-    ticker = ticker_for(symbol)
-    hist = ticker.history(period=period)
-    if hist.empty:
-        return []
-    hist = hist.reset_index()
-    rows = []
-    for _, row in hist.iterrows():
-        rows.append({
-            "date": str(row["Date"].date()),
-            "open": safe_float(row["Open"]),
-            "high": safe_float(row["High"]),
-            "low": safe_float(row["Low"]),
-            "close": safe_float(row["Close"]),
-            "volume": int(row["Volume"]) if safe_float(row["Volume"]) is not None else None,
-            "dividends": safe_float(row.get("Dividends", 0)) or 0,
-            "stock_splits": safe_float(row.get("Stock Splits", 0)) or 0,
-        })
-    return rows
-
-
-def download_batch(symbols: List[str], period: str, interval: str):
-    ensure_yfinance()
-    kwargs = {
-        "period": period,
-        "interval": interval,
-        "group_by": "ticker",
-        "threads": True,
-        "progress": False,
-        "auto_adjust": False,
-        "actions": True,
-        "repair": True,
-        "timeout": env_float("YFINANCE_DOWNLOAD_TIMEOUT_SECONDS", 15.0, 1.0, 60.0),
-    }
-    session = make_cached_session()
-    if session is not None:
-        try:
-            return yf.download(" ".join(symbols), session=session, **kwargs)
-        except Exception:
-            pass
-    return yf.download(" ".join(symbols), **kwargs)
-
-
-def get_historical_batch(symbols: List[str], period: str = "1mo", interval: str = "1d"):
-    normalized = sorted({symbol.strip().upper() for symbol in symbols if symbol.strip()})
-    if not normalized:
-        return {"symbols": [], "rows": 0, "latestClose": {}, "errors": []}
-    cache = load_cache()
-    key = cache_key("historical-batch", ",".join(normalized), period, interval)
-    cached = get_cached(cache, key)
-    if cached is not None:
-        return cached
-
-    latest_close: Dict[str, Optional[float]] = {}
-    errors: List[str] = []
-    total_rows = 0
-    batch_size = env_int("YFINANCE_BATCH_SIZE", 40, 1, 100)
-    for group in chunks(normalized, batch_size):
-        try:
-            data = download_batch(group, period, interval)
-            if data is None or getattr(data, "empty", False):
-                errors.append(f"empty download for batch: {','.join(group)}")
-                for symbol in group:
-                    latest_close[symbol] = None
-                continue
-            total_rows += int(len(data))
-            for symbol in group:
-                try:
-                    close_series = data[symbol]["Close"] if len(group) > 1 else data["Close"]
-                    close_series = close_series.dropna()
-                    latest_close[symbol] = None if close_series.empty else float(close_series.iloc[-1])
-                except Exception:
-                    latest_close[symbol] = None
-        except Exception as exc:
-            errors.append(f"batch {','.join(group)} failed: {exc}")
-            for symbol in group:
-                latest_close[symbol] = None
-
-    result = {"symbols": normalized, "rows": total_rows, "latestClose": latest_close, "errors": errors}
-    put_cached(cache, key, result)
-    save_cache(cache)
-    return result
-
-
-def quote_payload(symbol: str, info: Dict[str, Any]):
-    return {
+    data: dict[str, Any] = {
         "symbol": symbol,
+        "shortName": info.get("shortName"),
+        "sector": info.get("sector"),
+        "industry": info.get("industry"),
         "marketCap": info.get("marketCap"),
         "trailingPE": info.get("trailingPE"),
         "forwardPE": info.get("forwardPE"),
         "priceToBook": info.get("priceToBook"),
-        "earningsPerShare": info.get("trailingEps"),
-        "dividendYield": info.get("dividendYield"),
-        "beta": info.get("beta"),
-        "debtToEquity": info.get("debtToEquity"),
-        "currentRatio": info.get("currentRatio"),
+        "trailingEps": info.get("trailingEps"),
+        "earningsPerShare": info.get("earningsPerShare"),
         "returnOnEquity": info.get("returnOnEquity"),
-        "returnOnAssets": info.get("returnOnAssets"),
+        "debtToEquity": info.get("debtToEquity"),
         "revenueGrowth": info.get("revenueGrowth"),
         "earningsGrowth": info.get("earningsGrowth"),
-        "grossMargins": info.get("grossMargins"),
         "operatingMargins": info.get("operatingMargins"),
         "profitMargins": info.get("profitMargins"),
-        "shortName": info.get("shortName"),
-        "sector": info.get("sector"),
-        "industry": info.get("industry"),
+        "periodEnd": None,
     }
 
+    try:
+        qf = ticker.quarterly_financials
+        if qf is not None and not qf.empty:
+            data["periodEnd"] = qf.columns[0].strftime("%Y-%m-%d")
+    except Exception:
+        pass
 
-def get_quotes(symbols: List[str], min_delay_seconds: float = 0.75, max_delay_seconds: float = 1.75):
-    normalized = sorted({symbol.strip().upper() for symbol in symbols if symbol.strip()})
-    results: Dict[str, Any] = {}
-    cache = load_cache()
-    cache_changed = False
-    minimum = max(0.0, min(min_delay_seconds, max_delay_seconds))
-    maximum = max(minimum, max(min_delay_seconds, max_delay_seconds))
-    for index, symbol in enumerate(normalized):
-        key = cache_key("quote", symbol)
-        cached = get_cached(cache, key)
+    return data
+
+
+def cmd_quotes(symbols_str: str) -> None:
+    """Paced per-symbol Ticker.info calls with atomic JSON cache and optional requests-cache session."""
+    symbols = [s.strip() for s in symbols_str.replace(",", " ").split() if s.strip()]
+    if not symbols:
+        print(json.dumps({"error": "No symbols provided."}))
+        return
+
+    session = _maybe_setup_requests_cache()
+    cache = _load_cache()
+    results: dict[str, Any] = {}
+
+    for i, symbol in enumerate(symbols):
+        # Check cache first
+        cached = _cached_or_stale(cache, symbol)
         if cached is not None:
             results[symbol] = cached
             continue
-        if index > 0:
-            time.sleep(random.uniform(minimum, maximum))
+
+        # Randomized jitter between requests
+        if i > 0:
+            delay = random.uniform(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
+            time.sleep(delay)
+
+        # Fetch
         try:
-            ticker = ticker_for(symbol)
-            results[symbol] = quote_payload(symbol, ticker.info)
-            put_cached(cache, key, results[symbol])
-            cache_changed = True
+            data = _fetch_quote(symbol, session)
+            results[symbol] = data
+            if "error" not in data:
+                _set_cache(cache, symbol, data)
+                _save_cache(cache)
         except Exception as exc:
-            results[symbol] = {"error": str(exc)}
-    if cache_changed:
-        save_cache(cache)
-    return results
+            results[symbol] = {"symbol": symbol, "error": str(exc)}
+
+    print(json.dumps(results, indent=2))
 
 
-def get_dividends(symbol: str):
-    ticker = ticker_for(symbol)
-    divs = ticker.dividends
-    if divs.empty:
-        return []
-    return [{"date": str(date_val.date()), "amount": float(amount)} for date_val, amount in divs.items()]
+# ── historical-batch (chunked yf.download) ──────────────────────────────────
 
 
-def get_splits(symbol: str):
-    ticker = ticker_for(symbol)
-    splits = ticker.splits
-    if splits.empty:
-        return []
-    return [{"date": str(date_val.date()), "ratio": float(ratio)} for date_val, ratio in splits.items()]
+def cmd_historical_batch(tickers_str: str, period: str, interval: str) -> None:
+    """Chunked yf.download() with space-separated tickers, threads=True, group_by='ticker'."""
+    all_tickers = [s.strip() for s in tickers_str.replace(",", " ").split() if s.strip()]
+    if not all_tickers:
+        print(json.dumps({"error": "No tickers provided."}))
+        return
+
+    # Chunk tickers
+    chunks = [all_tickers[i : i + _ENV_BATCH_SIZE] for i in range(0, len(all_tickers), _ENV_BATCH_SIZE)]
+    combined: dict[str, Any] = {}
+    session = _maybe_setup_requests_cache()
+
+    for chunk_idx, symbols in enumerate(chunks):
+        if chunk_idx > 0:
+            delay = random.uniform(_ENV_MIN_DELAY, _ENV_MAX_DELAY)
+            time.sleep(delay)
+
+        # Batch call — yf.download handles space-separated tickers in a single request
+        try:
+            data = yf.download(
+                " ".join(symbols),
+                period=period,
+                interval=interval,
+                group_by="ticker",
+                threads=True,
+                repair=True,
+                auto_adjust=True,
+                actions=True,
+                progress=False,
+                timeout=_ENV_DOWNLOAD_TIMEOUT,
+                session=session,
+            )
+        except Exception as exc:
+            for sym in symbols:
+                combined[sym] = {"error": f"download failed: {exc}"}
+            continue
+
+        if data is None or data.empty:
+            for sym in symbols:
+                combined[sym] = {"error": "empty response from yfinance"}
+            continue
+
+        # data is a MultiIndex DataFrame when group_by="ticker"
+        for sym in symbols:
+            try:
+                # Try exact match first (yfinance uses the ticker as provided)
+                if sym in data.columns.get_level_values(0):
+                    sym_data = data.xs(key=sym, axis=1, level=0)
+                else:
+                    # Try .NS suffix version
+                    alt = f"{sym}.NS"
+                    if alt in data.columns.get_level_values(0):
+                        sym_data = data.xs(key=alt, axis=1, level=0)
+                    else:
+                        combined[sym] = {"error": f"symbol {sym} not found in batch response"}
+                        continue
+
+                # Convert to records
+                if sym_data.empty:
+                    combined[sym] = {"error": "empty data for symbol"}
+                    continue
+
+                records = []
+                for idx, row in sym_data.iterrows():
+                    record = {
+                        "date": idx.strftime("%Y-%m-%d") if hasattr(idx, "strftime") else str(idx),
+                        "open": _safe_float(row.get("Open")),
+                        "high": _safe_float(row.get("High")),
+                        "low": _safe_float(row.get("Low")),
+                        "close": _safe_float(row.get("Close")),
+                        "volume": _safe_int(row.get("Volume")),
+                        "dividends": _safe_float(row.get("Dividends")),
+                        "stock_splits": _safe_float(row.get("Stock Splits")),
+                    }
+                    records.append(record)
+
+                combined[sym] = {"records": records, "count": len(records)}
+            except Exception as exc:
+                combined[sym] = {"error": f"parse failed: {exc}"}
+
+    print(json.dumps(combined, indent=2))
 
 
-def main():
-    if len(sys.argv) < 2:
-        print(json.dumps({"error": "No command specified"}))
-        sys.exit(1)
-
-    cmd = sys.argv[1]
+def _safe_float(val: Any) -> Optional[float]:
+    if val is None:
+        return None
     try:
-        if cmd == "historical":
-            symbol = sys.argv[2]
-            period = sys.argv[3] if len(sys.argv) > 3 else "5y"
-            print(json.dumps(get_historical(symbol, period)))
-        elif cmd == "historical-batch":
-            symbols = [s.strip() for s in sys.argv[2].split(",") if s.strip()]
-            period = sys.argv[3] if len(sys.argv) > 3 else "1mo"
-            interval = sys.argv[4] if len(sys.argv) > 4 else "1d"
-            print(json.dumps(get_historical_batch(symbols, period, interval)))
-        elif cmd in {"quotes", "fundamentals-batch"}:
-            symbols = [s.strip() for s in sys.argv[2].split(",") if s.strip()]
-            min_delay = float(sys.argv[3]) if len(sys.argv) > 3 else env_float("YFINANCE_MIN_DELAY_SECONDS", 0.75)
-            max_delay = float(sys.argv[4]) if len(sys.argv) > 4 else env_float("YFINANCE_MAX_DELAY_SECONDS", 1.75)
-            print(json.dumps(get_quotes(symbols, min_delay, max_delay)))
-        elif cmd == "dividends":
-            print(json.dumps(get_dividends(sys.argv[2])))
-        elif cmd == "splits":
-            print(json.dumps(get_splits(sys.argv[2])))
-        else:
-            print(json.dumps({"error": f"Unknown command: {cmd}"}))
-            sys.exit(1)
-    except Exception as exc:
-        print(json.dumps({"error": str(exc)}))
-        sys.exit(1)
+        v = float(val)
+        return None if v != v else v  # NaN → None
+    except (ValueError, TypeError):
+        return None
+
+
+def _safe_int(val: Any) -> Optional[int]:
+    if val is None:
+        return None
+    try:
+        v = int(val)
+        return v
+    except (ValueError, TypeError):
+        return None
+
+
+# ── main ─────────────────────────────────────────────────────────────────────
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="YFinance data bridge.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # quotes subcommand
+    qp = subparsers.add_parser("quotes", help="Fetch paced fundamentals for one or more symbols.")
+    qp.add_argument("symbols", type=str, help="Comma or space-separated stock symbols.")
+    qp.add_argument("unused", nargs="?", default=None, help="Unused argument for compatibility.")
+
+    # historical-batch subcommand
+    hp = subparsers.add_parser("historical-batch", help="Fetch historical prices via chunked yf.download().")
+    hp.add_argument("tickers", type=str, help="Comma or space-separated ticker symbols.")
+    hp.add_argument("period", type=str, default="1mo", nargs="?", help="Valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max")
+    hp.add_argument("interval", type=str, default="1d", nargs="?", help="Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo")
+
+    args = parser.parse_args()
+
+    if args.command == "quotes":
+        cmd_quotes(args.symbols)
+    elif args.command == "historical-batch":
+        cmd_historical_batch(args.tickers, args.period, args.interval)
 
 
 if __name__ == "__main__":
