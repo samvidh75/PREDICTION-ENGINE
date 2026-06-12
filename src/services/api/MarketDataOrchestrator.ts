@@ -1,6 +1,12 @@
 // src/services/api/MarketDataOrchestrator.ts
 
 import { CompanyTelemetry } from '../../types/stock';
+import type { CompanyMetadata, StockQuote } from '../data/types';
+
+function positiveNumber(value: unknown): number | null {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
 
 function formatMarketCap(value: number | null | undefined): string {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 'Data unavailable';
@@ -9,27 +15,42 @@ function formatMarketCap(value: number | null | undefined): string {
   return `Rs ${Math.round(crore).toLocaleString('en-IN')} Cr`;
 }
 
+/**
+ * Build a truthful company telemetry envelope from the fields actually exposed
+ * by the market-data endpoint. Missing PE, 52-week range and health values remain
+ * unavailable instead of being synthesized from the current price.
+ */
+export function buildCompanyTelemetry(quote: StockQuote, metadata: CompanyMetadata): CompanyTelemetry {
+  const currentPrice = positiveNumber(quote.price);
+  const marketCap = positiveNumber(metadata.marketCap);
+
+  return {
+    symbol: quote.symbol,
+    marketCap: {
+      numeric: marketCap,
+      formatted: formatMarketCap(marketCap),
+      availability: marketCap === null ? 'unavailable' : 'real',
+    },
+    peRatio: null,
+    fiftyTwoWeekRange: {
+      low: null,
+      high: null,
+      current: currentPrice,
+    },
+    healthStatus: null,
+    lastUpdated: quote.updatedAt ?? null,
+    availability: currentPrice === null ? 'unavailable' : 'real',
+    source: currentPrice === null ? 'unavailable' : 'provider',
+  };
+}
+
 class MarketDataOrchestrator {
   async fetchCompanyData(symbol: string): Promise<CompanyTelemetry> {
     const res = await fetch(`/api/market-data/company/${encodeURIComponent(symbol)}`);
     if (!res.ok) throw new Error(`Market data request failed with HTTP ${res.status}`);
-    const { quote, metadata } = await res.json();
+    const { quote, metadata } = await res.json() as { quote: StockQuote; metadata: CompanyMetadata };
 
-    return {
-      symbol: quote.symbol,
-      marketCap: {
-        numeric: metadata.marketCap ?? 0,
-        formatted: formatMarketCap(metadata.marketCap),
-      },
-      peRatio: 0,
-      fiftyTwoWeekRange: {
-        low: quote.price * 0.9,
-        high: quote.price * 1.1,
-        current: quote.price,
-      },
-      healthStatus: 'stable' as any,
-      lastUpdated: quote.updatedAt,
-    };
+    return buildCompanyTelemetry(quote, metadata);
   }
 }
 
