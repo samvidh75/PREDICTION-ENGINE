@@ -25,24 +25,54 @@ type PredictionRow = Record<string, unknown> & {
   classification: string;
 };
 
-function finite(value: unknown): number {
+/**
+ * Returns the finite numeric value, or null if the value is null/undefined/NaN.
+ * Never silently invents a score when data is unavailable.
+ */
+function finiteOrNull(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function dateOnly(value: Date | string): string {
   return value instanceof Date ? value.toISOString().split('T')[0] : String(value).split('T')[0];
 }
 
-function buildExplanation(symbol: string, horizon: number, current: PredictionRow, previous: PredictionRow | null) {
-  const currentScore = finite(current.ranking_score);
-  const previousScore = previous ? finite(previous.ranking_score) : null;
+function buildExplanation(
+  symbol: string,
+  horizon: number,
+  current: PredictionRow,
+  previous: PredictionRow | null,
+) {
+  const currentScore = finiteOrNull(current.ranking_score);
+  const previousScore = previous ? finiteOrNull(previous.ranking_score) : null;
+
+  // Build contributions — skip factor deltas when a score is unavailable
   const contributions = previous
     ? SCORE_FIELDS.map(([field, factor]) => {
-        const delta = finite(current[field]) - finite(previous[field]);
-        return { factor, delta, percentContribution: 0, importanceRank: 0, direction: delta >= 0 ? 'positive' : 'negative' };
+        const currentVal = finiteOrNull(current[field]);
+        const prevVal = finiteOrNull(previous[field]);
+        const delta = currentVal !== null && prevVal !== null ? currentVal - prevVal : 0;
+        return {
+          factor,
+          delta,
+          percentContribution: 0,
+          importanceRank: 0,
+          direction: delta >= 0 ? 'positive' : 'negative',
+          currentAvailable: currentVal !== null,
+          previousAvailable: prevVal !== null,
+        };
       })
-    : [{ factor: 'Baseline (first prediction)', delta: 0, percentContribution: 0, importanceRank: 0, direction: 'positive' }];
+    : [{
+        factor: 'Baseline (first prediction)',
+        delta: 0,
+        percentContribution: 0,
+        importanceRank: 0,
+        direction: 'positive' as const,
+        currentAvailable: currentScore !== null,
+        previousAvailable: false,
+      }];
 
   const totalAbsoluteDelta = contributions.reduce((sum, item) => sum + Math.abs(item.delta), 0);
   contributions.forEach((item, index) => {
@@ -52,22 +82,37 @@ function buildExplanation(symbol: string, horizon: number, current: PredictionRo
   contributions.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
   contributions.forEach((item, index) => { item.importanceRank = index + 1; });
 
-  const drivers = contributions.map((item) => ({
-    factor: item.factor,
-    previous: previous ? finite(previous[SCORE_FIELDS.find(([, label]) => label === item.factor)?.[0] ?? '']) : 0,
-    current: finite(current[SCORE_FIELDS.find(([, label]) => label === item.factor)?.[0] ?? '']),
-    delta: item.delta,
-    percentContribution: item.percentContribution,
-    importanceRank: item.importanceRank,
-  }));
+  const drivers = contributions.map((item) => {
+    const field = SCORE_FIELDS.find(([, label]) => label === item.factor)?.[0] ?? '';
+    return {
+      factor: item.factor,
+      previous: previous ? finiteOrNull(previous[field]) : null,
+      current: finiteOrNull(current[field]),
+      delta: item.delta,
+      percentContribution: item.percentContribution,
+      importanceRank: item.importanceRank,
+    };
+  });
 
   const currentClassification = String(current.classification || 'Unavailable');
   const previousClassification = previous ? String(previous.classification || 'Unavailable') : null;
-  const scoreDelta = previousScore === null ? null : currentScore - previousScore;
-  const significantDrivers = drivers.filter((item) => Math.abs(item.delta) >= 3).slice(0, 3);
+  const scoreDelta = currentScore !== null && previousScore !== null ? currentScore - previousScore : null;
+  const significantDrivers = drivers.filter((item) => item.current !== null && Math.abs(item.delta) >= 3).slice(0, 3);
+
+  // Build honest summary that reflects data availability
+  const scorePart = currentScore !== null
+    ? `health score of ${currentScore}`
+    : 'health score is unavailable (missing ranking_score)';
+  const deltaPart = scoreDelta !== null
+    ? `Change: ${scoreDelta > 0 ? '+' : ''}${scoreDelta}.`
+    : 'No previous score for comparison.';
+  const driversPart = significantDrivers.length > 0
+    ? `Primary drivers: ${significantDrivers.map((item) => `${item.factor} ${(item.delta as number) > 0 ? '+' : ''}${item.delta}`).join(', ')}.`
+    : 'No material factor changes with complete data.';
+
   const summary = previous
-    ? `${symbol} is ${currentClassification}. Health score change: ${scoreDelta && scoreDelta > 0 ? '+' : ''}${scoreDelta ?? 0}. ${significantDrivers.length ? `Primary drivers: ${significantDrivers.map((item) => `${item.factor} ${item.delta > 0 ? '+' : ''}${item.delta}`).join(', ')}.` : 'No material factor changes.'}`
-    : `${symbol} is ${currentClassification} with a health score of ${currentScore}. No prior ${horizon}-day prediction for comparison.`;
+    ? `${symbol} is ${currentClassification}. ${scorePart}. ${deltaPart} ${driversPart}`
+    : `${symbol} is ${currentClassification} with ${scorePart}. No prior ${horizon}-day prediction for comparison.`;
 
   return {
     symbol,
@@ -80,9 +125,11 @@ function buildExplanation(symbol: string, horizon: number, current: PredictionRo
     healthScore: { from: previousScore, to: currentScore, delta: scoreDelta },
     summary,
     drivers,
-    positives: drivers.filter((item) => item.delta >= 3).map((item) => `${item.factor} +${item.delta}`),
-    negatives: drivers.filter((item) => item.delta <= -3).map((item) => `${item.factor} ${item.delta}`),
-    factorContributions: contributions,
+    positives: drivers.filter((item) => item.current !== null && (item.delta as number) >= 3).map((item) => `${item.factor} +${item.delta}`),
+    negatives: drivers.filter((item) => item.current !== null && (item.delta as number) <= -3).map((item) => `${item.factor} ${item.delta}`),
+    factorContributions: contributions.map(({ factor, delta, percentContribution, importanceRank, direction }) => ({
+      factor, delta, percentContribution, importanceRank, direction,
+    })),
     historicalReliability: null,
     generatedAt: new Date().toISOString(),
   };
@@ -104,6 +151,9 @@ export const predictionExplainF0Routes: FastifyPluginAsync = async (app) => {
     }
 
     try {
+      // When `previous` is specified, restrict the date range so the older
+      // prediction is no older than `previous`.  The query returns up to 2
+      // rows — current (closest <= today) and previous (next oldest).
       const rows = await pool.query(
         `SELECT symbol, prediction_date, ranking_score, classification,
                 confidence_score, quality_score, growth_score, value_score,
@@ -111,9 +161,10 @@ export const predictionExplainF0Routes: FastifyPluginAsync = async (app) => {
          FROM prediction_registry
          WHERE symbol = $1 AND prediction_horizon = $2
            AND ($3::date IS NULL OR prediction_date <= $3::date)
+           AND ($4::date IS NULL OR prediction_date >= $4::date)
          ORDER BY prediction_date DESC
          LIMIT 2`,
-        [ticker, horizon, query.today ?? null],
+        [ticker, horizon, query.today ?? null, query.previous ?? null],
       );
 
       if (rows.rows.length === 0) {
