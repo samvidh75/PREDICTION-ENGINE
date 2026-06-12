@@ -111,6 +111,11 @@ jobs:
       - name: Strict API smoke test
         run: API_BASE_URL=http://localhost:4001 npm run smoke:api
 
+      - name: Market action partial-state contract
+        run: |
+          RESPONSE=$(curl -fsS http://localhost:4001/api/market-data/market-action)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['status']=='partial', f'expected partial, got {d[\"status\"]}'; assert d['dataState']['rowsAnalyzed']>=1, 'expected at least one latest price row'; assert d['dataState']['rowsWithComparisons']==0, 'one-date fixture must not produce comparisons'; assert d['data']['gainers']==[], 'one-date fixture must not invent gainers'; assert d['data']['losers']==[], 'one-date fixture must not invent losers'; assert len(d['data']['scannerPresets'])==4, 'expected certified scanner presets'; print('PASS: market action partial state is honest')"
+
       - name: Upload API smoke report
         if: always()
         uses: actions/upload-artifact@v4
