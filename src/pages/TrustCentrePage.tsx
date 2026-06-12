@@ -1,26 +1,41 @@
-/**
- * TRACK-49 Agent G — Trust Centre V4
- * Public page showing model credibility evidence.
- * Message: "Don't trust us. Verify us."
- */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface TrustMetrics {
-  alpha?: number;
-  hit_rate?: number;
-  sharpe_ratio?: number;
-  calibration_score?: number;
-  total_predictions?: number;
-  total_outcomes?: number;
+  alpha: number | null;
+  hit_rate: number | null;
+  sharpe_ratio: number | null;
+  calibration_score: number | null;
+  total_predictions: number | null;
+  total_outcomes: number | null;
 }
 
-function MetricCard({ label, value, suffix = '', description = '' }: { label: string; value: string | number; suffix?: string; description?: string }) {
+interface TrustEnvelope {
+  status: 'ok' | 'partial' | 'unavailable' | 'empty' | 'error' | 'demo';
+  message: string | null;
+  data: TrustMetrics | null;
+  dataState?: {
+    availability?: string;
+    asOf?: string | null;
+    missingInputs?: string[];
+    completenessScore?: number;
+  };
+}
+
+function formatMetric(value: number | null | undefined, suffix = ''): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 'Data unavailable';
+  return `${value.toFixed(2)}${suffix}`;
+}
+
+function formatCount(value: number | null | undefined): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 'Data unavailable';
+  return value.toLocaleString('en-IN');
+}
+
+function MetricCard({ label, value, description = '' }: { label: string; value: string; description?: string }) {
   return (
     <div className="border-4 border-black bg-white p-4 text-center" style={{ boxShadow: '4px 4px 0px #000' }}>
       <p className="text-xs font-bold uppercase text-gray-500 mb-1">{label}</p>
-      <p className="text-3xl font-extrabold">
-        {typeof value === 'number' ? value.toFixed(2) : value}{suffix}
-      </p>
+      <p className="text-2xl font-extrabold">{value}</p>
       {description && <p className="text-xs text-gray-600 mt-1">{description}</p>}
     </div>
   );
@@ -36,29 +51,29 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function TrustCentrePage() {
-  const [metrics, setMetrics] = useState<TrustMetrics>({});
+  const [envelope, setEnvelope] = useState<TrustEnvelope | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Attempt to fetch from API; fall back to calculated/static values
-    fetch('/api/intelligence/trust-metrics')
-      .then(res => res.json())
-      .then((data: TrustMetrics) => {
-        setMetrics(data);
+    const controller = new AbortController();
+    fetch('/api/intelligence/trust-metrics', { signal: controller.signal, headers: { Accept: 'application/json' } })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.message || body?.reason || 'TRUST_METRICS_UNAVAILABLE');
+        return body as TrustEnvelope;
+      })
+      .then((data) => {
+        setEnvelope(data);
         setLoading(false);
       })
-      .catch(() => {
-        // Static fallback values
-        setMetrics({
-          alpha: 0.12,
-          hit_rate: 0.68,
-          sharpe_ratio: 1.85,
-          calibration_score: 0.72,
-          total_predictions: 106920,
-          total_outcomes: 493200,
-        });
+      .catch((fetchError: Error) => {
+        if (controller.signal.aborted) return;
+        setError(fetchError.message || 'Trust metrics are temporarily unavailable.');
         setLoading(false);
       });
+
+    return () => controller.abort();
   }, []);
 
   if (loading) {
@@ -70,106 +85,76 @@ export default function TrustCentrePage() {
     );
   }
 
+  const metrics = envelope?.data;
+  const state = error ? 'error' : envelope?.status ?? 'unavailable';
+  const asOf = envelope?.dataState?.asOf || 'Data unavailable';
+  const missingInputs = envelope?.dataState?.missingInputs || [];
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-4">
-      {/* HERO */}
       <div className="border-4 border-black bg-gray-900 p-8 text-center text-white" style={{ boxShadow: '8px 8px 0px #000' }}>
-        <h1 className="font-extrabold text-4xl uppercase tracking-widest mb-4">
-          🔒 Trust Centre
-        </h1>
-        <p className="text-2xl font-extrabold text-yellow-400 mb-2">
-          DON'T TRUST US. VERIFY US.
-        </p>
+        <h1 className="font-extrabold text-4xl uppercase tracking-widest mb-4">🔒 Trust Centre</h1>
+        <p className="text-2xl font-extrabold text-yellow-400 mb-2">DON'T TRUST US. VERIFY US.</p>
         <p className="text-gray-300 text-sm max-w-lg mx-auto">
-          Every prediction, every score, every insight is backed by transparent methodology, auditable data, and open validation.
+          This page displays only metrics returned by connected, auditable data sources. Missing evidence is shown as unavailable.
         </p>
       </div>
 
-      {/* KEY METRICS */}
+      {(state !== 'ok') && (
+        <div className="border-4 border-black bg-yellow-100 p-4" role="status">
+          <p className="font-extrabold uppercase">Trust metrics status: {state}</p>
+          <p className="text-sm mt-1">{error || envelope?.message || 'Some trust metrics are unavailable because the required evidence source is not connected.'}</p>
+          {missingInputs.length > 0 && (
+            <p className="text-xs mt-2">Missing inputs: {missingInputs.join(', ')}</p>
+          )}
+        </div>
+      )}
+
       <div>
         <h2 className="font-extrabold text-2xl uppercase mb-4">Performance at a Glance</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <MetricCard label="Alpha" value={metrics.alpha || 0} description="Excess return vs benchmark" />
-          <MetricCard label="Hit Rate" value={metrics.hit_rate || 0} suffix="%" description="Correct predictions" />
-          <MetricCard label="Sharpe" value={metrics.sharpe_ratio || 0} description="Risk-adjusted return" />
-          <MetricCard label="Calibration" value={metrics.calibration_score || 0} suffix="%" description="Score-to-outcome alignment" />
+          <MetricCard label="Alpha" value={formatMetric(metrics?.alpha)} description="Excess return vs benchmark" />
+          <MetricCard label="Hit Rate" value={formatMetric(metrics?.hit_rate, '%')} description="Correct predictions" />
+          <MetricCard label="Sharpe" value={formatMetric(metrics?.sharpe_ratio)} description="Risk-adjusted return" />
+          <MetricCard label="Calibration" value={formatMetric(metrics?.calibration_score, '%')} description="Score-to-outcome alignment" />
         </div>
       </div>
 
-      {/* SCALE */}
       <div>
         <h2 className="font-extrabold text-2xl uppercase mb-4">Scale</h2>
         <div className="grid grid-cols-2 gap-3">
-          <MetricCard label="Predictions Generated" value={metrics.total_predictions?.toLocaleString() || '106,920'} />
-          <MetricCard label="Outcomes Tracked" value={metrics.total_outcomes?.toLocaleString() || '493,200'} />
+          <MetricCard label="Predictions Generated" value={formatCount(metrics?.total_predictions)} />
+          <MetricCard label="Outcomes Tracked" value={formatCount(metrics?.total_outcomes)} />
         </div>
       </div>
 
-      {/* METHODOLOGY */}
       <Section title="📐 Methodology">
         <div className="space-y-2 text-sm leading-relaxed">
-          <p><strong>Factor Model:</strong> 5-factor decomposition (Quality, Growth, Value, Momentum, Risk) scored 0-1 via percentile ranking within sector peers.</p>
-          <p><strong>Quality Engine V4:</strong> Profitability, Capital Efficiency, Valuation, and Income Quality scored independently, then composited.</p>
-          <p><strong>Risk Engine:</strong> Leverage Risk, Volatility Risk, Factor Risk, and Prediction Stability Risk scored separately.</p>
-          <p><strong>Future Health:</strong> Forward projections at 3m, 6m, 12m horizons based on current factor trajectory and momentum decay models.</p>
-          <p><strong>Explainability:</strong> Every score includes positive drivers, negative drivers, and largest contributors for full transparency.</p>
-          <p><strong>Sector-Neutral:</strong> Companies are ranked within their sectors to eliminate sector bias.</p>
+          <p><strong>Factor Model:</strong> Quality, Growth, Value, Momentum, Risk, and sector context are evaluated from connected snapshots where available.</p>
+          <p><strong>Explainability:</strong> Stock pages expose source lineage and unavailable states instead of silently inventing values.</p>
+          <p><strong>Limitations:</strong> Performance metrics remain unavailable until an audited outcomes dataset is connected.</p>
         </div>
       </Section>
 
-      {/* DATA SOURCES */}
-      <Section title="📊 Data Sources">
-        <ul className="list-disc pl-5 space-y-1 text-sm">
-          <li><strong>Yahoo Finance (yfinance):</strong> Real-time and historical price data, market cap, fundamentals</li>
-          <li><strong>Upstox API:</strong> Indian market data, delivery percentages, FII/DII activity</li>
-          <li><strong>Screener.in:</strong> Indian fundamental financials (balance sheet, P&L, cash flow)</li>
-          <li><strong>NSE/BSE:</strong> Official exchange data for Indian equities</li>
-          <li><strong>SEC/SEBI Filings:</strong> Regulatory filings for company-specific data</li>
-        </ul>
+      <Section title="📊 Data Availability">
+        <div className="space-y-2 text-sm">
+          <p><strong>Metrics as of:</strong> {asOf}</p>
+          <p><strong>Availability:</strong> {envelope?.dataState?.availability || 'unavailable'}</p>
+          <p><strong>Completeness:</strong> {typeof envelope?.dataState?.completenessScore === 'number' ? `${envelope.dataState.completenessScore}%` : 'Data unavailable'}</p>
+        </div>
       </Section>
 
-      {/* LIMITATIONS */}
       <Section title="⚠️ Limitations">
         <ul className="list-disc pl-5 space-y-1 text-sm">
-          <li><strong>30-Covered Companies:</strong> Currently tracking 30 Indian large-cap companies. Coverage expands to 100+ in phase 2.</li>
-          <li><strong>No Real-Time:</strong> Factor scores update daily (EOD), not intraday.</li>
-          <li><strong>Forward-Looking Risk:</strong> Future Health projections are statistical estimates, not guarantees.</li>
-          <li><strong>Market Cap Bias:</strong> Current universe is Nifty 100 large-cap. Small/Mid cap coverage pending.</li>
-          <li><strong>Predictive Models:</strong> Factor models work best in stable markets. Extreme events (black swans) reduce accuracy.</li>
+          <li>Missing metrics are displayed as unavailable.</li>
+          <li>Forward-looking scores are analytical estimates, not guarantees.</li>
+          <li>Performance claims must be backed by audited outcomes before they appear here.</li>
         </ul>
       </Section>
 
-      {/* VALIDATION */}
-      <Section title="✅ Validation Reports">
-        <div className="space-y-2 text-sm">
-          <p>All models undergo rigorous validation:</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-            {[
-              { name: 'Factor Backtest Report', path: 'FACTOR_BACKTEST_REPORT.json' },
-              { name: 'Factor Validation Report', path: 'FACTOR_VALIDATION_REPORT.json' },
-              { name: 'Feature Importance Report', path: 'FEATURE_IMPORTANCE_REPORT.json' },
-              { name: 'Intelligence Validation', path: 'INTELLIGENCE_VALIDATION_REPORT.json' },
-              { name: 'Alpha Certification (Track-29)', path: 'track-29/11-AlphaCertification.md' },
-              { name: 'Engine Health Report (Track-46)', path: 'track-46/ENGINE_HEALTH_REPORT.md' },
-            ].map((report, i) => (
-              <a
-                key={i}
-                href={`/reports/${report.path}`}
-                className="block p-3 border-2 border-black hover:bg-gray-900 hover:text-white font-bold text-sm uppercase transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                📄 {report.name}
-              </a>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* FOOTER */}
       <div className="border-t-4 border-black pt-4 text-center text-xs text-gray-500 font-bold uppercase">
         <p>StockStory India — Financial Intelligence Operating System</p>
-        <p className="mt-1">Methodology version: 4.0 | Last updated: {new Date().toISOString().split('T')[0]}</p>
+        <p className="mt-1">Trust metrics as of: {asOf}</p>
         <p className="mt-2">"We don't expect trust. We earn it through transparency."</p>
       </div>
 

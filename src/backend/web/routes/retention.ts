@@ -124,7 +124,7 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     { preHandler: [requireAuthenticatedUser] },
     async (request, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
-      const success = await userAlertEngine.markAsRead(uid, parseInt(request.params.alertId));
+      const success = await userAlertEngine.markAsRead(uid, parseInt(request.params.alertId, 10));
       if (!success) return reply.status(404).send({ error: 'alert not found' });
       return reply.send({ success: true });
     },
@@ -136,6 +136,17 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const uid = request.authenticatedUser!.uid;
       await userAlertEngine.markAllAsRead(uid);
+      return reply.send({ success: true });
+    },
+  );
+
+  app.delete<{ Params: AlertIdParams }>(
+    '/api/alerts/:alertId',
+    { preHandler: [requireAuthenticatedUser] },
+    async (request, reply: FastifyReply) => {
+      const uid = request.authenticatedUser!.uid;
+      const success = await userAlertEngine.dismissAlert(uid, parseInt(request.params.alertId, 10));
+      if (!success) return reply.status(404).send({ error: 'alert not found' });
       return reply.send({ success: true });
     },
   );
@@ -164,14 +175,13 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
         uid,
         q.symbol,
         q.prediction_date || new Date().toISOString().split('T')[0],
-        parseInt(q.horizon || '30'),
+        parseInt(q.horizon || '30', 10),
       );
       if (!share) return reply.status(404).send({ error: 'prediction not found' });
       return reply.send(share);
     },
   );
 
-  // PUBLIC: shared prediction token
   app.get<{ Params: ShareTokenParams }>(
     '/api/share/:token',
     async (request, reply: FastifyReply) => {
@@ -213,7 +223,6 @@ export async function retentionRoutes(app: FastifyInstance): Promise<void> {
 
   // ── Subscriptions / Plans ───────────────────────────────────────
 
-  // PUBLIC: plans
   app.get('/api/plans', async (_req: FastifyRequest, reply: FastifyReply) => {
     return reply.send(await subscriptionService.getPlans());
   });
