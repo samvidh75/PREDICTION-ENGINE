@@ -14,6 +14,28 @@ import { RetryPolicy } from './RetryPolicy';
 const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
 
 /**
+ * Convert a provider exchange label or an explicitly resolved Yahoo ticker into
+ * an Indian exchange label. Unknown values remain unavailable.
+ */
+export function normalizeYahooExchange(exchangeName?: unknown, resolvedTicker?: string): 'NSE' | 'BSE' | undefined {
+  const label = typeof exchangeName === 'string' ? exchangeName.trim().toLowerCase() : '';
+  if (/bse|bombay/.test(label)) return 'BSE';
+  if (/nse|national stock exchange/.test(label)) return 'NSE';
+
+  const ticker = (resolvedTicker || '').trim().toUpperCase();
+  if (/\.BO$/.test(ticker)) return 'BSE';
+  if (/\.NS$/.test(ticker)) return 'NSE';
+  return undefined;
+}
+
+/** Convert a Yahoo epoch-seconds market timestamp into ISO format. */
+export function marketTimestampFromEpoch(value: unknown): string | undefined {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds) || seconds <= 0) return undefined;
+  return new Date(seconds * 1000).toISOString();
+}
+
+/**
  * YahooFinancials — structured output from Yahoo v8 chart API.
  *
  * NOTE: Yahoo v10 quoteSummary is currently blocked (401 Unauthorized).
@@ -69,9 +91,10 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   };
 
   private normalizeSymbol(symbol: string): string {
-    // If already suffixed with .NS or .BO, keep it
+    // If already suffixed with .NS or .BO, keep it.
     if (/\.(NS|BO)$/i.test(symbol)) return symbol.toUpperCase();
-    // Default to NSE
+    // Operational lookup default for the Indian equity universe. Displayed
+    // exchange still comes from provider evidence or this resolved ticker.
     return `${symbol.toUpperCase()}.NS`;
   }
 
@@ -96,16 +119,18 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     const data = await this.fetchJson(url);
     const meta = data?.chart?.result?.[0]?.meta;
     if (!meta) throw new Error(`Yahoo: no quote data for ${symbol}`);
+
     return {
       symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
-      exchange: meta.exchangeName === 'BSE' ? 'BSE' : 'NSE',
+      exchange: normalizeYahooExchange(meta.exchangeName ?? meta.fullExchangeName, ticker) ?? 'Data unavailable',
       price: meta.regularMarketPrice ?? 0,
       change: (meta.regularMarketPrice ?? 0) - (meta.chartPreviousClose ?? 0),
       changePercent: meta.chartPreviousClose
         ? (((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100)
         : 0,
       volume: meta.regularMarketVolume ?? 0,
-      updatedAt: new Date().toISOString(),
+      updatedAt: marketTimestampFromEpoch(meta.regularMarketTime),
+      retrievedAt: new Date().toISOString(),
     };
   }
 
@@ -122,9 +147,9 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
         companyName: meta.longName || meta.shortName || symbol,
         sector: '',
         industry: '',
-        exchange: meta.fullExchangeName === 'BSE' ? 'BSE' : (meta.fullExchangeName || 'NSE'),
+        exchange: normalizeYahooExchange(meta.fullExchangeName ?? meta.exchangeName, ticker),
         marketCap: meta.marketCap ?? undefined,
-        currency: meta.currency || 'INR',
+        currency: meta.currency || undefined,
         website: '',
       };
     } catch {
@@ -132,7 +157,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     }
   }
 
-  // ── Historical ────────────────────────────────────────────
+  // ── Historical ──────────────────────────────────────────────
   async getHistory(symbol: string, range: string = '1M'): Promise<HistoricalPoint[]> {
     return this.getHistorical(symbol, range);
   }
@@ -165,7 +190,6 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   // ── Financials (v8 chart API only — fundamentals NOT available) ──
   async getFinancials(symbol: string): Promise<YahooFinancials> {
     const cleanSym = symbol.replace(/\.(NS|BO)$/i, '').toUpperCase();
-    const ticker = this.normalizeSymbol(symbol);
 
     // Get 2Y historical data for beta derivation
     let beta: number | undefined;
@@ -190,7 +214,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     // v10 quoteSummary is blocked (401). v8 chart has no fundamental fields.
     // Return what we can derive from v8; throw so ProviderCoordinator tries Finnhub.
     throw new Error(
-      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (beta=${beta?.toFixed(2) ?? 'N/A'})`,
+      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (symbol=${cleanSym}, beta=${beta?.toFixed(2) ?? 'N/A'})`,
     );
   }
 }
