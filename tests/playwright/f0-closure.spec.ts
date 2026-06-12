@@ -116,7 +116,11 @@ test('StockStory horizon is URL-backed and reaches snapshot and explanation APIs
 
 test('authenticated alert centre dismisses a user-scoped alert', async ({ page }) => {
   await page.addInitScript(() => {
-    restoreBrowserSession();
+    window.localStorage.setItem('ss_auth_session_v1', JSON.stringify({
+      status: 'authenticated',
+      uid: 'browser-user',
+      createdAtMs: Date.now(),
+    }));
     window.localStorage.setItem('stockstory_alerts_v3_browser-user', JSON.stringify([{
       id: '42',
       category: 'Factor',
