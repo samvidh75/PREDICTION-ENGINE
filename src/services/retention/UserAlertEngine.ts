@@ -194,7 +194,7 @@ export class UserAlertEngine {
   async getUnreadCount(userId: string): Promise<number> {
     const res = await dbAdapter.query('SELECT COUNT(*) as cnt FROM user_alerts WHERE user_id = $1 AND is_read = 0', [userId]);
     const row = res.rows[0] as any;
-    return row?.cnt ?? 0;
+    return Number(row?.cnt ?? 0);
   }
 
   /** Get alerts for a user, newest first */
@@ -215,6 +215,12 @@ export class UserAlertEngine {
   /** Mark all alerts as read for a user */
   async markAllAsRead(userId: string): Promise<void> {
     await dbAdapter.query('UPDATE user_alerts SET is_read = 1 WHERE user_id = $1 AND is_read = 0', [userId]);
+  }
+
+  /** Dismiss one alert owned by a user */
+  async dismissAlert(userId: string, alertId: number): Promise<boolean> {
+    const res = await dbAdapter.query('DELETE FROM user_alerts WHERE id = $1 AND user_id = $2', [alertId, userId]);
+    return res.rowCount > 0;
   }
 }
 
