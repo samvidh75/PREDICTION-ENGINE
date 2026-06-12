@@ -70,6 +70,18 @@ function finite(value: unknown): boolean {
   return Number.isFinite(parsed);
 }
 
+function finiteNumber(value: unknown): number | null {
+  return finite(value) ? Number(value) : null;
+}
+
+function sanitize(value: unknown): string {
+  return String(value)
+    .replace(/token=[^&\s]+/gi, 'token=<redacted>')
+    .replace(/X-Api-Key\s*[:=]\s*[^\s]+/gi, 'X-Api-Key=<redacted>')
+    .replace(/FINNHUB_(?:API_)?KEY=[^\s]+/gi, 'FINNHUB_KEY=<redacted>')
+    .replace(/INDIANAPI_KEY=[^\s]+/gi, 'INDIANAPI_KEY=<redacted>');
+}
+
 function coverage(values: Partial<Record<TrackedField, unknown>>): FieldCoverage {
   return Object.fromEntries(TRACKED_FIELDS.map((field) => [field, finite(values[field])])) as FieldCoverage;
 }
@@ -101,7 +113,7 @@ async function fetchJson(label: string, url: string, init?: RequestInit): Promis
     }
     return { status: response.status, ok: response.ok, data };
   } catch (error) {
-    return { status: 0, ok: false, data: null, error: `${label}: ${error instanceof Error ? error.message : String(error)}` };
+    return { status: 0, ok: false, data: null, error: `${label}: ${sanitize(error instanceof Error ? error.message : String(error))}` };
   } finally {
     clearTimeout(timeout);
   }
@@ -114,6 +126,41 @@ function getObject(value: unknown): Record<string, unknown> {
 function firstPresent(record: Record<string, unknown>, keys: string[]): unknown {
   for (const key of keys) {
     if (record[key] !== null && record[key] !== undefined && record[key] !== '') return record[key];
+  }
+  return null;
+}
+
+function normalizeKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function collectScalars(value: unknown, output = new Map<string, unknown>()): Map<string, unknown> {
+  if (Array.isArray(value)) {
+    for (const item of value) collectScalars(item, output);
+    return output;
+  }
+  if (!value || typeof value !== 'object') return output;
+  const record = value as Record<string, unknown>;
+  const label = typeof record.key === 'string' ? record.key : typeof record.name === 'string' ? record.name : null;
+  const labelledValue = record.value ?? record.val ?? record.data;
+  if (label && labelledValue !== undefined && labelledValue !== null && typeof labelledValue !== 'object') {
+    output.set(normalizeKey(label), labelledValue);
+  }
+  for (const [key, nested] of Object.entries(record)) {
+    if (nested !== null && nested !== undefined && typeof nested !== 'object') {
+      if (!output.has(normalizeKey(key))) output.set(normalizeKey(key), nested);
+    } else {
+      collectScalars(nested, output);
+    }
+  }
+  return output;
+}
+
+function firstDeep(value: unknown, aliases: string[]): unknown {
+  const scalars = collectScalars(value);
+  for (const alias of aliases) {
+    const found = scalars.get(normalizeKey(alias));
+    if (found !== null && found !== undefined && found !== '') return found;
   }
   return null;
 }
@@ -131,65 +178,70 @@ async function checkFinnhub(): Promise<ProviderResult> {
       fetchJson('Finnhub stock/metric', `https://finnhub.io/api/v1/stock/metric?symbol=${encoded}&metric=all&token=${encodeURIComponent(token)}`),
       fetchJson('Finnhub stock/profile2', `https://finnhub.io/api/v1/stock/profile2?symbol=${encoded}&token=${encodeURIComponent(token)}`),
     ]);
-    const metricRoot = getObject(metric.data);
-    const metricValues = getObject(metricRoot.metric);
+    const metricValues = getObject(getObject(metric.data).metric);
     const profileValues = getObject(profile.data);
     const values = {
-      marketCap: firstPresent(profileValues, ['marketCapitalization', 'marketCap']),
+      marketCap: firstPresent(profileValues, ['marketCapitalization', 'marketCap']) ?? firstPresent(metricValues, ['marketCapitalization']),
       peRatio: firstPresent(metricValues, ['peBasicExclExtraTTM', 'peNormalizedAnnual', 'peTTM']),
-      pbRatio: firstPresent(metricValues, ['pbAnnual', 'pbQuarterly']),
+      pbRatio: firstPresent(metricValues, ['pbAnnual', 'pbQuarterly', 'priceToBookPerShareTTM']),
       eps: firstPresent(metricValues, ['epsBasicExclExtraItemsTTM', 'epsNormalizedAnnual', 'epsTTM']),
-      roe: firstPresent(metricValues, ['roeTTM', 'roeAnnual']),
-      debtToEquity: firstPresent(metricValues, ['totalDebt/totalEquityAnnual', 'totalDebt/totalEquityQuarterly', 'totalDebt/totalEquityTTM']),
+      roe: firstPresent(metricValues, ['roeTTM', 'roeRfy', 'roeAnnual']),
+      debtToEquity: firstPresent(metricValues, ['totalDebtOverTotalEquityTTM', 'totalDebtOverTotalEquityQuarterly', 'totalDebtOverTotalEquityAnnual']),
       revenueGrowth: firstPresent(metricValues, ['revenueGrowthTTMYoy', 'revenueGrowth3Y', 'revenueGrowth5Y']),
-      earningsGrowth: firstPresent(metricValues, ['epsGrowthTTMYoy', 'epsGrowth3Y', 'epsGrowth5Y']),
+      earningsGrowth: firstPresent(metricValues, ['netIncomeGrowthTTMYoy', 'netIncomeGrowth3Y', 'epsGrowthTTMYoy', 'epsGrowth3Y', 'epsGrowth5Y']),
       operatingMargin: firstPresent(metricValues, ['operatingMarginTTM', 'operatingMarginAnnual']),
       netMargin: firstPresent(metricValues, ['netProfitMarginTTM', 'netProfitMarginAnnual']),
     };
     const warnings: string[] = [];
+    if (metric.status === 401 || profile.status === 401) warnings.push('Finnhub authentication failed (401). Rotate FINNHUB_KEY or FINNHUB_API_KEY.');
     if (!metric.ok) warnings.push(`stock/metric HTTP ${metric.status}`);
     if (!profile.ok) warnings.push(`stock/profile2 HTTP ${profile.status}`);
-    const summary = summarizeCoverage(values, firstPresent(profileValues, ['finnhubIndustry', 'sector']), warnings);
-    symbolResults.push({ symbol, ok: metric.ok && summary.coverageCount > 0, httpStatus: metric.status, ...summary, error: metric.error ?? profile.error });
+    const summary = summarizeCoverage(values, firstPresent(profileValues, ['finnhubIndustry', 'gicSector', 'sector']), warnings);
+    if (strict && summary.coveragePercent < 70) warnings.push(`fundamental coverage ${summary.coveragePercent}% < 70%`);
+    const ok = metric.ok && summary.coverageCount > 0 && (!strict || summary.coveragePercent >= 70);
+    symbolResults.push({ symbol, ok, httpStatus: metric.status, ...summary, error: metric.error ?? profile.error });
   }
-  return { provider: 'finnhub', configured: true, required: requiredProvider, ok: symbolResults.every((result) => result.ok), status: symbolResults.every((result) => result.ok) ? 'passed' : 'failed', endpointLabels: ['stock/metric', 'stock/profile2'], symbols: symbolResults };
+  const ok = symbolResults.every((result) => result.ok);
+  return { provider: 'finnhub', configured: true, required: requiredProvider, ok, status: ok ? 'passed' : 'failed', endpointLabels: ['stock/metric', 'stock/profile2'], symbols: symbolResults };
 }
 
 async function checkIndianApi(): Promise<ProviderResult> {
   const token = process.env.INDIANAPI_KEY;
   const requiredProvider = required.has('indianapi');
   if (!token) {
-    return { provider: 'indianapi', configured: false, required: requiredProvider, ok: false, status: 'not-configured', endpointLabels: ['stock', 'stock_fundamentals'], symbols: [], error: 'Set INDIANAPI_KEY.' };
+    return { provider: 'indianapi', configured: false, required: requiredProvider, ok: false, status: 'not-configured', endpointLabels: ['stock'], symbols: [], error: 'Set INDIANAPI_KEY.' };
   }
   const symbolResults: SymbolResult[] = [];
   for (const symbol of symbols) {
     const headers = { 'X-Api-Key': token, Accept: 'application/json' };
-    const [quote, fundamentals] = await Promise.all([
-      fetchJson('IndianAPI stock', `https://stock.indianapi.in/stock?name=${encodeURIComponent(symbol)}`, { headers }),
-      fetchJson('IndianAPI stock_fundamentals', `https://stock.indianapi.in/stock_fundamentals?name=${encodeURIComponent(symbol)}`, { headers }),
-    ]);
-    const quoteValues = getObject(quote.data);
-    const fundamentalsValues = getObject(fundamentals.data);
-    const merged = { ...quoteValues, ...fundamentalsValues };
+    const stock = await fetchJson('IndianAPI stock', `https://stock.indianapi.in/stock?name=${encodeURIComponent(symbol)}`, { headers });
+    const stockValues = getObject(stock.data);
+    const currentPrice = getObject(stockValues.currentPrice);
     const values = {
-      marketCap: firstPresent(merged, ['marketCap', 'market_cap', 'marketCapFull']),
-      peRatio: firstPresent(merged, ['pe', 'pe_ratio', 'peRatio']),
-      pbRatio: firstPresent(merged, ['pb', 'pb_ratio', 'pbRatio']),
-      eps: firstPresent(merged, ['eps', 'earningsPerShare']),
-      roe: firstPresent(merged, ['roe', 'return_on_equity', 'returnOnEquity']),
-      debtToEquity: firstPresent(merged, ['debt_to_equity', 'debtToEquity']),
-      revenueGrowth: firstPresent(merged, ['revenue_growth', 'revenueGrowth']),
-      earningsGrowth: firstPresent(merged, ['earnings_growth', 'profit_growth', 'earningsGrowth']),
-      operatingMargin: firstPresent(merged, ['operating_margin', 'operatingMargin']),
-      netMargin: firstPresent(merged, ['net_margin', 'netMargin']),
+      marketCap: firstDeep(stockValues, ['marketCap', 'market_cap', 'marketCapitalization']),
+      peRatio: firstDeep(stockValues, ['pe', 'peRatio', 'priceToEarnings', 'priceEarningsRatio']),
+      pbRatio: firstDeep(stockValues, ['pb', 'pbRatio', 'priceToBook', 'priceBookRatio']),
+      eps: firstDeep(stockValues, ['eps', 'earningsPerShare']),
+      roe: firstDeep(stockValues, ['roe', 'returnOnEquity']),
+      debtToEquity: firstDeep(stockValues, ['debtToEquity', 'debt_equity', 'deRatio']),
+      revenueGrowth: firstDeep(stockValues, ['revenueGrowth', 'salesGrowth']),
+      earningsGrowth: firstDeep(stockValues, ['earningsGrowth', 'profitGrowth', 'netProfitGrowth']),
+      operatingMargin: firstDeep(stockValues, ['operatingMargin', 'operatingProfitMargin', 'opm']),
+      netMargin: firstDeep(stockValues, ['netMargin', 'netProfitMargin', 'npm']),
     };
+    const price = finiteNumber(firstPresent(currentPrice, ['NSE', 'BSE'])) ?? finiteNumber(firstDeep(stockValues, ['price', 'currentPrice']));
+    const sector = firstPresent(stockValues, ['industry', 'sector']) ?? firstDeep(stockValues, ['mgSector', 'sector', 'industry']);
     const warnings: string[] = [];
-    if (!quote.ok) warnings.push(`stock HTTP ${quote.status}`);
-    if (!fundamentals.ok) warnings.push(`stock_fundamentals HTTP ${fundamentals.status}`);
-    const summary = summarizeCoverage(values, firstPresent(merged, ['sector', 'industry']), warnings);
-    symbolResults.push({ symbol, ok: quote.ok && fundamentals.ok && summary.coverageCount > 0, httpStatus: fundamentals.status, ...summary, error: quote.error ?? fundamentals.error });
+    if (!stock.ok) warnings.push(`stock HTTP ${stock.status}`);
+    const summary = summarizeCoverage(values, sector, warnings);
+    if (summary.coveragePercent < 70) warnings.push(`fundamental coverage is partial (${summary.coveragePercent}%); use as quote/metadata fallback unless reviewed`);
+    if (price === null || price <= 0) warnings.push('quote price missing or invalid');
+    if (!summary.sectorAvailable) warnings.push('sector metadata missing');
+    const ok = stock.ok && price !== null && price > 0;
+    symbolResults.push({ symbol, ok, httpStatus: stock.status, ...summary, error: stock.error });
   }
-  return { provider: 'indianapi', configured: true, required: requiredProvider, ok: symbolResults.every((result) => result.ok), status: symbolResults.every((result) => result.ok) ? 'passed' : 'failed', endpointLabels: ['stock', 'stock_fundamentals'], symbols: symbolResults };
+  const ok = symbolResults.every((result) => result.ok);
+  return { provider: 'indianapi', configured: true, required: requiredProvider, ok, status: ok ? 'passed' : 'failed', endpointLabels: ['stock'], symbols: symbolResults };
 }
 
 function checkYfinance(): ProviderResult {
@@ -201,7 +253,7 @@ function checkYfinance(): ProviderResult {
   const yfinanceSymbols = symbols.map((symbol) => `${symbol}.NS`).join(',');
   const result = spawnSync('python3', ['scripts/yfinance_bridge.py', 'fundamentals-batch', yfinanceSymbols, '0.25', '0.75'], { cwd: process.cwd(), encoding: 'utf8', env: process.env });
   if (result.status !== 0) {
-    return { provider: 'yfinance', configured: true, required: requiredProvider, ok: false, status: 'failed', endpointLabels: ['scripts/yfinance_bridge.py fundamentals-batch'], symbols: [], error: (result.stderr || result.stdout || 'yfinance bridge failed').trim().slice(0, 500) };
+    return { provider: 'yfinance', configured: true, required: requiredProvider, ok: false, status: 'failed', endpointLabels: ['scripts/yfinance_bridge.py fundamentals-batch'], symbols: [], error: sanitize((result.stderr || result.stdout || 'yfinance bridge failed').trim().slice(0, 500)) };
   }
   let parsed: Record<string, unknown> = {};
   try {
@@ -215,7 +267,7 @@ function checkYfinance(): ProviderResult {
       marketCap: raw.marketCap,
       peRatio: firstPresent(raw, ['trailingPE', 'forwardPE']),
       pbRatio: raw.priceToBook,
-      eps: raw.earningsPerShare,
+      eps: firstPresent(raw, ['trailingEps', 'earningsPerShare']),
       roe: raw.returnOnEquity,
       debtToEquity: raw.debtToEquity,
       revenueGrowth: raw.revenueGrowth,
@@ -224,9 +276,14 @@ function checkYfinance(): ProviderResult {
       netMargin: raw.profitMargins,
     };
     const summary = summarizeCoverage(values, firstPresent(raw, ['sector', 'industry']));
-    return { symbol, ok: !raw.error && summary.coverageCount > 0, ...summary, error: typeof raw.error === 'string' ? raw.error.slice(0, 300) : undefined };
+    const warnings = [...summary.warnings];
+    if (Array.isArray(raw.warnings)) warnings.push(...raw.warnings.map((warning) => sanitize(warning)));
+    if (strict && summary.coveragePercent < 40) warnings.push(`fundamental coverage ${summary.coveragePercent}% < 40%`);
+    const ok = !raw.error && summary.coverageCount > 0 && (!strict || summary.coveragePercent >= 40);
+    return { symbol, ok, ...summary, warnings, error: typeof raw.error === 'string' ? sanitize(raw.error.slice(0, 300)) : undefined };
   });
-  return { provider: 'yfinance', configured: true, required: requiredProvider, ok: symbolResults.every((result) => result.ok), status: symbolResults.every((result) => result.ok) ? 'passed' : 'failed', endpointLabels: ['scripts/yfinance_bridge.py fundamentals-batch'], symbols: symbolResults };
+  const ok = symbolResults.every((item) => item.ok);
+  return { provider: 'yfinance', configured: true, required: requiredProvider, ok, status: ok ? 'passed' : 'failed', endpointLabels: ['scripts/yfinance_bridge.py fundamentals-batch'], symbols: symbolResults };
 }
 
 async function main(): Promise<void> {
@@ -236,13 +293,12 @@ async function main(): Promise<void> {
     if (provider === 'indianapi') providerResults.push(await checkIndianApi());
     if (provider === 'yfinance') providerResults.push(checkYfinance());
   }
-
   const failures = providerResults.filter((provider) => provider.required && !provider.ok);
   const report = {
     generatedAt: new Date().toISOString(),
     symbols,
     strict,
-    requiredProviders: [...required].map((provider) => provider.toLowerCase()),
+    requiredProviders: [...required],
     secretValuesPrinted: false,
     providers: providerResults,
     summary: {
@@ -251,16 +307,14 @@ async function main(): Promise<void> {
       requiredFailures: failures.map((provider) => provider.provider),
     },
   };
-
   const outputDirectory = path.resolve(process.cwd(), 'tmp', 'provider-health');
   mkdirSync(outputDirectory, { recursive: true });
   writeFileSync(path.join(outputDirectory, 'latest.json'), `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify(report, null, 2));
-
   if (strict && failures.length > 0) process.exitCode = 1;
 }
 
 main().catch((error) => {
-  console.error(JSON.stringify({ error: error instanceof Error ? error.message : String(error), secretValuesPrinted: false }, null, 2));
+  console.error(JSON.stringify({ error: sanitize(error instanceof Error ? error.message : String(error)), secretValuesPrinted: false }, null, 2));
   process.exitCode = 1;
 });
