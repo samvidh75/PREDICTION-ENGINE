@@ -83,13 +83,14 @@ IndianAPI fallback: `INDIANAPI_KEY` is optional and only used for missing sector
 
 Source type: Python `yfinance` library through `scripts/yfinance_bridge.py`.
 
-Authorization status: opt-in only. Finnhub remains the primary audited fundamentals provider for F1. yfinance is available for explicit CLI runs when a reviewer wants a secondary Yahoo-backed comparison or local enrichment path. It does not require Finnhub credentials and must not be used to scrape Yahoo Finance webpages directly.
+Authorization status: opt-in only. Finnhub remains the primary audited fundamentals provider for F1. yfinance is available for explicit CLI runs when a reviewer wants a secondary Yahoo-backed comparison or local enrichment path. It does not require Finnhub credentials and must not be used to scrape Yahoo Finance webpages directly. Review Yahoo's terms before any production activation.
 
 Activation:
 
 ```bash
 python3 -m pip install -r requirements-yfinance.txt
 npm run ingest:fundamentals -- --provider=yfinance --symbols=RELIANCE,TCS,INFY --dry-run
+python3 scripts/yfinance_bridge.py historical-batch RELIANCE.NS,TCS.NS,INFY.NS 1mo 1d
 ```
 
 Guarded apply:
@@ -99,9 +100,17 @@ CONFIRM_F1_FUNDAMENTALS_APPLY=true \
 npm run ingest:fundamentals -- --provider=yfinance --symbols=RELIANCE,TCS,INFY --apply
 ```
 
-Bridge behavior: fundamentals come from paced per-symbol quote/info calls because yfinance exposes fundamentals that way. Historical price support uses `yf.download()` with a batch ticker string through the `historical-batch` bridge command, so bulk price checks can avoid looping one ticker at a time.
+Bridge behavior: fundamentals come from paced per-symbol `Ticker.info` calls because those fields are retrieved per ticker. Historical-price support uses chunked `yf.download()` calls with space-separated ticker batches through the `historical-batch` bridge command. `yf.download()` receives `threads=true`, a bounded timeout, dividend/split actions, and repair mode. Empty or failed batches return explicit errors rather than invented OHLC values.
 
-Caching and rate limits: the bridge uses a local JSON cache for quote/fundamental responses under `tmp/yfinance-quote-cache.json` by default. `YFINANCE_CACHE_PATH` and `YFINANCE_CACHE_SECONDS` can tune the cache location and TTL. Per-symbol quote calls sleep between symbols; batch history uses threaded `yf.download()` and should still be kept to modest batches. A `requests-cache` session is not injected because current yfinance/curl runtimes reject external cached sessions.
+Caching and pacing controls:
+
+- `YFINANCE_CACHE_PATH=tmp/yfinance-cache.json` sets the atomic JSON result cache.
+- `YFINANCE_CACHE_SECONDS=3600` sets the cache TTL.
+- `YFINANCE_REQUEST_CACHE_ENABLED=true` enables the optional `requests-cache` HTTP session when compatible with the installed yfinance runtime. The bridge automatically falls back to native yfinance sessions when the cached session is rejected.
+- `YFINANCE_REQUEST_CACHE_NAME=tmp/yfinance-http-cache` sets the HTTP cache storage name.
+- `YFINANCE_BATCH_SIZE=40` limits tickers per historical batch; values are bounded between `1` and `100`.
+- `YFINANCE_DOWNLOAD_TIMEOUT_SECONDS=15` bounds historical-download wait time.
+- `YFINANCE_MIN_DELAY_SECONDS=0.75` and `YFINANCE_MAX_DELAY_SECONDS=1.75` control randomized delays between uncached per-ticker fundamentals requests.
 
 Normalized fields: yfinance fields map to the same internal fundamentals shape as Finnhub. Decimal ratios such as `returnOnEquity`, `revenueGrowth`, `earningsGrowth`, `operatingMargins`, and `profitMargins` are converted to percentages. yfinance `debtToEquity` values above `10` are treated as percentage-style values and converted to a ratio. Missing, empty, non-finite, or malformed values remain `null`.
 
