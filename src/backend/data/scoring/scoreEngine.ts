@@ -14,7 +14,7 @@ export type PredictionSnapshot = {
   symbol: string;
   horizon: 7 | 30 | 90 | 180 | 365;
   rankingScore: number | null;
-  classification: string | null;
+  classification: "Exceptional" | "Excellent" | "Good" | "Fair" | "Weak" | "Critical" | null;
   confidenceScore: number;
   availability: Availability;
   factors: Record<"quality_score" | "growth_score" | "value_score" | "momentum_score" | "risk_score" | "sector_score", FactorScore>;
@@ -55,66 +55,6 @@ function lineage(symbol: string, metric: string, sourceTable: string, sourceFiel
   };
 }
 
-function scoreQuality(symbol: string, f: FundamentalSnapshot | null): FactorScore {
-  if (!f) return unavailable(symbol, "quality_score", "financial_snapshots", "fundamentals unavailable");
-  const parts = [
-    f.roe == null ? null : normalize(f.roe, 0, 30),
-    f.operatingMargin == null ? null : normalize(f.operatingMargin, 0, 35),
-    f.netMargin == null ? null : normalize(f.netMargin, 0, 25),
-    f.totalDebt != null && f.equity != null && f.equity > 0 ? normalize(f.totalDebt / f.equity, 2, 0, true) : f.debtToEquityScore,
-  ].filter((v): v is number => v != null && Number.isFinite(v));
-  return fromParts(symbol, "quality_score", f, parts, "roe, margins, debt burden");
-}
-
-declare module "../providers/types" {
-  interface FundamentalSnapshot {
-    debtToEquityScore?: number | null;
-  }
-}
-
-function scoreGrowth(symbol: string, f: FundamentalSnapshot | null): FactorScore {
-  if (!f) return unavailable(symbol, "growth_score", "financial_snapshots", "growth inputs unavailable");
-  const parts = [
-    f.revenueGrowth == null ? null : normalize(f.revenueGrowth, -20, 30),
-    f.earningsGrowth == null ? null : normalize(f.earningsGrowth, -30, 40),
-  ].filter((v): v is number => v != null && Number.isFinite(v));
-  return fromParts(symbol, "growth_score", f, parts, "historical growth unavailable");
-}
-
-function scoreValue(symbol: string, f: FundamentalSnapshot | null): FactorScore {
-  if (!f) return unavailable(symbol, "value_score", "financial_snapshots", "valuation inputs unavailable");
-  const parts = [
-    f.peRatio == null || f.peRatio <= 0 ? null : normalize(f.peRatio, 45, 5, true),
-    f.pbRatio == null || f.pbRatio <= 0 ? null : normalize(f.pbRatio, 10, 1, true),
-  ].filter((v): v is number => v != null && Number.isFinite(v));
-  return fromParts(symbol, "value_score", f, parts, "valuation inputs unavailable");
-}
-
-function priceLineage(symbol: string, metric: string, prices: MarketPriceRecord[], availability: Availability, reason?: string): AnalyticalInputLineage[] {
-  if (prices.length === 0) return [lineage(symbol, metric, "daily_prices", "open, high, low, close, volume", new Date().toISOString().slice(0, 10), availability, "existing-database", reason)];
-  return [lineage(symbol, metric, "daily_prices", "close", prices[prices.length - 1].tradingDate, availability, prices[prices.length - 1].source, reason)];
-}
-
-function scoreMomentum(symbol: string, validPrices: MarketPriceRecord[]): FactorScore {
-  if (validPrices.length < 20) return { value: null, availability: "unavailable", confidence: 0, reason: "insufficient valid price history", lineage: priceLineage(symbol, "momentum_score", validPrices, "unavailable", "insufficient valid price history") };
-  const last = validPrices[validPrices.length - 1].close;
-  const prior = validPrices[Math.max(0, validPrices.length - 21)].close;
-  const ret = ((last - prior) / prior) * 100;
-  const value = Math.round(normalize(ret, -15, 15));
-  return { value, availability: "real", confidence: 90, lineage: priceLineage(symbol, "momentum_score", validPrices, "real") };
-}
-
-function scoreRisk(symbol: string, validPrices: MarketPriceRecord[]): FactorScore {
-  if (validPrices.length < 20) return { value: null, availability: "unavailable", confidence: 0, reason: "insufficient valid price history", lineage: priceLineage(symbol, "risk_score", validPrices, "unavailable", "insufficient valid price history") };
-  const returns: number[] = [];
-  for (let i = 1; i < validPrices.length; i++) returns.push((validPrices[i].close - validPrices[i - 1].close) / validPrices[i - 1].close);
-  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
-  const variance = returns.reduce((sum, r) => sum + (r - mean) ** 2, 0) / returns.length;
-  const vol = Math.sqrt(variance) * Math.sqrt(252) * 100;
-  const value = Math.round(normalize(vol, 60, 8, true));
-  return { value, availability: "real", confidence: 90, lineage: priceLineage(symbol, "risk_score", validPrices, "real") };
-}
-
 function unavailable(symbol: string, metric: string, table: string, reason: string): FactorScore {
   return { value: null, availability: "unavailable", confidence: 0, reason, lineage: [lineage(symbol, metric, table, "*", new Date().toISOString().slice(0, 10), "unavailable", "existing-database", reason)] };
 }
@@ -129,6 +69,68 @@ function fromParts(symbol: string, metric: string, f: FundamentalSnapshot, parts
     reason: parts.length >= 3 ? undefined : reason,
     lineage: [lineage(symbol, metric, "financial_snapshots", metric, f.asOfDate, parts.length >= 3 ? "real" : "partial", f.source)],
   };
+}
+
+function scoreQuality(symbol: string, f: FundamentalSnapshot | null): FactorScore {
+  if (!f) return unavailable(symbol, "quality_score", "financial_snapshots", "fundamentals unavailable");
+  const parts = [
+    f.roe == null ? null : normalize(f.roe, 0, 30),
+    f.operatingMargin == null ? null : normalize(f.operatingMargin, 0, 35),
+    f.netMargin == null ? null : normalize(f.netMargin, 0, 25),
+    f.debtToEquity == null || f.debtToEquity < 0 ? null : normalize(f.debtToEquity, 2, 0, true),
+  ].filter((value): value is number => value != null && Number.isFinite(value));
+  return fromParts(symbol, "quality_score", f, parts, "quality inputs incomplete");
+}
+
+function scoreGrowth(symbol: string, f: FundamentalSnapshot | null): FactorScore {
+  if (!f) return unavailable(symbol, "growth_score", "financial_snapshots", "growth inputs unavailable");
+  const parts = [
+    f.revenueGrowth == null ? null : normalize(f.revenueGrowth, -20, 30),
+    f.earningsGrowth == null ? null : normalize(f.earningsGrowth, -30, 40),
+  ].filter((value): value is number => value != null && Number.isFinite(value));
+  return fromParts(symbol, "growth_score", f, parts, "historical growth unavailable");
+}
+
+function scoreValue(symbol: string, f: FundamentalSnapshot | null): FactorScore {
+  if (!f) return unavailable(symbol, "value_score", "financial_snapshots", "valuation inputs unavailable");
+  const parts = [
+    f.peRatio == null || f.peRatio <= 0 ? null : normalize(f.peRatio, 45, 5, true),
+    f.pbRatio == null || f.pbRatio <= 0 ? null : normalize(f.pbRatio, 10, 1, true),
+  ].filter((value): value is number => value != null && Number.isFinite(value));
+  return fromParts(symbol, "value_score", f, parts, "valuation inputs unavailable");
+}
+
+function priceLineage(symbol: string, metric: string, prices: MarketPriceRecord[], availability: Availability, reason?: string): AnalyticalInputLineage[] {
+  if (prices.length === 0) return [lineage(symbol, metric, "daily_prices", "open, high, low, close, volume", new Date().toISOString().slice(0, 10), availability, "existing-database", reason)];
+  return [lineage(symbol, metric, "daily_prices", "close", prices[prices.length - 1].tradingDate, availability, prices[prices.length - 1].source, reason)];
+}
+
+function scoreMomentum(symbol: string, validPrices: MarketPriceRecord[]): FactorScore {
+  if (validPrices.length < 20) return { value: null, availability: "unavailable", confidence: 0, reason: "insufficient valid price history", lineage: priceLineage(symbol, "momentum_score", validPrices, "unavailable", "insufficient valid price history") };
+  const last = validPrices[validPrices.length - 1].close;
+  const prior = validPrices[Math.max(0, validPrices.length - 21)].close;
+  const value = Math.round(normalize(((last - prior) / prior) * 100, -15, 15));
+  return { value, availability: "real", confidence: 90, lineage: priceLineage(symbol, "momentum_score", validPrices, "real") };
+}
+
+function scoreRisk(symbol: string, validPrices: MarketPriceRecord[]): FactorScore {
+  if (validPrices.length < 20) return { value: null, availability: "unavailable", confidence: 0, reason: "insufficient valid price history", lineage: priceLineage(symbol, "risk_score", validPrices, "unavailable", "insufficient valid price history") };
+  const returns: number[] = [];
+  for (let i = 1; i < validPrices.length; i++) returns.push((validPrices[i].close - validPrices[i - 1].close) / validPrices[i - 1].close);
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((sum, current) => sum + (current - mean) ** 2, 0) / returns.length;
+  const annualizedVolatility = Math.sqrt(variance) * Math.sqrt(252) * 100;
+  const value = Math.round(normalize(annualizedVolatility, 60, 8, true));
+  return { value, availability: "real", confidence: 90, lineage: priceLineage(symbol, "risk_score", validPrices, "real") };
+}
+
+function classify(score: number): PredictionSnapshot["classification"] {
+  if (score >= 85) return "Exceptional";
+  if (score >= 75) return "Excellent";
+  if (score >= 60) return "Good";
+  if (score >= 45) return "Fair";
+  if (score >= 30) return "Weak";
+  return "Critical";
 }
 
 export function scoreSnapshot(input: {
@@ -149,17 +151,17 @@ export function scoreSnapshot(input: {
     risk_score: scoreRisk(symbol, validPrices),
     sector_score: sectorValue == null
       ? unavailable(symbol, "sector_score", "master_security_registry", "sector-relative peer data unavailable")
-      : { value: Math.round(clamp(sectorValue)), availability: "partial" as const, confidence: 50, lineage: [lineage(symbol, "sector_score", "master_security_registry", "sector", new Date().toISOString().slice(0, 10), "partial")] },
+      : { value: Math.round(clamp(sectorValue)), availability: "real" as const, confidence: 75, lineage: [lineage(symbol, "sector_score", "master_security_registry", "sector-relative peer score", new Date().toISOString().slice(0, 10), "real")] },
   };
   for (const factor of Object.values(factors)) assertValidFactorScore(factor.value);
-  const available = Object.values(factors).filter((f) => f.value != null);
+  const available = Object.values(factors).filter((factor) => factor.value != null);
   const essential = [factors.quality_score, factors.momentum_score, factors.risk_score];
-  const availability: Availability = essential.every((f) => f.value != null) && available.length >= 4 ? (Object.values(factors).every((f) => f.availability === "real") ? "real" : "partial") : available.length > 0 ? "partial" : "unavailable";
-  const rankingScore = available.length === 0 ? null : Math.round(available.reduce((sum, f) => sum + (f.value ?? 0), 0) / available.length);
+  const availability: Availability = essential.every((factor) => factor.value != null) && available.length === 6
+    ? (Object.values(factors).every((factor) => factor.availability === "real") ? "real" : "partial")
+    : available.length > 0 ? "partial" : "unavailable";
+  const rankingScore = available.length === 0 ? null : Math.round(available.reduce((sum, factor) => sum + (factor.value ?? 0), 0) / available.length);
   assertValidFactorScore(rankingScore);
-  const confidenceScore = Math.round(clamp((available.reduce((sum, f) => sum + f.confidence, 0) / Math.max(1, Object.keys(factors).length)) * (availability === "real" ? 1 : availability === "partial" ? 0.7 : 0)));
-  const classification = rankingScore == null || availability === "unavailable" ? null : rankingScore >= 75 ? "Healthy" : rankingScore >= 50 ? "Watch" : "At Risk";
-  const lineageEntries = Object.values(factors).flatMap((f) => f.lineage);
-  return { symbol, horizon: input.horizon ?? 30, rankingScore, classification, confidenceScore, availability, factors, lineage: lineageEntries, generatedAt: new Date().toISOString(), modelVersion: "f1-data-quality-v1" };
+  const confidenceScore = Math.round(clamp((available.reduce((sum, factor) => sum + factor.confidence, 0) / 6) * (availability === "real" ? 1 : availability === "partial" ? 0.7 : 0)));
+  const classification = rankingScore == null || availability === "unavailable" ? null : classify(rankingScore);
+  return { symbol, horizon: input.horizon ?? 30, rankingScore, classification, confidenceScore, availability, factors, lineage: Object.values(factors).flatMap((factor) => factor.lineage), generatedAt: new Date().toISOString(), modelVersion: "f1-data-quality-v2" };
 }
-
