@@ -68,7 +68,7 @@ test('portfolio operating view withholds incomplete live value and doctor uses r
   await expect(page.getByText('Sector unavailable', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Unavailable', { exact: true }).first()).toBeVisible();
 
-  await page.getByRole('button', { name: 'Doctor' }).click();
+  await page.getByRole('button', { name: 'Doctor', exact: true }).click();
   await expect(page).toHaveURL(/page=portfolio-doctor/);
   await expect.poll(() => doctorPositions).toBe('RELIANCE:0.25000000,INFY:0.75000000');
   await expect(page.getByText(/Input basis:/)).toContainText('recorded cost basis');
