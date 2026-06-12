@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
-import { PortfolioEngine, SECTOR_UNAVAILABLE, type UserHolding } from '../services/portfolio/PortfolioEngine';
+import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
 import { AlertCircle, Bell, Edit2, Plus, ShieldAlert, Stethoscope, Trash2, Upload, X } from 'lucide-react';
 import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
@@ -110,22 +110,23 @@ export const PortfolioPage: React.FC = () => {
         setImportError(`Row ${index + 1}: expected TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]`);
         return;
       }
-      const nextHolding: UserHolding = {
+      const normalized = normalizeUserHolding({
         symbol: parts[0].trim().toUpperCase(),
         shares: Number(parts[1].trim()),
         avgBuyPrice: Number(parts[2].trim()),
         sector: parts[3]?.trim() || SECTOR_UNAVAILABLE,
-      };
-      if (!PortfolioEngine.addHolding(nextHolding)) {
+      });
+      if (!normalized) {
         setImportError(`Row ${index + 1}: ticker, shares and average buy price must be valid positive values`);
         return;
       }
-      parsed.push(nextHolding);
+      parsed.push(normalized);
     }
     if (parsed.length === 0) {
       setImportError('No valid rows found.');
       return;
     }
+    parsed.forEach((holding) => PortfolioEngine.addHolding(holding));
     setIsImportOpen(false);
     setCsvText('');
   };
