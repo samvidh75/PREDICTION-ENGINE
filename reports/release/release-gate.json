@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-10T21:07:40.240Z",
-  "requireFullReleaseGate": true,
+  "generatedAt": "2026-06-12T14:56:17.247Z",
+  "requireFullReleaseGate": false,
   "summary": {
     "total": 15,
-    "passed": 15,
+    "passed": 14,
     "failed": 0,
-    "notExecuted": 0,
+    "notExecuted": 1,
     "mandatoryFailed": 0
   },
   "checks": [
@@ -15,8 +15,8 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 7740,
-      "stdoutPreview": "\nadded 747 packages, and audited 748 packages in 8s\n\n190 packages are looking for funding\n  run `npm fund` for details\n\n6 moderate severity vulnerabilities\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n",
+      "durationMs": 6920,
+      "stdoutPreview": "\nadded 751 packages, and audited 752 packages in 7s\n\n190 packages are looking for funding\n  run `npm fund` for details\n\n6 moderate severity vulnerabilities\n\nTo address issues that do not require attention, run:\n  npm audit fix\n\nTo address all issues (including breaking changes), run:\n  npm audit fix --force\n\nRun `npm audit` for details.\n",
       "stderrPreview": null
     },
     {
@@ -25,7 +25,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 1618,
+      "durationMs": 1408,
       "stdoutPreview": "\n> prediction-engine@0.1.0 lint\n> npm run lint:active\n\n\n> prediction-engine@0.1.0 lint:active\n> eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts\n\n",
       "stderrPreview": null
     },
@@ -35,7 +35,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 6288,
+      "durationMs": 4885,
       "stdoutPreview": "\n> prediction-engine@0.1.0 typecheck:all\n> npm run typecheck:active\n\n\n> prediction-engine@0.1.0 typecheck:active\n> npm run typecheck:frontend && npm run typecheck:backend\n\n\n> prediction-engine@0.1.0 typecheck:frontend\n> tsc -p tsconfig.frontend.json --noEmit\n\n\n> prediction-engine@0.1.0 typecheck:backend\n> tsc -p tsconfig.backend.json --noEmit\n\n",
       "stderrPreview": null
     },
@@ -45,8 +45,8 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 3351,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 test:unit\n> vitest run\n\n\n\u001b[1m\u001b[30m\u001b[46m RUN \u001b[49m\u001b[39m\u001b[22m \u001b[36mv4.1.8 \u001b[39m\u001b[90m/Users/samvidhmehta/Desktop/PREDICTION-ENGINE\u001b[39m\n\n \u001b[32m✓\u001b[39m src/db/__tests__/MigrationRunner.test.ts \u001b[2m(\u001b[22m\u001b[2m8 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 17\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/backend/auth/__tests__/requireAuthenticatedUser.test.ts \u001b[2m(\u001b[22m\u001b[2m12 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[32m 9\u001b[2mms\u001b[22m\u001b[39m\n \u001b[32m✓\u001b[39m src/backend/auth/__tests__/firebaseAdmin.test.ts \u001b[2m(\u001b[22m\u001b[2m6 tests\u001b[22m\u001b[... (truncated)",
+      "durationMs": 4025,
+      "stdoutPreview": "\n> prediction-engine@0.1.0 test:unit\n> vitest run\n\n\n RUN  v4.1.8 /Users/samvidhmehta/Desktop/PREDICTION-ENGINE\n\ntest env check... failing command... pass1... fail1... \n Test Files  24 passed (24)\n      Tests  240 passed (240)\n   Start at  20:26:02\n   Duration  2.94s (transform 1.41s, setup 0ms, import 3.70s, tests 1.18s, environment 15.99s)\n\n",
       "stderrPreview": null
     },
     {
@@ -55,8 +55,8 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 1929,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 test:integration:sqlite\n> cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts\n\n\n\u001b[1m\u001b[30m\u001b[46m RUN \u001b[49m\u001b[39m\u001b[22m \u001b[36mv4.1.8 \u001b[39m\u001b[90m/Users/samvidhmehta/Desktop/PREDICTION-ENGINE\u001b[39m\n\n\u001b[90mstdout\u001b[2m | src/__tests__/integration/sqlite-registry.integration.test.ts\u001b[2m > \u001b[22m\u001b[2mSQLite prediction_registry integration\u001b[2m > \u001b[22m\u001b[2mcomplete registry columns ex... (truncated)",
+      "durationMs": 1382,
+      "stdoutPreview": "\n> prediction-engine@0.1.0 test:integration:sqlite\n> cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts\n\n\n RUN  v4.1.8 /Users/samvidhmehta/Desktop/PREDICTION-ENGINE\n\n\n Test Files  6 passed | 3 skipped (9)\n      Tests  27 passed | 26 skipped (53)\n   Start at  20:26:05\n   Duration  933ms (transform 86ms, setup 0ms, import 190ms, tests 165ms, environment 0ms)\n\n",
       "stderrPreview": null
     },
     {
@@ -65,8 +65,8 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 354,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 validate:schema\n> tsx scripts/validate-schema-contract.ts\n\n=== Schema Contract Validation (Isolated) ===\n\nUsing temp DB: /var/folders/fl/l0gp8hnj0jgcrrd7qpc3_p8h0000gn/T/schema-contract-1781125648379-b0zb.db\n\n1. Table presence check for prediction_registry...\n  PASS: prediction_registry exists\n\n2. Column completeness check...\n  PASS: id\n  PASS: symbol\n  PASS: prediction_date\n  PASS: ranking_score\n  PASS: classification\n  PASS: confidence_score\n  PASS: confidence_level\n... (truncated)",
+      "durationMs": 319,
+      "stdoutPreview": "\n> prediction-engine@0.1.0 validate:schema\n> tsx scripts/validate-schema-contract.ts\n\n=== Schema Contract Validation (Isolated) ===\n\nUsing temp DB: /var/folders/fl/l0gp8hnj0jgcrrd7qpc3_p8h0000gn/T/schema-contract-1781276166924-r3vs.db\n\n1. Table presence check for prediction_registry...\n  PASS: prediction_registry exists\n\n2. Column completeness check...\n  PASS: id\n  PASS: symbol\n  PASS: prediction_date\n  PASS: ranking_score\n  PASS: classification\n  PASS: confidence_score\n  PASS: confidence_level\n... (truncated)",
       "stderrPreview": null
     },
     {
@@ -75,7 +75,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 198,
+      "durationMs": 197,
       "stdoutPreview": "\n> prediction-engine@0.1.0 validate:query-schema\n> tsx scripts/audit-query-schema-compatibility.ts\n\n=== Query-Schema Compatibility Audit ===\n\n  PASS: src/backend/web/routes/stockstory.ts — no obsolete column references\n  PASS: src/backend/web/routes/predictions/explain.ts — no obsolete column references\n  PASS: src/intelligence/PredictionDiffEngine.ts — no obsolete column references\n  PASS: src/intelligence/PredictionExplanationEngine.ts — no obsolete column references\n  PASS: src/predictions/Pr... (truncated)",
       "stderrPreview": null
     },
@@ -85,7 +85,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 204,
+      "durationMs": 199,
       "stdoutPreview": "\n> prediction-engine@0.1.0 validate:distributions\n> tsx scripts/validate-sector-distributions.ts\n\n=== Sector Distribution Validation ===\n\n1. Sector completeness check...\n  PASS: BANKING - all 16 metrics present\n  PASS: IT - all 16 metrics present\n  PASS: FMCG - all 16 metrics present\n  PASS: PHARMA - all 16 metrics present\n  PASS: AUTO - all 16 metrics present\n  PASS: ENERGY - all 16 metrics present\n  PASS: GENERAL - all 16 metrics present\n\n2. Monotonicity check...\n  PASS: all distributions mono... (truncated)",
       "stderrPreview": null
     },
@@ -95,7 +95,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 296,
+      "durationMs": 288,
       "stdoutPreview": "\n> prediction-engine@0.1.0 validate:data-integrity\n> tsx scripts/validate-data-integrity.ts\n\n=== Data Integrity Validation ===\n\n\n=== Data Integrity Complete ===\nCritical errors: 0\nWarnings: 0\nPASS: No critical data integrity violations\n",
       "stderrPreview": null
     },
@@ -105,7 +105,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 235,
+      "durationMs": 269,
       "stdoutPreview": "\n> prediction-engine@0.1.0 validate:hygiene\n> tsx scripts/validate-repository-hygiene.ts\n\n=== Repository Hygiene Scan ===\n\n\n=== Hygiene Scan Complete ===\nErrors (secrets): 0\nWarnings (hazards): 0\nPASS: No secrets detected\n",
       "stderrPreview": null
     },
@@ -115,8 +115,8 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 4985,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 build:vercel\n> npm run typecheck:vercel && vite build\n\n\n> prediction-engine@0.1.0 typecheck:vercel\n> tsc -p tsconfig.frontend.json --noEmit\n\n\u001b[36mvite v8.0.16 \u001b[32mbuilding client environment for production...\u001b[36m\u001b[39m\n\u001b[2K\rtransforming...✓ 1937 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                             5.08 kB │ gzip:   1.28 kB\ndist/assets/index-CJXBMYY0.css            127.14 kB │ gzip:  21.90 kB\ndist/assets/rolldown-r... (truncated)",
+      "durationMs": 5540,
+      "stdoutPreview": "\n> prediction-engine@0.1.0 build:vercel\n> npm run typecheck:vercel && vite build\n\n\n> prediction-engine@0.1.0 typecheck:vercel\n> tsc -p tsconfig.frontend.json --noEmit\n\nvite v8.0.16 building client environment for production...\n\u001b[2K\rtransforming...✓ 1936 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                             5.08 kB │ gzip:   1.28 kB\ndist/assets/index-ubJ4SGEf.css            127.16 kB │ gzip:  21.91 kB\ndist/assets/rolldown-runtime-Cyuzqnbw.js  ... (truncated)",
       "stderrPreview": null
     },
     {
@@ -125,7 +125,7 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 1313,
+      "durationMs": 1695,
       "stdoutPreview": "\n> prediction-engine@0.1.0 compile:backend\n> tsc -p tsconfig.backend.emit.json && node scripts/fix-esm-imports.js\n\nESM imports fixed in dist/backend/\n",
       "stderrPreview": null
     },
@@ -135,28 +135,28 @@
       "mandatory": true,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 2286,
+      "durationMs": 673,
       "stdoutPreview": "# npm audit report\n\nuuid  <11.1.1\nSeverity: moderate\nuuid: Missing buffer bounds check in v3/v5/v6 when buf is provided - https://github.com/advisories/GHSA-w5hq-g745-h8pq\nfix available via `npm audit fix --force`\nWill install firebase-admin@10.3.0, which is a breaking change\nnode_modules/uuid\n  gaxios  6.4.0 - 6.7.1\n  Depends on vulnerable versions of uuid\n  node_modules/gaxios\n  teeny-request  3.9.1 - 9.0.0\n  Depends on vulnerable versions of uuid\n  node_modules/teeny-request\n    @google-cloud... (truncated)",
       "stderrPreview": null
     },
     {
       "name": "PostgreSQL integration tests (CI)",
       "category": "environment-required",
-      "mandatory": true,
-      "status": "PASS",
-      "exitCode": 0,
-      "durationMs": 1499,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 test:integration:postgres:ci\n> cross-env REQUIRE_POSTGRES_INTEGRATION=true NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts\n\n\n\u001b[1m\u001b[30m\u001b[46m RUN \u001b[49m\u001b[39m\u001b[22m \u001b[36mv4.1.8 \u001b[39m\u001b[90m/Users/samvidhmehta/Desktop/PREDICTION-ENGINE\u001b[39m\n\n\u001b[90mstdout\u001b[2m | src/__tests__/integration/postgres-registry.integration.test.ts\u001b[2m > \u001b[22m\u001b[2mPostgreSQL prediction_registry integration\u001b[2... (truncated)",
-      "stderrPreview": null
+      "mandatory": false,
+      "status": "NOT_EXECUTED_ENVIRONMENT_MISSING",
+      "exitCode": null,
+      "durationMs": 0,
+      "stdoutPreview": null,
+      "stderrPreview": "Environment not available (not mandatory locally)"
     },
     {
       "name": "API smoke test",
       "category": "environment-required",
-      "mandatory": true,
+      "mandatory": false,
       "status": "PASS",
       "exitCode": 0,
-      "durationMs": 716,
-      "stdoutPreview": "\n> prediction-engine@0.1.0 migrate\n> tsx src/db/migrate.ts\n\n[db] Canonical adapter: PostgreSQL connected\n[migrate] Applied: 13, Pending: 0\n[migrate] No pending migrations. Up to date.\n[migrate] Complete.\n  Latest: 012_align_financial_snapshots_v5.sql, Applied: 13\n\n> prediction-engine@0.1.0 seed:ci\n> tsx scripts/seed-ci-fixtures.ts\n\n[db] Canonical adapter: PostgreSQL connected\n[seed:ci] Seeding fixture symbol: TESTIT\n  [ok] symbols\n  [ok] daily_prices\n  [ok] financial_snapshots\n  [ok] feature_sna... (truncated)",
+      "durationMs": 1344,
+      "stdoutPreview": "\n> prediction-engine@0.1.0 seed:ci\n> tsx scripts/seed-ci-fixtures.ts\n\n[db] Canonical adapter: SQLite configured\n[seed:ci] Seeding fixture symbol: TESTIT via sqlite\n  [ok] symbols\n  [ok] daily_prices\n  [ok] financial_snapshots\n  [ok] feature_snapshots (legacy shape)\n  [ok] factor_snapshots (legacy shape)\n  [ok] prediction_registry\n  [ok] benchmark_observations\n[seed:ci] Fixture seeding complete. Symbol: TESTIT, Date: 2025-06-09\n\n> prediction-engine@0.1.0 smoke:api\n> tsx scripts/smoke-test-api.ts\n... (truncated)",
       "stderrPreview": null
     }
   ]

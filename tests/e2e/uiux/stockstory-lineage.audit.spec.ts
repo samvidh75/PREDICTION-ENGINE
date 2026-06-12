@@ -47,9 +47,9 @@ async function seedPrediction(): Promise<void> {
     `INSERT INTO prediction_registry
       (symbol, prediction_date, ranking_score, classification, confidence_score,
        confidence_level, quality_score, growth_score, value_score,
-       momentum_score, risk_score, sector_score, prediction_horizon, created_by)
+       momentum_score, risk_score, sector_score, price_at_prediction, prediction_horizon, created_by)
      VALUES ($1, $2, 85.0, 'Excellent', 90.0, 'Very High',
-       82.0, 78.0, 72.0, 80.0, 12.0, 68.0, 30, 'ManualSnapshot')`,
+       82.0, 78.0, 72.0, 80.0, 12.0, 68.0, 1000.0, 30, 'ManualSnapshot')`,
     [TEST_SYMBOL, TEST_DATE],
   );
 }

@@ -79,6 +79,16 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
          FROM prediction_registry
          WHERE symbol = $1
            AND prediction_horizon = $2
+           AND classification IN ('Exceptional', 'Excellent', 'Good', 'Fair', 'Weak', 'Critical')
+           AND ranking_score BETWEEN 0 AND 100
+           AND confidence_score BETWEEN 0 AND 100
+           AND quality_score BETWEEN 0 AND 100
+           AND growth_score BETWEEN 0 AND 100
+           AND value_score BETWEEN 0 AND 100
+           AND momentum_score BETWEEN 0 AND 100
+           AND risk_score BETWEEN 0 AND 100
+           AND sector_score BETWEEN 0 AND 100
+           AND price_at_prediction > 0
          ORDER BY prediction_date DESC
          LIMIT 1`,
         [symbol, horizon]
