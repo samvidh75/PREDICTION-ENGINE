@@ -28,6 +28,17 @@ export interface EnrichedMetadata extends CompanyMetadata {
   enrichmentSource: 'provider' | 'registry' | 'fallback';
 }
 
+/**
+ * Infer exchange only from an explicit exchange suffix. A bare symbol does not
+ * prove its venue, so callers must keep the exchange unavailable in that case.
+ */
+export function inferExchangeFromSymbol(symbol: string): CompanyMetadata['exchange'] | undefined {
+  const normalized = symbol.trim().toUpperCase();
+  if (/\.(NS|NSE)$/.test(normalized)) return 'NSE';
+  if (/\.(BO|BSE)$/.test(normalized)) return 'BSE';
+  return undefined;
+}
+
 export class MetadataProviderCoordinator {
   private static providerCoordinator = new ProviderCoordinator();
   private static validator = new CompanyDataValidator();
@@ -74,7 +85,7 @@ export class MetadataProviderCoordinator {
         companyName: '', // Left blank so validator flags it, never use ticker as company name
         sector: '',
         industry: '',
-        exchange: rawSymbol.match(/\.(NS|BO|NSE|BSE)$/i) ? 'NSE' : 'NSE',
+        exchange: inferExchangeFromSymbol(rawSymbol),
         marketCap: undefined,
         currency: 'INR',
         website: '',
@@ -99,7 +110,7 @@ export class MetadataProviderCoordinator {
       companyName: enriched.companyName || registryMatch?.companyName || '',
       sector: enriched.sector || registryMatch?.sector || '',
       industry: enriched.industry || registryMatch?.industry || '',
-      exchange: enriched.exchange || registryMatch?.exchange || 'NSE',
+      exchange: enriched.exchange || registryMatch?.exchange || inferExchangeFromSymbol(rawSymbol),
       marketCap: enriched.marketCap ?? registryMatch?.marketCap,
       currency: enriched.currency || registryMatch?.currency || 'INR',
       website: enriched.website || registryMatch?.website || '',
