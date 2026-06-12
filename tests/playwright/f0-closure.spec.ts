@@ -165,6 +165,31 @@ test('stock workspace keeps exchange unavailable and passes ticker context to Co
   await expect(page.getByText('Showing alerts for RELIANCE', { exact: true })).toBeVisible();
 });
 
+test('stock workspace converts metadata outage into explicit unavailable state without inventing NSE', async ({ page }) => {
+  await page.addInitScript(restoreBrowserSession);
+  await page.route('**/api/**', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: '{}' });
+  });
+  await page.route('**/api/stockstory/RELIANCE**', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(stockStoryEnvelope) });
+  });
+  await page.route('**/api/market-data/metadata/RELIANCE', async (route) => {
+    await route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ code: 'METADATA_UNAVAILABLE' }) });
+  });
+  await page.route('**/api/market-data/quote/RELIANCE', async (route) => {
+    await route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ code: 'QUOTE_DATA_UNAVAILABLE' }) });
+  });
+
+  await page.goto('/?page=stock&id=RELIANCE&horizon=30');
+  const workspace = page.getByRole('region', { name: 'Stock workspace context' });
+  await expect(workspace).toBeVisible();
+  await expect(workspace).toContainText('Data unavailable');
+  await expect(workspace).toContainText('INVALID');
+  await expect(workspace).toContainText('Structured fallback');
+  await expect(workspace).not.toContainText('NSE');
+  await expect(page.getByText('NSE', { exact: true })).toHaveCount(0);
+});
+
 test('authenticated alert centre dismisses a user-scoped alert', async ({ page }) => {
   await page.addInitScript(() => {
     window.localStorage.setItem('ss_auth_session_v1', JSON.stringify({
