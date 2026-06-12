@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState } from "react";
+import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
@@ -8,6 +9,14 @@ function readHorizonFromUrl(): PredictionHorizon {
   if (typeof window === "undefined") return 30;
   const parsed = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "", 10) as PredictionHorizon;
   return HORIZONS.includes(parsed) ? parsed : 30;
+}
+
+function readTickerFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("id") ?? params.get("symbol") ?? params.get("ticker") ?? params.get("companyId") ?? "")
+    .toUpperCase()
+    .trim();
 }
 
 function appendHorizon(input: RequestInfo | URL, horizon: PredictionHorizon): RequestInfo | URL {
@@ -73,6 +82,7 @@ async function unwrapExplanationEnvelope(response: Response): Promise<Response> 
  */
 export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
+  const ticker = readTickerFromUrl();
 
   useLayoutEffect(() => {
     const originalFetch = window.fetch.bind(window);
@@ -100,6 +110,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
   return (
     <>
+      <StockWorkspaceBar ticker={ticker} horizon={horizon} />
       <section
         aria-label="Prediction horizon"
         className="mx-auto mb-4 flex w-full max-w-7xl flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-white"
