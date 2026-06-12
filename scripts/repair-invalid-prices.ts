@@ -42,10 +42,12 @@ console.log(JSON.stringify({
   bySymbol: Object.fromEntries(bySymbol),
   byReason: Object.fromEntries(byReason),
   examples: rows.slice(0, 20),
+  policy: "quarantine-only; source rows remain preserved and are excluded by scoring validation",
 }, null, 2));
 
 if (apply && rows.length > 0) {
   let quarantined = 0;
+  let nextId = Number((await query(`SELECT COALESCE(MAX(id), 0) AS max_id FROM rejected_market_records`)).rows[0]?.max_id ?? 0) + 1;
   for (const row of rows) {
     const rawPayload = JSON.stringify(row);
     const currentReason = reason(row);
@@ -55,12 +57,11 @@ if (apply && rows.length > 0) {
     );
     if (existing.rows.length === 0) {
       await query(
-        `INSERT INTO rejected_market_records (provider, symbol, trading_date, raw_payload, rejection_reason, created_at) VALUES ($1, $2, $3, $4, $5, $6)`,
-        ["existing-database-repair", row.symbol, row.trade_date, rawPayload, currentReason, new Date().toISOString()],
+        `INSERT INTO rejected_market_records (id, provider, symbol, trading_date, raw_payload, rejection_reason, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [nextId++, "existing-database-repair", row.symbol, row.trade_date, rawPayload, currentReason, new Date().toISOString()],
       );
       quarantined += 1;
     }
   }
-  await query(`DELETE FROM daily_prices WHERE ${invalidWhere}`);
-  console.log(`quarantined ${quarantined} new rows and removed ${rows.length} invalid daily_prices rows`);
+  console.log(`quarantined ${quarantined} new invalid daily_prices rows; source rows preserved for traceability`);
 }
