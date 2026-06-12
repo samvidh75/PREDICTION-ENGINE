@@ -1,2 +1,2 @@
-yfinance>=0.2.66
-requests-cache>=1.2.1
+yfinance==0.2.37
+requests-cache==1.2.0
