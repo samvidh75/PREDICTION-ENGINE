@@ -47,6 +47,35 @@ function restoreBrowserSession(): void {
   }));
 }
 
+async function mockStockWorkspace(page: import('@playwright/test').Page): Promise<void> {
+  await page.route('**/api/**', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: '{}' });
+  });
+  await page.route('**/api/stockstory/RELIANCE**', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(stockStoryEnvelope) });
+  });
+  await page.route('**/api/market-data/metadata/RELIANCE', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        companyName: 'Reliance Industries',
+        sector: 'Energy',
+        industry: 'Conglomerate',
+        currency: 'INR',
+        verificationStatus: 'PARTIAL',
+        verificationReasons: ['invalid_exchange'],
+        enrichmentSource: 'registry',
+      }),
+    });
+  });
+  await page.route('**/api/company/RELIANCE/ownership', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify({ categories: [], comment: 'Data unavailable' }) });
+  });
+  await page.route('**/api/company/RELIANCE/timeline', async (route) => {
+    await route.fulfill({ contentType: 'application/json', body: '[]' });
+  });
+}
+
 test('Trust Centre shows partial evidence and unavailable audited metrics', async ({ page }) => {
   await page.route('**/api/intelligence/trust-metrics', async (route) => {
     await route.fulfill({ contentType: 'application/json', body: JSON.stringify(partialTrustEnvelope) });
@@ -112,6 +141,28 @@ test('StockStory horizon is URL-backed and reaches snapshot and explanation APIs
   await page.getByRole('button', { name: 'whychange' }).click();
   await expect.poll(() => explanationHorizons).toContain('365');
   await expect(page.getByText('First Prediction', { exact: true })).toBeVisible();
+});
+
+test('stock workspace keeps exchange unavailable and passes ticker context to Compare and Alerts', async ({ page }) => {
+  await page.addInitScript(restoreBrowserSession);
+  await mockStockWorkspace(page);
+
+  await page.goto('/?page=stock&id=RELIANCE&horizon=30');
+  const workspace = page.getByRole('region', { name: 'Stock workspace context' });
+  await expect(workspace).toBeVisible();
+  await expect(workspace).toContainText('Data unavailable');
+  await expect(workspace).not.toContainText('NSE');
+  await expect(workspace).toContainText('PARTIAL');
+  await expect(workspace).toContainText('Verified registry');
+
+  await workspace.getByRole('button', { name: 'Compare' }).click();
+  await expect(page).toHaveURL(/page=compare.*symbol=RELIANCE/);
+  await expect(page.getByRole('textbox', { name: 'First company symbol' })).toHaveValue('RELIANCE');
+
+  await page.goto('/?page=stock&id=RELIANCE&horizon=30');
+  await page.getByRole('region', { name: 'Stock workspace context' }).getByRole('button', { name: 'Alerts' }).click();
+  await expect(page).toHaveURL(/page=alerts.*symbol=RELIANCE/);
+  await expect(page.getByText('Showing alerts for RELIANCE', { exact: true })).toBeVisible();
 });
 
 test('authenticated alert centre dismisses a user-scoped alert', async ({ page }) => {
