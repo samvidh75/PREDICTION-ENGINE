@@ -4,10 +4,9 @@
  * Compare two companies across: Health, Future Health, Quality, Risk, Narrative, Prediction Accuracy.
  * Winner by category. No recommendations. No buy/sell language.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Activity, ArrowRight, BarChart3, Brain, CheckCircle2, Gauge,
-  Heart, Scale, Shield, Sparkles, TrendingUp, Trophy, XCircle, Zap,
+  ArrowRight, Scale,
 } from 'lucide-react';
 
 interface CompareResult {
@@ -33,6 +32,11 @@ interface CategoryResult {
   companyB: number;
   winner: 'A' | 'B' | 'tie';
   diff: number;
+}
+
+function readPrefillSymbol(): string {
+  if (typeof window === 'undefined') return '';
+  return (new URLSearchParams(window.location.search).get('symbol') ?? '').toUpperCase().trim();
 }
 
 function finiteScore(value: unknown): number | null {
@@ -104,9 +108,7 @@ function WinnerBadge({ winner }: { winner: 'A' | 'B' | 'tie' }) {
   );
 }
 
-function CategoryCard({ result, labelA, labelB }: {
-  result: CategoryResult; labelA: string; labelB: string;
-}) {
+function CategoryCard({ result }: { result: CategoryResult }) {
   return (
     <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
       <div className="flex items-center justify-between mb-3">
@@ -137,7 +139,7 @@ function CategoryCard({ result, labelA, labelB }: {
 }
 
 export const StockCompare: React.FC = () => {
-  const [symA, setSymA] = useState('');
+  const [symA, setSymA] = useState(() => readPrefillSymbol());
   const [symB, setSymB] = useState('');
   const [dataA, setDataA] = useState<CompareResult | null>(null);
   const [dataB, setDataB] = useState<CompareResult | null>(null);
@@ -187,7 +189,6 @@ export const StockCompare: React.FC = () => {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6 px-4 pb-16">
-      {/* Header */}
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.015] p-6">
         <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="absolute -right-20 -bottom-20 h-40 w-40 rounded-full bg-fuchsia-500/10 blur-3xl" />
@@ -200,9 +201,9 @@ export const StockCompare: React.FC = () => {
         </div>
       </div>
 
-      {/* Input */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <input
+          aria-label="First company symbol"
           value={symA}
           onChange={e => setSymA(e.target.value.toUpperCase())}
           placeholder="RELIANCE"
@@ -212,6 +213,7 @@ export const StockCompare: React.FC = () => {
         />
         <ArrowRight className="h-5 w-5 text-white/20 shrink-0" />
         <input
+          aria-label="Second company symbol"
           value={symB}
           onChange={e => setSymB(e.target.value.toUpperCase())}
           placeholder="INFY"
@@ -228,7 +230,6 @@ export const StockCompare: React.FC = () => {
         </button>
       </div>
 
-      {/* Quick presets */}
       <div className="flex flex-wrap gap-2">
         {[
           ['RELIANCE', 'INFY'],
@@ -247,7 +248,6 @@ export const StockCompare: React.FC = () => {
         ))}
       </div>
 
-      {/* Results */}
       {loading && (
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-4">
@@ -259,7 +259,6 @@ export const StockCompare: React.FC = () => {
 
       {compared && !loading && dataA && dataB && (
         <>
-          {/* Summary */}
           <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
             <div className="text-center mb-4">
               <div className="text-[10px] font-bold uppercase tracking-wider text-white/30 mb-1">Overall Result</div>
@@ -287,14 +286,12 @@ export const StockCompare: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Cards */}
           <div className="grid gap-3 sm:grid-cols-2">
             {categories.map((cat, i) => (
-              <CategoryCard key={i} result={cat} labelA={symA} labelB={symB} />
+              <CategoryCard key={i} result={cat} />
             ))}
           </div>
 
-          {/* Narratives */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.03] p-4">
               <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">{symA} Narrative</div>
@@ -308,7 +305,6 @@ export const StockCompare: React.FC = () => {
         </>
       )}
 
-      {/* Disclaimer */}
       <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4 text-[11px] leading-relaxed text-white/40 text-center">
         This comparison is based on quantitative factor analysis from StockStory India's scoring engines.
         It does not provide investment advice, recommendations, or buy/sell signals.
