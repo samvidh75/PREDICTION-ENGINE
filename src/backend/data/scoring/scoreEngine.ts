@@ -77,7 +77,7 @@ function scoreQuality(symbol: string, f: FundamentalSnapshot | null): FactorScor
     f.roe == null ? null : normalize(f.roe, 0, 30),
     f.operatingMargin == null ? null : normalize(f.operatingMargin, 0, 35),
     f.netMargin == null ? null : normalize(f.netMargin, 0, 25),
-    f.debtToEquity == null || f.debtToEquity < 0 ? null : normalize(f.debtToEquity, 2, 0, true),
+    f.debtToEquity == null || f.debtToEquity < 0 ? null : normalize(f.debtToEquity, 0, 2, true),
   ].filter((value): value is number => value != null && Number.isFinite(value));
   return fromParts(symbol, "quality_score", f, parts, "quality inputs incomplete");
 }
@@ -94,8 +94,8 @@ function scoreGrowth(symbol: string, f: FundamentalSnapshot | null): FactorScore
 function scoreValue(symbol: string, f: FundamentalSnapshot | null): FactorScore {
   if (!f) return unavailable(symbol, "value_score", "financial_snapshots", "valuation inputs unavailable");
   const parts = [
-    f.peRatio == null || f.peRatio <= 0 ? null : normalize(f.peRatio, 45, 5, true),
-    f.pbRatio == null || f.pbRatio <= 0 ? null : normalize(f.pbRatio, 10, 1, true),
+    f.peRatio == null || f.peRatio <= 0 ? null : normalize(f.peRatio, 5, 45, true),
+    f.pbRatio == null || f.pbRatio <= 0 ? null : normalize(f.pbRatio, 1, 10, true),
   ].filter((value): value is number => value != null && Number.isFinite(value));
   return fromParts(symbol, "value_score", f, parts, "valuation inputs unavailable");
 }
@@ -120,7 +120,7 @@ function scoreRisk(symbol: string, validPrices: MarketPriceRecord[]): FactorScor
   const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
   const variance = returns.reduce((sum, current) => sum + (current - mean) ** 2, 0) / returns.length;
   const annualizedVolatility = Math.sqrt(variance) * Math.sqrt(252) * 100;
-  const value = Math.round(normalize(annualizedVolatility, 60, 8, true));
+  const value = Math.round(normalize(annualizedVolatility, 8, 60, true));
   return { value, availability: "real", confidence: 90, lineage: priceLineage(symbol, "risk_score", validPrices, "real") };
 }
 
