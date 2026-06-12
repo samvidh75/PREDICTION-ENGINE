@@ -33,13 +33,34 @@ function appendHorizon(input: RequestInfo | URL, horizon: PredictionHorizon): Re
   return next;
 }
 
-async function withHonestExchangeFallback(response: Response): Promise<Response> {
-  if (!response.ok) return response;
-  const body = await response.clone().json().catch(() => null) as Record<string, unknown> | null;
-  if (!body || typeof body !== "object" || body.exchange) return response;
+function unavailableMetadata(symbol: string): Record<string, unknown> {
+  return {
+    symbol,
+    companyName: "",
+    sector: "",
+    industry: "",
+    exchange: "Data unavailable",
+    currency: "Data unavailable",
+    verificationStatus: "INVALID",
+    verificationReasons: ["metadata_unavailable"],
+    enrichmentSource: "fallback",
+  };
+}
 
+async function withHonestMetadataFallback(response: Response, symbol: string): Promise<Response> {
+  const body = await response.clone().json().catch(() => null) as Record<string, unknown> | null;
   const headers = new Headers(response.headers);
   headers.set("content-type", "application/json");
+
+  if (!response.ok || !body || typeof body !== "object") {
+    return new Response(JSON.stringify(unavailableMetadata(symbol)), {
+      status: 200,
+      headers,
+    });
+  }
+
+  if (body.exchange) return response;
+
   return new Response(JSON.stringify({ ...body, exchange: "Data unavailable" }), {
     status: response.status,
     statusText: response.statusText,
@@ -91,7 +112,10 @@ export default function StockStoryPageF0(): JSX.Element {
       const url = new URL(raw, window.location.origin);
       const response = await originalFetch(appendHorizon(input, horizon), init);
 
-      if (url.pathname.startsWith("/api/market-data/metadata/")) return withHonestExchangeFallback(response);
+      if (url.pathname.startsWith("/api/market-data/metadata/")) {
+        const symbol = decodeURIComponent(url.pathname.split("/").pop() || ticker).toUpperCase().trim();
+        return withHonestMetadataFallback(response, symbol);
+      }
       if (url.pathname.startsWith("/api/predictions/explain/")) return unwrapExplanationEnvelope(response);
       return response;
     };
@@ -99,7 +123,7 @@ export default function StockStoryPageF0(): JSX.Element {
     return () => {
       window.fetch = originalFetch;
     };
-  }, [horizon]);
+  }, [horizon, ticker]);
 
   const selectHorizon = (nextHorizon: PredictionHorizon) => {
     const params = new URLSearchParams(window.location.search);
