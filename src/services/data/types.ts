@@ -24,6 +24,7 @@ export interface CompanyMetadata {
   nseSymbol?: string | null;
   verificationStatus?: 'VERIFIED' | 'PARTIAL' | 'INVALID';
   verificationReasons?: string[];
+  enrichmentSource?: 'provider' | 'registry' | 'fallback';
   // Backward compat aliases used by some providers
   name?: string;
 }
