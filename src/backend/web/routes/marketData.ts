@@ -1,5 +1,9 @@
 import type { FastifyPluginAsync } from "fastify";
 import { MarketDataGateway } from "../../../services/data/MarketDataGateway";
+import {
+  loadMarketActionSnapshot,
+  unavailableMarketActionResponse,
+} from "../../../services/market/MarketActionService";
 
 export const marketDataRoutes: FastifyPluginAsync = async (app) => {
   app.get("/api/market-data/company/:symbol", async (request, reply) => {
@@ -45,6 +49,17 @@ export const marketDataRoutes: FastifyPluginAsync = async (app) => {
     } catch (err: any) {
       request.log.error({ err, symbol: sym }, "market data metadata request failed");
       reply.status(502).send({ error: "Company metadata is temporarily unavailable.", code: "METADATA_UNAVAILABLE" });
+    }
+  });
+
+  app.get("/api/market-data/market-action", async (request, reply) => {
+    try {
+      return await loadMarketActionSnapshot();
+    } catch (err: any) {
+      request.log.error({ err }, "market action request failed");
+      reply.status(503).send(
+        unavailableMarketActionResponse("Market action is temporarily unavailable because the snapshot store could not be read."),
+      );
     }
   });
 };
