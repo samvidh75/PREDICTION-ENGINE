@@ -1,10 +1,31 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
-import { PortfolioEngine, UserHolding } from '../services/portfolio/PortfolioEngine';
-import { Plus, Upload, Trash2, Edit2, X, AlertCircle, ArrowUpRight, ArrowDownRight, ShieldAlert } from 'lucide-react';
-import { StockRegistry } from '../services/stocks/StockRegistry';
+import { PortfolioEngine, SECTOR_UNAVAILABLE, type UserHolding } from '../services/portfolio/PortfolioEngine';
+import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
+import { AlertCircle, Bell, Edit2, Plus, ShieldAlert, Stethoscope, Trash2, Upload, X } from 'lucide-react';
 import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader, Button } from '../components/ui/DesignSystem';
+
+function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
+  if (status === 'real') return 'text-[#22ab94]';
+  if (status === 'partial') return 'text-amber-300';
+  return 'text-white/35';
+}
+
+function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string {
+  if (severity === 'attention') return 'border-rose-400/20 bg-rose-400/5 text-rose-200/80';
+  if (severity === 'review') return 'border-amber-400/20 bg-amber-400/5 text-amber-100/80';
+  return 'border-[#2962ff]/20 bg-[#2962ff]/5 text-[#9bb5ff]';
+}
+
+function navigate(pageKey: string): void {
+  const params = new URLSearchParams(window.location.search);
+  params.set('page', pageKey);
+  params.delete('id');
+  params.delete('symbol');
+  window.history.pushState({}, '', `?${params.toString()}`);
+  window.dispatchEvent(new Event('urlchange'));
+}
 
 export const PortfolioPage: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
@@ -14,185 +35,259 @@ export const PortfolioPage: React.FC = () => {
   const [symbol, setSymbol] = useState('');
   const [shares, setShares] = useState('');
   const [price, setPrice] = useState('');
-  const [sector, setSector] = useState('IT');
+  const [sector, setSector] = useState('');
   const [csvText, setCsvText] = useState('');
+  const [formError, setFormError] = useState('');
   const [importError, setImportError] = useState('');
-  const liveQuotes = useLiveQuotes(snapshot.holdings.map(h => h.symbol));
+  const liveQuotes = useLiveQuotes(snapshot.holdings.map((holding) => holding.symbol));
 
   const refreshSnapshot = useCallback(() => setSnapshot(PortfolioSnapshotFactory.createSnapshot()), []);
-  useEffect(() => { window.addEventListener('portfoliochange', refreshSnapshot); return () => window.removeEventListener('portfoliochange', refreshSnapshot); }, [refreshSnapshot]);
+  useEffect(() => {
+    window.addEventListener('portfoliochange', refreshSnapshot);
+    return () => window.removeEventListener('portfoliochange', refreshSnapshot);
+  }, [refreshSnapshot]);
 
-  const handleAddHolding = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!symbol || !shares || !price) return;
-    PortfolioEngine.addHolding({ symbol: symbol.toUpperCase().trim(), shares: parseFloat(shares), avgBuyPrice: parseFloat(price), sector });
-    setSymbol(''); setShares(''); setPrice(''); setIsAddOpen(false);
+  const currentPrices = useMemo(() => {
+    const prices: Record<string, number> = {};
+    for (const holding of snapshot.holdings) {
+      const value = liveQuotes[holding.symbol]?.quote?.price;
+      if (typeof value === 'number' && Number.isFinite(value) && value > 0) prices[holding.symbol] = value;
+    }
+    return prices;
+  }, [liveQuotes, snapshot.holdings]);
+
+  const review = useMemo(() => buildPortfolioReview(snapshot.holdings, currentPrices), [currentPrices, snapshot.holdings]);
+
+  const resetHoldingForm = () => {
+    setSymbol('');
+    setShares('');
+    setPrice('');
+    setSector('');
+    setFormError('');
   };
 
-  const handleEditHolding = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingHolding || !shares || !price) return;
-    PortfolioEngine.updateHolding(editingHolding.symbol, parseFloat(shares), parseFloat(price));
-    setEditingHolding(null); setShares(''); setPrice('');
+  const handleAddHolding = (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormError('');
+    const added = PortfolioEngine.addHolding({
+      symbol: symbol.toUpperCase().trim(),
+      shares: Number(shares),
+      avgBuyPrice: Number(price),
+      sector,
+    });
+    if (!added) {
+      setFormError('Ticker, shares and average buy price must be valid positive values.');
+      return;
+    }
+    resetHoldingForm();
+    setIsAddOpen(false);
   };
 
-  const handleDeleteHolding = (sym: string) => { PortfolioEngine.removeHolding(sym); };
-  const handleCSVImport = (e: React.FormEvent) => {
-    e.preventDefault(); setImportError('');
+  const handleEditHolding = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!editingHolding) return;
+    setFormError('');
+    const updated = PortfolioEngine.updateHolding(editingHolding.symbol, Number(shares), Number(price));
+    if (!updated) {
+      setFormError('Shares and average buy price must be valid positive values.');
+      return;
+    }
+    setEditingHolding(null);
+    setShares('');
+    setPrice('');
+  };
+
+  const handleCSVImport = (event: React.FormEvent) => {
+    event.preventDefault();
+    setImportError('');
     const lines = csvText.split('\n');
     const parsed: UserHolding[] = [];
-    for (let i = 0; i < lines.length; i++) {
-      const parts = lines[i].trim().split(',');
-      if (!lines[i].trim()) continue;
-      if (parts.length < 3) { setImportError(`Row ${i+1}: insufficient columns`); return; }
-      const symVal = parts[0].trim().toUpperCase();
-      const sharesVal = parseFloat(parts[1].trim());
-      const priceVal = parseFloat(parts[2].trim());
-      const sectorVal = parts[3]?.trim() || 'Conglomerate';
-      if (!symVal || isNaN(sharesVal) || isNaN(priceVal)) { setImportError(`Row ${i+1}: invalid format`); return; }
-      parsed.push({ symbol: symVal, shares: sharesVal, avgBuyPrice: priceVal, sector: sectorVal });
+    for (let index = 0; index < lines.length; index++) {
+      const raw = lines[index].trim();
+      if (!raw) continue;
+      const parts = raw.split(',');
+      if (parts.length < 3) {
+        setImportError(`Row ${index + 1}: expected TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]`);
+        return;
+      }
+      const nextHolding: UserHolding = {
+        symbol: parts[0].trim().toUpperCase(),
+        shares: Number(parts[1].trim()),
+        avgBuyPrice: Number(parts[2].trim()),
+        sector: parts[3]?.trim() || SECTOR_UNAVAILABLE,
+      };
+      if (!PortfolioEngine.addHolding(nextHolding)) {
+        setImportError(`Row ${index + 1}: ticker, shares and average buy price must be valid positive values`);
+        return;
+      }
+      parsed.push(nextHolding);
     }
-    if (parsed.length === 0) { setImportError('No valid rows found'); return; }
-    parsed.forEach(h => PortfolioEngine.addHolding(h));
-    setIsImportOpen(false); setCsvText('');
+    if (parsed.length === 0) {
+      setImportError('No valid rows found.');
+      return;
+    }
+    setIsImportOpen(false);
+    setCsvText('');
   };
 
-  const handleOpenStock = (sym: string) => {
+  const handleOpenStock = (ticker: string) => {
     const params = new URLSearchParams(window.location.search);
-    params.set('page', 'stock'); params.set('id', sym);
+    params.set('page', 'stock');
+    params.set('id', ticker);
+    params.delete('symbol');
     window.history.pushState({}, '', `?${params.toString()}`);
     window.dispatchEvent(new Event('urlchange'));
   };
 
-  const calculatedHoldings = useMemo(() => {
-    return snapshot.holdings.map(h => {
-      const quoteState = liveQuotes[h.symbol];
-      const currentPrice = quoteState?.quote?.price ?? null;
-      const totalValue = currentPrice === null ? null : h.shares * currentPrice;
-      const costBasis = h.shares * h.avgBuyPrice;
-      const gainLossPct = totalValue && costBasis > 0 ? ((totalValue - costBasis) / costBasis) * 100 : null;
-      return { ...h, currentPrice, totalValue, gainLossPct };
-    }).sort((a, b) => (b.totalValue ?? 0) - (a.totalValue ?? 0));
-  }, [liveQuotes, snapshot.holdings]);
-
-  const totalValue = useMemo(() => calculatedHoldings.reduce((s, h) => s + (h.totalValue ?? 0), 0), [calculatedHoldings]);
-  const best = useMemo(() => [...calculatedHoldings].filter(h => h.gainLossPct !== null).sort((a, b) => (b.gainLossPct ?? 0) - (a.gainLossPct ?? 0))[0] || null, [calculatedHoldings]);
-  const worst = useMemo(() => [...calculatedHoldings].filter(h => h.gainLossPct !== null).sort((a, b) => (a.gainLossPct ?? 0) - (b.gainLossPct ?? 0))[0] || null, [calculatedHoldings]);
-  const largest = calculatedHoldings.length > 0 ? calculatedHoldings[0] : null;
+  const largest = review.concentration.largestPosition;
 
   return (
-    <div className="w-full flex flex-col space-y-8 pb-12 text-white min-h-screen font-sans max-w-5xl mx-auto antialiased">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col space-y-8 pb-12 font-sans text-white antialiased">
       <PageHeader
         title="Portfolio"
-        subtitle="What needs attention?"
+        subtitle="Recorded holdings, source-backed quotes and review queues"
         primaryAction={
-          <div className="flex items-center gap-2">
-            <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="w-3 h-3 mr-1" /> Add</Button>
-            <Button variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="w-3 h-3 mr-1" /> Import</Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="secondary" onClick={() => navigate('portfolio-doctor')}><Stethoscope className="mr-1 h-3 w-3" /> Doctor</Button>
+            <Button variant="secondary" onClick={() => navigate('alerts')}><Bell className="mr-1 h-3 w-3" /> Alerts</Button>
+            <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button>
+            <Button variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="mr-1 h-3 w-3" /> Import</Button>
           </div>
         }
       />
 
-      {/* TOP ROW: Best / Worst / Largest */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-          <span className="text-[10px] uppercase text-white/40 block">Best Performer</span>
-          {best ? (
-            <div className="mt-2">
-              <span className="text-sm font-bold text-white">{best.symbol}</span>
-              <span className="text-xs font-mono text-[#22ab94] ml-2">+{best.gainLossPct?.toFixed(1)}%</span>
-            </div>
-          ) : <span className="text-sm text-white/30 mt-2 block">—</span>}
-        </div>
-        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-          <span className="text-[10px] uppercase text-white/40 block">Worst Performer</span>
-          {worst ? (
-            <div className="mt-2">
-              <span className="text-sm font-bold text-white">{worst.symbol}</span>
-              <span className="text-xs font-mono text-rose-400 ml-2">{worst.gainLossPct?.toFixed(1)}%</span>
-            </div>
-          ) : <span className="text-sm text-white/30 mt-2 block">—</span>}
-        </div>
-        <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-          <span className="text-[10px] uppercase text-white/40 block">Largest Position</span>
-          {largest ? (
-            <div className="mt-2">
-              <span className="text-sm font-bold text-white">{largest.symbol}</span>
-              <span className="text-xs text-white/50 ml-2">{largest.totalValue ? formatINR(largest.totalValue) : '—'}</span>
-            </div>
-          ) : <span className="text-sm text-white/30 mt-2 block">—</span>}
-        </div>
-      </div>
-
-      {/* HOLDINGS TABLE */}
-      {calculatedHoldings.length === 0 ? (
-        <div className="p-8 text-center text-sm text-white/30">No holdings added yet.</div>
-      ) : (
-        <div className="bg-white/[0.01] border border-white/5 rounded-xl overflow-hidden">
-          <div className="grid grid-cols-[1fr_80px_100px_80px_120px] gap-2 p-3 text-[10px] uppercase text-white/40 font-bold tracking-wider border-b border-white/5">
-            <span className="pl-3">Ticker</span>
-            <span>Shares</span>
-            <span>Value</span>
-            <span>Return</span>
-            <span className="text-right pr-3">Actions</span>
+      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-xl border border-white/[0.06] bg-white/[0.012] p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white">Portfolio operating summary</h2>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-white/35">
+              Concentration uses recorded cost basis. Live portfolio value and returns remain unavailable until every holding has a source-backed quote.
+            </p>
           </div>
-          {calculatedHoldings.map(h => (
-            <div key={h.symbol} className="grid grid-cols-[1fr_80px_100px_80px_120px] gap-2 p-3 border-b border-white/5 last:border-0 hover:bg-white/[0.02] items-center">
-              <button onClick={() => handleOpenStock(h.symbol)} className="text-left font-mono font-bold text-white hover:text-[#7da0ff] cursor-pointer bg-transparent border-none pl-3">{h.symbol}</button>
-              <span className="font-mono text-xs text-white/70">{h.shares}</span>
-              <span className="font-mono text-xs text-white/70">{h.totalValue ? formatINR(h.totalValue) : '—'}</span>
-              <span className={`font-mono text-xs ${h.gainLossPct !== null && h.gainLossPct >= 0 ? 'text-[#22ab94]' : 'text-[#f23645]'}`}>
-                {h.gainLossPct !== null ? `${h.gainLossPct >= 0 ? '+' : ''}${h.gainLossPct.toFixed(1)}%` : '—'}
+          <span className={`text-[10px] font-bold uppercase tracking-wider ${statusClass(review.availability)}`}>{review.availability}</span>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard label="Recorded cost basis" value={review.totalCostBasis > 0 ? formatINR(review.totalCostBasis) : 'Data unavailable'} />
+          <SummaryCard label="Live portfolio value" value={review.livePortfolioValue === null ? 'Data unavailable' : formatINR(review.livePortfolioValue)} />
+          <SummaryCard label="Quote coverage" value={`${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions}`} detail={`${review.quoteCoverage.coveragePct.toFixed(0)}% of holdings`} />
+          <SummaryCard label="Largest position" value={largest ? largest.symbol : 'Data unavailable'} detail={largest ? `${largest.weightPct.toFixed(2)}% of cost basis` : undefined} />
+        </div>
+
+        {review.quoteCoverage.missingSymbols.length > 0 && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-3 text-[11px] text-amber-100/75">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            Missing live quotes: {review.quoteCoverage.missingSymbols.join(', ')}. Market value and portfolio return are intentionally withheld.
+          </div>
+        )}
+      </section>
+
+      {review.reviewQueue.length > 0 && (
+        <section aria-label="Portfolio review queue" className="space-y-3">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-4 w-4 text-amber-300" />
+            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white">Review queue</h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {review.reviewQueue.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => item.symbol && handleOpenStock(item.symbol)}
+                className={`rounded-lg border p-3 text-left transition-colors hover:bg-white/[0.04] ${reviewSeverityClass(item.severity)}`}
+              >
+                <div className="text-[11px] font-semibold">{item.title}</div>
+                <div className="mt-1 text-[10px] leading-relaxed opacity-75">{item.detail}</div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {review.concentration.sectorExposure.length > 0 && (
+        <section aria-label="Cost basis sector exposure" className="rounded-xl border border-white/[0.06] bg-white/[0.012] p-4">
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white">Sector exposure · recorded cost basis</h2>
+          <div className="mt-3 space-y-2">
+            {review.concentration.sectorExposure.map((item) => (
+              <div key={item.sector} className="flex items-center gap-3 text-[11px]">
+                <span className="w-40 truncate text-white/55">{item.sector}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5">
+                  <div className="h-full rounded-full bg-[#2962ff]" style={{ width: `${Math.min(100, item.weightPct)}%` }} />
+                </div>
+                <span className="w-16 text-right font-mono text-white/70">{item.weightPct.toFixed(2)}%</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {review.holdings.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-white/10 p-8 text-center text-sm text-white/30">No holdings added yet.</div>
+      ) : (
+        <section aria-label="Portfolio holdings" className="overflow-hidden rounded-xl border border-white/5 bg-white/[0.01]">
+          <div className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] gap-2 border-b border-white/5 p-3 text-[9px] font-bold uppercase tracking-wider text-white/40">
+            <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Cost basis</span><span>Live value</span><span>Return</span><span className="text-right pr-3">Actions</span>
+          </div>
+          {review.holdings.map((holding) => (
+            <div key={holding.symbol} className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] items-center gap-2 border-b border-white/5 p-3 last:border-0 hover:bg-white/[0.02]">
+              <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-white hover:text-[#7da0ff]">{holding.symbol}</button>
+              <span className="truncate text-[11px] text-white/45">{holding.sector}</span>
+              <span className="font-mono text-xs text-white/70">{holding.shares}</span>
+              <span className="font-mono text-xs text-white/70">{formatINR(holding.costBasis)}</span>
+              <span className="font-mono text-xs text-white/70">{holding.liveValue === null ? 'Unavailable' : formatINR(holding.liveValue)}</span>
+              <span className={`font-mono text-xs ${holding.gainLossPct === null ? 'text-white/35' : holding.gainLossPct >= 0 ? 'text-[#22ab94]' : 'text-[#f23645]'}`}>
+                {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
               </span>
               <div className="flex items-center justify-end gap-1 pr-2">
-                <button onClick={() => { setEditingHolding(h); setShares(h.shares.toString()); setPrice(h.avgBuyPrice.toString()); }} className="p-1.5 text-white/40 hover:text-white/70 cursor-pointer bg-transparent border-none"><Edit2 className="w-3 h-3" /></button>
-                <button onClick={() => handleDeleteHolding(h.symbol)} className="p-1.5 text-white/40 hover:text-rose-400 cursor-pointer bg-transparent border-none"><Trash2 className="w-3 h-3" /></button>
+                <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-white/40 hover:text-white/70"><Edit2 className="h-3 w-3" /></button>
+                <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-white/40 hover:text-rose-400"><Trash2 className="h-3 w-3" /></button>
               </div>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
-      {/* Add Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Add Holding</h3><button onClick={() => setIsAddOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#0c0e14] p-6">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-[#7da0ff]">Add Holding</h3><button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-white/45 hover:text-white"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleAddHolding} className="space-y-3">
-              <input type="text" required placeholder="Ticker" value={symbol} onChange={e => setSymbol(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
+              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" />
               <div className="grid grid-cols-2 gap-3">
-                <input type="number" required placeholder="Shares" value={shares} onChange={e => setShares(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
-                <input type="number" required placeholder="Avg Buy Price" value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" />
+                <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" />
+                <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" />
               </div>
-              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Add Asset</button>
+              <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 text-xs text-white" />
+              {formError && <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-2.5 text-[10px] text-rose-400">{formError}</div>}
+              <button type="submit" className="h-10 w-full rounded-xl bg-[#2962ff] text-xs font-bold text-white hover:bg-[#1e53e5]">Add Asset</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
       {editingHolding && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Edit {editingHolding.symbol}</h3><button onClick={() => setEditingHolding(null)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm space-y-4 rounded-2xl border border-white/10 bg-[#0c0e14] p-6">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-[#7da0ff]">Edit {editingHolding.symbol}</h3><button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-white/45 hover:text-white"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleEditHolding} className="space-y-3">
-              <input type="number" required value={shares} onChange={e => setShares(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" placeholder="Shares" />
-              <input type="number" required value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono" placeholder="Avg Buy Price" />
-              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Save</button>
+              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" placeholder="Shares" />
+              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" placeholder="Avg Buy Price" />
+              {formError && <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-2.5 text-[10px] text-rose-400">{formError}</div>}
+              <button type="submit" className="h-10 w-full rounded-xl bg-[#2962ff] text-xs font-bold text-white hover:bg-[#1e53e5]">Save</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Import Modal */}
       {isImportOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0c0e14] border border-white/10 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <div className="flex justify-between items-center"><h3 className="text-sm font-bold text-[#7da0ff]">Import CSV</h3><button onClick={() => setIsImportOpen(false)} className="text-white/45 hover:text-white"><X className="w-4 h-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-white/10 bg-[#0c0e14] p-6">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-[#7da0ff]">Import CSV</h3><button type="button" onClick={() => setIsImportOpen(false)} className="text-white/45 hover:text-white"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleCSVImport} className="space-y-3">
-              <textarea required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={e => setCsvText(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2.5 text-xs text-white font-mono resize-none" />
-              {importError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-400 text-[10px]">{importError}</div>}
-              <button type="submit" className="w-full h-10 bg-[#2962ff] text-white font-bold text-xs rounded-xl hover:bg-[#1e53e5]">Parse & Import</button>
+              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-white/10 bg-white/5 p-2.5 font-mono text-xs text-white" />
+              <p className="text-[10px] leading-relaxed text-white/35">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
+              {importError && <div className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-2.5 text-[10px] text-rose-400">{importError}</div>}
+              <button type="submit" className="h-10 w-full rounded-xl bg-[#2962ff] text-xs font-bold text-white hover:bg-[#1e53e5]">Parse & Import</button>
             </form>
           </div>
         </div>
@@ -200,5 +295,15 @@ export const PortfolioPage: React.FC = () => {
     </div>
   );
 };
+
+function SummaryCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <div className="rounded-lg border border-white/[0.06] bg-[#0D1117] p-3">
+      <div className="text-[9px] font-bold uppercase tracking-wider text-white/35">{label}</div>
+      <div className="mt-1 text-sm font-semibold text-white/80">{value}</div>
+      {detail && <div className="mt-1 text-[10px] text-white/35">{detail}</div>}
+    </div>
+  );
+}
 
 export default PortfolioPage;
