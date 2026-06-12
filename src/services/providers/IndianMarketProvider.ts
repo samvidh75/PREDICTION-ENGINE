@@ -1,6 +1,6 @@
 // src/services/providers/IndianMarketProvider.ts
 // Production Indian Market Provider — real HTTP requests via IndianAPI.in
-// Supports NSE, BSE, Quotes, Metadata, and Historical price candles.
+// Supports NSE, BSE, quotes, metadata, and close-only historical datasets.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -25,7 +25,14 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     return symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
   }
 
+  private finite(value: unknown): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
   private async fetchJson(url: string): Promise<any> {
+    if (!this.apiKey) throw new Error('IndianAPI key is required. Set INDIANAPI_KEY.');
     return RetryPolicy.execute(async () => {
       const resp = await fetch(url, {
         headers: {
@@ -34,7 +41,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
         },
       });
       if (!resp.ok) {
-        throw new Error(`IndianAPI HTTP ${resp.status}: ${resp.statusText} for ${url}`);
+        throw new Error(`IndianAPI HTTP ${resp.status}: ${resp.statusText}`);
       }
       return resp.json();
     }, RETRY_OPTS);
@@ -49,21 +56,22 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const s = data.stockDetailsReusableData || {};
     const currentPriceObj = data.currentPrice || {};
     const isBse = /\.(BO|BSE)$/i.test(symbol);
-
     const price = isBse
-      ? (parseFloat(currentPriceObj.BSE) || parseFloat(s.price) || 0)
-      : (parseFloat(currentPriceObj.NSE) || parseFloat(s.price) || 0);
+      ? (this.finite(currentPriceObj.BSE) ?? this.finite(s.price))
+      : (this.finite(currentPriceObj.NSE) ?? this.finite(s.price));
 
-    const changePercent = parseFloat(s.percentChange) || data.percentChange || 0;
-    const prevClose = parseFloat(s.close) || 0;
-    const change = prevClose ? price - prevClose : 0;
+    if (price === null || price <= 0) {
+      throw new Error(`IndianAPI: quote price unavailable for ${clean}`);
+    }
 
-    let volume = 0;
+    const previousClose = this.finite(s.close);
+    const changePercent = this.finite(s.percentChange) ?? this.finite(data.percentChange) ?? 0;
+    const change = previousClose !== null ? price - previousClose : 0;
+    let volume: number | undefined;
     if (data.keyMetrics?.priceandVolume) {
-      const item = data.keyMetrics.priceandVolume.find((x: any) => x.key === 'avgTradingVolumeLast10Days');
-      if (item && item.value) {
-        volume = parseFloat(item.value) * 100_000; // convert Lakhs to units
-      }
+      const item = data.keyMetrics.priceandVolume.find((entry: any) => entry.key === 'avgTradingVolumeLast10Days');
+      const averageVolumeLakhs = this.finite(item?.value);
+      if (averageVolumeLakhs !== null && averageVolumeLakhs >= 0) volume = averageVolumeLakhs * 100_000;
     }
 
     return {
@@ -85,9 +93,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
 
     const s = data.stockDetailsReusableData || {};
     const isBse = /\.(BO|BSE)$/i.test(symbol);
-
-    // Convert Market Cap from Crore INR to actual INR
-    const marketCap = s.marketCap ? parseFloat(s.marketCap) * 10_000_000 : undefined;
+    const marketCapCrore = this.finite(s.marketCap);
 
     return {
       symbol: clean,
@@ -95,62 +101,35 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
       sector: data.industry || '',
       industry: data.industry || '',
       exchange: isBse ? 'BSE' : 'NSE',
-      marketCap,
+      marketCap: marketCapCrore === null ? undefined : marketCapCrore * 10_000_000,
       currency: 'INR',
       website: '',
     };
   }
 
-  // ── Historical (Both getHistory and getHistorical for compatibility) ─
+  // ── Historical ────────────────────────────────────────────
   async getHistory(symbol: string, range: string = '1Y'): Promise<HistoricalPoint[]> {
     return this.getHistorical(symbol, range);
   }
 
   async getHistorical(symbol: string, range: string = '1Y'): Promise<HistoricalPoint[]> {
     const clean = this.cleanSymbol(symbol);
-    
-    // Map ranges
     let period = '1yr';
-    const r = range.toUpperCase();
-    if (r === '1D' || r === '5D' || r === '1M') period = '1m';
-    else if (r === '3M' || r === '6M') period = '6m';
-    else if (r === '1Y') period = '1yr';
-    else if (r === '3Y') period = '3yr';
-    else if (r === '5Y') period = '5yr';
-    else if (r === '10Y') period = '10yr';
-    else if (r === 'MAX') period = 'max';
+    const normalizedRange = range.toUpperCase();
+    if (normalizedRange === '1D' || normalizedRange === '5D' || normalizedRange === '1M') period = '1m';
+    else if (normalizedRange === '3M' || normalizedRange === '6M') period = '6m';
+    else if (normalizedRange === '3Y') period = '3yr';
+    else if (normalizedRange === '5Y') period = '5yr';
+    else if (normalizedRange === '10Y') period = '10yr';
+    else if (normalizedRange === 'MAX') period = 'max';
 
     const url = `https://stock.indianapi.in/historical_data?stock_name=${encodeURIComponent(clean)}&period=${period}&filter=price`;
     const data = await this.fetchJson(url);
+    const priceDataset = data.datasets?.find((dataset: any) => dataset.metric === 'Price');
 
-    const priceDs = data.datasets?.find((ds: any) => ds.metric === 'Price');
-    const volumeDs = data.datasets?.find((ds: any) => ds.metric === 'Volume');
-
-    const pointsMap = new Map<string, HistoricalPoint>();
-    
-    if (priceDs && Array.isArray(priceDs.values)) {
-      for (const [date, val] of priceDs.values) {
-        const price = parseFloat(val) || 0;
-        pointsMap.set(date, {
-          date,
-          open: price,
-          high: price,
-          low: price,
-          close: price,
-          volume: 0,
-        });
-      }
+    if (priceDataset?.values?.length) {
+      throw new Error(`IndianAPI: historical_data for ${clean} is close-only; refusing to synthesize OHLC candles`);
     }
-
-    if (volumeDs && Array.isArray(volumeDs.values)) {
-      for (const [date, val] of volumeDs.values) {
-        const point = pointsMap.get(date);
-        if (point) {
-          point.volume = typeof val === 'number' ? val : (parseFloat(val) || 0);
-        }
-      }
-    }
-
-    return Array.from(pointsMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    return [];
   }
 }
