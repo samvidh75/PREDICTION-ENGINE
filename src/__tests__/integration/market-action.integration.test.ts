@@ -34,13 +34,13 @@ async function insertSymbol(symbol: string, companyName: string, sector: string)
 async function insertPrices(symbol: string, previousClose: number, latestClose: number, volume: number): Promise<void> {
   await dbAdapter.query(
     `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
-     VALUES ($1, '2026-06-12', $2, $2, $2, $2, $2, $3)`,
-    [symbol, previousClose, volume - 100],
+     VALUES ($1, '2026-06-12', $2, $3, $4, $5, $6, $7)`,
+    [symbol, previousClose, previousClose, previousClose, previousClose, previousClose, volume - 100],
   );
   await dbAdapter.query(
     `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
-     VALUES ($1, '2026-06-13', $2, $2, $2, $2, $2, $3)`,
-    [symbol, latestClose, volume],
+     VALUES ($1, '2026-06-13', $2, $3, $4, $5, $6, $7)`,
+    [symbol, latestClose, latestClose, latestClose, latestClose, latestClose, volume],
   );
 }
 
