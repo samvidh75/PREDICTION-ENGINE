@@ -34,6 +34,8 @@ import WorkspacePage from "../pages/WorkspacePage";
 import DailyFeed from "../components/intelligence/DailyFeed";
 import PortfolioDoctor from "../components/portfolio/PortfolioDoctor";
 import AppLayout from "../components/navigation/AppLayout";
+import AcademyReviewNotice from "../components/trust/AcademyReviewNotice";
+import ResearchTrustLinks from "../components/trust/ResearchTrustLinks";
 import { AcademyProvider } from "../context/AcademyContext.jsx";
 
 interface PageRendererProps {
@@ -73,7 +75,12 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
 function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
   switch (pageKey) {
     case "portfolio":
-      return <PortfolioPage />;
+      return (
+        <>
+          <ResearchTrustLinks context="Portfolio workflow" />
+          <PortfolioPage />
+        </>
+      );
     case "watchlist":
       return <WatchlistPage />;
     case "alerts":
@@ -91,6 +98,8 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
     case "academy":
       return (
         <AcademyProvider>
+          <AcademyReviewNotice />
+          <ResearchTrustLinks context="Academy workflow" compact />
           <AcademyHub />
         </AcademyProvider>
       );
@@ -108,7 +117,12 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
       return <WorkspacePage />;
     case "brief":
     case "daily-feed":
-      return <DailyFeed />;
+      return (
+        <>
+          <ResearchTrustLinks context="Daily intelligence workflow" compact />
+          <DailyFeed />
+        </>
+      );
     case "portfolio-doctor":
       return <PortfolioDoctor />;
     case "predictions":
