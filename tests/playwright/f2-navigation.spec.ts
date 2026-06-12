@@ -35,6 +35,7 @@ test('desktop sidebar exposes grouped product workflows', async ({ page }) => {
 
   await sidebar.getByRole('button', { name: 'Portfolio doctor' }).click();
   await expect(page).toHaveURL(/page=portfolio-doctor/);
+  await expect(page.getByText('Portfolio Analysis Unavailable', { exact: true })).toBeVisible();
 
   await sidebar.getByRole('button', { name: 'Trust centre' }).click();
   await expect(page).toHaveURL(/page=trust/);
