@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   finiteOrNull,
   normalizeFinnhubSnapshot,
+  normalizeYFinanceSnapshot,
   normalizeSymbols,
   parseArgs,
   runFundamentalsIngestion,
@@ -145,6 +146,13 @@ describe("ingest-fundamentals", () => {
     await expect(runFundamentalsIngestion(baseOptions, { db: makeDb(), provider: provider() })).rejects.toThrow("Finnhub API key is required. Set FINNHUB_KEY or FINNHUB_API_KEY.");
   });
 
+  it("explicit yfinance provider does not require a Finnhub API key", async () => {
+    delete process.env.FINNHUB_KEY;
+    const report = await runFundamentalsIngestion({ ...baseOptions, provider: "yfinance" }, { db: makeDb(), provider: provider(), sleep: async () => {} });
+    expect(report.provider).toBe("yfinance");
+    expect(report.symbolsAccepted).toBe(1);
+  });
+
   it("--symbols normalizes and deduplicates symbols", () => {
     expect(normalizeSymbols([" reliance ", "RELIANCE", "tcs"])).toEqual(["RELIANCE", "TCS"]);
   });
@@ -174,6 +182,26 @@ describe("ingest-fundamentals", () => {
     expect(finiteOrNull("")).toBeNull();
     expect(finiteOrNull(Number.NaN)).toBeNull();
     expect(finiteOrNull(Infinity)).toBeNull();
+  });
+
+  it("yfinance decimal ratios normalize into percentage fields", () => {
+    const snapshot = normalizeYFinanceSnapshot("RELIANCE", {
+      symbol: "RELIANCE.NS",
+      marketCap: "1000000",
+      trailingPE: "25",
+      priceToBook: "3",
+      trailingEps: "40",
+      returnOnEquity: 0.18,
+      debtToEquity: 40,
+      revenueGrowth: 0.12,
+      earningsGrowth: 0.09,
+      operatingMargins: 0.22,
+      profitMargins: 0.11,
+    });
+    expect(snapshot.roe).toBe(18);
+    expect(snapshot.debtToEquity).toBe(0.4);
+    expect(snapshot.revenueGrowth).toBe(12);
+    expect(snapshot.netMargin).toBe(11);
   });
 
   it("completeness score is calculated correctly", () => {
@@ -249,6 +277,16 @@ describe("ingest-fundamentals", () => {
   it("API keys are never printed in reports", async () => {
     const report = await runFundamentalsIngestion(baseOptions, { db: makeDb(), provider: provider(), sleep: async () => {} });
     expect(JSON.stringify(report)).not.toContain("test-key");
+  });
+
+  it("yfinance lineage is labelled without token-bearing URLs", async () => {
+    delete process.env.FINNHUB_KEY;
+    process.env.CONFIRM_F1_FUNDAMENTALS_APPLY = "true";
+    const db = makeDb();
+    await runFundamentalsIngestion({ ...baseOptions, provider: "yfinance", mode: "apply" }, { db, provider: provider(), sleep: async () => {} });
+    expect(JSON.stringify(db.state.lineage)).toContain("yfinance");
+    expect(JSON.stringify(db.state.lineage)).not.toContain("token=");
+    expect(JSON.stringify(db.state.ingestionRuns)).toContain("yfinance");
   });
 
   it("one symbol failure does not abort a valid multi-symbol batch", async () => {
