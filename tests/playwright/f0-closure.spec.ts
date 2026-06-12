@@ -111,7 +111,7 @@ test('StockStory horizon is URL-backed and reaches snapshot and explanation APIs
   await expect.poll(() => stockHorizons).toContain('365');
   await page.getByRole('button', { name: 'whychange' }).click();
   await expect.poll(() => explanationHorizons).toContain('365');
-  await expect(page.getByText('First Prediction')).toBeVisible();
+  await expect(page.getByText('First Prediction', { exact: true })).toBeVisible();
 });
 
 test('authenticated alert centre dismisses a user-scoped alert', async ({ page }) => {
