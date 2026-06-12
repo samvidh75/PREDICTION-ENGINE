@@ -78,3 +78,40 @@ Rate-limit guidance: the CLI defaults to `--concurrency=3` and rejects values ab
 No-scraping policy: this path does not scrape Screener.in, Moneycontrol, Google Finance, Yahoo Finance webpages, NSE webpages, or BSE webpages. It does not use browser automation, cookie reuse, CAPTCHA bypass, undocumented HTML selectors, or hard-coded API keys.
 
 IndianAPI fallback: `INDIANAPI_KEY` is optional and only used for missing sector metadata when Finnhub profile data is absent. Finnhub remains the primary fundamentals provider.
+
+## yfinance optional bridge
+
+Source type: Python `yfinance` library through `scripts/yfinance_bridge.py`.
+
+Authorization status: opt-in only. Finnhub remains the primary audited fundamentals provider for F1. yfinance is available for explicit CLI runs when a reviewer wants a secondary Yahoo-backed comparison or local enrichment path. It does not require Finnhub credentials and must not be used to scrape Yahoo Finance webpages directly.
+
+Activation:
+
+```bash
+python3 -m pip install -r requirements-yfinance.txt
+npm run ingest:fundamentals -- --provider=yfinance --symbols=RELIANCE,TCS,INFY --dry-run
+```
+
+Guarded apply:
+
+```bash
+CONFIRM_F1_FUNDAMENTALS_APPLY=true \
+npm run ingest:fundamentals -- --provider=yfinance --symbols=RELIANCE,TCS,INFY --apply
+```
+
+Bridge behavior: fundamentals come from paced per-symbol quote/info calls because yfinance exposes fundamentals that way. Historical price support uses `yf.download()` with a batch ticker string through the `historical-batch` bridge command, so bulk price checks can avoid looping one ticker at a time.
+
+Caching and rate limits: the bridge uses a local JSON cache for quote/fundamental responses under `tmp/yfinance-quote-cache.json` by default. `YFINANCE_CACHE_PATH` and `YFINANCE_CACHE_SECONDS` can tune the cache location and TTL. Per-symbol quote calls sleep between symbols; batch history uses threaded `yf.download()` and should still be kept to modest batches. A `requests-cache` session is not injected because current yfinance/curl runtimes reject external cached sessions.
+
+Normalized fields: yfinance fields map to the same internal fundamentals shape as Finnhub. Decimal ratios such as `returnOnEquity`, `revenueGrowth`, `earningsGrowth`, `operatingMargins`, and `profitMargins` are converted to percentages. yfinance `debtToEquity` values above `10` are treated as percentage-style values and converted to a ratio. Missing, empty, non-finite, or malformed values remain `null`.
+
+Lineage behavior: apply mode records `source_name = yfinance` and token-free Yahoo query endpoint templates in `prediction_input_lineage`. No API keys are required, printed, or persisted for this provider.
+
+Sector-resolution order for explicit yfinance runs:
+
+1. Existing `master_security_registry.sector`
+2. yfinance quote metadata sector
+3. IndianAPI metadata sector only when `INDIANAPI_KEY` is configured
+4. `null`
+
+Secret handling: yfinance does not use the Finnhub secret. If Finnhub credentials are supplied, they are ignored for explicit `--provider=yfinance` runs.

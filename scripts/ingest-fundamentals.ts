@@ -2,6 +2,10 @@ import { dbAdapter } from "../src/db/DatabaseAdapter";
 import { NIFTY50_SYMBOLS } from "../src/backtest/BenchmarkEngine";
 import type { CompanyMetadata } from "../src/services/data/types";
 import type { FinancialData } from "../src/services/providers/FinancialProvider";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 export const TRACKED_FIELDS = [
   "marketCap",
@@ -18,6 +22,7 @@ export const TRACKED_FIELDS = [
 
 export type TrackedField = (typeof TRACKED_FIELDS)[number];
 export type IngestionMode = "dry-run" | "apply";
+export type FundamentalsProviderId = "finnhub" | "yfinance";
 
 export interface NormalizedFundamentalSnapshot {
   symbol: string;
@@ -33,7 +38,7 @@ export interface NormalizedFundamentalSnapshot {
   earningsGrowth: number | null;
   operatingMargin: number | null;
   netMargin: number | null;
-  source: "finnhub";
+  source: FundamentalsProviderId;
   retrievedAt: string;
   completenessScore: number;
   availableFields: string[];
@@ -46,14 +51,14 @@ export interface SymbolResult {
   snapshot: NormalizedFundamentalSnapshot | null;
   error: string | null;
   sector: string | null;
-  sectorSource: "master_security_registry" | "finnhub" | "indianapi" | null;
+  sectorSource: "master_security_registry" | FundamentalsProviderId | "indianapi" | null;
   sectorBackfillProposed: boolean;
   industry: string | null;
 }
 
 export interface IngestionReport {
   mode: IngestionMode;
-  provider: "finnhub";
+  provider: FundamentalsProviderId;
   symbolsRequested: number;
   symbolsFetched: number;
   symbolsAccepted: number;
@@ -162,6 +167,27 @@ function sourceUrl(symbol: string): string {
   return `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}.NS&metric=all`;
 }
 
+function providerSourceUrl(provider: FundamentalsProviderId, symbol: string): string {
+  if (provider === "finnhub") return sourceUrl(symbol);
+  return `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.NS`;
+}
+
+function toYahooSymbol(symbol: string): string {
+  return /\.[A-Z]+$/i.test(symbol) ? symbol.toUpperCase() : `${symbol.toUpperCase()}.NS`;
+}
+
+function percentOrNull(value: unknown): number | null {
+  const parsed = finiteOrNull(value);
+  if (parsed === null) return null;
+  return Math.abs(parsed) <= 1 ? Math.round(parsed * 10_000) / 100 : parsed;
+}
+
+function debtRatioOrNull(value: unknown): number | null {
+  const parsed = finiteOrNull(value);
+  if (parsed === null) return null;
+  return parsed > 10 ? Math.round((parsed / 100) * 10_000) / 10_000 : parsed;
+}
+
 export function normalizeFinnhubSnapshot(symbolInput: string, data: FinancialData | null | undefined, now = new Date()): NormalizedFundamentalSnapshot {
   if (!data || typeof data !== "object") throw new Error("provider response is missing or malformed");
   const symbol = String((data as Record<string, unknown>).symbol ?? symbolInput).trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
@@ -192,6 +218,69 @@ export function normalizeFinnhubSnapshot(symbolInput: string, data: FinancialDat
     availableFields: [...availableFields],
     missingFields: [...missingFields],
   };
+}
+
+export function normalizeYFinanceSnapshot(symbolInput: string, data: FinancialData | null | undefined, now = new Date()): NormalizedFundamentalSnapshot {
+  if (!data || typeof data !== "object") throw new Error("provider response is missing or malformed");
+  const raw = data as Record<string, unknown>;
+  if (raw.error) throw new Error(String(raw.error));
+  const symbol = String(raw.symbol ?? symbolInput).trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
+  const fiscalPeriod = isoDate(raw.periodEnd, now);
+  const snapshot: Omit<NormalizedFundamentalSnapshot, "completenessScore" | "availableFields" | "missingFields"> = {
+    symbol,
+    fiscalPeriod,
+    asOfDate: fiscalPeriod,
+    marketCap: finiteOrNull(raw.marketCap),
+    peRatio: finiteOrNull(raw.trailingPE ?? raw.forwardPE ?? raw.peRatio),
+    pbRatio: finiteOrNull(raw.priceToBook ?? raw.pbRatio),
+    eps: finiteOrNull(raw.trailingEps ?? raw.earningsPerShare ?? raw.eps),
+    roe: percentOrNull(raw.returnOnEquity ?? raw.roe),
+    debtToEquity: debtRatioOrNull(raw.debtToEquity),
+    revenueGrowth: percentOrNull(raw.revenueGrowth),
+    earningsGrowth: percentOrNull(raw.earningsGrowth ?? raw.profitGrowth),
+    operatingMargin: percentOrNull(raw.operatingMargins ?? raw.operatingMargin),
+    netMargin: percentOrNull(raw.profitMargins ?? raw.netMargin),
+    source: "yfinance",
+    retrievedAt: now.toISOString(),
+  };
+  const availableFields = TRACKED_FIELDS.filter((field) => snapshot[field] !== null);
+  const missingFields = TRACKED_FIELDS.filter((field) => snapshot[field] === null);
+  return {
+    ...snapshot,
+    completenessScore: Math.round((availableFields.length / TRACKED_FIELDS.length) * 100),
+    availableFields: [...availableFields],
+    missingFields: [...missingFields],
+  };
+}
+
+function normalizeProviderSnapshot(provider: FundamentalsProviderId, symbol: string, data: FinancialData | null | undefined, now: Date): NormalizedFundamentalSnapshot {
+  return provider === "finnhub" ? normalizeFinnhubSnapshot(symbol, data, now) : normalizeYFinanceSnapshot(symbol, data, now);
+}
+
+class YFinanceBridgeProvider implements ProviderLike {
+  async getFinancials(symbol: string): Promise<FinancialData> {
+    const yahooSymbol = toYahooSymbol(symbol);
+    const { stdout } = await execFileAsync("python3", ["scripts/yfinance_bridge.py", "quotes", yahooSymbol, "1"], {
+      cwd: process.cwd(),
+      maxBuffer: 1024 * 1024,
+      timeout: 30_000,
+    });
+    const parsed = JSON.parse(stdout) as Record<string, FinancialData>;
+    const quote = parsed[yahooSymbol];
+    if (!quote) throw new Error("provider response is missing or malformed");
+    return { ...quote, symbol };
+  }
+
+  async getMetadata(symbol: string): Promise<CompanyMetadata> {
+    const financials = await this.getFinancials(symbol);
+    return {
+      symbol,
+      companyName: String((financials as Record<string, unknown>).shortName ?? symbol),
+      sector: typeof (financials as Record<string, unknown>).sector === "string" ? String((financials as Record<string, unknown>).sector) : "",
+      industry: typeof (financials as Record<string, unknown>).industry === "string" ? String((financials as Record<string, unknown>).industry) : "",
+      exchange: "NSE",
+    };
+  }
 }
 
 export function validateSnapshot(snapshot: NormalizedFundamentalSnapshot): string[] {
@@ -251,6 +340,7 @@ async function resolveSector(
   symbol: string,
   db: DbLike,
   provider: ProviderLike,
+  providerId: FundamentalsProviderId,
   indianProvider: IndianMetadataProviderLike | null,
 ): Promise<{ sector: string | null; industry: string | null; source: SymbolResult["sectorSource"]; proposed: boolean }> {
   const existing = await existingRegistryMetadata(db, symbol);
@@ -259,7 +349,7 @@ async function resolveSector(
   try {
     const meta = await provider.getMetadata(symbol);
     const sector = meta.sector?.trim() || null;
-    if (sector) return { sector, industry: meta.industry?.trim() || null, source: "finnhub", proposed: true };
+    if (sector) return { sector, industry: meta.industry?.trim() || null, source: providerId, proposed: true };
   } catch {
     // Optional metadata failure should not reject fundamentals.
   }
@@ -348,11 +438,11 @@ async function backfillSector(db: DbLike, result: SymbolResult, now: Date): Prom
   return true;
 }
 
-async function insertIngestionRun(db: DbLike, runId: string, startedAt: string): Promise<void> {
+async function insertIngestionRun(db: DbLike, runId: string, provider: FundamentalsProviderId, startedAt: string): Promise<void> {
   await db.query(
     `INSERT INTO ingestion_runs (id, provider, dataset_type, started_at, completed_at, status, accepted_count, rejected_count, error_message)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-    [runId, "finnhub", "fundamentals", startedAt, null, "partial", 0, 0, null],
+    [runId, provider, "fundamentals", startedAt, null, "partial", 0, 0, null],
   );
 }
 
@@ -386,8 +476,8 @@ async function insertLineage(db: DbLike, runId: string, snapshot: NormalizedFund
         field,
         "financial_snapshots",
         field,
-        "finnhub",
-        sourceUrl(snapshot.symbol),
+        snapshot.source,
+        providerSourceUrl(snapshot.source, snapshot.symbol),
         snapshot.asOfDate,
         snapshot.retrievedAt,
         freshnessDays(snapshot.asOfDate, now),
@@ -403,11 +493,13 @@ async function insertLineage(db: DbLike, runId: string, snapshot: NormalizedFund
 
 function validateOptions(options: CliOptions): void {
   if (!options.provider) throw new Error("Missing --provider. Use --provider=finnhub.");
-  if (options.provider !== "finnhub") throw new Error(`Unsupported provider ${options.provider}. Only finnhub is enabled; scraping providers are prohibited.`);
+  if (options.provider !== "finnhub" && options.provider !== "yfinance") {
+    throw new Error(`Unsupported provider ${options.provider}. Use finnhub or yfinance; scraping providers are prohibited.`);
+  }
   if (options.mode === "apply" && process.env.CONFIRM_F1_FUNDAMENTALS_APPLY !== "true") {
     throw new Error("Apply mode requires CONFIRM_F1_FUNDAMENTALS_APPLY=true");
   }
-  if (!process.env.FINNHUB_KEY && !process.env.FINNHUB_API_KEY) {
+  if (options.provider === "finnhub" && !process.env.FINNHUB_KEY && !process.env.FINNHUB_API_KEY) {
     throw new Error("Finnhub API key is required. Set FINNHUB_KEY or FINNHUB_API_KEY.");
   }
 }
@@ -418,21 +510,24 @@ export async function runFundamentalsIngestion(options: CliOptions, deps: RunDep
   const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   const nowFn = deps.now ?? (() => new Date());
   await db.initialize();
-  const provider = deps.provider ?? new (await import("../src/services/providers/FinnhubProvider")).FinnhubProvider(process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY);
+  const providerId = options.provider as FundamentalsProviderId;
+  const provider = deps.provider ?? (providerId === "finnhub"
+    ? new (await import("../src/services/providers/FinnhubProvider")).FinnhubProvider(process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY)
+    : new YFinanceBridgeProvider());
   const indianProvider = deps.indianProvider ?? (process.env.INDIANAPI_KEY ? new (await import("../src/services/providers/IndianMarketProvider")).IndianMarketProvider(process.env.INDIANAPI_KEY) : null);
   const symbols = await resolveSymbols(options, db);
   if (symbols.length === 0) throw new Error("Symbol list is empty.");
   const startedAt = nowFn();
-  const runId = options.mode === "apply" ? `fundamentals-finnhub-${startedAt.getTime()}` : null;
-  if (options.mode === "apply" && runId) await insertIngestionRun(db, runId, startedAt.toISOString());
+  const runId = options.mode === "apply" ? `fundamentals-${providerId}-${startedAt.getTime()}` : null;
+  if (options.mode === "apply" && runId) await insertIngestionRun(db, runId, providerId, startedAt.toISOString());
 
   const results = await mapLimit(symbols, options.concurrency, async (symbol): Promise<SymbolResult> => {
     try {
       const [financials, sector] = await Promise.all([
         provider.getFinancials(symbol),
-        resolveSector(symbol, db, provider, indianProvider),
+        resolveSector(symbol, db, provider, providerId, indianProvider),
       ]);
-      const snapshot = normalizeFinnhubSnapshot(symbol, financials, nowFn());
+      const snapshot = normalizeProviderSnapshot(providerId, symbol, financials, nowFn());
       const errors = validateSnapshot(snapshot);
       if (errors.length > 0) {
         return { symbol, status: "rejected", snapshot, error: errors.join("; "), sector: sector.sector, sectorSource: sector.source, sectorBackfillProposed: sector.proposed, industry: sector.industry };
@@ -466,7 +561,7 @@ export async function runFundamentalsIngestion(options: CliOptions, deps: RunDep
 
   const report: IngestionReport = {
     mode: options.mode === "apply" ? "apply" : "dry-run",
-    provider: "finnhub",
+    provider: providerId,
     symbolsRequested: symbols.length,
     symbolsFetched: results.filter((result) => result.snapshot !== null).length,
     symbolsAccepted: results.filter((result) => result.status === "accepted").length,
