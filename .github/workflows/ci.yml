@@ -45,6 +45,25 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
 
+  f1-data-quality-dry-run:
+    runs-on: ubuntu-latest
+    env:
+      DB_ADAPTER: sqlite
+      SQLITE_DB_PATH: /tmp/stockstory-f1-ci.db
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: CI_FIXTURE_SEED=true npm run seed:ci
+      - run: npm run test:unit -- src/backend/scoring/__tests__/scoreDifferentiation.integration.test.ts src/backend/scoring/__tests__/predictionPipeline.contract.test.ts
+      - run: npm run repair:invalid-prices -- --dry-run
+      - run: npm run repair:prediction-registry -- --dry-run
+      - run: npm run pipeline:predictions -- --symbols=RELIANCE,HDFCBANK,INFY --horizon=30 --dry-run
+
   integration-tests-sqlite:
     runs-on: ubuntu-latest
     steps:
