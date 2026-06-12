@@ -46,15 +46,20 @@ type ProviderResult = {
 
 const argv = process.argv.slice(2);
 const strict = argv.includes('--strict');
-const symbols = parseCsvArg('--symbols=', ['RELIANCE', 'TCS', 'INFY']);
-const providers = parseCsvArg('--providers=', ['finnhub', 'indianapi', 'yfinance'])
+const symbols = parseCsvArg('--symbols=', ['RELIANCE', 'TCS', 'INFY'], 'upper');
+const providers = parseCsvArg('--providers=', ['finnhub', 'indianapi', 'yfinance'], 'lower')
   .filter((provider): provider is ProviderName => ['finnhub', 'indianapi', 'yfinance'].includes(provider));
-const required = new Set(parseCsvArg('--require=', ['finnhub', 'indianapi']));
+const required = new Set(parseCsvArg('--require=', ['finnhub', 'indianapi'], 'lower'));
 
-function parseCsvArg(prefix: string, fallback: string[]): string[] {
+function parseCsvArg(prefix: string, fallback: string[], casing: 'upper' | 'lower' | 'preserve' = 'preserve'): string[] {
   const value = argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length);
   const parsed = (value ? value.split(',') : fallback)
-    .map((entry) => entry.trim().toUpperCase())
+    .map((entry) => {
+      const trimmed = entry.trim();
+      if (casing === 'upper') return trimmed.toUpperCase();
+      if (casing === 'lower') return trimmed.toLowerCase();
+      return trimmed;
+    })
     .filter(Boolean);
   return [...new Set(parsed)];
 }
@@ -115,7 +120,7 @@ function firstPresent(record: Record<string, unknown>, keys: string[]): unknown 
 
 async function checkFinnhub(): Promise<ProviderResult> {
   const token = process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY;
-  const requiredProvider = required.has('FINNHUB');
+  const requiredProvider = required.has('finnhub');
   if (!token) {
     return { provider: 'finnhub', configured: false, required: requiredProvider, ok: false, status: 'not-configured', endpointLabels: ['stock/metric', 'stock/profile2'], symbols: [], error: 'Set FINNHUB_KEY or FINNHUB_API_KEY.' };
   }
@@ -152,7 +157,7 @@ async function checkFinnhub(): Promise<ProviderResult> {
 
 async function checkIndianApi(): Promise<ProviderResult> {
   const token = process.env.INDIANAPI_KEY;
-  const requiredProvider = required.has('INDIANAPI');
+  const requiredProvider = required.has('indianapi');
   if (!token) {
     return { provider: 'indianapi', configured: false, required: requiredProvider, ok: false, status: 'not-configured', endpointLabels: ['stock', 'stock_fundamentals'], symbols: [], error: 'Set INDIANAPI_KEY.' };
   }
@@ -188,7 +193,7 @@ async function checkIndianApi(): Promise<ProviderResult> {
 }
 
 function checkYfinance(): ProviderResult {
-  const requiredProvider = required.has('YFINANCE');
+  const requiredProvider = required.has('yfinance');
   const enabled = String(process.env.YFINANCE_ENABLED ?? '').toLowerCase() === 'true';
   if (!enabled) {
     return { provider: 'yfinance', configured: false, required: requiredProvider, ok: !requiredProvider, status: 'skipped', endpointLabels: ['scripts/yfinance_bridge.py fundamentals-batch'], symbols: [], error: 'Set YFINANCE_ENABLED=true to run the optional Python bridge healthcheck.' };
