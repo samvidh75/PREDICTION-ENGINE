@@ -27,6 +27,7 @@ export interface FundamentalSnapshot {
   peRatio?: number | null;
   pbRatio?: number | null;
   roe?: number | null;
+  debtToEquity?: number | null;
   operatingMargin?: number | null;
   netMargin?: number | null;
   revenueGrowth?: number | null;
@@ -42,4 +43,3 @@ export interface DataProvider {
   fetchPrices(symbols: string[], from: string, to: string): Promise<MarketPriceRecord[]>;
   fetchFundamentals(symbols: string[]): Promise<FundamentalSnapshot[]>;
 }
-
