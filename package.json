@@ -49,7 +49,12 @@
     "test:providers": "tsx src/scripts/provider-live-test.ts",
     "lint": "npm run lint:active",
     "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "repair:invalid-prices": "tsx scripts/repair-invalid-prices.ts",
+    "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
+    "check:score-collapse": "tsx scripts/check-score-collapse.ts",
+    "pipeline:predictions": "tsx scripts/run-prediction-pipeline.ts",
+    "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
