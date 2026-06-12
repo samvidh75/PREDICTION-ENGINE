@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Bell, Clock3, Database, GitCompare, ShieldCheck } from "lucide-react";
 import { useLiveQuote } from "../../hooks/useLiveQuotes";
 import type { CompanyMetadata } from "../../services/data/types";
+import ResearchTrustLinks from "../trust/ResearchTrustLinks";
 
 export type QuoteFreshness = "Recent" | "Delayed" | "Stale" | "Unavailable";
 
@@ -162,6 +163,10 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
         <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-300" />
         Missing market metadata remains unavailable. The workspace never infers an exchange from a bare ticker.
         <Clock3 className="ml-1 h-3 w-3 shrink-0 text-white/35" />
+      </div>
+
+      <div className="mt-3">
+        <ResearchTrustLinks context="Stock research workflow" compact />
       </div>
     </section>
   );
