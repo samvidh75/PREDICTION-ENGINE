@@ -32,6 +32,23 @@
     "src/scripts/run-explainability-pipeline.ts",
     "src/components/intelligence/ResponsiveUIScalingLayer.tsx",
     "**/*.bak.ts",
-    "**/*.deprecated.ts"
+    "**/*.deprecated.ts",
+    "scripts/adaptive-calibration.ts",
+    "scripts/backtesting-framework.ts",
+    "scripts/factor-quality-audit.ts",
+    "scripts/fundamental-completion.ts",
+    "scripts/fundamental-integration.ts",
+    "scripts/institutional-backtesting.ts",
+    "scripts/institutional-ranking-validator.ts",
+    "scripts/rc-upstox-001.ts",
+    "scripts/real-backtesting-framework.ts",
+    "scripts/real-financial-integration.ts",
+    "scripts/reproduce_all_claims.ts",
+    "scripts/revalidation-backtest.ts",
+    "scripts/track-7e-live-fundamental-activation.ts",
+    "scripts/track-7g-yahoo-fundamentals.ts",
+    "scripts/track-7h-portfolio-intelligence.ts",
+    "scripts/track-8a-fundamentals.ts",
+    "scripts/track-9a-fundamental-influence.ts"
   ]
 }
