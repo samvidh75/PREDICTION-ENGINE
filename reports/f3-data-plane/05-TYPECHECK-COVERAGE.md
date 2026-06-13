@@ -13,6 +13,23 @@
 | `tsc -p tsconfig.frontend.json` | ✅ 0 errors |
 | `tsc -p tsconfig.backend.json` | ✅ 0 errors |
 | `npm run typecheck:repo` (new) | ✅ Newly enforced as part of `typecheck:all` |
+| `npm run typecheck:providers` | ✅ 0 errors — rerun for F3.1A |
+| `npm run typecheck:ingestion` | ✅ 0 errors — rerun for F3.1A |
+| `npm run typecheck:repo` | ✅ 0 errors — rerun for F3.1A |
+
+## F3.1A CI Additions
+
+CI now runs provider, ingestion, and repo typechecks explicitly, in addition to the existing frontend/backend checks. A new provider broker test job runs deterministic broker tests with a Redis service container and secret-hygiene validation.
+
+Local verification on 2026-06-13:
+
+| Command | Result |
+|---------|--------|
+| `npm run test:provider-broker` | ✅ 14 test files, 58 tests |
+| `npm run validate:broker-secret-hygiene` | ✅ Passed |
+| `npm run typecheck:providers && npm run typecheck:ingestion && npm run typecheck:repo` | ✅ Passed |
+
+GitHub workflow IDs and Docker Smoke ID are pending post-push because this workspace has no authenticated GitHub Actions access.
 
 ## TypeScript Exclusions
 
