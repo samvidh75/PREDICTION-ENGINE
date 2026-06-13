@@ -31,13 +31,13 @@ import type {
 export type DbKind = "postgres" | "sqlite" | "unavailable";
 
 export interface DbQueryResult {
-  rows: Record<string, unknown>[];
+  rows: Record<string, any>[];
   rowCount: number;
 }
 
  
 type SQLitePoolLike = {
-  query: (text: string, params?: any[]) => Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
+  query: (text: string, params?: any[]) => Promise<{ rows: Record<string, any>[]; rowCount: number }>;
 
   executeScript?: (
     sql: string
@@ -236,7 +236,7 @@ export class DatabaseAdapter {
 
     if (this._kind === "postgres" && this.pool) {
       const result = await this.pool.query(text, params as unknown[]);
-      return { rows: result.rows as Record<string, unknown>[], rowCount: result.rowCount ?? 0 };
+      return { rows: result.rows as Record<string, any>[], rowCount: result.rowCount ?? 0 };
     }
 
     if (this._kind === "sqlite" && this.sqlitePool) {
@@ -288,7 +288,7 @@ export class DatabaseAdapter {
       return {
         query: async (text: string, params?: unknown[]) => {
           const result = await client.query(text, params as unknown[]);
-          return { rows: result.rows as Record<string, unknown>[], rowCount: result.rowCount ?? 0 };
+          return { rows: result.rows as Record<string, any>[], rowCount: result.rowCount ?? 0 };
         },
         release: () => client.release(),
       };
@@ -304,6 +304,13 @@ export class DatabaseAdapter {
     }
 
     throw new Error("DATABASE_UNAVAILABLE: Cannot get client connection");
+  }
+
+  /**
+   * Alias for shutdown(). Used by scripts expecting `.end()`.
+   */
+  async end(): Promise<void> {
+    return this.shutdown();
   }
 
   /**

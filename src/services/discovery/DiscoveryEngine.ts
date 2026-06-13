@@ -22,12 +22,13 @@ export class DiscoveryEngine {
       .slice(0, 12);
 
     const sectorLeaders = all
-      .filter((s) => s.peRatio > 0 && s.peRatio < 30)
+      .filter((s) => s.peRatio != null && s.peRatio > 0 && s.peRatio < 30)
       .slice(0, 12);
 
     const momentumLeaders = all
       .filter((s) => {
         const range = s.fiftyTwoWeekRange;
+        if (!range || range.current == null || range.low == null || range.high == null) return false;
         const proximity = (range.current - range.low) / (range.high - range.low || 1);
         return proximity > 0.7; // strong momentum
       })
@@ -36,6 +37,7 @@ export class DiscoveryEngine {
     const emerging = all
       .filter((s) => {
         const range = s.fiftyTwoWeekRange;
+        if (!range || range.current == null || range.low == null || range.high == null) return false;
         const proximity = (range.current - range.low) / (range.high - range.low || 1);
         return proximity >= 0.3 && proximity <= 0.6; // consolidation base
       })
