@@ -21,14 +21,13 @@
  *   });
  */
 
-import crypto from 'node:crypto';
-import type { ProviderOperation, BrokerResult, StatusClass, CacheState, ErrorCategory, CallLedgerEntry } from './types';
+import type { ProviderOperation, BrokerResult, StatusClass, CacheState } from './types';
 import { buildRequestKey, serializeRequestKey, requestKeyHash } from './ProviderRequestKey';
 import { ProviderQuotaPolicy } from './ProviderQuotaPolicy';
 import { ProviderCallLedger, callLedger } from './ProviderCallLedger';
 import { InMemoryProviderBrokerStore } from './InMemoryProviderBrokerStore';
 import { classifyHttpStatus, classifyNetworkError, parseRetryAfter } from './ProviderErrorClassifier';
-import { errCircuitOpen, errUnknown } from './ProviderBrokerErrors';
+import { errUnknown } from './ProviderBrokerErrors';
 
 /** Backoff config for retries. */
 const BACKOFF_CONFIG = {
@@ -93,15 +92,17 @@ export class ProviderRequestBroker {
 
     // 4. Single-flight: coalesce concurrent identical requests
     const { promise, isLeader } = this.store.getOrCreateInFlight<T>(cacheKey, async () => {
-      return this.executeUpstream<T>(provider, operation, symbol, params, fetcher, keyHash, cacheKey);
+      return this.executeUpstream<T>(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'miss');
     });
 
     if (!isLeader) {
       // Follower — wait for leader's result, record as coalesced
       const result = await promise;
-      result.coalesced = true;
-      result.cacheState = 'stale_revalidating';
-      return result;
+      return {
+        ...result,
+        coalesced: true,
+        latencyMs: Date.now() - startTime,
+      };
     }
 
     return promise;
@@ -118,21 +119,26 @@ export class ProviderRequestBroker {
     fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
     keyHash: string,
     cacheKey: string,
+    ledgerCacheState: CacheState,
   ): Promise<BrokerResult<T>> {
     const startTime = Date.now();
     let lastError: BrokerResult<T> | null = null;
     let sourceAsOf: string | null = null;
 
     for (let attempt = 1; attempt <= BACKOFF_CONFIG.maxRetries; attempt++) {
+      let callStarted = false;
       try {
         // Check quota before each attempt
         this.quota.checkQuota(provider);
         this.quota.recordCallStart(provider);
+        callStarted = true;
 
         const response = await fetcher({ provider, operation, symbol, attempt });
         sourceAsOf = response.sourceAsOf ?? null;
 
-        this.quota.recordCallEnd(provider, response.status, parseRetryAfter(response.headers?.['retry-after'] ?? null));
+        const retryAfterMs = parseRetryAfter(this.headerValue(response.headers, 'retry-after'));
+        this.quota.recordCallEnd(provider, response.status, retryAfterMs);
+        callStarted = false;
 
         if (response.status >= 200 && response.status < 300) {
           // Success
@@ -145,12 +151,12 @@ export class ProviderRequestBroker {
           // Record ledger entry
           this.ledger.record({
             provider, operation, symbol, requestKeyHash: keyHash,
-            cacheState: 'miss', coalescedFollowerCount: 0,
+            cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: 1, attemptCount: attempt,
             statusClass: 'success', errorCategory: null,
             latencyMs: Date.now() - startTime,
             quotaRemaining: this.quota.getRunLevelRemaining(),
-            cooldownUntil: null,
+            cooldownUntil: this.cooldownUntil(provider),
             sourceAsOf, retrievedAt: new Date().toISOString(),
           });
 
@@ -158,32 +164,31 @@ export class ProviderRequestBroker {
         }
 
         // Error response
-        const error = classifyHttpStatus(response.status, `HTTP ${response.status}`, parseRetryAfter(response.headers?.['retry-after'] ?? null));
+        const error = classifyHttpStatus(response.status, `HTTP ${response.status}`, retryAfterMs);
 
         // Non-retryable
         if (!error.retryable) {
-          this.quota.recordCallEnd(provider, response.status);
-          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+          const statusClass = this.statusClassForError(error);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, error);
 
           this.ledger.record({
             provider, operation, symbol, requestKeyHash: keyHash,
-            cacheState: 'miss', coalescedFollowerCount: 0,
+            cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: 1, attemptCount: attempt,
-            statusClass: 'error', errorCategory: error.category,
+            statusClass, errorCategory: error.category,
             latencyMs: Date.now() - startTime,
             quotaRemaining: this.quota.getRunLevelRemaining(),
-            cooldownUntil: null,
+            cooldownUntil: this.cooldownUntil(provider),
             sourceAsOf, retrievedAt: new Date().toISOString(),
           });
 
-          // Negative cache non-retryable errors briefly
-          this.store.setNegative(cacheKey, 30_000);
+          // Negative cache unavailable upstream responses briefly.
+          this.store.setNegative(cacheKey, this.cacheTtlFor(operation).negativeTtlMs);
           return result;
         }
 
         // Retryable error — apply backoff
-        this.quota.recordCallEnd(provider, response.status);
-        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error);
 
         if (attempt < BACKOFF_CONFIG.maxRetries) {
           await this.backoff(attempt);
@@ -192,17 +197,20 @@ export class ProviderRequestBroker {
         // Check if it's a broker-level error (quota, circuit)
         if (this.isBrokerError(err)) {
           const brokerErr = err as any;
-          this.quota.recordCallEnd(provider);
+          if (callStarted) {
+            this.quota.recordCallEnd(provider);
+            callStarted = false;
+          }
           const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, brokerErr);
 
           this.ledger.record({
             provider, operation, symbol, requestKeyHash: keyHash,
-            cacheState: 'miss', coalescedFollowerCount: 0,
+            cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: attempt > 1 ? 1 : 0, attemptCount: attempt,
-            statusClass: 'error', errorCategory: brokerErr.category,
+            statusClass: this.statusClassForError(brokerErr), errorCategory: brokerErr.category,
             latencyMs: Date.now() - startTime,
             quotaRemaining: this.quota.getRunLevelRemaining(),
-            cooldownUntil: null,
+            cooldownUntil: this.cooldownUntil(provider),
             sourceAsOf, retrievedAt: new Date().toISOString(),
           });
           return result;
@@ -210,13 +218,19 @@ export class ProviderRequestBroker {
 
         // Network error
         const error = classifyNetworkError(err);
-        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error);
 
         if (error.retryable && attempt < BACKOFF_CONFIG.maxRetries) {
-          this.quota.recordCallEnd(provider);
+          if (callStarted) {
+            this.quota.recordCallEnd(provider);
+            callStarted = false;
+          }
           await this.backoff(attempt);
         } else {
-          this.quota.recordCallEnd(provider);
+          if (callStarted) {
+            this.quota.recordCallEnd(provider);
+            callStarted = false;
+          }
           break;
         }
       }
@@ -224,16 +238,18 @@ export class ProviderRequestBroker {
 
     // All retries exhausted
     const finalErr = lastError?.error ?? errUnknown('All retries exhausted');
-    const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, BACKOFF_CONFIG.maxRetries, finalErr);
+    const statusClass = this.statusClassForError(finalErr);
+    const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, BACKOFF_CONFIG.maxRetries, finalErr);
+    this.store.setNegative(cacheKey, this.cacheTtlFor(operation).negativeTtlMs);
 
     this.ledger.record({
       provider, operation, symbol, requestKeyHash: keyHash,
-      cacheState: 'miss', coalescedFollowerCount: 0,
+      cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
       actualUpstreamCalls: 1, attemptCount: BACKOFF_CONFIG.maxRetries,
-      statusClass: 'error', errorCategory: finalErr.category,
+      statusClass, errorCategory: finalErr.category,
       latencyMs: Date.now() - startTime,
       quotaRemaining: this.quota.getRunLevelRemaining(),
-      cooldownUntil: null,
+      cooldownUntil: this.cooldownUntil(provider),
       sourceAsOf, retrievedAt: new Date().toISOString(),
     });
 
@@ -252,8 +268,10 @@ export class ProviderRequestBroker {
     params: Record<string, unknown> | undefined,
     fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
   ): void {
-    // Fire and forget — revalidation updates cache in background
-    this.executeUpstream(provider, operation, symbol, params, fetcher, keyHash, cacheKey).catch(() => {
+    // Fire and forget. Concurrent stale consumers attach to this same refresh.
+    this.store.getOrCreateInFlight<T>(cacheKey, async () => {
+      return this.executeUpstream(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'stale_revalidating');
+    }).promise.catch(() => {
       // Revalidation failure is non-fatal — stale cache remains
     });
   }
@@ -280,16 +298,16 @@ export class ProviderRequestBroker {
     };
   }
 
-  private cacheTtlFor(operation: ProviderOperation): { ttlMs: number; staleWindowMs: number } {
+  private cacheTtlFor(operation: ProviderOperation): { ttlMs: number; staleWindowMs: number; negativeTtlMs: number } {
     switch (operation) {
-      case 'quote': return { ttlMs: 30_000, staleWindowMs: 30_000 }; // 30s + 30s stale
-      case 'metadata': return { ttlMs: 300_000, staleWindowMs: 300_000 }; // 5m + 5m
-      case 'history': return { ttlMs: 600_000, staleWindowMs: 600_000 }; // 10m + 10m
+      case 'quote': return { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 }; // 30s + 30s stale
+      case 'metadata': return { ttlMs: 300_000, staleWindowMs: 300_000, negativeTtlMs: 60_000 }; // 5m + 5m
+      case 'history': return { ttlMs: 600_000, staleWindowMs: 600_000, negativeTtlMs: 60_000 }; // 10m + 10m
       case 'financials':
       case 'key_ratios':
-      case 'balance_sheet': return { ttlMs: 3_600_000, staleWindowMs: 3_600_000 }; // 1h + 1h
-      case 'news': return { ttlMs: 120_000, staleWindowMs: 120_000 }; // 2m + 2m
-      default: return { ttlMs: 60_000, staleWindowMs: 60_000 };
+      case 'balance_sheet': return { ttlMs: 3_600_000, staleWindowMs: 3_600_000, negativeTtlMs: 120_000 }; // 1h + 1h
+      case 'news': return { ttlMs: 120_000, staleWindowMs: 120_000, negativeTtlMs: 30_000 }; // 2m + 2m
+      default: return { ttlMs: 60_000, staleWindowMs: 60_000, negativeTtlMs: 30_000 };
     }
   }
 
@@ -305,6 +323,41 @@ export class ProviderRequestBroker {
       return e.code === 'RATE_LIMITED' || e.code === 'BUDGET_EXHAUSTED' || e.code === 'CIRCUIT_OPEN';
     }
     return false;
+  }
+
+  private coalescedFollowerCount(cacheKey: string): number {
+    return Math.max(0, this.store.getInFlightConsumerCount(cacheKey) - 1);
+  }
+
+  private cooldownUntil(provider: string): number | null {
+    const cooldownUntil = this.quota.getQuotaState(provider)?.cooldownUntil ?? 0;
+    return cooldownUntil > Date.now() ? cooldownUntil : null;
+  }
+
+  private headerValue(headers: Record<string, string> | undefined, name: string): string | null {
+    if (!headers) return null;
+    const target = name.toLowerCase();
+    for (const [key, value] of Object.entries(headers)) {
+      if (key.toLowerCase() === target) return value;
+    }
+    return null;
+  }
+
+  private statusClassForError(error: { category?: string; statusCode?: number; code?: string }): StatusClass {
+    switch (error.category) {
+      case 'retryable_429': return 'rate_limited';
+      case 'non_retryable_401': return 'unauthorized';
+      case 'non_retryable_404': return 'not_found';
+      case 'non_retryable_400': return 'bad_request';
+      case 'retryable_5xx': return 'server_error';
+      case 'retryable_network': return 'network_error';
+      case 'retryable_timeout': return 'timeout';
+      case 'circuit_open': return 'circuit_open';
+      case 'budget_exhausted': return 'budget_exhausted';
+      default:
+        if (error.statusCode === 429 || error.code === 'RATE_LIMITED') return 'rate_limited';
+        return 'error';
+    }
   }
 }
 

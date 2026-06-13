@@ -44,6 +44,11 @@ export class InMemoryProviderBrokerStore {
     return { promise, isLeader: true };
   }
 
+  /** Number of consumers attached to an in-flight request. */
+  getInFlightConsumerCount(key: string): number {
+    return this.inFlight.get(key)?.consumerCount ?? 0;
+  }
+
   /** Check cache for a fresh hit. */
   getFresh<T>(key: string): { data: T; staleAt: number } | null {
     const entry = this.cache.get(key) as CacheEntry<T> | undefined;

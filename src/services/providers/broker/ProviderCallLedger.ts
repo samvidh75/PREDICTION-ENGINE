@@ -8,14 +8,20 @@
  */
 
 import crypto from 'node:crypto';
-import type { CallLedgerEntry, StatusClass, CacheState, ErrorCategory, ProviderOperation } from './types';
+import type { CallLedgerEntry, ProviderOperation } from './types';
+
+export interface ProviderCallLedgerPersistence {
+  record(entry: CallLedgerEntry): void | Promise<void>;
+}
 
 export class ProviderCallLedger {
   private entries: CallLedgerEntry[] = [];
   private readonly maxEntries: number;
+  private readonly persistence?: ProviderCallLedgerPersistence;
 
-  constructor(maxEntries = 10_000) {
+  constructor(maxEntries = 10_000, persistence?: ProviderCallLedgerPersistence) {
     this.maxEntries = maxEntries;
+    this.persistence = persistence;
   }
 
   /**
@@ -29,6 +35,11 @@ export class ProviderCallLedger {
       this.entries.shift();
     }
     this.entries.push(full);
+    if (this.persistence) {
+      void Promise.resolve(this.persistence.record(full)).catch(() => {
+        // Ledger persistence is observational; broker execution should not fail here.
+      });
+    }
     return full;
   }
 
@@ -65,7 +76,7 @@ export class ProviderCallLedger {
     return {
       totalCalls: this.entries.length,
       totalUpstreamCalls: upstream.length,
-      totalCoalesced: this.entries.filter(e => e.coalescedFollowerCount > 0).length,
+      totalCoalesced: this.entries.reduce((sum, e) => sum + e.coalescedFollowerCount, 0),
       successCount: this.entries.filter(e => e.statusClass === 'success').length,
       errorCount: errors.length,
       rateLimitedCount: this.entries.filter(e => e.statusClass === 'rate_limited').length,

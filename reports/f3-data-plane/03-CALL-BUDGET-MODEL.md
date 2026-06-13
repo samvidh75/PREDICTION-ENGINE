@@ -13,6 +13,8 @@
 | Yahoo v8 chart | ~100 | — | ~200 | — | — | Observed |
 | Screener.in | **SHOULD NOT BE CALLED** | — | — | — | — | N/A |
 
+Broker implementation note: the budgets in `ProviderQuotaPolicy.DEFAULT_BUDGETS` are provisional conservative placeholders for development safety rails. They are not authoritative vendor limits and must not be treated as production policy until confirmed against provider terms/docs and wired to deployment configuration.
+
 ## Current State
 
 **No runtime call budget is enforced.** Each provider makes HTTP calls independently:

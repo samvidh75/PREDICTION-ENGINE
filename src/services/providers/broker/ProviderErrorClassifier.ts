@@ -5,7 +5,7 @@
  * provider broker. Retry decisions are deterministic based on status code.
  */
 
-import type { BrokerError, ErrorCategory } from './types';
+import type { BrokerError } from './types';
 import { errRateLimited, errServerError, errUnauthorized, errForbidden, errNotFound, errBadRequest, errNetworkError, errTimeout, errUnknown } from './ProviderBrokerErrors';
 
 /**
@@ -23,7 +23,7 @@ export function classifyHttpStatus(statusCode: number, message?: string, retryAf
     case 425: return errTimeout(message ?? `HTTP ${statusCode} — timeout`);
     case 429: return errRateLimited(retryAfterMs ?? 60_000);
     default:
-      if (statusCode >= 500) {
+      if (statusCode >= 500 && statusCode <= 599) {
         return errServerError(statusCode, message ?? `HTTP ${statusCode}`);
       }
       return errUnknown(message ?? `HTTP ${statusCode}`);
@@ -36,17 +36,24 @@ export function classifyHttpStatus(statusCode: number, message?: string, retryAf
  */
 export function classifyNetworkError(error: unknown): BrokerError {
   const msg = error instanceof Error ? error.message : String(error);
+  const name = error && typeof error === 'object' && 'name' in error
+    ? String((error as { name?: unknown }).name)
+    : '';
+  const code = error && typeof error === 'object' && 'code' in error
+    ? String((error as { code?: unknown }).code)
+    : '';
+  const text = `${name} ${code} ${msg}`.toLowerCase();
 
   // Timeout detection
-  if (error instanceof DOMException && error.name === 'AbortError') {
+  if (isAbortError(error)) {
     return errTimeout(msg);
   }
-  if (msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('abort')) {
+  if (text.includes('timeout') || text.includes('timedout') || text.includes('abort') || text.includes('etimedout')) {
     return errTimeout(msg);
   }
 
   // Network error detection
-  if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('fetch failed') || msg.toLowerCase().includes('econnrefused') || msg.toLowerCase().includes('enotfound')) {
+  if (text.includes('network') || text.includes('fetch failed') || text.includes('econnrefused') || text.includes('enotfound') || text.includes('eai_again') || text.includes('socket')) {
     return errNetworkError(msg);
   }
 
@@ -57,11 +64,21 @@ export function classifyNetworkError(error: unknown): BrokerError {
  * Extract Retry-After header value in milliseconds.
  */
 export function parseRetryAfter(retryAfter: string | null): number | undefined {
-  if (!retryAfter) return undefined;
-  const value = Number(retryAfter);
-  if (!Number.isNaN(value)) return value * 1000; // seconds → ms
+  const header = retryAfter?.trim();
+  if (!header) return undefined;
+  const value = Number(header);
+  if (Number.isFinite(value) && value >= 0) return value * 1000; // seconds → ms
   // HTTP-date format
-  const parsed = new Date(retryAfter).getTime();
+  const parsed = new Date(header).getTime();
   if (!Number.isNaN(parsed)) return Math.max(0, parsed - Date.now());
   return 60_000; // default 60s
+}
+
+function isAbortError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const name = 'name' in error ? (error as { name?: unknown }).name : undefined;
+  if (name === 'AbortError') return true;
+
+  const domExceptionCtor = globalThis.DOMException;
+  return typeof domExceptionCtor !== 'undefined' && error instanceof domExceptionCtor && error.name === 'AbortError';
 }
