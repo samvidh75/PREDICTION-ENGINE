@@ -20,9 +20,11 @@
 import { FinancialProvider, FinancialData } from './FinancialProvider';
 import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
 import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
+import { getCurrentIngestionRunId } from '../acquisition/IngestionRunContext';
 
 const API_BASE = 'https://api.upstox.com/v2/fundamentals';
 const REQUEST_TIMEOUT_MS = 10_000;
+const FUNDAMENTALS_CACHE_POLICY = { ttlMs: 3_600_000, staleWindowMs: 3_600_000, negativeTtlMs: 120_000 } as const;
 
 function headersToRecord(headers: Headers): Record<string, string> {
   const record: Record<string, string> = {};
@@ -179,6 +181,10 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
         status: resp.status,
         headers: headersToRecord(resp.headers),
       };
+    }, {
+      cachePolicy: FUNDAMENTALS_CACHE_POLICY,
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
     });
 
     if (!result.success || result.data === null) {
@@ -198,6 +204,10 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
         headers: headersToRecord(resp.headers),
         sourceAsOf: this.sourceAsOfBalanceSheet(data),
       };
+    }, {
+      cachePolicy: FUNDAMENTALS_CACHE_POLICY,
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
     });
 
     if (!result.success || result.data === null) {

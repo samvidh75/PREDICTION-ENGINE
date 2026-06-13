@@ -66,6 +66,10 @@ jobs:
             -e ALLOW_SQLITE_IN_PRODUCTION=false \
             -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            -e PROVIDER_BROKER_REDIS_REQUIRED=false \
+            -e PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED=true \
+            -e RATE_LIMIT_REDIS_REQUIRED=false \
+            -e RATE_LIMIT_SINGLE_INSTANCE_ALLOWED=true \
             stockstory-api:test
 
       - name: Wait for /healthz (liveness)

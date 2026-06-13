@@ -17,20 +17,20 @@ Broker implementation note: the budgets in `ProviderQuotaPolicy.DEFAULT_BUDGETS`
 
 ## Current State
 
-**No runtime call budget is enforced.** Each provider makes HTTP calls independently:
+F3.1B routes migrated live providers through the broker. Provider-local retry loops were removed from Finnhub, IndianAPI, Upstox fundamentals, Yahoo, and Google News RSS.
 
-- `RetryPolicy.ts` has backoff for failures but no rate-limit awareness
-- `ProviderCoordinator.ts` has no call budget tracking
+- `ProviderRequestBroker.ts` owns retry, cooldown, quota, cache, stale revalidation, and negative cache behavior
+- `ProviderCoordinator.ts` fetches one financial bundle per provider per symbol
 - `ProviderHealthMonitor.ts` counts failures but not call volume
 - `DataFlowTracer.ts` records usage but not budget consumption
 
 ## Call Amplification Defects
 
-1. **ProviderCoordinator.invokeFinancialsMerge** — iterates over all financial providers and merges results. If a provider fails (e.g. UpstoxFundamentals with no token), it immediately falls through to the next provider, potentially making 4 financial API calls per symbol.
+1. **ProviderCoordinator.invokeFinancialsMerge** — repaired in F3.1B to fetch each provider bundle once per symbol, merge all fields, and stop once required scoring fields are complete.
 
 2. **scripts/ingest-fundamentals.ts** — known defect: one symbol can call financials through the same provider for metadata, then again for financials, then Yahoo for metadata, then IndianAPI fallback.
 
-3. **ProviderFailoverManager** (`src/providers/v2/`) — per-field loop defect: calls `adapter.fetchFinancials(symbol)` for each field individually.
+3. **ProviderFailoverManager** (`src/providers/v2/`) — repaired in F3.1B to call `adapter.fetchFinancials(symbol)` once per provider bundle and extract requested fields from that bundle.
 
 ## Target Budget Model (Phase 1 Broker)
 
@@ -65,3 +65,17 @@ Redis-related broker configuration:
 | `PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED` | Explicit opt-in for in-memory single-instance mode. |
 
 CI broker tests use deterministic fixtures only and do not call live provider APIs.
+
+## F3.1B Inbound API Limiting
+
+`src/middleware/RateLimiter.ts` now enforces route-family counters:
+
+| Family | Prefix |
+|--------|--------|
+| `market-data` | `/api/market-data` |
+| `intelligence` | `/api/intelligence` |
+| `stockstory` | `/api/stockstory` |
+| `predictions` | `/api/predictions` |
+| `admin-ingestion` | `/api/admin/ingestion` |
+
+Query string variants share counters. Authenticated users are keyed before IP fallback. Redis-backed counters are used when `REDIS_URL` is configured; multi-replica production should set `RATE_LIMIT_REDIS_REQUIRED=true` and `RATE_LIMIT_SINGLE_INSTANCE_ALLOWED=false`.

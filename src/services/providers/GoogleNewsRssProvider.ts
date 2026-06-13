@@ -1,7 +1,9 @@
 import { NewsProvider, type NewsItem } from "./NewsProvider";
 import { getSharedProviderRequestBroker } from "./broker/createProviderRequestBroker";
+import { getCurrentIngestionRunId } from "../acquisition/IngestionRunContext";
 
 const REQUEST_TIMEOUT_MS = 10_000;
+const NEWS_CACHE_POLICY = { ttlMs: 120_000, staleWindowMs: 120_000, negativeTtlMs: 30_000 } as const;
 
 function headersToRecord(headers: Headers): Record<string, string> {
   const record: Record<string, string> = {};
@@ -81,6 +83,10 @@ export class GoogleNewsRssProvider implements NewsProvider {
       } finally {
         clearTimeout(timeout);
       }
+    }, {
+      cachePolicy: NEWS_CACHE_POLICY,
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
     });
 
     if (!result.success || result.data === null) {

@@ -6,8 +6,14 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { CompanyMetadata } from '../data/types';
 import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
+import { getCurrentIngestionRunId } from '../acquisition/IngestionRunContext';
 
 const REQUEST_TIMEOUT_MS = 10_000;
+const CACHE_POLICIES = {
+  metadata: { ttlMs: 300_000, staleWindowMs: 300_000, negativeTtlMs: 60_000 },
+  financials: { ttlMs: 3_600_000, staleWindowMs: 3_600_000, negativeTtlMs: 120_000 },
+  news: { ttlMs: 120_000, staleWindowMs: 120_000, negativeTtlMs: 30_000 },
+} as const;
 
 function headersToRecord(headers: Headers): Record<string, string> {
   const record: Record<string, string> = {};
@@ -58,6 +64,10 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
       } finally {
         clearTimeout(timeout);
       }
+    }, {
+      cachePolicy: CACHE_POLICIES[operation],
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
     });
 
     if (!result.success || result.data === null) {

@@ -60,6 +60,33 @@ describe('ProviderRequestBroker', () => {
     expect(entries[0]?.coalescedFollowerCount).toBe(1);
   });
 
+  it('records run metadata without adding it to request key material', async () => {
+    const { broker, ledger } = makeBroker();
+    const fetcher = vi.fn(async () => ({ data: { price: 123 }, status: 200 }));
+
+    const first = await broker.execute(
+      'test',
+      'quote',
+      'RELIANCE',
+      { region: 'IN' },
+      fetcher,
+      { runId: 'run-a', cachePolicy: { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 }, timeoutMs: 10_000 },
+    );
+    const second = await broker.execute(
+      'test',
+      'quote',
+      'RELIANCE',
+      { region: 'IN' },
+      fetcher,
+      { runId: 'run-b', cachePolicy: { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 }, timeoutMs: 10_000 },
+    );
+
+    expect(first).toMatchObject({ success: true, cacheState: 'miss', runId: 'run-a' });
+    expect(second).toMatchObject({ success: true, cacheState: 'fresh', runId: 'run-b' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(ledger.getEntries()[0]?.runId).toBe('run-a');
+  });
+
   it('returns stale data immediately and triggers one shared background revalidation', async () => {
     vi.useFakeTimers();
 
