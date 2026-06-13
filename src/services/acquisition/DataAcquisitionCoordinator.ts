@@ -12,6 +12,12 @@ import type {
   CompanyMetadata,
   FinancialSnapshot,
 } from "../data/types";
+import {
+  createIngestionRunId,
+  getCurrentIngestionRunContext,
+  runWithIngestionRunContext,
+  type IngestionRunContext,
+} from "./IngestionRunContext";
 
 const yahoo: PriceProvider & MetadataProvider & HistoricalProvider & FinancialProvider = new YahooProvider();
 const indian: PriceProvider & MetadataProvider & HistoricalProvider = new IndianMarketProvider();
@@ -19,8 +25,24 @@ const finnhub: MetadataProvider & FinancialProvider & NewsProvider = new Finnhub
 const gnews: NewsProvider = new GoogleNewsRssProvider();
 
 export class DataAcquisitionCoordinator {
+  static async runWithIngestionContext<T>(
+    work: () => Promise<T>,
+    context: Partial<IngestionRunContext> = {},
+  ): Promise<T> {
+    if (getCurrentIngestionRunContext()) return work();
+
+    return runWithIngestionRunContext({
+      runId: context.runId ?? createIngestionRunId("data-acquisition"),
+      source: context.source ?? "DataAcquisitionCoordinator",
+    }, work);
+  }
+
   /** Fetch quote using provider priority: Yahoo then IndianMarket */
   static async fetchQuote(symbol: string): Promise<StockQuote> {
+    return this.runWithIngestionContext(() => this.fetchQuoteWithinRun(symbol));
+  }
+
+  private static async fetchQuoteWithinRun(symbol: string): Promise<StockQuote> {
     const providers: PriceProvider[] = [yahoo, indian];
     for (const p of providers) {
       try {
@@ -35,6 +57,10 @@ export class DataAcquisitionCoordinator {
 
   /** Fetch metadata using priority: Yahoo -> Finnhub */
   static async fetchMetadata(symbol: string): Promise<CompanyMetadata> {
+    return this.runWithIngestionContext(() => this.fetchMetadataWithinRun(symbol));
+  }
+
+  private static async fetchMetadataWithinRun(symbol: string): Promise<CompanyMetadata> {
     const providers: MetadataProvider[] = [yahoo, finnhub];
     for (const p of providers) {
       try {
@@ -49,6 +75,10 @@ export class DataAcquisitionCoordinator {
 
   /** Fetch financial statements using priority: Finnhub -> Yahoo */
   static async fetchFinancials(symbol: string): Promise<FinancialSnapshot> {
+    return this.runWithIngestionContext(() => this.fetchFinancialsWithinRun(symbol));
+  }
+
+  private static async fetchFinancialsWithinRun(symbol: string): Promise<FinancialSnapshot> {
     const providers: FinancialProvider[] = [finnhub];
     for (const p of providers) {
       try {
@@ -65,6 +95,10 @@ export class DataAcquisitionCoordinator {
 
   /** Fetch news using priority: Finnhub -> GNews */
   static async fetchNews(symbol: string): Promise<NewsItem[]> {
+    return this.runWithIngestionContext(() => this.fetchNewsWithinRun(symbol));
+  }
+
+  private static async fetchNewsWithinRun(symbol: string): Promise<NewsItem[]> {
     const providers: NewsProvider[] = [finnhub, gnews];
     for (const p of providers) {
       try {

@@ -1,4 +1,10 @@
 // src/services/providers/ProviderCoordinator.ts
+//
+// F3.1B: Repair call amplification — fetch each provider bundle once per symbol,
+// extract all available fields, stop when required scoring fields are complete,
+// invoke fallback only for still-missing fields, preserve field-level lineage,
+// do not fabricate periodEnd.
+//
 // Orchestrates provider chains with failover, circuit breakers, and health monitoring.
 
 import { PriceProvider } from './PriceProvider';
@@ -8,7 +14,6 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { UpstoxProvider } from '../brokers/UpstoxProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
@@ -17,19 +22,43 @@ import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 
+/** Fields required for scoring — once these are all populated, stop fetching. */
+const REQUIRED_SCORING_FIELDS = new Set([
+  'peRatio',
+  'pbRatio',
+  'roe',
+  'roic',
+  'evEbitda',
+  'debtToEquity',
+  'marketCap',
+  'eps',
+  'dividendYield',
+  'beta',
+  'revenueGrowth',
+  'profitGrowth',
+  'epsGrowth',
+  'fcfGrowth',
+  'grossMargin',
+  'operatingMargin',
+  'currentRatio',
+  'fcfYield',
+]);
+
 /**
  * ProviderCoordinator is the single entry point for market data.
  *
- * TRACK-9B financial architecture (ScreenerProvider removed — QUARANTINED F3 Phase 0):
- *   Tier 1: UpstoxFundamentalsProvider
- *   Tier 2: FinnhubProvider
+ * Financial providers are merged, extracting one bundle per provider per symbol:
+ *   Tier 1: UpstoxFundamentalsProvider (primary Indian fundamentals)
+ *   Tier 2: FinnhubProvider (fills gaps)
  *   Tier 3: YahooProvider (price/volume only)
  *
- * Financial providers are merged, not first-success returned:
- *   - Upstox is primary for verified live ratios and balance-sheet fields.
- *   - Finnhub fills missing low-priority fields.
- *   - Yahoo provides price data only (no fundamentals via v8 chart).
- *   - No provider can overwrite a populated value from an earlier tier.
+ * Key contracts:
+ *   - One bundle fetch per provider per symbol, NOT one call per field
+ *   - Early stop when REQUIRED_SCORING_FIELDS are complete
+ *   - Fallback called only for still-missing fields
+ *   - No field-level parallelism (each provider fetched once in priority order)
+ *   - No fabricated periodEnd (null when source does not provide it)
+ *   - Sanitized provider errors preserved
  */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
@@ -37,7 +66,6 @@ export class ProviderCoordinator {
   private historicalProviders: HistoricalProvider[] = [];
   private newsProviders: NewsProvider[] = [];
   private financialProviders: FinancialProvider[] = [];
-  public upstox: UpstoxProvider;
 
   private healthMonitor: ProviderHealthMonitor;
   private circuitBreakers: Map<any, ProviderCircuitBreaker> = new Map();
@@ -46,9 +74,6 @@ export class ProviderCoordinator {
   constructor() {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
-
-    this.upstox = new UpstoxProvider();
-    this.circuitBreakers.set(this.upstox, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
 
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
       if (typeof window !== 'undefined') {
@@ -63,7 +88,6 @@ export class ProviderCoordinator {
     this.financialProviders.push(upstoxFundamentals);
 
     // ScreenerProvider is QUARANTINED (F3 Phase 0) — HTML scraper removed from runtime.
-    // See src/services/providers/ScreenerProvider.ts for details.
     
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
@@ -80,8 +104,6 @@ export class ProviderCoordinator {
     } catch {
       // Finnhub is optional when no API key is configured.
     }
-
-    this.financialProviders.push(yahoo);
 
     const googleNews = new GoogleNewsRssProvider();
     this.circuitBreakers.set(googleNews, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
@@ -137,7 +159,7 @@ export class ProviderCoordinator {
         this.tracer.recordUsage(symbol, category, provider.constructor.name, false);
         return result;
       } catch (err: any) {
-        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
+        errors.push(`${provider.constructor.name}: ${this.sanitizeProviderError(err)}`);
         this.healthMonitor.recordFailure(provider);
         this.tracer.recordUsage(symbol, category, provider.constructor.name, true);
       }
@@ -146,16 +168,38 @@ export class ProviderCoordinator {
     throw new Error(`All providers failed for ${category}(${symbol}): ${errors.join(' | ')}`);
   }
 
+  /**
+   * invokeFinancialsMerge — ONE bundle fetch per provider per symbol.
+   *
+   * 1. Fetch UpstoxFundamentalsProvider bundle first
+   * 2. Extract all available fields from the bundle
+   * 3. If REQUIRED_SCORING_FIELDS are incomplete, fetch FinnhubProvider bundle
+   * 4. Merge only fields still missing (no overwrites)
+   * 5. Never call more than one bundle fetch per provider per symbol
+   * 6. Do not fabricate periodEnd
+   */
   private async invokeFinancialsMerge(symbol: string): Promise<FinancialSnapshot> {
     const merged: Record<string, any> = {};
     const sourceMap: Record<string, string> = {};
     const errors: string[] = [];
+    const calledProviders = new Set<string>();
 
     for (const provider of this.financialProviders) {
+      const providerName = (provider as any).constructor?.name ?? 'unknown';
+
+      // Skip already-called providers
+      if (calledProviders.has(providerName)) continue;
+      calledProviders.add(providerName);
+
       const status = this.healthMonitor.getStatus(provider);
       if (status === 'Unavailable' || status === 'RateLimited') {
-        errors.push(`${provider.constructor.name}: skipped (${status})`);
+        errors.push(`${providerName}: skipped (${status})`);
         continue;
+      }
+
+      // Early stop: if all REQUIRED_SCORING_FIELDS are populated, skip remaining providers
+      if (this.scoringFieldsComplete(merged)) {
+        break;
       }
 
       const breaker = this.circuitBreakers.get(provider);
@@ -164,12 +208,12 @@ export class ProviderCoordinator {
           ? await breaker.execute(() => provider.getFinancials(symbol))
           : await provider.getFinancials(symbol);
         this.healthMonitor.recordSuccess(provider);
-        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, false);
-        this.mergeFinancialFields(merged, result as Record<string, any>, provider.constructor.name, sourceMap);
+        this.tracer.recordUsage(symbol, 'financials', providerName, false);
+        this.mergeFinancialFields(merged, result as Record<string, any>, providerName, sourceMap);
       } catch (err: any) {
-        errors.push(`${provider.constructor.name}: ${err?.message || String(err)}`);
+        errors.push(`${providerName}: ${this.sanitizeProviderError(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.tracer.recordUsage(symbol, 'financials', provider.constructor.name, true);
+        this.tracer.recordUsage(symbol, 'financials', providerName, true);
       }
     }
 
@@ -179,61 +223,49 @@ export class ProviderCoordinator {
 
     return {
       symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
-      periodEnd: merged.periodEnd ?? new Date().toISOString().split('T')[0],
+      // Do not fabricate periodEnd — null when source does not provide it
+      periodEnd: merged.periodEnd ?? undefined,
       ...merged,
       _sources: sourceMap,
       _providerErrors: errors,
     } as FinancialSnapshot;
   }
 
+  /** Returns true when all REQUIRED_SCORING_FIELDS are populated and non-null. */
+  private scoringFieldsComplete(merged: Record<string, any>): boolean {
+    for (const field of REQUIRED_SCORING_FIELDS) {
+      if (merged[field] === undefined || merged[field] === null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Merge fields from a single provider bundle fetch.
+   * Accepts ALL fields from the provider — no hard-coded allowlist.
+   * Only fills fields that are still missing (no overwrites).
+   */
   private mergeFinancialFields(
     target: Record<string, any>,
     source: Record<string, any>,
     providerName: string,
     sourceMap: Record<string, string>,
   ): void {
-    const upstoxFields = new Set([
-      'symbol',
-      'periodEnd',
-      'peRatio',
-      'pbRatio',
-      'roe',
-      'roa',
-      'roic',
-      'evEbitda',
-      'debtToEquity',
-      'totalAssets',
-      'totalLiabilities',
-      'totalEquity',
-    ]);
-    const screenerEnrichmentFields = new Set([
-      'revenueGrowth',
-      'profitGrowth',
-      'epsGrowth',
-      'fcfGrowth',
-      'operatingMargin',
-      'currentRatio',
-      'dividendYield',
-      'bookValue',
-      'marketCap',
-    ]);
-    const fallbackFields = new Set([
-      'eps',
-      'beta',
-      'fcfYield',
-      'grossMargin',
-    ]);
-
-    const allowed = providerName === 'UpstoxFundamentalsProvider'
-      ? upstoxFields
-      : fallbackFields;
-
     for (const [field, value] of Object.entries(source)) {
-      if (field.startsWith('_') || !allowed.has(field)) continue;
+      if (field.startsWith('_') || field === 'symbol') continue;
       if (value === undefined || value === null) continue;
       if (target[field] !== undefined && target[field] !== null) continue;
       target[field] = value;
       sourceMap[field] = providerName;
     }
+  }
+
+  private sanitizeProviderError(err: unknown): string {
+    const message = err instanceof Error ? err.message : String(err);
+    return message
+      .replace(/(token|api[_-]?key|apikey|key|secret|access[_-]?token)=([^&\s]+)/gi, '$1=[REDACTED]')
+      .replace(/bearer\s+[a-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
+      .replace(/authorization:\s*[^\s]+/gi, 'authorization:[REDACTED]');
   }
 }

@@ -35,3 +35,19 @@ Automated ingestion may only be added behind a provider adapter when all of the 
 - a kill switch that disables the provider without code changes.
 
 HTML scraping, CAPTCHA bypass, browser automation, cookie reuse, and committing API keys to the repository are prohibited.
+
+## F3.1B Broker-Migrated Providers
+
+The following live adapters are routed through the quota-aware provider request broker:
+
+- Finnhub: metadata, financials, news.
+- IndianAPI: quote, metadata, history.
+- Upstox Fundamentals: key-ratios and balance-sheet as separate broker operations.
+- Yahoo v8 chart: quote, metadata, history.
+- Google News RSS: news.
+
+Provider-local retry loops are not used by these adapters. The broker owns cache, stale-while-revalidate, negative cache, retry classification, `Retry-After`, cooldown, and quota accounting.
+
+Missing credentials block before outbound requests for Finnhub, IndianAPI, and Upstox. Missing or ambiguous source data remains unavailable; adapters must not fabricate exchange, fiscal period, or OHLC candles from close-only series.
+
+Inbound API requests are rate-limited by normalized route family so query variants share counters and client bursts cannot amplify provider calls.

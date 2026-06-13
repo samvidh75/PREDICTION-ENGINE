@@ -21,7 +21,7 @@
  *   });
  */
 
-import type { ProviderOperation, BrokerResult, StatusClass, CacheState } from './types';
+import type { ProviderOperation, BrokerResult, StatusClass, CacheState, BrokerExecuteOptions, CachePolicy } from './types';
 import { buildRequestKey, serializeRequestKey, requestKeyHash } from './ProviderRequestKey';
 import { ProviderQuotaPolicy } from './ProviderQuotaPolicy';
 import { ProviderCallLedger, callLedger } from './ProviderCallLedger';
@@ -61,6 +61,7 @@ export class ProviderRequestBroker {
     symbol: string,
     params: Record<string, unknown> | undefined,
     fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
+    options: BrokerExecuteOptions = {},
   ): Promise<BrokerResult<T>> {
     const startTime = Date.now();
     const key = buildRequestKey(provider, operation, symbol, params);
@@ -74,26 +75,26 @@ export class ProviderRequestBroker {
         message: 'Previously unavailable — cached negative result',
         category: 'unknown',
         retryable: false,
-      });
+      }, options.runId);
     }
 
     // 2. Check fresh cache
     const freshHit = this.store.getFresh<BrokerResult<T>>(cacheKey);
     if (freshHit) {
-      return this.makeResult<T>(provider, operation, symbol, startTime, freshHit.data.data, 'success', 'fresh', false, 0, null);
+      return this.makeResult<T>(provider, operation, symbol, startTime, freshHit.data.data, 'success', 'fresh', false, 0, null, options.runId);
     }
 
     // 3. Check stale cache for stale-while-revalidate
     const staleHit = this.store.getStale<BrokerResult<T>>(cacheKey);
     if (staleHit) {
       // Trigger async revalidation, return stale data immediately
-      this.revalidateAsync(keyHash, cacheKey, provider, operation, symbol, params, fetcher);
-      return this.makeResult<T>(provider, operation, symbol, startTime, staleHit.data.data, 'success', 'stale', false, 0, null);
+      this.revalidateAsync(keyHash, cacheKey, provider, operation, symbol, params, fetcher, options);
+      return this.makeResult<T>(provider, operation, symbol, startTime, staleHit.data.data, 'success', 'stale', false, 0, null, options.runId);
     }
 
     // 4. Single-flight: coalesce concurrent identical requests
     const { promise, isLeader } = this.store.getOrCreateInFlight<T>(cacheKey, async () => {
-      return this.executeUpstream<T>(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'miss');
+      return this.executeUpstream<T>(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'miss', options);
     });
 
     if (!isLeader) {
@@ -121,6 +122,7 @@ export class ProviderRequestBroker {
     keyHash: string,
     cacheKey: string,
     ledgerCacheState: CacheState,
+    options: BrokerExecuteOptions,
   ): Promise<BrokerResult<T>> {
     const startTime = Date.now();
     let lastError: BrokerResult<T> | null = null;
@@ -143,15 +145,15 @@ export class ProviderRequestBroker {
 
         if (response.status >= 200 && response.status < 300) {
           // Success
-          const result = this.makeResult<T>(provider, operation, symbol, startTime, response.data, 'success', 'miss', false, attempt, null);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, response.data, 'success', 'miss', false, attempt, null, options.runId);
 
           // Cache the successful result
-          const ttl = this.cacheTtlFor(operation);
+          const ttl = this.cacheTtlFor(operation, options.cachePolicy);
           this.store.setFresh(cacheKey, result, ttl.ttlMs, ttl.staleWindowMs);
 
           // Record ledger entry
           this.ledger.record({
-            provider, operation, symbol, requestKeyHash: keyHash,
+            runId: options.runId, provider, operation, symbol, requestKeyHash: keyHash,
             cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: 1, attemptCount: attempt,
             statusClass: 'success', errorCategory: null,
@@ -170,10 +172,10 @@ export class ProviderRequestBroker {
         // Non-retryable
         if (!error.retryable) {
           const statusClass = this.statusClassForError(error);
-          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, error);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, error, options.runId);
 
           this.ledger.record({
-            provider, operation, symbol, requestKeyHash: keyHash,
+            runId: options.runId, provider, operation, symbol, requestKeyHash: keyHash,
             cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: 1, attemptCount: attempt,
             statusClass, errorCategory: error.category,
@@ -184,12 +186,12 @@ export class ProviderRequestBroker {
           });
 
           // Negative cache unavailable upstream responses briefly.
-          this.store.setNegative(cacheKey, this.cacheTtlFor(operation).negativeTtlMs);
+          this.store.setNegative(cacheKey, this.cacheTtlFor(operation, options.cachePolicy).negativeTtlMs);
           return result;
         }
 
         // Retryable error — apply backoff
-        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error, options.runId);
 
         if (attempt < BACKOFF_CONFIG.maxRetries) {
           await this.backoff(attempt);
@@ -203,10 +205,10 @@ export class ProviderRequestBroker {
             callStarted = false;
           }
           const statusClass = this.statusClassForError(brokerErr);
-          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, brokerErr);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, brokerErr, options.runId);
 
           this.ledger.record({
-            provider, operation, symbol, requestKeyHash: keyHash,
+            runId: options.runId, provider, operation, symbol, requestKeyHash: keyHash,
             cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: attempt > 1 ? 1 : 0, attemptCount: attempt,
             statusClass, errorCategory: brokerErr.category,
@@ -220,7 +222,7 @@ export class ProviderRequestBroker {
 
         // Network error
         const error = classifyNetworkError(err);
-        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, this.statusClassForError(error), 'miss', false, attempt, error, options.runId);
 
         if (error.retryable && attempt < BACKOFF_CONFIG.maxRetries) {
           if (callStarted) {
@@ -241,11 +243,11 @@ export class ProviderRequestBroker {
     // All retries exhausted
     const finalErr = lastError?.error ?? errUnknown('All retries exhausted');
     const statusClass = this.statusClassForError(finalErr);
-    const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, BACKOFF_CONFIG.maxRetries, finalErr);
-    this.store.setNegative(cacheKey, this.cacheTtlFor(operation).negativeTtlMs);
+    const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, BACKOFF_CONFIG.maxRetries, finalErr, options.runId);
+    this.store.setNegative(cacheKey, this.cacheTtlFor(operation, options.cachePolicy).negativeTtlMs);
 
     this.ledger.record({
-      provider, operation, symbol, requestKeyHash: keyHash,
+      runId: options.runId, provider, operation, symbol, requestKeyHash: keyHash,
       cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
       actualUpstreamCalls: 1, attemptCount: BACKOFF_CONFIG.maxRetries,
       statusClass, errorCategory: finalErr.category,
@@ -269,10 +271,11 @@ export class ProviderRequestBroker {
     symbol: string,
     params: Record<string, unknown> | undefined,
     fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
+    options: BrokerExecuteOptions,
   ): void {
     // Fire and forget. Concurrent stale consumers attach to this same refresh.
     this.store.getOrCreateInFlight<T>(cacheKey, async () => {
-      return this.executeUpstream(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'stale_revalidating');
+      return this.executeUpstream(provider, operation, symbol, params, fetcher, keyHash, cacheKey, 'stale_revalidating', options);
     }).promise.catch(() => {
       // Revalidation failure is non-fatal — stale cache remains
     });
@@ -283,7 +286,7 @@ export class ProviderRequestBroker {
   private makeResult<T>(
     provider: string, operation: ProviderOperation, symbol: string, startTime: number,
     data: T | null, statusClass: StatusClass, cacheState: CacheState,
-    coalesced: boolean, attemptCount: number, error: any,
+    coalesced: boolean, attemptCount: number, error: any, runId?: string,
   ): BrokerResult<T> {
     return {
       success: statusClass === 'success' || statusClass === 'coalesced',
@@ -297,10 +300,12 @@ export class ProviderRequestBroker {
       latencyMs: Date.now() - startTime,
       provider, operation, symbol,
       retrievedAt: new Date().toISOString(),
+      runId,
     };
   }
 
-  private cacheTtlFor(operation: ProviderOperation): { ttlMs: number; staleWindowMs: number; negativeTtlMs: number } {
+  private cacheTtlFor(operation: ProviderOperation, override?: CachePolicy): { ttlMs: number; staleWindowMs: number; negativeTtlMs: number } {
+    if (override) return override;
     switch (operation) {
       case 'quote': return { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 }; // 30s + 30s stale
       case 'metadata': return { ttlMs: 300_000, staleWindowMs: 300_000, negativeTtlMs: 60_000 }; // 5m + 5m
