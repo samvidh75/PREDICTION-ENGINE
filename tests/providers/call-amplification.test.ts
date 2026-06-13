@@ -8,6 +8,7 @@ import { ProviderCoordinator } from '../../src/services/providers/ProviderCoordi
 const requiredFields = [
   'peRatio',
   'pbRatio',
+  'roa',
   'roe',
   'roic',
   'evEbitda',
@@ -55,7 +56,7 @@ describe('provider call amplification controls', () => {
 
     expect(bundleCalls).toBe(1);
     expect(result.fields.peRatio).toBe(1);
-    expect(result.fields.currentRatio).toBe(17);
+    expect(result.fields.currentRatio).toBe(18);
     expect(result.providerSummary.FinnhubProvider).toMatchObject({ attempted: 1, succeeded: 1 });
   });
 

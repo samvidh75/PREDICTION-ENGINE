@@ -1,7 +1,23 @@
+/**
+ * @deprecated Use `npx tsx src/scheduler/run-prediction-generation.ts` instead.
+ *
+ * This script uses the legacy scoreEngine (Pipeline B) which is being consolidated
+ * into PredictionFactory (Pipeline A). It is kept for manual/exploratory use but
+ * will be removed in a future track. Pipeline A is superior:
+ *  - Uses StockStoryEngine which directly reads factor_snapshots
+ *  - Writes to prediction_registry with created_by = 'PredictionFactory'
+ *  - Integrates with the daily scheduler and CI
+ */
 import { DatabaseSnapshotProvider } from "../src/backend/data/providers/DatabaseSnapshotProvider";
 import { scoreSnapshot, type PredictionSnapshot } from "../src/backend/data/scoring/scoreEngine";
 import { validateMarketPriceRecords } from "../src/backend/data/validation/priceValidation";
 import { query } from "../src/db";
+
+console.warn(
+  '[DEPRECATED] This script uses the legacy scoreEngine (Pipeline B).\n' +
+  '  Use instead: npx tsx src/scheduler/run-prediction-generation.ts\n' +
+  '  Pipeline A (PredictionFactory) is the canonical daily scoring path.\n'
+);
 
 const VALID_HORIZONS = [7, 30, 90, 180, 365] as const;
 type Horizon = (typeof VALID_HORIZONS)[number];
