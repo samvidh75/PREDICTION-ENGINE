@@ -9,9 +9,17 @@ import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint } from '../data/types';
-import { RetryPolicy } from './RetryPolicy';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
+const REQUEST_TIMEOUT_MS = 10_000;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
 
 /**
  * Convert a provider exchange label or an explicitly resolved Yahoo ticker into
@@ -98,25 +106,49 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     return `${symbol.toUpperCase()}.NS`;
   }
 
-  private async fetchJson(url: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const resp = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-      });
-      if (!resp.ok) {
-        throw new Error(`Yahoo HTTP ${resp.status}: ${resp.statusText} for ${url}`);
+  private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
+    const clean = symbol.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    const result = await (await getSharedProviderRequestBroker()).execute('yahoo', operation, clean, params, async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const resp = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          signal: controller.signal,
+        });
+        const data = await this.readJsonSafely(resp);
+        return {
+          data,
+          status: resp.status,
+          headers: headersToRecord(resp.headers),
+          sourceAsOf: marketTimestampFromEpoch(data?.chart?.result?.[0]?.meta?.regularMarketTime),
+        };
+      } finally {
+        clearTimeout(timeout);
       }
-      return resp.json();
-    }, RETRY_OPTS);
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`Yahoo ${operation} unavailable for ${clean}: ${result.statusClass}`);
+    }
+    return result.data;
+  }
+
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
   }
 
   // ── Quote ─────────────────────────────────────────────────
   async getQuote(symbol: string): Promise<StockQuote> {
     const ticker = this.normalizeSymbol(symbol);
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('quote', symbol, { ticker, range: '1d', interval: '1m' }, url);
     const meta = data?.chart?.result?.[0]?.meta;
     if (!meta) throw new Error(`Yahoo: no quote data for ${symbol}`);
 
@@ -140,7 +172,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     // Use v8 chart API for name/exchange (v10 quoteSummary is blocked)
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`;
     try {
-      const data = await this.fetchJson(url);
+      const data = await this.fetchJson('metadata', symbol, { ticker, range: '1d', interval: '1m' }, url);
       const meta = data?.chart?.result?.[0]?.meta ?? {};
       return {
         symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
@@ -169,7 +201,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
       ticker,
     )}?range=${yahooRange}&interval=${interval}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('history', symbol, { ticker, range: yahooRange, interval }, url);
     const result = data?.chart?.result?.[0];
     if (!result) throw new Error(`Yahoo: no historical data for ${symbol}`);
     const timestamps: number[] = result.timestamp || [];

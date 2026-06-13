@@ -67,9 +67,6 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
 
   // ─── ScreenerProvider — QUARANTINED (F3 Phase 0) ────────
   // Screener.in HTML scraper is removed from all runtime capability routing.
-  // Previously covered: revenueGrowth, profitGrowth, epsGrowth, fcfGrowth,
-  // operatingMargin, currentRatio, dividendYield, marketCap.
-  // These fields are now sourced from FinnhubProvider and DerivedMetricsEngine.
 
   // ─── FinnhubProvider ────────────────────────────────────
   { field: 'peRatio', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
@@ -106,10 +103,10 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
 ];
 
 export class ProviderCapabilityRegistry {
-  /** field → capability list */
+  /** field -> capability list */
   private capabilities: Map<string, ProviderCapability[]> = new Map();
 
-  /** provider → metadata */
+  /** provider -> metadata */
   private providerMeta: Map<string, {
     displayName: string;
     supportedUniverses: string[];
@@ -128,7 +125,6 @@ export class ProviderCapabilityRegistry {
   /** Register a single capability. */
   register(capability: ProviderCapability): void {
     const existing = this.capabilities.get(capability.field) ?? [];
-    // Avoid duplicates
     if (!existing.some(c => c.field === capability.field && c.provider === capability.provider)) {
       existing.push(capability);
     }
@@ -151,7 +147,7 @@ export class ProviderCapabilityRegistry {
     return fields;
   }
 
-  /** Get the full capability matrix as field → provider names. */
+  /** Get the full capability matrix as field -> provider names. */
   getCapabilityMatrix(): Map<string, string[]> {
     const matrix = new Map<string, string[]>();
     for (const [field, caps] of this.capabilities) {
@@ -216,7 +212,6 @@ export class ProviderCapabilityRegistry {
       rateLimitPerMin: 20,
       rateLimitPerDay: 500,
     });
-    // ScreenerProvider metadata removed (QUARANTINED — F3 Phase 0).
     this.providerMeta.set('DerivedMetricsEngine', {
       displayName: 'Derived Metrics Engine',
       supportedUniverses: ['NSE', 'BSE', 'US', 'Global'],

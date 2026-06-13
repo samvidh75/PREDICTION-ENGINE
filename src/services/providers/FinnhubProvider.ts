@@ -5,9 +5,17 @@ import { MetadataProvider } from './MetadataProvider';
 import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { CompanyMetadata } from '../data/types';
-import { RetryPolicy } from './RetryPolicy';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
+const REQUEST_TIMEOUT_MS = 10_000;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
 
 /**
  * FinnhubProvider — Tier 3 provider.
@@ -29,23 +37,62 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
     this.apiKey = key;
   }
 
-  private async fetchJson(url: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const resp = await fetch(url);
-      if (resp.status === 429) throw new Error('Finnhub: rate limited (429)');
-      if (!resp.ok) throw new Error(`Finnhub HTTP ${resp.status}: ${resp.statusText}`);
-      return resp.json();
-    }, RETRY_OPTS);
+  private async fetchJson(operation: 'metadata' | 'financials' | 'news', symbol: string, params: Record<string, unknown>, url: string): Promise<{ data: any; sourceAsOf?: string }> {
+    if (!this.apiKey) {
+      throw new Error('Finnhub API key not set (FINNHUB_KEY)');
+    }
+
+    const clean = this.cleanSymbol(symbol);
+    const result = await (await getSharedProviderRequestBroker()).execute('finnhub', operation, clean, params, async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const resp = await fetch(url, { signal: controller.signal });
+        const data = await this.readJsonSafely(resp);
+        return {
+          data,
+          status: resp.status,
+          headers: headersToRecord(resp.headers),
+          sourceAsOf: this.sourceAsOf(data),
+        };
+      } finally {
+        clearTimeout(timeout);
+      }
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`Finnhub ${operation} unavailable for ${clean}: ${result.statusClass}`);
+    }
+
+    return { data: result.data, sourceAsOf: this.sourceAsOf(result.data) };
+  }
+
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
+  }
+
+  private cleanSymbol(symbol: string): string {
+    return symbol.trim().toUpperCase().replace(/\.(NS|BO)$/i, '');
+  }
+
+  private sourceAsOf(data: any): string | undefined {
+    const sourceTimestamp = data?.metric?.periodEndDate ?? data?.periodEndDate ?? data?.asOfDate;
+    return typeof sourceTimestamp === 'string' && sourceTimestamp.trim() ? sourceTimestamp : undefined;
   }
 
   // ── Metadata ──────────────────────────────────────────────
   async getMetadata(symbol: string): Promise<CompanyMetadata> {
-    const ticker = symbol.toUpperCase().replace(/\.(NS|BO)$/i, '');
+    const ticker = this.cleanSymbol(symbol);
     // Finnhub uses ticker without exchange suffix for Indian stocks listed on NSE
+    const providerSymbol = `${ticker}.NS`;
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(
-      ticker + '.NS',
+      providerSymbol,
     )}&token=${this.apiKey}`;
-    const data = await this.fetchJson(url);
+    const { data } = await this.fetchJson('metadata', ticker, { providerSymbol }, url);
     if (!data || !data.name) {
       throw new Error(`Finnhub: no metadata for ${symbol}`);
     }
@@ -54,7 +101,7 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
       companyName: data.name || '',
       sector: data.finnhubIndustry || '',
       industry: data.gicSector || '',
-      exchange: data.exchange || 'NSE',
+      exchange: data.exchange || undefined,
       marketCap: data.marketCapitalization ? data.marketCapitalization * 1_000_000 : undefined,
       currency: data.currency || 'INR',
       website: data.weburl || '',
@@ -63,15 +110,16 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
 
   // ── News ──────────────────────────────────────────────────
   async getNews(symbol: string): Promise<NewsItem[]> {
-    const ticker = symbol.toUpperCase().replace(/\.(NS|BO)$/i, '');
+    const ticker = this.cleanSymbol(symbol);
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const from = weekAgo.toISOString().split('T')[0];
     const to = now.toISOString().split('T')[0];
+    const providerSymbol = `${ticker}.NS`;
     const url = `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(
-      ticker + '.NS',
+      providerSymbol,
     )}&from=${from}&to=${to}&token=${this.apiKey}`;
-    const data = await this.fetchJson(url);
+    const { data } = await this.fetchJson('news', ticker, { providerSymbol, from, to }, url);
     if (!Array.isArray(data)) return [];
     return data.slice(0, 20).map((item: any) => ({
       title: item.headline || '',
@@ -84,11 +132,12 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
 
   // ── Financials ────────────────────────────────────────────
   async getFinancials(symbol: string): Promise<any> {
-    const ticker = symbol.toUpperCase().replace(/\.(NS|BO)$/i, '');
+    const ticker = this.cleanSymbol(symbol);
+    const providerSymbol = `${ticker}.NS`;
     const url = `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(
-      ticker + '.NS',
+      providerSymbol,
     )}&metric=all&token=${this.apiKey}`;
-    const data = await this.fetchJson(url);
+    const { data, sourceAsOf } = await this.fetchJson('financials', ticker, { providerSymbol, metric: 'all' }, url);
     if (!data || !data.metric) {
       throw new Error(`Finnhub: no financial data for ${symbol}`);
     }
@@ -110,7 +159,9 @@ export class FinnhubProvider implements MetadataProvider, NewsProvider, Financia
 
     return {
       symbol: ticker,
-      periodEnd: new Date().toISOString().split('T')[0],
+      periodEnd: sourceAsOf,
+      sourceAsOf,
+      retrievedAt: new Date().toISOString(),
 
       // ── Valuation ───────────────────────────────────────
       marketCap: mcapRaw,

@@ -2,28 +2,28 @@ import { YahooProvider } from "../providers/YahooProvider";
 import { IndianMarketProvider } from "../providers/IndianMarketProvider";
 import { FinnhubProvider } from "../providers/FinnhubProvider";
 import { GoogleNewsRssProvider } from "../providers/GoogleNewsRssProvider";
+import type { PriceProvider } from "../providers/PriceProvider";
+import type { MetadataProvider } from "../providers/MetadataProvider";
+import type { HistoricalProvider } from "../providers/HistoricalProvider";
+import type { FinancialProvider } from "../providers/FinancialProvider";
+import type { NewsProvider, NewsItem } from "../providers/NewsProvider";
 import type {
-  StockQuote as Quote,
-  CompanyMetadata as Metadata,
-  FinancialSnapshot as FinancialStatement,
-  NewsItem as NewsArticle,
-} from "../providers/ProviderInterfaces";
+  StockQuote,
+  CompanyMetadata,
+  FinancialSnapshot,
+} from "../data/types";
 
-// Simple singleton providers – in a real system these would be instantiated with API keys.
-const yahoo = new YahooProvider();
-const indian = new IndianMarketProvider();
-const finnhub = new FinnhubProvider();
-const gnews = new GoogleNewsRssProvider();
-
+const yahoo: PriceProvider & MetadataProvider & HistoricalProvider & FinancialProvider = new YahooProvider();
+const indian: PriceProvider & MetadataProvider & HistoricalProvider = new IndianMarketProvider();
+const finnhub: MetadataProvider & FinancialProvider & NewsProvider = new FinnhubProvider();
+const gnews: NewsProvider = new GoogleNewsRssProvider();
 
 export class DataAcquisitionCoordinator {
   /** Fetch quote using provider priority: Yahoo then IndianMarket */
-  static async fetchQuote(symbol: string): Promise<Quote> {
-    const providers = [yahoo, indian];
+  static async fetchQuote(symbol: string): Promise<StockQuote> {
+    const providers: PriceProvider[] = [yahoo, indian];
     for (const p of providers) {
       try {
-        // each provider implements getQuote
-        // @ts-ignore – stub methods exist on each class
         const quote = await p.getQuote(symbol);
         if (quote && quote.price !== undefined) return quote;
       } catch (e) {
@@ -33,43 +33,47 @@ export class DataAcquisitionCoordinator {
     throw new Error(`Quote not available for ${symbol}`);
   }
 
-  /** Fetch metadata using priority: Yahoo → Finnhub */
-  static async fetchMetadata(symbol: string): Promise<Metadata> {
-    const providers = [yahoo, finnhub];
+  /** Fetch metadata using priority: Yahoo -> Finnhub */
+  static async fetchMetadata(symbol: string): Promise<CompanyMetadata> {
+    const providers: MetadataProvider[] = [yahoo, finnhub];
     for (const p of providers) {
       try {
-        // @ts-ignore – both have getMetadata
         const meta = await p.getMetadata(symbol);
         if (meta && meta.companyName) return meta;
-      } catch (e) {}
+      } catch (e) {
+        // continue to next provider
+      }
     }
     throw new Error(`Metadata not available for ${symbol}`);
   }
 
-  /** Fetch financial statements using priority: Finnhub → Yahoo */
-  static async fetchFinancials(symbol: string): Promise<FinancialStatement> {
-    const providers = [finnhub]; // Yahoo stub does not implement financials yet
+  /** Fetch financial statements using priority: Finnhub -> Yahoo */
+  static async fetchFinancials(symbol: string): Promise<FinancialSnapshot> {
+    const providers: FinancialProvider[] = [finnhub];
     for (const p of providers) {
       try {
-        // @ts-ignore – finnhub implements getFinancials
         const fin = await p.getFinancials(symbol);
-        if (fin && fin.periodEnd) return fin;
-      } catch (e) {}
+        // FinancialData is Record<string, unknown>, cast only at boundary
+        const result = fin as unknown as FinancialSnapshot | undefined;
+        if (result && result.symbol) return result;
+      } catch (e) {
+        // continue to next provider
+      }
     }
     throw new Error(`Financials not available for ${symbol}`);
   }
 
-  /** Fetch news using priority: Finnhub → GNews */
-  static async fetchNews(symbol: string): Promise<NewsArticle[]> {
-    const providers = [finnhub, gnews];
+  /** Fetch news using priority: Finnhub -> GNews */
+  static async fetchNews(symbol: string): Promise<NewsItem[]> {
+    const providers: NewsProvider[] = [finnhub, gnews];
     for (const p of providers) {
       try {
-        // @ts-ignore – both have getNews
         const news = await p.getNews(symbol);
         if (Array.isArray(news) && news.length) return news;
-      } catch (e) {}
+      } catch (e) {
+        // continue to next provider
+      }
     }
-    // Return empty array if no news found – not fatal for backfill.
     return [];
   }
 }
