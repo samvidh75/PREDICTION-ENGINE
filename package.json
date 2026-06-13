@@ -51,6 +51,8 @@
     "release:gate": "tsx scripts/release-gate.ts",
     "test:smoke": "vitest run scripts/__tests__/smoke-test-api.test.ts",
     "test:release-gate": "vitest run scripts/__tests__/release-gate.test.ts",
+    "test:provider-broker": "vitest run tests/providers src/services/providers/broker/*.test.ts src/backend/persistence/cache/cacheHierarchyEngine.test.ts",
+    "validate:broker-secret-hygiene": "tsx scripts/validate-broker-secret-hygiene.ts",
     "test:providers": "tsx src/scripts/provider-live-test.ts",
     "lint": "npm run lint:active",
     "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
