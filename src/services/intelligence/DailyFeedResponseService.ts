@@ -8,6 +8,7 @@ import {
   unavailableResponse,
 } from '../../shared/data/AnalyticalResponse';
 import { assessMarketSnapshotFreshness } from '../../shared/data/DataFreshness';
+import type { IntelligenceSignal } from '../../intelligence/SignalFeedEngine';
 
 interface LatestPredictionDateRow extends Record<string, unknown> {
   max_date: string | Date | null;
@@ -38,11 +39,12 @@ export function predictionRegistryLineage(asOf: string | null): DataLineageEntry
  * feed rather than generic feature/factor provenance.
  */
 export async function loadDailyFeedResponse(): Promise<AnalyticalResponse<unknown>> {
-  const [{ rows }, signals] = await Promise.all([
+  const [{ rows }, feedResult] = await Promise.all([
     query<LatestPredictionDateRow>('SELECT MAX(prediction_date) AS max_date FROM prediction_registry'),
     generateSignalFeed(),
   ]);
 
+  const signals: IntelligenceSignal[] = feedResult.signals;
   const asOf = extractDate(rows[0]?.max_date);
   const lineage = predictionRegistryLineage(asOf);
   if (!asOf) {
