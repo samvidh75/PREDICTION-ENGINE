@@ -14,19 +14,20 @@ import { errRateLimited, errServerError, errUnauthorized, errForbidden, errNotFo
  * Retryable: 408, 425, 429, 5xx.
  */
 export function classifyHttpStatus(statusCode: number, message?: string, retryAfterMs?: number): BrokerError {
+  const safeMessage = sanitizeErrorMessage(message);
   switch (statusCode) {
-    case 400: return errBadRequest(message ?? 'Bad request');
-    case 401: return errUnauthorized(message ?? 'Unauthorized');
-    case 403: return errForbidden(message ?? 'Forbidden');
-    case 404: return errNotFound(message ?? 'Not found');
+    case 400: return errBadRequest(safeMessage ?? 'Bad request');
+    case 401: return errUnauthorized(safeMessage ?? 'Unauthorized');
+    case 403: return errForbidden(safeMessage ?? 'Forbidden');
+    case 404: return errNotFound(safeMessage ?? 'Not found');
     case 408:
-    case 425: return errTimeout(message ?? `HTTP ${statusCode} — timeout`);
+    case 425: return errTimeout(safeMessage ?? `HTTP ${statusCode} — timeout`);
     case 429: return errRateLimited(retryAfterMs ?? 60_000);
     default:
       if (statusCode >= 500 && statusCode <= 599) {
-        return errServerError(statusCode, message ?? `HTTP ${statusCode}`);
+        return errServerError(statusCode, safeMessage ?? `HTTP ${statusCode}`);
       }
-      return errUnknown(message ?? `HTTP ${statusCode}`);
+      return errUnknown(safeMessage ?? `HTTP ${statusCode}`);
   }
 }
 
@@ -35,7 +36,7 @@ export function classifyHttpStatus(statusCode: number, message?: string, retryAf
  * Determines whether the error is retryable, timeouts vs. network vs. unknown.
  */
 export function classifyNetworkError(error: unknown): BrokerError {
-  const msg = error instanceof Error ? error.message : String(error);
+  const msg = sanitizeErrorMessage(error instanceof Error ? error.message : String(error)) ?? 'Unknown provider error';
   const name = error && typeof error === 'object' && 'name' in error
     ? String((error as { name?: unknown }).name)
     : '';
@@ -58,6 +59,14 @@ export function classifyNetworkError(error: unknown): BrokerError {
   }
 
   return errUnknown(msg);
+}
+
+function sanitizeErrorMessage(message: string | undefined): string | undefined {
+  if (!message) return undefined;
+  return message
+    .replace(/(token|api[_-]?key|apikey|key|secret|access[_-]?token)=([^&\s]+)/gi, '$1=[REDACTED]')
+    .replace(/bearer\s+[a-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
+    .replace(/authorization:\s*[^\s]+/gi, 'authorization:[REDACTED]');
 }
 
 /**
