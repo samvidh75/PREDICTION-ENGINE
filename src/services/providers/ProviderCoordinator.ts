@@ -12,7 +12,7 @@ import { UpstoxProvider } from '../brokers/UpstoxProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
-import { ScreenerProvider } from './ScreenerProvider';
+
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
@@ -63,10 +63,9 @@ export class ProviderCoordinator {
     this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.financialProviders.push(upstoxFundamentals);
 
-    const screener = new ScreenerProvider();
-    this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.financialProviders.push(screener);
-
+    // ScreenerProvider is QUARANTINED (F3 Phase 0) — HTML scraper removed from runtime.
+    // See src/services/providers/ScreenerProvider.ts for details.
+    
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
@@ -228,9 +227,7 @@ export class ProviderCoordinator {
 
     const allowed = providerName === 'UpstoxFundamentalsProvider'
       ? upstoxFields
-      : providerName === 'ScreenerProvider'
-        ? screenerEnrichmentFields
-        : fallbackFields;
+      : fallbackFields;
 
     for (const [field, value] of Object.entries(source)) {
       if (field.startsWith('_') || !allowed.has(field)) continue;

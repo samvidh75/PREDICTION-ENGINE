@@ -10,9 +10,10 @@ export interface PersonalInsight {
 export class PersonalInsightsEngine {
   public static generateInsights(snapshot: PortfolioSnapshot): PersonalInsight[] {
     const insights: PersonalInsight[] = [];
+    const review = snapshot.review;
 
     // Concentration Insight
-    const topSector = snapshot.sectorExposure[0];
+    const topSector = review.concentration?.sectorExposure?.[0];
     if (topSector && topSector.weightPct > 40) {
       insights.push({
         id: "in1",
@@ -21,33 +22,36 @@ export class PersonalInsightsEngine {
       });
     }
 
-    // Health Insight
-    if (snapshot.health.score > 75) {
-      insights.push({
-        id: "in2",
-        type: "positive",
-        message: `Overall portfolio health is strong (${snapshot.health.score}/100), backed by resilient legacy assets.`,
-      });
-    } else {
-      insights.push({
-        id: "in2",
-        type: "warning",
-        message: `Portfolio health is stabilizing near structural limits. Volatility sensitivity is elevated.`,
-      });
-    }
-
     // Performance Insight
-    if (snapshot.performance.totalGainPct > 5) {
+    if (review.totalGainLossPct != null && review.totalGainLossPct > 5) {
+      const best = review.concentration?.largestPosition;
       insights.push({
         id: "in3",
         type: "positive",
-        message: `Portfolio returns are compounding cleanly (+${snapshot.performance.totalGainPct}%), led by ${snapshot.performance.bestPerformerSymbol}.`,
+        message: `Portfolio returns are compounding cleanly (+${review.totalGainLossPct}%)${best ? `, led by ${best.symbol}.` : '.'}`,
       });
     } else {
       insights.push({
         id: "in3",
         type: "info",
         message: `Portfolio performance is consolidating stable bases. Proximity is supported by key index zones.`,
+      });
+    }
+
+    // Review-based insights
+    const attentionItems = review.reviewQueue.filter(item => item.severity === 'attention');
+    if (attentionItems.length > 0) {
+      const item = attentionItems[0];
+      insights.push({
+        id: "in2",
+        type: "warning",
+        message: item.detail,
+      });
+    } else {
+      insights.push({
+        id: "in2",
+        type: "positive",
+        message: `Portfolio allocation is within acceptable concentration limits.`,
       });
     }
 
