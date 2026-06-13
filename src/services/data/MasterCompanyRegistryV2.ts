@@ -80,7 +80,7 @@ export class MasterCompanyRegistryV2 {
   async getAllSymbols(): Promise<string[]> {
     try {
       const res = await pool.query('SELECT symbol FROM symbols ORDER BY symbol ASC');
-      return res.rows.map((r: { symbol: string }) => r.symbol);
+      return res.rows.map((r: Record<string, any>) => r.symbol as string);
     } catch {
       return [];
     }

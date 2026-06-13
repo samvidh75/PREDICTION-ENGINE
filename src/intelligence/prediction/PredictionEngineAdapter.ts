@@ -236,7 +236,8 @@ export class PredictionEngineAdapter {
   private calculateCorrelationIndex(telemetry: ICompanyTelemetry): number {
     // Simplified: correlate PE ratio movement with sector
     // In production, this would compare against sector benchmarks
-    return Math.min(Math.abs(telemetry.peRatio) / 50 * 100, 100);
+    const pe = telemetry.peRatio ?? 20;
+    return Math.min(Math.abs(pe) / 50 * 100, 100);
   }
 
   /**
