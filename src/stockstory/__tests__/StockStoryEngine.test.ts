@@ -33,7 +33,7 @@ function makeInputs(overrides: Partial<EngineInputs> = {}): EngineInputs {
       factorScore: 56,
     },
     financials: {
-      peRatio: 18, pbRatio: 3.2, eps: 120, dividendYield: 1.8,
+      peRatio: 18, pbRatio: 3.2, eps: 120, dividendYield: 0.018,
       beta: 1.1, marketCap: 500000, freeFloat: 45,
       fcfYield: 0.04, evEbitda: 12, roa: 0.12, roe: 0.18, roic: 0.14,
       debtToEquity: 0.5, currentRatio: 2.0,
