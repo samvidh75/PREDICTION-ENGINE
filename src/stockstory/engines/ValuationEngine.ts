@@ -83,11 +83,14 @@ export class ValuationEngine {
       }
     }
 
-    // ── Sub-score 5: Dividend Yield Score (TRACK-22) ───────────────
+    // ── Sub-score 5: Dividend Yield Score (TRACK-12B: yield-trap) ──
     let dividendYieldScore = 50;
     const divYield = financials.dividendYield;
     if (divYield !== null) {
-      if (divYield >= 0.04) dividendYieldScore = 90;
+      if (divYield >= 0.20) dividendYieldScore = 10;   // Extreme distress (likely unsustainable)
+      else if (divYield >= 0.12) dividendYieldScore = 25; // Probable distress / value trap
+      else if (divYield >= 0.08) dividendYieldScore = 50; // Possible distress — neutral
+      else if (divYield >= 0.04) dividendYieldScore = 90; // Healthy high yield
       else if (divYield >= 0.03) dividendYieldScore = 80;
       else if (divYield >= 0.02) dividendYieldScore = 65;
       else if (divYield >= 0.01) dividendYieldScore = 50;
