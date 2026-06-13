@@ -123,6 +123,6 @@ npm test           # 374 pass (0 fail, unchanged count — existing tests retain
 
 ## 5. Known Limitations / Follow-ups
 
-1. **`dividendYield: 1.8` fixture value** in `StockStoryEngine.test.ts` is incorrect (should be `0.018` for 1.8%). With the trap, this now correctly scores 10 (extreme distress). This doesn't break any test assertions but the fixture should eventually be fixed.
-2. **marketCap unit mismatch**: `MasterCompanyRegistry` stores marketCap in INR, but StabilityEngine expects crores. Production scores for real companies will be capped at 95 as long as this mismatch exists. This is a pre-existing issue, not introduced by this change.
-3. **DatabaseSnapshotProvider** does not SELECT `dividend_yield` or `market_cap` — the stockstory production pipeline gets these from `PredictionFactory`, not from `DatabaseSnapshotProvider`.
+1. ~~**`dividendYield: 1.8` fixture value** in `StockStoryEngine.test.ts` is incorrect~~ → **FIXED**: Changed to `0.018` (1.8% as fraction). Now correctly scores 50 (normal yield range).
+2. ~~**marketCap unit mismatch**: `MasterCompanyRegistry` stores marketCap in INR, but StabilityEngine expects crores~~ → **FIXED**: Added INR→crore conversion (`/ 10000000`) in `generate-deliverables.ts:40-42`. The `scale` calculation still uses the original INR value to avoid breaking ROA/ROE/ROIC size-scaling.
+3. **DatabaseSnapshotProvider** does not SELECT `dividend_yield` or `market_cap` — these reach StockStory engines through `PredictionFactory`, not `DatabaseSnapshotProvider`. The F0 scoring pipeline (`scoreEngine.ts`) does not consume these fields.

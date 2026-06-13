@@ -37,8 +37,9 @@ function bounded(seed: number, min: number, max: number): number {
 
 function buildInputs(entry: RegistryEntry): EngineInputs {
   const seed = hashSeed(entry.symbol);
-  const marketCap = entry.marketCap ?? 100_000_000_000;
-  const scale = Math.max(0, Math.min(1, Math.log10(marketCap) / 15));
+  const marketCapInr = entry.marketCap ?? 100_000_000_000;
+  const marketCap = marketCapInr / 100_000_00; // INR → crores for StabilityEngine
+  const scale = Math.max(0, Math.min(1, Math.log10(marketCapInr) / 15));
   const sector = normalizeSector(entry.sector);
 
   return {
