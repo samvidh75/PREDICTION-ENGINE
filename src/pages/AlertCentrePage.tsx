@@ -25,9 +25,15 @@ function actionForCategory(cat: AlertCategory): string {
   return map[cat] || 'Review the company page for additional context and data.';
 }
 
+function readFocusedSymbol(): string {
+  if (typeof window === 'undefined') return '';
+  return (new URLSearchParams(window.location.search).get('symbol') ?? '').toUpperCase().trim();
+}
+
 export const AlertCentrePage: React.FC = () => {
   const [alerts, setAlerts] = useState<SmartAlert[]>(() => AlertEngine.getAlerts());
   const [filter, setFilter] = useState<AlertCategory | 'all'>('all');
+  const [focusedSymbol, setFocusedSymbol] = useState(() => readFocusedSymbol());
 
   React.useEffect(() => {
     const handler = () => setAlerts([...AlertEngine.getAlerts()]);
@@ -45,18 +51,30 @@ export const AlertCentrePage: React.FC = () => {
     setAlerts([...AlertEngine.getAlerts()]);
   }, []);
 
+  const clearFocusedSymbol = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('symbol');
+    window.history.replaceState({}, '', `?${params.toString()}`);
+    setFocusedSymbol('');
+  }, []);
+
   const handleOpenCompany = (symbol: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set('page', 'stock');
     params.set('id', symbol);
+    params.delete('symbol');
     window.history.pushState({}, '', `?${params.toString()}`);
     window.dispatchEvent(new Event('urlchange'));
   };
 
+  const symbolScopedAlerts = useMemo(() => {
+    return focusedSymbol ? alerts.filter(alert => alert.symbol.toUpperCase() === focusedSymbol) : alerts;
+  }, [alerts, focusedSymbol]);
+
   const filtered = useMemo(() => {
-    const list = filter === 'all' ? alerts : alerts.filter(a => a.category === filter);
-    return list.sort((a, b) => (a.isRead ? 1 : 0) - (b.isRead ? 1 : 0));
-  }, [alerts, filter]);
+    const list = filter === 'all' ? symbolScopedAlerts : symbolScopedAlerts.filter(alert => alert.category === filter);
+    return [...list].sort((a, b) => (a.isRead ? 1 : 0) - (b.isRead ? 1 : 0));
+  }, [symbolScopedAlerts, filter]);
 
   const unreadCount = alerts.filter(a => !a.isRead).length;
   const categories: AlertCategory[] = ['Factor', 'Risk', 'Momentum', 'News', 'Market'];
@@ -65,7 +83,7 @@ export const AlertCentrePage: React.FC = () => {
     <div className="w-full flex flex-col space-y-8 pb-12 text-white min-h-screen font-sans max-w-3xl mx-auto antialiased">
       <PageHeader
         title="Alerts"
-        subtitle="What changed?"
+        subtitle={focusedSymbol ? `What changed for ${focusedSymbol}?` : 'What changed?'}
         primaryAction={
           unreadCount > 0 && (
             <button
@@ -78,7 +96,22 @@ export const AlertCentrePage: React.FC = () => {
         }
       />
 
-      {/* Category filters */}
+      {focusedSymbol && (
+        <section aria-label="Focused alert symbol" className="flex items-center justify-between gap-3 rounded-xl border border-[#2962ff]/25 bg-[#2962ff]/10 px-4 py-3">
+          <div>
+            <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#7da0ff]">Company focus</div>
+            <div className="mt-1 text-sm font-semibold text-white">Showing alerts for {focusedSymbol}</div>
+          </div>
+          <button
+            type="button"
+            onClick={clearFocusedSymbol}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 text-[10px] font-bold uppercase tracking-wider text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-3.5 w-3.5" /> Clear focus
+          </button>
+        </section>
+      )}
+
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setFilter('all')}
@@ -86,7 +119,7 @@ export const AlertCentrePage: React.FC = () => {
             filter === 'all' ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
           }`}
         >
-          All ({alerts.length})
+          All ({symbolScopedAlerts.length})
         </button>
         {categories.map(cat => (
           <button
@@ -96,16 +129,15 @@ export const AlertCentrePage: React.FC = () => {
               filter === cat ? 'bg-[#2962ff] text-white border-[#2962ff]' : 'bg-white/5 text-white/50 border-white/10 hover:bg-white/10'
             }`}
           >
-            {cat}
+            {cat} ({symbolScopedAlerts.filter(alert => alert.category === cat).length})
           </button>
         ))}
       </div>
 
-      {/* Alert list */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-white/30 space-y-3">
           <Bell className="w-8 h-8" />
-          <p className="text-sm">No alerts</p>
+          <p className="text-sm">{focusedSymbol ? `No alerts for ${focusedSymbol}` : 'No alerts'}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -116,7 +148,6 @@ export const AlertCentrePage: React.FC = () => {
                 alert.isRead ? 'bg-white/[0.01] border-white/5' : 'bg-white/[0.03] border-white/10'
               }`}
             >
-              {/* Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   {!alert.isRead && <span className="w-2 h-2 rounded-full bg-[#2962ff]" />}
@@ -128,27 +159,23 @@ export const AlertCentrePage: React.FC = () => {
                 <span className="text-[10px] text-white/30 font-mono">{alert.timestamp}</span>
               </div>
 
-              {/* What changed */}
               <div className="space-y-3">
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-white/40 block mb-1">What happened</span>
                   <p className="text-sm font-semibold text-white leading-snug">{alert.title}</p>
                 </div>
 
-                {/* Why it matters */}
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-white/40 block mb-1">Why it matters</span>
                   <p className="text-xs text-white/60 leading-relaxed">{alert.body.slice(0, 160)}</p>
                 </div>
 
-                {/* What to do */}
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-[#7da0ff] block mb-1 font-semibold">What to do</span>
                   <p className="text-xs text-[#7da0ff]/70 leading-relaxed">{actionForCategory(alert.category)}</p>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex items-center gap-3 mt-4 pt-3 border-t border-white/5">
                 <button
                   onClick={() => handleOpenCompany(alert.symbol)}

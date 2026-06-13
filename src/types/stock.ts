@@ -46,7 +46,7 @@ export interface CompanyTelemetry {
   marketCap: { numeric: number | null; formatted: string; availability?: 'real' | 'unavailable' };
   peRatio: number | null;
   fiftyTwoWeekRange: { low: number | null; high: number | null; current: number | null };
-  healthStatus: HealthStatus;
+  healthStatus: HealthStatus | null;
   lastUpdated: string | null;
   availability?: 'real' | 'registry-only' | 'unavailable';
   source?: 'provider' | 'registry-only' | 'unavailable';

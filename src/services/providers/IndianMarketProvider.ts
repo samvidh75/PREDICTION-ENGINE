@@ -6,9 +6,64 @@ import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint } from '../data/types';
-import { RetryPolicy } from './RetryPolicy';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
+import { getCurrentIngestionRunId } from '../acquisition/IngestionRunContext';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
+const REQUEST_TIMEOUT_MS = 10_000;
+const CACHE_POLICIES = {
+  quote: { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 },
+  metadata: { ttlMs: 300_000, staleWindowMs: 300_000, negativeTtlMs: 60_000 },
+  history: { ttlMs: 600_000, staleWindowMs: 600_000, negativeTtlMs: 60_000 },
+} as const;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
+
+type IndianExchange = 'NSE' | 'BSE';
+
+function positiveNumber(value: unknown): number | undefined {
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function finiteNumber(value: unknown): number | undefined {
+  const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function explicitIndianExchange(symbol: string): IndianExchange | undefined {
+  const normalized = symbol.trim().toUpperCase();
+  if (/\.(NS|NSE)$/.test(normalized)) return 'NSE';
+  if (/\.(BO|BSE)$/.test(normalized)) return 'BSE';
+  return undefined;
+}
+
+/**
+ * Resolve venue only from explicit suffix evidence or an unambiguous one-venue
+ * payload. A bare symbol with both NSE and BSE prices intentionally stays unknown.
+ */
+export function inferIndianApiExchange(symbol: string, currentPrice?: Record<string, unknown>): IndianExchange | undefined {
+  const explicit = explicitIndianExchange(symbol);
+  if (explicit) return explicit;
+
+  const nse = positiveNumber(currentPrice?.NSE);
+  const bse = positiveNumber(currentPrice?.BSE);
+  if (nse !== undefined && bse === undefined) return 'NSE';
+  if (bse !== undefined && nse === undefined) return 'BSE';
+  return undefined;
+}
+
+/** Convert IndianAPI source date/time into ISO without substituting retrieval time. */
+export function sourceTimestampFromIndianApi(date: unknown, time: unknown): string | undefined {
+  if (typeof date !== 'string' || typeof time !== 'string' || !date.trim() || !time.trim()) return undefined;
+  const parsed = new Date(`${date.trim()} ${time.trim()}`);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+}
 
 export class IndianMarketProvider implements PriceProvider, MetadataProvider, HistoricalProvider {
   private apiKey: string;
@@ -16,64 +71,102 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   constructor(apiKey?: string) {
     const key = apiKey || (typeof process !== 'undefined' && process.env?.INDIANAPI_KEY) || '';
     this.apiKey = key;
-    if (!key) {
-      console.warn('IndianMarket: INDIANAPI_KEY is not configured in the environment');
-    }
   }
 
   private cleanSymbol(symbol: string): string {
     return symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
   }
 
-  private async fetchJson(url: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const resp = await fetch(url, {
-        headers: {
-          'X-Api-Key': this.apiKey,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!resp.ok) {
-        throw new Error(`IndianAPI HTTP ${resp.status}: ${resp.statusText} for ${url}`);
+  private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
+    if (!this.apiKey) {
+      throw new Error('IndianAPI key not set (INDIANAPI_KEY)');
+    }
+
+    const clean = this.cleanSymbol(symbol);
+    const result = await (await getSharedProviderRequestBroker()).execute('indianapi', operation, clean, params, async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const resp = await fetch(url, {
+          headers: {
+            'X-Api-Key': this.apiKey,
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal,
+        });
+        return {
+          data: await this.readJsonSafely(resp),
+          status: resp.status,
+          headers: headersToRecord(resp.headers),
+        };
+      } finally {
+        clearTimeout(timeout);
       }
-      return resp.json();
-    }, RETRY_OPTS);
+    }, {
+      cachePolicy: CACHE_POLICIES[operation],
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`IndianAPI ${operation} unavailable for ${clean}: ${result.statusClass}`);
+    }
+
+    return result.data;
+  }
+
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
   }
 
   // ── Quote ─────────────────────────────────────────────────
   async getQuote(symbol: string): Promise<StockQuote> {
     const clean = this.cleanSymbol(symbol);
     const url = `https://stock.indianapi.in/stock?name=${encodeURIComponent(clean)}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('quote', symbol, { name: clean }, url);
 
     const s = data.stockDetailsReusableData || {};
     const currentPriceObj = data.currentPrice || {};
-    const isBse = /\.(BO|BSE)$/i.test(symbol);
+    const exchange = inferIndianApiExchange(symbol, currentPriceObj);
+    const nsePrice = positiveNumber(currentPriceObj.NSE);
+    const bsePrice = positiveNumber(currentPriceObj.BSE);
+    const neutralPrice = positiveNumber(s.price);
 
-    const price = isBse
-      ? (parseFloat(currentPriceObj.BSE) || parseFloat(s.price) || 0)
-      : (parseFloat(currentPriceObj.NSE) || parseFloat(s.price) || 0);
+    const price = exchange === 'NSE'
+      ? nsePrice ?? neutralPrice
+      : exchange === 'BSE'
+        ? bsePrice ?? neutralPrice
+        : neutralPrice;
 
-    const changePercent = parseFloat(s.percentChange) || data.percentChange || 0;
-    const prevClose = parseFloat(s.close) || 0;
+    if (price === undefined) {
+      throw new Error(`IndianAPI: quote price unavailable or venue-ambiguous for ${symbol}`);
+    }
+
+    const changePercent = finiteNumber(s.percentChange) ?? finiteNumber(data.percentChange) ?? 0;
+    const prevClose = positiveNumber(s.close) ?? 0;
     const change = prevClose ? price - prevClose : 0;
 
     let volume = 0;
     if (data.keyMetrics?.priceandVolume) {
       const item = data.keyMetrics.priceandVolume.find((x: any) => x.key === 'avgTradingVolumeLast10Days');
       if (item && item.value) {
-        volume = parseFloat(item.value) * 100_000; // convert Lakhs to units
+        volume = (positiveNumber(item.value) ?? 0) * 100_000; // convert Lakhs to units
       }
     }
 
     return {
       symbol: clean,
-      exchange: isBse ? 'BSE' : 'NSE',
+      exchange: exchange ?? 'Data unavailable',
       price,
       change,
       changePercent,
       volume,
-      updatedAt: s.date && s.time ? new Date(`${s.date} ${s.time}`).toISOString() : new Date().toISOString(),
+      updatedAt: sourceTimestampFromIndianApi(s.date, s.time),
+      retrievedAt: new Date().toISOString(),
     };
   }
 
@@ -81,20 +174,21 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   async getMetadata(symbol: string): Promise<CompanyMetadata> {
     const clean = this.cleanSymbol(symbol);
     const url = `https://stock.indianapi.in/stock?name=${encodeURIComponent(clean)}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('metadata', symbol, { name: clean }, url);
 
     const s = data.stockDetailsReusableData || {};
-    const isBse = /\.(BO|BSE)$/i.test(symbol);
+    const exchange = inferIndianApiExchange(symbol, data.currentPrice || {});
 
     // Convert Market Cap from Crore INR to actual INR
-    const marketCap = s.marketCap ? parseFloat(s.marketCap) * 10_000_000 : undefined;
+    const marketCapCrore = positiveNumber(s.marketCap);
+    const marketCap = marketCapCrore === undefined ? undefined : marketCapCrore * 10_000_000;
 
     return {
       symbol: clean,
       companyName: data.companyName || clean,
       sector: data.industry || '',
       industry: data.industry || '',
-      exchange: isBse ? 'BSE' : 'NSE',
+      exchange,
       marketCap,
       currency: 'INR',
       website: '',
@@ -108,7 +202,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
 
   async getHistorical(symbol: string, range: string = '1Y'): Promise<HistoricalPoint[]> {
     const clean = this.cleanSymbol(symbol);
-    
+
     // Map ranges
     let period = '1yr';
     const r = range.toUpperCase();
@@ -121,32 +215,22 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     else if (r === 'MAX') period = 'max';
 
     const url = `https://stock.indianapi.in/historical_data?stock_name=${encodeURIComponent(clean)}&period=${period}&filter=price`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('history', symbol, { stock_name: clean, period, filter: 'price' }, url);
 
     const priceDs = data.datasets?.find((ds: any) => ds.metric === 'Price');
     const volumeDs = data.datasets?.find((ds: any) => ds.metric === 'Volume');
 
     const pointsMap = new Map<string, HistoricalPoint>();
-    
+
     if (priceDs && Array.isArray(priceDs.values)) {
-      for (const [date, val] of priceDs.values) {
-        const price = parseFloat(val) || 0;
-        pointsMap.set(date, {
-          date,
-          open: price,
-          high: price,
-          low: price,
-          close: price,
-          volume: 0,
-        });
-      }
+      return [];
     }
 
     if (volumeDs && Array.isArray(volumeDs.values)) {
       for (const [date, val] of volumeDs.values) {
         const point = pointsMap.get(date);
         if (point) {
-          point.volume = typeof val === 'number' ? val : (parseFloat(val) || 0);
+          point.volume = typeof val === 'number' ? val : (finiteNumber(val) ?? 0);
         }
       }
     }

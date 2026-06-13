@@ -75,6 +75,7 @@ function scoreQuality(symbol: string, f: FundamentalSnapshot | null): FactorScor
   if (!f) return unavailable(symbol, "quality_score", "financial_snapshots", "fundamentals unavailable");
   const parts = [
     f.roe == null ? null : normalize(f.roe, 0, 30),
+    f.roa == null ? null : normalize(f.roa, 0, 15),
     f.operatingMargin == null ? null : normalize(f.operatingMargin, 0, 35),
     f.netMargin == null ? null : normalize(f.netMargin, 0, 25),
     f.debtToEquity == null || f.debtToEquity < 0 ? null : normalize(f.debtToEquity, 0, 2, true),

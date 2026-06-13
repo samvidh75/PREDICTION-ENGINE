@@ -32,7 +32,40 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run typecheck:all
+      - run: npm run typecheck:frontend
+      - run: npm run typecheck:backend
+      - run: npm run typecheck:providers
+      - run: npm run typecheck:ingestion
+      - run: npm run typecheck:repo
+
+  provider-broker-tests:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      PROVIDER_BROKER_ENABLED: "true"
+      PROVIDER_BROKER_REDIS_REQUIRED: "true"
+      PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED: "false"
+      REDIS_URL: redis://localhost:6379
+      MAX_PROVIDER_CALLS_PER_RUN: "100"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:provider-broker
+      - run: npm run validate:broker-secret-hygiene
 
   unit-tests:
     runs-on: ubuntu-latest

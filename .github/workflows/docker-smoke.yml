@@ -66,6 +66,10 @@ jobs:
             -e ALLOW_SQLITE_IN_PRODUCTION=false \
             -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            -e PROVIDER_BROKER_REDIS_REQUIRED=false \
+            -e PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED=true \
+            -e RATE_LIMIT_REDIS_REQUIRED=false \
+            -e RATE_LIMIT_SINGLE_INSTANCE_ALLOWED=true \
             stockstory-api:test
 
       - name: Wait for /healthz (liveness)
@@ -110,6 +114,11 @@ jobs:
 
       - name: Strict API smoke test
         run: API_BASE_URL=http://localhost:4001 npm run smoke:api
+
+      - name: Market action partial-state contract
+        run: |
+          RESPONSE=$(curl -fsS http://localhost:4001/api/market-data/market-action)
+          echo "${RESPONSE}" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['status']=='partial', f'expected partial, got {d[\"status\"]}'; assert d['dataState']['rowsAnalyzed']>=1, 'expected at least one latest price row'; assert d['dataState']['rowsWithComparisons']==0, 'one-date fixture must not produce comparisons'; assert d['data']['gainers']==[], 'one-date fixture must not invent gainers'; assert d['data']['losers']==[], 'one-date fixture must not invent losers'; assert len(d['data']['scannerPresets'])==4, 'expected certified scanner presets'; print('PASS: market action partial state is honest')"
 
       - name: Upload API smoke report
         if: always()

@@ -9,9 +9,45 @@ import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint } from '../data/types';
-import { RetryPolicy } from './RetryPolicy';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
+import { getCurrentIngestionRunId } from '../acquisition/IngestionRunContext';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
+const REQUEST_TIMEOUT_MS = 10_000;
+const CACHE_POLICIES = {
+  quote: { ttlMs: 30_000, staleWindowMs: 30_000, negativeTtlMs: 30_000 },
+  metadata: { ttlMs: 300_000, staleWindowMs: 300_000, negativeTtlMs: 60_000 },
+  history: { ttlMs: 600_000, staleWindowMs: 600_000, negativeTtlMs: 60_000 },
+} as const;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
+
+/**
+ * Convert a provider exchange label or an explicitly resolved Yahoo ticker into
+ * an Indian exchange label. Unknown values remain unavailable.
+ */
+export function normalizeYahooExchange(exchangeName?: unknown, resolvedTicker?: string): 'NSE' | 'BSE' | undefined {
+  const label = typeof exchangeName === 'string' ? exchangeName.trim().toLowerCase() : '';
+  if (/bse|bombay/.test(label)) return 'BSE';
+  if (/nse|national stock exchange/.test(label)) return 'NSE';
+
+  const ticker = (resolvedTicker || '').trim().toUpperCase();
+  if (/\.BO$/.test(ticker)) return 'BSE';
+  if (/\.NS$/.test(ticker)) return 'NSE';
+  return undefined;
+}
+
+/** Convert a Yahoo epoch-seconds market timestamp into ISO format. */
+export function marketTimestampFromEpoch(value: unknown): string | undefined {
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds) || seconds <= 0) return undefined;
+  return new Date(seconds * 1000).toISOString();
+}
 
 /**
  * YahooFinancials — structured output from Yahoo v8 chart API.
@@ -69,43 +105,74 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   };
 
   private normalizeSymbol(symbol: string): string {
-    // If already suffixed with .NS or .BO, keep it
+    // If already suffixed with .NS or .BO, keep it.
     if (/\.(NS|BO)$/i.test(symbol)) return symbol.toUpperCase();
-    // Default to NSE
+    // Operational lookup default for the Indian equity universe. Displayed
+    // exchange still comes from provider evidence or this resolved ticker.
     return `${symbol.toUpperCase()}.NS`;
   }
 
-  private async fetchJson(url: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const resp = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        },
-      });
-      if (!resp.ok) {
-        throw new Error(`Yahoo HTTP ${resp.status}: ${resp.statusText} for ${url}`);
+  private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
+    const clean = symbol.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    const result = await (await getSharedProviderRequestBroker()).execute('yahoo', operation, clean, params, async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const resp = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          signal: controller.signal,
+        });
+        const data = await this.readJsonSafely(resp);
+        return {
+          data,
+          status: resp.status,
+          headers: headersToRecord(resp.headers),
+          sourceAsOf: marketTimestampFromEpoch(data?.chart?.result?.[0]?.meta?.regularMarketTime),
+        };
+      } finally {
+        clearTimeout(timeout);
       }
-      return resp.json();
-    }, RETRY_OPTS);
+    }, {
+      cachePolicy: CACHE_POLICIES[operation],
+      runId: getCurrentIngestionRunId(),
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`Yahoo ${operation} unavailable for ${clean}: ${result.statusClass}`);
+    }
+    return result.data;
+  }
+
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
   }
 
   // ── Quote ─────────────────────────────────────────────────
   async getQuote(symbol: string): Promise<StockQuote> {
     const ticker = this.normalizeSymbol(symbol);
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('quote', symbol, { ticker, range: '1d', interval: '1m' }, url);
     const meta = data?.chart?.result?.[0]?.meta;
     if (!meta) throw new Error(`Yahoo: no quote data for ${symbol}`);
+
     return {
       symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
-      exchange: meta.exchangeName === 'BSE' ? 'BSE' : 'NSE',
+      exchange: normalizeYahooExchange(meta.exchangeName ?? meta.fullExchangeName, ticker) ?? 'Data unavailable',
       price: meta.regularMarketPrice ?? 0,
       change: (meta.regularMarketPrice ?? 0) - (meta.chartPreviousClose ?? 0),
       changePercent: meta.chartPreviousClose
         ? (((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose) * 100)
         : 0,
       volume: meta.regularMarketVolume ?? 0,
-      updatedAt: new Date().toISOString(),
+      updatedAt: marketTimestampFromEpoch(meta.regularMarketTime),
+      retrievedAt: new Date().toISOString(),
     };
   }
 
@@ -115,16 +182,16 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     // Use v8 chart API for name/exchange (v10 quoteSummary is blocked)
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`;
     try {
-      const data = await this.fetchJson(url);
+      const data = await this.fetchJson('metadata', symbol, { ticker, range: '1d', interval: '1m' }, url);
       const meta = data?.chart?.result?.[0]?.meta ?? {};
       return {
         symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
         companyName: meta.longName || meta.shortName || symbol,
         sector: '',
         industry: '',
-        exchange: meta.fullExchangeName === 'BSE' ? 'BSE' : (meta.fullExchangeName || 'NSE'),
+        exchange: normalizeYahooExchange(meta.fullExchangeName ?? meta.exchangeName, ticker),
         marketCap: meta.marketCap ?? undefined,
-        currency: meta.currency || 'INR',
+        currency: meta.currency || undefined,
         website: '',
       };
     } catch {
@@ -132,7 +199,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     }
   }
 
-  // ── Historical ────────────────────────────────────────────
+  // ── Historical ──────────────────────────────────────────────
   async getHistory(symbol: string, range: string = '1M'): Promise<HistoricalPoint[]> {
     return this.getHistorical(symbol, range);
   }
@@ -144,7 +211,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(
       ticker,
     )}?range=${yahooRange}&interval=${interval}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('history', symbol, { ticker, range: yahooRange, interval }, url);
     const result = data?.chart?.result?.[0];
     if (!result) throw new Error(`Yahoo: no historical data for ${symbol}`);
     const timestamps: number[] = result.timestamp || [];
@@ -165,7 +232,6 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
   // ── Financials (v8 chart API only — fundamentals NOT available) ──
   async getFinancials(symbol: string): Promise<YahooFinancials> {
     const cleanSym = symbol.replace(/\.(NS|BO)$/i, '').toUpperCase();
-    const ticker = this.normalizeSymbol(symbol);
 
     // Get 2Y historical data for beta derivation
     let beta: number | undefined;
@@ -190,7 +256,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     // v10 quoteSummary is blocked (401). v8 chart has no fundamental fields.
     // Return what we can derive from v8; throw so ProviderCoordinator tries Finnhub.
     throw new Error(
-      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (beta=${beta?.toFixed(2) ?? 'N/A'})`,
+      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (symbol=${cleanSym}, beta=${beta?.toFixed(2) ?? 'N/A'})`,
     );
   }
 }
