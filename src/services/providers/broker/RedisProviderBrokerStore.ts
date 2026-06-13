@@ -28,12 +28,12 @@ type CacheEntry<T = unknown> = {
  */
 export class RedisProviderBrokerStore implements ProviderBrokerStore {
   readonly redisUrl: string;
-  private readonly client?: ProviderBrokerRedisClient;
+  private readonly client: ProviderBrokerRedisClient;
   private inFlight = new Map<string, { promise: Promise<any>; createdAt: number; consumerCount: number }>();
   private cache = new Map<string, CacheEntry>();
   private negativeCache = new Map<string, number>();
 
-  constructor(redisUrl: string, client?: ProviderBrokerRedisClient) {
+  constructor(redisUrl: string, client: ProviderBrokerRedisClient) {
     if (!redisUrl) {
       throw new Error('RedisProviderBrokerStore requires REDIS_URL.');
     }
@@ -191,14 +191,11 @@ export class RedisProviderBrokerStore implements ProviderBrokerStore {
     this.negativeCache.clear();
   }
 
-  private optionalClient(): ProviderBrokerRedisClient | undefined {
+  private optionalClient(): ProviderBrokerRedisClient {
     return this.client;
   }
 
   private requireClient(): ProviderBrokerRedisClient {
-    if (!this.client) {
-      throw new Error('RedisProviderBrokerStore client is not connected.');
-    }
     return this.client;
   }
 

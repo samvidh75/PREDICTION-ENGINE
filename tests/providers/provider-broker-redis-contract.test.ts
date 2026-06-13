@@ -64,8 +64,10 @@ describe('provider broker Redis contract', () => {
 
     expect(store.key('quota', 'FinnHub', 'minute')).toBe('provider-broker:quota:finnhub:minute');
     expect(store.key('cooldown', 'FinnHub')).toBe('provider-broker:cooldown:finnhub');
+    expect(store.key('cache', 'quote:RELIANCE')).toBe('provider-broker:cache:quote_reliance');
     expect(store.key('negative', 'abc123')).toBe('provider-broker:negative:abc123');
     expect(store.key('lock', 'quote/RELIANCE')).toBe('provider-broker:lock:quote_reliance');
+    expect(store.key('run', 'run-123')).toBe('provider-broker:run:run-123');
   });
 
   it('applies TTL to quota, cooldown, and negative-cache keys', async () => {
