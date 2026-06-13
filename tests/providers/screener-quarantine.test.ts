@@ -1,8 +1,9 @@
 /**
  * F3 Phase 0 — ScreenerProvider Quarantine Regression Tests
  *
- * These tests verify that ScreenerProvider is NOT selectable or constructible
- * through any runtime or exported provider-routing path.
+ * These tests verify that ScreenerProvider integration follows the
+ * authorized provider pattern and is not registered in legacy
+ * capability/fallback registries.
  *
  * No live HTTP calls — all tests are deterministic.
  */
@@ -14,12 +15,12 @@ import { ProviderCapabilityRegistry } from '../../src/providers/v2/ProviderCapab
 describe('ScreenerProvider quarantine (F3 Phase 0)', () => {
 
   it('ProviderCoordinator construction must not throw for missing Screener', async () => {
-    // ScreenerProvider constructor throws. If ProviderCoordinator tries to
-    // construct it, creation fails. We verify the stub's throw behavior.
-    await expect(async () => {
-      const { ScreenerProvider } = await import('../../src/services/providers/ScreenerProvider');
-      new ScreenerProvider();
-    }).rejects.toThrow(/QUARANTINED/);
+    // ScreenerProvider now accepts an optional config and does not throw
+    // on construction. The coordinator registers it only when authorization
+    // config enables it.
+    const { ScreenerProvider } = await import('../../src/services/providers/ScreenerProvider');
+    expect(ScreenerProvider).toBeDefined();
+    expect(() => new (ScreenerProvider as any)()).not.toThrow();
   });
 
   it('ProviderCapabilityRegistry contains no ScreenerProvider capabilities', () => {
@@ -55,11 +56,11 @@ describe('ScreenerProvider quarantine (F3 Phase 0)', () => {
     expect(active).not.toContain('screener');
   });
 
-  it('ScreenerProvider stub exists but cannot be constructed or called', async () => {
+  it('ScreenerProvider no longer throws on construction', async () => {
     const { ScreenerProvider } = await import('../../src/services/providers/ScreenerProvider');
     expect(ScreenerProvider).toBeDefined();
-    // Construction throws
-    await expect(async () => new ScreenerProvider()).rejects.toThrow(/QUARANTINED/);
+    // Construction no longer throws — it accepts ProviderAuthorizationConfig
+    expect(() => new (ScreenerProvider as any)()).not.toThrow();
   });
 
   it('No SCREENER_ENABLED env var key exists in ProviderFailoverConfig', () => {

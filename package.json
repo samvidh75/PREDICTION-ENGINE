@@ -55,6 +55,8 @@
     "validate:broker-secret-hygiene": "tsx scripts/validate-broker-secret-hygiene.ts",
     "test:providers": "tsx src/scripts/provider-live-test.ts",
     "provider:healthcheck": "tsx scripts/provider-healthcheck.ts",
+    "audit:provider-coverage": "tsx scripts/provider-coverage-audit.ts",
+    "reconcile:repository": "tsx scripts/repository-reconciliation.ts",
     "lint": "npm run lint:active",
     "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
     "lint:fix": "eslint . --fix",
@@ -64,7 +66,13 @@
     "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
     "pipeline:predictions": "tsx scripts/run-prediction-pipeline.ts",
-    "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts"
+    "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
+    "ingest:authorized:financials": "tsx scripts/ingest-authorized-financials.ts",
+    "ingest:authorized:shareholding": "tsx scripts/ingest-authorized-shareholding.ts",
+    "ingest:authorized:corporate-actions": "tsx scripts/ingest-authorized-corporate-actions.ts",
+    "ingest:authorized:quotes": "tsx scripts/ingest-authorized-quotes.ts",
+    "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
+    "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

@@ -39,10 +39,10 @@ const DIVIDEND_PRICE_RATIO = 0.1; // 10 %
 
 const fmtDate = (d: Date): string => d.toISOString().slice(0, 10);
 
-/** Parse a record's date field regardless of whether it's a string or Date. */
+/** Parse a record's trade_date field (canonical column in daily_prices). */
 const recordDate = (r: DailyPriceRecord): string => {
-  if (typeof r.date === 'string') return r.date.slice(0, 10);
-  return fmtDate(r.date as unknown as Date);
+  if (typeof r.trade_date === 'string') return r.trade_date.slice(0, 10);
+  return fmtDate(r.trade_date as unknown as Date);
 };
 
 /** Days between two YYYY-MM-DD strings. */
@@ -355,8 +355,8 @@ export class MarketDataIntegrityEngine {
     const anomalyDates: string[] = [];
 
     for (let i = 1; i < sorted.length; i++) {
-      const prevClose = sorted[i - 1].adj_close;
-      const curClose = sorted[i].adj_close;
+      const prevClose = sorted[i - 1].adjusted_close;
+      const curClose = sorted[i].adjusted_close;
 
       if (prevClose <= 0 || curClose <= 0) continue;
 
@@ -410,20 +410,20 @@ export class MarketDataIntegrityEngine {
 
     const result = await query(
       `SELECT * FROM daily_prices
-       WHERE symbol = $1 AND date >= $2 AND date <= $3
-       ORDER BY date`,
+       WHERE symbol = $1 AND trade_date >= $2 AND trade_date <= $3
+       ORDER BY trade_date`,
       [symbol, start, end],
     );
 
     const rows = result?.rows ?? [];
     const records: DailyPriceRecord[] = rows.map((r: any) => ({
       symbol: r.symbol,
-      date: r.date instanceof Date ? fmtDate(r.date) : String(r.date).slice(0, 10),
+      trade_date: r.trade_date instanceof Date ? fmtDate(r.trade_date) : String(r.trade_date).slice(0, 10),
       open: Number(r.open),
       high: Number(r.high),
       low: Number(r.low),
       close: Number(r.close),
-      adj_close: Number(r.adj_close ?? r.close),
+      adjusted_close: Number(r.adjusted_close ?? r.close),
       volume: Number(r.volume),
       dividends: Number(r.dividends ?? 0),
       stock_splits: Number(r.stock_splits ?? 0),

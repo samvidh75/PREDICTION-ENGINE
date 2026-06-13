@@ -172,12 +172,12 @@ export class HistoricalPriceBackfill {
     // overwrite existing data during a backfill run.
     const columns = [
       'symbol',
-      'date',
+      'trade_date',
       'open',
       'high',
       'low',
       'close',
-      'adj_close',
+      'adjusted_close',
       'volume',
       'dividends',
       'stock_splits',
@@ -197,12 +197,12 @@ export class HistoricalPriceBackfill {
       );
       values.push(
         r.symbol,
-        r.date,
+        r.trade_date,
         r.open,
         r.high,
         r.low,
         r.close,
-        r.adj_close,
+        r.adjusted_close,
         r.volume,
         r.dividends,
         r.stock_splits,
@@ -216,7 +216,7 @@ export class HistoricalPriceBackfill {
     const sql = `
       INSERT INTO daily_prices (${columns.join(', ')})
       VALUES ${placeholders.join(', ')}
-      ON CONFLICT (symbol, date) DO NOTHING
+      ON CONFLICT (symbol, trade_date) DO NOTHING
     `;
 
     const result = await query(sql, values);
@@ -239,9 +239,9 @@ export class HistoricalPriceBackfill {
     const result = await query(
       `
         SELECT
-          MIN(date) AS earliest_date,
-          MAX(date) AS latest_date,
-          COUNT(*)  AS row_count
+          MIN(trade_date) AS earliest_date,
+          MAX(trade_date) AS latest_date,
+          COUNT(*)        AS row_count
         FROM daily_prices
         WHERE symbol = $1
       `,
