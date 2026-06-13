@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
 COPY package.json package-lock.json ./
-RUN apk add --no-cache python3 make g++ && npm ci --frozen-lockfile
+RUN npm ci --frozen-lockfile
 
 # Copy source and build
 COPY . .
@@ -26,7 +26,7 @@ ENV NODE_ENV=production
 
 # Only install production dependencies
 COPY package.json package-lock.json ./
-RUN apk add --no-cache python3 make g++ && npm ci --frozen-lockfile --omit=dev && apk del python3 make g++
+RUN npm ci --frozen-lockfile --omit=dev
 
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist

@@ -1,23 +1,3 @@
-/**
- * TRACK-P4B-P3G — Schema Contract Validation (Isolation-Fixed)
- *
- * Verifies the complete prediction_registry contract using the exact
- * temporary SQLiteAdapter DB. Never inspects or mutates data/stockstory.db.
- *
- * Flow:
- *   1. Create tmp/schema-contract-<timestamp>.db
- *   2. Set process.env.SQLITE_DB_PATH = tempPath
- *   3. Dynamically import SQLiteAdapter → triggers schema initialization
- *   4. Inspect exactly tempPath
- *   5. Validate complete prediction_registry columns
- *   6. Validate UNIQUE(symbol, prediction_date, prediction_horizon)
- *   7. Close adapter
- *   8. Delete .db, .db-wal, .db-shm
- *   9. Use process.exitCode (not process.exit())
- *
- * Usage: npx tsx scripts/validate-schema-contract.ts
- */
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -26,22 +6,14 @@ const timestamp = Date.now();
 const rand = Math.random().toString(36).slice(2, 6);
 const TEMP_DB_PATH = path.join(os.tmpdir(), `schema-contract-${timestamp}-${rand}.db`);
 
-// ---------------------------------------------------------------------------
-// Cleanup helper
-// ---------------------------------------------------------------------------
-
 function cleanup(): void {
   for (const ext of ['', '-wal', '-shm']) {
     const p = TEMP_DB_PATH + ext;
     if (fs.existsSync(p)) {
-      try { fs.unlinkSync(p); } catch { /* ignore */ }
+      try { fs.unlinkSync(p); } catch { }
     }
   }
 }
-
-// ---------------------------------------------------------------------------
-// Full canonical prediction_registry columns (Phase 8 spec)
-// ---------------------------------------------------------------------------
 
 const PREDICTION_REGISTRY_COLUMNS = [
   'id',
@@ -69,15 +41,7 @@ const PREDICTION_REGISTRY_COLUMNS = [
   'created_by',
 ];
 
-// ---------------------------------------------------------------------------
-// UNIQUE constraint
-// ---------------------------------------------------------------------------
-
 const UNIQUE_COLUMNS = ['symbol', 'prediction_date', 'prediction_horizon'];
-
-// ---------------------------------------------------------------------------
-// Main
-// ---------------------------------------------------------------------------
 
 async function main(): Promise<void> {
   let errors = 0;
@@ -86,45 +50,33 @@ async function main(): Promise<void> {
   console.log(`Using temp DB: ${TEMP_DB_PATH}`);
 
   try {
-    // Step 1-2: Set env and prepare temp path
     process.env.SQLITE_DB_PATH = TEMP_DB_PATH;
 
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const sqliteModPath = path.resolve(__dirname, '../src/db/SQLiteAdapter');
 
-    // Step 3: Dynamically import SQLiteAdapter — triggers schema init
-    // Use dynamic import with a fresh cache key.
     const sqliteMod = await import(sqliteModPath + `?t=${timestamp}`);
 
-    // Trigger the pool initialization which runs ensureTables()
     const pool = sqliteMod.pool;
 
-    // Give SQLiteAdapter a moment to initialize tables
     await pool.query('SELECT 1');
 
-    // Step 4-5: Inspect the temp DB directly
-    const db = new Database(TEMP_DB_PATH);
-
     console.log('\n1. Table presence check for prediction_registry...');
-    const tableCheck = db
-      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_registry'")
-      .get() as { name: string } | undefined;
+    const tableResult = await pool.query(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_registry'"
+    );
 
-    if (!tableCheck) {
+    if (tableResult.rows.length === 0) {
       console.error('  FAIL: prediction_registry table not found in temp DB');
       errors++;
-      db.close();
       process.exitCode = 1;
       return;
     }
     console.log('  PASS: prediction_registry exists');
 
-    // Step 5: Validate complete prediction_registry columns
     console.log('\n2. Column completeness check...');
-    const colRows = db
-      .prepare("PRAGMA table_info('prediction_registry')")
-      .all() as Array<{ name: string }>;
-    const existingColumns = new Set(colRows.map((r) => r.name));
+    const colResult = await pool.query("PRAGMA table_info('prediction_registry')");
+    const existingColumns = new Set(colResult.rows.map((r: Record<string, unknown>) => r.name as string));
 
     for (const col of PREDICTION_REGISTRY_COLUMNS) {
       if (existingColumns.has(col)) {
@@ -135,27 +87,24 @@ async function main(): Promise<void> {
       }
     }
 
-    // Also check for unexpected extra columns (warning only)
-    for (const row of colRows) {
-      if (!PREDICTION_REGISTRY_COLUMNS.includes(row.name)) {
+    for (const row of colResult.rows) {
+      if (!PREDICTION_REGISTRY_COLUMNS.includes(row.name as string)) {
         console.log(`  WARN: unexpected column '${row.name}' found`);
       }
     }
 
-    // Step 6: Validate UNIQUE constraint on (symbol, prediction_date, prediction_horizon)
     console.log('\n3. UNIQUE constraint validation...');
-    const uniqueIndexes = db
-      .prepare("PRAGMA index_list('prediction_registry')")
-      .all() as Array<{ name: string; unique: number }>;
+    const idxResult = await pool.query("PRAGMA index_list('prediction_registry')");
+    const uniqueIndexes = idxResult.rows.filter((r: Record<string, unknown>) => r.unique === 1);
 
     let uniqueFound = false;
-    for (const idx of uniqueIndexes.filter((index) => index.unique === 1)) {
-      const indexColumns = db
-        .prepare(`PRAGMA index_info(${JSON.stringify(idx.name)})`)
-        .all() as Array<{ name: string; seqno: number }>;
-      const orderedColumns = indexColumns
-        .sort((a, b) => a.seqno - b.seqno)
-        .map((col) => col.name);
+    for (const idx of uniqueIndexes) {
+      const idxColResult = await pool.query(
+        `PRAGMA index_info(${JSON.stringify(idx.name)})`
+      );
+      const orderedColumns = (idxColResult.rows as Array<Record<string, unknown>>)
+        .sort((a, b) => (a.seqno as number) - (b.seqno as number))
+        .map((col) => col.name as string);
       if (JSON.stringify(orderedColumns) === JSON.stringify(UNIQUE_COLUMNS)) {
         uniqueFound = true;
         console.log(`  PASS: UNIQUE constraint on (${UNIQUE_COLUMNS.join(', ')}) confirmed`);
@@ -170,15 +119,10 @@ async function main(): Promise<void> {
       errors++;
     }
 
-    // Step 7: Close the inspection DB
-    db.close();
-
-    // Step 8: Close the SQLite adapter and clean up singleton
     if (sqliteMod.closeSQLite) {
       sqliteMod.closeSQLite();
     }
 
-    // Summary
     console.log(`\n=== Validation Complete ===`);
     console.log(`Errors: ${errors}`);
 
@@ -193,12 +137,9 @@ async function main(): Promise<void> {
     console.error('Schema validation failed with exception:', err);
     process.exitCode = 1;
   } finally {
-    // Step 9: Cleanup temp DB files
     cleanup();
 
-    // Give a tick for any pending operations
     setTimeout(() => {
-      // process.exitCode is already set — the process will exit with it
     }, 100);
   }
 }

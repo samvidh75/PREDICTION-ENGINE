@@ -3,9 +3,9 @@
  * Calls yfinance_bridge.py for each symbol, inserts into SQLite.
  */
 const { execSync } = require('child_process');
-const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
+const { platform } = require('os');
 
 const DB_PATH = path.join(__dirname, '..', 'data', 'stockstory.db');
 const BRIDGE = path.join(__dirname, 'yfinance_bridge.py');

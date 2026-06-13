@@ -1,23 +1,23 @@
-/**
- * SQLiteAdapter — Zero-configuration database adapter.
- * Implements the same interface as pg Pool: query(sql, params?) => { rows[], rowCount }
- * Used as fallback when PostgreSQL is unavailable.
- *
- * TASK 2: DB path is injectable via SQLITE_DB_PATH env var.
- *         closeSQLite() closes the singleton.
- *         resetForTest() allows tests to isolate to a separate DB path.
- *
- * TRACK-P4B-P3I: Lazy reconnection via getConnection().
- */
-import Database from 'better-sqlite3';
+import initSqlJs, { type SqlJsModule, type SqlJsDatabase } from 'sql.js';
 import path from 'path';
 import fs from 'fs';
+
+let SQL: SqlJsModule | null = null;
+let initPromise: Promise<void> | null = null;
+
+async function ensureSql(): Promise<void> {
+  if (SQL) return;
+  if (!initPromise) {
+    initPromise = initSqlJs().then(sql => { SQL = sql; });
+  }
+  await initPromise;
+}
 
 function resolveDbPath(): string {
   return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
 }
 
-let _db: Database.Database | null = null;
+let _db: SqlJsDatabase | null = null;
 let _dbPath: string = resolveDbPath();
 
 function ensureDir(): void {
@@ -25,19 +25,40 @@ function ensureDir(): void {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-function getDb(): Database.Database {
-  if (_db && _db.open) return _db;
+async function getDb(): Promise<SqlJsDatabase> {
+  if (_db) return _db;
+  ensureSql();
+  await initPromise;
   _dbPath = resolveDbPath();
   ensureDir();
-  _db = new Database(_dbPath);
-  _db.pragma('journal_mode = WAL');
-  _db.pragma('foreign_keys = ON');
+  if (fs.existsSync(_dbPath)) {
+    const buffer = fs.readFileSync(_dbPath);
+    _db = new SQL!.Database(buffer);
+  } else {
+    _db = new SQL!.Database();
+  }
+  _db.run('PRAGMA journal_mode = WAL');
+  _db.run('PRAGMA foreign_keys = ON');
   return _db;
+}
+
+function saveDb(): void {
+  if (!_db) return;
+  const data = _db.export();
+  ensureDir();
+  fs.writeFileSync(_dbPath, Buffer.from(data));
+}
+
+let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+function debouncedSave(): void {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => saveDb(), 100);
 }
 
 export function closeSQLite(): void {
   if (_db) {
-    try { _db.close(); } catch { /* ignore */ }
+    saveDb();
+    try { _db.close(); } catch { }
     _db = null;
   }
 }
@@ -94,22 +115,73 @@ interface SQLiteResult {
   rowCount: number;
 }
 
-class SQLitePool {
-  private db: Database.Database | null = null;
+function execAndMap(db: SqlJsDatabase, sql: string, params?: unknown[]): SQLiteResult {
+  const isSelect = /^\s*SELECT/i.test(sql) || /^\s*PRAGMA/i.test(sql) || /^\s*WITH\s/i.test(sql);
+  const isReturning = /RETURNING/i.test(sql);
 
-  constructor() {
-    this.getConnection();
+  if (isSelect || isReturning) {
+    if (params && params.length > 0) {
+      const stmt = db.prepare(sql);
+      stmt.bind(params);
+      const rows: Record<string, unknown>[] = [];
+      while (stmt.step()) {
+        rows.push(stmt.getAsObject() as Record<string, unknown>);
+      }
+      stmt.free();
+      return { rows, rowCount: rows.length };
+    }
+    const results = db.exec(sql);
+    if (!results || results.length === 0) return { rows: [], rowCount: 0 };
+    const { columns, values } = results[0];
+    const rows = values.map(v => {
+      const row: Record<string, unknown> = {};
+      columns.forEach((c, i) => { row[c] = v[i]; });
+      return row;
+    });
+    return { rows, rowCount: rows.length };
   }
 
-  private getConnection(): Database.Database {
-    if (!this.db || !this.db.open) {
-      this.db = getDb();
-      this.ensureTables();
+  if (params && params.length > 0) {
+    const stmt = db.prepare(sql);
+    stmt.bind(params);
+    stmt.step();
+    stmt.free();
+  } else {
+    db.run(sql);
+  }
+  const rowCount = db.getRowsModified();
+
+  if (isReturning && /INSERT/i.test(sql)) {
+    const idResult = db.exec('SELECT last_insert_rowid() as id');
+    const lastId = idResult?.[0]?.values?.[0]?.[0];
+    if (lastId && Number(lastId) > 0) {
+      return { rows: [{ id: Number(lastId) }], rowCount };
+    }
+  }
+
+  return { rows: [], rowCount };
+}
+
+class SQLitePool {
+  private db: SqlJsDatabase | null = null;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init(): Promise<void> {
+    await ensureSql();
+  }
+
+  private async getConnection(): Promise<SqlJsDatabase> {
+    if (!this.db) {
+      this.db = await getDb();
+      await this.ensureTables();
     }
     return this.db;
   }
 
-  private ensureTables(): void {
+  private async ensureTables(): Promise<void> {
     const db = this.db;
     if (!db) throw new Error('SQLite connection unavailable during schema init');
 
@@ -195,37 +267,22 @@ class SQLitePool {
       )`,
     ];
     for (const sql of tables) {
-      try { db.exec(sql); } catch { /* ignore */ }
+      try { db.run(sql); } catch { }
     }
   }
 
   async query(text: string, params?: unknown[]): Promise<SQLiteResult> {
-    const db = this.getConnection();
+    const db = await this.getConnection();
     const translated = translateSQL(text);
 
     try {
-      const isSelect = /^\s*SELECT/i.test(translated) || /^\s*PRAGMA/i.test(translated) ||
-        /^\s*WITH\s/i.test(translated);
-      const isReturning = /RETURNING/i.test(translated);
+      const result = execAndMap(db, translated, params);
 
-      if (isSelect || isReturning) {
-        const stmt = db.prepare(translated);
-        const rows = params ? stmt.all(...params) : stmt.all();
-        return { rows: rows as Record<string, unknown>[], rowCount: (rows as unknown[]).length };
+      if (!/^\s*SELECT/i.test(translated) && !/^\s*PRAGMA/i.test(translated) && !/^\s*WITH\s/i.test(translated)) {
+        debouncedSave();
       }
 
-      const stmt = db.prepare(translated);
-      const result = params ? stmt.run(...params) : stmt.run();
-      const rowCount = result.changes;
-
-      if (isReturning && translated.includes('INSERT')) {
-        const lastId = result.lastInsertRowid;
-        if (lastId && lastId > 0) {
-          return { rows: [{ id: Number(lastId) }], rowCount };
-        }
-      }
-
-      return { rows: [], rowCount };
+      return result;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       const safeText = text.substring(0, 200);
@@ -242,8 +299,9 @@ class SQLitePool {
   }
 
   async executeScript(sql: string): Promise<void> {
-    const db = this.getConnection();
-    db.exec(sql);
+    const db = await this.getConnection();
+    db.run(sql);
+    debouncedSave();
   }
 
   async end(): Promise<void> {

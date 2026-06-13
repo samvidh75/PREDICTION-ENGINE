@@ -48,18 +48,12 @@ let pgInstalled = false;
 try { execSync('pg_isready --version 2>&1', { stdio: 'pipe' }); pgInstalled = true; } catch (e) {}
 try { execSync('psql --version 2>&1', { stdio: 'pipe' }); pgInstalled = true; } catch (e) {}
 
-// Check if any PostgreSQL service might be running (Windows)
+// Check if any PostgreSQL service might be running
 let pgServiceRunning = false;
 try {
-  const svc = execSync('sc query postgresql-x64-16 2>&1', { stdio: 'pipe' }).toString();
-  pgServiceRunning = svc.includes('RUNNING');
+  execSync('pg_isready -q 2>&1', { stdio: 'pipe' });
+  pgServiceRunning = true;
 } catch (e) {}
-if (!pgServiceRunning) {
-  try {
-    const svc = execSync('sc query postgresql-x64-15 2>&1', { stdio: 'pipe' }).toString();
-    pgServiceRunning = svc.includes('RUNNING');
-  } catch (e) {}
-}
 
 // Try actual connection
 let dbReachable = false;
