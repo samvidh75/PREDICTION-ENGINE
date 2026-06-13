@@ -65,15 +65,11 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
   { field: 'evEbitda', provider: 'UpstoxFundamentalsProvider', reliability: 0.90, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
   { field: 'debtToEquity', provider: 'UpstoxFundamentalsProvider', reliability: 0.90, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
 
-  // ─── ScreenerProvider ───────────────────────────────────
-  { field: 'revenueGrowth', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'profitGrowth', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'epsGrowth', provider: 'ScreenerProvider', reliability: 0.65, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'fcfGrowth', provider: 'ScreenerProvider', reliability: 0.65, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'operatingMargin', provider: 'ScreenerProvider', reliability: 0.75, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'currentRatio', provider: 'ScreenerProvider', reliability: 0.75, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'dividendYield', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'marketCap', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'daily', authRequired: false, costPerCall: 0 },
+  // ─── ScreenerProvider — QUARANTINED (F3 Phase 0) ────────
+  // Screener.in HTML scraper is removed from all runtime capability routing.
+  // Previously covered: revenueGrowth, profitGrowth, epsGrowth, fcfGrowth,
+  // operatingMargin, currentRatio, dividendYield, marketCap.
+  // These fields are now sourced from FinnhubProvider and DerivedMetricsEngine.
 
   // ─── FinnhubProvider ────────────────────────────────────
   { field: 'peRatio', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
@@ -220,12 +216,7 @@ export class ProviderCapabilityRegistry {
       rateLimitPerMin: 20,
       rateLimitPerDay: 500,
     });
-    this.providerMeta.set('ScreenerProvider', {
-      displayName: 'Screener.in',
-      supportedUniverses: ['NSE', 'BSE'],
-      rateLimitPerMin: 10,
-      rateLimitPerDay: 200,
-    });
+    // ScreenerProvider metadata removed (QUARANTINED — F3 Phase 0).
     this.providerMeta.set('DerivedMetricsEngine', {
       displayName: 'Derived Metrics Engine',
       supportedUniverses: ['NSE', 'BSE', 'US', 'Global'],

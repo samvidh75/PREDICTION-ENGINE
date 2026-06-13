@@ -44,28 +44,31 @@ export interface ResolutionContext {
   requireNonAuth?: boolean;  // Only use providers without auth (for fallback)
 }
 
-/** Per-field precedence: ordered list of provider preference. */
+/**
+ * Per-field precedence: ordered list of provider preference.
+ * ScreenerProvider references removed (QUARANTINED — F3 Phase 0).
+ */
 const FIELD_PRECEDENCE: Record<string, string[]> = {
-  peRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'ScreenerProvider'],
+  peRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   pbRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   roe: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   roa: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
   roic: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
   evEbitda: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   debtToEquity: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
-  marketCap: ['FinnhubProvider', 'ScreenerProvider'],
+  marketCap: ['FinnhubProvider'],
   eps: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  dividendYield: ['FinnhubProvider', 'ScreenerProvider'],
+  dividendYield: ['FinnhubProvider'],
   beta: ['FinnhubProvider'],
   freeFloat: [],
   fcfYield: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  revenueGrowth: ['ScreenerProvider', 'FinnhubProvider', 'DerivedMetricsEngine'],
-  profitGrowth: ['ScreenerProvider', 'FinnhubProvider', 'DerivedMetricsEngine'],
-  epsGrowth: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
-  fcfGrowth: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
+  revenueGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  profitGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  epsGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  fcfGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
   grossMargin: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  operatingMargin: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
-  currentRatio: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
+  operatingMargin: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  currentRatio: ['FinnhubProvider', 'DerivedMetricsEngine'],
 };
 
 export class ProviderPriorityResolver {

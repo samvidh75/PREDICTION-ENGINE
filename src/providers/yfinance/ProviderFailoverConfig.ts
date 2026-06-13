@@ -16,14 +16,13 @@
 export const PROVIDER_YFINANCE = 'yfinance';
 export const PROVIDER_FINNHUB = 'finnhub';
 export const PROVIDER_UPSTOX = 'upstox';
-export const PROVIDER_SCREENER = 'screener';
+// ScreenerProvider removed (QUARANTINED — F3 Phase 0). No SCREENER_ENABLED.
 
 // ---------------------------------------------------------------------------
 // Env-var key → provider name mapping
 // ---------------------------------------------------------------------------
 
 const PROVIDER_ENV_KEYS: Record<string, string> = {
-  [PROVIDER_SCREENER]: 'SCREENER_ENABLED',
   [PROVIDER_YFINANCE]: 'YFINANCE_ENABLED',
   [PROVIDER_FINNHUB]: 'FINNHUB_ENABLED',
   [PROVIDER_UPSTOX]: 'UPSTOX_ENABLED',
@@ -46,10 +45,10 @@ export class ProviderFailoverConfig {
 
   /**
    * Priority order for fundamental data providers.
-   * screener → yfinance → finnhub.
+   * Screener removed (QUARANTINED — F3 Phase 0).
+   * yfinance → finnhub.
    */
   static readonly PROVIDER_ORDER_FUNDAMENTALS: string[] = [
-    PROVIDER_SCREENER,
     PROVIDER_YFINANCE,
     PROVIDER_FINNHUB,
   ];
