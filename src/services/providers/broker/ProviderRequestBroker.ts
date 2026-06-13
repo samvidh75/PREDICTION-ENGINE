@@ -1,0 +1,311 @@
+/**
+ * F3.1A — ProviderRequestBroker
+ *
+ * Single outbound data-access boundary for all provider HTTP requests.
+ *
+ * Required behavior:
+ *   1. Normalized request keys with secret stripping
+ *   2. Single-flight coalescing: concurrent identical requests share one promise
+ *   3. Provider quota enforcement (per-minute, per-day, burst, concurrent)
+ *   4. Error classification (retry vs. non-retryable)
+ *   5. Secret redaction from logs, ledgers, and error messages
+ *   6. Cache integration with stale-while-revalidate
+ *   7. Sanitized call ledger per upstream request
+ *   8. Capped exponential backoff with jitter for retries
+ *
+ * Usage:
+ *   const result = await broker.execute('finnhub', 'quote', 'RELIANCE', {
+ *     token: 'secret'  // ← stripped from key, not logged
+ *   }, async () => {
+ *     return await fetch('https://finnhub.io/...');
+ *   });
+ */
+
+import crypto from 'node:crypto';
+import type { ProviderOperation, BrokerResult, StatusClass, CacheState, ErrorCategory, CallLedgerEntry } from './types';
+import { buildRequestKey, serializeRequestKey, requestKeyHash } from './ProviderRequestKey';
+import { ProviderQuotaPolicy } from './ProviderQuotaPolicy';
+import { ProviderCallLedger, callLedger } from './ProviderCallLedger';
+import { InMemoryProviderBrokerStore } from './InMemoryProviderBrokerStore';
+import { classifyHttpStatus, classifyNetworkError, parseRetryAfter } from './ProviderErrorClassifier';
+import { errCircuitOpen, errUnknown } from './ProviderBrokerErrors';
+
+/** Backoff config for retries. */
+const BACKOFF_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 500,
+  maxDelayMs: 10_000,
+};
+
+export class ProviderRequestBroker {
+  constructor(
+    private quota: ProviderQuotaPolicy = new ProviderQuotaPolicy(),
+    private ledger: ProviderCallLedger = callLedger,
+    private store: InMemoryProviderBrokerStore = new InMemoryProviderBrokerStore(),
+  ) {}
+
+  /**
+   * Execute a provider request through the broker.
+   *
+   * @param provider  - Provider name (e.g. 'finnhub', 'yahoo')
+   * @param operation - Operation type
+   * @param symbol    - Symbol to fetch
+   * @param params    - Parameters (secrets stripped before hashing)
+   * @param fetcher   - Async function that performs the actual HTTP request.
+   *                    Receives sanitized metadata (no secrets).
+   * @returns BrokerResult with typed data.
+   */
+  async execute<T>(
+    provider: string,
+    operation: ProviderOperation,
+    symbol: string,
+    params: Record<string, unknown> | undefined,
+    fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
+  ): Promise<BrokerResult<T>> {
+    const startTime = Date.now();
+    const key = buildRequestKey(provider, operation, symbol, params);
+    const cacheKey = serializeRequestKey(key);
+    const keyHash = requestKeyHash(key);
+
+    // 1. Check negative cache
+    if (this.store.isNegativelyCached(cacheKey)) {
+      return this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'negative', false, 0, {
+        code: 'NEGATIVE_CACHED',
+        message: 'Previously unavailable — cached negative result',
+        category: 'unknown',
+        retryable: false,
+      });
+    }
+
+    // 2. Check fresh cache
+    const freshHit = this.store.getFresh<BrokerResult<T>>(cacheKey);
+    if (freshHit) {
+      return this.makeResult<T>(provider, operation, symbol, startTime, freshHit.data.data, 'success', 'fresh', false, 0, null);
+    }
+
+    // 3. Check stale cache for stale-while-revalidate
+    const staleHit = this.store.getStale<BrokerResult<T>>(cacheKey);
+    if (staleHit) {
+      // Trigger async revalidation, return stale data immediately
+      this.revalidateAsync(keyHash, cacheKey, provider, operation, symbol, params, fetcher);
+      return this.makeResult<T>(provider, operation, symbol, startTime, staleHit.data.data, 'success', 'stale', false, 0, null);
+    }
+
+    // 4. Single-flight: coalesce concurrent identical requests
+    const { promise, isLeader } = this.store.getOrCreateInFlight<T>(cacheKey, async () => {
+      return this.executeUpstream<T>(provider, operation, symbol, params, fetcher, keyHash, cacheKey);
+    });
+
+    if (!isLeader) {
+      // Follower — wait for leader's result, record as coalesced
+      const result = await promise;
+      result.coalesced = true;
+      result.cacheState = 'stale_revalidating';
+      return result;
+    }
+
+    return promise;
+  }
+
+  /**
+   * Execute the actual upstream request with retry logic.
+   */
+  private async executeUpstream<T>(
+    provider: string,
+    operation: ProviderOperation,
+    symbol: string,
+    params: Record<string, unknown> | undefined,
+    fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
+    keyHash: string,
+    cacheKey: string,
+  ): Promise<BrokerResult<T>> {
+    const startTime = Date.now();
+    let lastError: BrokerResult<T> | null = null;
+    let sourceAsOf: string | null = null;
+
+    for (let attempt = 1; attempt <= BACKOFF_CONFIG.maxRetries; attempt++) {
+      try {
+        // Check quota before each attempt
+        this.quota.checkQuota(provider);
+        this.quota.recordCallStart(provider);
+
+        const response = await fetcher({ provider, operation, symbol, attempt });
+        sourceAsOf = response.sourceAsOf ?? null;
+
+        this.quota.recordCallEnd(provider, response.status, parseRetryAfter(response.headers?.['retry-after'] ?? null));
+
+        if (response.status >= 200 && response.status < 300) {
+          // Success
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, response.data, 'success', 'miss', false, attempt, null);
+
+          // Cache the successful result
+          const ttl = this.cacheTtlFor(operation);
+          this.store.setFresh(cacheKey, result, ttl.ttlMs, ttl.staleWindowMs);
+
+          // Record ledger entry
+          this.ledger.record({
+            provider, operation, symbol, requestKeyHash: keyHash,
+            cacheState: 'miss', coalescedFollowerCount: 0,
+            actualUpstreamCalls: 1, attemptCount: attempt,
+            statusClass: 'success', errorCategory: null,
+            latencyMs: Date.now() - startTime,
+            quotaRemaining: this.quota.getRunLevelRemaining(),
+            cooldownUntil: null,
+            sourceAsOf, retrievedAt: new Date().toISOString(),
+          });
+
+          return result;
+        }
+
+        // Error response
+        const error = classifyHttpStatus(response.status, `HTTP ${response.status}`, parseRetryAfter(response.headers?.['retry-after'] ?? null));
+
+        // Non-retryable
+        if (!error.retryable) {
+          this.quota.recordCallEnd(provider, response.status);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+
+          this.ledger.record({
+            provider, operation, symbol, requestKeyHash: keyHash,
+            cacheState: 'miss', coalescedFollowerCount: 0,
+            actualUpstreamCalls: 1, attemptCount: attempt,
+            statusClass: 'error', errorCategory: error.category,
+            latencyMs: Date.now() - startTime,
+            quotaRemaining: this.quota.getRunLevelRemaining(),
+            cooldownUntil: null,
+            sourceAsOf, retrievedAt: new Date().toISOString(),
+          });
+
+          // Negative cache non-retryable errors briefly
+          this.store.setNegative(cacheKey, 30_000);
+          return result;
+        }
+
+        // Retryable error — apply backoff
+        this.quota.recordCallEnd(provider, response.status);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+
+        if (attempt < BACKOFF_CONFIG.maxRetries) {
+          await this.backoff(attempt);
+        }
+      } catch (err: unknown) {
+        // Check if it's a broker-level error (quota, circuit)
+        if (this.isBrokerError(err)) {
+          const brokerErr = err as any;
+          this.quota.recordCallEnd(provider);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, brokerErr);
+
+          this.ledger.record({
+            provider, operation, symbol, requestKeyHash: keyHash,
+            cacheState: 'miss', coalescedFollowerCount: 0,
+            actualUpstreamCalls: attempt > 1 ? 1 : 0, attemptCount: attempt,
+            statusClass: 'error', errorCategory: brokerErr.category,
+            latencyMs: Date.now() - startTime,
+            quotaRemaining: this.quota.getRunLevelRemaining(),
+            cooldownUntil: null,
+            sourceAsOf, retrievedAt: new Date().toISOString(),
+          });
+          return result;
+        }
+
+        // Network error
+        const error = classifyNetworkError(err);
+        lastError = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, error);
+
+        if (error.retryable && attempt < BACKOFF_CONFIG.maxRetries) {
+          this.quota.recordCallEnd(provider);
+          await this.backoff(attempt);
+        } else {
+          this.quota.recordCallEnd(provider);
+          break;
+        }
+      }
+    }
+
+    // All retries exhausted
+    const finalErr = lastError?.error ?? errUnknown('All retries exhausted');
+    const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, BACKOFF_CONFIG.maxRetries, finalErr);
+
+    this.ledger.record({
+      provider, operation, symbol, requestKeyHash: keyHash,
+      cacheState: 'miss', coalescedFollowerCount: 0,
+      actualUpstreamCalls: 1, attemptCount: BACKOFF_CONFIG.maxRetries,
+      statusClass: 'error', errorCategory: finalErr.category,
+      latencyMs: Date.now() - startTime,
+      quotaRemaining: this.quota.getRunLevelRemaining(),
+      cooldownUntil: null,
+      sourceAsOf, retrievedAt: new Date().toISOString(),
+    });
+
+    return result;
+  }
+
+  /**
+   * Trigger async revalidation for stale cache.
+   */
+  private revalidateAsync<T>(
+    keyHash: string,
+    cacheKey: string,
+    provider: string,
+    operation: ProviderOperation,
+    symbol: string,
+    params: Record<string, unknown> | undefined,
+    fetcher: (meta: { provider: string; operation: ProviderOperation; symbol: string; attempt: number }) => Promise<{ data: T; status: number; headers?: Record<string, string>; sourceAsOf?: string }>,
+  ): void {
+    // Fire and forget — revalidation updates cache in background
+    this.executeUpstream(provider, operation, symbol, params, fetcher, keyHash, cacheKey).catch(() => {
+      // Revalidation failure is non-fatal — stale cache remains
+    });
+  }
+
+  // ── Helpers ──
+
+  private makeResult<T>(
+    provider: string, operation: ProviderOperation, symbol: string, startTime: number,
+    data: T | null, statusClass: StatusClass, cacheState: CacheState,
+    coalesced: boolean, attemptCount: number, error: any,
+  ): BrokerResult<T> {
+    return {
+      success: statusClass === 'success' || statusClass === 'coalesced',
+      data,
+      error,
+      statusClass,
+      cached: cacheState === 'fresh' || cacheState === 'stale',
+      cacheState,
+      coalesced,
+      attemptCount,
+      latencyMs: Date.now() - startTime,
+      provider, operation, symbol,
+      retrievedAt: new Date().toISOString(),
+    };
+  }
+
+  private cacheTtlFor(operation: ProviderOperation): { ttlMs: number; staleWindowMs: number } {
+    switch (operation) {
+      case 'quote': return { ttlMs: 30_000, staleWindowMs: 30_000 }; // 30s + 30s stale
+      case 'metadata': return { ttlMs: 300_000, staleWindowMs: 300_000 }; // 5m + 5m
+      case 'history': return { ttlMs: 600_000, staleWindowMs: 600_000 }; // 10m + 10m
+      case 'financials':
+      case 'key_ratios':
+      case 'balance_sheet': return { ttlMs: 3_600_000, staleWindowMs: 3_600_000 }; // 1h + 1h
+      case 'news': return { ttlMs: 120_000, staleWindowMs: 120_000 }; // 2m + 2m
+      default: return { ttlMs: 60_000, staleWindowMs: 60_000 };
+    }
+  }
+
+  private async backoff(attempt: number): Promise<void> {
+    const delay = Math.min(BACKOFF_CONFIG.baseDelayMs * Math.pow(2, attempt - 1), BACKOFF_CONFIG.maxDelayMs);
+    const jitter = delay * (0.5 + Math.random() * 0.5); // 50-100% of delay
+    await new Promise(resolve => setTimeout(resolve, jitter));
+  }
+
+  private isBrokerError(err: unknown): boolean {
+    if (err && typeof err === 'object' && 'code' in (err as any) && 'category' in (err as any)) {
+      const e = err as any;
+      return e.code === 'RATE_LIMITED' || e.code === 'BUDGET_EXHAUSTED' || e.code === 'CIRCUIT_OPEN';
+    }
+    return false;
+  }
+}
+
+export const providerRequestBroker = new ProviderRequestBroker();

@@ -6,7 +6,7 @@
  * Multi-replica production requires Redis-backed store.
  */
 
-import type { InFlightRequest, BrokerResult, CacheState } from './types';
+import type { BrokerResult, CacheState } from './types';
 
 interface CacheEntry<T = unknown> {
   data: T;
@@ -16,8 +16,8 @@ interface CacheEntry<T = unknown> {
 }
 
 export class InMemoryProviderBrokerStore {
-  // Single-flight in-flight requests
-  private inFlight = new Map<string, InFlightRequest>();
+  // Single-flight in-flight requests — stored as Promise<any> to avoid generic complications
+  private inFlight = new Map<string, { promise: Promise<any>; createdAt: number; consumerCount: number }>();
 
   // Cache: key → { data, expiresAt, staleAt }
   private cache = new Map<string, CacheEntry>();
@@ -30,12 +30,11 @@ export class InMemoryProviderBrokerStore {
     const existing = this.inFlight.get(key);
     if (existing) {
       existing.consumerCount++;
-      return { promise: existing.promise, isLeader: false };
+      return { promise: existing.promise as Promise<BrokerResult<T>>, isLeader: false };
     }
 
-    const promise = factory();
-    const entry: InFlightRequest<T> = { promise, createdAt: Date.now(), consumerCount: 1 };
-    this.inFlight.set(key, entry as InFlightRequest);
+    const promise = factory() as Promise<any>;
+    this.inFlight.set(key, { promise, createdAt: Date.now(), consumerCount: 1 });
 
     // Clean up on settle
     promise.finally(() => {
