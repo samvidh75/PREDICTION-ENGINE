@@ -64,7 +64,11 @@
     "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
     "pipeline:predictions": "tsx scripts/run-prediction-pipeline.ts",
-    "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts"
+    "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
+    "backtest:unified-engine": "tsx scripts/backtest-unified-engine.ts",
+    "validate:unified-ranking": "tsx scripts/validate-unified-ranking.ts",
+    "shadow:compare:unified": "tsx scripts/shadow-compare-unified-engine.ts",
+    "audit:unified-features": "tsx scripts/audit-unified-feature-coverage.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

@@ -14,6 +14,7 @@ import pool from '../db/index';
 import { stockStoryEngine } from '../stockstory';
 import { TemporalGuard } from '../validation/TemporalGuard';
 import { predictionRegistry } from './PredictionRegistry';
+import type { UnifiedPredictionOutput, UnifiedClassification } from '../prediction-engine/types';
 import {
   mapStockStoryClassification,
   type RegistryPredictionHorizon,
@@ -35,6 +36,33 @@ export interface GenerationSummary {
   skippedInsufficientData: number;
   failed: number;
   errors: GenerationError[];
+}
+
+const UNIFIED_TO_STOCKSTORY_CLASSIFICATION: Record<UnifiedClassification, string> = {
+  EXCELLENT: 'Excellent',
+  HEALTHY: 'Healthy',
+  STABLE: 'Stable',
+  WEAKENING: 'Weakening',
+  AT_RISK: 'At Risk',
+  INSUFFICIENT_DATA: 'At Risk',
+};
+
+function getFactorValue(factorScores: UnifiedPredictionOutput['factorScores'], group: string): number | null {
+  const factor = factorScores.find(f => f.group === group);
+  return factor?.value ?? null;
+}
+
+function mapUnifiedOutputToContractInput(output: UnifiedPredictionOutput): Record<string, unknown> {
+  return {
+    healthScore: output.rankingScore ?? 50,
+    classification: UNIFIED_TO_STOCKSTORY_CLASSIFICATION[output.classification],
+    quality: getFactorValue(output.factorScores, 'quality'),
+    growth: getFactorValue(output.factorScores, 'growth'),
+    risk: getFactorValue(output.factorScores, 'risk'),
+    valuation: getFactorValue(output.factorScores, 'valuation'),
+    momentum: getFactorValue(output.factorScores, 'momentum'),
+    _sectorStrengthFactor: getFactorValue(output.factorScores, 'sector'),
+  };
 }
 
 export class PredictionFactory {
@@ -294,6 +322,30 @@ export class PredictionFactory {
         historical: { featureHistory: [], factorHistory: [] },
         sector: { name: sectorName, sectorStrength: sectorStrength ?? 50, sectorMomentum: 'Steady' as const },
       };
+
+      // F5: Feature-flagged delegation to UnifiedPredictionEngine
+      const unifiedEngineEnabled = process.env.UNIFIED_PREDICTION_ENGINE_ENABLED === 'true';
+      const predictionFactoryDelegation = process.env.F5_PREDICTION_FACTORY_DELEGATE === 'true';
+
+      if (unifiedEngineEnabled && predictionFactoryDelegation) {
+        const { UnifiedPredictionEngine } = require('../../prediction-engine/UnifiedPredictionEngine');
+        const { adaptPredictionFactoryData } = require('../../prediction-engine/adapters/PredictionFactoryAdapter');
+        const engine = new UnifiedPredictionEngine();
+        const unifiedInput = adaptPredictionFactoryData(
+          symbol,
+          30,
+          tradeDate,
+          fin ?? {},
+          feat ?? {},
+          fact ?? {},
+          sectorName,
+          sectorStrength,
+          [],
+          []
+        );
+        const output = engine.evaluate(unifiedInput);
+        return mapUnifiedOutputToContractInput(output);
+      }
 
       const result = await stockStoryEngine.evaluate(engineInputs as any);
       (result as any)._sectorStrengthFactor = fact?.sector_strength_factor ?? null;

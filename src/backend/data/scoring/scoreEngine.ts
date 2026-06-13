@@ -1,5 +1,6 @@
 import type { AnalyticalInputLineage, Availability } from "../lineage/types";
 import type { FundamentalSnapshot, MarketPriceRecord } from "../providers/types";
+import type { UnifiedPredictionOutput, UnifiedClassification } from "../../../prediction-engine/types";
 import { assertValidFactorScore, validateMarketPriceRecords } from "../validation/priceValidation";
 
 export type FactorScore = {
@@ -134,6 +135,69 @@ function classify(score: number): PredictionSnapshot["classification"] {
   return "Critical";
 }
 
+function convertUnifiedOutputToPredictionSnapshot(output: UnifiedPredictionOutput): PredictionSnapshot {
+  const unifiedToSnapshotClassification: Record<UnifiedClassification, PredictionSnapshot['classification']> = {
+    EXCELLENT: 'Excellent',
+    HEALTHY: 'Good',
+    STABLE: 'Fair',
+    WEAKENING: 'Weak',
+    AT_RISK: 'Critical',
+    INSUFFICIENT_DATA: null,
+  };
+
+  const factorGroupToKey: Record<string, keyof PredictionSnapshot['factors']> = {
+    quality: 'quality_score',
+    growth: 'growth_score',
+    value: 'value_score',
+    momentum: 'momentum_score',
+    risk: 'risk_score',
+    sector: 'sector_score',
+  };
+
+  const factors: PredictionSnapshot['factors'] = {
+    quality_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+    growth_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+    value_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+    momentum_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+    risk_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+    sector_score: { value: null, availability: 'unavailable', confidence: 0, lineage: [] },
+  };
+
+  const allLineage: AnalyticalInputLineage[] = [];
+
+  for (const fs of output.factorScores) {
+    const key = factorGroupToKey[fs.group];
+    if (key) {
+      factors[key] = {
+        value: fs.value,
+        availability: fs.availability >= 50 ? 'real' : fs.availability > 0 ? 'partial' : 'unavailable' as Availability,
+        confidence: fs.confidence,
+        reason: fs.reason,
+        lineage: [],
+      };
+    }
+  }
+
+  const available = Object.values(factors).filter(f => f.value != null);
+  const essential = [factors.quality_score, factors.momentum_score, factors.risk_score];
+  const availability: Availability = essential.every(f => f.value != null) && available.length === 6
+    ? (Object.values(factors).every(f => f.availability === 'real') ? 'real' : 'partial')
+    : available.length > 0 ? 'partial' : 'unavailable';
+
+  return {
+    symbol: output.symbol,
+    horizon: output.horizon as 7 | 30 | 90 | 180 | 365,
+    rankingScore: output.rankingScore,
+    classification: unifiedToSnapshotClassification[output.classification],
+    confidenceScore: output.confidenceScore,
+    availability,
+    factors,
+    lineage: allLineage,
+    generatedAt: output.generatedAt,
+    modelVersion: output.modelVersion,
+  };
+}
+
 export function scoreSnapshot(input: {
   symbol: string;
   horizon?: 7 | 30 | 90 | 180 | 365;
@@ -144,6 +208,24 @@ export function scoreSnapshot(input: {
   const symbol = input.symbol.toUpperCase();
   const validPrices = validateMarketPriceRecords(input.prices).accepted.sort((a, b) => a.tradingDate.localeCompare(b.tradingDate));
   const sectorValue = input.sectorScore ?? null;
+
+  // F5: If unified engine is active, delegate
+  const unifiedEngineEnabled = process.env.UNIFIED_PREDICTION_ENGINE_ENABLED === 'true';
+  const featuredFlagDelegation = process.env.F5_SCORE_SNAPSHOT_DELEGATE === 'true';
+
+  if (unifiedEngineEnabled && featuredFlagDelegation) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { UnifiedPredictionEngine } = require('../../../prediction-engine/UnifiedPredictionEngine');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { adaptScoreSnapshotParams } = require('../../../prediction-engine/adapters/ScoreSnapshotAdapter');
+    const engine = new UnifiedPredictionEngine();
+    const closePrices = validPrices.map(p => p.close);
+    const tradeDates = validPrices.map(p => p.tradingDate);
+    const unifiedInput = adaptScoreSnapshotParams(symbol, input.horizon ?? 30, closePrices, tradeDates, (input.fundamental ?? {}) as Record<string, unknown>, sectorValue);
+    const output = engine.evaluate(unifiedInput);
+    return convertUnifiedOutputToPredictionSnapshot(output);
+  }
+
   const factors = {
     quality_score: scoreQuality(symbol, input.fundamental),
     growth_score: scoreGrowth(symbol, input.fundamental),
