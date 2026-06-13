@@ -27,6 +27,7 @@ export interface FundamentalSnapshot {
   peRatio?: number | null;
   pbRatio?: number | null;
   roe?: number | null;
+  roa?: number | null;
   debtToEquity?: number | null;
   operatingMargin?: number | null;
   netMargin?: number | null;
