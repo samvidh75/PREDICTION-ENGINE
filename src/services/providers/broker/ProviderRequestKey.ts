@@ -24,23 +24,28 @@ export function buildRequestKey(
   symbol: string,
   params?: Record<string, unknown>,
 ): RequestKey {
-  const normalizedProvider = provider.trim().toLowerCase();
-  const normalizedOperation = operation.trim().toLowerCase() as ProviderOperation;
-  const normalizedSymbol = symbol.trim().toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
-  const sanitizedParams = canonicalize(params ?? {});
-  const canonicalKeyMaterial = {
-    provider: normalizedProvider,
-    operation: normalizedOperation,
-    symbol: normalizedSymbol,
-    params: sanitizedParams,
-  };
+  const canonicalKeyMaterial = buildRequestKeyDebugMaterial(provider, operation, symbol, params);
   const paramsHash = sha256(JSON.stringify(canonicalKeyMaterial)).slice(0, 16);
 
   return {
-    provider: normalizedProvider,
-    operation: normalizedOperation,
-    symbol: normalizedSymbol,
+    provider: canonicalKeyMaterial.provider,
+    operation: canonicalKeyMaterial.operation,
+    symbol: canonicalKeyMaterial.symbol,
     paramsHash,
+  };
+}
+
+export function buildRequestKeyDebugMaterial(
+  provider: string,
+  operation: ProviderOperation,
+  symbol: string,
+  params?: Record<string, unknown>,
+): { provider: string; operation: ProviderOperation; symbol: string; params: unknown } {
+  return {
+    provider: provider.trim().toLowerCase(),
+    operation: operation.trim().toLowerCase() as ProviderOperation,
+    symbol: symbol.trim().toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+    params: canonicalize(params ?? {}),
   };
 }
 

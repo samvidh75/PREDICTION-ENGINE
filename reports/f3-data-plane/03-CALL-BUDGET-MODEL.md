@@ -43,3 +43,25 @@ Broker implementation note: the budgets in `ProviderQuotaPolicy.DEFAULT_BUDGETS`
 | Cooldown | Auto 60s after rate-limit signal |
 | Run-level max | `MAX_PROVIDER_CALLS_PER_RUN` env var |
 | Exhaustion | Stop before exhaustion, mark run `budget_exhausted` |
+
+## F3.1A Broker Budget Implementation
+
+The broker now supports:
+
+- per-minute provider budget;
+- per-day provider budget;
+- burst budget;
+- max concurrent requests;
+- cooldown after 429 / rate-limit signal;
+- run-level maximum via `MAX_PROVIDER_CALLS_PER_RUN`;
+- remaining-budget reporting for observability.
+
+Redis-related broker configuration:
+
+| Variable | Required use |
+|----------|--------------|
+| `REDIS_URL` | Enables Redis-selected broker contract mode and CI Redis contract tests. |
+| `PROVIDER_BROKER_REDIS_REQUIRED` | Fails closed when Redis is required and missing. |
+| `PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED` | Explicit opt-in for in-memory single-instance mode. |
+
+CI broker tests use deterministic fixtures only and do not call live provider APIs.

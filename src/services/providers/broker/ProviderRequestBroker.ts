@@ -201,13 +201,14 @@ export class ProviderRequestBroker {
             this.quota.recordCallEnd(provider);
             callStarted = false;
           }
-          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, 'error', 'miss', false, attempt, brokerErr);
+          const statusClass = this.statusClassForError(brokerErr);
+          const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, brokerErr);
 
           this.ledger.record({
             provider, operation, symbol, requestKeyHash: keyHash,
             cacheState: ledgerCacheState, coalescedFollowerCount: this.coalescedFollowerCount(cacheKey),
             actualUpstreamCalls: attempt > 1 ? 1 : 0, attemptCount: attempt,
-            statusClass: this.statusClassForError(brokerErr), errorCategory: brokerErr.category,
+            statusClass, errorCategory: brokerErr.category,
             latencyMs: Date.now() - startTime,
             quotaRemaining: this.quota.getRunLevelRemaining(),
             cooldownUntil: this.cooldownUntil(provider),
