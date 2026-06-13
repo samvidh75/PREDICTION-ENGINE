@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
 import { CacheHierarchyEngine } from './cacheHierarchyEngine';
 import type { AppEnv } from '../../config/env';
 
@@ -10,6 +10,10 @@ const env: AppEnv = {
 };
 
 describe('CacheHierarchyEngine', () => {
+  beforeEach(() => {
+    delete process.env.REDIS_URL;
+  });
+
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();

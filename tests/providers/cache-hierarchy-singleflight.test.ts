@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CacheHierarchyEngine } from '../../src/backend/persistence/cache/cacheHierarchyEngine';
 import type { AppEnv } from '../../src/backend/config/env';
 
@@ -10,6 +10,10 @@ const env: AppEnv = {
 };
 
 describe('cache hierarchy single-flight contract', () => {
+  beforeEach(() => {
+    delete process.env.REDIS_URL;
+  });
+
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
