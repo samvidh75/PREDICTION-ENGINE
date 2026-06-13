@@ -1,4 +1,20 @@
 /**
+ * F5: StockStoryEngine is RETAINED as the presentation/explanation layer.
+ * 
+ * Decision: The unified engine (UnifiedPredictionEngine) is the authoritative
+ * scoring engine. StockStoryEngine continues to serve as:
+ *   - The analytical narrative generator (explanations, strengths, risks)
+ *   - The engine detail provider for the StockStoryPage UI
+ *   - A compatibility layer for existing API consumers
+ * 
+ * The unified engine produces rankingScore, classification, and confidence.
+ * StockStoryEngine's healthScore and narrative are used for display, not
+ * for prediction registry writes (which now come from the unified engine).
+ * 
+ * No duplicate writes to prediction_registry originate from StockStoryEngine.
+ */
+
+/**
  * StockStory Engine — Orchestrator (RC-ENGINE-003)
  * 
  * TRACK-P1: Single risk dampening policy.
