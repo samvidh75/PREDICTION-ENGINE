@@ -1,10 +1,11 @@
 /**
  * TRACK-P1 — Scoring Integrity Tests
+ * TRACK-12B: Added GROUP H (Dividend Yield Trap), updated GROUP A (log10 market cap)
  * 
  * Test Groups: A (Market Cap Activation), B (Metric Identity),
  * C (Risk Dampening Once), D (Per-Metric Fallback),
  * E (Null Handling), F (Distribution Completeness),
- * G (Rank Map Logic), H (Latest Snapshot), I (Determinism), J (Score Range)
+ * H (Dividend Yield Trap), I (Determinism), J (Score Range)
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
@@ -72,8 +73,8 @@ describe('GROUP A: Market Cap Activation', () => {
       financials: makeFinancials({ marketCap: 80000 }),
       sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
     }));
-    expect(mega.marketCapSizeScore).toBe(95);
-    expect(large.marketCapSizeScore).toBe(85);
+    expect(mega.marketCapSizeScore).toBe(87);
+    expect(large.marketCapSizeScore).toBe(79);
     expect(mega.score).toBeGreaterThanOrEqual(large.score);
   });
 
@@ -86,8 +87,8 @@ describe('GROUP A: Market Cap Activation', () => {
       financials: makeFinancials({ marketCap: 10000 }),
       sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
     }));
-    expect(large.marketCapSizeScore).toBe(85);
-    expect(mid.marketCapSizeScore).toBe(70);
+    expect(large.marketCapSizeScore).toBe(75);
+    expect(mid.marketCapSizeScore).toBe(62);
     expect(large.score).toBeGreaterThanOrEqual(mid.score);
   });
 
@@ -347,6 +348,71 @@ describe('GROUP F: Distribution Completeness', () => {
         }
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TEST GROUP H — DIVIDEND YIELD TRAP
+// ---------------------------------------------------------------------------
+describe('GROUP H: Dividend Yield Trap', () => {
+  it('normal healthy yield (2-4%) scores highly', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.035 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(80);
+  });
+
+  it('moderate yield (5-7%) scores highest (90)', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.06 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(90);
+  });
+
+  it('high yield (10%) penalised to neutral (possible distress)', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.10 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(50);
+  });
+
+  it('extreme yield (25%) penalised heavily', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.25 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(10);
+  });
+
+  it('very low yield (0.5%) scores 35', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.005 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(35);
+  });
+
+  it('null yield gives neutral score 50', () => {
+    const result = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: null }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.dividendYieldScore).toBe(50);
+  });
+
+  it('distress yield drags composite valuation score down vs normal yield', () => {
+    const normal = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.03 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    const distressed = valuationEngine.evaluate(makeFixture({
+      financials: makeFinancials({ dividendYield: 0.15 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(normal.score).toBeGreaterThan(distressed.score);
   });
 });
 
