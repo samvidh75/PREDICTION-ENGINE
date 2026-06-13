@@ -140,7 +140,7 @@ export class StabilityEngine {
       { score: volatilityScore, weight: STABILITY_WEIGHTS.volatility },
       { score: coverageScore, weight: STABILITY_WEIGHTS.coverage },
       { score: interestCoverageScore, weight: STABILITY_WEIGHTS.interestCoverage },
-      { score: marketCapSizeScore, weight: STABILITY_WEIGHTS.marketCapSize },
+      { score: marketCapSizeScore, weight: financials.marketCap !== null ? STABILITY_WEIGHTS.marketCapSize : 0 },
     ]);
 
     const factorAdjust = (factors.riskFactor - 50) * 0.2;
