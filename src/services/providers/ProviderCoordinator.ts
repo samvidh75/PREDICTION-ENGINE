@@ -20,16 +20,15 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 /**
  * ProviderCoordinator is the single entry point for market data.
  *
- * TRACK-9B financial architecture:
+ * TRACK-9B financial architecture (ScreenerProvider removed — QUARANTINED F3 Phase 0):
  *   Tier 1: UpstoxFundamentalsProvider
- *   Tier 2: ScreenerProvider
- *   Tier 3: FinnhubProvider
- *   Tier 4: YahooProvider
+ *   Tier 2: FinnhubProvider
+ *   Tier 3: YahooProvider (price/volume only)
  *
  * Financial providers are merged, not first-success returned:
  *   - Upstox is primary for verified live ratios and balance-sheet fields.
- *   - Screener can only enrich missing growth/liquidity/margin fields.
- *   - Finnhub/Yahoo can only fill still-missing low-priority fields.
+ *   - Finnhub fills missing low-priority fields.
+ *   - Yahoo provides price data only (no fundamentals via v8 chart).
  *   - No provider can overwrite a populated value from an earlier tier.
  */
 export class ProviderCoordinator {
