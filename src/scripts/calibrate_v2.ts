@@ -388,8 +388,8 @@ Correlation of individual factors relative to final **Health Score** under diffe
   console.log(`Saved EngineCalibrationV2.md to: ${workspacePath}`);
 
   // Write to artifacts
-  const artifactDir = "C:\\Users\\Samvidh\\.gemini\\antigravity-ide\\brain\\62e934e3-4a45-449b-9f4f-6ecd58c4d7d8";
-  if (fs.existsSync(artifactDir)) {
+  const artifactDir = process.env.ARTIFACT_OUT_DIR ?? "";
+  if (artifactDir && fs.existsSync(artifactDir)) {
     const artifactPath = path.join(artifactDir, "EngineCalibrationV2.md");
     fs.writeFileSync(artifactPath, mdContent, "utf8");
     console.log(`Saved EngineCalibrationV2.md to: ${artifactPath}`);

@@ -2,13 +2,15 @@
 import { existsSync, unlinkSync, openSync } from 'fs';
 import { spawn } from 'child_process';
 import { join } from 'path';
+import { platform } from 'os';
 
-const BASE_DIR = 'C:\\Users\\Samvidh';
-const DATA_DIR = join(BASE_DIR, 'postgres-data');
+const PG_EXE_SUFFIX = platform() === 'win32' ? '.exe' : '';
+const BASE_DIR = process.env.PG_BASE_DIR ?? join(process.cwd(), 'pg-portable');
+const DATA_DIR = process.env.PG_DATA_DIR ?? join(BASE_DIR, 'postgres-data');
 const PID_FILE = join(DATA_DIR, 'postmaster.pid');
 const LOG_FILE = join(BASE_DIR, 'postgres-server.log');
 const PGSQL_DIR = join(BASE_DIR, 'postgres-bin', 'pgsql');
-const POSTGRES_EXE = join(PGSQL_DIR, 'bin', 'postgres.exe');
+const POSTGRES_EXE = join(PGSQL_DIR, 'bin', `postgres${PG_EXE_SUFFIX}`);
 
 async function start() {
   console.log('Starting PostgreSQL server...');
@@ -31,7 +33,7 @@ async function start() {
   });
 
   child.unref();
-  console.log(`Spawned postgres.exe with PID: ${child.pid}`);
+  console.log(`Spawned postgres with PID: ${child.pid}`);
 
   // Wait 4 seconds for server to start and bind
   await new Promise((r) => setTimeout(r, 4000));

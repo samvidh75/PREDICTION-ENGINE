@@ -13,10 +13,10 @@ import { ProviderCapabilityRegistry } from '../../src/providers/v2/ProviderCapab
 
 describe('ScreenerProvider quarantine (F3 Phase 0)', () => {
 
-  it('ProviderCoordinator construction must not throw for missing Screener', () => {
+  it('ProviderCoordinator construction must not throw for missing Screener', async () => {
     // ScreenerProvider constructor throws. If ProviderCoordinator tries to
     // construct it, creation fails. We verify the stub's throw behavior.
-    expect(async () => {
+    await expect(async () => {
       const { ScreenerProvider } = await import('../../src/services/providers/ScreenerProvider');
       new ScreenerProvider();
     }).rejects.toThrow(/QUARANTINED/);

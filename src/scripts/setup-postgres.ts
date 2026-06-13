@@ -2,13 +2,16 @@
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { execSync } from 'child_process';
 import { join } from 'path';
+import { platform } from 'os';
 
-const DOWNLOAD_URL = 'https://get.enterprisedb.com/postgresql/postgresql-16.4-1-windows-x64-binaries.zip';
-const BASE_DIR = 'C:\\Users\\Samvidh';
+const PG_EXE_SUFFIX = platform() === 'win32' ? '.exe' : '';
+
+const DOWNLOAD_URL = process.env.PG_DOWNLOAD_URL ?? 'https://get.enterprisedb.com/postgresql/postgresql-16.4-1-windows-x64-binaries.zip';
+const BASE_DIR = process.env.PG_BASE_DIR ?? join(process.cwd(), 'pg-portable');
 const ZIP_PATH = join(BASE_DIR, 'postgres.zip');
 const BIN_DIR = join(BASE_DIR, 'postgres-bin');
-const DATA_DIR = join(BASE_DIR, 'postgres-data');
-const PGSQL_DIR = join(BIN_DIR, 'pgsql');
+const DATA_DIR = process.env.PG_DATA_DIR ?? join(BASE_DIR, 'postgres-data');
+const PGSQL_DIR = process.env.PG_HOME ?? join(BIN_DIR, 'pgsql');
 
 async function setup() {
   console.log('=== Setting up Portable PostgreSQL (Real Warehouse) ===');
@@ -40,7 +43,7 @@ async function setup() {
   // Step 3: Initialize data directory
   if (!existsSync(DATA_DIR)) {
     console.log(`Initializing database in ${DATA_DIR}...`);
-    const initdbCmd = `"${join(PGSQL_DIR, 'bin', 'initdb.exe')}" -U postgres -A trust -D "${DATA_DIR}"`;
+    const initdbCmd = `"${join(PGSQL_DIR, 'bin', `initdb${PG_EXE_SUFFIX}`)}" -U postgres -A trust -D "${DATA_DIR}"`;
     execSync(initdbCmd, { stdio: 'inherit' });
     console.log('Database initialization complete.');
   } else {
@@ -50,7 +53,7 @@ async function setup() {
   // Step 4: Start PostgreSQL
   console.log('Starting PostgreSQL server on port 5432...');
   try {
-    const pgctlCmd = `"${join(PGSQL_DIR, 'bin', 'pg_ctl.exe')}" -D "${DATA_DIR}" -o "-p 5432" start`;
+    const pgctlCmd = `"${join(PGSQL_DIR, 'bin', `pg_ctl${PG_EXE_SUFFIX}`)}" -D "${DATA_DIR}" -o "-p 5432" start`;
     execSync(pgctlCmd, { stdio: 'inherit' });
     console.log('PostgreSQL started.');
   } catch (err: any) {
@@ -63,7 +66,7 @@ async function setup() {
   // Step 5: Create database stockstory
   console.log('Creating database "stockstory"...');
   try {
-    const createdbCmd = `"${join(PGSQL_DIR, 'bin', 'createdb.exe')}" -U postgres -p 5432 stockstory`;
+    const createdbCmd = `"${join(PGSQL_DIR, 'bin', `createdb${PG_EXE_SUFFIX}`)}" -U postgres -p 5432 stockstory`;
     execSync(createdbCmd, { stdio: 'inherit' });
     console.log('Database created.');
   } catch (err: any) {

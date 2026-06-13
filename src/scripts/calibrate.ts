@@ -367,8 +367,8 @@ Based on the distribution diagnostics, we recommend the following recalibrated w
   fs.writeFileSync(workspacePath, content, "utf8");
   console.log(`Saved EngineCalibrationReport.md to: ${workspacePath}`);
 
-  const artifactDir = "C:\\Users\\Samvidh\\.gemini\\antigravity-ide\\brain\\62e934e3-4a45-449b-9f4f-6ecd58c4d7d8";
-  if (fs.existsSync(artifactDir)) {
+  const artifactDir = process.env.ARTIFACT_OUT_DIR ?? "";
+  if (artifactDir && fs.existsSync(artifactDir)) {
     const artifactPath = path.join(artifactDir, "EngineCalibrationReport.md");
     fs.writeFileSync(artifactPath, content, "utf8");
     console.log(`Saved EngineCalibrationReport.md to: ${artifactPath}`);
