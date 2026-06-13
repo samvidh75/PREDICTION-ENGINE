@@ -16,7 +16,7 @@ export type { DbKind, DbQueryResult } from "./DatabaseAdapter";
 // Re-export query for backward compatibility with code that does:
 //   import { query } from "../db/index"
 import { dbAdapter } from "./DatabaseAdapter";
-export async function query<T extends Record<string, unknown> = Record<string, unknown>>(
+export async function query<T extends Record<string, any> = Record<string, any>>(
   text: string,
   params?: unknown[],
 ): Promise<{ rows: T[]; rowCount: number }> {
