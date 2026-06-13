@@ -6,9 +6,17 @@ import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint } from '../data/types';
-import { RetryPolicy } from './RetryPolicy';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
+const REQUEST_TIMEOUT_MS = 10_000;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
 
 type IndianExchange = 'NSE' | 'BSE';
 
@@ -57,35 +65,59 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   constructor(apiKey?: string) {
     const key = apiKey || (typeof process !== 'undefined' && process.env?.INDIANAPI_KEY) || '';
     this.apiKey = key;
-    if (!key) {
-      console.warn('IndianMarket: INDIANAPI_KEY is not configured in the environment');
-    }
   }
 
   private cleanSymbol(symbol: string): string {
     return symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
   }
 
-  private async fetchJson(url: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const resp = await fetch(url, {
-        headers: {
-          'X-Api-Key': this.apiKey,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!resp.ok) {
-        throw new Error(`IndianAPI HTTP ${resp.status}: ${resp.statusText} for ${url}`);
+  private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
+    if (!this.apiKey) {
+      throw new Error('IndianAPI key not set (INDIANAPI_KEY)');
+    }
+
+    const clean = this.cleanSymbol(symbol);
+    const result = await (await getSharedProviderRequestBroker()).execute('indianapi', operation, clean, params, async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+      try {
+        const resp = await fetch(url, {
+          headers: {
+            'X-Api-Key': this.apiKey,
+            'Content-Type': 'application/json',
+          },
+          signal: controller.signal,
+        });
+        return {
+          data: await this.readJsonSafely(resp),
+          status: resp.status,
+          headers: headersToRecord(resp.headers),
+        };
+      } finally {
+        clearTimeout(timeout);
       }
-      return resp.json();
-    }, RETRY_OPTS);
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`IndianAPI ${operation} unavailable for ${clean}: ${result.statusClass}`);
+    }
+
+    return result.data;
+  }
+
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
   }
 
   // ── Quote ─────────────────────────────────────────────────
   async getQuote(symbol: string): Promise<StockQuote> {
     const clean = this.cleanSymbol(symbol);
     const url = `https://stock.indianapi.in/stock?name=${encodeURIComponent(clean)}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('quote', symbol, { name: clean }, url);
 
     const s = data.stockDetailsReusableData || {};
     const currentPriceObj = data.currentPrice || {};
@@ -132,7 +164,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   async getMetadata(symbol: string): Promise<CompanyMetadata> {
     const clean = this.cleanSymbol(symbol);
     const url = `https://stock.indianapi.in/stock?name=${encodeURIComponent(clean)}`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('metadata', symbol, { name: clean }, url);
 
     const s = data.stockDetailsReusableData || {};
     const exchange = inferIndianApiExchange(symbol, data.currentPrice || {});
@@ -173,7 +205,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     else if (r === 'MAX') period = 'max';
 
     const url = `https://stock.indianapi.in/historical_data?stock_name=${encodeURIComponent(clean)}&period=${period}&filter=price`;
-    const data = await this.fetchJson(url);
+    const data = await this.fetchJson('history', symbol, { stock_name: clean, period, filter: 'price' }, url);
 
     const priceDs = data.datasets?.find((ds: any) => ds.metric === 'Price');
     const volumeDs = data.datasets?.find((ds: any) => ds.metric === 'Volume');
@@ -181,17 +213,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const pointsMap = new Map<string, HistoricalPoint>();
 
     if (priceDs && Array.isArray(priceDs.values)) {
-      for (const [date, val] of priceDs.values) {
-        const price = positiveNumber(val) ?? 0;
-        pointsMap.set(date, {
-          date,
-          open: price,
-          high: price,
-          low: price,
-          close: price,
-          volume: 0,
-        });
-      }
+      return [];
     }
 
     if (volumeDs && Array.isArray(volumeDs.values)) {

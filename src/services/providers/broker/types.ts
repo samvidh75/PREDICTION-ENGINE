@@ -58,6 +58,7 @@ export interface BrokerResult<T = unknown> {
   operation: ProviderOperation;
   symbol: string;
   retrievedAt: string;
+  runId?: string;
 }
 
 /** Structured broker error (never contains secrets). */
@@ -73,6 +74,7 @@ export interface BrokerError {
 /** Call ledger entry — one row per actual upstream request. */
 export interface CallLedgerEntry {
   id: string;
+  runId?: string;
   provider: string;
   operation: ProviderOperation;
   symbol: string;
@@ -106,4 +108,11 @@ export interface CachePolicy {
   ttlMs: number;
   staleWindowMs: number;
   negativeTtlMs: number;
+}
+
+/** Per-call broker metadata that must not become cache-key material. */
+export interface BrokerExecuteOptions {
+  runId?: string;
+  cachePolicy?: CachePolicy;
+  timeoutMs?: number;
 }

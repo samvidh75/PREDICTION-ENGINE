@@ -11,6 +11,8 @@ export interface ProviderRequestBrokerHandle {
   shutdown: () => Promise<void>;
 }
 
+let sharedProviderRequestBrokerHandle: Promise<ProviderRequestBrokerHandle> | null = null;
+
 export function createProviderRequestBroker(config: ProviderBrokerConfig = loadProviderBrokerConfig()): ProviderRequestBroker {
   assertProviderBrokerConfig(config);
   assertSynchronousFactoryAllowed(config);
@@ -45,6 +47,21 @@ export async function createProviderRequestBrokerHandle(
       await redisHandle?.shutdown();
     },
   };
+}
+
+export async function getSharedProviderRequestBroker(): Promise<ProviderRequestBroker> {
+  if (!sharedProviderRequestBrokerHandle) {
+    sharedProviderRequestBrokerHandle = createProviderRequestBrokerHandle();
+  }
+  const handle = await sharedProviderRequestBrokerHandle;
+  return handle.broker;
+}
+
+export async function shutdownSharedProviderRequestBroker(): Promise<void> {
+  if (!sharedProviderRequestBrokerHandle) return;
+  const handle = await sharedProviderRequestBrokerHandle;
+  await handle.shutdown();
+  sharedProviderRequestBrokerHandle = null;
 }
 
 function assertSynchronousFactoryAllowed(config: ProviderBrokerConfig): void {

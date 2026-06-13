@@ -18,12 +18,19 @@
  */
 
 import { FinancialProvider, FinancialData } from './FinancialProvider';
-import { RetryPolicy } from './RetryPolicy';
 import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
+import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
 
-const RETRY_OPTS = { retries: 2, minDelayMs: 500, maxDelayMs: 3000 };
 const API_BASE = 'https://api.upstox.com/v2/fundamentals';
 const REQUEST_TIMEOUT_MS = 10_000;
+
+function headersToRecord(headers: Headers): Record<string, string> {
+  const record: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
 
 /** Access token provider — injected at construction so it's call-site agnostic */
 export type UpstoxTokenProvider = () => string | null;
@@ -58,8 +65,8 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
 
     // Fetch key ratios + balance sheet in parallel
     const [ratios, balanceSheet] = await Promise.allSettled([
-      this.fetchKeyRatios(isin, token),
-      this.fetchBalanceSheet(isin, token),
+      this.fetchKeyRatios(clean, isin, token),
+      this.fetchBalanceSheet(clean, isin, token),
     ]);
 
     if (ratios.status === 'rejected' && balanceSheet.status === 'rejected') {
@@ -129,9 +136,9 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
 
     return {
       symbol: clean,
-      periodEnd: latestBs?.period
-        ? this.parsePeriod(latestBs.period)
-        : new Date().toISOString().split('T')[0],
+      periodEnd: latestBs?.period ? this.parsePeriod(latestBs.period) : undefined,
+      sourceAsOf: latestBs?.period ? this.parsePeriod(latestBs.period) : undefined,
+      retrievedAt: new Date().toISOString(),
 
       // ── Valuation ──────────────────────────────────────
       marketCap: undefined,
@@ -163,28 +170,40 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
 
   // ── API helpers ─────────────────────────────────────────
 
-  private async fetchKeyRatios(isin: string, token: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const url = `${API_BASE}/${isin}/key-ratios`;
+  private async fetchKeyRatios(symbol: string, isin: string, token: string): Promise<any> {
+    const url = `${API_BASE}/${isin}/key-ratios`;
+    const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'key_ratios', symbol, { isin }, async () => {
       const resp = await this.fetchWithTimeout(url, token);
-      if (resp.status === 401 || resp.status === 403) throw new Error(`UpstoxFundamentals: token expired or unauthorized (${resp.status})`);
-      if (resp.status === 404) throw new Error(`UpstoxFundamentals: no data for ISIN ${isin} (404)`);
-      if (resp.status === 429) throw new Error('UpstoxFundamentals: rate limited (429)');
-      if (!resp.ok) throw new Error(`UpstoxFundamentals HTTP ${resp.status}: ${resp.statusText}`);
-      return resp.json();
-    }, RETRY_OPTS);
+      return {
+        data: await this.readJsonSafely(resp),
+        status: resp.status,
+        headers: headersToRecord(resp.headers),
+      };
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`UpstoxFundamentals key ratios unavailable for ${symbol}: ${result.statusClass}`);
+    }
+    return result.data;
   }
 
-  private async fetchBalanceSheet(isin: string, token: string): Promise<any> {
-    return RetryPolicy.execute(async () => {
-      const url = `${API_BASE}/${isin}/balance-sheet?type=consolidated`;
+  private async fetchBalanceSheet(symbol: string, isin: string, token: string): Promise<any> {
+    const url = `${API_BASE}/${isin}/balance-sheet?type=consolidated`;
+    const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'balance_sheet', symbol, { isin, type: 'consolidated' }, async () => {
       const resp = await this.fetchWithTimeout(url, token);
-      if (resp.status === 401 || resp.status === 403) throw new Error(`UpstoxFundamentals: token expired or unauthorized (${resp.status})`);
-      if (resp.status === 404) throw new Error(`UpstoxFundamentals: no balance sheet for ISIN ${isin} (404)`);
-      if (resp.status === 429) throw new Error('UpstoxFundamentals: rate limited (429)');
-      if (!resp.ok) throw new Error(`UpstoxFundamentals HTTP ${resp.status}: ${resp.statusText}`);
-      return resp.json();
-    }, RETRY_OPTS);
+      const data = await this.readJsonSafely(resp);
+      return {
+        data,
+        status: resp.status,
+        headers: headersToRecord(resp.headers),
+        sourceAsOf: this.sourceAsOfBalanceSheet(data),
+      };
+    });
+
+    if (!result.success || result.data === null) {
+      throw new Error(`UpstoxFundamentals balance sheet unavailable for ${symbol}: ${result.statusClass}`);
+    }
+    return result.data;
   }
 
   private async fetchWithTimeout(url: string, token: string): Promise<Response> {
@@ -208,18 +227,30 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
     }
   }
 
-  /** Convert "Mar 2025" → "2025-03-31" (approximate period end) */
-  private parsePeriod(period: string): string {
-    const months: Record<string, string> = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12',
+  private async readJsonSafely(resp: Response): Promise<any> {
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
+  }
+
+  private sourceAsOfBalanceSheet(data: any): string | undefined {
+    const period = data?.data?.history?.[0]?.period;
+    return typeof period === 'string' ? this.parsePeriod(period) : undefined;
+  }
+
+  /** Convert "Mar 2025" → actual calendar month end, or undefined. */
+  private parsePeriod(period: string): string | undefined {
+    const months: Record<string, number> = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
     };
     const match = period.match(/^([A-Z][a-z]{2})\s+(\d{4})$/);
-    if (match) {
-      const monthCode = months[match[1]] ?? '03';
-      const year = match[2];
-      return `${year}-${monthCode}-31`;
-    }
-    return new Date().toISOString().split('T')[0];
+    if (!match) return undefined;
+    const month = months[match[1]];
+    const year = Number(match[2]);
+    if (month === undefined || !Number.isInteger(year)) return undefined;
+    return new Date(Date.UTC(year, month + 1, 0)).toISOString().split('T')[0];
   }
 }
