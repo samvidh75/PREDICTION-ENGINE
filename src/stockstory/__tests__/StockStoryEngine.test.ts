@@ -212,9 +212,8 @@ describe('QualityEngine', () => {
     }));
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
-    // Null ROA should produce a neutral sub-score (50),
-    // not be treated as zero profitability
-    expect(result.roa).toBe(0);
+    // Null ROA should propagate null to output, not silently convert to 0
+    expect(result.roa).toBe(null);
   });
 
   it('null ROA with valid ROE and ROIC still produces score', () => {
