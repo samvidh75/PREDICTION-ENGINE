@@ -65,15 +65,8 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
   { field: 'evEbitda', provider: 'UpstoxFundamentalsProvider', reliability: 0.90, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
   { field: 'debtToEquity', provider: 'UpstoxFundamentalsProvider', reliability: 0.90, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
 
-  // ─── ScreenerProvider ───────────────────────────────────
-  { field: 'revenueGrowth', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'profitGrowth', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'epsGrowth', provider: 'ScreenerProvider', reliability: 0.65, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'fcfGrowth', provider: 'ScreenerProvider', reliability: 0.65, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'operatingMargin', provider: 'ScreenerProvider', reliability: 0.75, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'currentRatio', provider: 'ScreenerProvider', reliability: 0.75, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'dividendYield', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
-  { field: 'marketCap', provider: 'ScreenerProvider', reliability: 0.70, freshness: 'daily', authRequired: false, costPerCall: 0 },
+  // ─── ScreenerProvider — QUARANTINED (F3 Phase 0) ────────
+  // Screener.in HTML scraper is removed from all runtime capability routing.
 
   // ─── FinnhubProvider ────────────────────────────────────
   { field: 'peRatio', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
@@ -110,10 +103,10 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
 ];
 
 export class ProviderCapabilityRegistry {
-  /** field → capability list */
+  /** field -> capability list */
   private capabilities: Map<string, ProviderCapability[]> = new Map();
 
-  /** provider → metadata */
+  /** provider -> metadata */
   private providerMeta: Map<string, {
     displayName: string;
     supportedUniverses: string[];
@@ -132,7 +125,6 @@ export class ProviderCapabilityRegistry {
   /** Register a single capability. */
   register(capability: ProviderCapability): void {
     const existing = this.capabilities.get(capability.field) ?? [];
-    // Avoid duplicates
     if (!existing.some(c => c.field === capability.field && c.provider === capability.provider)) {
       existing.push(capability);
     }
@@ -155,7 +147,7 @@ export class ProviderCapabilityRegistry {
     return fields;
   }
 
-  /** Get the full capability matrix as field → provider names. */
+  /** Get the full capability matrix as field -> provider names. */
   getCapabilityMatrix(): Map<string, string[]> {
     const matrix = new Map<string, string[]>();
     for (const [field, caps] of this.capabilities) {
@@ -219,12 +211,6 @@ export class ProviderCapabilityRegistry {
       supportedUniverses: ['NSE', 'BSE'],
       rateLimitPerMin: 20,
       rateLimitPerDay: 500,
-    });
-    this.providerMeta.set('ScreenerProvider', {
-      displayName: 'Screener.in',
-      supportedUniverses: ['NSE', 'BSE'],
-      rateLimitPerMin: 10,
-      rateLimitPerDay: 200,
     });
     this.providerMeta.set('DerivedMetricsEngine', {
       displayName: 'Derived Metrics Engine',

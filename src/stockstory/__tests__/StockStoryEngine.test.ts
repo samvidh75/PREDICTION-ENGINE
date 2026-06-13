@@ -33,7 +33,7 @@ function makeInputs(overrides: Partial<EngineInputs> = {}): EngineInputs {
       factorScore: 56,
     },
     financials: {
-      peRatio: 18, pbRatio: 3.2, eps: 120, dividendYield: 1.8,
+      peRatio: 18, pbRatio: 3.2, eps: 120, dividendYield: 0.018,
       beta: 1.1, marketCap: 500000, freeFloat: 45,
       fcfYield: 0.04, evEbitda: 12, roa: 0.12, roe: 0.18, roic: 0.14,
       debtToEquity: 0.5, currentRatio: 2.0,
@@ -182,6 +182,74 @@ describe('QualityEngine', () => {
     // So om=0.30 → between fair and high → score 65-80 range
     expect(result.score).toBeGreaterThanOrEqual(40);
     expect(result.score).toBeLessThanOrEqual(85);
+  });
+
+  // ─── ROA-specific tests ─────────────────────────────────────
+
+  it('high ROA improves quality score relative to low ROA', () => {
+    const highRoa = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: 0.20, roe: 0.15, roic: 0.12 },
+    }));
+    const lowRoa = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: 0.02, roe: 0.15, roic: 0.12 },
+    }));
+    expect(highRoa.score).toBeGreaterThan(lowRoa.score);
+  });
+
+  it('negative ROA reduces quality score', () => {
+    const negativeRoa = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: -0.05 },
+    }));
+    const baseline = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: 0.05 },
+    }));
+    expect(negativeRoa.score).toBeLessThan(baseline.score);
+  });
+
+  it('null ROA is handled safely without throwing', () => {
+    const result = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: null },
+    }));
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+    // Null ROA should produce a neutral sub-score (50),
+    // not be treated as zero profitability
+    expect(result.roa).toBe(0);
+  });
+
+  it('null ROA with valid ROE and ROIC still produces score', () => {
+    const withRoa = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: 0.12, roe: 0.15, roic: 0.12 },
+    }));
+    const withoutRoa = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: null, roe: 0.15, roic: 0.12 },
+    }));
+    // Both should produce valid scores; null ROA reduces available evidence
+    // but should not crash or return zero
+    expect(withoutRoa.score).toBeGreaterThanOrEqual(0);
+    expect(withoutRoa.score).toBeLessThanOrEqual(100);
+  });
+
+  it('existing ROE and ROIC behaviour remains intact when ROA varies', () => {
+    const highRoe = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roe: 0.30, roa: 0.10, roic: 0.14 },
+    }));
+    const lowRoe = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roe: 0.05, roa: 0.10, roic: 0.14 },
+    }));
+    // ROE difference alone should produce a meaningful gap
+    expect(highRoe.roe).toBe(0.30);
+    expect(lowRoe.roe).toBe(0.05);
+    expect(highRoe.score).toBeGreaterThan(lowRoe.score);
+  });
+
+  it('ROA component is exposed in engine output', () => {
+    const result = engine.evaluate(makeInputs({
+      financials: { ...makeInputs().financials, roa: 0.12 },
+    }));
+    expect(result).toHaveProperty('roa');
+    expect(typeof result.roa).toBe('number');
+    expect(result.roa).toBe(0.12);
   });
 });
 

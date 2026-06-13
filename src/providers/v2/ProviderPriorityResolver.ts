@@ -5,28 +5,6 @@
  *   - CapabilityRegistry (which providers can supply the field)
  *   - HealthService (which providers are currently healthy)
  *   - Per-field precedence rules (configurable priority ordering)
- *
- * Field-level precedence (from TRACK-21 spec):
- *   PE:          Finnhub > Screener > Yahoo
- *   RevenueGrowth: Screener > Finnhub
- *   ROA:        Finnhub > Upstox > DerivedMetricsEngine
- *   pbRatio:    Finnhub > Upstox
- *   roe:        Finnhub > Upstox
- *   roic:       Finnhub > Upstox > DerivedMetricsEngine
- *   evEbitda:   Finnhub > Upstox
- *   debtToEquity: Finnhub > Upstox > DerivedMetricsEngine
- *   marketCap:  Finnhub > Screener
- *   eps:        Finnhub > DerivedMetricsEngine
- *   dividendYield: Finnhub > Screener
- *   beta:       Finnhub
- *   fcfYield:   Finnhub > DerivedMetricsEngine
- *   revenueGrowth: Screener > Finnhub > DerivedMetricsEngine
- *   profitGrowth: Screener > Finnhub > DerivedMetricsEngine
- *   epsGrowth:  Finnhub > Screener > DerivedMetricsEngine
- *   fcfGrowth:  Finnhub > Screener > DerivedMetricsEngine
- *   grossMargin: Finnhub > DerivedMetricsEngine
- *   operatingMargin: Finnhub > Screener > DerivedMetricsEngine
- *   currentRatio: Finnhub > Screener > DerivedMetricsEngine
  */
 
 import { ProviderCapabilityRegistry, ProviderCapability } from './ProviderCapabilityRegistry';
@@ -41,31 +19,34 @@ export interface ProviderPriority {
 export interface ResolutionContext {
   skipRateLimited?: boolean;
   skipDegraded?: boolean;
-  requireNonAuth?: boolean;  // Only use providers without auth (for fallback)
+  requireNonAuth?: boolean;
 }
 
-/** Per-field precedence: ordered list of provider preference. */
+/**
+ * Per-field precedence: ordered list of provider preference.
+ * ScreenerProvider references removed (QUARANTINED — F3 Phase 0).
+ */
 const FIELD_PRECEDENCE: Record<string, string[]> = {
-  peRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'ScreenerProvider'],
+  peRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   pbRatio: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   roe: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   roa: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
   roic: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
   evEbitda: ['FinnhubProvider', 'UpstoxFundamentalsProvider'],
   debtToEquity: ['FinnhubProvider', 'UpstoxFundamentalsProvider', 'DerivedMetricsEngine'],
-  marketCap: ['FinnhubProvider', 'ScreenerProvider'],
+  marketCap: ['FinnhubProvider'],
   eps: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  dividendYield: ['FinnhubProvider', 'ScreenerProvider'],
+  dividendYield: ['FinnhubProvider'],
   beta: ['FinnhubProvider'],
   freeFloat: [],
   fcfYield: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  revenueGrowth: ['ScreenerProvider', 'FinnhubProvider', 'DerivedMetricsEngine'],
-  profitGrowth: ['ScreenerProvider', 'FinnhubProvider', 'DerivedMetricsEngine'],
-  epsGrowth: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
-  fcfGrowth: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
+  revenueGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  profitGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  epsGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  fcfGrowth: ['FinnhubProvider', 'DerivedMetricsEngine'],
   grossMargin: ['FinnhubProvider', 'DerivedMetricsEngine'],
-  operatingMargin: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
-  currentRatio: ['FinnhubProvider', 'ScreenerProvider', 'DerivedMetricsEngine'],
+  operatingMargin: ['FinnhubProvider', 'DerivedMetricsEngine'],
+  currentRatio: ['FinnhubProvider', 'DerivedMetricsEngine'],
 };
 
 export class ProviderPriorityResolver {
@@ -114,12 +95,10 @@ export class ProviderPriorityResolver {
       const aIdx = precedence.indexOf(a.provider);
       const bIdx = precedence.indexOf(b.provider);
 
-      // Precedence takes priority
       if (aIdx >= 0 && bIdx >= 0) return aIdx - bIdx;
       if (aIdx >= 0) return -1;
       if (bIdx >= 0) return 1;
 
-      // Fallback: sort by (reliability × health_score)
       const aHealth = this.providerHealthScore(a.provider);
       const bHealth = this.providerHealthScore(b.provider);
       return (b.reliability * bHealth) - (a.reliability * aHealth);
@@ -147,7 +126,7 @@ export class ProviderPriorityResolver {
   }
 
   /**
-   * Get a summary of field-level resolution: which field is resolved by which provider.
+   * Get a summary of field-level resolution.
    */
   getResolutionSummary(fields: string[]): Record<string, { primary: string; fallbacks: string[]; reason: string }> {
     const summary: Record<string, { primary: string; fallbacks: string[]; reason: string }> = {};

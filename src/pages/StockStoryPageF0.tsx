@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useState } from "react";
+import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
@@ -8,6 +9,14 @@ function readHorizonFromUrl(): PredictionHorizon {
   if (typeof window === "undefined") return 30;
   const parsed = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "", 10) as PredictionHorizon;
   return HORIZONS.includes(parsed) ? parsed : 30;
+}
+
+function readTickerFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("id") ?? params.get("symbol") ?? params.get("ticker") ?? params.get("companyId") ?? "")
+    .toUpperCase()
+    .trim();
 }
 
 function appendHorizon(input: RequestInfo | URL, horizon: PredictionHorizon): RequestInfo | URL {
@@ -24,13 +33,34 @@ function appendHorizon(input: RequestInfo | URL, horizon: PredictionHorizon): Re
   return next;
 }
 
-async function withHonestExchangeFallback(response: Response): Promise<Response> {
-  if (!response.ok) return response;
-  const body = await response.clone().json().catch(() => null) as Record<string, unknown> | null;
-  if (!body || typeof body !== "object" || body.exchange) return response;
+function unavailableMetadata(symbol: string): Record<string, unknown> {
+  return {
+    symbol,
+    companyName: "",
+    sector: "",
+    industry: "",
+    exchange: "Data unavailable",
+    currency: "Data unavailable",
+    verificationStatus: "INVALID",
+    verificationReasons: ["metadata_unavailable"],
+    enrichmentSource: "fallback",
+  };
+}
 
+async function withHonestMetadataFallback(response: Response, symbol: string): Promise<Response> {
+  const body = await response.clone().json().catch(() => null) as Record<string, unknown> | null;
   const headers = new Headers(response.headers);
   headers.set("content-type", "application/json");
+
+  if (!response.ok || !body || typeof body !== "object") {
+    return new Response(JSON.stringify(unavailableMetadata(symbol)), {
+      status: 200,
+      headers,
+    });
+  }
+
+  if (body.exchange) return response;
+
   return new Response(JSON.stringify({ ...body, exchange: "Data unavailable" }), {
     status: response.status,
     statusText: response.statusText,
@@ -73,6 +103,7 @@ async function unwrapExplanationEnvelope(response: Response): Promise<Response> 
  */
 export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
+  const ticker = readTickerFromUrl();
 
   useLayoutEffect(() => {
     const originalFetch = window.fetch.bind(window);
@@ -81,7 +112,10 @@ export default function StockStoryPageF0(): JSX.Element {
       const url = new URL(raw, window.location.origin);
       const response = await originalFetch(appendHorizon(input, horizon), init);
 
-      if (url.pathname.startsWith("/api/market-data/metadata/")) return withHonestExchangeFallback(response);
+      if (url.pathname.startsWith("/api/market-data/metadata/")) {
+        const symbol = decodeURIComponent(url.pathname.split("/").pop() || ticker).toUpperCase().trim();
+        return withHonestMetadataFallback(response, symbol);
+      }
       if (url.pathname.startsWith("/api/predictions/explain/")) return unwrapExplanationEnvelope(response);
       return response;
     };
@@ -89,7 +123,7 @@ export default function StockStoryPageF0(): JSX.Element {
     return () => {
       window.fetch = originalFetch;
     };
-  }, [horizon]);
+  }, [horizon, ticker]);
 
   const selectHorizon = (nextHorizon: PredictionHorizon) => {
     const params = new URLSearchParams(window.location.search);
@@ -100,6 +134,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
   return (
     <>
+      <StockWorkspaceBar ticker={ticker} horizon={horizon} />
       <section
         aria-label="Prediction horizon"
         className="mx-auto mb-4 flex w-full max-w-7xl flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-white"

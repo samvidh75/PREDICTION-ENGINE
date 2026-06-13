@@ -122,16 +122,15 @@ export class StabilityEngine {
       }
     }
 
-    // ── Sub-score 6: Market Cap Size Score ──────────────────────────
+    // ── Sub-score 6: Market Cap Size Score (TRACK-12B: log10) ──────
     let marketCapSizeScore = 50;
-    if (financials.marketCap !== null) {
+    if (financials.marketCap !== null && financials.marketCap > 0) {
       const mcapCr = financials.marketCap; // in crores (INR)
-      if (mcapCr >= 100000) marketCapSizeScore = 95;       // Large cap (>1L Cr)
-      else if (mcapCr >= 20000) marketCapSizeScore = 85;   // Large-Mid
-      else if (mcapCr >= 5000) marketCapSizeScore = 70;    // Mid cap
-      else if (mcapCr >= 1000) marketCapSizeScore = 50;    // Small-Mid
-      else if (mcapCr >= 100) marketCapSizeScore = 30;     // Small cap
-      else marketCapSizeScore = 15;                         // Micro cap
+      const logMcap = Math.log10(mcapCr);
+      // Continuous log10 scaling: ~10 Cr (log10≈1) → 5, 1L Cr (log10=5) → 81, ~1M Cr (log10=6) → 100
+      marketCapSizeScore = clampScore((logMcap - 1) / 5 * 95 + 5);
+    } else if (financials.marketCap !== null) {
+      marketCapSizeScore = 10; // Negative or zero → score floor
     }
 
     // ── Composite: INCLUDES marketCapSizeScore (TRACK-P1 fix) ───────

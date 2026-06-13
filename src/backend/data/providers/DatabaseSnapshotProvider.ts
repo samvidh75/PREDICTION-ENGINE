@@ -28,7 +28,7 @@ export class DatabaseSnapshotProvider implements DataProvider {
     if (symbols.length === 0) return [];
     const normalized = symbols.map((symbol) => symbol.trim().toUpperCase()).filter(Boolean);
     const placeholders = normalized.map((_, i) => `$${i + 1}`).join(",");
-    const rows = await query(`SELECT symbol, period_end, snapshot_date, pe_ratio, pb_ratio, eps, roe, debt_to_equity, revenue_growth, profit_growth AS earnings_growth, operating_margin FROM financial_snapshots WHERE symbol IN (${placeholders}) ORDER BY symbol, period_end DESC`, normalized);
+    const rows = await query(`SELECT symbol, period_end, snapshot_date, pe_ratio, pb_ratio, eps, roe, roa, debt_to_equity, revenue_growth, profit_growth AS earnings_growth, operating_margin FROM financial_snapshots WHERE symbol IN (${placeholders}) ORDER BY symbol, period_end DESC`, normalized);
     const latest = new Map<string, Record<string, unknown>>();
     for (const row of rows.rows) {
       const symbol = String(row.symbol).trim().toUpperCase();
@@ -36,7 +36,7 @@ export class DatabaseSnapshotProvider implements DataProvider {
     }
     const retrievedAt = new Date().toISOString();
     return [...latest.values()].map((row) => {
-      const fields = ["pe_ratio", "pb_ratio", "eps", "roe", "debt_to_equity", "revenue_growth", "earnings_growth", "operating_margin"];
+      const fields = ["pe_ratio", "pb_ratio", "eps", "roe", "roa", "debt_to_equity", "revenue_growth", "earnings_growth", "operating_margin"];
       const present = fields.filter((field) => row[field] != null && Number.isFinite(Number(row[field]))).length;
       return {
         symbol: String(row.symbol),
@@ -53,6 +53,7 @@ export class DatabaseSnapshotProvider implements DataProvider {
         peRatio: row.pe_ratio == null ? null : Number(row.pe_ratio),
         pbRatio: row.pb_ratio == null ? null : Number(row.pb_ratio),
         roe: row.roe == null ? null : Number(row.roe),
+        roa: row.roa == null ? null : Number(row.roa),
         debtToEquity: row.debt_to_equity == null ? null : Number(row.debt_to_equity),
         operatingMargin: row.operating_margin == null ? null : Number(row.operating_margin),
         netMargin: null,

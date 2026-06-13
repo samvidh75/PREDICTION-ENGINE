@@ -34,6 +34,8 @@ import WorkspacePage from "../pages/WorkspacePage";
 import DailyFeed from "../components/intelligence/DailyFeed";
 import PortfolioDoctor from "../components/portfolio/PortfolioDoctor";
 import AppLayout from "../components/navigation/AppLayout";
+import AcademyReviewNotice from "../components/trust/AcademyReviewNotice";
+import ResearchTrustLinks from "../components/trust/ResearchTrustLinks";
 import { AcademyProvider } from "../context/AcademyContext.jsx";
 
 interface PageRendererProps {
@@ -42,64 +44,114 @@ interface PageRendererProps {
   hasStockId: boolean;
 }
 
-export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
-  // Public pages accessible without authentication
-  const publicOnlyPages: Record<string, boolean> = {
-    landing: true, about: true, login: true, signup: true,
-    trust: true, methodology: true, validation: true,
-    predictions: true, rankings: true, leaderboard: true,
-    "validation-dashboard": true,
-  };
+const PUBLIC_ONLY_PAGES: Record<string, boolean> = {
+  landing: true,
+  about: true,
+  login: true,
+  signup: true,
+  trust: true,
+  methodology: true,
+  validation: true,
+  predictions: true,
+  rankings: true,
+  leaderboard: true,
+  "validation-dashboard": true,
+};
 
-  if (!isAuthenticated && publicOnlyPages[pageKey]) {
-    if (pageKey === "about") return <PublicAboutPage />;
-    if (pageKey === "login") return <LoginPage />;
-    if (pageKey === "signup") return <SignupPage />;
-    if (pageKey === "trust" || pageKey === "methodology" || pageKey === "validation") {
+function renderPublicPage(pageKey: PageKey): JSX.Element {
+  if (pageKey === "about") return <PublicAboutPage />;
+  if (pageKey === "login") return <LoginPage />;
+  if (pageKey === "signup") return <SignupPage />;
+  if (pageKey === "trust" || pageKey === "methodology" || pageKey === "validation") {
+    return <TrustCentrePage />;
+  }
+  if (pageKey === "predictions") return <PublicPredictionsPage />;
+  if (pageKey === "rankings") return <PublicRankingsPage />;
+  if (pageKey === "leaderboard") return <LeaderboardPage />;
+  if (pageKey === "validation-dashboard") return <ValidationDashboard />;
+  return <PublicLandingPage />;
+}
+
+function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
+  switch (pageKey) {
+    case "portfolio":
+      return (
+        <>
+          <ResearchTrustLinks context="Portfolio workflow" />
+          <PortfolioPage />
+        </>
+      );
+    case "watchlist":
+      return <WatchlistPage />;
+    case "alerts":
+      return <AlertCentrePage />;
+    case "discovery":
+    case "explore":
+      return <DiscoveryPage />;
+    case "settings":
+      return <SettingsPage />;
+    case "search":
+      return <SearchPage />;
+    case "company":
+    case "stock":
+      return hasStockId ? <StockStoryPage /> : <DashboardHub />;
+    case "academy":
+      return (
+        <AcademyProvider>
+          <AcademyReviewNotice />
+          <ResearchTrustLinks context="Academy workflow" compact />
+          <AcademyHub />
+        </AcademyProvider>
+      );
+    case "analysis":
+      return <AnalysisHub />;
+    case "compare":
+      return <StockCompare />;
+    case "journal":
+      return <PredictionJournalPage />;
+    case "trust":
+    case "methodology":
+    case "validation":
       return <TrustCentrePage />;
-    }
-    if (pageKey === "predictions") return <PublicPredictionsPage />;
-    if (pageKey === "rankings") return <PublicRankingsPage />;
-    if (pageKey === "leaderboard") return <LeaderboardPage />;
-    if (pageKey === "validation-dashboard") return <ValidationDashboard />;
-    return <PublicLandingPage />;
+    case "workspace":
+      return <WorkspacePage />;
+    case "brief":
+    case "daily-feed":
+      return (
+        <>
+          <ResearchTrustLinks context="Daily intelligence workflow" compact />
+          <DailyFeed />
+        </>
+      );
+    case "portfolio-doctor":
+      return <PortfolioDoctor />;
+    case "predictions":
+      return <PublicPredictionsPage />;
+    case "rankings":
+      return <PublicRankingsPage />;
+    case "leaderboard":
+      return <LeaderboardPage />;
+    case "onboarding":
+      return <OnboardingWizard />;
+    case "validation-dashboard":
+      return <ValidationDashboard />;
+    case "dashboard":
+    case "landing":
+    case "login":
+    case "signup":
+    case "about":
+    default:
+      return <DashboardHub />;
   }
+}
 
-  // Unauthenticated — show landing with value proposition
+export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
   if (!isAuthenticated) {
-    return <PublicLandingPage />;
+    return PUBLIC_ONLY_PAGES[pageKey] ? renderPublicPage(pageKey) : <PublicLandingPage />;
   }
 
-  // About is public even when authenticated
+  // About keeps its public presentation even for authenticated users.
   if (pageKey === "about") return <PublicAboutPage />;
 
-  // Authenticated pages wrapped in AppLayout
-  return (
-    <AppLayout>
-      {pageKey === "portfolio" && <PortfolioPage />}
-      {pageKey === "watchlist" && <WatchlistPage />}
-      {pageKey === "alerts" && <AlertCentrePage />}
-      {pageKey === "discovery" && <DiscoveryPage />}
-      {pageKey === "settings" && <SettingsPage />}
-      {pageKey === "dashboard" && <DashboardHub />}
-      {pageKey === "search" && <SearchPage />}
-      {pageKey === "company" && hasStockId && <StockStoryPage />}
-      {pageKey === "company" && !hasStockId && <DashboardHub />}
-      {pageKey === "stock" && hasStockId && <StockStoryPage />}
-      {pageKey === "stock" && !hasStockId && <DashboardHub />}
-      {pageKey === "academy" && <AcademyProvider><AcademyHub /></AcademyProvider>}
-      {pageKey === "analysis" && <AnalysisHub />}
-      {pageKey === "compare" && <StockCompare />}
-      {pageKey === "journal" && <PredictionJournalPage />}
-      {pageKey === "trust" && <TrustCentrePage />}
-      {pageKey === "workspace" && <WorkspacePage />}
-      {pageKey === "daily-feed" && <DailyFeed />}
-      {pageKey === "portfolio-doctor" && <PortfolioDoctor />}
-      {pageKey === "explore" && <DiscoveryPage />}
-      {pageKey === "leaderboard" && <LeaderboardPage />}
-      {pageKey === "onboarding" && <OnboardingWizard />}
-      {pageKey === "validation-dashboard" && <ValidationDashboard />}
-      {(pageKey === "landing" || pageKey === "login" || pageKey === "signup") && <DashboardHub />}
-    </AppLayout>
-  );
+  return <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}</AppLayout>;
 }
