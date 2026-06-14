@@ -84,7 +84,7 @@ export const companyRoutes: FastifyPluginAsync = async (app) => {
            pb_ratio,
            roe,
            roa,
-           roic,
+           roce AS roic,
            operating_margin,
            NULL AS net_margin,
            revenue_growth,
