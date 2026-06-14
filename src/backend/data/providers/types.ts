@@ -33,6 +33,17 @@ export interface FundamentalSnapshot {
   netMargin?: number | null;
   revenueGrowth?: number | null;
   earningsGrowth?: number | null;
+  dividendYield?: number | null;
+  beta?: number | null;
+  marketCap?: number | null;
+  freeFloat?: number | null;
+  fcfYield?: number | null;
+  evEbitda?: number | null;
+  roic?: number | null;
+  currentRatio?: number | null;
+  epsGrowth?: number | null;
+  fcfGrowth?: number | null;
+  grossMargin?: number | null;
   source: string;
   sourceUrl?: string;
   retrievedAt: string;

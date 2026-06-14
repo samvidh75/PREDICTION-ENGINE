@@ -1,3 +1,16 @@
+/**
+ * @deprecated Use PredictionFactory (src/predictions/PredictionFactory.ts) instead.
+ *
+ * This scoring engine (Pipeline B) produces PredictionSnapshot records and writes
+ * to prediction_registry with created_by = 'ManualSnapshot'. It is retained only
+ * for manual/exploratory use.
+ *
+ * Pipeline A (PredictionFactory → StockStoryEngine → PredictionRegistryContract)
+ * is the canonical daily scoring path used by the scheduler and CI pipeline.
+ * Migration: replace `scoreSnapshot(...)` calls with `predictionFactory.generateDaily()`.
+ *
+ * This module will be removed in a future track.
+ */
 import type { AnalyticalInputLineage, Availability } from "../lineage/types";
 import type { FundamentalSnapshot, MarketPriceRecord } from "../providers/types";
 import type { UnifiedPredictionOutput, UnifiedClassification } from "../../../prediction-engine/types";

@@ -3,7 +3,7 @@
  */
 
 /** Operations each provider can perform. */
-export type ProviderOperation = 'quote' | 'metadata' | 'history' | 'financials' | 'news' | 'key_ratios' | 'balance_sheet';
+export type ProviderOperation = 'quote' | 'metadata' | 'history' | 'financials' | 'news' | 'key_ratios' | 'balance_sheet' | 'corporate_actions' | 'shareholding';
 
 /** Status class returned by the broker for each request. */
 export type StatusClass = 'success' | 'coalesced' | 'rate_limited' | 'unauthorized' | 'not_found' | 'bad_request' | 'server_error' | 'network_error' | 'timeout' | 'circuit_open' | 'budget_exhausted' | 'error';

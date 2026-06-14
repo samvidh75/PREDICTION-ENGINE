@@ -18,6 +18,9 @@ declare module 'fastify' {
     /** Cache hierarchy used by stale-while-revalidate flows. */
     cache?: CacheHierarchyEngine;
 
+    /** Health watchdog started at server boot. */
+    watchdog?: import('../../services/health/AppHealthWatchdog').AppHealthWatchdog;
+
     /** PostgreSQL-only private user-state database. */
     userDb?: {
       query(

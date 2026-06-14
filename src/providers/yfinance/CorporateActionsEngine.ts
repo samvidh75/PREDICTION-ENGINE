@@ -193,8 +193,8 @@ export class CorporateActionsEngine {
       return { continuous: true, breaks: [] };
     }
 
-    // Sort by date ascending to guarantee correct ordering
-    const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
+    // Sort by trade_date ascending to guarantee correct ordering
+    const sorted = [...records].sort((a, b) => a.trade_date.localeCompare(b.trade_date));
 
     // Gather all corporate actions for this symbol (needed for split/dividend adjustments)
     const actions = await this.getCorporateActions(symbol);
@@ -212,9 +212,9 @@ export class CorporateActionsEngine {
       const current = sorted[i];
       const next = sorted[i + 1];
 
-      // Apply any corporate actions on current.date (actions typically apply
+      // Apply any corporate actions on current.trade_date (actions typically apply
       // before the next trading day, so we process actions on the current bar's date).
-      const dateActions = actionMap.get(current.date) ?? [];
+      const dateActions = actionMap.get(current.trade_date) ?? [];
       for (const action of dateActions) {
         if (action.type === 'split') {
           cumulativeSplitRatio *= action.value;
@@ -225,10 +225,10 @@ export class CorporateActionsEngine {
       //   next.close * cumulativeSplitRatio - dividends_on_next_date
       //
       // Actually: adj_close should already incorporate splits and dividends.
-      // We verify that next.adj_close ≈ next.close * cumulativeSplitRatio - dividends.
+      // We verify that next.adjusted_close ≈ next.close * cumulativeSplitRatio - dividends.
       //
-      // Dividends on the next bar's date reduce adj_close.
-      const nextDateActions = actionMap.get(next.date) ?? [];
+      // Dividends on the next bar's date reduce adjusted_close.
+      const nextDateActions = actionMap.get(next.trade_date) ?? [];
       const nextDividends = nextDateActions
         .filter((a) => a.type === 'dividend')
         .reduce((sum, a) => sum + a.value, 0);
@@ -236,13 +236,13 @@ export class CorporateActionsEngine {
       const expectedAdjClose =
         next.close * cumulativeSplitRatio - nextDividends;
 
-      const actualAdjClose = next.adj_close;
+      const actualAdjClose = next.adjusted_close;
 
       const discrepancy = Math.abs(expectedAdjClose - actualAdjClose);
 
       if (discrepancy > TOLERANCE) {
         breaks.push({
-          date: next.date,
+          date: next.trade_date,
           expectedAdjClose: parseFloat(expectedAdjClose.toFixed(6)),
           actualAdjClose: parseFloat(actualAdjClose.toFixed(6)),
           discrepancy: parseFloat(discrepancy.toFixed(6)),

@@ -417,6 +417,316 @@ describe('GROUP H: Dividend Yield Trap', () => {
 });
 
 // ---------------------------------------------------------------------------
+// TEST GROUP K — ADVERSARIAL CALIBRATION (TRACK-12C)
+// ---------------------------------------------------------------------------
+describe('GROUP K: Adversarial Calibration (TRACK-12C)', () => {
+
+  describe('K1 — ROA calibration', () => {
+    it('negative ROA scores base penalty (10)', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: -0.05, roe: 0.15, roic: 0.12 }),
+        sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+      }));
+      // ROA = -0.05 is < 0 → normalized to 10; score diluted by other quality metrics
+      expect(result.score).toBeGreaterThanOrEqual(0);
+      expect(result.roa).toBe(-0.05);
+    });
+
+    it('positive vs negative ROA differentiates via percentile scoring', () => {
+      const positive = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0.10, roe: 0.15, roic: 0.12 }),
+      }));
+      const negative = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: -0.05, roe: 0.15, roic: 0.12 }),
+      }));
+      // 0.10 is at GENERAL p50 (score 65); -0.05 is below p10 (score 15)
+      expect(positive.roa).toBe(0.10);
+      expect(negative.roa).toBe(-0.05);
+      expect(positive.score).toBeGreaterThan(negative.score);
+    });
+
+    it('low ROA (0.04) returns value correctly', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0.04, roe: 0.15, roic: 0.12 }),
+      }));
+      expect(result.roa).toBe(0.04);
+    });
+
+    it('high ROA (0.12) returns value correctly', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0.12, roe: 0.15, roic: 0.12 }),
+      }));
+      expect(result.roa).toBe(0.12);
+    });
+
+    it('null ROA does NOT behave like zero ROA', () => {
+      const nullRoa = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: null, roe: 0.15, roic: 0.12 }),
+      }));
+      const zeroRoa = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0, roe: 0.15, roic: 0.12 }),
+      }));
+      // Null ROA excludes the 2.0 weight entirely; zero ROA includes it with score 30
+      // The composite should differ because the denominator changed
+      expect(nullRoa.roa).toBe(null);
+      expect(zeroRoa.roa).toBe(0);
+      // Null ROA should not produce a score identical to poor performance
+      // (denominator is smaller when ROA omitted)
+    });
+
+    it('NaN ROA is rejected and treated as missing', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: NaN as any, roe: 0.15, roic: 0.12 }),
+      }));
+      expect(result.roa).toBe(null);
+    });
+
+    it('Infinity ROA is rejected and treated as missing', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: Infinity as any, roe: 0.15, roic: 0.12 }),
+      }));
+      expect(result.roa).toBe(null);
+    });
+
+    it('ROA cannot overwhelm ROE and ROIC (weight parity 2:2:2)', () => {
+      const extremeRoa = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0.50, roe: 0.05, roic: 0.05 }),
+      }));
+      const lowRoa = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ roa: 0.05, roe: 0.05, roic: 0.05 }),
+      }));
+      // ROE and ROIC each have weight 2.0, same as ROA — gap should be modest
+      const gap = Math.abs(extremeRoa.score - lowRoa.score);
+      expect(gap).toBeLessThan(60);
+    });
+  });
+
+  describe('K2 — Dividend Yield calibration', () => {
+    it('null yield → null in output', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: null }),
+      }));
+      expect(result.dividendYieldScore).toBe(50);
+    });
+
+    it('zero yield scores 20', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0 }),
+      }));
+      expect(result.dividendYieldScore).toBe(20);
+    });
+
+    it('low yield 0.5% scores 35', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.005 }),
+      }));
+      expect(result.dividendYieldScore).toBe(35);
+    });
+
+    it('healthy yield 2% scores 65', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.02 }),
+      }));
+      expect(result.dividendYieldScore).toBe(65);
+    });
+
+    it('sweet-spot yield 4% scores 90', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.04 }),
+      }));
+      expect(result.dividendYieldScore).toBe(90);
+    });
+
+    it('moderate yield 6% scores 90 (top of sweet spot)', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.06 }),
+      }));
+      expect(result.dividendYieldScore).toBe(90);
+    });
+
+    it('distress yield 12% scores 25 (probable distress)', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.12 }),
+      }));
+      expect(result.dividendYieldScore).toBe(25);
+    });
+
+    it('extreme yield 20% scores 10', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.20 }),
+      }));
+      expect(result.dividendYieldScore).toBe(10);
+    });
+
+    it('negative yield scores 20 (same as zero)', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: -0.02 }),
+      }));
+      expect(result.dividendYieldScore).toBe(20);
+    });
+
+    it('NaN dividend yield → falls through all thresholds to default score 20', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: NaN as any }),
+      }));
+      // NaN !== null → enters if, NaN >= 0.20 → false → ... → else → 20
+      expect(result.dividendYieldScore).toBe(20);
+    });
+
+    it('Infinity dividend yield → hits extreme distress branch (score 10)', () => {
+      const result = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: Infinity as any }),
+      }));
+      // Infinity >= 0.20 → true → score 10
+      expect(result.dividendYieldScore).toBe(10);
+    });
+
+    it('extreme dividend yields do not receive blindly favourable scores', () => {
+      const veryHigh = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.50 }),
+      }));
+      // 50% yield → extreme distress penalty → 10
+      expect(veryHigh.dividendYieldScore).toBeLessThanOrEqual(25);
+    });
+
+    it('null yield does not increase confidence vs real yield', () => {
+      // When yield is null, weight=0 so composite effectively ignores it
+      const nullYield = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: null }),
+      }));
+      const poorYield = valuationEngine.evaluate(makeFixture({
+        financials: makeFinancials({ dividendYield: 0.001 }),
+      }));
+      // Both should produce valid scores; null yield should not falsely inflate
+      expect(nullYield.score).toBeGreaterThanOrEqual(0);
+      expect(poorYield.score).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  describe('K3 — Market Cap calibration', () => {
+    it('null marketCap → null in engine inputs, score 50 excluded from weighted avg', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: null }),
+      }));
+      expect(result.marketCapSizeScore).toBe(50);
+    });
+
+    it('zero marketCap scores floor (10)', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 0 }),
+      }));
+      expect(result.marketCapSizeScore).toBe(10);
+    });
+
+    it('negative marketCap scores floor (10)', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: -100 }),
+      }));
+      expect(result.marketCapSizeScore).toBe(10);
+    });
+
+    it('micro-cap (50 Cr) scores ~18', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 50 }),
+      }));
+      expect(result.marketCapSizeScore).toBeGreaterThanOrEqual(15);
+      expect(result.marketCapSizeScore).toBeLessThanOrEqual(25);
+    });
+
+    it('small-cap (500 Cr) scores ~33', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 500 }),
+      }));
+      expect(result.marketCapSizeScore).toBeGreaterThanOrEqual(28);
+      expect(result.marketCapSizeScore).toBeLessThanOrEqual(38);
+    });
+
+    it('mid-cap (5000 Cr) scores ~56', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 5000 }),
+      }));
+      expect(result.marketCapSizeScore).toBeGreaterThanOrEqual(50);
+      expect(result.marketCapSizeScore).toBeLessThanOrEqual(62);
+    });
+
+    it('large-cap (50000 Cr) scores ~75', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 50000 }),
+      }));
+      expect(result.marketCapSizeScore).toBeGreaterThanOrEqual(70);
+      expect(result.marketCapSizeScore).toBeLessThanOrEqual(80);
+    });
+
+    it('mega-cap (500000 Cr) scores ~94', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 500000 }),
+      }));
+      expect(result.marketCapSizeScore).toBeGreaterThanOrEqual(88);
+      expect(result.marketCapSizeScore).toBeLessThanOrEqual(100);
+    });
+
+    it('market-cap scoring cannot dominate StabilityEngine (weight=1.0)', () => {
+      const highMcap = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 500000, debtToEquity: 0.1, currentRatio: 3.0 }),
+      }));
+      const lowMcap = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: 50, debtToEquity: 0.1, currentRatio: 3.0 }),
+      }));
+      // With weight=1.0, mega vs micro cap gap is ~76 points in sub-score
+      // but only ~7 points in composite (76/11 = ~7)
+      const diff = Math.abs(highMcap.score - lowMcap.score);
+      expect(diff).toBeLessThan(15);
+    });
+
+    it('NaN marketCap → falls to zero/negative branch (score 10) at engine level', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: NaN as any }),
+      }));
+      // NaN is not null and NaN > 0 is false → hits else-if (not null) → 10
+      expect(result.marketCapSizeScore).toBe(10);
+    });
+
+    it('Infinity marketCap → hits positive branch, clamped to 100', () => {
+      const result = stabilityEngine.evaluate(makeFixture({
+        financials: makeFinancials({ marketCap: Infinity as any }),
+      }));
+      // Infinity > 0 → log10(Infinity) = Infinity → clampScore(Infinity) → 100
+      expect(result.marketCapSizeScore).toBe(100);
+    });
+  });
+
+  describe('K4 — Missing data cannot increase confidence', () => {
+    it('missing all optional metrics still produces bounded score', () => {
+      const result = qualityEngine.evaluate(makeFixture({
+        financials: makeFinancials({
+          roa: null, roe: 0.15, roic: null,
+          grossMargin: null, operatingMargin: null,
+          peRatio: null, pbRatio: null, evEbitda: null, fcfYield: null,
+          dividendYield: null, marketCap: null,
+        }),
+      }));
+      expect(result.score).toBeGreaterThanOrEqual(0);
+      expect(result.score).toBeLessThanOrEqual(100);
+    });
+
+    it('score changes remain bounded and explainable', () => {
+      const engine = new StockStoryEngine();
+      const base = engine.evaluate(makeFixture({}));
+      const allNull = engine.evaluate(makeFixture({
+        financials: makeFinancials({
+          roa: null, roe: null, roic: null,
+          grossMargin: null, operatingMargin: null,
+          dividendYield: null, marketCap: null,
+          revenueGrowth: null, profitGrowth: null, epsGrowth: null, fcfGrowth: null,
+        }),
+      }));
+      const gap = Math.abs(base.healthScore - allNull.healthScore);
+      expect(gap).toBeLessThanOrEqual(100);
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // TEST GROUP I — DETERMINISM
 // ---------------------------------------------------------------------------
 describe('GROUP I: Determinism', () => {

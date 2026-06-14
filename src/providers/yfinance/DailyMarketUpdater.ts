@@ -87,17 +87,17 @@ export class DailyMarketUpdater {
 
     const result = await query(
       `SELECT DISTINCT date
-       FROM daily_prices
-       WHERE symbol = $1
-         AND date >= $2
-         AND date <= $3
-       ORDER BY date`,
+        FROM daily_prices
+        WHERE symbol = $1
+          AND trade_date >= $2
+          AND trade_date <= $3
+        ORDER BY trade_date`,
       [symbol, start, end],
     );
 
     const existing = new Set<string>(
       (result.rows ?? []).map((r: any) =>
-        r.date instanceof Date ? fmtDate(r.date) : String(r.date).slice(0, 10),
+        r.trade_date instanceof Date ? fmtDate(r.trade_date) : String(r.trade_date).slice(0, 10),
       ),
     );
 
@@ -145,12 +145,12 @@ export class DailyMarketUpdater {
 
         records.push({
           symbol: sym,
-          date: dateStr,
+          trade_date: dateStr,
           open: Number(row.Open ?? row.open ?? 0),
           high: Number(row.High ?? row.high ?? 0),
           low: Number(row.Low ?? row.low ?? 0),
           close: Number(row.Close ?? row.close ?? 0),
-          adj_close: Number(row['Adj Close'] ?? row.adj_close ?? row.close ?? 0),
+          adjusted_close: Number(row['Adj Close'] ?? row.adj_close ?? row.close ?? 0),
           volume: Number(row.Volume ?? row.volume ?? 0),
           dividends: Number(row.Dividends ?? row.dividends ?? 0),
           stock_splits: Number(row['Stock Splits'] ?? row.stock_splits ?? 0),
@@ -194,12 +194,12 @@ export class DailyMarketUpdater {
         );
         values.push(
           r.symbol,
-          r.date,
+          r.trade_date,
           r.open,
           r.high,
           r.low,
           r.close,
-          r.adj_close,
+          r.adjusted_close,
           r.volume,
           r.dividends,
           r.stock_splits,
@@ -212,40 +212,40 @@ export class DailyMarketUpdater {
 
       const sql = `
         INSERT INTO daily_prices
-          (symbol, date, open, high, low, close, adj_close, volume,
+          (symbol, trade_date, open, high, low, close, adjusted_close, volume,
            dividends, stock_splits, source, quality_score, ingested_at)
         VALUES ${placeholders.join(', ')}
-        ON CONFLICT (symbol, date)
+        ON CONFLICT (symbol, trade_date)
         DO UPDATE SET
-          open        = EXCLUDED.open,
-          high        = EXCLUDED.high,
-          low         = EXCLUDED.low,
-          close       = EXCLUDED.close,
-          adj_close   = EXCLUDED.adj_close,
-          volume      = EXCLUDED.volume,
-          dividends   = EXCLUDED.dividends,
-          stock_splits= EXCLUDED.stock_splits,
-          source      = EXCLUDED.source,
-          quality_score = EXCLUDED.quality_score,
-          ingested_at = EXCLUDED.ingested_at
+          open           = EXCLUDED.open,
+          high           = EXCLUDED.high,
+          low            = EXCLUDED.low,
+          close          = EXCLUDED.close,
+          adjusted_close = EXCLUDED.adjusted_close,
+          volume         = EXCLUDED.volume,
+          dividends      = EXCLUDED.dividends,
+          stock_splits   = EXCLUDED.stock_splits,
+          source         = EXCLUDED.source,
+          quality_score  = EXCLUDED.quality_score,
+          ingested_at    = EXCLUDED.ingested_at
       `;
 
       try {
         const res = await query(sql, values);
         // rowCount is number of rows affected. In an upsert each row counts once,
         // but we don't easily distinguish insert vs update without RETURNING.
-        // We approximate: if no prior row for that (symbol,date) it's an insert.
+        // We approximate: if no prior row for that (symbol, trade_date) it's an insert.
         // We'll run a lightweight check.
         const rowCount = res?.rowCount ?? chunk.length;
         // Approximation: if ON CONFLICT didn't fire for a row it was inserted.
         // Since we can't easily tell, we'll treat all as inserted for the report.
         // More accurate: run a SELECT count before upsert for each chunk.
         const symbolsInChunk = [...new Set(chunk.map((r) => r.symbol))];
-        const datesInChunk = [...new Set(chunk.map((r) => r.date))];
+        const datesInChunk = [...new Set(chunk.map((r) => r.trade_date))];
 
         const preResult = await query(
           `SELECT COUNT(*) as cnt FROM daily_prices
-           WHERE symbol = ANY($1) AND date = ANY($2)`,
+           WHERE symbol = ANY($1) AND trade_date = ANY($2)`,
           [symbolsInChunk, datesInChunk],
         );
         const preCount = parseInt(String(preResult?.rows?.[0]?.cnt ?? 0), 10);
@@ -276,32 +276,32 @@ export class DailyMarketUpdater {
     for (const r of chunk) {
       try {
         const exists = await query(
-          `SELECT 1 FROM daily_prices WHERE symbol = $1 AND date = $2`,
-          [r.symbol, r.date],
+          `SELECT 1 FROM daily_prices WHERE symbol = $1 AND trade_date = $2`,
+          [r.symbol, r.trade_date],
         );
         if ((exists?.rows?.length ?? 0) > 0) {
           await query(
             `UPDATE daily_prices
-             SET open=$1, high=$2, low=$3, close=$4, adj_close=$5,
+             SET open=$1, high=$2, low=$3, close=$4, adjusted_close=$5,
                  volume=$6, dividends=$7, stock_splits=$8, source=$9,
                  quality_score=$10, ingested_at=$11
-             WHERE symbol=$12 AND date=$13`,
+             WHERE symbol=$12 AND trade_date=$13`,
             [
-              r.open, r.high, r.low, r.close, r.adj_close,
+              r.open, r.high, r.low, r.close, r.adjusted_close,
               r.volume, r.dividends, r.stock_splits, r.source,
               r.quality_score, r.ingested_at,
-              r.symbol, r.date,
+              r.symbol, r.trade_date,
             ],
           );
         } else {
           await query(
             `INSERT INTO daily_prices
-               (symbol, date, open, high, low, close, adj_close,
+               (symbol, trade_date, open, high, low, close, adjusted_close,
                 volume, dividends, stock_splits, source, quality_score, ingested_at)
              VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
             [
-              r.symbol, r.date, r.open, r.high, r.low, r.close,
-              r.adj_close, r.volume, r.dividends, r.stock_splits,
+              r.symbol, r.trade_date, r.open, r.high, r.low, r.close,
+              r.adjusted_close, r.volume, r.dividends, r.stock_splits,
               r.source, r.quality_score, r.ingested_at,
             ],
           );
@@ -327,15 +327,15 @@ export class DailyMarketUpdater {
     const start = addDays(end, -29);
 
     const result = await query(
-      `SELECT date FROM daily_prices
-       WHERE symbol = $1 AND date >= $2 AND date <= $3
-       ORDER BY date`,
+      `SELECT trade_date FROM daily_prices
+       WHERE symbol = $1 AND trade_date >= $2 AND trade_date <= $3
+       ORDER BY trade_date`,
       [symbol, start, end],
     );
 
     const existing = new Set<string>(
       (result.rows ?? []).map((r: any) =>
-        r.date instanceof Date ? fmtDate(r.date) : String(r.date).slice(0, 10),
+        r.trade_date instanceof Date ? fmtDate(r.trade_date) : String(r.trade_date).slice(0, 10),
       ),
     );
 
