@@ -58,7 +58,9 @@ function debouncedSave(): void {
 export function closeSQLite(): void {
   if (_db) {
     saveDb();
-    try { _db.close(); } catch { }
+    try { _db.close(); } catch {
+      // sql.js close can fail during test teardown; the adapter is being reset anyway.
+    }
     _db = null;
   }
 }
@@ -267,7 +269,9 @@ class SQLitePool {
       )`,
     ];
     for (const sql of tables) {
-      try { db.run(sql); } catch { }
+      try { db.run(sql); } catch {
+        // Idempotent compatibility DDL may fail on already-normalized schemas.
+      }
     }
   }
 

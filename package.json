@@ -62,6 +62,8 @@
     "lint:fix": "eslint . --fix",
     "repair:auto": "tsx scripts/auto-repair.ts",
     "repair:auto:apply": "CONFIRM_F1_REPAIR_APPLY=true tsx scripts/auto-repair.ts --apply",
+    "agent:doctor": "tsx scripts/agent-doctor.ts",
+    "agent:doctor:apply": "AGENT_DOCTOR_APPLY=true CONFIRM_F1_REPAIR_APPLY=true tsx scripts/agent-doctor.ts --apply",
     "repair:invalid-prices": "tsx scripts/repair-invalid-prices.ts",
     "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
