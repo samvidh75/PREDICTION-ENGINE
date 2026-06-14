@@ -10,7 +10,9 @@ function cleanup(): void {
   for (const ext of ['', '-wal', '-shm']) {
     const p = TEMP_DB_PATH + ext;
     if (fs.existsSync(p)) {
-      try { fs.unlinkSync(p); } catch { }
+      try { fs.unlinkSync(p); } catch {
+        // Best-effort cleanup for temporary database artifacts.
+      }
     }
   }
 }

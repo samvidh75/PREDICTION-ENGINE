@@ -92,7 +92,9 @@ describe('GROUP A — SQLite Schema Contract', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch { }
+    try { fs.rmSync(dbDir, { recursive: true }); } catch {
+      // Temporary test directory cleanup is best effort.
+    }
   });
 
   it('feature_snapshots contains all canonical columns', async () => {
@@ -179,7 +181,9 @@ describe('GROUP B — Feature Engine Write Test', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch { }
+    try { fs.rmSync(dbDir, { recursive: true }); } catch {
+      // Temporary test directory cleanup is best effort.
+    }
   });
 
   it('can insert a feature_snapshot with canonical columns', () => {
@@ -249,7 +253,9 @@ describe('GROUP C — Factor Engine Write Test', () => {
 
   afterAll(() => {
     db.close();
-    try { fs.rmSync(dbDir, { recursive: true }); } catch { }
+    try { fs.rmSync(dbDir, { recursive: true }); } catch {
+      // Temporary test directory cleanup is best effort.
+    }
   });
 
   it('can insert a factor_snapshot with canonical columns', () => {
