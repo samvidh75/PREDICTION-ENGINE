@@ -67,12 +67,14 @@ export interface YahooTickerInfo {
 
 export interface DailyPriceRecord {
   symbol: string;
-  date: string;
+  /** Canonical column name in daily_prices – matches migration 001 */
+  trade_date: string;
   open: number;
   high: number;
   low: number;
   close: number;
-  adj_close: number;
+  /** Canonical column name in daily_prices – matches migration 001 */
+  adjusted_close: number;
   volume: number;
   dividends: number;
   stock_splits: number;

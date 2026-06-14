@@ -99,11 +99,11 @@ export interface GrowthEngineOutput {
 
 export interface QualityEngineOutput {
   score: number;        // 0-100
-  roa: number;
-  roe: number;
-  roic: number;
-  grossMargin: number;
-  operatingMargin: number;
+  roa: number | null;
+  roe: number | null;
+  roic: number | null;
+  grossMargin: number | null;
+  operatingMargin: number | null;
   efficiencyScore: number;
   commentary: string;
 }
@@ -197,6 +197,15 @@ export interface StockStoryOutput {
 export function clampScore(v: number): number {
   return Math.max(0, Math.min(100, Math.round(v)));
 }
+
+/** Safely convert a raw DB value to a finite number or null. Rejects NaN, Infinity, -Infinity. */
+export function isFiniteNumber(raw: unknown): number | null {
+  if (raw === null || raw === undefined || raw === '') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+
 
 /** Weighted average of scored components */
 export function weightedAverage(

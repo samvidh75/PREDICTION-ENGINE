@@ -1,10 +1,22 @@
 import { pool } from '../src/db';
+import { dbAdapter } from '../src/db/DatabaseAdapter';
 
 interface RepairAction {
   name: string;
   description: string;
   check: () => Promise<{ needsRepair: boolean; detail: string }>;
   repair: () => Promise<string>;
+}
+
+/** Detect which adapter is in use — SQLite-specific queries fail on PostgreSQL. */
+async function detectDbKind(): Promise<'sqlite' | 'postgres'> {
+  try {
+    const row = await pool.query('SELECT version()');
+    if (row.rows.length > 0 && String(row.rows[0]?.version ?? '').toLowerCase().includes('postgresql')) {
+      return 'postgres';
+    }
+  } catch { /* fall through */ }
+  return 'sqlite';
 }
 
 async function main() {
@@ -16,7 +28,8 @@ async function main() {
     throw new Error('Apply mode requires CONFIRM_F1_REPAIR_APPLY=true');
   }
 
-  console.log(`=== Auto-Repair: ${dryRun ? 'DRY RUN' : 'APPLY'} ===\n`);
+  const dbKind = await detectDbKind();
+  console.log(`=== Auto-Repair: ${dryRun ? 'DRY RUN' : 'APPLY'} (db=${dbKind}) ===\n`);
 
   const repairs: RepairAction[] = [
     {
@@ -25,17 +38,33 @@ async function main() {
       check: async () => {
         const required = ['master_security_registry', 'symbols', 'daily_prices', 'financial_snapshots',
           'factor_snapshots', 'feature_snapshots', 'prediction_registry', 'benchmark_observations'];
-        const existing = (await pool.query("SELECT name FROM sqlite_master WHERE type='table'")).rows.map(r => r.name);
+        let existing: string[];
+        if (dbKind === 'postgres') {
+          const res = await pool.query(
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
+          );
+          existing = res.rows.map(r => String(r.table_name));
+        } else {
+          const res = await pool.query("SELECT name FROM sqlite_master WHERE type='table'");
+          existing = res.rows.map(r => String(r.name));
+        }
         const missing = required.filter(t => !existing.includes(t));
         return { needsRepair: missing.length > 0, detail: missing.length ? `Missing: ${missing.join(', ')}` : 'All present' };
       },
       repair: async () => {
-        const sql = `CREATE TABLE IF NOT EXISTS master_security_registry (
-          symbol TEXT PRIMARY KEY, isin TEXT, company_name TEXT, nse_symbol TEXT, bse_symbol TEXT,
-          sector TEXT, industry TEXT, market_cap_category TEXT, listing_status TEXT DEFAULT 'Active',
-          data_sources TEXT, last_verified TEXT
-        )`;
-        await pool.query(sql);
+        if (dbKind === 'postgres') {
+          await pool.query(`CREATE TABLE IF NOT EXISTS master_security_registry (
+            symbol TEXT PRIMARY KEY, isin TEXT, company_name TEXT, nse_symbol TEXT, bse_symbol TEXT,
+            sector TEXT, industry TEXT, market_cap_category TEXT, listing_status TEXT DEFAULT 'Active',
+            data_sources TEXT, last_verified TEXT
+          )`);
+        } else {
+          await pool.query(`CREATE TABLE IF NOT EXISTS master_security_registry (
+            symbol TEXT PRIMARY KEY, isin TEXT, company_name TEXT, nse_symbol TEXT, bse_symbol TEXT,
+            sector TEXT, industry TEXT, market_cap_category TEXT, listing_status TEXT DEFAULT 'Active',
+            data_sources TEXT, last_verified TEXT
+          )`);
+        }
         return 'Created missing tables';
       },
     },
@@ -43,23 +72,46 @@ async function main() {
       name: 'rejected-market-records',
       description: 'Create rejected_market_records table if missing',
       check: async () => {
-        const existing = (await pool.query("SELECT name FROM sqlite_master WHERE type='table' AND name='rejected_market_records'")).rows;
-        return { needsRepair: existing.length === 0, detail: existing.length ? 'Exists' : 'Missing' };
+        let exists: boolean;
+        if (dbKind === 'postgres') {
+          const res = await pool.query(
+            "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'rejected_market_records'"
+          );
+          exists = res.rows.length > 0;
+        } else {
+          const res = await pool.query(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='rejected_market_records'"
+          );
+          exists = res.rows.length > 0;
+        }
+        return { needsRepair: !exists, detail: exists ? 'Exists' : 'Missing' };
       },
       repair: async () => {
-        await pool.query(`CREATE TABLE IF NOT EXISTS rejected_market_records (
-          id INTEGER PRIMARY KEY AUTOINCREMENT, provider TEXT NOT NULL,
-          symbol TEXT NOT NULL, trading_date TEXT NOT NULL,
-          raw_payload TEXT, rejection_reason TEXT, created_at TEXT DEFAULT (datetime('now'))
-        )`);
-        await pool.query('CREATE INDEX IF NOT EXISTS idx_rejected_market_records_symbol ON rejected_market_records(symbol)');
+        if (dbKind === 'postgres') {
+          await pool.query(`CREATE TABLE IF NOT EXISTS rejected_market_records (
+            id SERIAL PRIMARY KEY, provider TEXT NOT NULL,
+            symbol TEXT NOT NULL, trading_date TEXT NOT NULL,
+            raw_payload TEXT, rejection_reason TEXT, created_at TIMESTAMPTZ DEFAULT NOW()
+          )`);
+          await pool.query('CREATE INDEX IF NOT EXISTS idx_rejected_market_records_symbol ON rejected_market_records(symbol)');
+        } else {
+          await pool.query(`CREATE TABLE IF NOT EXISTS rejected_market_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, provider TEXT NOT NULL,
+            symbol TEXT NOT NULL, trading_date TEXT NOT NULL,
+            raw_payload TEXT, rejection_reason TEXT, created_at TEXT DEFAULT (datetime('now'))
+          )`);
+          await pool.query('CREATE INDEX IF NOT EXISTS idx_rejected_market_records_symbol ON rejected_market_records(symbol)');
+        }
         return 'Created rejected_market_records table';
       },
     },
     {
       name: 'stale-pragma',
-      description: 'Ensure WAL mode and foreign keys are enabled',
+      description: 'Ensure WAL mode and foreign keys are enabled (SQLite only)',
       check: async () => {
+        if (dbKind !== 'sqlite') {
+          return { needsRepair: false, detail: 'PostgreSQL — no PRAGMA needed' };
+        }
         const walCheck = await pool.query("PRAGMA journal_mode");
         const journalMode = String(walCheck.rows[0]?.journal_mode ?? 'unknown').toLowerCase();
         return { needsRepair: !journalMode.includes('wal'), detail: `Journal mode: ${journalMode}` };
@@ -99,7 +151,18 @@ async function main() {
       name: 'missing-prediction-indexes',
       description: 'Create indexes for common prediction queries',
       check: async () => {
-        const indexes = (await pool.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry'")).rows.map(r => r.name);
+        let indexes: string[];
+        if (dbKind === 'postgres') {
+          const res = await pool.query(
+            "SELECT indexname AS name FROM pg_indexes WHERE tablename = 'prediction_registry'"
+          );
+          indexes = res.rows.map(r => String(r.name));
+        } else {
+          const res = await pool.query(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='prediction_registry'"
+          );
+          indexes = res.rows.map(r => String(r.name));
+        }
         const needed = ['idx_prediction_registry_symbol', 'idx_prediction_registry_prediction_date'];
         const missing = needed.filter(i => !indexes.includes(i));
         return { needsRepair: missing.length > 0, detail: missing.length ? `Missing: ${missing.join(', ')}` : 'All present' };

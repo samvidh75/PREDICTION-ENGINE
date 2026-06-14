@@ -189,12 +189,12 @@ export class YFinanceValidator {
       const dateVal = (row.Date ?? row.date) as string;
       valid.push({
         symbol,
-        date: dateVal,
+        trade_date: dateVal,
         open: Number(row.Open ?? row.open),
         high: Number(row.High ?? row.high),
         low: Number(row.Low ?? row.low),
         close: Number(row.Close ?? row.close),
-        adj_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
+        adjusted_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
         volume: Number(row.Volume ?? row.volume),
         dividends: Number(row.Dividends ?? row.dividends ?? 0),
         stock_splits: Number(row['Stock Splits'] ?? row.stock_splits ?? row.stockSplits ?? 0),
@@ -220,14 +220,14 @@ export class YFinanceValidator {
       return { symbol, missingDates };
     }
 
-    // Sort by date ascending
-    const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
+    // Sort by trade_date ascending
+    const sorted = [...records].sort((a, b) => a.trade_date.localeCompare(b.trade_date));
 
-    const startDate = new Date(sorted[0].date + 'T00:00:00');
-    const endDate = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
+    const startDate = new Date(sorted[0].trade_date + 'T00:00:00');
+    const endDate = new Date(sorted[sorted.length - 1].trade_date + 'T00:00:00');
 
     // Build a Set of existing dates for O(1) lookup
-    const existingDates = new Set(sorted.map((r) => r.date));
+    const existingDates = new Set(sorted.map((r) => r.trade_date));
 
     // Iterate day by day over the range
     const current = new Date(startDate);
@@ -254,8 +254,8 @@ export class YFinanceValidator {
     const duplicateDates: string[] = [];
 
     for (const record of records) {
-      const count = seen.get(record.date) || 0;
-      seen.set(record.date, count + 1);
+      const count = seen.get(record.trade_date) || 0;
+      seen.set(record.trade_date, count + 1);
     }
 
     for (const [date, count] of seen) {

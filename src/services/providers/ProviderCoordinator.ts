@@ -17,15 +17,19 @@ import { YahooProvider } from './YahooProvider';
 import { FinnhubProvider } from './FinnhubProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
+import { ScreenerProvider } from './ScreenerProvider';
+import { MoneycontrolFinancialsProvider } from './MoneycontrolFinancialsProvider';
 
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
+import { loadAuthorizedProviderConfig } from './authorization/ProviderAuthorization';
 
 /** Fields required for scoring — once these are all populated, stop fetching. */
 const REQUIRED_SCORING_FIELDS = new Set([
   'peRatio',
   'pbRatio',
+  'roa',
   'roe',
   'roic',
   'evEbitda',
@@ -49,8 +53,10 @@ const REQUIRED_SCORING_FIELDS = new Set([
  *
  * Financial providers are merged, extracting one bundle per provider per symbol:
  *   Tier 1: UpstoxFundamentalsProvider (primary Indian fundamentals)
- *   Tier 2: FinnhubProvider (fills gaps)
- *   Tier 3: YahooProvider (price/volume only)
+ *   Tier 2: ScreenerProvider (secondary Indian fundamentals, authorized)
+ *   Tier 3: MoneycontrolFinancialsProvider (tertiary Indian financials, authorized)
+ *   Tier 4: FinnhubProvider (fills gaps)
+ *   Tier 5: YahooProvider (price/volume only)
  *
  * Key contracts:
  *   - One bundle fetch per provider per symbol, NOT one call per field
@@ -87,8 +93,21 @@ export class ProviderCoordinator {
     this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.financialProviders.push(upstoxFundamentals);
 
-    // ScreenerProvider is QUARANTINED (F3 Phase 0) — HTML scraper removed from runtime.
-    
+    // Tier 2: ScreenerProvider — registered only when authorized config enables it
+    const authorizedConfig = loadAuthorizedProviderConfig();
+    if (authorizedConfig.screener.enabled) {
+      const screener = new ScreenerProvider(authorizedConfig.screener);
+      this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+      this.financialProviders.push(screener);
+    }
+
+    // Tier 3: MoneycontrolFinancialsProvider — registered only when authorized config enables it
+    if (authorizedConfig.moneycontrol.enabled) {
+      const moneycontrolFinancials = new MoneycontrolFinancialsProvider(authorizedConfig.moneycontrol);
+      this.circuitBreakers.set(moneycontrolFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+      this.financialProviders.push(moneycontrolFinancials);
+    }
+
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);

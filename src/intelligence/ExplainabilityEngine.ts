@@ -143,12 +143,16 @@ export class ExplainabilityEngine {
 
   private explainQuality(output: StockStoryOutput): ScoreExplanation {
     const q = output.engineDetails.quality;
+    const roe = q.roe ?? 0;
+    const roic = q.roic ?? 0;
+    const operatingMargin = q.operatingMargin ?? 0;
+    const grossMargin = q.grossMargin ?? 0;
     const components: FactorContribution[] = [
-      { name: 'ROE', score: Math.round(q.roe * 100), contribution: Math.round(q.roe * 100) - 50, weight: 0.30, rationale: `ROE: ${(q.roe * 100).toFixed(1)}%` },
-      { name: 'ROIC', score: Math.round(q.roic * 100), contribution: Math.round(q.roic * 100) - 50, weight: 0.25, rationale: `ROIC: ${(q.roic * 100).toFixed(1)}%` },
-      { name: 'Operating Margin', score: Math.round(q.operatingMargin * 100), contribution: Math.round(q.operatingMargin * 100) - 50, weight: 0.20, rationale: `Op Margin: ${(q.operatingMargin * 100).toFixed(1)}%` },
+      { name: 'ROE', score: Math.round(roe * 100), contribution: Math.round(roe * 100) - 50, weight: 0.30, rationale: q.roe === null ? 'ROE unavailable' : `ROE: ${(roe * 100).toFixed(1)}%` },
+      { name: 'ROIC', score: Math.round(roic * 100), contribution: Math.round(roic * 100) - 50, weight: 0.25, rationale: q.roic === null ? 'ROIC unavailable' : `ROIC: ${(roic * 100).toFixed(1)}%` },
+      { name: 'Operating Margin', score: Math.round(operatingMargin * 100), contribution: Math.round(operatingMargin * 100) - 50, weight: 0.20, rationale: q.operatingMargin === null ? 'Operating margin unavailable' : `Op Margin: ${(operatingMargin * 100).toFixed(1)}%` },
       { name: 'Efficiency', score: q.efficiencyScore, contribution: q.efficiencyScore - 50, weight: 0.15, rationale: 'Combined ROE/Gross Margin efficiency' },
-      { name: 'Gross Margin', score: Math.round(q.grossMargin * 100), contribution: Math.round(q.grossMargin * 100) - 50, weight: 0.10, rationale: `Gross Margin: ${(q.grossMargin * 100).toFixed(1)}%` },
+      { name: 'Gross Margin', score: Math.round(grossMargin * 100), contribution: Math.round(grossMargin * 100) - 50, weight: 0.10, rationale: q.grossMargin === null ? 'Gross margin unavailable' : `Gross Margin: ${(grossMargin * 100).toFixed(1)}%` },
     ];
     return this.buildExplanation('Quality Score', q.score, components);
   }

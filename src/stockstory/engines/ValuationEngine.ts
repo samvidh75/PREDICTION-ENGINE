@@ -107,7 +107,7 @@ export class ValuationEngine {
       { score: pbScore, weight: pbWeight },
       { score: evEbitdaScore, weight: evWeight },
       { score: fcfYieldScore, weight: 3 },
-      { score: dividendYieldScore, weight: 1.5 },
+      { score: dividendYieldScore, weight: financials.dividendYield !== null ? 1.5 : 0 },
     ]);
 
     const factorAdjust = (factors.valueFactor - 50) * 0.2;

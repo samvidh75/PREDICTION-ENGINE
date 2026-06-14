@@ -5,7 +5,7 @@
  * grossMargin → grossMargin (NOT operatingMargin).
  */
 
-import { EngineInputs, QualityEngineOutput, clampScore, weightedAverage } from '../types';
+import { EngineInputs, QualityEngineOutput, clampScore, weightedAverage, isFiniteNumber } from '../types';
 import { getSectorProfile } from '../SectorAdapter';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
 
@@ -113,7 +113,7 @@ export class QualityEngine {
 
     const rawComposite = weightedAverage([
       { score: roeNormalized, weight: 2.0 },
-      { score: roaNormalized, weight: 2.0 },
+      { score: roaNormalized, weight: financials.roa !== null ? 2.0 : 0 },
       { score: roicNormalized, weight: 2.0 },
       { score: grossMarginScore, weight: gmWeight },
       { score: operatingMarginScore, weight: 2 },
@@ -128,11 +128,11 @@ export class QualityEngine {
 
     return {
       score: compositeScore,
-      roa: financials.roa ?? 0,
-      roe: financials.roe ?? 0,
-      roic: financials.roic ?? 0,
-      grossMargin: financials.grossMargin ?? 0,
-      operatingMargin: financials.operatingMargin ?? 0,
+      roa: isFiniteNumber(financials.roa),
+      roe: isFiniteNumber(financials.roe),
+      roic: isFiniteNumber(financials.roic),
+      grossMargin: isFiniteNumber(financials.grossMargin),
+      operatingMargin: isFiniteNumber(financials.operatingMargin),
       efficiencyScore,
       commentary,
     };

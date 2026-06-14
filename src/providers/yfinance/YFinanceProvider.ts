@@ -155,12 +155,12 @@ export class YFinanceProvider implements MarketDataProvider {
 
         records.push({
           symbol,
-          date: String(dateVal),
+          trade_date: String(dateVal),
           open: Number(row.Open ?? row.open ?? 0),
           high: Number(row.High ?? row.high ?? 0),
           low: Number(row.Low ?? row.low ?? 0),
           close: Number(row.Close ?? row.close ?? 0),
-          adj_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
+          adjusted_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
           volume: Number(row.Volume ?? row.volume ?? 0),
           dividends: Number(row.Dividends ?? row.dividends ?? 0),
           stock_splits: Number(row['Stock Splits'] ?? row.stock_splits ?? row.stockSplits ?? 0),
@@ -216,12 +216,12 @@ export class YFinanceProvider implements MarketDataProvider {
 
       const record: DailyPriceRecord = {
         symbol,
-        date: String(dateVal),
+        trade_date: String(dateVal),
         open: Number(row.Open ?? row.open ?? 0),
         high: Number(row.High ?? row.high ?? 0),
         low: Number(row.Low ?? row.low ?? 0),
         close: Number(row.Close ?? row.close ?? 0),
-        adj_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
+        adjusted_close: Number(row['Adj Close'] ?? row.adj_close ?? row.adjClose ?? 0),
         volume: Number(row.Volume ?? row.volume ?? 0),
         dividends: Number(row.Dividends ?? row.dividends ?? 0),
         stock_splits: Number(row['Stock Splits'] ?? row.stock_splits ?? row.stockSplits ?? 0),
