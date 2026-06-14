@@ -55,3 +55,6 @@ temp/
 # Local artifact archive
 archive/local-artifacts/
 temp_*.ps1
+
+# Generated/artifact directories (may appear from code generation)
+src/components/src/
