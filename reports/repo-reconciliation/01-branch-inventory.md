@@ -1,168 +1,192 @@
-# 01 - Branch Inventory & Reconciliation (F0-Recon)
+# Repository Reconciliation: Branch Inventory
 
-Date: 2026-06-14
-Repo: samvidh75/PREDICTION-ENGINE
-Local working tree: `/Users/samvidhmehta/Desktop/PREDICTION-ENGINE`
+Audit date: 2026-06-14
+Repository: `samvidh75/PREDICTION-ENGINE`
 
-## 1. Default branch and HEAD
+## Baseline
 
-- Default branch: `main` (`refs/remotes/origin/HEAD -> origin/main`)
-- Current local HEAD: `a41a2bd70f3328cdeb1e2f1648e81f704074c2b1`
-- `origin/main` HEAD: `a41a2bd70f3328cdeb1e2f1648e81f704074c2b1`
-- `git status --short`: working tree has 2 uncommitted modifications
-  - `package-lock.json` (29 lines, +28/-1)
-  - `src/backend/web/routes/company.ts` (+1/-1, local tweak: alias `roce AS roic` in a SELECT)
-- No staged changes; not on a feature branch (current branch is `main`).
+- Default branch: `origin/main`
+- Default branch HEAD SHA: `c26e13bb3ae9ecc461afaa3d106029d4f9a464b4`
+- Local HEAD: `main` at `c26e13bb3ae9ecc461afaa3d106029d4f9a464b4`
+- Remote HEAD: `refs/remotes/origin/main`
+- Required fetch command run: `git fetch origin --prune`
+- Required inventory commands run: `git status --short`, `git branch -a`, `git log --oneline --decorate --graph --all -n 80`
 
-## 2. Branch counts
+## Clean Clone Check
 
-- 60 local branches
-- 65 remote refs (excluding `origin/HEAD`)
+The requested starting state was a clean local clone, but the working tree was already dirty before this audit wrote reports:
 
-The "ahead / behind" numbers are taken from `git rev-list --left-right --count origin/main...BRANCH` and mean `<commits-only-on-branch> <commits-only-on-main>`.
+```text
+ M package-lock.json
+ M src/backend/web/routes/company.ts
+?? reports/repo-reconciliation/
+```
 
-## 3. Full per-branch inventory
+During the audit, `main` advanced from `a41a2bd70f3328cdeb1e2f1648e81f704074c2b1` to `c26e13bb3ae9ecc461afaa3d106029d4f9a464b4` via commit `c26e13bb implement changes`. This audit did not push, create PRs, close PRs, or rewrite branches.
 
-### 3a. Active / diverged (unique code on top of main, NOT in main history)
+## Open PR Branches Visible Locally
 
-| Branch | HEAD commit | ahead / behind vs origin/main | Why it matters |
-|---|---|---|---|
-| `track-f4-authorized-screener-moneycontrol-ingestion` (local + remote) | d384a8b | 2 / 0 | Tip `F4: Authorized Screener.in & Moneycontrol ingestion providers` is not in main. Branched from `track-12c-production-scoring-integrity` (1d41eef). |
-| `track-f5-unified-100-feature-prediction-engine` (local + remote) | b2b3543 | 1 / 0 | Tip `feat(prediction): unify scoring engines with 100+ feature registry` is not in main. Branched from main HEAD `a41a2bd7`. This is the F5-A consolidation target branch. |
-| `track-12c-production-scoring-integrity` (local + remote) | 1d41eef | 0 / 1 | Tip is one commit ahead of origin/main (the Track-12c commit itself, not yet merged). |
-| `origin/codex/f1-finnhub-fundamentals-ingestion` | 7555a6b | 6 / 92 | Remote head is NOT an ancestor of main. 6 unique commits ahead. Contains the only remaining diverged provider work flagged by the prompt. |
-| `origin/track-12-roa-activation` | 421db37 | 247 / 56 | Old line, pre-Track-12 merge. Not the canonical track-12a. Treat as historical artifact. |
-| `origin/track-22-production-engine-completion` | 0ad0907 | 247 / 80 | Old line. Contains `feat(stockstory): add confidence engine v2`, `feat(quality): add anomaly detection engine`, `feat(metrics): add derived metrics engine with validation`, `feat(providers): promote Finnhub and resolve financial fields by precedence`, `feat(population): add replay service / failure queue / checkpoint manager`. Diverged historical. |
+These branches were called out in the task and are visible as remote branches:
 
-### 3b. Absorbed (HEAD reachable from origin/main via existing merges, usually `df68aad5`)
+| Branch | Behind `origin/main` | Ahead of `origin/main` | Status | Evidence |
+|---|---:|---:|---|---|
+| `origin/track-f3-provider-request-broker` | 33 | 0 | absorbed/stale PR branch | `git cherry -v origin/main origin/track-f3-provider-request-broker` returned no unique commits. |
+| `origin/track-f3-provider-adapter-migration` | 31 | 0 | absorbed/stale PR branch | `git cherry -v origin/main origin/track-f3-provider-adapter-migration` returned no unique commits. |
+| `origin/track-f2-stock-detail-workspace` | 79 | 0 | absorbed/stale PR branch | `git cherry -v origin/main origin/track-f2-stock-detail-workspace` returned no unique commits. |
+| `origin/track-f2-market-dashboard-scanners` | 68 | 0 | absorbed/stale PR branch | `git cherry -v origin/main origin/track-f2-market-dashboard-scanners` returned no unique commits. |
+| `origin/track-f2-portfolio-operating-system` | 52 | 0 | absorbed/stale PR branch | `git cherry -v origin/main origin/track-f2-portfolio-operating-system` returned no unique commits. |
+| `origin/codex/f1-finnhub-fundamentals-ingestion` | 94 | 6 | diverged/active candidate | Six unique provider/cache commits remain: IndianAPI diagnostics, yfinance fallbacks, Alpha Vantage env cleanup, invalid quote rejection, sqlite cache removal, cache ignore. |
 
-- `track-12-local-opencode-sync` (local + remote) - 26 / 0
-- `codex/track-12a-roa-quality-activation` (local + remote) - 28 / 0
-- `codex/track-12b-dividend-yield-marketcap-activation` (local + remote) - 27 / 0
-- `codex/f1-finnhub-fundamentals-ingestion` (local) - 0 / 0 (local tip `0bb7e14` is an ancestor of main; only the remote ref is diverged)
-- `track-f2-feed-learning-trust` (local + remote) - 39 / 0
-- `track-f2-market-dashboard-scanners` (remote) - 66 / 0
-- `track-f2-portfolio-operating-system` (remote) - 50 / 0
-- `track-f2-stock-detail-workspace` (remote) - 77 / 0
-- `track-f2-refined-information-architecture` (remote) - 103 / 0
-- `track-f3-data-plane-quota-governance` (local + remote) - 34 / 0 (local 8ce831d is 5 ahead of origin's 82d7ef1, but both ancestors of main)
-- `track-f3-data-plane-quota-governance-certification` (remote) - 34 / 5
-- `track-f3-provider-adapter-migration` (local + remote) - 29 / 0
-- `track-f3-provider-request-broker` (local + remote) - 30 / 0 / 31 / 0
+Additional near-main remote branches with unique commits:
 
-### 3c. Stale (deep behind main, no overlap with F4/F5 work)
+| Branch | Behind | Ahead | Status |
+|---|---:|---:|---|
+| `origin/track-12c-production-scoring-integrity` | 2 | 1 | active/diverged |
+| `origin/track-f4-authorized-screener-moneycontrol-ingestion` | 2 | 2 | active/diverged |
+| `origin/track-f5-unified-100-feature-prediction-engine` | 1 | 0 | absorbed/stale |
 
-- `codex/f0-alert-auth-hardening` (local + remote) - 147 / 2, 147 / 1
-- `codex/f0-api-contract-audit` (local + remote) - 147 / 1
-- `codex/f0-browser-test-hardening-audit` - 148 / 1
-- `codex/f0-dependency-audit-fix` (local + remote) - 147 / 0
-- `codex/f0-playwright-hardening` - 147 / 0
-- `codex/f1-data-quality-and-score-differentiation` (local + remote) - 115 / 0
-- `track-f0-closure-truth-browser` (local + remote) - 148 / 1, 147 / 0
-- `track-feature-f0-truth-foundation` (local + remote) - 176 / 2
-- `track-p0-mega-beta-stabilization` (local + remote) - 186 / 0
-- `track-p0-production-stabilization` (local + remote) - 231 / 1
-- `track-p1-mega-public-beta-hardening` (local + remote) - 184 / 0
-- `track-p4b-p2-auth-hardening` - 222 / 0
-- `track-p4b-p3-persistence-convergence` (local + remote) - 211 / 1
-- `track-p4b-p3b-finish-persistence` - 216 / 0
-- `track-p4b-p3c-wire-and-test-persistence` (local + remote) - 211 / 1, 210 / 0
-- `track-p4b-p3d-close-runtime-proof-gaps` (local + remote) - 209 / 0
-- `track-p4b-p3d-proof-tests-and-ci-repair` (local + remote) - 211 / 0
-- `track-p4b-p3e-finish-local-runtime-certification` (local + remote) - 206 / 0
-- `track-p4b-p3e-finish-local-runtime-proof` (local + remote) - 209 / 0, 206 / 2
-- `track-p4b-p3f-complete-local-runtime-proof` (local + remote) - 206 / 0, 204 / 0
-- `track-p4b-p3g-finalize-local-runtime-proof` (local + remote) - 205 / 0
-- `track-p4b-p3g-finish-local-runtime-certification` (local + remote) - 199 / 0
-- `track-p4b-p3h-execute-local-runtime-certification` (local + remote) - 198 / 0
-- `track-p4b-p3h-runtime-proof-vercel-ci-foundations` (local + remote) - 199 / 5
-- `track-p4b-p4a-postgres-ci-readiness` (local + remote) - 195 / 0
-- `track-p4c-remaining-blockers` (local + remote) - 219 / 0
-- `track-portability-p0-cross-platform-certification` - 187 / 4
-- `track-portability-p1-remove-native-sqlite` - 187 / 0
-- `track-portability-p2-remove-os-assumptions` - 187 / 2
-- `track-portability-p3-reproducible-environment` (local + remote) - 187 / 1
-- `track-portability-r1-reconcile-deliverables` (local + remote) - 187 / 7
-- `track-portability-r1d-fix-executable-proof` (local + remote) - 187 / 8
-- `track-portability-r2-remove-better-sqlite3` (local + remote) - 187 / 3
-- `track-portability-r2b-remove-active-native-sqlite-paths` (local + remote) - 187 / 11
-- `track-portability-r3-complete-and-harden-sqljs` (local + remote) - 187 / 5
-- `track-portability-r3-harden-sqljs-and-certify` (local + remote) - 187 / 4
-- `track-portability-r4-reconcile-sqljs-package-and-ci` (local + remote) - 187 / 6 / 7
-- `track-portability-r5-fix-executable-proof` (local + remote) - 187 / 8
-- `track-portability-r6-remove-remaining-native-sqlite-paths` (local + remote) - 187 / 8
-- `track-release-p1-truthful-gate` (local + remote) - 187 / 2
-- `track-release-r2-final-truthful-gate` - 187 / 1
-- `track-release-r4-execute-truthful-gate` (local + remote) - 187 / 7
-- `track-smoke-mega-strict-api-certification` (local + remote) - 177 / 0
-- `track-smoke-r7-safe-migration-node22-retention-audit` (local + remote) - 178 / 0
-- `track-smoke-r8-retention-authz-and-migration-cleanup` (local + remote) - 179 / 0
-- `track-uiux-p0-full-app-audit` - 189 / 0
-- `vercel-p0-frontend-build-unblock` - 203 / 2
-- `workspace-consolidation-cleanup` (local + remote) - 218 / 0
-- `f0-release` (remote) - 146 / 1
-- `noop` (remote) - 148 / 2
+## Branch Inventory Versus `origin/main`
 
-### 3d. Backups (quarantined / pre-sync safety)
+Counts are from `git rev-list --left-right --count origin/main...<branch>`.
+`Behind` is commits reachable from `origin/main` but not the branch. `Ahead` is commits reachable from the branch but not `origin/main`.
 
-- `backup/local-main-before-origin-sync-20260612-153921` - 176 / 2
-- `backup/track-f2-feed-learning-trust-contaminated-77bd6f0f` (local + remote) - 38 / 0
-- `backup/track-f2-feed-learning-trust-contaminated-d6ce20e` (local + remote) - 36 / 0
-- `backup/track-f3-data-plane-phase0-77bd6f0f` (local + remote) - 38 / 0
-- `backup/track-f3-data-plane-quota-governance-broker-core-remote` (local + remote) - 34 / 5
+| Branch | Behind | Ahead | Head | Status |
+|---|---:|---:|---|---|
+| `backup/local-main-before-origin-sync-20260612-153921` | 178 | 2 | `d33e90e7e966` | diverged/stale backup |
+| `backup/track-f2-feed-learning-trust-contaminated-77bd6f0f` | 40 | 0 | `77bd6f0fa3a8` | absorbed/stale backup |
+| `backup/track-f2-feed-learning-trust-contaminated-d6ce20e` | 38 | 0 | `d6ce20eff6e9` | absorbed/stale backup |
+| `backup/track-f3-data-plane-phase0-77bd6f0f` | 40 | 0 | `77bd6f0fa3a8` | absorbed/stale backup |
+| `backup/track-f3-data-plane-quota-governance-broker-core-remote` | 36 | 5 | `8ce831de2b17` | diverged/stale backup |
+| `codex/f0-alert-auth-hardening` | 149 | 2 | `b3fc4cde0563` | diverged/stale |
+| `codex/f0-api-contract-audit` | 149 | 1 | `5422c6777334` | diverged/stale |
+| `codex/f0-browser-test-hardening-audit` | 150 | 1 | `085da901db05` | diverged/stale |
+| `codex/f0-dependency-audit-fix` | 149 | 0 | `209a02583c7d` | absorbed/stale |
+| `codex/f0-playwright-hardening` | 149 | 0 | `209a02583c7d` | absorbed/stale |
+| `codex/f1-data-quality-and-score-differentiation` | 117 | 0 | `deebffda7e14` | absorbed/stale |
+| `codex/f1-finnhub-fundamentals-ingestion` | 94 | 0 | `0bb7e14e5193` | absorbed/stale |
+| `codex/track-12a-roa-quality-activation` | 30 | 0 | `6557a718acb1` | absorbed/stale Track-12/Track-22 |
+| `codex/track-12b-dividend-yield-marketcap-activation` | 29 | 0 | `4d44975a492b` | absorbed/stale Track-12/Track-22 |
+| `main` | 0 | 0 | `c26e13bb3ae9` | current/default |
+| `origin/backup/track-f2-feed-learning-trust-contaminated-77bd6f0f` | 40 | 0 | `77bd6f0fa3a8` | absorbed/stale backup |
+| `origin/backup/track-f2-feed-learning-trust-contaminated-d6ce20e` | 38 | 0 | `d6ce20eff6e9` | absorbed/stale backup |
+| `origin/backup/track-f3-data-plane-phase0-77bd6f0f` | 40 | 0 | `77bd6f0fa3a8` | absorbed/stale backup |
+| `origin/backup/track-f3-data-plane-quota-governance-broker-core-remote` | 36 | 5 | `8ce831de2b17` | diverged/stale backup |
+| `origin/codex/f0-alert-auth-hardening` | 149 | 1 | `fb32ce7ed286` | diverged/stale |
+| `origin/codex/f0-api-contract-audit` | 149 | 1 | `5422c6777334` | diverged/stale |
+| `origin/codex/f0-dependency-audit-fix` | 149 | 0 | `209a02583c7d` | absorbed/stale |
+| `origin/codex/f1-data-quality-and-score-differentiation` | 117 | 0 | `deebffda7e14` | absorbed/stale |
+| `origin/codex/f1-finnhub-fundamentals-ingestion` | 94 | 6 | `7555a6bc28d9` | diverged/active candidate |
+| `origin/codex/track-12a-roa-quality-activation` | 30 | 0 | `6557a718acb1` | absorbed/stale Track-12/Track-22 |
+| `origin/codex/track-12b-dividend-yield-marketcap-activation` | 29 | 0 | `4d44975a492b` | absorbed/stale Track-12/Track-22 |
+| `origin/f0-release` | 148 | 1 | `bbcc4fd46dd3` | diverged/stale |
+| `origin/main` | 0 | 0 | `c26e13bb3ae9` | current/default |
+| `origin/noop` | 150 | 2 | `94c80ce21130` | diverged/stale |
+| `origin/track-12-local-opencode-sync` | 28 | 0 | `da376d0dac17` | absorbed/stale Track-12/Track-22 |
+| `origin/track-12-roa-activation` | 249 | 56 | `421db37d1b6b` | diverged/stale |
+| `origin/track-12c-production-scoring-integrity` | 2 | 1 | `1d41eef9c4bb` | active/diverged |
+| `origin/track-22-production-engine-completion` | 249 | 80 | `0ad0907e09ba` | diverged/stale |
+| `origin/track-f0-closure-truth-browser` | 149 | 0 | `209a02583c7d` | absorbed/stale |
+| `origin/track-f2-feed-learning-trust` | 41 | 0 | `de649080ccdc` | absorbed/stale |
+| `origin/track-f2-market-dashboard-scanners` | 68 | 0 | `5a2cf146d5f8` | absorbed/stale PR branch |
+| `origin/track-f2-portfolio-operating-system` | 52 | 0 | `57303a9bf78f` | absorbed/stale PR branch |
+| `origin/track-f2-refined-information-architecture` | 105 | 0 | `25e260204ef6` | absorbed/stale |
+| `origin/track-f2-stock-detail-workspace` | 79 | 0 | `6ec0a7fe0189` | absorbed/stale PR branch |
+| `origin/track-f3-data-plane-quota-governance` | 36 | 0 | `82d7ef145898` | absorbed/stale |
+| `origin/track-f3-data-plane-quota-governance-certification` | 36 | 5 | `8ce831de2b17` | diverged/stale |
+| `origin/track-f3-provider-adapter-migration` | 31 | 0 | `4d6704b4d9e1` | absorbed/stale PR branch |
+| `origin/track-f3-provider-request-broker` | 33 | 0 | `878e7e65a1e6` | absorbed/stale PR branch |
+| `origin/track-f4-authorized-screener-moneycontrol-ingestion` | 2 | 2 | `d384a8bf293d` | active/diverged |
+| `origin/track-f5-unified-100-feature-prediction-engine` | 1 | 0 | `b2b35436c8cd` | absorbed/stale |
+| `origin/track-feature-f0-truth-foundation` | 178 | 2 | `d33e90e7e966` | diverged/stale |
+| `origin/track-p0-mega-beta-stabilization` | 188 | 0 | `0657fed52c77` | absorbed/stale |
+| `origin/track-p0-production-stabilization` | 233 | 1 | `30e97fbc8016` | diverged/stale |
+| `origin/track-p1-mega-public-beta-hardening` | 186 | 0 | `0c9c248b6865` | absorbed/stale |
+| `origin/track-p4b-p3-persistence-convergence` | 213 | 1 | `c556e11bc68e` | diverged/stale |
+| `origin/track-p4b-p3c-wire-and-test-persistence` | 212 | 0 | `deee2cdbdd11` | absorbed/stale |
+| `origin/track-p4b-p3d-close-runtime-proof-gaps` | 211 | 0 | `da197daf17a2` | absorbed/stale |
+| `origin/track-p4b-p3d-proof-tests-and-ci-repair` | 213 | 0 | `dc987f6d4ed2` | absorbed/stale |
+| `origin/track-p4b-p3e-finish-local-runtime-certification` | 208 | 0 | `3ad53bc67187` | absorbed/stale |
+| `origin/track-p4b-p3e-finish-local-runtime-proof` | 208 | 2 | `c97348aa5f9a` | diverged/stale |
+| `origin/track-p4b-p3f-complete-local-runtime-proof` | 206 | 0 | `04559ef20b09` | absorbed/stale |
+| `origin/track-p4b-p3g-finalize-local-runtime-proof` | 207 | 0 | `cb1891f4b4d8` | absorbed/stale |
+| `origin/track-p4b-p3g-finish-local-runtime-certification` | 201 | 0 | `cc12c6e408b5` | absorbed/stale |
+| `origin/track-p4b-p3h-execute-local-runtime-certification` | 200 | 0 | `2f87c6f471d0` | absorbed/stale |
+| `origin/track-p4b-p3h-runtime-proof-vercel-ci-foundations` | 201 | 5 | `b1686f629461` | diverged/stale |
+| `origin/track-p4b-p4a-postgres-ci-readiness` | 197 | 0 | `08c7fff60e1e` | absorbed/stale |
+| `origin/track-p4c-remaining-blockers` | 221 | 0 | `fe1388d582d3` | absorbed/stale |
+| `origin/track-portability-p3-reproducible-environment` | 189 | 1 | `fe4291a7bee8` | diverged/stale |
+| `origin/track-portability-r1-reconcile-deliverables` | 189 | 7 | `cd95f1e24350` | diverged/stale |
+| `origin/track-portability-r1d-fix-executable-proof` | 189 | 8 | `81d5c15bd558` | diverged/stale |
+| `origin/track-portability-r2-remove-better-sqlite3` | 189 | 3 | `fecb407b2178` | diverged/stale |
+| `origin/track-portability-r2b-remove-active-native-sqlite-paths` | 189 | 11 | `8143b6b89a22` | diverged/stale |
+| `origin/track-portability-r3-complete-and-harden-sqljs` | 189 | 5 | `149d8dccbfb6` | diverged/stale |
+| `origin/track-portability-r3-harden-sqljs-and-certify` | 189 | 4 | `59b9133ed608` | diverged/stale |
+| `origin/track-portability-r4-reconcile-sqljs-package-and-ci` | 189 | 6 | `6d3660d57e03` | diverged/stale |
+| `origin/track-portability-r5-fix-executable-proof` | 189 | 8 | `e3dea18bda28` | diverged/stale |
+| `origin/track-portability-r6-remove-remaining-native-sqlite-paths` | 189 | 8 | `e3dea18bda28` | diverged/stale |
+| `origin/track-release-p1-truthful-gate` | 189 | 2 | `99a1f0de8e34` | diverged/stale |
+| `origin/track-release-r4-execute-truthful-gate` | 189 | 7 | `bcaa77b7c232` | diverged/stale |
+| `origin/track-smoke-mega-strict-api-certification` | 179 | 0 | `7ad65e9b012b` | absorbed/stale |
+| `origin/track-smoke-r7-safe-migration-node22-retention-audit` | 180 | 0 | `fa285ab500f9` | absorbed/stale |
+| `origin/track-smoke-r8-retention-authz-and-migration-cleanup` | 181 | 0 | `748b5f0147ed` | absorbed/stale |
+| `origin/workspace-consolidation-cleanup` | 220 | 0 | `3295ad1319fa` | absorbed/stale |
+| `track-12-local-opencode-sync` | 28 | 0 | `da376d0dac17` | absorbed/stale Track-12/Track-22 |
+| `track-12c-production-scoring-integrity` | 2 | 1 | `1d41eef9c4bb` | active/diverged |
+| `track-f0-closure-truth-browser` | 150 | 1 | `09912fea2b08` | diverged/stale |
+| `track-f2-feed-learning-trust` | 41 | 0 | `de649080ccdc` | absorbed/stale |
+| `track-f3-data-plane-quota-governance` | 36 | 5 | `8ce831de2b17` | diverged/stale |
+| `track-f3-provider-adapter-migration` | 31 | 0 | `4d6704b4d9e1` | absorbed/stale |
+| `track-f3-provider-request-broker` | 32 | 0 | `57ba60f7855b` | absorbed/stale |
+| `track-f4-authorized-screener-moneycontrol-ingestion` | 2 | 2 | `d384a8bf293d` | active/diverged |
+| `track-f5-2-live-validation-rollout` | 2 | 0 | `a41a2bd70f33` | absorbed/stale |
+| `track-f5-unified-100-feature-prediction-engine` | 1 | 0 | `b2b35436c8cd` | absorbed/stale |
+| `track-f5-unified-100-feature-prediction-engine-v2` | 2 | 0 | `a41a2bd70f33` | absorbed/stale |
+| `track-feature-f0-truth-foundation` | 178 | 2 | `d33e90e7e966` | diverged/stale |
+| `track-p0-mega-beta-stabilization` | 188 | 0 | `0657fed52c77` | absorbed/stale |
+| `track-p0-production-stabilization` | 233 | 1 | `30e97fbc8016` | diverged/stale |
+| `track-p1-mega-public-beta-hardening` | 186 | 0 | `0c9c248b6865` | absorbed/stale |
+| `track-p4b-p2-auth-hardening` | 224 | 0 | `b8577ee5380a` | absorbed/stale |
+| `track-p4b-p3-persistence-convergence` | 213 | 1 | `c556e11bc68e` | diverged/stale |
+| `track-p4b-p3b-finish-persistence` | 218 | 0 | `fd0cd5393e8d` | absorbed/stale |
+| `track-p4b-p3c-wire-and-test-persistence` | 213 | 1 | `c556e11bc68e` | diverged/stale |
+| `track-p4b-p3d-close-runtime-proof-gaps` | 211 | 0 | `da197daf17a2` | absorbed/stale |
+| `track-p4b-p3d-proof-tests-and-ci-repair` | 213 | 0 | `dc987f6d4ed2` | absorbed/stale |
+| `track-p4b-p3e-finish-local-runtime-certification` | 208 | 0 | `3ad53bc67187` | absorbed/stale |
+| `track-p4b-p3e-finish-local-runtime-proof` | 211 | 0 | `da197daf17a2` | absorbed/stale |
+| `track-p4b-p3f-complete-local-runtime-proof` | 208 | 0 | `3ad53bc67187` | absorbed/stale |
+| `track-p4b-p3g-finalize-local-runtime-proof` | 207 | 0 | `cb1891f4b4d8` | absorbed/stale |
+| `track-p4b-p3g-finish-local-runtime-certification` | 201 | 0 | `cc12c6e408b5` | absorbed/stale |
+| `track-p4b-p3h-execute-local-runtime-certification` | 200 | 0 | `2f87c6f471d0` | absorbed/stale |
+| `track-p4b-p3h-runtime-proof-vercel-ci-foundations` | 201 | 5 | `b1686f629461` | diverged/stale |
+| `track-p4b-p4a-postgres-ci-readiness` | 197 | 0 | `08c7fff60e1e` | absorbed/stale |
+| `track-p4c-remaining-blockers` | 221 | 0 | `fe1388d582d3` | absorbed/stale |
+| `track-portability-p0-cross-platform-certification` | 189 | 4 | `7ae692d925cc` | diverged/stale |
+| `track-portability-p1-remove-native-sqlite` | 189 | 0 | `627fcdc7edf2` | absorbed/stale |
+| `track-portability-p2-remove-os-assumptions` | 189 | 2 | `270c904e1b9d` | diverged/stale |
+| `track-portability-p3-reproducible-environment` | 189 | 1 | `fe4291a7bee8` | diverged/stale |
+| `track-portability-r1-reconcile-deliverables` | 189 | 7 | `cd95f1e24350` | diverged/stale |
+| `track-portability-r1d-fix-executable-proof` | 189 | 8 | `81d5c15bd558` | diverged/stale |
+| `track-portability-r2-remove-better-sqlite3` | 189 | 3 | `fecb407b2178` | diverged/stale |
+| `track-portability-r2b-remove-active-native-sqlite-paths` | 189 | 11 | `8143b6b89a22` | diverged/stale |
+| `track-portability-r3-complete-and-harden-sqljs` | 189 | 5 | `149d8dccbfb6` | diverged/stale |
+| `track-portability-r3-harden-sqljs-and-certify` | 189 | 4 | `59b9133ed608` | diverged/stale |
+| `track-portability-r4-reconcile-sqljs-package-and-ci` | 189 | 7 | `cd95f1e24350` | diverged/stale |
+| `track-portability-r5-fix-executable-proof` | 189 | 8 | `e3dea18bda28` | diverged/stale |
+| `track-portability-r6-remove-remaining-native-sqlite-paths` | 189 | 8 | `e3dea18bda28` | diverged/stale |
+| `track-release-p1-truthful-gate` | 189 | 2 | `99a1f0de8e34` | diverged/stale |
+| `track-release-r2-final-truthful-gate` | 189 | 1 | `fe4291a7bee8` | diverged/stale |
+| `track-release-r4-execute-truthful-gate` | 189 | 7 | `bcaa77b7c232` | diverged/stale |
+| `track-smoke-mega-strict-api-certification` | 179 | 0 | `7ad65e9b012b` | absorbed/stale |
+| `track-smoke-r7-safe-migration-node22-retention-audit` | 180 | 0 | `fa285ab500f9` | absorbed/stale |
+| `track-smoke-r8-retention-authz-and-migration-cleanup` | 181 | 0 | `748b5f0147ed` | absorbed/stale |
+| `track-uiux-p0-full-app-audit` | 191 | 0 | `3eb68a9bb628` | absorbed/stale |
+| `vercel-p0-frontend-build-unblock` | 205 | 2 | `1925762d8ede` | diverged/stale |
+| `workspace-consolidation-cleanup` | 220 | 0 | `3295ad1319fa` | absorbed/stale |
 
-### 3e. Alias-of-main (no unique code)
+## Local-Only or Local Tracking Notes
 
-- `main`, `track-f5-2-live-validation-rollout`, `track-f5-unified-100-feature-prediction-engine-v2` - all 0 / 0 vs origin/main.
+Local branches without matching remote visible after pruning should be treated as stale/local until intentionally reviewed. Examples include `codex/f0-browser-test-hardening-audit`, `codex/f0-playwright-hardening`, `track-p4b-p2-auth-hardening`, `track-p4b-p3b-finish-persistence`, `track-portability-p0-cross-platform-certification`, `track-portability-p1-remove-native-sqlite`, `track-portability-p2-remove-os-assumptions`, `track-release-r2-final-truthful-gate`, `track-uiux-p0-full-app-audit`, and `vercel-p0-frontend-build-unblock`.
 
-## 4. Confirmation against the prompt's expectations
+## Recommendation
 
-The four F2/F3 branches called out in the prompt are confirmed absorbed:
-
-- `track-f3-provider-request-broker` - ahead 30, behind 0. Local tip `57ba60f implemented changes` is an ancestor of main via `878e7e6 -> ... -> df68aad5 (merge of track-12-local-opencode-sync)`. No unique code.
-- `track-f3-provider-adapter-migration` - ahead 29, behind 0. Local tip `4d6704b refactor: introduce request broker for provider API calls` is an ancestor of main via the same merge chain. No unique code.
-- `track-f2-stock-detail-workspace` - exists only as `origin/track-f2-stock-detail-workspace`; tip `6ec0a7f test(telemetry): refuse scoring from missing source inputs` is an ancestor of main. No unique code.
-- `track-f2-market-dashboard-scanners` - exists only as `origin/track-f2-market-dashboard-scanners`; tip `5a2cf14 test(dashboard): reject malformed market action envelopes` is an ancestor of main. No unique code.
-- `track-f2-portfolio-operating-system` - exists only as `origin/track-f2-portfolio-operating-system`; tip `57303a9 test(playwright): assert full portfolio doctor disclosure sentence` is an ancestor of main. No unique code.
-
-The prompt's caveat about `codex/f1-finnhub-fundamentals-ingestion` is confirmed for the remote ref: `origin/codex/f1-finnhub-fundamentals-ingestion` at 7555a6b is NOT an ancestor of main; 6 unique commits (visible above). The local `codex/f1-finnhub-fundamentals-ingestion` at 0bb7e14 IS an ancestor of main; the local divergence is already merged. The unique provider work to evaluate lives on the remote ref only.
-
-The diverged branch's unique files vs main (sample, all paths are from `git diff --name-only origin/main origin/codex/f1-finnhub-fundamentals-ingestion`):
-
-- `src/services/providers/IndianMarketProvider.ts` (massive change: -164 / +59 lines)
-- `src/services/providers/MetadataProviderCoordinator.ts` and test
-- `src/services/providers/ProviderCoordinator.ts`
-- `src/services/providers/ScreenerProvider.ts`
-- `src/services/providers/UpstoxFundamentalsProvider.ts`
-- `src/services/providers/YahooProvider.ts` and test
-- `src/services/providers/YahooFinancePriceProvider.ts`
-- `src/backend/data/providers/DatabaseSnapshotProvider.ts` (5 lines changed)
-- `src/backend/data/providers/types.ts` (1 line removed)
-- `src/backend/data/scoring/scoreEngine.ts` (1 line removed)
-- `src/backend/web/routes/dailyFeed.ts` (25 lines removed)
-- `src/backend/web/routes/marketData.ts` (15 lines removed)
-- `src/stockstory/engines/StabilityEngine.ts` (15 lines changed)
-- `src/stockstory/engines/ValuationEngine.ts` (7 lines changed)
-- `src/stockstory/__tests__/ScoringIntegrity.test.ts` (76 lines changed)
-- `src/stockstory/__tests__/StockStoryEngine.test.ts` (70 lines changed)
-- `src/services/telemetry/TelemetrySnapshotFactory.ts` (40 lines changed)
-- `src/services/universe/MasterSymbolUniverse.ts` (21 lines changed)
-- `src/views/DashboardHub.tsx` (28 lines changed)
-- `src/app/PageRenderer.tsx` (154 lines changed)
-- `src/app/router.ts` (65 lines changed)
-- `src/backend/persistence/cache/cacheHierarchyEngine.ts` (172 lines changed)
-- New files: `scripts/provider-healthcheck.ts`, `scripts/yfinance_bridge.py`, `yfinance_cache.sqlite`
-
-These represent provider work that the remote branch is carrying but main does not have. None of this is reflected in local `main` and it should NOT be auto-merged.
-
-## 5. Local working-tree state (recorded but not touched per prompt)
-
-- `M package-lock.json` - minor drift, no source impact.
-- `M src/backend/web/routes/company.ts` - local alias `roce AS roic` in a SELECT (1 line). Stays as-is for this audit per the "do not edit source code" rule. Documented here so it is not lost.
-
-## 6. Output: stale vs active vs diverged vs absorbed
-
-- Stale: every branch in section 3c (about 50 branches).
-- Active on top of main: `track-f4-authorized-screener-moneycontrol-ingestion` (2 ahead), `track-f5-unified-100-feature-prediction-engine` (1 ahead), and `track-12c-production-scoring-integrity` (1 ahead).
-- Diverged: `origin/codex/f1-finnhub-fundamentals-ingestion` (the only branch with code not reachable from main), and the historical `origin/track-12-roa-activation` and `origin/track-22-production-engine-completion`.
-- Absorbed: every branch in section 3b (about 12 branches including the F2/F3 subtracks the prompt called out).
+Do not re-implement Track-12 scoring. The stale/absorbed PR branches should be closed or archived outside this task after human confirmation. The next branch worth reconciling for feature work is `origin/codex/f1-finnhub-fundamentals-ingestion`, because it has six unique provider/cache commits not present on `origin/main`.
