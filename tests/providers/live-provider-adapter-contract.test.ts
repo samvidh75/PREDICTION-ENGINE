@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FinnhubProvider } from '../../src/services/providers/FinnhubProvider';
 import { GoogleNewsRssProvider } from '../../src/services/providers/GoogleNewsRssProvider';
 import { IndianMarketProvider } from '../../src/services/providers/IndianMarketProvider';
@@ -19,35 +19,59 @@ describe('live provider adapter contracts', () => {
     delete process.env.INDIANAPI_KEY;
   });
 
-  it('Finnhub blocks missing key before fetch', () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    expect(() => new FinnhubProvider('')).toThrow(/FINNHUB_KEY/);
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
+  describe('FinnhubProvider', () => {
+    let originalFinnhubKey: string | undefined;
+    let originalFinnhubApiKey: string | undefined;
+    let originalViteFinnhubKey: string | undefined;
 
-  it('Finnhub keeps missing exchange and fiscal period unavailable', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(jsonResponse({ name: 'No Exchange Ltd', currency: 'INR' }))
-      .mockResolvedValueOnce(jsonResponse({ metric: { peNormalizedAnnual: 12 } }));
-    const provider = new FinnhubProvider('secret-token');
+    beforeEach(() => {
+      // Save env vars that FinnhubProvider constructor may pick up
+      originalFinnhubKey = process.env.FINNHUB_KEY;
+      originalFinnhubApiKey = process.env.FINNHUB_API_KEY;
+      originalViteFinnhubKey = process.env.VITE_FINNHUB_API_KEY;
+      // Clear them so empty-string arg triggers the missing-key error
+      delete process.env.FINNHUB_KEY;
+      delete process.env.FINNHUB_API_KEY;
+      delete process.env.VITE_FINNHUB_API_KEY;
+    });
 
-    await expect(provider.getMetadata('NOEXCH1')).resolves.toMatchObject({ exchange: undefined });
-    const financials = await provider.getFinancials('NOFISCAL1');
+    afterEach(() => {
+      // Restore env vars
+      if (originalFinnhubKey) process.env.FINNHUB_KEY = originalFinnhubKey;
+      if (originalFinnhubApiKey) process.env.FINNHUB_API_KEY = originalFinnhubApiKey;
+      if (originalViteFinnhubKey) process.env.VITE_FINNHUB_API_KEY = originalViteFinnhubKey;
+    });
 
-    expect(financials.periodEnd).toBeUndefined();
-    expect(JSON.stringify(financials)).not.toContain('secret-token');
-    expect(fetchSpy.mock.calls.map(call => String(call[0])).join('\n')).toContain('token=secret-token');
-  });
+    it('Finnhub blocks missing key before fetch', () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch');
+      expect(() => new FinnhubProvider('')).toThrow(/FINNHUB_KEY/);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
 
-  it('Finnhub permanent 4xx is not retried and error is sanitized', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValue(jsonResponse({ error: 'bad token' }, 401));
-    const provider = new FinnhubProvider('secret-token');
+    it('Finnhub keeps missing exchange and fiscal period unavailable', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(jsonResponse({ name: 'No Exchange Ltd', currency: 'INR' }))
+        .mockResolvedValueOnce(jsonResponse({ metric: { peNormalizedAnnual: 12 } }));
+      const provider = new FinnhubProvider('secret-token');
 
-    await expect(provider.getMetadata('PERM4XX1')).rejects.toThrow(/unauthorized/);
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    await expect(provider.getMetadata('PERM4XX1')).rejects.toThrow(/unavailable|negative/i);
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+      await expect(provider.getMetadata('NOEXCH1')).resolves.toMatchObject({ exchange: undefined });
+      const financials = await provider.getFinancials('NOFISCAL1');
+
+      expect(financials.periodEnd).toBeUndefined();
+      expect(JSON.stringify(financials)).not.toContain('secret-token');
+      expect(fetchSpy.mock.calls.map(call => String(call[0])).join('\n')).toContain('token=secret-token');
+    });
+
+    it('Finnhub permanent 4xx is not retried and error is sanitized', async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValue(jsonResponse({ error: 'bad token' }, 401));
+      const provider = new FinnhubProvider('secret-token');
+
+      await expect(provider.getMetadata('PERM4XX1')).rejects.toThrow(/unauthorized/);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      await expect(provider.getMetadata('PERM4XX1')).rejects.toThrow(/unavailable|negative/i);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('IndianAPI blocks missing key before fetch', async () => {
