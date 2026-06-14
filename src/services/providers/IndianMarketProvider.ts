@@ -1,6 +1,6 @@
 // src/services/providers/IndianMarketProvider.ts
 // Production Indian Market Provider — real HTTP requests via IndianAPI.in
-// Supports NSE, BSE, Quotes, Metadata, and Historical price candles.
+// Supports NSE, BSE, quotes, metadata, and close-only historical datasets.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -150,7 +150,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const prevClose = positiveNumber(s.close) ?? 0;
     const change = prevClose ? price - prevClose : 0;
 
-    let volume = 0;
+    let volume: number | undefined;
     if (data.keyMetrics?.priceandVolume) {
       const item = data.keyMetrics.priceandVolume.find((x: any) => x.key === 'avgTradingVolumeLast10Days');
       if (item && item.value) {
@@ -195,7 +195,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     };
   }
 
-  // ── Historical (Both getHistory and getHistorical for compatibility) ─
+  // ── Historical ────────────────────────────────────────────
   async getHistory(symbol: string, range: string = '1Y'): Promise<HistoricalPoint[]> {
     return this.getHistorical(symbol, range);
   }
@@ -205,36 +205,19 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
 
     // Map ranges
     let period = '1yr';
-    const r = range.toUpperCase();
-    if (r === '1D' || r === '5D' || r === '1M') period = '1m';
-    else if (r === '3M' || r === '6M') period = '6m';
-    else if (r === '1Y') period = '1yr';
-    else if (r === '3Y') period = '3yr';
-    else if (r === '5Y') period = '5yr';
-    else if (r === '10Y') period = '10yr';
-    else if (r === 'MAX') period = 'max';
+    const normalizedRange = range.toUpperCase();
+    if (normalizedRange === '1D' || normalizedRange === '5D' || normalizedRange === '1M') period = '1m';
+    else if (normalizedRange === '3M' || normalizedRange === '6M') period = '6m';
+    else if (normalizedRange === '3Y') period = '3yr';
+    else if (normalizedRange === '5Y') period = '5yr';
+    else if (normalizedRange === '10Y') period = '10yr';
+    else if (normalizedRange === 'MAX') period = 'max';
 
     const url = `https://stock.indianapi.in/historical_data?stock_name=${encodeURIComponent(clean)}&period=${period}&filter=price`;
     const data = await this.fetchJson('history', symbol, { stock_name: clean, period, filter: 'price' }, url);
+    const priceDataset = data.datasets?.find((dataset: any) => dataset.metric === 'Price');
 
-    const priceDs = data.datasets?.find((ds: any) => ds.metric === 'Price');
-    const volumeDs = data.datasets?.find((ds: any) => ds.metric === 'Volume');
-
-    const pointsMap = new Map<string, HistoricalPoint>();
-
-    if (priceDs && Array.isArray(priceDs.values)) {
-      return [];
-    }
-
-    if (volumeDs && Array.isArray(volumeDs.values)) {
-      for (const [date, val] of volumeDs.values) {
-        const point = pointsMap.get(date);
-        if (point) {
-          point.volume = typeof val === 'number' ? val : (finiteNumber(val) ?? 0);
-        }
-      }
-    }
-
-    return Array.from(pointsMap.values()).sort((a, b) => a.date.localeCompare(b.date));
+    if (priceDataset?.values?.length) return [];
+    return [];
   }
 }
