@@ -6,6 +6,15 @@ import { ProfileButton } from './ProfileButton';
 export const TopNav: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
 
+  // Determine the current page from URL query parameters.
+  const currentPage = (typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('page')
+    : null) ?? 'landing';
+  // Public pages where we should hide authenticated-only navigation like search and alerts.
+  const isPublicPage = ['landing', 'about', 'login', 'signup'].includes(currentPage);
+  // Only show search and alert/profile buttons when the user is authenticated and not on a public page.
+  const showSearch = isAuthenticated && user && !isPublicPage;
+
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", pageKey);
@@ -31,7 +40,7 @@ export const TopNav: React.FC = () => {
         STOCKSTORY<span className="text-[#2962ff]">.INDIA</span>
       </button>
 
-      {isAuthenticated && user ? (
+      {showSearch ? (
         <button
           type="button"
           onClick={triggerSearch}
@@ -53,7 +62,7 @@ export const TopNav: React.FC = () => {
 
     <nav className="ss-tv-neon-edge fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-white/10 bg-black/94 px-8 backdrop-blur-xl md:flex">
       <div className="flex-shrink-0 w-[240px] flex items-center">
-        <span 
+        <span
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
           className="text-sm font-bold tracking-[0.2em] text-[#f0f3fa] cursor-pointer"
         >
@@ -61,7 +70,7 @@ export const TopNav: React.FC = () => {
         </span>
       </div>
 
-      {isAuthenticated && user ? (
+      {showSearch ? (
         <>
           <div className="flex-1 flex justify-center max-w-[620px] mx-auto">
             <button
@@ -88,25 +97,25 @@ export const TopNav: React.FC = () => {
         </>
       ) : (
         <div className="flex-shrink-0 flex items-center gap-7 ml-auto">
-          <button 
+          <button
             onClick={() => setPage("about")}
             className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
             About
           </button>
-          <button 
+          <button
             onClick={() => setPage("landing")}
             className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
             Home
           </button>
-          <button 
+          <button
             onClick={() => setPage("login")}
             className="text-sm font-bold text-[#d1d4dc] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
           >
             Sign in
           </button>
-          <button 
+          <button
             onClick={() => setPage("signup")}
             className="px-5 py-2.5 bg-[#2962ff] text-white font-bold rounded-full hover:bg-[#1e53e5] transition-all text-sm cursor-pointer shadow-[0_0_28px_rgba(41,98,255,0.38)]"
           >
