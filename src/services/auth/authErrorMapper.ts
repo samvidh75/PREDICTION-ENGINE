@@ -10,7 +10,7 @@ export function mapAuthError(error: unknown): string {
   console.error("[Auth Technical Diagnostic Error]:", error);
 
   if (!error || typeof error !== "object") {
-    return "Authentication could not be completed. Please try again.";
+    return "Authentication could not be completed. Please try again later or contact support.";
   }
 
   // Handle nested error shapes if any
@@ -81,5 +81,5 @@ export function mapAuthError(error: unknown): string {
     return "An account already exists with this email address under a different sign-in method.";
   }
 
-  return "Authentication could not be completed. Please try again.";
+  return "Authentication could not be completed. Please try again later or contact support.";
 }
