@@ -71,3 +71,8 @@ Note: `npm run build:frontend` emitted Vite's existing warning that `NODE_ENV=pr
 - Protected Search redirected to Login when unauthenticated.
 - Auth form errors rendered as readable inline alerts.
 - An explicit missing-Firebase production build (`VITE_FIREBASE_API_KEY=`, `VITE_FIREBASE_APP_ID=`, `VITE_FIREBASE_MESSAGING_SENDER_ID=`) rendered Landing, Signup, and Login with no console errors and no page errors.
+
+## Post-Push Production Confirmation
+
+- `https://www.stockstory-india.com` served asset `/assets/index-CKEV4-B8.js`, rendered the landing page, and had no console errors or page errors.
+- `https://stockstory-india.com` served asset `/assets/index-CKEV4-B8.js`, rendered the landing page, and had no console errors or page errors.
