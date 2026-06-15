@@ -1,27 +1,31 @@
 # Verification
 
-After applying the fixes on branch `fix-production-auth-public-ux`, the following actions should be performed:
+Branch: fix-production-auth-public-ux
 
-1. **Typechecking and linting**:
-   ```
-   npm run typecheck:all
-   npm run lint
-   ```
+Scope:
+- src/components/navigation/TopNav.tsx
+- src/services/auth/authErrorMapper.ts
+- reports/production-ux-auth-audit/*
 
-2. **Unit tests**:
-   ```
-   npm run test:unit
-   ```
+Commands to run before merge:
+- npm run typecheck:all
+- npm run lint
+- npm run test:unit
+- npm run validate:hygiene
+- npm run build:frontend
+- npm run build:backend
 
-3. **Repository hygiene**:
-   ```
-   npm run validate:hygiene
-   ```
+Manual production checks after deploy:
+1. Open /, ?page=login, and ?page=signup.
+2. Confirm Search, Intel, alerts, and profile actions are hidden on public/auth pages.
+3. Confirm public nav shows only Home, About, Sign in, and Get started.
+4. Confirm Google login either succeeds or shows a specific Firebase-domain/config message.
+5. Confirm email signup either succeeds or shows a specific Firebase configuration/provider message.
+6. Confirm the app does not render a blank black page when auth configuration is incomplete.
 
-4. **Build**:
-   ```
-   npm run build:frontend
-   npm run build:backend
-   ```
-
-Due to the limitations of the current environment, these commands were not executed here.  The changes made are confined to client‑side TypeScript files and do not introduce new dependencies, so they are expected to pass typechecking and tests.  The maintainers should run the above commands in the repository root to confirm.  If any failures occur, investigate and fix them before merging.
+Remaining external configuration:
+- Add deployed domains to Firebase Authentication authorized domains.
+- Enable Google provider in Firebase Authentication.
+- Enable Email/Password provider in Firebase Authentication.
+- Add all required VITE_FIREBASE_* vars to Vercel Production.
+- Redeploy after changing Vercel environment variables.
