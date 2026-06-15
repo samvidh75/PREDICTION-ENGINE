@@ -31,7 +31,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[72px] z-40 hidden w-[240px] select-none flex-col justify-between border-r border-slate-800 bg-slate-950 py-6 md:flex">
+    <aside className="fixed bottom-0 left-0 top-[72px] z-40 hidden w-[240px] select-none flex-col justify-between border-r border-slate-200 bg-white py-6 md:flex">
       <nav className="flex-1 space-y-1 overflow-y-auto px-3">
         {links.map((link) => {
           const isActive = currentView === link.id;
@@ -42,11 +42,11 @@ export const Sidebar: React.FC = () => {
               onClick={() => MapsTo(link.id)}
               className={`group flex h-10 w-full cursor-pointer items-center space-x-3 rounded-lg px-3 text-left text-sm font-medium transition ${
                 isActive
-                  ? "bg-slate-850 text-slate-100 font-semibold border border-slate-700"
-                  : "text-slate-400 hover:bg-slate-900 hover:text-slate-200 border border-transparent"
+                  ? "bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-950 border border-transparent"
               }`}
             >
-              <span className={`transition ${isActive ? "text-slate-100" : "text-slate-500 group-hover:text-slate-400"}`}>
+              <span className={`transition ${isActive ? "text-emerald-700" : "text-slate-400 group-hover:text-slate-600"}`}>
                 {link.icon}
               </span>
               <span>{link.label}</span>
@@ -56,14 +56,14 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {isAuthenticated && (
-        <div className="mt-4 border-t border-slate-800 px-3 pt-4">
+        <div className="mt-4 border-t border-slate-200 px-3 pt-4">
           <button
             type="button"
             onClick={() => void logout()}
             disabled={isConnecting}
-            className="group flex h-10 w-full cursor-pointer items-center space-x-3 rounded-lg px-3 text-left text-sm font-medium text-slate-400 hover:bg-slate-900 hover:text-slate-200 disabled:opacity-50"
+            className="group flex h-10 w-full cursor-pointer items-center space-x-3 rounded-lg px-3 text-left text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-950 disabled:opacity-50"
           >
-            <LogOut className="h-4 w-4 text-slate-500 group-hover:text-slate-400" />
+            <LogOut className="h-4 w-4 text-slate-400 group-hover:text-slate-600" />
             <span>Sign out</span>
           </button>
         </div>

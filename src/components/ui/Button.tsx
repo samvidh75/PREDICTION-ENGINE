@@ -13,14 +13,14 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ...props
 }) => {
-  const baseStyle = "inline-flex items-center justify-center font-medium transition-all rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-900";
+  const baseStyle = "inline-flex items-center justify-center gap-2 font-semibold transition rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 focus:ring-offset-white";
   
   const variantStyles = {
-    primary: "bg-slate-100 text-slate-950 hover:bg-slate-200 border border-transparent",
-    secondary: "bg-slate-800 text-slate-100 hover:bg-slate-700 border border-slate-700",
-    outline: "bg-transparent border border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-slate-100",
-    ghost: "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-transparent",
-    danger: "bg-rose-900/50 border border-rose-800 text-rose-200 hover:bg-rose-800/60",
+    primary: "bg-slate-950 text-white hover:bg-slate-800 border border-slate-950",
+    secondary: "bg-white text-slate-800 hover:bg-slate-50 border border-slate-200",
+    outline: "bg-transparent border border-slate-300 text-slate-800 hover:bg-slate-50",
+    ghost: "bg-transparent text-slate-600 hover:text-slate-950 hover:bg-slate-100 border border-transparent",
+    danger: "bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100",
   };
 
   const sizeStyles = {

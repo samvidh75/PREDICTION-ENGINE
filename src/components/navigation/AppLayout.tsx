@@ -9,37 +9,35 @@ interface AppLayoutProps {
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  useAuth();
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative bg-slate-950 text-slate-100">
-      {/* Top Header */}
+    <div className="relative flex h-screen w-screen select-none flex-col overflow-hidden bg-slate-100 font-sans text-slate-900">
       <div className="hidden md:block">
         <TopNav />
       </div>
 
-      {/* Main Structural Body */}
-      <div className="flex flex-1 w-full h-full overflow-hidden relative">
-        {/* Left Side Rail */}
+      <div className="relative flex h-full w-full flex-1 overflow-hidden">
         <Sidebar />
 
-        {/* Central Workspace */}
         <main className="
-          w-full md:w-[calc(100vw-240px)] 
-          h-[calc(100vh-72px)] 
-          mt-[72px] 
+          mt-[60px]
+          h-[calc(100vh-60px)]
+          w-full
           overflow-y-auto 
-          bg-transparent
+          bg-slate-100
+          md:mt-[72px]
+          md:h-[calc(100vh-72px)]
           md:ml-[240px]
+          md:w-[calc(100vw-240px)]
           pb-24
         ">
-          <div className="relative z-10 max-w-6xl mx-auto w-full px-6 py-8">
+          <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
             {children}
           </div>
         </main>
       </div>
 
-      {/* Bottom Nav Bar - Mobile Viewport */}
       <MobileNav />
     </div>
   );

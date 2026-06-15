@@ -12,14 +12,14 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between select-none">
+    <main className="flex min-h-screen select-none flex-col justify-between bg-slate-100 font-sans text-slate-900">
       <TopNav />
       <MobileNav />
 
-      <section className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:py-24 z-10">
-        <div className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900 p-8 shadow-lg shadow-black/20">
+      <section className="z-10 flex flex-1 flex-col items-center justify-center px-6 py-12 md:py-24">
+        <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col items-center mb-6">
-            <span className="text-xs tracking-widest font-semibold text-slate-400 uppercase">
+            <span className="text-xs tracking-widest font-semibold text-slate-500 uppercase">
               STOCKSTORY INDIA
             </span>
           </div>
@@ -31,7 +31,7 @@ export const SignupPage: React.FC = () => {
         </div>
       </section>
 
-      <footer className="py-6 text-center text-xs text-slate-600 bg-slate-950">
+      <footer className="bg-slate-100 py-6 text-center text-xs text-slate-500">
         <p>Research workspace signals. Not investment advice.</p>
       </footer>
     </main>

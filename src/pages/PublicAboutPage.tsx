@@ -1,8 +1,8 @@
 import React from "react";
-import TopNav from "../components/navigation/TopNav";
+import { BarChart3, Database, FileSearch, LineChart, ShieldCheck } from "lucide-react";
 import MobileNav from "../components/navigation/MobileNav";
+import TopNav from "../components/navigation/TopNav";
 import { ResearchDisclaimer } from "../components/ui/PageHeader";
-import { Database, LineChart, BarChart3, ShieldCheck, FileSearch } from "lucide-react";
 
 function setPage(pageKey: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -12,138 +12,73 @@ function setPage(pageKey: string): void {
   window.dispatchEvent(new Event("urlchange"));
 }
 
-const providers = ["Yahoo Finance", "Upstox", "Screener"];
-
 const architecture = [
-  { icon: <Database className="h-4 w-4" />, title: "Financial Data", body: "Provider snapshots, ratios, market data, and freshness metadata feed the company view." },
-  { icon: <LineChart className="h-4 w-4" />, title: "Technical Signals", body: "Momentum, volatility, RSI, MACD, trend strength, and risk-sensitive signals are mapped into engine inputs when available." },
-  { icon: <BarChart3 className="h-4 w-4" />, title: "Factor Models", body: "Quality, value, growth, risk, and sector factors create a repeatable ranking structure." },
-  { icon: <ShieldCheck className="h-4 w-4" />, title: "Risk Analysis", body: "Volatility, leverage, cash-flow stress, accounting quality, and confidence indicators are separated from narrative." },
+  { icon: <Database className="h-4 w-4" />, title: "Financial data", body: "Provider snapshots, ratios, market data and freshness metadata feed company pages when available." },
+  { icon: <LineChart className="h-4 w-4" />, title: "Technical signals", body: "Momentum, volatility, trend and risk-sensitive signals are mapped into engine inputs only when source data exists." },
+  { icon: <BarChart3 className="h-4 w-4" />, title: "Factor models", body: "Quality, value, growth, risk and sector factors create a repeatable ranking structure." },
+  { icon: <ShieldCheck className="h-4 w-4" />, title: "Risk separation", body: "Confidence and availability are shown separately from score outputs so missing evidence is visible." },
 ];
 
-const methodology = ["Collect Data", "Generate Features", "Generate Factors", "Run Engines", "Produce Rankings"];
+const methodology = ["Collect data", "Generate features", "Generate factors", "Run engines", "Publish rankings"];
 
 export const PublicAboutPage: React.FC = () => {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
+    <main className="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pb-16 pt-28 md:pt-32">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl">
+      <section className="mx-auto max-w-6xl px-6 pb-12 pt-28 md:pt-32">
+        <div className="max-w-3xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+            <FileSearch className="h-3.5 w-3.5 text-emerald-700" />
+            Research methodology
+          </div>
+          <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl">
             Research intelligence for Indian equities
           </h1>
-          <p className="mt-6 text-base leading-relaxed text-slate-400 sm:text-lg">
-            StockStory transforms financial data into structured, source-backed research signals. 
-            The platform is built for serious investors who want explainable rankings, not black-box scores.
+          <p className="mt-6 text-base leading-7 text-slate-600 sm:text-lg">
+            StockStory transforms provider-driven financial data into structured, source-backed research signals. The product is built for explainability, unavailable-state honesty and repeatable analysis.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => setPage("signup")}
-              className="h-11 rounded-lg bg-slate-100 px-6 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
-            >
+            <button type="button" onClick={() => setPage("signup")} className="h-11 rounded-lg bg-slate-950 px-6 text-sm font-semibold text-white hover:bg-slate-800">
               Create free account
             </button>
-            <button
-              type="button"
-              onClick={() => setPage("landing")}
-              className="h-11 rounded-lg border border-slate-700 bg-slate-900/40 px-6 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
-            >
+            <button type="button" onClick={() => setPage("landing")} className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 hover:bg-slate-50">
               Back to home
             </button>
           </div>
         </div>
       </section>
 
-      {/* Providers */}
-      <section className="border-t border-slate-800 py-14">
+      <section className="border-y border-slate-200 bg-white py-14">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-white">Data providers</h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-500">
-            Rankings are generated from provider-driven data, not paid placements or hidden analyst picks.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            {providers.map((provider) => (
-              <div key={provider} className="rounded-lg border border-slate-800 bg-slate-900/40 px-6 py-4 text-center">
-                <div className="text-sm font-bold text-white">{provider}</div>
-                <div className="mt-1 text-[10px] uppercase tracking-wider text-slate-500">provider</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Architecture */}
-      <section className="border-t border-slate-800 py-14">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-white">What the system measures</h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-500">
-            Factor-based scoring across five domains, backed by provider data.
-          </p>
+          <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">What the system measures</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {architecture.map((item) => (
-              <div key={item.title} className="rounded-lg border border-slate-800 bg-slate-900/40 p-5">
-                <div className="mb-4 inline-flex rounded-lg border border-slate-700 bg-slate-950 p-2.5 text-slate-300">{item.icon}</div>
-                <h3 className="text-base font-semibold text-slate-200">{item.title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-slate-400">{item.body}</p>
+              <div key={item.title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-4 inline-flex rounded-lg bg-slate-100 p-2.5 text-emerald-800">{item.icon}</div>
+                <h3 className="text-base font-semibold text-slate-950">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Methodology pipeline */}
-      <section className="border-t border-slate-800 py-14">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-white">From raw data to ranking</h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-500">
-            Five steps from ingestion to output.
-          </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-5">
-            {methodology.map((step, index) => (
-              <div key={step} className="rounded-lg border border-slate-800 bg-slate-900/40 p-4 text-center">
-                <div className="font-mono text-sm font-bold text-slate-400">{String(index + 1).padStart(2, "0")}</div>
-                <div className="mt-3 text-sm font-semibold text-white">{step}</div>
-              </div>
-            ))}
-          </div>
+      <section className="mx-auto max-w-5xl px-6 py-14">
+        <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">From raw data to ranking</h2>
+        <div className="mt-8 grid gap-3 sm:grid-cols-5">
+          {methodology.map((step, index) => (
+            <div key={step} className="rounded-lg border border-slate-200 bg-white p-4 text-center shadow-sm">
+              <div className="font-mono text-sm font-semibold text-slate-500">{String(index + 1).padStart(2, "0")}</div>
+              <div className="mt-3 text-sm font-semibold text-slate-950">{step}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Principles */}
-      <section className="border-t border-slate-800 py-14">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-6">
-              <h2 className="text-lg font-semibold text-white">What rankings mean</h2>
-              <ul className="mt-4 space-y-2 text-sm text-slate-400">
-                <li>• StockStory measures business quality, growth, valuation, stability, momentum, and risk.</li>
-                <li>• StockStory does not guarantee returns or provide personalised investment advice.</li>
-                <li>• Rankings change when provider data, factor snapshots, or risk context changes.</li>
-                <li>• Confidence explains how complete and internally consistent the available data is.</li>
-              </ul>
-            </div>
-            <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-6">
-              <h2 className="text-lg font-semibold text-white">Data commitment</h2>
-              <ul className="mt-4 space-y-2 text-sm text-slate-400">
-                <li>• Provider-driven data is preferred over manual overrides.</li>
-                <li>• No manual stock picks are inserted into rankings.</li>
-                <li>• No paid ranking placements are supported.</li>
-                <li>• Unavailable data is shown as unavailable, not invented.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Research Disclaimer */}
-      <section className="border-t border-slate-800 px-6 py-10">
-        <div className="mx-auto max-w-3xl">
-          <ResearchDisclaimer />
-        </div>
+      <section className="mx-auto max-w-3xl px-6 pb-12">
+        <ResearchDisclaimer />
       </section>
     </main>
   );

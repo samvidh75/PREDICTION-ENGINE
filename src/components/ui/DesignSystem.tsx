@@ -12,8 +12,9 @@ export const SmallCard: React.FC<CardProps> = ({ children, className = "", onCli
     // Spacing: p-4 (16px), gap-2 (8px)
     <Comp
       onClick={onClick}
-      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-lg p-4 transition-all hover:border-[#2962ff]/45 ${
-        onClick ? "cursor-pointer hover:-translate-y-0.5 hover:bg-[#10131d]" : ""
+      type={onClick ? "button" : undefined}
+      className={`w-full rounded-lg border border-slate-200 bg-white p-4 text-left text-slate-900 shadow-sm transition ${
+        onClick ? "cursor-pointer hover:border-slate-300 hover:bg-slate-50" : ""
       } ${className}`}
     >
       {children}
@@ -27,8 +28,9 @@ export const MediumCard: React.FC<CardProps> = ({ children, className = "", onCl
     // Spacing: p-6 (24px)
     <Comp
       onClick={onClick}
-      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-lg p-6 transition-all hover:border-[#2962ff]/45 ${
-        onClick ? "cursor-pointer hover:-translate-y-0.5 hover:bg-[#10131d]" : ""
+      type={onClick ? "button" : undefined}
+      className={`w-full rounded-lg border border-slate-200 bg-white p-6 text-left text-slate-900 shadow-sm transition ${
+        onClick ? "cursor-pointer hover:border-slate-300 hover:bg-slate-50" : ""
       } ${className}`}
     >
       {children}
@@ -42,8 +44,9 @@ export const LargeCard: React.FC<CardProps> = ({ children, className = "", onCli
     // Spacing: p-8 (32px)
     <Comp
       onClick={onClick}
-      className={`ss-tv-panel ss-tv-neon-edge text-left w-full rounded-lg p-8 shadow-xl transition-all ${
-        onClick ? "cursor-pointer hover:-translate-y-0.5 hover:bg-[#10131d]" : ""
+      type={onClick ? "button" : undefined}
+      className={`w-full rounded-lg border border-slate-200 bg-white p-8 text-left text-slate-900 shadow-sm transition ${
+        onClick ? "cursor-pointer hover:border-slate-300 hover:bg-slate-50" : ""
       } ${className}`}
     >
       {children}
@@ -64,12 +67,12 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ...props
 }) => {
-  const baseStyle = "inline-flex items-center justify-center font-bold tracking-wide uppercase transition-all rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none";
+  const baseStyle = "inline-flex items-center justify-center font-semibold transition rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 focus:ring-offset-white";
   
   const variantStyles = {
-    primary: "bg-[#2962ff] text-white hover:bg-[#1e53e5] border border-transparent shadow-[0_0_28px_rgba(41,98,255,0.32)]",
-    secondary: "bg-[#10131d] border border-[#2a2e39] text-[#f0f3fa] hover:bg-[#161a26] hover:border-[#2962ff]/45",
-    ghost: "bg-transparent text-[#b2b5be] hover:text-[#f0f3fa] hover:bg-[#1e222d] border border-transparent",
+    primary: "bg-slate-950 text-white hover:bg-slate-800 border border-slate-950",
+    secondary: "bg-white border border-slate-200 text-slate-800 hover:bg-slate-50",
+    ghost: "bg-transparent text-slate-600 hover:text-slate-950 hover:bg-slate-100 border border-transparent",
   };
 
   const sizeStyles = {
@@ -98,10 +101,10 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, primaryAction }) => {
   return (
     // Spacing: py-6 (24px) or py-8 (32px), mb-6 (24px)
-    <div className="ss-tv-chart-terminal ss-tv-neon-edge rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between pb-5 mb-6 gap-4">
+    <div className="mb-6 flex flex-col justify-between gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#f0f3fa]">{title}</h1>
-        <p className="mt-2 text-xs text-[#787b86] font-medium">{subtitle}</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{title}</h1>
+        <p className="mt-2 text-xs font-medium text-slate-600">{subtitle}</p>
       </div>
       {primaryAction && <div className="shrink-0 flex items-center">{primaryAction}</div>}
     </div>
@@ -116,16 +119,16 @@ interface TableProps {
 
 export const CustomTable: React.FC<TableProps> = ({ headers, children, className = "" }) => {
   return (
-    <div className={`ss-tv-panel overflow-x-auto w-full rounded-lg ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}>
       <table className="w-full text-left text-xs border-collapse">
         <thead>
-          <tr className="border-b border-[#2a2e39] text-[#787b86] font-semibold bg-[#1e222d]">
+          <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-500">
             {headers.map((h, i) => (
               <th key={i} className="p-4 uppercase tracking-wider font-semibold font-mono">{h}</th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">{children}</tbody>
+        <tbody className="divide-y divide-slate-100 text-slate-700">{children}</tbody>
       </table>
     </div>
   );

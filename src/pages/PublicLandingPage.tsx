@@ -1,8 +1,8 @@
 import React from "react";
-import TopNav from "../components/navigation/TopNav";
+import { BarChart3, Eye, Search, ShieldCheck } from "lucide-react";
 import MobileNav from "../components/navigation/MobileNav";
+import TopNav from "../components/navigation/TopNav";
 import { ResearchDisclaimer } from "../components/ui/PageHeader";
-import { Search, BarChart3, Eye, ShieldCheck } from "lucide-react";
 
 function setPage(pageKey: string, id?: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -13,89 +13,80 @@ function setPage(pageKey: string, id?: string): void {
   window.dispatchEvent(new Event("urlchange"));
 }
 
+const workflow = [
+  { icon: <Search className="h-5 w-5" />, title: "Search", body: "Find Indian listed companies by ticker, name, or sector and open the company research page." },
+  { icon: <BarChart3 className="h-5 w-5" />, title: "Review", body: "Read source-backed scores only when production data supports them. Missing fields stay unavailable." },
+  { icon: <Eye className="h-5 w-5" />, title: "Track", body: "Save companies to watchlists and keep research notes separate from investment decisions." },
+];
+
 export const PublicLandingPage: React.FC = () => {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
+    <main className="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
-      {/* Hero */}
-      <section className="mx-auto max-w-6xl px-6 pb-16 pt-28 md:pt-32">
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+      <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-12 pt-28 md:grid-cols-[1.1fr_0.9fr] md:items-end md:pt-32">
+        <div>
+          <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+            <ShieldCheck className="h-3.5 w-3.5" />
             Indian equity research platform
           </div>
-          
-          <h1 className="text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-semibold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl">
             Research Indian stocks with cleaner context.
           </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
-            StockStory India helps investors search companies, review source-backed scoring signals, track watchlists, and organise research notes. The platform is designed for analytical use only — it does not provide investment recommendations.
+          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+            StockStory India helps investors search companies, review source-backed scoring signals, track watchlists, and organise research notes. It is analytical software, not an investment recommendation engine.
           </p>
-
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
               onClick={() => setPage("signup")}
-              className="h-11 rounded-lg bg-slate-100 px-6 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+              className="h-11 rounded-lg bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               Create free account
             </button>
             <button
               type="button"
               onClick={() => setPage("methodology")}
-              className="h-11 rounded-lg border border-slate-700 bg-slate-900/40 px-6 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
+              className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
             >
               Read methodology
             </button>
           </div>
-
-          <p className="mt-4 text-xs font-medium text-slate-500">
-            Research signals only. Not investment advice.
-          </p>
         </div>
-      </section>
 
-      {/* Workflow */}
-      <section className="border-t border-slate-900 bg-slate-900/20 py-16">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-white">How the research workflow works</h2>
-          <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-relaxed text-slate-500">
-            Three steps from symbol lookup to organised research context — no portfolio claims or recommendations.
-          </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {[
-              { icon: <Search className="h-5 w-5" />, title: "Search", body: "Find Indian listed companies by ticker, name, or sector. Move directly into the company research page." },
-              { icon: <BarChart3 className="h-5 w-5" />, title: "Review scores", body: "Check score context across growth, quality, valuation, risk, and momentum. Scores appear only when backend data provides usable values." },
-              { icon: <Eye className="h-5 w-5" />, title: "Track & note", body: "Save companies to a watchlist. Add research notes alongside each entry. No portfolio claims, no recommendations." },
-            ].map(({ icon, title, body }) => (
-              <div key={title} className="rounded-lg border border-slate-800 bg-slate-900/40 p-6 text-center">
-                <div className="mb-4 inline-flex rounded-md bg-slate-950 p-2 text-slate-300">{icon}</div>
-                <h3 className="text-base font-semibold text-slate-200">{title}</h3>
-                <p className="mt-2 text-xs leading-relaxed text-slate-400">{body}</p>
+        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Production data posture</span>
+            <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700">Unavailable until populated</span>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {["No fabricated rankings", "No paid placements", "No hidden recommendations"].map((item) => (
+              <div key={item} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+                {item}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Product principles */}
-      <section className="border-t border-slate-800 py-16">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-xl font-semibold tracking-tight text-white">Built on source-backed discipline</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-400">
-            StockStory stays close to available data, labels missing fields clearly, and separates analytical signals from investment decisions. No fabricated metrics, no invented scores.
-          </p>
+      <section className="border-y border-slate-200 bg-white py-14">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">How the research workflow works</h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {workflow.map(({ icon, title, body }) => (
+              <div key={title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 inline-flex rounded-md bg-slate-100 p-2 text-emerald-800">{icon}</div>
+                <h3 className="text-base font-semibold text-slate-950">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Research Disclaimer */}
-      <section className="border-t border-slate-800 px-6 py-10">
-        <div className="mx-auto max-w-3xl">
-          <ResearchDisclaimer />
-        </div>
+      <section className="mx-auto max-w-3xl px-6 py-12">
+        <ResearchDisclaimer />
       </section>
     </main>
   );
