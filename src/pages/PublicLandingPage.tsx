@@ -37,20 +37,27 @@ export const PublicLandingPage: React.FC = () => {
           <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
             StockStory India helps investors search companies, review source-backed scoring signals, track watchlists, and organise research notes. It is analytical software, not an investment recommendation engine.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setPage("signup")}
               className="h-11 rounded-lg bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
-              Create free account
+              Start research
             </button>
             <button
               type="button"
               onClick={() => setPage("methodology")}
-              className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-850 transition hover:bg-slate-50"
             >
-              Read methodology
+              View methodology
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage("rankings")}
+              className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-850 transition hover:bg-slate-50"
+            >
+              View rankings
             </button>
           </div>
         </div>

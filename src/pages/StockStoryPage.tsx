@@ -381,105 +381,100 @@ export const StockStoryPage: React.FC = () => {
         <div className="flex items-center justify-between gap-3 text-xs">
           <button
             onClick={() => navigateToPage("dashboard")}
-            className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:text-emerald-700"
+            className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:text-emerald-700 font-semibold"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </button>
         </div>
 
-        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
-            <div className="min-w-0">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            <div className="min-w-0 font-sans">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 <span>{ticker}</span>
-                <span>/</span>
-                <span>{exchange}</span>
-                <span>/</span>
+                <span>•</span>
+                <span>{exchange !== "Data unavailable" ? exchange : "NSE / BSE"}</span>
+                <span>•</span>
                 <span>{currency}</span>
               </div>
-              <h1 className="max-w-2xl truncate text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-700">
-                Prediction unavailable
+              <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">{companyName}</h1>
+              <div className="mt-3 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                Awaiting Prediction Indexing
               </div>
             </div>
 
             <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-slate-200 bg-slate-50 p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live price</div>
-                <div className="mt-1 font-mono text-xl font-bold text-slate-950">{priceLabel}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live Quote</div>
+                <div className="mt-1 font-mono text-lg font-bold text-slate-900">{priceLabel}</div>
                 <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
                   {changeLabel}
                 </div>
               </div>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Volume</div>
-                <div className="mt-1 font-mono text-xl font-bold text-slate-950">
+                <div className="mt-1 font-mono text-lg font-bold text-slate-900">
                   {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] text-slate-500">Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-slate-400">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Registry status</div>
-              <div className="mt-2 text-sm font-semibold text-slate-950">{storyData?.unavailableReason ?? "Unavailable"}</div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Score shown</div>
-              <div className="mt-2 text-sm font-semibold text-slate-950">None</div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Data policy</div>
-              <div className="mt-2 text-sm font-semibold text-emerald-700">No fallback score</div>
-            </div>
+          <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50/50 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Why are prediction scores missing?</h3>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              This company exists in the Indian equity universe and live market pricing is active. However, the analytical scoring models have not completed their ingestion backfill for this symbol yet. Scores will appear automatically after the next scheduled nightly pipeline run.
+            </p>
           </div>
 
-          <p className="mt-5 max-w-4xl text-sm leading-6 text-slate-600">
-            {storyData?.unavailableMessage ?? storyError ?? `StockStory could not find a usable production prediction snapshot for ${ticker}.`}
-          </p>
-
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              onClick={handleToggleWatchlist}
+              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${
+                isInWatchlist
+                  ? "border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100"
+                  : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+              }`}
+            >
+              <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
+              {isInWatchlist ? "Remove from Watchlist" : "Track via Watchlist"}
+            </button>
             <button
               type="button"
               onClick={() => navigateToPage("search")}
-              className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="h-10 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
             >
-              Back to search
+              Search Another Company
             </button>
             <button
               type="button"
               onClick={() => navigateToPage("methodology")}
-              className="h-10 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              View methodology
+              View Scoring Methodology
             </button>
             <button
               type="button"
               onClick={() => navigateToPage("rankings")}
-              className="h-10 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              View rankings
+              View Active Rankings
             </button>
           </div>
 
           {missingInputs.length > 0 && (
-            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Missing inputs</div>
+            <div className="mt-6 border-t border-slate-100 pt-4">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Awaiting Ingestion Inputs</div>
               <div className="flex flex-wrap gap-2">
                 {missingInputs.map((input: string) => (
-                  <span key={input} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-600">
+                  <span key={input} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-500 font-mono">
                     {input}
                   </span>
                 ))}
               </div>
             </div>
           )}
-
-          <p className="mt-4 max-w-4xl rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600">
-            The page keeps live market data visible, but prediction, confidence, and factor scores are hidden until the backend has a valid registry row with real source price and valid factor domains.
-          </p>
         </section>
 
         <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5">

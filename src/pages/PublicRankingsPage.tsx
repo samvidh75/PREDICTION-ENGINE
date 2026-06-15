@@ -113,10 +113,28 @@ export const PublicRankingsPage: React.FC = () => {
       {loading ? (
         <div className="py-12 text-center text-sm text-slate-500">Loading rankings...</div>
       ) : filteredRankings.length === 0 ? (
-        <EmptyState
-          title="Rankings are not available yet"
-          description="Once the production data backfill completes, verified ranking rows will appear here. No sample rows are shown in the meantime."
-        />
+        <div className="flex flex-col gap-6">
+          <EmptyState
+            title="Rankings Awaiting Ingestion Backfill"
+            description="Verified ranking rows will appear here after the background scoring pipeline runs and populates the database registry. No fabricated or placeholder rankings are shown."
+          />
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPage("search")}
+              className="h-10 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
+            >
+              Search a Stock
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage("methodology")}
+              className="h-10 rounded-lg border border-slate-250 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              View Scoring Methodology
+            </button>
+          </div>
+        </div>
       ) : (
         <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector"]}>
           {filteredRankings.map((r, index) => {
