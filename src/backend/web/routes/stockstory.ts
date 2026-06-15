@@ -24,6 +24,7 @@ import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFres
 
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
+    const log = request.log;
     const { ticker } = request.params as { ticker: string };
     const query = request.query as { horizon?: string };
     const symbol = ticker.toUpperCase().trim();
@@ -249,10 +250,10 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         reasonCode
       );
     } catch (err: any) {
-      console.error('[stockstory] Error:', err);
+      log.error({ err, symbol }, 'stockstory evaluation failed');
       return errorResponse(
         'BACKEND_UNAVAILABLE',
-        `StockStory evaluation failed for ${symbol}: ${err.message}`
+        `StockStory evaluation is temporarily unavailable for ${symbol}.`
       );
     }
   });

@@ -18,66 +18,73 @@ import { modelHealthEngine } from '../../../validation/ModelHealthEngine';
 import { sectorDriftEngine } from '../../../validation/SectorDriftEngine';
 
 export const validationRoutes: FastifyPluginAsync = async (app) => {
-  app.get('/api/validation/performance', async (_request, reply) => {
+  app.get('/api/validation/performance', async (request, reply) => {
     try {
       const scorecard = await accuracyEngine.getScorecard();
       return reply.send(scorecard);
     } catch (err: any) {
-      return reply.status(500).send({ code: 'PERFORMANCE_ERROR', error: err.message });
+      request.log.error({ err }, 'validation performance failed');
+      return reply.status(500).send({ code: 'PERFORMANCE_ERROR', error: 'Validation performance data is temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/drift', async (_request, reply) => {
+  app.get('/api/validation/drift', async (request, reply) => {
     try {
       const drift = await accuracyEngine.detectDrift();
       return reply.send(drift);
     } catch (err: any) {
-      return reply.status(500).send({ code: 'DRIFT_ERROR', error: err.message });
+      request.log.error({ err }, 'validation drift failed');
+      return reply.status(500).send({ code: 'DRIFT_ERROR', error: 'Drift metrics are temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/calibration', async (_request, reply) => {
+  app.get('/api/validation/calibration', async (request, reply) => {
     try {
       const curve = await accuracyEngine.getCalibrationCurve();
       return reply.send({ curve });
     } catch (err: any) {
-      return reply.status(500).send({ code: 'CALIBRATION_ERROR', error: err.message });
+      request.log.error({ err }, 'validation calibration failed');
+      return reply.status(500).send({ code: 'CALIBRATION_ERROR', error: 'Calibration data is temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/factors', async (_request, reply) => {
+  app.get('/api/validation/factors', async (request, reply) => {
     try {
       const factors = await accuracyEngine.getFactorRanking();
       return reply.send({ factors });
     } catch (err: any) {
-      return reply.status(500).send({ code: 'FACTORS_ERROR', error: err.message });
+      request.log.error({ err }, 'validation factors failed');
+      return reply.status(500).send({ code: 'FACTORS_ERROR', error: 'Factor ranking data is temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/classification', async (_request, reply) => {
+  app.get('/api/validation/classification', async (request, reply) => {
     try {
       const classification = await accuracyEngine.getClassificationPerformance();
       return reply.send({ classification });
     } catch (err: any) {
-      return reply.status(500).send({ code: 'CLASSIFICATION_ERROR', error: err.message });
+      request.log.error({ err }, 'validation classification failed');
+      return reply.status(500).send({ code: 'CLASSIFICATION_ERROR', error: 'Classification performance data is temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/model-health', async (_request, reply) => {
+  app.get('/api/validation/model-health', async (request, reply) => {
     try {
       const health = await modelHealthEngine.assess();
       return reply.send(health);
     } catch (err: any) {
-      return reply.status(500).send({ code: 'MODEL_HEALTH_ERROR', error: err.message });
+      request.log.error({ err }, 'validation model health failed');
+      return reply.status(500).send({ code: 'MODEL_HEALTH_ERROR', error: 'Model health assessment is temporarily unavailable.' });
     }
   });
 
-  app.get('/api/validation/sectors', async (_request, reply) => {
+  app.get('/api/validation/sectors', async (request, reply) => {
     try {
       const sectors = await sectorDriftEngine.analyze();
       return reply.send(sectors);
     } catch (err: any) {
-      return reply.status(500).send({ code: 'SECTOR_DRIFT_ERROR', error: err.message });
+      request.log.error({ err }, 'validation sector drift failed');
+      return reply.status(500).send({ code: 'SECTOR_DRIFT_ERROR', error: 'Sector drift data is temporarily unavailable.' });
     }
   });
 };

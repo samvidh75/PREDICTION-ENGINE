@@ -27,6 +27,7 @@ import { assessPredictionSnapshotFreshness } from '../../../../shared/data/DataF
 
 export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/predictions/signals', async (request, reply) => {
+    const log = request.log;
     const query = request.query as {
       limit?: string;
       symbol?: string;
@@ -158,10 +159,10 @@ export const predictionSignalsRoutes: FastifyPluginAsync = async (app) => {
         'OK'
       );
     } catch (err: any) {
-      console.error('[predictions/signals] Error:', err);
+      log.error({ err }, 'prediction signals generation failed');
       return errorResponse(
         'BACKEND_UNAVAILABLE',
-        `Failed to generate prediction signals: ${err.message}`
+        'Failed to generate prediction signals.'
       );
     }
   });
