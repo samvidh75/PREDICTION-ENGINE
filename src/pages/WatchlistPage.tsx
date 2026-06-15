@@ -7,6 +7,7 @@ import { NoteEngine } from "../services/portfolio/NoteEngine";
 import Card from "../components/ui/Card";
 import ScorePill from "../components/ui/ScorePill";
 import Badge from "../components/ui/Badge";
+import { EmptyState } from "../components/ui/DataState";
 
 export const WatchlistPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
@@ -88,12 +89,10 @@ export const WatchlistPage: React.FC = () => {
         {/* Main watchlist content */}
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">
-              <p className="font-semibold text-slate-800">No companies saved in this list.</p>
-              <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-slate-500">
-                Use Search to open a company research page, then save companies you want to monitor.
-              </p>
-            </div>
+            <EmptyState
+              title="No companies saved in this list"
+              description="Use Search to open a company research page, then save companies you want to monitor."
+            />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
               <div className="min-w-[720px]">

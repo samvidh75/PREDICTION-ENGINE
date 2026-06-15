@@ -6,6 +6,7 @@ import { AlertCircle, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide
 import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/DataState';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-emerald-700';
@@ -213,12 +214,10 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.holdings.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">
-          <p className="font-semibold text-slate-800">No holdings added yet.</p>
-          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed">
-            Add holdings when you want to track recorded cost basis. Live value and return remain unavailable until source-backed quotes cover the full portfolio.
-          </p>
-        </div>
+        <EmptyState
+          title="No holdings added yet"
+          description="Add holdings when you want to track recorded cost basis. Live value and return remain unavailable until source-backed quotes cover the full portfolio."
+        />
       ) : (
         <section aria-label="Portfolio holdings" className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">
@@ -255,7 +254,7 @@ export const PortfolioPage: React.FC = () => {
               </div>
               <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs text-slate-900" />
               {formError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{formError}</div>}
-              <button type="submit" className="h-10 w-full rounded-lg bg-slate-950 text-xs font-bold text-white hover:bg-slate-800">Add asset</button>
+              <Button type="submit" className="w-full text-xs">Add asset</Button>
             </form>
           </div>
         </div>
@@ -269,7 +268,7 @@ export const PortfolioPage: React.FC = () => {
               <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" placeholder="Shares" />
               <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" placeholder="Avg Buy Price" />
               {formError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{formError}</div>}
-              <button type="submit" className="h-10 w-full rounded-lg bg-slate-950 text-xs font-bold text-white hover:bg-slate-800">Save</button>
+              <Button type="submit" className="w-full text-xs">Save</Button>
             </form>
           </div>
         </div>
@@ -283,7 +282,7 @@ export const PortfolioPage: React.FC = () => {
               <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
               <p className="text-[10px] leading-relaxed text-slate-500">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
               {importError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{importError}</div>}
-              <button type="submit" className="h-10 w-full rounded-lg bg-slate-950 text-xs font-bold text-white hover:bg-slate-800">Parse and import</button>
+              <Button type="submit" className="w-full text-xs">Parse and import</Button>
             </form>
           </div>
         </div>
