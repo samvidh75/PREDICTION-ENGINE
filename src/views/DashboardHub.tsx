@@ -10,8 +10,8 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
-import ResearchJourneyPanel from "../components/ui/ResearchJourneyPanel";
 import tokens from "../components/ui/tokens";
+import { OnboardingChecklist, DataReadinessPanel } from "../components/ui/OnboardingComponents";
 
 interface SignalItem {
   symbol: string;
@@ -50,6 +50,12 @@ export const DashboardHub: React.FC = () => {
   const [signalsError, setSignalsError] = useState(false);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [methodologyViewed, setMethodologyViewed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem("onboarding_methodology_viewed") === "true";
+    }
+    return false;
+  });
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -106,6 +112,39 @@ export const DashboardHub: React.FC = () => {
     }
   };
 
+  const handleNavigateMethodology = () => {
+    window.localStorage.setItem("onboarding_methodology_viewed", "true");
+    setMethodologyViewed(true);
+    navigate("trust");
+  };
+
+  const onboardingSteps = [
+    {
+      id: "search",
+      title: "Search a company",
+      description: "Find any Indian listed company by ticker or name to begin your research.",
+      isCompleted: recentResearch.length > 0,
+      actionLabel: "Search now",
+      onAction: () => navigate("search"),
+    },
+    {
+      id: "methodology",
+      title: "Understand the score methodology",
+      description: "Read how our model calculates predictions and the rules that govern data trust.",
+      isCompleted: methodologyViewed,
+      actionLabel: "Read methodology",
+      onAction: handleNavigateMethodology,
+    },
+    {
+      id: "track",
+      title: "Save or track companies",
+      description: "Add companies to your Watchlist to monitor scoring updates and keep research notes.",
+      isCompleted: followedTickers.length > 0,
+      actionLabel: "Go to Watchlist",
+      onAction: () => navigate("watchlist"),
+    },
+  ];
+
   return (
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
@@ -125,31 +164,17 @@ export const DashboardHub: React.FC = () => {
         }
       />
 
-      {/* Pipeline status banner */}
-      <div className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3.5 text-sm text-emerald-950 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-2.5">
-          <Database className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-          <div>
-            <span className="block font-semibold text-emerald-900 text-sm">Pipeline status: ingestion active</span>
-            <p className="text-xs text-emerald-800 mt-0.5">
-              Live quotes are running. Factor scores appear once the nightly scoring cycle completes.
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("trust")}
-          className="inline-flex w-fit shrink-0 items-center gap-1 text-xs font-semibold text-emerald-900 hover:underline"
-        >
-          About the pipeline <ArrowRight className="h-3 w-3" aria-hidden="true" />
-        </button>
-      </div>
+      {/* Onboarding Checklist */}
+      <OnboardingChecklist steps={onboardingSteps} />
+
+      {/* Data Ingestion Status Panel */}
+      <DataReadinessPanel />
 
       {/* Primary search action */}
       <Card className="p-6">
         <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">Find a company</h2>
+            <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>
             <p className="text-xs text-slate-500 mt-0.5">Search by ticker symbol, company name, or sector.</p>
           </div>
           <div className="flex gap-2">
@@ -170,12 +195,6 @@ export const DashboardHub: React.FC = () => {
           </div>
         </form>
       </Card>
-
-      {/* Research workflow guide */}
-      <ResearchJourneyPanel
-        onStartSearch={() => navigate("search")}
-        onViewMethodology={() => navigate("trust")}
-      />
 
       {/* Stats row */}
       <div className="grid gap-4 md:grid-cols-3">

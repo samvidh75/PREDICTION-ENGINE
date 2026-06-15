@@ -217,7 +217,7 @@ export const PortfolioPage: React.FC = () => {
       {review.holdings.length === 0 ? (
         <EmptyState
           title="No holdings added yet"
-          description="Add holdings when you want to track recorded cost basis. Live value and return remain unavailable until source-backed quotes cover the full portfolio."
+          description="Recorded portfolio holdings act as a saved research space. Add holdings here to track cost basis and exposure metrics. Live valuations and returns will populate automatically once the nightly ingestion pipeline matches your assets to verified market pricing."
         />
       ) : (
         <section aria-label="Portfolio holdings" className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
