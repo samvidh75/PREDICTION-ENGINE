@@ -7,6 +7,7 @@ import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/DataState';
+import tokens from '../components/ui/tokens';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-emerald-700';
@@ -136,7 +137,7 @@ export const PortfolioPage: React.FC = () => {
   const largest = review.concentration.largestPosition;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col space-y-8 pb-12 font-sans text-slate-900 antialiased">
+    <div className={`${tokens.layout.container} flex flex-col space-y-8`}>
       <PageHeader
         title="Portfolio"
         subtitle="Recorded holdings, source-backed quotes and review queues"

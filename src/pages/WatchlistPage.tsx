@@ -8,6 +8,7 @@ import Card from "../components/ui/Card";
 import ScorePill from "../components/ui/ScorePill";
 import Badge from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/DataState";
+import tokens from "../components/ui/tokens";
 
 export const WatchlistPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
@@ -45,7 +46,7 @@ export const WatchlistPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col space-y-6 pb-12 font-sans text-slate-900 antialiased">
+    <div className={`${tokens.layout.container} flex flex-col space-y-6`}>
       <header className="border-b border-slate-200 pb-5">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Watchlist</h1>
         <p className="mt-2 text-sm text-slate-600">
