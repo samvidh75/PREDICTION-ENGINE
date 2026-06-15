@@ -154,7 +154,11 @@ export const SearchPage: React.FC = () => {
             {results.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {results.map((stock) => {
-                  const score = stock.telemetrySnapshot?.healthScore ?? 0;
+                  const score =
+                    typeof stock.telemetrySnapshot?.healthScore === "number" &&
+                    Number.isFinite(stock.telemetrySnapshot.healthScore)
+                      ? stock.telemetrySnapshot.healthScore
+                      : null;
                   return (
                     <Card
                       key={stock.symbol}
@@ -170,12 +174,21 @@ export const SearchPage: React.FC = () => {
                             {stock.companyName}
                           </div>
                         </div>
-                        <ScorePill score={score} />
+                        {score !== null ? (
+                          <ScorePill score={score} />
+                        ) : (
+                          <span className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-400">
+                            Score not available
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-[11px] text-slate-400">
-                        <Badge variant="info">{stock.sector || "Unavailable"}</Badge>
-                        <span>{stock.marketCap.formatted || "Data unavailable"}</span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-800 pt-3 text-[11px] text-slate-400">
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="info">{stock.sector || "Not available"}</Badge>
+                          {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}
+                        </div>
+                        <span>{stock.marketCap.formatted || "Not available"}</span>
                       </div>
                     </Card>
                   );

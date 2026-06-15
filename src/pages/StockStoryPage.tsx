@@ -10,7 +10,7 @@ import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 
 function localFormatPercent(value?: number | null): string {
-  if (value === undefined || value === null) return "Unavailable";
+  if (typeof value !== "number" || !Number.isFinite(value)) return "Unavailable";
   if (Math.abs(value) < 1.0 && value !== 0) {
     return `${(value * 100).toFixed(2)}%`;
   }
@@ -18,7 +18,7 @@ function localFormatPercent(value?: number | null): string {
 }
 
 function formatNumber(value?: number | null, decimals: number = 2): string {
-  if (value === undefined || value === null) return "Unavailable";
+  if (typeof value !== "number" || !Number.isFinite(value)) return "Unavailable";
   return value.toFixed(decimals);
 }
 
@@ -101,6 +101,11 @@ function formatDateTime(value?: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   });
+}
+
+function formatScoreLabel(value: number | null | undefined, suffix = "/100"): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "Not available";
+  return `${Math.round(value)}${suffix}`;
 }
 
 function EmptyState({ label }: { label: string }) {
@@ -286,7 +291,7 @@ export const StockStoryPage: React.FC = () => {
       : registryStock?.companyName || ticker;
   const sector = metadata.data?.sector || registryStock?.sector || "Data unavailable";
   const industry = metadata.data?.industry || "Data unavailable";
-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || "NSE";
+  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Data unavailable";
   const marketCap = formatLargeINR(metadata.data?.marketCap);
   const currency = metadata.data?.currency || "INR";
   const quote = liveQuote.quote;
@@ -400,7 +405,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Volume</div>
                 <div className="mt-1 font-mono text-xl font-bold text-white">
-                  {quote?.volume ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -470,7 +475,7 @@ export const StockStoryPage: React.FC = () => {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
           <span className="text-white/60">{label}</span>
-          <span className={colorClass}>{hasScore ? `${score}/100` : "Unavailable"}</span>
+          <span className={colorClass}>{hasScore ? formatScoreLabel(score) : "Not available"}</span>
         </div>
         <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
           <div
@@ -516,12 +521,6 @@ export const StockStoryPage: React.FC = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-white/[0.01] border border-white/10">
               <svg className="h-full w-full -rotate-90">
-                <defs>
-                  <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#06b6d4" />
-                    <stop offset="100%" stopColor="#8b5cf6" />
-                  </linearGradient>
-                </defs>
                 <circle
                   cx="56"
                   cy="56"
@@ -534,7 +533,7 @@ export const StockStoryPage: React.FC = () => {
                   cx="56"
                   cy="56"
                   r={radius}
-                  stroke="url(#healthGradient)"
+                  stroke="#06b6d4"
                   strokeWidth="8"
                   fill="transparent"
                   strokeDasharray={circumference}
@@ -544,7 +543,7 @@ export const StockStoryPage: React.FC = () => {
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-extrabold tracking-tight text-white">{healthScore ?? "Unavailable"}</span>
+                <span className="text-xl font-extrabold tracking-tight text-white">{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-cyan-400">Score</span>
               </div>
             </div>
@@ -582,7 +581,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Volume</div>
                 <div className="mt-1 font-mono text-xl font-bold text-white">
-                  {quote?.volume ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -687,7 +686,7 @@ export const StockStoryPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between gap-4">
                     <dt className="text-white/45">Data Policy</dt>
-                    <dd className="text-right text-emerald-400 font-semibold">Real Data Verified</dd>
+                    <dd className="text-right text-white/70 font-semibold">Source-backed only</dd>
                   </div>
                 </dl>
               </div>
@@ -704,7 +703,7 @@ export const StockStoryPage: React.FC = () => {
                   <Sparkles className="h-4 w-4" /> Growth Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 font-bold">
-                  Score: {storyData.growth}/100
+                  Score: {formatScoreLabel(storyData.growth)}
                 </span>
               </div>
               
@@ -737,7 +736,7 @@ export const StockStoryPage: React.FC = () => {
                   <Trophy className="h-4 w-4" /> Quality Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
-                  Score: {storyData.quality}/100
+                  Score: {formatScoreLabel(storyData.quality)}
                 </span>
               </div>
               
@@ -760,7 +759,7 @@ export const StockStoryPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between pb-1">
                   <dt className="text-white/50">Asset Efficiency Score</dt>
-                  <dd className="font-mono font-bold text-white">{storyData.engineDetails.quality.efficiencyScore}/100</dd>
+                  <dd className="font-mono font-bold text-white">{formatScoreLabel(storyData.engineDetails.quality.efficiencyScore)}</dd>
                 </div>
               </dl>
               <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/10 p-3 text-xs text-emerald-300/80 leading-normal">
@@ -779,7 +778,7 @@ export const StockStoryPage: React.FC = () => {
                   <TrendingUp className="h-4 w-4" /> Valuation Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold">
-                  Score: {storyData.valuation}/100
+                  Score: {formatScoreLabel(storyData.valuation)}
                 </span>
               </div>
               
@@ -801,19 +800,19 @@ export const StockStoryPage: React.FC = () => {
               <dl className="space-y-3 text-xs">
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/E Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.peRatio ? formatNumber(storyData.financials.peRatio, 2) : "Unavailable"}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.peRatio, 2)}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/B Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.pbRatio ? formatNumber(storyData.financials.pbRatio, 2) : "Unavailable"}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.pbRatio, 2)}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">EV/EBITDA</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.evEbitda ? formatNumber(storyData.financials.evEbitda, 2) : "Unavailable"}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.evEbitda, 2)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-white/50">FCF Yield</dt>
-                  <dd className="font-mono text-white font-bold">{storyData.financials.fcfYield ? (storyData.financials.fcfYield * 100).toFixed(2) + "%" : "Unavailable"}</dd>
+                  <dd className="font-mono text-white font-bold">{localFormatPercent(storyData.financials.fcfYield)}</dd>
                 </div>
               </dl>
             </div>
@@ -873,7 +872,7 @@ export const StockStoryPage: React.FC = () => {
                   <AlertCircle className="h-4 w-4" /> Risk Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold">
-                  Risk Level: {storyData.risk}/100
+                  Risk Level: {formatScoreLabel(storyData.risk)}
                 </span>
               </div>
               

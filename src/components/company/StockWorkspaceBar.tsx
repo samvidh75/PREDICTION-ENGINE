@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Clock3, Database, ShieldCheck } from "lucide-react";
 import { useLiveQuote } from "../../hooks/useLiveQuotes";
 import type { CompanyMetadata } from "../../services/data/types";
+import { StockRegistry } from "../../services/stocks/StockRegistry";
 
 export type QuoteFreshness = "Recent" | "Delayed" | "Stale" | "Unavailable";
 
@@ -94,7 +95,8 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
     return () => controller.abort();
   }, [ticker]);
 
-  const exchange = metadata?.exchange || quoteState.quote?.exchange || "Data unavailable";
+  const registryStock = StockRegistry.getStock(ticker);
+  const exchange = metadata?.exchange || quoteState.quote?.exchange || registryStock?.exchange || "Data unavailable";
   const verification = metadataLoading ? "Loading" : metadata?.verificationStatus || "Unavailable";
   const freshness = quoteState.loading ? "Loading" : getQuoteFreshness(quoteState.quote?.updatedAt);
   const quoteTimestamp = quoteState.loading ? "Loading quote timestamp" : formatDateTime(quoteState.quote?.updatedAt);
@@ -132,7 +134,7 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
 
       <div className="mt-2 flex items-center gap-1.5 text-[9px] leading-relaxed text-white/35">
         <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-300" />
-        Missing market metadata remains unavailable. The workspace never infers an exchange from a bare ticker.
+        Missing market data remains unavailable. Exchange labels use provider metadata when available, then the local company registry.
         <Clock3 className="ml-1 h-3 w-3 shrink-0 text-white/35" />
       </div>
     </section>

@@ -127,13 +127,21 @@ export const PublicRankingsPage: React.FC = () => {
                   {registryInfo?.companyName || "Unavailable"}
                 </td>
                 <td className="p-4">
-                  <ScorePill score={r.ranking_score ?? 0} />
+                  {typeof r.ranking_score === "number" && Number.isFinite(r.ranking_score) ? (
+                    <ScorePill score={Math.round(r.ranking_score)} />
+                  ) : (
+                    <span className="text-xs font-semibold text-slate-500">Not available</span>
+                  )}
                 </td>
                 <td className="p-4">
-                  <ScorePill score={r.confidence_score ?? 0} />
+                  {typeof r.confidence_score === "number" && Number.isFinite(r.confidence_score) ? (
+                    <ScorePill score={Math.round(r.confidence_score)} />
+                  ) : (
+                    <span className="text-xs font-semibold text-slate-500">Not available</span>
+                  )}
                 </td>
                 <td className="p-4">
-                  <Badge variant="info">{r.sector || "Unavailable"}</Badge>
+                  <Badge variant="info">{r.sector || "Not available"}</Badge>
                 </td>
               </tr>
             );
