@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type ViewType =
-  | "terminal"
+  | "dashboard"
   | "search"
   | "rankings"
   | "portfolio"
@@ -16,7 +16,7 @@ export type LayoutContextType = {
 };
 
 export const VIEW_TO_PAGE: Record<ViewType, string> = {
-  terminal: "dashboard",
+  dashboard: "dashboard",
   search: "search",
   rankings: "rankings",
   portfolio: "portfolio",
@@ -28,10 +28,10 @@ export const VIEW_TO_PAGE: Record<ViewType, string> = {
 export const NAVIGATION_VIEWS = Object.keys(VIEW_TO_PAGE) as ViewType[];
 
 const PAGE_TO_VIEW: Record<string, ViewType> = {
-  market: "terminal",
-  dashboard: "terminal",
-  explore: "terminal",
-  discovery: "terminal",
+  market: "dashboard",
+  dashboard: "dashboard",
+  explore: "dashboard",
+  discovery: "dashboard",
   search: "search",
   rankings: "rankings",
   portfolio: "portfolio",
@@ -48,13 +48,13 @@ export function mapViewToPage(view: ViewType): string {
 
 export function mapPageToView(page: string | null): ViewType {
   const normalized = (page ?? "dashboard").toLowerCase().trim();
-  return PAGE_TO_VIEW[normalized] ?? "terminal";
+  return PAGE_TO_VIEW[normalized] ?? "dashboard";
 }
 
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentView, setCurrentView] = useState<ViewType>("terminal");
+  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
   const validViews = NAVIGATION_VIEWS;
 
   const MapsTo = (targetView: ViewType) => {
