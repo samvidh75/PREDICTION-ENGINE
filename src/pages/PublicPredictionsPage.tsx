@@ -38,6 +38,14 @@ export default function PublicPredictionsPage(): JSX.Element {
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const setPage = (pageKey: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", pageKey);
+    params.delete("id");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
   return (
     <main className="min-h-screen bg-slate-100 pb-20 pt-[76px] text-slate-900 antialiased md:pt-28">
       <TopNav />
@@ -51,22 +59,34 @@ export default function PublicPredictionsPage(): JSX.Element {
 
       {loading ? (
         <LoadingState description="Checking whether production prediction rows are available." />
-      ) : error || !data ? (
-        <EmptyState
-          title="Predictions are not available yet"
-          description="The public prediction feed is waiting for production ingestion and scoring. No sample rankings are shown."
-        />
-      ) : data.length === 0 ? (
-        <EmptyState
-          title="Predictions are not available yet"
-          description="Verified prediction rows will appear here after the production data backfill completes."
-        />
+      ) : error || !data || data.length === 0 ? (
+        <div className="flex flex-col gap-6">
+          <EmptyState
+            title="Predictions Awaiting Ingestion Backfill"
+            description="The public prediction feed is waiting for background ingestion and scoring. No placeholder data or sample rows are shown."
+          />
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPage("search")}
+              className="h-10 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
+            >
+              Search a Stock
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage("methodology")}
+              className="h-10 rounded-lg border border-slate-205 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              View Scoring Methodology
+            </button>
+          </div>
+        </div>
       ) : (
         <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-slate-500">
-                <th className="p-4 font-semibold uppercase tracking-wider">Rank</th>
                 <th className="p-4 font-semibold uppercase tracking-wider">Symbol</th>
                 <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Score</th>
                 <th className="p-4 font-semibold uppercase tracking-wider hidden md:table-cell">Confidence</th>

@@ -207,7 +207,7 @@ test.describe("Public navigation", () => {
 
   test("landing page has working CTA to signup", async ({ page }) => {
     await page.goto("/?page=landing");
-    await page.getByRole("button", { name: /create.*account/i }).first().click();
+    await page.getByRole("button", { name: /start research|create.*account/i }).first().click();
     await expect(page).toHaveURL(/page=signup/);
   });
 
@@ -343,7 +343,7 @@ test.describe("Company page", () => {
     await assertNoRenderGarbage(page);
     // Should show prediction unavailable message
     await expect(
-      page.getByText(/prediction unavailable/i)
+      page.getByText(/awaiting prediction indexing|prediction unavailable/i)
     ).toBeVisible();
   });
 });
