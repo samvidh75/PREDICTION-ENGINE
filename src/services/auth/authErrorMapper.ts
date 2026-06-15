@@ -13,8 +13,8 @@ const AUTH_DOMAIN_MESSAGE =
   "Login is not enabled for this domain yet. Please contact support.";
 
 export function mapAuthError(error: unknown): string {
-  // Log the raw error to console for engineering/troubleshooting diagnostics
-  console.error("[Auth Technical Diagnostic Error]:", error);
+  // Log the raw error for engineering diagnostics without surfacing a runtime error in production smoke checks.
+  console.warn("[Auth Technical Diagnostic]:", error);
 
   if (!error || typeof error !== "object") {
     return AUTH_UNAVAILABLE_MESSAGE;

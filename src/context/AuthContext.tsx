@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut, type User } from "firebase/auth";
-import { firebaseAuth, firebasePersistenceReady } from "../config/firebase";
+import { firebaseAuth, firebasePersistenceReady, isFirebaseClientConfigured } from "../config/firebase";
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "../services/auth/sessionStore";
 import {
   logAuthState,
@@ -101,6 +101,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let alive = true;
     let unsubscribe: (() => void) | undefined;
 
+    if (!isFirebaseClientConfigured) {
+      logAuthState({
+        phase: "persistence_error",
+        error: "Firebase auth is not configured for this deployment.",
+      });
+      setAuthError("Authentication is not configured for this deployment. Please contact support.");
+      setUser(null);
+      clearAuthSession();
+      clearSessionStart();
+      setLoading(false);
+      setSessionAgeMs(null);
+      return () => {
+        alive = false;
+      };
+    }
+
     const restoreStoredSession = (): boolean => {
       const stored = loadAuthSession();
       if (stored.status !== "authenticated" || !stored.uid) {
@@ -155,6 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const message = error instanceof Error ? error.message : "Google sign-in could not be completed.";
             logAuthState({ phase: "redirect_result_error", error: message });
             setAuthError(message);
+            setLoading(false);
           });
 
         unsubscribe = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
