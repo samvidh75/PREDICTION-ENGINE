@@ -27,9 +27,9 @@ const trustSignals = [
 ];
 
 const engineCards = [
-  { icon: <Database className="h-4 w-4" />, title: "Data coverage", copy: "Market data, fundamentals, factor snapshots, and source freshness are kept visible instead of buried." },
-  { icon: <Radar className="h-4 w-4" />, title: "Ranking engine", copy: "Growth, quality, stability, valuation, momentum, and risk engines produce an auditable composite view." },
-  { icon: <ShieldCheck className="h-4 w-4" />, title: "Trust controls", copy: "Provider source, confidence, and data freshness are first-class parts of the investor workflow." },
+  { icon: <Database className="h-4 w-4" />, title: "Data coverage", copy: "Market data, fundamentals, factor snapshots, and source freshness stay visible." },
+  { icon: <Radar className="h-4 w-4" />, title: "Ranking engine", copy: "Growth, quality, stability, valuation, momentum, and risk feed one auditable score." },
+  { icon: <ShieldCheck className="h-4 w-4" />, title: "Trust controls", copy: "Provider source, confidence, and freshness are shown next to the analysis." },
 ];
 
 const examples = ["RELIANCE", "TCS", "HDFCBANK", "INFY"];
@@ -50,7 +50,7 @@ export const PublicLandingPage: React.FC = () => {
             Intelligence for Indian Investors
           </h1>
           <p className="mt-7 max-w-2xl text-base leading-8 text-[#B8C4D8] md:text-lg">
-            StockStory transforms thousands of financial, technical, factor, and risk signals into actionable stock intelligence with visible methodology and source transparency.
+            StockStory turns financial, technical, factor, and risk data into clear company research with visible methodology and source transparency.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setPage("signup")} className="ss-premium-button px-7 text-sm">
@@ -64,7 +64,7 @@ export const PublicLandingPage: React.FC = () => {
             {metrics.map(([label, value]) => (
               <div key={label} className="ss-premium-panel p-4">
                 <div className="font-mono text-xl font-bold text-white">{value}</div>
-                <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#718096]">{label}</div>
+                <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#8B98AA]">{label}</div>
               </div>
             ))}
           </div>
@@ -72,7 +72,7 @@ export const PublicLandingPage: React.FC = () => {
 
         <div className="ss-premium-panel relative overflow-hidden p-4">
           <div className="flex h-11 items-center justify-between border-b border-white/10 px-2">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#718096]">
+            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#8B98AA]">
               <LineChart className="h-4 w-4 text-[#00C8FF]" />
               StockStory terminal
             </div>
@@ -82,7 +82,7 @@ export const PublicLandingPage: React.FC = () => {
             <div className="rounded-lg border border-white/10 bg-[#05070A] p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#718096]">Composite health</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8B98AA]">Composite health</div>
                   <div className="mt-2 text-3xl font-extrabold text-white">Reliance Industries</div>
                 </div>
                 <div className="rounded-lg border border-[#00C8FF]/25 bg-[#00C8FF]/10 p-3 text-[#00C8FF]">
@@ -107,7 +107,7 @@ export const PublicLandingPage: React.FC = () => {
                 >
                   <span>
                     <span className="block font-mono text-xs font-bold text-white">{symbol}</span>
-                    <span className="block text-[10px] text-[#718096]">NSE equity</span>
+                    <span className="block text-[10px] text-[#8B98AA]">NSE equity</span>
                   </span>
                   <span className={index < 2 ? "text-[#00E676]" : "text-[#FFC857]"}>
                     <TrendingUp className="h-4 w-4" />
@@ -115,7 +115,7 @@ export const PublicLandingPage: React.FC = () => {
                 </button>
               ))}
               <div className="rounded-lg border border-[#FFC857]/20 bg-[#FFC857]/10 p-3 text-xs leading-6 text-[#D6DEEA]">
-                Rankings are research signals, not personal investment advice.
+                Research signals only. Not personal investment advice.
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export const PublicLandingPage: React.FC = () => {
           <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#00C8FF]">Why different</div>
           <h2 className="mt-3 text-4xl font-extrabold tracking-normal text-white md:text-5xl">A research platform that shows its work.</h2>
           <p className="mt-5 text-base leading-8 text-[#B8C4D8]">
-            StockStory is built for repeated research workflows: find a company, inspect data lineage, read engine breakdowns, track the watchlist, and understand why rankings move.
+            Find a company, inspect data lineage, read engine breakdowns, and understand why rankings move.
           </p>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -158,7 +158,7 @@ export const PublicLandingPage: React.FC = () => {
             <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#00FFE0]">Performance dashboard</div>
             <h2 className="mt-3 text-3xl font-extrabold text-white">Coverage, factors, technicals, and confidence in one workspace.</h2>
             <p className="mt-4 text-sm leading-7 text-[#B8C4D8]">
-              The homepage now explains why to trust the product, why it is different, and how the ranking engine connects to data coverage.
+              Compare the signals behind a stock score before you decide what deserves deeper research.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">

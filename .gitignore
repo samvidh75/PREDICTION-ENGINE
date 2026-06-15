@@ -58,3 +58,5 @@ temp_*.ps1
 
 # Generated/artifact directories (may appear from code generation)
 src/components/src/
+.vercel
+.env*
