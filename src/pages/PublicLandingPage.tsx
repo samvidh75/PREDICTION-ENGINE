@@ -3,6 +3,7 @@ import { ArrowRight, BarChart3, Eye, Search, ShieldCheck } from "lucide-react";
 import MobileNav from "../components/navigation/MobileNav";
 import TopNav from "../components/navigation/TopNav";
 import { ResearchDisclaimer } from "../components/ui/PageHeader";
+import Button from "../components/ui/Button";
 
 function setPage(pageKey: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -56,30 +57,32 @@ export const PublicLandingPage: React.FC = () => {
             StockStory India helps investors search companies, review source-backed scoring signals, and organise research notes. Analytical software — not an investment recommendation engine.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button
+            <Button
               id="hero-cta-start"
               type="button"
               onClick={() => setPage("signup")}
-              className="inline-flex h-11 items-center gap-2 rounded-lg bg-slate-950 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
+              className="h-11 px-6 text-sm"
             >
               Start for free <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
+            </Button>
+            <Button
               id="hero-cta-methodology"
               type="button"
               onClick={() => setPage("methodology")}
-              className="h-11 rounded-lg border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
+              variant="secondary"
+              className="h-11 px-6 text-sm"
             >
               How it works
-            </button>
-            <button
+            </Button>
+            <Button
               id="hero-cta-rankings"
               type="button"
               onClick={() => setPage("rankings")}
-              className="h-11 rounded-lg border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
+              variant="secondary"
+              className="h-11 px-6 text-sm"
             >
               Rankings
-            </button>
+            </Button>
           </div>
         </div>
 

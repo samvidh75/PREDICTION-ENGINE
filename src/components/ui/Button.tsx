@@ -13,7 +13,7 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ...props
 }) => {
-  const baseStyle = "inline-flex items-center justify-center gap-2 font-semibold transition rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 focus:ring-offset-white";
+  const baseStyle = "inline-flex items-center justify-center gap-2 font-semibold transition rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700";
   
   const variantStyles = {
     primary: "bg-slate-950 text-white hover:bg-slate-800 border border-slate-950",
@@ -40,3 +40,4 @@ export const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
+

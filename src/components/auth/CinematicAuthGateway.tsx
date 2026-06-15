@@ -4,6 +4,8 @@ import type { AuthUser } from "../../services/auth/authService";
 import { authService } from "../../services/auth/authService";
 import { AnalyticsCoordinator } from "../../services/diagnostics/AnalyticsCoordinator";
 import { mapAuthError } from "../../services/auth/authErrorMapper";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
 
 type Stage = "login" | "signup" | "forgot";
 type AutoProvider = "google";
@@ -173,13 +175,6 @@ export default function CinematicAuthGateway({
     setStage(nextStage);
   };
 
-  const secondaryButton =
-    "h-[50px] rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
-  const primaryButton =
-    "h-[50px] rounded-lg bg-slate-950 text-white hover:bg-slate-800 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
-  const inputClass =
-    "h-[50px] w-full rounded-lg border border-slate-300 bg-white px-3 text-[14px] text-slate-900 placeholder-slate-400 transition focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/10 disabled:bg-slate-50";
-
   return (
     <div className="w-full antialiased [text-rendering:geometricPrecision]">
       <div className="p-2" aria-live="polite">
@@ -189,9 +184,9 @@ export default function CinematicAuthGateway({
         <div className="mt-8">
           {stage === "login" && (
             <div className="flex flex-col gap-4">
-              <button type="button" disabled={busy} onClick={() => void startGoogle()} className={secondaryButton}>
+              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-12 text-sm font-semibold">
                 Continue with Google
-              </button>
+              </Button>
 
               <div className="flex items-center my-2">
                 <div className="flex-grow border-t border-slate-200" />
@@ -199,12 +194,12 @@ export default function CinematicAuthGateway({
                 <div className="flex-grow border-t border-slate-200" />
               </div>
 
-              <input aria-label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
-              <input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type="password" className={inputClass} disabled={busy} />
+              <Input aria-label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
+              <Input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type="password" className="h-12" disabled={busy} />
 
-              <button type="button" disabled={busy || !canLogin} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className={primaryButton}>
+              <Button type="button" disabled={busy || !canLogin} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className="w-full h-12 text-sm font-semibold">
                 Sign in
-              </button>
+              </Button>
 
               <button type="button" className="text-[13px] text-slate-500 hover:text-slate-800 transition" disabled={busy} onClick={() => goToStage("forgot")}>
                 Forgot your password?
@@ -221,9 +216,9 @@ export default function CinematicAuthGateway({
 
           {stage === "signup" && (
             <div className="flex flex-col gap-4">
-              <button type="button" disabled={busy} onClick={() => void startGoogle()} className={secondaryButton}>
+              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-12 text-sm font-semibold">
                 Continue with Google
-              </button>
+              </Button>
 
               <div className="flex items-center my-2">
                 <div className="flex-grow border-t border-slate-200" />
@@ -231,13 +226,13 @@ export default function CinematicAuthGateway({
                 <div className="flex-grow border-t border-slate-200" />
               </div>
 
-              <input aria-label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className={inputClass} disabled={busy} />
-              <input aria-label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
-              <input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className={inputClass} disabled={busy} />
+              <Input aria-label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className="h-12" disabled={busy} />
+              <Input aria-label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
+              <Input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className="h-12" disabled={busy} />
 
-              <button type="button" disabled={busy || !canSignup} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className={primaryButton}>
+              <Button type="button" disabled={busy || !canSignup} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className="w-full h-12 text-sm font-semibold">
                 Create account
-              </button>
+              </Button>
 
               <div className="text-center text-[13px] text-slate-500">
                 Already have an account?{" "}
@@ -250,10 +245,10 @@ export default function CinematicAuthGateway({
 
           {stage === "forgot" && (
             <div className="flex flex-col gap-4">
-              <input aria-label="Recovery email address" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
-              <button type="button" disabled={busy || !canReset} onClick={() => void sendPasswordReset()} className={primaryButton}>
+              <Input aria-label="Recovery email address" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
+              <Button type="button" disabled={busy || !canReset} onClick={() => void sendPasswordReset()} className="w-full h-12 text-sm font-semibold">
                 Send reset link
-              </button>
+              </Button>
               <button type="button" disabled={busy} className="text-center text-[13px] text-slate-500 transition hover:text-slate-800" onClick={() => goToStage("login")}>
                 Back to sign in
               </button>

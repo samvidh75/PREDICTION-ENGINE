@@ -3,11 +3,12 @@ import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
-import EmptyState from "../components/ui/EmptyState";
+import { EmptyState } from "../components/ui/DataState";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
+import Button from "../components/ui/Button";
 
 interface RankingEntry {
   symbol: string;
@@ -119,20 +120,21 @@ export const PublicRankingsPage: React.FC = () => {
             description="Verified ranking rows will appear here after the background scoring pipeline runs and populates the database registry. No fabricated or placeholder rankings are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
-            <button
+            <Button
               type="button"
               onClick={() => setPage("search")}
-              className="h-10 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
+              className="h-10 px-4 text-xs"
             >
-              Search a Stock
-            </button>
-            <button
+              Search a stock
+            </Button>
+            <Button
               type="button"
               onClick={() => setPage("methodology")}
-              className="h-10 rounded-lg border border-slate-250 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+              variant="secondary"
+              className="h-10 px-4 text-xs"
             >
-              View Scoring Methodology
-            </button>
+              View scoring methodology
+            </Button>
           </div>
         </div>
       ) : (

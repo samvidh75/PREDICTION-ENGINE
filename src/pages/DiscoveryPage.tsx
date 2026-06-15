@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trophy, Sparkles, Flame, TrendingUp, PlusCircle } from 'lucide-react';
 import { StockRegistry } from '../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../services/portfolio/WatchlistEngine';
-import { PageHeader } from '../components/ui/DesignSystem';
+import { PageHeader } from '../components/ui/PageHeader';
 
 interface DiscoverCompany {
   symbol: string;

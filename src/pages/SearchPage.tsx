@@ -9,7 +9,7 @@ import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
-import EmptyState from "../components/ui/EmptyState";
+import { EmptyState } from "../components/ui/DataState";
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
