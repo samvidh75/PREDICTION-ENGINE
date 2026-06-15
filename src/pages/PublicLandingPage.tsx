@@ -1,5 +1,5 @@
 import React from "react";
-import { Activity, BarChart3, Database, LineChart, Lock, Radar, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart3, Database, LineChart, ShieldCheck, TrendingUp } from "lucide-react";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 
@@ -14,22 +14,22 @@ function setPage(pageKey: string, id?: string): void {
 
 const metrics = [
   ["Companies tracked", "500+"],
-  ["Signals analysed", "12k+"],
-  ["Factors calculated", "35+"],
+  ["Signals reviewed", "12k+"],
+  ["Financial factors", "35+"],
   ["Technical indicators", "11"],
 ];
 
 const trustSignals = [
-  "Provider-driven data",
-  "No manual stock picks",
-  "No paid ranking placements",
-  "Confidence shown with every score",
+  "Source-backed data",
+  "No paid placements",
+  "Confidence shown clearly",
+  "Research, not investment advice",
 ];
 
 const engineCards = [
-  { icon: <Database className="h-4 w-4" />, title: "Data coverage", copy: "Market data, fundamentals, factor snapshots, and source freshness are kept visible instead of buried." },
-  { icon: <Radar className="h-4 w-4" />, title: "Ranking engine", copy: "Growth, quality, stability, valuation, momentum, and risk engines produce an auditable composite view." },
-  { icon: <ShieldCheck className="h-4 w-4" />, title: "Trust controls", copy: "Provider source, confidence, and data freshness are first-class parts of the investor workflow." },
+  { title: "Clean company view", copy: "Financials, factors, technicals, and confidence are grouped into one readable workspace." },
+  { title: "Transparent scoring", copy: "Each ranking shows the inputs and methodology behind the score instead of hiding the calculation." },
+  { title: "Built for Indian equities", copy: "The product focuses on NSE-listed companies and keeps provider freshness visible." },
 ];
 
 const examples = ["RELIANCE", "TCS", "HDFCBANK", "INFY"];
@@ -43,28 +43,27 @@ export const PublicLandingPage: React.FC = () => {
       <section className="relative z-10 mx-auto grid min-h-[92vh] max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-14 pt-28 md:px-8 lg:grid-cols-[0.92fr_1.08fr]">
         <div>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#00FFE0]">
-            <Sparkles className="h-3.5 w-3.5" />
-            AI-native Indian equity intelligence
+            Indian equity research platform
           </div>
-          <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-normal text-white md:text-7xl">
-            Intelligence for Indian Investors
+          <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.03em] text-white md:text-7xl">
+            Clear stock research for Indian investors
           </h1>
-          <p className="mt-7 max-w-2xl text-base leading-8 text-[#B8C4D8] md:text-lg">
-            StockStory transforms thousands of financial, technical, factor, and risk signals into actionable stock intelligence with visible methodology and source transparency.
+          <p className="mt-7 max-w-2xl text-base leading-8 text-[#D6DEEA] md:text-lg">
+            StockStory India turns market data, fundamentals, technical indicators, and risk signals into a readable research workspace. Rankings are research signals, not personal investment advice.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setPage("signup")} className="ss-premium-button px-7 text-sm">
-              Open workspace
+              Create account
             </button>
             <button type="button" onClick={() => setPage("about")} className="ss-secondary-button px-7 text-sm">
-              View methodology
+              See methodology
             </button>
           </div>
           <div className="mt-10 grid max-w-2xl grid-cols-2 gap-3 md:grid-cols-4">
             {metrics.map(([label, value]) => (
               <div key={label} className="ss-premium-panel p-4">
                 <div className="font-mono text-xl font-bold text-white">{value}</div>
-                <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#718096]">{label}</div>
+                <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[#9AA8BD]">{label}</div>
               </div>
             ))}
           </div>
@@ -72,17 +71,17 @@ export const PublicLandingPage: React.FC = () => {
 
         <div className="ss-premium-panel relative overflow-hidden p-4">
           <div className="flex h-11 items-center justify-between border-b border-white/10 px-2">
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#718096]">
+            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#9AA8BD]">
               <LineChart className="h-4 w-4 text-[#00C8FF]" />
-              StockStory terminal
+              Research preview
             </div>
-            <div className="rounded border border-[#00FFE0]/20 bg-[#00FFE0]/10 px-2 py-1 font-mono text-[10px] text-[#00FFE0]">LIVE METHOD</div>
+            <div className="rounded border border-[#00FFE0]/20 bg-[#00FFE0]/10 px-2 py-1 font-mono text-[10px] text-[#00FFE0]">METHOD</div>
           </div>
           <div className="grid gap-4 p-2 pt-5 lg:grid-cols-[1fr_220px]">
             <div className="rounded-lg border border-white/10 bg-[#05070A] p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#718096]">Composite health</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#9AA8BD]">Composite health</div>
                   <div className="mt-2 text-3xl font-extrabold text-white">Reliance Industries</div>
                 </div>
                 <div className="rounded-lg border border-[#00C8FF]/25 bg-[#00C8FF]/10 p-3 text-[#00C8FF]">
@@ -93,7 +92,6 @@ export const PublicLandingPage: React.FC = () => {
                 <svg viewBox="0 0 720 260" className="h-full w-full" role="img" aria-label="Market intelligence preview">
                   <path d="M0 188 L80 170 L150 180 L230 118 L310 132 L405 88 L480 110 L570 62 L650 78 L720 44" fill="none" stroke="#00C8FF" strokeWidth="5" />
                   <path d="M0 210 L90 190 L180 198 L270 160 L360 172 L450 140 L540 151 L630 116 L720 126" fill="none" stroke="#00E676" strokeWidth="3" opacity="0.75" />
-                  <path d="M0 154 L95 158 L180 135 L270 144 L360 111 L450 119 L540 91 L630 98 L720 84" fill="none" stroke="#7B61FF" strokeWidth="3" opacity="0.72" />
                 </svg>
               </div>
             </div>
@@ -107,7 +105,7 @@ export const PublicLandingPage: React.FC = () => {
                 >
                   <span>
                     <span className="block font-mono text-xs font-bold text-white">{symbol}</span>
-                    <span className="block text-[10px] text-[#718096]">NSE equity</span>
+                    <span className="block text-[11px] text-[#9AA8BD]">NSE equity</span>
                   </span>
                   <span className={index < 2 ? "text-[#00E676]" : "text-[#FFC857]"}>
                     <TrendingUp className="h-4 w-4" />
@@ -115,7 +113,7 @@ export const PublicLandingPage: React.FC = () => {
                 </button>
               ))}
               <div className="rounded-lg border border-[#FFC857]/20 bg-[#FFC857]/10 p-3 text-xs leading-6 text-[#D6DEEA]">
-                Rankings are research signals, not personal investment advice.
+                Use rankings as research context, not buy or sell instructions.
               </div>
             </div>
           </div>
@@ -135,40 +133,20 @@ export const PublicLandingPage: React.FC = () => {
 
       <section className="relative z-10 mx-auto max-w-7xl px-5 py-20 md:px-8">
         <div className="max-w-3xl">
-          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#00C8FF]">Why different</div>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-normal text-white md:text-5xl">A research platform that shows its work.</h2>
-          <p className="mt-5 text-base leading-8 text-[#B8C4D8]">
-            StockStory is built for repeated research workflows: find a company, inspect data lineage, read engine breakdowns, track the watchlist, and understand why rankings move.
+          <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#00C8FF]">Why it helps</div>
+          <h2 className="mt-3 text-4xl font-extrabold tracking-[-0.02em] text-white md:text-5xl">Research that shows its work.</h2>
+          <p className="mt-5 text-base leading-8 text-[#D6DEEA]">
+            Find a company, review its data lineage, inspect the score breakdown, and understand why a ranking changed.
           </p>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           {engineCards.map((card) => (
             <div key={card.title} className="ss-premium-panel p-6">
-              <div className="mb-8 inline-flex rounded-lg border border-[#00C8FF]/25 bg-[#00C8FF]/10 p-3 text-[#00C8FF]">{card.icon}</div>
+              <div className="mb-8 inline-flex rounded-lg border border-[#00C8FF]/25 bg-[#00C8FF]/10 p-3 text-[#00C8FF]"><Database className="h-4 w-4" /></div>
               <h3 className="text-xl font-bold text-white">{card.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-[#B8C4D8]">{card.copy}</p>
+              <p className="mt-3 text-sm leading-7 text-[#D6DEEA]">{card.copy}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="relative z-10 mx-auto max-w-7xl px-5 pb-24 md:px-8">
-        <div className="ss-premium-panel grid gap-8 p-8 md:grid-cols-[1fr_0.9fr] md:p-10">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#00FFE0]">Performance dashboard</div>
-            <h2 className="mt-3 text-3xl font-extrabold text-white">Coverage, factors, technicals, and confidence in one workspace.</h2>
-            <p className="mt-4 text-sm leading-7 text-[#B8C4D8]">
-              The homepage now explains why to trust the product, why it is different, and how the ranking engine connects to data coverage.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {["Financial data", "Technical signals", "Factor models", "AI explanations"].map((item) => (
-              <div key={item} className="rounded-lg border border-white/10 bg-[#05070A]/70 p-4">
-                <Activity className="mb-5 h-4 w-4 text-[#00C8FF]" />
-                <div className="text-sm font-bold text-white">{item}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </main>
