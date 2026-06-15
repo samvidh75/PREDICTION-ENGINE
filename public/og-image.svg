@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05070A"/>
+      <stop offset="50%" stop-color="#0A0F17"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00C8FF"/>
+      <stop offset="100%" stop-color="#00FFE0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="60" y="60" width="1080" height="510" rx="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <text x="80" y="220" font-family="system-ui,sans-serif" font-weight="800" font-size="72" fill="#f0f3fa" letter-spacing="-0.03">STOCKSTORY</text>
+  <text x="80" y="290" font-family="system-ui,sans-serif" font-weight="800" font-size="72" fill="#00C8FF" letter-spacing="-0.03">.INDIA</text>
+  <text x="80" y="370" font-family="system-ui,sans-serif" font-weight="400" font-size="28" fill="#b2b5be" letter-spacing="-0.01">AI-Powered Investor Intelligence</text>
+  <text x="80" y="415" font-family="system-ui,sans-serif" font-weight="400" font-size="20" fill="#787b86" letter-spacing="-0.01">Discover, analyse and track NSE/BSE equities</text>
+  <text x="80" y="445" font-family="system-ui,sans-serif" font-weight="400" font-size="20" fill="#787b86" letter-spacing="-0.01">with real-time data, factor scoring and narrative insights.</text>
+  <text x="80" y="530" font-family="system-ui,sans-serif" font-weight="400" font-size="14" fill="#4a4d52">Research signals only. Not investment advice.</text>
+  <rect x="80" y="480" width="120" height="4" rx="2" fill="url(#accent)"/>
+  <line x1="80" y1="500" x2="200" y2="500" stroke="rgba(0,200,255,0.3)" stroke-width="1"/>
+</svg>
+</create_svg_or_dot_ico>

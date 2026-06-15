@@ -162,9 +162,4 @@ async function handleBatchAnalysis(
   }
 }
 
-/**
- * Initialize worker
- */
-console.log('🚀 PredictiveWorker initialized');
-
 export {};

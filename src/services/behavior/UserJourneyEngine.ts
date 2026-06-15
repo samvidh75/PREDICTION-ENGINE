@@ -29,9 +29,13 @@ export class UserJourneyEngine {
         existing.shift();
       }
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existing));
-      console.log(`[UserJourneyEngine] Tracked: ${type}`, metadata);
+      if (import.meta.env.DEV) {
+        console.log(`[UserJourneyEngine] Tracked: ${type}`, metadata);
+      }
     } catch (e) {
-      console.warn('[UserJourneyEngine] Failed to save local event', e);
+      if (import.meta.env.DEV) {
+        console.warn('[UserJourneyEngine] Failed to save local event', e);
+      }
     }
   }
 
