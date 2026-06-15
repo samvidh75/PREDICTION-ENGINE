@@ -7,7 +7,7 @@
 
 ## dynamic-renewal Final Status
 
-Final GitHub external status for `a41077fbf777e9ac7a17c6b1c1d4f39ae0ffd2ed`:
+Final GitHub external status for `a41077fbf777e9ac7a17c6b1c1d4f39ae0ffd2ed` before the second startup fix:
 
 - Context: `dynamic-renewal - PREDICTION-ENGINE`
 - State: `failure`
@@ -17,9 +17,19 @@ Final GitHub external status for `a41077fbf777e9ac7a17c6b1c1d4f39ae0ffd2ed`:
 
 The status was polled while pending and rechecked until it reached failure.
 
+Post-fix commit pushed for Railway re-evaluation:
+
+- Commit: `4cfcff78fbf78e15cd275755c0a078b506d7e700`
+- Vercel status: `success`
+- `dynamic-renewal - PREDICTION-ENGINE` state: `failure`
+- Description: `Deployment failed`
+- Updated at: `2026-06-15T14:34:11Z`
+
+Railway still did not recover after the repo-side eager provider broker startup fix.
+
 ## Whether Railway Recovered
 
-Railway did not recover on commit `a41077fbf777e9ac7a17c6b1c1d4f39ae0ffd2ed`.
+Railway did not recover on commit `a41077fbf777e9ac7a17c6b1c1d4f39ae0ffd2ed` or on post-fix commit `4cfcff78fbf78e15cd275755c0a078b506d7e700`.
 
 GitHub Actions evidence for the same commit:
 - `backend-build`: success
@@ -137,7 +147,7 @@ railway logs --service PREDICTION-ENGINE
 railway variables --service PREDICTION-ENGINE
 ```
 
-If Railway fails again after this fix, inspect logs for:
+Because Railway failed again after this fix, the next required step is external log/config inspection. Inspect logs for:
 - missing `COOKIE_SECRET`
 - missing or invalid `DATABASE_URL`
 - `PROVIDER_BROKER_REDIS_REQUIRED=true` without `REDIS_URL`
@@ -183,4 +193,4 @@ Scoring, ranking, provider ingestion algorithms, API contracts, database schema/
 
 Notes:
 - `npm run build:frontend` emitted the existing local Vite warning about `NODE_ENV=production` in `.env`; the command completed successfully.
-- A new push is required for Railway to evaluate this second startup fix.
+- Railway evaluated commit `4cfcff78fbf78e15cd275755c0a078b506d7e700` after this report's code fix and still returned `Deployment failed`; Railway logs or service settings are now required to identify the remaining cause safely.
