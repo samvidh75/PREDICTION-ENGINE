@@ -10,30 +10,16 @@ export type PageKey =
   | "signup"
   | "stock"
   | "company"
-  | "explore"
   | "dashboard"
   | "search"
   | "portfolio"
   | "watchlist"
-  | "alerts"
-  | "discovery"
-  | "brief"
   | "settings"
-  | "academy"
-  | "analysis"
-  | "compare"
-  | "journal"
   | "trust"
   | "methodology"
   | "validation"
   | "predictions"
-  | "rankings"
-  | "leaderboard"
-  | "onboarding"
-  | "validation-dashboard"
-  | "workspace"
-  | "daily-feed"
-  | "portfolio-doctor";
+  | "rankings";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {
@@ -49,31 +35,17 @@ export function getPageKeyFromUrl(): PageKey {
       signup: "signup",
       company: "company",
       stock: "company",
-      explore: "explore",
       dashboard: "dashboard",
       market: "dashboard",
       search: "search",
       portfolio: "portfolio",
       watchlist: "watchlist",
-      alerts: "alerts",
-      discovery: "discovery",
-      brief: "brief",
       settings: "settings",
-      academy: "academy",
-      analysis: "analysis",
-      compare: "compare",
-      journal: "journal",
       trust: "trust",
       methodology: "methodology",
       validation: "validation",
-      "validation-dashboard": "validation-dashboard",
       predictions: "predictions",
       rankings: "rankings",
-      leaderboard: "leaderboard",
-      onboarding: "onboarding",
-      workspace: "workspace",
-      "daily-feed": "daily-feed",
-      "portfolio-doctor": "portfolio-doctor",
     };
 
     return mapping[raw] ?? "landing";
@@ -89,22 +61,14 @@ export function getRouteSignatureFromUrl(): string {
   try {
     const params = new URLSearchParams(window.location.search);
     const page = (params.get("page") ?? "landing").toLowerCase().trim();
-    const kind = (params.get("kind") ?? "").trim();
     const id = (params.get("id") ?? "").trim();
     const q = (params.get("q") ?? "").trim();
-    const searchOpen =
-      params.get("search") === "1" ||
-      params.get("search")?.toLowerCase() === "true";
 
-    const searchSig = searchOpen ? `search:${q}` : "";
-
-    if (page === "explore") return `explore:${kind}:${id}`;
     if (page === "search") return `search:${q}`;
-    if (searchSig) return `${page}:${searchSig}`;
-
+    if (id) return `${page}:${id}`;
     return `page:${page}`;
   } catch {
-    return "stock";
+    return "landing";
   }
 }
 
@@ -116,17 +80,14 @@ export function notifyUrlChange(): void {
 
 /** Protected pages that require authentication. */
 export const PROTECTED_PAGES: PageKey[] = [
-  "dashboard", "search", "discovery", "stock", "company",
-  "watchlist", "portfolio", "alerts", "settings", "explore",
-  "academy", "analysis", "compare", "journal", "onboarding",
-  "workspace", "daily-feed", "portfolio-doctor",
+  "dashboard", "search", "stock", "company",
+  "watchlist", "portfolio", "settings",
 ];
 
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "trust", "methodology",
-  "validation", "predictions", "rankings", "leaderboard",
-  "validation-dashboard",
+  "validation", "predictions", "rankings",
 ];
 
 /** Check whether a stock/company ID is present in the URL.
@@ -153,11 +114,10 @@ export function getRouteSubsystem(pageKey: PageKey): string {
     case "about": return "public_about";
     case "login": return "public_login";
     case "signup": return "public_signup";
-    case "stock": return "stock_story";
-    case "explore": return "explore_discovery";
+    case "stock":
+    case "company": return "stock_story";
     case "dashboard": return "market_intelligence_dashboard";
     case "search": return "search_page";
-    case "company": return "company_universe";
     case "portfolio": return "portfolio_page";
     case "watchlist": return "watchlist_page";
     default: return `route_${pageKey}`;
