@@ -12,11 +12,11 @@ export const Badge: React.FC<BadgeProps> = ({
   className = "",
 }) => {
   const styles = {
-    success: "bg-emerald-950/40 border border-emerald-800 text-emerald-300",
-    warning: "bg-amber-950/40 border border-amber-800 text-amber-300",
-    danger: "bg-rose-950/40 border border-rose-800 text-rose-300",
-    info: "bg-blue-950/40 border border-blue-800 text-blue-300",
-    neutral: "bg-slate-800 border border-slate-700 text-slate-300",
+    success: "bg-emerald-50 border border-emerald-200 text-emerald-800",
+    warning: "bg-amber-50 border border-amber-200 text-amber-800",
+    danger: "bg-rose-50 border border-rose-200 text-rose-700",
+    info: "bg-blue-50 border border-blue-200 text-blue-800",
+    neutral: "bg-slate-100 border border-slate-200 text-slate-700",
   };
 
   return (

@@ -22,7 +22,7 @@ export const Sidebar: React.FC = () => {
   const { isAuthenticated, logout, isConnecting } = useAuth();
 
   const links: NavItem[] = [
-    { id: "terminal", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { id: "dashboard" as ViewType, label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
     { id: "search", label: "Search", icon: <Search className="h-4 w-4" /> },
     { id: "rankings", label: "Rankings", icon: <Trophy className="h-4 w-4" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="h-4 w-4" /> },
