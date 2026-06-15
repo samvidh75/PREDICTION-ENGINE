@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowLeft, ArrowRight, Building2, Compass, FileText, Star, Trophy, Sparkles, Flame, TrendingUp, Activity } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Star, Trophy, Sparkles, Flame, TrendingUp, Activity } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
@@ -350,8 +350,8 @@ export const StockStoryPage: React.FC = () => {
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent shadow-lg shadow-cyan-500/20"></div>
-            <span className="text-sm font-semibold tracking-wider text-cyan-400 uppercase animate-pulse">Loading company health analysis...</span>
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-slate-300"></div>
+            <span className="text-sm font-semibold tracking-wider text-slate-300 uppercase">Loading company research...</span>
           </div>
         </div>
       </div>
@@ -370,12 +370,6 @@ export const StockStoryPage: React.FC = () => {
             className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
-          </button>
-          <button
-            onClick={() => navigateToPage("discovery")}
-            className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-white/60 transition-colors hover:text-white"
-          >
-            <Compass className="h-3.5 w-3.5" /> Discovery
           </button>
         </div>
 
@@ -481,12 +475,12 @@ export const StockStoryPage: React.FC = () => {
         <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-1000 ${
-              colorClass.includes("fuchsia") ? "bg-fuchsia-500 shadow-[0_0_8px_rgba(217,70,239,0.5)]" :
-              colorClass.includes("emerald") ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
-              colorClass.includes("cyan") ? "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]" :
-              colorClass.includes("orange") ? "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]" :
-              colorClass.includes("amber") ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" :
-              colorClass.includes("rose") ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" : "bg-white/40"
+              colorClass.includes("fuchsia") ? "bg-sky-500" :
+              colorClass.includes("emerald") ? "bg-emerald-500" :
+              colorClass.includes("cyan") ? "bg-cyan-500" :
+              colorClass.includes("orange") ? "bg-orange-500" :
+              colorClass.includes("amber") ? "bg-amber-500" :
+              colorClass.includes("rose") ? "bg-rose-500" : "bg-white/40"
             }`}
             style={{ width: hasScore ? `${score}%` : "0%" }}
           />
@@ -514,23 +508,13 @@ export const StockStoryPage: React.FC = () => {
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
         </button>
-        <button
-          onClick={() => navigateToPage("discovery")}
-          className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-white/60 transition-colors hover:text-white"
-        >
-          <Compass className="h-3.5 w-3.5" /> Discovery
-        </button>
       </div>
 
-      {/* --- MASTER HEALTHOMETER HEADER --- */}
-      <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.015] p-6 backdrop-blur-md shadow-2xl">
-        <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl"></div>
-        <div className="absolute -right-20 -bottom-20 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl"></div>
-
-        <div className="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+      {/* --- COMPANY RESEARCH HEADER --- */}
+      <section className="rounded-xl border border-white/10 bg-white/[0.015] p-6">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            {/* Radial circular Healthometer dial */}
-            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-white/[0.01] border border-white/5 shadow-inner">
+            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-white/[0.01] border border-white/10">
               <svg className="h-full w-full -rotate-90">
                 <defs>
                   <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import type { AuthUser } from "../../services/auth/authService";
 import { authService } from "../../services/auth/authService";
 import { AnalyticsCoordinator } from "../../services/diagnostics/AnalyticsCoordinator";
@@ -261,32 +260,24 @@ export default function CinematicAuthGateway({
           )}
         </div>
 
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="mt-4 text-[13px] leading-[1.6] text-red-400 text-center"
-              role="alert"
-            >
-              {error}
-            </motion.div>
-          )}
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="mt-4 text-[13px] leading-[1.6] text-emerald-400 text-center"
-              role="status"
-            >
-              {success}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {error && (
+          <div
+            className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-[13px] leading-[1.5] text-red-200"
+            role="alert"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />
+            <span>{error}</span>
+          </div>
+        )}
+        {success && (
+          <div
+            className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-[13px] leading-[1.5] text-emerald-200"
+            role="status"
+          >
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+            <span>{success}</span>
+          </div>
+        )}
 
         {busy && (
           <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-white/65">
