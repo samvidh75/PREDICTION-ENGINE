@@ -5,12 +5,19 @@
  * production-safe UI messages, while logging raw technical details for diagnostic purposes.
  */
 
+const AUTH_UNAVAILABLE_MESSAGE =
+  "Authentication is unavailable right now. Please try again later or contact support.";
+const AUTH_CONFIG_MESSAGE =
+  "Authentication is not configured for this deployment. Please contact support.";
+const AUTH_DOMAIN_MESSAGE =
+  "Login is not enabled for this domain yet. Please contact support.";
+
 export function mapAuthError(error: unknown): string {
   // Log the raw error to console for engineering/troubleshooting diagnostics
   console.error("[Auth Technical Diagnostic Error]:", error);
 
   if (!error || typeof error !== "object") {
-    return "Authentication could not be completed. Please try again.";
+    return AUTH_UNAVAILABLE_MESSAGE;
   }
 
   // Handle nested error shapes if any
@@ -21,11 +28,11 @@ export function mapAuthError(error: unknown): string {
   // Check error code first (most reliable)
   switch (errorCode) {
     case "auth/unauthorized-domain":
-      return "This domain is not authorized for login. If you are the administrator, please ensure this domain is added to the Firebase console's Authorized Domains list.";
+      return AUTH_DOMAIN_MESSAGE;
     case "auth/popup-closed-by-user":
       return "The Google sign-in popup was closed before completion. Please try again.";
     case "auth/network-request-failed":
-      return "A network connection error occurred. Please check your internet connection.";
+      return "A network error interrupted sign-in. Please check your connection and try again.";
     case "auth/user-disabled":
       return "This account has been disabled. Please contact support.";
     case "auth/invalid-credential":
@@ -50,10 +57,12 @@ export function mapAuthError(error: unknown): string {
     case "auth/popup-blocked":
       return "Sign-in was blocked by the browser. Please allow pop-ups and try again.";
     case "auth/operation-not-allowed":
-      return "This sign-in method is not enabled in Firebase. Please enable it in the Firebase console.";
+      return "This sign-in method is not enabled for this deployment. Please contact support.";
     case "auth/invalid-api-key":
     case "auth/app-not-authorized":
-      return "Firebase authentication is not configured correctly for this app.";
+    case "auth/missing-api-key":
+    case "auth/invalid-app-credential":
+      return AUTH_CONFIG_MESSAGE;
     case "auth/missing-email":
       return "Please enter your email address.";
     case "auth/id-token-expired":
@@ -63,13 +72,13 @@ export function mapAuthError(error: unknown): string {
 
   // Fallback pattern matching in error message if code is not directly present
   if (errorMessage.includes("auth/unauthorized-domain") || errorMessage.includes("unauthorized-domain")) {
-    return "This domain is not authorized for login. If you are the administrator, please ensure this domain is added to the Firebase console's Authorized Domains list.";
+    return AUTH_DOMAIN_MESSAGE;
   }
   if (errorMessage.includes("auth/popup-closed-by-user") || errorMessage.includes("popup-closed-by-user")) {
     return "The Google sign-in popup was closed before completion. Please try again.";
   }
   if (errorMessage.includes("auth/network-request-failed") || errorMessage.includes("network-request-failed")) {
-    return "A network connection error occurred. Please check your internet connection.";
+    return "A network error interrupted sign-in. Please check your connection and try again.";
   }
   if (errorMessage.includes("auth/user-disabled") || errorMessage.includes("user-disabled")) {
     return "This account has been disabled. Please contact support.";
@@ -80,6 +89,24 @@ export function mapAuthError(error: unknown): string {
   if (errorMessage.includes("auth/account-exists-with-different-credential") || errorMessage.includes("account-exists-with-different-credential")) {
     return "An account already exists with this email address under a different sign-in method.";
   }
+  if (
+    errorMessage.includes("auth/invalid-api-key") ||
+    errorMessage.includes("auth/app-not-authorized") ||
+    errorMessage.includes("auth/operation-not-allowed") ||
+    errorMessage.includes("API key") ||
+    errorMessage.includes("INVALID_API_KEY") ||
+    errorMessage.includes("Firebase") ||
+    errorMessage.includes("not configured")
+  ) {
+    return AUTH_CONFIG_MESSAGE;
+  }
+  if (
+    errorMessage.includes("Failed to fetch") ||
+    errorMessage.includes("NetworkError") ||
+    errorMessage.includes("ERR_NETWORK")
+  ) {
+    return "A network error interrupted sign-in. Please check your connection and try again.";
+  }
 
-  return "Authentication could not be completed. Please try again.";
+  return AUTH_UNAVAILABLE_MESSAGE;
 }

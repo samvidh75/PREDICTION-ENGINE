@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import MobileHeader from "./MobileHeader";
 import MobileNav from "./MobileNav";
 import CommandCentreSearch from "./CommandCentreSearch";
+import { useAuth } from "../../context/AuthContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,9 +12,12 @@ interface AppLayoutProps {
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isAuthenticated) return;
+
       // Ctrl + K or Cmd + K
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -31,6 +35,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     };
 
     const handleOpenSearchEvent = () => {
+      if (!isAuthenticated) return;
       setIsSearchOpen(true);
     };
 
@@ -41,7 +46,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("ss:open-search", handleOpenSearchEvent);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className="ss-tv-app ss-tv-stage h-screen w-screen overflow-hidden flex flex-col font-sans select-none relative text-[#f0f3fa]">
@@ -81,7 +86,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <MobileNav />
 
       {/* Global Search Overlay */}
-      {isSearchOpen && (
+      {isAuthenticated && isSearchOpen && (
         <CommandCentreSearch onClose={() => setIsSearchOpen(false)} />
       )}
     </div>

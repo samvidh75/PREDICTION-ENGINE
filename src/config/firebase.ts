@@ -7,7 +7,7 @@
  * Secret values (apiKey, messagingSenderId, appId) are read from VITE_* env vars.
  *
  * In development:  set these in .env
- * In production:   set these in .env.production (never commit to git)
+ * In production:   set these in the deployment provider's secret/env UI
  *
  * ── How to obtain the missing values ──────────────────────────────────────
  *  1. Go to https://console.firebase.google.com/project/stockstory-india/settings/general
@@ -47,8 +47,8 @@ console.log("[Firebase bootstrap] env diagnostics", {
 });
 
 // ── Startup validation ─────────────────────────────────────────────────────
-// In production, bail immediately if secrets are missing so deployments
-// fail loudly instead of silently serving a broken sign-in flow.
+// Warn loudly if secrets are missing. Auth calls still fail closed, but the
+// public app remains renderable so users see a clear sign-in error.
 function assertFirebaseEnv(): void {
   const missing: string[] = [];
 
@@ -63,10 +63,8 @@ function assertFirebaseEnv(): void {
       `Get them from: https://console.firebase.google.com/project/${PROJECT_ID}/settings/general`;
 
     if (isProd) {
-      // Hard fail in production
-      throw new Error(msg);
+      console.error(msg);
     } else {
-      // Warn in development — app loads but auth won't work
       console.warn(msg);
     }
   }
