@@ -64,8 +64,8 @@ export default function PublicPredictionsPage(): JSX.Element {
       ) : error || !data || data.length === 0 ? (
         <div className="flex flex-col gap-6">
           <EmptyState
-            title="Predictions Awaiting Ingestion Backfill"
-            description="The public prediction feed is waiting for background ingestion and scoring. No placeholder data or sample rows are shown."
+            title="Scoring signals not populated yet"
+            description="Verified predictions will appear here after the background scoring pipeline runs and completes ingestion. No placeholder data or sample rows are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
             <Button
@@ -90,6 +90,7 @@ export default function PublicPredictionsPage(): JSX.Element {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-slate-500">
+                <th className="p-4 font-semibold uppercase tracking-wider">Rank</th>
                 <th className="p-4 font-semibold uppercase tracking-wider">Symbol</th>
                 <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Score</th>
                 <th className="p-4 font-semibold uppercase tracking-wider hidden md:table-cell">Confidence</th>

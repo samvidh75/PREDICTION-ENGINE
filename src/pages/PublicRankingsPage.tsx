@@ -117,8 +117,8 @@ export const PublicRankingsPage: React.FC = () => {
       ) : filteredRankings.length === 0 ? (
         <div className="flex flex-col gap-6">
           <EmptyState
-            title="Rankings Awaiting Ingestion Backfill"
-            description="Verified ranking rows will appear here after the background scoring pipeline runs and populates the database registry. No fabricated or placeholder rankings are shown."
+            title="Scoring signals not populated yet"
+            description="Verified rankings will appear here after the background scoring pipeline runs and completes ingestion. No placeholder data or fabricated rankings are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
             <Button

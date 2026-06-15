@@ -398,8 +398,8 @@ export const StockStoryPage: React.FC = () => {
                 <span>{currency}</span>
               </div>
               <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                Awaiting Prediction Indexing
+              <div className="mt-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-800">
+                Company not indexed yet
               </div>
             </div>
 
@@ -424,7 +424,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50/50 p-4">
             <h3 className="text-sm font-semibold text-slate-900">Why are prediction scores missing?</h3>
             <p className="mt-2 text-xs leading-relaxed text-slate-600">
-              This company exists in the Indian equity universe and live market pricing is active. However, the analytical scoring models have not completed their ingestion backfill for this symbol yet. Scores will appear automatically after the next scheduled nightly pipeline run.
+              This company exists in the Indian equity universe, and fresh metadata or live pricing is active. However, the background analytical scoring models have not completed their ingestion backfill for this symbol yet. Real scores will appear automatically after the next scheduled nightly run.
             </p>
           </div>
 
@@ -477,13 +477,13 @@ export const StockStoryPage: React.FC = () => {
           )}
         </section>
 
-        <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">My Research Notes</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">My Research Notes</div>
           <textarea
             value={noteText}
             onChange={(event) => handleSaveNote(event.target.value)}
             placeholder="Add your own research notes for this company..."
-            className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
+            className="h-20 w-full resize-none rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
           />
         </div>
       </div>

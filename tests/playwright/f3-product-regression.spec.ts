@@ -346,7 +346,7 @@ test.describe("Company page", () => {
     await assertNoRenderGarbage(page);
     // Should show prediction unavailable message
     await expect(
-      page.getByText(/awaiting prediction indexing|prediction unavailable/i)
+      page.getByText(/company not indexed yet|awaiting prediction indexing|prediction unavailable/i)
     ).toBeVisible();
   });
 });

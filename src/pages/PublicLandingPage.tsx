@@ -63,7 +63,7 @@ export const PublicLandingPage: React.FC = () => {
               onClick={() => setPage("signup")}
               className="h-11 px-6 text-sm"
             >
-              Start for free <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Start Research <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
             <Button
               id="hero-cta-methodology"
@@ -72,7 +72,7 @@ export const PublicLandingPage: React.FC = () => {
               variant="secondary"
               className="h-11 px-6 text-sm"
             >
-              How it works
+              View Methodology
             </Button>
             <Button
               id="hero-cta-rankings"
@@ -81,7 +81,7 @@ export const PublicLandingPage: React.FC = () => {
               variant="secondary"
               className="h-11 px-6 text-sm"
             >
-              Rankings
+              View Rankings
             </Button>
           </div>
         </div>
