@@ -34,6 +34,12 @@ const STORAGE_BUCKET = "stockstory-india.firebasestorage.app";
 const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY as string | undefined;
 const MESSAGING_SENDER_ID = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined;
 const APP_ID = import.meta.env.VITE_FIREBASE_APP_ID as string | undefined;
+export const isFirebaseClientConfigured = Boolean(
+  API_KEY &&
+    !API_KEY.includes("placeholder") &&
+    MESSAGING_SENDER_ID &&
+    APP_ID,
+);
 
 console.log("[Firebase bootstrap] env diagnostics", {
   hasApiKey: Boolean(API_KEY && !API_KEY.includes("placeholder")),
@@ -57,16 +63,11 @@ function assertFirebaseEnv(): void {
   if (!APP_ID) missing.push("VITE_FIREBASE_APP_ID");
 
   if (missing.length > 0) {
-    const isProd = import.meta.env.PROD;
     const msg =
       `[StockStory Firebase] Missing required environment variables: ${missing.join(", ")}.\n` +
       `Get them from: https://console.firebase.google.com/project/${PROJECT_ID}/settings/general`;
 
-    if (isProd) {
-      console.error(msg);
-    } else {
-      console.warn(msg);
-    }
+    console.warn(msg);
   }
 }
 
@@ -91,10 +92,11 @@ export const firebaseAuth: Auth = getAuth(firebaseApp);
 
 // Set session persistence to LOCAL so users stay signed in across refreshes.
 // This is async; components relying on auth state must use onAuthStateChanged.
-export const firebasePersistenceReady = setPersistence(firebaseAuth, browserLocalPersistence).catch((err) => {
-  console.error("[Firebase] Could not set auth persistence:", err);
-  throw err;
-});
+export const firebasePersistenceReady = isFirebaseClientConfigured
+  ? setPersistence(firebaseAuth, browserLocalPersistence).catch((err) => {
+      console.warn("[Firebase] Could not set auth persistence:", err);
+    })
+  : Promise.resolve();
 
 // ── Firestore ──────────────────────────────────────────────────────────────
 export const firestoreDb: Firestore = getFirestore(firebaseApp);

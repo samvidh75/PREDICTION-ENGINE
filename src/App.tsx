@@ -193,7 +193,7 @@ function AppContent(): JSX.Element {
   // ── Main app shell ──
   return (
     <TokenProvider tokenVars={buildTokenCssVars()}>
-      <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
+      <ConfidenceEngine paused={!isAuthed || isPublicPage} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
         <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
           <PageRenderer
             pageKey={activePageKey}

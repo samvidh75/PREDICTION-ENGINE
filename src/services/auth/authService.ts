@@ -12,7 +12,7 @@ import {
   type User,
 } from "firebase/auth";
 
-import { firebaseConfig, firebasePersistenceReady, googleAuthProvider } from "../../config/firebase";
+import { firebaseConfig, firebasePersistenceReady, googleAuthProvider, isFirebaseClientConfigured } from "../../config/firebase";
 import { clearAuthSession, saveAuthSession } from "./sessionStore";
 import { getFirebaseAuthClient } from "./firebaseClient";
 
@@ -73,6 +73,9 @@ function persistAuthUser(user: User, isNewUser?: boolean): AuthUser {
 }
 
 async function ensureAuthPersistence(): Promise<void> {
+  if (!isFirebaseClientConfigured) {
+    throw { code: "auth/missing-api-key", message: "Firebase authentication is not configured for this deployment." };
+  }
   await firebasePersistenceReady;
 }
 
@@ -102,8 +105,8 @@ function logAuthDiagnostic(scope: string, error: unknown): void {
     }
   }
 
-  console.error(`[Auth ${scope} error details]`, JSON.stringify(diagnostic));
-  console.error(`[Auth ${scope} error raw]`, error);
+  console.warn(`[Auth ${scope} diagnostic details]`, JSON.stringify(diagnostic));
+  console.warn(`[Auth ${scope} diagnostic raw]`, error);
 }
 
 function getErrorCode(error: unknown): string | undefined {
