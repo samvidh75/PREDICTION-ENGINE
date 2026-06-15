@@ -32,8 +32,6 @@ import { profileToMarketInputs, type UserProfile } from "./services/auth/userPro
 import { MarketInputs } from "./services/intelligence/marketState";
 import { loadUserProfile } from "./services/auth/userProfileStore";
 
-// Config
-import { IS_DEV_ENVIRONMENT } from "./config/domain";
 
 const DEFAULT_SKIP_PROFILE: UserProfile = {
   focusAreas: ["Institutional activity"],
