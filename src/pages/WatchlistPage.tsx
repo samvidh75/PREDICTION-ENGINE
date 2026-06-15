@@ -88,11 +88,15 @@ export const WatchlistPage: React.FC = () => {
         {/* Main watchlist content */}
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
-            <div className="p-8 text-center text-sm text-slate-500 border border-slate-800 border-dashed rounded-xl">
-              No stocks in this list.
+            <div className="rounded-xl border border-dashed border-slate-800 p-8 text-center text-sm text-slate-400">
+              <p className="font-semibold text-slate-300">No companies saved in this list.</p>
+              <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-slate-500">
+                Use Search to open a company research page, then save companies you want to monitor.
+              </p>
             </div>
           ) : (
-            <div className="border border-slate-800 bg-slate-900/20 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/20">
+              <div className="min-w-[720px]">
               <div className="grid grid-cols-[100px_80px_110px_1fr_80px] gap-2 p-3 text-[10px] uppercase text-slate-400 font-bold tracking-wider border-b border-slate-800 bg-slate-900/40">
                 <span className="pl-3">Ticker</span>
                 <span>Score</span>
@@ -137,6 +141,7 @@ export const WatchlistPage: React.FC = () => {
                   </div>
                 );
               })}
+              </div>
             </div>
           )}
         </div>
