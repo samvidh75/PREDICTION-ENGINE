@@ -6,22 +6,19 @@
  */
 
 export function mapAuthError(error: unknown): string {
-  // Log the raw error to console for engineering/troubleshooting diagnostics
   console.error("[Auth Technical Diagnostic Error]:", error);
 
   if (!error || typeof error !== "object") {
-    return "Authentication could not be completed. Please try again later or contact support.";
+    return "Authentication is not available right now. Please try again later or contact support.";
   }
 
-  // Handle nested error shapes if any
   const errObj = error as { code?: string; message?: string };
   const errorCode = errObj.code || "";
   const errorMessage = errObj.message || "";
 
-  // Check error code first (most reliable)
   switch (errorCode) {
     case "auth/unauthorized-domain":
-      return "This domain is not authorized for login. If you are the administrator, please ensure this domain is added to the Firebase console's Authorized Domains list.";
+      return "This website domain is not authorized for Firebase login. Add this Vercel/custom domain in Firebase Authentication > Settings > Authorized domains.";
     case "auth/popup-closed-by-user":
       return "The Google sign-in popup was closed before completion. Please try again.";
     case "auth/network-request-failed":
@@ -29,7 +26,7 @@ export function mapAuthError(error: unknown): string {
     case "auth/user-disabled":
       return "This account has been disabled. Please contact support.";
     case "auth/invalid-credential":
-      return "The credentials provided are invalid. Please check your email and password.";
+      return "The email or password is incorrect. Please check and try again.";
     case "auth/email-already-in-use":
     case "auth/email-exists":
       return "An account already exists with this email. Please sign in or reset your password.";
@@ -50,10 +47,10 @@ export function mapAuthError(error: unknown): string {
     case "auth/popup-blocked":
       return "Sign-in was blocked by the browser. Please allow pop-ups and try again.";
     case "auth/operation-not-allowed":
-      return "This sign-in method is not enabled in Firebase. Please enable it in the Firebase console.";
+      return "This sign-in method is not enabled in Firebase. Enable Google or Email/Password sign-in in the Firebase Authentication console.";
     case "auth/invalid-api-key":
     case "auth/app-not-authorized":
-      return "Firebase authentication is not configured correctly for this app.";
+      return "Firebase authentication is not configured correctly for this app. Check Vercel production environment variables and Firebase app settings.";
     case "auth/missing-email":
       return "Please enter your email address.";
     case "auth/id-token-expired":
@@ -61,9 +58,11 @@ export function mapAuthError(error: unknown): string {
       return "Your session has expired. Please sign in again.";
   }
 
-  // Fallback pattern matching in error message if code is not directly present
   if (errorMessage.includes("auth/unauthorized-domain") || errorMessage.includes("unauthorized-domain")) {
-    return "This domain is not authorized for login. If you are the administrator, please ensure this domain is added to the Firebase console's Authorized Domains list.";
+    return "This website domain is not authorized for Firebase login. Add this Vercel/custom domain in Firebase Authentication > Settings > Authorized domains.";
+  }
+  if (errorMessage.includes("operation-not-allowed")) {
+    return "This sign-in method is not enabled in Firebase. Enable Google or Email/Password sign-in in the Firebase Authentication console.";
   }
   if (errorMessage.includes("auth/popup-closed-by-user") || errorMessage.includes("popup-closed-by-user")) {
     return "The Google sign-in popup was closed before completion. Please try again.";
@@ -75,11 +74,11 @@ export function mapAuthError(error: unknown): string {
     return "This account has been disabled. Please contact support.";
   }
   if (errorMessage.includes("auth/invalid-credential") || errorMessage.includes("invalid-credential") || errorMessage.includes("auth/wrong-password")) {
-    return "The credentials provided are invalid. Please check your email and password.";
+    return "The email or password is incorrect. Please check and try again.";
   }
   if (errorMessage.includes("auth/account-exists-with-different-credential") || errorMessage.includes("account-exists-with-different-credential")) {
     return "An account already exists with this email address under a different sign-in method.";
   }
 
-  return "Authentication could not be completed. Please try again later or contact support.";
+  return "Authentication is not available right now. Please try again later or contact support.";
 }
