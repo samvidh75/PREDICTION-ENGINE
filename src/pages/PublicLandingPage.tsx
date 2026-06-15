@@ -134,6 +134,36 @@ export const PublicLandingPage: React.FC = () => {
       <section className="mx-auto max-w-3xl px-6 py-12">
         <ResearchDisclaimer />
       </section>
+
+      {/* Onboarding CTA bar */}
+      <section className="bg-slate-950 py-10">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h2 className="text-lg font-semibold text-white">Ready to start your research?</h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Create a free account to search companies, track watchlists, and explore scoring methodology — no investment advice, no hidden fees.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Button
+              id="onboarding-cta-signup"
+              type="button"
+              onClick={() => setPage("signup")}
+              variant="primary"
+              className="h-11 px-6 text-sm"
+            >
+              Create free account <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+            <Button
+              id="onboarding-cta-about"
+              type="button"
+              onClick={() => setPage("about")}
+              variant="outline"
+              className="h-11 px-6 text-sm border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+            >
+              Learn more
+            </Button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 };

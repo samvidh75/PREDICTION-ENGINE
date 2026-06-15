@@ -207,7 +207,6 @@ test.describe("Public navigation", () => {
 
   test("landing page has working CTA to signup", async ({ page }) => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
-    // Wait for the hero CTA to appear before interacting
     await page.locator("#hero-cta-start").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-start").click();
     await expect(page).toHaveURL(/page=signup/);
@@ -218,6 +217,20 @@ test.describe("Public navigation", () => {
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-methodology").click();
     await expect(page).toHaveURL(/page=methodology/);
+  });
+
+  test("landing page has working CTA to onboarding signup", async ({ page }) => {
+    await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
+    await page.locator("#onboarding-cta-signup").waitFor({ state: "visible", timeout: 10000 });
+    await page.locator("#onboarding-cta-signup").click();
+    await expect(page).toHaveURL(/page=signup/);
+  });
+
+  test("landing page has working CTA to about", async ({ page }) => {
+    await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
+    await page.locator("#onboarding-cta-about").waitFor({ state: "visible", timeout: 10000 });
+    await page.locator("#onboarding-cta-about").click();
+    await expect(page).toHaveURL(/page=about/);
   });
 });
 
