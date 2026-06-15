@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { LoadingState, EmptyState, ErrorState } from "../components/ui/DataState";
+import { LoadingState, EmptyState } from "../components/ui/DataState";
 import ScorePill from "../components/ui/ScorePill";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
+import TopNav from "../components/navigation/TopNav";
+import MobileNav from "../components/navigation/MobileNav";
 
 export default function PublicPredictionsPage(): JSX.Element {
   const [data, setData] = useState<any[] | null>(null);
@@ -37,24 +39,27 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 text-slate-900 antialiased">
-      <PageHeader
-        title="Top-ranked companies"
-        subtitle="Source-backed ranking scores from the intelligence API. Missing values remain unavailable."
-        primaryAction={<MissingDataBadge />}
-      />
+    <main className="min-h-screen bg-slate-100 pb-20 pt-[76px] text-slate-900 antialiased md:pt-28">
+      <TopNav />
+      <MobileNav />
+      <div className="mx-auto w-full max-w-5xl px-4">
+        <PageHeader
+          title="Top-ranked companies"
+          subtitle="Prediction rows will appear after production ingestion and scoring have produced verified snapshots."
+          primaryAction={<MissingDataBadge />}
+        />
 
       {loading ? (
-        <LoadingState description="Loading rankings from the intelligence API..." />
+        <LoadingState description="Checking whether production prediction rows are available." />
       ) : error || !data ? (
-        <ErrorState
-          title="Rankings unavailable"
-          description="The intelligence API could not be reached. Rankings will be available after the next pipeline run."
+        <EmptyState
+          title="Predictions are not available yet"
+          description="The public prediction feed is waiting for production ingestion and scoring. No sample rankings are shown."
         />
       ) : data.length === 0 ? (
         <EmptyState
-          title="No rankings available"
-          description="Ranking data has not been generated yet. Check back after the daily pipeline run."
+          title="Predictions are not available yet"
+          description="Verified prediction rows will appear here after the production data backfill completes."
         />
       ) : (
         <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -104,6 +109,7 @@ export default function PublicPredictionsPage(): JSX.Element {
       )}
       <div className="mt-6">
         <ResearchDisclaimer />
+      </div>
       </div>
     </main>
   );

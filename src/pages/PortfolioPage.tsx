@@ -2,11 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
 import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
-import { AlertCircle, Bell, Edit2, Plus, ShieldAlert, Stethoscope, Trash2, Upload, X } from 'lucide-react';
+import { AlertCircle, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide-react';
 import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Button } from '../components/ui/Button';
-import { ResearchDisclaimer, MetricCard } from '../components/ui/PageHeader';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-emerald-700';
@@ -18,15 +17,6 @@ function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string 
   if (severity === 'attention') return 'border-rose-200 bg-rose-50 text-rose-800';
   if (severity === 'review') return 'border-amber-200 bg-amber-50 text-amber-800';
   return 'border-emerald-200 bg-emerald-50 text-emerald-800';
-}
-
-function navigate(pageKey: string): void {
-  const params = new URLSearchParams(window.location.search);
-  params.set('page', pageKey);
-  params.delete('id');
-  params.delete('symbol');
-  window.history.pushState({}, '', `?${params.toString()}`);
-  window.dispatchEvent(new Event('urlchange'));
 }
 
 export const PortfolioPage: React.FC = () => {
@@ -151,8 +141,6 @@ export const PortfolioPage: React.FC = () => {
         subtitle="Recorded holdings, source-backed quotes and review queues"
         primaryAction={
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" onClick={() => navigate('portfolio-doctor')}><Stethoscope className="mr-1 h-3 w-3" /> Doctor</Button>
-            <Button variant="secondary" onClick={() => navigate('alerts')}><Bell className="mr-1 h-3 w-3" /> Alerts</Button>
             <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button>
             <Button variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="mr-1 h-3 w-3" /> Import</Button>
           </div>
@@ -225,7 +213,12 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.holdings.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">No holdings added yet.</div>
+        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">
+          <p className="font-semibold text-slate-800">No holdings added yet.</p>
+          <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed">
+            Add holdings when you want to track recorded cost basis. Live value and return remain unavailable until source-backed quotes cover the full portfolio.
+          </p>
+        </div>
       ) : (
         <section aria-label="Portfolio holdings" className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">

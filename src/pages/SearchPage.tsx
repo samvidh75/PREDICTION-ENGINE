@@ -115,6 +115,7 @@ export const SearchPage: React.FC = () => {
 
           <div className="relative">
             <Input
+              aria-label="Search Indian stocks"
               ref={inputRef}
               value={query}
               onChange={(e) => handleSearchChange(e.target.value)}

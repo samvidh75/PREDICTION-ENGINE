@@ -57,11 +57,11 @@ export const PublicLandingPage: React.FC = () => {
 
         <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Production data posture</span>
-            <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700">Unavailable until populated</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Research discipline</span>
+            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">Evidence first</span>
           </div>
           <div className="mt-4 grid gap-3">
-            {["No fabricated rankings", "No paid placements", "No hidden recommendations"].map((item) => (
+            {["No fabricated rankings", "No paid placements", "Unavailable data is labelled clearly"].map((item) => (
               <div key={item} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
                 {item}
               </div>

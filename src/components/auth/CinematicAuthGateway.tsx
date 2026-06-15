@@ -199,8 +199,8 @@ export default function CinematicAuthGateway({
                 <div className="flex-grow border-t border-slate-200" />
               </div>
 
-              <input value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
-              <input value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type="password" className={inputClass} disabled={busy} />
+              <input aria-label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
+              <input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type="password" className={inputClass} disabled={busy} />
 
               <button type="button" disabled={busy || !canLogin} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className={primaryButton}>
                 Sign in
@@ -231,9 +231,9 @@ export default function CinematicAuthGateway({
                 <div className="flex-grow border-t border-slate-200" />
               </div>
 
-              <input value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className={inputClass} disabled={busy} />
-              <input value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
-              <input value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className={inputClass} disabled={busy} />
+              <input aria-label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className={inputClass} disabled={busy} />
+              <input aria-label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
+              <input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className={inputClass} disabled={busy} />
 
               <button type="button" disabled={busy || !canSignup} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className={primaryButton}>
                 Create account
@@ -250,7 +250,7 @@ export default function CinematicAuthGateway({
 
           {stage === "forgot" && (
             <div className="flex flex-col gap-4">
-              <input value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
+              <input aria-label="Recovery email address" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
               <button type="button" disabled={busy || !canReset} onClick={() => void sendPasswordReset()} className={primaryButton}>
                 Send reset link
               </button>
