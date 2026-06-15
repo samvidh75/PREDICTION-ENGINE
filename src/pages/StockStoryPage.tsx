@@ -353,19 +353,19 @@ export const StockStoryPage: React.FC = () => {
 
   if (storyLoading) {
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-slate-900 antialiased">
         <div className="flex items-center justify-between gap-3 text-xs">
           <button
             onClick={() => navigateToPage("dashboard")}
-            className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300 animate-pulse"
+            className="flex animate-pulse items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:text-emerald-700"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
           </button>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-slate-300"></div>
-            <span className="text-sm font-semibold tracking-wider text-slate-300 uppercase">Loading company research...</span>
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-700"></div>
+            <span className="text-sm font-semibold tracking-wider text-slate-600 uppercase">Loading company research...</span>
           </div>
         </div>
       </div>
@@ -377,75 +377,75 @@ export const StockStoryPage: React.FC = () => {
       ? storyData.dataState.missingInputs.filter(Boolean)
       : [];
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-slate-900 antialiased">
         <div className="flex items-center justify-between gap-3 text-xs">
           <button
             onClick={() => navigateToPage("dashboard")}
-            className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
+            className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-emerald-800 transition-colors hover:text-emerald-700"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
           </button>
         </div>
 
-        <section className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/45">
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                 <span>{ticker}</span>
-                <span>•</span>
+                <span>/</span>
                 <span>{exchange}</span>
-                <span>•</span>
+                <span>/</span>
                 <span>{currency}</span>
               </div>
-              <h1 className="max-w-2xl truncate text-2xl font-extrabold tracking-tight text-white md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-300">
+              <h1 className="max-w-2xl truncate text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">{companyName}</h1>
+              <div className="mt-3 inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-700">
                 Prediction unavailable
               </div>
             </div>
 
-            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-white/5 bg-white/[0.02] p-3.5">
+            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-slate-200 bg-slate-50 p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Live Price</div>
-                <div className="mt-1 font-mono text-xl font-bold text-white">{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live price</div>
+                <div className="mt-1 font-mono text-xl font-bold text-slate-950">{priceLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
                   {changeLabel}
                 </div>
               </div>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Volume</div>
-                <div className="mt-1 font-mono text-xl font-bold text-white">
+                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Volume</div>
+                <div className="mt-1 font-mono text-xl font-bold text-slate-950">
                   {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-slate-500">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Registry Status</div>
-              <div className="mt-2 text-sm font-semibold text-white">{storyData?.unavailableReason ?? "Unavailable"}</div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Registry status</div>
+              <div className="mt-2 text-sm font-semibold text-slate-950">{storyData?.unavailableReason ?? "Unavailable"}</div>
             </div>
-            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Score Shown</div>
-              <div className="mt-2 text-sm font-semibold text-white">None</div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Score shown</div>
+              <div className="mt-2 text-sm font-semibold text-slate-950">None</div>
             </div>
-            <div className="rounded-lg border border-white/5 bg-white/[0.015] p-4">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">Data Policy</div>
-              <div className="mt-2 text-sm font-semibold text-emerald-300">No fallback score</div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Data policy</div>
+              <div className="mt-2 text-sm font-semibold text-emerald-700">No fallback score</div>
             </div>
           </div>
 
-          <p className="mt-5 max-w-4xl text-sm leading-6 text-white/65">
+          <p className="mt-5 max-w-4xl text-sm leading-6 text-slate-600">
             {storyData?.unavailableMessage ?? storyError ?? `StockStory could not find a usable production prediction snapshot for ${ticker}.`}
           </p>
 
           {missingInputs.length > 0 && (
-            <div className="mt-4 rounded-lg border border-white/5 bg-white/[0.015] p-4">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/35">Missing Inputs</div>
+            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Missing inputs</div>
               <div className="flex flex-wrap gap-2">
                 {missingInputs.map((input: string) => (
-                  <span key={input} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold text-white/60">
+                  <span key={input} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-600">
                     {input}
                   </span>
                 ))}
@@ -453,7 +453,7 @@ export const StockStoryPage: React.FC = () => {
             </div>
           )}
 
-          <p className="mt-4 max-w-4xl rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-white/55">
+          <p className="mt-4 max-w-4xl rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-600">
             The page keeps live market data visible, but prediction, confidence, and factor scores are hidden until the backend has a valid registry row with real source price and valid factor domains.
           </p>
         </section>

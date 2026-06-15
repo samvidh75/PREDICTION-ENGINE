@@ -137,9 +137,9 @@ export default function StockStoryPageF0(): JSX.Element {
       <StockWorkspaceBar ticker={ticker} horizon={horizon} />
       <section
         aria-label="Prediction horizon"
-        className="mx-auto mb-4 flex w-full max-w-7xl flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 text-white"
+        className="mx-auto mb-4 flex w-full max-w-7xl flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm"
       >
-        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-white/45">Horizon</span>
+        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Horizon</span>
         {HORIZONS.map((option) => (
           <button
             key={option}
@@ -147,7 +147,7 @@ export default function StockStoryPageF0(): JSX.Element {
             onClick={() => selectHorizon(option)}
             aria-pressed={horizon === option}
             className={`rounded-md px-2 py-1 text-[10px] font-bold transition-colors ${
-              horizon === option ? "bg-cyan-500/20 text-cyan-300" : "text-white/45 hover:text-white"
+              horizon === option ? "bg-emerald-50 text-emerald-800" : "text-slate-500 hover:text-slate-900"
             }`}
           >
             {option}D

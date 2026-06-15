@@ -52,17 +52,17 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col space-y-6 select-none pb-12 text-slate-200 font-sans max-w-5xl mx-auto antialiased">
-      <header className="border-b border-slate-800 pb-5">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Settings</h1>
-        <p className="mt-2 text-sm text-slate-400">
+    <div className="mx-auto flex w-full max-w-5xl select-none flex-col space-y-6 pb-12 font-sans text-slate-900 antialiased">
+      <header className="border-b border-slate-200 pb-5">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Settings</h1>
+        <p className="mt-2 text-sm text-slate-600">
           Manage workspace settings, notifications and preferences.
         </p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
         {/* Tab Sidebar */}
-        <div className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-2 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-slate-800 pr-0 md:pr-4">
+        <div className="flex flex-row gap-2 overflow-x-auto border-b border-slate-200 pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:border-r md:pb-0 md:pr-4">
           {[
             { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
             { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
@@ -74,8 +74,8 @@ export const SettingsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as SettingsTab)}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-semibold text-left transition shrink-0 cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-slate-800 text-white font-bold"
-                  : "bg-transparent text-slate-400 hover:bg-slate-900/40 hover:text-slate-200"
+                  ? "bg-emerald-50 text-emerald-900 font-bold border border-emerald-200"
+                  : "bg-transparent text-slate-600 hover:bg-white hover:text-slate-950 border border-transparent"
               }`}
             >
               {tab.icon}
@@ -89,8 +89,8 @@ export const SettingsPage: React.FC = () => {
           {activeTab === "profile" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">Profile Information</h2>
-                <p className="text-xs text-slate-400">Review your workspace identity details.</p>
+                <h2 className="text-lg font-semibold text-slate-950 mb-1">Profile information</h2>
+                <p className="text-xs text-slate-500">Review your workspace identity details.</p>
               </div>
               <div className="space-y-4 max-w-md">
                 <Input
@@ -126,29 +126,29 @@ export const SettingsPage: React.FC = () => {
           {activeTab === "notifications" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">Notifications Channel</h2>
-                <p className="text-xs text-slate-400">Control alert categories monitored for watchlists.</p>
+                <h2 className="text-lg font-semibold text-slate-950 mb-1">Notifications channel</h2>
+                <p className="text-xs text-slate-500">Control alert categories monitored for watchlists.</p>
               </div>
               <div className="space-y-3 max-w-md">
                 {(["Factor", "Risk", "Momentum", "News", "Market"] as AlertCategory[]).map((cat) => (
                   <div
                     key={cat}
-                    className="flex items-center justify-between p-4 bg-slate-900/40 border border-slate-800 rounded-xl"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                   >
                     <div>
-                      <span className="text-xs font-semibold text-white block">{cat} Alerts</span>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                      <span className="block text-xs font-semibold text-slate-950">{cat} Alerts</span>
+                      <span className="mt-0.5 block text-[10px] text-slate-500">
                         Monitors {cat.toLowerCase()} analysis updates.
                       </span>
                     </div>
                     <button
                       onClick={() => toggleAlertCategory(cat)}
                       className={`w-10 h-5 rounded-full transition relative cursor-pointer ${
-                        alertCategories[cat] ? "bg-slate-200" : "bg-slate-800"
+                        alertCategories[cat] ? "bg-emerald-700" : "bg-slate-300"
                       }`}
                     >
                       <div
-                        className={`w-4 h-4 rounded-full bg-slate-950 absolute top-0.5 transition ${
+                        className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition ${
                           alertCategories[cat] ? "left-[22px]" : "left-[2px]"
                         }`}
                       />
@@ -162,15 +162,15 @@ export const SettingsPage: React.FC = () => {
           {activeTab === "appearance" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">Appearance Settings</h2>
-                <p className="text-xs text-slate-400">Configure your workspace interface theme.</p>
+                <h2 className="text-lg font-semibold text-slate-950 mb-1">Appearance settings</h2>
+                <p className="text-xs text-slate-500">Configure your workspace interface theme.</p>
               </div>
               <div className="max-w-md">
-                <Card className="flex items-center justify-between p-4 bg-slate-900/40 border border-slate-800">
+                <Card className="flex items-center justify-between p-4">
                   <div>
-                    <span className="text-xs font-bold text-white block">Dark Professional Theme</span>
-                    <span className="text-[10px] text-slate-400 block mt-0.5">
-                      Slate/Zinc Dark theme is default and cannot be modified.
+                    <span className="block text-xs font-bold text-slate-950">Professional research theme</span>
+                    <span className="mt-0.5 block text-[10px] text-slate-500">
+                      The production interface uses a fixed research workspace theme.
                     </span>
                   </div>
                   <Badge variant="neutral">Locked</Badge>
@@ -182,14 +182,14 @@ export const SettingsPage: React.FC = () => {
           {activeTab === "security" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-white mb-1">Security & Credentials</h2>
-                <p className="text-xs text-slate-400">Manage password and credentials security.</p>
+                <h2 className="text-lg font-semibold text-slate-950 mb-1">Security and credentials</h2>
+                <p className="text-xs text-slate-500">Manage password and credentials security.</p>
               </div>
               <div className="max-w-md">
-                <Card className="space-y-4 p-5 bg-slate-900/40 border border-slate-800">
+                <Card className="space-y-4 p-5">
                   <div>
-                    <span className="text-xs font-bold text-white block mb-1">Reset Password</span>
-                    <p className="text-[10px] text-slate-400 mb-3">
+                    <span className="mb-1 block text-xs font-bold text-slate-950">Reset password</span>
+                    <p className="mb-3 text-[10px] text-slate-500">
                       We will send a password change link to your registered email address.
                     </p>
                     <Button variant="outline" size="sm" onClick={() => void handlePasswordReset()}>

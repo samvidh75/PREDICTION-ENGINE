@@ -107,8 +107,8 @@ export const SearchPage: React.FC = () => {
       <Card className="p-8">
         <div className="mx-auto flex max-w-[600px] flex-col gap-5 text-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Search Indian stocks</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Search Indian stocks</h1>
+            <p className="mt-1 text-sm text-slate-600">
               The fastest path into a company research page.
             </p>
           </div>
@@ -134,7 +134,7 @@ export const SearchPage: React.FC = () => {
                   key={item}
                   type="button"
                   onClick={() => handleRecentSearch(item)}
-                  className="rounded-full border border-slate-800 bg-slate-900/50 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-600 transition"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-white"
                 >
                   {item}
                 </button>
@@ -147,8 +147,8 @@ export const SearchPage: React.FC = () => {
       <section className="space-y-4">
         {query.trim().length >= 2 ? (
           <>
-            <div className="text-sm font-medium text-slate-400">
-              {results.length} result{results.length === 1 ? "" : "s"} for <span className="text-white">"{query.trim()}"</span>
+            <div className="text-sm font-medium text-slate-600">
+              {results.length} result{results.length === 1 ? "" : "s"} for <span className="text-slate-950">"{query.trim()}"</span>
             </div>
 
             {results.length > 0 ? (
@@ -163,27 +163,27 @@ export const SearchPage: React.FC = () => {
                     <Card
                       key={stock.symbol}
                       onClick={() => handleOpenStock(stock)}
-                      className="flex flex-col justify-between hover:bg-slate-900/80 cursor-pointer"
+                      className="flex cursor-pointer flex-col justify-between"
                     >
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
-                          <div className="font-mono font-bold text-lg text-white">
+                          <div className="font-mono text-lg font-semibold text-slate-950">
                             {stock.symbol}
                           </div>
-                          <div className="text-xs text-slate-400 truncate max-w-[200px]">
+                          <div className="max-w-[200px] truncate text-xs text-slate-500">
                             {stock.companyName}
                           </div>
                         </div>
                         {score !== null ? (
                           <ScorePill score={score} />
                         ) : (
-                          <span className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-400">
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500">
                             Score not available
                           </span>
                         )}
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-800 pt-3 text-[11px] text-slate-400">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[11px] text-slate-500">
                         <div className="flex flex-wrap gap-2">
                           <Badge variant="info">{stock.sector || "Not available"}</Badge>
                           {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}

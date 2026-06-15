@@ -7,10 +7,10 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 
 export const Table: React.FC<TableProps> = ({ headers, children, className = "", ...props }) => {
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-slate-800 bg-slate-900/20">
+    <div className="w-full overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
       <table className={`w-full text-left text-xs border-collapse ${className}`} {...props}>
         <thead>
-          <tr className="border-b border-slate-800 text-slate-400 font-semibold bg-slate-900/60">
+          <tr className="border-b border-slate-200 bg-slate-50 font-semibold text-slate-500">
             {headers.map((h, i) => (
               <th key={i} className="p-4 uppercase tracking-wider font-semibold">
                 {h}
@@ -18,7 +18,7 @@ export const Table: React.FC<TableProps> = ({ headers, children, className = "",
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/60 bg-transparent text-slate-300">
+        <tbody className="divide-y divide-slate-100 bg-transparent text-slate-700">
           {children}
         </tbody>
       </table>

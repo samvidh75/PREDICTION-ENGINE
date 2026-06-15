@@ -174,16 +174,17 @@ export default function CinematicAuthGateway({
   };
 
   const secondaryButton =
-    "h-[50px] rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/90 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
+    "h-[50px] rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
   const primaryButton =
-    "h-[50px] rounded-lg bg-white text-black hover:bg-white/90 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
-  const inputClass = "ss-input ss-input--tall ss-input--auth";
+    "h-[50px] rounded-lg bg-slate-950 text-white hover:bg-slate-800 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed text-[14px]";
+  const inputClass =
+    "h-[50px] w-full rounded-lg border border-slate-300 bg-white px-3 text-[14px] text-slate-900 placeholder-slate-400 transition focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/10 disabled:bg-slate-50";
 
   return (
     <div className="w-full antialiased [text-rendering:geometricPrecision]">
       <div className="p-2" aria-live="polite">
-        <div className="text-[24px] font-bold text-white/95 tracking-tight">{titleForStage(stage)}</div>
-        <div className="mt-2 text-[14px] leading-relaxed text-white/60">{subtitleForStage(stage)}</div>
+        <div className="text-[24px] font-semibold tracking-tight text-slate-950">{titleForStage(stage)}</div>
+        <div className="mt-2 text-[14px] leading-relaxed text-slate-600">{subtitleForStage(stage)}</div>
 
         <div className="mt-8">
           {stage === "login" && (
@@ -193,9 +194,9 @@ export default function CinematicAuthGateway({
               </button>
 
               <div className="flex items-center my-2">
-                <div className="flex-grow border-t border-white/10" />
-                <span className="mx-3 text-[11px] uppercase tracking-wider text-white/35 font-medium">Or email</span>
-                <div className="flex-grow border-t border-white/10" />
+                <div className="flex-grow border-t border-slate-200" />
+                <span className="mx-3 text-[11px] uppercase tracking-wider text-slate-500 font-medium">Or email</span>
+                <div className="flex-grow border-t border-slate-200" />
               </div>
 
               <input value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className={inputClass} disabled={busy} />
@@ -205,13 +206,13 @@ export default function CinematicAuthGateway({
                 Sign in
               </button>
 
-              <button type="button" className="text-[13px] text-white/50 hover:text-white/80 transition" disabled={busy} onClick={() => goToStage("forgot")}>
+              <button type="button" className="text-[13px] text-slate-500 hover:text-slate-800 transition" disabled={busy} onClick={() => goToStage("forgot")}>
                 Forgot your password?
               </button>
 
-              <div className="text-[13px] text-center text-white/50">
+              <div className="text-center text-[13px] text-slate-500">
                 Don't have an account?{" "}
-                <button type="button" className="text-white/80 hover:text-white underline transition" disabled={busy} onClick={() => goToStage("signup")}>
+                <button type="button" className="text-slate-800 underline transition hover:text-slate-950" disabled={busy} onClick={() => goToStage("signup")}>
                   Create account
                 </button>
               </div>
@@ -225,9 +226,9 @@ export default function CinematicAuthGateway({
               </button>
 
               <div className="flex items-center my-2">
-                <div className="flex-grow border-t border-white/10" />
-                <span className="mx-3 text-[11px] uppercase tracking-wider text-white/35 font-medium">Or email</span>
-                <div className="flex-grow border-t border-white/10" />
+                <div className="flex-grow border-t border-slate-200" />
+                <span className="mx-3 text-[11px] uppercase tracking-wider text-slate-500 font-medium">Or email</span>
+                <div className="flex-grow border-t border-slate-200" />
               </div>
 
               <input value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className={inputClass} disabled={busy} />
@@ -238,9 +239,9 @@ export default function CinematicAuthGateway({
                 Create account
               </button>
 
-              <div className="text-[13px] text-center text-white/50">
+              <div className="text-center text-[13px] text-slate-500">
                 Already have an account?{" "}
-                <button type="button" className="text-white/80 hover:text-white underline transition" disabled={busy} onClick={() => goToStage("login")}>
+                <button type="button" className="text-slate-800 underline transition hover:text-slate-950" disabled={busy} onClick={() => goToStage("login")}>
                   Sign in
                 </button>
               </div>
@@ -253,7 +254,7 @@ export default function CinematicAuthGateway({
               <button type="button" disabled={busy || !canReset} onClick={() => void sendPasswordReset()} className={primaryButton}>
                 Send reset link
               </button>
-              <button type="button" disabled={busy} className="text-[13px] text-white/50 hover:text-white/80 transition text-center" onClick={() => goToStage("login")}>
+              <button type="button" disabled={busy} className="text-center text-[13px] text-slate-500 transition hover:text-slate-800" onClick={() => goToStage("login")}>
                 Back to sign in
               </button>
             </div>
@@ -262,26 +263,26 @@ export default function CinematicAuthGateway({
 
         {error && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-[13px] leading-[1.5] text-red-200"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] leading-[1.5] text-red-700"
             role="alert"
           >
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
             <span>{error}</span>
           </div>
         )}
         {success && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-[13px] leading-[1.5] text-emerald-200"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-[13px] leading-[1.5] text-emerald-700"
             role="status"
           >
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
             <span>{success}</span>
           </div>
         )}
 
         {busy && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-white/65">
-            <Loader2 className="h-4 w-4 animate-spin text-white/50" />
+          <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-slate-500">
+            <Loader2 className="h-4 w-4 animate-spin text-emerald-700" />
             Loading...
           </div>
         )}
