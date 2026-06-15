@@ -4,6 +4,7 @@ import ScorePill from "../components/ui/ScorePill";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
+import Button from "../components/ui/Button";
 
 export default function PublicPredictionsPage(): JSX.Element {
   const [data, setData] = useState<any[] | null>(null);
@@ -66,20 +67,21 @@ export default function PublicPredictionsPage(): JSX.Element {
             description="The public prediction feed is waiting for background ingestion and scoring. No placeholder data or sample rows are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
-            <button
+            <Button
               type="button"
               onClick={() => setPage("search")}
-              className="h-10 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
+              className="h-10 px-4 text-xs"
             >
-              Search a Stock
-            </button>
-            <button
+              Search a stock
+            </Button>
+            <Button
               type="button"
               onClick={() => setPage("methodology")}
-              className="h-10 rounded-lg border border-slate-205 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+              variant="secondary"
+              className="h-10 px-4 text-xs"
             >
-              View Scoring Methodology
-            </button>
+              View scoring methodology
+            </Button>
           </div>
         </div>
       ) : (
