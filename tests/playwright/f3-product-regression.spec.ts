@@ -152,7 +152,7 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /research indian stocks/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -166,14 +166,14 @@ test.describe("Public route smoke", () => {
   test("login page renders", async ({ page }) => {
     await page.goto("/?page=login");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText(/sign in/i)).toBeVisible();
+    await expect(page.locator("section").getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("signup page renders", async ({ page }) => {
     await page.goto("/?page=signup");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText(/create.*account/i)).toBeVisible();
+    await expect(page.getByText("Create your account", { exact: true })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -360,7 +360,7 @@ test.describe("Rankings page", () => {
     await expect(page.locator("body")).toBeVisible();
     // Should have table headers or empty state
     await expect(
-      page.getByText(/no ranking|rank|score/i)
+      page.getByText(/no ranking|rank|score/i).first()
     ).toBeVisible();
     await assertNoRenderGarbage(page);
   });
@@ -406,8 +406,8 @@ test.describe("Authenticated shell", () => {
   test("settings page renders with tabs", async ({ page }) => {
     await page.goto("/?page=settings");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText(/profile/i)).toBeVisible();
-    await expect(page.getByText(/notifications/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Profile", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Notifications", exact: true })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -426,7 +426,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /research indian stocks/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
