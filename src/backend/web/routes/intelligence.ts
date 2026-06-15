@@ -125,6 +125,78 @@ function extractDate(val: unknown): string | null {
 
 export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
   // ──────────────────────────────────────────────────────────────────
+  // LEADERBOARD – GET /api/intelligence/leaderboard
+  // Read-only ranking surface backed by the latest prediction_registry
+  // snapshot. Empty production tables intentionally return [].
+  // ──────────────────────────────────────────────────────────────────
+  app.get("/api/intelligence/leaderboard", async (request, reply) => {
+    const queryParams = request.query as { limit?: string; horizon?: string };
+    const parsedLimit = Number.parseInt(queryParams.limit ?? "50", 10);
+    const limit = Number.isFinite(parsedLimit) ? Math.max(1, Math.min(parsedLimit, 200)) : 50;
+    const parsedHorizon = Number.parseInt(queryParams.horizon ?? "30", 10);
+    const horizon = [7, 30, 90, 180, 365].includes(parsedHorizon) ? parsedHorizon : 30;
+
+    try {
+      const result = await query(
+        `SELECT
+           pr.symbol,
+           msr.company_name,
+           msr.sector,
+           msr.industry,
+           pr.prediction_date,
+           pr.ranking_score,
+           pr.classification,
+           pr.confidence_score,
+           pr.confidence_level,
+           pr.quality_score,
+           pr.growth_score,
+           pr.value_score,
+           pr.momentum_score,
+           pr.risk_score,
+           pr.sector_score
+         FROM prediction_registry pr
+         LEFT JOIN master_security_registry msr ON msr.symbol = pr.symbol
+         WHERE pr.prediction_horizon = $1
+           AND pr.prediction_date = (
+             SELECT MAX(prediction_date)
+             FROM prediction_registry
+             WHERE prediction_horizon = $1
+           )
+         ORDER BY pr.ranking_score DESC, pr.symbol ASC
+         LIMIT $2`,
+        [horizon, limit],
+      );
+
+      return reply.send(result.rows.map((row: any, index: number) => ({
+        rank: index + 1,
+        symbol: row.symbol,
+        companyName: row.company_name ?? row.symbol,
+        sector: row.sector ?? null,
+        industry: row.industry ?? null,
+        predictionDate: extractDate(row.prediction_date),
+        rankingScore: row.ranking_score == null ? null : Number(row.ranking_score),
+        classification: row.classification,
+        confidenceScore: row.confidence_score == null ? null : Number(row.confidence_score),
+        confidenceLevel: row.confidence_level,
+        factors: {
+          quality: row.quality_score == null ? null : Number(row.quality_score),
+          growth: row.growth_score == null ? null : Number(row.growth_score),
+          value: row.value_score == null ? null : Number(row.value_score),
+          momentum: row.momentum_score == null ? null : Number(row.momentum_score),
+          risk: row.risk_score == null ? null : Number(row.risk_score),
+          sector: row.sector_score == null ? null : Number(row.sector_score),
+        },
+      })));
+    } catch (err: any) {
+      request.log.error({ err }, "leaderboard query failed");
+      return reply.status(500).send({
+        code: "LEADERBOARD_UNAVAILABLE",
+        error: "Leaderboard data is temporarily unavailable.",
+      });
+    }
+  });
+
+  // ──────────────────────────────────────────────────────────────────
   // COMPANY INTELLIGENCE – GET /api/intelligence/company/:symbol
   // TRACK-P2: No synthetic fallback. Real/Partial/Unavailable envelope.
   // ──────────────────────────────────────────────────────────────────
