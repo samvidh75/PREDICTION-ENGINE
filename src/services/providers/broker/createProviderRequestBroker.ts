@@ -70,5 +70,3 @@ function assertSynchronousFactoryAllowed(config: ProviderBrokerConfig): void {
 
   throw new Error('Provider broker configuration error: Redis-backed broker creation requires createProviderRequestBrokerHandle() so the Redis client is connected before use.');
 }
-
-export const providerRequestBroker = createProviderRequestBroker();
