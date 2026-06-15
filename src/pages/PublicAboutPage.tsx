@@ -3,6 +3,7 @@ import { BarChart3, Database, FileSearch, LineChart, ShieldCheck } from "lucide-
 import MobileNav from "../components/navigation/MobileNav";
 import TopNav from "../components/navigation/TopNav";
 import { ResearchDisclaimer } from "../components/ui/PageHeader";
+import Button from "../components/ui/Button";
 
 function setPage(pageKey: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -40,12 +41,12 @@ export const PublicAboutPage: React.FC = () => {
             StockStory transforms provider-driven financial data into structured, source-backed research signals. The product is built for explainability, unavailable-state honesty and repeatable analysis.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={() => setPage("signup")} className="h-11 rounded-lg bg-slate-950 px-6 text-sm font-semibold text-white hover:bg-slate-800">
+            <Button type="button" onClick={() => setPage("signup")} className="h-11 px-6 text-sm">
               Create free account
-            </button>
-            <button type="button" onClick={() => setPage("landing")} className="h-11 rounded-lg border border-slate-300 bg-white px-6 text-sm font-semibold text-slate-800 hover:bg-slate-50">
+            </Button>
+            <Button type="button" onClick={() => setPage("landing")} variant="secondary" className="h-11 px-6 text-sm">
               Back to home
-            </button>
+            </Button>
           </div>
         </div>
       </section>

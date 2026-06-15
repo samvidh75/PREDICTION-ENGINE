@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { AlertEngine, SmartAlert, AlertCategory } from '../services/portfolio/AlertEngine';
 import { Bell, X } from 'lucide-react';
-import { PageHeader } from '../components/ui/DesignSystem';
+import { PageHeader } from '../components/ui/PageHeader';
 
 function categoryColor(cat: AlertCategory): string {
   const map: Record<AlertCategory, string> = {
