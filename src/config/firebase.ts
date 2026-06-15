@@ -41,16 +41,18 @@ export const isFirebaseClientConfigured = Boolean(
     APP_ID,
 );
 
-console.log("[Firebase bootstrap] env diagnostics", {
-  hasApiKey: Boolean(API_KEY && !API_KEY.includes("placeholder")),
-  hasMessagingSenderId: Boolean(MESSAGING_SENDER_ID),
-  hasAppId: Boolean(APP_ID),
-  hasAuthDomain: Boolean(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN),
-  hasProjectId: Boolean(import.meta.env.VITE_FIREBASE_PROJECT_ID),
-  hasStorageBucket: Boolean(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET),
-  hasGoogleClientId: Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID),
-  isProd: import.meta.env.PROD,
-});
+if (import.meta.env.DEV) {
+  console.log("[Firebase bootstrap] env diagnostics", {
+    hasApiKey: Boolean(API_KEY && !API_KEY.includes("placeholder")),
+    hasMessagingSenderId: Boolean(MESSAGING_SENDER_ID),
+    hasAppId: Boolean(APP_ID),
+    hasAuthDomain: Boolean(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN),
+    hasProjectId: Boolean(import.meta.env.VITE_FIREBASE_PROJECT_ID),
+    hasStorageBucket: Boolean(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET),
+    hasGoogleClientId: Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID),
+    isProd: import.meta.env.PROD,
+  });
+}
 
 // ── Startup validation ─────────────────────────────────────────────────────
 // Warn loudly if secrets are missing. Auth calls still fail closed, but the

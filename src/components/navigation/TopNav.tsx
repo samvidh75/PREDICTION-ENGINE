@@ -53,12 +53,13 @@ export const TopNav: React.FC = () => {
 
     <nav className="fixed top-0 left-0 z-50 hidden h-[72px] w-full select-none items-center border-b border-slate-800 bg-slate-950 px-8 md:flex">
       <div className="flex-shrink-0 w-[240px] flex items-center">
-        <span 
+        <button
+          type="button"
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
-          className="text-sm font-bold tracking-[0.2em] text-[#f0f3fa] cursor-pointer"
+          className="text-sm font-bold tracking-[0.2em] text-[#f0f3fa] cursor-pointer border-none bg-transparent p-0"
         >
           STOCKSTORY<span className="text-[#2962ff]">.INDIA</span>
-        </span>
+        </button>
       </div>
 
       {isAuthenticated && user ? (
