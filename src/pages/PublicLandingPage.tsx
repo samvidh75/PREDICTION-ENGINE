@@ -20,7 +20,7 @@ export const PublicLandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative mx-auto max-w-5xl px-6 pt-32 pb-20 text-center flex flex-col items-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-6">
+        <div className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-6">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
           Professional Equity Research Platform
         </div>
@@ -58,8 +58,8 @@ export const PublicLandingPage: React.FC = () => {
       {/* Core Methodology Highlights */}
       <section className="border-t border-slate-900 bg-slate-900/20 py-16">
         <div className="mx-auto max-w-5xl px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-6 rounded-xl border border-slate-900 bg-slate-900/40">
-            <div className="mb-4 inline-flex p-2 rounded-lg bg-slate-900 text-slate-300">
+          <div className="p-6 rounded-lg border border-slate-800 bg-slate-900/40">
+            <div className="mb-4 inline-flex p-2 rounded-md bg-slate-950 text-slate-300">
               <BarChart3 className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-slate-200">Fundamental Scoring</h3>
@@ -68,8 +68,8 @@ export const PublicLandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-slate-900 bg-slate-900/40">
-            <div className="mb-4 inline-flex p-2 rounded-lg bg-slate-900 text-slate-300">
+          <div className="p-6 rounded-lg border border-slate-800 bg-slate-900/40">
+            <div className="mb-4 inline-flex p-2 rounded-md bg-slate-950 text-slate-300">
               <TrendingUp className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-slate-200">Technical Context</h3>
@@ -78,8 +78,8 @@ export const PublicLandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-slate-900 bg-slate-900/40">
-            <div className="mb-4 inline-flex p-2 rounded-lg bg-slate-900 text-slate-300">
+          <div className="p-6 rounded-lg border border-slate-800 bg-slate-900/40">
+            <div className="mb-4 inline-flex p-2 rounded-md bg-slate-950 text-slate-300">
               <HelpCircle className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-slate-200">Confidence Context</h3>

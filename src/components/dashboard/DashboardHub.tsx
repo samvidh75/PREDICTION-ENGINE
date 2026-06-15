@@ -1,13 +1,13 @@
 /**
- * TRACK-95O — Dashboard Command Centre
- * Bloomberg/Liquid-style institutional workspace.
+ * TRACK-95O — Dashboard
+ * Practical research workspace.
  * 3-column layout: Watchlist | Signals (real prediction diffs) | Portfolio Snapshot.
  * 
  * Signals are now powered by GET /api/predictions/signals — real
  * prediction_registry snapshot diffs, not synthetic rankings.
  */
 import React, { useMemo, useState, useEffect } from 'react';
-import { ArrowRight, Bell, TrendingUp, TrendingDown, Activity, Layers, Plus, Star, Eye, AlertTriangle } from 'lucide-react';
+import { ArrowRight, TrendingUp, Activity, ListFilter, Star, Eye, AlertTriangle } from 'lucide-react';
 import { StockRegistry } from '../../services/stocks/StockRegistry';
 import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
 import { PortfolioEngine } from '../../services/portfolio/PortfolioEngine';
@@ -119,8 +119,8 @@ export const DashboardHub: React.FC = () => {
           <h1 className="text-sm font-semibold">Dashboard</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate('discovery')} className="flex items-center gap-1.5 rounded border border-white/[0.08] px-3 py-1 text-[10px] font-semibold text-[#8B949E] bg-transparent cursor-pointer hover:border-white/[0.15] hover:text-white transition-colors">
-            <Plus className="h-3 w-3" /> Discover
+          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded border border-white/[0.08] px-3 py-1 text-[10px] font-semibold text-[#8B949E] bg-transparent cursor-pointer hover:border-white/[0.15] hover:text-white transition-colors">
+            <ListFilter className="h-3 w-3" /> Search
           </button>
           <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded border border-white/[0.08] px-3 py-1 text-[10px] font-semibold text-[#8B949E] bg-transparent cursor-pointer hover:border-white/[0.15] hover:text-white transition-colors">
             <Star className="h-3 w-3" /> Watchlists
@@ -142,8 +142,8 @@ export const DashboardHub: React.FC = () => {
           {followedTickers.length === 0 ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
               <p>No stocks in your watchlist.</p>
-              <button onClick={() => navigate('discovery')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
-                Add your first stock
+              <button onClick={() => navigate('search')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+                Search companies
               </button>
             </div>
           ) : (
@@ -211,27 +211,27 @@ export const DashboardHub: React.FC = () => {
 
           {signals.length > 0 && (
             <div className="border-t border-white/[0.06] px-3 py-2">
-              <button onClick={() => navigate('daily-feed')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
-                View all signals <ArrowRight className="h-3 w-3" />
+              <button onClick={() => navigate('rankings')} className="flex items-center gap-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+                View rankings <ArrowRight className="h-3 w-3" />
               </button>
             </div>
           )}
         </section>
 
-        {/* COL C: Portfolio Snapshot + Quick Access */}
+        {/* COL C: Saved research + quick access */}
         <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
             <div className="flex items-center gap-2">
-              <Layers className="h-3.5 w-3.5 text-[#22AB94]" />
-              <h2 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Portfolio</h2>
+              <Star className="h-3.5 w-3.5 text-[#22AB94]" />
+              <h2 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Saved research</h2>
             </div>
           </div>
 
           {holdings.length === 0 ? (
             <div className="px-3 py-3 text-center text-xs text-[#484F58] border-b border-white/[0.04]">
-              <p>No holdings tracked.</p>
-              <button onClick={() => navigate('portfolio')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
-                Add your first holding
+              <p>No holdings tracked in the local workspace.</p>
+              <button onClick={() => navigate('watchlist')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+                Open watchlist
               </button>
             </div>
           ) : (
@@ -270,10 +270,10 @@ export const DashboardHub: React.FC = () => {
 
           <div className="border-t border-white/[0.06] px-3 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bell className="h-3 w-3 text-[#EF9A09]" />
-              <span className="text-[10px] text-[#8B949E]">Alerts</span>
+              <ListFilter className="h-3 w-3 text-[#8B949E]" />
+              <span className="text-[10px] text-[#8B949E]">Methodology</span>
             </div>
-            <button onClick={() => navigate('alerts')} className="text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
+            <button onClick={() => navigate('methodology')} className="text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
               View →
             </button>
           </div>
