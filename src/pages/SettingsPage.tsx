@@ -8,6 +8,7 @@ import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Badge from "../components/ui/Badge";
+import tokens from "../components/ui/tokens";
 
 type SettingsTab = "profile" | "notifications" | "appearance" | "security";
 
@@ -52,7 +53,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl select-none flex-col space-y-6 pb-12 font-sans text-slate-900 antialiased">
+    <div className={`${tokens.layout.container} flex flex-col space-y-6 select-none`}>
       <header className="border-b border-slate-200 pb-5">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Settings</h1>
         <p className="mt-2 text-sm text-slate-600">

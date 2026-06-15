@@ -1,4 +1,5 @@
 import React from "react";
+import tokens from "./tokens";
 
 interface PageHeaderProps {
   title: string;
@@ -12,8 +13,8 @@ export function PageHeader({ title, subtitle, actions, primaryAction }: PageHead
   return (
     <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl leading-tight">{title}</h1>
-        {subtitle && <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-500">{subtitle}</p>}
+        <h1 className={tokens.typography.pageTitle}>{title}</h1>
+        {subtitle && <p className={tokens.typography.pageSubtitle}>{subtitle}</p>}
       </div>
       {actionContent && (
         <div className="flex shrink-0 items-center gap-2 pt-0.5">{actionContent}</div>
@@ -32,8 +33,8 @@ export function SectionHeader({ title, subtitle, action }: SectionHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <h2 className="text-sm font-semibold text-slate-950 leading-snug">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{subtitle}</p>}
+        <h2 className={tokens.typography.sectionTitle}>{title}</h2>
+        {subtitle && <p className={tokens.typography.sectionSubtitle}>{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

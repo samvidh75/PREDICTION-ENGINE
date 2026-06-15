@@ -9,6 +9,7 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
+import tokens from "../components/ui/tokens";
 
 interface RankingEntry {
   symbol: string;
@@ -74,10 +75,10 @@ export const PublicRankingsPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 pb-20 pt-[76px] text-slate-900 md:pt-28">
+    <main className="min-h-screen bg-slate-100 text-slate-900">
       <TopNav />
       <MobileNav />
-      <div className="mx-auto w-full max-w-6xl px-4">
+      <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Research rankings"
           subtitle="Rankings will appear here after production ingestion and scoring have populated verified company snapshots."

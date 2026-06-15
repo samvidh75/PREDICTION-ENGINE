@@ -11,6 +11,7 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
 import ResearchJourneyPanel from "../components/ui/ResearchJourneyPanel";
+import tokens from "../components/ui/tokens";
 
 interface SignalItem {
   symbol: string;
@@ -106,7 +107,7 @@ export const DashboardHub: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pb-12">
+    <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
         title="Research Dashboard"
         subtitle="Search any Indian listed company, track your watchlists, and monitor scoring updates when the backend pipeline runs."
@@ -197,7 +198,7 @@ export const DashboardHub: React.FC = () => {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className={tokens.layout.sidebarGrid}>
         {/* Signal changes */}
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader

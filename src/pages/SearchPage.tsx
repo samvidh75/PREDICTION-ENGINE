@@ -10,6 +10,7 @@ import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
+import tokens from "../components/ui/tokens";
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -103,7 +104,7 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 pb-16">
+    <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <Card className="p-8">
         <div className="mx-auto flex max-w-[600px] flex-col gap-5 text-center">
           <div>

@@ -5,6 +5,7 @@ import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
+import tokens from "../components/ui/tokens";
 
 export default function PublicPredictionsPage(): JSX.Element {
   const [data, setData] = useState<any[] | null>(null);
@@ -48,10 +49,10 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 pb-20 pt-[76px] text-slate-900 antialiased md:pt-28">
+    <main className="min-h-screen bg-slate-100 text-slate-900">
       <TopNav />
       <MobileNav />
-      <div className="mx-auto w-full max-w-5xl px-4">
+      <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Top-ranked companies"
           subtitle="Prediction rows will appear after production ingestion and scoring have produced verified snapshots."
