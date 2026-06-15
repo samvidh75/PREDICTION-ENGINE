@@ -4,7 +4,9 @@ import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHol
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
 import { AlertCircle, Bell, Edit2, Plus, ShieldAlert, Stethoscope, Trash2, Upload, X } from 'lucide-react';
 import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
-import { PageHeader, Button } from '../components/ui/DesignSystem';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Button } from '../components/ui/Button';
+import { ResearchDisclaimer, MetricCard } from '../components/ui/PageHeader';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-[#22ab94]';
