@@ -3,19 +3,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 export type ViewType =
   | "terminal"
   | "search"
-  | "discovery"
-  | "daily-feed"
-  | "analysis"
-  | "compare"
   | "rankings"
-  | "leaderboard"
-  | "academy"
   | "portfolio"
   | "watchlist"
-  | "alerts"
-  | "portfolio-doctor"
-  | "journal"
-  | "workspace"
   | "trust"
   | "settings";
 
@@ -28,20 +18,10 @@ export type LayoutContextType = {
 export const VIEW_TO_PAGE: Record<ViewType, string> = {
   terminal: "dashboard",
   search: "search",
-  discovery: "discovery",
-  "daily-feed": "daily-feed",
-  analysis: "analysis",
-  compare: "compare",
   rankings: "rankings",
-  leaderboard: "leaderboard",
-  academy: "academy",
   portfolio: "portfolio",
   watchlist: "watchlist",
-  alerts: "alerts",
-  "portfolio-doctor": "portfolio-doctor",
-  journal: "journal",
-  workspace: "workspace",
-  trust: "trust",
+  trust: "methodology",
   settings: "settings",
 };
 
@@ -50,21 +30,12 @@ export const NAVIGATION_VIEWS = Object.keys(VIEW_TO_PAGE) as ViewType[];
 const PAGE_TO_VIEW: Record<string, ViewType> = {
   market: "terminal",
   dashboard: "terminal",
+  explore: "terminal",
+  discovery: "terminal",
   search: "search",
-  discovery: "discovery",
-  explore: "discovery",
-  "daily-feed": "daily-feed",
-  analysis: "analysis",
-  compare: "compare",
   rankings: "rankings",
-  leaderboard: "leaderboard",
-  academy: "academy",
   portfolio: "portfolio",
   watchlist: "watchlist",
-  alerts: "alerts",
-  "portfolio-doctor": "portfolio-doctor",
-  journal: "journal",
-  workspace: "workspace",
   trust: "trust",
   methodology: "trust",
   validation: "trust",

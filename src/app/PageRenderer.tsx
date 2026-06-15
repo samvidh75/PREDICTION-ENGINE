@@ -1,6 +1,8 @@
 /**
  * PageRenderer — maps PageKey to the correct page component.
- * Extracted from App.tsx to keep routing and rendering separate.
+ * Only routes intentionally reachable from the main navigation
+ * and public routes are rendered. Stale routes fall through to
+ * the default (DashboardHub or PublicLandingPage).
  */
 import React from "react";
 import type { PageKey } from "./router";
@@ -10,33 +12,18 @@ import PublicLandingPage from "../pages/PublicLandingPage";
 import PublicAboutPage from "../pages/PublicAboutPage";
 import PublicPredictionsPage from "../pages/PublicPredictionsPage";
 import PublicRankingsPage from "../pages/PublicRankingsPage";
-import LeaderboardPage from "../pages/LeaderboardPage";
-import OnboardingWizard from "../pages/OnboardingWizard";
-import ValidationDashboard from "../pages/ValidationDashboard";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 
-// Authenticated pages
+// Authenticated pages (intentional nav targets)
 import DashboardHub from "../views/DashboardHub";
 import SearchPage from "../pages/SearchPage";
 import StockStoryPage from "../pages/StockStoryPageF0";
 import PortfolioPage from "../pages/PortfolioPage";
 import WatchlistPage from "../pages/WatchlistPage";
-import AlertCentrePage from "../pages/AlertCentrePage";
-import DiscoveryPage from "../pages/DiscoveryPage";
 import SettingsPage from "../pages/SettingsPage";
-import AcademyHub from "../views/AcademyHub";
-import AnalysisHub from "../views/AnalysisHub";
-import StockCompare from "../components/company/StockCompare";
-import PredictionJournalPage from "../pages/PredictionJournalPage";
 import TrustCentrePage from "../pages/TrustCentrePage";
-import WorkspacePage from "../pages/WorkspacePage";
-import DailyFeed from "../components/intelligence/DailyFeed";
-import PortfolioDoctor from "../components/portfolio/PortfolioDoctor";
 import AppLayout from "../components/navigation/AppLayout";
-import AcademyReviewNotice from "../components/trust/AcademyReviewNotice";
-import ResearchTrustLinks from "../components/trust/ResearchTrustLinks";
-import { AcademyProvider } from "../context/AcademyContext.jsx";
 
 interface PageRendererProps {
   pageKey: PageKey;
@@ -44,7 +31,7 @@ interface PageRendererProps {
   hasStockId: boolean;
 }
 
-const PUBLIC_ONLY_PAGES: Record<string, boolean> = {
+const PUBLIC_PAGES: Record<string, boolean> = {
   landing: true,
   about: true,
   login: true,
@@ -54,40 +41,35 @@ const PUBLIC_ONLY_PAGES: Record<string, boolean> = {
   validation: true,
   predictions: true,
   rankings: true,
-  leaderboard: true,
-  "validation-dashboard": true,
 };
 
 function renderPublicPage(pageKey: PageKey): JSX.Element {
-  if (pageKey === "about") return <PublicAboutPage />;
-  if (pageKey === "login") return <LoginPage />;
-  if (pageKey === "signup") return <SignupPage />;
-  if (pageKey === "trust" || pageKey === "methodology" || pageKey === "validation") {
-    return <TrustCentrePage />;
+  switch (pageKey) {
+    case "about":
+      return <PublicAboutPage />;
+    case "login":
+      return <LoginPage />;
+    case "signup":
+      return <SignupPage />;
+    case "trust":
+    case "methodology":
+    case "validation":
+      return <TrustCentrePage />;
+    case "predictions":
+      return <PublicPredictionsPage />;
+    case "rankings":
+      return <PublicRankingsPage />;
+    default:
+      return <PublicLandingPage />;
   }
-  if (pageKey === "predictions") return <PublicPredictionsPage />;
-  if (pageKey === "rankings") return <PublicRankingsPage />;
-  if (pageKey === "leaderboard") return <LeaderboardPage />;
-  if (pageKey === "validation-dashboard") return <ValidationDashboard />;
-  return <PublicLandingPage />;
 }
 
 function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
   switch (pageKey) {
     case "portfolio":
-      return (
-        <>
-          <ResearchTrustLinks context="Portfolio workflow" />
-          <PortfolioPage />
-        </>
-      );
+      return <PortfolioPage />;
     case "watchlist":
       return <WatchlistPage />;
-    case "alerts":
-      return <AlertCentrePage />;
-    case "discovery":
-    case "explore":
-      return <DiscoveryPage />;
     case "settings":
       return <SettingsPage />;
     case "search":
@@ -95,51 +77,15 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
     case "company":
     case "stock":
       return hasStockId ? <StockStoryPage /> : <DashboardHub />;
-    case "academy":
-      return (
-        <AcademyProvider>
-          <AcademyReviewNotice />
-          <ResearchTrustLinks context="Academy workflow" compact />
-          <AcademyHub />
-        </AcademyProvider>
-      );
-    case "analysis":
-      return <AnalysisHub />;
-    case "compare":
-      return <StockCompare />;
-    case "journal":
-      return <PredictionJournalPage />;
     case "trust":
     case "methodology":
     case "validation":
       return <TrustCentrePage />;
-    case "workspace":
-      return <WorkspacePage />;
-    case "brief":
-    case "daily-feed":
-      return (
-        <>
-          <ResearchTrustLinks context="Daily intelligence workflow" compact />
-          <DailyFeed />
-        </>
-      );
-    case "portfolio-doctor":
-      return <PortfolioDoctor />;
     case "predictions":
       return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
-    case "leaderboard":
-      return <LeaderboardPage />;
-    case "onboarding":
-      return <OnboardingWizard />;
-    case "validation-dashboard":
-      return <ValidationDashboard />;
     case "dashboard":
-    case "landing":
-    case "login":
-    case "signup":
-    case "about":
     default:
       return <DashboardHub />;
   }
@@ -147,7 +93,7 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
 
 export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
   if (!isAuthenticated) {
-    return PUBLIC_ONLY_PAGES[pageKey] ? renderPublicPage(pageKey) : <PublicLandingPage />;
+    return PUBLIC_PAGES[pageKey] ? renderPublicPage(pageKey) : <PublicLandingPage />;
   }
 
   // About keeps its public presentation even for authenticated users.

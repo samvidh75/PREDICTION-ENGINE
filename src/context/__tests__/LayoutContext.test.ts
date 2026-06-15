@@ -10,7 +10,8 @@ describe("LayoutContext route mapping", () => {
 
   it("normalizes legacy route aliases", () => {
     expect(mapPageToView("market")).toBe("terminal");
-    expect(mapPageToView("explore")).toBe("discovery");
+    expect(mapPageToView("explore")).toBe("terminal");
+    expect(mapPageToView("discovery")).toBe("terminal");
     expect(mapPageToView("methodology")).toBe("trust");
     expect(mapPageToView("validation")).toBe("trust");
   });
