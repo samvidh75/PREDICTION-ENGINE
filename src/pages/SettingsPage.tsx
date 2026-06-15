@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { User, Bell, Eye, Lock } from "lucide-react";
 import { AlertEngine, AlertCategory } from "../services/portfolio/AlertEngine";
 import { useAuth } from "../context/AuthContext";
+import { authService } from "../services/auth/authService";
+import { mapAuthError } from "../services/auth/authErrorMapper";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -33,14 +35,20 @@ export const SettingsPage: React.FC = () => {
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState("");
 
-  const handlePasswordReset = () => {
+  const handlePasswordReset = async () => {
     if (!email) {
       setResetError("No email address available.");
       return;
     }
     setResetError("");
-    setResetSent(true);
-    setTimeout(() => setResetSent(false), 5000);
+    setResetSent(false);
+    try {
+      await authService.sendPasswordReset(email);
+      setResetSent(true);
+      setTimeout(() => setResetSent(false), 5000);
+    } catch (error) {
+      setResetError(mapAuthError(error));
+    }
   };
 
   return (
@@ -82,7 +90,7 @@ export const SettingsPage: React.FC = () => {
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-bold text-white mb-1">Profile Information</h2>
-                <p className="text-xs text-slate-400">Update your primary identity metrics.</p>
+                <p className="text-xs text-slate-400">Review your workspace identity details.</p>
               </div>
               <div className="space-y-4 max-w-md">
                 <Input
@@ -184,7 +192,7 @@ export const SettingsPage: React.FC = () => {
                     <p className="text-[10px] text-slate-400 mb-3">
                       We will send a password change link to your registered email address.
                     </p>
-                    <Button variant="outline" size="sm" onClick={handlePasswordReset}>
+                    <Button variant="outline" size="sm" onClick={() => void handlePasswordReset()}>
                       Send Reset Link
                     </Button>
                     {resetSent && (

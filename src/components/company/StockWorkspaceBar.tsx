@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Bell, Clock3, Database, GitCompare, ShieldCheck } from "lucide-react";
+import { Clock3, Database, ShieldCheck } from "lucide-react";
 import { useLiveQuote } from "../../hooks/useLiveQuotes";
 import type { CompanyMetadata } from "../../services/data/types";
-import ResearchTrustLinks from "../trust/ResearchTrustLinks";
 
 export type QuoteFreshness = "Recent" | "Delayed" | "Stale" | "Unavailable";
 
@@ -47,18 +46,6 @@ function stateClass(value: string): string {
   if (value === "PARTIAL" || value === "Delayed") return "text-amber-300";
   if (value === "INVALID" || value === "Stale") return "text-rose-300";
   return "text-white/55";
-}
-
-function navigate(pageKey: string, ticker: string): void {
-  const params = new URLSearchParams(window.location.search);
-  params.set("page", pageKey);
-  params.set("symbol", ticker);
-  params.delete("id");
-  params.delete("ticker");
-  params.delete("companyId");
-  params.delete("tab");
-  window.history.pushState({}, "", `?${params.toString()}`);
-  window.dispatchEvent(new Event("urlchange"));
 }
 
 function TrustItem({ label, value, detail, valueClass = "text-white/80" }: {
@@ -123,22 +110,6 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => navigate("compare", ticker)}
-            className="flex h-8 items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-cyan-300 transition-colors hover:bg-cyan-500/20"
-          >
-            <GitCompare className="h-3.5 w-3.5" /> Compare
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("alerts", ticker)}
-            className="flex h-8 items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-violet-300 transition-colors hover:bg-violet-500/20"
-          >
-            <Bell className="h-3.5 w-3.5" /> Alerts
-          </button>
-        </div>
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
@@ -163,10 +134,6 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
         <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-300" />
         Missing market metadata remains unavailable. The workspace never infers an exchange from a bare ticker.
         <Clock3 className="ml-1 h-3 w-3 shrink-0 text-white/35" />
-      </div>
-
-      <div className="mt-3">
-        <ResearchTrustLinks context="Stock research workflow" compact />
       </div>
     </section>
   );
