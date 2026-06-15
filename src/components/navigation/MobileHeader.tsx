@@ -7,7 +7,10 @@ export const MobileHeader: React.FC<{ onMenuClick?: () => void }> = ({ onMenuCli
       onMenuClick();
       return;
     }
-    window.dispatchEvent(new Event("ss:open-search"));
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "search");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
   };
 
   return (
