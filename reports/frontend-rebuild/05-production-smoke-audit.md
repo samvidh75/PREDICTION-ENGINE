@@ -21,6 +21,7 @@ Authenticated Dashboard, Search, Watchlist, Settings, and company research flows
 - Both production domains returned `200` HTML but rendered a blank React root.
 - Browser console showed `Firebase: Error (auth/invalid-api-key)` and a missing `VITE_FIREBASE_API_KEY` diagnostic.
 - Auth initialization could keep the app from rendering when Firebase client config was missing.
+- Follow-up production re-poll showed the first pushed fix removed the console diagnostic but the deployed page still blanked because `getAuth()` was still being instantiated at module load with invalid config.
 - Public/auth pages triggered `/api/intelligence/market` through the global confidence layer, causing backend API noise on pages that should be static and public.
 - Auth diagnostic logging used console errors for handled sign-in failures, adding avoidable console noise during smoke testing.
 
@@ -28,7 +29,10 @@ Authenticated Dashboard, Search, Watchlist, Settings, and company research flows
 
 - Added a Firebase client configuration availability flag.
 - Made Firebase persistence resolve safely when client auth config is unavailable.
+- Prevented Firebase Auth from being instantiated unless the client configuration is valid.
+- Guarded the shared Firebase auth client accessor so auth calls fail closed with a mapped auth error when config is unavailable.
 - Updated AuthContext to fail closed, clear loading, and render public/auth pages with a readable auth-unavailable state when Firebase client config is missing.
+- Guarded AuthContext session sync, initialization, and logout paths from touching Firebase Auth when config is unavailable.
 - Added an auth-service guard so login/signup actions map missing Firebase config to a user-readable auth error.
 - Paused the global confidence polling layer on public and unauthenticated pages.
 - Changed handled auth diagnostics from console errors to warnings.
@@ -66,3 +70,4 @@ Note: `npm run build:frontend` emitted Vite's existing warning that `NODE_ENV=pr
 - Login rendered with no console errors or page errors.
 - Protected Search redirected to Login when unauthenticated.
 - Auth form errors rendered as readable inline alerts.
+- An explicit missing-Firebase production build (`VITE_FIREBASE_API_KEY=`, `VITE_FIREBASE_APP_ID=`, `VITE_FIREBASE_MESSAGING_SENDER_ID=`) rendered Landing, Signup, and Login with no console errors and no page errors.
