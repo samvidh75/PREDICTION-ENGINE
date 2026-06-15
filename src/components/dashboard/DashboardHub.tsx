@@ -1,7 +1,7 @@
 /**
  * TRACK-95O — Dashboard
  * Practical research workspace.
- * 3-column layout: Watchlist | Signals (real prediction diffs) | Portfolio Snapshot.
+ * 3-column layout: Watchlist | Signals (real prediction diffs) | Saved research.
  * 
  * Signals are now powered by GET /api/predictions/signals — real
  * prediction_registry snapshot diffs, not synthetic rankings.
@@ -141,7 +141,7 @@ export const DashboardHub: React.FC = () => {
           </div>
           {followedTickers.length === 0 ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
-              <p>No stocks in your watchlist.</p>
+              <p>No companies saved yet.</p>
               <button onClick={() => navigate('search')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
                 Search companies
               </button>
@@ -174,23 +174,23 @@ export const DashboardHub: React.FC = () => {
               <h2 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Signals</h2>
             </div>
             <span className="text-[10px] text-[#484F58] font-mono">
-              {signalsLoading ? '...' : signalsError ? 'err' : `${signals.length}/${symbolsAnalyzed}`}
+              {signalsLoading ? 'Loading' : signalsError ? 'Unavailable' : `${signals.length}/${symbolsAnalyzed}`}
             </span>
           </div>
 
           {signalsLoading ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
-              <p>Loading signals from prediction registry...</p>
+              <p>Loading source-backed signal changes...</p>
             </div>
           ) : signalsError ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
               <AlertTriangle className="h-4 w-4 text-[#EF9A09] mx-auto mb-1" />
-              <p>Signal data is currently unavailable.</p>
-              <p className="mt-1 text-[10px]">Check back after the daily pipeline runs.</p>
+              <p>Signal changes are not available right now.</p>
+              <p className="mt-1 text-[10px]">The dashboard will update when the prediction registry is reachable.</p>
             </div>
           ) : signals.length === 0 ? (
             <div className="px-3 py-4 text-center text-xs text-[#484F58]">
-              <p>No significant changes detected today.</p>
+              <p>No significant source-backed changes detected.</p>
               <p className="mt-1 text-[10px]">
                 {symbolsAnalyzed > 0
                   ? `${symbolsAnalyzed} symbols analyzed — markets are stable.`
@@ -229,7 +229,7 @@ export const DashboardHub: React.FC = () => {
 
           {holdings.length === 0 ? (
             <div className="px-3 py-3 text-center text-xs text-[#484F58] border-b border-white/[0.04]">
-              <p>No holdings tracked in the local workspace.</p>
+              <p>No saved research items yet.</p>
               <button onClick={() => navigate('watchlist')} className="mt-1 text-[10px] text-[#2962FF] bg-transparent border-none cursor-pointer hover:underline">
                 Open watchlist
               </button>
