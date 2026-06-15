@@ -72,6 +72,15 @@ type MetadataState = {
 };
 
 const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents", "whychange"];
+const TAB_LABELS: Record<TabKey, string> = {
+  overview: "Overview",
+  financials: "Fundamentals",
+  valuation: "Valuation",
+  ownership: "Quality",
+  risks: "Risk",
+  documents: "Data freshness",
+  whychange: "Score changes",
+};
 
 function readTickerFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -639,7 +648,7 @@ export const StockStoryPage: React.FC = () => {
               activeTab === tab ? "border-cyan-400 text-cyan-400 font-extrabold" : "border-transparent text-white/50 hover:text-white"
             }`}
           >
-            {tab}
+            {TAB_LABELS[tab]}
           </button>
         ))}
       </div>

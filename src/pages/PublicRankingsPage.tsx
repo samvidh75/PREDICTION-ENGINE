@@ -72,9 +72,9 @@ export const PublicRankingsPage: React.FC = () => {
   return (
     <main className="w-full max-w-6xl mx-auto px-4 py-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Stock Rankings</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Research rankings</h1>
         <p className="mt-2 text-sm text-slate-400">
-          Sorted by StockStory Engine composite score. Updated daily.
+          Source-backed ranking rows from the intelligence API. Missing values stay unavailable.
         </p>
       </header>
 
@@ -108,9 +108,9 @@ export const PublicRankingsPage: React.FC = () => {
       {loading ? (
         <div className="text-sm text-slate-400 py-12 text-center">Loading rankings...</div>
       ) : filteredRankings.length === 0 ? (
-        <EmptyState description="No rankings match your filter criteria or data is unavailable." />
+        <EmptyState description="No ranking rows match your filters, or ranking data is currently unavailable." />
       ) : (
-        <Table headers={["Rank", "Symbol", "Company", "Health Score", "Confidence", "Sector"]}>
+        <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector"]}>
           {filteredRankings.map((r, index) => {
             const registryInfo = StockRegistry.getStock(r.symbol);
             return (

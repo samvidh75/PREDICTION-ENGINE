@@ -107,9 +107,9 @@ export const SearchPage: React.FC = () => {
       <Card className="p-8">
         <div className="mx-auto flex max-w-[600px] flex-col gap-5 text-center">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Search Workspace</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-white">Search Indian stocks</h1>
             <p className="mt-1 text-sm text-slate-400">
-              Search Indian equities by ticker symbol, company name, or sector.
+              The fastest path into a company research page.
             </p>
           </div>
 
@@ -121,7 +121,7 @@ export const SearchPage: React.FC = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSubmit();
               }}
-              placeholder="Try RELIANCE, Infosys, Tata..."
+              placeholder="Try RELIANCE, TCS, INFY..."
               className="pl-10"
             />
             <Search className="absolute left-3 top-[13px] h-4 w-4 text-slate-500" />
@@ -195,11 +195,11 @@ export const SearchPage: React.FC = () => {
                 })}
               </div>
             ) : (
-              <EmptyState description="No matching companies found." />
+              <EmptyState description="No matching company was found in the current Indian equity registry." />
             )}
           </>
         ) : (
-          <EmptyState description="Start typing at least 2 characters to see matching companies." />
+          <EmptyState description="Type at least 2 characters to search by ticker, company name, or sector." />
         )}
       </section>
     </div>
