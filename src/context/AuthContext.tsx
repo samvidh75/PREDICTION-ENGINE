@@ -228,7 +228,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           displayName: stored.displayName ?? null,
         });
         setSessionAgeMs(getSessionAgeMs());
-      } else if (!firebaseAuth.currentUser) {
+      } else if (!isFirebaseClientConfigured || !firebaseAuth.currentUser) {
         setUser(null);
         setSessionAgeMs(null);
       }
@@ -247,6 +247,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsConnecting(true);
     setAuthError(null);
     try {
+      if (!isFirebaseClientConfigured) {
+        setAuthError("Authentication is not configured for this deployment. Please contact support.");
+        return;
+      }
       await firebasePersistenceReady;
       if (firebaseAuth.currentUser) {
         await firebaseAuth.currentUser.reload();
@@ -272,7 +276,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsConnecting(true);
     setAuthError(null);
     try {
-      await firebaseSignOut(firebaseAuth);
+      if (isFirebaseClientConfigured) {
+        await firebaseSignOut(firebaseAuth);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Sign out could not be completed.";
       logAuthState({ phase: "persistence_error", error: message });

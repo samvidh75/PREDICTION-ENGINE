@@ -88,7 +88,9 @@ export const firebaseApp: FirebaseApp =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // ── Auth (LOCAL persistence = survives browser refresh) ───────────────────
-export const firebaseAuth: Auth = getAuth(firebaseApp);
+export const firebaseAuth: Auth = isFirebaseClientConfigured
+  ? getAuth(firebaseApp)
+  : (null as unknown as Auth);
 
 // Set session persistence to LOCAL so users stay signed in across refreshes.
 // This is async; components relying on auth state must use onAuthStateChanged.

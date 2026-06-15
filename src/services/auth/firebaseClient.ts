@@ -5,10 +5,13 @@
  * Kept as a function so call-sites don't change (authService.ts calls getFirebaseAuthClient()).
  */
 
-import { firebaseApp, firebaseAuth } from "../../config/firebase";
+import { firebaseApp, firebaseAuth, isFirebaseClientConfigured } from "../../config/firebase";
 import type { FirebaseApp } from "firebase/app";
 import type { Auth } from "firebase/auth";
 
 export function getFirebaseAuthClient(): { app: FirebaseApp; auth: Auth } {
+  if (!isFirebaseClientConfigured) {
+    throw { code: "auth/missing-api-key", message: "Firebase authentication is not configured for this deployment." };
+  }
   return { app: firebaseApp, auth: firebaseAuth };
 }
