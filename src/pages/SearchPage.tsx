@@ -5,7 +5,11 @@ import { UserJourneyEngine } from "../services/behavior/UserJourneyEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { RegisteredStock } from "../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../services/stocks/StockSearchEngine";
-import { CompanyCard } from "../components/company/CompanyCard";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
+import Input from "../components/ui/Input";
+import ScorePill from "../components/ui/ScorePill";
+import EmptyState from "../components/ui/EmptyState";
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -22,18 +26,6 @@ function updateSearchUrl(query: string, mode: "push" | "replace"): void {
   else window.history.replaceState({}, "", url.toString());
 
   window.dispatchEvent(new Event("urlchange"));
-}
-
-function getScore(stock: RegisteredStock): number | string {
-  const snapshotScore = stock.telemetrySnapshot?.healthScore;
-  return typeof snapshotScore === "number" ? Math.round(snapshotScore) : "N/A";
-}
-
-function getOneLineReason(stock: RegisteredStock): string {
-  if (stock.sector?.trim()) {
-    return `${stock.sector} company available for company intelligence review.`;
-  }
-  return "Company intelligence is available for this listing.";
 }
 
 export const SearchPage: React.FC = () => {
@@ -111,28 +103,28 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 pb-16">
-      <section className="ss-tv-panel ss-tv-neon-edge rounded-2xl p-5 md:p-6">
-        <div className="mx-auto flex max-w-[720px] flex-col gap-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-[#f0f3fa] md:text-3xl">Search</h1>
-            <p className="mt-2 text-sm text-[#b2b5be]">
-              Search Indian companies by ticker, company name, or sector.
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 pb-16">
+      <Card className="p-8">
+        <div className="mx-auto flex max-w-[600px] flex-col gap-5 text-center">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">Search Workspace</h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Search Indian equities by ticker symbol, company name, or sector.
             </p>
           </div>
 
-          <div className="flex h-14 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_0_30px_rgba(41,98,255,0.08)]">
-            <Search className="h-4 w-4 text-[#787b86]" />
-            <input
+          <div className="relative">
+            <Input
               ref={inputRef}
               value={query}
-              onChange={(event) => handleSearchChange(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") handleSubmit();
+              onChange={(e) => handleSearchChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSubmit();
               }}
-              placeholder="Try RELIANCE, Infosys, Banking, or Tata"
-              className="h-full flex-1 border-none bg-transparent text-base text-[#f0f3fa] outline-none placeholder:text-[#787b86]"
+              placeholder="Try RELIANCE, Infosys, Tata..."
+              className="pl-10"
             />
+            <Search className="absolute left-3 top-[13px] h-4 w-4 text-slate-500" />
           </div>
 
           {recentSearches.length > 0 && !query.trim() && (
@@ -142,7 +134,7 @@ export const SearchPage: React.FC = () => {
                   key={item}
                   type="button"
                   onClick={() => handleRecentSearch(item)}
-                  className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-[#b2b5be] transition hover:border-[#2962ff]/50 hover:text-[#f0f3fa]"
+                  className="rounded-full border border-slate-800 bg-slate-900/50 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-600 transition"
                 >
                   {item}
                 </button>
@@ -150,45 +142,51 @@ export const SearchPage: React.FC = () => {
             </div>
           )}
         </div>
-      </section>
+      </Card>
 
       <section className="space-y-4">
-        <div className="text-xs text-[#787b86]">
-          Health Score and Research Signal are research aids based on available company data, not investment advice.
-        </div>
         {query.trim().length >= 2 ? (
           <>
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-medium text-[#b2b5be]">
-                {results.length} result{results.length === 1 ? "" : "s"} for <span className="text-[#f0f3fa]">{query.trim()}</span>
-              </div>
+            <div className="text-sm font-medium text-slate-400">
+              {results.length} result{results.length === 1 ? "" : "s"} for <span className="text-white">"{query.trim()}"</span>
             </div>
 
             {results.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {results.map((stock) => (
-                  <CompanyCard
-                    key={stock.symbol}
-                    ticker={stock.symbol}
-                    name={stock.companyName}
-                    sector={stock.sector || "Data unavailable"}
-                    marketCap={stock.marketCap.formatted || "Data unavailable"}
-                    score={getScore(stock)}
-                    whyItMatters={getOneLineReason(stock)}
-                    onOpenBriefing={() => handleOpenStock(stock)}
-                  />
-                ))}
+              <div className="grid gap-4 md:grid-cols-2">
+                {results.map((stock) => {
+                  const score = stock.telemetrySnapshot?.healthScore ?? 0;
+                  return (
+                    <Card
+                      key={stock.symbol}
+                      onClick={() => handleOpenStock(stock)}
+                      className="flex flex-col justify-between hover:bg-slate-900/80 cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                          <div className="font-mono font-bold text-lg text-white">
+                            {stock.symbol}
+                          </div>
+                          <div className="text-xs text-slate-400 truncate max-w-[200px]">
+                            {stock.companyName}
+                          </div>
+                        </div>
+                        <ScorePill score={score} />
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-slate-800 pt-3 text-[11px] text-slate-400">
+                        <Badge variant="info">{stock.sector || "Unavailable"}</Badge>
+                        <span>{stock.marketCap.formatted || "Data unavailable"}</span>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
             ) : (
-              <div className="ss-tv-panel rounded-2xl p-8 text-center text-sm text-[#787b86]">
-                No matching companies found for this search yet.
-              </div>
+              <EmptyState description="No matching companies found." />
             )}
           </>
         ) : (
-          <div className="ss-tv-panel rounded-2xl p-8 text-center text-sm text-[#787b86]">
-            Start typing at least 2 characters to see matching companies.
-          </div>
+          <EmptyState description="Start typing at least 2 characters to see matching companies." />
         )}
       </section>
     </div>

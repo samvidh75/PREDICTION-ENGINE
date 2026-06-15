@@ -16,18 +16,8 @@ import PageRenderer from "./app/PageRenderer";
 import TokenProvider from "./shared/ui/foundations/TokenProvider";
 import { buildTokenCssVars } from "./shared/ui/foundations/tokenCssVarMaps";
 
-// Intelligence & spatial layers
-import MotionController from "./components/motion/MotionController";
+// Intelligence layers
 import ConfidenceEngine from "./components/intelligence/ConfidenceEngine";
-import LivingInterfaceEngine from "./components/spatial/LivingInterfaceEngine";
-import { SpatialEnvironmentProvider } from "./components/spatial/SpatialEnvironmentContext";
-import SpatialInterfaceReconstructionEngine from "./components/spatial/SpatialInterfaceReconstructionEngine";
-import SpatialTypographyRenderingEngine from "./components/spatial/SpatialTypographyRenderingEngine";
-import MasterMotionEngine from "./components/motion/MasterMotionEngine";
-import CinematicTransitionLayer from "./components/motion/CinematicTransitionLayer";
-import AdaptiveColourCoordinationLayer from "./components/intelligence/AdaptiveColourCoordinationLayer";
-import ResponsiveUIScalingLayer from "./components/intelligence/ResponsiveUIScalingLayer";
-import IntelligenceHUD from "./components/intelligence/IntelligenceHUD";
 
 // Error handling
 import SubsystemErrorBoundary from "./components/diagnostics/SubsystemErrorBoundary";
@@ -203,35 +193,15 @@ function AppContent(): JSX.Element {
   // ── Main app shell ──
   return (
     <TokenProvider tokenVars={buildTokenCssVars()}>
-      <MotionController>
-        <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
-          <MasterMotionEngine enabled={true}>
-            <SpatialEnvironmentProvider enabled>
-              <SpatialTypographyRenderingEngine enabled>
-                <SpatialInterfaceReconstructionEngine enabled={true} />
-                <AdaptiveColourCoordinationLayer>
-                  <ResponsiveUIScalingLayer>
-                    <LivingInterfaceEngine enabled={true}>
-                      <CinematicTransitionLayer activeKey={routeSignature} enabled>
-                        <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
-                          <PageRenderer
-                            pageKey={activePageKey}
-                            isAuthenticated={isAuthed}
-                            hasStockId={hasStockIdParam}
-                          />
-                        </SubsystemErrorBoundary>
-                      </CinematicTransitionLayer>
-                      <SubsystemErrorBoundary subsystem="intelligence_hud" phase="render">
-                        <IntelligenceHUD />
-                      </SubsystemErrorBoundary>
-                    </LivingInterfaceEngine>
-                  </ResponsiveUIScalingLayer>
-                </AdaptiveColourCoordinationLayer>
-              </SpatialTypographyRenderingEngine>
-            </SpatialEnvironmentProvider>
-          </MasterMotionEngine>
-        </ConfidenceEngine>
-      </MotionController>
+      <ConfidenceEngine paused={false} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
+        <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
+          <PageRenderer
+            pageKey={activePageKey}
+            isAuthenticated={isAuthed}
+            hasStockId={hasStockIdParam}
+          />
+        </SubsystemErrorBoundary>
+      </ConfidenceEngine>
     </TokenProvider>
   );
 }
