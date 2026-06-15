@@ -440,6 +440,30 @@ export const StockStoryPage: React.FC = () => {
             {storyData?.unavailableMessage ?? storyError ?? `StockStory could not find a usable production prediction snapshot for ${ticker}.`}
           </p>
 
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => navigateToPage("search")}
+              className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              Back to search
+            </button>
+            <button
+              type="button"
+              onClick={() => navigateToPage("methodology")}
+              className="h-10 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+            >
+              View methodology
+            </button>
+            <button
+              type="button"
+              onClick={() => navigateToPage("rankings")}
+              className="h-10 rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+            >
+              View rankings
+            </button>
+          </div>
+
           {missingInputs.length > 0 && (
             <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Missing inputs</div>

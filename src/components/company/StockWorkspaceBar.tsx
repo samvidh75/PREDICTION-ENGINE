@@ -43,23 +43,23 @@ function sourceLabel(source?: CompanyMetadata["enrichmentSource"]): string {
 }
 
 function stateClass(value: string): string {
-  if (value === "VERIFIED" || value === "Recent") return "text-emerald-300";
-  if (value === "PARTIAL" || value === "Delayed") return "text-amber-300";
-  if (value === "INVALID" || value === "Stale") return "text-rose-300";
-  return "text-white/55";
+  if (value === "VERIFIED" || value === "Recent") return "text-emerald-700";
+  if (value === "PARTIAL" || value === "Delayed") return "text-amber-700";
+  if (value === "INVALID" || value === "Stale") return "text-rose-700";
+  return "text-slate-500";
 }
 
-function TrustItem({ label, value, detail, valueClass = "text-white/80" }: {
+function TrustItem({ label, value, detail, valueClass = "text-slate-800" }: {
   label: string;
   value: string;
   detail?: string;
   valueClass?: string;
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-white/5 bg-white/[0.018] px-3 py-2.5">
-      <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/35">{label}</div>
+    <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+      <div className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500">{label}</div>
       <div className={`mt-1 truncate text-[11px] font-semibold ${valueClass}`}>{value}</div>
-      {detail && <div className="mt-0.5 truncate text-[9px] text-white/35">{detail}</div>}
+      {detail && <div className="mt-0.5 truncate text-[9px] text-slate-500">{detail}</div>}
     </div>
   );
 }
@@ -102,13 +102,13 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
   const quoteTimestamp = quoteState.loading ? "Loading quote timestamp" : formatDateTime(quoteState.quote?.updatedAt);
 
   return (
-    <section aria-label="Stock workspace context" className="mx-auto mb-4 w-full max-w-7xl rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3 text-white shadow-lg shadow-black/10">
+    <section aria-label="Stock workspace context" className="mx-auto mb-4 w-full max-w-7xl rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex items-center gap-2">
-          <Database className="h-4 w-4 text-cyan-300" />
+          <Database className="h-4 w-4 text-emerald-700" />
           <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-cyan-300">Stock workspace</div>
-            <div className="mt-0.5 text-[10px] text-white/40">{ticker} · {horizon}D prediction horizon · registry-backed scores only</div>
+            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-800">Stock workspace</div>
+            <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D prediction horizon · registry-backed scores only</div>
           </div>
         </div>
 
@@ -132,10 +132,10 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
         <TrustItem label="Quote timestamp" value={quoteTimestamp} />
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 text-[9px] leading-relaxed text-white/35">
-        <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-300" />
+      <div className="mt-2 flex items-center gap-1.5 text-[9px] leading-relaxed text-slate-500">
+        <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-700" />
         Missing market data remains unavailable. Exchange labels use provider metadata when available, then the local company registry.
-        <Clock3 className="ml-1 h-3 w-3 shrink-0 text-white/35" />
+        <Clock3 className="ml-1 h-3 w-3 shrink-0 text-slate-400" />
       </div>
     </section>
   );

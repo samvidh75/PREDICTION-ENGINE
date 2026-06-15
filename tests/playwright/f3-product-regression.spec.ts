@@ -187,7 +187,7 @@ test.describe("Public route smoke", () => {
   test("rankings page renders", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText(/rankings/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import Card from "../components/ui/Card";
-import { EmptyState, ErrorState, LoadingState } from "../components/ui/DataState";
+import { EmptyState, LoadingState } from "../components/ui/DataState";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer, SectionHeader } from "../components/ui/PageHeader";
 import ScorePill from "../components/ui/ScorePill";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
@@ -131,16 +131,16 @@ export const DashboardHub: React.FC = () => {
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader
             title="Signal changes"
-            subtitle="Fetched from /api/predictions/signals; no synthetic rows are shown."
+            subtitle="Changes appear after production ingestion and scoring publish verified snapshots."
             action={<MissingDataBadge />}
           />
           <div className="mt-4">
             {signalsLoading ? (
               <LoadingState description="Checking the prediction registry for source-backed changes." />
             ) : signalsError ? (
-              <ErrorState
-                title="Signals unavailable"
-                description="The signal endpoint could not be reached. The dashboard keeps this section unavailable instead of inventing market events."
+              <EmptyState
+                title="Signals are not ready yet"
+                description="Signal changes will appear after the production data backfill completes. No sample events are shown."
               />
             ) : signals.length === 0 ? (
               <EmptyState
@@ -222,7 +222,9 @@ export const DashboardHub: React.FC = () => {
             )}
           </Card>
 
-          <ResearchDisclaimer />
+          <div className="hidden lg:block">
+            <ResearchDisclaimer />
+          </div>
           <Button type="button" variant="secondary" className="w-full" onClick={() => navigate("methodology")}>
             <ShieldCheck className="h-4 w-4" />
             Methodology

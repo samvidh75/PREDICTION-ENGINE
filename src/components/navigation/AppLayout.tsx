@@ -13,9 +13,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="relative flex h-screen w-screen select-none flex-col overflow-hidden bg-slate-100 font-sans text-slate-900">
-      <div className="hidden md:block">
-        <TopNav />
-      </div>
+      <TopNav />
 
       <div className="relative flex h-full w-full flex-1 overflow-hidden">
         <Sidebar />

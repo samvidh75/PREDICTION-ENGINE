@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const ProfileButton: React.FC = () => {
@@ -13,22 +13,25 @@ export const ProfileButton: React.FC = () => {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+        className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-700 transition hover:bg-slate-50"
         aria-expanded={open}
+        aria-label="Account menu"
       >
-        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#2962ff] to-[#8f5cff]" />
-        <span className="text-xs font-medium text-white truncate max-w-[120px]">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
+          <User className="h-3.5 w-3.5" />
+        </span>
+        <span className="max-w-[140px] truncate text-xs font-medium">
           {user.displayName || user.email || 'Account'}
         </span>
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg border border-white/10 bg-[#090b0d] p-2 shadow-2xl">
+        <div className="absolute right-0 mt-2 w-48 rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
           <button
             type="button"
             disabled={isConnecting}
             onClick={() => void logout()}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-50"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950 disabled:opacity-50"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign out

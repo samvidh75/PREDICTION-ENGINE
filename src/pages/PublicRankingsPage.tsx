@@ -6,6 +6,8 @@ import ScorePill from "../components/ui/ScorePill";
 import EmptyState from "../components/ui/EmptyState";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import TopNav from "../components/navigation/TopNav";
+import MobileNav from "../components/navigation/MobileNav";
 
 interface RankingEntry {
   symbol: string;
@@ -71,16 +73,20 @@ export const PublicRankingsPage: React.FC = () => {
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 text-slate-900">
-      <PageHeader
-        title="Research rankings"
-        subtitle="Source-backed ranking rows from the intelligence API. Missing values stay unavailable."
-        primaryAction={<MissingDataBadge />}
-      />
+    <main className="min-h-screen bg-slate-100 pb-20 pt-[76px] text-slate-900 md:pt-28">
+      <TopNav />
+      <MobileNav />
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <PageHeader
+          title="Research rankings"
+          subtitle="Rankings will appear here after production ingestion and scoring have populated verified company snapshots."
+          primaryAction={<MissingDataBadge />}
+        />
 
       <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:flex-row">
         <div className="w-full sm:w-72">
           <Input
+            aria-label="Search rankings by symbol or sector"
             placeholder="Search symbol or sector..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -107,7 +113,10 @@ export const PublicRankingsPage: React.FC = () => {
       {loading ? (
         <div className="py-12 text-center text-sm text-slate-500">Loading rankings...</div>
       ) : filteredRankings.length === 0 ? (
-        <EmptyState description="No ranking rows match your filters, or ranking data is currently unavailable." />
+        <EmptyState
+          title="Rankings are not available yet"
+          description="Once the production data backfill completes, verified ranking rows will appear here. No sample rows are shown in the meantime."
+        />
       ) : (
         <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector"]}>
           {filteredRankings.map((r, index) => {
@@ -149,6 +158,7 @@ export const PublicRankingsPage: React.FC = () => {
       )}
       <div className="mt-6">
         <ResearchDisclaimer />
+      </div>
       </div>
     </main>
   );
