@@ -17,7 +17,10 @@ export const TopNav: React.FC = () => {
   };
 
   const triggerSearch = () => {
-    window.dispatchEvent(new Event("ss:open-search"));
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "search");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
   };
 
   return (
