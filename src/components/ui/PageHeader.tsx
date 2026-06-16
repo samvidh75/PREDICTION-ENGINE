@@ -84,3 +84,40 @@ export function MissingDataBadge() {
     </span>
   );
 }
+
+interface FreshnessBadgeProps {
+  date?: string | null;
+}
+
+function formatDisplayDate(date: string): string {
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toISOString().slice(0, 10);
+}
+
+export function DataFreshnessBadge({ date }: FreshnessBadgeProps) {
+  if (!date) {
+    return (
+      <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-medium text-slate-400 select-none">
+        Freshness pending
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-800 select-none">
+      As of {formatDisplayDate(date)}
+    </span>
+  );
+}
+
+interface SourceBadgeProps {
+  source?: string | null;
+}
+
+export function SourceBadge({ source }: SourceBadgeProps) {
+  return (
+    <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-600 font-mono select-none">
+      {source || "Unavailable"}
+    </span>
+  );
+}

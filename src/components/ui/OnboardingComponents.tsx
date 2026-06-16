@@ -3,6 +3,13 @@ import { CheckCircle2, Circle, AlertCircle, ShieldCheck, X } from "lucide-react"
 import { Button } from "./Button";
 import Card from "./Card";
 
+interface OpsHealthMetrics {
+  predictions_today?: number;
+  symbols_covered?: number;
+  pipeline_freshness?: string;
+  db_health?: string;
+}
+
 interface StepItem {
   id: string;
   title: string;
@@ -89,6 +96,21 @@ export const DataReadinessPanel: React.FC = () => {
     return false;
   });
 
+  const [metrics, setMetrics] = useState<OpsHealthMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/ops/health")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "ok" && data.metrics) {
+          setMetrics(data.metrics);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   const handleDismiss = () => {
     window.localStorage.setItem(DATA_PANEL_DISMISSED_KEY, "true");
     setDismissed(true);
@@ -96,14 +118,37 @@ export const DataReadinessPanel: React.FC = () => {
 
   if (dismissed) return null;
 
+  const predictionsToday =
+    typeof metrics?.predictions_today === "number" && metrics.predictions_today >= 0
+      ? metrics.predictions_today
+      : null;
+  const symbolsCovered =
+    typeof metrics?.symbols_covered === "number" && metrics.symbols_covered >= 0
+      ? metrics.symbols_covered
+      : null;
+  const hasRealData = predictionsToday !== null && predictionsToday > 0;
+  const hasHealthCheck = metrics?.db_health === "connected";
+
   return (
-    <Card className="border-slate-200/80 bg-white p-4">
+    <Card className={`border-slate-200/80 bg-white p-4`}>
       <div className="flex items-start gap-3">
-        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+        <AlertCircle className={`mt-0.5 h-4 w-4 shrink-0 ${hasRealData ? "text-emerald-700" : "text-slate-500"}`} />
         <div className="flex-1 space-y-1">
-          <h3 className="text-xs font-semibold text-slate-900">Rankings are not available yet</h3>
+          <h3 className="text-xs font-semibold text-slate-900">
+            {hasRealData
+              ? "Scoring pipeline is active"
+              : hasHealthCheck
+                ? "Scoring data is connected"
+                : loading
+                  ? "Checking scoring data"
+                  : "Scoring pipeline checks are pending"}
+          </h3>
           <p className="max-w-2xl text-[11px] leading-5 text-slate-500">
-            Search works where source data exists. Rankings and prediction rows appear only when scoring has source-backed inputs.
+            {hasRealData
+              ? `Surfacing ${predictionsToday.toLocaleString()} prediction rows for today${
+                  symbolsCovered !== null ? ` across ${symbolsCovered.toLocaleString()} symbols` : ""
+                }${metrics?.pipeline_freshness ? `; price freshness ${metrics.pipeline_freshness}` : ""}.`
+              : "Search works where source data exists. Rankings and prediction rows appear only when scoring has source-backed inputs."}
           </p>
         </div>
         <button

@@ -85,6 +85,18 @@ export const TopNav: React.FC = () => {
         </>
       ) : (
         <div className="flex-shrink-0 flex items-center gap-6 ml-auto">
+          <button
+            onClick={() => setPage("rankings")}
+            className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"
+          >
+            Rankings
+          </button>
+          <button
+            onClick={() => setPage("predictions")}
+            className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"
+          >
+            Signals
+          </button>
           <button 
             onClick={() => setPage("about")}
             className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"

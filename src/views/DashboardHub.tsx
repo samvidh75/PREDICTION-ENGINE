@@ -4,7 +4,7 @@ import { Button } from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import { EmptyState, LoadingState } from "../components/ui/DataState";
-import { MissingDataBadge, PageHeader, ResearchDisclaimer, SectionHeader } from "../components/ui/PageHeader";
+import { MissingDataBadge, PageHeader, ResearchDisclaimer, SectionHeader, DataFreshnessBadge } from "../components/ui/PageHeader";
 import ScorePill from "../components/ui/ScorePill";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
@@ -18,6 +18,14 @@ interface SignalItem {
   type: string;
   severity: "critical" | "important" | "monitor";
   explanation: string;
+  snapshotDate?: string | null;
+}
+
+interface OpsHealthMetrics {
+  predictions_today?: number;
+  symbols_covered?: number;
+  pipeline_freshness?: string;
+  db_health?: string;
 }
 
 function navigate(pageKey: string, query?: string): void {
@@ -64,6 +72,19 @@ export const DashboardHub: React.FC = () => {
     return () => window.removeEventListener("watchlistchange", handler);
   }, []);
 
+  const [pipelineMetrics, setPipelineMetrics] = useState<OpsHealthMetrics | null>(null);
+
+  useEffect(() => {
+    fetch("/api/ops/health")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ok" && data.metrics) {
+          setPipelineMetrics(data.metrics);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
     setSignalsLoading(true);
@@ -77,14 +98,16 @@ export const DashboardHub: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        const items: SignalItem[] = (data.signals ?? []).map((signal: any) => ({
+        const payload = data.data || data;
+        const items: SignalItem[] = (payload.signals ?? []).map((signal: any) => ({
           symbol: signal.symbol,
           type: signal.type,
           severity: signal.severity,
           explanation: signal.explanation ?? "",
+          snapshotDate: signal.snapshotDate || payload.snapshotDate || null,
         }));
         setSignals(items);
-        setSymbolsAnalyzed(data.symbolsAnalyzed ?? 0);
+        setSymbolsAnalyzed(payload.symbolsAnalyzed ?? 0);
       })
       .catch(() => {
         if (controller.signal.aborted) return;
@@ -104,6 +127,15 @@ export const DashboardHub: React.FC = () => {
   }, [watchlists]);
   const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
   const recentTickers = recentResearch.slice(0, 6);
+  const healthSymbolsCovered =
+    typeof pipelineMetrics?.symbols_covered === "number" && pipelineMetrics.symbols_covered >= 0
+      ? pipelineMetrics.symbols_covered
+      : null;
+  const healthPredictionsToday =
+    typeof pipelineMetrics?.predictions_today === "number" && pipelineMetrics.predictions_today >= 0
+      ? pipelineMetrics.predictions_today
+      : null;
+  const indexedCompanyCount = healthSymbolsCovered ?? (signalsLoading ? null : symbolsAnalyzed);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -207,9 +239,15 @@ export const DashboardHub: React.FC = () => {
         <Card>
           <SectionHeader title="Indexed companies" subtitle="Verified registry" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {signalsLoading ? "—" : symbolsAnalyzed}
+            {indexedCompanyCount === null ? "—" : indexedCompanyCount.toLocaleString()}
           </div>
-          <p className="mt-1 text-xs text-slate-500">Available after source updates.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {healthPredictionsToday !== null
+              ? `${healthPredictionsToday.toLocaleString()} prediction rows today${
+                  pipelineMetrics?.pipeline_freshness ? `; prices ${pipelineMetrics.pipeline_freshness}` : ""
+                }.`
+              : "Available after source updates."}
+          </p>
         </Card>
       </div>
 
@@ -219,7 +257,7 @@ export const DashboardHub: React.FC = () => {
           <SectionHeader
             title="Score changes"
             subtitle="Appears when verified score changes are available."
-            action={<MissingDataBadge />}
+            action={signals[0]?.snapshotDate ? <DataFreshnessBadge date={signals[0].snapshotDate} /> : <MissingDataBadge />}
           />
           <div className="mt-4">
             {signalsLoading ? (
