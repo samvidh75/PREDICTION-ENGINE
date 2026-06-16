@@ -2,16 +2,12 @@ import React from "react";
 import { AlertCircle, CircleSlash, Loader2 } from "lucide-react";
 
 interface DataStateProps {
-  /** Title shown in loading/empty/error states */
   title?: string;
-  /** Description shown in loading/empty/error states */
   description: string;
-  /** Optional className override */
   className?: string;
 }
 
 interface EmptyStateProps extends DataStateProps {
-  /** Optional CTA element rendered below the description */
   action?: React.ReactNode;
 }
 
@@ -33,22 +29,22 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-lg border border-slate-200/80 bg-white p-8 text-center shadow-[0_1px_2px_rgba(15,23,42,0.03)] ${className}`}
+      className={`flex flex-col items-center justify-center rounded-xl border border-slate-200/60 bg-white p-8 text-center shadow-sm ${className}`}
     >
-      <CircleSlash className="mb-4 h-6 w-6 text-slate-300" aria-hidden="true" />
+      <CircleSlash className="mb-3 h-6 w-6 text-slate-300" aria-hidden="true" />
       <h3 className="mb-1 text-sm font-semibold text-slate-800">{title}</h3>
       <p className="max-w-sm text-xs leading-5 text-slate-500">{description}</p>
-      {action && <div className="mt-5 grid w-full max-w-sm gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center">{action}</div>}
+      {action && <div className="mt-5 flex w-full max-w-sm flex-wrap justify-center gap-2">{action}</div>}
     </div>
   );
 }
 
 export function ErrorState({ title = "Something went wrong", description, className = "" }: DataStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center rounded-lg border border-rose-100 bg-rose-50 p-8 text-center ${className}`}>
-      <AlertCircle className="mb-3 h-7 w-7 text-rose-600" />
-      <h3 className="text-sm font-semibold text-rose-800">{title}</h3>
-      <p className="mt-1 text-xs text-rose-700 max-w-sm">{description}</p>
+    <div className={`flex flex-col items-center justify-center rounded-xl border border-red-100 bg-red-50 p-8 text-center ${className}`}>
+      <AlertCircle className="mb-3 h-7 w-7 text-red-600" />
+      <h3 className="text-sm font-semibold text-red-800">{title}</h3>
+      <p className="mt-1 max-w-sm text-xs text-red-700">{description}</p>
     </div>
   );
 }

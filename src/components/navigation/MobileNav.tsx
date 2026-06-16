@@ -73,7 +73,7 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[90] flex h-16 items-center justify-around border-t border-slate-200 bg-white px-2 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around border-t border-slate-200 bg-white/95 px-2 backdrop-blur-md md:hidden">
       {isPublicMobile
         ? publicTabs.map((tab) => {
             const isActive = currentPage === tab.page;
@@ -83,11 +83,11 @@ export const MobileNav: React.FC = () => {
                 type="button"
                 onClick={() => handlePublicNav(tab.page)}
                 className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
-                  isActive ? "text-emerald-800" : "text-slate-500"
+                  isActive ? "text-emerald-800" : "text-slate-400"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[9px] font-bold uppercase tracking-wider">{tab.label}</span>
+                <span className="text-[8px] font-semibold uppercase tracking-wider">{tab.label}</span>
               </button>
             );
           })
@@ -99,11 +99,11 @@ export const MobileNav: React.FC = () => {
                 type="button"
                 onClick={() => handleNav(tab.id)}
                 className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
-                  isActive ? "text-emerald-800" : "text-slate-500"
+                  isActive ? "text-emerald-800" : "text-slate-400"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[9px] font-bold uppercase tracking-wider">{tab.label}</span>
+                <span className="text-[8px] font-semibold uppercase tracking-wider">{tab.label}</span>
               </button>
             );
           })}

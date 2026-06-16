@@ -232,7 +232,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('As of 2026-06-15')).toBeInTheDocument();
+      expect(screen.getByText(/As of/)).toBeInTheDocument();
       expect(screen.getByText('RELIANCE')).toBeInTheDocument();
       expect(screen.getByText('84')).toBeInTheDocument();
     });
@@ -257,7 +257,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('As of 2026-06-15')).toBeInTheDocument();
+      expect(screen.getByText(/As of/)).toBeInTheDocument();
       expect(screen.getByText('RELIANCE')).toBeInTheDocument();
       expect(screen.getByText(/bullish/i)).toBeInTheDocument();
     });

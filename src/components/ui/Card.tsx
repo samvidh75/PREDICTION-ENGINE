@@ -26,10 +26,10 @@ export const Card: React.FC<CardProps> = ({
     <Comp
       onClick={onClick}
       type={onClick ? "button" : undefined}
-      className={`w-full rounded-lg border border-slate-200/80 bg-white text-left text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition ${
+      className={`w-full rounded-xl border border-slate-200/80 bg-white text-left text-slate-900 shadow-sm transition-all ${
         paddingStyles[padding]
       } ${
-        onClick || hover ? "cursor-pointer hover:border-slate-300 hover:bg-slate-50/80" : ""
+        onClick || hover ? "cursor-pointer hover:border-slate-300 hover:shadow-md hover:-translate-y-px" : ""
       } ${className}`}
     >
       {children}
