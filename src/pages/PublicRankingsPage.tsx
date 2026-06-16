@@ -26,11 +26,18 @@ interface RankingEntry {
   source?: string | null;
 }
 
+interface CoverageInfo {
+  symbolCount: number | null;
+  registryRowCount: number | null;
+  latestPredictionDate: string | null;
+}
+
 export const PublicRankingsPage: React.FC = () => {
   const [rankings, setRankings] = useState<RankingEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [sectorFilter, setSectorFilter] = useState("all");
+  const [coverageData, setCoverageData] = useState<CoverageInfo | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -50,6 +57,19 @@ export const PublicRankingsPage: React.FC = () => {
         setRankings([]);
         setLoading(false);
       });
+
+    fetch("/api/ops/data-coverage", { headers: { Accept: "application/json" } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        if (!body?.ok || !active) return;
+        const cov = body.coverage;
+        setCoverageData({
+          symbolCount: cov.symbols?.status === "available" ? (cov.symbols.count ?? 0) : null,
+          registryRowCount: cov.predictionRegistry?.status === "available" ? (cov.predictionRegistry.rowCount ?? 0) : null,
+          latestPredictionDate: cov.predictionRegistry?.latestPredictionDate ?? null,
+        });
+      })
+      .catch(() => {});
     return () => {
       active = false;
     };
@@ -129,6 +149,38 @@ export const PublicRankingsPage: React.FC = () => {
             title="Verified rankings are being prepared"
             description="Rankings will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or fabricated scores are shown."
           />
+          {coverageData && (
+            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
+                Data Coverage Context
+              </h4>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <span className="block text-[10px] font-medium text-slate-400">Indexed Symbols</span>
+                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
+                    {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-medium text-slate-400">Prediction Rows</span>
+                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
+                    {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-medium text-slate-400">Latest Prediction</span>
+                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
+                    {coverageData.latestPredictionDate || "—"}
+                  </span>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+                Rankings require verified prediction snapshots. No rankings are 
+                fabricated or extrapolated. Verified scores will appear automatically 
+                when new snapshots are produced.
+              </p>
+            </div>
+          )}
           <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
             <Button
               type="button"

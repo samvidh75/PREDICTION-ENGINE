@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Star, Trophy, Sparkles, Flame, TrendingUp, Activity } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Star, Trophy, Sparkles, TrendingUp, Activity } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
@@ -8,47 +8,48 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
-import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore as formatScoreAdapter, formatFreshness } from "../services/ui/dataFormatting";
+import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore } from "../services/ui/dataFormatting";
+import { DataFreshnessBadge, SourceBadge, CoverageStatusBadge } from "../components/ui/PageHeader";
 
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
     case "Exceptional":
     case "Excellent":
-      return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+      return "bg-emerald-50 border-emerald-200 text-emerald-800";
     case "Good":
-      return "bg-cyan-500/10 border-cyan-500/30 text-cyan-400";
+      return "bg-sky-50 border-sky-200 text-sky-800";
     case "Fair":
-      return "bg-amber-500/10 border-amber-500/30 text-amber-400";
+      return "bg-amber-50 border-amber-200 text-amber-800";
     case "Weak":
-      return "bg-orange-500/10 border-orange-500/30 text-orange-400";
+      return "bg-orange-50 border-orange-200 text-orange-800";
     case "Critical":
-      return "bg-rose-500/10 border-rose-500/30 text-rose-400";
+      return "bg-rose-50 border-rose-200 text-rose-800";
     case "Healthy":
-      return "bg-cyan-500/10 border-cyan-500/30 text-cyan-400";
+      return "bg-sky-50 border-sky-200 text-sky-800";
     case "Stable":
-      return "bg-neutral-500/10 border-neutral-500/30 text-neutral-400";
+      return "bg-neutral-50 border-neutral-200 text-neutral-700";
     case "Weakening":
-      return "bg-amber-500/10 border-amber-500/30 text-amber-400";
+      return "bg-amber-50 border-amber-200 text-amber-800";
     case "At Risk":
-      return "bg-rose-500/10 border-rose-500/30 text-rose-400";
+      return "bg-rose-50 border-rose-200 text-rose-800";
     default:
-      return "bg-white/5 border-white/10 text-white/60";
+      return "bg-slate-50 border-slate-200 text-slate-500";
   }
 };
 
 const getConfidenceStyle = (conf: string) => {
   switch (conf) {
     case "Very High":
-      return "bg-indigo-500/10 border-indigo-500/30 text-indigo-400";
+      return "bg-indigo-50 border-indigo-200 text-indigo-800";
     case "High":
-      return "bg-cyan-500/10 border-cyan-500/30 text-cyan-400";
+      return "bg-sky-50 border-sky-200 text-sky-800";
     case "Medium":
-      return "bg-amber-500/10 border-amber-500/30 text-amber-400";
+      return "bg-amber-50 border-amber-200 text-amber-800";
     case "Low":
-      return "bg-rose-500/10 border-rose-500/30 text-rose-400";
+      return "bg-rose-50 border-rose-200 text-rose-800";
     default:
-      return "bg-white/5 border-white/10 text-white/60";
+      return "bg-slate-50 border-slate-200 text-slate-500";
   }
 };
 
@@ -95,19 +96,6 @@ function formatDateTime(value?: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   });
-}
-
-function formatScoreLabel(value: number | null | undefined, suffix = "/100"): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "Not available";
-  return `${Math.round(value)}${suffix}`;
-}
-
-function EmptyState({ label }: { label: string }) {
-  return (
-    <div className="rounded-lg border border-white/5 bg-white/[0.015] p-5 text-sm text-white/45">
-      {label} is not available from the connected data providers yet.
-    </div>
-  );
 }
 
 function scoreFromLineage(factor: any): number | null {
@@ -394,7 +382,7 @@ export const StockStoryPage: React.FC = () => {
           </button>
         </div>
 
-        <section className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:p-6">
+        <section className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0 font-sans">
               <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-slate-500">
@@ -506,22 +494,25 @@ export const StockStoryPage: React.FC = () => {
 
   const renderProgressBar = (label: string, score: number | null, colorClass: string) => {
     const hasScore = typeof score === "number" && Number.isFinite(score);
+    const barColors: Record<string, string> = {
+      "text-fuchsia-700": "bg-fuchsia-500",
+      "text-emerald-700": "bg-emerald-500",
+      "text-sky-700": "bg-sky-500",
+      "text-orange-700": "bg-orange-500",
+      "text-amber-700": "bg-amber-500",
+      "text-rose-700": "bg-rose-500",
+      "text-indigo-700": "bg-indigo-500",
+    };
+    const barColor = barColors[colorClass] || "bg-slate-400";
     return (
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
-          <span className="text-white/60">{label}</span>
-          <span className={colorClass}>{hasScore ? formatScoreLabel(score) : "Not available"}</span>
+          <span className="text-slate-600">{label}</span>
+          <span className={colorClass}>{hasScore ? formatScore(score) : "Not available"}</span>
         </div>
-        <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+        <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-1000 ${
-              colorClass.includes("fuchsia") ? "bg-sky-500" :
-              colorClass.includes("emerald") ? "bg-emerald-500" :
-              colorClass.includes("cyan") ? "bg-cyan-500" :
-              colorClass.includes("orange") ? "bg-orange-500" :
-              colorClass.includes("amber") ? "bg-amber-500" :
-              colorClass.includes("rose") ? "bg-rose-500" : "bg-white/40"
-            }`}
+            className={`h-full rounded-full transition-all duration-1000 ${barColor}`}
             style={{ width: hasScore ? `${score}%` : "0%" }}
           />
         </div>
@@ -530,37 +521,36 @@ export const StockStoryPage: React.FC = () => {
   };
 
   const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span className="text-white/30">Unavailable</span>;
+    if (val === null || val === undefined) return <span className="text-slate-400">Unavailable</span>;
     const isPos = val >= 0;
     return (
-      <span className={`font-mono font-bold ${isPos ? "text-emerald-400" : "text-rose-400"}`}>
+      <span className={`font-mono font-bold ${isPos ? "text-emerald-700" : "text-rose-700"}`}>
         {isPos ? "+" : ""}{(val * 100).toFixed(2)}%
       </span>
     );
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-white antialiased">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 text-slate-900 antialiased">
       <div className="flex items-center justify-between gap-3 text-xs">
         <button
           onClick={() => navigateToPage("dashboard")}
-          className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-cyan-400 transition-colors hover:text-cyan-300"
+          className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-emerald-700 transition-colors hover:text-emerald-600"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
         </button>
       </div>
 
-      {/* --- COMPANY RESEARCH HEADER --- */}
-      <section className="rounded-xl border border-white/10 bg-white/[0.015] p-6">
+      <section className="rounded-xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-white/[0.01] border border-white/10">
+            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-200">
               <svg className="h-full w-full -rotate-90">
                 <circle
                   cx="56"
                   cy="56"
                   r={radius}
-                  className="stroke-white/5"
+                  className="stroke-slate-200"
                   strokeWidth="8"
                   fill="transparent"
                 />
@@ -568,7 +558,7 @@ export const StockStoryPage: React.FC = () => {
                   cx="56"
                   cy="56"
                   r={radius}
-                  stroke="#06b6d4"
+                  stroke="#059669"
                   strokeWidth="8"
                   fill="transparent"
                   strokeDasharray={circumference}
@@ -578,20 +568,20 @@ export const StockStoryPage: React.FC = () => {
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-extrabold tracking-tight text-white">{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
-                <span className="text-[8px] font-bold uppercase tracking-widest text-cyan-400">Score</span>
+                <span className="text-xl font-extrabold tracking-tight text-slate-900">{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-emerald-700">Score</span>
               </div>
             </div>
 
             <div className="min-w-0">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/45">
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 <span>{ticker}</span>
                 <span>•</span>
                 <span>{exchange}</span>
                 <span>•</span>
                 <span>{currency}</span>
               </div>
-              <h1 className="max-w-xl text-2xl font-extrabold tracking-tight text-white md:text-3xl truncate">{companyName}</h1>
+              <h1 className="max-w-xl text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl truncate">{companyName}</h1>
               
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
@@ -605,73 +595,70 @@ export const StockStoryPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-4 lg:items-end">
-            <div className="grid grid-cols-2 gap-6 bg-white/[0.02] border border-white/5 rounded-xl p-3.5">
+            <div className="grid grid-cols-2 gap-6 bg-slate-50/80 border border-slate-200/80 rounded-xl p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Live Price</div>
-                <div className="mt-1 font-mono text-xl font-bold text-white">{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live Price</div>
+                <div className="mt-1 font-mono text-xl font-bold text-slate-900">{priceLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
                   {changeLabel}
                 </div>
               </div>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-white/30">Volume</div>
-                <div className="mt-1 font-mono text-xl font-bold text-white">
+                <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Volume</div>
+                <div className="mt-1 font-mono text-xl font-bold text-slate-900">
                   {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] text-white/35">Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-slate-400">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 border-t border-white/5 pt-4">
-          <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400 mb-1 flex items-center gap-1.5">
+        <div className="mt-5 border-t border-slate-200 pt-4">
+          <div className="text-[9px] font-bold uppercase tracking-wider text-emerald-700 mb-1 flex items-center gap-1.5">
             <Activity className="h-3 w-3" /> Explanation
           </div>
-          <p className="text-xs text-white/80 leading-relaxed max-w-5xl">
+          <p className="text-xs text-slate-700 leading-relaxed max-w-5xl">
             {storyData.narrative}
           </p>
-          <p className="mt-3 max-w-5xl rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-white/55">
+          <p className="mt-3 max-w-5xl rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-500">
             StockStory provides research intelligence and health assessments.
             It does not provide personalised investment advice.
           </p>
         </div>
       </section>
 
-      {/* --- QUICK ACTION CONTROLS --- */}
       <section className="flex flex-wrap items-center gap-3">
         <button
           onClick={handleToggleWatchlist}
           className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${
             isInWatchlist
-              ? "border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-              : "border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20"
+              ? "border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100"
+              : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
           }`}
         >
-          <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-400" : ""}`} />
+          <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
           {isInWatchlist ? "Remove From Watchlist" : "Add To Watchlist"}
         </button>
       </section>
 
-      {/* --- RESEARCH NOTE --- */}
-      <div className="rounded-xl border border-white/5 bg-white/[0.015] p-5">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">My Research Notes</div>
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">My Research Notes</div>
         <textarea
           value={noteText}
           onChange={(event) => handleSaveNote(event.target.value)}
           placeholder="Add your own research notes for this company..."
-          className="h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-white placeholder-white/25 outline-none transition-colors focus:border-cyan-400"
+          className="h-20 w-full resize-none rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
         />
       </div>
 
-      {/* --- TABS --- */}
-      <div className="flex gap-2 overflow-x-auto border-b border-white/5">
+      <div className="flex gap-2 overflow-x-auto border-b border-slate-200">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => selectTab(tab)}
             className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${
-              activeTab === tab ? "border-cyan-400 text-cyan-400 font-extrabold" : "border-transparent text-white/50 hover:text-white"
+              activeTab === tab ? "border-emerald-700 text-emerald-700 font-extrabold" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             {TAB_LABELS[tab]}
@@ -679,49 +666,47 @@ export const StockStoryPage: React.FC = () => {
         ))}
       </div>
 
-      {/* --- TAB CONTENT PANEL --- */}
-      <div className="min-h-[300px] rounded-xl border border-white/5 bg-white/[0.01] p-6">
+      <div className="min-h-[300px] rounded-xl border border-slate-200/80 bg-white p-6">
         
-        {/* === TAB 1: OVERVIEW === */}
         {activeTab === "overview" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-5 bg-white/[0.01] border border-white/5 rounded-xl p-5">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-2 flex items-center gap-1.5">
+            <div className="md:col-span-2 space-y-5 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 mb-2 flex items-center gap-1.5">
                 <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("Growth Outlook", storyData.growth, "text-fuchsia-400")}
-                {renderProgressBar("Business Quality", storyData.quality, "text-emerald-400")}
-                {renderProgressBar("Financial Stability", storyData.stability, "text-cyan-400")}
-                {renderProgressBar("Market Momentum", storyData.momentum, "text-orange-400")}
-                {renderProgressBar("Value & Margins", storyData.valuation, "text-amber-400")}
+                {renderProgressBar("Growth Outlook", storyData.growth, "text-fuchsia-700")}
+                {renderProgressBar("Business Quality", storyData.quality, "text-emerald-700")}
+                {renderProgressBar("Financial Stability", storyData.stability, "text-sky-700")}
+                {renderProgressBar("Market Momentum", storyData.momentum, "text-orange-700")}
+                {renderProgressBar("Value & Margins", storyData.valuation, "text-amber-700")}
               </div>
-              <div className="text-[9px] text-white/35 leading-normal mt-3 pt-3 border-t border-white/5">
+              <div className="text-[9px] text-slate-500 leading-normal mt-3 pt-3 border-t border-slate-200">
                 * Composite score is the average of available real factor scores from the prediction registry. Missing factors are shown as unavailable, not filled.
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5">
-                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30">
+              <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5">
+                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   <Building2 className="h-3.5 w-3.5" /> Corporate Profile
                 </div>
                 <dl className="space-y-3 text-xs">
-                  <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
-                    <dt className="text-white/45">Sector</dt>
-                    <dd className="text-right text-white/80 font-semibold">{sector}</dd>
+                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                    <dt className="text-slate-500">Sector</dt>
+                    <dd className="text-right text-slate-800 font-semibold">{sector}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
-                    <dt className="text-white/45">Industry</dt>
-                    <dd className="text-right text-white/80 font-semibold truncate max-w-[180px]">{industry}</dd>
+                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                    <dt className="text-slate-500">Industry</dt>
+                    <dd className="text-right text-slate-800 font-semibold truncate max-w-[180px]">{industry}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-white/5 pb-2">
-                    <dt className="text-white/45">Market Cap</dt>
-                    <dd className="text-right font-mono text-white/80 font-semibold">{marketCap}</dd>
+                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                    <dt className="text-slate-500">Market Cap</dt>
+                    <dd className="text-right font-mono text-slate-800 font-semibold">{marketCap}</dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt className="text-white/45">Data Policy</dt>
-                    <dd className="text-right text-white/70 font-semibold">Source-backed only</dd>
+                    <dt className="text-slate-500">Data Policy</dt>
+                    <dd className="text-right text-slate-700 font-semibold">Source-backed only</dd>
                   </div>
                 </dl>
               </div>
@@ -729,138 +714,135 @@ export const StockStoryPage: React.FC = () => {
           </div>
         )}
 
-        {/* === TAB 2: FINANCIALS === */}
         {activeTab === "financials" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-fuchsia-400 flex items-center gap-1.5">
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-fuchsia-700 flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4" /> Growth Engine
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 font-bold">
-                  Score: {formatScoreLabel(storyData.growth)}
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-700 font-bold">
+                  Score: {formatScore(storyData.growth)}
                 </span>
               </div>
               
               <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Revenue Growth (QoQ/YoY)</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Revenue Growth (QoQ/YoY)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.revenueGrowth)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">EPS Growth</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">EPS Growth</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.epsGrowth)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Profit Growth</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Profit Growth</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.profitGrowth)}</dd>
                 </div>
                 <div className="flex justify-between pb-1">
-                  <dt className="text-white/50">Free Cash Flow (FCF) Growth</dt>
+                  <dt className="text-slate-500">Free Cash Flow (FCF) Growth</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.fcfGrowth)}</dd>
                 </div>
               </dl>
-              <div className="rounded-lg bg-fuchsia-500/5 border border-fuchsia-500/10 p-3 text-xs text-fuchsia-300/80 leading-normal">
+              <div className="rounded-lg bg-fuchsia-50 border border-fuchsia-100 p-3 text-xs text-fuchsia-700 leading-normal">
                 {storyData.engineDetails.growth.commentary}
               </div>
             </div>
 
-            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
                   <Trophy className="h-4 w-4" /> Quality Engine
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
-                  Score: {formatScoreLabel(storyData.quality)}
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
+                  Score: {formatScore(storyData.quality)}
                 </span>
               </div>
               
               <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Return on Equity (ROE)</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Return on Equity (ROE)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.roe)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Return on Invested Capital (ROIC)</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Return on Invested Capital (ROIC)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.roic)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Gross Profit Margin</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Gross Profit Margin</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.grossMargin)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-2">
-                  <dt className="text-white/50">Operating Profit Margin</dt>
+                <div className="flex justify-between border-b border-slate-200 pb-2">
+                  <dt className="text-slate-500">Operating Profit Margin</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.operatingMargin)}</dd>
                 </div>
                 <div className="flex justify-between pb-1">
-                  <dt className="text-white/50">Asset Efficiency Score</dt>
-                  <dd className="font-mono font-bold text-white">{formatScoreLabel(storyData.engineDetails.quality.efficiencyScore)}</dd>
+                  <dt className="text-slate-500">Asset Efficiency Score</dt>
+                  <dd className="font-mono font-bold text-slate-900">{formatScore(storyData.engineDetails.quality.efficiencyScore)}</dd>
                 </div>
               </dl>
-              <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/10 p-3 text-xs text-emerald-300/80 leading-normal">
+              <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3 text-xs text-emerald-700 leading-normal">
                 {storyData.engineDetails.quality.commentary}
               </div>
             </div>
           </div>
         )}
 
-        {/* === TAB 3: VALUATION === */}
         {activeTab === "valuation" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+            <div className="md:col-span-2 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                   <TrendingUp className="h-4 w-4" /> Valuation Engine
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold">
-                  Score: {formatScoreLabel(storyData.valuation)}
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 font-bold">
+                  Score: {formatScore(storyData.valuation)}
                 </span>
               </div>
               
               <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("PE Multiples Rating", storyData.engineDetails.valuation.peScore, "text-amber-400")}
-                {renderProgressBar("Price to Book (PB) Rating", storyData.engineDetails.valuation.pbScore, "text-amber-400")}
-                {renderProgressBar("EV/EBITDA Rating", storyData.engineDetails.valuation.evEbitdaScore, "text-amber-400")}
-                {renderProgressBar("Free Cash Flow Yield Rating", storyData.engineDetails.valuation.fcfYieldScore, "text-amber-400")}
+                {renderProgressBar("PE Multiples Rating", storyData.engineDetails.valuation.peScore, "text-amber-700")}
+                {renderProgressBar("Price to Book (PB) Rating", storyData.engineDetails.valuation.pbScore, "text-amber-700")}
+                {renderProgressBar("EV/EBITDA Rating", storyData.engineDetails.valuation.evEbitdaScore, "text-amber-700")}
+                {renderProgressBar("Free Cash Flow Yield Rating", storyData.engineDetails.valuation.fcfYieldScore, "text-amber-700")}
               </div>
-              <div className="rounded-lg bg-amber-500/5 border border-amber-500/10 p-3 text-xs text-amber-300/80 leading-normal">
+              <div className="rounded-lg bg-amber-50 border border-amber-100 p-3 text-xs text-amber-700 leading-normal">
                 {storyData.engineDetails.valuation.commentary}
               </div>
             </div>
 
-            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-3">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-2">
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-3">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
                 Raw Valuation Multiples
               </div>
               <dl className="space-y-3 text-xs">
-                <div className="flex justify-between border-b border-white/5 pb-1.5">
-                  <dt className="text-white/50">P/E Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.peRatio)}</dd>
+                <div className="flex justify-between border-b border-slate-200 pb-1.5">
+                  <dt className="text-slate-500">P/E Ratio</dt>
+                  <dd className="font-mono text-slate-900 font-bold">{formatNumber(storyData.financials.peRatio)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-1.5">
-                  <dt className="text-white/50">P/B Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.pbRatio)}</dd>
+                <div className="flex justify-between border-b border-slate-200 pb-1.5">
+                  <dt className="text-slate-500">P/B Ratio</dt>
+                  <dd className="font-mono text-slate-900 font-bold">{formatNumber(storyData.financials.pbRatio)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-white/5 pb-1.5">
-                  <dt className="text-white/50">EV/EBITDA</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.evEbitda)}</dd>
+                <div className="flex justify-between border-b border-slate-200 pb-1.5">
+                  <dt className="text-slate-500">EV/EBITDA</dt>
+                  <dd className="font-mono text-slate-900 font-bold">{formatNumber(storyData.financials.evEbitda)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-white/50">FCF Yield</dt>
-                  <dd className="font-mono text-white font-bold">{localFormatPercent(storyData.financials.fcfYield)}</dd>
+                  <dt className="text-slate-500">FCF Yield</dt>
+                  <dd className="font-mono text-slate-900 font-bold">{localFormatPercent(storyData.financials.fcfYield)}</dd>
                 </div>
               </dl>
             </div>
           </div>
         )}
 
-        {/* === TAB 4: OWNERSHIP === */}
         {activeTab === "ownership" && (
           <div className="space-y-6">
             {ownership ? (
               <div className="grid gap-6 md:grid-cols-3">
-                <div className="md:col-span-2 bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-                  <h3 className="text-sm font-extrabold uppercase tracking-wider text-cyan-400 border-b border-white/5 pb-3">
+                <div className="md:col-span-2 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+                  <h3 className="text-sm font-extrabold uppercase tracking-wider text-sky-700 border-b border-slate-200 pb-3">
                     Shareholding Breakdown
                   </h3>
                   <div className="space-y-4">
@@ -869,153 +851,154 @@ export const StockStoryPage: React.FC = () => {
                       return (
                         <div key={c.category} className="space-y-1">
                           <div className="flex justify-between text-xs font-semibold">
-                            <span className="text-white/70">{c.category}</span>
-                            <span className="text-white/40">{c.share} <span className="text-[10px] text-cyan-400 font-normal">({c.change})</span></span>
+                            <span className="text-slate-700">{c.category}</span>
+                            <span className="text-slate-500">{c.share} <span className="text-[10px] text-sky-700 font-normal">({c.change})</span></span>
                           </div>
-                          <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
-                            <div className="h-full rounded-full bg-cyan-500" style={{ width: `${pct}%` }} />
+                          <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                            <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
-                <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 flex flex-col justify-between">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-2">
+                <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 flex flex-col justify-between">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
                     Institutional Stance
                   </div>
-                  <p className="text-xs text-white/70 leading-relaxed my-4">
+                  <p className="text-xs text-slate-700 leading-relaxed my-4">
                     {ownership.comment}
                   </p>
-                  <div className="text-[9px] text-white/30 italic">
+                  <div className="text-[9px] text-slate-400 italic">
                     * Sourced from quarterly shareholding declarations to the stock exchange.
                   </div>
                 </div>
               </div>
             ) : (
-              <EmptyState label="Ownership and shareholding data" />
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
+                Ownership and shareholding data is not available from the connected data providers yet.
+              </div>
             )}
           </div>
         )}
 
-        {/* === TAB 5: RISKS === */}
         {activeTab === "risks" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-rose-700 flex items-center gap-1.5">
                   <AlertCircle className="h-4 w-4" /> Risk Engine
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold">
-                  Risk Level: {formatScoreLabel(storyData.risk)}
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-700 font-bold">
+                  Risk Level: {formatScore(storyData.risk)}
                 </span>
               </div>
               
               <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Accounting Anomalies", storyData.engineDetails.risk.accountingAnomalyScore, "text-rose-400")}
-                {renderProgressBar("Leverage Stress Score", storyData.engineDetails.risk.debtStressScore, "text-rose-400")}
-                {renderProgressBar("Cash Flow Strains", storyData.engineDetails.risk.cashFlowStressScore, "text-rose-400")}
-                {renderProgressBar("Price Volatility Risk", storyData.engineDetails.risk.volatilityRiskScore, "text-rose-400")}
+                {renderProgressBar("Accounting Anomalies", storyData.engineDetails.risk.accountingAnomalyScore, "text-rose-700")}
+                {renderProgressBar("Leverage Stress Score", storyData.engineDetails.risk.debtStressScore, "text-rose-700")}
+                {renderProgressBar("Cash Flow Strains", storyData.engineDetails.risk.cashFlowStressScore, "text-rose-700")}
+                {renderProgressBar("Price Volatility Risk", storyData.engineDetails.risk.volatilityRiskScore, "text-rose-700")}
               </div>
               
-              <div className="rounded-lg bg-rose-500/5 border border-rose-500/10 p-3 text-xs text-rose-300/80 leading-normal flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0 text-rose-400 mt-0.5" />
+              <div className="rounded-lg bg-rose-50 border border-rose-100 p-3 text-xs text-rose-700 leading-normal flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
                 <div>
-                  <span className="font-extrabold block text-[10px] uppercase text-rose-400 mb-1">{storyData.engineDetails.risk.redFlagCount} RED FLAGS DETECTED</span>
+                  <span className="font-extrabold block text-[10px] uppercase text-rose-700 mb-1">{storyData.engineDetails.risk.redFlagCount} RED FLAGS DETECTED</span>
                   {storyData.engineDetails.risk.commentary}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/[0.01] border border-white/5 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                <h3 className="text-sm font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-extrabold uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">
                   <Activity className="h-4 w-4" /> Confidence Engine
                 </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold">
+                <span className="font-mono text-xs px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold">
                   Reliability: {storyData.confidence}
                 </span>
               </div>
               
               <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Data Completeness", storyData.engineDetails.confidence.dataCompleteness, "text-indigo-400")}
-                {renderProgressBar("Signal Agreement", storyData.engineDetails.confidence.signalAgreement, "text-indigo-400")}
-                {renderProgressBar("Risk Consistency", storyData.engineDetails.confidence.riskConsistency, "text-indigo-400")}
-                {renderProgressBar("Historical Stability", storyData.engineDetails.confidence.historicalStability, "text-indigo-400")}
+                {renderProgressBar("Data Completeness", storyData.engineDetails.confidence.dataCompleteness, "text-indigo-700")}
+                {renderProgressBar("Signal Agreement", storyData.engineDetails.confidence.signalAgreement, "text-indigo-700")}
+                {renderProgressBar("Risk Consistency", storyData.engineDetails.confidence.riskConsistency, "text-indigo-700")}
+                {renderProgressBar("Historical Stability", storyData.engineDetails.confidence.historicalStability, "text-indigo-700")}
               </div>
-              <div className="rounded-lg bg-indigo-500/5 border border-indigo-500/10 p-3 text-xs text-indigo-300/80 leading-normal">
+              <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-700 leading-normal">
                 {storyData.engineDetails.confidence.commentary}
               </div>
             </div>
           </div>
         )}
 
-        {/* === TAB 7: WHY IT CHANGED === */}
         {activeTab === "whychange" && (
           <div>
-            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
-              <Activity className="h-4 w-4 text-emerald-400" /> Why It Changed
+            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-3">
+              <Activity className="h-4 w-4 text-emerald-700" /> Why It Changed
             </div>
             <WhyItChangedTab symbol={ticker} />
           </div>
         )}
 
-        {/* === TAB 6: DOCUMENTS === */}
         {activeTab === "documents" && (
           <div className="space-y-6">
             <div>
-              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
-                <FileText className="h-4 w-4 text-cyan-400" /> Corporate Actions & Timeline
+              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-3">
+                <FileText className="h-4 w-4 text-emerald-700" /> Corporate Actions & Timeline
               </div>
               
               {timeline.length > 0 ? (
-                <div className="relative border-l border-white/10 ml-3.5 pl-5 space-y-6 text-xs">
+                <div className="relative border-l border-slate-200 ml-3.5 pl-5 space-y-6 text-xs">
                   {timeline.map((evt, idx) => (
                     <div key={idx} className="relative">
-                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-cyan-500 ring-4 ring-black/40"></span>
-                      <div className="font-mono text-[10px] font-extrabold text-cyan-400 mb-1">{evt.date}</div>
-                      <div className="font-bold text-white text-sm mb-1">{evt.event}</div>
-                      <p className="text-white/60 leading-relaxed">{evt.detail}</p>
+                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-emerald-500 ring-4 ring-white"></span>
+                      <div className="font-mono text-[10px] font-extrabold text-emerald-700 mb-1">{evt.date}</div>
+                      <div className="font-bold text-slate-900 text-sm mb-1">{evt.event}</div>
+                      <p className="text-slate-600 leading-relaxed">{evt.detail}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <EmptyState label="Corporate actions timeline" />
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-500">
+                  Corporate actions timeline is not available from the connected data providers yet.
+                </div>
               )}
             </div>
 
             <div>
-              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
-                <FileText className="h-4 w-4 text-cyan-400" /> Data Source & Freshness
+              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-3">
+                <FileText className="h-4 w-4 text-emerald-700" /> Data Source & Freshness
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Financial Data</div>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Financial Data</div>
                   <dl className="mt-2 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <dt className="text-white/50">Snapshot date</dt>
-                      <dd className="font-mono text-white/80">{normalizeDate(financials?.snapshot_date) || "Unavailable"}</dd>
+                      <dt className="text-slate-500">Snapshot date</dt>
+                      <dd className="font-mono text-slate-800">{normalizeDate(financials?.snapshot_date) || "Unavailable"}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-white/50">Sources</dt>
-                      <dd className="font-mono text-white/80">Provider filings</dd>
+                      <dt className="text-slate-500">Sources</dt>
+                      <dd><SourceBadge source="Provider filings" /></dd>
                     </div>
                   </dl>
                 </div>
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Prediction Data</div>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Prediction Data</div>
                   <dl className="mt-2 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <dt className="text-white/50">Prediction date</dt>
-                      <dd className="font-mono text-white/80">{normalizeDate(storyData?.dataState?.asOf) || normalizeDate(storyData?.predictionDate) || "Unavailable"}</dd>
+                      <dt className="text-slate-500">Prediction date</dt>
+                      <dd className="font-mono text-slate-800">{normalizeDate(storyData?.dataState?.asOf) || normalizeDate(storyData?.predictionDate) || "Unavailable"}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-white/50">Freshness</dt>
-                      <dd className="font-mono text-white/80">{storyData?.predictionDate ? formatFreshness(storyData.predictionDate) : "Unavailable"}</dd>
+                      <dt className="text-slate-500">Freshness</dt>
+                      <dd><DataFreshnessBadge date={storyData?.predictionDate ?? null} /></dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-white/50">Status</dt>
-                      <dd className="font-mono text-white/80">{storyData?.apiStatus === "ok" ? "Available" : "Unavailable"}</dd>
+                      <dt className="text-slate-500">Status</dt>
+                      <dd><CoverageStatusBadge status={storyData?.apiStatus === "ok" ? "available" : null} /></dd>
                     </div>
                   </dl>
                 </div>
@@ -1026,20 +1009,20 @@ export const StockStoryPage: React.FC = () => {
       </div>
 
       {relatedCompanies.length > 0 && (
-        <section className="border-t border-white/5 pt-6">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-white/40">Same Sector Companies</div>
+        <section className="border-t border-slate-200 pt-6">
+          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Same Sector Companies</div>
           <div className="flex flex-wrap gap-3">
             {relatedCompanies.map((company) => (
               <button
                 key={company.symbol}
                 onClick={() => navigateToStock({ ticker: company.symbol, mode: "push" })}
-                className="flex items-center justify-between gap-4 rounded-lg border border-white/5 bg-white/[0.01] px-4 py-2.5 text-left transition-all hover:border-cyan-500/20 hover:bg-white/[0.03]"
+                className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-left transition-all hover:border-emerald-200 hover:bg-white"
               >
                 <div>
-                  <div className="font-mono text-xs font-bold text-white">{company.symbol}</div>
-                  <div className="max-w-[160px] truncate text-[10px] text-white/40">{company.companyName}</div>
+                  <div className="font-mono text-xs font-bold text-slate-900">{company.symbol}</div>
+                  <div className="max-w-[160px] truncate text-[10px] text-slate-500">{company.companyName}</div>
                 </div>
-                <ArrowRight className="h-3.5 w-3.5 text-cyan-400" />
+                <ArrowRight className="h-3.5 w-3.5 text-emerald-700" />
               </button>
             ))}
           </div>
