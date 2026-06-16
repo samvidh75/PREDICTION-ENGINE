@@ -29,6 +29,7 @@
     "src/intelligence/DataFreshnessEngine.ts",
     "src/services/FeatureEngine.ts",
     "src/services/FactorEngine.ts",
+    "src/services/providers/MoneycontrolQuoteProvider.ts",
     "src/services/ExplanationEngine.ts",
     "src/middleware/RateLimiter.ts",
     "src/validation/PredictionAccuracyEngine.ts",
