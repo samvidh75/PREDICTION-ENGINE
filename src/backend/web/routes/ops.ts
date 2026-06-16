@@ -343,6 +343,12 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const completedAt = new Date().toISOString();
         try {
+          await query(`CREATE TABLE IF NOT EXISTS pipeline_health (
+            id UUID PRIMARY KEY, run_id VARCHAR(100) NOT NULL, phase VARCHAR(50) NOT NULL,
+            status VARCHAR(20) NOT NULL, started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            completed_at TIMESTAMPTZ, symbols_attempted INTEGER DEFAULT 0,
+            symbols_succeeded INTEGER DEFAULT 0
+          )`);
           await query(
             `INSERT INTO pipeline_health (id, run_id, phase, status, started_at, completed_at, symbols_attempted, symbols_succeeded)
              VALUES ($1, $2, 'api_pipeline_run', 'success', $3, $4, $5, $6)`,
