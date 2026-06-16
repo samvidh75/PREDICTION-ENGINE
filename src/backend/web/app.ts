@@ -14,12 +14,21 @@ import { persistencePlugin } from "../persistence/persistencePlugin";
 import { cachePlugin } from "../persistence/cache/cachePlugin";
 import { loadEnv } from "../config/env";
 import { dbAdapter } from "../../db/DatabaseAdapter";
+import { runMigrations } from "../../db/migrate";
 
 export async function buildServer(): Promise<ReturnType<typeof Fastify>> {
   const env = loadEnv();
 
   // Initialize the canonical database adapter before the server starts
   await dbAdapter.initialize();
+
+  // Run pending forward-only migrations on startup so production schema stays current
+  try {
+    await runMigrations();
+  } catch (err: any) {
+    console.error("[buildServer] Migration run failed:", err.message);
+    // Do not block startup on migration failure; ops endpoints will surface schema issues
+  }
 
   const app = Fastify({ logger: false });
   app.decorate("db", dbAdapter);

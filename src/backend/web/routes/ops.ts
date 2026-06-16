@@ -328,17 +328,58 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const overallError: string | null = null;
 
     try {
-      // Stage 1: Registry (verify symbols exist)
+      // Stage 1: Registry (verify symbols exist, insert missing in apply mode)
       const registryOk: string[] = [];
       const registryFailed: string[] = [];
+      const fallbackNames: Record<string, { name: string; sector: string; industry: string }> = {
+        RELIANCE: { name: "Reliance Industries Limited", sector: "Energy & Oil", industry: "Oil & Gas" },
+        TCS: { name: "Tata Consultancy Services Limited", sector: "Technology", industry: "IT Services" },
+        INFY: { name: "Infosys Limited", sector: "Technology", industry: "IT Services" },
+        HDFCBANK: { name: "HDFC Bank Limited", sector: "Financials", industry: "Banking" },
+        ICICIBANK: { name: "ICICI Bank Limited", sector: "Financials", industry: "Banking" },
+      };
+
       for (const symbol of symbols) {
         try {
           const existing = await query("SELECT symbol FROM symbols WHERE symbol = $1", [symbol]);
           if (existing.rows.length > 0) {
             registryOk.push(symbol);
-          } else {
-            registryFailed.push(symbol);
+            continue;
           }
+
+          if (!applyMode) {
+            registryFailed.push(symbol);
+            continue;
+          }
+
+          // Try to fetch real metadata, otherwise use verified fallback
+          let companyName = symbol;
+          let sector = "";
+          let industry = "";
+          try {
+            const mod = await import("../../../services/providers/IndianMarketProvider.js");
+            const indianProvider = new mod.IndianMarketProvider();
+            const meta = await indianProvider.getMetadata(symbol);
+            companyName = meta?.companyName || fallbackNames[symbol]?.name || symbol;
+            sector = meta?.sector || fallbackNames[symbol]?.sector || "";
+            industry = meta?.industry || fallbackNames[symbol]?.industry || "";
+          } catch {
+            const fallback = fallbackNames[symbol];
+            companyName = fallback?.name || symbol;
+            sector = fallback?.sector || "";
+            industry = fallback?.industry || "";
+          }
+
+          await query(
+            `INSERT INTO symbols (symbol, exchange, company_name, sector, industry, listing_status)
+             VALUES ($1, 'NSE', $2, $3, $4, 'Active')
+             ON CONFLICT (symbol) DO UPDATE SET
+               company_name = EXCLUDED.company_name,
+               sector = COALESCE(NULLIF(EXCLUDED.sector, ''), symbols.sector),
+               industry = COALESCE(NULLIF(EXCLUDED.industry, ''), symbols.industry)`,
+            [symbol, companyName, sector, industry]
+          );
+          registryOk.push(symbol);
         } catch (err: any) {
           registryFailed.push(symbol);
         }
