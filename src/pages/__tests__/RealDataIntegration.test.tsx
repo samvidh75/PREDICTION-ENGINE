@@ -86,6 +86,55 @@ describe('Real Data Integration Pages', () => {
     });
   });
 
+  it('DashboardHub renders DataCoveragePanel correctly from coverage API data', async () => {
+    window.history.replaceState({}, '', '?page=dashboard');
+    vi.stubGlobal('fetch', vi.fn(async (url) => {
+      if (url.includes('/api/ops/data-coverage')) {
+        return {
+          ok: true,
+          json: async () => ({
+            ok: true,
+            generatedAt: '2026-06-16T08:00:00Z',
+            database: { status: 'ready', migrationsReady: true },
+            coverage: {
+              symbols: { count: 116, latestUpdatedAt: '2026-06-08', status: 'available' },
+              dailyPrices: { rowCount: 38775, symbolCount: 110, latestPriceDate: '2026-06-07', status: 'available' },
+              financialSnapshots: { rowCount: 61, symbolCount: 5, latestSnapshotDate: '2026-06-06', status: 'available' },
+              featureSnapshots: { rowCount: 35735, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+              factorSnapshots: { rowCount: 38395, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+              predictionRegistry: { rowCount: 107485, symbolCount: 116, latestPredictionDate: '2026-06-08', status: 'available' },
+            },
+            providers: {
+              FINNHUB_KEY: 'present',
+              REDIS_URL: 'missing',
+            },
+          }),
+        };
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          signals: [],
+          symbolsAnalyzed: 0,
+        }),
+      };
+    }) as unknown as typeof fetch);
+
+    render(
+      <LayoutProvider>
+        <DashboardHub />
+      </LayoutProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Production Data Coverage')).toBeInTheDocument();
+      expect(screen.getByText('38,775')).toBeInTheDocument();
+      expect(screen.getByText('Latest: 2026-06-07')).toBeInTheDocument();
+      expect(screen.getByText('FINNHUB_KEY')).toBeInTheDocument();
+    });
+  });
+
+
   it('SearchPage displays pending vs active prediction scores dynamically', async () => {
     window.history.replaceState({}, '', '?page=search&q=RELIANCE');
 

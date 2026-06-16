@@ -12,8 +12,10 @@ import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
 import tokens from "../components/ui/tokens";
 import { OnboardingChecklist, DataReadinessPanel } from "../components/ui/OnboardingComponents";
+import { DataCoveragePanel } from "../components/ui/DataCoveragePanel";
 
 interface SignalItem {
+
   symbol: string;
   type: string;
   severity: "critical" | "important" | "monitor";
@@ -200,7 +202,10 @@ export const DashboardHub: React.FC = () => {
 
       <DataReadinessPanel />
 
+      <DataCoveragePanel />
+
       <Card className="p-6">
+
         <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>

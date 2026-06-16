@@ -121,3 +121,46 @@ export function SourceBadge({ source }: SourceBadgeProps) {
     </span>
   );
 }
+
+interface ProviderStatusPillProps {
+  name: string;
+  status: "present" | "missing" | string;
+}
+
+export function ProviderStatusPill({ name, status }: ProviderStatusPillProps) {
+  const isPresent = status === "present";
+  return (
+    <div className="flex items-center justify-between gap-3 px-2 py-1 text-[11px] font-mono border-b border-slate-100 last:border-0">
+      <span className="text-slate-500">{name}</span>
+      <span
+        className={`inline-flex items-center rounded px-1.5 py-0.2 text-[9px] font-semibold select-none ${
+          isPresent
+            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            : "bg-amber-50 text-amber-700 border border-amber-200"
+        }`}
+      >
+        {isPresent ? "Ready" : "Missing"}
+      </span>
+    </div>
+  );
+}
+
+interface CoverageStatusBadgeProps {
+  status?: string | null;
+}
+
+export function CoverageStatusBadge({ status }: CoverageStatusBadgeProps) {
+  const isAvailable = status === "available";
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold select-none ${
+        isAvailable
+          ? "bg-emerald-50 text-emerald-800 border border-emerald-100"
+          : "bg-slate-50 text-slate-500 border border-slate-200"
+      }`}
+    >
+      {isAvailable ? "Indexed" : "Unavailable"}
+    </span>
+  );
+}
+

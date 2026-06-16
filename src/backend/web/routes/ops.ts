@@ -91,6 +91,145 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       metrics,
     });
   });
+
+  app.get("/api/ops/data-coverage", async (_request, reply) => {
+    const generatedAt = new Date().toISOString();
+    
+    // Check DB status
+    let dbStatus: "ready" | "unavailable" = "ready";
+    let dbError: string | null = null;
+    try {
+      await query("SELECT 1");
+    } catch (err: any) {
+      dbStatus = "unavailable";
+      dbError = err.message || "database connection failed";
+    }
+
+    // Helper to run aggregate queries safely
+    const fetchTableStats = async (
+      tableName: string,
+      dateCol: string,
+      isDateUnix: boolean = false
+    ) => {
+      try {
+        const rowRes = await query(`SELECT COUNT(*) as row_count, COUNT(DISTINCT symbol) as symbol_count FROM ${tableName}`);
+        const dateRes = await query(`SELECT MAX(${dateCol}) as latest_date FROM ${tableName}`);
+        
+        let latestDate: string | null = null;
+        const rawDate = dateRes.rows[0]?.latest_date;
+        if (rawDate !== null && rawDate !== undefined) {
+          if (isDateUnix) {
+            // Check if unix timestamp (number or string representation of a number)
+            const num = Number(rawDate);
+            if (!isNaN(num)) {
+              // Convert to milliseconds if standard seconds or milliseconds
+              const ms = num < 10000000000 ? num * 1000 : num;
+              latestDate = new Date(ms).toISOString().split("T")[0];
+            } else {
+              latestDate = new Date(rawDate).toISOString().split("T")[0];
+            }
+          } else {
+            // Ensure parseable date format
+            latestDate = new Date(rawDate).toISOString().split("T")[0];
+          }
+        }
+
+        return {
+          rowCount: Number(rowRes.rows[0]?.row_count ?? 0),
+          symbolCount: Number(rowRes.rows[0]?.symbol_count ?? 0),
+          latestSnapshotDate: latestDate,
+          status: "available"
+        };
+      } catch (err: any) {
+        return {
+          rowCount: 0,
+          symbolCount: 0,
+          latestSnapshotDate: null,
+          status: "unavailable"
+        };
+      }
+    };
+
+    // Symbols is slightly different structure
+    let symbolsCount = 0;
+    let symbolsLatest: string | null = null;
+    let symbolsStatus = "available";
+    try {
+      const symRes = await query("SELECT COUNT(*) as count FROM symbols");
+      symbolsCount = Number(symRes.rows[0]?.count ?? 0);
+      
+      // Look in predictions for latest update or default to current date
+      const latestRes = await query("SELECT MAX(prediction_date) as max_date FROM prediction_registry");
+      symbolsLatest = latestRes.rows[0]?.max_date ? new Date(latestRes.rows[0]?.max_date).toISOString().split("T")[0] : null;
+    } catch {
+      symbolsStatus = "unavailable";
+    }
+
+    // Run table queries
+    const dailyPrices = await fetchTableStats("daily_prices", "trade_date");
+    const financialSnapshots = await fetchTableStats("financial_snapshots", "snapshot_date", true);
+    const featureSnapshots = await fetchTableStats("feature_snapshots", "snapshot_date");
+    const factorSnapshots = await fetchTableStats("factor_snapshots", "snapshot_date");
+    const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
+
+    // Masked provider environment checks
+    const providers = {
+      FINNHUB_KEY: env.finnhubKey ? "present" : "missing",
+      INDIANAPI_KEY: env.indianApiKey ? "present" : "missing",
+      UPSTOX_ACCESS_TOKEN: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing",
+      UPSTOX_API_KEY: process.env.UPSTOX_API_KEY ? "present" : "missing",
+      UPSTOX_CLIENT_SECRET: process.env.UPSTOX_CLIENT_SECRET ? "present" : "missing",
+      REDIS_URL: process.env.REDIS_URL ? "present" : "missing",
+    };
+
+    return reply.send({
+      ok: true,
+      generatedAt,
+      database: {
+        status: dbStatus,
+        migrationsReady: dbStatus === "ready",
+        error: dbError
+      },
+      coverage: {
+        symbols: {
+          count: symbolsCount,
+          latestUpdatedAt: symbolsLatest,
+          status: symbolsStatus
+        },
+        dailyPrices: {
+          rowCount: dailyPrices.rowCount,
+          symbolCount: dailyPrices.symbolCount,
+          latestPriceDate: dailyPrices.latestSnapshotDate,
+          status: dailyPrices.status
+        },
+        financialSnapshots: {
+          rowCount: financialSnapshots.rowCount,
+          symbolCount: financialSnapshots.symbolCount,
+          latestSnapshotDate: financialSnapshots.latestSnapshotDate,
+          status: financialSnapshots.status
+        },
+        featureSnapshots: {
+          rowCount: featureSnapshots.rowCount,
+          symbolCount: featureSnapshots.symbolCount,
+          latestSnapshotDate: featureSnapshots.latestSnapshotDate,
+          status: featureSnapshots.status
+        },
+        factorSnapshots: {
+          rowCount: factorSnapshots.rowCount,
+          symbolCount: factorSnapshots.symbolCount,
+          latestSnapshotDate: factorSnapshots.latestSnapshotDate,
+          status: factorSnapshots.status
+        },
+        predictionRegistry: {
+          rowCount: predictionRegistry.rowCount,
+          symbolCount: predictionRegistry.symbolCount,
+          latestPredictionDate: predictionRegistry.latestSnapshotDate,
+          status: predictionRegistry.status
+        }
+      },
+      providers
+    });
+  });
 };
 
 export default opsRoutes;
