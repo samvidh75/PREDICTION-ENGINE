@@ -1,4 +1,4 @@
-import { createClient } from "ioredis";
+import { createClient } from "redis";
 
 const redisUrl = process.env.REDIS_URL;
 
@@ -20,4 +20,4 @@ client
     console.log("unreachable");
     process.exit(1);
   })
-  .finally(() => client.disconnect());
+  .finally(() => client.quit());
