@@ -57,6 +57,26 @@ export const SearchPage: React.FC = () => {
     };
   }, []);
 
+  const [predictionsMap, setPredictionsMap] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    fetch("/api/intelligence/leaderboard?limit=200")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const map: Record<string, any> = {};
+          data.forEach((item) => {
+            if (item.symbol) {
+              const cleaned = item.symbol.replace(/\.NS$/, "").toUpperCase();
+              map[cleaned] = item;
+            }
+          });
+          setPredictionsMap(map);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const recentSearches = useMemo(() => {
     return RecentSearchStore.getRecent().slice(0, 6);
   }, [results, query]);
@@ -156,11 +176,11 @@ export const SearchPage: React.FC = () => {
             {results.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {results.map((stock) => {
-                  const score =
-                    typeof stock.telemetrySnapshot?.healthScore === "number" &&
-                    Number.isFinite(stock.telemetrySnapshot.healthScore)
-                      ? stock.telemetrySnapshot.healthScore
-                      : null;
+                  const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
+                  const prediction = predictionsMap[cleanedSym];
+                  const score = prediction ? prediction.rankingScore : null;
+                  const predictionDate = prediction ? prediction.predictionDate : null;
+
                   return (
                     <Card
                       key={stock.symbol}
@@ -177,10 +197,13 @@ export const SearchPage: React.FC = () => {
                           </div>
                         </div>
                         {score !== null ? (
-                          <ScorePill score={score} />
+                          <div className="flex flex-col items-end gap-1">
+                            <ScorePill score={score} />
+                            <span className="text-[10px] text-slate-500 font-medium">Rank #{prediction.rank}</span>
+                          </div>
                         ) : (
-                          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500">
-                            Score not available
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-500">
+                            Score pending
                           </span>
                         )}
                       </div>
@@ -189,6 +212,16 @@ export const SearchPage: React.FC = () => {
                         <div className="flex flex-wrap gap-2">
                           <Badge variant="info">{stock.sector || "Not available"}</Badge>
                           {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}
+                          {predictionDate && (
+                            <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">
+                              Updated {predictionDate}
+                            </span>
+                          )}
+                          {!prediction && (
+                            <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500 font-mono">
+                              Source registry
+                            </span>
+                          )}
                         </div>
                         <span>{stock.marketCap.formatted || "Not available"}</span>
                       </div>
@@ -197,7 +230,24 @@ export const SearchPage: React.FC = () => {
                 })}
               </div>
             ) : (
-              <EmptyState title="No matching company" description="Try another ticker, company name, or sector." />
+              <div className="flex flex-col items-center justify-center p-8 text-center rounded-xl border border-dashed border-slate-200 bg-white">
+                <span className="text-sm font-medium text-slate-900">No matching equity found</span>
+                <p className="mt-1 text-xs text-slate-500 max-w-sm">
+                  We couldn't find any companies matching "{query.trim()}". Try searching for these major Indian companies:
+                </p>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"].map((sym) => (
+                    <button
+                      key={sym}
+                      type="button"
+                      onClick={() => handleRecentSearch(sym)}
+                      className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-white"
+                    >
+                      {sym}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </>
         ) : (

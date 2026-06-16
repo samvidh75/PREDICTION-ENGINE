@@ -156,8 +156,14 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
       risk: null,
       narrative: data.message ?? "No production prediction snapshot is available for this company.",
       factors: {},
-      financials: {},
+      financials: financialsObj || {},
       engineDetails: {
+        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Scoring engine details are pending." },
+        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Scoring engine details are pending." },
+        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Scoring engine details are pending." },
+        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Scoring engine details are pending." },
+        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Scoring engine details are pending." },
+        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Scoring engine details are pending." },
         confidence: {
           level: "Unavailable",
           score: null,
@@ -314,10 +320,15 @@ export const StockStoryPage: React.FC = () => {
   const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
   const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Data unavailable";
   const storyData = useMemo(() => {
-    if (!story) return null;
+    if (!story) {
+      if (financials && financials.snapshot_date) {
+        return adaptStockStoryResponse({ status: "unavailable" }, financials);
+      }
+      return null;
+    }
     return adaptStockStoryResponse(story, financials);
   }, [story, financials]);
-  const storyUnavailable = storyData?.apiStatus === "unavailable";
+  const storyUnavailable = !story || storyData?.apiStatus === "unavailable";
 
   const isInWatchlist = useMemo(() => {
     return watchlists.some((w) => w.tickers.includes(ticker));
@@ -382,7 +393,8 @@ export const StockStoryPage: React.FC = () => {
     );
   }
 
-  if (!storyData || storyUnavailable) {
+  const hasFinancials = financials && financials.snapshot_date;
+  if (!storyData || (storyUnavailable && !hasFinancials)) {
     const missingInputs = Array.isArray(storyData?.dataState?.missingInputs)
       ? storyData.dataState.missingInputs.filter(Boolean)
       : [];

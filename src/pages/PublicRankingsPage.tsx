@@ -4,8 +4,7 @@ import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
-import { MissingDataBadge, PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
-import { StockRegistry } from "../services/stocks/StockRegistry";
+import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } from "../components/ui/PageHeader";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
@@ -13,10 +12,15 @@ import tokens from "../components/ui/tokens";
 
 interface RankingEntry {
   symbol: string;
+  rankingScore?: number;
   ranking_score?: number;
+  confidenceScore?: number;
   confidence_score?: number;
+  companyName?: string | null;
   classification?: string;
-  sector?: string;
+  sector?: string | null;
+  industry?: string | null;
+  predictionDate?: string | null;
 }
 
 export const PublicRankingsPage: React.FC = () => {
@@ -82,7 +86,7 @@ export const PublicRankingsPage: React.FC = () => {
         <PageHeader
           title="Research rankings"
           subtitle="Rankings will appear here when source-backed scoring has produced verified company snapshots."
-          primaryAction={<MissingDataBadge />}
+          primaryAction={rankings[0]?.predictionDate ? <DataFreshnessBadge date={rankings[0].predictionDate} /> : <MissingDataBadge />}
         />
 
       <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:flex-row">
@@ -141,7 +145,9 @@ export const PublicRankingsPage: React.FC = () => {
       ) : (
         <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector"]}>
           {filteredRankings.map((r, index) => {
-            const registryInfo = StockRegistry.getStock(r.symbol);
+            const rankingScore = r.rankingScore ?? r.ranking_score;
+            const confidenceScore = r.confidenceScore ?? r.confidence_score;
+
             return (
               <tr
                 key={r.symbol}
@@ -153,18 +159,18 @@ export const PublicRankingsPage: React.FC = () => {
                   {r.symbol}
                 </td>
                 <td className="max-w-[200px] truncate p-4 text-slate-700">
-                  {registryInfo?.companyName || "Unavailable"}
+                  {r.companyName || "Unavailable"}
                 </td>
                 <td className="p-4">
-                  {typeof r.ranking_score === "number" && Number.isFinite(r.ranking_score) ? (
-                    <ScorePill score={Math.round(r.ranking_score)} />
+                  {typeof rankingScore === "number" && Number.isFinite(rankingScore) ? (
+                    <ScorePill score={Math.round(rankingScore)} />
                   ) : (
                     <MissingDataBadge />
                   )}
                 </td>
                 <td className="p-4">
-                  {typeof r.confidence_score === "number" && Number.isFinite(r.confidence_score) ? (
-                    <ScorePill score={Math.round(r.confidence_score)} />
+                  {typeof confidenceScore === "number" && Number.isFinite(confidenceScore) ? (
+                    <ScorePill score={Math.round(confidenceScore)} />
                   ) : (
                     <MissingDataBadge />
                   )}
