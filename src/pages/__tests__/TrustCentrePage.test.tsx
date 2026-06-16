@@ -34,7 +34,8 @@ describe('TrustCentrePage regression states', () => {
 
     render(<TrustCentrePage />);
 
-    expect(await screen.findByText(/Partial — some evidence sources are not yet connected/i)).toBeInTheDocument();
+    // The envelope message and humanState label are surfaced in the amber banner
+    expect(await screen.findByText('Only registry-backed trust metrics are available.')).toBeInTheDocument();
     expect(screen.getAllByText('Data unavailable').length).toBeGreaterThanOrEqual(5);
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
@@ -48,8 +49,8 @@ describe('TrustCentrePage regression states', () => {
 
     render(<TrustCentrePage />);
 
-    expect(await screen.findByText(/Temporarily unavailable/i)).toBeInTheDocument();
-    expect(screen.getByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
+    // The error message from the API is surfaced to the user in the amber status banner
+    expect(await screen.findByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
     expect(screen.getAllByText('Data unavailable').length).toBeGreaterThan(0);
   });
 });
