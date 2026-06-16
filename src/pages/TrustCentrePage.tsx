@@ -178,6 +178,34 @@ export const TrustCentrePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Data System Status */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-950">Data system status</h2>
+        <Card className="p-5">
+          <p className="text-xs text-slate-600 leading-relaxed mb-4">
+            StockStory India runs automated queries across live registry components to ensure database updates match production specifications. Below is the active data readiness.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring Database</span>
+              <span className="text-xs font-semibold text-slate-900">
+                {rawState === "ok" || rawState === "partial" ? "Connected (Live)" : "Ready (Syncing)"}
+              </span>
+            </div>
+            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of Date</span>
+              <span className="text-xs font-semibold text-slate-900">{asOf}</span>
+            </div>
+            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence Completeness</span>
+              <span className="text-xs font-semibold text-slate-900">
+                {envelope?.dataState?.completenessScore ? `${envelope.dataState.completenessScore}% Verified` : "Pending audit"}
+              </span>
+            </div>
+          </div>
+        </Card>
+      </section>
+
       {/* Disclaimer */}
       <section className="border-t border-slate-200 pt-6">
         <ResearchDisclaimer />
