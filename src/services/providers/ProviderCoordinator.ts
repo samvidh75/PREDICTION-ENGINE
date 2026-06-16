@@ -6,6 +6,7 @@ import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
 import { IndianMarketProvider } from './IndianMarketProvider';
+import { IndianApiFinancialProvider } from './IndianApiFinancialProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
 import { ScreenerProvider } from './ScreenerProvider';
@@ -52,6 +53,10 @@ export class ProviderCoordinator {
   constructor() {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
+
+    const indianApiFinancials = new IndianApiFinancialProvider();
+    this.circuitBreakers.set(indianApiFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.financialProviders.push(indianApiFinancials);
 
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
       if (typeof window !== 'undefined') {
