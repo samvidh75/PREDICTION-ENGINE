@@ -69,9 +69,19 @@ export const TrustCentrePage: React.FC = () => {
   }
 
   const metrics = envelope?.data;
-  const state = error ? "error" : envelope?.status ?? "unavailable";
+  const rawState = error ? "error" : envelope?.status ?? "unavailable";
   const asOf = envelope?.dataState?.asOf || "Data unavailable";
   const missingInputs = envelope?.dataState?.missingInputs || [];
+
+  const stateLabel: Record<string, string> = {
+    ok: "All metrics available",
+    partial: "Partial — some evidence sources are not yet connected",
+    unavailable: "Unavailable — verified scoring data is not ready yet",
+    empty: "No data — scoring registry is empty",
+    error: "Temporarily unavailable",
+    demo: "Demo mode",
+  };
+  const humanState = stateLabel[rawState] ?? rawState;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-4 text-slate-900">
@@ -80,12 +90,12 @@ export const TrustCentrePage: React.FC = () => {
         subtitle="Auditable performance metrics and scoring explanations for StockStory India."
       />
 
-      {state !== "ok" && (
+      {rawState !== "ok" && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
-          <p className="font-semibold uppercase tracking-wider text-xs">Trust metrics status: {state}</p>
+          <p className="font-semibold text-xs">{humanState}</p>
           <p className="mt-1">{error || envelope?.message || "Some trust metrics are unavailable because required evidence sources are not connected."}</p>
           {missingInputs.length > 0 && (
-            <p className="text-xs mt-2 text-amber-700">Missing inputs: {missingInputs.join(", ")}</p>
+            <p className="text-xs mt-2 text-amber-700">Some performance fields require additional verified data updates before they are available.</p>
           )}
         </div>
       )}

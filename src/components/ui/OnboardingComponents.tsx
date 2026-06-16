@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, Circle, AlertCircle, Play, FileText, Bookmark, Search, BarChart3, ShieldCheck, Briefcase } from "lucide-react";
+import { CheckCircle2, Circle, AlertCircle, ShieldCheck, X } from "lucide-react";
 import { Button } from "./Button";
 import Card from "./Card";
 
@@ -79,17 +79,41 @@ export const OnboardingChecklist: React.FC<{ steps: StepItem[] }> = ({ steps }) 
   );
 };
 
+const DATA_PANEL_DISMISSED_KEY = "onboarding_data_panel_dismissed";
+
 export const DataReadinessPanel: React.FC = () => {
+  const [dismissed, setDismissed] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.localStorage.getItem(DATA_PANEL_DISMISSED_KEY) === "true";
+    }
+    return false;
+  });
+
+  const handleDismiss = () => {
+    window.localStorage.setItem(DATA_PANEL_DISMISSED_KEY, "true");
+    setDismissed(true);
+  };
+
+  if (dismissed) return null;
+
   return (
-    <Card className="p-5 border-blue-100 bg-blue-50/30">
+    <Card className="p-4 border-blue-100 bg-blue-50/30">
       <div className="flex items-start gap-3">
         <AlertCircle className="h-4 w-4 text-blue-700 shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <h3 className="text-xs font-semibold text-blue-900">Data Status: Ingestion Sync Pending</h3>
+        <div className="flex-1 space-y-1">
+          <h3 className="text-xs font-semibold text-blue-900">Rankings are not available yet</h3>
           <p className="text-[11px] text-blue-800 leading-relaxed max-w-2xl">
-            Live prices and structural metadata are active during market hours. Financial factor scoring models will populate verified rankings after the nightly pipeline run completes. No fabricated rankings or filler mock stock data will be shown.
+            Company search and structural metadata are available where source data exists. Verified rankings and prediction rows will appear only when scoring has source-backed inputs. No fabricated rankings or sample stock rows are shown.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          aria-label="Dismiss data status notice"
+          className="shrink-0 rounded p-1 text-blue-600 hover:bg-blue-100 hover:text-blue-900 transition"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
     </Card>
   );

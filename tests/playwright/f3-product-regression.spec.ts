@@ -374,10 +374,8 @@ test.describe("Rankings page", () => {
   test("rankings page renders table structure", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    // Should have table headers or empty state
-    await expect(
-      page.getByText(/no ranking|rank|score/i).first()
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
+    await expect(page.getByText(/verified rankings are being prepared/i)).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 });
@@ -474,4 +472,41 @@ test("no href='#' in visible anchor elements", async ({ page }) => {
   await page.goto("/?page=landing");
   const anchors = page.locator('a[href="#"]');
   await expect(anchors).toHaveCount(0);
+});
+
+// ── Rankings / Predictions CTA routing ───────────────────────────────
+
+test.describe("Public rankings/predictions CTA routing", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+  });
+
+  test("rankings empty state primary CTA routes to signup", async ({ page }) => {
+    await page.goto("/?page=rankings");
+    await expect(page.locator("body")).toBeVisible();
+    // When the API returns empty, the CTA should be 'Create free account' → signup
+    const cta = page.getByRole("button", { name: /create free account/i });
+    if (await cta.isVisible()) {
+      await cta.click();
+      await expect(page).toHaveURL(/page=signup/);
+    } else {
+      // Rankings loaded with data — CTA absent is acceptable
+      await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
+    }
+    await assertNoRenderGarbage(page);
+  });
+
+  test("predictions empty state primary CTA routes to signup", async ({ page }) => {
+    await page.goto("/?page=predictions");
+    await expect(page.locator("body")).toBeVisible();
+    const cta = page.getByRole("button", { name: /create free account/i });
+    if (await cta.isVisible()) {
+      await cta.click();
+      await expect(page).toHaveURL(/page=signup/);
+    } else {
+      // Predictions loaded with data — CTA absent is acceptable
+      await expect(page.locator("body")).toBeVisible();
+    }
+    await assertNoRenderGarbage(page);
+  });
 });

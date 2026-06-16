@@ -55,7 +55,7 @@ export default function PublicPredictionsPage(): JSX.Element {
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Top-ranked companies"
-          subtitle="Prediction rows will appear after production ingestion and scoring have produced verified snapshots."
+          subtitle="Prediction rows will appear when source-backed scoring has produced verified snapshots."
           primaryAction={<MissingDataBadge />}
         />
 
@@ -64,16 +64,16 @@ export default function PublicPredictionsPage(): JSX.Element {
       ) : error || !data || data.length === 0 ? (
         <div className="flex flex-col gap-6">
           <EmptyState
-            title="Scoring signals not populated yet"
-            description="Verified predictions will appear here after the background scoring pipeline runs and completes ingestion. No placeholder data or sample rows are shown."
+            title="Verified predictions are being prepared"
+            description="Prediction rows will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or sample rows are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
             <Button
               type="button"
-              onClick={() => setPage("search")}
+              onClick={() => setPage("signup")}
               className="h-10 px-4 text-xs"
             >
-              Search a stock
+              Create free account
             </Button>
             <Button
               type="button"

@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   Search,
   Trophy,
+  BarChart3,
   Eye,
   ShieldCheck,
   Settings,
@@ -21,7 +22,7 @@ interface MobileNavItem {
 }
 
 interface PublicMobileNavItem {
-  page: "landing" | "about" | "login" | "signup";
+  page: "landing" | "about" | "rankings" | "predictions" | "login" | "signup";
   label: string;
   icon: React.ReactNode;
 }
@@ -35,7 +36,7 @@ export const MobileNav: React.FC = () => {
     return new URLSearchParams(window.location.search).get("page") ?? "landing";
   })();
 
-  const isPublicMobile = !isAuthenticated || ["landing", "about", "login", "signup"].includes(currentPage);
+  const isPublicMobile = !isAuthenticated || ["landing", "about", "rankings", "predictions", "login", "signup"].includes(currentPage);
 
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -64,9 +65,11 @@ export const MobileNav: React.FC = () => {
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="h-5 w-5" /> },
+    { page: "rankings", label: "Rankings", icon: <Trophy className="h-5 w-5" /> },
+    { page: "predictions", label: "Signals", icon: <BarChart3 className="h-5 w-5" /> },
     { page: "about", label: "About", icon: <Info className="h-5 w-5" /> },
     { page: "login", label: "Sign in", icon: <LogIn className="h-5 w-5" /> },
-    { page: "signup", label: "Create", icon: <UserPlus className="h-5 w-5" /> },
+    { page: "signup", label: "Join", icon: <UserPlus className="h-5 w-5" /> },
   ];
 
   return (
