@@ -1,6 +1,5 @@
 import { YahooProvider } from "../providers/YahooProvider";
 import { IndianMarketProvider } from "../providers/IndianMarketProvider";
-import { FinnhubProvider } from "../providers/FinnhubProvider";
 import { GoogleNewsRssProvider } from "../providers/GoogleNewsRssProvider";
 import type { PriceProvider } from "../providers/PriceProvider";
 import type { MetadataProvider } from "../providers/MetadataProvider";
@@ -21,7 +20,6 @@ import {
 
 const yahoo: PriceProvider & MetadataProvider & HistoricalProvider & FinancialProvider = new YahooProvider();
 const indian: PriceProvider & MetadataProvider & HistoricalProvider = new IndianMarketProvider();
-const finnhub: MetadataProvider & FinancialProvider & NewsProvider = new FinnhubProvider();
 const gnews: NewsProvider = new GoogleNewsRssProvider();
 
 export class DataAcquisitionCoordinator {
@@ -37,13 +35,13 @@ export class DataAcquisitionCoordinator {
     }, work);
   }
 
-  /** Fetch quote using provider priority: Yahoo then IndianMarket */
+  /** Fetch quote using provider priority: IndianAPI then Yahoo */
   static async fetchQuote(symbol: string): Promise<StockQuote> {
     return this.runWithIngestionContext(() => this.fetchQuoteWithinRun(symbol));
   }
 
   private static async fetchQuoteWithinRun(symbol: string): Promise<StockQuote> {
-    const providers: PriceProvider[] = [yahoo, indian];
+    const providers: PriceProvider[] = [indian, yahoo];
     for (const p of providers) {
       try {
         const quote = await p.getQuote(symbol);
@@ -55,13 +53,13 @@ export class DataAcquisitionCoordinator {
     throw new Error(`Quote not available for ${symbol}`);
   }
 
-  /** Fetch metadata using priority: Yahoo -> Finnhub */
+  /** Fetch metadata using priority: IndianAPI -> Yahoo */
   static async fetchMetadata(symbol: string): Promise<CompanyMetadata> {
     return this.runWithIngestionContext(() => this.fetchMetadataWithinRun(symbol));
   }
 
   private static async fetchMetadataWithinRun(symbol: string): Promise<CompanyMetadata> {
-    const providers: MetadataProvider[] = [yahoo, finnhub];
+    const providers: MetadataProvider[] = [indian, yahoo];
     for (const p of providers) {
       try {
         const meta = await p.getMetadata(symbol);
@@ -73,33 +71,22 @@ export class DataAcquisitionCoordinator {
     throw new Error(`Metadata not available for ${symbol}`);
   }
 
-  /** Fetch financial statements using priority: Finnhub -> Yahoo */
+  /** Fetch financial statements using priority: IndianAPI -> Yahoo */
   static async fetchFinancials(symbol: string): Promise<FinancialSnapshot> {
     return this.runWithIngestionContext(() => this.fetchFinancialsWithinRun(symbol));
   }
 
   private static async fetchFinancialsWithinRun(symbol: string): Promise<FinancialSnapshot> {
-    const providers: FinancialProvider[] = [finnhub];
-    for (const p of providers) {
-      try {
-        const fin = await p.getFinancials(symbol);
-        // FinancialData is Record<string, unknown>, cast only at boundary
-        const result = fin as unknown as FinancialSnapshot | undefined;
-        if (result && result.symbol) return result;
-      } catch (e) {
-        // continue to next provider
-      }
-    }
-    throw new Error(`Financials not available for ${symbol}`);
+    throw new Error(`Financials not available for ${symbol} — no financial provider configured`);
   }
 
-  /** Fetch news using priority: Finnhub -> GNews */
+  /** Fetch news using priority: GNews */
   static async fetchNews(symbol: string): Promise<NewsItem[]> {
     return this.runWithIngestionContext(() => this.fetchNewsWithinRun(symbol));
   }
 
   private static async fetchNewsWithinRun(symbol: string): Promise<NewsItem[]> {
-    const providers: NewsProvider[] = [finnhub, gnews];
+    const providers: NewsProvider[] = [gnews];
     for (const p of providers) {
       try {
         const news = await p.getNews(symbol);

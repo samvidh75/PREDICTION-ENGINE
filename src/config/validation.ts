@@ -1,23 +1,15 @@
-// src/config/validation.ts
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const required = [
-  "FINNHUB_KEY",
-  "RAPIDAPI_NSE_KEY",
-  "RAPIDAPI_NSE_HOST",
-];
+const required: string[] = [];
 
 const missing = required.filter((key) => !process.env[key]);
 if (missing.length) {
-  console.error("❌ Missing required environment variables:", missing.join(", "));
+  console.error("Missing required environment variables:", missing.join(", "));
   console.error("The application cannot start without these credentials.");
   process.exit(1);
 }
 
 export const config = {
-  finnhubKey: process.env.FINNHUB_KEY as string,
-  rapidApiNseKey: process.env.RAPIDAPI_NSE_KEY as string,
-  rapidApiNseHost: process.env.RAPIDAPI_NSE_HOST as string,
 };

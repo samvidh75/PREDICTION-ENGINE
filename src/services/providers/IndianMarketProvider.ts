@@ -217,7 +217,15 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const data = await this.fetchJson('history', symbol, { stock_name: clean, period, filter: 'price' }, url);
     const priceDataset = data.datasets?.find((dataset: any) => dataset.metric === 'Price');
 
-    if (priceDataset?.values?.length) return [];
-    return [];
+    if (!priceDataset?.values?.length) return [];
+
+    return priceDataset.values
+      .filter((v: any) => v && typeof v[0] === 'string' && typeof v[1] === 'number')
+      .map((v: any) => ({
+        date: v[0].split('T')[0] || v[0],
+        close: v[1],
+        source: 'indianapi',
+      }))
+      .filter((p: HistoricalPoint) => p.date && p.close > 0);
   }
 }

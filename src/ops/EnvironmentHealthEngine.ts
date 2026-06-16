@@ -1,9 +1,3 @@
-/**
- * EnvironmentHealthEngine — TRACK-35 Group C
- * Validates environment configuration at startup.
- * Status: 'ONLINE' | 'DEGRADED' | 'OFFLINE' | 'MISCONFIGURED'
- */
-
 export interface EnvCheck {
   variable: string;
   status: 'ok' | 'missing' | 'invalid';
@@ -21,7 +15,6 @@ export class EnvironmentHealthEngine {
     const checks: EnvCheck[] = [];
     const missingRequired: string[] = [];
 
-    // Database
     const dbUrl = process.env.DATABASE_URL;
     const pgHost = process.env.PGHOST;
     if (dbUrl || pgHost) {
@@ -31,7 +24,6 @@ export class EnvironmentHealthEngine {
       missingRequired.push('DATABASE_URL');
     }
 
-    // API keys
     const upstox = process.env.UPSTOX_ACCESS_TOKEN || process.env.VITE_UPSTOX_ACCESS_TOKEN;
     checks.push({
       variable: 'UPSTOX_ACCESS_TOKEN',
@@ -40,11 +32,18 @@ export class EnvironmentHealthEngine {
     });
     if (!upstox) missingRequired.push('UPSTOX_ACCESS_TOKEN');
 
+    const indianapi = process.env.INDIANAPI_KEY;
+    checks.push({
+      variable: 'INDIANAPI_KEY',
+      status: indianapi ? 'ok' : 'missing',
+      detail: indianapi ? 'Configured' : 'Not set',
+    });
+
     const finnhub = process.env.FINNHUB_API_KEY || process.env.VITE_FINNHUB_API_KEY;
     checks.push({
       variable: 'FINNHUB_API_KEY',
       status: finnhub ? 'ok' : 'missing',
-      detail: finnhub ? 'Configured' : 'Not set',
+      detail: finnhub ? 'Configured (deprecated — Finnhub removed from active pipeline)' : 'Not set (removed)',
     });
 
     const yahoo = process.env.YAHOO_API_KEY || process.env.VITE_YAHOO_API_KEY;
@@ -54,7 +53,6 @@ export class EnvironmentHealthEngine {
       detail: yahoo ? 'Configured' : 'Not set',
     });
 
-    // Port
     const port = process.env.PORT;
     if (port) {
       const p = parseInt(port);
@@ -67,7 +65,6 @@ export class EnvironmentHealthEngine {
       checks.push({ variable: 'PORT', status: 'missing', detail: 'Will use default (3000 or 5173)' });
     }
 
-    // NODE_ENV
     const env = process.env.NODE_ENV;
     checks.push({
       variable: 'NODE_ENV',
