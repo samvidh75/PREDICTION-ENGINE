@@ -35,19 +35,21 @@ export async function runMigrations(): Promise<MigrationStatus> {
 }
 
 // CLI entry — always runs shutdown in finally
-let exitCode = 0;
+if (import.meta.url === `file://${process.argv[1]}`) {
+  let exitCode = 0;
 
-(async () => {
-  try {
-    const result = await runMigrations();
-    console.log("[migrate] Complete.");
-    console.log(`  Latest: ${result.latestAppliedId}, Applied: ${result.appliedCount}`);
-  } catch (err: unknown) {
-    exitCode = 1;
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("[migrate] FAILED:", msg);
-  } finally {
-    await dbAdapter.shutdown();
-    process.exitCode = exitCode;
-  }
-})();
+  (async () => {
+    try {
+      const result = await runMigrations();
+      console.log("[migrate] Complete.");
+      console.log(`  Latest: ${result.latestAppliedId}, Applied: ${result.appliedCount}`);
+    } catch (err: unknown) {
+      exitCode = 1;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[migrate] FAILED:", msg);
+    } finally {
+      await dbAdapter.shutdown();
+      process.exitCode = exitCode;
+    }
+  })();
+}
