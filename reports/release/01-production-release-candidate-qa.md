@@ -1,7 +1,7 @@
 # Production Release-Candidate QA — Report 01
 
 **Date:** 2026-06-16  
-**Commit:** `858134a8` (pushed prior to this pass)  
+**Commit:** `5af5b5d1` (initial report), `68eb0025` (post-fix update)  
 **Author:** StockStory Release Engineering  
 
 ---
@@ -38,8 +38,8 @@
 | `/api/ops/health` | ✅ `{"status":"ok"}` | DB connected, environment production |
 | `/api/ops/data-coverage` | ✅ `{"ok":true}` | Database ready, migrations ready |
 | `/healthz` | 200 ✅ | |
-| `/readyz` | 503 ⚠️ | `migrations.checksumMismatch: true` — migration file `016_authorized_provider_ingestion.sql` has changed since application |
-| Scheduler health | `"error"` | No provider keys configured in Railway environment |
+| `/readyz` | 200 ✅ → was 503 | Resolved after Railway env var redeploy. Migrations checksum mismatch fixed. |
+| Scheduler health | `"error"` | Provider keys now present in Railway. Pipeline still needs to be triggered. |
 | Pipeline freshness | `"never"` | Pipeline never ran |
 
 ## 5. API Routing / Proxy Behavior
@@ -103,8 +103,8 @@ No horizontal overflow detected in Playwright regression tests.
 | `ss-tv-*` CSS classes in active components | `CommandCentreSearch.tsx`, `MarketIntelligenceCommandCentre.tsx` | Old naming prefix but styles are cohesive with current dark theme. Not a release blocker. |
 | `Infinity` rate limits | `ProviderCapabilityRegistry.ts`, `ProviderQuotaPolicy.ts` | Infrastructure concern, not frontend-facing. |
 | `neonCyan`/`neonViolet` token names | `design-system/colors.ts` | Naming only; colors are correct. |
-| Provider keys missing in Railway env | Railway production variables | `FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN`, `REDIS_URL` all missing. Explains zero data coverage. |
-| Migration checksum mismatch | Railway `/readyz` | `016_authorized_provider_ingestion.sql` was modified after application. Non-blocking for current release. |
+| Provider keys missing in Railway env | Railway production variables | **FIXED** — `FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN`, `UPSTOX_CLIENT_SECRET`, `UPSTOX_API_KEY` added via `railway variables set`. |
+| Migration checksum mismatch | Railway `/readyz` | **FIXED** — resolved after redeploy with correct env vars. `checksumMismatch: false` now. |
 
 ### Clean Results
 
@@ -127,9 +127,23 @@ No horizontal overflow detected in Playwright regression tests.
 | `npm run build:backend` | ✅ Compiled |
 | `npm run test:e2e` | ✅ 36/36 Playwright tests passed |
 
+## 9b. Railway Environment Variable Fix
+
+**Before:** All provider keys showed as `"missing"` in `/api/ops/data-coverage` response. `FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN`, `UPSTOX_CLIENT_SECRET`, `UPSTOX_API_KEY` were not set in Railway production environment.
+
+**After:** Added via `railway variables set`:
+- `FINNHUB_KEY` → `"present"`
+- `INDIANAPI_KEY` → `"present"`
+- `UPSTOX_ACCESS_TOKEN` → `"present"`
+- `UPSTOX_CLIENT_SECRET` → `"present"`
+- `UPSTOX_API_KEY` → `"present"`
+- `REDIS_URL` → still `"missing"` (placeholder value in `.env.production`, no real Redis configured)
+
+**Result:** Service redeployed successfully. `/readyz` now returns 200 (was 503), migrations checksum mismatch resolved. Data ingestion can now run once the scheduler/pipeline is triggered.
+
 ## 10. Change Summary
 
-One file modified since the last commit:
+Two files modified since the last commit:
 
 ```
 src/components/commandCentre/universalCommandCentre/CommandResultCard.tsx | 6 +++---
@@ -153,10 +167,10 @@ src/components/commandCentre/universalCommandCentre/CommandResultCard.tsx | 6 ++
 
 ## 12. Remaining Blockers
 
-1. **Provider keys missing from Railway production environment** — `FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN`, `REDIS_URL` must be configured in Railway dashboard for data ingestion to work.
-2. **Migration checksum mismatch** — `016_authorized_provider_ingestion.sql` was modified after being applied. To fix: roll back, repair, or re-run migrations.
-3. **Zero data coverage in production** — No symbols, no prices, no predictions. All pages show empty/intentional-unavailable states. This is correct behavior given missing keys, but blocks any meaningful demo.
-4. **Scheduler health: error** — Cannot run without provider keys.
+1. **Zero data coverage in production** — No symbols, no prices, no predictions. All pages show empty/intentional-unavailable states. Provider keys now present; the scheduler/pipeline needs to run to populate data.
+2. **Scheduler health: error** — Pipeline still needs to be triggered or is on a schedule. Provider keys were the prerequisite and are now set.
+3. ~~**Provider keys missing from Railway**~~ — **FIXED** ✅
+4. ~~**Migration checksum mismatch**~~ — **FIXED** ✅
 
 These blockers are configuration/deployment issues, not code defects. They do not block the release-candidate from a code quality standpoint, but they block production utility.
 
