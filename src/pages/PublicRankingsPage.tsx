@@ -81,7 +81,7 @@ export const PublicRankingsPage: React.FC = () => {
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Research rankings"
-          subtitle="Rankings will appear here after production ingestion and scoring have populated verified company snapshots."
+          subtitle="Rankings will appear here when source-backed scoring has produced verified company snapshots."
           primaryAction={<MissingDataBadge />}
         />
 
@@ -117,16 +117,16 @@ export const PublicRankingsPage: React.FC = () => {
       ) : filteredRankings.length === 0 ? (
         <div className="flex flex-col gap-6">
           <EmptyState
-            title="Scoring signals not populated yet"
-            description="Verified rankings will appear here after the background scoring pipeline runs and completes ingestion. No placeholder data or fabricated rankings are shown."
+            title="Verified rankings are being prepared"
+            description="Rankings will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or fabricated scores are shown."
           />
           <div className="flex flex-wrap justify-center gap-3">
             <Button
               type="button"
-              onClick={() => setPage("search")}
+              onClick={() => setPage("signup")}
               className="h-10 px-4 text-xs"
             >
-              Search a stock
+              Create free account
             </Button>
             <Button
               type="button"

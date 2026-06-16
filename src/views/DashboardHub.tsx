@@ -122,15 +122,15 @@ export const DashboardHub: React.FC = () => {
     {
       id: "search",
       title: "Search a company",
-      description: "Find any Indian listed company by ticker or name to begin your research.",
+      description: "Find any Indian listed company by ticker or name to begin structured research.",
       isCompleted: recentResearch.length > 0,
       actionLabel: "Search now",
       onAction: () => navigate("search"),
     },
     {
       id: "methodology",
-      title: "Understand the score methodology",
-      description: "Read how our model calculates predictions and the rules that govern data trust.",
+      title: "Review the scoring methodology",
+      description: "Read how scoring inputs, availability labels, and research-only safeguards work.",
       isCompleted: methodologyViewed,
       actionLabel: "Read methodology",
       onAction: handleNavigateMethodology,
@@ -149,9 +149,9 @@ export const DashboardHub: React.FC = () => {
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
         title="Research Dashboard"
-        subtitle="Search any Indian listed company, track your watchlists, and monitor scoring updates when the backend pipeline runs."
+        subtitle="Search Indian listed companies, track watchlists, and review scoring updates when verified data is available."
         primaryAction={
-          <div className="flex flex-wrap gap-2">
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
             <Button type="button" variant="secondary" size="sm" onClick={() => navigate("rankings")}>
               <BarChart3 className="h-4 w-4" aria-hidden="true" />
               Rankings
@@ -177,7 +177,7 @@ export const DashboardHub: React.FC = () => {
             <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>
             <p className="text-xs text-slate-500 mt-0.5">Search by ticker symbol, company name, or sector.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <div className="relative flex-1">
               <Input
                 id="dashboard-search"
@@ -222,7 +222,7 @@ export const DashboardHub: React.FC = () => {
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader
             title="Score changes"
-            subtitle="Appears after the background scoring pipeline completes."
+            subtitle="Appears when verified score changes are available."
             action={<MissingDataBadge />}
           />
           <div className="mt-4">
@@ -231,14 +231,14 @@ export const DashboardHub: React.FC = () => {
             ) : signalsError ? (
               <EmptyState
                 title="Score changes unavailable"
-                description="The database backfill is in progress. No mocked results are shown. Check back after the next ingestion cycle."
+                description="Score-change data is unavailable right now. No sample results are shown."
               />
             ) : signals.length === 0 ? (
               <EmptyState
                 title="Awaiting scoring cycle"
                 description={
                   symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear after the next nightly run.`
+                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear when the next verified scoring update is available.`
                     : "No companies indexed yet. Use Search to find companies and add them to your watchlist."
                 }
                 action={

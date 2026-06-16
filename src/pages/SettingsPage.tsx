@@ -118,7 +118,7 @@ export const SettingsPage: React.FC = () => {
                   Save Profile
                 </Button>
                 {saveNotice && (
-                  <p className="text-xs text-emerald-400">{saveNotice}</p>
+                  <p className="text-xs text-emerald-700">{saveNotice}</p>
                 )}
               </div>
             </div>
@@ -197,7 +197,7 @@ export const SettingsPage: React.FC = () => {
                       Send Reset Link
                     </Button>
                     {resetSent && (
-                      <p className="mt-2 text-xs text-emerald-400">Reset instructions sent successfully.</p>
+                      <p className="mt-2 text-xs text-emerald-700">Reset instructions sent successfully.</p>
                     )}
                     {resetError && <p className="mt-2 text-xs text-rose-400">{resetError}</p>}
                   </div>
