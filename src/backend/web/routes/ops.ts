@@ -236,29 +236,37 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
       .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
     const applyMode = rawApply === "true";
-    const results: Array<{ symbol: string; ok: boolean; error: string | null }> = [];
+    const results: Array<{ symbol: string; ok: boolean; price: number | null; error: string | null }> = [];
     for (const symbol of symbols) {
       try {
-        const { MoneycontrolQuoteProvider } = await import("../../../services/providers/MoneycontrolQuoteProvider");
-        const provider = new MoneycontrolQuoteProvider();
-        const quote = await provider.getQuote(symbol);
-        const price = typeof quote?.price === "number" && quote.price > 0 ? quote.price : null;
-        const ok = price !== null;
+        const slug = symbol.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        const url = `https://www.moneycontrol.com/india/stockpricequote/${slug}/${symbol}`;
+        const resp = await fetch(url, {
+          headers: { "User-Agent": "StockStory/ingestion (contact@stockstory.in)" },
+          signal: AbortSignal.timeout(15_000),
+        });
+        const html = await resp.text();
+        const priceMatch = html.match(/class="[^"]*price[^"]*"[^>]*>([0-9,]+\.\d+)/i)
+          || html.match(/data-reactid="\d+">([0-9,]+\.\d+)<\/span>/)
+          || html.match(/<span[^>]*id="Nst_lblCurrentValue"[^>]*>([0-9,]+\.\d+)<\/span>/)
+          || html.match(/([0-9,]+\.\d{2})\s*<\/div>\s*<div[^>]*class="[^"]*change/i);
+        const rawPrice = priceMatch?.[1];
+        const price = rawPrice ? parseFloat(rawPrice.replace(/,/g, '')) : null;
+        const ok = price !== null && price > 0;
         if (ok && applyMode) {
           const today = new Date().toISOString().slice(0, 10);
           await query(
             `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
              VALUES ($1, $2, $3, $4, $5, $6, $7)
              ON CONFLICT (symbol, trade_date) DO UPDATE SET
-               close = EXCLUDED.close,
-               volume = EXCLUDED.volume`,
-            [symbol, today, price, price, price, price, quote.volume ?? null]
+               close = EXCLUDED.close, volume = EXCLUDED.volume`,
+            [symbol, today, price, price, price, price, null]
           );
         }
-        results.push({ symbol, ok, error: null });
+        results.push({ symbol, ok, price, error: ok ? null : "Could not parse price from Moneycontrol page" });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
-        results.push({ symbol, ok: false, error: msg });
+        results.push({ symbol, ok: false, price: null, error: msg });
       }
     }
     return reply.send({
