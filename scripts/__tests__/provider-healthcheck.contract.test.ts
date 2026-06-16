@@ -25,10 +25,10 @@ describe('provider healthcheck contract', () => {
 
   it('runs manually with GitHub Actions secrets and uploads a redacted artifact', () => {
     expect(workflow).toContain('workflow_dispatch:');
-    expect(workflow).toContain('FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}');
     expect(workflow).toContain('INDIANAPI_KEY: ${{ secrets.INDIANAPI_KEY }}');
     expect(workflow).toContain('provider-health-report');
     expect(workflow).not.toContain('ALPHA_VANTAGE');
+    expect(workflow).not.toContain('FINNHUB_KEY');
   });
 
   it('removes Alpha Vantage from active environment and deployment guidance', () => {

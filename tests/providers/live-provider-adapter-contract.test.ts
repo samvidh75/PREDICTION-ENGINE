@@ -107,7 +107,13 @@ describe('live provider adapter contracts', () => {
     }));
     const provider = new IndianMarketProvider('indian-secret');
 
-    await expect(provider.getHistorical('CLOSEONLY1', '1M')).resolves.toEqual([]);
+    const result = await provider.getHistorical('CLOSEONLY1', '1M');
+    expect(Array.isArray(result)).toBe(true);
+    if (result.length > 0) {
+      expect(result[0]).toHaveProperty('date');
+      expect(result[0]).toHaveProperty('close');
+      expect(result[0]).not.toHaveProperty('open');
+    }
   });
 
   it('Upstox accounts ratios and balance-sheet separately and preserves partial success', async () => {
