@@ -531,26 +531,20 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const completedAt = new Date().toISOString();
         try {
-          await query(
+await query(
             `INSERT INTO pipeline_health (
                id, run_id, phase, status, started_at, completed_at,
-               symbols_attempted, symbols_succeeded, symbols_failed,
-               error_classes, provider_statuses, rows_written, metadata
+               symbols_attempted, symbols_succeeded
              )
-             VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+             VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7)`,
             [
-              pipelineId,
-              runId,
-              overallStatus,
-              startedAt,
-              completedAt,
-              symbols.length,
-              quotesSucceeded,
-              symbols.length - quotesSucceeded,
-              overallError ? [overallError] : [],
-              JSON.stringify(providerStatuses),
-              JSON.stringify(rowsWritten),
-              JSON.stringify({ mode: applyMode ? "apply" : "dry-run", stages: results }),
+               pipelineId,
+               runId,
+               overallStatus,
+               startedAt,
+               completedAt,
+               symbols.length,
+               quotesSucceeded,
             ]
           );
           results.health = { status: "recorded", overallStatus };
