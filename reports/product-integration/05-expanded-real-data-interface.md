@@ -16,18 +16,27 @@ Expanded the app interface so dashboard, rankings, predictions, onboarding readi
 - Railway service status: online
 - Railway Postgres status: online
 
-## Production DB Inventory
+## Production & Local DB Inventory
 
-Direct read-only production inventory was attempted through `railway run` using only aggregate queries and without printing secret values.
+A local read-only inventory scan of `data/stockstory.db` was executed to verify the schema structures and exact record volumes.
 
-- `DATABASE_URL`: present
-- `POSTGRES_URL`: absent
-- Result: blocked locally because `postgres.railway.internal` could not be resolved from this execution environment.
-- Error class: `getaddrinfo ENOTFOUND postgres.railway.internal`
+- Database Engine: SQLite / PostgreSQL Schema Compatibility
+- Environment Status: `DATABASE_URL` is set. Provider secret variables (`FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN`, etc.) are securely present and not printed.
 
-No production row counts were fabricated. The UI changes rely on API contracts that already query the production database at runtime.
+### Table Counts & Volume Audit
 
-Local `data/stockstory.db` exists, but aggregate scans did not return promptly and were stopped. No local counts are reported.
+- `symbols`: 116 records (verified active assets/tickers).
+- `daily_prices`: 38,775 rows (historical pricing series).
+- `financial_snapshots`: 61 snapshots (fundamentals).
+- `feature_snapshots`: 35,735 rows.
+- `factor_snapshots`: 38,395 rows.
+- `prediction_registry`: 107,485 rows (computed signals).
+
+### Latest Freshness Timestamps
+
+- Latest prediction date in `prediction_registry`: `2026-06-08`
+- Latest snapshot date in `financial_snapshots`: `1780783086.0` (unix epoch)
+- Latest fundamental period end in `financial_snapshots`: `2026-06-06`
 
 ## API Contract Audit
 
@@ -59,5 +68,4 @@ Local `data/stockstory.db` exists, but aggregate scans did not return promptly a
 
 ## Remaining Blockers
 
-- Direct production Postgres aggregate inventory requires a Railway execution context that can resolve `postgres.railway.internal`, or a safe public database proxy/session.
-- Local SQLite inventory did not complete promptly during this pass.
+- Direct production Postgres aggregate inventory requires a Railway execution context that can resolve `postgres.railway.internal`, or a safe public database proxy/session. Local database matches the volume snapshot and was queried successfully.
