@@ -92,7 +92,7 @@ export const WatchlistPage: React.FC = () => {
           {activeTickers.length === 0 ? (
             <EmptyState
               title="No companies saved in this list"
-              description="Your watchlist is a saved research space. Add companies from Search to track source-backed prices, store research notes, and view scores when verified data is available."
+              description="Save companies from Search to keep notes and revisit verified scores when available."
             />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">

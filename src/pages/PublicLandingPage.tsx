@@ -17,17 +17,17 @@ const workflow = [
   {
     icon: <Search className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
     title: "Search",
-    body: "Find Indian listed companies by ticker, name, or sector. Each result opens a structured company research page.",
+    body: "Find Indian listed companies by ticker, name, or sector.",
   },
   {
     icon: <BarChart3 className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
     title: "Review",
-    body: "Read source-backed scoring signals. Fields without production data are clearly labelled as unavailable — no fabricated metrics.",
+    body: "Review scoring signals only when source data is available.",
   },
   {
     icon: <Eye className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
     title: "Track",
-    body: "Save companies to watchlists and attach research notes, kept separate from any investment decisions.",
+    body: "Save companies and keep research notes in one place.",
   },
 ];
 
@@ -44,24 +44,24 @@ export const PublicLandingPage: React.FC = () => {
       <MobileNav />
 
       {/* Hero */}
-      <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-14 pt-28 md:grid-cols-[1.15fr_0.85fr] md:items-start md:pt-32">
+      <section className="mx-auto grid max-w-6xl gap-8 px-6 pb-12 pt-24 md:grid-cols-[1.15fr_0.85fr] md:items-start md:pt-32">
         <div>
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-800">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             Indian equity research
           </div>
-          <h1 className="max-w-2xl text-4xl font-semibold leading-[1.06] tracking-tight text-slate-950 sm:text-5xl">
-            Research Indian stocks with cleaner context.
+          <h1 className="max-w-2xl text-4xl font-semibold leading-[1.06] tracking-tight text-slate-950 sm:text-5xl md:text-6xl">
+            A calmer workspace for Indian equity research.
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-            StockStory India helps investors search companies, review source-backed scoring signals, and organise research notes. Analytical software — not an investment recommendation engine.
+          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 md:text-lg">
+            Search companies, review source-backed signals, and organise watchlists without fabricated scores or trading noise.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
             <Button
               id="hero-cta-start"
               type="button"
               onClick={() => setPage("signup")}
-              className="h-11 px-6 text-sm"
+              className="h-11 px-5 text-sm"
             >
               Start Research <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
@@ -70,7 +70,7 @@ export const PublicLandingPage: React.FC = () => {
               type="button"
               onClick={() => setPage("methodology")}
               variant="secondary"
-              className="h-11 px-6 text-sm"
+              className="h-11 px-5 text-sm"
             >
               View Methodology
             </Button>
@@ -79,7 +79,7 @@ export const PublicLandingPage: React.FC = () => {
               type="button"
               onClick={() => setPage("rankings")}
               variant="secondary"
-              className="h-11 px-6 text-sm"
+              className="h-11 px-5 text-sm"
             >
               View Rankings
             </Button>
@@ -87,12 +87,12 @@ export const PublicLandingPage: React.FC = () => {
         </div>
 
         {/* Trust card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <div className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+          <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+            <span className="text-xs font-medium text-slate-500">
               Research principles
             </span>
-            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+            <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-800">
               Evidence first
             </span>
           </div>
@@ -100,7 +100,7 @@ export const PublicLandingPage: React.FC = () => {
             {trust.map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-2.5 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700"
+                className="flex items-center gap-2.5 rounded-md bg-slate-50 px-4 py-3 text-sm text-slate-700"
               >
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
                 {item}
@@ -111,15 +111,15 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* Workflow section */}
-      <section className="border-y border-slate-200 bg-white py-14">
+      <section className="border-y border-slate-200/80 bg-white py-12">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">
             How the research workflow works
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {workflow.map(({ icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 inline-flex rounded-lg bg-emerald-50 p-2.5">
+              <div key={title} className="rounded-lg border border-slate-200/80 bg-white p-5">
+                <div className="mb-4 inline-flex rounded-md bg-slate-50 p-2.5">
                   {icon}
                 </div>
                 <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
@@ -136,13 +136,13 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       {/* Onboarding CTA bar */}
-      <section className="bg-slate-950 py-10">
+      <section className="bg-slate-950 py-9">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-lg font-semibold text-white">Ready to start your research?</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Create a free account to search companies, track watchlists, and explore scoring methodology — no investment advice, no hidden fees.
+            Create a free account to search companies, track watchlists, and explore methodology.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
             <Button
               id="onboarding-cta-signup"
               type="button"

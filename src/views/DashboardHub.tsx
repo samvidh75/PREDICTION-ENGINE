@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck, Database } from "lucide-react";
+import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
@@ -122,7 +122,7 @@ export const DashboardHub: React.FC = () => {
     {
       id: "search",
       title: "Search a company",
-      description: "Find any Indian listed company by ticker or name to begin structured research.",
+      description: "Find a company by ticker or name.",
       isCompleted: recentResearch.length > 0,
       actionLabel: "Search now",
       onAction: () => navigate("search"),
@@ -130,7 +130,7 @@ export const DashboardHub: React.FC = () => {
     {
       id: "methodology",
       title: "Review the scoring methodology",
-      description: "Read how scoring inputs, availability labels, and research-only safeguards work.",
+      description: "Review scoring inputs and availability labels.",
       isCompleted: methodologyViewed,
       actionLabel: "Read methodology",
       onAction: handleNavigateMethodology,
@@ -138,7 +138,7 @@ export const DashboardHub: React.FC = () => {
     {
       id: "track",
       title: "Save or track companies",
-      description: "Add companies to your Watchlist to monitor scoring updates and keep research notes.",
+      description: "Save companies and notes in a watchlist.",
       isCompleted: followedTickers.length > 0,
       actionLabel: "Go to Watchlist",
       onAction: () => navigate("watchlist"),
@@ -149,7 +149,7 @@ export const DashboardHub: React.FC = () => {
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
         title="Research Dashboard"
-        subtitle="Search Indian listed companies, track watchlists, and review scoring updates when verified data is available."
+        subtitle="Search companies, save research, and review verified score changes when available."
         primaryAction={
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
             <Button type="button" variant="secondary" size="sm" onClick={() => navigate("rankings")}>
@@ -164,18 +164,15 @@ export const DashboardHub: React.FC = () => {
         }
       />
 
-      {/* Onboarding Checklist */}
       <OnboardingChecklist steps={onboardingSteps} />
 
-      {/* Data Ingestion Status Panel */}
       <DataReadinessPanel />
 
-      {/* Primary search action */}
       <Card className="p-6">
         <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Search by ticker symbol, company name, or sector.</p>
+            <p className="mt-1 text-xs text-slate-500">Search by ticker, company name, or sector.</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="relative flex-1">
@@ -196,24 +193,23 @@ export const DashboardHub: React.FC = () => {
         </form>
       </Card>
 
-      {/* Stats row */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-3">
         <Card>
           <SectionHeader title="Watchlist" subtitle="Saved companies" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">{followedTickers.length}</div>
-          <p className="mt-1 text-xs text-slate-500">Saved locally to your browser session.</p>
+          <p className="mt-1 text-xs text-slate-500">Saved to your workspace.</p>
         </Card>
         <Card>
           <SectionHeader title="Portfolio" subtitle="Recorded holdings" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">{holdings.length}</div>
-          <p className="mt-1 text-xs text-slate-500">Live quotes withheld when feeds are offline.</p>
+          <p className="mt-1 text-xs text-slate-500">Quotes appear when verified.</p>
         </Card>
         <Card>
-          <SectionHeader title="Indexed companies" subtitle="Backend registry" />
+          <SectionHeader title="Indexed companies" subtitle="Verified registry" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {signalsLoading ? "—" : symbolsAnalyzed}
           </div>
-          <p className="mt-1 text-xs text-slate-500">Populated by scheduled data syncs.</p>
+          <p className="mt-1 text-xs text-slate-500">Available after source updates.</p>
         </Card>
       </div>
 
@@ -235,11 +231,11 @@ export const DashboardHub: React.FC = () => {
               />
             ) : signals.length === 0 ? (
               <EmptyState
-                title="Awaiting scoring cycle"
+                title="Score changes not ready yet"
                 description={
                   symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear when the next verified scoring update is available.`
-                    : "No companies indexed yet. Use Search to find companies and add them to your watchlist."
+                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear after verified updates.`
+                    : "Use Search to find companies and add them to your watchlist."
                 }
                 action={
                   <Button
@@ -278,7 +274,7 @@ export const DashboardHub: React.FC = () => {
             {followedTickers.length === 0 ? (
               <div className="mt-4">
                 <EmptyState
-                  description="No companies saved. Open a company page and click 'Add to Watchlist' to monitor it here."
+                  description="No companies saved yet. Open a company page to track it here."
                 />
               </div>
             ) : (

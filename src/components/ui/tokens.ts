@@ -5,20 +5,20 @@
 export const tokens = {
   // Page Shell Layouts
   layout: {
-    container: "mx-auto w-full max-w-6xl px-4 py-8 md:py-12 font-sans antialiased text-slate-900",
-    authContainer: "mx-auto w-full max-w-md px-6 py-12 md:py-24 font-sans antialiased text-slate-900",
-    grid: "grid gap-6",
-    sidebarGrid: "grid gap-6 lg:grid-cols-[1fr_340px]",
-    sectionSpacing: "space-y-6",
+    container: "mx-auto w-full max-w-6xl px-4 py-6 font-sans antialiased text-slate-900 sm:px-6 md:py-10",
+    authContainer: "mx-auto w-full max-w-md px-5 py-10 md:py-20 font-sans antialiased text-slate-900",
+    grid: "grid gap-5",
+    sidebarGrid: "grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]",
+    sectionSpacing: "space-y-5",
     innerSpacing: "space-y-4",
   },
 
   // Typography Scale
   typography: {
-    pageTitle: "text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl leading-tight",
-    pageSubtitle: "mt-1.5 max-w-3xl text-sm leading-6 text-slate-500",
+    pageTitle: "text-2xl font-semibold tracking-tight text-slate-950 md:text-[2rem] leading-tight",
+    pageSubtitle: "mt-2 max-w-2xl text-sm leading-6 text-slate-500",
     sectionTitle: "text-sm font-semibold text-slate-950 leading-snug",
-    sectionSubtitle: "mt-0.5 text-xs leading-relaxed text-slate-500",
+    sectionSubtitle: "mt-1 text-xs leading-5 text-slate-500",
     bodyMuted: "text-xs leading-relaxed text-slate-500",
     tickerBold: "font-mono text-sm font-semibold text-slate-950",
     metaMuted: "text-[10px] font-semibold uppercase tracking-wider text-slate-500",
@@ -26,7 +26,7 @@ export const tokens = {
 
   // Focus Ring Consistency
   focus: {
-    ring: "focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700",
+    ring: "focus:outline-none focus:ring-2 focus:ring-emerald-700/15 focus:border-emerald-700",
   },
 };
 

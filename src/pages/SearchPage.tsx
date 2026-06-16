@@ -105,12 +105,12 @@ export const SearchPage: React.FC = () => {
 
   return (
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
-      <Card className="p-8">
-        <div className="mx-auto flex max-w-[600px] flex-col gap-5 text-center">
+      <Card className="p-6 sm:p-8">
+        <div className="mx-auto flex max-w-[620px] flex-col gap-5 text-center">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-950">Search Indian stocks</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">Search Indian stocks</h1>
             <p className="mt-1 text-sm text-slate-600">
-              The fastest path into a company research page.
+              Start with a ticker, company name, or sector.
             </p>
           </div>
 
@@ -197,11 +197,11 @@ export const SearchPage: React.FC = () => {
                 })}
               </div>
             ) : (
-              <EmptyState description="No matching company was found in the current Indian equity registry." />
+              <EmptyState title="No matching company" description="Try another ticker, company name, or sector." />
             )}
           </>
         ) : (
-          <EmptyState description="Type at least 2 characters to search by ticker, company name, or sector." />
+          <EmptyState title="Search the company universe" description="Type at least 2 characters to begin." />
         )}
       </section>
     </div>

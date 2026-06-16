@@ -24,21 +24,21 @@ const methodology = ["Collect data", "Generate features", "Generate factors", "R
 
 export const PublicAboutPage: React.FC = () => {
   return (
-    <main className="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+    <main className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
-      <section className="mx-auto max-w-6xl px-6 pb-12 pt-28 md:pt-32">
+      <section className="mx-auto max-w-6xl px-6 pb-12 pt-24 md:pt-32">
         <div className="max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600">
             <FileSearch className="h-3.5 w-3.5 text-emerald-700" />
             Research methodology
           </div>
           <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl">
             Research intelligence for Indian equities
           </h1>
-          <p className="mt-6 text-base leading-7 text-slate-600 sm:text-lg">
-            StockStory transforms provider-driven financial data into structured, source-backed research signals. The product is built for explainability, unavailable-state honesty and repeatable analysis.
+          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
+            StockStory turns available financial data into structured research signals with clear source and availability labels.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button type="button" onClick={() => setPage("signup")} className="h-11 px-6 text-sm">
@@ -51,13 +51,13 @@ export const PublicAboutPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-white py-14">
+      <section className="border-y border-slate-200/80 bg-white py-12">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">What the system measures</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {architecture.map((item) => (
-              <div key={item.title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="mb-4 inline-flex rounded-lg bg-slate-100 p-2.5 text-emerald-800">{item.icon}</div>
+              <div key={item.title} className="rounded-lg border border-slate-200/80 bg-white p-5">
+                <div className="mb-4 inline-flex rounded-md bg-slate-50 p-2.5 text-emerald-800">{item.icon}</div>
                 <h3 className="text-base font-semibold text-slate-950">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
               </div>
@@ -70,7 +70,7 @@ export const PublicAboutPage: React.FC = () => {
         <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">From raw data to ranking</h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-5">
           {methodology.map((step, index) => (
-            <div key={step} className="rounded-lg border border-slate-200 bg-white p-4 text-center shadow-sm">
+            <div key={step} className="rounded-lg border border-slate-200/80 bg-white p-4 text-center">
               <div className="font-mono text-sm font-semibold text-slate-500">{String(index + 1).padStart(2, "0")}</div>
               <div className="mt-3 text-sm font-semibold text-slate-950">{step}</div>
             </div>

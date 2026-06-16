@@ -62,8 +62,8 @@ export const TrustCentrePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-16">
-        <LoadingState description="Loading trust and methodology data from the intelligence API." />
+      <div className="p-10">
+        <LoadingState description="Loading methodology and trust metrics." />
       </div>
     );
   }
@@ -84,14 +84,14 @@ export const TrustCentrePage: React.FC = () => {
   const humanState = stateLabel[rawState] ?? rawState;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-4 text-slate-900">
+    <div className="mx-auto max-w-4xl space-y-7 p-4 text-slate-900">
       <PageHeader
         title="Methodology & Trust Centre"
-        subtitle="Auditable performance metrics and scoring explanations for StockStory India."
+        subtitle="Scoring inputs, availability labels, and performance metrics when evidence is available."
       />
 
       {rawState !== "ok" && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+        <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800" role="status">
           <p className="font-semibold text-xs">{humanState}</p>
           <p className="mt-1">{error || envelope?.message || "Some trust metrics are unavailable because required evidence sources are not connected."}</p>
           {missingInputs.length > 0 && (
@@ -103,7 +103,7 @@ export const TrustCentrePage: React.FC = () => {
       {/* Performance Grid */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-950">Performance audit</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <Card className="p-4 text-center">
             <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Alpha</span>
             <span className="text-xl font-semibold text-slate-950">{formatMetric(metrics?.alpha)}</span>
@@ -124,7 +124,7 @@ export const TrustCentrePage: React.FC = () => {
       </section>
 
       {/* Scale */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Card className="p-5">
           <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total predictions generated</span>
           <span className="text-2xl font-semibold text-slate-950">{formatCount(metrics?.total_predictions)}</span>
@@ -138,11 +138,11 @@ export const TrustCentrePage: React.FC = () => {
       {/* Scoring Engines Explanation */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-950">Scoring engines</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           <Card className="p-5">
             <h3 className="font-semibold text-slate-950 text-sm">Growth engine</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Measures historical revenue, EPS, profit, and Free Cash Flow (FCF) trajectory over multiple quarters and fiscal years.
+              Measures revenue, EPS, profit, and free cash flow trajectory when data is available.
             </p>
           </Card>
           <Card className="p-5">
@@ -154,25 +154,25 @@ export const TrustCentrePage: React.FC = () => {
           <Card className="p-5">
             <h3 className="font-semibold text-slate-950 text-sm">Valuation engine</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Inspects relative multiple pricing (P/E, P/B, EV/EBITDA) and cash yields vs industry peers.
+              Reviews relative pricing multiples and cash yields against industry peers.
             </p>
           </Card>
           <Card className="p-5">
             <h3 className="font-semibold text-slate-950 text-sm">Stability and risk engine</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Monitors debt stress, leverage ratios, cash buffer, accounting flags, and historical price volatility.
+              Monitors leverage, cash buffer, accounting flags, and price volatility.
             </p>
           </Card>
           <Card className="p-5">
             <h3 className="font-semibold text-slate-950 text-sm">Momentum engine</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Analyzes price trend strength, moving average alignments, and relative market strength signals.
+              Reviews trend strength and relative market signals.
             </p>
           </Card>
           <Card className="p-5">
             <h3 className="font-semibold text-slate-950 text-sm">Confidence rating</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
-              Calculates prediction validity based on data completeness, source freshness, and signal consistency.
+              Separates score visibility from data completeness, freshness, and consistency.
             </p>
           </Card>
         </div>

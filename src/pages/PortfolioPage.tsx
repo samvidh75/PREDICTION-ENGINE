@@ -140,7 +140,7 @@ export const PortfolioPage: React.FC = () => {
     <div className={`${tokens.layout.container} flex flex-col space-y-8`}>
       <PageHeader
         title="Portfolio"
-        subtitle="Recorded holdings, source-backed quotes and review queues"
+        subtitle="Recorded holdings, cost basis, and verified quote availability"
         primaryAction={
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button>
@@ -149,12 +149,12 @@ export const PortfolioPage: React.FC = () => {
         }
       />
 
-      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Portfolio operating summary</h2>
             <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-slate-500">
-              Concentration uses recorded cost basis. Live portfolio value and returns remain unavailable until every holding has a source-backed quote.
+              Concentration uses recorded cost basis. Live values appear only when every holding has a source-backed quote.
             </p>
           </div>
           <span className={`text-[10px] font-bold uppercase tracking-wider ${statusClass(review.availability)}`}>{review.availability}</span>
@@ -217,7 +217,7 @@ export const PortfolioPage: React.FC = () => {
       {review.holdings.length === 0 ? (
         <EmptyState
           title="No holdings added yet"
-          description="Recorded portfolio holdings act as a saved research space. Add holdings here to track cost basis and exposure metrics. Live valuations and returns appear only when every holding has verified market pricing."
+          description="Add holdings to track cost basis and exposure. Live values appear only when every holding has verified market pricing."
         />
       ) : (
         <section aria-label="Portfolio holdings" className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
