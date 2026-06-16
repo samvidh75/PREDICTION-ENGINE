@@ -247,9 +247,9 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const marketCap = meta?.marketCap ?? null;
         if (marketCap !== null && applyMode) {
           await query(
-            `INSERT INTO financial_snapshots (symbol, snapshot_date, market_cap)
-             VALUES ($1, $2, $3)
-             ON CONFLICT (symbol, snapshot_date) DO UPDATE SET
+            `INSERT INTO financial_snapshots (symbol, snapshot_date, period_end, market_cap)
+             VALUES ($1, $2, $2::DATE, $3)
+             ON CONFLICT (symbol, period_end) DO UPDATE SET
                market_cap = COALESCE(EXCLUDED.market_cap, financial_snapshots.market_cap)`,
             [symbol, today, marketCap]
           );
