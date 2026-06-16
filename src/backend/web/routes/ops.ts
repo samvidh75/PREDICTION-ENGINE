@@ -278,10 +278,78 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
       .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
     const results: Record<string, any> = {};
+    const rowsWritten: Record<string, number> = {};
+    const providerStatuses = {
+      indianapi: process.env.INDIANAPI_KEY ? "present" : "missing",
+      upstox: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing",
+      finnhub: "deprecated-removed",
+      redis: process.env.REDIS_URL ? "present" : "missing",
+    };
+
+    function finiteNumber(value: unknown): number | null {
+      if (value === null || value === undefined || value === "") return null;
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function snapshotToDbColumns(snapshot: Record<string, unknown>): Record<string, unknown> {
+      return {
+        snapshot_date: snapshot.periodEnd,
+        period_end: snapshot.periodEnd,
+        market_cap: finiteNumber(snapshot.marketCap),
+        pe_ratio: finiteNumber(snapshot.peRatio),
+        pb_ratio: finiteNumber(snapshot.pbRatio),
+        eps: finiteNumber(snapshot.eps),
+        dividend_yield: finiteNumber(snapshot.dividendYield),
+        beta: finiteNumber(snapshot.beta),
+        roe: finiteNumber(snapshot.roe),
+        roa: finiteNumber(snapshot.roa),
+        roic: finiteNumber(snapshot.roic),
+        roce: finiteNumber(snapshot.roic),
+        ev_ebitda: finiteNumber(snapshot.evEbitda),
+        debt_to_equity: finiteNumber(snapshot.debtToEquity),
+        fcf_yield: finiteNumber(snapshot.fcfYield),
+        operating_margin: finiteNumber(snapshot.operatingMargin),
+        net_margin: finiteNumber(snapshot.netMargin),
+        revenue_growth: finiteNumber(snapshot.revenueGrowth),
+        profit_growth: finiteNumber(snapshot.profitGrowth),
+        earnings_growth: finiteNumber(snapshot.epsGrowth ?? snapshot.profitGrowth),
+        eps_growth: finiteNumber(snapshot.epsGrowth),
+        fcf_growth: finiteNumber(snapshot.fcfGrowth),
+        current_ratio: finiteNumber(snapshot.currentRatio),
+        gross_margin: finiteNumber(snapshot.grossMargin),
+        total_assets: finiteNumber(snapshot.totalAssets),
+        total_liabilities: finiteNumber(snapshot.totalLiabilities),
+        total_equity: finiteNumber(snapshot.totalEquity),
+      };
+    }
+
+    let overallStatus: "success" | "partial" | "failure" = "success";
+    const overallError: string | null = null;
 
     try {
-      results.registry = { status: "skipped", message: "Symbols already registered" };
+      // Stage 1: Registry (verify symbols exist)
+      const registryOk: string[] = [];
+      const registryFailed: string[] = [];
+      for (const symbol of symbols) {
+        try {
+          const existing = await query("SELECT symbol FROM symbols WHERE symbol = $1", [symbol]);
+          if (existing.rows.length > 0) {
+            registryOk.push(symbol);
+          } else {
+            registryFailed.push(symbol);
+          }
+        } catch (err: any) {
+          registryFailed.push(symbol);
+        }
+      }
+      results.registry = {
+        status: registryFailed.length > 0 ? (registryOk.length > 0 ? "partial" : "failure") : "success",
+        succeeded: registryOk.length,
+        failed: registryFailed.length,
+      };
 
+      // Stage 2: Quotes
       results.quotes = { status: "running" };
       const imp = await import("../../../services/providers/IndianMarketProvider.js");
       const indianProvider = new imp.IndianMarketProvider();
@@ -299,77 +367,176 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
                  close = EXCLUDED.close, volume = EXCLUDED.volume`,
               [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
             );
+            rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + 1;
           }
           quoteResults.push({ symbol, ok, price: ok ? quote.price : null });
         } catch (err: any) {
           quoteResults.push({ symbol, ok: false, error: err.message });
         }
       }
-      results.quotes = { status: "complete", succeeded: quoteResults.filter(r => r.ok).length, failed: quoteResults.filter(r => !r.ok).length };
+      const quotesSucceeded = quoteResults.filter(r => r.ok).length;
+      results.quotes = {
+        status: quotesSucceeded === symbols.length ? "success" : (quotesSucceeded > 0 ? "partial" : "failure"),
+        succeeded: quotesSucceeded,
+        failed: quoteResults.filter(r => !r.ok).length,
+      };
 
+      // Stage 3: Financials (only in apply mode to avoid provider calls on dry-run)
       if (applyMode) {
+        results.financials = { status: "running" };
+        const finResults: any[] = [];
+        const coordModule = await import("../../../services/providers/ProviderCoordinator.js");
+        const coordinator = new coordModule.ProviderCoordinator();
+        for (const symbol of symbols) {
+          try {
+            const snapshot = await coordinator.getFinancials(symbol);
+            const columns = snapshotToDbColumns((snapshot as unknown) as Record<string, unknown>);
+            const periodEnd = columns.period_end || today;
+            const writable = Object.entries(columns)
+              .filter(([key]) => key !== "symbol")
+              .filter(([, value]) => value !== null && value !== undefined);
+
+            if (writable.length > 0) {
+              const columnNames = ["symbol", ...writable.map(([key]) => key)];
+              const values = [symbol, ...writable.map(([, value]) => value)];
+              const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");
+              const updates = columnNames
+                .filter(col => col !== "symbol" && col !== "period_end")
+                .map(col => `${col} = EXCLUDED.${col}`)
+                .join(", ");
+              await query(
+                `INSERT INTO financial_snapshots (${columnNames.join(", ")}) VALUES (${placeholders})
+                 ON CONFLICT (symbol, period_end) DO UPDATE SET ${updates}`,
+                values
+              );
+              rowsWritten["financial_snapshots"] = (rowsWritten["financial_snapshots"] ?? 0) + 1;
+            }
+            finResults.push({ symbol, ok: true, fields: writable.length });
+          } catch (err: any) {
+            finResults.push({ symbol, ok: false, error: err.message });
+          }
+        }
+        const finSucceeded = finResults.filter(r => r.ok).length;
+        results.financials = {
+          status: finSucceeded === symbols.length ? "success" : (finSucceeded > 0 ? "partial" : "failure"),
+          succeeded: finSucceeded,
+          failed: finResults.filter(r => !r.ok).length,
+        };
+
+        // Stage 4: Features
         try {
           const { FeatureEngine } = await import("../../../services/FeatureEngine.js");
           const featureEngine = new FeatureEngine();
+          let featureRows = 0;
           for (const symbol of symbols) {
             const snapshots = await featureEngine.calculateAndStoreFeatures(symbol);
+            featureRows += snapshots.filter(s => s.rsi !== null && s.macd !== null).length;
             console.log(`  ${symbol}: ${snapshots.length} feature snapshots`);
           }
-          results.features = { status: "complete" };
+          rowsWritten["feature_snapshots"] = (rowsWritten["feature_snapshots"] ?? 0) + featureRows;
+          results.features = { status: "success", rowsWritten: featureRows };
         } catch (err: any) {
-          results.features = { status: "failed", error: err.message };
+          results.features = { status: "failure", error: err.message };
         }
 
+        // Stage 5: Factors
         try {
           const { FactorEngine } = await import("../../../services/FactorEngine.js");
           const factorEngine = new FactorEngine();
+          let factorRows = 0;
           for (const symbol of symbols) {
             const snapshots = await factorEngine.calculateAndStoreFactors(symbol);
+            factorRows += snapshots.length;
             console.log(`  ${symbol}: ${snapshots.length} factor snapshots`);
           }
-          results.factors = { status: "complete" };
+          rowsWritten["factor_snapshots"] = (rowsWritten["factor_snapshots"] ?? 0) + factorRows;
+          results.factors = { status: "success", rowsWritten: factorRows };
         } catch (err: any) {
-          results.factors = { status: "failed", error: err.message };
+          results.factors = { status: "failure", error: err.message };
         }
 
+        // Stage 6: Predictions
         try {
           const { predictionFactory } = await import("../../../predictions/PredictionFactory.js");
           const predResult = await predictionFactory.generateDaily([30, 90, 365]);
-          results.predictions = { status: "complete", created: predResult.created, skipped: predResult.skipped, failed: predResult.failed };
+          rowsWritten["prediction_registry"] = (rowsWritten["prediction_registry"] ?? 0) + predResult.created;
+          results.predictions = {
+            status: predResult.failed > 0 ? (predResult.created > 0 ? "partial" : "failure") : "success",
+            created: predResult.created,
+            skipped: predResult.skipped,
+            failed: predResult.failed,
+          };
         } catch (err: any) {
-          results.predictions = { status: "failed", error: err.message };
+          results.predictions = { status: "failure", error: err.message };
         }
+
+        // Stage 7: Signals
+        try {
+          const signalRes = await query(
+            `SELECT symbol, ranking_score, classification, confidence_score
+             FROM prediction_registry WHERE prediction_date = $1 AND prediction_horizon = 30`,
+            [today]
+          );
+          results.signals = { status: "success", count: signalRes.rows.length };
+        } catch (err: any) {
+          results.signals = { status: "failure", error: err.message };
+        }
+
+        // Stage 8: Pipeline health
+        const failures = Object.values(results).some((r: any) => r.status === "failure");
+        const partials = Object.values(results).some((r: any) => r.status === "partial");
+        overallStatus = failures ? "failure" : partials ? "partial" : "success";
 
         const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const completedAt = new Date().toISOString();
         try {
-          await query(`CREATE TABLE IF NOT EXISTS pipeline_health (
-            id UUID PRIMARY KEY, run_id VARCHAR(100) NOT NULL, phase VARCHAR(50) NOT NULL,
-            status VARCHAR(20) NOT NULL, started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-            completed_at TIMESTAMPTZ, symbols_attempted INTEGER DEFAULT 0,
-            symbols_succeeded INTEGER DEFAULT 0
-          )`);
           await query(
-            `INSERT INTO pipeline_health (id, run_id, phase, status, started_at, completed_at, symbols_attempted, symbols_succeeded)
-             VALUES ($1, $2, 'api_pipeline_run', 'success', $3, $4, $5, $6)`,
-            [pipelineId, runId, startedAt, completedAt, symbols.length, quoteResults.filter(r => r.ok).length]
+            `INSERT INTO pipeline_health (
+               id, run_id, phase, status, started_at, completed_at,
+               symbols_attempted, symbols_succeeded, symbols_failed,
+               error_classes, provider_statuses, rows_written, metadata
+             )
+             VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+            [
+              pipelineId,
+              runId,
+              overallStatus,
+              startedAt,
+              completedAt,
+              symbols.length,
+              quotesSucceeded,
+              symbols.length - quotesSucceeded,
+              overallError ? [overallError] : [],
+              JSON.stringify(providerStatuses),
+              JSON.stringify(rowsWritten),
+              JSON.stringify({ mode: applyMode ? "apply" : "dry-run", stages: results }),
+            ]
           );
-          results.health = { status: "recorded" };
+          results.health = { status: "recorded", overallStatus };
         } catch (err: any) {
           results.health = { status: "failed", error: err.message };
         }
+      } else {
+        results.financials = { status: "skipped", message: "Dry-run: financials stage skipped to avoid provider calls" };
+        results.features = { status: "skipped", message: "Dry-run: features stage skipped" };
+        results.factors = { status: "skipped", message: "Dry-run: factors stage skipped" };
+        results.predictions = { status: "skipped", message: "Dry-run: predictions stage skipped" };
+        results.signals = { status: "skipped", message: "Dry-run: signals stage skipped" };
+        results.health = { status: "skipped", message: "Dry-run: health row skipped" };
       }
 
       return reply.send({
         ok: true,
         runId,
         mode: applyMode ? "apply" : "dry-run",
+        overallStatus,
         results,
       });
     } catch (err: any) {
       return reply.send({
         ok: false,
         runId,
+        overallStatus: "failure",
         error: err.message,
       });
     }
