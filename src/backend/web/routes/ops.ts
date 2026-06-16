@@ -344,9 +344,9 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const completedAt = new Date().toISOString();
         try {
           await query(
-            `INSERT INTO pipeline_health (id, phase, status, started_at, completed_at, symbols_processed, symbols_succeeded, symbols_failed)
-             VALUES ($1, 'api_pipeline_run', 'success', $2, $3, $4, $5, $6)`,
-            [pipelineId, startedAt, completedAt, symbols.length, quoteResults.filter(r => r.ok).length, quoteResults.filter(r => !r.ok).length]
+            `INSERT INTO pipeline_health (id, run_id, phase, status, started_at, completed_at, symbols_attempted, symbols_succeeded)
+             VALUES ($1, $2, 'api_pipeline_run', 'success', $3, $4, $5, $6)`,
+            [pipelineId, runId, startedAt, completedAt, symbols.length, quoteResults.filter(r => r.ok).length]
           );
           results.health = { status: "recorded" };
         } catch (err: any) {
