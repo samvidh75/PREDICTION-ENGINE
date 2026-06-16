@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import { LoadingState } from "../components/ui/DataState";
-import { PageHeader, ResearchDisclaimer, ProviderStatusPill } from "../components/ui/PageHeader";
+import { PageHeader, ResearchDisclaimer, ProviderStatusPill, DataFreshnessBadge } from "../components/ui/PageHeader";
 import { formatNumber } from "../services/ui/dataFormatting";
 
 interface TrustMetrics {
@@ -56,11 +56,6 @@ function formatMetric(value: number | null | undefined, suffix = ""): string {
 function formatCount(value: number | null | undefined): string {
   if (typeof value !== "number" || !Number.isFinite(value)) return "Data unavailable";
   return value.toLocaleString("en-IN");
-}
-
-function coverageStatusLabel(status: string): string {
-  if (status === "available") return "Available";
-  return "Unavailable";
 }
 
 export const TrustCentrePage: React.FC = () => {
@@ -219,8 +214,8 @@ export const TrustCentrePage: React.FC = () => {
                 </span>
               </div>
             </div>
-            <div className="mt-3 text-[9px] text-slate-400">
-              As of {coverageData.generatedAt ? new Date(coverageData.generatedAt).toISOString().split("T")[0] : "N/A"}
+            <div className="mt-3">
+              <DataFreshnessBadge date={coverageData.generatedAt ?? null} />
             </div>
           </Card>
         ) : (
@@ -287,7 +282,9 @@ export const TrustCentrePage: React.FC = () => {
             </div>
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
               <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of Date</span>
-              <span className="text-xs font-semibold text-slate-900">{asOf}</span>
+              <span className="text-xs font-semibold text-slate-900">
+                <DataFreshnessBadge date={asOf !== "Data unavailable" ? asOf : null} />
+              </span>
             </div>
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
               <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence Completeness</span>

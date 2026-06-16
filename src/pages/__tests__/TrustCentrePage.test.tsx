@@ -42,7 +42,7 @@ describe('TrustCentrePage regression states', () => {
     // System status assertions
     expect(screen.getByText('Data system status')).toBeInTheDocument();
     expect(screen.getByText('17% Verified')).toBeInTheDocument();
-    expect(screen.getByText('2026-06-11')).toBeInTheDocument();
+    expect(screen.getByText('As of 2026-06-11')).toBeInTheDocument();
   });
 
   it('renders an explicit error state when the metrics service fails', async () => {
