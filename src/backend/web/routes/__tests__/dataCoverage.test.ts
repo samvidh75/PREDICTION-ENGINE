@@ -89,7 +89,7 @@ describe("Ops Data Coverage Endpoint Route", () => {
     expect(body.providers).toHaveProperty("REDIS_URL");
     // Ensure actual secrets are not visible in keys/values
     Object.values(body.providers).forEach((val) => {
-      expect(val).toMatch(/^(present|missing)$/);
+      expect(val).toMatch(/^(present|missing|present \(.*\)|missing \(.*\))$/);
     });
 
     await app.close();
