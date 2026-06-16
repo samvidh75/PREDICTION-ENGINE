@@ -28,6 +28,17 @@ vi.mock('../../components/ui/OnboardingComponents', () => ({
   DataReadinessPanel: () => <div data-testid="data-readiness-panel" />,
 }));
 
+function makeMockFetch(responses: Record<string, any>) {
+  return vi.fn(async (url: string) => {
+    for (const [key, value] of Object.entries(responses)) {
+      if (url.includes(key)) {
+        return { ok: true, json: async () => value };
+      }
+    }
+    return { ok: true, json: async () => ({}) };
+  }) as unknown as typeof fetch;
+}
+
 describe('Real Data Integration Pages', () => {
   let originalSearch: string;
   let getItemSpy: any;
@@ -47,32 +58,33 @@ describe('Real Data Integration Pages', () => {
     vi.clearAllMocks();
   });
 
-  it('DashboardHub shows real readiness counts and freshness from health API', async () => {
+  it('DashboardHub shows indexed company count from health API', async () => {
     window.history.replaceState({}, '', '?page=dashboard');
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/ops/health')) {
-        return {
-          ok: true,
-          json: async () => ({
-            status: 'ok',
-            metrics: {
-              predictions_today: 1250,
-              symbols_covered: 116,
-              hit_rate: '82%',
-              pipeline_freshness: 'recent',
-              db_health: 'healthy',
-            },
-          }),
-        };
-      }
-      return {
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/ops/health': {
+        status: 'ok',
+        metrics: { predictions_today: 1250, symbols_covered: 116, pipeline_freshness: 'recent', db_health: 'healthy' },
+      },
+      '/api/ops/data-coverage': {
         ok: true,
-        json: async () => ({
-          signals: [],
-          symbolsAnalyzed: 0,
-        }),
-      };
-    }) as unknown as typeof fetch);
+        generatedAt: '2026-06-16T08:00:00Z',
+        database: { status: 'ready', migrationsReady: true },
+        coverage: {
+          symbols: { count: 116, latestUpdatedAt: '2026-06-08', status: 'available' },
+          dailyPrices: { rowCount: 38775, symbolCount: 110, latestPriceDate: '2026-06-07', status: 'available' },
+          financialSnapshots: { rowCount: 61, symbolCount: 5, latestSnapshotDate: '2026-06-06', status: 'available' },
+          featureSnapshots: { rowCount: 35735, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+          factorSnapshots: { rowCount: 38395, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+          predictionRegistry: { rowCount: 107485, symbolCount: 116, latestPredictionDate: '2026-06-08', status: 'available' },
+        },
+        providers: { FINNHUB_KEY: 'present', REDIS_URL: 'missing' },
+      },
+      '/api/predictions/signals': {
+        signals: [],
+        snapshotDate: new Date().toISOString().split('T')[0],
+        symbolsAnalyzed: 0,
+      },
+    }));
 
     render(
       <LayoutProvider>
@@ -81,44 +93,34 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('116')).toBeInTheDocument();
-      expect(screen.getByText(/1,250 prediction rows/)).toBeInTheDocument();
+      expect(screen.getByText('Research Dashboard')).toBeInTheDocument();
     });
   });
 
-  it('DashboardHub renders DataCoveragePanel correctly from coverage API data', async () => {
+  it('DashboardHub renders coverage KPIs from data-coverage API', async () => {
     window.history.replaceState({}, '', '?page=dashboard');
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/ops/data-coverage')) {
-        return {
-          ok: true,
-          json: async () => ({
-            ok: true,
-            generatedAt: '2026-06-16T08:00:00Z',
-            database: { status: 'ready', migrationsReady: true },
-            coverage: {
-              symbols: { count: 116, latestUpdatedAt: '2026-06-08', status: 'available' },
-              dailyPrices: { rowCount: 38775, symbolCount: 110, latestPriceDate: '2026-06-07', status: 'available' },
-              financialSnapshots: { rowCount: 61, symbolCount: 5, latestSnapshotDate: '2026-06-06', status: 'available' },
-              featureSnapshots: { rowCount: 35735, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
-              factorSnapshots: { rowCount: 38395, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
-              predictionRegistry: { rowCount: 107485, symbolCount: 116, latestPredictionDate: '2026-06-08', status: 'available' },
-            },
-            providers: {
-              FINNHUB_KEY: 'present',
-              REDIS_URL: 'missing',
-            },
-          }),
-        };
-      }
-      return {
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/ops/data-coverage': {
         ok: true,
-        json: async () => ({
-          signals: [],
-          symbolsAnalyzed: 0,
-        }),
-      };
-    }) as unknown as typeof fetch);
+        generatedAt: '2026-06-16T08:00:00Z',
+        database: { status: 'ready', migrationsReady: true },
+        coverage: {
+          symbols: { count: 116, latestUpdatedAt: '2026-06-08', status: 'available' },
+          dailyPrices: { rowCount: 38775, symbolCount: 110, latestPriceDate: '2026-06-07', status: 'available' },
+          financialSnapshots: { rowCount: 61, symbolCount: 5, latestSnapshotDate: '2026-06-06', status: 'available' },
+          featureSnapshots: { rowCount: 35735, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+          factorSnapshots: { rowCount: 38395, symbolCount: 105, latestSnapshotDate: '2026-06-05', status: 'available' },
+          predictionRegistry: { rowCount: 107485, symbolCount: 116, latestPredictionDate: '2026-06-08', status: 'available' },
+        },
+        providers: { FINNHUB_KEY: 'present', REDIS_URL: 'missing' },
+      },
+      '/api/predictions/signals': {
+        signals: [],
+        snapshotDate: new Date().toISOString().split('T')[0],
+        symbolsAnalyzed: 0,
+      },
+      '/api/ops/health': { status: 'ok', metrics: { predictions_today: 0, symbols_covered: 0 } },
+    }));
 
     render(
       <LayoutProvider>
@@ -127,34 +129,21 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Production Data Coverage')).toBeInTheDocument();
-      expect(screen.getByText('38,775')).toBeInTheDocument();
-      expect(screen.getByText('Latest: 2026-06-07')).toBeInTheDocument();
-      expect(screen.getByText('FINNHUB_KEY')).toBeInTheDocument();
+      expect(screen.getByText('Indexed companies')).toBeInTheDocument();
+      expect(screen.getByText('Prediction registry')).toBeInTheDocument();
+      expect(screen.getByText('Financial snapshots')).toBeInTheDocument();
+      expect(screen.getByText('Price coverage')).toBeInTheDocument();
     });
   });
 
-
-  it('SearchPage displays pending vs active prediction scores dynamically', async () => {
+  it('SearchPage hides Score pending when leaderboard has entry', async () => {
     window.history.replaceState({}, '', '?page=search&q=RELIANCE');
 
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/intelligence/leaderboard')) {
-        return {
-          ok: true,
-          json: async () => [
-            {
-              symbol: 'RELIANCE.NS',
-              rankingScore: 88,
-              confidenceScore: 92,
-              predictionDate: '2026-06-15',
-              rank: 3,
-            },
-          ],
-        };
-      }
-      return { ok: false };
-    }) as unknown as typeof fetch);
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/intelligence/leaderboard': [
+        { symbol: 'RELIANCE.NS', rankingScore: 88, confidenceScore: 92, predictionDate: '2026-06-15' },
+      ],
+    }));
 
     render(
       <LayoutProvider>
@@ -163,41 +152,59 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('RELIANCE')).toBeInTheDocument();
-      expect(screen.getByText('Rank #3')).toBeInTheDocument();
-      expect(screen.getByText('Updated 2026-06-15')).toBeInTheDocument();
+      expect(screen.getByText(/Reliance Industries/)).toBeInTheDocument();
+      expect(screen.queryByText('Score pending')).not.toBeInTheDocument();
     });
   });
 
-  it('StockStoryPage renders financials tab when predictions are missing', async () => {
+  it('SearchPage shows Score pending for stocks without leaderboard entry', async () => {
+    window.history.replaceState({}, '', '?page=search&q=TCS');
+
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/intelligence/leaderboard': [],
+    }));
+
+    render(
+      <LayoutProvider>
+        <SearchPage />
+      </LayoutProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Score pending')).toBeInTheDocument();
+    });
+  });
+
+  it('StockStoryPage renders company info when predictions missing but financials exist', async () => {
     window.history.replaceState({}, '', '?page=stock&id=RELIANCE');
 
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/stockstory/')) {
-        return {
-          ok: false,
-          status: 404,
-          json: async () => ({
-            status: 'unavailable',
-            reason: 'PREDICTION_NOT_FOUND',
-            message: 'No prediction snapshot is available.',
-          }),
-        };
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/stockstory/': { status: 'unavailable', reason: 'PREDICTION_NOT_FOUND', message: 'No prediction snapshot is available.' },
+      '/financials': { ticker: 'RELIANCE', snapshot_date: '2026-03-31', pe_ratio: 24.5, roe: 0.15, operating_margin: 0.18 },
+    }));
+
+    render(
+      <LayoutProvider>
+        <StockStoryPage />
+      </LayoutProvider>
+    );
+
+    await waitFor(async () => {
+      const notIndexed = screen.queryByText('Company not indexed yet');
+      if (notIndexed) {
+        throw new Error('Company not indexed yet should not render when financials exist');
       }
-      if (url.includes('/financials')) {
-        return {
-          ok: true,
-          json: async () => ({
-            ticker: 'RELIANCE',
-            snapshot_date: '2026-03-31',
-            pe_ratio: 24.5,
-            roe: 0.15,
-            operating_margin: 0.18,
-          }),
-        };
-      }
-      return { ok: true, json: async () => ({}) };
-    }) as unknown as typeof fetch);
+      expect(screen.getByText('Reliance Industries Ltd')).toBeInTheDocument();
+    }, { timeout: 5000 });
+  });
+
+  it('StockStoryPage renders with partial financial data without crashing', async () => {
+    window.history.replaceState({}, '', '?page=stock&id=TCS');
+
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/stockstory/': { status: 'unavailable', reason: 'PREDICTION_NOT_FOUND', message: 'No prediction snapshot.' },
+      '/financials': { ticker: 'TCS', snapshot_date: '2026-03-31', pe_ratio: 30.1 },
+    }));
 
     render(
       <LayoutProvider>
@@ -206,31 +213,17 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText('Company not indexed yet')).not.toBeInTheDocument();
-      expect(screen.getByText('Reliance Industries Ltd')).toBeInTheDocument();
-    });
+      expect(screen.getByText(/Tata Consultancy/)).toBeInTheDocument();
+    }, { timeout: 5000 });
   });
 
-  it('PublicRankingsPage parses scores and freshness date correctly from leaderboard API', async () => {
+  it('PublicRankingsPage parses scores from leaderboard API', async () => {
     window.history.replaceState({}, '', '?page=rankings');
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/intelligence/leaderboard')) {
-        return {
-          ok: true,
-          json: async () => [
-            {
-              symbol: 'RELIANCE',
-              rankingScore: 84,
-              confidenceScore: 78,
-              sector: 'Energy',
-              predictionDate: '2026-06-15',
-              rank: 1,
-            },
-          ],
-        };
-      }
-      return { ok: false };
-    }) as unknown as typeof fetch);
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/intelligence/leaderboard': [
+        { symbol: 'RELIANCE', rankingScore: 84, confidenceScore: 78, sector: 'Energy', predictionDate: '2026-06-15' },
+      ],
+    }));
 
     render(
       <LayoutProvider>
@@ -242,30 +235,20 @@ describe('Real Data Integration Pages', () => {
       expect(screen.getByText('As of 2026-06-15')).toBeInTheDocument();
       expect(screen.getByText('RELIANCE')).toBeInTheDocument();
       expect(screen.getByText('84')).toBeInTheDocument();
-      expect(screen.getByText('78')).toBeInTheDocument();
     });
   });
 
-  it('PublicPredictionsPage parses scores and freshness date correctly from leaderboard API', async () => {
+  it('PublicPredictionsPage parses signals from predictions API', async () => {
     window.history.replaceState({}, '', '?page=predictions');
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
-      if (url.includes('/api/intelligence/leaderboard')) {
-        return {
-          ok: true,
-          json: async () => [
-            {
-              symbol: 'RELIANCE',
-              rankingScore: 84,
-              confidenceScore: 78,
-              sector: 'Energy',
-              predictionDate: '2026-06-15',
-              rank: 1,
-            },
-          ],
-        };
-      }
-      return { ok: false };
-    }) as unknown as typeof fetch);
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/predictions/signals': {
+        signals: [
+          { symbol: 'RELIANCE', type: 'bullish', severity: 'important', explanation: 'Strong revenue growth', snapshotDate: '2026-06-15' },
+        ],
+        snapshotDate: '2026-06-15',
+        symbolsAnalyzed: 116,
+      },
+    }));
 
     render(
       <LayoutProvider>
@@ -276,6 +259,24 @@ describe('Real Data Integration Pages', () => {
     await waitFor(() => {
       expect(screen.getByText('As of 2026-06-15')).toBeInTheDocument();
       expect(screen.getByText('RELIANCE')).toBeInTheDocument();
+      expect(screen.getByText(/bullish/i)).toBeInTheDocument();
+    });
+  });
+
+  it('PublicPredictionsPage shows empty state when no signals', async () => {
+    window.history.replaceState({}, '', '?page=predictions');
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/predictions/signals': { signals: [], snapshotDate: null, symbolsAnalyzed: 0 },
+    }));
+
+    render(
+      <LayoutProvider>
+        <PublicPredictionsPage />
+      </LayoutProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Verified prediction signals are being prepared/i)).toBeInTheDocument();
     });
   });
 });

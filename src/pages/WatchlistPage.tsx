@@ -8,6 +8,8 @@ import Card from "../components/ui/Card";
 import ScorePill from "../components/ui/ScorePill";
 import Badge from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/DataState";
+import { MissingDataBadge } from "../components/ui/PageHeader";
+import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
 import tokens from "../components/ui/tokens";
 
 export const WatchlistPage: React.FC = () => {
@@ -55,7 +57,6 @@ export const WatchlistPage: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Sidebar: lists selector */}
         <div className="flex flex-col space-y-4 lg:col-span-1">
           <div className="space-y-1">
                 <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">My Lists</span>
@@ -87,7 +88,6 @@ export const WatchlistPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main watchlist content */}
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
             <EmptyState
@@ -97,19 +97,21 @@ export const WatchlistPage: React.FC = () => {
           ) : (
             <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
               <div className="min-w-[720px]">
-              <div className="grid grid-cols-[100px_80px_110px_1fr_80px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 <span className="pl-3">Ticker</span>
                 <span>Score</span>
-                <span>Last Update</span>
+                <span>Freshness</span>
                 <span>My Note</span>
                 <span className="text-right pr-3">Actions</span>
               </div>
               {activeTickers.map((ticker) => {
                 const info = StockRegistry.getStock(ticker);
-                const score = info?.telemetrySnapshot?.healthScore ? Math.round(info.telemetrySnapshot.healthScore) : null;
+                const score = info?.telemetrySnapshot?.healthScore ?? null;
+                const scoreState = getScoreState(score);
                 const noteObj = NoteEngine.getNote(ticker);
+
                 return (
-                  <div key={ticker} className="grid grid-cols-[100px_80px_110px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
+                  <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
                     <button
                       onClick={() => navigateToStock({ ticker, mode: "push" })}
                       className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:underline"
@@ -117,9 +119,15 @@ export const WatchlistPage: React.FC = () => {
                       {ticker}
                     </button>
                     <div>
-                      {score !== null ? <ScorePill score={score} /> : <span className="font-mono text-slate-500">Unavailable</span>}
+                      {scoreState === "available" ? (
+                        <ScorePill score={Math.round(score!)} />
+                      ) : (
+                        <MissingDataBadge />
+                      )}
                     </div>
-                    <span className="font-mono text-[10px] text-slate-500">{noteObj.lastUpdated || "Unavailable"}</span>
+                    <span className="font-mono text-[10px] text-slate-500">
+                      {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
+                    </span>
                     <div>
                       <input
                         type="text"

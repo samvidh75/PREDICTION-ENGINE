@@ -8,7 +8,7 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
-import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate } from "../services/ui/dataFormatting";
+import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore as formatScoreAdapter, formatFreshness } from "../services/ui/dataFormatting";
 
 
 const getClassificationStyle = (cls: string) => {
@@ -962,25 +962,65 @@ export const StockStoryPage: React.FC = () => {
 
         {/* === TAB 6: DOCUMENTS === */}
         {activeTab === "documents" && (
-          <div>
-            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
-              <FileText className="h-4 w-4 text-cyan-400" /> Corporate Actions & Timeline
-            </div>
-            
-            {timeline.length > 0 ? (
-              <div className="relative border-l border-white/10 ml-3.5 pl-5 space-y-6 text-xs">
-                {timeline.map((evt, idx) => (
-                  <div key={idx} className="relative">
-                    <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-cyan-500 ring-4 ring-black/40"></span>
-                    <div className="font-mono text-[10px] font-extrabold text-cyan-400 mb-1">{evt.date}</div>
-                    <div className="font-bold text-white text-sm mb-1">{evt.event}</div>
-                    <p className="text-white/60 leading-relaxed">{evt.detail}</p>
-                  </div>
-                ))}
+          <div className="space-y-6">
+            <div>
+              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
+                <FileText className="h-4 w-4 text-cyan-400" /> Corporate Actions & Timeline
               </div>
-            ) : (
-              <EmptyState label="Corporate actions timeline" />
-            )}
+              
+              {timeline.length > 0 ? (
+                <div className="relative border-l border-white/10 ml-3.5 pl-5 space-y-6 text-xs">
+                  {timeline.map((evt, idx) => (
+                    <div key={idx} className="relative">
+                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-cyan-500 ring-4 ring-black/40"></span>
+                      <div className="font-mono text-[10px] font-extrabold text-cyan-400 mb-1">{evt.date}</div>
+                      <div className="font-bold text-white text-sm mb-1">{evt.event}</div>
+                      <p className="text-white/60 leading-relaxed">{evt.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState label="Corporate actions timeline" />
+              )}
+            </div>
+
+            <div>
+              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-white/30 border-b border-white/5 pb-3">
+                <FileText className="h-4 w-4 text-cyan-400" /> Data Source & Freshness
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Financial Data</div>
+                  <dl className="mt-2 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <dt className="text-white/50">Snapshot date</dt>
+                      <dd className="font-mono text-white/80">{normalizeDate(financials?.snapshot_date) || "Unavailable"}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-white/50">Sources</dt>
+                      <dd className="font-mono text-white/80">Provider filings</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Prediction Data</div>
+                  <dl className="mt-2 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <dt className="text-white/50">Prediction date</dt>
+                      <dd className="font-mono text-white/80">{normalizeDate(storyData?.dataState?.asOf) || normalizeDate(storyData?.predictionDate) || "Unavailable"}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-white/50">Freshness</dt>
+                      <dd className="font-mono text-white/80">{storyData?.predictionDate ? formatFreshness(storyData.predictionDate) : "Unavailable"}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-white/50">Status</dt>
+                      <dd className="font-mono text-white/80">{storyData?.apiStatus === "ok" ? "Available" : "Unavailable"}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

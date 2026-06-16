@@ -11,7 +11,7 @@ import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
 import tokens from "../components/ui/tokens";
-import { formatNumber } from "../services/ui/dataFormatting";
+import { formatNumber, formatINR, formatRank, formatFreshness } from "../services/ui/dataFormatting";
 
 
 function readQueryFromUrl(): string {
@@ -177,11 +177,16 @@ export const SearchPage: React.FC = () => {
 
             {results.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
-                {results.map((stock) => {
+                {results.map((stock, idx) => {
                   const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
                   const prediction = predictionsMap[cleanedSym];
-                  const score = prediction ? prediction.rankingScore : null;
-                  const predictionDate = prediction ? prediction.predictionDate : null;
+                  const score = prediction ? prediction.rankingScore ?? prediction.ranking_score : null;
+                  const confidenceScore = prediction ? prediction.confidenceScore ?? prediction.confidence_score : null;
+                  const predictionDate = prediction ? prediction.predictionDate ?? prediction.prediction_date : null;
+                  const predictionSector = prediction?.sector ?? null;
+                  const rank = prediction
+                    ? Object.keys(predictionsMap).indexOf(cleanedSym) + 1
+                    : null;
 
                   return (
                     <Card
@@ -197,11 +202,17 @@ export const SearchPage: React.FC = () => {
                           <div className="max-w-[200px] truncate text-xs text-slate-500">
                             {stock.companyName}
                           </div>
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            <Badge variant="info">{stock.sector || predictionSector || "Unavailable"}</Badge>
+                            {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}
+                          </div>
                         </div>
                         {score !== null ? (
                           <div className="flex flex-col items-end gap-1">
-                            <ScorePill score={score} />
-                            <span className="text-[10px] text-slate-500 font-medium">Rank #{prediction.rank}</span>
+                            <ScorePill score={Math.round(score)} />
+                            {rank !== null && (
+                              <span className="text-[10px] text-slate-500 font-medium">{formatRank(rank)}</span>
+                            )}
                           </div>
                         ) : (
                           <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-500">
@@ -212,11 +223,9 @@ export const SearchPage: React.FC = () => {
 
                       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-[11px] text-slate-500">
                         <div className="flex flex-wrap gap-2">
-                          <Badge variant="info">{stock.sector || "Not available"}</Badge>
-                          {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}
                           {predictionDate && (
                             <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-semibold text-emerald-800">
-                              Updated {predictionDate}
+                              Updated {formatFreshness(predictionDate)}
                             </span>
                           )}
                           {!prediction && (
@@ -224,11 +233,16 @@ export const SearchPage: React.FC = () => {
                               Source registry
                             </span>
                           )}
+                          {confidenceScore !== null && (
+                            <span className="inline-flex items-center rounded bg-indigo-50 px-1.5 py-0.5 text-[9px] font-medium text-indigo-600 font-mono">
+                              {Math.round(confidenceScore)}% confidence
+                            </span>
+                          )}
                         </div>
                         <span>
                           {typeof stock.marketCap.numeric === "number"
-                            ? `₹${formatNumber(stock.marketCap.numeric)}`
-                            : stock.marketCap.formatted || "Not available"}
+                            ? formatINR(stock.marketCap.numeric, true)
+                            : stock.marketCap.formatted || "Unavailable"}
                         </span>
                       </div>
                     </Card>
