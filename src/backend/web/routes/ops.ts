@@ -239,19 +239,19 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const results: Array<{ symbol: string; ok: boolean; price: number | null; error: string | null }> = [];
     for (const symbol of symbols) {
       try {
-        const slug = symbol.toLowerCase().replace(/[^a-z0-9]/g, '-');
-        const url = `https://www.moneycontrol.com/india/stockpricequote/${slug}/${symbol}`;
+        const yahooSymbol = `${symbol}.NS`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`;
         const resp = await fetch(url, {
-          headers: { "User-Agent": "StockStory/ingestion (contact@stockstory.in)" },
+          headers: { "User-Agent": "Mozilla/5.0" },
           signal: AbortSignal.timeout(15_000),
         });
-        const html = await resp.text();
-        const priceMatch = html.match(/class="[^"]*price[^"]*"[^>]*>([0-9,]+\.\d+)/i)
-          || html.match(/data-reactid="\d+">([0-9,]+\.\d+)<\/span>/)
-          || html.match(/<span[^>]*id="Nst_lblCurrentValue"[^>]*>([0-9,]+\.\d+)<\/span>/)
-          || html.match(/([0-9,]+\.\d{2})\s*<\/div>\s*<div[^>]*class="[^"]*change/i);
-        const rawPrice = priceMatch?.[1];
-        const price = rawPrice ? parseFloat(rawPrice.replace(/,/g, '')) : null;
+        if (!resp.ok) {
+          results.push({ symbol, ok: false, price: null, error: `Yahoo HTTP ${resp.status}` });
+          continue;
+        }
+        const data = await resp.json() as any;
+        const meta = data?.chart?.result?.[0]?.meta;
+        const price = typeof meta?.regularMarketPrice === "number" ? meta.regularMarketPrice : null;
         const ok = price !== null && price > 0;
         if (ok && applyMode) {
           const today = new Date().toISOString().slice(0, 10);
@@ -263,7 +263,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
             [symbol, today, price, price, price, price, null]
           );
         }
-        results.push({ symbol, ok, price, error: ok ? null : "Could not parse price from Moneycontrol page" });
+        results.push({ symbol, ok, price, error: ok ? null : "Yahoo returned no price data" });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         results.push({ symbol, ok: false, price: null, error: msg });
