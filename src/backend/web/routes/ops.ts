@@ -230,6 +230,46 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       providers
     });
   });
+
+  app.post("/api/ops/ingest-quotes", async (request, reply) => {
+    const { symbols: rawSymbols, apply: rawApply } = request.query as Record<string, string | undefined>;
+    const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
+      .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
+    const applyMode = rawApply === "true";
+    const results: Array<{ symbol: string; ok: boolean; error: string | null }> = [];
+    for (const symbol of symbols) {
+      try {
+        const { MoneycontrolQuoteProvider } = await import("../../../services/providers/MoneycontrolQuoteProvider");
+        const provider = new MoneycontrolQuoteProvider();
+        const quote = await provider.getQuote(symbol);
+        const price = typeof quote?.price === "number" && quote.price > 0 ? quote.price : null;
+        const ok = price !== null;
+        if (ok && applyMode) {
+          const today = new Date().toISOString().slice(0, 10);
+          await query(
+            `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (symbol, trade_date) DO UPDATE SET
+               close = EXCLUDED.close,
+               volume = EXCLUDED.volume`,
+            [symbol, today, price, price, price, price, quote.volume ?? null]
+          );
+        }
+        results.push({ symbol, ok, error: null });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({ symbol, ok: false, error: msg });
+      }
+    }
+    return reply.send({
+      ok: true,
+      mode: applyMode ? "apply" : "dry-run",
+      symbols: results.length,
+      succeeded: results.filter(r => r.ok).length,
+      failed: results.filter(r => !r.ok).length,
+      results,
+    });
+  });
 };
 
 export default opsRoutes;
