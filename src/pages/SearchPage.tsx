@@ -11,6 +11,8 @@ import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
 import tokens from "../components/ui/tokens";
+import { formatNumber } from "../services/ui/dataFormatting";
+
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -223,7 +225,11 @@ export const SearchPage: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <span>{stock.marketCap.formatted || "Not available"}</span>
+                        <span>
+                          {typeof stock.marketCap.numeric === "number"
+                            ? `₹${formatNumber(stock.marketCap.numeric)}`
+                            : stock.marketCap.formatted || "Not available"}
+                        </span>
                       </div>
                     </Card>
                   );

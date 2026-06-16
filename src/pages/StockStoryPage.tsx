@@ -8,19 +8,8 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import type { CompanyMetadata } from "../services/data/types";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
+import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate } from "../services/ui/dataFormatting";
 
-function localFormatPercent(value?: number | null): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "Unavailable";
-  if (Math.abs(value) < 1.0 && value !== 0) {
-    return `${(value * 100).toFixed(2)}%`;
-  }
-  return `${value.toFixed(2)}%`;
-}
-
-function formatNumber(value?: number | null, decimals: number = 2): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "Unavailable";
-  return value.toFixed(decimals);
-}
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -95,11 +84,7 @@ function readTabFromUrl(): TabKey {
 }
 
 function formatLargeINR(value?: number | null): string {
-  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) return "Data unavailable";
-  const crore = value / 10_000_000;
-  if (crore >= 100_000) return `Rs ${(crore / 100_000).toFixed(2)} L Cr`;
-  if (crore >= 1) return `Rs ${crore.toLocaleString("en-IN", { maximumFractionDigits: 0 })} Cr`;
-  return formatINR(value);
+  return uiFormatINR(value, true);
 }
 
 function formatDateTime(value?: string): string {
@@ -850,15 +835,15 @@ export const StockStoryPage: React.FC = () => {
               <dl className="space-y-3 text-xs">
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/E Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.peRatio, 2)}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.peRatio)}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">P/B Ratio</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.pbRatio, 2)}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.pbRatio)}</dd>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <dt className="text-white/50">EV/EBITDA</dt>
-                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.evEbitda, 2)}</dd>
+                  <dd className="font-mono text-white font-bold">{formatNumber(storyData.financials.evEbitda)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-white/50">FCF Yield</dt>
