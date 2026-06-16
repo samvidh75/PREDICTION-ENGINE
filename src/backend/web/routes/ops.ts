@@ -241,7 +241,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const today = new Date().toISOString().slice(0, 10);
     for (const symbol of symbols) {
       try {
-        const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+        const indianProvider = new (await import("../../../services/providers/IndianMarketProvider")).IndianMarketProvider();
         const meta = await indianProvider.getMetadata(symbol);
         const marketCap = meta?.marketCap ?? null;
         if (marketCap !== null && applyMode) {
@@ -282,7 +282,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       results.registry = { status: "skipped", message: "Symbols already registered" };
 
       results.quotes = { status: "running" };
-      const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+      const indianProvider = new (await import("../../../services/providers/IndianMarketProvider")).IndianMarketProvider();
       const today = new Date().toISOString().slice(0, 10);
       const quoteResults: any[] = [];
       for (const symbol of symbols) {
@@ -307,7 +307,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
       if (applyMode) {
         try {
-          const { FeatureEngine } = await import("../../services/FeatureEngine");
+          const { FeatureEngine } = await import("../../../services/FeatureEngine");
           const featureEngine = new FeatureEngine();
           for (const symbol of symbols) {
             const snapshots = await featureEngine.calculateAndStoreFeatures(symbol);
@@ -319,7 +319,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         }
 
         try {
-          const { FactorEngine } = await import("../../services/FactorEngine");
+          const { FactorEngine } = await import("../../../services/FactorEngine");
           const factorEngine = new FactorEngine();
           for (const symbol of symbols) {
             const snapshots = await factorEngine.calculateAndStoreFactors(symbol);
@@ -331,7 +331,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         }
 
         try {
-          const { predictionFactory } = await import("../../predictions/PredictionFactory");
+          const { predictionFactory } = await import("../../../predictions/PredictionFactory");
           const predResult = await predictionFactory.generateDaily([30, 90, 365]);
           results.predictions = { status: "complete", created: predResult.created, skipped: predResult.skipped, failed: predResult.failed };
         } catch (err: any) {
@@ -373,7 +373,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
     const applyMode = rawApply === "true";
     const results: Array<{ symbol: string; ok: boolean; price: number | null; error: string | null }> = [];
-    const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+    const indianProvider = new (await import("../../../services/providers/IndianMarketProvider")).IndianMarketProvider();
     const today = new Date().toISOString().slice(0, 10);
     for (const symbol of symbols) {
       try {
