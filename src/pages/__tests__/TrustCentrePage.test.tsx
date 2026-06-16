@@ -39,6 +39,10 @@ describe('TrustCentrePage regression states', () => {
     expect(screen.getAllByText('Data unavailable').length).toBeGreaterThanOrEqual(5);
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
+    // System status assertions
+    expect(screen.getByText('Data system status')).toBeInTheDocument();
+    expect(screen.getByText('17% Verified')).toBeInTheDocument();
+    expect(screen.getByText('2026-06-11')).toBeInTheDocument();
   });
 
   it('renders an explicit error state when the metrics service fails', async () => {
