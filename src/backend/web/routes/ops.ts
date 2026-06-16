@@ -232,39 +232,163 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     });
   });
 
+  app.post("/api/ops/ingest-financials", async (request, reply) => {
+    const { symbols: rawSymbols, apply: rawApply } = request.query as Record<string, string | undefined>;
+    const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
+      .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
+    const applyMode = rawApply === "true";
+    const results: Array<{ symbol: string; ok: boolean; marketCap: number | null; error: string | null }> = [];
+    const today = new Date().toISOString().slice(0, 10);
+    for (const symbol of symbols) {
+      try {
+        const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+        const meta = await indianProvider.getMetadata(symbol);
+        const marketCap = meta?.marketCap ?? null;
+        if (marketCap !== null && applyMode) {
+          await query(
+            `INSERT INTO financial_snapshots (symbol, snapshot_date, market_cap)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (symbol, snapshot_date) DO UPDATE SET
+               market_cap = COALESCE(EXCLUDED.market_cap, financial_snapshots.market_cap)`,
+            [symbol, today, marketCap]
+          );
+        }
+        results.push({ symbol, ok: marketCap !== null, marketCap, error: marketCap === null ? "No market cap available" : null });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({ symbol, ok: false, marketCap: null, error: msg });
+      }
+    }
+    return reply.send({
+      ok: true,
+      mode: applyMode ? "apply" : "dry-run",
+      symbols: results.length,
+      succeeded: results.filter(r => r.ok).length,
+      failed: results.filter(r => !r.ok).length,
+      results,
+    });
+  });
+
+  app.post("/api/ops/pipeline-run", async (request, reply) => {
+    const { apply: rawApply, symbols: rawSymbols } = request.query as Record<string, string | undefined>;
+    const runId = `api-trigger-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+    const startedAt = new Date().toISOString();
+    const applyMode = rawApply === "true";
+    const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
+      .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
+    const results: Record<string, any> = {};
+
+    try {
+      results.registry = { status: "skipped", message: "Symbols already registered" };
+
+      results.quotes = { status: "running" };
+      const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+      const today = new Date().toISOString().slice(0, 10);
+      const quoteResults: any[] = [];
+      for (const symbol of symbols) {
+        try {
+          const quote = await indianProvider.getQuote(symbol);
+          const ok = quote && quote.price !== undefined && quote.price > 0;
+          if (ok && applyMode) {
+            await query(
+              `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)
+               ON CONFLICT (symbol, trade_date) DO UPDATE SET
+                 close = EXCLUDED.close, volume = EXCLUDED.volume`,
+              [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
+            );
+          }
+          quoteResults.push({ symbol, ok, price: ok ? quote.price : null });
+        } catch (err: any) {
+          quoteResults.push({ symbol, ok: false, error: err.message });
+        }
+      }
+      results.quotes = { status: "complete", succeeded: quoteResults.filter(r => r.ok).length, failed: quoteResults.filter(r => !r.ok).length };
+
+      if (applyMode) {
+        try {
+          const { FeatureEngine } = await import("../../services/FeatureEngine");
+          const featureEngine = new FeatureEngine();
+          for (const symbol of symbols) {
+            const snapshots = await featureEngine.calculateAndStoreFeatures(symbol);
+            console.log(`  ${symbol}: ${snapshots.length} feature snapshots`);
+          }
+          results.features = { status: "complete" };
+        } catch (err: any) {
+          results.features = { status: "failed", error: err.message };
+        }
+
+        try {
+          const { FactorEngine } = await import("../../services/FactorEngine");
+          const factorEngine = new FactorEngine();
+          for (const symbol of symbols) {
+            const snapshots = await factorEngine.calculateAndStoreFactors(symbol);
+            console.log(`  ${symbol}: ${snapshots.length} factor snapshots`);
+          }
+          results.factors = { status: "complete" };
+        } catch (err: any) {
+          results.factors = { status: "failed", error: err.message };
+        }
+
+        try {
+          const { predictionFactory } = await import("../../predictions/PredictionFactory");
+          const predResult = await predictionFactory.generateDaily([30, 90, 365]);
+          results.predictions = { status: "complete", created: predResult.created, skipped: predResult.skipped, failed: predResult.failed };
+        } catch (err: any) {
+          results.predictions = { status: "failed", error: err.message };
+        }
+
+        const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const completedAt = new Date().toISOString();
+        try {
+          await query(
+            `INSERT INTO pipeline_health (id, phase, status, started_at, completed_at, symbols_processed, symbols_succeeded, symbols_failed)
+             VALUES ($1, 'api_pipeline_run', 'success', $2, $3, $4, $5, $6)`,
+            [pipelineId, startedAt, completedAt, symbols.length, quoteResults.filter(r => r.ok).length, quoteResults.filter(r => !r.ok).length]
+          );
+          results.health = { status: "recorded" };
+        } catch (err: any) {
+          results.health = { status: "failed", error: err.message };
+        }
+      }
+
+      return reply.send({
+        ok: true,
+        runId,
+        mode: applyMode ? "apply" : "dry-run",
+        results,
+      });
+    } catch (err: any) {
+      return reply.send({
+        ok: false,
+        runId,
+        error: err.message,
+      });
+    }
+  });
+
   app.post("/api/ops/ingest-quotes", async (request, reply) => {
     const { symbols: rawSymbols, apply: rawApply } = request.query as Record<string, string | undefined>;
     const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
       .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
     const applyMode = rawApply === "true";
     const results: Array<{ symbol: string; ok: boolean; price: number | null; error: string | null }> = [];
+    const indianProvider = new (await import("../../services/providers/IndianMarketProvider")).IndianMarketProvider();
+    const today = new Date().toISOString().slice(0, 10);
     for (const symbol of symbols) {
       try {
-        const yahooSymbol = `${symbol}.NS`;
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`;
-        const resp = await fetch(url, {
-          headers: { "User-Agent": "Mozilla/5.0" },
-          signal: AbortSignal.timeout(15_000),
-        });
-        if (!resp.ok) {
-          results.push({ symbol, ok: false, price: null, error: `Yahoo HTTP ${resp.status}` });
-          continue;
-        }
-        const data = await resp.json() as any;
-        const meta = data?.chart?.result?.[0]?.meta;
-        const price = typeof meta?.regularMarketPrice === "number" ? meta.regularMarketPrice : null;
-        const ok = price !== null && price > 0;
+        const quote = await indianProvider.getQuote(symbol);
+        const ok = quote && quote.price !== undefined && quote.price > 0;
         if (ok && applyMode) {
-          const today = new Date().toISOString().slice(0, 10);
           await query(
             `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
              VALUES ($1, $2, $3, $4, $5, $6, $7)
              ON CONFLICT (symbol, trade_date) DO UPDATE SET
                close = EXCLUDED.close, volume = EXCLUDED.volume`,
-            [symbol, today, price, price, price, price, null]
+            [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
           );
         }
-        results.push({ symbol, ok, price, error: ok ? null : "Yahoo returned no price data" });
+        results.push({ symbol, ok, price: ok ? quote.price : null, error: ok ? null : "IndianAPI returned no price data" });
       } catch (err: unknown) {
         const msg = err instanceof Error ? `${err.name}: ${err.message}${err.cause ? " cause=" + String(err.cause) : ""}` : String(err);
         results.push({ symbol, ok: false, price: null, error: msg });
