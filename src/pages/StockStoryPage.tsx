@@ -132,7 +132,7 @@ function scoreFromLineage(factor: any): number | null {
   return factor.score;
 }
 
-function adaptStockStoryResponse(data: any) {
+function adaptStockStoryResponse(data: any, financialsObj: any = null) {
   if (!data) {
     throw new Error("STOCKSTORY_SNAPSHOT_UNAVAILABLE");
   }
@@ -193,10 +193,10 @@ function adaptStockStoryResponse(data: any) {
     valuation,
     momentum,
     risk,
-    financials: {},
+    financials: financialsObj || {},
     engineDetails: {
-      growth: { score: growth, revenueGrowth: null, epsGrowth: null, fcfGrowth: null, profitGrowth: null, commentary: `Source: ${factors.growth.source} (${factors.growth.snapshotDate}).` },
-      quality: { score: quality, roe: null, roic: null, grossMargin: null, operatingMargin: null, efficiencyScore: quality, commentary: `Source: ${factors.quality.source} (${factors.quality.snapshotDate}).` },
+      growth: { score: growth, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: `Source: ${factors.growth.source} (${factors.growth.snapshotDate}).` },
+      quality: { score: quality, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: quality, commentary: `Source: ${factors.quality.source} (${factors.quality.snapshotDate}).` },
       stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: `Source: ${factors.stability.source} (${factors.stability.snapshotDate}).` },
       momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: `Source: ${factors.momentum.source} (${factors.momentum.snapshotDate}).` },
       valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: `Source: ${factors.value.source} (${factors.value.snapshotDate}).` },
@@ -270,7 +270,7 @@ export const StockStoryPage: React.FC = () => {
         return body;
       })
       .then((data) => {
-        setStory(adaptStockStoryResponse(data));
+        setStory(data);
         setStoryLoading(false);
       })
       .catch((error: Error) => {
@@ -282,7 +282,14 @@ export const StockStoryPage: React.FC = () => {
     return () => controller.abort();
   }, [ticker]);
 
+  const [financials, setFinancials] = useState<any>(null);
+
   useEffect(() => {
+    fetch(`/api/company/${encodeURIComponent(ticker)}/financials`)
+      .then(res => res.json())
+      .then(data => setFinancials(data))
+      .catch(() => setFinancials(null));
+
     fetch(`/api/company/${encodeURIComponent(ticker)}/ownership`)
       .then(res => res.json())
       .then(data => setOwnership(data))
@@ -306,7 +313,10 @@ export const StockStoryPage: React.FC = () => {
   const quote = liveQuote.quote;
   const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
   const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Data unavailable";
-  const storyData = story;
+  const storyData = useMemo(() => {
+    if (!story) return null;
+    return adaptStockStoryResponse(story, financials);
+  }, [story, financials]);
   const storyUnavailable = storyData?.apiStatus === "unavailable";
 
   const isInWatchlist = useMemo(() => {
