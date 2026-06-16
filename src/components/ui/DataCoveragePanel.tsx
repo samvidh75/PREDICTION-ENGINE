@@ -83,33 +83,33 @@ export const DataCoveragePanel: React.FC = () => {
   const metrics = [
     {
       label: "Indexed Symbols",
-      value: coverage.symbols.status === "available" ? coverage.symbols.count.toLocaleString() : "—",
-      detail: coverage.symbols.latestUpdatedAt ? `Updated ${coverage.symbols.latestUpdatedAt}` : "No predictions",
+      value: coverage.symbols?.status === "available" ? (coverage.symbols.count ?? 0).toLocaleString() : "—",
+      detail: coverage.symbols?.latestUpdatedAt ? `Updated ${coverage.symbols.latestUpdatedAt}` : "No predictions",
     },
     {
       label: "Daily Price Rows",
-      value: coverage.dailyPrices.status === "available" ? (coverage.dailyPrices.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.dailyPrices.latestPriceDate ? `Latest: ${coverage.dailyPrices.latestPriceDate}` : "No prices",
+      value: coverage.dailyPrices?.status === "available" ? (coverage.dailyPrices.rowCount ?? 0).toLocaleString() : "—",
+      detail: coverage.dailyPrices?.latestPriceDate ? `Latest: ${coverage.dailyPrices.latestPriceDate}` : "No prices",
     },
     {
       label: "Financial Snapshots",
-      value: coverage.financialSnapshots.status === "available" ? (coverage.financialSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.financialSnapshots.latestSnapshotDate ? `Latest: ${coverage.financialSnapshots.latestSnapshotDate}` : "No snapshot",
+      value: coverage.financialSnapshots?.status === "available" ? (coverage.financialSnapshots.rowCount ?? 0).toLocaleString() : "—",
+      detail: coverage.financialSnapshots?.latestSnapshotDate ? `Latest: ${coverage.financialSnapshots.latestSnapshotDate}` : "No snapshot",
     },
     {
       label: "Features",
-      value: coverage.featureSnapshots.status === "available" ? (coverage.featureSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.featureSnapshots.latestSnapshotDate ? `Latest: ${coverage.featureSnapshots.latestSnapshotDate}` : "No features",
+      value: coverage.featureSnapshots?.status === "available" ? (coverage.featureSnapshots.rowCount ?? 0).toLocaleString() : "—",
+      detail: coverage.featureSnapshots?.latestSnapshotDate ? `Latest: ${coverage.featureSnapshots.latestSnapshotDate}` : "No features",
     },
     {
       label: "Factors",
-      value: coverage.factorSnapshots.status === "available" ? (coverage.factorSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.factorSnapshots.latestSnapshotDate ? `Latest: ${coverage.factorSnapshots.latestSnapshotDate}` : "No factors",
+      value: coverage.factorSnapshots?.status === "available" ? (coverage.factorSnapshots.rowCount ?? 0).toLocaleString() : "—",
+      detail: coverage.factorSnapshots?.latestSnapshotDate ? `Latest: ${coverage.factorSnapshots.latestSnapshotDate}` : "No factors",
     },
     {
       label: "Predictions Registry",
-      value: coverage.predictionRegistry.status === "available" ? (coverage.predictionRegistry.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.predictionRegistry.latestPredictionDate ? `Latest: ${coverage.predictionRegistry.latestPredictionDate}` : "No predictions",
+      value: coverage.predictionRegistry?.status === "available" ? (coverage.predictionRegistry.rowCount ?? 0).toLocaleString() : "—",
+      detail: coverage.predictionRegistry?.latestPredictionDate ? `Latest: ${coverage.predictionRegistry.latestPredictionDate}` : "No predictions",
     },
   ];
 

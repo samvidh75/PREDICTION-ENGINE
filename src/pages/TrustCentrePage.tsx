@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import { LoadingState } from "../components/ui/DataState";
-import { PageHeader, ResearchDisclaimer } from "../components/ui/PageHeader";
+import { PageHeader, ResearchDisclaimer, ProviderStatusPill } from "../components/ui/PageHeader";
+import { formatNumber } from "../services/ui/dataFormatting";
 
 interface TrustMetrics {
   alpha: number | null;
@@ -24,6 +25,29 @@ interface TrustEnvelope {
   };
 }
 
+interface CoverageStats {
+  count: number;
+  status: string;
+  latestUpdatedAt?: string | null;
+  latestPriceDate?: string | null;
+  latestSnapshotDate?: string | null;
+  latestPredictionDate?: string | null;
+  rowCount?: number;
+}
+
+interface CoverageData {
+  ok: boolean;
+  generatedAt: string;
+  database: { status: string; migrationsReady: boolean };
+  coverage: {
+    symbols: CoverageStats;
+    dailyPrices: CoverageStats;
+    financialSnapshots: CoverageStats;
+    predictionRegistry: CoverageStats;
+  };
+  providers: Record<string, string>;
+}
+
 function formatMetric(value: number | null | undefined, suffix = ""): string {
   if (typeof value !== "number" || !Number.isFinite(value)) return "Data unavailable";
   return `${value.toFixed(2)}${suffix}`;
@@ -34,10 +58,17 @@ function formatCount(value: number | null | undefined): string {
   return value.toLocaleString("en-IN");
 }
 
+function coverageStatusLabel(status: string): string {
+  if (status === "available") return "Available";
+  return "Unavailable";
+}
+
 export const TrustCentrePage: React.FC = () => {
   const [envelope, setEnvelope] = useState<TrustEnvelope | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [coverageData, setCoverageData] = useState<CoverageData | null>(null);
+  const [coverageLoading, setCoverageLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -60,6 +91,18 @@ export const TrustCentrePage: React.FC = () => {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    fetch("/api/ops/data-coverage")
+      .then(res => res.json())
+      .then((data) => {
+        if (data.ok) {
+          setCoverageData(data);
+        }
+        setCoverageLoading(false);
+      })
+      .catch(() => setCoverageLoading(false));
+  }, []);
+
   if (loading) {
     return (
       <div className="p-10">
@@ -70,8 +113,9 @@ export const TrustCentrePage: React.FC = () => {
 
   const metrics = envelope?.data;
   const rawState = error ? "error" : envelope?.status ?? "unavailable";
-  const asOf = envelope?.dataState?.asOf || "Data unavailable";
+  const asOf = envelope?.dataState?.asOf || coverageData?.generatedAt || "Data unavailable";
   const missingInputs = envelope?.dataState?.missingInputs || [];
+  const completenessScore = envelope?.dataState?.completenessScore;
 
   const stateLabel: Record<string, string> = {
     ok: "All metrics available",
@@ -100,7 +144,6 @@ export const TrustCentrePage: React.FC = () => {
         </div>
       )}
 
-      {/* Performance Grid */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-950">Performance audit</h2>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -123,7 +166,6 @@ export const TrustCentrePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Scale */}
       <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Card className="p-5">
           <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total predictions generated</span>
@@ -135,7 +177,59 @@ export const TrustCentrePage: React.FC = () => {
         </Card>
       </section>
 
-      {/* Scoring Engines Explanation */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-slate-950">Data coverage summary</h2>
+        {coverageLoading ? (
+          <Card className="p-5">
+            <p className="text-xs text-slate-500">Loading coverage data...</p>
+          </Card>
+        ) : coverageData ? (
+          <Card className="p-5">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Indexed symbols</span>
+                <span className="block text-sm font-semibold text-slate-950">
+                  {coverageData.coverage.symbols.status === "available"
+                    ? formatNumber(coverageData.coverage.symbols.count)
+                    : "Unavailable"}
+                </span>
+              </div>
+              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Price rows</span>
+                <span className="block text-sm font-semibold text-slate-950">
+                  {coverageData.coverage.dailyPrices.status === "available"
+                    ? formatNumber(coverageData.coverage.dailyPrices.rowCount ?? 0)
+                    : "Unavailable"}
+                </span>
+              </div>
+              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial snapshots</span>
+                <span className="block text-sm font-semibold text-slate-950">
+                  {coverageData.coverage.financialSnapshots.status === "available"
+                    ? formatNumber(coverageData.coverage.financialSnapshots.rowCount ?? 0)
+                    : "Unavailable"}
+                </span>
+              </div>
+              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Prediction rows</span>
+                <span className="block text-sm font-semibold text-slate-950">
+                  {coverageData.coverage.predictionRegistry.status === "available"
+                    ? formatNumber(coverageData.coverage.predictionRegistry.rowCount ?? 0)
+                    : "Unavailable"}
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 text-[9px] text-slate-400">
+              As of {coverageData.generatedAt ? new Date(coverageData.generatedAt).toISOString().split("T")[0] : "N/A"}
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-5">
+            <p className="text-xs text-slate-500">Coverage data is temporarily unavailable.</p>
+          </Card>
+        )}
+      </section>
+
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-950">Scoring engines</h2>
         <div className="grid gap-3 md:grid-cols-2">
@@ -178,7 +272,6 @@ export const TrustCentrePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Data System Status */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-950">Data system status</h2>
         <Card className="p-5">
@@ -199,14 +292,26 @@ export const TrustCentrePage: React.FC = () => {
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
               <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence Completeness</span>
               <span className="text-xs font-semibold text-slate-900">
-                {envelope?.dataState?.completenessScore ? `${envelope.dataState.completenessScore}% Verified` : "Pending audit"}
+                {completenessScore ? `${completenessScore}% Verified` : "Pending audit"}
               </span>
             </div>
           </div>
         </Card>
       </section>
 
-      {/* Disclaimer */}
+      {coverageData && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-slate-950">Provider readiness</h2>
+          <Card className="p-5">
+            <div className="border border-slate-100 rounded-lg overflow-hidden bg-slate-50/50">
+              {Object.entries(coverageData.providers).map(([key, val]) => (
+                <ProviderStatusPill key={key} name={key} status={val} />
+              ))}
+            </div>
+          </Card>
+        </section>
+      )}
+
       <section className="border-t border-slate-200 pt-6">
         <ResearchDisclaimer />
       </section>

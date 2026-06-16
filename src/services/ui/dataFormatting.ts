@@ -1,11 +1,3 @@
-/**
- * Safe frontend data formatting and availability mappings for Indian equity workspace.
- * Prevents displaying raw null, undefined, NaN, Infinity, or [object Object].
- */
-
-/**
- * Format raw numbers as a standard Indian locale format (e.g. 1,23,456).
- */
 export function formatNumber(val: number | string | null | undefined): string {
   if (val === null || val === undefined || val === "") return "Unavailable";
   const num = Number(val);
@@ -13,22 +5,15 @@ export function formatNumber(val: number | string | null | undefined): string {
   return num.toLocaleString("en-IN");
 }
 
-/**
- * Format percentages cleanly (e.g. +12.34% or -5.67%).
- */
 export function formatPercentage(val: number | string | null | undefined): string {
   if (val === null || val === undefined || val === "") return "Unavailable";
   const num = Number(val);
   if (isNaN(num) || !isFinite(num)) return "Unavailable";
   const sign = num > 0 ? "+" : "";
-  // Check if standard fractional format or already multi-percent value
   const finalVal = Math.abs(num) < 1.0 && num !== 0 ? num * 100 : num;
   return `${sign}${finalVal.toFixed(2)}%`;
 }
 
-/**
- * Format Indian Rupee currency quantities.
- */
 export function formatINR(val: number | string | null | undefined, compact = false): string {
   if (val === null || val === undefined || val === "") return "Unavailable";
   const num = Number(val);
@@ -50,9 +35,6 @@ export function formatINR(val: number | string | null | undefined, compact = fal
   });
 }
 
-/**
- * Normalizes date values safely to YYYY-MM-DD.
- */
 export function normalizeDate(val: string | number | Date | null | undefined): string {
   if (!val) return "Date pending";
   try {
@@ -64,14 +46,55 @@ export function normalizeDate(val: string | number | Date | null | undefined): s
   }
 }
 
-/**
- * Derives user-facing clean labels for snake_case/camelCase data keys.
- */
 export function getCleanLabel(key: string): string {
   if (!key) return "";
-  // Handle snake_case or camelCase splitting
   const result = key
     .replace(/_/g, " ")
     .replace(/([a-z])([A-Z])/g, "$1 $2");
   return result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+}
+
+export function formatScore(val: number | null | undefined): string {
+  if (typeof val !== "number" || !isFinite(val)) return "Score pending";
+  return `${Math.round(val)}/100`;
+}
+
+export function formatRank(val: number | null | undefined): string {
+  if (typeof val !== "number" || !isFinite(val) || val < 1) return "—";
+  return `#${Math.round(val)}`;
+}
+
+export function getScoreState(score: number | null | undefined): "available" | "pending" {
+  if (typeof score === "number" && isFinite(score)) return "available";
+  return "pending";
+}
+
+export function normalizeFieldName(key: string): string {
+  if (!key) return "";
+  const cleaned = key
+    .replace(/_/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2");
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+}
+
+export function formatFreshness(dateVal: string | null | undefined): string {
+  if (!dateVal) return "Freshness pending";
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return "Freshness pending";
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return d.toISOString().split("T")[0];
+  } catch {
+    return "Freshness pending";
+  }
+}
+
+export function formatSource(source: string | null | undefined): string {
+  if (!source) return "Unavailable";
+  return source;
 }

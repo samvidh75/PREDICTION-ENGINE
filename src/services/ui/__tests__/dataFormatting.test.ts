@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { formatNumber, formatPercentage, formatINR, normalizeDate, getCleanLabel } from "../dataFormatting";
+import {
+  formatNumber, formatPercentage, formatINR, normalizeDate, getCleanLabel,
+  formatScore, formatRank, getScoreState, normalizeFieldName, formatFreshness, formatSource,
+} from "../dataFormatting";
 
 describe("Frontend dataFormatting Utilities", () => {
   it("formats positive, negative, and invalid values safely as locale numbers", () => {
@@ -8,6 +11,8 @@ describe("Frontend dataFormatting Utilities", () => {
     expect(formatNumber(null)).toBe("Unavailable");
     expect(formatNumber(undefined)).toBe("Unavailable");
     expect(formatNumber("NaN")).toBe("Unavailable");
+    expect(formatNumber(Infinity)).toBe("Unavailable");
+    expect(formatNumber("")).toBe("Unavailable");
   });
 
   it("formats percentages with clean fraction bounds and signs", () => {
@@ -15,6 +20,11 @@ describe("Frontend dataFormatting Utilities", () => {
     expect(formatPercentage(-0.0567)).toBe("-5.67%");
     expect(formatPercentage(15.5)).toBe("+15.50%");
     expect(formatPercentage(null)).toBe("Unavailable");
+    expect(formatPercentage(undefined)).toBe("Unavailable");
+    expect(formatPercentage(NaN)).toBe("Unavailable");
+    expect(formatPercentage(Infinity)).toBe("Unavailable");
+    expect(formatPercentage("")).toBe("Unavailable");
+    expect(formatPercentage(0)).toBe("0.00%");
   });
 
   it("formats currency values in Indian Rupees with optional compact modes", () => {
@@ -22,15 +32,114 @@ describe("Frontend dataFormatting Utilities", () => {
     expect(formatINR(15000000, true)).toBe("₹1.50 Cr");
     expect(formatINR(250000, true)).toBe("₹2.50 L");
     expect(formatINR(null)).toBe("Unavailable");
+    expect(formatINR(undefined)).toBe("Unavailable");
+    expect(formatINR(NaN)).toBe("Unavailable");
+    expect(formatINR(Infinity)).toBe("Unavailable");
   });
 
   it("normalizes date bounds safely into YYYY-MM-DD format", () => {
     expect(normalizeDate("2026-06-15T12:00:00.000Z")).toBe("2026-06-15");
     expect(normalizeDate(null)).toBe("Date pending");
+    expect(normalizeDate(undefined)).toBe("Date pending");
+    expect(normalizeDate("")).toBe("Date pending");
   });
 
   it("converts raw snake_case or camelCase variables to clean display labels", () => {
     expect(getCleanLabel("pe_ratio")).toBe("Pe ratio");
     expect(getCleanLabel("revenueGrowth")).toBe("Revenue growth");
+  });
+});
+
+describe("formatScore", () => {
+  it("formats valid scores as N/100", () => {
+    expect(formatScore(88)).toBe("88/100");
+    expect(formatScore(0)).toBe("0/100");
+  });
+
+  it("returns Score pending for null/undefined/non-finite", () => {
+    expect(formatScore(null)).toBe("Score pending");
+    expect(formatScore(undefined)).toBe("Score pending");
+    expect(formatScore(NaN)).toBe("Score pending");
+    expect(formatScore(Infinity)).toBe("Score pending");
+  });
+});
+
+describe("formatRank", () => {
+  it("formats valid rank with hash prefix", () => {
+    expect(formatRank(1)).toBe("#1");
+    expect(formatRank(42)).toBe("#42");
+  });
+
+  it("returns em-dash for null/undefined/invalid", () => {
+    expect(formatRank(null)).toBe("—");
+    expect(formatRank(undefined)).toBe("—");
+    expect(formatRank(0)).toBe("—");
+    expect(formatRank(-1)).toBe("—");
+  });
+});
+
+describe("getScoreState", () => {
+  it("returns available for valid finite numbers", () => {
+    expect(getScoreState(88)).toBe("available");
+    expect(getScoreState(0)).toBe("available");
+  });
+
+  it("returns pending for null/undefined/non-finite", () => {
+    expect(getScoreState(null)).toBe("pending");
+    expect(getScoreState(undefined)).toBe("pending");
+    expect(getScoreState(NaN)).toBe("pending");
+  });
+});
+
+describe("normalizeFieldName", () => {
+  it("converts snake_case and camelCase to title case", () => {
+    expect(normalizeFieldName("revenue_growth")).toBe("Revenue growth");
+    expect(normalizeFieldName("revenueGrowth")).toBe("Revenue growth");
+    expect(normalizeFieldName("pe_ratio")).toBe("Pe ratio");
+  });
+
+  it("returns empty for empty input", () => {
+    expect(normalizeFieldName("")).toBe("");
+    expect(normalizeFieldName(null as any)).toBe("");
+    expect(normalizeFieldName(undefined as any)).toBe("");
+  });
+});
+
+describe("formatFreshness", () => {
+  it("returns Today for recent dates", () => {
+    const today = new Date().toISOString();
+    expect(formatFreshness(today)).toBe("Today");
+  });
+
+  it("returns Yesterday for one day ago", () => {
+    const yesterday = new Date(Date.now() - 86400000).toISOString();
+    expect(formatFreshness(yesterday)).toBe("Yesterday");
+  });
+
+  it("returns Xd ago for dates within 30 days", () => {
+    const fiveDaysAgo = new Date(Date.now() - 5 * 86400000).toISOString();
+    expect(formatFreshness(fiveDaysAgo)).toBe("5d ago");
+  });
+
+  it("returns date string for older dates", () => {
+    const oldDate = "2026-01-01T00:00:00Z";
+    expect(formatFreshness(oldDate)).toBe("2026-01-01");
+  });
+
+  it("returns Freshness pending for null/undefined", () => {
+    expect(formatFreshness(null)).toBe("Freshness pending");
+    expect(formatFreshness(undefined)).toBe("Freshness pending");
+    expect(formatFreshness("")).toBe("Freshness pending");
+  });
+});
+
+describe("formatSource", () => {
+  it("returns source for valid values", () => {
+    expect(formatSource("finnhub")).toBe("finnhub");
+  });
+
+  it("returns Unavailable for null/undefined", () => {
+    expect(formatSource(null)).toBe("Unavailable");
+    expect(formatSource(undefined)).toBe("Unavailable");
   });
 });

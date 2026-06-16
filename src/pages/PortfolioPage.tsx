@@ -3,10 +3,11 @@ import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapsho
 import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
 import { AlertCircle, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide-react';
-import { formatINR, useLiveQuotes } from '../hooks/useLiveQuotes';
+import { useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader } from '../components/ui/PageHeader';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/DataState';
+import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 import tokens from '../components/ui/tokens';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
@@ -291,8 +292,6 @@ export const PortfolioPage: React.FC = () => {
     </div>
   );
 };
-
-import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 
 function SummaryCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (

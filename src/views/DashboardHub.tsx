@@ -10,12 +10,12 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
+import { formatNumber } from "../services/ui/dataFormatting";
 import tokens from "../components/ui/tokens";
 import { OnboardingChecklist, DataReadinessPanel } from "../components/ui/OnboardingComponents";
 import { DataCoveragePanel } from "../components/ui/DataCoveragePanel";
 
 interface SignalItem {
-
   symbol: string;
   type: string;
   severity: "critical" | "important" | "monitor";
@@ -28,6 +28,17 @@ interface OpsHealthMetrics {
   symbols_covered?: number;
   pipeline_freshness?: string;
   db_health?: string;
+}
+
+interface CoverageData {
+  ok: boolean;
+  generatedAt: string;
+  coverage: {
+    symbols: { count: number; status: string; latestUpdatedAt?: string | null };
+    dailyPrices: { rowCount?: number; symbolCount?: number; latestPriceDate?: string | null; status: string };
+    financialSnapshots: { rowCount?: number; symbolCount?: number; latestSnapshotDate?: string | null; status: string };
+    predictionRegistry: { rowCount?: number; symbolCount?: number; latestPredictionDate?: string | null; status: string };
+  };
 }
 
 function navigate(pageKey: string, query?: string): void {
@@ -87,6 +98,19 @@ export const DashboardHub: React.FC = () => {
       .catch(() => {});
   }, []);
 
+  const [coverageData, setCoverageData] = useState<CoverageData | null>(null);
+
+  useEffect(() => {
+    fetch("/api/ops/data-coverage")
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          setCoverageData(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
     setSignalsLoading(true);
@@ -129,15 +153,20 @@ export const DashboardHub: React.FC = () => {
   }, [watchlists]);
   const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
   const recentTickers = recentResearch.slice(0, 6);
-  const healthSymbolsCovered =
-    typeof pipelineMetrics?.symbols_covered === "number" && pipelineMetrics.symbols_covered >= 0
-      ? pipelineMetrics.symbols_covered
-      : null;
-  const healthPredictionsToday =
-    typeof pipelineMetrics?.predictions_today === "number" && pipelineMetrics.predictions_today >= 0
-      ? pipelineMetrics.predictions_today
-      : null;
-  const indexedCompanyCount = healthSymbolsCovered ?? (signalsLoading ? null : symbolsAnalyzed);
+
+  const cov = coverageData?.coverage;
+  const indexedSymbols = cov?.symbols.status === "available" ? cov.symbols.count : null;
+  const predictionRows = cov?.predictionRegistry.status === "available" ? cov.predictionRegistry.rowCount ?? null : null;
+  const latestPredictionDate = cov?.predictionRegistry.latestPredictionDate ?? null;
+  const financialSnapshots = cov?.financialSnapshots.status === "available" ? cov.financialSnapshots.rowCount ?? null : null;
+  const latestFinancialDate = cov?.financialSnapshots.latestSnapshotDate ?? null;
+  const priceRows = cov?.dailyPrices.status === "available" ? cov.dailyPrices.rowCount ?? null : null;
+  const latestPriceDate = cov?.dailyPrices.latestPriceDate ?? null;
+
+  const indexedCompanyCount = indexedSymbols ?? (pipelineMetrics?.symbols_covered ?? null);
+  const healthPredictionsToday = pipelineMetrics?.predictions_today ?? null;
+
+  const latestSignalDate = signals[0]?.snapshotDate ?? null;
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -204,8 +233,46 @@ export const DashboardHub: React.FC = () => {
 
       <DataCoveragePanel />
 
-      <Card className="p-6">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="p-4">
+          <SectionHeader title="Indexed companies" subtitle="Registry symbols" />
+          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
+            {indexedCompanyCount === null ? "—" : formatNumber(indexedCompanyCount)}
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            {cov?.symbols.latestUpdatedAt ? `Updated ${cov.symbols.latestUpdatedAt}` : "Pending registry sync"}
+          </p>
+        </Card>
+        <Card className="p-4">
+          <SectionHeader title="Prediction registry" subtitle="Scored companies" />
+          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
+            {predictionRows === null ? "—" : formatNumber(predictionRows)}
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            {latestPredictionDate ? `Latest ${latestPredictionDate}` : "No predictions yet"}
+          </p>
+        </Card>
+        <Card className="p-4">
+          <SectionHeader title="Financial snapshots" subtitle="Fundamental data" />
+          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
+            {financialSnapshots === null ? "—" : formatNumber(financialSnapshots)}
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            {latestFinancialDate ? `Latest ${latestFinancialDate}` : "No financials yet"}
+          </p>
+        </Card>
+        <Card className="p-4">
+          <SectionHeader title="Price coverage" subtitle="Daily price rows" />
+          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
+            {priceRows === null ? "—" : formatNumber(priceRows)}
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            {latestPriceDate ? `Latest ${latestPriceDate}` : "No prices yet"}
+          </p>
+        </Card>
+      </div>
 
+      <Card className="p-6">
         <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
           <div>
             <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>
@@ -242,22 +309,19 @@ export const DashboardHub: React.FC = () => {
           <p className="mt-1 text-xs text-slate-500">Quotes appear when verified.</p>
         </Card>
         <Card>
-          <SectionHeader title="Indexed companies" subtitle="Verified registry" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {indexedCompanyCount === null ? "—" : indexedCompanyCount.toLocaleString()}
+          <SectionHeader title="Signals freshness" subtitle="Latest score changes" />
+          <div className="mt-3 text-sm font-semibold text-slate-950">
+            {latestSignalDate ? `As of ${latestSignalDate}` : "No signals yet"}
           </div>
           <p className="mt-1 text-xs text-slate-500">
             {healthPredictionsToday !== null
-              ? `${healthPredictionsToday.toLocaleString()} prediction rows today${
-                  pipelineMetrics?.pipeline_freshness ? `; prices ${pipelineMetrics.pipeline_freshness}` : ""
-                }.`
-              : "Available after source updates."}
+              ? `${formatNumber(healthPredictionsToday)} prediction rows today`
+              : "Pending provider updates"}
           </p>
         </Card>
       </div>
 
       <div className={tokens.layout.sidebarGrid}>
-        {/* Signal changes */}
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader
             title="Score changes"
@@ -310,7 +374,6 @@ export const DashboardHub: React.FC = () => {
           </div>
         </section>
 
-        {/* Right sidebar */}
         <div className="space-y-4">
           <Card>
             <SectionHeader title="Saved workspace" subtitle="Your watchlist tickers" />

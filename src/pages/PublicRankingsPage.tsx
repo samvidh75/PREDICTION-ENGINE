@@ -9,6 +9,7 @@ import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import tokens from "../components/ui/tokens";
+import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
 
 interface RankingEntry {
   symbol: string;
@@ -21,6 +22,8 @@ interface RankingEntry {
   sector?: string | null;
   industry?: string | null;
   predictionDate?: string | null;
+  prediction_date?: string | null;
+  source?: string | null;
 }
 
 export const PublicRankingsPage: React.FC = () => {
@@ -78,6 +81,8 @@ export const PublicRankingsPage: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const freshnessDate = rankings[0]?.predictionDate ?? rankings[0]?.prediction_date ?? null;
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <TopNav />
@@ -86,7 +91,7 @@ export const PublicRankingsPage: React.FC = () => {
         <PageHeader
           title="Research rankings"
           subtitle="Rankings will appear here when source-backed scoring has produced verified company snapshots."
-          primaryAction={rankings[0]?.predictionDate ? <DataFreshnessBadge date={rankings[0].predictionDate} /> : <MissingDataBadge />}
+          primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
 
       <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:flex-row">
@@ -143,10 +148,11 @@ export const PublicRankingsPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector"]}>
+        <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
           {filteredRankings.map((r, index) => {
             const rankingScore = r.rankingScore ?? r.ranking_score;
             const confidenceScore = r.confidenceScore ?? r.confidence_score;
+            const predictionDate = r.predictionDate ?? r.prediction_date ?? null;
 
             return (
               <tr
@@ -154,7 +160,7 @@ export const PublicRankingsPage: React.FC = () => {
                 className="cursor-pointer transition-colors hover:bg-slate-50"
                 onClick={() => setPage("stock", r.symbol)}
               >
-                <td className="p-4 font-semibold text-slate-500">#{index + 1}</td>
+                <td className="p-4 font-semibold text-slate-500">{formatRank(index + 1)}</td>
                 <td className="p-4 font-mono font-bold text-slate-950 hover:underline">
                   {r.symbol}
                 </td>
@@ -177,6 +183,15 @@ export const PublicRankingsPage: React.FC = () => {
                 </td>
                 <td className="p-4">
                   <Badge variant="info">{r.sector || "Not available"}</Badge>
+                </td>
+                <td className="p-4">
+                  {predictionDate ? (
+                    <span className="text-[10px] text-emerald-700 font-semibold whitespace-nowrap">
+                      {formatFreshness(predictionDate)}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-400">Pending</span>
+                  )}
                 </td>
               </tr>
             );

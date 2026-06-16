@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { LoadingState, EmptyState } from "../components/ui/DataState";
-import ScorePill from "../components/ui/ScorePill";
 import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } from "../components/ui/PageHeader";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import tokens from "../components/ui/tokens";
+import { formatFreshness } from "../services/ui/dataFormatting";
 
-interface PredictionRow {
-  symbol?: string | null;
-  companyName?: string | null;
-  rankingScore?: number | null;
-  ranking_score?: number | null;
-  confidenceScore?: number | null;
-  confidence_score?: number | null;
-  sector?: string | null;
-  predictionDate?: string | null;
+interface SignalRow {
+  symbol: string;
+  type: string;
+  severity: string;
+  explanation: string;
+  snapshotDate?: string | null;
+}
+
+interface SignalsPayload {
+  signals: SignalRow[];
+  snapshotDate?: string | null;
+  symbolsAnalyzed?: number;
 }
 
 export default function PublicPredictionsPage(): JSX.Element {
-  const [data, setData] = useState<PredictionRow[] | null>(null);
+  const [payload, setPayload] = useState<SignalsPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [symbolsAnalyzed, setSymbolsAnalyzed] = useState<number | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetch("/api/intelligence/leaderboard?limit=20", {
+    fetch("/api/predictions/signals?limit=50", {
       signal: ctrl.signal,
       headers: { Accept: "application/json" },
     })
       .then(async (r) => {
-        if (!r.ok) throw new Error("UNAVAILABLE");
+        if (!r.ok) throw new Error(r.status === 404 ? "SIGNALS_UNAVAILABLE" : "UNAVAILABLE");
         const body = await r.json();
-        if (!Array.isArray(body)) throw new Error("UNEXPECTED_FORMAT");
-        setData(body);
+        const data = body.data || body;
+        setPayload(data);
+        if (typeof data.symbolsAnalyzed === "number") {
+          setSymbolsAnalyzed(data.symbolsAnalyzed);
+        }
       })
       .catch((e: Error) => {
         if (ctrl.signal.aborted) return;
@@ -59,24 +66,37 @@ export default function PublicPredictionsPage(): JSX.Element {
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const signals = payload?.signals ?? [];
+  const snapshotDate = payload?.snapshotDate ?? null;
+
+  const severityColors: Record<string, string> = {
+    critical: "bg-rose-50 border-rose-200 text-rose-800",
+    important: "bg-amber-50 border-amber-200 text-amber-800",
+    monitor: "bg-sky-50 border-sky-200 text-sky-800",
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <TopNav />
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
-          title="Top-ranked companies"
-          subtitle="Prediction rows will appear when source-backed scoring has produced verified snapshots."
-          primaryAction={data && data[0]?.predictionDate ? <DataFreshnessBadge date={data[0].predictionDate} /> : <MissingDataBadge />}
+          title="Prediction signals"
+          subtitle="Real signal rows appear when the prediction registry has produced verified signals."
+          primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
         />
 
       {loading ? (
-        <LoadingState description="Checking whether verified prediction rows are available." />
-      ) : error || !data || data.length === 0 ? (
+        <LoadingState description="Checking prediction registry for verified signals." />
+      ) : error || signals.length === 0 ? (
         <div className="flex flex-col gap-5">
           <EmptyState
-            title="Verified predictions are being prepared"
-            description="Prediction rows will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or sample rows are shown."
+            title="Verified prediction signals are being prepared"
+            description={
+              symbolsAnalyzed && symbolsAnalyzed > 0
+                ? `${symbolsAnalyzed} companies are registered. Signals will appear after verified prediction updates.`
+                : "Signal rows will appear here when source-backed predictions have produced verified outputs. No placeholder data or fabricated signals are shown."
+            }
           />
           <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
             <Button
@@ -101,50 +121,58 @@ export default function PublicPredictionsPage(): JSX.Element {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500">
-                <th className="p-4 font-semibold uppercase tracking-wider">Rank</th>
                 <th className="p-4 font-semibold uppercase tracking-wider">Symbol</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Score</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden md:table-cell">Confidence</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden lg:table-cell">Sector</th>
+                <th className="p-4 font-semibold uppercase tracking-wider">Signal</th>
+                <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Severity</th>
+                <th className="p-4 font-semibold uppercase tracking-wider hidden md:table-cell">Explanation</th>
+                <th className="p-4 font-semibold uppercase tracking-wider hidden lg:table-cell">Freshness</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {data.map((entry, i) => {
-                const rankingScore = entry.rankingScore ?? entry.ranking_score;
-                const confidenceScore = entry.confidenceScore ?? entry.confidence_score;
+              {signals.map((signal, i) => {
+                const severityClass = severityColors[signal.severity] || "bg-slate-50 border-slate-200 text-slate-700";
 
                 return (
                   <tr
-                    key={entry.symbol ?? i}
-                    onClick={() => entry.symbol && navigate(entry.symbol)}
+                    key={`${signal.symbol}:${i}`}
+                    onClick={() => signal.symbol && navigate(signal.symbol)}
                     className="cursor-pointer transition-colors hover:bg-slate-50"
                   >
-                    <td className="p-4 font-semibold text-slate-500">#{i + 1}</td>
                     <td className="p-4 font-mono font-bold text-slate-950 hover:text-emerald-800">
-                      {entry.symbol ?? "—"}
+                      {signal.symbol}
+                    </td>
+                    <td className="p-4">
+                      <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-slate-50 border-slate-200 text-slate-700">
+                        {signal.type || "Signal pending"}
+                      </span>
                     </td>
                     <td className="hidden p-4 sm:table-cell">
-                      {typeof rankingScore === "number" && Number.isFinite(rankingScore) ? (
-                        <ScorePill score={Math.round(rankingScore)} />
-                      ) : (
-                        <MissingDataBadge />
-                      )}
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
+                        {signal.severity || "Unknown"}
+                      </span>
                     </td>
-                    <td className="hidden p-4 md:table-cell">
-                      {typeof confidenceScore === "number" && Number.isFinite(confidenceScore) ? (
-                        <span className="text-slate-700">{Math.round(confidenceScore)}%</span>
-                      ) : (
-                        <MissingDataBadge />
-                      )}
+                    <td className="hidden max-w-xs truncate p-4 md:table-cell">
+                      <span className="text-slate-600">{signal.explanation || "No explanation"}</span>
                     </td>
                     <td className="hidden p-4 lg:table-cell">
-                      <span className="text-slate-500">{entry.sector || "Not available"}</span>
+                      {signal.snapshotDate || snapshotDate ? (
+                        <span className="text-[10px] text-emerald-700 font-semibold whitespace-nowrap">
+                          {formatFreshness(signal.snapshotDate || snapshotDate)}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Pending</span>
+                      )}
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+          {symbolsAnalyzed !== null && (
+            <div className="border-t border-slate-100 bg-slate-50/50 px-4 py-2 text-[10px] text-slate-500">
+              {symbolsAnalyzed} companies analyzed
+            </div>
+          )}
         </div>
       )}
       <div className="mt-6">
