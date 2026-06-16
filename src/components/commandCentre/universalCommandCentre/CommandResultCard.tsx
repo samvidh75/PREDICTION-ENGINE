@@ -39,8 +39,8 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-function formatPrice(v: number): string {
-  if (!Number.isFinite(v)) return "—";
+function formatPrice(v: number | null): string {
+  if (v === null || !Number.isFinite(v)) return "—";
   if (Math.abs(v) >= 1000) return v.toFixed(0);
   if (Math.abs(v) >= 100) return v.toFixed(2);
   return v.toFixed(2);
@@ -132,7 +132,7 @@ export default function CommandResultCard({
 
   const liveQuote = React.useMemo(() => {
     if (!priceSeries || priceSeries.length < 2) {
-      return { price: NaN, changePct: 0, rising: true };
+      return { price: null, changePct: 0, rising: true };
     }
     const last = priceSeries[priceSeries.length - 1];
     const prev = priceSeries[priceSeries.length - 2] ?? last;
