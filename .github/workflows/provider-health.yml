@@ -20,7 +20,6 @@ jobs:
   provider-health:
     runs-on: ubuntu-latest
     env:
-      FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
       INDIANAPI_KEY: ${{ secrets.INDIANAPI_KEY }}
       YFINANCE_ENABLED: ${{ inputs.include_yfinance }}
       YFINANCE_CACHE_PATH: tmp/yfinance-cache.json
@@ -48,8 +47,8 @@ jobs:
         run: >-
           npx tsx scripts/provider-healthcheck.ts
           --symbols=${{ inputs.symbols }}
-          --providers=finnhub,indianapi,yfinance
-          --require=finnhub,indianapi
+          --providers=indianapi,yfinance
+          --require=indianapi
           --strict
       - name: Upload redacted provider health report
         if: always()

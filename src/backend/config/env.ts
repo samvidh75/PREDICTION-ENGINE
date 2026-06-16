@@ -16,15 +16,15 @@ const DEV_ORIGINS = [
 export interface AppEnv {
   nodeEnv: "development" | "production" | "test";
   isProduction: boolean;
-  /** Permitted CORS origins (checked at every request). */
   allowedOrigins: string[];
-  /** Secret used to sign session cookies. */
   cookieSecret: string;
   postgres?: {
     connectionString: string;
   };
+  /** @deprecated Finnhub removed from active pipeline — kept for historical reference */
   finnhubKey?: string;
   indianApiKey?: string;
+  redisUrl?: string;
 }
 
 export function loadEnv(): AppEnv {
@@ -62,5 +62,6 @@ export function loadEnv(): AppEnv {
       : undefined,
     finnhubKey: process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY,
     indianApiKey: process.env.INDIANAPI_KEY,
+    redisUrl: process.env.REDIS_URL,
   };
 }

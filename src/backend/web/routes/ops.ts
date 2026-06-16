@@ -172,14 +172,15 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const factorSnapshots = await fetchTableStats("factor_snapshots", "snapshot_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
-    // Masked provider environment checks
     const providers = {
-      FINNHUB_KEY: env.finnhubKey ? "present" : "missing",
+      FINNHUB_KEY: env.finnhubKey ? "present (removed from active pipeline)" : "missing (deprecated)",
       INDIANAPI_KEY: env.indianApiKey ? "present" : "missing",
       UPSTOX_ACCESS_TOKEN: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing",
       UPSTOX_API_KEY: process.env.UPSTOX_API_KEY ? "present" : "missing",
       UPSTOX_CLIENT_SECRET: process.env.UPSTOX_CLIENT_SECRET ? "present" : "missing",
       REDIS_URL: process.env.REDIS_URL ? "present" : "missing",
+      UPSTOX_REDIRECT_URI: process.env.UPSTOX_REDIRECT_URI ? "present" : "missing",
+      UPSTOX_NOTIFIER_SECRET: process.env.UPSTOX_NOTIFIER_SECRET ? "present" : "missing",
     };
 
     return reply.send({

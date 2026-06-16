@@ -1,12 +1,3 @@
-// src/services/providers/ProviderCoordinator.ts
-//
-// F3.1B: Repair call amplification — fetch each provider bundle once per symbol,
-// extract all available fields, stop when required scoring fields are complete,
-// invoke fallback only for still-missing fields, preserve field-level lineage,
-// do not fabricate periodEnd.
-//
-// Orchestrates provider chains with failover, circuit breakers, and health monitoring.
-
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
 import { HistoricalProvider } from './HistoricalProvider';
@@ -14,7 +5,7 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { FinnhubProvider } from './FinnhubProvider';
+import { IndianMarketProvider } from './IndianMarketProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
 import { ScreenerProvider } from './ScreenerProvider';
@@ -25,7 +16,6 @@ import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 import { loadAuthorizedProviderConfig } from './authorization/ProviderAuthorization';
 
-/** Fields required for scoring — once these are all populated, stop fetching. */
 const REQUIRED_SCORING_FIELDS = new Set([
   'peRatio',
   'pbRatio',
@@ -48,24 +38,6 @@ const REQUIRED_SCORING_FIELDS = new Set([
   'fcfYield',
 ]);
 
-/**
- * ProviderCoordinator is the single entry point for market data.
- *
- * Financial providers are merged, extracting one bundle per provider per symbol:
- *   Tier 1: UpstoxFundamentalsProvider (primary Indian fundamentals)
- *   Tier 2: ScreenerProvider (secondary Indian fundamentals, authorized)
- *   Tier 3: MoneycontrolFinancialsProvider (tertiary Indian financials, authorized)
- *   Tier 4: FinnhubProvider (fills gaps)
- *   Tier 5: YahooProvider (price/volume only)
- *
- * Key contracts:
- *   - One bundle fetch per provider per symbol, NOT one call per field
- *   - Early stop when REQUIRED_SCORING_FIELDS are complete
- *   - Fallback called only for still-missing fields
- *   - No field-level parallelism (each provider fetched once in priority order)
- *   - No fabricated periodEnd (null when source does not provide it)
- *   - Sanitized provider errors preserved
- */
 export class ProviderCoordinator {
   private priceProviders: PriceProvider[] = [];
   private metadataProviders: MetadataProvider[] = [];
@@ -93,7 +65,6 @@ export class ProviderCoordinator {
     this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.financialProviders.push(upstoxFundamentals);
 
-    // Tier 2: ScreenerProvider — registered only when authorized config enables it
     const authorizedConfig = loadAuthorizedProviderConfig();
     if (authorizedConfig.screener.enabled) {
       const screener = new ScreenerProvider(authorizedConfig.screener);
@@ -101,28 +72,23 @@ export class ProviderCoordinator {
       this.financialProviders.push(screener);
     }
 
-    // Tier 3: MoneycontrolFinancialsProvider — registered only when authorized config enables it
     if (authorizedConfig.moneycontrol.enabled) {
       const moneycontrolFinancials = new MoneycontrolFinancialsProvider(authorizedConfig.moneycontrol);
       this.circuitBreakers.set(moneycontrolFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
       this.financialProviders.push(moneycontrolFinancials);
     }
 
+    const indian = new IndianMarketProvider();
+    this.circuitBreakers.set(indian, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.priceProviders.push(indian);
+    this.metadataProviders.push(indian);
+    this.historicalProviders.push(indian);
+
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
-
-    try {
-      const finnhub = new FinnhubProvider();
-      this.circuitBreakers.set(finnhub, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-      this.metadataProviders.push(finnhub);
-      this.financialProviders.push(finnhub);
-      this.newsProviders.push(finnhub);
-    } catch {
-      // Finnhub is optional when no API key is configured.
-    }
 
     const googleNews = new GoogleNewsRssProvider();
     this.circuitBreakers.set(googleNews, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
@@ -187,16 +153,6 @@ export class ProviderCoordinator {
     throw new Error(`All providers failed for ${category}(${symbol}): ${errors.join(' | ')}`);
   }
 
-  /**
-   * invokeFinancialsMerge — ONE bundle fetch per provider per symbol.
-   *
-   * 1. Fetch UpstoxFundamentalsProvider bundle first
-   * 2. Extract all available fields from the bundle
-   * 3. If REQUIRED_SCORING_FIELDS are incomplete, fetch FinnhubProvider bundle
-   * 4. Merge only fields still missing (no overwrites)
-   * 5. Never call more than one bundle fetch per provider per symbol
-   * 6. Do not fabricate periodEnd
-   */
   private async invokeFinancialsMerge(symbol: string): Promise<FinancialSnapshot> {
     const merged: Record<string, any> = {};
     const sourceMap: Record<string, string> = {};
@@ -206,7 +162,6 @@ export class ProviderCoordinator {
     for (const provider of this.financialProviders) {
       const providerName = (provider as any).constructor?.name ?? 'unknown';
 
-      // Skip already-called providers
       if (calledProviders.has(providerName)) continue;
       calledProviders.add(providerName);
 
@@ -216,7 +171,6 @@ export class ProviderCoordinator {
         continue;
       }
 
-      // Early stop: if all REQUIRED_SCORING_FIELDS are populated, skip remaining providers
       if (this.scoringFieldsComplete(merged)) {
         break;
       }
@@ -242,7 +196,6 @@ export class ProviderCoordinator {
 
     return {
       symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
-      // Do not fabricate periodEnd — null when source does not provide it
       periodEnd: merged.periodEnd ?? undefined,
       ...merged,
       _sources: sourceMap,
@@ -250,7 +203,6 @@ export class ProviderCoordinator {
     } as FinancialSnapshot;
   }
 
-  /** Returns true when all REQUIRED_SCORING_FIELDS are populated and non-null. */
   private scoringFieldsComplete(merged: Record<string, any>): boolean {
     for (const field of REQUIRED_SCORING_FIELDS) {
       if (merged[field] === undefined || merged[field] === null) {
@@ -260,11 +212,6 @@ export class ProviderCoordinator {
     return true;
   }
 
-  /**
-   * Merge fields from a single provider bundle fetch.
-   * Accepts ALL fields from the provider — no hard-coded allowlist.
-   * Only fills fields that are still missing (no overwrites).
-   */
   private mergeFinancialFields(
     target: Record<string, any>,
     source: Record<string, any>,
