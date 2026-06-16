@@ -152,7 +152,7 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /research indian stocks/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /calmer workspace for indian equity research/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -440,7 +440,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /research indian stocks/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /calmer workspace for indian equity research/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

@@ -11,13 +11,13 @@ interface PageHeaderProps {
 export function PageHeader({ title, subtitle, actions, primaryAction }: PageHeaderProps) {
   const actionContent = actions ?? primaryAction;
   return (
-    <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 md:flex-row md:items-start md:justify-between">
+    <div className="flex flex-col gap-4 border-b border-slate-200/80 pb-5 md:flex-row md:items-start md:justify-between">
       <div className="min-w-0">
         <h1 className={tokens.typography.pageTitle}>{title}</h1>
         {subtitle && <p className={tokens.typography.pageSubtitle}>{subtitle}</p>}
       </div>
       {actionContent && (
-        <div className="flex shrink-0 items-center gap-2 pt-0.5">{actionContent}</div>
+        <div className="grid w-full grid-cols-2 gap-2 pt-0.5 sm:flex sm:w-auto sm:shrink-0 sm:items-center">{actionContent}</div>
       )}
     </div>
   );
@@ -55,7 +55,7 @@ export function MetricCard({ label, value, detail, trend }: MetricCardProps) {
     neutral: "text-slate-500",
   };
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
       <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">{label}</div>
       <div className={`text-lg font-semibold leading-tight ${trend ? trendColors[trend] : "text-slate-950"}`}>
         {value}
@@ -67,20 +67,19 @@ export function MetricCard({ label, value, detail, trend }: MetricCardProps) {
 
 export function ResearchDisclaimer({ context: _context = "research" }: { context?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-xs leading-relaxed text-slate-600">
-      <p className="font-semibold uppercase tracking-wider text-slate-700 text-[10px] mb-1.5">
+    <div className="rounded-lg border border-slate-200/80 bg-white px-4 py-3.5 text-xs leading-5 text-slate-600">
+      <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-slate-700">
         Research only — not investment advice
       </p>
-      StockStory India provides analytical signals and research data for educational purposes only.
-      Nothing on this platform constitutes investment advice or a recommendation to buy or sell securities.
-      All investment decisions carry risk. Conduct your own due diligence before investing.
+      Analytical research signals only. Nothing here is a recommendation to buy or sell securities.
+      Markets carry risk; review independent sources before investing.
     </div>
   );
 }
 
 export function MissingDataBadge() {
   return (
-    <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-500 uppercase tracking-wider select-none">
+    <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-medium text-slate-500 select-none">
       Not available
     </span>
   );

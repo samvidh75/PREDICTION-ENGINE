@@ -387,10 +387,10 @@ export const StockStoryPage: React.FC = () => {
           </button>
         </div>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-lg border border-slate-200/80 bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:p-6">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0 font-sans">
-              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-slate-500">
                 <span>{ticker}</span>
                 <span>•</span>
                 <span>{exchange !== "Data unavailable" ? exchange : "NSE / BSE"}</span>
@@ -398,12 +398,12 @@ export const StockStoryPage: React.FC = () => {
                 <span>{currency}</span>
               </div>
               <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-800">
+              <div className="mt-3 inline-flex rounded-full border border-sky-100 bg-sky-50 px-2.5 py-1 text-[10px] font-medium text-sky-800">
                 Company not indexed yet
               </div>
             </div>
 
-            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-slate-200 bg-slate-50 p-3.5">
+            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-slate-200/80 bg-slate-50/80 p-3.5">
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live Quote</div>
                 <div className="mt-1 font-mono text-lg font-bold text-slate-900">{priceLabel}</div>
@@ -421,14 +421,14 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50/50 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Why are prediction scores missing?</h3>
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">
-              This company exists in the Indian equity universe, and fresh metadata or live pricing is active. However, the background analytical scoring models have not completed their ingestion backfill for this symbol yet. Real scores will appear automatically after the next scheduled nightly run.
+          <div className="mt-6 rounded-lg border border-slate-200/80 bg-slate-50/70 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Why scores are unavailable</h3>
+            <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-600">
+              This company is in the equity universe, but verified analytical factors are not ready for this symbol. Live quote fields may still appear when provider data is available.
             </p>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
             <button
               onClick={handleToggleWatchlist}
               className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${

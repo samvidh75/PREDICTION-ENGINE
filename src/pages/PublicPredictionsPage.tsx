@@ -49,7 +49,7 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <TopNav />
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
@@ -60,14 +60,14 @@ export default function PublicPredictionsPage(): JSX.Element {
         />
 
       {loading ? (
-        <LoadingState description="Checking whether production prediction rows are available." />
+        <LoadingState description="Checking whether verified prediction rows are available." />
       ) : error || !data || data.length === 0 ? (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
           <EmptyState
             title="Verified predictions are being prepared"
             description="Prediction rows will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or sample rows are shown."
           />
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
             <Button
               type="button"
               onClick={() => setPage("signup")}
@@ -86,10 +86,10 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-slate-500">
+              <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500">
                 <th className="p-4 font-semibold uppercase tracking-wider">Rank</th>
                 <th className="p-4 font-semibold uppercase tracking-wider">Symbol</th>
                 <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Score</th>

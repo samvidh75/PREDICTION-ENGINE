@@ -75,7 +75,7 @@ export const PublicRankingsPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
       <TopNav />
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
@@ -85,7 +85,7 @@ export const PublicRankingsPage: React.FC = () => {
           primaryAction={<MissingDataBadge />}
         />
 
-      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:flex-row">
+      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:flex-row">
         <div className="w-full sm:w-72">
           <Input
             aria-label="Search rankings by symbol or sector"
@@ -95,13 +95,13 @@ export const PublicRankingsPage: React.FC = () => {
           />
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold whitespace-nowrap">
+          <span className="whitespace-nowrap text-xs font-medium text-slate-500">
             Sector:
           </span>
           <select
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}
-            className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none sm:w-48"
+            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15 sm:w-48"
           >
             {sectors.map((sec) => (
               <option key={sec} value={sec}>
@@ -115,12 +115,12 @@ export const PublicRankingsPage: React.FC = () => {
       {loading ? (
         <div className="py-12 text-center text-sm text-slate-500">Loading rankings...</div>
       ) : filteredRankings.length === 0 ? (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5">
           <EmptyState
             title="Verified rankings are being prepared"
             description="Rankings will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or fabricated scores are shown."
           />
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
             <Button
               type="button"
               onClick={() => setPage("signup")}
