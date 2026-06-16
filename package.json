@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:frontend",
-    "redis:health": "node -r ts-node/register src/bin/redisHealth.ts",
+    "redis:health": "npx tsx scripts/redis-health.ts",
     "build:frontend": "npm run typecheck:frontend && vite build",
     "build:vercel": "npm run typecheck:vercel && vite build",
     "build:backend": "npm run typecheck:backend && npm run compile:backend",
