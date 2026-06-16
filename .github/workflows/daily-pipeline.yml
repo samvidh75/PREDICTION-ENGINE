@@ -2,7 +2,7 @@ name: SSI Daily Pipeline
 
 on:
   schedule:
-    # Runs every day at 05:00 IST (23:30 UTC) — 6 phases over 1.75 hours
+    # Runs every day at 05:00 IST (23:30 UTC) - 6 phases over 1.75 hours
     - cron: '30 23 * * *'
   workflow_dispatch:
     inputs:
@@ -43,8 +43,8 @@ jobs:
       - name: Copy production env
         run: cp .env.production.example .env.production
 
-      # ═══ Phase 1: Data Refresh (05:00 IST) ═══
-      - name: Phase 1 — Data Refresh
+      # === Phase 1: Data Refresh (05:00 IST) ===
+      - name: Phase 1 - Data Refresh
         id: phase1
         continue-on-error: true
         run: |
@@ -59,8 +59,8 @@ jobs:
           echo "WARNING: Data refresh phase failed"
           # Alerting handled by PipelineAlertService in next phase
 
-      # ═══ Phase 2: Factor Refresh (05:30 IST) ═══
-      - name: Phase 2 — Factor Refresh
+      # === Phase 2: Factor Refresh (05:30 IST) ===
+      - name: Phase 2 - Factor Refresh
         id: phase2
         continue-on-error: true
         run: |
@@ -73,8 +73,8 @@ jobs:
         if: steps.phase2.outcome == 'failure'
         run: echo "WARNING: Factor refresh phase failed"
 
-      # ═══ Phase 3: Prediction Generation (06:00 IST) ═══
-      - name: Phase 3 — Prediction Generation
+      # === Phase 3: Prediction Generation (06:00 IST) ===
+      - name: Phase 3 - Prediction Generation
         id: phase3
         run: |
           echo "=== Phase 3: Prediction Generation ==="
@@ -86,8 +86,8 @@ jobs:
         if: steps.phase3.outcome == 'failure'
         run: echo "CRITICAL: Prediction generation failed"
 
-      # ═══ Phase 4: Outcome Validation (06:15 IST) ═══
-      - name: Phase 4 — Outcome Validation
+      # === Phase 4: Outcome Validation (06:15 IST) ===
+      - name: Phase 4 - Outcome Validation
         id: phase4
         run: |
           echo "=== Phase 4: Outcome Validation ==="
@@ -99,8 +99,8 @@ jobs:
         if: steps.phase4.outcome == 'failure'
         run: echo "CRITICAL: Outcome validation failed"
 
-      # ═══ Phase 5: Trust Metrics (06:30 IST) ═══
-      - name: Phase 5 — Trust Metrics Refresh
+      # === Phase 5: Trust Metrics (06:30 IST) ===
+      - name: Phase 5 - Trust Metrics Refresh
         id: phase5
         run: |
           echo "=== Phase 5: Trust Metrics ==="
@@ -108,8 +108,8 @@ jobs:
           echo "Trust metrics updated"
         timeout-minutes: 10
 
-      # ═══ Phase 6: Daily Feed (06:45 IST) ═══
-      - name: Phase 6 — Daily Feed Generation
+      # === Phase 6: Daily Feed (06:45 IST) ===
+      - name: Phase 6 - Daily Feed Generation
         id: phase6
         run: |
           echo "=== Phase 6: Daily Feed ==="
@@ -117,8 +117,8 @@ jobs:
           echo "Daily feed generated"
         timeout-minutes: 10
 
-      # ═══ Phase 7: Performance Assessment (06:50 IST) ═══
-      - name: Phase 7 — Performance Assessment
+      # === Phase 7: Performance Assessment (06:50 IST) ===
+      - name: Phase 7 - Performance Assessment
         id: phase7
         run: |
           echo "=== Phase 7: Performance Assessment ==="
@@ -127,7 +127,7 @@ jobs:
           echo "Performance reports generated"
         timeout-minutes: 10
 
-      # ═══ Commit performance reports ═══
+      # === Commit performance reports ===
       - name: Commit performance reports
         if: steps.phase7.outcome == 'success'
         run: |
@@ -137,7 +137,7 @@ jobs:
           git diff --staged --quiet || (git commit -m "Daily performance certification $(date +%Y-%m-%d)" && git push)
         continue-on-error: true
 
-      # ═══ Health Check & Alerting ═══
+      # === Health Check & Alerting ===
       - name: Pipeline Health Check
         if: always()
         run: |
@@ -150,7 +150,7 @@ jobs:
           echo "Phase 6 (Daily Feed):       ${{ steps.phase6.outcome }}"
           npx tsx src/scheduler/run-pipeline-health.ts || echo "Health check script not yet deployed"
 
-      # ═══ Commit updated metrics ═══  
+      # === Commit updated metrics ===  
       - name: Commit trust metrics update
         if: steps.phase5.outcome == 'success'
         run: |
