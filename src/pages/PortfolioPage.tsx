@@ -161,8 +161,8 @@ export const PortfolioPage: React.FC = () => {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard label="Recorded cost basis" value={review.totalCostBasis > 0 ? formatINR(review.totalCostBasis) : 'Data unavailable'} />
-          <SummaryCard label="Live portfolio value" value={review.livePortfolioValue === null ? 'Data unavailable' : formatINR(review.livePortfolioValue)} />
+          <SummaryCard label="Recorded cost basis" value={review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Data unavailable'} />
+          <SummaryCard label="Live portfolio value" value={review.livePortfolioValue === null ? 'Data unavailable' : uiFormatINR(review.livePortfolioValue)} />
           <SummaryCard label="Quote coverage" value={`${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions}`} detail={`${review.quoteCoverage.coveragePct.toFixed(0)}% of holdings`} />
           <SummaryCard label="Largest position" value={largest ? largest.symbol : 'Data unavailable'} detail={largest ? `${largest.weightPct.toFixed(2)}% of cost basis` : undefined} />
         </div>
@@ -229,8 +229,8 @@ export const PortfolioPage: React.FC = () => {
               <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
               <span className="truncate text-[11px] text-slate-500">{holding.sector}</span>
               <span className="font-mono text-xs text-slate-700">{holding.shares}</span>
-              <span className="font-mono text-xs text-slate-700">{formatINR(holding.costBasis)}</span>
-              <span className="font-mono text-xs text-slate-700">{holding.liveValue === null ? 'Unavailable' : formatINR(holding.liveValue)}</span>
+              <span className="font-mono text-xs text-slate-700">{uiFormatINR(holding.costBasis)}</span>
+              <span className="font-mono text-xs text-slate-700">{holding.liveValue === null ? 'Unavailable' : uiFormatINR(holding.liveValue)}</span>
               <span className={`font-mono text-xs ${holding.gainLossPct === null ? 'text-slate-500' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
                 {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
               </span>
@@ -291,6 +291,8 @@ export const PortfolioPage: React.FC = () => {
     </div>
   );
 };
+
+import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 
 function SummaryCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
