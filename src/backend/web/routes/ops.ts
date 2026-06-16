@@ -265,7 +265,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         }
         results.push({ symbol, ok, price, error: ok ? null : "Yahoo returned no price data" });
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
+        const msg = err instanceof Error ? `${err.name}: ${err.message}${err.cause ? " cause=" + String(err.cause) : ""}` : String(err);
         results.push({ symbol, ok: false, price: null, error: msg });
       }
     }
