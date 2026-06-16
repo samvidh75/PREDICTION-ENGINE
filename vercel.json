@@ -6,15 +6,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://stockstory-api.onrender.com/api/:path*"
+      "destination": "https://prediction-engine-production-f7a8.up.railway.app/api/:path*"
     },
     {
       "source": "/healthz",
-      "destination": "https://stockstory-api.onrender.com/healthz"
+      "destination": "https://prediction-engine-production-f7a8.up.railway.app/healthz"
     },
     {
       "source": "/readyz",
-      "destination": "https://stockstory-api.onrender.com/readyz"
+      "destination": "https://prediction-engine-production-f7a8.up.railway.app/readyz"
     },
     {
       "source": "/((?!api|healthz|readyz).*)",
