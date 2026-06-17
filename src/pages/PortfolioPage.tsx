@@ -10,14 +10,14 @@ import { PageHeader } from '../components/ui/PageHeader';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/DataState';
 import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
-import tokens from '../components/ui/tokens';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { useToast } from '../components/feedback/useToast';
+import GlassModal from '../components/aura/GlassModal';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
-  if (status === 'real') return 'text-emerald-700';
+  if (status === 'real') return 'text-accent-success';
   if (status === 'partial') return 'text-amber-700';
-  return 'text-slate-500';
+  return 'text-ink-muted';
 }
 
 function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string {
@@ -45,10 +45,7 @@ export const PortfolioPage: React.FC = () => {
   const toast = useToast();
 
   const refreshSnapshot = useCallback(() => setSnapshot(PortfolioSnapshotFactory.createSnapshot()), []);
-  useEffect(() => {
-    window.addEventListener('portfoliochange', refreshSnapshot);
-    return () => window.removeEventListener('portfoliochange', refreshSnapshot);
-  }, [refreshSnapshot]);
+  useEffect(() => { window.addEventListener('portfoliochange', refreshSnapshot); return () => window.removeEventListener('portfoliochange', refreshSnapshot); }, [refreshSnapshot]);
 
   const currentPrices = useMemo(() => {
     const prices: Record<string, number> = {};
@@ -61,85 +58,40 @@ export const PortfolioPage: React.FC = () => {
 
   const review = useMemo(() => buildPortfolioReview(snapshot.holdings, currentPrices), [currentPrices, snapshot.holdings]);
 
-  const resetHoldingForm = () => {
-    setSymbol('');
-    setShares('');
-    setPrice('');
-    setSector('');
-    setFormError('');
-  };
+  const resetHoldingForm = () => { setSymbol(''); setShares(''); setPrice(''); setSector(''); setFormError(''); };
 
   const handleAddHolding = (event: React.FormEvent) => {
-    event.preventDefault();
-    setFormError('');
-    const added = PortfolioEngine.addHolding({
-      symbol: symbol.toUpperCase().trim(),
-      shares: Number(shares),
-      avgBuyPrice: Number(price),
-      sector,
-    });
-    if (!added) {
-      setFormError('Ticker, shares and average buy price must be valid positive values.');
-      return;
-    }
-    resetHoldingForm();
-    setIsAddOpen(false);
+    event.preventDefault(); setFormError('');
+    const added = PortfolioEngine.addHolding({ symbol: symbol.toUpperCase().trim(), shares: Number(shares), avgBuyPrice: Number(price), sector });
+    if (!added) { setFormError('Ticker, shares and average buy price must be valid positive values.'); return; }
+    resetHoldingForm(); setIsAddOpen(false);
   };
 
   const handleEditHolding = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!editingHolding) return;
-    setFormError('');
+    event.preventDefault(); if (!editingHolding) return; setFormError('');
     const updated = PortfolioEngine.updateHolding(editingHolding.symbol, Number(shares), Number(price));
-    if (!updated) {
-      setFormError('Shares and average buy price must be valid positive values.');
-      return;
-    }
-    setEditingHolding(null);
-    setShares('');
-    setPrice('');
+    if (!updated) { setFormError('Shares and average buy price must be valid positive values.'); return; }
+    setEditingHolding(null); setShares(''); setPrice('');
   };
 
   const handleCSVImport = (event: React.FormEvent) => {
-    event.preventDefault();
-    setImportError('');
-    const lines = csvText.split('\n');
-    const parsed: UserHolding[] = [];
+    event.preventDefault(); setImportError(''); const lines = csvText.split('\n'); const parsed: UserHolding[] = [];
     for (let index = 0; index < lines.length; index++) {
-      const raw = lines[index].trim();
-      if (!raw) continue;
-      const parts = raw.split(',');
-      if (parts.length < 3) {
-        setImportError(`Row ${index + 1}: expected TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]`);
-        return;
-      }
-      const normalized = normalizeUserHolding({
-        symbol: parts[0].trim().toUpperCase(),
-        shares: Number(parts[1].trim()),
-        avgBuyPrice: Number(parts[2].trim()),
-        sector: parts[3]?.trim() || SECTOR_UNAVAILABLE,
-      });
-      if (!normalized) {
-        setImportError(`Row ${index + 1}: ticker, shares and average buy price must be valid positive values`);
-        return;
-      }
+      const raw = lines[index].trim(); if (!raw) continue; const parts = raw.split(',');
+      if (parts.length < 3) { setImportError(`Row ${index + 1}: expected TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]`); return; }
+      const normalized = normalizeUserHolding({ symbol: parts[0].trim().toUpperCase(), shares: Number(parts[1].trim()), avgBuyPrice: Number(parts[2].trim()), sector: parts[3]?.trim() || SECTOR_UNAVAILABLE });
+      if (!normalized) { setImportError(`Row ${index + 1}: ticker, shares and average buy price must be valid positive values`); return; }
       parsed.push(normalized);
     }
-    if (parsed.length === 0) {
-      setImportError('No valid rows found.');
-      return;
-    }
-    parsed.forEach((holding) => PortfolioEngine.addHolding(holding));
-    setIsImportOpen(false);
-    setCsvText('');
+    if (parsed.length === 0) { setImportError('No valid rows found.'); return; }
+    parsed.forEach((holding) => PortfolioEngine.addHolding(holding)); setIsImportOpen(false); setCsvText('');
   };
 
   const handleOpenStock = (ticker: string) => navigateToStock({ ticker, mode: "push" });
-
   const largest = review.concentration.largestPosition;
 
   return (
-    <div className={`${tokens.layout.container} flex flex-col space-y-8`}>
+    <div className="flex flex-col space-y-8 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
       <PageHeader
         title="Portfolio"
         subtitle={`Recorded holdings, cost basis, and verified quote availability.${isLocalOnly ? ' (saved locally)' : ''}`}
@@ -151,11 +103,11 @@ export const PortfolioPage: React.FC = () => {
         }
       />
 
-      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-xl glass-panel p-5">
+      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Portfolio operating summary</h2>
-            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed text-slate-500">
+            <h2 className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "#0f1419" }}>Portfolio operating summary</h2>
+            <p className="mt-1 max-w-3xl text-[10px] leading-relaxed" style={{ color: "#536471" }}>
               Concentration uses recorded cost basis. Live values appear only when every holding has a source-backed quote.
             </p>
           </div>
@@ -163,14 +115,22 @@ export const PortfolioPage: React.FC = () => {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <SummaryCard label="Recorded cost basis" value={review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Data unavailable'} />
-          <SummaryCard label="Live portfolio value" value={review.livePortfolioValue === null ? 'Data unavailable' : uiFormatINR(review.livePortfolioValue)} />
-          <SummaryCard label="Quote coverage" value={`${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions}`} detail={`${review.quoteCoverage.coveragePct.toFixed(0)}% of holdings`} />
-          <SummaryCard label="Largest position" value={largest ? largest.symbol : 'Data unavailable'} detail={largest ? `${largest.weightPct.toFixed(2)}% of cost basis` : undefined} />
+          {[
+            { label: "Recorded cost basis", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Data unavailable' },
+            { label: "Live portfolio value", value: review.livePortfolioValue === null ? 'Data unavailable' : uiFormatINR(review.livePortfolioValue) },
+            { label: "Quote coverage", value: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions}`, detail: `${review.quoteCoverage.coveragePct.toFixed(0)}% of holdings` },
+            { label: "Largest position", value: largest ? largest.symbol : 'Data unavailable', detail: largest ? `${largest.weightPct.toFixed(2)}% of cost basis` : undefined },
+          ].map((item) => (
+            <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+              <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>{item.label}</div>
+              <div className="mt-1 text-sm font-semibold tabular-nums" style={{ color: "#0f1419" }}>{item.value}</div>
+              {item.detail && <div className="mt-1 text-[10px]" style={{ color: "#536471" }}>{item.detail}</div>}
+            </div>
+          ))}
         </div>
 
         {review.quoteCoverage.missingSymbols.length > 0 && (
-          <div className="flex items-start gap-2 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 px-3 py-3 text-[11px] text-amber-800">
+          <div className="flex items-start gap-2 rounded-xl px-3 py-3 text-[11px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             Missing live quotes: {review.quoteCoverage.missingSymbols.join(', ')}. Market value and portfolio return are intentionally withheld.
           </div>
@@ -179,18 +139,10 @@ export const PortfolioPage: React.FC = () => {
 
       {review.reviewQueue.length > 0 && (
         <section aria-label="Portfolio review queue" className="space-y-3">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="h-4 w-4 text-amber-300" />
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Review queue</h2>
-          </div>
+          <div className="flex items-center gap-2"><ShieldAlert className="h-4 w-4" style={{ color: "#b8860b" }} /><h2 className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "#0f1419" }}>Review queue</h2></div>
           <div className="grid gap-3 md:grid-cols-2">
             {review.reviewQueue.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => item.symbol && handleOpenStock(item.symbol)}
-                className={`rounded-lg border p-3 text-left transition-colors hover:bg-white ${reviewSeverityClass(item.severity)}`}
-              >
+              <button key={item.id} type="button" onClick={() => item.symbol && handleOpenStock(item.symbol)} className={`rounded-lg border p-3 text-left transition-colors hover:bg-white ${reviewSeverityClass(item.severity)}`}>
                 <div className="text-[11px] font-semibold">{item.title}</div>
                 <div className="mt-1 text-[10px] leading-relaxed opacity-75">{item.detail}</div>
               </button>
@@ -200,16 +152,16 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.concentration.sectorExposure.length > 0 && (
-        <section aria-label="Cost basis sector exposure" className="rounded-xl glass-panel p-5">
-          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Sector exposure - recorded cost basis</h2>
+        <section aria-label="Cost basis sector exposure" className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "#0f1419" }}>Sector exposure - recorded cost basis</h2>
           <div className="mt-3 space-y-2">
             {review.concentration.sectorExposure.map((item) => (
               <div key={item.sector} className="flex items-center gap-3 text-[11px]">
-                <span className="w-40 truncate text-slate-600">{item.sector}</span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full rounded-full bg-emerald-700" style={{ width: `${Math.min(100, item.weightPct)}%` }} />
+                <span className="w-40 truncate" style={{ color: "#536471" }}>{item.sector}</span>
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: "#f0f1f5" }}>
+                  <div className="h-full rounded-full" style={{ background: "#1a6e4a", width: `${Math.min(100, item.weightPct)}%` }} />
                 </div>
-                <span className="w-16 text-right font-mono text-slate-700">{item.weightPct.toFixed(2)}%</span>
+                <span className="w-16 text-right font-mono tabular-nums" style={{ color: "#0f1419" }}>{item.weightPct.toFixed(2)}%</span>
               </div>
             ))}
           </div>
@@ -217,54 +169,49 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.holdings.length === 0 ? (
-        <EmptyState
-          title="No holdings added yet"
-          description="Add holdings to track cost basis and exposure. Live values appear only when every holding has verified market pricing."
-        />
+        <EmptyState title="No holdings added yet" description="Add holdings to track cost basis and exposure. Live values appear only when every holding has verified market pricing." />
       ) : (
         <section aria-label="Portfolio holdings">
-          {/* Desktop table — hidden on small screens */}
-          <div className="hidden sm:block overflow-hidden rounded-xl glass-panel">
-            <div className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+          <div className="hidden sm:block overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+            <div className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] gap-2 p-3 text-[9px] font-bold uppercase tracking-wider" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
               <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Cost basis</span><span>Live value</span><span>Return</span><span className="text-right pr-3"></span>
             </div>
             {review.holdings.map((holding) => (
-              <div key={holding.symbol} className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
-                <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
-                <span className="truncate text-[11px] text-slate-500">{holding.sector}</span>
-                <span className="font-mono text-xs text-slate-700">{holding.shares}</span>
-                <span className="font-mono text-xs text-slate-700">{uiFormatINR(holding.costBasis)}</span>
-                <span className="font-mono text-xs text-slate-700">{holding.liveValue === null ? 'Unavailable' : uiFormatINR(holding.liveValue)}</span>
-                <span className={`font-mono text-xs ${holding.gainLossPct === null ? 'text-slate-500' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+              <div key={holding.symbol} className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] items-center gap-2 p-3 last:border-0 hover:bg-white/30 transition-colors" style={{ borderBottom: "1px solid rgba(255,255,255,0.2)" }}>
+                <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{holding.symbol}</button>
+                <span className="truncate text-[11px]" style={{ color: "#536471" }}>{holding.sector}</span>
+                <span className="font-mono text-xs tabular-nums" style={{ color: "#0f1419" }}>{holding.shares}</span>
+                <span className="font-mono text-xs tabular-nums" style={{ color: "#0f1419" }}>{uiFormatINR(holding.costBasis)}</span>
+                <span className="font-mono text-xs tabular-nums" style={{ color: "#0f1419" }}>{holding.liveValue === null ? <span style={{ color: "#8b98a5" }}>Unavailable</span> : uiFormatINR(holding.liveValue)}</span>
+                <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-ink-muted' : holding.gainLossPct >= 0 ? 'text-accent-success' : 'text-rose-700'}`}>
                   {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                 </span>
                 <div className="flex items-center justify-end gap-1">
-                  <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-slate-800"><Edit2 className="h-3 w-3" /></button>
-                  <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-rose-700"><Trash2 className="h-3 w-3" /></button>
+                  <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 hover:opacity-80" style={{ color: "#8b98a5" }}><Edit2 className="h-3 w-3" /></button>
+                  <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 hover:text-rose-700" style={{ color: "#8b98a5" }}><Trash2 className="h-3 w-3" /></button>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Mobile cards — shown only on small screens */}
           <div className="sm:hidden space-y-3">
             {review.holdings.map((holding) => (
-              <div key={holding.symbol} className="rounded-xl glass-panel p-4">
+              <div key={holding.symbol} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
                 <div className="flex items-center justify-between mb-3">
-                  <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono font-bold text-sm text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
+                  <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono font-bold text-sm hover:underline" style={{ color: "#0f1419" }}>{holding.symbol}</button>
                   <div className="flex items-center gap-2">
-                    <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-slate-800"><Edit2 className="h-3.5 w-3.5" /></button>
-                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 hover:opacity-80" style={{ color: "#8b98a5" }}><Edit2 className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 hover:text-rose-700" style={{ color: "#8b98a5" }}><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
-                  <div><span className="text-slate-500">Sector</span><p className="font-medium text-slate-800 truncate">{holding.sector}</p></div>
-                  <div><span className="text-slate-500">Shares</span><p className="font-mono font-medium text-slate-800">{holding.shares}</p></div>
-                  <div><span className="text-slate-500">Cost basis</span><p className="font-mono font-medium text-slate-800">{uiFormatINR(holding.costBasis)}</p></div>
-                  <div><span className="text-slate-500">Live value</span><p className="font-mono font-medium text-slate-800">{holding.liveValue === null ? <span className="text-slate-400">Unavailable</span> : uiFormatINR(holding.liveValue)}</p></div>
+                  <div><span style={{ color: "#536471" }}>Sector</span><p className="font-medium truncate" style={{ color: "#0f1419" }}>{holding.sector}</p></div>
+                  <div><span style={{ color: "#536471" }}>Shares</span><p className="font-mono font-medium tabular-nums" style={{ color: "#0f1419" }}>{holding.shares}</p></div>
+                  <div><span style={{ color: "#536471" }}>Cost basis</span><p className="font-mono font-medium tabular-nums" style={{ color: "#0f1419" }}>{uiFormatINR(holding.costBasis)}</p></div>
+                  <div><span style={{ color: "#536471" }}>Live value</span><p className="font-mono font-medium tabular-nums" style={{ color: "#0f1419" }}>{holding.liveValue === null ? <span style={{ color: "#8b98a5" }}>Unavailable</span> : uiFormatINR(holding.liveValue)}</p></div>
                   <div className="col-span-2">
-                    <span className="text-slate-500">Return</span>
-                    <p className={`font-mono font-medium ${holding.gainLossPct === null ? 'text-slate-400' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    <span style={{ color: "#536471" }}>Return</span>
+                    <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-ink-muted' : holding.gainLossPct >= 0 ? 'text-accent-success' : 'text-rose-700'}`}>
                       {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                     </p>
                   </div>
@@ -275,51 +222,36 @@ export const PortfolioPage: React.FC = () => {
         </section>
       )}
 
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
-          <div className="w-full max-w-sm space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Add holding</h3><button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
-            <form onSubmit={handleAddHolding} className="space-y-3">
-              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" />
-              <div className="grid grid-cols-2 gap-3">
-                <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
-                <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
-              </div>
-              <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 text-xs text-slate-900" />
-              {formError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{formError}</div>}
-              <Button type="submit" className="w-full text-xs">Add asset</Button>
-            </form>
+      <GlassModal open={isAddOpen} onClose={() => { setIsAddOpen(false); resetHoldingForm(); }} title="Add holding" maxWidth="max-w-sm">
+        <form onSubmit={handleAddHolding} className="space-y-3">
+          <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+          <div className="grid grid-cols-2 gap-3">
+            <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+            <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
           </div>
-        </div>
-      )}
+          <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-xl px-3 py-2.5 text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+          {formError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{formError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Add asset</button>
+        </form>
+      </GlassModal>
 
-      {editingHolding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
-          <div className="w-full max-w-sm space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Edit {editingHolding.symbol}</h3><button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
-            <form onSubmit={handleEditHolding} className="space-y-3">
-              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" placeholder="Shares" />
-              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" placeholder="Avg Buy Price" />
-              {formError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{formError}</div>}
-              <Button type="submit" className="w-full text-xs">Save</Button>
-            </form>
-          </div>
-        </div>
-      )}
+      <GlassModal open={editingHolding !== null} onClose={() => { setEditingHolding(null); setFormError(''); }} title={`Edit ${editingHolding?.symbol || ''}`} maxWidth="max-w-sm">
+        <form onSubmit={handleEditHolding} className="space-y-3">
+          <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} placeholder="Shares" />
+          <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} placeholder="Avg Buy Price" />
+          {formError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{formError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Save</button>
+        </form>
+      </GlassModal>
 
-      {isImportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
-          <div className="w-full max-w-md space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Import CSV</h3><button type="button" onClick={() => setIsImportOpen(false)} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
-            <form onSubmit={handleCSVImport} className="space-y-3">
-              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" />
-              <p className="text-[10px] leading-relaxed text-slate-500">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
-              {importError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{importError}</div>}
-              <Button type="submit" className="w-full text-xs">Parse and import</Button>
-            </form>
-          </div>
-        </div>
-      )}
+      <GlassModal open={isImportOpen} onClose={() => setIsImportOpen(false)} title="Import CSV" maxWidth="max-w-md">
+        <form onSubmit={handleCSVImport} className="space-y-3">
+          <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+          <p className="text-[10px] leading-relaxed" style={{ color: "#536471" }}>Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
+          {importError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{importError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Parse and import</button>
+        </form>
+      </GlassModal>
 
       <ConfirmDialog
         open={deleteConfirmSymbol !== null}
@@ -328,27 +260,11 @@ export const PortfolioPage: React.FC = () => {
         confirmLabel="Remove"
         cancelLabel="Cancel"
         destructive={true}
-        onConfirm={() => {
-          if (deleteConfirmSymbol) {
-            PortfolioEngine.removeHolding(deleteConfirmSymbol);
-            toast.success(`${deleteConfirmSymbol} removed from portfolio`);
-            setDeleteConfirmSymbol(null);
-          }
-        }}
+        onConfirm={() => { if (deleteConfirmSymbol) { PortfolioEngine.removeHolding(deleteConfirmSymbol); toast.success(`${deleteConfirmSymbol} removed from portfolio`); setDeleteConfirmSymbol(null); } }}
         onCancel={() => setDeleteConfirmSymbol(null)}
       />
     </div>
   );
 };
-
-function SummaryCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
-  return (
-    <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">{label}</div>
-      <div className="mt-1 text-sm font-semibold text-slate-950">{value}</div>
-      {detail && <div className="mt-1 text-[10px] text-slate-500">{detail}</div>}
-    </div>
-  );
-}
 
 export default PortfolioPage;

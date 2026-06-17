@@ -26,18 +26,29 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main className="flex min-h-screen flex-col justify-between font-sans text-slate-900 antialiased">
+    <main
+      className="flex min-h-screen flex-col justify-between antialiased"
+      style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}
+    >
       <TopNav />
       <MobileNav />
 
       <section className="z-10 flex flex-1 flex-col items-center justify-center px-5 py-12 md:py-24">
-        <div className="w-full max-w-md rounded-2xl glass-panel-lg p-6 sm:p-8">
+        <div
+          className="w-full max-w-md rounded-2xl p-6 sm:p-8"
+          style={{
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.6)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)",
+          }}
+        >
           <div className="mb-6 flex flex-col items-center">
-            <span className="text-base font-semibold tracking-[0.1em] text-slate-700">
+            <span className="text-base font-semibold tracking-[0.08em]" style={{ color: "#0f1419" }}>
               StockStory India
             </span>
             {contextMessage && (
-              <p className="mt-2 text-xs text-slate-500 text-center">{contextMessage}</p>
+              <p className="mt-2 text-xs text-center" style={{ color: "#536471" }}>{contextMessage}</p>
             )}
           </div>
           <CinematicAuthGateway
@@ -49,7 +60,7 @@ export const SignupPage: React.FC = () => {
         </div>
       </section>
 
-      <footer className="py-6 text-center text-xs text-slate-400">
+      <footer className="py-6 text-center text-xs" style={{ color: "#8b98a5" }}>
         <p>Research signals only. Not investment advice.</p>
       </footer>
     </main>

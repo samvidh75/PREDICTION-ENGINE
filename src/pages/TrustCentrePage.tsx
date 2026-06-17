@@ -75,170 +75,172 @@ export const TrustCentrePage: React.FC = () => {
   const humanState = stateLabel[rawState] ?? rawState;
 
   return (
-    <main className="min-h-screen"><div className="mx-auto max-w-4xl space-y-8 p-4 pt-[76px] md:pt-28 text-slate-900">
-      <PageHeader
-        title="Research Methodology & Trust Centre"
-        subtitle="Scoring inputs, availability labels, and verified performance metrics."
-      />
+    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
+      <div className="mx-auto max-w-4xl space-y-8 p-4 pt-[76px] md:pt-28">
 
-      {rawState !== "ok" && (
-        <div className="rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4 text-sm text-amber-800" role="status">
-          <p className="font-semibold text-xs">{humanState}</p>
-          <p className="mt-1">{error || envelope?.message || "Some metrics are unavailable because required data sources are not connected."}</p>
-          {missingInputs.length > 0 && (
-            <p className="text-xs mt-2 text-amber-700">Some fields require additional verified data updates.</p>
-          )}
-        </div>
-      )}
+        <PageHeader
+          title="Research Methodology & Trust Centre"
+          subtitle="Scoring inputs, availability labels, and verified performance metrics."
+        />
 
-      <section className="space-y-5">
-        <h2 className="text-lg font-semibold text-slate-900">Performance audit</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="rounded-xl glass-panel p-5 text-center">
-            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Alpha</span>
-            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.alpha)}</span>
-          </div>
-          <div className="rounded-xl glass-panel p-5 text-center">
-            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Hit Rate</span>
-            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.hit_rate, "%")}</span>
-          </div>
-          <div className="rounded-xl glass-panel p-5 text-center">
-            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Sharpe</span>
-            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.sharpe_ratio)}</span>
-          </div>
-          <div className="rounded-xl glass-panel p-5 text-center">
-            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Calibration</span>
-            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.calibration_score, "%")}</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl glass-panel p-6">
-          <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total predictions generated</span>
-          <span className="text-2xl font-semibold text-slate-900">{formatCount(metrics?.total_predictions)}</span>
-        </div>
-        <div className="rounded-xl glass-panel p-6">
-          <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total outcomes tracked</span>
-          <span className="text-2xl font-semibold text-slate-900">{formatCount(metrics?.total_outcomes)}</span>
-        </div>
-      </section>
-
-      <section className="space-y-5">
-        <h2 className="text-lg font-semibold text-slate-900">Data coverage summary</h2>
-        {coverageLoading ? (
-          <div className="rounded-xl glass-panel p-6">
-            <p className="text-sm text-slate-500">Loading coverage data...</p>
-          </div>
-        ) : coverageData?.coverage ? (
-          <div className="rounded-xl glass-panel p-6">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
-                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
-                  {coverageData.coverage.symbols?.status === "available"
-                    ? formatNumber(coverageData.coverage.symbols?.count ?? 0)
-                    : "Unavailable"}
-                </span>
-              </div>
-              <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Price rows</span>
-                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
-                  {coverageData.coverage.dailyPrices?.status === "available"
-                    ? formatNumber(coverageData.coverage.dailyPrices?.rowCount ?? 0)
-                    : "Unavailable"}
-                </span>
-              </div>
-              <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial records</span>
-                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
-                  {coverageData.coverage.financialSnapshots?.status === "available"
-                    ? formatNumber(coverageData.coverage.financialSnapshots?.rowCount ?? 0)
-                    : "Unavailable"}
-                </span>
-              </div>
-              <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scored records</span>
-                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
-                  {coverageData.coverage.predictionRegistry?.status === "available"
-                    ? formatNumber(coverageData.coverage.predictionRegistry?.rowCount ?? 0)
-                    : "Unavailable"}
-                </span>
-              </div>
-            </div>
-            <div className="mt-4">
-              <DataFreshnessBadge date={coverageData.generatedAt ?? null} />
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl glass-panel p-6">
-            <p className="text-sm text-slate-500">Coverage data is temporarily unavailable.</p>
+        {rawState !== "ok" && (
+          <div
+            className="rounded-xl p-4 text-sm"
+            role="status"
+            style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
+          >
+            <p className="font-semibold text-xs">{humanState}</p>
+            <p className="mt-1">{error || envelope?.message || "Some metrics are unavailable because required data sources are not connected."}</p>
+            {missingInputs.length > 0 && (
+              <p className="text-xs mt-2">Some fields require additional verified data updates.</p>
+            )}
           </div>
         )}
-      </section>
 
-      <section className="space-y-5">
-        <h2 className="text-lg font-semibold text-slate-900">Scoring factors</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {[
-            { title: "Growth", body: "Measures revenue, EPS, profit, and free cash flow trajectory when data is available." },
-            { title: "Quality", body: "Evaluates capital returns (ROE, ROIC), profit margins, and operational asset efficiency." },
-            { title: "Valuation", body: "Reviews relative pricing multiples and cash yields against industry peers." },
-            { title: "Stability & risk", body: "Monitors leverage, cash buffer, accounting flags, and price volatility." },
-            { title: "Momentum", body: "Reviews trend strength and relative market signals." },
-            { title: "Confidence", body: "Separates score visibility from data completeness, freshness, and consistency." },
-          ].map(f => (
-            <div key={f.title} className="rounded-xl glass-panel p-6">
-              <h3 className="font-semibold text-slate-900 text-sm">{f.title}</h3>
-              <p className="mt-2 text-sm text-slate-600 leading-relaxed">{f.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-5">
-        <h2 className="text-lg font-semibold text-slate-900">Data status</h2>
-        <div className="rounded-xl glass-panel p-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring database</span>
-              <span className="text-sm font-semibold text-slate-900">
-                {rawState === "ok" || rawState === "partial" ? "Connected" : "Pending"}
-              </span>
-            </div>
-            <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of date</span>
-              <span className="text-sm font-semibold text-slate-900">
-                <DataFreshnessBadge date={asOf !== "Data unavailable" ? asOf : null} />
-              </span>
-            </div>
-            <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
-              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence completeness</span>
-              <span className="text-sm font-semibold text-slate-900">
-                {completenessScore ? `${completenessScore}% verified` : "Pending"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {coverageData?.providers && Object.keys(coverageData.providers).length > 0 && (
         <section className="space-y-5">
-          <h2 className="text-lg font-semibold text-slate-900">Provider status</h2>
-          <div className="rounded-xl glass-panel p-6">
-            <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 overflow-hidden">
-              {Object.entries(coverageData.providers).map(([key, val]) => (
-                <ProviderStatusPill key={key} name={key} status={val} />
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Performance audit</h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {[
+              { label: "Alpha", value: formatMetric(metrics?.alpha) },
+              { label: "Hit Rate", value: formatMetric(metrics?.hit_rate, "%") },
+              { label: "Sharpe", value: formatMetric(metrics?.sharpe_ratio) },
+              { label: "Calibration", value: formatMetric(metrics?.calibration_score, "%") },
+            ].map((m) => (
+              <div
+                key={m.label}
+                className="rounded-xl p-5 text-center"
+                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+              >
+                <span className="text-[11px] uppercase tracking-wider font-semibold block mb-1" style={{ color: "#536471" }}>{m.label}</span>
+                <span className="text-xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{m.value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            <span className="text-[11px] uppercase tracking-wider font-semibold block mb-1" style={{ color: "#536471" }}>Total predictions generated</span>
+            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatCount(metrics?.total_predictions)}</span>
+          </div>
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            <span className="text-[11px] uppercase tracking-wider font-semibold block mb-1" style={{ color: "#536471" }}>Total outcomes tracked</span>
+            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatCount(metrics?.total_outcomes)}</span>
+          </div>
+        </section>
+
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data coverage summary</h2>
+          {coverageLoading ? (
+            <div
+              className="rounded-xl p-6"
+              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}
+            >
+              <p className="text-sm" style={{ color: "#536471" }}>Loading coverage data...</p>
+            </div>
+          ) : coverageData?.coverage ? (
+            <div
+              className="rounded-xl p-6"
+              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+            >
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { label: "Companies covered", value: coverageData.coverage.symbols?.status === "available" ? formatNumber(coverageData.coverage.symbols?.count ?? 0) : "Unavailable" },
+                  { label: "Price rows", value: coverageData.coverage.dailyPrices?.status === "available" ? formatNumber(coverageData.coverage.dailyPrices?.rowCount ?? 0) : "Unavailable" },
+                  { label: "Financial records", value: coverageData.coverage.financialSnapshots?.status === "available" ? formatNumber(coverageData.coverage.financialSnapshots?.rowCount ?? 0) : "Unavailable" },
+                  { label: "Scored records", value: coverageData.coverage.predictionRegistry?.status === "available" ? formatNumber(coverageData.coverage.predictionRegistry?.rowCount ?? 0) : "Unavailable" },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                    <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
+                    <span className="block text-sm font-semibold tabular-nums" style={{ color: "#0f1419" }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4">
+                <DataFreshnessBadge date={coverageData.generatedAt ?? null} />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="rounded-xl p-6"
+              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}
+            >
+              <p className="text-sm" style={{ color: "#536471" }}>Coverage data is temporarily unavailable.</p>
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Scoring factors</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              { title: "Growth", body: "Measures revenue, EPS, profit, and free cash flow trajectory when data is available." },
+              { title: "Quality", body: "Evaluates capital returns (ROE, ROIC), profit margins, and operational asset efficiency." },
+              { title: "Valuation", body: "Reviews relative pricing multiples and cash yields against industry peers." },
+              { title: "Stability & risk", body: "Monitors leverage, cash buffer, accounting flags, and price volatility." },
+              { title: "Momentum", body: "Reviews trend strength and relative market signals." },
+              { title: "Confidence", body: "Separates score visibility from data completeness, freshness, and consistency." },
+            ].map(f => (
+              <div
+                key={f.title}
+                className="rounded-xl p-6"
+                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+              >
+                <h3 className="font-semibold text-sm" style={{ color: "#0f1419" }}>{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed" style={{ color: "#536471" }}>{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data status</h2>
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                { label: "Scoring database", value: rawState === "ok" || rawState === "partial" ? "Connected" : "Pending" },
+                { label: "As of date", value: asOf !== "Data unavailable" ? asOf : "Pending" },
+                { label: "Evidence completeness", value: completenessScore ? `${completenessScore}% verified` : "Pending" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                  <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#0f1419" }}>{item.value}</span>
+                </div>
               ))}
             </div>
           </div>
         </section>
-      )}
 
-      <section className="border-t border-white/30 pt-6">
-        <ResearchDisclaimer />
-      </section>
-    </div></main>
+        {coverageData?.providers && Object.keys(coverageData.providers).length > 0 && (
+          <section className="space-y-5">
+            <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Provider status</h2>
+            <div
+              className="rounded-xl p-6"
+              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+            >
+              <div className="rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                {Object.entries(coverageData.providers).map(([key, val]) => (
+                  <ProviderStatusPill key={key} name={key} status={val} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
+          <ResearchDisclaimer />
+        </section>
+      </div>
+    </main>
   );
 };
 
