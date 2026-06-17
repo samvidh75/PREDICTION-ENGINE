@@ -313,14 +313,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         net_margin: finiteNumber(snapshot.netMargin),
         revenue_growth: finiteNumber(snapshot.revenueGrowth),
         profit_growth: finiteNumber(snapshot.profitGrowth),
-        earnings_growth: finiteNumber(snapshot.epsGrowth ?? snapshot.profitGrowth),
         eps_growth: finiteNumber(snapshot.epsGrowth),
         fcf_growth: finiteNumber(snapshot.fcfGrowth),
         current_ratio: finiteNumber(snapshot.currentRatio),
         gross_margin: finiteNumber(snapshot.grossMargin),
-        total_assets: finiteNumber(snapshot.totalAssets),
-        total_liabilities: finiteNumber(snapshot.totalLiabilities),
-        total_equity: finiteNumber(snapshot.totalEquity),
       };
     }
 
