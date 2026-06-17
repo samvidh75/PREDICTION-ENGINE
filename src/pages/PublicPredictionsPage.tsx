@@ -6,20 +6,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import tokens from "../components/ui/tokens";
 import { formatFreshness } from "../services/ui/dataFormatting";
-
-interface SignalRow {
-  symbol: string;
-  type: string;
-  severity: string;
-  explanation: string;
-  snapshotDate?: string | null;
-}
-
-interface SignalsPayload {
-  signals: SignalRow[];
-  snapshotDate?: string | null;
-  symbolsAnalyzed?: number;
-}
+import { api, ApiError, type Signal } from "../services/api/client";
 
 interface CoverageInfo {
   symbolCount: number | null;
@@ -28,48 +15,41 @@ interface CoverageInfo {
 }
 
 export default function PublicPredictionsPage(): JSX.Element {
-  const [payload, setPayload] = useState<SignalsPayload | null>(null);
+  const [signals, setSignals] = useState<Signal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [snapshotDate, setSnapshotDate] = useState<string | null>(null);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState<number | null>(null);
   const [coverageData, setCoverageData] = useState<CoverageInfo | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetch("/api/predictions/signals?limit=50", {
-      signal: ctrl.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then(async (r) => {
-        if (!r.ok) throw new Error(r.status === 404 ? "SIGNALS_UNAVAILABLE" : "UNAVAILABLE");
-        const body = await r.json();
-        const data = body.data || body;
-        setPayload(data);
-        if (typeof data?.symbolsAnalyzed === "number") {
-          setSymbolsAnalyzed(data.symbolsAnalyzed);
-        }
-      })
-      .catch((e: Error) => {
-        if (ctrl.signal.aborted) return;
-        setError(e.message);
-      })
-      .finally(() => setLoading(false));
 
-    fetch("/api/ops/data-coverage", {
-      signal: ctrl.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((body) => {
-        if (!body?.ok || ctrl.signal.aborted) return;
-        const cov = body.coverage;
+    api.getSignals(50)
+      .then((data) => {
+        if (ctrl.signal.aborted) return;
+        setSignals(data?.signals ?? []);
+        setSnapshotDate(data?.snapshotDate ?? null);
+        setSymbolsAnalyzed(data?.symbolsAnalyzed ?? null);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (ctrl.signal.aborted) return;
+        setError(err instanceof ApiError ? err.message : "Signals unavailable");
+        setLoading(false);
+      });
+
+    api.getDataCoverage()
+      .then((cov) => {
+        if (ctrl.signal.aborted) return;
         setCoverageData({
-          symbolCount: cov.symbols?.status === "available" ? (cov.symbols.count ?? 0) : null,
-          registryRowCount: cov.predictionRegistry?.status === "available" ? (cov.predictionRegistry.rowCount ?? 0) : null,
-          latestPredictionDate: cov.predictionRegistry?.latestPredictionDate ?? null,
+          symbolCount: cov.coverage?.symbols?.count ?? null,
+          registryRowCount: cov.coverage?.predictionRegistry?.rowCount ?? null,
+          latestPredictionDate: cov.coverage?.predictionRegistry?.latestPredictionDate ?? null,
         });
       })
       .catch(() => {});
+
     return () => ctrl.abort();
   }, []);
 
@@ -89,9 +69,6 @@ export default function PublicPredictionsPage(): JSX.Element {
     window.dispatchEvent(new Event("urlchange"));
   };
 
-  const signals = payload?.signals ?? [];
-  const snapshotDate = payload?.snapshotDate ?? null;
-
   const severityColors: Record<string, string> = {
     critical: "bg-rose-50 border-rose-200 text-rose-700",
     important: "bg-amber-50 border-amber-200 text-amber-700",
@@ -109,9 +86,16 @@ export default function PublicPredictionsPage(): JSX.Element {
           primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
         />
 
+      {error && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+          <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
+          <p className="mt-1 text-xs">{error}</p>
+        </div>
+      )}
+
       {loading ? (
         <LoadingState description="Checking for recent score changes…" />
-      ) : error || signals.length === 0 ? (
+      ) : signals.length === 0 ? (
         <div className="flex flex-col gap-5">
           <EmptyState
             title="Score changes pending"
@@ -221,7 +205,7 @@ export default function PublicPredictionsPage(): JSX.Element {
               })}
             </tbody>
           </table>
-              {symbolsAnalyzed !== null && (
+          {symbolsAnalyzed !== null && (
             <div className="border-t border-slate-100 bg-slate-50/50 px-4 py-2 text-[10px] text-slate-500">
               {symbolsAnalyzed} companies in latest cycle
             </div>
