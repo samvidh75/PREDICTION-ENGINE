@@ -9,11 +9,11 @@ module.exports = {
       },
       colors: {
         background: {
-          DEFAULT: "#f8f7f4",
-          secondary: "#efeeeb",
+          DEFAULT: "#f5f4f1",
+          secondary: "#eeedea",
           panel: "#ffffff",
           elevated: "#ffffff",
-          hover: "#f1f0ec",
+          hover: "#efeeeb",
         },
         surface: {
           card: "#ffffff",
@@ -32,10 +32,10 @@ module.exports = {
           info: "#2c6b9e",
         },
         border: {
-          DEFAULT: "rgba(0, 0, 0, 0.07)",
+          DEFAULT: "rgba(0, 0, 0, 0.06)",
           subtle: "rgba(0, 0, 0, 0.03)",
           focus: "rgba(26, 74, 58, 0.35)",
-          divider: "rgba(0, 0, 0, 0.05)",
+          divider: "rgba(0, 0, 0, 0.04)",
         },
         text: {
           primary: "#0f1419",
@@ -55,19 +55,20 @@ module.exports = {
       },
       boxShadow: {
         none: "none",
-        sm: "0 1px 2px rgba(0, 0, 0, 0.04)",
-        md: "0 2px 4px rgba(0, 0, 0, 0.05)",
-        lg: "0 4px 12px rgba(0, 0, 0, 0.06)",
-        xl: "0 8px 24px rgba(0, 0, 0, 0.07)",
-        panel: "0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03)",
-        elevated: "0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04)",
+        sm: "0 1px 2px rgba(0, 0, 0, 0.03)",
+        md: "0 2px 4px rgba(0, 0, 0, 0.04)",
+        lg: "0 4px 12px rgba(0, 0, 0, 0.05)",
+        xl: "0 8px 24px rgba(0, 0, 0, 0.06)",
+        panel: "0 1px 2px rgba(0, 0, 0, 0.03)",
+        elevated: "0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03)",
         focus: "0 0 0 3px rgba(26, 74, 58, 0.15)",
+        card: "0 1px 3px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02)",
       },
       borderRadius: {
         sm: "4px",
-        md: "6px",
-        lg: "10px",
-        xl: "14px",
+        md: "8px",
+        lg: "12px",
+        xl: "16px",
       },
       screens: {
         xs: "420px",

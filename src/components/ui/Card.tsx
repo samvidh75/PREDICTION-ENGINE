@@ -4,14 +4,15 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
-  padding?: "sm" | "md" | "lg";
+  padding?: "sm" | "md" | "lg" | "none";
   hover?: boolean;
 }
 
 const paddingStyles = {
-  sm: "p-3.5",
-  md: "p-5",
-  lg: "p-6",
+  none: "",
+  sm: "p-4",
+  md: "p-6",
+  lg: "p-8",
 };
 
 export const Card: React.FC<CardProps> = ({
@@ -26,7 +27,7 @@ export const Card: React.FC<CardProps> = ({
     <Comp
       onClick={onClick}
       type={onClick ? "button" : undefined}
-      className={`w-full rounded-xl border border-slate-200/80 bg-white text-left text-slate-900 shadow-sm transition-all ${
+      className={`w-full rounded-xl border border-slate-200/60 bg-white text-left text-slate-900 shadow-card transition-all ${
         paddingStyles[padding]
       } ${
         onClick || hover ? "cursor-pointer hover:border-slate-300 hover:shadow-md hover:-translate-y-px" : ""

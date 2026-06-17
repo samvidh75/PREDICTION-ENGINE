@@ -407,7 +407,7 @@ test.describe("Authenticated shell", () => {
   }) => {
     await page.goto("/?page=dashboard");
     const sidebar = page.locator("aside");
-    await sidebar.getByRole("button", { name: /methodology/i }).click();
+    await sidebar.getByRole("button", { name: /research|methodology/i }).click();
     await expect(page).toHaveURL(/page=methodology/);
   });
 

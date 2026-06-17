@@ -82,7 +82,7 @@ describe('Real Data Integration Pages', () => {
     render(<DashboardHub />);
 
     await waitFor(() => {
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Research workspace')).toBeInTheDocument();
     });
   });
 
