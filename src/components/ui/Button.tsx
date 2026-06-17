@@ -13,10 +13,11 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ...props
 }) => {
-  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-emerald-700/15 focus:border-emerald-700";
+  const base =
+    "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary";
 
   const variants: Record<string, string> = {
-    primary: "bg-emerald-900 text-white hover:bg-emerald-800 border border-emerald-900 shadow-sm",
+    primary: "bg-accent-primary text-white hover:bg-accent-hover border border-accent-primary shadow-sm",
     secondary: "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 shadow-sm",
     outline: "bg-transparent border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-white",
     ghost: "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-transparent",

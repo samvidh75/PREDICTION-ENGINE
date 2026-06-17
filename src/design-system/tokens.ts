@@ -9,10 +9,11 @@ export const stockStoryTokens = {
   shadows: stockStoryShadows,
   animations: stockStoryAnimations,
   radius: {
-    control: "8px",
-    panel: "8px",
-    modal: "8px",
-    pill: "999px",
+    sm: "4px",
+    md: "6px",
+    lg: "10px",
+    xl: "14px",
+    full: "9999px",
   },
 } as const;
 

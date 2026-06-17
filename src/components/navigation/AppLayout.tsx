@@ -11,7 +11,7 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   useAuth();
   return (
-    <div className="relative flex h-screen w-screen select-none flex-col overflow-hidden bg-slate-50 font-sans text-slate-900 antialiased">
+    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background font-sans text-slate-900 antialiased">
       <TopNav />
       <div className="relative flex h-full w-full flex-1 overflow-hidden">
         <Sidebar />

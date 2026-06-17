@@ -123,7 +123,7 @@ export const TrustCentrePage: React.FC = () => {
   const humanState = stateLabel[rawState] ?? rawState;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-7 p-4 text-slate-900">
+    <main className="min-h-screen bg-background"><div className="mx-auto max-w-4xl space-y-7 p-4 pt-[76px] md:pt-28 text-slate-900">
       <PageHeader
         title="Methodology & Trust Centre"
         subtitle="Scoring inputs, availability labels, and performance metrics when evidence is available."
@@ -312,7 +312,7 @@ export const TrustCentrePage: React.FC = () => {
       <section className="border-t border-slate-200 pt-6">
         <ResearchDisclaimer />
       </section>
-    </div>
+    </div></main>
   );
 };
 

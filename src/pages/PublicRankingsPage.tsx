@@ -104,7 +104,7 @@ export const PublicRankingsPage: React.FC = () => {
   const freshnessDate = rankings[0]?.predictionDate ?? rankings[0]?.prediction_date ?? null;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-background text-slate-900">
       <TopNav />
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
@@ -114,7 +114,7 @@ export const PublicRankingsPage: React.FC = () => {
           primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
 
-      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:flex-row">
+      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm sm:flex-row">
         <div className="w-full sm:w-72">
           <Input
             aria-label="Search rankings by symbol or sector"
@@ -130,7 +130,7 @@ export const PublicRankingsPage: React.FC = () => {
           <select
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}
-            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 transition focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15 sm:w-48"
+            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/15 sm:w-48"
           >
             {sectors.map((sec) => (
               <option key={sec} value={sec}>
@@ -150,7 +150,7 @@ export const PublicRankingsPage: React.FC = () => {
             description="Rankings will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or fabricated scores are shown."
           />
           {coverageData && (
-            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data Coverage Context
               </h4>
@@ -175,9 +175,7 @@ export const PublicRankingsPage: React.FC = () => {
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Rankings require verified prediction snapshots. No rankings are 
-                fabricated or extrapolated. Verified scores will appear automatically 
-                when new snapshots are produced.
+                Rankings require verified prediction snapshots. No rankings are fabricated or extrapolated.
               </p>
             </div>
           )}

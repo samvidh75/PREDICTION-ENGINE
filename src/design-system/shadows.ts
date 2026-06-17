@@ -1,9 +1,12 @@
 export const stockStoryShadows = {
-  blueGlow: "0 0 20px rgba(0,200,255,.35)",
-  cyanGlow: "0 0 24px rgba(0,255,224,.25)",
-  purpleGlow: "0 0 30px rgba(123,97,255,.25)",
-  panel: "0 18px 60px rgba(0,0,0,.35)",
-  elevated: "0 24px 80px rgba(0,0,0,.46)",
+  none: "none",
+  sm: "0 1px 2px rgba(0, 0, 0, 0.04)",
+  md: "0 2px 4px rgba(0, 0, 0, 0.05)",
+  lg: "0 4px 12px rgba(0, 0, 0, 0.06)",
+  xl: "0 8px 24px rgba(0, 0, 0, 0.07)",
+  panel: "0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03)",
+  elevated: "0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04)",
+  focus: "0 0 0 3px rgba(26, 74, 58, 0.15)",
 } as const;
 
 export type StockStoryShadows = typeof stockStoryShadows;

@@ -93,13 +93,13 @@ export default function PublicPredictionsPage(): JSX.Element {
   const snapshotDate = payload?.snapshotDate ?? null;
 
   const severityColors: Record<string, string> = {
-    critical: "bg-rose-50 border-rose-200 text-rose-800",
-    important: "bg-amber-50 border-amber-200 text-amber-800",
-    monitor: "bg-sky-50 border-sky-200 text-sky-800",
+    critical: "bg-rose-50 border-rose-200 text-rose-700",
+    important: "bg-amber-50 border-amber-200 text-amber-700",
+    monitor: "bg-sky-50 border-sky-200 text-sky-700",
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
+    <main className="min-h-screen bg-background text-slate-900">
       <TopNav />
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
@@ -122,7 +122,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             }
           />
           {coverageData && (
-            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data Coverage Context
               </h4>
@@ -148,8 +148,7 @@ export default function PublicPredictionsPage(): JSX.Element {
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
                 Signal generation requires active deltas in the prediction registry. 
-                No signals are fabricated or backfilled. Verified signals will appear 
-                automatically when new prediction snapshots are produced.
+                No signals are fabricated or backfilled.
               </p>
             </div>
           )}
@@ -172,7 +171,7 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-sm">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500">
@@ -193,7 +192,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                     onClick={() => signal.symbol && navigate(signal.symbol)}
                     className="cursor-pointer transition-colors hover:bg-slate-50"
                   >
-                    <td className="p-4 font-mono font-bold text-slate-950 hover:text-emerald-800">
+                    <td className="p-4 font-mono font-bold text-slate-950 hover:text-emerald-700">
                       {signal.symbol}
                     </td>
                     <td className="p-4">

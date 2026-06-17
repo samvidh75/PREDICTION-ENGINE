@@ -36,11 +36,11 @@ export const TodayIntelligenceBrief: React.FC = () => {
       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-cyan-500/5 rounded-full blur-[80px] pointer-events-none" />
       <div className="flex justify-between items-center border-b border-white/5 pb-4">
         <div>
-          <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest block">System Intelligence</span>
-          <h4 className="text-xl font-bold text-white tracking-tight font-vos-display">Today's Intelligence Brief</h4>
+          <span className="text-[10px] font-medium text-white/50 uppercase tracking-widest block">Market Brief</span>
+          <h4 className="text-xl font-bold text-white tracking-tight">Today's Brief</h4>
         </div>
-        <div className="bg-cyan-500/10 border border-cyan-500/30 px-3 py-1 rounded-full text-[9px] font-mono text-cyan-300">
-          DAILY_SYNC // ACTIVE
+        <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-[9px] font-medium text-white/50">
+          Daily update
         </div>
       </div>
 

@@ -1,13 +1,17 @@
 export const stockStoryAnimations = {
-  easing: {
-    standard: "cubic-bezier(0.22, 1, 0.36, 1)",
-    entrance: "cubic-bezier(0.16, 1, 0.3, 1)",
+  ease: {
+    primary: "cubic-bezier(0.22, 1, 0.36, 1)",
+    smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
   },
   duration: {
-    fast: "140ms",
-    normal: "220ms",
-    slow: "700ms",
-    nebula: "28s",
+    fast: "120ms",
+    normal: "200ms",
+    slow: "300ms",
+  },
+  transition: {
+    hover: "all 200ms cubic-bezier(0.22, 1, 0.36, 1)",
+    focus: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+    expand: "all 300ms cubic-bezier(0.22, 1, 0.36, 1)",
   },
 } as const;
 

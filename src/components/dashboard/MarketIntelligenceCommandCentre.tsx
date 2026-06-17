@@ -34,22 +34,22 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
     <div className="min-h-screen bg-transparent text-white">
       <div className="mx-auto max-w-[1600px] px-6 py-10 sm:px-10 lg:px-16">
         <div className="mb-10 flex flex-col gap-5">
-          <div className="inline-flex w-fit items-center rounded-full border border-[#2962ff]/25 bg-[#2962ff]/10 px-4 py-1 text-xs uppercase tracking-[0.28em] text-[#9bb5ff]">
-            StockStory India
+          <div className="inline-flex w-fit items-center rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs uppercase tracking-wider text-white/60">
+            Research workspace
           </div>
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                Market Intelligence OS
+                Market Intelligence
               </h1>
 
               <p className="mt-4 text-base leading-7 text-white/60 sm:text-lg">
-                Real company search, market data, watchlists, alerts, and health signals in one trading-desk workspace.
+                Company search, market data, watchlists, and health signals in one research workspace.
               </p>
             </div>
 
-            <div className="ss-tv-chart-terminal w-full max-w-[480px] rounded-lg p-3">
+            <div className="w-full max-w-[480px] rounded-lg border border-white/10 bg-[#111418] p-3">
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-[#1e222d] px-4 py-3">
                 <div className="text-white/40">⌕</div>
 
@@ -77,7 +77,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
           {sections.map((section) => (
             <div
               key={section.title}
-              className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6"
+              className="rounded-lg border border-white/10 bg-[#161B22] p-6"
             >
               <div className="mb-3 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 {section.title}
@@ -91,7 +91,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-          <div className="ss-tv-chart-terminal rounded-lg p-6">
+            <div className="rounded-lg border border-white/10 bg-[#111418] p-6">
             <div className="mb-8 flex items-center justify-between gap-4">
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-[#9bb5ff]">
@@ -109,7 +109,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
                 </div>
               </div>
 
-              <div className="rounded-full border border-[#2962ff]/30 bg-[#2962ff]/10 px-4 py-2 text-sm text-[#9bb5ff]">
+              <div                     className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60">
                 Data-backed
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
           </div>
 
           <div className="space-y-6">
-            <div className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6">
+            <div className="rounded-lg border border-white/10 bg-[#161B22] p-6">
               <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 Healthometer
               </div>
@@ -132,13 +132,13 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
                   </div>
                 </div>
 
-                <div className="rounded-full border border-[#2962ff]/30 bg-[#2962ff]/10 px-4 py-2 text-sm text-[#9bb5ff]">
+                <div                     className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/60">
                   Research Signal
                 </div>
               </div>
             </div>
 
-            <div className="ss-tv-panel ss-tv-neon-edge rounded-lg p-6">
+            <div className="rounded-lg border border-white/10 bg-[#161B22] p-6">
               <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
                 Quick Stats
               </div>

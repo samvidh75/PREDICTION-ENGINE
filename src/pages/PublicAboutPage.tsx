@@ -24,7 +24,7 @@ const methodology = ["Collect data", "Generate features", "Generate factors", "R
 
 export const PublicAboutPage: React.FC = () => {
   return (
-    <main className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+    <main className="min-h-screen bg-background font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
@@ -51,13 +51,13 @@ export const PublicAboutPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="border-y border-slate-200/80 bg-white py-12">
+      <section className="border-y border-slate-200/80 bg-white py-16">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">What the system measures</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {architecture.map((item) => (
               <div key={item.title} className="rounded-lg border border-slate-200/80 bg-white p-5">
-                <div className="mb-4 inline-flex rounded-md bg-slate-50 p-2.5 text-emerald-800">{item.icon}</div>
+                <div className="mb-4 inline-flex rounded-md bg-emerald-50 p-2.5 text-emerald-700">{item.icon}</div>
                 <h3 className="text-base font-semibold text-slate-950">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
               </div>
@@ -66,19 +66,19 @@ export const PublicAboutPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-14">
+      <section className="mx-auto max-w-5xl px-6 py-16">
         <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">From raw data to ranking</h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-5">
           {methodology.map((step, index) => (
-            <div key={step} className="rounded-lg border border-slate-200/80 bg-white p-4 text-center">
-              <div className="font-mono text-sm font-semibold text-slate-500">{String(index + 1).padStart(2, "0")}</div>
+            <div key={step} className="rounded-lg border border-slate-200/80 bg-white p-5 text-center">
+              <div className="font-mono text-sm font-semibold text-slate-400">{String(index + 1).padStart(2, "0")}</div>
               <div className="mt-3 text-sm font-semibold text-slate-950">{step}</div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-6 pb-12">
+      <section className="mx-auto max-w-3xl px-6 pb-16">
         <ResearchDisclaimer />
       </section>
     </main>
