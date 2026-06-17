@@ -23,15 +23,24 @@ vi.mock('../services/portfolio/AlertEngine', () => ({
 }));
 
 describe('SettingsPage states', () => {
-  it('renders profile tab with email', () => {
+  it('renders profile tab with email from auth context', () => {
     render(<SettingsPage />);
     expect(screen.getByText('Settings')).toBeInTheDocument();
     expect(screen.getByText('Profile information')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
   });
 
   it('shows profile name stored locally notice', () => {
     render(<SettingsPage />);
     expect(screen.getByText(/Profile name is stored locally/)).toBeInTheDocument();
+  });
+
+  it('does not show raw Firebase field names in profile', () => {
+    render(<SettingsPage />);
+    expect(screen.queryByText(/uid/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/providerData/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/isAnonymous/)).not.toBeInTheDocument();
   });
 
   it('renders notifications tab with alert categories', () => {
@@ -55,5 +64,12 @@ describe('SettingsPage states', () => {
     fireEvent.click(securityButtons[0]);
     expect(screen.getByText('Security and credentials')).toBeInTheDocument();
     expect(screen.getByText('Send Reset Link')).toBeInTheDocument();
+  });
+
+  it('shows local-only label for name settings', () => {
+    render(<SettingsPage />);
+    expect(screen.getByText(/Profile name is stored locally/)).toBeInTheDocument();
+    expect(screen.queryByText(/Cloud-saved/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Synced/)).not.toBeInTheDocument();
   });
 });

@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 import { getRedirectResult, onAuthStateChanged, signOut as firebaseSignOut, type User } from "firebase/auth";
 import { firebaseAuth, firebasePersistenceReady, isFirebaseClientConfigured } from "../config/firebase";
 import { clearAuthSession, loadAuthSession, saveAuthSession } from "../services/auth/sessionStore";
+import { registerTokenProvider } from "../services/auth/authenticatedFetch";
 import {
   logAuthState,
   getSessionAgeMs,
@@ -159,6 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               uid: result.user.uid,
               provider: providerForUser(result.user),
             });
+            registerTokenProvider(() => result.user.getIdToken());
             setUser(result.user);
             persistFirebaseUser(result.user);
             setAuthError(null);
@@ -185,6 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               uid: firebaseUser.uid,
               provider: providerForUser(firebaseUser),
             });
+            registerTokenProvider(() => firebaseUser.getIdToken());
             setUser(firebaseUser);
             persistFirebaseUser(firebaseUser);
           } else {
@@ -254,6 +257,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await firebasePersistenceReady;
       if (firebaseAuth.currentUser) {
         await firebaseAuth.currentUser.reload();
+        registerTokenProvider(() => firebaseAuth.currentUser!.getIdToken());
         persistFirebaseUser(firebaseAuth.currentUser);
         setUser(firebaseAuth.currentUser);
         setSessionAgeMs(getSessionAgeMs());
