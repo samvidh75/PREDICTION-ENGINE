@@ -180,16 +180,60 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const factorSnapshots = await fetchTableStats("factor_snapshots", "trade_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
-    const providers = {
-      FINNHUB_KEY: env.finnhubKey ? "present (removed from active pipeline)" : "missing (deprecated)",
-      INDIANAPI_KEY: env.indianApiKey ? "present" : "missing",
-      UPSTOX_ACCESS_TOKEN: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing",
-      UPSTOX_API_KEY: process.env.UPSTOX_API_KEY ? "present" : "missing",
-      UPSTOX_CLIENT_SECRET: process.env.UPSTOX_CLIENT_SECRET ? "present" : "missing",
-      REDIS_URL: process.env.REDIS_URL ? "present" : "missing",
-      UPSTOX_REDIRECT_URI: process.env.UPSTOX_REDIRECT_URI ? "present" : "missing",
-      UPSTOX_NOTIFIER_SECRET: process.env.UPSTOX_NOTIFIER_SECRET ? "present" : "missing",
+    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string }> => {
+      const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string }> = {
+        FINNHUB_KEY: {
+          lifecycle: "deprecated",
+          required: false,
+          status: "disabled",
+          message: "Removed from active pipeline. Not required.",
+        },
+        INDIANAPI_KEY: {
+          lifecycle: "active",
+          required: true,
+          status: env.indianApiKey ? "healthy" : "missing_required",
+          message: env.indianApiKey ? "Quotes and metadata active." : "Required for quotes and metadata.",
+        },
+        UPSTOX_ACCESS_TOKEN: {
+          lifecycle: "optional",
+          required: false,
+          status: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing_optional",
+          message: process.env.UPSTOX_ACCESS_TOKEN ? "Provider token present." : "Optional — token refresh needed for Upstox data.",
+        },
+        UPSTOX_API_KEY: {
+          lifecycle: "optional",
+          required: false,
+          status: process.env.UPSTOX_API_KEY ? "present" : "missing_optional",
+          message: process.env.UPSTOX_API_KEY ? "Configured." : "Optional — needed for OAuth refresh flow only.",
+        },
+        UPSTOX_CLIENT_SECRET: {
+          lifecycle: "optional",
+          required: false,
+          status: process.env.UPSTOX_CLIENT_SECRET ? "present" : "missing_optional",
+          message: process.env.UPSTOX_CLIENT_SECRET ? "Configured." : "Optional — needed for OAuth refresh flow only.",
+        },
+        REDIS_URL: {
+          lifecycle: "active",
+          required: true,
+          status: process.env.REDIS_URL ? "healthy" : "missing_required",
+          message: process.env.REDIS_URL ? "Cache and queue active." : "Required for cache and queue.",
+        },
+        UPSTOX_REDIRECT_URI: {
+          lifecycle: "optional_refresh",
+          required: false,
+          status: process.env.UPSTOX_REDIRECT_URI ? "present" : "missing_optional",
+          message: process.env.UPSTOX_REDIRECT_URI ? "Configured." : "Optional — needed only for OAuth refresh flow.",
+        },
+        UPSTOX_NOTIFIER_SECRET: {
+          lifecycle: "optional_notifier",
+          required: false,
+          status: process.env.UPSTOX_NOTIFIER_SECRET ? "present" : "missing_optional",
+          message: process.env.UPSTOX_NOTIFIER_SECRET ? "Configured." : "Optional — needed only for Upstox notifier endpoint.",
+        },
+      };
+      return matrix;
     };
+    const providers = providerStatuses();
 
     return reply.send({
       ok: true,
@@ -287,11 +331,11 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
     const results: Record<string, any> = {};
     const rowsWritten: Record<string, number> = {};
-    const providerStatuses = {
-      indianapi: process.env.INDIANAPI_KEY ? "present" : "missing",
-      upstox: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing",
-      finnhub: "deprecated-removed",
-      redis: process.env.REDIS_URL ? "present" : "missing",
+    const pipProviderStatuses = {
+      indianapi: { lifecycle: "active", required: true, status: process.env.INDIANAPI_KEY ? "healthy" : "missing_required" },
+      upstox: { lifecycle: "optional", required: false, status: process.env.UPSTOX_ACCESS_TOKEN ? "present" : "missing_optional" },
+      finnhub: { lifecycle: "deprecated", required: false, status: "disabled" },
+      redis: { lifecycle: "active", required: true, status: process.env.REDIS_URL ? "healthy" : "missing_required" },
     };
 
     function finiteNumber(value: unknown): number | null {
@@ -634,7 +678,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
               quotesSucceeded,
               symbolsFailed,
               errorClasses,
-              JSON.stringify(providerStatuses),
+              JSON.stringify(pipProviderStatuses),
               JSON.stringify(rowsWrittenSummary),
               JSON.stringify({ mode: applyMode ? 'apply' : 'dry-run', version: '1.0' }),
             ]
