@@ -87,7 +87,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/82 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
-      <div className="ss-tv-panel ss-tv-neon-edge w-full md:w-[760px] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh]">
+      <div className="w-full md:w-[760px] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] border border-white/10 bg-[#161B22]">
         <div className="flex items-center gap-3.5 px-4 h-[58px] bg-white/[0.045] border-b border-white/10">
           <Search className="w-4 h-4 text-[#b2b5be]" />
           <input

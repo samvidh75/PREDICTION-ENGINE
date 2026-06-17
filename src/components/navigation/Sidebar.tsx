@@ -41,9 +41,9 @@ export const Sidebar: React.FC = () => {
               type="button"
               onClick={() => MapsTo(link.id)}
               className={`group flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 text-left text-sm font-medium transition ${
-                isActive
-                  ? "bg-emerald-900 text-white"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+isActive
+                    ? "bg-accent-primary text-white"
+                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
               <span className={`shrink-0 ${isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600"}`}>

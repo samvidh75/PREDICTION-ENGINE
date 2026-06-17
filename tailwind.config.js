@@ -9,7 +9,7 @@ module.exports = {
       },
       colors: {
         background: {
-          DEFAULT: "#f7f6f3",
+          DEFAULT: "#f8f7f4",
           secondary: "#efeeeb",
           panel: "#ffffff",
           elevated: "#ffffff",
@@ -25,9 +25,11 @@ module.exports = {
           primary: "#1a4a3a",
           hover: "#15573f",
           muted: "rgba(26, 74, 58, 0.08)",
+          subtle: "#e8f0ec",
           success: "#1a6e4a",
           danger: "#c0392b",
           warning: "#b8860b",
+          info: "#2c6b9e",
         },
         border: {
           DEFAULT: "rgba(0, 0, 0, 0.07)",
@@ -41,13 +43,14 @@ module.exports = {
           muted: "#8b98a5",
           inverse: "#ffffff",
         },
-        brand: {
-          void: "#0f1419",
-          surface: "#ffffff",
-          emerald: "#1a6e4a",
-          amber: "#b8860b",
-          crimson: "#c0392b",
-          muted: "#8b98a5",
+        market: {
+          positive: "#16a34a",
+          negative: "#dc2626",
+          neutral: "#6b7280",
+          positiveBg: "rgba(22, 163, 74, 0.08)",
+          negativeBg: "rgba(220, 38, 38, 0.08)",
+          positiveMuted: "#15803d",
+          negativeMuted: "#b91c1c",
         },
       },
       boxShadow: {
@@ -58,6 +61,7 @@ module.exports = {
         xl: "0 8px 24px rgba(0, 0, 0, 0.07)",
         panel: "0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03)",
         elevated: "0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04)",
+        focus: "0 0 0 3px rgba(26, 74, 58, 0.15)",
       },
       borderRadius: {
         sm: "4px",

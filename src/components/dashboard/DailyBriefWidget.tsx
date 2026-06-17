@@ -27,7 +27,7 @@ export const DailyBriefWidget: React.FC = () => {
         <h4 className="text-xs font-mono text-cyan-400 uppercase tracking-widest font-bold">
           Daily Brief Summary
         </h4>
-        <span className="text-[9px] text-gray-500 font-mono">LIVE_NODE_SYNC</span>
+        <span className="text-[9px] text-white/40 font-medium">Live</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

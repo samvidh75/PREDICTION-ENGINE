@@ -83,7 +83,7 @@ export const MobileNav: React.FC = () => {
                 type="button"
                 onClick={() => handlePublicNav(tab.page)}
                 className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
-                  isActive ? "text-emerald-800" : "text-slate-400"
+                  isActive ? "text-accent-primary" : "text-slate-400"
                 }`}
               >
                 {tab.icon}
@@ -99,7 +99,7 @@ export const MobileNav: React.FC = () => {
                 type="button"
                 onClick={() => handleNav(tab.id)}
                 className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
-                  isActive ? "text-emerald-800" : "text-slate-400"
+                  isActive ? "text-accent-primary" : "text-slate-400"
                 }`}
               >
                 {tab.icon}

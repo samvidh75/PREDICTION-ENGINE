@@ -31,7 +31,7 @@ export const TopNav: React.FC = () => {
         onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
         className="border-none bg-transparent p-0 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-900"
       >
-        StockStory<span className="text-emerald-800">.India</span>
+          StockStory<span className="text-accent-primary">.India</span>
       </button>
 
       {isAuthenticated && user ? (
@@ -47,7 +47,7 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={() => setPage("signup")}
-          className="h-9 rounded-lg bg-emerald-900 px-4 text-[11px] font-medium text-white hover:bg-emerald-800 transition"
+          className="h-9 rounded-lg bg-accent-primary px-4 text-[11px] font-medium text-white hover:bg-accent-hover transition"
         >
           Start
         </button>
@@ -61,7 +61,7 @@ export const TopNav: React.FC = () => {
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
           className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-[0.12em] text-slate-900"
         >
-          StockStory<span className="text-emerald-800">.India</span>
+        StockStory<span className="text-accent-primary">.India</span>
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export const TopNav: React.FC = () => {
           <div className="mx-auto flex max-w-md flex-1 justify-center">
             <button
               onClick={triggerSearch}
-              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50/80 px-3.5 text-left transition hover:border-slate-300 hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
+              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50/80 px-3.5 text-left transition hover:border-slate-300 hover:bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/15"
             >
               <Search className="h-3.5 w-3.5 text-slate-400" />
               <span className="text-xs text-slate-400">
@@ -117,7 +117,7 @@ export const TopNav: React.FC = () => {
           </button>
           <button 
             onClick={() => setPage("signup")}
-            className="cursor-pointer rounded-lg bg-emerald-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800"
+            className="cursor-pointer rounded-lg bg-accent-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
           >
             Get started
           </button>
