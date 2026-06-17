@@ -428,7 +428,8 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           try {
             const snapshot = await coordinator.getFinancials(symbol);
             const columns = snapshotToDbColumns((snapshot as unknown) as Record<string, unknown>);
-            const periodEnd = columns.period_end || today;
+            if (!columns.period_end) columns.period_end = today;
+            if (!columns.snapshot_date) columns.snapshot_date = today;
             const writable = Object.entries(columns)
               .filter(([key]) => key !== "symbol")
               .filter(([, value]) => value !== null && value !== undefined);
