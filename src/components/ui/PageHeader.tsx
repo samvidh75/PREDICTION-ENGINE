@@ -55,7 +55,7 @@ export function MetricCard({ label, value, detail, trend }: MetricCardProps) {
     neutral: "text-slate-500",
   };
   return (
-    <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
+    <div className="rounded-xl glass-panel p-5">
       <div className="text-[11px] font-medium uppercase tracking-wider text-slate-400 mb-1.5">{label}</div>
       <div className={`text-2xl font-semibold leading-tight tracking-tight ${trend ? trendColors[trend] : "text-slate-900"}`}>
         {value}
@@ -67,7 +67,7 @@ export function MetricCard({ label, value, detail, trend }: MetricCardProps) {
 
 export function ResearchDisclaimer({ context: _context = "research" }: { context?: string }) {
   return (
-    <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-5 py-4 text-sm leading-6 text-slate-500">
+    <div className="rounded-xl glass-panel px-5 py-4 text-sm leading-6 text-slate-500">
       <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
         Research only — not investment advice
       </p>

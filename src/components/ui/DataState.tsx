@@ -29,7 +29,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-10 text-center ${className}`}
+      className={`flex flex-col items-center justify-center rounded-xl glass-panel p-10 text-center ${className}`}
     >
       <CircleSlash className="mb-4 h-8 w-8 text-slate-300" aria-hidden="true" />
       <h3 className="mb-1.5 text-base font-semibold text-slate-800">{title}</h3>

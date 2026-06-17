@@ -3,6 +3,20 @@ import { Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ProfileButton } from './ProfileButton';
 
+const navGlass = {
+  background: 'rgba(255,255,255,0.72)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderBottom: '1px solid rgba(255,255,255,0.5)',
+};
+
+const searchGlass = {
+  background: 'rgba(255,255,255,0.68)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid rgba(255,255,255,0.5)',
+};
+
 export const TopNav: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
 
@@ -25,7 +39,7 @@ export const TopNav: React.FC = () => {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-[56px] items-center justify-between bg-white/85 backdrop-blur-glassLg border-b border-white/50 shadow-glass px-4 md:hidden">
+    <header style={navGlass} className="fixed top-0 left-0 right-0 z-50 flex h-[56px] items-center justify-between px-4 md:hidden">
       <button
         type="button"
         onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
@@ -38,7 +52,7 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={triggerSearch}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 text-slate-500 transition hover:bg-white/90"
+          className="flex h-9 w-9 items-center justify-center rounded-xl glass-panel text-slate-500 transition hover:opacity-80"
           aria-label="Open search"
         >
           <Search className="h-4 w-4" />
@@ -54,7 +68,7 @@ export const TopNav: React.FC = () => {
       )}
     </header>
 
-    <nav className="fixed top-0 left-0 z-50 hidden h-[60px] w-full items-center bg-white/85 backdrop-blur-glassLg border-b border-white/50 shadow-glass px-8 md:flex">
+    <nav style={navGlass} className="fixed top-0 left-0 z-50 hidden h-[60px] w-full items-center px-8 md:flex">
       <div className="flex w-[220px] shrink-0 items-center">
         <button
           type="button"
@@ -70,7 +84,8 @@ export const TopNav: React.FC = () => {
           <div className="mx-auto flex max-w-md flex-1 justify-center">
             <button
               onClick={triggerSearch}
-              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3.5 text-left transition hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+              style={searchGlass}
+              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3.5 text-left transition hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
             >
               <Search className="h-3.5 w-3.5 text-slate-400" />
               <span className="text-sm text-slate-400">

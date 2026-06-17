@@ -31,7 +31,7 @@ export const SignupPage: React.FC = () => {
       <MobileNav />
 
       <section className="z-10 flex flex-1 flex-col items-center justify-center px-5 py-12 md:py-24">
-        <div className="w-full max-w-md rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 sm:p-8">
+        <div className="w-full max-w-md rounded-2xl glass-panel-lg p-6 sm:p-8">
           <div className="mb-6 flex flex-col items-center">
             <span className="text-base font-semibold tracking-[0.1em] text-slate-700">
               StockStory India

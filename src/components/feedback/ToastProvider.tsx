@@ -91,7 +91,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
           <div
             key={toast.id}
             role="status"
-            className={`pointer-events-auto flex items-start gap-2.5 rounded-xl bg-white/85 backdrop-blur-glassLg border border-white/50 shadow-glassLg border-l-4 ${BORDER_COLORS[toast.type]} px-3.5 py-3 animate-in slide-in-from-top-2 fade-in duration-200`}
+            className={`pointer-events-auto flex items-start gap-2.5 rounded-xl glass-panel-strong border-l-4 ${BORDER_COLORS[toast.type]} px-3.5 py-3 animate-in slide-in-from-top-2 fade-in duration-200`}
           >
             {ICONS[toast.type]}
             <span className="text-[13px] leading-relaxed text-slate-800 flex-1 min-w-0">

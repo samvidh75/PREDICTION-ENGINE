@@ -527,7 +527,7 @@ export const StockStoryPage: React.FC = () => {
         </button>
       </div>
 
-        <section className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+        <section className="rounded-2xl glass-panel p-6">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-200">
@@ -627,13 +627,13 @@ export const StockStoryPage: React.FC = () => {
         </button>
       </section>
 
-      <div className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
+      <div className="rounded-2xl glass-panel p-5">
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">My Research Notes</div>
         <textarea
           value={noteText}
           onChange={(event) => handleSaveNote(event.target.value)}
           placeholder="Add your own research notes for this company..."
-          className="h-20 w-full resize-none rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
+          className="h-20 w-full resize-none rounded-xl glass-panel p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
         />
       </div>
 
@@ -651,7 +651,7 @@ export const StockStoryPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="min-h-[300px] rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+      <div className="min-h-[300px] rounded-2xl glass-panel p-6">
         
         {activeTab === "overview" && (
           <div className="grid gap-6 md:grid-cols-3">

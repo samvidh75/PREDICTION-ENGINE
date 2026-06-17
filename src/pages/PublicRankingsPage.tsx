@@ -96,7 +96,7 @@ export const PublicRankingsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-4 sm:flex-row">
+      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl glass-panel p-4 sm:flex-row">
         <div className="w-full sm:w-72">
           <Input
             aria-label="Search rankings by symbol or sector"
@@ -113,7 +113,7 @@ export const PublicRankingsPage: React.FC = () => {
           <select
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}
-            className="h-10 w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-48"
+            className="h-10 w-full rounded-xl glass-panel px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-48"
           >
             {sectors.map((sec) => (
               <option key={sec} value={sec}>
@@ -133,7 +133,7 @@ export const PublicRankingsPage: React.FC = () => {
             description="Rankings appear after verified scoring has completed for the latest cycle."
           />
           {(symbolCount !== null || registryRowCount !== null) && (
-            <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
+            <div className="rounded-xl glass-panel p-5">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data coverage
               </h4>

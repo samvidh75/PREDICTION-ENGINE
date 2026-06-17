@@ -122,7 +122,7 @@ export const SearchPage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-8">
+      <div className="rounded-2xl glass-panel-lg p-8">
         <div className="mx-auto flex max-w-[620px] flex-col gap-6 text-center">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Search Indian stocks</h1>
@@ -141,7 +141,7 @@ export const SearchPage: React.FC = () => {
                 if (e.key === "Enter") handleSubmit();
               }}
               placeholder="Try RELIANCE, TCS, INFY..."
-              className="h-11 w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 pl-10 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+              className="h-11 w-full rounded-xl glass-panel px-3 pl-10 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
             />
             <Search className="absolute left-3 top-[14px] h-4 w-4 text-slate-500" />
           </div>
@@ -185,7 +185,7 @@ export const SearchPage: React.FC = () => {
                     <button
                       key={stock.symbol}
                       onClick={() => handleOpenStock(stock)}
-                      className="flex cursor-pointer flex-col justify-between rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6 text-left transition-all hover:bg-white/85 hover:-translate-y-px"
+                      className="flex cursor-pointer flex-col justify-between rounded-2xl glass-panel p-6 text-left transition-all hover:bg-white/85 hover:-translate-y-px"
                     >
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
@@ -243,7 +243,7 @@ export const SearchPage: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center p-10 text-center rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass">
+              <div className="flex flex-col items-center justify-center p-10 text-center rounded-2xl glass-panel">
                 <span className="text-base font-semibold text-slate-900">No matching equity found</span>
                 <p className="mt-1.5 text-sm text-slate-500 max-w-md">
                   We couldn't find any companies matching "{query.trim()}". Try searching for these major Indian companies:

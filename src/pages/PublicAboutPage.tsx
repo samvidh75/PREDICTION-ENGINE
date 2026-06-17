@@ -30,7 +30,7 @@ export const PublicAboutPage: React.FC = () => {
 
       <section className="mx-auto max-w-6xl px-6 pb-12 pt-24 md:pt-32">
         <div className="max-w-3xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 py-1.5 text-xs font-medium text-slate-600">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full glass-panel px-3 py-1.5 text-xs font-medium text-slate-600">
             <FileSearch className="h-3.5 w-3.5 text-emerald-700" />
             Research methodology
           </div>
@@ -56,7 +56,7 @@ export const PublicAboutPage: React.FC = () => {
           <h2 className="text-center text-xl font-semibold tracking-tight text-slate-900">What the research measures</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {architecture.map((item) => (
-              <div key={item.title} className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+              <div key={item.title} className="rounded-2xl glass-panel p-6">
                 <div className="mb-4 inline-flex rounded-xl bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/30 p-2.5 text-emerald-700">{item.icon}</div>
                 <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
@@ -70,7 +70,7 @@ export const PublicAboutPage: React.FC = () => {
         <h2 className="text-center text-xl font-semibold tracking-tight text-slate-900">From raw data to ranking</h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-5">
           {methodology.map((step, index) => (
-            <div key={step} className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5 text-center">
+            <div key={step} className="rounded-2xl glass-panel p-5 text-center">
               <div className="font-mono text-sm font-semibold text-slate-400">{String(index + 1).padStart(2, "0")}</div>
               <div className="mt-3 text-sm font-semibold text-slate-900">{step}</div>
             </div>

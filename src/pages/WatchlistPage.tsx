@@ -214,7 +214,7 @@ export const WatchlistPage: React.FC = () => {
                   const noteObj = NoteEngine.getNote(ticker);
 
                   return (
-                    <div key={ticker} className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-4">
+                    <div key={ticker} className="rounded-xl glass-panel p-4">
                       <div className="flex items-center justify-between mb-3">
                         <button
                           onClick={() => navigateToStock({ ticker, mode: "push" })}
@@ -252,7 +252,7 @@ export const WatchlistPage: React.FC = () => {
                           value={noteObj.note}
                           onChange={(e) => handleNoteChange(ticker, e.target.value)}
                           placeholder="Add a research note..."
-                          className="w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+                          className="w-full rounded-xl glass-panel px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
                         />
                       </div>
                     </div>
@@ -260,7 +260,7 @@ export const WatchlistPage: React.FC = () => {
                 })}
               </div>
               {/* Desktop table */}
-              <div className="hidden sm:block overflow-hidden rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass">
+              <div className="hidden sm:block overflow-hidden rounded-xl glass-panel">
                 <div className="min-w-[720px]">
                 <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-white/20 bg-slate-50/30 p-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   <span className="pl-3">Ticker</span>
@@ -299,7 +299,7 @@ export const WatchlistPage: React.FC = () => {
                           value={noteObj.note}
                           onChange={(e) => handleNoteChange(ticker, e.target.value)}
                           placeholder="Why am I watching?"
-                          className="w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-2 py-1.5 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+                          className="w-full rounded-xl glass-panel px-2 py-1.5 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
                         />
                       </div>
                       <div className="flex items-center justify-end gap-2 pr-2">

@@ -8,7 +8,7 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 
 export const Table: React.FC<TableProps> = ({ headers, children, glass = false, className = "", ...props }) => {
   const containerStyles = glass
-    ? "w-full overflow-x-auto rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass"
+    ? "w-full overflow-x-auto rounded-xl glass-panel"
     : "w-full overflow-x-auto rounded-xl border border-slate-200/60 bg-white shadow-sm";
   return (
     <div className={containerStyles}>

@@ -43,7 +43,7 @@ export default function StockStoryPageF0(): JSX.Element {
       <StockWorkspaceBar ticker={ticker} horizon={horizon} />
       <section
         aria-label="Prediction horizon"
-        className="mx-auto mb-5 flex w-full max-w-7xl flex-wrap items-center gap-3 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-5 py-3 text-slate-900"
+        className="mx-auto mb-5 flex w-full max-w-7xl flex-wrap items-center gap-3 rounded-xl glass-panel px-5 py-3 text-slate-900"
       >
         <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Horizon</span>
         {HORIZONS.map((option) => (

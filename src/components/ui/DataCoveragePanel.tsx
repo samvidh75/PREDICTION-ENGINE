@@ -116,7 +116,7 @@ export const DataCoveragePanel: React.FC = () => {
   return (
     <div className="grid gap-5 md:grid-cols-3">
       {/* Coverage stats block */}
-      <div className="md:col-span-2 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+      <div className="md:col-span-2 rounded-xl glass-panel p-6">
         <SectionHeader
           title="Data coverage"
           subtitle="Aggregate data volumes across all connected sources."
@@ -147,7 +147,7 @@ export const DataCoveragePanel: React.FC = () => {
 
 
       {/* Provider environment statuses */}
-      <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+      <div className="rounded-xl glass-panel p-6">
         <SectionHeader
           title="Data sources"
           subtitle="Connected provider status."

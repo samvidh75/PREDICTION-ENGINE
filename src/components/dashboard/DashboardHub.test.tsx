@@ -40,6 +40,32 @@ vi.mock('../../architecture/navigation/routeCoordinator', () => ({
   navigateToStock: vi.fn(),
 }));
 
+// Mock the API client
+const mockGetSignals = vi.fn();
+const mockGetOpsHealth = vi.fn();
+vi.mock('../../services/api/client', () => ({
+  api: {
+    getSignals: (...args: unknown[]) => mockGetSignals(...args),
+    getOpsHealth: (...args: unknown[]) => mockGetOpsHealth(...args),
+  },
+  ApiError: class ApiError extends Error {
+    status: number;
+    code: string;
+    constructor(status: number, code: string, message: string) {
+      super(message);
+      this.status = status;
+      this.code = code;
+    }
+  },
+}));
+
+const pending = () => new Promise(() => {});
+
+beforeEach(() => {
+  mockGetSignals.mockReturnValue(pending());
+  mockGetOpsHealth.mockReturnValue(pending());
+});
+
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     render(<DashboardHub />);
@@ -62,39 +88,31 @@ describe('DashboardHub states', () => {
   });
 
   it('shows signals error state when API fails', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => {
-      return { ok: false, status: 500, json: async () => ({}) };
-    }));
+    mockGetSignals.mockRejectedValue(new Error('API error'));
+    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 0, db_health: 'connected' } });
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText('Signal changes are not available right now.')).toBeInTheDocument();
+    expect(await screen.findByText('Signal changes not available right now.')).toBeInTheDocument();
   });
 
   it('shows signals empty state when API returns no signals', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      if (url.includes('signals')) {
-        return { ok: true, json: async () => ({ status: 'ok', data: { signals: [], symbolsAnalyzed: 5 } }) };
-      }
-      if (url.includes('health')) {
-        return { ok: true, json: async () => ({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } }) };
-      }
-      return { ok: true, json: async () => ({}) };
-    }));
+    mockGetSignals.mockResolvedValue({
+      signals: [],
+      symbolsAnalyzed: 5,
+      snapshotDate: new Date().toISOString(),
+    });
+    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText('No significant source-backed changes detected.')).toBeInTheDocument();
+    expect(await screen.findByText('No significant signal changes detected.')).toBeInTheDocument();
     expect(screen.getByText(/5 symbols analyzed/)).toBeInTheDocument();
   });
 
   it('shows status bar when health data loads', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      if (url.includes('health')) {
-        return { ok: true, json: async () => ({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } }) };
-      }
-      return { ok: true, json: async () => ({ status: 'ok', data: { signals: [], symbolsAnalyzed: 0 } }) };
-    }));
+    mockGetSignals.mockResolvedValue({ signals: [], symbolsAnalyzed: 0 });
+    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
     render(<DashboardHub />);
 

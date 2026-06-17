@@ -122,10 +122,10 @@ export const DashboardHub: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
+          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded-xl glass-panel px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
             <Search className="h-3.5 w-3.5" /> Search
           </button>
-          <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
+          <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded-xl glass-panel px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
             <Star className="h-3.5 w-3.5" /> Watchlists
           </button>
         </div>
@@ -133,7 +133,7 @@ export const DashboardHub: React.FC = () => {
 
       {/* Status bar */}
       {healthData && (
-        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-5 py-3 text-xs text-slate-500">
+        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl glass-panel px-5 py-3 text-xs text-slate-500">
           <span className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full ${healthData.dbConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             {healthData.symbolsCovered} companies in coverage universe
@@ -144,7 +144,7 @@ export const DashboardHub: React.FC = () => {
       {/* 3-column grid */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* COL A: Watchlist */}
-        <section className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass overflow-hidden">
+        <section className="rounded-2xl glass-panel overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <Eye className="h-4 w-4 text-accent-primary" />
@@ -184,7 +184,7 @@ export const DashboardHub: React.FC = () => {
         </section>
 
         {/* COL B: Signals */}
-        <section className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass overflow-hidden">
+        <section className="rounded-2xl glass-panel overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <TrendingUp className="h-4 w-4 text-accent-primary" />
@@ -240,7 +240,7 @@ export const DashboardHub: React.FC = () => {
         </section>
 
         {/* COL C: Saved research */}
-        <section className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass overflow-hidden">
+        <section className="rounded-2xl glass-panel overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <Star className="h-4 w-4 text-accent-primary" />

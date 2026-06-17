@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   const variants: Record<string, string> = {
     primary: "bg-accent-primary text-white hover:bg-accent-hover border border-accent-primary shadow-sm",
     secondary: glass
-      ? "bg-white/70 backdrop-blur-glass text-slate-700 hover:bg-white/90 border border-white/50 shadow-glass"
+      ? "glass-panel text-slate-700 hover:bg-white/90"
       : "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200/80 shadow-sm",
     outline: "bg-transparent border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-white/50",
     ghost: "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 border border-transparent",

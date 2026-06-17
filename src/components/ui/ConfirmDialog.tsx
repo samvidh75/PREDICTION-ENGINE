@@ -46,7 +46,7 @@ export default function ConfirmDialog({
       aria-label={title}
       onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white/85 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 transition-all duration-200 scale-in">
+      <div className="w-full max-w-sm rounded-2xl glass-panel-strong p-6 transition-all duration-200 scale-in">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             {destructive && <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />}

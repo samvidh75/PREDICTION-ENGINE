@@ -17,6 +17,13 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
+const sidebarGlass = {
+  background: 'rgba(255,255,255,0.72)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  borderRight: '1px solid rgba(255,255,255,0.5)',
+};
+
 export const Sidebar: React.FC = () => {
   const { currentView, MapsTo } = useNavigation();
   const { isAuthenticated, logout, isConnecting } = useAuth();
@@ -31,7 +38,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[60px] z-40 hidden w-[220px] select-none flex-col justify-between bg-white/80 backdrop-blur-glass border-r border-white/50 shadow-glass py-4 md:flex">
+    <aside style={sidebarGlass} className="fixed bottom-0 left-0 top-[60px] z-40 hidden w-[220px] select-none flex-col justify-between py-4 md:flex">
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3">
         {links.map((link) => {
           const isActive = currentView === link.id;
