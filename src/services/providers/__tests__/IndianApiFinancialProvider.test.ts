@@ -262,6 +262,81 @@ describe('IndianApiFinancialProvider', () => {
     }
   });
 
+  it('extracts financial fields from stock endpoint keyMetrics when fundamentals returns 404', async () => {
+    process.env.INDIANAPI_KEY = 'test-key';
+    const provider = new IndianApiFinancialProvider('test-key');
+
+    const mockBroker = {
+      execute: makeBrokerMock(async (prov: string, op: string) => {
+        if (op === 'financials') {
+          return {
+            success: false,
+            data: null,
+            statusClass: 'not_found',
+            error: { message: 'Endpoint not allowed', statusCode: 404 },
+          };
+        }
+        if (op === 'metadata') {
+          return {
+            success: true,
+            data: {
+              stockDetailsReusableData: { marketCap: 1749418.94 },
+              keyMetrics: {
+                valuation: [
+                  { key: 'pPerEExcludingExtraordinaryItemsMostRecentFiscalYear', value: '21.16' },
+                  { key: 'priceToBookMostRecentFiscalYear', value: '1.89' },
+                  { key: 'currentDividendYieldCommonStockPrimaryIssueLTM', value: '0.48' },
+                ],
+                mgmtEffectiveness: [
+                  { key: 'returnOnAverageEquity5YearAverage', value: '8.78' },
+                  { key: 'returnOnInvestmentMostRecentFiscalYear', value: '6.87' },
+                  { key: 'returnOnAverageAssetsMostRecenFiscalYear', value: '4.63' },
+                ],
+                margins: [
+                  { key: 'operatingMarginTrailing12Month', value: '11.27' },
+                  { key: 'grossMargin5YearAverage', value: '29.96' },
+                  { key: 'netProfitMarginPercent1stHistoricalFiscalYear', value: '8.89' },
+                ],
+                growth: [
+                  { key: 'revenueGrowthRate5Year', value: '17.21' },
+                  { key: 'ePSChangePercentTTMOverTTM', value: '15.99' },
+                ],
+                financialstrength: [
+                  { key: 'totalDebtPerTotalEquityMostRecentQuarter', value: '0.44' },
+                  { key: 'freeCashFlowtrailing12Month', value: '617540' },
+                ],
+              },
+            },
+            statusClass: 'success',
+            error: null,
+          };
+        }
+        return { success: false, data: null, statusClass: 'error', error: { message: 'unknown' } };
+      }),
+    };
+    vi.mocked(getSharedProviderRequestBroker).mockResolvedValue(mockBroker as any);
+
+    const result = await provider.getFinancials('RELIANCE') as Record<string, any>;
+
+    expect(result.symbol).toBe('RELIANCE');
+    expect(result.source).toBe('indianapi');
+    expect(result.peRatio).toBe(21.16);
+    expect(result.pbRatio).toBe(1.89);
+    expect(result.roe).toBeCloseTo(0.0878);
+    expect(result.roic).toBeCloseTo(0.0687);
+    expect(result.roa).toBeCloseTo(0.0463);
+    expect(result.operatingMargin).toBeCloseTo(0.1127);
+    expect(result.grossMargin).toBeCloseTo(0.2996);
+    expect(result.netMargin).toBeCloseTo(0.0889);
+    expect(result.revenueGrowth).toBeCloseTo(0.1721);
+    expect(result.epsGrowth).toBeCloseTo(0.1599);
+    expect(result.debtToEquity).toBe(0.44);
+    expect(result.dividendYield).toBeCloseTo(0.0048);
+    expect(result.marketCap).toBe(1749418.94 * 10_000_000);
+    expect(result._sources?.fundamentalsAvailable).toBe(false);
+    expect(result._sources?.stockMetricsAvailable).toBe(true);
+  });
+
   it('throws unsupported_field when response has no usable fields', async () => {
     process.env.INDIANAPI_KEY = 'test-key';
     const provider = new IndianApiFinancialProvider('test-key');
