@@ -123,23 +123,54 @@ export function SourceBadge({ source }: SourceBadgeProps) {
 
 interface ProviderStatusPillProps {
   name: string;
-  status: "present" | "missing" | string;
+  status:
+    | { lifecycle: string; required: boolean; status: string; message: string }
+    | string;
+}
+
+function providerPillStyle(status: string): { bg: string; text: string; border: string; label: string } {
+  switch (status) {
+    case "healthy":
+      return { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Active" };
+    case "present":
+      return { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Configured" };
+    case "disabled":
+    case "deprecated":
+      return { bg: "bg-slate-50", text: "text-slate-400", border: "border-slate-200", label: "Deprecated" };
+    case "missing_optional":
+      return { bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Optional" };
+    case "missing_required":
+      return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Required" };
+    default:
+      return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: status };
+  }
+}
+
+function displayName(raw: string): string {
+  const cleaned = raw.replace(/_/g, " ").toLowerCase();
+  const parts = cleaned.split(" ").map((s) => s.charAt(0).toUpperCase() + s.slice(1));
+  return parts.join(" ");
 }
 
 export function ProviderStatusPill({ name, status }: ProviderStatusPillProps) {
-  const isPresent = status === "present";
+  const parsed = typeof status === "string"
+    ? { lifecycle: "unknown", required: false, status, message: "" }
+    : status;
+
+  const style = providerPillStyle(parsed.status);
   return (
-    <div className="flex items-center justify-between gap-3 px-2 py-1 text-[11px] font-mono border-b border-slate-100 last:border-0">
-      <span className="text-slate-500">{name}</span>
-      <span
-        className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-semibold select-none ${
-          isPresent
-            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-            : "bg-amber-50 text-amber-700 border border-amber-200"
-        }`}
-      >
-        {isPresent ? "Ready" : "Missing"}
-      </span>
+    <div className="flex flex-col gap-0.5 px-2 py-1.5 text-[11px] border-b border-slate-100 last:border-0">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-slate-500 font-medium">{displayName(name)}</span>
+        <span
+          className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-semibold select-none ${style.bg} ${style.text} ${style.border} border`}
+        >
+          {style.label}
+        </span>
+      </div>
+      {parsed.message && (
+        <span className="text-[10px] text-slate-400 leading-relaxed">{parsed.message}</span>
+      )}
     </div>
   );
 }

@@ -87,10 +87,19 @@ describe("Ops Data Coverage Endpoint Route", () => {
 
     expect(body.providers).toHaveProperty("FINNHUB_KEY");
     expect(body.providers).toHaveProperty("REDIS_URL");
-    // Ensure actual secrets are not visible in keys/values
-    Object.values(body.providers).forEach((val) => {
-      expect(val).toMatch(/^(present|missing|present \(.*\)|missing \(.*\))$/);
+    // Validate structured provider status format
+    Object.values(body.providers).forEach((val: any) => {
+      expect(val).toHaveProperty("lifecycle");
+      expect(val).toHaveProperty("required");
+      expect(val).toHaveProperty("status");
+      expect(val).toHaveProperty("message");
+      expect(typeof val.lifecycle).toBe("string");
+      expect(typeof val.required).toBe("boolean");
+      expect(typeof val.status).toBe("string");
     });
+    // Finnhub must never be required (deprecated)
+    expect(body.providers.FINNHUB_KEY.lifecycle).toBe("deprecated");
+    expect(body.providers.FINNHUB_KEY.required).toBe(false);
 
     await app.close();
   });
