@@ -154,7 +154,7 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-sm">
+        <div className="mt-8 overflow-x-auto rounded-lg border border-slate-200/80 bg-white shadow-sm">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500">

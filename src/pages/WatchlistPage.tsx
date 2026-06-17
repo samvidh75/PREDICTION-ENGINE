@@ -200,62 +200,119 @@ export const WatchlistPage: React.FC = () => {
               description="Save companies from Search to keep notes and revisit verified scores when available."
             />
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-              <div className="min-w-[720px]">
-              <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                <span className="pl-3">Ticker</span>
-                <span>Score</span>
-                <span>Freshness</span>
-                <span>My Note</span>
-                <span className="text-right pr-3">Actions</span>
-              </div>
-              {activeTickers.map((ticker) => {
-                const info = StockRegistry.getStock(ticker);
-                const score = info?.telemetrySnapshot?.healthScore ?? null;
-                const scoreState = getScoreState(score);
-                const noteObj = NoteEngine.getNote(ticker);
+            <>
+              {/* Mobile card layout */}
+              <div className="space-y-3 sm:hidden">
+                {activeTickers.map((ticker) => {
+                  const info = StockRegistry.getStock(ticker);
+                  const score = info?.telemetrySnapshot?.healthScore ?? null;
+                  const scoreState = getScoreState(score);
+                  const noteObj = NoteEngine.getNote(ticker);
 
-                return (
-                  <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
-                    <button
-                      onClick={() => navigateToStock({ ticker, mode: "push" })}
-                      className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:underline"
-                    >
-                      {ticker}
-                    </button>
-                    <div>
-                      {scoreState === "available" ? (
-                        <ScorePill score={Math.round(score!)} />
-                      ) : (
-                        <MissingDataBadge />
-                      )}
+                  return (
+                    <div key={ticker} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          onClick={() => navigateToStock({ ticker, mode: "push" })}
+                          className="cursor-pointer border-none bg-transparent text-left font-mono font-bold text-slate-950 hover:underline"
+                        >
+                          {ticker}
+                        </button>
+                        <button
+                          onClick={() => handleRemoveTicker(ticker)}
+                          className="text-xs text-rose-400 hover:text-rose-500 cursor-pointer bg-transparent border-none"
+                          disabled={selectedList.startsWith(SMART_PREFIX)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">Score</span>
+                          {scoreState === "available" ? (
+                            <ScorePill score={Math.round(score!)} />
+                          ) : (
+                            <span className="text-[10px] text-slate-400">Unavailable</span>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">Freshness</span>
+                          <span className="font-mono text-[10px] text-slate-500">
+                            {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          value={noteObj.note}
+                          onChange={(e) => handleNoteChange(ticker, e.target.value)}
+                          placeholder="Add a research note..."
+                          className="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/15"
+                        />
+                      </div>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-500">
-                      {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
-                    </span>
-                    <div>
-                      <input
-                        type="text"
-                        value={noteObj.note}
-                        onChange={(e) => handleNoteChange(ticker, e.target.value)}
-                        placeholder="Why am I watching?"
-                        className="w-full bg-transparent text-xs text-slate-700 placeholder-slate-400 focus:outline-none"
-                      />
-                    </div>
-                    <div className="flex items-center justify-end gap-2 pr-2">
-                      <button
-                        onClick={() => handleRemoveTicker(ticker)}
-                        className="text-[11px] text-rose-400/80 hover:text-rose-400 cursor-pointer bg-transparent border-none"
-                        disabled={selectedList.startsWith(SMART_PREFIX)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
-            </div>
+              {/* Desktop table */}
+              <div className="hidden sm:block overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+                <div className="min-w-[720px]">
+                <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                  <span className="pl-3">Ticker</span>
+                  <span>Score</span>
+                  <span>Freshness</span>
+                  <span>My Note</span>
+                  <span className="text-right pr-3">Actions</span>
+                </div>
+                {activeTickers.map((ticker) => {
+                  const info = StockRegistry.getStock(ticker);
+                  const score = info?.telemetrySnapshot?.healthScore ?? null;
+                  const scoreState = getScoreState(score);
+                  const noteObj = NoteEngine.getNote(ticker);
+
+                  return (
+                    <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
+                      <button
+                        onClick={() => navigateToStock({ ticker, mode: "push" })}
+                        className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:underline"
+                      >
+                        {ticker}
+                      </button>
+                      <div>
+                        {scoreState === "available" ? (
+                          <ScorePill score={Math.round(score!)} />
+                        ) : (
+                          <MissingDataBadge />
+                        )}
+                      </div>
+                      <span className="font-mono text-[10px] text-slate-500">
+                        {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
+                      </span>
+                      <div>
+                        <input
+                          type="text"
+                          value={noteObj.note}
+                          onChange={(e) => handleNoteChange(ticker, e.target.value)}
+                          placeholder="Why am I watching?"
+                          className="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/15"
+                        />
+                      </div>
+                      <div className="flex items-center justify-end gap-2 pr-2">
+                        <button
+                          onClick={() => handleRemoveTicker(ticker)}
+                          className="text-[11px] text-rose-400/80 hover:text-rose-400 cursor-pointer bg-transparent border-none"
+                          disabled={selectedList.startsWith(SMART_PREFIX)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

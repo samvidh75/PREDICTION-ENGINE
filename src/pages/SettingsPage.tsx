@@ -53,7 +53,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className={`${tokens.layout.container} flex flex-col space-y-6 select-none`}>
+    <div className={`${tokens.layout.container} flex flex-col space-y-6`}>
       <header className="border-b border-slate-200 pb-5">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Settings</h1>
         <p className="mt-2 text-sm text-slate-600">
@@ -110,12 +110,15 @@ export const SettingsPage: React.FC = () => {
                   disabled
                   className="opacity-50 cursor-not-allowed"
                 />
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                  Profile name is stored locally for this session and is not synced to the server.
+                </div>
                 <Button
                   type="button"
                   variant="primary"
-                  onClick={() => setSaveNotice("Profile changes saved locally for this session.")}
+                  onClick={() => setSaveNotice("Name saved for this session.")}
                 >
-                  Save Profile
+                  Save name
                 </Button>
                 {saveNotice && (
                   <p className="text-xs text-emerald-700">{saveNotice}</p>
@@ -167,14 +170,11 @@ export const SettingsPage: React.FC = () => {
                 <p className="text-xs text-slate-500">Configure your workspace interface theme.</p>
               </div>
               <div className="max-w-md">
-                <Card className="flex items-center justify-between p-4">
-                  <div>
-                    <span className="block text-xs font-bold text-slate-950">Professional research theme</span>
-                    <span className="mt-0.5 block text-[10px] text-slate-500">
-                      The production interface uses a fixed research workspace theme.
-                    </span>
-                  </div>
-                  <Badge variant="neutral">Locked</Badge>
+                <Card className="p-4">
+                  <span className="block text-xs font-bold text-slate-950">Research workspace theme</span>
+                  <span className="mt-0.5 block text-[10px] text-slate-500">
+                    The interface uses a fixed light theme optimised for equity research. Dark mode is not available.
+                  </span>
                 </Card>
               </div>
             </div>

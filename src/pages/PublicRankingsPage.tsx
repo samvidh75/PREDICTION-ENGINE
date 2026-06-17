@@ -125,7 +125,7 @@ export const PublicRankingsPage: React.FC = () => {
 
       {loading ? (
         <div className="py-12 text-center text-sm text-slate-500">Loading rankings…</div>
-      ) : filteredRankings.length === 0 ? (
+      ) : filteredRankings.length === 0 && rankings.length === 0 ? (
         <div className="flex flex-col gap-5">
           <EmptyState
             title="Rankings pending"
@@ -178,6 +178,13 @@ export const PublicRankingsPage: React.FC = () => {
               View scoring methodology
             </Button>
           </div>
+        </div>
+      ) : filteredRankings.length === 0 && rankings.length > 0 ? (
+        <div className="py-12 text-center">
+          <p className="text-sm text-slate-500">No rankings match your search or sector filter.</p>
+          <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="mt-2 text-xs text-emerald-700 hover:underline bg-transparent border-none cursor-pointer">
+            Clear filters
+          </button>
         </div>
       ) : (
         <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>

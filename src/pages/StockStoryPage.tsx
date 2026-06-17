@@ -132,12 +132,12 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
       factors: {},
       financials: financialsObj || {},
       engineDetails: {
-        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Scoring engine details are pending." },
-        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Scoring engine details are pending." },
-        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Scoring engine details are pending." },
-        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Scoring engine details are pending." },
-        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Scoring engine details are pending." },
-        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Scoring engine details are pending." },
+        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Factor scoring details are pending." },
+        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Factor scoring details are pending." },
+        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Factor scoring details are pending." },
+        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Factor scoring details are pending." },
+        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Factor scoring details are pending." },
+        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Factor scoring details are pending." },
         confidence: {
           level: "Unavailable",
           score: null,
@@ -145,7 +145,7 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
           signalAgreement: null,
           riskConsistency: null,
           historicalStability: null,
-          commentary: "No confidence score is shown because the prediction registry did not provide a usable production snapshot.",
+          commentary: "No confidence score is shown because the prediction system did not provide a usable production snapshot.",
         },
       },
     };

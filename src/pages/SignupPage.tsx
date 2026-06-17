@@ -19,7 +19,7 @@ export const SignupPage: React.FC = () => {
       <section className="z-10 flex flex-1 flex-col items-center justify-center px-5 py-12 md:py-24">
         <div className="w-full max-w-md rounded-xl border border-slate-200/60 bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6 flex flex-col items-center">
-            <span className="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">
+            <span className="text-sm font-bold uppercase tracking-[0.15em] text-slate-700">
               StockStory India
             </span>
           </div>
