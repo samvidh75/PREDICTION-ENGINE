@@ -59,7 +59,7 @@ export const MobileNav: React.FC = () => {
     { id: "search", label: "Search", icon: <Search className="h-5 w-5" /> },
     { id: "rankings", label: "Rankings", icon: <Trophy className="h-5 w-5" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
-    { id: "trust", label: "Method", icon: <ShieldCheck className="h-5 w-5" /> },
+    { id: "trust", label: "Research", icon: <ShieldCheck className="h-5 w-5" /> },
     { id: "settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
   ];
 
