@@ -93,7 +93,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Research Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
   });
 
@@ -130,9 +130,9 @@ describe('Real Data Integration Pages', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Companies covered')).toBeInTheDocument();
-      expect(screen.getByText('Scored companies')).toBeInTheDocument();
-      expect(screen.getByText('Fundamental data')).toBeInTheDocument();
-      expect(screen.getByText('Price data')).toBeInTheDocument();
+      expect(screen.getByText('Scored records')).toBeInTheDocument();
+      expect(screen.getByText('Financial records')).toBeInTheDocument();
+      expect(screen.getByText('Price records')).toBeInTheDocument();
     });
   });
 

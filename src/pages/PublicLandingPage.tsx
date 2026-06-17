@@ -109,8 +109,8 @@ export const PublicLandingPage: React.FC = () => {
 
       <section className="border-y border-slate-200/60 bg-white py-16">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-slate-900">
-            How the workspace works
+            <h2 className="text-center text-xl font-semibold tracking-tight text-slate-900">
+            How it works
           </h2>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {workflow.map(({ icon, title, body }) => (
@@ -130,11 +130,11 @@ export const PublicLandingPage: React.FC = () => {
         <ResearchDisclaimer />
       </section>
 
-      <section className="bg-accent-primary py-10">
+          <section className="bg-accent-primary py-10" aria-label="Call to action">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-lg font-semibold text-white">Start researching</h2>
-          <p className="mt-2 text-sm text-white/70">
-            Create a free account to search companies, review signals, and track your research.
+          <p className="mt-2 text-sm text-white/70 max-w-md mx-auto">
+            Search companies, review signals, and track your research.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button

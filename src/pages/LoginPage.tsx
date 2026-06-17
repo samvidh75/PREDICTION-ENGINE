@@ -12,7 +12,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <main className="flex min-h-screen select-none flex-col justify-between bg-slate-50 font-sans text-slate-900 antialiased">
+    <main className="flex min-h-screen flex-col justify-between bg-background font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
@@ -31,8 +31,8 @@ export const LoginPage: React.FC = () => {
         </div>
       </section>
 
-      <footer className="bg-slate-50 py-6 text-center text-xs text-slate-400">
-        <p>Research workspace signals. Not investment advice.</p>
+      <footer className="bg-background py-6 text-center text-xs text-slate-400">
+        <p>Research signals only. Not investment advice.</p>
       </footer>
     </main>
   );

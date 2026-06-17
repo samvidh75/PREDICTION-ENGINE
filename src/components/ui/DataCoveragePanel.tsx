@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "./Card";
 import { SectionHeader, ProviderStatusPill } from "./PageHeader";
-import { Server, Database, Key } from "lucide-react";
+import { Database, Key } from "lucide-react";
 
 interface CoverageStats {
   count: number;
@@ -82,34 +82,34 @@ export const DataCoveragePanel: React.FC = () => {
 
   const metrics = [
     {
-      label: "Indexed Symbols",
+      label: "Companies covered",
       value: coverage.symbols?.status === "available" ? (coverage.symbols.count ?? 0).toLocaleString() : "—",
-      detail: coverage.symbols?.latestUpdatedAt ? `Updated ${coverage.symbols.latestUpdatedAt}` : "No predictions",
+      detail: coverage.symbols?.latestUpdatedAt ? `Updated ${coverage.symbols.latestUpdatedAt}` : "No data",
     },
     {
-      label: "Daily Price Rows",
+      label: "Daily prices",
       value: coverage.dailyPrices?.status === "available" ? (coverage.dailyPrices.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.dailyPrices?.latestPriceDate ? `Latest: ${coverage.dailyPrices.latestPriceDate}` : "No prices",
+      detail: coverage.dailyPrices?.latestPriceDate ? `Latest: ${coverage.dailyPrices.latestPriceDate}` : "No data",
     },
     {
-      label: "Financial Snapshots",
+      label: "Financial records",
       value: coverage.financialSnapshots?.status === "available" ? (coverage.financialSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.financialSnapshots?.latestSnapshotDate ? `Latest: ${coverage.financialSnapshots.latestSnapshotDate}` : "No snapshot",
+      detail: coverage.financialSnapshots?.latestSnapshotDate ? `Latest: ${coverage.financialSnapshots.latestSnapshotDate}` : "No data",
     },
     {
-      label: "Features",
+      label: "Feature records",
       value: coverage.featureSnapshots?.status === "available" ? (coverage.featureSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.featureSnapshots?.latestSnapshotDate ? `Latest: ${coverage.featureSnapshots.latestSnapshotDate}` : "No features",
+      detail: coverage.featureSnapshots?.latestSnapshotDate ? `Latest: ${coverage.featureSnapshots.latestSnapshotDate}` : "No data",
     },
     {
-      label: "Factors",
+      label: "Factor records",
       value: coverage.factorSnapshots?.status === "available" ? (coverage.factorSnapshots.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.factorSnapshots?.latestSnapshotDate ? `Latest: ${coverage.factorSnapshots.latestSnapshotDate}` : "No factors",
+      detail: coverage.factorSnapshots?.latestSnapshotDate ? `Latest: ${coverage.factorSnapshots.latestSnapshotDate}` : "No data",
     },
     {
-      label: "Predictions Registry",
+      label: "Scored records",
       value: coverage.predictionRegistry?.status === "available" ? (coverage.predictionRegistry.rowCount ?? 0).toLocaleString() : "—",
-      detail: coverage.predictionRegistry?.latestPredictionDate ? `Latest: ${coverage.predictionRegistry.latestPredictionDate}` : "No predictions",
+      detail: coverage.predictionRegistry?.latestPredictionDate ? `Latest: ${coverage.predictionRegistry.latestPredictionDate}` : "No data",
     },
   ];
 
@@ -118,12 +118,12 @@ export const DataCoveragePanel: React.FC = () => {
       {/* Coverage stats block */}
       <Card className="md:col-span-2 p-5 border-slate-200/80 bg-white">
         <SectionHeader
-          title="Production Data Coverage"
-          subtitle="Real aggregate database volumes and update freshness."
+          title="Data coverage"
+          subtitle="Aggregate data volumes across all connected sources."
           action={
-            <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-500 font-mono">
+            <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-500">
               <Database className="h-3.5 w-3.5" />
-              <span>DB: {database.status === "ready" ? "READY" : "OFFLINE"}</span>
+              <span>{database.status === "ready" ? "Connected" : "Unavailable"}</span>
             </div>
           }
         />
@@ -147,8 +147,8 @@ export const DataCoveragePanel: React.FC = () => {
       {/* Provider environment statuses */}
       <Card className="p-5 border-slate-200/80 bg-white">
         <SectionHeader
-          title="Data Providers"
-          subtitle="Ingestion key availability."
+          title="Data sources"
+          subtitle="Connected provider status."
           action={<Key className="h-3.5 w-3.5 text-slate-400" />}
         />
         <div className="mt-4 border border-slate-100 rounded-lg overflow-hidden bg-slate-50/50">

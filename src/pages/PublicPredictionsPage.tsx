@@ -105,7 +105,7 @@ export default function PublicPredictionsPage(): JSX.Element {
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Score changes"
-          subtitle="Verified score changes appear when provider data has been processed."
+          subtitle="Score changes from the latest verified data update cycle."
           primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
         />
 
@@ -147,7 +147,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Score changes require verified data updates. No fabricated or backfilled values are shown.
+                Score changes appear once updated provider data has been verified.
               </p>
             </div>
           )}

@@ -110,7 +110,7 @@ export const PublicRankingsPage: React.FC = () => {
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Research rankings"
-          subtitle="Verified company rankings from the latest scoring cycle."
+          subtitle="Company rankings from the latest verified scoring cycle."
           primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
 
@@ -175,7 +175,7 @@ export const PublicRankingsPage: React.FC = () => {
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Rankings require verified scoring data. No fabricated or extrapolated values are shown.
+                Rankings appear once verified scoring data is available.
               </p>
             </div>
           )}

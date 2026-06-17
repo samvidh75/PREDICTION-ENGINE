@@ -226,40 +226,40 @@ export const TrustCentrePage: React.FC = () => {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Scoring engines</h2>
+        <h2 className="text-lg font-semibold text-slate-950">Scoring factors</h2>
         <div className="grid gap-3 md:grid-cols-2">
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Growth engine</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Growth</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Measures revenue, EPS, profit, and free cash flow trajectory when data is available.
             </p>
           </Card>
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Quality engine</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Quality</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Evaluates capital returns (ROE, ROIC), profit margins, and operational asset efficiency.
             </p>
           </Card>
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Valuation engine</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Valuation</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Reviews relative pricing multiples and cash yields against industry peers.
             </p>
           </Card>
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Stability and risk engine</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Stability & risk</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Monitors leverage, cash buffer, accounting flags, and price volatility.
             </p>
           </Card>
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Momentum engine</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Momentum</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Reviews trend strength and relative market signals.
             </p>
           </Card>
           <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Confidence rating</h3>
+            <h3 className="font-semibold text-slate-950 text-sm">Confidence</h3>
             <p className="mt-2 text-xs text-slate-600 leading-relaxed">
               Separates score visibility from data completeness, freshness, and consistency.
             </p>
@@ -268,16 +268,13 @@ export const TrustCentrePage: React.FC = () => {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Data system status</h2>
+        <h2 className="text-lg font-semibold text-slate-950">Data status</h2>
         <Card className="p-5">
-          <p className="text-xs text-slate-600 leading-relaxed mb-4">
-            Active data readiness across all connected sources.
-          </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
               <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring database</span>
               <span className="text-xs font-semibold text-slate-900">
-                {rawState === "ok" || rawState === "partial" ? "Connected" : "Syncing"}
+                {rawState === "ok" || rawState === "partial" ? "Connected" : "Pending"}
               </span>
             </div>
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
@@ -289,7 +286,7 @@ export const TrustCentrePage: React.FC = () => {
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
               <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence completeness</span>
               <span className="text-xs font-semibold text-slate-900">
-                {completenessScore ? `${completenessScore}% Verified` : "Pending audit"}
+                {completenessScore ? `${completenessScore}% verified` : "Pending"}
               </span>
             </div>
           </div>
@@ -298,7 +295,7 @@ export const TrustCentrePage: React.FC = () => {
 
       {coverageData && (
         <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-slate-950">Provider readiness</h2>
+          <h2 className="text-lg font-semibold text-slate-950">Provider status</h2>
           <Card className="p-5">
             <div className="border border-slate-100 rounded-lg overflow-hidden bg-slate-50/50">
               {Object.entries(coverageData.providers).map(([key, val]) => (

@@ -53,7 +53,7 @@ export const PublicAboutPage: React.FC = () => {
 
       <section className="border-y border-slate-200/80 bg-white py-16">
         <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">What the system measures</h2>
+          <h2 className="text-center text-xl font-semibold tracking-tight text-slate-950">What the research measures</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {architecture.map((item) => (
               <div key={item.title} className="rounded-lg border border-slate-200/80 bg-white p-5">
