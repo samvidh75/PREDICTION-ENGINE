@@ -168,8 +168,8 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     // Run table queries
     const dailyPrices = await fetchTableStats("daily_prices", "trade_date");
     const financialSnapshots = await fetchTableStats("financial_snapshots", "snapshot_date", true);
-    const featureSnapshots = await fetchTableStats("feature_snapshots", "snapshot_date");
-    const factorSnapshots = await fetchTableStats("factor_snapshots", "snapshot_date");
+    const featureSnapshots = await fetchTableStats("feature_snapshots", "trade_date");
+    const factorSnapshots = await fetchTableStats("factor_snapshots", "trade_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
     const providers = {
