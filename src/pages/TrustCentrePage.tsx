@@ -131,38 +131,38 @@ export const TrustCentrePage: React.FC = () => {
           <Card className="p-5">
             <p className="text-xs text-slate-500">Loading coverage data...</p>
           </Card>
-        ) : coverageData ? (
+        ) : coverageData?.coverage ? (
           <Card className="p-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
                 <span className="block text-sm font-semibold text-slate-950">
-                  {coverageData.coverage.symbols.status === "available"
-                    ? formatNumber(coverageData.coverage.symbols.count ?? 0)
+                  {coverageData.coverage.symbols?.status === "available"
+                    ? formatNumber(coverageData.coverage.symbols?.count ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Price rows</span>
                 <span className="block text-sm font-semibold text-slate-950">
-                  {coverageData.coverage.dailyPrices.status === "available"
-                    ? formatNumber(coverageData.coverage.dailyPrices.rowCount ?? 0)
+                  {coverageData.coverage.dailyPrices?.status === "available"
+                    ? formatNumber(coverageData.coverage.dailyPrices?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial records</span>
                 <span className="block text-sm font-semibold text-slate-950">
-                  {coverageData.coverage.financialSnapshots.status === "available"
-                    ? formatNumber(coverageData.coverage.financialSnapshots.rowCount ?? 0)
+                  {coverageData.coverage.financialSnapshots?.status === "available"
+                    ? formatNumber(coverageData.coverage.financialSnapshots?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scored records</span>
                 <span className="block text-sm font-semibold text-slate-950">
-                  {coverageData.coverage.predictionRegistry.status === "available"
-                    ? formatNumber(coverageData.coverage.predictionRegistry.rowCount ?? 0)
+                  {coverageData.coverage.predictionRegistry?.status === "available"
+                    ? formatNumber(coverageData.coverage.predictionRegistry?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>

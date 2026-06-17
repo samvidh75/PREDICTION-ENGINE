@@ -90,6 +90,46 @@ export const PUBLIC_PAGES: PageKey[] = [
   "validation", "predictions", "rankings",
 ];
 
+/**
+ * Sanitize a returnTo URL for safe post-auth redirect.
+ * Only allows internal relative query-param paths (e.g. "?page=stock&id=RELIANCE").
+ * Rejects any URL with a protocol, hostname, or absolute path.
+ * Returns null for unsafe/invalid URLs.
+ */
+export function sanitizeReturnTo(returnTo: string | null): string | null {
+  if (!returnTo || typeof returnTo !== "string") return null;
+  const trimmed = returnTo.trim();
+  if (!trimmed.startsWith("?")) return null;
+  if (trimmed.toLowerCase().includes("http:") || trimmed.toLowerCase().includes("https:")) return null;
+  if (trimmed.startsWith("//")) return null;
+  if (/[\s<>"'()@]/.test(trimmed)) return null;
+  // Ensure only valid query param characters
+  const queryPart = trimmed.slice(1);
+  if (!/^[a-zA-Z0-9&=._~%+-]+$/.test(queryPart)) return null;
+  return trimmed;
+}
+
+/**
+ * Get a human-readable context message for the auth page based on the returnTo URL.
+ */
+export function getReturnToContext(returnTo: string | null): string | null {
+  if (!returnTo) return null;
+  try {
+    const params = new URLSearchParams(returnTo.replace(/^\?/, ""));
+    const targetPage = params.get("page");
+    const symbol = params.get("id") || params.get("symbol");
+    if (targetPage === "company" || targetPage === "stock") {
+      return symbol ? `Sign in to open research for ${symbol.toUpperCase()}.` : "Sign in to open this research view.";
+    }
+    if (targetPage === "portfolio") return "Sign in to view your portfolio.";
+    if (targetPage === "watchlist") return "Sign in to manage your watchlist.";
+    if (targetPage === "dashboard") return "Sign in to access your dashboard.";
+    return "Sign in to continue using StockStory India.";
+  } catch {
+    return null;
+  }
+}
+
 /** Check whether a stock/company ID is present in the URL.
  * Supports multiple parameter name aliases used across the codebase:
  *   id, symbol, ticker, companyId

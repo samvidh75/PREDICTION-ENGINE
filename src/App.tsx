@@ -7,6 +7,7 @@ import {
   getRouteSubsystem,
   hasStockId as checkHasStockId,
   notifyUrlChange,
+  sanitizeReturnTo,
   PROTECTED_PAGES,
   type PageKey,
 } from "./app/router";
@@ -34,6 +35,9 @@ import { AuthUXLoader } from "./components/auth/AuthUXLoader";
 import { profileToMarketInputs, type UserProfile } from "./services/auth/userProfile";
 import { MarketInputs } from "./services/intelligence/marketState";
 import { loadUserProfile } from "./services/auth/userProfileStore";
+
+// Feedback
+import ToastProvider from "./components/feedback/ToastProvider";
 
 
 const DEFAULT_SKIP_PROFILE: UserProfile = {
@@ -130,22 +134,34 @@ function AppContent(): JSX.Element {
     setDraftProfile(existing);
   }, [isAuthed, uid]);
 
-  // Redirect unauthenticated users from protected pages
+  // Redirect unauthenticated users from protected pages, preserving return context
   useEffect(() => {
     if (isAuthLoading || isAuthed || !PROTECTED_PAGES.includes(pageKey)) return;
-    const url = new URL(window.location.href);
+    const currentUrl = window.location.href;
+    const returnTo = currentUrl.includes("?") ? currentUrl.substring(currentUrl.indexOf("?")) : null;
+    const url = new URL(currentUrl);
     url.searchParams.set("page", "login");
+    if (returnTo) {
+      url.searchParams.set("returnTo", returnTo);
+    }
     window.history.replaceState({}, "", url.toString());
     notifyUrlChange();
   }, [isAuthLoading, isAuthed, pageKey]);
 
-  // Redirect authenticated users away from login/signup
+  // Redirect authenticated users away from login/signup — check returnTo first
   useEffect(() => {
     if (isAuthLoading || !isAuthed) return;
     if (pageKey !== "login" && pageKey !== "signup") return;
     const url = new URL(window.location.href);
-    url.searchParams.set("page", "dashboard");
-    window.history.replaceState({}, "", url.toString());
+    const rawReturnTo = url.searchParams.get("returnTo");
+    const safeReturnTo = sanitizeReturnTo(rawReturnTo);
+    if (safeReturnTo) {
+      window.history.replaceState({}, "", safeReturnTo);
+    } else {
+      url.searchParams.delete("returnTo");
+      url.searchParams.set("page", "dashboard");
+      window.history.replaceState({}, "", url.toString());
+    }
     notifyUrlChange();
   }, [isAuthLoading, isAuthed, pageKey]);
 
@@ -195,16 +211,18 @@ function AppContent(): JSX.Element {
 
   // ── Main app shell ──
   return (
-    <TokenProvider tokenVars={buildTokenCssVars()}>
-      <ConfidenceEngine paused={!isAuthed || isPublicPage} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
-        <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
-          <PageRenderer
-            pageKey={activePageKey}
-            isAuthenticated={isAuthed}
-            hasStockId={hasStockIdParam}
-          />
-        </SubsystemErrorBoundary>
-      </ConfidenceEngine>
-    </TokenProvider>
+    <ToastProvider>
+      <TokenProvider tokenVars={buildTokenCssVars()}>
+        <ConfidenceEngine paused={!isAuthed || isPublicPage} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
+          <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
+            <PageRenderer
+              pageKey={activePageKey}
+              isAuthenticated={isAuthed}
+              hasStockId={hasStockIdParam}
+            />
+          </SubsystemErrorBoundary>
+        </ConfidenceEngine>
+      </TokenProvider>
+    </ToastProvider>
   );
 }

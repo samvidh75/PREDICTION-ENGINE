@@ -11,6 +11,7 @@ import type { CompanyMetadata } from "../services/api/client";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore } from "../services/ui/dataFormatting";
 import { DataFreshnessBadge, SourceBadge, CoverageStatusBadge } from "../components/ui/PageHeader";
+import { useToast } from "../components/feedback/useToast";
 
 
 const getClassificationStyle = (cls: string) => {
@@ -202,6 +203,7 @@ export const StockStoryPage: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [noteText, setNoteText] = useState(() => NoteEngine.getNote(ticker).note);
   const [metadata, setMetadata] = useState<MetadataState>({ data: null, loading: true, error: null });
+  const toast = useToast();
 
   const [story, setStory] = useState<any | null>(null);
   const [storyLoading, setStoryLoading] = useState<boolean>(true);
@@ -296,8 +298,13 @@ export const StockStoryPage: React.FC = () => {
   const handleToggleWatchlist = () => {
     const defaultList = watchlists[0];
     if (!defaultList) return;
-    if (isInWatchlist) WatchlistEngine.removeTicker(defaultList.id, ticker);
-    else WatchlistEngine.addTicker(defaultList.id, ticker);
+    if (isInWatchlist) {
+      WatchlistEngine.removeTicker(defaultList.id, ticker);
+      toast.success(`${ticker} removed from watchlist`);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, ticker);
+      toast.success(`${ticker} saved to watchlist`);
+    }
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 

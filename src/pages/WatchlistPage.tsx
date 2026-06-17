@@ -11,6 +11,7 @@ import { EmptyState } from "../components/ui/DataState";
 import { MissingDataBadge } from "../components/ui/PageHeader";
 import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
 import tokens from "../components/ui/tokens";
+import { useToast } from "../components/feedback/useToast";
 
 interface DisplayList {
   id: string;
@@ -28,6 +29,7 @@ export const WatchlistPage: React.FC = () => {
   const [localLists, setLocalLists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
   const [smartWatchlists] = useState<SmartWatchlist[]>(() => SmartWatchlistEngine.getSmartWatchlists());
   const [selectedList, setSelectedList] = useState<string>("");
+  const toast = useToast();
   const [noteRefresh, setNoteRefresh] = useState(0);
 
   useEffect(() => {
@@ -91,13 +93,16 @@ export const WatchlistPage: React.FC = () => {
       api.removeWatchlistTicker(remoteId, ticker)
         .then(updated => {
           setRemoteLists(prev => prev ? prev.map(wl => wl.id === remoteId ? updated : wl) : prev);
+          toast.success(`${ticker} removed from watchlist`);
         })
         .catch(() => {
+          toast.error(`Could not remove ${ticker}. Try again.`);
           api.getWatchlists().then(lists => setRemoteLists(lists)).catch(() => {});
         });
     } else {
       WatchlistEngine.removeTicker(selectedList, ticker);
       setLocalLists([...WatchlistEngine.getWatchlists()]);
+      toast.success(`${ticker} removed from watchlist`);
     }
   };
 
