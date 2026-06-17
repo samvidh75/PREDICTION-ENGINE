@@ -136,7 +136,7 @@ export const SettingsPage: React.FC = () => {
                 {(["Factor", "Risk", "Momentum", "News", "Market"] as AlertCategory[]).map((cat) => (
                   <div
                     key={cat}
-                    className="flex items-center justify-between rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-4"
+                    className="flex items-center justify-between rounded-xl glass-panel p-4"
                   >
                     <div>
                       <span className="block text-sm font-semibold text-slate-900">{cat} Alerts</span>
@@ -169,7 +169,7 @@ export const SettingsPage: React.FC = () => {
                 <p className="text-sm text-slate-500">Configure your workspace interface theme.</p>
               </div>
               <div className="max-w-md">
-                <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
+                <div className="rounded-xl glass-panel p-5">
                   <span className="block text-sm font-semibold text-slate-900">Research workspace theme</span>
                   <span className="mt-1 block text-sm text-slate-500">
                     The interface uses a fixed light theme optimised for equity research. Dark mode is not available.
@@ -186,7 +186,7 @@ export const SettingsPage: React.FC = () => {
                 <p className="text-sm text-slate-500">Manage password and credentials security.</p>
               </div>
               <div className="max-w-md">
-                <div className="space-y-4 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+                <div className="space-y-4 rounded-xl glass-panel p-6">
                   <div>
                     <span className="mb-1 block text-sm font-semibold text-slate-900">Reset password</span>
                     <p className="mb-3 text-sm text-slate-500">

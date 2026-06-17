@@ -25,7 +25,7 @@ export const Card: React.FC<CardProps> = ({
   glass = false,
 }) => {
   const Comp = onClick ? "button" : "div";
-  const glassStyles = "bg-white/75 backdrop-blur-glass border border-white/50 shadow-glass";
+  const glassStyles = "glass-panel-lg";
   const solidStyles = "bg-white border border-slate-200/60 shadow-card";
   return (
     <Comp

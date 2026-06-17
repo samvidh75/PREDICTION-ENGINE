@@ -21,7 +21,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={`h-10 w-full rounded-xl text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed ${
             glass
-              ? "bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass"
+              ? "glass-panel"
               : "bg-white border border-slate-200 shadow-sm"
           } px-3 ${className}`}
           {...props}

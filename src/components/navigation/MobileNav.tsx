@@ -27,6 +27,13 @@ interface PublicMobileNavItem {
   icon: React.ReactNode;
 }
 
+const bottomNavGlass = {
+  background: 'rgba(255,255,255,0.72)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderTop: '1px solid rgba(255,255,255,0.5)',
+};
+
 export const MobileNav: React.FC = () => {
   const { currentView, MapsTo } = useNavigation();
   const { isAuthenticated } = useAuth();
@@ -73,7 +80,7 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around bg-white/85 backdrop-blur-glassLg border-t border-white/40 shadow-glass px-2 md:hidden">
+    <div style={bottomNavGlass} className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around px-2 md:hidden">
       {isPublicMobile
         ? publicTabs.map((tab) => {
             const isActive = currentPage === tab.page;

@@ -106,7 +106,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             }
           />
           {coverageData && (
-            <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
+            <div className="rounded-xl glass-panel p-5">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data coverage
               </h4>
@@ -154,7 +154,7 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mt-8 overflow-hidden rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass">
+        <div className="mt-8 overflow-hidden rounded-xl glass-panel">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/20 bg-slate-50/30 text-slate-500">

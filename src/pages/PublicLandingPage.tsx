@@ -40,7 +40,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="relative mx-auto max-w-6xl px-6 pb-16 pt-24 md:pt-36">
         <div className="grid gap-12 md:grid-cols-[1.2fr_0.8fr] md:items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 py-1 text-xs font-medium text-slate-500">
+            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full glass-panel px-3 py-1 text-xs font-medium text-slate-500">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Evidence-driven research
             </div>
@@ -81,7 +81,7 @@ export const PublicLandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 float-animate">
+          <div className="rounded-2xl glass-panel-lg p-6 float-animate">
             <div className="mb-5 flex items-center justify-between border-b border-white/20 pb-4">
               <span className="text-sm font-medium text-slate-500">
                 Research principles
@@ -115,7 +115,7 @@ export const PublicLandingPage: React.FC = () => {
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {workflow.map(({ icon, title, body }) => (
-              <div key={title} className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+              <div key={title} className="rounded-2xl glass-panel p-6">
                 <div className="mb-4 inline-flex rounded-xl bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/30 p-3">
                   {icon}
                 </div>
