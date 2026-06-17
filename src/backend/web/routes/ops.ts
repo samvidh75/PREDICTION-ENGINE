@@ -63,9 +63,17 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     // Scheduler health
     try {
       const schedRes = await query(
-        "SELECT status, phase FROM pipeline_health ORDER BY started_at DESC LIMIT 6"
+        "SELECT status, phase, error_classes FROM pipeline_health ORDER BY started_at DESC LIMIT 6"
       );
-      const phases = schedRes.rows.map((r: any) => `${r.phase}:${r.status}`);
+      const phases = schedRes.rows.map((r: any) => {
+        const base = `${r.phase}:${r.status}`;
+        if (r.status === 'partial' && r.error_classes && r.error_classes.length > 0) {
+          const classes = r.error_classes.map((c: string) => c.split(/[:(]/)[0]).filter(Boolean);
+          const unique = [...new Set(classes)].join(',');
+          return `${base}[${unique}]`;
+        }
+        return base;
+      });
       metrics.scheduler_health = phases.length > 0 ? phases.join(", ") : "no runs";
     } catch {
       metrics.scheduler_health = "error";
@@ -588,8 +596,24 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const errorClasses: string[] = [];
         const rowsWrittenSummary: Record<string, number> = { ...rowsWritten };
 
+        function classifyError(stage: string, errorMessage: string): string {
+          const msg = errorMessage.toLowerCase();
+          if (msg.includes('upstox token expired') || msg.includes('401') && msg.includes('upstox')) return `provider_auth_expired:${stage}`;
+          if (msg.includes('token expired') || msg.includes('401')) return `provider_auth_expired:${stage}`;
+          if (msg.includes('plan') && msg.includes('limit')) return `provider_plan_limited:${stage}`;
+          if (msg.includes('no financial fields returned') || msg.includes('fundamentals unavailable')) return `provider_plan_limited:${stage}`;
+          if (msg.includes('no isin') || msg.includes('isin not found') || msg.includes('isin lookup')) return `provider_isin_unavailable:${stage}`;
+          if (msg.includes('network') || msg.includes('enotfound') || msg.includes('econnrefused') || msg.includes('timeout')) return `provider_network_error:${stage}`;
+          if (msg.includes('fetch') && (msg.includes('failed') || msg.includes('error'))) return `provider_network_error:${stage}`;
+          return `code_error:${stage}`;
+        }
+
         for (const [stage, r] of Object.entries(results)) {
-          if ((r as any).error) errorClasses.push(`${stage}:${String((r as any).error).substring(0, 40)}`);
+          if ((r as any).error) {
+            const rawError = String((r as any).error).substring(0, 60);
+            const classified = classifyError(stage, rawError);
+            errorClasses.push(`${classified}  (${rawError.substring(0, 40)})`);
+          }
         }
 
         try {
