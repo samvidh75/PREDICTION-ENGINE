@@ -87,7 +87,7 @@ export default function PublicPredictionsPage(): JSX.Element {
         />
 
       {error && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+        <div className="mb-4 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4 text-sm text-amber-800" role="status">
           <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
           <p className="mt-1 text-xs">{error}</p>
         </div>
@@ -106,7 +106,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             }
           />
           {coverageData && (
-            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
+            <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data coverage
               </h4>
@@ -154,37 +154,37 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         </div>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-lg border border-slate-200/80 bg-white shadow-sm">
-          <table className="w-full text-left text-xs">
+        <div className="mt-8 overflow-hidden rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass">
+          <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500">
-                <th className="p-4 font-semibold uppercase tracking-wider">Symbol</th>
-                <th className="p-4 font-semibold uppercase tracking-wider">Signal</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden sm:table-cell">Severity</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden md:table-cell">Explanation</th>
-                <th className="p-4 font-semibold uppercase tracking-wider hidden lg:table-cell">Freshness</th>
+              <tr className="border-b border-white/20 bg-slate-50/30 text-slate-500">
+                <th className="p-4 font-semibold uppercase tracking-wider text-[11px]">Symbol</th>
+                <th className="p-4 font-semibold uppercase tracking-wider text-[11px]">Signal</th>
+                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden sm:table-cell">Severity</th>
+                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden md:table-cell">Explanation</th>
+                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden lg:table-cell">Freshness</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/20">
               {signals.map((signal, i) => {
-                const severityClass = severityColors[signal.severity] || "bg-slate-50 border-slate-200 text-slate-700";
+                const severityClass = severityColors[signal.severity] || "bg-slate-50/60 border-slate-200/50 text-slate-700";
 
                 return (
                   <tr
                     key={`${signal.symbol}:${i}`}
                     onClick={() => signal.symbol && navigate(signal.symbol)}
-                    className="cursor-pointer transition-colors hover:bg-slate-50"
+                    className="cursor-pointer transition-colors hover:bg-white/40"
                   >
-                    <td className="p-4 font-mono font-bold text-slate-950 hover:text-emerald-700">
+                    <td className="p-4 font-mono font-bold text-slate-900 hover:text-emerald-700">
                       {signal.symbol}
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-slate-50 border-slate-200 text-slate-700">
+                      <span className="inline-flex items-center rounded-lg bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
                         {signal.type || "Signal pending"}
                       </span>
                     </td>
                     <td className="hidden p-4 sm:table-cell">
-                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
+                      <span className={`inline-flex items-center rounded-lg backdrop-blur-sm border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
                         {signal.severity || "Unknown"}
                       </span>
                     </td>
@@ -206,7 +206,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             </tbody>
           </table>
           {symbolsAnalyzed !== null && (
-            <div className="border-t border-slate-100 bg-slate-50/50 px-4 py-2 text-[10px] text-slate-500">
+            <div className="border-t border-white/20 bg-slate-50/20 px-4 py-2 text-xs text-slate-500">
               {symbolsAnalyzed} companies in latest cycle
             </div>
           )}

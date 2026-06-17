@@ -37,13 +37,6 @@ const BORDER_COLORS: Record<ToastType, string> = {
   warning: "border-l-amber-500",
 };
 
-const BG_COLORS: Record<ToastType, string> = {
-  success: "bg-emerald-50",
-  error: "bg-red-50",
-  info: "bg-blue-50",
-  warning: "bg-amber-50",
-};
-
 const AUTO_DISMISS_MS: Record<ToastType, number> = {
   success: 4000,
   error: 8000,
@@ -98,7 +91,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
           <div
             key={toast.id}
             role="status"
-            className={`pointer-events-auto flex items-start gap-2.5 rounded-lg border border-slate-200 border-l-4 ${BORDER_COLORS[toast.type]} ${BG_COLORS[toast.type]} px-3.5 py-3 shadow-sm animate-in slide-in-from-top-2 fade-in duration-200`}
+            className={`pointer-events-auto flex items-start gap-2.5 rounded-xl bg-white/85 backdrop-blur-glassLg border border-white/50 shadow-glassLg border-l-4 ${BORDER_COLORS[toast.type]} px-3.5 py-3 animate-in slide-in-from-top-2 fade-in duration-200`}
           >
             {ICONS[toast.type]}
             <span className="text-[13px] leading-relaxed text-slate-800 flex-1 min-w-0">

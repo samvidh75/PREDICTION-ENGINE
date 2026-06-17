@@ -116,7 +116,7 @@ export const DataCoveragePanel: React.FC = () => {
   return (
     <div className="grid gap-5 md:grid-cols-3">
       {/* Coverage stats block */}
-      <Card className="md:col-span-2 p-6 border-slate-200/60 bg-white">
+      <div className="md:col-span-2 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
         <SectionHeader
           title="Data coverage"
           subtitle="Aggregate data volumes across all connected sources."
@@ -129,7 +129,7 @@ export const DataCoveragePanel: React.FC = () => {
         />
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
           {metrics.map((m, idx) => (
-            <div key={idx} className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+            <div key={idx} className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
               <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
                 {m.label}
               </span>
@@ -142,10 +142,12 @@ export const DataCoveragePanel: React.FC = () => {
             </div>
           ))}
         </div>
-      </Card>
+      </div>
+
+
 
       {/* Provider environment statuses */}
-      <Card className="p-6 border-slate-200/60 bg-white">
+      <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
         <SectionHeader
           title="Data sources"
           subtitle="Connected provider status."
@@ -155,7 +157,7 @@ export const DataCoveragePanel: React.FC = () => {
             <ProviderStatusPill key={key} name={key} status={val} />
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
