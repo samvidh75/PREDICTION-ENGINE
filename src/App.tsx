@@ -22,6 +22,9 @@ import ConfidenceEngine from "./components/intelligence/ConfidenceEngine";
 // Error handling
 import SubsystemErrorBoundary from "./components/diagnostics/SubsystemErrorBoundary";
 
+// Route metadata
+import { useRouteMetadata } from "./hooks/useRouteMetadata";
+
 // Auth
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LayoutProvider, useNavigation } from "./context/LayoutContext";
@@ -42,6 +45,8 @@ const DEFAULT_SKIP_PROFILE: UserProfile = {
 };
 
 export default function App(): JSX.Element {
+  useRouteMetadata();
+
   // Dev: redirect 127.0.0.1 → localhost
   useEffect(() => {
     if (!import.meta.env.DEV || typeof window === "undefined") return;
