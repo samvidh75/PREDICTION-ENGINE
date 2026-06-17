@@ -4,7 +4,6 @@ import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } 
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
-import tokens from "../components/ui/tokens";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type Signal } from "../services/api/client";
 
@@ -76,145 +75,140 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   return (
-    <main className="min-h-screen bg-background text-slate-900">
+    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
       <TopNav />
       <MobileNav />
-      <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
+      <div className="mx-auto max-w-6xl px-4 pt-[76px] md:pt-28 sm:px-6">
+
         <PageHeader
           title="Score changes"
           subtitle="Score changes from the latest verified data update cycle."
           primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
         />
 
-      {error && (
-        <div className="mb-4 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4 text-sm text-amber-800" role="status">
-          <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
-          <p className="mt-1 text-xs">{error}</p>
-        </div>
-      )}
-
-      {loading ? (
-        <LoadingState description="Checking for recent score changes…" />
-      ) : signals.length === 0 ? (
-        <div className="flex flex-col gap-5">
-          <EmptyState
-            title="Score changes pending"
-            description={
-              symbolsAnalyzed && symbolsAnalyzed > 0
-                ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update cycle.`
-                : "Score changes appear when provider data has been processed and verified."
-            }
-          />
-          {coverageData && (
-            <div className="rounded-xl glass-panel p-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
-                Data coverage
-              </h4>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Companies covered</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Scored records</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Latest update</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.latestPredictionDate || "—"}
-                  </span>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Score changes appear once updated provider data has been verified.
-              </p>
-            </div>
-          )}
-          <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
-            <Button
-              type="button"
-              onClick={() => setPage("signup")}
-              className="h-10 px-4 text-xs"
-            >
-              Create free account
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setPage("methodology")}
-              variant="secondary"
-              className="h-10 px-4 text-xs"
-            >
-              View scoring methodology
-            </Button>
+        {error && (
+          <div
+            className="mb-4 rounded-xl p-4 text-sm"
+            role="status"
+            style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
+          >
+            <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
+            <p className="mt-1 text-xs">{error}</p>
           </div>
-        </div>
-      ) : (
-        <div className="mt-8 overflow-hidden rounded-xl glass-panel">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-white/20 bg-slate-50/30 text-slate-500">
-                <th className="p-4 font-semibold uppercase tracking-wider text-[11px]">Symbol</th>
-                <th className="p-4 font-semibold uppercase tracking-wider text-[11px]">Signal</th>
-                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden sm:table-cell">Severity</th>
-                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden md:table-cell">Explanation</th>
-                <th className="p-4 font-semibold uppercase tracking-wider text-[11px] hidden lg:table-cell">Freshness</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/20">
-              {signals.map((signal, i) => {
-                const severityClass = severityColors[signal.severity] || "bg-slate-50/60 border-slate-200/50 text-slate-700";
+        )}
 
-                return (
-                  <tr
-                    key={`${signal.symbol}:${i}`}
-                    onClick={() => signal.symbol && navigate(signal.symbol)}
-                    className="cursor-pointer transition-colors hover:bg-white/40"
-                  >
-                    <td className="p-4 font-mono font-bold text-slate-900 hover:text-emerald-700">
-                      {signal.symbol}
-                    </td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center rounded-lg bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-700">
-                        {signal.type || "Signal pending"}
-                      </span>
-                    </td>
-                    <td className="hidden p-4 sm:table-cell">
-                      <span className={`inline-flex items-center rounded-lg backdrop-blur-sm border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
-                        {signal.severity || "Unknown"}
-                      </span>
-                    </td>
-                    <td className="hidden max-w-xs truncate p-4 md:table-cell">
-                      <span className="text-slate-600">{signal.explanation || "No explanation"}</span>
-                    </td>
-                    <td className="hidden p-4 lg:table-cell">
-                      {signal.snapshotDate || snapshotDate ? (
-                        <span className="text-[10px] text-emerald-700 font-semibold whitespace-nowrap">
-                          {formatFreshness(signal.snapshotDate || snapshotDate)}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-slate-400">Pending</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {symbolsAnalyzed !== null && (
-            <div className="border-t border-white/20 bg-slate-50/20 px-4 py-2 text-xs text-slate-500">
-              {symbolsAnalyzed} companies in latest cycle
+        {loading ? (
+          <LoadingState description="Checking for recent score changes…" />
+        ) : signals.length === 0 ? (
+          <div className="flex flex-col gap-5">
+            <EmptyState
+              title="Score changes pending"
+              description={
+                symbolsAnalyzed && symbolsAnalyzed > 0
+                  ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update cycle.`
+                  : "Score changes appear when provider data has been processed and verified."
+              }
+            />
+            {coverageData && (
+              <div
+                className="rounded-xl p-5"
+                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+              >
+                <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#536471" }}>Data coverage</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Companies covered</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Scored records</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Latest update</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {coverageData.latestPredictionDate || "—"}
+                    </span>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs leading-relaxed" style={{ color: "#536471" }}>
+                  Score changes appear once updated provider data has been verified.
+                </p>
+              </div>
+            )}
+            <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
+              <Button type="button" onClick={() => setPage("signup")} className="h-10 px-4 text-xs">Create free account</Button>
+              <Button type="button" onClick={() => setPage("methodology")} variant="secondary" className="h-10 px-4 text-xs">View scoring methodology</Button>
             </div>
-          )}
+          </div>
+        ) : (
+          <div className="mt-8 overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
+                  <th className="p-4">Symbol</th>
+                  <th className="p-4">Signal</th>
+                  <th className="p-4 hidden sm:table-cell">Severity</th>
+                  <th className="p-4 hidden md:table-cell">Explanation</th>
+                  <th className="p-4 hidden lg:table-cell">Freshness</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y" style={{ borderColor: "rgba(255,255,255,0.2)" }}>
+                {signals.map((signal, i) => {
+                  const severityClass = severityColors[signal.severity] || "bg-white/60 border-white/30 text-ink-secondary";
+
+                  return (
+                    <tr
+                      key={`${signal.symbol}:${i}`}
+                      onClick={() => signal.symbol && navigate(signal.symbol)}
+                      className="cursor-pointer transition-colors hover:bg-white/40"
+                    >
+                      <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{signal.symbol}</td>
+                      <td className="p-4">
+                        <span
+                          className="inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                          style={{ background: "rgba(255,255,255,0.6)", borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}
+                        >
+                          {signal.type || "Signal pending"}
+                        </span>
+                      </td>
+                      <td className="hidden p-4 sm:table-cell">
+                        <span className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
+                          {signal.severity || "Unknown"}
+                        </span>
+                      </td>
+                      <td className="hidden max-w-xs truncate p-4 md:table-cell">
+                        <span style={{ color: "#536471" }}>{signal.explanation || "No explanation"}</span>
+                      </td>
+                      <td className="hidden p-4 lg:table-cell">
+                        {signal.snapshotDate || snapshotDate ? (
+                          <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "#1a6e4a" }}>
+                            {formatFreshness(signal.snapshotDate || snapshotDate)}
+                          </span>
+                        ) : (
+                          <span className="text-[10px]" style={{ color: "#8b98a5" }}>Pending</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {symbolsAnalyzed !== null && (
+              <div className="border-t px-4 py-2 text-xs" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
+                {symbolsAnalyzed} companies in latest cycle
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6">
+          <ResearchDisclaimer />
         </div>
-      )}
-      <div className="mt-6">
-        <ResearchDisclaimer />
-      </div>
       </div>
     </main>
   );

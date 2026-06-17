@@ -8,7 +8,6 @@ import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } 
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
-import tokens from "../components/ui/tokens";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
 
@@ -52,9 +51,7 @@ export const PublicRankingsPage: React.FC = () => {
 
   const sectors = useMemo(() => {
     const set = new Set<string>();
-    rankings.forEach((r) => {
-      if (r.sector) set.add(r.sector);
-    });
+    rankings.forEach((r) => { if (r.sector) set.add(r.sector); });
     return ["all", ...Array.from(set)];
   }, [rankings]);
 
@@ -79,167 +76,152 @@ export const PublicRankingsPage: React.FC = () => {
   const freshnessDate = rankings[0]?.predictionDate ?? null;
 
   return (
-    <main className="min-h-screen bg-background text-slate-900">
+    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
       <TopNav />
       <MobileNav />
-      <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
+      <div className="mx-auto max-w-6xl px-4 pt-[76px] md:pt-28 sm:px-6">
+
         <PageHeader
           title="Research rankings"
           subtitle="Company rankings from the latest verified scoring cycle."
           primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
 
-      {error && (
-        <div className="mb-4 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4 text-sm text-amber-800" role="status">
-          <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
-          <p className="mt-1 text-xs">{error}</p>
-        </div>
-      )}
-
-      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl glass-panel p-4 sm:flex-row">
-        <div className="w-full sm:w-72">
-          <Input
-            aria-label="Search rankings by symbol or sector"
-            placeholder="Search symbol or sector..."
-            glass
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <span className="whitespace-nowrap text-xs font-medium text-slate-500">
-            Sector:
-          </span>
-          <select
-            value={sectorFilter}
-            onChange={(e) => setSectorFilter(e.target.value)}
-            className="h-10 w-full rounded-xl glass-panel px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-48"
+        {error && (
+          <div
+            className="mb-4 rounded-xl p-4 text-sm"
+            role="status"
+            style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
           >
-            {sectors.map((sec) => (
-              <option key={sec} value={sec}>
-                {sec === "all" ? "All Sectors" : sec}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+            <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
+            <p className="mt-1 text-xs">{error}</p>
+          </div>
+        )}
 
-      {loading ? (
-        <div className="py-12 text-center text-sm text-slate-500">Loading rankings…</div>
-      ) : filteredRankings.length === 0 && rankings.length === 0 ? (
-        <div className="flex flex-col gap-5">
-          <EmptyState
-            title="Rankings pending"
-            description="Rankings appear after verified scoring has completed for the latest cycle."
-          />
-          {(symbolCount !== null || registryRowCount !== null) && (
-            <div className="rounded-xl glass-panel p-5">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
-                Data coverage
-              </h4>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Companies covered</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {symbolCount !== null ? symbolCount.toLocaleString() : "—"}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Scored records</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {registryRowCount !== null ? registryRowCount.toLocaleString() : "—"}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Latest update</span>
-                  <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {latestPredictionDate || "—"}
-                  </span>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Rankings appear once verified scoring data is available.
-              </p>
-            </div>
-          )}
-          <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
-            <Button
-              type="button"
-              onClick={() => setPage("signup")}
-              className="h-10 px-4 text-xs"
+        <div
+          className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl p-4 sm:flex-row"
+          style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+        >
+          <div className="w-full sm:w-72">
+            <Input
+              aria-label="Search rankings by symbol or sector"
+              placeholder="Search symbol or sector..."
+              glass
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <span className="whitespace-nowrap text-xs font-medium" style={{ color: "#536471" }}>Sector:</span>
+            <select
+              value={sectorFilter}
+              onChange={(e) => setSectorFilter(e.target.value)}
+              className="h-10 w-full rounded-xl px-3 text-sm focus:outline-none sm:w-48"
+              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#0f1419" }}
             >
-              Create free account
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setPage("methodology")}
-              variant="secondary"
-              className="h-10 px-4 text-xs"
-            >
-              View scoring methodology
-            </Button>
+              {sectors.map((sec) => (
+                <option key={sec} value={sec}>{sec === "all" ? "All Sectors" : sec}</option>
+              ))}
+            </select>
           </div>
         </div>
-      ) : filteredRankings.length === 0 && rankings.length > 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-sm text-slate-500">No rankings match your search or sector filter.</p>
-          <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="mt-2 text-xs text-emerald-700 hover:underline bg-transparent border-none cursor-pointer">
-            Clear filters
-          </button>
-        </div>
-      ) : (
-        <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
-          {filteredRankings.map((r) => {
-            const rankingScore = r.rankingScore;
-            const confidenceScore = r.confidenceScore;
 
-            return (
-              <tr
-                key={r.symbol}
-                className="cursor-pointer transition-colors hover:bg-white/40"
-                onClick={() => setPage("stock", r.symbol)}
+        {loading ? (
+          <div className="py-12 text-center text-sm" style={{ color: "#536471" }}>Loading rankings…</div>
+        ) : filteredRankings.length === 0 && rankings.length === 0 ? (
+          <div className="flex flex-col gap-5">
+            <EmptyState
+              title="Rankings pending"
+              description="Rankings appear after verified scoring has completed for the latest cycle."
+            />
+            {(symbolCount !== null || registryRowCount !== null) && (
+              <div
+                className="rounded-xl p-5"
+                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
               >
-                <td className="p-4 font-semibold text-slate-500">{formatRank(r.rank)}</td>
-                <td className="p-4 font-mono font-bold text-slate-950 hover:underline">
-                  {r.symbol}
-                </td>
-                <td className="max-w-[200px] truncate p-4 text-slate-700">
-                  {r.companyName || "Unavailable"}
-                </td>
-                <td className="p-4">
-                  {typeof rankingScore === "number" && Number.isFinite(rankingScore) ? (
-                    <ScorePill score={Math.round(rankingScore)} />
-                  ) : (
-                    <MissingDataBadge />
-                  )}
-                </td>
-                <td className="p-4">
-                  {typeof confidenceScore === "number" && Number.isFinite(confidenceScore) ? (
-                    <ScorePill score={Math.round(confidenceScore)} />
-                  ) : (
-                    <MissingDataBadge />
-                  )}
-                </td>
-                <td className="p-4">
-                  <Badge variant="info">{r.sector || "Not available"}</Badge>
-                </td>
-                <td className="p-4">
-                  {r.predictionDate ? (
-                    <span className="text-[10px] text-emerald-700 font-semibold whitespace-nowrap">
-                      {formatFreshness(r.predictionDate)}
+                <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#536471" }}>Data coverage</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Companies covered</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {symbolCount !== null ? symbolCount.toLocaleString() : "—"}
                     </span>
-                  ) : (
-                    <span className="text-[10px] text-slate-400">Pending</span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </Table>
-      )}
-      <div className="mt-6">
-        <ResearchDisclaimer />
-      </div>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Scored records</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {registryRowCount !== null ? registryRowCount.toLocaleString() : "—"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Latest update</span>
+                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                      {latestPredictionDate || "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
+              <Button type="button" onClick={() => setPage("signup")} className="h-10 px-4 text-xs">Create free account</Button>
+              <Button type="button" onClick={() => setPage("methodology")} variant="secondary" className="h-10 px-4 text-xs">View scoring methodology</Button>
+            </div>
+          </div>
+        ) : filteredRankings.length === 0 && rankings.length > 0 ? (
+          <div className="py-12 text-center">
+            <p className="text-sm" style={{ color: "#536471" }}>No rankings match your search or sector filter.</p>
+            <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer" style={{ color: "#1a6e4a" }}>
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
+            {filteredRankings.map((r) => {
+              const rankingScore = r.rankingScore;
+              const confidenceScore = r.confidenceScore;
+
+              return (
+                <tr
+                  key={r.symbol}
+                  className="cursor-pointer transition-colors hover:bg-white/40"
+                  onClick={() => setPage("stock", r.symbol)}
+                >
+                  <td className="p-4 font-semibold" style={{ color: "#536471" }}>{formatRank(r.rank)}</td>
+                  <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{r.symbol}</td>
+                  <td className="max-w-[200px] truncate p-4" style={{ color: "#536471" }}>{r.companyName || "Unavailable"}</td>
+                  <td className="p-4">
+                    {typeof rankingScore === "number" && Number.isFinite(rankingScore) ? (
+                      <ScorePill score={Math.round(rankingScore)} />
+                    ) : (
+                      <MissingDataBadge />
+                    )}
+                  </td>
+                  <td className="p-4">
+                    {typeof confidenceScore === "number" && Number.isFinite(confidenceScore) ? (
+                      <ScorePill score={Math.round(confidenceScore)} />
+                    ) : (
+                      <MissingDataBadge />
+                    )}
+                  </td>
+                  <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
+                  <td className="p-4">
+                    {r.predictionDate ? (
+                      <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "#1a6e4a" }}>
+                        {formatFreshness(r.predictionDate)}
+                      </span>
+                    ) : (
+                      <span className="text-[10px]" style={{ color: "#8b98a5" }}>Pending</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </Table>
+        )}
+
+        <div className="mt-6">
+          <ResearchDisclaimer />
+        </div>
       </div>
     </main>
   );

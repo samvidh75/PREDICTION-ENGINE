@@ -49,10 +49,7 @@ export const DashboardHub: React.FC = () => {
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [signalsError, setSignalsError] = useState(false);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState(0);
-  const [healthData, setHealthData] = useState<{
-    symbolsCovered: number;
-    dbConnected: boolean;
-  } | null>(null);
+  const [healthData, setHealthData] = useState<{ symbolsCovered: number; dbConnected: boolean; } | null>(null);
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -66,10 +63,7 @@ export const DashboardHub: React.FC = () => {
     setSignalsError(false);
     api.getSignals(20)
       .then(data => {
-        if (!data.signals) {
-          setSignals([]);
-          return;
-        }
+        if (!data.signals) { setSignals([]); return; }
         const items: SignalItem[] = data.signals.map((s: ApiSignal) => ({
           symbol: s.symbol,
           type: s.type,
@@ -80,10 +74,7 @@ export const DashboardHub: React.FC = () => {
         setSignals(items);
         setSymbolsAnalyzed(data.symbolsAnalyzed ?? 0);
       })
-      .catch(() => {
-        setSignalsError(true);
-        setSignals([]);
-      })
+      .catch(() => { setSignalsError(true); setSignals([]); })
       .finally(() => setSignalsLoading(false));
   }, []);
 
@@ -111,51 +102,47 @@ export const DashboardHub: React.FC = () => {
   const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-0 font-sans text-slate-900 antialiased">
-      {/* Header */}
+    <div className="mx-auto w-full max-w-7xl px-0 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Activity className="h-5 w-5 text-accent-primary" />
+          <Activity className="h-5 w-5" style={{ color: "#1a6e4a" }} />
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">Research workspace</h1>
-            <p className="text-sm text-slate-500">Review signals, saved companies, and recent activity</p>
+            <h1 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Research workspace</h1>
+            <p className="text-sm" style={{ color: "#536471" }}>Review signals, saved companies, and recent activity</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded-xl glass-panel px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
+          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium transition hover:opacity-80" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#536471" }}>
             <Search className="h-3.5 w-3.5" /> Search
           </button>
-          <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded-xl glass-panel px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-white/90 transition-colors">
+          <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium transition hover:opacity-80" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#536471" }}>
             <Star className="h-3.5 w-3.5" /> Watchlists
           </button>
         </div>
       </div>
 
-      {/* Status bar */}
       {healthData && (
-        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl glass-panel px-5 py-3 text-xs text-slate-500">
+        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl px-5 py-3 text-xs" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)", color: "#536471" }}>
           <span className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${healthData.dbConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+            <span className={`h-2 w-2 rounded-full ${healthData.dbConnected ? 'bg-accent-success' : 'bg-amber-500'}`} />
             {healthData.symbolsCovered} companies in coverage universe
           </span>
         </div>
       )}
 
-      {/* 3-column grid */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        {/* COL A: Watchlist */}
-        <section className="rounded-2xl glass-panel overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
+        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
             <div className="flex items-center gap-2.5">
-              <Eye className="h-4 w-4 text-accent-primary" />
-              <h2 className="text-xs font-semibold text-slate-700">Watchlist</h2>
+              <Eye className="h-4 w-4" style={{ color: "#1a6e4a" }} />
+              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Watchlist</h2>
             </div>
-            <span className="text-xs text-slate-400 font-mono tabular-nums">{followedTickers.length}</span>
+            <span className="text-xs font-mono tabular-nums" style={{ color: "#8b98a5" }}>{followedTickers.length}</span>
           </div>
           {followedTickers.length === 0 ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-slate-500">No companies saved yet.</p>
-              <button onClick={() => navigate('search')} className="mt-2 text-xs text-accent-primary hover:underline bg-transparent border-none cursor-pointer font-medium">
+              <p className="text-sm" style={{ color: "#536471" }}>No companies saved yet.</p>
+              <button onClick={() => navigate('search')} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
                 Search companies to follow
               </button>
             </div>
@@ -167,51 +154,49 @@ export const DashboardHub: React.FC = () => {
                 <button
                   key={ticker}
                   onClick={() => openCompany(ticker)}
-                  className="flex w-full items-center gap-3 border-b border-white/20 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                  className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                  style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
                 >
-                  <span className="font-mono font-semibold text-sm min-w-[64px] text-slate-900">{ticker}</span>
-                  <span className="flex-1 text-xs text-slate-500 truncate">{info?.companyName || ''}</span>
+                  <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{ticker}</span>
+                  <span className="flex-1 text-xs truncate" style={{ color: "#536471" }}>{info?.companyName || ''}</span>
                   {score !== null && (
-                    <span className={`font-mono text-xs font-semibold tabular-nums ${score >= 70 ? 'text-emerald-700' : score >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
+                    <span className={`font-mono text-xs font-semibold tabular-nums ${score >= 70 ? 'text-accent-success' : score >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
                       {score}
                     </span>
                   )}
-                  <span className="text-xs text-slate-300">→</span>
+                  <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
                 </button>
               );
             })
           )}
         </section>
 
-        {/* COL B: Signals */}
-        <section className="rounded-2xl glass-panel overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
+        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
             <div className="flex items-center gap-2.5">
-              <TrendingUp className="h-4 w-4 text-accent-primary" />
-              <h2 className="text-xs font-semibold text-slate-700">Latest signals</h2>
+              <TrendingUp className="h-4 w-4" style={{ color: "#1a6e4a" }} />
+              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Latest signals</h2>
             </div>
-            <span className="text-xs text-slate-400 font-mono tabular-nums">
+            <span className="text-xs font-mono tabular-nums" style={{ color: "#8b98a5" }}>
               {signalsLoading ? 'Loading' : signalsError ? 'Unavailable' : `${signals.length}/${symbolsAnalyzed}`}
             </span>
           </div>
 
           {signalsLoading ? (
-            <div className="px-5 py-8 text-center text-sm text-slate-500">
+            <div className="px-5 py-8 text-center text-sm" style={{ color: "#536471" }}>
               <p>Loading source-backed signal changes...</p>
             </div>
           ) : signalsError ? (
             <div className="px-5 py-8 text-center">
-              <AlertTriangle className="h-5 w-5 text-amber-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-500">Signal changes not available right now.</p>
-              <p className="text-xs text-slate-400 mt-1">The dashboard will update when prediction data is reachable.</p>
+              <AlertTriangle className="h-5 w-5 mx-auto mb-2" style={{ color: "#b8860b" }} />
+              <p className="text-sm" style={{ color: "#536471" }}>Signal changes not available right now.</p>
+              <p className="text-xs mt-1" style={{ color: "#8b98a5" }}>The dashboard will update when prediction data is reachable.</p>
             </div>
           ) : signals.length === 0 ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-slate-500">No significant signal changes detected.</p>
-              <p className="text-xs text-slate-400 mt-1">
-                {symbolsAnalyzed > 0
-                  ? `${symbolsAnalyzed} symbols analyzed — markets are stable.`
-                  : 'Signals update after the daily pipeline run.'}
+              <p className="text-sm" style={{ color: "#536471" }}>No significant signal changes detected.</p>
+              <p className="text-xs mt-1" style={{ color: "#8b98a5" }}>
+                {symbolsAnalyzed > 0 ? `${symbolsAnalyzed} symbols analyzed — markets are stable.` : 'Signals update after the daily pipeline run.'}
               </p>
             </div>
           ) : (
@@ -219,75 +204,77 @@ export const DashboardHub: React.FC = () => {
               <button
                 key={`${s.symbol}:${s.type}:${i}`}
                 onClick={() => openCompany(s.symbol)}
-                className="flex w-full items-center gap-3 border-b border-white/20 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
               >
                 <span className={`w-2 h-2 rounded-full shrink-0 ${SEVERITY_DOT[s.severity]}`} />
-                <span className="font-mono font-semibold text-sm min-w-[64px] text-slate-900">{s.symbol}</span>
-                <span className="text-xs text-slate-400 uppercase tracking-wider">{TYPE_LABEL[s.type] ?? s.type}</span>
-                <span className="flex-1 text-xs text-slate-500 truncate">{s.explanation}</span>
-                <span className="text-xs text-slate-300">→</span>
+                <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{s.symbol}</span>
+                <span className="text-xs uppercase tracking-wider" style={{ color: "#8b98a5" }}>{TYPE_LABEL[s.type] ?? s.type}</span>
+                <span className="flex-1 text-xs truncate" style={{ color: "#536471" }}>{s.explanation}</span>
+                <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
               </button>
             ))
           )}
 
           {signals.length > 0 && (
-            <div className="border-t border-white/20 px-5 py-2.5">
-              <button onClick={() => navigate('rankings')} className="flex items-center gap-1 text-xs text-accent-primary hover:underline bg-transparent border-none cursor-pointer font-medium">
+            <div className="px-5 py-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
+              <button onClick={() => navigate('rankings')} className="flex items-center gap-1 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
                 View all rankings <ArrowRight className="h-3 w-3" />
               </button>
             </div>
           )}
         </section>
 
-        {/* COL C: Saved research */}
-        <section className="rounded-2xl glass-panel overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/20 px-5 py-3.5">
+        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
             <div className="flex items-center gap-2.5">
-              <Star className="h-4 w-4 text-accent-primary" />
-              <h2 className="text-xs font-semibold text-slate-700">Saved research</h2>
+              <Star className="h-4 w-4" style={{ color: "#1a6e4a" }} />
+              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Saved research</h2>
             </div>
           </div>
 
           {holdings.length === 0 ? (
             <div className="px-5 py-6 text-center">
-              <p className="text-sm text-slate-500">No saved research items yet.</p>
-              <button onClick={() => navigate('watchlist')} className="mt-2 text-xs text-accent-primary hover:underline bg-transparent border-none cursor-pointer font-medium">
+              <p className="text-sm" style={{ color: "#536471" }}>No saved research items yet.</p>
+              <button onClick={() => navigate('watchlist')} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
                 Open watchlist
               </button>
             </div>
           ) : (
             <>
-              <div className="px-5 py-2 text-xs text-slate-400 uppercase font-semibold tracking-wider border-b border-white/20">
+              <div className="px-5 py-2 text-xs uppercase font-semibold tracking-wider" style={{ color: "#8b98a5", borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
                 {holdings.length} position{holdings.length !== 1 ? 's' : ''}
               </div>
               {holdings.slice(0, 5).map(h => (
                 <button
                   key={h.symbol}
                   onClick={() => openCompany(h.symbol)}
-                  className="flex w-full items-center gap-3 border-b border-white/20 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                  className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
+                  style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
                 >
-                  <span className="font-mono font-semibold text-sm min-w-[64px] text-slate-900">{h.symbol}</span>
-                  <span className="text-xs text-slate-500">{h.shares} @ {h.avgBuyPrice}</span>
-                  <span className="text-xs text-slate-300">→</span>
+                  <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{h.symbol}</span>
+                  <span className="text-xs" style={{ color: "#536471" }}>{h.shares} @ {h.avgBuyPrice}</span>
+                  <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
                 </button>
               ))}
             </>
           )}
 
-          <div className="border-t border-white/20 px-5 py-3.5">
+          <div className="px-5 py-3.5" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
             <div className="flex items-center gap-2 mb-3">
-              <Eye className="h-3.5 w-3.5 text-slate-400" />
-              <span className="text-xs font-semibold text-slate-500">Recently viewed</span>
+              <Eye className="h-3.5 w-3.5" style={{ color: "#8b98a5" }} />
+              <span className="text-xs font-semibold" style={{ color: "#536471" }}>Recently viewed</span>
             </div>
             {recentTickers.length === 0 ? (
-              <p className="text-xs text-slate-400">No recently viewed companies.</p>
+              <p className="text-xs" style={{ color: "#8b98a5" }}>No recently viewed companies.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {recentTickers.map(t => (
                   <button
                     key={t}
                     onClick={() => openCompany(t)}
-                    className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-2.5 py-1 font-mono text-xs text-slate-600 hover:bg-white/60 transition-colors"
+                    className="rounded-xl px-2.5 py-1 font-mono text-xs transition hover:bg-white/60"
+                    style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
                   >
                     {t}
                   </button>
@@ -296,9 +283,9 @@ export const DashboardHub: React.FC = () => {
             )}
           </div>
 
-          <div className="border-t border-white/20 px-5 py-3 flex items-center justify-between">
-            <span className="text-xs text-slate-500">Research methodology</span>
-            <button onClick={() => navigate('methodology')} className="text-xs text-accent-primary hover:underline bg-transparent border-none cursor-pointer font-medium">
+          <div className="flex items-center justify-between px-5 py-3" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
+            <span className="text-xs" style={{ color: "#536471" }}>Research methodology</span>
+            <button onClick={() => navigate('methodology')} className="text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
               View →
             </button>
           </div>
