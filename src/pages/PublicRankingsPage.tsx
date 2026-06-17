@@ -10,69 +10,44 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import tokens from "../components/ui/tokens";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
-
-interface RankingEntry {
-  symbol: string;
-  rankingScore?: number;
-  ranking_score?: number;
-  confidenceScore?: number;
-  confidence_score?: number;
-  companyName?: string | null;
-  classification?: string;
-  sector?: string | null;
-  industry?: string | null;
-  predictionDate?: string | null;
-  prediction_date?: string | null;
-  source?: string | null;
-}
-
-interface CoverageInfo {
-  symbolCount: number | null;
-  registryRowCount: number | null;
-  latestPredictionDate: string | null;
-}
+import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
 
 export const PublicRankingsPage: React.FC = () => {
-  const [rankings, setRankings] = useState<RankingEntry[]>([]);
+  const [rankings, setRankings] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [sectorFilter, setSectorFilter] = useState("all");
-  const [coverageData, setCoverageData] = useState<CoverageInfo | null>(null);
+  const [symbolCount, setSymbolCount] = useState<number | null>(null);
+  const [registryRowCount, setRegistryRowCount] = useState<number | null>(null);
+  const [latestPredictionDate, setLatestPredictionDate] = useState<string | null>(null);
 
   useEffect(() => {
-    let active = true;
-    fetch("/api/intelligence/leaderboard?limit=100", { headers: { Accept: "application/json" } })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("LEADERBOARD_UNAVAILABLE");
-        const body = await response.json();
-        return Array.isArray(body) ? body : [];
-      })
-      .then((body) => {
-        if (!active) return;
-        setRankings(body);
+    const ctrl = new AbortController();
+
+    api.getLeaderboard(100)
+      .then((res) => {
+        if (ctrl.signal.aborted) return;
+        setRankings(res.data ?? []);
         setLoading(false);
       })
-      .catch(() => {
-        if (!active) return;
+      .catch((err) => {
+        if (ctrl.signal.aborted) return;
+        setError(err instanceof ApiError ? err.message : "Rankings unavailable");
         setRankings([]);
         setLoading(false);
       });
 
-    fetch("/api/ops/data-coverage", { headers: { Accept: "application/json" } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((body) => {
-        if (!body?.ok || !active) return;
-        const cov = body.coverage;
-        setCoverageData({
-          symbolCount: cov.symbols?.status === "available" ? (cov.symbols.count ?? 0) : null,
-          registryRowCount: cov.predictionRegistry?.status === "available" ? (cov.predictionRegistry.rowCount ?? 0) : null,
-          latestPredictionDate: cov.predictionRegistry?.latestPredictionDate ?? null,
-        });
+    api.getDataCoverage()
+      .then((cov) => {
+        if (ctrl.signal.aborted) return;
+        setSymbolCount(cov.coverage?.symbols?.count ?? null);
+        setRegistryRowCount(cov.coverage?.predictionRegistry?.rowCount ?? null);
+        setLatestPredictionDate(cov.coverage?.predictionRegistry?.latestPredictionDate ?? null);
       })
       .catch(() => {});
-    return () => {
-      active = false;
-    };
+
+    return () => ctrl.abort();
   }, []);
 
   const sectors = useMemo(() => {
@@ -101,7 +76,7 @@ export const PublicRankingsPage: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
-  const freshnessDate = rankings[0]?.predictionDate ?? rankings[0]?.prediction_date ?? null;
+  const freshnessDate = rankings[0]?.predictionDate ?? null;
 
   return (
     <main className="min-h-screen bg-background text-slate-900">
@@ -113,6 +88,13 @@ export const PublicRankingsPage: React.FC = () => {
           subtitle="Company rankings from the latest verified scoring cycle."
           primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+          <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
+          <p className="mt-1 text-xs">{error}</p>
+        </div>
+      )}
 
       <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm sm:flex-row">
         <div className="w-full sm:w-72">
@@ -149,7 +131,7 @@ export const PublicRankingsPage: React.FC = () => {
             title="Rankings pending"
             description="Rankings appear after verified scoring has completed for the latest cycle."
           />
-          {coverageData && (
+          {(symbolCount !== null || registryRowCount !== null) && (
             <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data coverage
@@ -158,19 +140,19 @@ export const PublicRankingsPage: React.FC = () => {
                 <div>
                   <span className="block text-[10px] font-medium text-slate-400">Companies covered</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
+                    {symbolCount !== null ? symbolCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
                   <span className="block text-[10px] font-medium text-slate-400">Scored records</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
+                    {registryRowCount !== null ? registryRowCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
                   <span className="block text-[10px] font-medium text-slate-400">Latest update</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
-                    {coverageData.latestPredictionDate || "—"}
+                    {latestPredictionDate || "—"}
                   </span>
                 </div>
               </div>
@@ -199,10 +181,9 @@ export const PublicRankingsPage: React.FC = () => {
         </div>
       ) : (
         <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
-          {filteredRankings.map((r, index) => {
-            const rankingScore = r.rankingScore ?? r.ranking_score;
-            const confidenceScore = r.confidenceScore ?? r.confidence_score;
-            const predictionDate = r.predictionDate ?? r.prediction_date ?? null;
+          {filteredRankings.map((r) => {
+            const rankingScore = r.rankingScore;
+            const confidenceScore = r.confidenceScore;
 
             return (
               <tr
@@ -210,7 +191,7 @@ export const PublicRankingsPage: React.FC = () => {
                 className="cursor-pointer transition-colors hover:bg-slate-50"
                 onClick={() => setPage("stock", r.symbol)}
               >
-                <td className="p-4 font-semibold text-slate-500">{formatRank(index + 1)}</td>
+                <td className="p-4 font-semibold text-slate-500">{formatRank(r.rank)}</td>
                 <td className="p-4 font-mono font-bold text-slate-950 hover:underline">
                   {r.symbol}
                 </td>
@@ -235,9 +216,9 @@ export const PublicRankingsPage: React.FC = () => {
                   <Badge variant="info">{r.sector || "Not available"}</Badge>
                 </td>
                 <td className="p-4">
-                  {predictionDate ? (
+                  {r.predictionDate ? (
                     <span className="text-[10px] text-emerald-700 font-semibold whitespace-nowrap">
-                      {formatFreshness(predictionDate)}
+                      {formatFreshness(r.predictionDate)}
                     </span>
                   ) : (
                     <span className="text-[10px] text-slate-400">Pending</span>

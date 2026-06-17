@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { StockQuote } from "../services/data/types";
+import { api, ApiError, type StockQuote } from "../services/api/client";
 
 export type LiveQuoteState = {
   quote: StockQuote | null;
@@ -15,24 +15,6 @@ const emptyQuoteState: LiveQuoteState = {
 
 function normalizeSymbol(symbol: string): string {
   return symbol.trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
-}
-
-async function fetchLiveQuote(symbol: string, signal: AbortSignal): Promise<StockQuote> {
-  const response = await fetch(`/api/market-data/quote/${encodeURIComponent(symbol)}`, {
-    signal,
-    headers: { Accept: "application/json" },
-  });
-
-  if (!response.ok) {
-    throw new Error("QUOTE_UNAVAILABLE");
-  }
-  const body = await response.json().catch(() => null);
-
-  if (!body || typeof body.price !== "number" || !Number.isFinite(body.price) || body.price <= 0) {
-    throw new Error("QUOTE_UNAVAILABLE");
-  }
-
-  return body as StockQuote;
 }
 
 export function useLiveQuote(symbol?: string): LiveQuoteState {
@@ -67,14 +49,15 @@ export function useLiveQuotes(symbols: string[]): Record<string, LiveQuoteState>
     });
 
     normalizedSymbols.forEach((symbol) => {
-      fetchLiveQuote(symbol, controller.signal)
+      api.getQuote(symbol)
         .then((quote) => {
+          if (controller.signal.aborted) return;
           setStates((prev) => ({
             ...prev,
             [symbol]: { quote, loading: false, error: null },
           }));
         })
-        .catch(() => {
+        .catch((err) => {
           if (controller.signal.aborted) return;
           setStates((prev) => ({
             ...prev,

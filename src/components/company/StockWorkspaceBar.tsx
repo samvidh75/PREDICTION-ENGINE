@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Clock3, Database, ShieldCheck } from "lucide-react";
 import { useLiveQuote } from "../../hooks/useLiveQuotes";
-import type { CompanyMetadata } from "../../services/data/types";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
+import { api, ApiError, type CompanyMetadata } from "../../services/api/client";
 
 export type QuoteFreshness = "Recent" | "Delayed" | "Stale" | "Unavailable";
 
@@ -74,15 +74,9 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
     setMetadataLoading(true);
     setMetadata(null);
 
-    fetch(`/api/market-data/metadata/${encodeURIComponent(ticker)}`, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("METADATA_UNAVAILABLE");
-        return response.json() as Promise<CompanyMetadata>;
-      })
+    api.getMetadata(ticker)
       .then((nextMetadata) => {
+        if (controller.signal.aborted) return;
         setMetadata(nextMetadata);
         setMetadataLoading(false);
       })

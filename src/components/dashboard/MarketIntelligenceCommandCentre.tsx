@@ -168,8 +168,8 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
           </div>
         </div>
 
-        <div className="ss-tv-panel ss-tv-neon-edge mt-10 rounded-lg p-6">
-          <div className="mb-5 text-sm uppercase tracking-[0.18em] text-[#9bb5ff]">
+        <div className="mt-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-5 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
             Company Health
           </div>
           <PredictivePanel symbol="RELIANCE" />

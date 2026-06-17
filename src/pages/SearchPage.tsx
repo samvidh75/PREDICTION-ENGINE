@@ -12,6 +12,7 @@ import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
 import tokens from "../components/ui/tokens";
 import { formatNumber, formatINR, formatRank, formatFreshness } from "../services/ui/dataFormatting";
+import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
 
 
 function readQueryFromUrl(): string {
@@ -59,22 +60,20 @@ export const SearchPage: React.FC = () => {
     };
   }, []);
 
-  const [predictionsMap, setPredictionsMap] = useState<Record<string, any>>({});
+  const [predictionsMap, setPredictionsMap] = useState<Record<string, LeaderboardEntry>>({});
 
   useEffect(() => {
-    fetch("/api/intelligence/leaderboard?limit=200")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const map: Record<string, any> = {};
-          data.forEach((item) => {
-            if (item.symbol) {
-              const cleaned = item.symbol.replace(/\.NS$/, "").toUpperCase();
-              map[cleaned] = item;
-            }
-          });
-          setPredictionsMap(map);
-        }
+    api.getLeaderboard(200)
+      .then((res) => {
+        if (!res.data) return;
+        const map: Record<string, LeaderboardEntry> = {};
+        res.data.forEach((item) => {
+          if (item.symbol) {
+            const cleaned = item.symbol.replace(/\.NS$/, "").toUpperCase();
+            map[cleaned] = item;
+          }
+        });
+        setPredictionsMap(map);
       })
       .catch(() => {});
   }, []);
@@ -180,13 +179,11 @@ export const SearchPage: React.FC = () => {
                 {results.map((stock, idx) => {
                   const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
                   const prediction = predictionsMap[cleanedSym];
-                  const score = prediction ? prediction.rankingScore ?? prediction.ranking_score : null;
-                  const confidenceScore = prediction ? prediction.confidenceScore ?? prediction.confidence_score : null;
-                  const predictionDate = prediction ? prediction.predictionDate ?? prediction.prediction_date : null;
+                  const score = prediction?.rankingScore ?? null;
+                  const confidenceScore = prediction?.confidenceScore ?? null;
+                  const predictionDate = prediction?.predictionDate ?? null;
                   const predictionSector = prediction?.sector ?? null;
-                  const rank = prediction
-                    ? Object.keys(predictionsMap).indexOf(cleanedSym) + 1
-                    : null;
+                  const rank = prediction?.rank ?? null;
 
                   return (
                     <Card

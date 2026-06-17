@@ -167,7 +167,7 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
         [horizon, limit],
       );
 
-      return reply.send(result.rows.map((row: any, index: number) => ({
+      const rows = result.rows.map((row: any, index: number) => ({
         rank: index + 1,
         symbol: row.symbol,
         companyName: row.company_name ?? row.symbol,
@@ -186,12 +186,14 @@ export const intelligenceRoutes: FastifyPluginAsync = async (app) => {
           risk: row.risk_score == null ? null : Number(row.risk_score),
           sector: row.sector_score == null ? null : Number(row.sector_score),
         },
-      })));
+      }));
+
+      return reply.send({ ok: true, data: rows });
     } catch (err: any) {
       request.log.error({ err }, "leaderboard query failed");
       return reply.status(500).send({
-        code: "LEADERBOARD_UNAVAILABLE",
-        error: "Leaderboard data is temporarily unavailable.",
+        ok: false,
+        error: { code: "LEADERBOARD_UNAVAILABLE", message: "Leaderboard data is temporarily unavailable." },
       });
     }
   });

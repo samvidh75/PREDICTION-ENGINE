@@ -3,50 +3,7 @@ import Card from "../components/ui/Card";
 import { LoadingState } from "../components/ui/DataState";
 import { PageHeader, ResearchDisclaimer, ProviderStatusPill, DataFreshnessBadge } from "../components/ui/PageHeader";
 import { formatNumber } from "../services/ui/dataFormatting";
-
-interface TrustMetrics {
-  alpha: number | null;
-  hit_rate: number | null;
-  sharpe_ratio: number | null;
-  calibration_score: number | null;
-  total_predictions: number | null;
-  total_outcomes: number | null;
-}
-
-interface TrustEnvelope {
-  status: "ok" | "partial" | "unavailable" | "empty" | "error" | "demo";
-  message: string | null;
-  data: TrustMetrics | null;
-  dataState?: {
-    availability?: string;
-    asOf?: string | null;
-    missingInputs?: string[];
-    completenessScore?: number;
-  };
-}
-
-interface CoverageStats {
-  count: number;
-  status: string;
-  latestUpdatedAt?: string | null;
-  latestPriceDate?: string | null;
-  latestSnapshotDate?: string | null;
-  latestPredictionDate?: string | null;
-  rowCount?: number;
-}
-
-interface CoverageData {
-  ok: boolean;
-  generatedAt: string;
-  database: { status: string; migrationsReady: boolean };
-  coverage: {
-    symbols: CoverageStats;
-    dailyPrices: CoverageStats;
-    financialSnapshots: CoverageStats;
-    predictionRegistry: CoverageStats;
-  };
-  providers: Record<string, string>;
-}
+import { api, ApiError, type TrustMetricsEnvelope, type DataCoverage } from "../services/api/client";
 
 function formatMetric(value: number | null | undefined, suffix = ""): string {
   if (typeof value !== "number" || !Number.isFinite(value)) return "Data unavailable";
@@ -59,43 +16,39 @@ function formatCount(value: number | null | undefined): string {
 }
 
 export const TrustCentrePage: React.FC = () => {
-  const [envelope, setEnvelope] = useState<TrustEnvelope | null>(null);
+  const [envelope, setEnvelope] = useState<TrustMetricsEnvelope | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [coverageData, setCoverageData] = useState<CoverageData | null>(null);
+  const [coverageData, setCoverageData] = useState<DataCoverage | null>(null);
   const [coverageLoading, setCoverageLoading] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/intelligence/trust-metrics", { signal: controller.signal, headers: { Accept: "application/json" } })
-      .then(async (response) => {
-        const body = await response.json().catch(() => null);
-        if (!response.ok) throw new Error(body?.message || body?.reason || "TRUST_METRICS_UNAVAILABLE");
-        return body as TrustEnvelope;
-      })
+    const ctrl = new AbortController();
+
+    api.getTrustMetrics()
       .then((data) => {
+        if (ctrl.signal.aborted) return;
         setEnvelope(data);
         setLoading(false);
       })
-      .catch((fetchError: Error) => {
-        if (controller.signal.aborted) return;
-        setError(fetchError.message || "Trust metrics are temporarily unavailable.");
+      .catch((err) => {
+        if (ctrl.signal.aborted) return;
+        setError(err instanceof ApiError ? err.message : "Trust metrics are temporarily unavailable.");
         setLoading(false);
       });
 
-    return () => controller.abort();
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/ops/data-coverage")
-      .then(res => res.json())
+    api.getDataCoverage()
       .then((data) => {
-        if (data.ok) {
-          setCoverageData(data);
-        }
+        if (ctrl.signal.aborted) return;
+        setCoverageData(data);
         setCoverageLoading(false);
       })
-      .catch(() => setCoverageLoading(false));
+      .catch(() => {
+        if (ctrl.signal.aborted) return;
+        setCoverageLoading(false);
+      });
+
+    return () => ctrl.abort();
   }, []);
 
   if (loading) {
@@ -185,7 +138,7 @@ export const TrustCentrePage: React.FC = () => {
                 <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
                 <span className="block text-sm font-semibold text-slate-950">
                   {coverageData.coverage.symbols.status === "available"
-                    ? formatNumber(coverageData.coverage.symbols.count)
+                    ? formatNumber(coverageData.coverage.symbols.count ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
@@ -293,7 +246,7 @@ export const TrustCentrePage: React.FC = () => {
         </Card>
       </section>
 
-      {coverageData && (
+      {coverageData?.providers && Object.keys(coverageData.providers).length > 0 && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-950">Provider status</h2>
           <Card className="p-5">
