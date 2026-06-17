@@ -154,7 +154,18 @@ async function main(): Promise<void> {
     },
   ));
 
-  // Prediction registry coverage
+  // Fundamentals coverage
+  results.push(await dqCheck("fundamentals", "coverage",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`,
+    ["coverage.financialSnapshots.rowCount"],
+    (body) => {
+      const cov = body.coverage as Record<string, any> | undefined;
+      const fs = cov?.financialSnapshots;
+      if (!fs || fs.status !== "available") return `financialSnapshots status=${fs?.status ?? "unavailable"}`;
+      if (typeof fs.rowCount === "number" && fs.rowCount === 0) return "financial_snapshots has 0 rows";
+      return null;
+    },
+  ));
   results.push(await dqCheck("prediction_registry", "coverage",
     `${__DQ_FRONTEND}/api/ops/data-coverage`,
     ["coverage.predictionRegistry.rowCount"],
