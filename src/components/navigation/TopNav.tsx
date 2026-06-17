@@ -54,7 +54,7 @@ export const TopNav: React.FC = () => {
       )}
     </header>
 
-    <nav className="fixed top-0 left-0 z-50 hidden h-[64px] w-full select-none items-center border-b border-slate-200/60 bg-white/90 px-8 backdrop-blur-md md:flex">
+    <nav className="fixed top-0 left-0 z-50 hidden h-[64px] w-full items-center border-b border-slate-200/60 bg-white/90 px-8 backdrop-blur-md md:flex">
       <div className="flex w-[220px] shrink-0 items-center">
         <button
           type="button"

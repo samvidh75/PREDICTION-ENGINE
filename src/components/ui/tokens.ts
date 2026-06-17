@@ -17,7 +17,7 @@ export const tokens = {
     metaMuted: "text-[10px] font-medium uppercase tracking-wider text-slate-400",
   },
   focus: {
-    ring: "focus:outline-none focus:ring-2 focus:ring-emerald-700/15 focus:border-emerald-700",
+    ring: "focus:outline-none focus:ring-2 focus:ring-accent-primary/15 focus:border-accent-primary",
   },
 };
 

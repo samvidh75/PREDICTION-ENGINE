@@ -40,8 +40,8 @@ describe('TrustCentrePage regression states', () => {
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
     // System status assertions
-    expect(screen.getByText('Data system status')).toBeInTheDocument();
-    expect(screen.getByText('17% Verified')).toBeInTheDocument();
+    expect(screen.getByText('Data status')).toBeInTheDocument();
+    expect(screen.getByText('17% verified')).toBeInTheDocument();
     expect(screen.getAllByText(/As of/).length).toBeGreaterThanOrEqual(1);
   });
 

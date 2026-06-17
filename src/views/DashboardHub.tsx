@@ -211,7 +211,7 @@ export const DashboardHub: React.FC = () => {
   return (
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
-        title="Research Dashboard"
+        title="Dashboard"
         subtitle="Search companies, review scored records, and track your research."
         primaryAction={
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
@@ -244,7 +244,7 @@ export const DashboardHub: React.FC = () => {
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Scored companies" subtitle="Prediction records" />
+          <SectionHeader title="Scored records" subtitle="Prediction registry" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {predictionRows === null ? "—" : formatNumber(predictionRows)}
           </div>
@@ -253,7 +253,7 @@ export const DashboardHub: React.FC = () => {
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Fundamental data" subtitle="Financial records" />
+          <SectionHeader title="Financial records" subtitle="Fundamental data" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {financialSnapshots === null ? "—" : formatNumber(financialSnapshots)}
           </div>
@@ -262,7 +262,7 @@ export const DashboardHub: React.FC = () => {
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Price data" subtitle="Daily market records" />
+          <SectionHeader title="Price records" subtitle="Daily market data" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {priceRows === null ? "—" : formatNumber(priceRows)}
           </div>
@@ -272,12 +272,12 @@ export const DashboardHub: React.FC = () => {
         </Card>
       </div>
 
-      <Card className="p-6">
-        <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-sm font-semibold text-slate-900">Start your research</h2>
-            <p className="mt-1 text-xs text-slate-500">Search by ticker, company name, or sector.</p>
-          </div>
+        <Card className="p-6">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-900">Search companies</h2>
+              <p className="mt-1 text-xs text-slate-500">By ticker, company name, or sector.</p>
+            </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="relative flex-1">
               <Input
@@ -309,13 +309,13 @@ export const DashboardHub: React.FC = () => {
           <p className="mt-1 text-xs text-slate-500">Quotes appear when verified.</p>
         </Card>
         <Card>
-          <SectionHeader title="Prediction cycle" subtitle="Latest update" />
+          <SectionHeader title="Latest update" subtitle="Scoring cycle" />
           <div className="mt-3 text-sm font-semibold text-slate-950">
             {latestSignalDate ? `As of ${latestSignalDate}` : "No update yet"}
           </div>
           <p className="mt-1 text-xs text-slate-500">
             {healthPredictionsToday !== null
-              ? `${formatNumber(healthPredictionsToday)} records in latest cycle`
+              ? `${formatNumber(healthPredictionsToday)} records scored`
               : "Pending provider data"}
           </p>
         </Card>
@@ -325,23 +325,23 @@ export const DashboardHub: React.FC = () => {
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader
             title="Score changes"
-            subtitle="Verified score changes from the latest prediction cycle."
+            subtitle="Recent score changes from the latest verified update."
             action={signals[0]?.snapshotDate ? <DataFreshnessBadge date={signals[0].snapshotDate} /> : <MissingDataBadge />}
           />
           <div className="mt-4">
             {signalsLoading ? (
-              <LoadingState description="Checking prediction registry for recent score changes…" />
+              <LoadingState description="Checking for recent score changes…" />
             ) : signalsError ? (
               <EmptyState
                 title="Score changes unavailable"
-                description="Score-change data is unavailable right now."
+                description="Score change data is not available right now."
               />
             ) : signals.length === 0 ? (
               <EmptyState
                 title="Score changes pending"
                 description={
                   symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear after the next verified update cycle.`
+                    ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update.`
                     : "Search for companies to begin tracking score changes."
                 }
                 action={

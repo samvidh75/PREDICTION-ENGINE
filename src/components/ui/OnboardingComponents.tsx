@@ -130,25 +130,25 @@ export const DataReadinessPanel: React.FC = () => {
   const hasHealthCheck = metrics?.db_health === "connected";
 
   return (
-    <Card className={`border-slate-200/80 bg-white p-4`}>
+    <Card className="border-slate-200/80 bg-white p-4">
       <div className="flex items-start gap-3">
         <AlertCircle className={`mt-0.5 h-4 w-4 shrink-0 ${hasRealData ? "text-emerald-700" : "text-slate-500"}`} />
         <div className="flex-1 space-y-1">
           <h3 className="text-xs font-semibold text-slate-900">
             {hasRealData
-              ? "Scoring pipeline is active"
+              ? "Scoring data available"
               : hasHealthCheck
-                ? "Scoring data is connected"
+                ? "Data sources connected"
                 : loading
-                  ? "Checking scoring data"
-                  : "Scoring pipeline checks are pending"}
+                  ? "Checking data status"
+                  : "Data status pending"}
           </h3>
           <p className="max-w-2xl text-[11px] leading-5 text-slate-500">
             {hasRealData
-              ? `Surfacing ${predictionsToday.toLocaleString()} prediction rows for today${
-                  symbolsCovered !== null ? ` across ${symbolsCovered.toLocaleString()} symbols` : ""
-                }${metrics?.pipeline_freshness ? `; price freshness ${metrics.pipeline_freshness}` : ""}.`
-              : "Search works where source data exists. Rankings and prediction rows appear only when scoring has source-backed inputs."}
+              ? `${predictionsToday.toLocaleString()} scored records today${
+                  symbolsCovered !== null ? ` across ${symbolsCovered.toLocaleString()} companies` : ""
+                }.`
+              : "Search works where source data exists. Rankings and scores appear once data has been verified."}
           </p>
         </div>
         <button

@@ -72,7 +72,6 @@ export function ResearchDisclaimer({ context: _context = "research" }: { context
         Research only — not investment advice
       </p>
       Analytical research signals only. Nothing here is a recommendation to buy or sell securities.
-      Markets carry risk; review independent sources before investing.
     </div>
   );
 }
