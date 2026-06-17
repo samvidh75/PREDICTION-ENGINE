@@ -150,7 +150,12 @@ async function createRateLimitStore(opts: RateLimiterOptions): Promise<RateLimit
       // Connection errors surface during commands; avoid logging sensitive URLs.
     });
     try {
-      await client.connect();
+      await Promise.race([
+        client.connect(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Redis connect timed out')), 5000),
+        ),
+      ]);
     } catch (error) {
       if (redisRequired) throw new Error(`Rate limiter Redis unavailable: ${safeRedisError(error)}`);
       return defaultMemoryStore;
