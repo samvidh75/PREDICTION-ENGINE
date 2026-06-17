@@ -462,6 +462,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           status: finSucceeded === symbols.length ? "success" : (finSucceeded > 0 ? "partial" : "failure"),
           succeeded: finSucceeded,
           failed: finResults.filter(r => !r.ok).length,
+          details: finResults.map(r => ({ symbol: r.symbol, ok: r.ok, fields: r.fields, error: r.error })),
         };
 
         // Stage 4: Features
