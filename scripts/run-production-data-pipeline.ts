@@ -15,6 +15,7 @@ import { FactorEngine } from '../src/services/FactorEngine';
 import { predictionFactory } from '../src/predictions/PredictionFactory';
 import { ProviderCoordinator } from '../src/services/providers/ProviderCoordinator';
 import { IndianMarketProvider } from '../src/services/providers/IndianMarketProvider';
+import { YahooProvider } from '../src/services/providers/YahooProvider';
 import type { FinancialSnapshot } from '../src/services/data/types';
 
 const DEFAULT_SYMBOLS = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK'];
@@ -25,6 +26,7 @@ interface PipelineOptions {
   skipUpstox: boolean;
   skipIndianApi: boolean;
   quotesOnly: boolean;
+  historical: boolean;
   financialsOnly: boolean;
   featuresOnly: boolean;
   factorsOnly: boolean;
@@ -51,18 +53,19 @@ interface StageResult {
 
 function parseArgs(): PipelineOptions {
   const args = process.argv.slice(2);
-  const opts: PipelineOptions = {
-    symbols: DEFAULT_SYMBOLS,
-    apply: false,
-    skipUpstox: false,
-    skipIndianApi: false,
-    quotesOnly: false,
-    financialsOnly: false,
-    featuresOnly: false,
-    factorsOnly: false,
-    predictionsOnly: false,
-    signalsOnly: false,
-  };
+    const opts: PipelineOptions = {
+      symbols: DEFAULT_SYMBOLS,
+      apply: false,
+      skipUpstox: false,
+      skipIndianApi: false,
+      quotesOnly: false,
+      historical: false,
+      financialsOnly: false,
+      featuresOnly: false,
+      factorsOnly: false,
+      predictionsOnly: false,
+      signalsOnly: false,
+    };
 
   for (const arg of args) {
     if (arg === '--apply') opts.apply = true;
@@ -70,6 +73,7 @@ function parseArgs(): PipelineOptions {
     else if (arg === '--skip-upstox') opts.skipUpstox = true;
     else if (arg === '--skip-indianapi') opts.skipIndianApi = true;
     else if (arg === '--quotes-only') opts.quotesOnly = true;
+    else if (arg === '--historical') opts.historical = true;
     else if (arg === '--financials-only') opts.financialsOnly = true;
     else if (arg === '--features-only') opts.featuresOnly = true;
     else if (arg === '--factors-only') opts.factorsOnly = true;
@@ -157,16 +161,21 @@ class ProductionPipeline {
     let overallError: string | undefined;
 
     try {
-      const runAll = !this.opts.quotesOnly && !this.opts.financialsOnly && !this.opts.featuresOnly &&
-        !this.opts.factorsOnly && !this.opts.predictionsOnly && !this.opts.signalsOnly;
+    const runAll = !this.opts.quotesOnly && !this.opts.financialsOnly && !this.opts.featuresOnly &&
+      !this.opts.factorsOnly && !this.opts.predictionsOnly && !this.opts.signalsOnly && !this.opts.historical;
 
-      // Stage 1: Registry fix (idempotent)
+      // Stage 1: Historical backfill (if requested)
+      if (this.opts.historical) {
+        await this.stageHistorical();
+      }
+
+      // Stage 2: Registry fix (idempotent)
       if (runAll) {
         await this.stageRegistry();
       }
 
-      // Stage 2: Quotes
-      if (runAll || this.opts.quotesOnly) {
+      // Stage 3: Quotes
+      if (runAll || this.opts.quotesOnly || this.opts.historical) {
         await this.stageQuotes();
       }
 
@@ -294,6 +303,57 @@ class ProductionPipeline {
       console.error(`  Failed to ensure symbol ${symbol}: ${err.message}`);
       return false;
     }
+  }
+
+  private async stageHistorical(): Promise<void> {
+    console.log('[Stage 1a] Historical Price Backfill...');
+    const yahoo = new YahooProvider();
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    let rowsWritten = 0;
+
+    for (const symbol of this.opts.symbols) {
+      try {
+        const points = await yahoo.getHistorical(symbol, '2Y');
+        if (points.length === 0) {
+          console.log(`  ${symbol}: no historical data from Yahoo`);
+          failed.push(symbol);
+          continue;
+        }
+
+        if (!this.opts.apply) {
+          console.log(`  [DRY-RUN] ${symbol}: ${points.length} historical rows`);
+          succeeded.push(symbol);
+          continue;
+        }
+
+        for (const point of points) {
+          const volume = point.volume !== null && point.volume !== undefined ? Math.round(Number(point.volume)) : null;
+          await pool.query(
+            `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (symbol, trade_date) DO UPDATE SET
+               close = EXCLUDED.close,
+               volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
+            [symbol, point.date, point.open, point.high, point.low, point.close, volume]
+          );
+          rowsWritten++;
+        }
+        console.log(`  ${symbol}: ${points.length} historical rows written`);
+        succeeded.push(symbol);
+      } catch (err: any) {
+        console.error(`  ${symbol}: ${err.message}`);
+        failed.push(symbol);
+      }
+    }
+
+    this.rowsWritten['daily_prices'] = (this.rowsWritten['daily_prices'] ?? 0) + rowsWritten;
+    this.results['1a_historical'] = {
+      status: failed.length > 0 ? (succeeded.length > 0 ? 'partial' : 'failure') : 'success',
+      succeeded: succeeded.length,
+      failed: failed.length,
+    };
+    console.log(`  Succeeded: ${succeeded.length}, Failed: ${failed.length}`);
   }
 
   private async stageRegistry(): Promise<void> {

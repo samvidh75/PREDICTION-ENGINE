@@ -271,7 +271,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   });
 
   app.post("/api/ops/pipeline-run", async (request, reply) => {
-    const { apply: rawApply, symbols: rawSymbols } = request.query as Record<string, string | undefined>;
+    const { apply: rawApply, symbols: rawSymbols, historical: rawHistorical } = request.query as Record<string, string | undefined>;
     const runId = `api-trigger-${new Date().toISOString().replace(/[:.]/g, '-')}`;
     const startedAt = new Date().toISOString();
     const applyMode = rawApply === "true";
@@ -324,6 +324,43 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const overallError: string | null = null;
 
     try {
+      // Stage 0: Historical backfill (if requested)
+      if (rawHistorical === "true") {
+        results.historical = { status: "running" };
+        if (applyMode) {
+          try {
+            const { YahooProvider } = await import("../../../services/providers/YahooProvider.js");
+            const yahoo = new YahooProvider();
+            let histRows = 0;
+            for (const symbol of symbols) {
+              try {
+                const points = await yahoo.getHistorical(symbol, '2Y');
+                if (points.length === 0) continue;
+                for (const point of points) {
+                  const volume = point.volume !== null && point.volume !== undefined ? Math.round(Number(point.volume)) : null;
+                  await query(
+                    `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7)
+                     ON CONFLICT (symbol, trade_date) DO UPDATE SET
+                       close = EXCLUDED.close, volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
+                    [symbol, point.date, point.open, point.high, point.low, point.close, volume]
+                  );
+                  histRows++;
+                }
+              } catch (err: any) {
+                console.error(`Historical backfill failed for ${symbol}: ${err.message}`);
+              }
+            }
+            rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + histRows;
+            results.historical = { status: "success", rowsWritten: histRows };
+          } catch (err: any) {
+            results.historical = { status: "failure", error: err.message };
+          }
+        } else {
+          results.historical = { status: "skipped", message: "Dry-run: historical stage skipped" };
+        }
+      }
+
       // Stage 1: Registry (verify symbols exist, insert missing in apply mode)
       const registryOk: string[] = [];
       const registryFailed: string[] = [];
