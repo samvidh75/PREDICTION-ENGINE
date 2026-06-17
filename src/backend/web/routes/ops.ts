@@ -332,10 +332,13 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           try {
             const ticker = symbol + ".NS";
             const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=2y&interval=1d`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
             const resp = await fetch(url, {
               headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockStoryBot/1.0)' },
-              signal: AbortSignal.timeout(15000),
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
             if (!resp.ok) {
               console.error(`Yahoo chart API returned ${resp.status} for ${symbol}`);
               continue;
