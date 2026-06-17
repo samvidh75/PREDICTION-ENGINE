@@ -74,7 +74,7 @@ describe('DashboardHub states', () => {
   it('shows signals empty state when API returns no signals', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string) => {
       if (url.includes('signals')) {
-        return { ok: true, json: async () => ({ signals: [], symbolsAnalyzed: 5 }) };
+        return { ok: true, json: async () => ({ status: 'ok', data: { signals: [], symbolsAnalyzed: 5 } }) };
       }
       if (url.includes('health')) {
         return { ok: true, json: async () => ({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } }) };
@@ -93,7 +93,7 @@ describe('DashboardHub states', () => {
       if (url.includes('health')) {
         return { ok: true, json: async () => ({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } }) };
       }
-      return { ok: true, json: async () => ({ signals: [], symbolsAnalyzed: 0 }) };
+      return { ok: true, json: async () => ({ status: 'ok', data: { signals: [], symbolsAnalyzed: 0 } }) };
     }));
 
     render(<DashboardHub />);
