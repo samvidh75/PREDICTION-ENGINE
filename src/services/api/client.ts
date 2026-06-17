@@ -7,7 +7,10 @@
  * - Sanitized error class (no raw stack traces to UI)
  * - Consistent empty-data semantics
  * - No secret exposure
+ * - Watchlist methods use authenticated fetch (Bearer token)
  */
+
+import { authenticatedFetchJSON } from "../auth/authenticatedFetch";
 
 // ── Base URL Resolution ──────────────────────────────────────────────
 
@@ -330,12 +333,16 @@ export interface CompanyMetadata {
 
 // -- Watchlists (authenticated) --
 
-export interface Watchlist {
+export interface WatchlistRow {
   id: string;
+  user_id: string;
   name: string;
   tickers: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  is_archived: boolean;
+  is_favourite: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 // ── API Methods ──────────────────────────────────────────────────────
@@ -358,19 +365,22 @@ export const api = {
     apiFetch<SearchResponse>(`/api/search/universal?query=${encodeURIComponent(query)}`),
 
   // -- StockStory --
-  getStockStory: (ticker: string, horizon = 30) =>
-    apiFetch<{ ok: true; data: StockStoryData }>(`/api/stockstory/${encodeURIComponent(ticker)}?horizon=${horizon}`),
+  getStockStory: (ticker: string, horizon = 30, options?: ApiRequestOptions) =>
+    apiFetch<{ ok: true; data: StockStoryData }>(
+      `/api/stockstory/${encodeURIComponent(ticker)}?horizon=${horizon}`,
+      options,
+    ),
 
   // -- Company --
-  getCompanyFinancials: (ticker: string) =>
-    apiFetch<CompanyFinancials>(`/api/company/${encodeURIComponent(ticker)}/financials`),
+  getCompanyFinancials: (ticker: string, options?: ApiRequestOptions) =>
+    apiFetch<CompanyFinancials>(`/api/company/${encodeURIComponent(ticker)}/financials`, options),
 
   // -- Market Data --
   getQuote: (symbol: string) =>
     apiFetch<StockQuote>(`/api/market-data/quote/${encodeURIComponent(symbol)}`),
 
-  getMetadata: (symbol: string) =>
-    apiFetch<CompanyMetadata>(`/api/market-data/metadata/${encodeURIComponent(symbol)}`),
+  getMetadata: (symbol: string, options?: ApiRequestOptions) =>
+    apiFetch<CompanyMetadata>(`/api/market-data/metadata/${encodeURIComponent(symbol)}`, options),
 
   getCompanyData: (symbol: string) =>
     apiFetch<{ quote: StockQuote; metadata: CompanyMetadata }>(
@@ -391,6 +401,42 @@ export const api = {
   getPredictionExplain: (symbol: string, horizon = 30) =>
     apiFetch<{ ok: boolean; data: Record<string, unknown> }>(
       `/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${horizon}`,
+    ),
+
+  // -- Watchlists (authenticated) --
+  getWatchlists: () =>
+    authenticatedFetchJSON<WatchlistRow[]>("/api/watchlists"),
+
+  createWatchlist: (name: string) =>
+    authenticatedFetchJSON<WatchlistRow>("/api/watchlists", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    }),
+
+  updateWatchlist: (id: string, name: string, tickers: string[]) =>
+    authenticatedFetchJSON<WatchlistRow>(`/api/watchlists/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, tickers }),
+    }),
+
+  deleteWatchlist: (id: string) =>
+    authenticatedFetchJSON<{ success: boolean }>(`/api/watchlists/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+
+  addWatchlistTicker: (id: string, ticker: string) =>
+    authenticatedFetchJSON<WatchlistRow>(`/api/watchlists/${encodeURIComponent(id)}/tickers`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ticker }),
+    }),
+
+  removeWatchlistTicker: (id: string, ticker: string) =>
+    authenticatedFetchJSON<WatchlistRow>(
+      `/api/watchlists/${encodeURIComponent(id)}/tickers/${encodeURIComponent(ticker)}`,
+      { method: "DELETE" },
     ),
 };
 

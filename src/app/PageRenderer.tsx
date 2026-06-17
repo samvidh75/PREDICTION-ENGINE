@@ -16,7 +16,7 @@ import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 
 // Authenticated pages (intentional nav targets)
-import DashboardHub from "../views/DashboardHub";
+import DashboardHub from "../components/dashboard/DashboardHub";
 import SearchPage from "../pages/SearchPage";
 import StockStoryPage from "../pages/StockStoryPageF0";
 import PortfolioPage from "../pages/PortfolioPage";

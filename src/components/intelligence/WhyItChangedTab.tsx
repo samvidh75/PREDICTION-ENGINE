@@ -78,7 +78,8 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
     setLoading(true);
     setError(null);
 
-    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}`)
+    const horizon = new URLSearchParams(window.location.search).get('horizon') || '30';
+    fetch(`/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${encodeURIComponent(horizon)}`)
       .then(async (res) => {
         if (!res.ok) {
           const body = await res.json().catch(() => null);
@@ -86,7 +87,11 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
         }
         return res.json();
       })
-      .then((explanation: ExplanationData) => {
+      .then((envelope: { status?: string; data?: ExplanationData; message?: string | null }) => {
+        if (envelope?.status === 'unavailable') {
+          throw new Error(envelope.message || 'Prediction explanation not available');
+        }
+        const explanation = envelope?.data ?? envelope as unknown as ExplanationData;
         if (!cancelled) setData(explanation);
       })
       .catch((err: Error) => {
