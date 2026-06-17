@@ -49,6 +49,8 @@
     "validate:distributions": "tsx scripts/validate-sector-distributions.ts",
     "smoke:production": "tsx scripts/smoke-production.ts",
     "verify:data:production": "tsx scripts/verify-production-data-quality.ts",
+    "verify:symbols:production": "tsx scripts/verify-symbol-universe.ts",
+    "check:upstox": "tsx scripts/check-upstox-token.ts",
     "smoke:api": "tsx scripts/smoke-test-api.ts",
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
     "validate:hygiene": "tsx scripts/validate-repository-hygiene.ts",
