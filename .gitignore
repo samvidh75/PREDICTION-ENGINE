@@ -72,3 +72,4 @@ temp_*.ps1
 src/components/src/
 .vercel
 .env*
+.playwright-mcp/
