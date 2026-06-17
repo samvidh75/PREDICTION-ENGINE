@@ -402,9 +402,9 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
                VALUES ($1, $2, $3, $4, $5, $6, $7)
                ON CONFLICT (symbol, trade_date) DO UPDATE SET
                  close = EXCLUDED.close, volume = EXCLUDED.volume`,
-              [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
-            );
-            rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + 1;
+              [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume !== null && quote.volume !== undefined ? Math.round(Number(quote.volume)) : null]
+             );
+             rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + 1;
           }
           quoteResults.push({ symbol, ok, price: ok ? quote.price : null });
         } catch (err: any) {
@@ -629,7 +629,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
              VALUES ($1, $2, $3, $4, $5, $6, $7)
              ON CONFLICT (symbol, trade_date) DO UPDATE SET
                close = EXCLUDED.close, volume = EXCLUDED.volume`,
-            [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
+            [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume !== null && quote.volume !== undefined ? Math.round(Number(quote.volume)) : null]
           );
         }
         results.push({ symbol, ok, price: ok ? quote.price : null, error: ok ? null : "IndianAPI returned no price data" });
