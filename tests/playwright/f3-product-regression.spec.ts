@@ -27,8 +27,13 @@ function mockAuthSession(): void {
 
 /** Intercept all /api/ calls and return empty/controlled JSON. */
 async function mockAllApi(page: import("@playwright/test").Page): Promise<void> {
-  await page.route("**/api/**", async (route) => {
+  await page.route(/\/api\//, async (route) => {
     const url = route.request().url();
+    const pathname = new URL(url).pathname;
+    // Only intercept actual API routes, not source files containing "/api/" in their path
+    if (!pathname.startsWith("/api/")) {
+      return route.fallback();
+    }
     // Return realistic empty-state shapes for known endpoints
     if (url.includes("/api/intelligence/leaderboard")) {
       return route.fulfill({
@@ -152,14 +157,14 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /calmer workspace for indian equity research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Indian equity research/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("about page renders", async ({ page }) => {
     await page.goto("/?page=about");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Research intelligence for Indian equities/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -375,7 +380,7 @@ test.describe("Rankings page", () => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
     await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
-    await expect(page.getByText(/verified rankings are being prepared/i)).toBeVisible();
+    await expect(page.getByText(/Rankings pending/i)).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 });
@@ -440,7 +445,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /calmer workspace for indian equity research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Indian equity research/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

@@ -15,6 +15,7 @@ type Props = {
   restoreOnMount?: boolean;
   autoProvider?: AutoProvider | null;
   initialStage?: Stage;
+  contextMessage?: string | null;
 };
 
 function titleForStage(stage: Stage): string {
@@ -49,6 +50,7 @@ export default function CinematicAuthGateway({
   restoreOnMount = true,
   autoProvider = null,
   initialStage = "login",
+  contextMessage = null,
 }: Props): JSX.Element {
   const [stage, setStage] = useState<Stage>(initialStage);
   const [busy, setBusy] = useState(false);
@@ -184,7 +186,14 @@ export default function CinematicAuthGateway({
     <div className="w-full antialiased [text-rendering:geometricPrecision]">
       <div className="p-2" aria-live="polite">
         <div className="text-[24px] font-semibold tracking-tight text-slate-950">{titleForStage(stage)}</div>
-        <div className="mt-2 text-[14px] leading-relaxed text-slate-600">{subtitleForStage(stage)}</div>
+        <div className="mt-2 text-[14px] leading-relaxed text-slate-600">
+          {contextMessage || subtitleForStage(stage)}
+        </div>
+        {contextMessage && stage === "signup" && (
+          <div className="mt-1 text-[13px] leading-relaxed text-slate-500">
+            {subtitleForStage(stage)}
+          </div>
+        )}
 
         <div className="mt-8">
           {stage === "login" && (

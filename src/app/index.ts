@@ -9,6 +9,8 @@ export {
   hasStockId,
   getStockTicker,
   notifyUrlChange,
+  sanitizeReturnTo,
+  getReturnToContext,
   PROTECTED_PAGES,
   PUBLIC_PAGES,
 } from "./router";

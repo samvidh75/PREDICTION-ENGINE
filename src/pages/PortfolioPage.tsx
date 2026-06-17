@@ -11,6 +11,8 @@ import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/DataState';
 import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 import tokens from '../components/ui/tokens';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import { useToast } from '../components/feedback/useToast';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-emerald-700';
@@ -39,6 +41,8 @@ export const PortfolioPage: React.FC = () => {
   const liveQuotes = useLiveQuotes(snapshot.holdings.map((holding) => holding.symbol));
   const authSession = loadAuthSession();
   const isLocalOnly = !authSession.uid;
+  const [deleteConfirmSymbol, setDeleteConfirmSymbol] = useState<string | null>(null);
+  const toast = useToast();
 
   const refreshSnapshot = useCallback(() => setSnapshot(PortfolioSnapshotFactory.createSnapshot()), []);
   useEffect(() => {
@@ -236,7 +240,7 @@ export const PortfolioPage: React.FC = () => {
                 </span>
                 <div className="flex items-center justify-end gap-1">
                   <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-slate-800"><Edit2 className="h-3 w-3" /></button>
-                  <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-rose-700"><Trash2 className="h-3 w-3" /></button>
+                  <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-rose-700"><Trash2 className="h-3 w-3" /></button>
                 </div>
               </div>
             ))}
@@ -250,7 +254,7 @@ export const PortfolioPage: React.FC = () => {
                   <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono font-bold text-sm text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
                   <div className="flex items-center gap-2">
                     <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-slate-800"><Edit2 className="h-3.5 w-3.5" /></button>
-                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
@@ -316,6 +320,23 @@ export const PortfolioPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirmSymbol !== null}
+        title="Remove holding"
+        message={`Remove ${deleteConfirmSymbol} from your portfolio? This cannot be undone.`}
+        confirmLabel="Remove"
+        cancelLabel="Cancel"
+        destructive={true}
+        onConfirm={() => {
+          if (deleteConfirmSymbol) {
+            PortfolioEngine.removeHolding(deleteConfirmSymbol);
+            toast.success(`${deleteConfirmSymbol} removed from portfolio`);
+            setDeleteConfirmSymbol(null);
+          }
+        }}
+        onCancel={() => setDeleteConfirmSymbol(null)}
+      />
     </div>
   );
 };

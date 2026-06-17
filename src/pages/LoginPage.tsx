@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useMemo } from "react";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import CinematicAuthGateway from "../components/auth/CinematicAuthGateway";
+import { sanitizeReturnTo, getReturnToContext } from "../app/router";
 
 export const LoginPage: React.FC = () => {
-  const goDashboard = () => {
+  const returnToParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    params.set("page", "dashboard");
-    window.history.replaceState({}, "", `?${params.toString()}`);
+    return params.get("returnTo");
+  }, []);
+
+  const safeReturnTo = useMemo(() => sanitizeReturnTo(returnToParam), [returnToParam]);
+  const contextMessage = useMemo(() => getReturnToContext(returnToParam), [returnToParam]);
+
+  const onAuthed = () => {
+    if (safeReturnTo) {
+      window.history.replaceState({}, "", safeReturnTo);
+    } else {
+      const params = new URLSearchParams(window.location.search);
+      params.delete("returnTo");
+      params.set("page", "dashboard");
+      window.history.replaceState({}, "", `?${params.toString()}`);
+    }
     window.dispatchEvent(new Event("urlchange"));
   };
 
@@ -24,9 +38,10 @@ export const LoginPage: React.FC = () => {
             </span>
           </div>
           <CinematicAuthGateway
-            onAuthed={goDashboard}
+            onAuthed={onAuthed}
             initialStage="login"
             restoreOnMount={false}
+            contextMessage={contextMessage}
           />
         </div>
       </section>
