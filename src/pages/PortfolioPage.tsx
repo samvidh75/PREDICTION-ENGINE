@@ -151,7 +151,7 @@ export const PortfolioPage: React.FC = () => {
         }
       />
 
-      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <section aria-label="Portfolio operating summary" className="space-y-4 rounded-xl glass-panel p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Portfolio operating summary</h2>
@@ -170,7 +170,7 @@ export const PortfolioPage: React.FC = () => {
         </div>
 
         {review.quoteCoverage.missingSymbols.length > 0 && (
-          <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-[11px] text-amber-800">
+          <div className="flex items-start gap-2 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 px-3 py-3 text-[11px] text-amber-800">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             Missing live quotes: {review.quoteCoverage.missingSymbols.join(', ')}. Market value and portfolio return are intentionally withheld.
           </div>
@@ -200,7 +200,7 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.concentration.sectorExposure.length > 0 && (
-        <section aria-label="Cost basis sector exposure" className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <section aria-label="Cost basis sector exposure" className="rounded-xl glass-panel p-5">
           <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-slate-950">Sector exposure - recorded cost basis</h2>
           <div className="mt-3 space-y-2">
             {review.concentration.sectorExposure.map((item) => (
@@ -224,7 +224,7 @@ export const PortfolioPage: React.FC = () => {
       ) : (
         <section aria-label="Portfolio holdings">
           {/* Desktop table — hidden on small screens */}
-          <div className="hidden sm:block overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="hidden sm:block overflow-hidden rounded-xl glass-panel">
             <div className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">
               <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Cost basis</span><span>Live value</span><span>Return</span><span className="text-right pr-3"></span>
             </div>
@@ -249,7 +249,7 @@ export const PortfolioPage: React.FC = () => {
           {/* Mobile cards — shown only on small screens */}
           <div className="sm:hidden space-y-3">
             {review.holdings.map((holding) => (
-              <div key={holding.symbol} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <div key={holding.symbol} className="rounded-xl glass-panel p-4">
                 <div className="flex items-center justify-between mb-3">
                   <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono font-bold text-sm text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
                   <div className="flex items-center gap-2">
@@ -276,11 +276,11 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-950">Add holding</h3><button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
+          <div className="w-full max-w-sm space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Add holding</h3><button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleAddHolding} className="space-y-3">
-              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
+              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" />
               <div className="grid grid-cols-2 gap-3">
                 <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
                 <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
@@ -294,12 +294,12 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {editingHolding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-950">Edit {editingHolding.symbol}</h3><button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
+          <div className="w-full max-w-sm space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Edit {editingHolding.symbol}</h3><button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleEditHolding} className="space-y-3">
-              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" placeholder="Shares" />
-              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" placeholder="Avg Buy Price" />
+              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" placeholder="Shares" />
+              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" placeholder="Avg Buy Price" />
               {formError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{formError}</div>}
               <Button type="submit" className="w-full text-xs">Save</Button>
             </form>
@@ -308,11 +308,11 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {isImportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-950">Import CSV</h3><button type="button" onClick={() => setIsImportOpen(false)} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4">
+          <div className="w-full max-w-md space-y-4 rounded-2xl glass-panel-strong p-6 shadow-glassLg">
+            <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">Import CSV</h3><button type="button" onClick={() => setIsImportOpen(false)} className="text-slate-500 hover:text-slate-800"><X className="h-4 w-4" /></button></div>
             <form onSubmit={handleCSVImport} className="space-y-3">
-              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-slate-300 bg-white p-2.5 font-mono text-xs text-slate-900" />
+              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-xl bg-white/70 backdrop-blur-sm border border-white/30 p-2.5 font-mono text-xs text-slate-900" />
               <p className="text-[10px] leading-relaxed text-slate-500">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
               {importError && <div className="rounded-lg border border-rose-200 bg-rose-50 p-2.5 text-[10px] text-rose-700">{importError}</div>}
               <Button type="submit" className="w-full text-xs">Parse and import</Button>
@@ -343,7 +343,7 @@ export const PortfolioPage: React.FC = () => {
 
 function SummaryCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3">
       <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">{label}</div>
       <div className="mt-1 text-sm font-semibold text-slate-950">{value}</div>
       {detail && <div className="mt-1 text-[10px] text-slate-500">{detail}</div>}
