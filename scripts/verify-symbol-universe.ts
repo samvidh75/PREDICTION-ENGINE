@@ -2,8 +2,8 @@ export {};
 /**
  * verify-symbol-universe.ts
  *
- * Verifies provider-backed availability for candidate symbols.
- * Checks canonical symbol, provider lookup, and DB existence.
+ * Verifies provider-backed availability for candidate symbols via production API.
+ * Checks quote availability, metadata, stockstory universe membership.
  * Does NOT add fake data — marks unavailable domains honestly.
  *
  * Usage:
@@ -12,28 +12,30 @@ export {};
  *
  * Environment:
  *   SMOKE_TIMEOUT_MS  — per-request timeout in ms (default: 10000)
- *   CANDIDATE_SYMBOLS  — comma-separated override (alternative to --symbols)
  */
 
 const TIMEOUT_MS = parseInt(process.env.SMOKE_TIMEOUT_MS || "10000", 10);
 
 const DEFAULT_CANDIDATES = [
-  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-  "SBIN", "BHARTIARTL", "ITC", "LT", "AXISBANK",
-  "KOTAKBANK", "HINDUNILVR", "MARUTI", "SUNPHARMA", "BAJFINANCE",
+  "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "BHARTIARTL",
+  "SBIN", "ITC", "LT", "AXISBANK", "KOTAKBANK", "HINDUNILVR",
+  "MARUTI", "SUNPHARMA", "BAJFINANCE", "HCLTECH", "WIPRO",
+  "ASIANPAINT", "ULTRACEMCO", "TITAN", "NTPC", "POWERGRID",
+  "M&M", "ADANIENT", "ADANIPORTS", "TATASTEEL", "JSWSTEEL",
+  "COALINDIA", "ONGC", "NESTLEIND", "TECHM",
 ];
 
-const UPSTOX_API = "https://api.upstox.com/v2";
 const FRONTEND_URL = "https://www.stockstory-india.com";
 
-interface SymbolAvailability {
+interface SymbolStatus {
   symbol: string;
-  dbExists: boolean | null;
+  companyName: string | null;
+  inDb: boolean;
   quoteAvailable: boolean;
-  historicalAvailable: boolean;
-  financialAvailable: boolean;
+  metadataAvailable: boolean;
   scoreAvailable: boolean;
-  reason: string | null;
+  providerSource: string | null;
+  unavailableReason: string | null;
 }
 
 function getSymbols(): string[] {
@@ -46,11 +48,13 @@ function getSymbols(): string[] {
   return DEFAULT_CANDIDATES;
 }
 
-async function fetchWithTimeout(url: string): Promise<Response | null> {
+async function fetchJson(url: string): Promise<Record<string, unknown> | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    return await fetch(url, { signal: controller.signal });
+    const resp = await fetch(url, { signal: controller.signal });
+    if (!resp.ok) return null;
+    return await resp.json() as Record<string, unknown>;
   } catch {
     return null;
   } finally {
@@ -58,80 +62,79 @@ async function fetchWithTimeout(url: string): Promise<Response | null> {
   }
 }
 
-async function checkSymbol(symbol: string): Promise<SymbolAvailability> {
-  const result: SymbolAvailability = {
+async function fetchStatus(url: string): Promise<number | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const resp = await fetch(url, { signal: controller.signal });
+    return resp.status;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function checkSymbol(symbol: string): Promise<SymbolStatus> {
+  const result: SymbolStatus = {
     symbol,
-    dbExists: null,
+    companyName: null,
+    inDb: false,
     quoteAvailable: false,
-    historicalAvailable: false,
-    financialAvailable: false,
+    metadataAvailable: false,
     scoreAvailable: false,
-    reason: null,
+    providerSource: null,
+    unavailableReason: null,
   };
 
-  // Check DB existence via data-coverage API
-  // (This only tells us if the symbol is in the coverage list, not individual existence)
-  const coverageResp = await fetchWithTimeout(`${FRONTEND_URL}/api/ops/data-coverage`);
-  if (coverageResp?.ok) {
-    try {
-      const body = await coverageResp.json();
-      result.dbExists = true; // We'll refine this with the coverage count
-    } catch {
-      result.dbExists = null;
-    }
-  }
-
-  // Check stockstory endpoint (does the company have a prediction entry?)
-  const storyResp = await fetchWithTimeout(`${FRONTEND_URL}/api/stockstory/${symbol}`);
-  if (storyResp?.ok) {
-    try {
-      const body = await storyResp.json();
-      if (body.status === "available") {
-        result.scoreAvailable = true;
-        result.quoteAvailable = true;
-        result.historicalAvailable = true;
-        result.financialAvailable = body.data?.fundamentals?.length > 0;
-      } else if (body.status === "unavailable") {
-        // Symbol exists in universe but has no prediction entry yet
-        result.reason = body.message || "Symbol in universe, no prediction entry yet";
-      } else {
-        result.reason = `stockstory status: ${body.status}`;
-      }
-    } catch {
-      result.reason = "stockstory JSON parse failed";
-    }
-  } else {
-    const status = storyResp?.status ?? 0;
-    if (status === 404) {
-      result.reason = "Symbol not found in stockstory universe";
-    } else {
-      result.reason = `stockstory HTTP ${status}`;
-    }
-  }
-
-  // Quick quote check via market-data endpoint
-  // (This may not work for all symbols, but we try)
-  const quoteResp = await fetchWithTimeout(`${FRONTEND_URL}/api/market-data/company/${symbol}`);
-  if (quoteResp?.ok) {
+  // 1. Check quote availability
+  const quoteStatus = await fetchStatus(`${FRONTEND_URL}/api/market-data/quote/${symbol}`);
+  if (quoteStatus === 200) {
     result.quoteAvailable = true;
+    result.providerSource = "IndianAPI/Yahoo";
   }
 
-  // Check leaderboard for score availability
-  const lbResp = await fetchWithTimeout(`${FRONTEND_URL}/api/intelligence/leaderboard?limit=30`);
-  if (lbResp?.ok) {
-    try {
-      const body = await lbResp.json();
-      const data = body.data ?? [];
-      const found = data.find((e: any) => e.symbol === symbol);
-      if (found) {
-        result.scoreAvailable = true;
-        if (found.rankingScore !== null && found.rankingScore !== undefined) {
-          result.historicalAvailable = true;
-        }
-      }
-    } catch {
-      // Leaderboard parse failed
+  // 2. Check metadata availability (company name, sector)
+  const meta = await fetchJson(`${FRONTEND_URL}/api/market-data/metadata/${symbol}`);
+  if (meta && meta.symbol) {
+    result.metadataAvailable = true;
+    result.companyName = (meta.companyName as string) || null;
+    result.providerSource = "IndianAPI";
+  }
+
+  // 3. Check stockstory universe membership
+  const story = await fetchJson(`${FRONTEND_URL}/api/stockstory/${symbol}`);
+  if (story) {
+    const status = story.status as string;
+    if (status === "available") {
+      result.scoreAvailable = true;
+      result.inDb = true;
+    } else if (status === "unavailable") {
+      result.inDb = true; // symbol is in DB but has no prediction entry
+      const msg = story.message as string;
+      result.unavailableReason = msg || "In universe, no prediction entry";
     }
+  }
+
+  // 4. Check leaderboard for score availability
+  const lb = await fetchJson(`${FRONTEND_URL}/api/intelligence/leaderboard?limit=50`);
+  if (lb) {
+    const data = (lb as any).data ?? [];
+    const found = data.find((e: any) => e.symbol === symbol);
+    if (found) {
+      result.scoreAvailable = true;
+      result.inDb = true;
+      if (result.companyName && !result.companyName.startsWith(symbol)) {
+        result.companyName = found.companyName || result.companyName;
+      }
+    }
+  }
+
+  // Determine final classification
+  if (!result.quoteAvailable && !result.metadataAvailable) {
+    result.unavailableReason = result.unavailableReason || "No provider data available for this symbol";
+  } else if (!result.inDb) {
+    result.unavailableReason = "Provider data available — not yet indexed in DB. Can be added via pipeline.";
   }
 
   return result;
@@ -140,47 +143,56 @@ async function checkSymbol(symbol: string): Promise<SymbolAvailability> {
 async function main(): Promise<void> {
   const symbols = getSymbols();
   console.log(`\n=== Symbol Universe Verification (${symbols.length} candidates) ===\n`);
-  console.log(`  Provider: Vercel API (${FRONTEND_URL})\n`);
-  console.log("  Legend: ✓=available  △=partial/unavailable  ✗=not found  ?=unknown\n");
 
-  const results: SymbolAvailability[] = [];
+  const results: SymbolStatus[] = [];
   for (const symbol of symbols) {
-    process.stdout.write(`  Checking ${symbol}...`);
+    process.stdout.write(`  ${symbol}...`);
     const result = await checkSymbol(symbol);
     results.push(result);
-    const icon = result.scoreAvailable ? "✓" : result.reason?.includes("prediction entry") ? "△" : "✗";
-    console.log(` ${icon}  ${result.reason ? `(${result.reason})` : ""}`);
+
+    const flags: string[] = [];
+    if (result.scoreAvailable) flags.push("scored");
+    if (result.quoteAvailable) flags.push("quote");
+    if (result.metadataAvailable) flags.push("meta");
+    if (result.inDb && !result.scoreAvailable) flags.push("in_db");
+    const flagStr = flags.length > 0 ? ` [${flags.join(",")}]` : "";
+
+    if (result.scoreAvailable) {
+      const name = result.companyName ? ` (${result.companyName})` : "";
+      console.log(` ✓${flagStr}${name}`);
+    } else if (result.quoteAvailable || result.metadataAvailable) {
+      const reason = result.unavailableReason ? ` — ${result.unavailableReason}` : "";
+      console.log(` △${flagStr}${reason}`);
+    } else {
+      const reason = result.unavailableReason ? ` — ${result.unavailableReason}` : "";
+      console.log(` ✗${reason}`);
+    }
   }
 
   // Summary
-  const verified = results.filter((r) => r.scoreAvailable);
-  const limited = results.filter((r) => !r.scoreAvailable && r.reason?.includes("prediction entry"));
-  const missing = results.filter((r) => !r.scoreAvailable && !limited.includes(r));
+  const scored = results.filter((r) => r.scoreAvailable);
+  const ingestible = results.filter((r) => !r.scoreAvailable && (r.quoteAvailable || r.metadataAvailable));
+  const unavailable = results.filter((r) => !r.scoreAvailable && !r.quoteAvailable && !r.metadataAvailable);
 
   console.log(`\n  --- Summary ---`);
-  console.log(`  Verified (scored): ${verified.length}`);
-  console.log(`  In universe (unscored): ${limited.length}`);
-  console.log(`  Not found: ${missing.length}`);
+  console.log(`  Total candidates:     ${symbols.length}`);
+  console.log(`  Already scored:       ${scored.length}`);
+  console.log(`  Ingestible (new):     ${ingestible.length}`);
+  console.log(`  Unavailable:          ${unavailable.length}`);
 
-  if (verified.length > 0) {
-    console.log(`\n  Verified symbols:`);
-    for (const r of verified) {
-      console.log(`    ✓ ${r.symbol}`);
-    }
+  if (scored.length > 0) {
+    console.log(`\n  Already scored:`);
+    for (const r of scored) console.log(`    ✓ ${r.symbol}  ${r.companyName ? `(${r.companyName})` : ""}`);
   }
 
-  if (limited.length > 0) {
-    console.log(`\n  In universe but pending scoring:`);
-    for (const r of limited) {
-      console.log(`    △ ${r.symbol}`);
-    }
+  if (ingestible.length > 0) {
+    console.log(`\n  Ready for ingestion (real provider data exists):`);
+    for (const r of ingestible) console.log(`    △ ${r.symbol}  ${r.companyName ? `(${r.companyName})` : ""}`);
   }
 
-  if (missing.length > 0) {
-    console.log(`\n  Symbols not found in any provider:`);
-    for (const r of missing) {
-      console.log(`    ✗ ${r.symbol}`);
-    }
+  if (unavailable.length > 0) {
+    console.log(`\n  Unavailable (no provider data):`);
+    for (const r of unavailable) console.log(`    ✗ ${r.symbol}  ${r.unavailableReason ? `(${r.unavailableReason})` : ""}`);
   }
 
   console.log();

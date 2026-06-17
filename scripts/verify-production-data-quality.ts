@@ -100,7 +100,7 @@ async function main(): Promise<void> {
       const cov = body.coverage as Record<string, any> | undefined;
       if (!cov) return "no coverage object";
       if (typeof cov.symbols?.count !== "number") return "symbols count not a number";
-      if (cov.symbols.count < 5) return `only ${cov.symbols.count} symbols (expected >= 5)`;
+      if (cov.symbols.count < 10) return `only ${cov.symbols.count} symbols (expected >= 10)`;
       return null;
     },
   ));
