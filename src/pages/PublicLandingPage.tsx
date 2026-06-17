@@ -17,24 +17,24 @@ const workflow = [
   {
     icon: <Search className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
     title: "Search",
-    body: "Find Indian listed companies by ticker, name, or sector.",
+    body: "Find companies by ticker, name, or sector with coverage indicators.",
   },
   {
     icon: <BarChart3 className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
-    title: "Review",
-    body: "Review scoring signals only when source data is available.",
+    title: "Analyse",
+    body: "Review scoring signals, fundamentals, and source labels in one place.",
   },
   {
     icon: <Eye className="h-5 w-5 text-emerald-700" aria-hidden="true" />,
-    title: "Track",
-    body: "Save companies and keep research notes in one place.",
+    title: "Monitor",
+    body: "Track companies and research notes without fabricated scores.",
   },
 ];
 
 const trust = [
-  "No fabricated rankings",
-  "No paid placements",
-  "Unavailable data labelled clearly",
+  "No fabricated rankings or scores",
+  "Unavailable data clearly labelled",
+  "Source-backed signals only",
 ];
 
 export const PublicLandingPage: React.FC = () => {
@@ -50,11 +50,11 @@ export const PublicLandingPage: React.FC = () => {
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
             Indian equity research
           </div>
-          <h1 className="max-w-2xl text-4xl font-semibold leading-[1.06] tracking-tight text-slate-900 sm:text-5xl md:text-5xl">
-            A calmer workspace for Indian equity research.
+            <h1 className="max-w-2xl text-4xl font-semibold leading-[1.06] tracking-tight text-slate-900 sm:text-5xl md:text-5xl">
+            Indian equity research, with evidence you can inspect.
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-500 md:text-lg">
-            Search companies, review source-backed signals, and organise watchlists without fabricated scores or trading noise.
+            Search companies, review source-backed signals, and organise watchlists. No fabricated scores, no trading noise, no advisory.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button
@@ -114,7 +114,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="border-y border-slate-200/60 bg-white py-12">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-center text-xl font-semibold tracking-tight text-slate-900">
-            How the research workflow works
+            How the workspace works
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {workflow.map(({ icon, title, body }) => (
@@ -138,9 +138,9 @@ export const PublicLandingPage: React.FC = () => {
       {/* Onboarding CTA bar */}
       <section className="bg-slate-900 py-9">
         <div className="mx-auto max-w-4xl px-6 text-center">
-          <h2 className="text-lg font-semibold text-white">Ready to start your research?</h2>
+          <h2 className="text-lg font-semibold text-white">Start researching</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Create a free account to search companies, track watchlists, and explore methodology.
+            Create a free account to search companies, review signals, and track your research.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button

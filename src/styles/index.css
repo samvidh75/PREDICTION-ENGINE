@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -9,71 +9,50 @@
 :root {
   color-scheme: light;
 
-  /* Responsive UI scaling (adaptive typography + spacing) */
   --ss-ui-type-scale: 1;
   --ss-ui-space-scale: 1;
 
-  /* StockStory India master design tokens (CSS variables) */
-  --ss-bg-primary: #05070A;
-  --ss-bg-secondary: #0A0F17;
-  --ss-bg-tertiary: #111827;
-  --ss-bg-elevated: #141C28;
-  --ss-border: rgba(255,255,255,0.08);
-  --ss-border-strong: #363a45;
-  --ss-text-primary: #f0f3fa;
-  --ss-text-secondary: #b2b5be;
-  --ss-text-muted: #787b86;
-  --ss-tv-blue: #00C8FF;
-  --ss-tv-blue-hover: #00FFE0;
-  --ss-tv-green: #00E676;
-  --ss-tv-red: #FF5252;
-  --ss-tv-yellow: #FFC857;
+  /* Core dark palette — calm, muted, finance-grade */
+  --ss-bg-primary: #0c0f14;
+  --ss-bg-secondary: #10141a;
+  --ss-bg-tertiary: #161b23;
+  --ss-bg-elevated: #1a2028;
+  --ss-border: rgba(255,255,255,0.07);
+  --ss-border-strong: #2a2f38;
+  --ss-text-primary: #eef1f6;
+  --ss-text-secondary: #9ca3af;
+  --ss-text-muted: #6b7280;
 
-  --ss-surface-2: #0A0F17;
-  --ss-surface-3: #111827;
-  --ss-surface-4: #141C28;
-  --ss-surface-tertiary: #1b2433;
+  --ss-tv-green: #22a17d;
+  --ss-tv-red: #e05a5a;
+  --ss-tv-yellow: #c8963e;
 
-  --ss-accent-cyan: #00FFE0;
-  --ss-accent-deep-cyan: #00C8FF;
-  --ss-accent-electric-blue-soft: #00C8FF;
-  --ss-accent-muted-magenta: #7B61FF;
-  --ss-accent-warning: #FFC857;
+  --ss-surface-2: #10141a;
+  --ss-surface-3: #161b23;
+  --ss-surface-4: #1a2028;
+  --ss-surface-tertiary: #1e2530;
 
-  /* Glow propagation (intentionally restrained for premium calm) */
-  --ss-glow-cyan: rgba(0, 255, 210, 0.18);
-  --ss-glow-cyan-strong: rgba(0, 255, 210, 0.26);
+  /* Accent — single muted teal, no cyan/blue/violet neon */
+  --ss-accent-primary: #25846a;
+  --ss-accent-primary-hover: #2d9c7e;
+  --ss-accent-muted: rgba(37, 132, 106, 0.15);
+  --ss-accent-warning: #c8963e;
 
-  --ss-glow-deep-blue: rgba(0, 120, 255, 0.14);
-  --ss-glow-deep-blue-strong: rgba(0, 120, 255, 0.22);
+  /* Ambient state lighting — restrained */
+  --ss-ambient-bullish: rgba(34, 161, 125, 0.07);
+  --ss-ambient-bearish: rgba(224, 90, 90, 0.06);
+  --ss-ambient-stable: rgba(156, 163, 175, 0.05);
 
-  --ss-glow-magenta: rgba(209, 107, 165, 0.20);
-  --ss-glow-magenta-strong: rgba(209, 107, 165, 0.28);
-
-  --ss-glow-warning: rgba(217, 140, 122, 0.16);
-  --ss-glow-warning-strong: rgba(217, 140, 122, 0.24);
-
-  /* Premium System 2.0 styles (Section 83) */
-  --ss-premium-border: rgba(41, 98, 255, 0.28);
-  --ss-premium-glow: rgba(41, 98, 255, 0.18);
-
-  /* Lighting Engine state lighting (Section 87) */
-  --ss-ambient-bullish: rgba(0, 209, 122, 0.08);
-  --ss-ambient-bearish: rgba(255, 91, 110, 0.06);
-  --ss-ambient-stable: rgba(87, 185, 255, 0.06);
-
-  --ss-radius-small: 14px;
-  --ss-radius-medium: 22px;
-  --ss-radius-large: 28px;
-  --ss-radius-extra-large: 32px;
+  --ss-radius-small: 12px;
+  --ss-radius-medium: 18px;
+  --ss-radius-large: 24px;
+  --ss-radius-extra-large: 28px;
   --ss-radius-orb: 999px;
 
-  /* Spacing primitives (token-governed geometry) */
   --ss-pad-4: 16px;
   --ss-pad-5: 20px;
   --ss-pad-6: 24px;
 
-  /* Rhythm / layout primitives (token-governed spacing) */
   --ss-space-20: 20px;
   --ss-space-64: 64px;
   --ss-space-72: 72px;
@@ -81,154 +60,126 @@
   --ss-space-96: 96px;
   --ss-space-110: 110px;
 
-  --ss-shadow-layer-1: 0 0 40px rgba(0, 0, 0, 0.45);
-  --ss-shadow-layer-2: 0 20px 80px rgba(0, 0, 0, 0.32);
-  --ss-shadow-layer-3: 0 0 120px rgba(0, 255, 210, 0.03);
+  --ss-shadow-layer-1: 0 0 40px rgba(0, 0, 0, 0.35);
+  --ss-shadow-layer-2: 0 20px 80px rgba(0, 0, 0, 0.28);
 
-  /* Elevation hierarchy governance (cards/panels/overlays) */
   --ss-elev-0-shadow: none;
   --ss-elev-1-shadow: var(--ss-shadow-layer-1);
   --ss-elev-2-shadow: var(--ss-shadow-layer-2);
-  --ss-elev-3-shadow: var(--ss-shadow-layer-3);
 
-  /* Blur hierarchy governance (readability-safe) */
   --ss-blur-12: blur(12px);
   --ss-blur-18: blur(18px);
   --ss-blur-24: blur(24px);
 
-  /* Opacity hierarchy governance (overlay + surface physics) */
   --ss-opacity-veil-1: 0.16;
   --ss-opacity-veil-2: 0.22;
   --ss-opacity-veil-3: 0.35;
-  --ss-opacity-border-veil: 0.10;
 
   --ss-ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
-
   --ss-transition-fast: 120ms;
   --ss-transition-medium: 220ms;
   --ss-transition-slow: 320ms;
 
-  /* Glassmorphism “surface physics” presets (calm + premium) */
-  --ss-glass-bg: rgba(19, 23, 34, 0.72);
-  --ss-glass-bg-2: rgba(30, 34, 45, 0.84);
-  --ss-glass-border: rgba(120, 123, 134, 0.22);
-  --ss-glass-border-2: rgba(178, 181, 190, 0.28);
+  /* Glassmorphism */
+  --ss-glass-bg: rgba(20, 26, 32, 0.78);
+  --ss-glass-bg-2: rgba(26, 32, 40, 0.88);
+  --ss-glass-border: rgba(156, 163, 175, 0.16);
+  --ss-glass-border-2: rgba(156, 163, 175, 0.22);
 
   /* Typography */
-  /* Elite font pairing (from index.html): Geist Sans + Geist Mono */
-  --ss-font-ui: "Inter", "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --ss-font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --ss-font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --ss-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* Hybrid semantic font-role variables:
-     Active semantic vars (--font-display/heading/body/...) are selected via CSS below
-     using the token-injected --font-*-desktop / --font-*-mobile vars. */
-
-  /* Intelligence OS Typography Tokens */
+  /* Typography Tokens */
   --ss-ty-kicker-size: 10px;
   --ss-ty-kicker-letter-spacing: 0.28em;
   --ss-ty-kicker-weight: 500;
-  --ss-ty-kicker-color: rgba(255,255,255,0.60);
+  --ss-ty-kicker-color: rgba(255,255,255,0.55);
 
-  --ss-ty-hero-title-size: 48px;
-  --ss-ty-hero-title-size-sm: 68px;
+  --ss-ty-hero-title-size: 40px;
+  --ss-ty-hero-title-size-sm: 52px;
   --ss-ty-hero-title-weight: 600;
-  --ss-ty-hero-title-line-height: 1.0;
-  --ss-ty-hero-title-tracking: -0.07em;
-  --ss-ty-hero-title-shadow: 0 0 40px rgba(0,255,210,0.07);
+  --ss-ty-hero-title-line-height: 1.08;
+  --ss-ty-hero-title-tracking: -0.05em;
 
-  --ss-ty-section-title-size: 20px;
-  --ss-ty-section-title-size-sm: 22px;
+  --ss-ty-section-title-size: 18px;
+  --ss-ty-section-title-size-sm: 20px;
   --ss-ty-section-title-weight: 600;
-  --ss-ty-section-title-line-height: 1.15;
-  --ss-ty-section-title-tracking: -0.03em;
+  --ss-ty-section-title-line-height: 1.2;
+  --ss-ty-section-title-tracking: -0.02em;
   --ss-ty-section-title-color: rgba(255,255,255,0.92);
 
   --ss-ty-micro-label-size: 10px;
-  --ss-ty-micro-label-letter-spacing: 0.22em;
+  --ss-ty-micro-label-letter-spacing: 0.20em;
   --ss-ty-micro-label-weight: 500;
-  --ss-ty-micro-label-color: rgba(255,255,255,0.50);
+  --ss-ty-micro-label-color: rgba(255,255,255,0.45);
 
   --ss-ty-body-size: 14px;
   --ss-ty-body-size-sm: 15px;
   --ss-ty-body-weight: 400;
-  --ss-ty-body-line-height: 1.8;
-  --ss-ty-body-color: rgba(255,255,255,0.84);
+  --ss-ty-body-line-height: 1.7;
+  --ss-ty-body-color: rgba(255,255,255,0.80);
 
-  --ss-ty-card-label-size: 11px;
-  --ss-ty-card-label-letter-spacing: 0.22em;
+  --ss-ty-card-label-size: 10px;
+  --ss-ty-card-label-letter-spacing: 0.20em;
   --ss-ty-card-label-weight: 500;
-  --ss-ty-card-label-color: rgba(255,255,255,0.65);
+  --ss-ty-card-label-color: rgba(255,255,255,0.55);
 
-  --ss-ty-card-heading-size: 17px;
-  --ss-ty-card-heading-size-sm: 18px;
+  --ss-ty-card-heading-size: 15px;
+  --ss-ty-card-heading-size-sm: 16px;
   --ss-ty-card-heading-weight: 600;
-  --ss-ty-card-heading-line-height: 1.25;
-  --ss-ty-card-heading-tracking: -0.02em;
+  --ss-ty-card-heading-line-height: 1.3;
   --ss-ty-card-heading-color: rgba(255,255,255,0.92);
 
-  --ss-ty-card-body-size: 13.5px;
+  --ss-ty-card-body-size: 13px;
   --ss-ty-card-body-size-sm: 14px;
-  --ss-ty-card-body-line-height: 1.75;
-  --ss-ty-card-body-color: rgba(255,255,255,0.80);
+  --ss-ty-card-body-line-height: 1.7;
+  --ss-ty-card-body-color: rgba(255,255,255,0.75);
 
-  --ss-ty-shadow-soft: 0 0 22px rgba(0,255,210,0.06);
-
-  /* Typography calmness (driven at runtime by ResponsiveUIScalingLayer) */
   --ss-ty-weight-bias: 0;
   --ss-ty-tracking-bias-em: 0em;
 
-  /* Spatial typography depth (injected by SpatialTypographyRenderingEngine) */
-  --ss-ty-depth-shadow-soft: 0 0 0 rgba(0,0,0,0);
-  --ss-ty-depth-shadow: 0 0 0 rgba(0,0,0,0);
-
-  /* --- Premium Typography Module / Navigation / Telemetry --- */
-
-  /* Module headings (product-oriented, OS-module feel) */
   --ss-ty-module-kicker-size: 10px;
   --ss-ty-module-kicker-letter-spacing: 0.28em;
   --ss-ty-module-kicker-weight: 500;
-  --ss-ty-module-kicker-color: rgba(255,255,255,0.60);
-  --ss-ty-module-kicker-shadow-soft: 0 0 22px rgba(0,255,210,0.06);
+  --ss-ty-module-kicker-color: rgba(255,255,255,0.55);
 
-  --ss-ty-module-title-size: 20px;
-  --ss-ty-module-title-size-sm: 22px;
+  --ss-ty-module-title-size: 18px;
+  --ss-ty-module-title-size-sm: 20px;
   --ss-ty-module-title-weight: 600;
-  --ss-ty-module-title-line-height: 1.15;
-  --ss-ty-module-title-tracking: -0.03em;
+  --ss-ty-module-title-line-height: 1.2;
+  --ss-ty-module-title-tracking: -0.02em;
   --ss-ty-module-title-color: rgba(255,255,255,0.92);
 
-  /* Widget support line */
   --ss-ty-widget-support-size: 14px;
   --ss-ty-widget-support-size-sm: 14px;
   --ss-ty-widget-support-weight: 400;
-  --ss-ty-widget-support-line-height: 1.75;
-  --ss-ty-widget-support-color: rgba(255,255,255,0.82);
+  --ss-ty-widget-support-line-height: 1.7;
+  --ss-ty-widget-support-color: rgba(255,255,255,0.75);
 
-  /* Navigation labels */
   --ss-ty-nav-label-size: 11px;
-  --ss-ty-nav-label-letter-spacing: 0.18em;
-  --ss-ty-nav-label-color: rgba(255,255,255,0.72);
+  --ss-ty-nav-label-letter-spacing: 0.15em;
+  --ss-ty-nav-label-color: rgba(255,255,255,0.65);
   --ss-ty-nav-label-weight: 500;
   --ss-ty-nav-label-line-height: 1.15;
 
-  /* Telemetry numeric typography */
-  --ss-ty-metric-value-size: 36px;
-  --ss-ty-metric-value-size-sm: 40px;
+  --ss-ty-metric-value-size: 28px;
+  --ss-ty-metric-value-size-sm: 32px;
   --ss-ty-metric-value-weight: 600;
-  --ss-ty-metric-value-line-height: 1.05;
-  --ss-ty-metric-value-tracking: -0.06em;
+  --ss-ty-metric-value-line-height: 1.1;
+  --ss-ty-metric-value-tracking: -0.04em;
   --ss-ty-metric-value-color: rgba(255,255,255,0.96);
 
   --ss-ty-metric-subvalue-size: 13px;
   --ss-ty-metric-subvalue-size-sm: 14px;
   --ss-ty-metric-subvalue-weight: 500;
-  --ss-ty-metric-subvalue-line-height: 1.55;
+  --ss-ty-metric-subvalue-line-height: 1.5;
   --ss-ty-metric-subvalue-tracking: -0.01em;
-  --ss-ty-metric-subvalue-color: rgba(255,255,255,0.90);
+  --ss-ty-metric-subvalue-color: rgba(255,255,255,0.88);
 
   --ss-ty-metric-label-size: 10px;
-  --ss-ty-metric-label-letter-spacing: 0.18em;
-  --ss-ty-metric-label-color: rgba(255,255,255,0.60);
+  --ss-ty-metric-label-letter-spacing: 0.16em;
+  --ss-ty-metric-label-color: rgba(255,255,255,0.55);
   --ss-ty-metric-label-weight: 600;
   --ss-ty-metric-label-line-height: 1.2;
 }
@@ -284,66 +235,30 @@ body {
 
 .ss-tv-app {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(0, 200, 255, 0.18), transparent 28%),
-    radial-gradient(circle at 82% 12%, rgba(123, 97, 255, 0.15), transparent 30%),
-    radial-gradient(circle at 58% 78%, rgba(0, 255, 224, 0.08), transparent 34%),
-    linear-gradient(180deg, #05070A 0%, #070b12 44%, #0A0F17 100%);
+  background: var(--ss-bg-primary);
   color: var(--ss-text-primary);
 }
 
 .ss-tv-stage {
   position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 12% 16%, rgba(0, 200, 255, 0.20), transparent 30%),
-    radial-gradient(circle at 86% 14%, rgba(123, 97, 255, 0.18), transparent 32%),
-    radial-gradient(circle at 50% 84%, rgba(0, 255, 224, 0.07), transparent 30%),
-    linear-gradient(180deg, #05070A 0%, #070A10 48%, #0A0F17 100%);
-}
-
-.ss-tv-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 48% 18%, rgba(255, 255, 255, 0.10), transparent 3%),
-    radial-gradient(circle at 20% 78%, rgba(0, 200, 255, 0.14), transparent 24%),
-    radial-gradient(circle at 82% 76%, rgba(123, 97, 255, 0.13), transparent 23%);
-  filter: blur(22px);
-  opacity: 0.52;
-  animation: ss-nebula-drift 28s ease-in-out infinite alternate;
-}
-
-.ss-tv-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.28) 0 1px, transparent 1.3px),
-    linear-gradient(to right, rgba(120,123,134,0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(120,123,134,0.07) 1px, transparent 1px);
-  background-size: 140px 140px, 78px 78px, 78px 78px;
-  opacity: 0.22;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 24%, black 88%, transparent 100%);
-}
-
-@keyframes ss-nebula-drift {
-  from { transform: translate3d(-1.5%, -0.5%, 0) scale(1); }
-  to { transform: translate3d(1.5%, 0.7%, 0) scale(1.04); }
+  background: var(--ss-bg-secondary);
 }
 
 .ss-premium-panel {
   border: 1px solid var(--ss-border);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015)),
-    rgba(17, 24, 39, 0.86);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0,200,255,.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border-radius: 10px;
+  background: var(--ss-bg-tertiary);
+  box-shadow: var(--ss-shadow-layer-1);
+}
+
+.ss-glass:hover {
+  transform: translate3d(0, -2px, 0);
+  border-color: var(--ss-glass-border-2);
+}
+
+.ss-glass-2:hover {
+  transform: translate3d(0, -2px, 0);
+  border-color: var(--ss-glass-border-2);
 }
 
 .ss-premium-button {
@@ -353,18 +268,16 @@ body {
   gap: 8px;
   min-height: 44px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 200, 255, 0.28);
-  background: linear-gradient(135deg, rgba(0, 200, 255, 0.98), rgba(0, 255, 224, 0.86));
-  color: #031017;
-  font-weight: 800;
+  border: none;
+  background: var(--ss-accent-primary);
+  color: #ffffff;
+  font-weight: 600;
   letter-spacing: 0;
-  box-shadow: 0 0 20px rgba(0,200,255,.35);
-  transition: transform 160ms var(--ss-ease-primary), box-shadow 160ms var(--ss-ease-primary), border-color 160ms var(--ss-ease-primary);
+  transition: background 160ms var(--ss-ease-primary);
 }
 
 .ss-premium-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 24px rgba(0,255,224,.25);
+  background: var(--ss-accent-primary-hover);
 }
 
 .ss-secondary-button {
@@ -402,13 +315,7 @@ body {
   text-transform: lowercase;
 }
 
-.ss-tv-terminal-glow {
-  box-shadow:
-    -26px 0 70px rgba(41, 98, 255, 0.58),
-    26px 0 70px rgba(255, 51, 153, 0.56),
-    0 28px 95px rgba(143, 92, 255, 0.32),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-}
+/* terminal-glow removed — use box-shadow directly */
 
 .ss-tv-app::selection {
   background: rgba(41, 98, 255, 0.42);
@@ -482,23 +389,7 @@ body {
     0 0 42px rgba(41, 98, 255, 0.08);
 }
 
-.ss-tv-neon-edge {
-  position: relative;
-}
-
-.ss-tv-neon-edge::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  pointer-events: none;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(41, 98, 255, 0.95), rgba(34, 171, 148, 0.42), rgba(143, 92, 255, 0.82), rgba(255, 51, 153, 0.72));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.55;
-}
+/* neon-edge removed — use border directly */
 
 .ss-tv-chart-terminal {
   overflow: hidden;
@@ -708,9 +599,8 @@ body {
 }
 
 .ss-glass:hover {
-  transform: translate3d(0, -4px, 0) scale(1.02);
-  border-color: rgba(0, 209, 122, 0.22);
-  box-shadow: 0 10px 70px rgba(0, 0, 0, 0.45), 0 0 120px rgba(0, 255, 210, 0.10);
+  transform: translate3d(0, -2px, 0);
+  border-color: var(--ss-glass-border-2);
 }
 
 .ss-glass-2 {
@@ -754,9 +644,8 @@ body {
 }
 
 .ss-glass-2:hover {
-  transform: translate3d(0, -4px, 0) scale(1.02);
-  border-color: rgba(0, 209, 122, 0.20);
-  box-shadow: 0 10px 65px rgba(0, 0, 0, 0.42), 0 0 100px rgba(0, 255, 210, 0.10);
+  transform: translate3d(0, -2px, 0);
+  border-color: var(--ss-glass-border-2);
 }
 
 .ss-laser-label {
@@ -768,15 +657,8 @@ body {
 
 .ss-telemetry-pill {
   border-radius: var(--ss-radius-orb);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ss-border);
   background: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 0 18px var(--ss-glow-cyan);
-}
-
-.ss-neural-glow-edge {
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02),
-    0 0 120px var(--ss-glow-cyan);
 }
 
 .ss-focus-outline {
@@ -784,7 +666,7 @@ body {
 }
 
 .ss-focus-outline:focus-visible {
-  outline: 2px solid rgba(0, 255, 210, 0.35);
+  outline: 2px solid var(--ss-accent-primary);
   outline-offset: 2px;
   border-radius: 16px;
 }
