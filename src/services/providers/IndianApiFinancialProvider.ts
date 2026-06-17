@@ -99,35 +99,38 @@ export class IndianApiFinancialProvider implements FinancialProvider {
     const fund = fundamentals || {};
     const stock = stockMetrics || {};
 
-    const marketCap = croreToInr(fund.market_cap) ?? croreToInr(stock.marketCapCrore);
-    const roe = percentToFraction(fund.roe ?? fund.return_on_equity);
-    const roa = percentToFraction(fund.roa);
-    const roce = percentToFraction(fund.roce);
-    const grossMargin = percentToFraction(fund.gross_margin);
-    const operatingMargin = percentToFraction(fund.operating_margin ?? fund.opm);
-    const netMargin = percentToFraction(fund.net_profit_margin ?? fund.npm);
-    const revenueGrowth = percentToFraction(fund.revenue_growth_3y ?? fund.revenue_growth ?? fund.sales_growth_3y);
-    const epsGrowth = percentToFraction(fund.eps_growth_3y ?? fund.earnings_growth);
-    const profitGrowth = percentToFraction(fund.profit_growth_3y ?? fund.net_profit_growth_3y);
-    const fcfGrowth = percentToFraction(fund.fcf_growth_3y);
-    const dividendYield = percentToFraction(fund.dividend_yield);
-    const debtToEquity = finiteNumber(fund.debt_to_equity);
-    const currentRatio = finiteNumber(fund.current_ratio);
-    const peRatio = finiteNumber(fund.pe_ratio);
-    const pbRatio = finiteNumber(fund.pb_ratio);
-    const eps = finiteNumber(fund.eps);
-    const beta = finiteNumber(fund.beta);
-    const evEbitda = finiteNumber(fund.ev_ebitda ?? fund.ev_to_ebitda);
-    const interestCoverage = finiteNumber(fund.interest_coverage);
+    const f = (field: string) => fund[field];
+    const s = (field: string) => stock[field];
 
-    const freeCashFlow = finiteNumber(fund.free_cash_flow ?? fund.fcf);
+    const marketCap = croreToInr(f('market_cap')) ?? croreToInr(s('marketCapCrore'));
+    const peRatio = finiteNumber(f('pe_ratio')) ?? finiteNumber(s('pe_ratio'));
+    const pbRatio = finiteNumber(f('pb_ratio')) ?? finiteNumber(s('pb_ratio'));
+    const eps = finiteNumber(f('eps')) ?? finiteNumber(s('eps'));
+    const dividendYield = percentToFraction(f('dividend_yield')) ?? percentToFraction(s('dividend_yield'));
+    const beta = finiteNumber(f('beta')) ?? finiteNumber(s('beta'));
+    const roe = percentToFraction(f('roe') ?? f('return_on_equity')) ?? percentToFraction(s('roe'));
+    const roa = percentToFraction(f('roa')) ?? percentToFraction(s('roa'));
+    const roce = percentToFraction(f('roce')) ?? percentToFraction(s('roce'));
+    const evEbitda = finiteNumber(f('ev_ebitda') ?? f('ev_to_ebitda')) ?? finiteNumber(s('ev_ebitda'));
+    const debtToEquity = finiteNumber(f('debt_to_equity')) ?? finiteNumber(s('debt_to_equity'));
+    const currentRatio = finiteNumber(f('current_ratio')) ?? finiteNumber(s('current_ratio'));
+    const interestCoverage = finiteNumber(f('interest_coverage')) ?? finiteNumber(s('interest_coverage'));
+    const grossMargin = percentToFraction(f('gross_margin')) ?? percentToFraction(s('gross_margin'));
+    const operatingMargin = percentToFraction(f('operating_margin') ?? f('opm')) ?? percentToFraction(s('operating_margin'));
+    const netMargin = percentToFraction(f('net_profit_margin') ?? f('npm')) ?? percentToFraction(s('net_margin'));
+    const revenueGrowth = percentToFraction(f('revenue_growth_3y') ?? f('revenue_growth') ?? f('sales_growth_3y')) ?? percentToFraction(s('revenue_growth'));
+    const epsGrowth = percentToFraction(f('eps_growth_3y') ?? f('earnings_growth')) ?? percentToFraction(s('eps_growth'));
+    const profitGrowth = percentToFraction(f('profit_growth_3y') ?? f('net_profit_growth_3y')) ?? percentToFraction(s('profit_growth'));
+    const fcfGrowth = percentToFraction(f('fcf_growth_3y')) ?? percentToFraction(s('fcf_growth'));
+
+    const freeCashFlow = finiteNumber(f('free_cash_flow') ?? f('fcf')) ?? finiteNumber(s('free_cash_flow'));
     const fcfYield = (freeCashFlow !== undefined && marketCap !== undefined && marketCap > 0)
       ? freeCashFlow / marketCap
-      : finiteNumber(fund.fcf_yield);
+      : (finiteNumber(f('fcf_yield')) ?? finiteNumber(s('fcf_yield')));
 
-    const totalAssets = croreToInr(fund.total_assets);
-    const totalLiabilities = croreToInr(fund.total_liabilities);
-    const totalEquity = croreToInr(fund.total_equity);
+    const totalAssets = croreToInr(f('total_assets')) ?? croreToInr(s('total_assets'));
+    const totalLiabilities = croreToInr(f('total_liabilities')) ?? croreToInr(s('total_liabilities'));
+    const totalEquity = croreToInr(f('total_equity')) ?? croreToInr(s('total_equity'));
 
     const availableFields = [
       'peRatio', 'pbRatio', 'eps', 'dividendYield', 'beta', 'marketCap',
@@ -135,14 +138,14 @@ export class IndianApiFinancialProvider implements FinancialProvider {
       'grossMargin', 'operatingMargin', 'netMargin', 'revenueGrowth',
       'epsGrowth', 'profitGrowth', 'fcfGrowth', 'fcfYield', 'interestCoverage',
       'totalAssets', 'totalLiabilities', 'totalEquity',
-    ].filter(f => {
+    ].filter(fn => {
       const val = ({
         peRatio, pbRatio, eps, dividendYield, beta, marketCap,
         roe, roa, roic: roce, evEbitda, debtToEquity, currentRatio,
         grossMargin, operatingMargin, netMargin, revenueGrowth,
         epsGrowth, profitGrowth, fcfGrowth, fcfYield, interestCoverage,
         totalAssets, totalLiabilities, totalEquity,
-      } as Record<string, unknown>)[f];
+      } as Record<string, unknown>)[fn];
       return val !== undefined && val !== null;
     });
 
@@ -155,7 +158,7 @@ export class IndianApiFinancialProvider implements FinancialProvider {
     return {
       symbol: clean,
       source: 'indianapi',
-      periodEnd: fund.period_end ?? fund.reporting_date ?? undefined,
+      periodEnd: f('period_end') ?? f('reporting_date') ?? undefined,
       snapshotDate: new Date().toISOString().split('T')[0],
       retrievedAt: new Date().toISOString(),
 
@@ -189,12 +192,14 @@ export class IndianApiFinancialProvider implements FinancialProvider {
       _sources: {
         indianapi: 'IndianAPI /stock_fundamentals + /stock',
         fieldsAvailable: availableFields.join(','),
+        fundamentalsAvailable: !!fundamentals,
+        stockMetricsAvailable: !!stockMetrics,
       },
       _raw: {
         fundamentals: fund,
         stockMetrics: stock,
       },
-    };
+    } as any;
   }
 
   private async fetchFundamentals(
@@ -272,19 +277,53 @@ export class IndianApiFinancialProvider implements FinancialProvider {
       throw err;
     }
 
-    const data = result.data;
+    return this.normalizeStockMetrics(result.data);
+  }
+
+  private normalizeStockMetrics(data: Record<string, any>): Record<string, any> {
     const s = data.stockDetailsReusableData || {};
     const marketCapCrore = finiteNumber(s.marketCap);
 
     const extracted: Record<string, any> = { marketCapCrore };
 
     if (data.keyMetrics && typeof data.keyMetrics === 'object') {
-      for (const [category, items] of Object.entries(data.keyMetrics)) {
+      for (const items of Object.values(data.keyMetrics) as any) {
         if (Array.isArray(items)) {
-          for (const item of items as any[]) {
+          for (const item of items) {
             if (item?.key && item?.value !== undefined) {
               extracted[item.key] = item.value;
             }
+          }
+        }
+      }
+    }
+
+    const km = extracted;
+
+    const INDIANAPI_METRIC_MAP: Array<{ keys: string[]; field: string; convert: (v: unknown) => number | undefined }> = [
+      { keys: ['pPerEExcludingExtraordinaryItemsMostRecentFiscalYear', 'pPerEBasicExcludingExtraordinaryItemsTTM'], field: 'pe_ratio', convert: finiteNumber },
+      { keys: ['priceToBookMostRecentFiscalYear'], field: 'pb_ratio', convert: finiteNumber },
+      { keys: ['returnOnAverageEquity5YearAverage'], field: 'roe', convert: finiteNumber },
+      { keys: ['returnOnInvestmentMostRecentFiscalYear'], field: 'roce', convert: finiteNumber },
+      { keys: ['returnOnAverageAssetsMostRecenFiscalYear'], field: 'roa', convert: finiteNumber },
+      { keys: ['operatingMarginTrailing12Month', 'operatingMargin5YearAverage', 'operatingMargin1stHistoricalFiscalYear)'], field: 'operating_margin', convert: finiteNumber },
+      { keys: ['grossMargin5YearAverage'], field: 'gross_margin', convert: finiteNumber },
+      { keys: ['netProfitMarginPercent1stHistoricalFiscalYear'], field: 'net_margin', convert: finiteNumber },
+      { keys: ['revenueGrowthRate5Year', 'revenueChangePercentMostRecentQuarter1YearAgo'], field: 'revenue_growth', convert: finiteNumber },
+      { keys: ['ePSChangePercentTTMOverTTM', 'ePSGrowthRate5Year'], field: 'eps_growth', convert: finiteNumber },
+      { keys: ['totalDebtPerTotalEquityMostRecentQuarter'], field: 'debt_to_equity', convert: finiteNumber },
+      { keys: ['currentDividendYieldCommonStockPrimaryIssueLTM'], field: 'dividend_yield', convert: finiteNumber },
+      { keys: ['freeCashFlowtrailing12Month', 'freeCashFlowMostRecentFiscalYear'], field: 'free_cash_flow', convert: finiteNumber },
+    ];
+
+    for (const mapping of INDIANAPI_METRIC_MAP) {
+      for (const key of mapping.keys) {
+        const raw = km[key];
+        if (raw !== undefined && raw !== null && raw !== 'null' && raw !== '') {
+          const converted = mapping.convert(raw);
+          if (converted !== undefined) {
+            extracted[mapping.field] = converted;
+            break;
           }
         }
       }
