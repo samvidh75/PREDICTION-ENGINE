@@ -27,3 +27,29 @@ describe('IndianMarketProvider trust helpers', () => {
     expect(Number.isNaN(new Date(timestamp as string).getTime())).toBe(false);
   });
 });
+
+describe('Volume rounding (Lakhs to units)', () => {
+  it('rounds float volume to integer for bigint column compatibility', () => {
+    const values = [
+      { input: '20.24', expected: 2024000 },
+      { input: '19.74', expected: 1974000 },
+      { input: '100.50', expected: 10050000 },
+      { input: '0.50', expected: 50000 },
+      { input: '1.00', expected: 100000 },
+    ];
+    for (const { input, expected } of values) {
+      const parsed = Number.parseFloat(input);
+      const volume = Math.round((Number.isFinite(parsed) && parsed > 0 ? parsed : 0) * 100_000);
+      expect(volume).toBe(expected);
+    }
+  });
+
+  it('handles edge case values without producing float artifacts', () => {
+    const fpa = (v: number) => Math.round(v * 100_000);
+    expect(fpa(20.24)).toBe(2024000);
+    expect(fpa(19.74)).toBe(1974000);
+    expect(fpa(0)).toBe(0);
+    expect(fpa(0.001)).toBe(100);
+    expect(Number.isInteger(fpa(999.99))).toBe(true);
+  });
+});
