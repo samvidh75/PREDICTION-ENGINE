@@ -528,26 +528,60 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
         const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const completedAt = new Date().toISOString();
+        const symbolsFailed = symbols.length - quotesSucceeded;
+        const errorClasses: string[] = [];
+        const rowsWrittenSummary: Record<string, number> = { ...rowsWritten };
+
+        for (const [stage, r] of Object.entries(results)) {
+          if ((r as any).error) errorClasses.push(`${stage}:${String((r as any).error).substring(0, 40)}`);
+        }
+
         try {
-await query(
+          await query(
             `INSERT INTO pipeline_health (
                id, run_id, phase, status, started_at, completed_at,
-               symbols_attempted, symbols_succeeded
+               symbols_attempted, symbols_succeeded, symbols_failed,
+               error_classes, provider_statuses, rows_written, metadata
              )
-             VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7)`,
+             VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
             [
-               pipelineId,
-               runId,
-               overallStatus,
-               startedAt,
-               completedAt,
-               symbols.length,
-               quotesSucceeded,
+              pipelineId,
+              runId,
+              overallStatus,
+              startedAt,
+              completedAt,
+              symbols.length,
+              quotesSucceeded,
+              symbolsFailed,
+              errorClasses,
+              JSON.stringify(providerStatuses),
+              JSON.stringify(rowsWrittenSummary),
+              JSON.stringify({ mode: applyMode ? 'apply' : 'dry-run', version: '1.0' }),
             ]
           );
           results.health = { status: "recorded", overallStatus };
         } catch (err: any) {
-          results.health = { status: "failed", error: err.message };
+          try {
+            await query(
+              `INSERT INTO pipeline_health (
+                 id, run_id, phase, status, started_at, completed_at,
+                 symbols_attempted, symbols_succeeded
+               )
+               VALUES ($1, $2, 'api_pipeline_run', $3, $4, $5, $6, $7)`,
+              [
+                pipelineId,
+                runId,
+                overallStatus,
+                startedAt,
+                completedAt,
+                symbols.length,
+                quotesSucceeded,
+              ]
+            );
+            results.health = { status: "recorded", overallStatus };
+          } catch (err2: any) {
+            results.health = { status: "failed", error: err2.message };
+          }
         }
       } else {
         results.financials = { status: "skipped", message: "Dry-run: financials stage skipped to avoid provider calls" };
