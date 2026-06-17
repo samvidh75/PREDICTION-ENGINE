@@ -416,6 +416,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         status: quotesSucceeded === symbols.length ? "success" : (quotesSucceeded > 0 ? "partial" : "failure"),
         succeeded: quotesSucceeded,
         failed: quoteResults.filter(r => !r.ok).length,
+        details: quoteResults.map(r => ({ symbol: r.symbol, ok: r.ok, price: r.price, error: r.error })),
       };
 
       // Stage 3: Financials (only in apply mode to avoid provider calls on dry-run)
