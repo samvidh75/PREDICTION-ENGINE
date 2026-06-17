@@ -384,7 +384,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-lg border border-slate-200/80 bg-slate-50/80 p-3.5">
+            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 p-3.5">
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Live Quote</div>
                 <div className="mt-1 font-mono text-lg font-bold text-slate-900">{priceLabel}</div>
@@ -402,7 +402,7 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 rounded-lg border border-slate-200/80 bg-slate-50/70 p-4">
+          <div className="mt-6 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4">
             <h3 className="text-sm font-semibold text-slate-900">Why scoring is unavailable</h3>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-600">
               This company is recognised but verified scoring factors are not yet ready. Live quotes may still appear when market data is available.
@@ -412,11 +412,11 @@ export const StockStoryPage: React.FC = () => {
           <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
             <button
               onClick={handleToggleWatchlist}
-              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-xs font-semibold transition-all ${
-                isInWatchlist
-                  ? "border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
-              }`}
+              className={`flex h-10 items-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all ${
+                 isInWatchlist
+                   ? "border-rose-200/50 bg-rose-50/60 backdrop-blur-sm text-rose-800 hover:bg-rose-100/80"
+                   : "border-emerald-200/50 bg-emerald-50/60 backdrop-blur-sm text-emerald-800 hover:bg-emerald-100/80"
+               }`}
             >
               <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
               {isInWatchlist ? "Remove from Watchlist" : "Track via Watchlist"}
@@ -527,7 +527,7 @@ export const StockStoryPage: React.FC = () => {
         </button>
       </div>
 
-      <section className="rounded-xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-200">
@@ -627,23 +627,23 @@ export const StockStoryPage: React.FC = () => {
         </button>
       </section>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">My Research Notes</div>
         <textarea
           value={noteText}
           onChange={(event) => handleSaveNote(event.target.value)}
           placeholder="Add your own research notes for this company..."
-          className="h-20 w-full resize-none rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-emerald-700 focus:ring-2 focus:ring-emerald-700/20"
+          className="h-20 w-full resize-none rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-3 text-xs text-slate-900 placeholder-slate-400 outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
         />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-slate-200">
+      <div className="flex gap-2 overflow-x-auto border-b border-white/30">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => selectTab(tab)}
             className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${
-              activeTab === tab ? "border-emerald-700 text-emerald-700 font-extrabold" : "border-transparent text-slate-500 hover:text-slate-800"
+              activeTab === tab ? "border-accent-primary text-accent-primary font-extrabold" : "border-transparent text-slate-500 hover:text-slate-800"
             }`}
           >
             {TAB_LABELS[tab]}
@@ -651,11 +651,11 @@ export const StockStoryPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="min-h-[300px] rounded-xl border border-slate-200/80 bg-white p-6">
+      <div className="min-h-[300px] rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
         
         {activeTab === "overview" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-5 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5">
+            <div className="md:col-span-2 space-y-5 bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5">
               <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 mb-2 flex items-center gap-1.5">
                 <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
@@ -672,20 +672,20 @@ export const StockStoryPage: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5">
+              <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5">
                 <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   <Building2 className="h-3.5 w-3.5" /> Corporate Profile
                 </div>
                 <dl className="space-y-3 text-xs">
-                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                  <div className="flex justify-between gap-4 border-b border-white/20 pb-2">
                     <dt className="text-slate-500">Sector</dt>
                     <dd className="text-right text-slate-800 font-semibold">{sector}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                  <div className="flex justify-between gap-4 border-b border-white/20 pb-2">
                     <dt className="text-slate-500">Industry</dt>
                     <dd className="text-right text-slate-800 font-semibold truncate max-w-[180px]">{industry}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-b border-slate-200 pb-2">
+                  <div className="flex justify-between gap-4 border-b border-white/20 pb-2">
                     <dt className="text-slate-500">Market Cap</dt>
                     <dd className="text-right font-mono text-slate-800 font-semibold">{marketCap}</dd>
                   </div>
@@ -701,8 +701,8 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "financials" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/20 pb-3">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-fuchsia-700 flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4" /> Growth Engine
                 </h3>
@@ -712,15 +712,15 @@ export const StockStoryPage: React.FC = () => {
               </div>
               
               <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Revenue Growth (QoQ/YoY)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.revenueGrowth)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">EPS Growth</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.epsGrowth)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Profit Growth</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.growth.profitGrowth)}</dd>
                 </div>
@@ -734,8 +734,8 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/20 pb-3">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
                   <Trophy className="h-4 w-4" /> Quality Engine
                 </h3>
@@ -745,19 +745,19 @@ export const StockStoryPage: React.FC = () => {
               </div>
               
               <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Return on Equity (ROE)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.roe)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Return on Invested Capital (ROIC)</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.roic)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Gross Profit Margin</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.grossMargin)}</dd>
                 </div>
-                <div className="flex justify-between border-b border-slate-200 pb-2">
+                <div className="flex justify-between border-b border-white/20 pb-2">
                   <dt className="text-slate-500">Operating Profit Margin</dt>
                   <dd>{formatGrowthValue(storyData.engineDetails.quality.operatingMargin)}</dd>
                 </div>
@@ -775,7 +775,7 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "valuation" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+            <div className="md:col-span-2 bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
                   <TrendingUp className="h-4 w-4" /> Valuation Engine
@@ -796,8 +796,8 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-3">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-3">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-white/20 pb-2">
                 Raw Valuation Multiples
               </div>
               <dl className="space-y-3 text-xs">
@@ -826,7 +826,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="space-y-6">
             {ownership ? (
               <div className="grid gap-6 md:grid-cols-3">
-                <div className="md:col-span-2 bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+                <div className="md:col-span-2 bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
                   <h3 className="text-sm font-extrabold uppercase tracking-wider text-sky-700 border-b border-slate-200 pb-3">
                     Shareholding Breakdown
                   </h3>
@@ -847,8 +847,8 @@ export const StockStoryPage: React.FC = () => {
                     })}
                   </div>
                 </div>
-                <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 flex flex-col justify-between">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+                <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 flex flex-col justify-between">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-white/20 pb-2">
                     Institutional Stance
                   </div>
                   <p className="text-xs text-slate-700 leading-relaxed my-4">
@@ -869,7 +869,7 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "risks" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-rose-700 flex items-center gap-1.5">
                   <AlertCircle className="h-4 w-4" /> Risk Engine
@@ -895,7 +895,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-5 space-y-4">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">
                   <Activity className="h-4 w-4" /> Confidence Engine
@@ -994,14 +994,14 @@ export const StockStoryPage: React.FC = () => {
       </div>
 
       {relatedCompanies.length > 0 && (
-        <section className="border-t border-slate-200 pt-6">
+        <section className="border-t border-white/30 pt-6">
           <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">Same Sector Companies</div>
           <div className="flex flex-wrap gap-3">
             {relatedCompanies.map((company) => (
               <button
                 key={company.symbol}
                 onClick={() => navigateToStock({ ticker: company.symbol, mode: "push" })}
-                className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-left transition-all hover:border-emerald-200 hover:bg-white"
+                className="flex items-center justify-between gap-4 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 px-4 py-2.5 text-left transition-all hover:bg-white/80"
               >
                 <div>
                   <div className="font-mono text-xs font-bold text-slate-900">{company.symbol}</div>
