@@ -65,9 +65,17 @@ describe('Real Data Integration Pages', () => {
         metrics: { predictions_today: 1250, symbols_covered: 116, pipeline_freshness: 'recent', db_health: 'connected', hit_rate: 'N/A', scheduler_health: 'ok', response_ms: 18, environment: 'production', uptime_seconds: 112, node_version: 'v22' },
       },
       '/api/predictions/signals': {
-        signals: [],
-        snapshotDate: new Date().toISOString().split('T')[0],
-        symbolsAnalyzed: 0,
+        status: 'ok',
+        mode: 'production_real',
+        data: {
+          signals: [],
+          snapshotDate: new Date().toISOString().split('T')[0],
+          symbolsAnalyzed: 0,
+        },
+        reason: 'OK',
+        message: null,
+        generatedAt: new Date().toISOString(),
+        dataState: {},
       },
     }));
 
@@ -188,11 +196,19 @@ describe('Real Data Integration Pages', () => {
     window.history.replaceState({}, '', '?page=predictions');
     vi.stubGlobal('fetch', makeMockFetch({
       '/api/predictions/signals': {
-        signals: [
-          { symbol: 'RELIANCE', type: 'bullish', severity: 'important', explanation: 'Strong revenue growth', snapshotDate: '2026-06-15' },
-        ],
-        snapshotDate: '2026-06-15',
-        symbolsAnalyzed: 116,
+        status: 'ok',
+        mode: 'production_real',
+        data: {
+          signals: [
+            { symbol: 'RELIANCE', type: 'bullish', severity: 'important', explanation: 'Strong revenue growth', snapshotDate: '2026-06-15' },
+          ],
+          snapshotDate: '2026-06-15',
+          symbolsAnalyzed: 116,
+        },
+        reason: 'OK',
+        message: null,
+        generatedAt: '2026-06-15T00:00:00.000Z',
+        dataState: {},
       },
     }));
 
@@ -211,7 +227,15 @@ describe('Real Data Integration Pages', () => {
   it('PublicPredictionsPage shows empty state when no signals', async () => {
     window.history.replaceState({}, '', '?page=predictions');
     vi.stubGlobal('fetch', makeMockFetch({
-      '/api/predictions/signals': { signals: [], snapshotDate: null, symbolsAnalyzed: 0 },
+      '/api/predictions/signals': {
+        status: 'ok',
+        mode: 'production_real',
+        data: { signals: [], snapshotDate: null, symbolsAnalyzed: 0 },
+        reason: 'OK',
+        message: null,
+        generatedAt: new Date().toISOString(),
+        dataState: {},
+      },
     }));
 
     render(

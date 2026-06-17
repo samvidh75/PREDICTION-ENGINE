@@ -47,6 +47,7 @@
     "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",
     "validate:distributions": "tsx scripts/validate-sector-distributions.ts",
+    "smoke:production": "tsx scripts/smoke-production.ts",
     "smoke:api": "tsx scripts/smoke-test-api.ts",
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
     "validate:hygiene": "tsx scripts/validate-repository-hygiene.ts",

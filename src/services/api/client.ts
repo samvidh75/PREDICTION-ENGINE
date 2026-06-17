@@ -212,6 +212,16 @@ export interface SignalsResponse {
   symbolsAnalyzed: number;
 }
 
+interface SignalsApiEnvelope {
+  status: string;
+  mode: string;
+  data: SignalsResponse;
+  reason: string;
+  message: string | null;
+  generatedAt: string;
+  dataState: Record<string, unknown>;
+}
+
 // -- Search --
 
 export interface SearchResult {
@@ -358,7 +368,8 @@ export const api = {
 
   // -- Signals --
   getSignals: (limit = 50) =>
-    apiFetch<SignalsResponse>(`/api/predictions/signals?limit=${limit}`),
+    apiFetch<SignalsApiEnvelope>(`/api/predictions/signals?limit=${limit}`)
+      .then((envelope) => envelope.data),
 
   // -- Search --
   searchUniversal: (query: string) =>
