@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
 import type { AuthUser } from "../../services/auth/authService";
 import { authService } from "../../services/auth/authService";
 import { AnalyticsCoordinator } from "../../services/diagnostics/AnalyticsCoordinator";
@@ -57,17 +57,22 @@ export default function CinematicAuthGateway({
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState("");
 
   useEffect(() => {
     if (!restoreOnMount) return;
     let alive = true;
+    setBusy(true);
 
     void authService.restoreSession().then((user) => {
       if (alive && user) onAuthed(user);
+    }).finally(() => {
+      if (alive) setBusy(false);
     });
 
     return () => {
@@ -195,7 +200,12 @@ export default function CinematicAuthGateway({
               </div>
 
               <Input aria-label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
-              <Input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type="password" className="h-12" disabled={busy} />
+              <div className="relative">
+                <Input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type={showLoginPassword ? "text" : "password"} className="h-12 pr-10" disabled={busy} />
+                <button type="button" tabIndex={-1} onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-transparent border-none text-slate-400 hover:text-slate-600" disabled={busy} aria-label={showLoginPassword ? "Hide password" : "Show password"}>
+                  {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
 
               <Button type="button" disabled={busy || !canLogin} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className="w-full h-12 text-sm font-semibold">
                 Sign in
@@ -228,7 +238,12 @@ export default function CinematicAuthGateway({
 
               <Input aria-label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className="h-12" disabled={busy} />
               <Input aria-label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
-              <Input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type="password" className="h-12" disabled={busy} />
+              <div className="relative">
+                <Input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type={showSignupPassword ? "text" : "password"} className="h-12 pr-10" disabled={busy} />
+                <button type="button" tabIndex={-1} onClick={() => setShowSignupPassword(!showSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-transparent border-none text-slate-400 hover:text-slate-600" disabled={busy} aria-label={showSignupPassword ? "Hide password" : "Show password"}>
+                  {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
 
               <Button type="button" disabled={busy || !canSignup} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className="w-full h-12 text-sm font-semibold">
                 Create account

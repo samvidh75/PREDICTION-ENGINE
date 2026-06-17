@@ -201,7 +201,7 @@ export const DashboardHub: React.FC = () => {
             <div className="px-4 py-6 text-center text-xs text-slate-500">
               <AlertTriangle className="h-4 w-4 text-amber-700 mx-auto mb-1" />
               <p>Signal changes are not available right now.</p>
-              <p className="mt-1 text-[10px]">The dashboard will update when the prediction registry is reachable.</p>
+              <p className="mt-1 text-[10px]">The dashboard will update when prediction data is reachable.</p>
             </div>
           ) : signals.length === 0 ? (
             <div className="px-4 py-6 text-center text-xs text-slate-500">
