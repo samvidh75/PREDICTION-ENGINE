@@ -327,38 +327,53 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       // Stage 0: Historical backfill (if requested)
       if (rawHistorical === "true") {
         results.historical = { status: "running" };
-        if (applyMode) {
+        let histRows = 0;
+        for (const symbol of symbols) {
           try {
-            const { YahooProvider } = await import("../../../services/providers/YahooProvider.js");
-            const yahoo = new YahooProvider();
-            let histRows = 0;
-            for (const symbol of symbols) {
-              try {
-                const points = await yahoo.getHistorical(symbol, '2Y');
-                if (points.length === 0) continue;
-                for (const point of points) {
-                  const volume = point.volume !== null && point.volume !== undefined ? Math.round(Number(point.volume)) : null;
-                  await query(
-                    `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
-                     VALUES ($1, $2, $3, $4, $5, $6, $7)
-                     ON CONFLICT (symbol, trade_date) DO UPDATE SET
-                       close = EXCLUDED.close, volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
-                    [symbol, point.date, point.open, point.high, point.low, point.close, volume]
-                  );
-                  histRows++;
-                }
-              } catch (err: any) {
-                console.error(`Historical backfill failed for ${symbol}: ${err.message}`);
+            const ticker = symbol + ".NS";
+            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=2y&interval=1d`;
+            const resp = await fetch(url, {
+              headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockStoryBot/1.0)' },
+              signal: AbortSignal.timeout(15000),
+            });
+            if (!resp.ok) {
+              console.error(`Yahoo chart API returned ${resp.status} for ${symbol}`);
+              continue;
+            }
+            const data = await resp.json() as any;
+            const result = data?.chart?.result?.[0];
+            if (!result) continue;
+            const timestamps: number[] = result.timestamp || [];
+            const q = result.indicators?.quote?.[0] || {};
+            const points = timestamps.map((ts: number, i: number) => ({
+              date: new Date(ts * 1000).toISOString().split('T')[0],
+              open: q.open?.[i] ?? 0,
+              high: q.high?.[i] ?? 0,
+              low: q.low?.[i] ?? 0,
+              close: q.close?.[i] ?? 0,
+              volume: q.volume?.[i] ?? 0,
+            })).filter((p: any) => p.close !== null && p.close !== 0);
+
+            if (applyMode) {
+              for (const point of points) {
+                const volume = point.volume !== null && point.volume !== undefined ? Math.round(Number(point.volume)) : null;
+                await query(
+                  `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7)
+                   ON CONFLICT (symbol, trade_date) DO UPDATE SET
+                     close = EXCLUDED.close, volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
+                  [symbol, point.date, point.open, point.high, point.low, point.close, volume]
+                );
+                histRows++;
               }
             }
-            rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + histRows;
-            results.historical = { status: "success", rowsWritten: histRows };
+            console.log(`Historical backfill for ${symbol}: ${points.length} rows` + (applyMode ? ' written' : ' would write'));
           } catch (err: any) {
-            results.historical = { status: "failure", error: err.message };
+            console.error(`Historical backfill failed for ${symbol}: ${err.message}`);
           }
-        } else {
-          results.historical = { status: "skipped", message: "Dry-run: historical stage skipped" };
         }
+        rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + histRows;
+        results.historical = { status: applyMode ? "success" : "dry-run", rowsWritten: histRows };
       }
 
       // Stage 1: Registry (verify symbols exist, insert missing in apply mode)
