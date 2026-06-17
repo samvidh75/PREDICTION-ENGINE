@@ -212,7 +212,7 @@ export const DashboardHub: React.FC = () => {
     <div className={`${tokens.layout.container} flex flex-col gap-6`}>
       <PageHeader
         title="Research Dashboard"
-        subtitle="Search companies, save research, and review verified score changes when available."
+        subtitle="Search companies, review scored records, and track your research."
         primaryAction={
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
             <Button type="button" variant="secondary" size="sm" onClick={() => navigate("rankings")}>
@@ -235,39 +235,39 @@ export const DashboardHub: React.FC = () => {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-4">
-          <SectionHeader title="Indexed companies" subtitle="Registry symbols" />
+          <SectionHeader title="Companies covered" subtitle="Indexed on exchange" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {indexedCompanyCount === null ? "—" : formatNumber(indexedCompanyCount)}
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {cov?.symbols.latestUpdatedAt ? `Updated ${cov.symbols.latestUpdatedAt}` : "Pending registry sync"}
+            {cov?.symbols.latestUpdatedAt ? `Updated ${cov.symbols.latestUpdatedAt}` : "Registry pending"}
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Prediction registry" subtitle="Scored companies" />
+          <SectionHeader title="Scored companies" subtitle="Prediction records" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {predictionRows === null ? "—" : formatNumber(predictionRows)}
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {latestPredictionDate ? `Latest ${latestPredictionDate}` : "No predictions yet"}
+            {latestPredictionDate ? `Latest ${latestPredictionDate}` : "No scored records yet"}
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Financial snapshots" subtitle="Fundamental data" />
+          <SectionHeader title="Fundamental data" subtitle="Financial records" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {financialSnapshots === null ? "—" : formatNumber(financialSnapshots)}
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {latestFinancialDate ? `Latest ${latestFinancialDate}` : "No financials yet"}
+            {latestFinancialDate ? `Latest ${latestFinancialDate}` : "No financial records yet"}
           </p>
         </Card>
         <Card className="p-4">
-          <SectionHeader title="Price coverage" subtitle="Daily price rows" />
+          <SectionHeader title="Price data" subtitle="Daily market records" />
           <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
             {priceRows === null ? "—" : formatNumber(priceRows)}
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {latestPriceDate ? `Latest ${latestPriceDate}` : "No prices yet"}
+            {latestPriceDate ? `Latest ${latestPriceDate}` : "No price records yet"}
           </p>
         </Card>
       </div>
@@ -309,14 +309,14 @@ export const DashboardHub: React.FC = () => {
           <p className="mt-1 text-xs text-slate-500">Quotes appear when verified.</p>
         </Card>
         <Card>
-          <SectionHeader title="Signals freshness" subtitle="Latest score changes" />
+          <SectionHeader title="Prediction cycle" subtitle="Latest update" />
           <div className="mt-3 text-sm font-semibold text-slate-950">
-            {latestSignalDate ? `As of ${latestSignalDate}` : "No signals yet"}
+            {latestSignalDate ? `As of ${latestSignalDate}` : "No update yet"}
           </div>
           <p className="mt-1 text-xs text-slate-500">
             {healthPredictionsToday !== null
-              ? `${formatNumber(healthPredictionsToday)} prediction rows today`
-              : "Pending provider updates"}
+              ? `${formatNumber(healthPredictionsToday)} records in latest cycle`
+              : "Pending provider data"}
           </p>
         </Card>
       </div>
@@ -325,7 +325,7 @@ export const DashboardHub: React.FC = () => {
         <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <SectionHeader
             title="Score changes"
-            subtitle="Appears when verified score changes are available."
+            subtitle="Verified score changes from the latest prediction cycle."
             action={signals[0]?.snapshotDate ? <DataFreshnessBadge date={signals[0].snapshotDate} /> : <MissingDataBadge />}
           />
           <div className="mt-4">
@@ -334,15 +334,15 @@ export const DashboardHub: React.FC = () => {
             ) : signalsError ? (
               <EmptyState
                 title="Score changes unavailable"
-                description="Score-change data is unavailable right now. No sample results are shown."
+                description="Score-change data is unavailable right now."
               />
             ) : signals.length === 0 ? (
               <EmptyState
-                title="Score changes not ready yet"
+                title="Score changes pending"
                 description={
                   symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear after verified updates.`
-                    : "Use Search to find companies and add them to your watchlist."
+                    ? `${symbolsAnalyzed} companies are registered. Score changes will appear after the next verified update cycle.`
+                    : "Search for companies to begin tracking score changes."
                 }
                 action={
                   <Button
@@ -376,11 +376,11 @@ export const DashboardHub: React.FC = () => {
 
         <div className="space-y-4">
           <Card>
-            <SectionHeader title="Saved workspace" subtitle="Your watchlist tickers" />
+            <SectionHeader title="Watchlist" subtitle="Saved tickers" />
             {followedTickers.length === 0 ? (
               <div className="mt-4">
                 <EmptyState
-                  description="No companies saved yet. Open a company page to track it here."
+                  description="No companies saved yet. Search and open a company page to track it."
                 />
               </div>
             ) : (
@@ -414,9 +414,9 @@ export const DashboardHub: React.FC = () => {
           </Card>
 
           <Card>
-            <SectionHeader title="Recently explored" subtitle="Last opened companies" />
+            <SectionHeader title="Recently explored" subtitle="Previously opened" />
             {recentTickers.length === 0 ? (
-              <p className="mt-3 text-xs text-slate-500">No recently viewed companies.</p>
+              <p className="mt-3 text-xs text-slate-500">No recently viewed tickers.</p>
             ) : (
               <div className="mt-4 flex flex-wrap gap-2">
                 {recentTickers.map((ticker) => (

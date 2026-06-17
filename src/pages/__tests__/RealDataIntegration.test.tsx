@@ -129,10 +129,10 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Indexed companies')).toBeInTheDocument();
-      expect(screen.getByText('Prediction registry')).toBeInTheDocument();
-      expect(screen.getByText('Financial snapshots')).toBeInTheDocument();
-      expect(screen.getByText('Price coverage')).toBeInTheDocument();
+      expect(screen.getByText('Companies covered')).toBeInTheDocument();
+      expect(screen.getByText('Scored companies')).toBeInTheDocument();
+      expect(screen.getByText('Fundamental data')).toBeInTheDocument();
+      expect(screen.getByText('Price data')).toBeInTheDocument();
     });
   });
 
@@ -276,7 +276,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Verified prediction signals are being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Score changes pending/i)).toBeInTheDocument();
     });
   });
 });
