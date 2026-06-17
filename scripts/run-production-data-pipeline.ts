@@ -343,7 +343,7 @@ class ProductionPipeline {
            ON CONFLICT (symbol, trade_date) DO UPDATE SET
              close = EXCLUDED.close,
              volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
-          [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume ?? null]
+          [symbol, today, quote.price, quote.price, quote.price, quote.price, quote.volume !== null && quote.volume !== undefined ? Math.round(Number(quote.volume)) : null]
         );
         rowsWritten++;
         console.log(`  ${symbol}: ₹${quote.price} written`);

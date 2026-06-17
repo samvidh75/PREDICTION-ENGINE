@@ -154,7 +154,7 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     if (data.keyMetrics?.priceandVolume) {
       const item = data.keyMetrics.priceandVolume.find((x: any) => x.key === 'avgTradingVolumeLast10Days');
       if (item && item.value) {
-        volume = (positiveNumber(item.value) ?? 0) * 100_000; // convert Lakhs to units
+        volume = Math.round((positiveNumber(item.value) ?? 0) * 100_000); // convert Lakhs to units
       }
     }
 
