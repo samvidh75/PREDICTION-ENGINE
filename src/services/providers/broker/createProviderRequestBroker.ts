@@ -51,7 +51,14 @@ export async function createProviderRequestBrokerHandle(
 
 export async function getSharedProviderRequestBroker(): Promise<ProviderRequestBroker> {
   if (!sharedProviderRequestBrokerHandle) {
-    sharedProviderRequestBrokerHandle = createProviderRequestBrokerHandle();
+    sharedProviderRequestBrokerHandle = createProviderRequestBrokerHandle().catch((err) => {
+      console.error(`[broker] Redis-backed broker unavailable, falling back to in-memory: ${err?.message || err}`);
+      const quota = new ProviderQuotaPolicy();
+      return {
+        broker: new ProviderRequestBroker(quota, new ProviderCallLedger(), new InMemoryProviderBrokerStore()),
+        shutdown: async () => {},
+      };
+    });
   }
   const handle = await sharedProviderRequestBrokerHandle;
   return handle.broker;

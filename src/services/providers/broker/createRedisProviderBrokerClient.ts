@@ -8,6 +8,8 @@ export interface RedisProviderBrokerClientHandle {
 
 export type RedisClientFactory = (redisUrl: string) => Promise<RedisProviderBrokerClientHandle>;
 
+const REDIS_CONNECT_TIMEOUT_MS = 10_000;
+
 export async function createRedisProviderBrokerClient(redisUrl: string): Promise<RedisProviderBrokerClientHandle> {
   if (!redisUrl) {
     throw new Error('Provider broker Redis configuration error: REDIS_URL is required.');
@@ -19,8 +21,14 @@ export async function createRedisProviderBrokerClient(redisUrl: string): Promise
   });
 
   try {
-    await client.connect();
+    await Promise.race([
+      client.connect(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Redis connect timed out after ${REDIS_CONNECT_TIMEOUT_MS}ms`)), REDIS_CONNECT_TIMEOUT_MS),
+      ),
+    ]);
   } catch (error) {
+    try { if (client.isOpen) await client.quit(); } catch {}
     throw new Error(`Provider broker Redis unavailable: ${safeRedisError(error)}`);
   }
 
