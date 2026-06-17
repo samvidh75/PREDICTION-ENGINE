@@ -5,15 +5,11 @@ import { UserJourneyEngine } from "../services/behavior/UserJourneyEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { RegisteredStock } from "../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../services/stocks/StockSearchEngine";
-import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
-import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
-import tokens from "../components/ui/tokens";
-import { formatNumber, formatINR, formatRank, formatFreshness } from "../services/ui/dataFormatting";
-import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
-
+import { formatINR, formatRank, formatFreshness } from "../services/ui/dataFormatting";
+import { api, type LeaderboardEntry } from "../services/api/client";
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -126,7 +122,7 @@ export const SearchPage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="p-8">
+      <div className="rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-8">
         <div className="mx-auto flex max-w-[620px] flex-col gap-6 text-center">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Search Indian stocks</h1>
@@ -136,7 +132,7 @@ export const SearchPage: React.FC = () => {
           </div>
 
           <div className="relative">
-            <Input
+            <input
               aria-label="Search Indian stocks"
               ref={inputRef}
               value={query}
@@ -145,7 +141,7 @@ export const SearchPage: React.FC = () => {
                 if (e.key === "Enter") handleSubmit();
               }}
               placeholder="Try RELIANCE, TCS, INFY..."
-              className="pl-10 h-11"
+              className="h-11 w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 pl-10 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
             />
             <Search className="absolute left-3 top-[14px] h-4 w-4 text-slate-500" />
           </div>
@@ -157,7 +153,7 @@ export const SearchPage: React.FC = () => {
                   key={item}
                   type="button"
                   onClick={() => handleRecentSearch(item)}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-white"
+                  className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-3.5 py-1.5 text-xs text-slate-600 transition hover:bg-white/60"
                 >
                   {item}
                 </button>
@@ -165,7 +161,7 @@ export const SearchPage: React.FC = () => {
             </div>
           )}
         </div>
-      </Card>
+      </div>
 
       <section className="space-y-5">
         {query.trim().length >= 2 ? (
@@ -186,10 +182,10 @@ export const SearchPage: React.FC = () => {
                   const rank = prediction?.rank ?? null;
 
                   return (
-                    <Card
+                    <button
                       key={stock.symbol}
                       onClick={() => handleOpenStock(stock)}
-                      className="flex cursor-pointer flex-col justify-between"
+                      className="flex cursor-pointer flex-col justify-between rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6 text-left transition-all hover:bg-white/85 hover:-translate-y-px"
                     >
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
@@ -200,8 +196,8 @@ export const SearchPage: React.FC = () => {
                             {stock.companyName}
                           </div>
                           <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            <Badge variant="info">{stock.sector || predictionSector || "Unavailable"}</Badge>
-                            {stock.exchange && <Badge variant="neutral">{stock.exchange}</Badge>}
+                            <Badge variant="info" glass>{stock.sector || predictionSector || "Unavailable"}</Badge>
+                            {stock.exchange && <Badge variant="neutral" glass>{stock.exchange}</Badge>}
                           </div>
                         </div>
                         {score !== null ? (
@@ -212,26 +208,26 @@ export const SearchPage: React.FC = () => {
                             )}
                           </div>
                         ) : (
-                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                          <span className="rounded-full bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-2.5 py-1 text-xs font-semibold text-slate-500">
                             Score pending
                           </span>
                         )}
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3.5 text-xs text-slate-500">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/20 pt-3.5 text-xs text-slate-500">
                         <div className="flex flex-wrap gap-2">
                           {predictionDate && (
-                            <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                            <span className="inline-flex items-center rounded-lg bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/50 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
                               Updated {formatFreshness(predictionDate)}
                             </span>
                           )}
                           {!prediction && (
-                            <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 font-mono">
+                            <span className="inline-flex items-center rounded-lg bg-slate-100/60 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-slate-500 font-mono">
                               Source registry
                             </span>
                           )}
                           {confidenceScore !== null && (
-                            <span className="inline-flex items-center rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-600 font-mono">
+                            <span className="inline-flex items-center rounded-lg bg-indigo-50/60 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-indigo-600 font-mono">
                               {Math.round(confidenceScore)}% confidence
                             </span>
                           )}
@@ -242,12 +238,12 @@ export const SearchPage: React.FC = () => {
                             : stock.marketCap.formatted || "Unavailable"}
                         </span>
                       </div>
-                    </Card>
+                    </button>
                   );
                 })}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center p-10 text-center rounded-xl border border-dashed border-slate-200 bg-white">
+              <div className="flex flex-col items-center justify-center p-10 text-center rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass">
                 <span className="text-base font-semibold text-slate-900">No matching equity found</span>
                 <p className="mt-1.5 text-sm text-slate-500 max-w-md">
                   We couldn't find any companies matching "{query.trim()}". Try searching for these major Indian companies:
@@ -258,7 +254,7 @@ export const SearchPage: React.FC = () => {
                       key={sym}
                       type="button"
                       onClick={() => handleRecentSearch(sym)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-white"
+                      className="rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-3.5 py-1.5 text-xs text-slate-600 transition hover:bg-white/60"
                     >
                       {sym}
                     </button>

@@ -33,14 +33,14 @@ const workflow = [
 
 export const PublicLandingPage: React.FC = () => {
   return (
-    <main className="min-h-screen bg-background font-sans text-slate-900 antialiased">
+    <main className="min-h-screen font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
-      <section className="mx-auto max-w-6xl px-6 pb-16 pt-24 md:pt-36">
+      <section className="relative mx-auto max-w-6xl px-6 pb-16 pt-24 md:pt-36">
         <div className="grid gap-12 md:grid-cols-[1.2fr_0.8fr] md:items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
+            <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 py-1 text-xs font-medium text-slate-500">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Evidence-driven research
             </div>
@@ -64,6 +64,7 @@ export const PublicLandingPage: React.FC = () => {
                 type="button"
                 onClick={() => setPage("methodology")}
                 variant="secondary"
+                glass
                 className="h-12 px-6 text-sm"
               >
                 View Methodology
@@ -80,25 +81,25 @@ export const PublicLandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200/60 bg-white p-6 shadow-card">
-            <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 float-animate">
+            <div className="mb-5 flex items-center justify-between border-b border-white/20 pb-4">
               <span className="text-sm font-medium text-slate-500">
                 Research principles
               </span>
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-0.5 text-xs font-medium text-emerald-700">
+              <span className="rounded-full bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/50 px-3 py-0.5 text-xs font-medium text-emerald-700">
                 Evidence first
               </span>
             </div>
             <div className="grid gap-3">
-              <div className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-4 py-3 text-sm text-slate-600">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
                 No fabricated rankings or scores
               </div>
-              <div className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-4 py-3 text-sm text-slate-600">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
                 Unavailable data clearly labelled
               </div>
-              <div className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50/60 backdrop-blur-sm border border-slate-200/30 px-4 py-3 text-sm text-slate-600">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden="true" />
                 Source-backed signals only
               </div>
@@ -107,15 +108,15 @@ export const PublicLandingPage: React.FC = () => {
         </div>
       </section>
 
-      <section className="border-y border-slate-200/60 bg-white py-20">
+      <section className="border-y border-white/30 py-20">
         <div className="mx-auto max-w-5xl px-6">
             <h2 className="text-center text-2xl font-semibold tracking-tight text-slate-900">
             How it works
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {workflow.map(({ icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-slate-200/60 bg-white p-6 shadow-card">
-                <div className="mb-4 inline-flex rounded-lg bg-emerald-50 p-3">
+              <div key={title} className="rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
+                <div className="mb-4 inline-flex rounded-xl bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/30 p-3">
                   {icon}
                 </div>
                 <h3 className="text-base font-semibold text-slate-900">{title}</h3>
@@ -130,7 +131,7 @@ export const PublicLandingPage: React.FC = () => {
         <ResearchDisclaimer />
       </section>
 
-          <section className="bg-accent-primary py-12" aria-label="Call to action">
+      <section className="bg-accent-primary py-12" aria-label="Call to action">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h2 className="text-xl font-semibold text-white">Start researching</h2>
           <p className="mt-3 text-base text-white/70 max-w-md mx-auto">

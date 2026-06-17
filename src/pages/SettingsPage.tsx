@@ -4,10 +4,8 @@ import { AlertEngine, AlertCategory } from "../services/portfolio/AlertEngine";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/auth/authService";
 import { mapAuthError } from "../services/auth/authErrorMapper";
-import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import tokens from "../components/ui/tokens";
 
 type SettingsTab = "profile" | "notifications" | "appearance" | "security";
 
@@ -53,7 +51,7 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col space-y-6">
-      <header className="border-b border-slate-200/60 pb-6">
+      <header className="border-b border-white/30 pb-6">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Settings</h1>
         <p className="mt-1.5 text-sm text-slate-500">
           Manage workspace settings, notifications and preferences.
@@ -62,7 +60,7 @@ export const SettingsPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
         {/* Tab Sidebar */}
-        <div className="flex flex-row gap-2 overflow-x-auto border-b border-slate-200 pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:border-r md:pb-0 md:pr-4">
+        <div className="flex flex-row gap-2 overflow-x-auto border-b border-white/30 pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:border-r md:pb-0 md:pr-4">
           {[
             { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
             { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
@@ -72,10 +70,10 @@ export const SettingsPage: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as SettingsTab)}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-xs font-semibold text-left transition shrink-0 cursor-pointer ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-left transition shrink-0 cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-accent-primary text-white"
-                  : "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-accent-primary text-white shadow-sm"
+                  : "bg-transparent text-slate-600 hover:bg-white/40 hover:text-slate-900"
               }`}
             >
               {tab.icon}
@@ -97,6 +95,7 @@ export const SettingsPage: React.FC = () => {
                   label="Full Name"
                   type="text"
                   value={name}
+                  glass
                   onChange={(e) => {
                     setName(e.target.value);
                     setSaveNotice("");
@@ -107,9 +106,10 @@ export const SettingsPage: React.FC = () => {
                   type="email"
                   value={email}
                   disabled
+                  glass
                   className="opacity-50 cursor-not-allowed"
                 />
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                <div className="rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-3 text-sm text-amber-800">
                   Profile name is stored locally for this session and is not synced to the server.
                 </div>
                 <Button
@@ -136,7 +136,7 @@ export const SettingsPage: React.FC = () => {
                 {(["Factor", "Risk", "Momentum", "News", "Market"] as AlertCategory[]).map((cat) => (
                   <div
                     key={cat}
-                    className="flex items-center justify-between rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm"
+                    className="flex items-center justify-between rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-4"
                   >
                     <div>
                       <span className="block text-sm font-semibold text-slate-900">{cat} Alerts</span>
@@ -169,12 +169,12 @@ export const SettingsPage: React.FC = () => {
                 <p className="text-sm text-slate-500">Configure your workspace interface theme.</p>
               </div>
               <div className="max-w-md">
-                <Card className="p-5">
+                <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
                   <span className="block text-sm font-semibold text-slate-900">Research workspace theme</span>
                   <span className="mt-1 block text-sm text-slate-500">
                     The interface uses a fixed light theme optimised for equity research. Dark mode is not available.
                   </span>
-                </Card>
+                </div>
               </div>
             </div>
           )}
@@ -186,7 +186,7 @@ export const SettingsPage: React.FC = () => {
                 <p className="text-sm text-slate-500">Manage password and credentials security.</p>
               </div>
               <div className="max-w-md">
-                <Card className="space-y-4 p-6">
+                <div className="space-y-4 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-6">
                   <div>
                     <span className="mb-1 block text-sm font-semibold text-slate-900">Reset password</span>
                     <p className="mb-3 text-sm text-slate-500">
@@ -200,7 +200,7 @@ export const SettingsPage: React.FC = () => {
                     )}
                     {resetError && <p className="mt-3 text-sm text-red-500">{resetError}</p>}
                   </div>
-                </Card>
+                </div>
               </div>
             </div>
           )}

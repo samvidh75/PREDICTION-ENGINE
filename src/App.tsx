@@ -39,6 +39,9 @@ import { loadUserProfile } from "./services/auth/userProfileStore";
 // Feedback
 import ToastProvider from "./components/feedback/ToastProvider";
 
+// Aura/glass background
+import AuraBackground from "./components/ui/AuraBackground";
+
 
 const DEFAULT_SKIP_PROFILE: UserProfile = {
   focusAreas: ["Institutional activity"],
@@ -214,6 +217,7 @@ function AppContent(): JSX.Element {
     <ToastProvider>
       <TokenProvider tokenVars={buildTokenCssVars()}>
         <ConfidenceEngine paused={!isAuthed || isPublicPage} inputsOverride={overrideInputs} initialInputs={overrideInputs ?? undefined}>
+          <AuraBackground />
           <SubsystemErrorBoundary subsystem={routeSubsystem} phase="render">
             <PageRenderer
               pageKey={activePageKey}

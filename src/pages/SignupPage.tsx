@@ -26,12 +26,12 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main className="flex min-h-screen flex-col justify-between bg-background font-sans text-slate-900 antialiased">
+    <main className="flex min-h-screen flex-col justify-between font-sans text-slate-900 antialiased">
       <TopNav />
       <MobileNav />
 
       <section className="z-10 flex flex-1 flex-col items-center justify-center px-5 py-12 md:py-24">
-        <div className="w-full max-w-md rounded-xl border border-slate-200/60 bg-white p-6 shadow-card sm:p-8">
+        <div className="w-full max-w-md rounded-2xl bg-white/70 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 sm:p-8">
           <div className="mb-6 flex flex-col items-center">
             <span className="text-base font-semibold tracking-[0.1em] text-slate-700">
               StockStory India
@@ -49,7 +49,7 @@ export const SignupPage: React.FC = () => {
         </div>
       </section>
 
-      <footer className="bg-background py-6 text-center text-xs text-slate-400">
+      <footer className="py-6 text-center text-xs text-slate-400">
         <p>Research signals only. Not investment advice.</p>
       </footer>
     </main>
