@@ -5,6 +5,7 @@ import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
 import { PortfolioEngine } from '../../services/portfolio/PortfolioEngine';
 import { RecentSearchStore } from '../../services/search/RecentSearchStore';
 import { api, ApiError, type Signal as ApiSignal } from '../../services/api/client';
+import { navigateToStock } from '../../architecture/navigation/routeCoordinator';
 import Card from '../ui/Card';
 
 function navigate(pageKey: string): void {
@@ -16,11 +17,7 @@ function navigate(pageKey: string): void {
 
 function openCompany(symbol: string): void {
   RecentSearchStore.addTicker(symbol);
-  const params = new URLSearchParams(window.location.search);
-  params.set('page', 'stock');
-  params.set('id', symbol);
-  window.history.pushState({}, '', `?${params.toString()}`);
-  window.dispatchEvent(new Event('urlchange'));
+  navigateToStock({ ticker: symbol, mode: "push" });
 }
 
 interface SignalItem {

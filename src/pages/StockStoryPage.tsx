@@ -6,7 +6,8 @@ import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
-import type { CompanyMetadata } from "../services/data/types";
+import { api, ApiError } from "../services/api/client";
+import type { CompanyMetadata } from "../services/api/client";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore } from "../services/ui/dataFormatting";
 import { DataFreshnessBadge, SourceBadge, CoverageStatusBadge } from "../components/ui/PageHeader";
@@ -216,17 +217,12 @@ export const StockStoryPage: React.FC = () => {
     const controller = new AbortController();
     setMetadata({ data: null, loading: true, error: null });
 
-    fetch(`/api/market-data/metadata/${encodeURIComponent(ticker)}`, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then(async (response) => {
-        const body = await response.json().catch(() => null);
-        if (!response.ok) throw new Error(body?.code || "METADATA_UNAVAILABLE");
-        return body as CompanyMetadata;
+    api.getMetadata(ticker, { signal: controller.signal })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        setMetadata({ data, loading: false, error: null });
       })
-      .then((data) => setMetadata({ data, loading: false, error: null }))
-      .catch((error: Error) => {
+      .catch((error: ApiError) => {
         if (controller.signal.aborted) return;
         setMetadata({ data: null, loading: false, error: "Company metadata is temporarily unavailable." });
       });
@@ -239,20 +235,14 @@ export const StockStoryPage: React.FC = () => {
     setStoryLoading(true);
     setStoryError(null);
 
-    fetch(`/api/stockstory/${encodeURIComponent(ticker)}`, {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then(async (response) => {
-        const body = await response.json().catch(() => null);
-        if (!response.ok) throw new Error(body?.code || "STOCKSTORY_UNAVAILABLE");
-        return body;
-      })
+    const horizon = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "30", 10);
+    api.getStockStory(ticker, horizon, { signal: controller.signal })
       .then((data) => {
+        if (controller.signal.aborted) return;
         setStory(data);
         setStoryLoading(false);
       })
-      .catch((error: Error) => {
+      .catch((error: ApiError) => {
         if (controller.signal.aborted) return;
         setStoryError("Company health analysis is temporarily unavailable.");
         setStoryLoading(false);
@@ -264,20 +254,9 @@ export const StockStoryPage: React.FC = () => {
   const [financials, setFinancials] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`/api/company/${encodeURIComponent(ticker)}/financials`)
-      .then(res => res.json())
+    api.getCompanyFinancials(ticker)
       .then(data => setFinancials(data))
       .catch(() => setFinancials(null));
-
-    fetch(`/api/company/${encodeURIComponent(ticker)}/ownership`)
-      .then(res => res.json())
-      .then(data => setOwnership(data))
-      .catch(() => setOwnership(null));
-
-    fetch(`/api/company/${encodeURIComponent(ticker)}/timeline`)
-      .then(res => res.json())
-      .then(data => setTimeline(data))
-      .catch(() => setTimeline([]));
   }, [ticker]);
 
   const companyName =

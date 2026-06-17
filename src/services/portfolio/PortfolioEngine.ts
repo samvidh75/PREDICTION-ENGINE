@@ -1,4 +1,5 @@
 import { loadAuthSession } from "../auth/sessionStore";
+import { authenticatedFetchJSON, authenticatedFetchOnlyIfSignedIn } from "../auth/authenticatedFetch";
 import { StockRegistry } from "../stocks/StockRegistry";
 import { CompanyDNAEngine } from "../dna/CompanyDNAEngine";
 import { AnalyticsCoordinator } from "../diagnostics/AnalyticsCoordinator";
@@ -76,13 +77,13 @@ export class PortfolioEngine {
 
   private static syncHoldingsWithBackend(): void {
     if (typeof window === "undefined") return;
-    const uid = loadAuthSession().uid || "anonymous";
 
-    fetch(`/api/investor-state?uid=${encodeURIComponent(uid)}`)
-      .then(res => res.json())
-      .then((state: any) => {
-        if (state && state.memory && Array.isArray(state.memory.portfolio)) {
-          const normalized = state.memory.portfolio
+    authenticatedFetchOnlyIfSignedIn("/api/investor-state")
+      .then(async (response) => {
+        if (!response || !response.ok) return;
+        const state = await response.json().catch(() => null) as Record<string, unknown> | null;
+        if (state && typeof state.memory === "object" && state.memory && Array.isArray((state.memory as Record<string, unknown>).portfolio)) {
+          const normalized = ((state.memory as Record<string, unknown>).portfolio as unknown[])
             .map(normalizeUserHolding)
             .filter((holding: UserHolding | null): holding is UserHolding => holding !== null);
           const key = this.getStorageKey();
@@ -159,25 +160,11 @@ export class PortfolioEngine {
       timestamp: new Date().toISOString(),
     }));
 
-    fetch(`/api/investor-state?uid=${encodeURIComponent(uid)}`)
-      .then(res => res.json())
-      .then((state: any) => {
-        const currentMemory = state?.memory || {};
-        const updatedMemory = { ...currentMemory, portfolio: normalized };
-
-        fetch(`/api/investor-state?uid=${encodeURIComponent(uid)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ memory: updatedMemory }),
-        }).catch(() => {});
-      })
-      .catch(() => {
-        fetch(`/api/investor-state?uid=${encodeURIComponent(uid)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ memory: { portfolio: normalized } }),
-        }).catch(() => {});
-      });
+    authenticatedFetchOnlyIfSignedIn("/api/investor-state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memory: { portfolio: normalized } }),
+    }).catch(() => {});
   }
 
   public static addHolding(holding: UserHolding): boolean {

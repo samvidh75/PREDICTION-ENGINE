@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
 import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
+import { navigateToStock } from '../architecture/navigation/routeCoordinator';
+import { loadAuthSession } from '../services/auth/sessionStore';
 import { AlertCircle, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide-react';
 import { useLiveQuotes } from '../hooks/useLiveQuotes';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -35,6 +37,8 @@ export const PortfolioPage: React.FC = () => {
   const [formError, setFormError] = useState('');
   const [importError, setImportError] = useState('');
   const liveQuotes = useLiveQuotes(snapshot.holdings.map((holding) => holding.symbol));
+  const authSession = loadAuthSession();
+  const isLocalOnly = !authSession.uid;
 
   const refreshSnapshot = useCallback(() => setSnapshot(PortfolioSnapshotFactory.createSnapshot()), []);
   useEffect(() => {
@@ -126,14 +130,7 @@ export const PortfolioPage: React.FC = () => {
     setCsvText('');
   };
 
-  const handleOpenStock = (ticker: string) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set('page', 'stock');
-    params.set('id', ticker);
-    params.delete('symbol');
-    window.history.pushState({}, '', `?${params.toString()}`);
-    window.dispatchEvent(new Event('urlchange'));
-  };
+  const handleOpenStock = (ticker: string) => navigateToStock({ ticker, mode: "push" });
 
   const largest = review.concentration.largestPosition;
 
@@ -141,7 +138,7 @@ export const PortfolioPage: React.FC = () => {
     <div className={`${tokens.layout.container} flex flex-col space-y-8`}>
       <PageHeader
         title="Portfolio"
-        subtitle="Recorded holdings, cost basis, and verified quote availability"
+        subtitle={`Recorded holdings, cost basis, and verified quote availability.${isLocalOnly ? ' (saved locally)' : ''}`}
         primaryAction={
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button>
@@ -221,26 +218,56 @@ export const PortfolioPage: React.FC = () => {
           description="Add holdings to track cost basis and exposure. Live values appear only when every holding has verified market pricing."
         />
       ) : (
-        <section aria-label="Portfolio holdings" className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">
-            <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Cost basis</span><span>Live value</span><span>Return</span><span className="text-right pr-3">Actions</span>
-          </div>
-          {review.holdings.map((holding) => (
-            <div key={holding.symbol} className="grid grid-cols-[1fr_130px_72px_110px_110px_82px_72px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
-              <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
-              <span className="truncate text-[11px] text-slate-500">{holding.sector}</span>
-              <span className="font-mono text-xs text-slate-700">{holding.shares}</span>
-              <span className="font-mono text-xs text-slate-700">{uiFormatINR(holding.costBasis)}</span>
-              <span className="font-mono text-xs text-slate-700">{holding.liveValue === null ? 'Unavailable' : uiFormatINR(holding.liveValue)}</span>
-              <span className={`font-mono text-xs ${holding.gainLossPct === null ? 'text-slate-500' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
-              </span>
-              <div className="flex items-center justify-end gap-1 pr-2">
-                <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 hover:text-slate-800"><Edit2 className="h-3 w-3" /></button>
-                <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-500 hover:text-rose-700"><Trash2 className="h-3 w-3" /></button>
-              </div>
+        <section aria-label="Portfolio holdings">
+          {/* Desktop table — hidden on small screens */}
+          <div className="hidden sm:block overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Cost basis</span><span>Live value</span><span>Return</span><span className="text-right pr-3"></span>
             </div>
-          ))}
+            {review.holdings.map((holding) => (
+              <div key={holding.symbol} className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_64px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
+                <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
+                <span className="truncate text-[11px] text-slate-500">{holding.sector}</span>
+                <span className="font-mono text-xs text-slate-700">{holding.shares}</span>
+                <span className="font-mono text-xs text-slate-700">{uiFormatINR(holding.costBasis)}</span>
+                <span className="font-mono text-xs text-slate-700">{holding.liveValue === null ? 'Unavailable' : uiFormatINR(holding.liveValue)}</span>
+                <span className={`font-mono text-xs ${holding.gainLossPct === null ? 'text-slate-500' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                </span>
+                <div className="flex items-center justify-end gap-1">
+                  <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-slate-800"><Edit2 className="h-3 w-3" /></button>
+                  <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-slate-400 hover:text-rose-700"><Trash2 className="h-3 w-3" /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile cards — shown only on small screens */}
+          <div className="sm:hidden space-y-3">
+            {review.holdings.map((holding) => (
+              <div key={holding.symbol} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono font-bold text-sm text-slate-950 hover:text-emerald-800">{holding.symbol}</button>
+                  <div className="flex items-center gap-2">
+                    <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-slate-800"><Edit2 className="h-3.5 w-3.5" /></button>
+                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => PortfolioEngine.removeHolding(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-slate-400 hover:text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                  <div><span className="text-slate-500">Sector</span><p className="font-medium text-slate-800 truncate">{holding.sector}</p></div>
+                  <div><span className="text-slate-500">Shares</span><p className="font-mono font-medium text-slate-800">{holding.shares}</p></div>
+                  <div><span className="text-slate-500">Cost basis</span><p className="font-mono font-medium text-slate-800">{uiFormatINR(holding.costBasis)}</p></div>
+                  <div><span className="text-slate-500">Live value</span><p className="font-mono font-medium text-slate-800">{holding.liveValue === null ? <span className="text-slate-400">Unavailable</span> : uiFormatINR(holding.liveValue)}</p></div>
+                  <div className="col-span-2">
+                    <span className="text-slate-500">Return</span>
+                    <p className={`font-mono font-medium ${holding.gainLossPct === null ? 'text-slate-400' : holding.gainLossPct >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                      {holding.gainLossPct === null ? 'Unavailable' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
