@@ -18,6 +18,29 @@ import { getAuth, type Auth } from 'firebase-admin/auth';
 let _app: App | null = null;
 let _auth: Auth | null = null;
 
+export function isFirebaseAdminConfigured(): boolean {
+  if (_app) return true;
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const useAdc = process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === 'true';
+  if (projectId && clientEmail && privateKey) return true;
+  if (useAdc) return true;
+  return false;
+}
+
+export function getFirebaseAdminStatus(): string {
+  if (_app) return 'initialized';
+  const missing: string[] = [];
+  if (!process.env.FIREBASE_PROJECT_ID) missing.push('FIREBASE_PROJECT_ID');
+  if (!process.env.FIREBASE_CLIENT_EMAIL) missing.push('FIREBASE_CLIENT_EMAIL');
+  if (!process.env.FIREBASE_PRIVATE_KEY) missing.push('FIREBASE_PRIVATE_KEY');
+  const useAdc = process.env.FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS === 'true';
+  if (useAdc) return 'adc';
+  if (missing.length > 0) return `missing: ${missing.join(', ')}`;
+  return 'ok';
+}
+
 function getFirebaseApp(): App {
   if (_app) return _app;
 
@@ -102,6 +125,10 @@ export function getTokenVerifier(): TokenVerifier {
   return _injectedVerifier ?? {
     verifyIdToken: verifyFirebaseToken,
   };
+}
+
+export function isUsingInjectedVerifier(): boolean {
+  return _injectedVerifier !== null;
 }
 
 export function resetTokenVerifier(): void {

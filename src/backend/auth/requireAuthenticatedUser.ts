@@ -6,7 +6,7 @@
  * NEVER trusts x-user-uid, ?uid=, or localStorage.
  */
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { getTokenVerifier } from './firebaseAdmin';
+import { getTokenVerifier, isFirebaseAdminConfigured, isUsingInjectedVerifier } from './firebaseAdmin';
 import type { TokenVerifier } from './firebaseAdmin';
 
 export interface AuthenticatedUser {
@@ -60,14 +60,23 @@ export async function requireAuthenticatedUser(
 
   // Verify token server-side
   try {
+    // Only check Firebase Admin config when using the real verifier
+    if (!isUsingInjectedVerifier() && !isFirebaseAdminConfigured()) {
+      if (request.log) request.log.warn('Firebase Admin is not configured — cannot verify tokens');
+      return reply.status(503).send({
+        code: 'AUTH_SERVICE_UNAVAILABLE',
+        error: 'Authentication service is not available. Please try again later.',
+      });
+    }
     const verifier = getTokenVerifier();
     const decoded = await verifier.verifyIdToken(token);
     request.authenticatedUser = {
       uid: decoded.uid,
       email: decoded.email,
     };
-  } catch {
-    // 403: Invalid, expired, or revoked token
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    if (request.log) request.log.warn({ err: errMsg }, 'Token verification failed');
     return reply.status(403).send({
       code: 'AUTH_INVALID_TOKEN',
       error: 'The provided token is invalid, expired, or revoked.',
@@ -115,7 +124,9 @@ export function createRequireAuth(verifier: TokenVerifier): (
         uid: decoded.uid,
         email: decoded.email,
       };
-    } catch {
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (request.log) request.log.warn({ err: errMsg }, 'Token verification failed');
       return reply.status(403).send({
         code: 'AUTH_INVALID_TOKEN',
         error: 'The provided token is invalid, expired, or revoked.',

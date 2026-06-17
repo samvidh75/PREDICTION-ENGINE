@@ -1,5 +1,6 @@
 import { buildServer } from "./web/app.js";
 import { AppHealthWatchdog } from "../services/health/AppHealthWatchdog";
+import { isFirebaseAdminConfigured, getFirebaseAdminStatus } from "./auth/firebaseAdmin.js";
 
 const port = Number(process.env.PORT ?? 4001);
 const host = process.env.HOST ?? "0.0.0.0";
@@ -17,6 +18,13 @@ async function main(): Promise<void> {
 
   await app.listen({ port, host });
   console.log(`[backend] fastify listening on http://${host}:${port}`);
+
+  const fbStatus = getFirebaseAdminStatus();
+  if (fbStatus !== 'initialized') {
+    console.warn(`[backend] Firebase Admin status: ${fbStatus}`);
+  } else {
+    console.log('[backend] Firebase Admin initialized');
+  }
 
   watchdog.start();
 }

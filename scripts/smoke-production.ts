@@ -1,3 +1,4 @@
+export {};
 /**
  * Production Smoke Test Script
  *
@@ -124,6 +125,16 @@ async function main(): Promise<void> {
       `${RAILWAY_URL}/api/ops/data-coverage`,
       ["ok", "coverage.symbols.count", "coverage.dailyPrices.rowCount"]
     )
+  );
+
+  // Leaderboard (threshold: >= 1 row)
+  results.push(
+    await checkEndpoint("LEADERBOARD", `${FRONTEND_URL}/api/intelligence/leaderboard?limit=3`, [])
+  );
+
+  // Company endpoint for a known symbol
+  results.push(
+    await checkEndpoint("COMPANY_RELIANCE", `${FRONTEND_URL}/api/stockstory/RELIANCE`, [])
   );
 
   // Print results
