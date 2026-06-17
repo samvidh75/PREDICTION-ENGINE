@@ -6,6 +6,7 @@ interface CardProps {
   onClick?: () => void;
   padding?: "sm" | "md" | "lg" | "none";
   hover?: boolean;
+  glass?: boolean;
 }
 
 const paddingStyles = {
@@ -21,16 +22,19 @@ export const Card: React.FC<CardProps> = ({
   onClick,
   padding = "md",
   hover = false,
+  glass = false,
 }) => {
   const Comp = onClick ? "button" : "div";
+  const glassStyles = "bg-white/75 backdrop-blur-glass border border-white/50 shadow-glass";
+  const solidStyles = "bg-white border border-slate-200/60 shadow-card";
   return (
     <Comp
       onClick={onClick}
       type={onClick ? "button" : undefined}
-      className={`w-full rounded-xl border border-slate-200/60 bg-white text-left text-slate-900 shadow-card transition-all ${
+      className={`w-full rounded-xl text-left text-slate-900 transition-all ${
         paddingStyles[padding]
-      } ${
-        onClick || hover ? "cursor-pointer hover:border-slate-300 hover:shadow-md hover:-translate-y-px" : ""
+      } ${glass ? glassStyles : solidStyles} ${
+        onClick || hover ? "cursor-pointer hover:-translate-y-px card-lift" : ""
       } ${className}`}
     >
       {children}

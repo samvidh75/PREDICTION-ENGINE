@@ -3,10 +3,11 @@ import React from "react";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  glass?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, id, className = "", ...props }, ref) => {
+  ({ label, error, id, glass = false, className = "", ...props }, ref) => {
     const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
     return (
       <div className="w-full text-left">
@@ -18,7 +19,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           id={inputId}
           ref={ref}
-          className={`h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/15 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed ${className}`}
+          className={`h-10 w-full rounded-xl text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed ${
+            glass
+              ? "bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass"
+              : "bg-white border border-slate-200 shadow-sm"
+          } px-3 ${className}`}
           {...props}
         />
         {error && <p className="mt-1.5 text-xs text-red-500">{error}</p>}

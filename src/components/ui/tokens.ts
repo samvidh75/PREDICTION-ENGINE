@@ -19,8 +19,15 @@ export const tokens = {
     cardValue: "text-xl font-semibold text-slate-900 tracking-tight",
     statLabel: "text-[11px] font-medium uppercase tracking-wider text-slate-400",
   },
+  glass: {
+    panel: "bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass rounded-xl",
+    panelLg: "bg-white/75 backdrop-blur-glassLg border border-white/50 shadow-glassLg rounded-2xl",
+    card: "bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass rounded-xl",
+    input: "bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass rounded-xl",
+    badge: "backdrop-blur-sm border border-white/30",
+  },
   focus: {
-    ring: "focus:outline-none focus:ring-2 focus:ring-accent-primary/15 focus:border-accent-primary",
+    ring: "focus:outline-none focus:ring-2 focus:ring-accent-primary/20 focus:border-accent-primary",
   },
 };
 

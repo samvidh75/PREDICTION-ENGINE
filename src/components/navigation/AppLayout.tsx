@@ -11,12 +11,12 @@ interface AppLayoutProps {
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   useAuth();
   return (
-    <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background font-sans text-slate-900 antialiased">
+    <div className="relative flex h-screen w-screen flex-col overflow-hidden font-sans text-slate-900 antialiased">
       <TopNav />
       <div className="relative flex h-full w-full flex-1 overflow-hidden">
         <Sidebar />
         <main className="
-          mt-[56px] h-[calc(100vh-56px)] w-full overflow-y-auto bg-background-secondary
+          mt-[56px] h-[calc(100vh-56px)] w-full overflow-y-auto
           md:mt-[60px] md:h-[calc(100vh-60px)] md:ml-[220px] md:w-[calc(100vw-220px)]
           pb-16 md:pb-6
         ">

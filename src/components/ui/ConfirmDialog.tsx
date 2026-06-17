@@ -35,18 +35,18 @@ export default function ConfirmDialog({
   if (!open) return null;
 
   const confirmClasses = destructive
-    ? "bg-red-50 border border-red-100 text-red-700 hover:bg-red-100"
+    ? "bg-red-50/80 backdrop-blur-sm border border-red-100/60 text-red-700 hover:bg-red-100"
     : "bg-accent-primary text-white hover:bg-accent-hover border border-accent-primary shadow-sm";
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/30 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center glass-modal-backdrop p-4"
       role="dialog"
       aria-modal="true"
       aria-label={title}
       onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
     >
-      <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-2xl bg-white/85 backdrop-blur-glassLg border border-white/50 shadow-glassLg p-6 transition-all duration-200 scale-in">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             {destructive && <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />}
@@ -63,12 +63,12 @@ export default function ConfirmDialog({
         </div>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">{message}</p>
         <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
+          <Button variant="secondary" size="sm" glass onClick={onCancel}>
             {cancelLabel}
           </Button>
           <button
             type="button"
-            className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary h-8 px-3 text-xs ${confirmClasses}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary active:scale-[0.97] h-8 px-3 text-xs ${confirmClasses}`}
             onClick={onConfirm}
           >
             {confirmLabel}
