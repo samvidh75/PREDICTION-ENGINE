@@ -417,9 +417,9 @@ export const StockStoryPage: React.FC = () => {
           </div>
 
           <div className="mt-6 rounded-lg border border-slate-200/80 bg-slate-50/70 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Why scores are unavailable</h3>
+            <h3 className="text-sm font-semibold text-slate-900">Why scoring is unavailable</h3>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-600">
-              This company is in the equity universe, but verified analytical factors are not ready for this symbol. Live quote fields may still appear when provider data is available.
+              This company is recognised but verified scoring factors are not yet ready. Live quotes may still appear when market data is available.
             </p>
           </div>
 
@@ -460,7 +460,7 @@ export const StockStoryPage: React.FC = () => {
 
           {missingInputs.length > 0 && (
             <div className="mt-6 border-t border-slate-100 pt-4">
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Awaiting Ingestion Inputs</div>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Data sources pending</div>
               <div className="flex flex-wrap gap-2">
                 {missingInputs.map((input: string) => (
                   <span key={input} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-500 font-mono">
@@ -622,8 +622,7 @@ export const StockStoryPage: React.FC = () => {
             {storyData.narrative}
           </p>
           <p className="mt-3 max-w-5xl rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-500">
-            StockStory provides research intelligence and health assessments.
-            It does not provide personalised investment advice.
+            Research signals are for informational purposes only. Not personalised investment advice.
           </p>
         </div>
       </section>
@@ -682,7 +681,7 @@ export const StockStoryPage: React.FC = () => {
                 {renderProgressBar("Value & Margins", storyData.valuation, "text-amber-700")}
               </div>
               <div className="text-[9px] text-slate-500 leading-normal mt-3 pt-3 border-t border-slate-200">
-                * Composite score is the average of available real factor scores from the prediction registry. Missing factors are shown as unavailable, not filled.
+                Composite score is the average of available factor scores. Missing factors are shown as unavailable.
               </div>
             </div>
 

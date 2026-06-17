@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
 test('authenticated rankings route renders an intentional screen', async ({ page }) => {
   await page.goto('/?page=rankings');
   await expect(page.getByRole('heading', { name: 'Stock Rankings' })).toBeVisible();
-  await expect(page.getByText('Rankings are unavailable from the prediction registry right now. No sample rankings are shown.')).toBeVisible();
+  await expect(page.getByText('Rankings pending')).toBeVisible();
 });
 
 test('desktop sidebar exposes grouped product workflows', async ({ page }) => {

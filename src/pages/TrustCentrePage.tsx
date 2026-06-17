@@ -101,7 +101,7 @@ export const TrustCentrePage: React.FC = () => {
   if (loading) {
     return (
       <div className="p-10">
-        <LoadingState description="Loading methodology and trust metrics." />
+        <LoadingState description="Loading methodology and trust metrics…" />
       </div>
     );
   }
@@ -114,8 +114,8 @@ export const TrustCentrePage: React.FC = () => {
 
   const stateLabel: Record<string, string> = {
     ok: "All metrics available",
-    partial: "Partial — some evidence sources are not yet connected",
-    unavailable: "Unavailable — verified scoring data is not ready yet",
+    partial: "Partial — some data sources not yet connected",
+    unavailable: "Unavailable — verified scoring data pending",
     empty: "No data — scoring registry is empty",
     error: "Temporarily unavailable",
     demo: "Demo mode",
@@ -126,15 +126,15 @@ export const TrustCentrePage: React.FC = () => {
     <main className="min-h-screen bg-background"><div className="mx-auto max-w-4xl space-y-7 p-4 pt-[76px] md:pt-28 text-slate-900">
       <PageHeader
         title="Methodology & Trust Centre"
-        subtitle="Scoring inputs, availability labels, and performance metrics when evidence is available."
+        subtitle="Scoring inputs, availability labels, and verified performance metrics."
       />
 
       {rawState !== "ok" && (
         <div className="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800" role="status">
           <p className="font-semibold text-xs">{humanState}</p>
-          <p className="mt-1">{error || envelope?.message || "Some trust metrics are unavailable because required evidence sources are not connected."}</p>
+          <p className="mt-1">{error || envelope?.message || "Some metrics are unavailable because required data sources are not connected."}</p>
           {missingInputs.length > 0 && (
-            <p className="text-xs mt-2 text-amber-700">Some performance fields require additional verified data updates before they are available.</p>
+            <p className="text-xs mt-2 text-amber-700">Some fields require additional verified data updates.</p>
           )}
         </div>
       )}
@@ -182,7 +182,7 @@ export const TrustCentrePage: React.FC = () => {
           <Card className="p-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Indexed symbols</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
                 <span className="block text-sm font-semibold text-slate-950">
                   {coverageData.coverage.symbols.status === "available"
                     ? formatNumber(coverageData.coverage.symbols.count)
@@ -198,7 +198,7 @@ export const TrustCentrePage: React.FC = () => {
                 </span>
               </div>
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial snapshots</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial records</span>
                 <span className="block text-sm font-semibold text-slate-950">
                   {coverageData.coverage.financialSnapshots.status === "available"
                     ? formatNumber(coverageData.coverage.financialSnapshots.rowCount ?? 0)
@@ -206,7 +206,7 @@ export const TrustCentrePage: React.FC = () => {
                 </span>
               </div>
               <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Prediction rows</span>
+                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scored records</span>
                 <span className="block text-sm font-semibold text-slate-950">
                   {coverageData.coverage.predictionRegistry.status === "available"
                     ? formatNumber(coverageData.coverage.predictionRegistry.rowCount ?? 0)
@@ -271,23 +271,23 @@ export const TrustCentrePage: React.FC = () => {
         <h2 className="text-lg font-semibold text-slate-950">Data system status</h2>
         <Card className="p-5">
           <p className="text-xs text-slate-600 leading-relaxed mb-4">
-            StockStory India runs automated queries across live registry components to ensure database updates match production specifications. Below is the active data readiness.
+            Active data readiness across all connected sources.
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring Database</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring database</span>
               <span className="text-xs font-semibold text-slate-900">
-                {rawState === "ok" || rawState === "partial" ? "Connected (Live)" : "Ready (Syncing)"}
+                {rawState === "ok" || rawState === "partial" ? "Connected" : "Syncing"}
               </span>
             </div>
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of Date</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of date</span>
               <span className="text-xs font-semibold text-slate-900">
                 <DataFreshnessBadge date={asOf !== "Data unavailable" ? asOf : null} />
               </span>
             </div>
             <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence Completeness</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence completeness</span>
               <span className="text-xs font-semibold text-slate-900">
                 {completenessScore ? `${completenessScore}% Verified` : "Pending audit"}
               </span>

@@ -110,7 +110,7 @@ export const PublicRankingsPage: React.FC = () => {
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
           title="Research rankings"
-          subtitle="Rankings will appear here when source-backed scoring has produced verified company snapshots."
+          subtitle="Verified company rankings from the latest scoring cycle."
           primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
         />
 
@@ -142,40 +142,40 @@ export const PublicRankingsPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="py-12 text-center text-sm text-slate-500">Loading rankings...</div>
+        <div className="py-12 text-center text-sm text-slate-500">Loading rankings…</div>
       ) : filteredRankings.length === 0 ? (
         <div className="flex flex-col gap-5">
           <EmptyState
-            title="Verified rankings are being prepared"
-            description="Rankings will appear here when source-backed scoring has produced verified company snapshots. No placeholder data or fabricated scores are shown."
+            title="Rankings pending"
+            description="Rankings appear after verified scoring has completed for the latest cycle."
           />
           {coverageData && (
             <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
-                Data Coverage Context
+                Data coverage
               </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Indexed Symbols</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Companies covered</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Prediction Rows</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Scored records</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Latest Prediction</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Latest update</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.latestPredictionDate || "—"}
                   </span>
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Rankings require verified prediction snapshots. No rankings are fabricated or extrapolated.
+                Rankings require verified scoring data. No fabricated or extrapolated values are shown.
               </p>
             </div>
           )}

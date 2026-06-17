@@ -104,51 +104,50 @@ export default function PublicPredictionsPage(): JSX.Element {
       <MobileNav />
       <div className={`${tokens.layout.container} pt-[76px] md:pt-28`}>
         <PageHeader
-          title="Prediction signals"
-          subtitle="Real signal rows appear when the prediction registry has produced verified signals."
+          title="Score changes"
+          subtitle="Verified score changes appear when provider data has been processed."
           primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
         />
 
       {loading ? (
-        <LoadingState description="Checking prediction registry for verified signals." />
+        <LoadingState description="Checking for recent score changes…" />
       ) : error || signals.length === 0 ? (
         <div className="flex flex-col gap-5">
           <EmptyState
-            title="Verified prediction signals are being prepared"
+            title="Score changes pending"
             description={
               symbolsAnalyzed && symbolsAnalyzed > 0
-                ? `${symbolsAnalyzed} companies are registered. Signals will appear after verified prediction updates.`
-                : "Signal rows will appear here when source-backed predictions have produced verified outputs. No placeholder data or fabricated signals are shown."
+                ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update cycle.`
+                : "Score changes appear when provider data has been processed and verified."
             }
           />
           {coverageData && (
             <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
-                Data Coverage Context
+                Data coverage
               </h4>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Indexed Symbols</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Companies covered</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Prediction Rows</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Scored records</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
                   </span>
                 </div>
                 <div>
-                  <span className="block text-[10px] font-medium text-slate-400">Latest Prediction</span>
+                  <span className="block text-[10px] font-medium text-slate-400">Latest update</span>
                   <span className="block text-lg font-bold text-slate-950 tabular-nums">
                     {coverageData.latestPredictionDate || "—"}
                   </span>
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 leading-relaxed">
-                Signal generation requires active deltas in the prediction registry. 
-                No signals are fabricated or backfilled.
+                Score changes require verified data updates. No fabricated or backfilled values are shown.
               </p>
             </div>
           )}
@@ -222,9 +221,9 @@ export default function PublicPredictionsPage(): JSX.Element {
               })}
             </tbody>
           </table>
-          {symbolsAnalyzed !== null && (
+              {symbolsAnalyzed !== null && (
             <div className="border-t border-slate-100 bg-slate-50/50 px-4 py-2 text-[10px] text-slate-500">
-              {symbolsAnalyzed} companies analyzed
+              {symbolsAnalyzed} companies in latest cycle
             </div>
           )}
         </div>
