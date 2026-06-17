@@ -90,17 +90,18 @@ export const PublicRankingsPage: React.FC = () => {
         />
 
       {error && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+        <div className="mb-4 rounded-xl bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 p-4 text-sm text-amber-800" role="status">
           <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
           <p className="mt-1 text-xs">{error}</p>
         </div>
       )}
 
-      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm sm:flex-row">
+      <div className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-4 sm:flex-row">
         <div className="w-full sm:w-72">
           <Input
             aria-label="Search rankings by symbol or sector"
             placeholder="Search symbol or sector..."
+            glass
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
@@ -112,7 +113,7 @@ export const PublicRankingsPage: React.FC = () => {
           <select
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}
-            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/15 sm:w-48"
+            className="h-10 w-full rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass px-3 text-sm text-slate-900 transition focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-48"
           >
             {sectors.map((sec) => (
               <option key={sec} value={sec}>
@@ -132,7 +133,7 @@ export const PublicRankingsPage: React.FC = () => {
             description="Rankings appear after verified scoring has completed for the latest cycle."
           />
           {(symbolCount !== null || registryRowCount !== null) && (
-            <div className="rounded-lg border border-slate-200/80 bg-white p-4 shadow-sm">
+            <div className="rounded-xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass p-5">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">
                 Data coverage
               </h4>
@@ -187,7 +188,7 @@ export const PublicRankingsPage: React.FC = () => {
           </button>
         </div>
       ) : (
-        <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
+        <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
           {filteredRankings.map((r) => {
             const rankingScore = r.rankingScore;
             const confidenceScore = r.confidenceScore;
@@ -195,7 +196,7 @@ export const PublicRankingsPage: React.FC = () => {
             return (
               <tr
                 key={r.symbol}
-                className="cursor-pointer transition-colors hover:bg-slate-50"
+                className="cursor-pointer transition-colors hover:bg-white/40"
                 onClick={() => setPage("stock", r.symbol)}
               >
                 <td className="p-4 font-semibold text-slate-500">{formatRank(r.rank)}</td>
