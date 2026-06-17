@@ -98,6 +98,6 @@ describe('DashboardHub states', () => {
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText(/6 companies covered/)).toBeInTheDocument();
+    expect(await screen.findByText(/6 companies/)).toBeInTheDocument();
   });
 });

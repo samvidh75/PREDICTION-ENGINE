@@ -26,13 +26,13 @@ export const Sidebar: React.FC = () => {
     { id: "search", label: "Search", icon: <Search className="h-4 w-4" /> },
     { id: "rankings", label: "Rankings", icon: <Trophy className="h-4 w-4" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="h-4 w-4" /> },
-    { id: "trust", label: "Methodology", icon: <ShieldCheck className="h-4 w-4" /> },
+    { id: "trust", label: "Research", icon: <ShieldCheck className="h-4 w-4" /> },
     { id: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
   ];
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[64px] z-40 hidden w-[220px] select-none flex-col justify-between border-r border-slate-200/60 bg-white py-4 md:flex">
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5">
+    <aside className="fixed bottom-0 left-0 top-[60px] z-40 hidden w-[220px] select-none flex-col justify-between border-r border-slate-200/60 bg-white py-4 md:flex">
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3">
         {links.map((link) => {
           const isActive = currentView === link.id;
           return (
@@ -56,12 +56,12 @@ isActive
       </nav>
 
       {isAuthenticated && (
-        <div className="mt-4 border-t border-slate-200/60 px-2.5 pt-4">
+        <div className="mt-4 border-t border-slate-200/60 px-3 pt-4">
           <button
             type="button"
             onClick={() => void logout()}
             disabled={isConnecting}
-            className="group flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
+            className="group flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50 transition"
           >
             <LogOut className="h-4 w-4 text-slate-400 group-hover:text-slate-600" />
             <span>Sign out</span>

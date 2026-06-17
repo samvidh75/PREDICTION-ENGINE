@@ -54,7 +54,7 @@ export const TrustCentrePage: React.FC = () => {
   if (loading) {
     return (
       <div className="p-10">
-        <LoadingState description="Loading methodology and trust metrics…" />
+        <LoadingState description="Loading methodology and trust metrics..." />
       </div>
     );
   }
@@ -76,9 +76,9 @@ export const TrustCentrePage: React.FC = () => {
   const humanState = stateLabel[rawState] ?? rawState;
 
   return (
-    <main className="min-h-screen bg-background"><div className="mx-auto max-w-4xl space-y-7 p-4 pt-[76px] md:pt-28 text-slate-900">
+    <main className="min-h-screen bg-background"><div className="mx-auto max-w-4xl space-y-8 p-4 pt-[76px] md:pt-28 text-slate-900">
       <PageHeader
-        title="Methodology & Trust Centre"
+        title="Research Methodology & Trust Centre"
         subtitle="Scoring inputs, availability labels, and verified performance metrics."
       />
 
@@ -92,153 +92,153 @@ export const TrustCentrePage: React.FC = () => {
         </div>
       )}
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Performance audit</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Card className="p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Alpha</span>
-            <span className="text-xl font-semibold text-slate-950">{formatMetric(metrics?.alpha)}</span>
+      <section className="space-y-5">
+        <h2 className="text-lg font-semibold text-slate-900">Performance audit</h2>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Card className="p-5 text-center">
+            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Alpha</span>
+            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.alpha)}</span>
           </Card>
-          <Card className="p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Hit Rate</span>
-            <span className="text-xl font-semibold text-slate-950">{formatMetric(metrics?.hit_rate, "%")}</span>
+          <Card className="p-5 text-center">
+            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Hit Rate</span>
+            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.hit_rate, "%")}</span>
           </Card>
-          <Card className="p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Sharpe</span>
-            <span className="text-xl font-semibold text-slate-950">{formatMetric(metrics?.sharpe_ratio)}</span>
+          <Card className="p-5 text-center">
+            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Sharpe</span>
+            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.sharpe_ratio)}</span>
           </Card>
-          <Card className="p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Calibration</span>
-            <span className="text-xl font-semibold text-slate-950">{formatMetric(metrics?.calibration_score, "%")}</span>
+          <Card className="p-5 text-center">
+            <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Calibration</span>
+            <span className="text-xl font-semibold text-slate-900 tabular-nums">{formatMetric(metrics?.calibration_score, "%")}</span>
           </Card>
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <Card className="p-5">
-          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total predictions generated</span>
-          <span className="text-2xl font-semibold text-slate-950">{formatCount(metrics?.total_predictions)}</span>
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card className="p-6">
+          <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total predictions generated</span>
+          <span className="text-2xl font-semibold text-slate-900">{formatCount(metrics?.total_predictions)}</span>
         </Card>
-        <Card className="p-5">
-          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total outcomes tracked</span>
-          <span className="text-2xl font-semibold text-slate-950">{formatCount(metrics?.total_outcomes)}</span>
+        <Card className="p-6">
+          <span className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold block mb-1">Total outcomes tracked</span>
+          <span className="text-2xl font-semibold text-slate-900">{formatCount(metrics?.total_outcomes)}</span>
         </Card>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Data coverage summary</h2>
+      <section className="space-y-5">
+        <h2 className="text-lg font-semibold text-slate-900">Data coverage summary</h2>
         {coverageLoading ? (
-          <Card className="p-5">
-            <p className="text-xs text-slate-500">Loading coverage data...</p>
+          <Card className="p-6">
+            <p className="text-sm text-slate-500">Loading coverage data...</p>
           </Card>
         ) : coverageData?.coverage ? (
-          <Card className="p-5">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
-                <span className="block text-sm font-semibold text-slate-950">
+          <Card className="p-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Companies covered</span>
+                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
                   {coverageData.coverage.symbols?.status === "available"
                     ? formatNumber(coverageData.coverage.symbols?.count ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
-              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Price rows</span>
-                <span className="block text-sm font-semibold text-slate-950">
+              <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Price rows</span>
+                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
                   {coverageData.coverage.dailyPrices?.status === "available"
                     ? formatNumber(coverageData.coverage.dailyPrices?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
-              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial records</span>
-                <span className="block text-sm font-semibold text-slate-950">
+              <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Financial records</span>
+                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
                   {coverageData.coverage.financialSnapshots?.status === "available"
                     ? formatNumber(coverageData.coverage.financialSnapshots?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
-              <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-                <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scored records</span>
-                <span className="block text-sm font-semibold text-slate-950">
+              <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scored records</span>
+                <span className="block text-sm font-semibold text-slate-900 tabular-nums">
                   {coverageData.coverage.predictionRegistry?.status === "available"
                     ? formatNumber(coverageData.coverage.predictionRegistry?.rowCount ?? 0)
                     : "Unavailable"}
                 </span>
               </div>
             </div>
-            <div className="mt-3">
+            <div className="mt-4">
               <DataFreshnessBadge date={coverageData.generatedAt ?? null} />
             </div>
           </Card>
         ) : (
-          <Card className="p-5">
-            <p className="text-xs text-slate-500">Coverage data is temporarily unavailable.</p>
+          <Card className="p-6">
+            <p className="text-sm text-slate-500">Coverage data is temporarily unavailable.</p>
           </Card>
         )}
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Scoring factors</h2>
-        <div className="grid gap-3 md:grid-cols-2">
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Growth</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+      <section className="space-y-5">
+        <h2 className="text-lg font-semibold text-slate-900">Scoring factors</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Growth</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Measures revenue, EPS, profit, and free cash flow trajectory when data is available.
             </p>
           </Card>
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Quality</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Quality</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Evaluates capital returns (ROE, ROIC), profit margins, and operational asset efficiency.
             </p>
           </Card>
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Valuation</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Valuation</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Reviews relative pricing multiples and cash yields against industry peers.
             </p>
           </Card>
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Stability & risk</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Stability & risk</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Monitors leverage, cash buffer, accounting flags, and price volatility.
             </p>
           </Card>
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Momentum</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Momentum</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Reviews trend strength and relative market signals.
             </p>
           </Card>
-          <Card className="p-5">
-            <h3 className="font-semibold text-slate-950 text-sm">Confidence</h3>
-            <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+          <Card className="p-6">
+            <h3 className="font-semibold text-slate-900 text-sm">Confidence</h3>
+            <p className="mt-2 text-sm text-slate-600 leading-relaxed">
               Separates score visibility from data completeness, freshness, and consistency.
             </p>
           </Card>
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-950">Data status</h2>
-        <Card className="p-5">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring database</span>
-              <span className="text-xs font-semibold text-slate-900">
+      <section className="space-y-5">
+        <h2 className="text-lg font-semibold text-slate-900">Data status</h2>
+        <Card className="p-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Scoring database</span>
+              <span className="text-sm font-semibold text-slate-900">
                 {rawState === "ok" || rawState === "partial" ? "Connected" : "Pending"}
               </span>
             </div>
-            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of date</span>
-              <span className="text-xs font-semibold text-slate-900">
+            <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">As of date</span>
+              <span className="text-sm font-semibold text-slate-900">
                 <DataFreshnessBadge date={asOf !== "Data unavailable" ? asOf : null} />
               </span>
             </div>
-            <div className="rounded border border-slate-100 bg-slate-50/50 p-3">
-              <span className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence completeness</span>
-              <span className="text-xs font-semibold text-slate-900">
+            <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Evidence completeness</span>
+              <span className="text-sm font-semibold text-slate-900">
                 {completenessScore ? `${completenessScore}% verified` : "Pending"}
               </span>
             </div>
@@ -247,9 +247,9 @@ export const TrustCentrePage: React.FC = () => {
       </section>
 
       {coverageData?.providers && Object.keys(coverageData.providers).length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-slate-950">Provider status</h2>
-          <Card className="p-5">
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold text-slate-900">Provider status</h2>
+          <Card className="p-6">
             <div className="border border-slate-100 rounded-lg overflow-hidden bg-slate-50/50">
               {Object.entries(coverageData.providers).map(([key, val]) => (
                 <ProviderStatusPill key={key} name={key} status={val} />

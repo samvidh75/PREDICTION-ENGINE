@@ -73,7 +73,7 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around border-t border-slate-200 bg-white/95 px-2 backdrop-blur-md md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around border-t border-slate-200 bg-white/95 px-2 backdrop-blur-lg md:hidden">
       {isPublicMobile
         ? publicTabs.map((tab) => {
             const isActive = currentPage === tab.page;
@@ -87,7 +87,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 {tab.icon}
-                <span className="text-[9px] font-semibold uppercase tracking-wider">{tab.label}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider">{tab.label}</span>
               </button>
             );
           })
@@ -103,7 +103,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 {tab.icon}
-                <span className="text-[9px] font-semibold uppercase tracking-wider">{tab.label}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider">{tab.label}</span>
               </button>
             );
           })}

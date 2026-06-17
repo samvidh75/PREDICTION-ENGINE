@@ -10,7 +10,6 @@ import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
 import { MissingDataBadge } from "../components/ui/PageHeader";
 import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
-import tokens from "../components/ui/tokens";
 import { useToast } from "../components/feedback/useToast";
 
 interface DisplayList {
@@ -121,7 +120,6 @@ export const WatchlistPage: React.FC = () => {
       const timeB = NoteEngine.getNote(b).timestamp || 0;
       return timeB - timeA;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawActiveTickers, noteRefresh]);
 
   const handleNoteChange = (ticker: string, text: string) => {
@@ -137,9 +135,9 @@ export const WatchlistPage: React.FC = () => {
 
   if (authState === "loading") {
     return (
-      <div className={`${tokens.layout.container} flex flex-col space-y-6`}>
-        <header className="border-b border-slate-200 pb-5">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Watchlist</h1>
+      <div className="flex flex-col space-y-6">
+        <header className="border-b border-slate-200/60 pb-6">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Watchlist</h1>
         </header>
         <div className="flex items-center justify-center min-h-[200px]">
           <span className="text-sm text-slate-500">Loading watchlists...</span>
@@ -149,10 +147,10 @@ export const WatchlistPage: React.FC = () => {
   }
 
   return (
-    <div className={`${tokens.layout.container} flex flex-col space-y-6`}>
-      <header className="border-b border-slate-200 pb-5">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">Watchlist</h1>
-        <p className="mt-2 text-sm text-slate-600">
+    <div className="flex flex-col space-y-6">
+      <header className="border-b border-slate-200/60 pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Watchlist</h1>
+        <p className="mt-1.5 text-sm text-slate-500">
           Track and add research notes for monitored companies.
           {isAuthenticated && !isBackendActive && (
             <span className="ml-2 text-amber-600 text-xs">(offline mode — changes saved locally)</span>
@@ -163,36 +161,36 @@ export const WatchlistPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         <div className="flex flex-col space-y-4 lg:col-span-1">
           <div className="space-y-1">
-            <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">My Lists</span>
+            <span className="text-[11px] uppercase text-slate-500 font-semibold tracking-wider">My Lists</span>
             {displayLists.map((wl) => {
               const label = listSourceLabel(wl.source);
               return (
                 <button
                   key={wl.id}
                   onClick={() => setSelectedList(wl.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-xs transition cursor-pointer flex items-center justify-between ${
-                    selectedList === wl.id ? "bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200" : "text-slate-600 hover:text-slate-950 hover:bg-white border border-transparent"
+                  className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition cursor-pointer flex items-center justify-between ${
+                    selectedList === wl.id ? "bg-accent-primary text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  <span>{wl.name} <span className="text-slate-500 ml-1">({wl.tickers.length})</span></span>
+                  <span>{wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span></span>
                   {label && (
-                    <span className="text-[9px] uppercase tracking-wider text-slate-400 ml-2">{label}</span>
+                    <span className={`text-[10px] uppercase tracking-wider ml-2 ${selectedList === wl.id ? 'text-white/70' : 'text-slate-400'}`}>{label}</span>
                   )}
                 </button>
               );
             })}
           </div>
           <div className="space-y-1">
-            <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Smart Lists</span>
+            <span className="text-[11px] uppercase text-slate-500 font-semibold tracking-wider">Smart Lists</span>
             {smartWatchlists.map((wl, idx) => (
               <button
                 key={wl.name}
                 onClick={() => setSelectedList(`${SMART_PREFIX}${idx}`)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition cursor-pointer ${
-                  selectedList === `${SMART_PREFIX}${idx}` ? "bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200" : "text-slate-600 hover:text-slate-950 hover:bg-white border border-transparent"
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition cursor-pointer ${
+                  selectedList === `${SMART_PREFIX}${idx}` ? "bg-accent-primary text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                {wl.name} <span className="text-slate-500 ml-1">({wl.tickers.length})</span>
+                {wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span>
               </button>
             ))}
           </div>
@@ -215,45 +213,45 @@ export const WatchlistPage: React.FC = () => {
                   const noteObj = NoteEngine.getNote(ticker);
 
                   return (
-                    <div key={ticker} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={ticker} className="rounded-xl border border-slate-200/60 bg-white p-4 shadow-card">
+                      <div className="flex items-center justify-between mb-3">
                         <button
                           onClick={() => navigateToStock({ ticker, mode: "push" })}
-                          className="cursor-pointer border-none bg-transparent text-left font-mono font-bold text-slate-950 hover:underline"
+                          className="cursor-pointer border-none bg-transparent text-left font-mono font-semibold text-slate-900 hover:underline"
                         >
                           {ticker}
                         </button>
                         <button
                           onClick={() => handleRemoveTicker(ticker)}
-                          className="text-xs text-rose-400 hover:text-rose-500 cursor-pointer bg-transparent border-none"
+                          className="text-xs text-slate-400 hover:text-rose-500 cursor-pointer bg-transparent border-none transition-colors"
                           disabled={selectedList.startsWith(SMART_PREFIX)}
                         >
                           Remove
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <span className="text-[10px] text-slate-400 block">Score</span>
+                          <span className="text-xs text-slate-400 block">Score</span>
                           {scoreState === "available" ? (
                             <ScorePill score={Math.round(score!)} />
                           ) : (
-                            <span className="text-[10px] text-slate-400">Unavailable</span>
+                            <span className="text-xs text-slate-400">Unavailable</span>
                           )}
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-400 block">Freshness</span>
-                          <span className="font-mono text-[10px] text-slate-500">
+                          <span className="text-xs text-slate-400 block">Freshness</span>
+                          <span className="font-mono text-xs text-slate-500">
                             {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
                           </span>
                         </div>
                       </div>
-                      <div className="mt-2">
+                      <div className="mt-3">
                         <input
                           type="text"
                           value={noteObj.note}
                           onChange={(e) => handleNoteChange(ticker, e.target.value)}
                           placeholder="Add a research note..."
-                          className="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/15"
+                          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/15"
                         />
                       </div>
                     </div>
@@ -261,9 +259,9 @@ export const WatchlistPage: React.FC = () => {
                 })}
               </div>
               {/* Desktop table */}
-              <div className="hidden sm:block overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+              <div className="hidden sm:block overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-card">
                 <div className="min-w-[720px]">
-                <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-slate-200 bg-slate-50 p-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 border-b border-slate-100 bg-slate-50/50 p-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   <span className="pl-3">Ticker</span>
                   <span>Score</span>
                   <span>Freshness</span>
@@ -277,10 +275,10 @@ export const WatchlistPage: React.FC = () => {
                   const noteObj = NoteEngine.getNote(ticker);
 
                   return (
-                    <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50">
+                    <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 border-b border-slate-100 p-3 last:border-0 hover:bg-slate-50 transition-colors">
                       <button
                         onClick={() => navigateToStock({ ticker, mode: "push" })}
-                        className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-bold text-slate-950 hover:underline"
+                        className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-semibold text-slate-900 hover:underline"
                       >
                         {ticker}
                       </button>
@@ -291,7 +289,7 @@ export const WatchlistPage: React.FC = () => {
                           <MissingDataBadge />
                         )}
                       </div>
-                      <span className="font-mono text-[10px] text-slate-500">
+                      <span className="font-mono text-xs text-slate-500">
                         {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}
                       </span>
                       <div>
@@ -300,13 +298,13 @@ export const WatchlistPage: React.FC = () => {
                           value={noteObj.note}
                           onChange={(e) => handleNoteChange(ticker, e.target.value)}
                           placeholder="Why am I watching?"
-                          className="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/15"
+                          className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-slate-700 placeholder-slate-400 focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/15"
                         />
                       </div>
                       <div className="flex items-center justify-end gap-2 pr-2">
                         <button
                           onClick={() => handleRemoveTicker(ticker)}
-                          className="text-[11px] text-rose-400/80 hover:text-rose-400 cursor-pointer bg-transparent border-none"
+                          className="text-xs text-slate-400 hover:text-rose-500 cursor-pointer bg-transparent border-none transition-colors"
                           disabled={selectedList.startsWith(SMART_PREFIX)}
                         >
                           Remove

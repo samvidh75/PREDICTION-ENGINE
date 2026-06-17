@@ -25,11 +25,11 @@ export const TopNav: React.FC = () => {
 
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-50 flex h-[56px] items-center justify-between border-b border-slate-200/60 bg-white/90 px-4 backdrop-blur-md md:hidden">
+    <header className="fixed top-0 left-0 right-0 z-50 flex h-[56px] items-center justify-between border-b border-slate-200/60 bg-white/95 px-4 backdrop-blur-lg md:hidden">
       <button
         type="button"
         onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
-        className="border-none bg-transparent p-0 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-900"
+        className="border-none bg-transparent p-0 text-left text-[12px] font-semibold tracking-[0.1em] text-slate-900"
       >
           StockStory<span className="text-accent-primary">.India</span>
       </button>
@@ -47,19 +47,19 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={() => setPage("signup")}
-          className="h-9 rounded-lg bg-accent-primary px-4 text-[11px] font-medium text-white hover:bg-accent-hover transition"
+          className="h-9 rounded-lg bg-accent-primary px-4 text-xs font-medium text-white hover:bg-accent-hover transition"
         >
           Start
         </button>
       )}
     </header>
 
-    <nav className="fixed top-0 left-0 z-50 hidden h-[64px] w-full items-center border-b border-slate-200/60 bg-white/90 px-8 backdrop-blur-md md:flex">
+    <nav className="fixed top-0 left-0 z-50 hidden h-[60px] w-full items-center border-b border-slate-200/60 bg-white/95 px-8 backdrop-blur-lg md:flex">
       <div className="flex w-[220px] shrink-0 items-center">
         <button
           type="button"
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
-          className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-[0.12em] text-slate-900"
+          className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-[0.1em] text-slate-900"
         >
         StockStory<span className="text-accent-primary">.India</span>
         </button>
@@ -70,10 +70,10 @@ export const TopNav: React.FC = () => {
           <div className="mx-auto flex max-w-md flex-1 justify-center">
             <button
               onClick={triggerSearch}
-              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50/80 px-3.5 text-left transition hover:border-slate-300 hover:bg-white focus:outline-none focus:ring-2 focus:ring-accent-primary/15"
+              className="flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50/80 px-3.5 text-left transition hover:border-slate-300 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
             >
               <Search className="h-3.5 w-3.5 text-slate-400" />
-              <span className="text-xs text-slate-400">
+              <span className="text-sm text-slate-400">
                 Search companies or sectors
               </span>
             </button>
@@ -84,7 +84,7 @@ export const TopNav: React.FC = () => {
           </div>
         </>
       ) : (
-        <div className="ml-auto flex shrink-0 items-center gap-5">
+        <div className="ml-auto flex shrink-0 items-center gap-6">
           <button
             onClick={() => setPage("rankings")}
             className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
@@ -104,12 +104,6 @@ export const TopNav: React.FC = () => {
             About
           </button>
           <button 
-            onClick={() => setPage("landing")}
-            className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
-          >
-            Home
-          </button>
-          <button 
             onClick={() => setPage("login")}
             className="cursor-pointer border-none bg-transparent text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
           >
@@ -117,7 +111,7 @@ export const TopNav: React.FC = () => {
           </button>
           <button 
             onClick={() => setPage("signup")}
-            className="cursor-pointer rounded-lg bg-accent-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
+            className="cursor-pointer rounded-lg bg-accent-primary px-5 py-2 text-sm font-medium text-white transition hover:bg-accent-hover"
           >
             Get started
           </button>
