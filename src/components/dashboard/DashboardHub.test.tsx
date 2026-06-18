@@ -43,10 +43,12 @@ vi.mock('../../architecture/navigation/routeCoordinator', () => ({
 // Mock the API client
 const mockGetSignals = vi.fn();
 const mockGetOpsHealth = vi.fn();
+const mockGetDataCoverage = vi.fn();
 vi.mock('../../services/api/client', () => ({
   api: {
     getSignals: (...args: unknown[]) => mockGetSignals(...args),
     getOpsHealth: (...args: unknown[]) => mockGetOpsHealth(...args),
+    getDataCoverage: (...args: unknown[]) => mockGetDataCoverage(...args),
   },
   ApiError: class ApiError extends Error {
     status: number;
@@ -64,27 +66,28 @@ const pending = () => new Promise(() => {});
 beforeEach(() => {
   mockGetSignals.mockReturnValue(pending());
   mockGetOpsHealth.mockReturnValue(pending());
+  mockGetDataCoverage.mockResolvedValue({ coverage: { symbols: { count: 6 }, predictionRegistry: { symbolCount: 5 } }, generatedAt: '2026-06-17T00:00:00.000Z' });
 });
 
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('Loading source-backed signal changes...')).toBeInTheDocument();
+    expect(screen.getByText('Recent signal changes')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('No companies saved yet.')).toBeInTheDocument();
+    expect(screen.getByText(/No companies saved yet/)).toBeInTheDocument();
   });
 
   it('shows empty saved research state', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('No saved research items yet.')).toBeInTheDocument();
+    expect(screen.getByText(/No user-entered holdings saved/)).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('No recently viewed companies.')).toBeInTheDocument();
+    expect(screen.getByText('Your Indian equity research command centre.')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {
@@ -93,7 +96,7 @@ describe('DashboardHub states', () => {
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText('Signal changes not available right now.')).toBeInTheDocument();
+    expect(await screen.findByText('Signals temporarily unavailable')).toBeInTheDocument();
   });
 
   it('shows signals empty state when API returns no signals', async () => {
@@ -106,8 +109,8 @@ describe('DashboardHub states', () => {
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText('No significant signal changes detected.')).toBeInTheDocument();
-    expect(screen.getByText(/5 symbols analyzed/)).toBeInTheDocument();
+    expect(await screen.findByText('No significant signal changes')).toBeInTheDocument();
+    expect(screen.getByText(/5 companies were analyzed/)).toBeInTheDocument();
   });
 
   it('shows status bar when health data loads', async () => {
@@ -116,6 +119,7 @@ describe('DashboardHub states', () => {
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText(/6 companies/)).toBeInTheDocument();
+    expect(await screen.findByText('Companies covered')).toBeInTheDocument();
+    expect(screen.getByText('6')).toBeInTheDocument();
   });
 });
