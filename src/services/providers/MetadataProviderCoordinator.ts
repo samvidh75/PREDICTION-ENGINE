@@ -5,7 +5,7 @@
  * raw BSE codes, and lack ISIN support.
  *
  * Solution: This coordinator sits between the provider chain and consumers. It:
- *   1. Calls the standard ProviderCoordinator chain (Yahoo → Finnhub → IndianMarket)
+ *   1. Calls the standard ProviderCoordinator chain (Yahoo → IndianMarket)
  *   2. Validates the result via CompanyDataValidator
  *   3. Enriches missing fields from a master company registry
  *   4. Applies DataIntegrityEngine to normalise BSE codes, ISIN format, etc.

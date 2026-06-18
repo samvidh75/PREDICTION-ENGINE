@@ -171,7 +171,7 @@ const aMd = `# Backtest Input Audit — TRACK-7C
 |:---------|:-----|:--|
 | Technical (RSI/MACD/ADX/Vol) | ${totalTech}/${totalFields} | ${(totalTech / totalFields * 100).toFixed(1)}% |
 | Financial (Beta) | ${totalFin}/${UNIVERSE.length * SNAPS.length} | ${(totalFin / (UNIVERSE.length * SNAPS.length) * 100).toFixed(1)}% |
-| Financial statements (PE/ROE/etc) | 0 | Needs Finnhub API key |
+| Financial statements (PE/ROE/etc) | 0 | Needs API key |
 
 ✅ Technical indicators are real, computed from Yahoo 2Y price history. Beta is approximated from price volatility.
 `;
@@ -290,7 +290,7 @@ const mcMd = `# Monte Carlo Validation V2
 |:--|:--|:--|:--|
 | Stable tests | 0/24 (0%) | ${mcStable}/${mcTotal} (${(mcStable / mcTotal * 100).toFixed(0)}%) | ${mcStable > 0 ? '✅ Improved' : '⚠️ No change'} |
 
-**Robustness verdict:** ${mcStable > 0 ? '✅ Some factor correlations now stable under bootstrap. Real technical data improves signal reliability.' : '⚠️ Factor correlations remain unstable. Financial statement data (Finnhub) likely needed for further improvement.'}
+**Robustness verdict:** ${mcStable > 0 ? '✅ Some factor correlations now stable under bootstrap. Real technical data improves signal reliability.' : '⚠️ Factor correlations remain unstable. Financial statement data likely needed for further improvement.'}
 `;
 fs.writeFileSync(path.join(OUT, 'MonteCarloValidationV2.md'), mcMd);
 console.log('✅ P7: Monte Carlo');
@@ -315,7 +315,7 @@ const iMd = `# Improvement Report — TRACK-6B vs TRACK-7C
 | Sector-neutral win rate | 56% | ${snW}/${snT} (${(snW / snT * 100).toFixed(0)}%) | ${snW / snT > .56 ? '✅ Improved' : snW / snT > .5 ? '⚠️ Same' : '❌ Declined'} |
 | Monte Carlo stable | 0/24 (0%) | ${mcStable}/${mcTotal} (${(mcStable / mcTotal * 100).toFixed(0)}%) | ${mcStable > 0 ? '✅ Improved' : '⚠️ No change'} |
 | Technical inputs real | 0% | ${(totalTech / totalFields * 100).toFixed(0)}% | ✅ Massive improvement |
-| Financial inputs real | 0% | ${(totalFin / (UNIVERSE.length * SNAPS.length) * 100).toFixed(0)}% | ⚠️ Needs Finnhub |
+| Financial inputs real | 0% | ${(totalFin / (UNIVERSE.length * SNAPS.length) * 100).toFixed(0)}% | ⚠️ Needs API key |
 
 `;
 fs.writeFileSync(path.join(OUT, 'ImprovementReport.md'), iMd);
@@ -347,12 +347,12 @@ See FactorValidationV2.md. Real technical data enables the momentum and risk fac
 ---
 
 ## 4. Did Robustness Improve?
-${mcStable > 0 ? '✅ Yes — Monte Carlo bootstrap now shows some stable factor-horizon combinations.' : '⚠️ Marginal — still needs Finnhub financial statement data for full robustness.'}
+${mcStable > 0 ? '✅ Yes — Monte Carlo bootstrap now shows some stable factor-horizon combinations.' : '⚠️ Marginal — still needs financial statement data for full robustness.'}
 
 ---
 
 ## 5. Is StockStory Ready for Production Research Usage?
-**${totalTech / totalFields > .7 ? '✅ Technical indicators are production-ready.' : '⚠️'} ${totalFin / (UNIVERSE.length * SNAPS.length) > .5 ? '✅ Financial statements are production-ready.' : '⚠️ Financial statements need Finnhub API key.'}**
+**${totalTech / totalFields > .7 ? '✅ Technical indicators are production-ready.' : '⚠️'} ${totalFin / (UNIVERSE.length * SNAPS.length) > .5 ? '✅ Financial statements are production-ready.' : '⚠️ Financial statements need API key.'}**
 
 ---
 

@@ -14,7 +14,7 @@
  * IMPORTANT: This provider requires an active Upstox access token. It does NOT
  * use API keys — it reuses the user's Upstox OAuth session. If the user hasn't
  * connected Upstox, this provider will fail gracefully and the coordinator will
- * fall through to Finnhub/IndianAPI/Yahoo.
+ * fall through to IndianAPI/Yahoo.
  */
 
 import { FinancialProvider, FinancialData } from './FinancialProvider';

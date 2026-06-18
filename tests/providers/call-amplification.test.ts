@@ -5,7 +5,7 @@ import { ProviderHealthService } from '../../src/providers/v2/ProviderHealthServ
 import { ProviderPriorityResolver } from '../../src/providers/v2/ProviderPriorityResolver';
 import { ProviderCoordinator } from '../../src/services/providers/ProviderCoordinator';
 
-const requiredFields = [
+const coordinatorRequiredFields = [
   'peRatio',
   'pbRatio',
   'roa',
@@ -27,8 +27,18 @@ const requiredFields = [
   'fcfYield',
 ];
 
+const upstoxFields = [
+  'peRatio',
+  'pbRatio',
+  'roe',
+  'roa',
+  'roic',
+  'evEbitda',
+  'debtToEquity',
+];
+
 function fullBundle(): Record<string, number> {
-  return Object.fromEntries(requiredFields.map((field, index) => [field, index + 1]));
+  return Object.fromEntries(coordinatorRequiredFields.map((field, index) => [field, index + 1]));
 }
 
 describe('provider call amplification controls', () => {
@@ -40,7 +50,7 @@ describe('provider call amplification controls', () => {
 
     let bundleCalls = 0;
     const adapter: ProviderAdapter = {
-      name: 'FinnhubProvider',
+      name: 'UpstoxFundamentalsProvider',
       async fetchFinancials() {
         bundleCalls++;
         return fullBundle();
@@ -50,14 +60,14 @@ describe('provider call amplification controls', () => {
     const result = await manager.fetchAllFields(
       'RELIANCE',
       [...ALL_FINANCIAL_FIELDS],
-      new Map([['FinnhubProvider', adapter]]),
+      new Map([['UpstoxFundamentalsProvider', adapter]]),
       new Map(),
     );
 
     expect(bundleCalls).toBe(1);
     expect(result.fields.peRatio).toBe(1);
-    expect(result.fields.currentRatio).toBe(18);
-    expect(result.providerSummary.FinnhubProvider).toMatchObject({ attempted: 1, succeeded: 1 });
+    expect(result.fields.debtToEquity).toBe(7);
+    expect(result.providerSummary.UpstoxFundamentalsProvider).toMatchObject({ attempted: 1, succeeded: 1 });
   });
 
   it('ProviderCoordinator stops after required fields are complete', async () => {

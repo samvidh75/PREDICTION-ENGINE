@@ -8,9 +8,8 @@ const envTemplate = readFileSync(resolve(process.cwd(), '.env.production.example
 const deploymentGuide = readFileSync(resolve(process.cwd(), 'DEPLOYMENT_GUIDE.md'), 'utf8');
 
 describe('provider healthcheck contract', () => {
-  it('tests only configured Finnhub, IndianAPI, and optional yfinance providers', () => {
-    expect(healthcheck).toContain("type ProviderName = 'finnhub' | 'indianapi' | 'yfinance'");
-    expect(healthcheck).toContain("process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY");
+  it('tests only configured IndianAPI and optional yfinance providers', () => {
+    expect(healthcheck).toContain("type ProviderName = 'indianapi' | 'yfinance'");
     expect(healthcheck).toContain('process.env.INDIANAPI_KEY');
     expect(healthcheck).toContain("String(process.env.YFINANCE_ENABLED ?? '').toLowerCase() === 'true'");
     expect(healthcheck).not.toContain('ALPHA_VANTAGE');
@@ -28,7 +27,6 @@ describe('provider healthcheck contract', () => {
     expect(workflow).toContain('INDIANAPI_KEY: ${{ secrets.INDIANAPI_KEY }}');
     expect(workflow).toContain('provider-health-report');
     expect(workflow).not.toContain('ALPHA_VANTAGE');
-    expect(workflow).not.toContain('FINNHUB_KEY');
   });
 
   it('removes Alpha Vantage from active environment and deployment guidance', () => {

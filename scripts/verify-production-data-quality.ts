@@ -213,13 +213,13 @@ async function main(): Promise<void> {
 
   // ── Provider compliance checks ────────────────────────────────
 
-  // No active Dhan/Upstox/Finnhub in provider code
+  // No active Dhan/Upstox in provider code
   results.push(await dqCheck("no_deprecated_providers", "compliance",
     `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
     (body) => {
       const provs = (body as any).providers as Record<string, any> || {};
       const keys = Object.keys(provs);
-      const forbidden = ["FINNHUB_KEY", "DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
+      const forbidden = ["DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
       const found = forbidden.filter((k) => keys.includes(k));
       if (found.length > 0) return `deprecated providers present: ${found.join(", ")}`;
       return null;

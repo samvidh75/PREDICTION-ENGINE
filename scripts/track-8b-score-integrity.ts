@@ -320,7 +320,7 @@ r4 += '## 1. Are Fundamentals Accurate?\n\n';
 
 if (successCount === 0) {
   r4 += '**NO. Zero provider responses available for accuracy verification.**\n\n';
-  r4 += 'The IndianAPI /stock_fundamentals endpoint returned failures for all ' + COMPANIES.length + ' tested companies. Finnhub free tier returns 403 for /stock/metric (US-only on free tier). Yahoo v10 quoteSummary returns 401.\n\n';
+  r4 += 'The IndianAPI /stock_fundamentals endpoint returned failures for all ' + COMPANIES.length + ' tested companies. Yahoo v10 quoteSummary returns 401.\n\n';
   r4 += '**Currently, 0% of financial inputs come from real data sources.** The only real data is market cap (MasterCompanyRegistry) and sector classification.\n';
 }
 
@@ -349,7 +349,7 @@ r4 += '\n## 4. Is the Health Score Institutionally Defensible?\n\n';
 if (successCount === 0) {
   r4 += '**NO.** The scoring methodology is sound (sector-aware, percentile-based, multi-factor), but without real input data, the output cannot be trusted for investment decisions.\n\n';
   r4 += '**To make the Health Score institutionally defensible:**\n';
-  r4 += '1. Secure a Finnhub premium key (unlocks /stock/metric -> 18 real fields)\n';
+  r4 += '1. Secure a premium financial data key (unlocks 18+ real fields)\n';
   r4 += '2. Use Upstox Company Fundamentals API (NEW - launched May 2026) for Indian equity coverage\n';
   r4 += '3. Verify IndianAPI /stock_fundamentals endpoint is live (the key is valid but no responses were received)\n';
   r4 += '4. Add at least one more Indian financial data source as fallback\n';
@@ -359,8 +359,8 @@ if (successCount === 0) {
 r4 += '\n## 5. Remaining Weaknesses\n\n';
 r4 += '| Weakness | Impact | Mitigation |\n';
 r4 += '|:---------|:-------|:-----------|\n';
-r4 += '| No working financial data provider | 94% of fields are fallback | Finnhub premium + Upstox Fundamentals API + IndianAPI verification |\n';
-r4 += '| Finnhub free tier limited to metadata | Cannot access /stock/metric | Upgrade to Finnhub Basic ($89/mo) or find alternative |\n';
+r4 += '| No working financial data provider | 94% of fields are fallback | Premium financial data + Upstox Fundamentals API + IndianAPI verification |\n';
+r4 += '| Free tier limited to metadata | Cannot access financial metrics | Upgrade to premium or find alternative |\n';
 r4 += '| IndianAPI endpoint not responding | No fallback data available | Investigate API status; may need different endpoint |\n';
 r4 += '| Yahoo v10 blocked (401) | Historical data only | Known limitation - Yahoo is not a viable fundamental source |\n';
 r4 += '| All scores sector-driven | No company-level differentiation | Real data solves this completely |\n';

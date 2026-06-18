@@ -22,7 +22,7 @@ export const TRACKED_FIELDS = [
 
 export type TrackedField = (typeof TRACKED_FIELDS)[number];
 export type IngestionMode = "dry-run" | "apply";
-export type FundamentalsProviderId = "finnhub" | "yfinance";
+export type FundamentalsProviderId = "yfinance";
 
 export interface NormalizedFundamentalSnapshot {
   symbol: string;
@@ -163,12 +163,7 @@ function freshnessDays(asOf: string, now: Date): number {
   return Number.isFinite(then) ? Math.max(0, Math.floor((now.getTime() - then) / 86_400_000)) : 9999;
 }
 
-function sourceUrl(symbol: string): string {
-  return `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}.NS&metric=all`;
-}
-
 function providerSourceUrl(provider: FundamentalsProviderId, symbol: string): string {
-  if (provider === "finnhub") return sourceUrl(symbol);
   return `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.NS`;
 }
 
@@ -186,38 +181,6 @@ function debtRatioOrNull(value: unknown): number | null {
   const parsed = finiteOrNull(value);
   if (parsed === null) return null;
   return parsed > 10 ? Math.round((parsed / 100) * 10_000) / 10_000 : parsed;
-}
-
-export function normalizeFinnhubSnapshot(symbolInput: string, data: FinancialData | null | undefined, now = new Date()): NormalizedFundamentalSnapshot {
-  if (!data || typeof data !== "object") throw new Error("provider response is missing or malformed");
-  const symbol = String((data as Record<string, unknown>).symbol ?? symbolInput).trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
-  const fiscalPeriod = isoDate((data as Record<string, unknown>).periodEnd, now);
-  const asOfDate = fiscalPeriod;
-  const snapshot: Omit<NormalizedFundamentalSnapshot, "completenessScore" | "availableFields" | "missingFields"> = {
-    symbol,
-    fiscalPeriod,
-    asOfDate,
-    marketCap: finiteOrNull((data as Record<string, unknown>).marketCap),
-    peRatio: finiteOrNull((data as Record<string, unknown>).peRatio),
-    pbRatio: finiteOrNull((data as Record<string, unknown>).pbRatio),
-    eps: finiteOrNull((data as Record<string, unknown>).eps),
-    roe: finiteOrNull((data as Record<string, unknown>).roe),
-    debtToEquity: finiteOrNull((data as Record<string, unknown>).debtToEquity),
-    revenueGrowth: finiteOrNull((data as Record<string, unknown>).revenueGrowth),
-    earningsGrowth: finiteOrNull((data as Record<string, unknown>).profitGrowth ?? (data as Record<string, unknown>).epsGrowth),
-    operatingMargin: finiteOrNull((data as Record<string, unknown>).operatingMargin),
-    netMargin: finiteOrNull((data as Record<string, unknown>).netMargin),
-    source: "finnhub",
-    retrievedAt: now.toISOString(),
-  };
-  const availableFields = TRACKED_FIELDS.filter((field) => snapshot[field] !== null);
-  const missingFields = TRACKED_FIELDS.filter((field) => snapshot[field] === null);
-  return {
-    ...snapshot,
-    completenessScore: Math.round((availableFields.length / TRACKED_FIELDS.length) * 100),
-    availableFields: [...availableFields],
-    missingFields: [...missingFields],
-  };
 }
 
 export function normalizeYFinanceSnapshot(symbolInput: string, data: FinancialData | null | undefined, now = new Date()): NormalizedFundamentalSnapshot {
@@ -254,7 +217,7 @@ export function normalizeYFinanceSnapshot(symbolInput: string, data: FinancialDa
 }
 
 function normalizeProviderSnapshot(provider: FundamentalsProviderId, symbol: string, data: FinancialData | null | undefined, now: Date): NormalizedFundamentalSnapshot {
-  return provider === "finnhub" ? normalizeFinnhubSnapshot(symbol, data, now) : normalizeYFinanceSnapshot(symbol, data, now);
+  return normalizeYFinanceSnapshot(symbol, data, now);
 }
 
 class YFinanceBridgeProvider implements ProviderLike {
@@ -492,15 +455,12 @@ async function insertLineage(db: DbLike, runId: string, snapshot: NormalizedFund
 }
 
 function validateOptions(options: CliOptions): void {
-  if (!options.provider) throw new Error("Missing --provider. Use --provider=finnhub.");
-  if (options.provider !== "finnhub" && options.provider !== "yfinance") {
-    throw new Error(`Unsupported provider ${options.provider}. Use finnhub or yfinance; scraping providers are prohibited.`);
+  if (!options.provider) throw new Error("Missing --provider. Use --provider=yfinance.");
+  if (options.provider !== "yfinance") {
+    throw new Error(`Unsupported provider ${options.provider}. Use yfinance; scraping providers are prohibited.`);
   }
   if (options.mode === "apply" && process.env.CONFIRM_F1_FUNDAMENTALS_APPLY !== "true") {
     throw new Error("Apply mode requires CONFIRM_F1_FUNDAMENTALS_APPLY=true");
-  }
-  if (options.provider === "finnhub" && !process.env.FINNHUB_KEY && !process.env.FINNHUB_API_KEY) {
-    throw new Error("Finnhub API key is required. Set FINNHUB_KEY or FINNHUB_API_KEY.");
   }
 }
 
@@ -511,9 +471,7 @@ export async function runFundamentalsIngestion(options: CliOptions, deps: RunDep
   const nowFn = deps.now ?? (() => new Date());
   await db.initialize();
   const providerId = options.provider as FundamentalsProviderId;
-  const provider = deps.provider ?? (providerId === "finnhub"
-    ? new (await import("../src/services/providers/FinnhubProvider")).FinnhubProvider(process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY)
-    : new YFinanceBridgeProvider());
+  const provider = deps.provider ?? new YFinanceBridgeProvider();
   const indianProvider = deps.indianProvider ?? (process.env.INDIANAPI_KEY ? new (await import("../src/services/providers/IndianMarketProvider")).IndianMarketProvider(process.env.INDIANAPI_KEY) : null);
   const symbols = await resolveSymbols(options, db);
   if (symbols.length === 0) throw new Error("Symbol list is empty.");

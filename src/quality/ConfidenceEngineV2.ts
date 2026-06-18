@@ -30,7 +30,6 @@ export interface ConfidenceResult {
 
 /** Provider base confidence weights (from TRACK-20 scorecards). */
 const PROVIDER_WEIGHTS: Record<string, number> = {
-  'FinnhubProvider': 0.85,
   'UpstoxFundamentalsProvider': 0.90,
   'YahooProvider': 0.95,
   'DerivedMetricsEngine': 0.80,

@@ -98,7 +98,6 @@ describe("Ops Data Coverage Endpoint Route", () => {
       expect(typeof val.status).toBe("string");
     });
     // Only active providers should appear in health check
-    expect(Object.keys(body.providers)).not.toContain("FINNHUB_KEY");
     expect(Object.keys(body.providers)).not.toContain("DHAN_CLIENT_ID");
     expect(Object.keys(body.providers)).not.toContain("UPSTOX_ACCESS_TOKEN");
 

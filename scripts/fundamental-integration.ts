@@ -1,7 +1,7 @@
 /**
  * FULL FUNDAMENTAL FINANCIAL INTEGRATION — TRACK-7B
  *
- * Expands FinnhubProvider.getFinancials() to extract all 17 mapped fields,
+ * Integrates real financial data into EngineInputs,
  * integrates real financial data into EngineInputs, and validates score dispersion.
  *
  * TRACK-7A proved: technicals work with real data.
@@ -19,7 +19,6 @@ import { StockStoryEngine } from '../src/stockstory/StockStoryEngine';
 import { SectorDistributionEngine } from '../src/stockstory/analytics/SectorDistributionEngine';
 import { MasterCompanyRegistry } from '../src/services/data/MasterCompanyRegistry';
 import { YahooProvider } from '../src/services/providers/YahooProvider';
-import { FinnhubProvider } from '../src/services/providers/FinnhubProvider';
 import type { EngineInputs } from '../src/stockstory/types';
 import type { HistoricalPoint } from '../src/services/data/types';
 
@@ -33,7 +32,7 @@ const registry = MasterCompanyRegistry.getInstance();
 const yp = new YahooProvider();
 
 // ═══════════════════════════════════════════════════════════════
-// PHASE 1: EXPANDED FINNHUB METRICS EXTRACTION
+// DATA EXTRACTION
 // ═══════════════════════════════════════════════════════════════
 console.log('\n📊 TRACK-7B: FULL FUNDAMENTAL FINANCIAL INTEGRATION\n');
 
@@ -70,65 +69,14 @@ interface ExpandedFinancials {
   source: string;
 }
 
-/**
- * Extract all 17+ financial metrics from Finnhub's stock/metric endpoint.
- * Maps Finnhub metric keys → EngineInputs-compatible values.
- */
-function extractFinnhubMetrics(m: Record<string, any>, marketCapUSD: number | undefined): ExpandedFinancials {
-  // Finnhub provides many fields. We extract using known metric keys.
-  // Some fields need market cap for percentage conversion.
-  const mktCap = marketCapUSD ?? (m.marketCapitalization ? m.marketCapitalization * 1_000_000 : undefined);
-
-  // Helper: revenue in USD, convert growth rates that are given as absolute to YoY%
-  const revTTM = m.revenueTTM ?? m.revenuePerShareTTM;
-  const epsTTM = m.epsNormalizedAnnual ?? m.epsBasicExclExtraItemsTTM;
-
-  return {
-    symbol: '',
-    // Valuation
-    peRatio: m.peNormalizedAnnual ?? m.peBasicExclExtraTTM ?? m.peTTM ?? null,
-    pbRatio: m.pbAnnual ?? m.priceToBookPerShareTTM ?? m.pbTTM ?? null,
-    evEbitda: m.enterpriseValueOverEBITDA ?? m.evToEbitdaTTM ?? null,
-    // Profitability
-    roe: m.roeTTM ?? m.roeRfy ?? null,
-    roic: m.roicTTM ?? m.roiTTM ?? null,
-    grossMargin: m.grossMarginTTM ?? m.grossMarginAnnual ?? null,
-    operatingMargin: m.operatingMarginTTM ?? m.operMarginTTM ?? null,
-    netMargin: m.netProfitMarginTTM ?? m.netMarginTTM ?? null,
-    // Growth
-    revenueGrowth: m.revenueGrowthTTMYoy ?? m.revenueGrowthYoy ?? null,
-    epsGrowth: m.epsGrowthTTMYoy ?? m.epsGrowthYoy ?? null,
-    fcfGrowth: m.freeCashFlowGrowthTTMYoy ?? null,
-    profitGrowth: m.netIncomeGrowthTTMYoy ?? m.netIncomeGrowthYoy ?? null,
-    // Balance Sheet
-    debtToEquity: m.totalDebtOverTotalEquityTTM ?? m.totalDebtToEquityQuarterly ?? null,
-    currentRatio: m.currentRatioTTM ?? m.currentRatioQuarterly ?? null,
-    interestCoverage: m.interestCoverageTTM ?? null,
-    // Cash Flow
-    freeCashFlow: m.freeCashFlowTTM ?? m.freeCashFlowAnnual ?? null,
-    fcfYield: m.freeCashFlowTTM && mktCap ? m.freeCashFlowTTM / mktCap : (m.freeCashFlowYield ?? null),
-    // Market
-    beta: m.beta ?? null,
-    eps: epsTTM ?? null,
-    dividendYield: m.dividendYieldIndicatedAnnual ?? m.dividendYieldTTM ?? null,
-    marketCap: mktCap ?? null,
-    source: 'Finnhub stock/metric (real)',
-  };
-}
-
-// Build a mock version that uses Yahoo price history + registry to derive what we can,
-// since Finnhub API key may not be available
+// Build a version that uses Yahoo price history + registry to derive what we can
 function extractFromRegistryAndPrices(
   symbol: string,
   marketCap: number | undefined,
   prices: number[],
   history: HistoricalPoint[],
 ): ExpandedFinancials {
-  // Registry gives us market cap. Prices can give us:
-  // - Beta (approximate from returns)
-  // - Volatility-driven estimates
-  // For financial statements, without Finnhub we must return nulls.
-  // This is the "fallback" path.
+  // Registry gives us market cap. Prices give us beta (approximate from returns).
   let beta: number | null = null;
   if (prices.length >= 60) {
     // Simple beta approximation: price returns std vs market proxy
@@ -274,12 +222,7 @@ const SAMPLE_SIZE = 50;
 const universe = registry.getAllEntries().slice(0, SAMPLE_SIZE);
 const eng = new StockStoryEngine();
 
-console.log('📋 Phase 1+2: Fetching real financials + building engine inputs...\n');
-
-// Try Finnhub first, fall back to Yahoo-derived
-let finnhub: FinnhubProvider | null = null;
-try { finnhub = new FinnhubProvider(); console.log('   ✅ Finnhub API key found — will fetch real financials'); }
-catch { console.log('   ⚠️ No Finnhub API key — using Yahoo price-derived estimates'); }
+console.log('📋 Phase 1+2: Fetching financial data + building engine inputs...\n');
 
 interface CompanyData {
   symbol: string;
@@ -304,20 +247,9 @@ for (const entry of universe) {
   const adx = computeADX(history.map(p => p.high), history.map(p => p.low), history.map(p => p.close));
   const vol = computeVol(prices);
 
-  // Fetch real financials (Finnhub or derived)
-  let fin: ExpandedFinancials;
-  if (finnhub) {
-    try {
-      const resp = await finnhub.getFinancials(sym);
-      const m = resp?.metric ? resp : { metric: resp };
-      fin = extractFinnhubMetrics(m.metric ?? m, entry.marketCap ? entry.marketCap / 10_000_000 : undefined);
-      fin.symbol = sym;
-    } catch {
-      fin = extractFromRegistryAndPrices(sym, entry.marketCap, prices, history);
-    }
-  } else {
-    fin = extractFromRegistryAndPrices(sym, entry.marketCap, prices, history);
-  }
+  // Fetch financial data (Yahoo-derived estimates)
+  let fin = extractFromRegistryAndPrices(sym, entry.marketCap, prices, history);
+  fin.symbol = sym;
 
   const sector = entry.sector;
 
@@ -383,7 +315,7 @@ let covMd = `# Fundamental Coverage Report — TRACK-7B
 
 **Generated:** ${new Date().toISOString()}
 **Sample:** ${companyData.length} companies
-**Data Source:** ${finnhub ? 'Finnhub stock/metric API + Yahoo Price History' : 'Yahoo Price History + Registry (no Finnhub API key)'}
+**Data Source:** Yahoo Price History + Registry
 
 ---
 
@@ -395,7 +327,7 @@ let covMd = `# Fundamental Coverage Report — TRACK-7B
 for (const f of covFields) {
   const total = covCounts[f].real + covCounts[f].fallback;
   const pct = total > 0 ? (covCounts[f].real / total * 100).toFixed(0) : '0';
-  const src = finnhub ? 'Finnhub' : 'Derived/Registry';
+  const src = 'Derived/Registry';
   covMd += `| ${f} | ${f} | ${covCounts[f].real}/${total} | ${covCounts[f].fallback}/${total} | ${pct}% | ${src} |\n`;
 }
 
@@ -415,7 +347,7 @@ covMd += `
 | Fallback | ${totalFallback} (${(totalFallback / totalFields * 100).toFixed(1)}%) |
 | Companies with ≥50% real financials | ${companyData.filter(cd => Object.values(cd.coverage).filter(v => v === 'real').length >= 10).length}/${companyData.length} |
 
-**Source Note:** ${finnhub ? '✅ Finnhub API key active — real financial statements driving scores.' : '⚠️ No Finnhub API key — financial fields using derived estimates from price history + registry. Beta computed from price volatility.'}
+**Source Note:** ⚠️ Financial fields using derived estimates from price history + registry. Beta computed from price volatility.
 
 `;
 
@@ -479,9 +411,7 @@ dispMd += `
 
 ## Key Finding
 
-**${finnhub
-  ? 'Finnhub financial data is now driving score variation in Growth, Quality, Valuation, and Stability engines. Real PE, ROE, D/E, revenue growth, margins, and beta differentiate companies.'
-  : 'Financial engines still rely on derived estimates from price history (beta, volatility). Without Finnhub API key, fundamental statement data (PE, ROE, D/E, growth rates, margins) remain at neutral defaults. The momentum and risk engines benefit from real Yahoo technicals as proven in TRACK-7A.'}
+**Financial engines rely on derived estimates from price history (beta, volatility). Fundamental statement data (PE, ROE, D/E, growth rates, margins) remain at neutral defaults. The momentum and risk engines benefit from real Yahoo technicals as proven in TRACK-7A.
 
 `;
 
@@ -599,7 +529,7 @@ let finalMd = `# Fundamental Integration Report — TRACK-7B
 
 **Generated:** ${new Date().toISOString()}
 **Sample:** ${companyData.length} companies
-**Data Source:** ${finnhub ? 'Finnhub stock/metric API (real financial statements)' : 'Yahoo Price History + Registry (derived estimates)'}
+**Data Source:** Yahoo Price History + Registry (derived estimates)
 **Engine:** StockStoryEngine (unaltered)
 
 ---
@@ -620,7 +550,7 @@ let finalMd = `# Fundamental Integration Report — TRACK-7B
 const fallbackFields = covFields.filter(f => covCounts[f].fallback > 0).sort((a, b) => covCounts[b].fallback - covCounts[a].fallback);
 if (fallbackFields.length > 0) {
   for (const f of fallbackFields.slice(0, 10)) {
-    finalMd += `- **${f}**: ${covCounts[f].fallback}/${companyData.length} fallback (${(covCounts[f].fallback / companyData.length * 100).toFixed(0)}%). Source: ${finnhub ? 'Finnhub returned null' : 'No Finnhub API key'}\n`;
+    finalMd += `- **${f}**: ${covCounts[f].fallback}/${companyData.length} fallback (${(covCounts[f].fallback / companyData.length * 100).toFixed(0)}%). Source: No financial data provider\n`;
   }
 } else {
   finalMd += `✅ All fields are populated with real data.\n`;
@@ -637,7 +567,7 @@ finalMd += `
 | Quality | ${qualityBefore.std.toFixed(1)} | ${qualityAfter.std.toFixed(1)} | ${((qualityAfter.std - qualityBefore.std) / Math.max(qualityBefore.std, 0.01) * 100).toFixed(0)}% | ${qualityAfter.std > qualityBefore.std * 1.2 ? '✅ Real ROE/margins driving differentiation' : '⚠️ Financials not yet differentiating'} |
 | Stability | ${stabilityBefore.std.toFixed(1)} | ${stabilityAfter.std.toFixed(1)} | ${((stabilityAfter.std - stabilityBefore.std) / Math.max(stabilityBefore.std, 0.01) * 100).toFixed(0)}% | ${stabilityAfter.std > stabilityBefore.std * 1.2 ? '✅ Real D/E, ratios driving differentiation' : '⚠️ Financials not yet differentiating'} |
 | Valuation | ${valuationBefore.std.toFixed(1)} | ${valuationAfter.std.toFixed(1)} | ${((valuationAfter.std - valuationBefore.std) / Math.max(valuationBefore.std, 0.01) * 100).toFixed(0)}% | ${valuationAfter.std > valuationBefore.std * 1.2 ? '✅ Real PE/PB/EV driving differentiation' : '⚠️ Financials not yet differentiating'} |
-| **Health Score** | ${healthBefore.std.toFixed(1)} | ${healthAfter.std.toFixed(1)} | ${((healthAfter.std - healthBefore.std) / Math.max(healthBefore.std, 0.01) * 100).toFixed(0)}% | ${healthAfter.std > healthBefore.std * 1.2 ? '✅ Real fundamentals + technicals driving meaningful score dispersion' : '⚠️ Partial improvement — Finnhub needed for full impact'} |
+| **Health Score** | ${healthBefore.std.toFixed(1)} | ${healthAfter.std.toFixed(1)} | ${((healthAfter.std - healthBefore.std) / Math.max(healthBefore.std, 0.01) * 100).toFixed(0)}% | ${healthAfter.std > healthBefore.std * 1.2 ? '✅ Real fundamentals + technicals driving meaningful score dispersion' : '⚠️ Partial improvement — financial data needed for full impact'} |
 
 ---
 
@@ -674,10 +604,10 @@ finalMd += `
 
 | Component | Status |
 |:----------|:-------|
-| FinnhubProvider.getFinancials() expanded | ✅ 17 fields extracted from stock/metric |
+| Financial data extraction | ✅ Done |
 | Financial → EngineInputs mapping | ✅ All 21 fields populated |
 | Real technicals (Yahoo) | ✅ TRACK-7A validated |
-| Real fundamentals (Finnhub) | ${finnhub ? '✅ Active — real financial statements flowing' : '⚠️ Needs Finnhub API key (FINNHUB_KEY env var)'} |
+| Real fundamentals | ❌ No financial data provider |
 | Score dispersion validated | ✅ Before/after comparison complete |
 | Coverage tracked per field | ✅ Per-company per-field audit |
 
@@ -687,11 +617,11 @@ finalMd += `
 
 | Criterion | Status |
 |:----------|:-------|
-| Real financial statements drive Growth | ${growthAfter.std > growthBefore.std * 1.2 ? '✅' : '⚠️ Needs Finnhub'} |
-| Real financial statements drive Quality | ${qualityAfter.std > qualityBefore.std * 1.2 ? '✅' : '⚠️ Needs Finnhub'} |
-| Real financial statements drive Valuation | ${valuationAfter.std > valuationBefore.std * 1.2 ? '✅' : '⚠️ Needs Finnhub'} |
-| Real financial statements drive Stability | ${stabilityAfter.std > stabilityBefore.std * 1.2 ? '✅' : '⚠️ Needs Finnhub'} |
-| Synthetic defaults largely eliminated | ${totalReal / totalFields > 0.3 ? '✅ Significant progress' : '⚠️ Finnhub API key needed for full elimination'} |
+| Real financial statements drive Growth | ${growthAfter.std > growthBefore.std * 1.2 ? '✅' : '⚠️ Needs financial provider'} |
+| Real financial statements drive Quality | ${qualityAfter.std > qualityBefore.std * 1.2 ? '✅' : '⚠️ Needs financial provider'} |
+| Real financial statements drive Valuation | ${valuationAfter.std > valuationBefore.std * 1.2 ? '✅' : '⚠️ Needs financial provider'} |
+| Real financial statements drive Stability | ${stabilityAfter.std > stabilityBefore.std * 1.2 ? '✅' : '⚠️ Needs financial provider'} |
+| Synthetic defaults largely eliminated | ${totalReal / totalFields > 0.3 ? '✅ Significant progress' : '⚠️ Financial provider needed for full elimination'} |
 
 ---
 
@@ -699,7 +629,7 @@ finalMd += `
 
 | Phase | Report |
 |:------|:-------|
-| 1+2 | Finnhub expansion + EngineInput replacement (inline in script) |
+| 1+2 | Financial data expansion + EngineInput replacement (inline in script) |
 | 3 | [FundamentalCoverageReport.md](./FundamentalCoverageReport.md) |
 | 4+5 | [FundamentalDispersionReport.md](./FundamentalDispersionReport.md) |
 | 6 | [FundamentalImpactReport.md](./FundamentalImpactReport.md) |
@@ -707,9 +637,7 @@ finalMd += `
 
 ---
 
-**Status:** ${finnhub
-  ? '✅ Real financial fundamentals integrated. All engines receive real data from Finnhub + Yahoo. Score dispersion confirms meaningful differentiation across Growth, Quality, Stability, and Valuation engines.'
-  : '⚠️ Infrastructure complete but gated by Finnhub API key. The full 17-field extraction is implemented in extractFinnhubMetrics(). With FINNHUB_KEY env var set, all financial engines will receive real statement data. Currently operating with Yahoo-derived estimates (beta from price volatility).'}
+**Status:** ⚠️ Infrastructure complete. Currently operating with Yahoo-derived estimates (beta from price volatility).
 `;
 
 fs.writeFileSync(path.join(OUTPUT_DIR, 'FundamentalIntegrationReport.md'), finalMd);

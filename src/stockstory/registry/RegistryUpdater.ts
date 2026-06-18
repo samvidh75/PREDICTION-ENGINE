@@ -414,7 +414,7 @@ export class RegistryUpdater {
 
   /**
    * Detect company name changes using metadata provider enrichment.
-   * This requires supplementary metadata fetch (Yahoo/Finnhub).
+   * This requires supplementary metadata fetch (Yahoo/IndianAPI).
    * For now, placeholder with extensibility point.
    */
   private detectNameChanges(

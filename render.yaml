@@ -51,9 +51,6 @@ services:
         sync: false
 
       # ── Market Data APIs ───────────────────────────────────────────────
-      - key: FINNHUB_KEY
-        sync: false
-
       - key: INDIANAPI_KEY
         sync: false
 

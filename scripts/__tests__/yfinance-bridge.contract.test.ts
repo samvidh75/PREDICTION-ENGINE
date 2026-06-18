@@ -30,8 +30,5 @@ describe("yfinance Python bridge contract", () => {
   it("documents runtime controls without hard-coded credentials", () => {
     expect(envTemplate).toContain('YFINANCE_CACHE_PATH=tmp/yfinance-cache.json');
     expect(envTemplate).toContain('YFINANCE_BATCH_SIZE=40');
-    expect(envTemplate).toContain('FINNHUB_KEY=');
-    expect(envTemplate).not.toMatch(/FINNHUB_KEY=\S+/);
-    expect(envTemplate).not.toMatch(/FINNHUB_API_KEY=\S+/);
   });
 });

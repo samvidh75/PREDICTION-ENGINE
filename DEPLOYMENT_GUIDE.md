@@ -29,7 +29,6 @@ cp .env.production.example .env.production
 #   COOKIE_SECRET    (openssl rand -base64 64)
 #   DATABASE_URL     (your production Postgres connection string)
 #   REDIS_PASSWORD   (strong random password)
-#   FINNHUB_KEY      (primary fundamentals provider)
 #   INDIANAPI_KEY    (Indian quote / metadata fallback)
 nano .env.production
 ```
@@ -39,8 +38,8 @@ Run provider health checks locally without printing secrets:
 ```bash
 npx tsx scripts/provider-healthcheck.ts \
   --symbols=RELIANCE,TCS,INFY \
-  --providers=finnhub,indianapi,yfinance \
-  --require=finnhub,indianapi \
+  --providers=indianapi,yfinance \
+  --require=indianapi \
   --strict
 ```
 
@@ -156,7 +155,6 @@ docker compose up -d --build
 | `DATABASE_URL` | ✅ | Postgres connection string |
 | `NODE_ENV` | ✅ | `production` |
 | `PORT` | ✅ | `4001` |
-| `FINNHUB_KEY` | ✅ | Primary fundamentals and company-profile provider |
 | `INDIANAPI_KEY` | Optional | Indian quote, metadata, and sector fallback |
 | `YFINANCE_ENABLED` | Optional | Explicit yfinance research and enrichment bridge |
 | `REDIS_PASSWORD` | ✅ | Redis auth |

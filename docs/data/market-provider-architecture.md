@@ -88,6 +88,5 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 |----------|--------|-------------|
 | Dhan | No credentials available | 2026-06-18 |
 | Upstox | Token lifecycle unsuitable | 2026-06-18 |
-| Finnhub | Removed from active pipeline | 2026-06-18 |
 
 Source files remain in the repository for reference but are not imported by the active provider broker or displayed in the Trust Centre.

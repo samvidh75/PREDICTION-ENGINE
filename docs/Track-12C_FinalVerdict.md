@@ -56,7 +56,6 @@ Files modified:
 | Provider | Status | Notes |
 |---|---|---|
 | Upstox Fundamentals API | ✅ Active (Tier 1) | Uses `UPSTOX_ACCESS_TOKEN` from env; reads `localStorage` in browser |
-| Finnhub.io | ✅ Active (Tier 2) | `FINNHUB_KEY` configured; optional — failover when unset |
 | Yahoo Finance v8 | ✅ Active (prices) | Free, no key; fundamentals blocked (v10 returns 401) |
 | IndianAPI.in | ✅ Active (fallback) | `INDIANAPI_KEY` configured |
 | Google News RSS | ✅ Active (news fallback) | Free, no key |
@@ -68,7 +67,7 @@ Files modified:
 | File | Change |
 |---|---|
 | `.env` | New `UPSTOX_ACCESS_TOKEN` (fresh JWT) |
-| `.env.production` | Added `FINNHUB_KEY`, `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN` |
+| `.env.production` | Added `INDIANAPI_KEY`, `UPSTOX_ACCESS_TOKEN` |
 | `.env.production.example` | Added `UPSTOX_ACCESS_TOKEN` field |
 
 ### 6. Legacy Fix: `ingest-news.ts`
@@ -84,7 +83,6 @@ deprecation stub pointing to `DataAcquisitionCoordinator.fetchNews()`.
                     INGESTION BOUNDARY
                     ┌─────────────────┐
   Upstox Fundamentals│  isFiniteNumber │
-  Finnhub           │  sanitisation   │
   Yahoo v8          │  NaN→null       │
   IndianAPI         │  Infinity→null  │
                     └────────┬────────┘

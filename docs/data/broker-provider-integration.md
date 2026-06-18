@@ -41,7 +41,6 @@ StockStory India integrates **read-only broker market data providers** to popula
 | Upstox     | optional_degraded | false    | quotes, historical, market_feed, holdings |
 | IndianAPI  | active            | true     | quotes, metadata                          |
 | Yahoo      | active_fallback   | false    | quotes, historical                        |
-| Finnhub    | deprecated        | false    | (removed from pipeline)                   |
 | Redis      | active            | true     | cache, queue                              |
 
 ## Credentials (Env Vars)

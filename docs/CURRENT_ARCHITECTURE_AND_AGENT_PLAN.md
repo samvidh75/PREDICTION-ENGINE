@@ -28,8 +28,7 @@ Financial fundamentals should flow through this precedence:
 1. Upstox fundamentals when an access token is configured.
 2. Screener.in only when authorized provider config enables it.
 3. Moneycontrol only when authorized provider config enables it.
-4. Finnhub when `FINNHUB_KEY` or `FINNHUB_API_KEY` is present.
-5. Yahoo only for price/volume/history and derived fields that are actually available.
+4. Yahoo only for price/volume/history and derived fields that are actually available.
 
 Rules:
 

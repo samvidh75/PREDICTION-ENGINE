@@ -3,11 +3,11 @@ import { buildRequestKey, requestKeyHash, serializeRequestKey } from './Provider
 
 describe('ProviderRequestKey', () => {
   it('normalizes provider, operation, and symbol before hashing', () => {
-    const a = buildRequestKey(' FinnHub ', 'quote', ' reliance.ns ', { range: '1d' });
-    const b = buildRequestKey('finnhub', 'quote', 'RELIANCE', { range: '1d' });
+    const a = buildRequestKey(' IndianApi ', 'quote', ' reliance.ns ', { range: '1d' });
+    const b = buildRequestKey('indianapi', 'quote', 'RELIANCE', { range: '1d' });
 
     expect(a).toEqual(b);
-    expect(a.provider).toBe('finnhub');
+    expect(a.provider).toBe('indianapi');
     expect(a.operation).toBe('quote');
     expect(a.symbol).toBe('RELIANCE');
   });

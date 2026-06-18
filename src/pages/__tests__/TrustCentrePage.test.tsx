@@ -60,7 +60,7 @@ describe('TrustCentrePage regression states', () => {
               factorSnapshots: { rowCount: 2365, status: 'available' },
               predictionRegistry: { rowCount: 27, status: 'available' },
             },
-            providers: { FINNHUB_KEY: 'present' },
+            providers: {},
           }),
         };
       }
@@ -100,7 +100,7 @@ describe('TrustCentrePage regression states', () => {
               factorSnapshots: { rowCount: 2365, status: 'available' },
               predictionRegistry: { rowCount: 27, status: 'available' },
             },
-            providers: { FINNHUB_KEY: 'present' },
+            providers: {},
           }),
         };
       }

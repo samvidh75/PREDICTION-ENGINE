@@ -120,7 +120,7 @@ const p1Md = `# Yahoo Field Mapping — TRACK-7G
 
 ## Note on ROIC
 
-Yahoo quoteSummary does not have a direct ROIC field. The \`returnOnEquity\` field from defaultKeyStatistics is used as a proxy. For accurate ROIC, Finnhub or IndianAPI would be needed as a fallback.
+Yahoo quoteSummary does not have a direct ROIC field. The \`returnOnEquity\` field from defaultKeyStatistics is used as a proxy. For accurate ROIC, IndianAPI would be needed as a fallback.
 
 ## Note on Interest Coverage
 
@@ -128,7 +128,7 @@ Interest coverage ratio (EBIT / interest expense) is not available in quoteSumma
 
 ## Note on FCF Growth
 
-Multi-year free cash flow growth is not derivable from a single quoteSummary call. The GrowthEngine treats null fcfGrowth as neutral (score = 50). Real FCF growth requires Finnhub or multi-year Yahoo historical calls.
+Multi-year free cash flow growth is not derivable from a single quoteSummary call. The GrowthEngine treats null fcfGrowth as neutral (score = 50). Real FCF growth requires multi-year Yahoo historical calls or another provider.
 
 ---
 
@@ -156,7 +156,7 @@ const p2Md = `# Provider Chain Integration — TRACK-7G
 | Priority | Provider | Status | Access | Cost |
 |:---------|:---------|:-------|:-------|:-----|
 | 1 (Tier 1) | **Yahoo Finance quoteSummary** | ✅ Active | Public HTTP, no key required | $0/mo |
-| 2 (Tier 2) | Finnhub stock/metric | ⚠️ Conditional | Requires FINNHUB_KEY | Free tier / Premium |
+| 2 (Tier 2) | Supplemental provider | ⚠️ Conditional | Requires API key | Varies |
 | 3 (Tier 3) | MasterCompanyRegistry | ✅ Always | Local JSON | $0 (always active) |
 
 ### How It Works
@@ -164,14 +164,14 @@ const p2Md = `# Provider Chain Integration — TRACK-7G
 1. \`ProviderCoordinator.getFinancials(symbol)\` calls \`YahooProvider.getFinancials(symbol)\` first
 2. Yahoo fetches 7 quoteSummary modules in a single HTTP request
 3. Fields are extracted, derived from financial statements, and returned as \`YahooFinancials\`
-4. If Yahoo fails (unlikely — it's a public API), Finnhub is tried next
+4. If Yahoo fails (unlikely — it's a public API), fallback providers are tried next
 5. If both fail, an error is thrown (caught by caller)
 
 ### Code Changes
 
 - \`YahooProvider.ts\`: Now implements \`FinancialProvider\` interface. Added \`getFinancials()\` method with full field extraction from quoteSummary modules.
 - \`FinancialProvider.ts\`: Updated return type to accept \`YahooFinancials\`.
-- \`ProviderCoordinator.ts\`: Yahoo added as Tier 1 financial provider before Finnhub.
+- \`ProviderCoordinator.ts\`: Yahoo added as Tier 1 financial provider.
 
 ### Files Modified
 
@@ -179,7 +179,7 @@ const p2Md = `# Provider Chain Integration — TRACK-7G
 |:-----|:-------|
 | src/services/providers/YahooProvider.ts | +getFinancials() with 7 quoteSummary modules |
 | src/services/providers/FinancialProvider.ts | Updated FinancialData type |
-| src/services/providers/ProviderCoordinator.ts | Yahoo pushed to financialProviders before Finnhub |
+| src/services/providers/ProviderCoordinator.ts | Yahoo pushed to financialProviders |
 
 ### No Changes To
 
@@ -652,7 +652,7 @@ p5Md += `
 
 ${differentiatedCount >= 4
     ? '✅ **Score dispersion is meaningful.** Companies are being differentiated based on real Yahoo quoteSummary financial data. The system produces useful signal across multiple dimensions.'
-    : '⚠️ **Score dispersion is limited.** The compressed scores are expected when many financial fields are null. This improves naturally as Yahoo coverage expands or when Finnhub is added as a secondary provider.'}
+    : '⚠️ **Score dispersion is limited.** The compressed scores are expected when many financial fields are null. This improves naturally as Yahoo coverage expands or when additional providers are added.'}
 
 `;
 
@@ -815,7 +815,7 @@ p7Md += `
 | Priority | Provider | What It Provides | Status |
 |:---------|:---------|:-----------------|:-------|
 | 1 | **Yahoo quoteSummary** | 18/20 financial fields | ✅ **LIVE** |
-| 2 | Finnhub stock/metric | Supplementary coverage for gaps | ⚠️ On standby |
+| 2 | Supplemental provider | Supplementary coverage for gaps | ⚠️ On standby |
 | 3 | MasterCompanyRegistry | Market cap, sector classification | ✅ Always active |
 
 ---
@@ -861,7 +861,7 @@ Real financial statements from Yahoo Finance are actively driving Growth, Qualit
 |:----------|:-------|
 | YahooProvider implements FinancialProvider | ✅ Done |
 | getFinancials() extracts from quoteSummary | ✅ Done — 7 modules, 20 fields |
-| Yahoo added as Tier 1 in ProviderCoordinator | ✅ Done — before Finnhub |
+| Yahoo added as Tier 1 in ProviderCoordinator | ✅ Done |
 | No scoring changes made | ✅ Confirmed |
 | No weight changes made | ✅ Confirmed |
 | No UI changes made | ✅ Confirmed |

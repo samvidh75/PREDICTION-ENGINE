@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   finiteOrNull,
-  normalizeFinnhubSnapshot,
   normalizeYFinanceSnapshot,
   normalizeSymbols,
   parseArgs,
@@ -117,18 +116,14 @@ function provider(financials: Record<string, unknown> | Error = makeFinancial())
   };
 }
 
-const baseOptions: CliOptions = { provider: "finnhub", symbols: ["RELIANCE"], mode: "dry-run", concurrency: 1 };
+const baseOptions: CliOptions = { provider: "yfinance", symbols: ["RELIANCE"], mode: "dry-run", concurrency: 1 };
 
 beforeEach(() => {
-  process.env.FINNHUB_KEY = "test-key";
-  delete process.env.FINNHUB_API_KEY;
   delete process.env.CONFIRM_F1_FUNDAMENTALS_APPLY;
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
-  delete process.env.FINNHUB_KEY;
-  delete process.env.FINNHUB_API_KEY;
   delete process.env.CONFIRM_F1_FUNDAMENTALS_APPLY;
 });
 
@@ -141,13 +136,7 @@ describe("ingest-fundamentals", () => {
     await expect(runFundamentalsIngestion({ ...baseOptions, provider: "screener" }, { db: makeDb(), provider: provider() })).rejects.toThrow("Unsupported provider screener");
   });
 
-  it("missing Finnhub API key fails clearly", async () => {
-    delete process.env.FINNHUB_KEY;
-    await expect(runFundamentalsIngestion(baseOptions, { db: makeDb(), provider: provider() })).rejects.toThrow("Finnhub API key is required. Set FINNHUB_KEY or FINNHUB_API_KEY.");
-  });
-
-  it("explicit yfinance provider does not require a Finnhub API key", async () => {
-    delete process.env.FINNHUB_KEY;
+  it("explicit yfinance provider works correctly", async () => {
     const report = await runFundamentalsIngestion({ ...baseOptions, provider: "yfinance" }, { db: makeDb(), provider: provider(), sleep: async () => {} });
     expect(report.provider).toBe("yfinance");
     expect(report.symbolsAccepted).toBe(1);
@@ -159,23 +148,6 @@ describe("ingest-fundamentals", () => {
 
   it("empty symbol list fails", async () => {
     await expect(runFundamentalsIngestion({ ...baseOptions, symbols: [] }, { db: makeDb(), provider: provider() })).rejects.toThrow("Symbol list is empty");
-  });
-
-  it("universe=nifty50 resolves from existing canonical source", async () => {
-    const p = provider();
-    const report = await runFundamentalsIngestion({ provider: "finnhub", universe: "nifty50", mode: "dry-run", concurrency: 5 }, { db: makeDb(), provider: p, sleep: async () => {} });
-    expect(report.symbolsRequested).toBeGreaterThanOrEqual(50);
-  });
-
-  it("provider numeric strings normalize into finite numbers", () => {
-    const snapshot = normalizeFinnhubSnapshot("RELIANCE", makeFinancial());
-    expect(snapshot.peRatio).toBe(25.5);
-    expect(snapshot.marketCap).toBe(1000000);
-  });
-
-  it("missing provider fields remain null", () => {
-    const snapshot = normalizeFinnhubSnapshot("RELIANCE", makeFinancial({ pbRatio: undefined }));
-    expect(snapshot.pbRatio).toBeNull();
   });
 
   it("NaN, Infinity, and empty strings normalize to null", () => {
@@ -204,20 +176,10 @@ describe("ingest-fundamentals", () => {
     expect(snapshot.netMargin).toBe(11);
   });
 
-  it("completeness score is calculated correctly", () => {
-    const snapshot = normalizeFinnhubSnapshot("RELIANCE", makeFinancial({ pbRatio: undefined, netMargin: undefined }));
-    expect(snapshot.completenessScore).toBe(80);
-  });
-
   it("partial snapshots remain partial", async () => {
     const report = await runFundamentalsIngestion(baseOptions, { db: makeDb(), provider: provider({ symbol: "RELIANCE", periodEnd: "2026-03-31", peRatio: 20, eps: 4 }), sleep: async () => {} });
     expect(report.symbolsPartial).toBe(1);
     expect(report.symbolsAccepted).toBe(0);
-  });
-
-  it("all-null snapshots are rejected", () => {
-    const snapshot = normalizeFinnhubSnapshot("RELIANCE", { symbol: "RELIANCE", periodEnd: "2026-03-31" });
-    expect(validateSnapshot(snapshot)).toContain("all tracked fundamentals are null");
   });
 
   it("dry-run performs no database mutations", async () => {
@@ -271,16 +233,9 @@ describe("ingest-fundamentals", () => {
     const db = makeDb();
     await runFundamentalsIngestion({ ...baseOptions, mode: "apply" }, { db, provider: provider(), sleep: async () => {} });
     expect(JSON.stringify(db.state.lineage)).not.toContain("token=");
-    expect(JSON.stringify(db.state.lineage)).not.toContain("test-key");
-  });
-
-  it("API keys are never printed in reports", async () => {
-    const report = await runFundamentalsIngestion(baseOptions, { db: makeDb(), provider: provider(), sleep: async () => {} });
-    expect(JSON.stringify(report)).not.toContain("test-key");
   });
 
   it("yfinance lineage is labelled without token-bearing URLs", async () => {
-    delete process.env.FINNHUB_KEY;
     process.env.CONFIRM_F1_FUNDAMENTALS_APPLY = "true";
     const db = makeDb();
     await runFundamentalsIngestion({ ...baseOptions, provider: "yfinance", mode: "apply" }, { db, provider: provider(), sleep: async () => {} });
@@ -305,7 +260,7 @@ describe("ingest-fundamentals", () => {
   });
 
   it("concurrency above 5 is rejected", () => {
-    expect(() => parseArgs(["--provider=finnhub", "--symbols=RELIANCE", "--concurrency=6"])).toThrow("Concurrency must be an integer between 1 and 5.");
+    expect(() => parseArgs(["--provider=yfinance", "--symbols=RELIANCE", "--concurrency=6"])).toThrow("Concurrency must be an integer between 1 and 5.");
   });
 
   it("PostgreSQL SQL path is portable", async () => {
