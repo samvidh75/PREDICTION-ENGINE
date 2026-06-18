@@ -9,25 +9,25 @@ All core providers are public, free, or no-credential. No broker tokens needed.
 ### Quote Precedence
 
 ```
-IndianAPI (if configured) → jugaad-data (degraded) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
+IndianAPI (if configured) → jugaad-data (degraded) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
 ### Historical Precedence
 
 ```
-jugaad-data (degraded, Python 3.10+ OK) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
+jugaad-data (degraded, Python 3.10+ OK) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
 ### Bhavcopy Precedence
 
 ```
-jugaad-data (active, CSV file) → nselib (active, Docker Python 3.12) → nsepython (active, DataFrame) → unavailable
+jugaad-data (active, CSV file) → nsepython (active, DataFrame) → unavailable
 ```
 
 ### Index Precedence
 
 ```
-nselib (active, Docker Python 3.12) → nsepython (active) → jugaad-data (active) → unavailable
+nsepython (active) → jugaad-data (active) → unavailable
 ```
 
 ### Macro Precedence
@@ -48,7 +48,7 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 |----------|--------|------------|----------|-------|-------|-------------|
 | IndianAPI | ✅ Active | — | — | — | — | — |
 | Jugaad-Data | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | ✅ Active | — |
-| NSELib | ❌ Unavailable | ❌ Unavailable | ✅ Active | ✅ Active | — | ❌ Unavailable |
+| NSELib | 🟣 Archived | 🟣 Archived | 🟣 Archived | 🟣 Archived | — | 🟣 Archived |
 | NSEPython | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | — | ❌ Unavailable |
 | Yahoo | ❌ Blocked | ❌ Blocked | — | — | — | — |
 | CSV Import | — | — | — | — | — | ✅ Active |
@@ -60,8 +60,7 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 | Added jugaad-data | New public NSE provider for bhavcopy, RBI rates, market status, indices |
 | Yahoo marked blocked | HTTP 429 — rate-limited, not just unreachable from Railway |
 | NSEPython updated | Package version, bhavcopy confirmed working, more blocked endpoints documented |
-| NSELib bhavcopy/index enabled | Dockerfile now installs Python 3.12 (Alpine 3.21); nselib bhavcopy and index functions work |
-| NSELib quotes/historical still blocked | NSE blocks server-side equity quote and historical endpoints regardless of Python version |
+| NSELib archived | nselib evaluated across v0.2–2.5.1 — no domain returns usable data. Removed from active runtime. See [nselib-provider.md](./nselib-provider.md). |
 | Fundamentals unchanged | Still CSV import only; no automatic source available |
 
 ## Source Files
@@ -71,7 +70,6 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 | `src/providers/publicMarketData/providerBroker.ts` | Provider fallback broker with precedence |
 | `src/providers/publicMarketData/jugaadDataProvider.ts` | Jugaad-Data provider adapter |
 | `src/providers/publicMarketData/jugaadDataBridge.ts` | Python bridge for jugaad-data |
-| `src/providers/publicMarketData/nselibProvider.ts` | NSELib provider adapter |
 | `src/providers/publicMarketData/nsePythonProvider.ts` | NSEPython provider adapter |
 | `src/providers/publicMarketData/yahooProvider.ts` | Yahoo Finance adapter |
 | `src/providers/marketData/providerBroker.ts` | Legacy provider fallback broker |

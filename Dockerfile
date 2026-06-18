@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: build ───────────────────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:22-alpine3.20 AS builder
 WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
@@ -18,13 +18,13 @@ RUN npm run build
 RUN npm run compile:backend
 
 # ── Stage 2: production runtime ───────────────────────────────────────────────
-FROM node:22-alpine AS runner
+FROM node:22-alpine3.20 AS runner
 WORKDIR /app
 RUN mkdir -p data
 
-# Install Python 3.11+ for public NSE data providers
-# (nselib, nsepython, jugaad-data — no credentials needed)
-RUN apk add --no-cache python3 py3-pip && \
+# Install Python 3.12 (Alpine 3.20) for public NSE data providers
+# jugaad-data, nsepython — no credentials needed
+RUN apk add --no-cache python3 py3-pip py3-virtualenv && \
     python3 --version
 
 ENV NODE_ENV=production
@@ -33,14 +33,15 @@ ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 RUN npm ci --frozen-lockfile --omit=dev
 
-# Install Python dependencies for public NSE data providers
-# jugaad-data, nsepython, nselib — no credentials required
+# Create Python venv and install dependencies
+# Using venv avoids PEP 668 --break-system-packages requirement
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements-nse.txt ./
-RUN python3 -m pip install --break-system-packages --no-cache-dir -r requirements-nse.txt 2>&1; \
+RUN pip install --no-cache-dir -r requirements-nse.txt 2>&1; \
     echo "pip_exit=$?"
 
 # Copy probe scripts for runtime diagnostics
-COPY scripts/probe-nselib-provider.py ./scripts/probe-nselib-provider.py
 COPY scripts/check-python-runtime.ts ./scripts/check-python-runtime.ts
 
 # Copy compiled frontend assets

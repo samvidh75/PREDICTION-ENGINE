@@ -18,7 +18,7 @@ import { NIFTY50_SYMBOLS } from "../src/backtest/BenchmarkEngine";
 import { ProviderBroker } from "../src/providers/marketData/providerBroker";
 import type { ProviderId } from "../src/providers/marketData/types";
 
-const VALID_PROVIDERS = new Set(["auto", "jugaad-data", "nselib", "nsepython", "yahoo"]);
+const VALID_PROVIDERS = new Set(["auto", "jugaad-data", "nsepython", "yahoo"]);
 
 interface CliOptions {
   symbols: string[];

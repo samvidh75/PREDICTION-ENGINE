@@ -2,19 +2,18 @@ export {};
 /**
  * sync-public-nse-universe.ts — Sync NSE universe from public providers.
  *
- * Gets equity list from nsepython (nse_eq_symbols or similar) and nselib (equity_list).
+ * Gets equity list from nsepython. nselib source removed — evaluated and not active.
  * Upserts into master_security_registry. Dry-run by default.
  *
  * Usage:
  *   npx tsx scripts/sync-public-nse-universe.ts
  *   npx tsx scripts/sync-public-nse-universe.ts --apply
- *   npx tsx scripts/sync-public-nse-universe.ts --apply --source=nselib
  */
 
 import { dbAdapter } from "../src/db/DatabaseAdapter";
 import { execSync } from "node:child_process";
 
-const VALID_SOURCES = ["auto", "nsepython", "nselib"];
+const VALID_SOURCES = ["auto", "nsepython"];
 
 interface EquityEntry {
   symbol: string;
@@ -83,83 +82,13 @@ except Exception:
   }
 }
 
-function fetchFromNselib(): EquityEntry[] {
-  try {
-    const output = execSync(`python3 -c "
-import json, sys
-try:
-    from nselib import capital_market
-    df = capital_market.equity_list()
-    if hasattr(df, 'shape') and df.shape[0] > 0:
-        cols = list(df.columns[:15])
-        rows = []
-        for _, r in df.iterrows():
-            row = {}
-            for c in cols:
-                try: row[c.lower()] = str(r[c])[:100]
-                except: row[c.lower()] = ''
-            rows.append(row)
-        print(json.dumps({'status': 'ok', 'count': len(rows), 'columns': cols, 'sample': rows[:3]}))
-    else:
-        print(json.dumps({'status': 'no_data'}))
-except Exception as e:
-    print(json.dumps({'status': 'error', 'detail': str(e)[:200]}))
-"`, { encoding: "utf-8", timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-    const parsed = JSON.parse(output.trim());
-    if (parsed.status !== "ok" || !parsed.sample || parsed.sample.length === 0) {
-      console.warn(`  nselib.equity_list: ${parsed.status} - ${parsed.detail || "no data"}`);
-      return [];
-    }
-    const rawOutput = execSync(`python3 -c "
-import json, sys
-try:
-    from nselib import capital_market
-    import pandas as pd
-    df = capital_market.equity_list()
-    if hasattr(df, 'shape') and df.shape[0] > 0:
-        symbol_col = [c for c in df.columns if 'symbol' in c.lower() or 'ticker' in c.lower() or 'scrip' in c.lower()]
-        name_col = [c for c in df.columns if 'name' in c.lower() or 'company' in c.lower()]
-        isin_col = [c for c in df.columns if 'isin' in c.lower()]
-        sector_col = [c for c in df.columns if 'sector' in c.lower()]
-        industry_col = [c for c in df.columns if 'industry' in c.lower()]
-        sc = symbol_col[0] if symbol_col else df.columns[0]
-        nc = name_col[0] if name_col else sc
-        ic = isin_col[0] if isin_col else None
-        sec = sector_col[0] if sector_col else None
-        indc = industry_col[0] if industry_col else None
-        rows = []
-        for _, r in df.iterrows():
-            rows.append({'symbol': str(r[sc]).upper().strip(), 'company_name': str(r[nc])[:200], 'isin': str(r[ic])[:20] if ic else None, 'sector': str(r[sec])[:100] if sec and str(r[sec]) != 'nan' else None, 'industry': str(r[indc])[:100] if indc and str(r[indc]) != 'nan' else None})
-        print(json.dumps(rows))
-    else:
-        print(json.dumps([]))
-except Exception as e:
-    print(json.dumps({'error': str(e)[:200]}))
-"`, { encoding: "utf-8", timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
-    const rows: Record<string, string | null>[] = JSON.parse(rawOutput.trim());
-    if ("error" in rows[0]) {
-      console.warn(`  nselib.equity_list: parse error - ${rows[0].error}`);
-      return [];
-    }
-    return rows.map((r) => ({
-      symbol: String(r.symbol ?? "").replace(/-/g, "").toUpperCase(),
-      companyName: String(r.company_name ?? r.symbol ?? ""),
-      isin: r.isin && String(r.isin) !== "nan" ? String(r.isin) : null,
-      sector: r.sector && String(r.sector) !== "nan" ? String(r.sector) : null,
-      industry: r.industry && String(r.industry) !== "nan" ? String(r.industry) : null,
-    })).filter((e) => e.symbol && /^[A-Z0-9]+$/.test(e.symbol));
-  } catch (err) {
-    console.warn(`  nselib.equity_list: error - ${err instanceof Error ? err.message.slice(0, 200) : String(err)}`);
-    return [];
-  }
-}
-
 async function main(): Promise<void> {
   const options = parseArgs();
   console.log(JSON.stringify({
     script: "sync-public-nse-universe",
     mode: options.apply ? "apply" : "dry-run",
     source: options.source,
+    note: "NSELib source removed — evaluated and not active. See docs/data/nselib-provider.md",
   }));
 
   let entries: EquityEntry[] = [];
@@ -167,11 +96,6 @@ async function main(): Promise<void> {
     console.log("  Fetching from nsepython.nse_eq_symbols...");
     entries = fetchFromNsepython();
     if (entries.length > 0) console.log(`  nsepython: ${entries.length} symbols`);
-  }
-  if ((options.source === "auto" || options.source === "nselib") && entries.length === 0) {
-    console.log("  Fetching from nselib.equity_list...");
-    entries = fetchFromNselib();
-    if (entries.length > 0) console.log(`  nselib: ${entries.length} symbols`);
   }
 
   if (entries.length === 0) {

@@ -26,7 +26,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   INDIANAPI_KEY: "Indian API",
   YAHOO: "Yahoo Finance",
   JUGAD_DATA: "Jugaad Data",
-  NSELIB: "NSELib",
+  NSELIB: "NSELib (archived)",
   NSEPYTHON: "NSE Python",
   FUNDAMENTALS_AUTOMATIC: "Fundamentals",
   CSV_FALLBACK: "CSV Import",
@@ -40,6 +40,7 @@ const STATUS_STYLE: Record<string, { dot: string; bg: string; text: string; bord
   unavailable: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
   local_only: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Local Only" },
   missing_required: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
+  archived_unusable: { dot: "bg-purple-400", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", label: "Archived" },
 };
 
 const LEFT_BORDER: Record<string, string> = {
@@ -48,6 +49,7 @@ const LEFT_BORDER: Record<string, string> = {
   unavailable: "border-l-red-400",
   local_only: "border-l-slate-300",
   missing_required: "border-l-red-400",
+  archived_unusable: "border-l-purple-400",
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -59,7 +61,6 @@ const DOMAIN_LABELS: Record<string, string> = {
   macro: "Macro",
   delivery: "Delivery",
   sector: "Sector",
-  nse_lib: "NSELib",
 };
 
 function getStatusStyle(status: string) {
@@ -83,8 +84,6 @@ function inferDomains(key: string, entry: ProviderEntry): Record<string, Provide
     }
     case "CSV_FALLBACK":
       return { bhavcopy: { healthy: false, provider: key, detail: "Local/dev only" } };
-    case "NSELIB":
-      return { nse_lib: { healthy: false, provider: key, detail: entry.message } };
     default:
       return {};
   }

@@ -1,16 +1,15 @@
 import type { NormalizedCandle, ProviderHealth, ProviderId, ProviderBrokerResult } from '../marketData/types';
 import type { NormalizedQuote, NormalizedBhavcopy, NormalizedIndexConstituent, NormalizedFinancialResult, PublicProviderId, ProviderDomain, DomainHealth } from './types';
 import { JugaadDataProvider } from './jugaadDataProvider';
-import { NseLibProvider } from './nseLibProvider';
 import { NsePythonProvider } from './nsePythonProvider';
 import { YahooProvider } from './yahooProvider';
 import { IndianApiProvider } from './indianApiProvider';
 import { YahooFallbackProvider } from '../marketData/yahooFallbackProvider';
 
-const QUOTE_PRECEDENCE: PublicProviderId[] = ['indianapi', 'jugaad-data', 'nselib', 'nsepython', 'yahoo'];
-const HISTORICAL_PRECEDENCE: PublicProviderId[] = ['jugaad-data', 'nselib', 'nsepython', 'yahoo'];
-const BHAVCOPY_PRECEDENCE: PublicProviderId[] = ['jugaad-data', 'nselib', 'nsepython'];
-const INDEX_PRECEDENCE: PublicProviderId[] = ['nselib', 'nsepython', 'jugaad-data'];
+const QUOTE_PRECEDENCE: PublicProviderId[] = ['indianapi', 'jugaad-data', 'nsepython', 'yahoo'];
+const HISTORICAL_PRECEDENCE: PublicProviderId[] = ['jugaad-data', 'nsepython', 'yahoo'];
+const BHAVCOPY_PRECEDENCE: PublicProviderId[] = ['jugaad-data', 'nsepython'];
+const INDEX_PRECEDENCE: PublicProviderId[] = ['nsepython', 'jugaad-data'];
 const FUNDAMENTALS_PRECEDENCE: string[] = ['automatic_public', 'csv_import'];
 const MACRO_PRECEDENCE: PublicProviderId[] = ['jugaad-data'];
 
@@ -58,13 +57,12 @@ export class PublicMarketDataProviderBroker {
 
   constructor() {
     const jugaad = new JugaadDataProvider();
-    const nselib = new NseLibProvider();
     const nsepython = new NsePythonProvider();
     const yahoo = new YahooProvider();
     const indianapi = new IndianApiProvider();
     this.yahooFallback = new YahooFallbackProvider();
 
-    this.providers = [jugaad, nselib, nsepython, yahoo, indianapi];
+    this.providers = [jugaad, nsepython, yahoo, indianapi];
     this.providerMap = new Map(this.providers.map(p => [p.providerId, p]));
   }
 

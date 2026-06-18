@@ -2,7 +2,7 @@
 
 ## Overview
 
-Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **operator-provided data imports**. No public NSE provider currently delivers reliable structured fundamentals — nselib requires Python 3.10+, nsepython's `nse_results()` returns no data, and jugaad-data does not provide fundamentals.
+Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **operator-provided data imports**. No public NSE provider currently delivers reliable structured fundamentals — nselib is archived (evaluated and not active), nsepython's `nse_results()` returns no data, and jugaad-data does not provide fundamentals.
 
 ## Data Sources
 
@@ -12,9 +12,9 @@ Fundamentals (financial statements, ratios, company data) for StockStory India a
 | Screener.in export | Optional | Permitted |
 | Moneycontrol export | Optional | Permitted |
 | BSE/NSE official filings parser | Planned | Not built |
-| nselib `financial_results_for_equity` | N/A | Requires Python 3.10+ |
-| nsepython `nse_results()` | N/A | Returns no data |
-| jugaad-data | N/A | Does not provide fundamentals |
+ | nselib `financial_results_for_equity` | Archived | Evaluated and not active — see nselib-provider.md |
+ | nsepython `nse_results()` | N/A | Returns no data |
+ | jugaad-data | N/A | Does not provide fundamentals |
 
 ## Automatic Fundamentals
 
@@ -23,7 +23,7 @@ There is currently **no reliable automatic source** for fundamentals:
 | Attempt | Result |
 |---------|--------|
 | `nsepython.nse_results("RELIANCE")` | Empty — no data returned |
-| `nselib.financial_results_for_equity("RELIANCE")` | Unavailable — Python 3.10+ required |
+| `nselib.financial_results_for_equity("RELIANCE")` | Archived — evaluated and not active (see [nselib-provider.md](./nselib-provider.md)) |
 | Public NSE/BSE results pages | Not machine-readable without scraping |
 | Official filings / XBRL | Not yet implemented |
 
@@ -106,7 +106,7 @@ The `financial_snapshots` table stores:
 
 | Issue | Detail |
 |-------|--------|
-| nselib | `financial_results_for_equity` requires Python 3.10+ (current: 3.9.6) |
+| nselib | Archived — `financial_results_for_equity` does not return usable data even on Python 3.12 (see [nselib-provider.md](./nselib-provider.md)) |
 | nsepython | `nse_results()` returns no data — NSE API restrictions |
 | jugaad-data | Does not provide fundamentals at all |
 | Automation | No reliable automatic source; all imports are manual |

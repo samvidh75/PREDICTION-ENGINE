@@ -14,7 +14,7 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 |-----------|----------|------|--------|-------|
 | 1 | IndianAPI | REST API | Active (primary) | Requires `INDIANAPI_KEY` |
 | 2 | jugaad-data | Python (NSELive) | Local / degraded | stock_quote blocked by NSE |
-| 3 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 3 | nselib | Python | Archived | See nselib-provider.md |
 | 4 | nsepython | Python | Degraded | equity_quote blocked by NSE |
 | 5 | Yahoo Finance | REST API | Blocked | HTTP 429 |
 
@@ -23,7 +23,7 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 | Precedence | Provider | Type | Status | Notes |
 |-----------|----------|------|--------|-------|
 | 1 | jugaad-data | Python (stock_df) | Local / degraded | Fails on Python 3.9 |
-| 2 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 2 | nselib | Python | Archived | See nselib-provider.md |
 | 3 | nsepython | Python | Degraded | Blocked by NSE |
 | 4 | Yahoo Finance | REST API | Blocked | HTTP 429 |
 
@@ -32,14 +32,14 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 | Precedence | Provider | Type | Status | Notes |
 |-----------|----------|------|--------|-------|
 | 1 | jugaad-data | Python (bhavcopy_save) | Active (local) | Returns CSV file path |
-| 2 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 2 | nselib | Python | Archived | See nselib-provider.md |
 | 3 | nsepython | Python | Active | Returns DataFrame |
 
 ### Index Data
 
 | Precedence | Provider | Type | Status | Notes |
 |-----------|----------|------|--------|-------|
-| 1 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 1 | nselib | Python | Archived | See nselib-provider.md |
 | 2 | nsepython | Python | Active | Index quote, index list, market status |
 | 3 | jugaad-data | Python (NSELive) | Active | All indices via NSELive |
 
@@ -49,7 +49,7 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 |-----------|----------|------|--------|-------|
 | 1 | CSV import | Operator | Primary | Screener/Moneycontrol exports |
 | 2 | Official filings | Manual | Fallback | BSE/NSE filings, annual reports |
-| 3 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 3 | nselib | Python | Archived | See nselib-provider.md |
 | 4 | nsepython | Python | Unavailable | Returns empty data |
 
 ### Macro (RBI Rates)
@@ -80,13 +80,12 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 - **Limitations**: stock_df fails on Python 3.9, stock_quote blocked by NSE, futures_quote API removed
 - **Status**: local_only / degraded
 
-### NSELib
+### NSELib (Archived)
 
-- **Package**: `nselib` (pip install)
+- **Package**: `nselib` (pip install, removed from requirements)
 - **Python**: 3.10+ required (PEP 604)
 - **Credentials**: None
-- **Provides** (on 3.10+): Equity list, index constituents, bhavcopy, corporate actions, financial results, derivatives
-- **Status**: Unavailable on Python 3.9
+- **Status**: **Archived** — evaluated and not active. Even on Python 3.12 (Railway Docker), no domain-level API returns usable data for quote, bhavcopy, index, or financial results. See [nselib-provider.md](./nselib-provider.md).
 
 ### NSEPython
 
@@ -143,7 +142,6 @@ No broker credentials (Dhan, Upstox) are required.
 | `src/providers/publicMarketData/providerBroker.ts` | Provider fallback broker with precedence |
 | `src/providers/publicMarketData/jugaadDataProvider.ts` | Jugaad-Data provider adapter |
 | `src/providers/publicMarketData/jugaadDataBridge.ts` | Python bridge for jugaad-data |
-| `src/providers/publicMarketData/nselibProvider.ts` | NSELib provider adapter |
 | `src/providers/publicMarketData/nsePythonProvider.ts` | NSEPython provider adapter |
 | `src/providers/publicMarketData/yahooProvider.ts` | Yahoo Finance adapter |
 | `scripts/probe-jugaad-data-provider.py` | Probe script for jugaad-data |
@@ -152,7 +150,6 @@ No broker credentials (Dhan, Upstox) are required.
 ## Commands
 
 ```bash
-npm run probe:nselib          # Probe nselib availability
 npm run probe:nsepython       # Probe nsepython availability
 npm run probe:jugaad-data     # Probe jugaad-data availability
 npm run check:market-providers # Health of all configured providers

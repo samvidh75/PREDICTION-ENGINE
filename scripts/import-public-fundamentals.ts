@@ -2,7 +2,7 @@ export {};
 /**
  * import-public-fundamentals.ts — Imports financial data from public NSE sources.
  *
- * Sources: nsepython (nse_results, nse_past_results), nselib (financial_results_for_equity)
+ * Sources: nsepython (nse_results, nse_past_results). nselib archived — see docs/data/nselib-provider.md
  * Normalizes into financial_snapshots table format. Idempotent upsert.
  * Dry-run by default, --apply required to write.
  *
@@ -201,10 +201,7 @@ async function main(): Promise<void> {
     const batchResults = await Promise.all(batch.map(async (symbol) => {
       let row = fetchFromNsepython(symbol);
       let source = row ? "nsepython" : null;
-      if (!row) {
-        row = fetchFromNselib(symbol);
-        source = row ? "nselib" : null;
-      }
+      // nselib fallback removed — evaluated and not active. See docs/data/nselib-provider.md
       if (!row) {
         return { symbol, status: "skipped", fields: 0, source: null, error: "no data from any source" };
       }

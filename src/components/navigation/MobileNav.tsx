@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Search, Trophy, BarChart3, Eye, ShieldCheck, Settings, LogIn, UserPlus, Home, Info } from "lucide-react";
+import { BarChart3, Briefcase, Eye, Home, Info, LogIn, Settings, Sparkles } from "lucide-react";
 import { useNavigation, type ViewType } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -39,28 +39,23 @@ export const MobileNav: React.FC = () => {
   const handlePublicNav = (page: PublicMobileNavItem["page"]) => setPage(page);
 
   const tabs: MobileNavItem[] = [
-    { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-    { id: "search", label: "Search", icon: <Search className="h-5 w-5" /> },
-    { id: "rankings", label: "Rankings", icon: <Trophy className="h-5 w-5" /> },
-    { id: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
-    { id: "trust", label: "Research", icon: <ShieldCheck className="h-5 w-5" /> },
-    { id: "settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
+    { id: "dashboard", label: "Home", icon: <Home className="h-5 w-5" /> },
+    { id: "watchlist", label: "Watching", icon: <Eye className="h-5 w-5" /> },
+    { id: "rankings", label: "Research", icon: <Sparkles className="h-5 w-5" /> },
+    { id: "portfolio", label: "Portfolio", icon: <Briefcase className="h-5 w-5" /> },
+    { id: "settings", label: "Account", icon: <Settings className="h-5 w-5" /> },
   ];
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="h-5 w-5" /> },
-    { page: "rankings", label: "Rankings", icon: <Trophy className="h-5 w-5" /> },
+    { page: "rankings", label: "Research", icon: <Sparkles className="h-5 w-5" /> },
     { page: "predictions", label: "Signals", icon: <BarChart3 className="h-5 w-5" /> },
     { page: "about", label: "About", icon: <Info className="h-5 w-5" /> },
     { page: "login", label: "Sign in", icon: <LogIn className="h-5 w-5" /> },
-    { page: "signup", label: "Join", icon: <UserPlus className="h-5 w-5" /> },
   ];
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around gap-0 px-1 safe-area-bottom md:hidden"
-      style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.5)" }}
-    >
+    <nav className="ssi-bottom-nav md:hidden">
       {isPublicMobile
         ? publicTabs.map((tab) => {
             const isActive = currentPage === tab.page;
@@ -69,12 +64,10 @@ export const MobileNav: React.FC = () => {
                 key={tab.page}
                 type="button"
                 onClick={() => handlePublicNav(tab.page)}
-                className={`flex min-h-[44px] min-w-[44px] flex-1 cursor-pointer flex-col items-center justify-center gap-px transition-all ${
-                  isActive ? "text-[#1a6e4a]" : "text-ink-muted"
-                }`}
+                className={`ssi-bottom-tab ${isActive ? "active" : ""}`}
               >
                 {tab.icon}
-                <span className="max-w-[52px] truncate text-[9px] font-semibold uppercase leading-tight tracking-wider">{tab.label}</span>
+                <span className="max-w-[58px] truncate text-[10px] leading-tight">{tab.label}</span>
               </button>
             );
           })
@@ -85,12 +78,10 @@ export const MobileNav: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => handleNav(tab.id)}
-                className={`flex min-h-[44px] min-w-[44px] flex-1 cursor-pointer flex-col items-center justify-center gap-px transition-all ${
-                  isActive ? "text-[#1a6e4a]" : "text-ink-muted"
-                }`}
+                className={`ssi-bottom-tab ${isActive ? "active" : ""}`}
               >
                 {tab.icon}
-                <span className="max-w-[52px] truncate text-[9px] font-semibold uppercase leading-tight tracking-wider">{tab.label}</span>
+                <span className="max-w-[58px] truncate text-[10px] leading-tight">{tab.label}</span>
               </button>
             );
           })}

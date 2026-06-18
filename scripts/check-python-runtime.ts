@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 interface RuntimeReport {
   pythonVersion: string;
   pipVersion: string;
+  venvActive: boolean;
   packages: Record<string, string>;
   nodeVersion: string;
 }
@@ -11,6 +12,7 @@ function run(): RuntimeReport {
   const report: RuntimeReport = {
     pythonVersion: 'not_found',
     pipVersion: 'not_found',
+    venvActive: false,
     packages: {},
     nodeVersion: process.version,
   };
@@ -27,12 +29,20 @@ function run(): RuntimeReport {
     report.pipVersion = pipOut.replace(/^pip\s+/, '').split(/\s+/)[0];
   } catch { report.pipVersion = 'not_found'; }
 
-  // Package imports
+  // Venv check
+  try {
+    const venvOut = execSync('python3 -c "import sys; print(sys.prefix != sys.base_prefix)" 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+    report.venvActive = venvOut === 'True';
+  } catch { report.venvActive = false; }
+
+  // Package imports (active providers only)
   const packages: [string, string][] = [
     ['jugaad_data', 'import jugaad_data; print(getattr(jugaad_data, "__version__", "unknown"))'],
-    ['nselib', 'import nselib; print(getattr(nselib, "__version__", "unknown"))'],
     ['nsepython', 'import nsepython; print(getattr(nsepython, "__version__", "unknown"))'],
     ['nsepythonserver', 'import nsepythonserver; print(getattr(nsepythonserver, "__version__", "unknown"))'],
+    ['pandas', 'import pandas; print(getattr(pandas, "__version__", "unknown"))'],
+    ['lxml', 'import lxml; print(getattr(lxml, "__version__", "unknown"))'],
+    ['beautifulsoup4', 'import bs4; print(getattr(bs4, "__version__", "unknown"))'],
   ];
 
   for (const [name, code] of packages) {
@@ -42,6 +52,8 @@ function run(): RuntimeReport {
     } catch { report.packages[name] = 'not_installed'; }
   }
 
+  report.packages.nselib = 'archived_unusable';
+
   return report;
 }
 
@@ -49,7 +61,6 @@ const report = run();
 console.log(JSON.stringify(report, null, 2));
 
 const ok = report.packages.jugaad_data !== 'not_installed'
-  || report.packages.nselib !== 'not_installed'
   || report.packages.nsepython !== 'not_installed'
   || report.packages.nsepythonserver !== 'not_installed';
 
