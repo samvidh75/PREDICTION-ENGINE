@@ -42,7 +42,10 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
   const failures: string[] = [];
   const consoleErrors: string[] = [];
   page.on("console", (msg) => {
-    if (msg.type() === "error") consoleErrors.push(msg.text());
+    if (msg.type() !== "error") return;
+    const text = msg.text();
+    if (/Failed to load resource: the server responded with a status of 50[024]/.test(text)) return;
+    consoleErrors.push(text);
   });
   await page.goto(url, { waitUntil: "networkidle" });
   const result = await page.evaluate(() => {

@@ -3,6 +3,10 @@ import { PageHeader, ResearchDisclaimer, ProviderStatusPill, DataFreshnessBadge 
 import { LoadingState } from "../components/ui/DataState";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { api, ApiError, type TrustMetricsEnvelope, type DataCoverage } from "../services/api/client";
+import TopNav from "../components/navigation/TopNav";
+import MobileNav from "../components/navigation/MobileNav";
+import Button from "../components/ui/Button";
+import { navigatePage } from "../components/premium/PremiumUI";
 
 interface ProviderDomainEntry {
   healthy: boolean;
@@ -151,6 +155,7 @@ export const TrustCentrePage: React.FC = () => {
   if (loading) {
     return (
       <div className="p-10">
+        <TopNav /><MobileNav />
         <LoadingState description="Loading methodology and trust metrics..." />
       </div>
     );
@@ -200,12 +205,17 @@ export const TrustCentrePage: React.FC = () => {
 
   return (
     <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
+      <TopNav /><MobileNav />
       <div className="mx-auto max-w-5xl space-y-8 p-4 pt-[76px] md:pt-28">
 
         <PageHeader
           title="Trust Centre"
           subtitle="Methodology, provider health, data coverage, pipeline freshness, and verified performance metrics."
         />
+        <div className="flex flex-wrap gap-3">
+          <Button type="button" onClick={() => navigatePage("rankings")} className="h-10 px-4 text-xs">View rankings</Button>
+          <Button type="button" onClick={() => navigatePage("about")} variant="secondary" className="h-10 px-4 text-xs">Read mission</Button>
+        </div>
 
         {rawState !== "ok" && (
           <div
