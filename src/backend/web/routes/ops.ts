@@ -409,7 +409,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           try {
             const result = await broker.getHistoricalDaily(symbol, fromDate, toDate);
             if (!result.data || result.data.length === 0) {
-              console.error(`Historical backfill returned no data for ${symbol} (provider: ${result.provider})`);
+              console.error(`Historical backfill returned no data for ${symbol} (provider: ${result.provider}, error: ${result.error}, fallback: ${result.fallbackChain?.join(" -> ") || "none"})`);
               failures.push(symbol);
               continue;
             }
