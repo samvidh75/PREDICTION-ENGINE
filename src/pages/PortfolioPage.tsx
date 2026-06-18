@@ -13,6 +13,7 @@ import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { useToast } from '../components/feedback/useToast';
 import GlassModal from '../components/aura/GlassModal';
+import { AppScreen, MobilePageHeader, ResearchEmptyState, SourceAuditCard } from '../components/premium/PremiumUI';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
   if (status === 'real') return 'text-accent-success';
@@ -91,16 +92,12 @@ export const PortfolioPage: React.FC = () => {
   const largest = review.concentration.largestPosition;
 
   return (
-    <div className="flex flex-col space-y-8 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
-      <PageHeader
-        title="Portfolio"
-        subtitle={`Recorded holdings, cost basis, and verified quote availability.${isLocalOnly ? ' (saved locally)' : ''}`}
-        primaryAction={
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button>
-            <Button variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="mr-1 h-3 w-3" /> Import</Button>
-          </div>
-        }
+    <AppScreen>
+      <MobilePageHeader
+        eyebrow="My investments"
+        title="What you own right now"
+        body={`Practice research holdings only. Real brokerage money is never connected.${isLocalOnly ? ' Saved locally.' : ''}`}
+        action={<div className="flex flex-wrap justify-end gap-2"><Button variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="mr-1 h-3 w-3" /> Add</Button><Button variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="mr-1 h-3 w-3" /> Import</Button></div>}
       />
 
       <section aria-label="Portfolio operating summary" className="space-y-4 rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
@@ -169,7 +166,7 @@ export const PortfolioPage: React.FC = () => {
       )}
 
       {review.holdings.length === 0 ? (
-        <EmptyState title="No holdings added yet" description="Add holdings to track cost basis and exposure. Live values appear only when every holding has verified market pricing." />
+        <ResearchEmptyState title="No open positions" body="Use Search or the manual entry form to record a research position and start tracking source availability." />
       ) : (
         <section aria-label="Portfolio holdings">
           <div className="hidden sm:block overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
@@ -222,6 +219,12 @@ export const PortfolioPage: React.FC = () => {
         </section>
       )}
 
+      <SourceAuditCard title="Source audit" rows={[
+        { label: "Holdings", value: "User entered", tone: "muted" },
+        { label: "Live quotes", value: review.availability === "unavailable" ? "Unavailable" : review.availability, tone: review.availability === "real" ? "ok" : "warn" },
+        { label: "Advice state", value: "Research only", tone: "ok" },
+      ]} />
+
       <GlassModal open={isAddOpen} onClose={() => { setIsAddOpen(false); resetHoldingForm(); }} title="Add holding" maxWidth="max-w-sm">
         <form onSubmit={handleAddHolding} className="space-y-3">
           <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
@@ -231,7 +234,7 @@ export const PortfolioPage: React.FC = () => {
           </div>
           <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-xl px-3 py-2.5 text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
           {formError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{formError}</div>}
-          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Add asset</button>
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Save holding</button>
         </form>
       </GlassModal>
 
@@ -263,7 +266,7 @@ export const PortfolioPage: React.FC = () => {
         onConfirm={() => { if (deleteConfirmSymbol) { PortfolioEngine.removeHolding(deleteConfirmSymbol); toast.success(`${deleteConfirmSymbol} removed from portfolio`); setDeleteConfirmSymbol(null); } }}
         onCancel={() => setDeleteConfirmSymbol(null)}
       />
-    </div>
+    </AppScreen>
   );
 };
 

@@ -6,7 +6,7 @@ import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
-import { DataUnavailableState, MetricCard, PremiumSkeleton, SectionHeader, StatusChip, Surface, navigatePage } from "../premium/PremiumUI";
+import { AppScreen, DataSourcePill, DataUnavailableState, MetricCard, MobilePageHeader, PremiumSkeleton, ResearchHeroCard, SectionHeader, StatusChip, Surface, WatchlistSearchCard, navigatePage } from "../premium/PremiumUI";
 
 interface SignalItem {
   symbol: string;
@@ -93,28 +93,24 @@ export const DashboardHub: React.FC = () => {
   const recentTickers = recentResearch.slice(0, 6);
 
   return (
-    <div className="space-y-6 antialiased">
-      <Surface dark className="ss-grid-texture relative overflow-hidden p-5 sm:p-7">
-        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
-              <Activity className="h-3.5 w-3.5" aria-hidden="true" /> Research workspace
-            </div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Your Indian equity research command centre.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
-              Track source-backed signal changes, saved companies, and coverage freshness without advisory language or fabricated portfolio values.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+    <AppScreen>
+      <MobilePageHeader eyebrow="My research" title="What to inspect right now" body="Source-backed market research, saved companies, and data freshness. No trading prompts or fabricated metrics." />
+      <WatchlistSearchCard onSearch={() => navigatePage("search")} />
+      <ResearchHeroCard eyebrow="Research workspace" title="Your Indian equity research command centre." body="Search NSE/BSE companies, inspect signal changes, and keep watchlists grounded in verified data availability.">
+        <div className="flex flex-wrap gap-2">
+          <DataSourcePill label="Research only" tone="ok" />
+          <DataSourcePill label="Unavailable data labelled" tone="muted" />
+          <DataSourcePill label="No fake recommendations" tone="warn" />
+        </div>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <button onClick={() => navigatePage("search")} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white px-4 text-sm font-bold text-slate-950 shadow-lg">
               <Search className="h-4 w-4" /> Search
             </button>
             <button onClick={() => navigatePage("rankings")} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-bold text-white backdrop-blur">
               Rankings <ArrowRight className="h-4 w-4" />
             </button>
-          </div>
         </div>
-      </Surface>
+      </ResearchHeroCard>
 
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard label="Companies covered" value={coverage.symbols !== null ? coverage.symbols.toLocaleString("en-IN") : "Unavailable"} detail="Live coverage metadata." />
@@ -206,7 +202,7 @@ export const DashboardHub: React.FC = () => {
           <AlertTriangle className="h-4 w-4" /> Signal panel degraded; no fake signal cards were added.
         </div>
       )}
-    </div>
+    </AppScreen>
   );
 };
 

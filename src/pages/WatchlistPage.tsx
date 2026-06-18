@@ -12,6 +12,7 @@ import { MissingDataBadge } from "../components/ui/PageHeader";
 import { ChevronRight } from "lucide-react";
 import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
+import { AppScreen, MobilePageHeader, ResearchEmptyState, WatchlistSearchCard } from "../components/premium/PremiumUI";
 
 interface DisplayList {
   id: string;
@@ -101,7 +102,7 @@ export const WatchlistPage: React.FC = () => {
     return (
       <div className="flex flex-col space-y-6">
         <header className="pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>Watchlist</h1>
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>Loading watchlists</h1>
         </header>
         <div className="flex items-center justify-center min-h-[200px]">
           <span className="text-sm" style={{ color: "#536471" }}>Loading watchlists...</span>
@@ -111,14 +112,14 @@ export const WatchlistPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col space-y-6 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
-      <header className="pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-        <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>Watchlist</h1>
-        <p className="mt-1.5 text-sm" style={{ color: "#536471" }}>
-          Track and add research notes for monitored companies.
-          {isAuthenticated && !isBackendActive && <span className="ml-2 text-xs" style={{ color: "#b8860b" }}>(offline mode — changes saved locally)</span>}
-        </p>
-      </header>
+    <AppScreen>
+      <MobilePageHeader eyebrow="Watching" title="Watchlist" body={`Tap a row to open the evidence view, or search to add a company.${isAuthenticated && !isBackendActive ? " offline mode saves locally." : ""}`} />
+      <WatchlistSearchCard onSearch={() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set("page", "search");
+        window.history.pushState({}, "", `?${params.toString()}`);
+        window.dispatchEvent(new Event("urlchange"));
+      }} />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         <div className="flex flex-col space-y-4 lg:col-span-1">
@@ -160,7 +161,7 @@ export const WatchlistPage: React.FC = () => {
 
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
-            <EmptyState title="No companies saved in this list" description="Save companies from Search to keep notes and revisit verified scores when available." />
+            <ResearchEmptyState title="No companies saved in this list" body="Search a stock above to add it. Saved companies stay grounded in verified score availability." />
           ) : (
             <>
               <div className="space-y-3 sm:hidden">
@@ -217,7 +218,7 @@ export const WatchlistPage: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </AppScreen>
   );
 };
 
