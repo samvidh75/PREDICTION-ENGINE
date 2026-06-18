@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Probe nsepython SDK for usable Indian market data domains."""
-import json, sys, platform
+import json
+import platform
+import sys
+from datetime import date, timedelta
 
 try:
     import nsepython
@@ -9,27 +12,56 @@ except ImportError as e:
     print(json.dumps({"provider": "nsepython", "installed": False, "error": str(e)}))
     sys.exit(1)
 
-def safe_call(name, fn, *args, **kwargs):
+
+def as_date(value):
+    if hasattr(value, "strftime"):
+        return value.strftime("%d-%m-%Y")
+    return str(value)
+
+
+def safe_call(fn, *args):
     try:
-        result = fn(*args, **kwargs)
+        result = fn(*args)
         count = len(result) if hasattr(result, "__len__") else 1
-        return {"status": "ok", "sampleFields": ["response_received"], "rows": count}
+        if count == 0:
+            return {"status": "unavailable", "detail": "empty response", "rows": 0}
+        return {"status": "healthy", "detail": "usable data returned", "rows": count}
     except Exception as e:
-        return {"status": "fail", "failureClass": type(e).__name__, "error": str(e)[:200]}
+        return {"status": "failed", "failureClass": type(e).__name__, "detail": str(e)[:240]}
 
-results = {
-    "provider": "nsepython",
-    "packageVersion": VERSION,
-    "pythonVersion": platform.python_version(),
-    "domains": {
-        "historical": safe_call("equity_history", nsepython.equity_history, "SBIN", "01-01-2025", "01-06-2025"),
-        "bhavcopy": safe_call("get_bhavcopy", nsepython.get_bhavcopy, "01", "06", "2025"),
-        "index": safe_call("index_history", nsepython.index_history, "NIFTY 50"),
-    },
-    "safeToActivate": False,
-    "warnings": ["Depends on NSE website availability", "May get rate-limited under heavy use"]
-}
 
-has_ok = any(d.get("status") == "ok" for d in results["domains"].values())
-results["safeToActivate"] = has_ok
-print(json.dumps(results, default=str))
+def main():
+    start = as_date(date.today() - timedelta(days=30))
+    end = as_date(date.today())
+    bhav_date = as_date(date.today() - timedelta(days=2))
+
+    results = {
+        "nifty_quote": safe_call(nsepython.nse_get_index_quote, "NIFTY 50"),
+        "bhavcopy": safe_call(nsepython.get_bhavcopy, bhav_date),
+        "index_history": safe_call(nsepython.index_history, "NIFTY 50", start, end),
+        "historical": safe_call(nsepython.equity_history, "SBIN", "EQ", start, end),
+    }
+    healthy = sum(1 for item in results.values() if item.get("status") == "healthy")
+    report = {
+        "provider": "nsepython",
+        "installed": True,
+        "packageVersion": VERSION,
+        "pythonVersion": platform.python_version(),
+        "probe": "nsepython",
+        "healthy_probes": healthy,
+        "total_probes": len(results),
+        "results": results,
+        "domains": {
+            "index_quote": results["nifty_quote"],
+            "bhavcopy": results["bhavcopy"],
+            "index": results["index_history"],
+            "historical": results["historical"],
+        },
+        "safeToActivate": healthy > 0,
+        "warnings": ["Uses public NSE endpoints; unavailable domains must remain labelled."],
+    }
+    print(json.dumps(report, default=str))
+
+
+if __name__ == "__main__":
+    main()

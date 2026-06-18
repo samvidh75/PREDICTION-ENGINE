@@ -95,4 +95,32 @@ export class NsePythonProvider implements PublicMarketDataProvider {
       return { provider: 'nsepython' as ProviderId, status: 'provider_unreachable', latencyMs: Date.now() - start, checkedAt: new Date().toISOString() };
     }
   }
+
+  async checkDomainHealth(): Promise<Record<string, { healthy: boolean; detail?: string }>> {
+    try {
+      const probe = await runProbe();
+      const domain = (name: string, fallback: string) => {
+        const info = probe.results?.[name] ?? (probe as any).domains?.[name];
+        return {
+          healthy: info?.status === 'healthy',
+          detail: info?.detail ?? fallback,
+        };
+      };
+      return {
+        index_quote: domain('nifty_quote', 'NSEPython index quote probe unavailable.'),
+        bhavcopy: domain('bhavcopy', 'NSEPython bhavcopy probe unavailable.'),
+        index: domain('index_history', 'NSEPython index history probe unavailable.'),
+        historical: domain('historical', 'NSEPython historical probe unavailable.'),
+        quote: { healthy: false, detail: 'Equity quote scraping is not used; NSE restrictions are labelled instead of bypassed.' },
+      };
+    } catch {
+      return {
+        index_quote: { healthy: false, detail: 'NSEPython probe failed.' },
+        bhavcopy: { healthy: false, detail: 'NSEPython probe failed.' },
+        index: { healthy: false, detail: 'NSEPython probe failed.' },
+        historical: { healthy: false, detail: 'NSEPython probe failed.' },
+        quote: { healthy: false, detail: 'Equity quote scraping is not used; NSE restrictions are labelled instead of bypassed.' },
+      };
+    }
+  }
 }

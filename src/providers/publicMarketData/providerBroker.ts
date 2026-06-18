@@ -79,6 +79,14 @@ function domainFromHealth(health: ProviderHealth | undefined, healthyDetail: str
   };
 }
 
+function domainStatus(
+  domains: Record<string, ProviderDomainStatusEntry> | null,
+  key: string,
+  fallback: ProviderDomainStatusEntry,
+): ProviderDomainStatusEntry {
+  return domains?.[key] ?? fallback;
+}
+
 export class PublicMarketDataProviderBroker {
   private providers: DomainProvider[];
   private providerMap: Map<PublicProviderId, DomainProvider>;
@@ -291,6 +299,12 @@ export class PublicMarketDataProviderBroker {
 
     const jugaadEnabled = process.env.JUGAD_DATA_ENABLED === 'true';
     const nsepythonEnabled = process.env.NSEPYTHON_ENABLED === 'true';
+    const jugaadDomains = jugaadEnabled && this.getProvider('jugaad-data') instanceof JugaadDataProvider
+      ? await (this.getProvider('jugaad-data') as JugaadDataProvider).checkDomainHealth()
+      : null;
+    const nsepythonDomains = nsepythonEnabled && this.getProvider('nsepython') instanceof NsePythonProvider
+      ? await (this.getProvider('nsepython') as NsePythonProvider).checkDomainHealth()
+      : null;
 
     return {
       INDIANAPI_KEY: {
@@ -320,9 +334,11 @@ export class PublicMarketDataProviderBroker {
           ? healthMessage(jugaad, 'Jugaad-Data probe reachable for public NSE backup domains. Equity quote endpoints remain restricted by NSE.', 'Optional — set JUGAD_DATA_ENABLED for bhavcopy/RBI/market-status backup checks.')
           : 'Optional — set JUGAD_DATA_ENABLED for bhavcopy/RBI/market-status backup checks.',
         domains: {
-          bhavcopy: domainFromHealth(jugaadEnabled ? jugaad : undefined, 'Jugaad-Data public NSE backup probe reachable.', 'Jugaad-Data backup not enabled or unavailable.'),
-          rbi: domainFromHealth(jugaadEnabled ? jugaad : undefined, 'Jugaad-Data RBI/macro backup probe reachable.', 'Jugaad-Data RBI backup not enabled or unavailable.'),
-          market_status: domainFromHealth(jugaadEnabled ? jugaad : undefined, 'Jugaad-Data market-status probe reachable.', 'Jugaad-Data market-status backup not enabled or unavailable.'),
+          historical: domainStatus(jugaadDomains, 'historical', { healthy: false, detail: 'Jugaad-Data historical backup not enabled or unavailable.' }),
+          bhavcopy: domainStatus(jugaadDomains, 'bhavcopy', { healthy: false, detail: 'Jugaad-Data bhavcopy backup not enabled or unavailable.' }),
+          index: domainStatus(jugaadDomains, 'index', { healthy: false, detail: 'Jugaad-Data index backup not enabled or unavailable.' }),
+          rbi: domainStatus(jugaadDomains, 'rbi', { healthy: false, detail: 'Jugaad-Data RBI backup not enabled or unavailable.' }),
+          market_status: domainStatus(jugaadDomains, 'market_status', { healthy: false, detail: 'Jugaad-Data market-status backup not enabled or unavailable.' }),
           quote: { healthy: false, detail: 'Equity quote scraping is not used; NSE restrictions are labelled instead of bypassed.' },
         },
       },
@@ -334,8 +350,10 @@ export class PublicMarketDataProviderBroker {
           ? healthMessage(nsepython, 'NSEPython backup probe reachable for index/bhavcopy domains. Equity quote endpoints remain restricted by NSE.', 'Optional — set NSEPYTHON_ENABLED for index/bhavcopy backup checks.')
           : 'Optional — set NSEPYTHON_ENABLED for index/bhavcopy backup checks.',
         domains: {
-          index_quote: domainFromHealth(nsepythonEnabled ? nsepython : undefined, 'NSEPython index backup probe reachable.', 'NSEPython index backup not enabled or unavailable.'),
-          bhavcopy: domainFromHealth(nsepythonEnabled ? nsepython : undefined, 'NSEPython bhavcopy backup probe reachable.', 'NSEPython bhavcopy backup not enabled or unavailable.'),
+          index_quote: domainStatus(nsepythonDomains, 'index_quote', { healthy: false, detail: 'NSEPython index backup not enabled or unavailable.' }),
+          bhavcopy: domainStatus(nsepythonDomains, 'bhavcopy', { healthy: false, detail: 'NSEPython bhavcopy backup not enabled or unavailable.' }),
+          historical: domainStatus(nsepythonDomains, 'historical', { healthy: false, detail: 'NSEPython historical backup not enabled or unavailable.' }),
+          index: domainStatus(nsepythonDomains, 'index', { healthy: false, detail: 'NSEPython index-history backup not enabled or unavailable.' }),
           quote: { healthy: false, detail: 'Equity quote scraping is not used; NSE restrictions are labelled instead of bypassed.' },
         },
       },

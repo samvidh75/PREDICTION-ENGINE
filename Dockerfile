@@ -38,11 +38,12 @@ RUN npm ci --frozen-lockfile --omit=dev
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements-nse.txt ./
-RUN pip install --no-cache-dir -r requirements-nse.txt 2>&1; \
-    echo "pip_exit=$?"
+RUN pip install --no-cache-dir -r requirements-nse.txt
 
 # Copy probe scripts for runtime diagnostics
 COPY scripts/check-python-runtime.ts ./scripts/check-python-runtime.ts
+COPY scripts/probe-jugaad-data-provider.py ./scripts/probe-jugaad-data-provider.py
+COPY scripts/probe-nsepython-provider.py ./scripts/probe-nsepython-provider.py
 
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist
