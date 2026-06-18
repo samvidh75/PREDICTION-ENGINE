@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
+import { AppScreen, DataSourcePill, MobilePageHeader, SourceAuditCard } from "../components/premium/PremiumUI";
+import { StockRegistry } from "../services/stocks/StockRegistry";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
 type PredictionHorizon = (typeof HORIZONS)[number];
@@ -20,6 +22,7 @@ function readTickerFromUrl(): string {
 export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
   const ticker = readTickerFromUrl();
+  const stockInfo = ticker ? StockRegistry.getStock(ticker) : null;
 
   const selectHorizon = (nextHorizon: PredictionHorizon) => {
     const params = new URLSearchParams(window.location.search);
@@ -29,7 +32,13 @@ export default function StockStoryPageF0(): JSX.Element {
   };
 
   return (
-    <div className="antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
+    <AppScreen className="antialiased">
+      <MobilePageHeader eyebrow="Stock details" title={ticker || "Company research"} body={stockInfo?.companyName || "Company identity is shown when registry data is available."} action={<DataSourcePill label="Research only" tone="ok" />} />
+      <SourceAuditCard title="Company source state" rows={[
+        { label: "Registry identity", value: stockInfo ? "Available" : "Unavailable", tone: stockInfo ? "ok" : "warn" },
+        { label: "Forecast horizon", value: `${horizon} days`, tone: "muted" },
+        { label: "Action model", value: "Inspect only", tone: "ok" },
+      ]} />
       <StockWorkspaceBar ticker={ticker} horizon={horizon} />
       <section
         aria-label="Prediction horizon"
@@ -53,6 +62,6 @@ export default function StockStoryPageF0(): JSX.Element {
         ))}
       </section>
       <StockStoryPage key={horizon} />
-    </div>
+    </AppScreen>
   );
 }

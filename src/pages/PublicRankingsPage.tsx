@@ -10,7 +10,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
-import { MetricCard, PremiumPage, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
+import { AppScreen, DataSourcePill, MetricCard, MobilePageHeader, PremiumPage, ResearchHeroCard, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
 
 export const PublicRankingsPage: React.FC = () => {
   const [rankings, setRankings] = useState<LeaderboardEntry[]>([]);
@@ -81,8 +81,17 @@ export const PublicRankingsPage: React.FC = () => {
       <TopNav />
       <MobileNav />
       <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+        <AppScreen>
 
-        <Surface dark className="ss-grid-texture relative mb-6 overflow-hidden p-6 md:p-8">
+        <MobilePageHeader eyebrow="AI scanner" title="Research rankings" body="Today's research scanner uses verified scoring rows from the latest cycle. Tap any stock to inspect the evidence before making your own decision." />
+        <ResearchHeroCard eyebrow="Source-backed" title="Ranked companies without fabricated calls." body="Scores are shown only when available from the leaderboard API. Missing confidence, sector, or freshness data remains labelled.">
+          <div className="flex flex-wrap gap-2">
+            <DataSourcePill label={`${rankings.length.toLocaleString("en-IN")} rows loaded`} tone="muted" />
+            {freshnessDate ? <DataSourcePill label={`Fresh ${formatFreshness(freshnessDate)}`} tone="ok" /> : <DataSourcePill label="Freshness pending" tone="warn" />}
+          </div>
+        </ResearchHeroCard>
+
+        <Surface dark className="ss-grid-texture relative mb-6 hidden overflow-hidden p-6 md:p-8">
           <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <SectionHeader eyebrow="Leaderboard" title="Research rankings" body="Company rankings from the latest verified scoring cycle, with source freshness visible and missing values labelled." />
             {freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
@@ -251,6 +260,7 @@ export const PublicRankingsPage: React.FC = () => {
         <div className="mt-6">
           <ResearchDisclaimer />
         </div>
+        </AppScreen>
       </div>
     </PremiumPage>
   );
