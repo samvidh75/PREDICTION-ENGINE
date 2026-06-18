@@ -8,6 +8,40 @@ import {
 } from "../../../shared/data/AnalyticalResponse";
 
 export const researchRoutes: FastifyPluginAsync = async (app) => {
+  app.get("/api/research/fundamentals-coverage", async (req, reply) => {
+    try {
+      const allSymbolsRes = await query(`SELECT symbol FROM symbols ORDER BY symbol`);
+      const allSymbols: string[] = (allSymbolsRes.rows || []).map((r: any) => r.symbol);
+
+      const fsSymbolsRes = await query(
+        `SELECT DISTINCT symbol FROM financial_snapshots WHERE source_label IS NOT NULL ORDER BY symbol`
+      );
+      const fsSymbols = new Set((fsSymbolsRes.rows || []).map((r: any) => r.symbol));
+
+      const covered = allSymbols.filter((s) => fsSymbols.has(s));
+      const missing = allSymbols.filter((s) => !fsSymbols.has(s));
+
+      const latestPerSymbol = await query(
+        `SELECT symbol, MAX(snapshot_date) as latest_date, MAX(ingestion_timestamp) as latest_ingestion
+         FROM financial_snapshots WHERE source_label IS NOT NULL GROUP BY symbol ORDER BY symbol`
+      );
+
+      return reply.send({
+        total: allSymbols.length,
+        covered: covered.length,
+        missing: missing.length,
+        coveredSymbols: covered,
+        missingSymbols: missing,
+        latestSnapshots: (latestPerSymbol.rows || []).reduce((acc: any, r: any) => {
+          acc[r.symbol] = { latestDate: r.latest_date, latestIngestion: r.latest_ingestion };
+          return acc;
+        }, {}),
+      });
+    } catch (err: any) {
+      return reply.send({ total: 0, covered: 0, missing: 0, coveredSymbols: [], missingSymbols: [], error: err.message });
+    }
+  });
+
   app.get("/api/research/lineage/:symbol", async (req, reply) => {
     const { symbol } = req.params as { symbol: string };
     if (!symbol || typeof symbol !== "string") {

@@ -104,6 +104,13 @@ export const TrustCentrePage: React.FC = () => {
   const [detailSheet, setDetailSheet] = useState<{ provider: string; entry: ProviderEntry } | null>(null);
   const [fundamentalsGapSheet, setFundamentalsGapSheet] = useState(false);
   const [symbolGapSheet, setSymbolGapSheet] = useState(false);
+  const [fundamentalsCoverage, setFundamentalsCoverage] = useState<{ total: number; covered: number; missing: number; coveredSymbols: string[]; missingSymbols: string[] } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/research/fundamentals-coverage").then(r => r.json()).then(d => {
+      if (d.total > 0) setFundamentalsCoverage(d);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -391,9 +398,9 @@ export const TrustCentrePage: React.FC = () => {
           <p className="mt-1 text-[10px] text-[#8B949E]">Financial snapshots are the primary source for fundamentals. Coverage is tracked per-symbol with source provenance.</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {[
-              { label: "Symbols with snapshots", value: coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—", detail: `${coverage?.financialSnapshots?.rowCount?.toLocaleString("en-IN") || "—"} total rows`, tone: (coverage?.financialSnapshots?.symbolCount ?? 0) > 0 ? "ok" : "warn" },
-              { label: "Total tracked symbols", value: coverage?.symbols?.count?.toLocaleString("en-IN") || "—", detail: "In company registry", tone: "ok" },
-              { label: "Coverage gap", value: `${Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols`, detail: "No financial snapshot available", tone: "warn" },
+              { label: "Symbols with snapshots", value: fundamentalsCoverage ? `${fundamentalsCoverage.covered}/${fundamentalsCoverage.total}` : coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—", detail: `${coverage?.financialSnapshots?.rowCount?.toLocaleString("en-IN") || "—"} total rows`, tone: (coverage?.financialSnapshots?.symbolCount ?? 0) > 0 ? "ok" : "warn" },
+              { label: "Total tracked", value: fundamentalsCoverage?.total?.toLocaleString("en-IN") || coverage?.symbols?.count?.toLocaleString("en-IN") || "—", detail: "In company registry", tone: "ok" },
+              { label: "Missing", value: `${fundamentalsCoverage?.missing ?? Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols`, detail: "No financial snapshot available", tone: "warn" },
             ].map((item) => (
               <div key={item.label} className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
                 <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">{item.label}</span>
@@ -402,6 +409,16 @@ export const TrustCentrePage: React.FC = () => {
               </div>
             ))}
           </div>
+          {fundamentalsCoverage && fundamentalsCoverage.missingSymbols.length > 0 && (
+            <div className="mt-3 rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#EF9A09]">Missing symbols:</span>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {fundamentalsCoverage.missingSymbols.map((s) => (
+                  <span key={s} className="inline-flex items-center rounded-md border border-[#EF9A09]/20 bg-[#EF9A09]/[0.06] px-2 py-0.5 font-mono text-[10px] font-medium text-[#EF9A09]">{s}</span>
+                ))}
+              </div>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setFundamentalsGapSheet(true)}
@@ -495,16 +512,22 @@ export const TrustCentrePage: React.FC = () => {
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Coverage</span>
-              <span className="text-xs font-semibold text-[#E6EDF3]">{coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—"} / {coverage?.symbols?.count?.toLocaleString("en-IN") || "—"} symbols</span>
+              <span className="text-xs font-semibold text-[#E6EDF3]">{(fundamentalsCoverage?.covered ?? coverage?.financialSnapshots?.symbolCount)?.toLocaleString("en-IN") || "—"} / {(fundamentalsCoverage?.total ?? coverage?.symbols?.count)?.toLocaleString("en-IN") || "—"} symbols</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Missing</span>
-              <span className="text-xs font-semibold text-[#EF9A09]">{Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols</span>
+              <span className="text-xs font-semibold text-[#EF9A09]">{fundamentalsCoverage?.missing ?? Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Total rows</span>
               <span className="text-xs font-semibold text-[#E6EDF3]">{coverage?.financialSnapshots?.rowCount?.toLocaleString("en-IN") || "—"}</span>
             </div>
+            {fundamentalsCoverage && fundamentalsCoverage.missingSymbols.length > 0 && (
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Missing symbols</span>
+                <span className="text-xs font-semibold text-[#EF9A09]">{fundamentalsCoverage.missingSymbols.join(", ")}</span>
+              </div>
+            )}
           </div>
           <div className="rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
             <p className="text-[10px] leading-relaxed text-[#8B949E]">
