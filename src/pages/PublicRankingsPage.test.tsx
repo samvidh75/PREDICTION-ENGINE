@@ -46,28 +46,6 @@ describe('PublicRankingsPage states', () => {
     expect(screen.getByText('View scoring methodology')).toBeInTheDocument();
   });
 
-  it('shows data coverage card in empty state when coverage data exists', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      if (url.includes('leaderboard')) {
-        return { ok: true, json: async () => ({ data: [] }) };
-      }
-      if (url.includes('data-coverage')) {
-        return { ok: true, json: async () => ({
-          coverage: {
-            symbols: { count: 6, status: 'available' },
-            predictionRegistry: { rowCount: 27, latestPredictionDate: '2026-06-17', status: 'available' },
-          },
-        })};
-      }
-      return { ok: true, json: async () => ({}) };
-    }));
-
-    render(<PublicRankingsPage />);
-    expect(await screen.findByText('Data coverage')).toBeInTheDocument();
-    expect(screen.getAllByText('6').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('27').length).toBeGreaterThan(0);
-  });
-
   it('renders filter controls and data when rankings exist', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string) => {
       if (url.includes('leaderboard')) {

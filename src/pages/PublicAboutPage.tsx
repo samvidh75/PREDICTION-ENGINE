@@ -12,16 +12,16 @@ import {
 } from "../components/product/ProductUI";
 
 const does = [
-  { icon: FileSearch, title: "Structures research", body: "Company pages organize model state, source freshness, and missing inputs." },
-  { icon: Database, title: "Shows coverage health", body: "Unavailable data remains explicit instead of being replaced by decorative numbers." },
+  { icon: FileSearch, title: "Structures research", body: "Company pages organize model state, source availability, and model context." },
+  { icon: Database, title: "Transparent about limits", body: "Data limits stay visible. Nothing is fabricated." },
   { icon: Workflow, title: "Connects workflows", body: "Search, rankings, compare, watchlist, and Trust Centre stay one step apart." },
   { icon: ShieldCheck, title: "Keeps trust visible", body: "Provider status and methodology live in the product flow, not buried in fine print." },
 ];
 
 const principles = [
   "No buy, sell, hold, or trading advice.",
-  "No fabricated metrics, rankings, signals, provider health, or source labels.",
-  "No hiding unavailable fundamentals or coverage gaps.",
+  "No fabricated metrics, rankings, or signals.",
+  "No hiding what we don't know.",
   "No broker execution or paywall-first product framing.",
 ];
 
@@ -31,7 +31,7 @@ export const PublicAboutPage: React.FC = () => (
       <ProductHero
         eyebrow="Mission"
         title="Research intelligence for Indian equities, built around evidence."
-        body="StockStory India is a research workspace for understanding companies through source-backed model context. The product is built around traceability, coverage limits, and clear next steps."
+        body="StockStory India is a research workspace for understanding companies through source-backed model context. The product is built around transparency, and clear next steps."
         actions={(
           <>
             <ProductAction onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>

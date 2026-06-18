@@ -51,7 +51,7 @@ describe('WatchlistPage states', () => {
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText('No saved research')).toBeInTheDocument();
+    expect(await screen.findByText('Track companies you are researching')).toBeInTheDocument();
   });
 
   it('renders watchlist header', async () => {
@@ -61,17 +61,17 @@ describe('WatchlistPage states', () => {
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText('Saved research')).toBeInTheDocument();
+    expect(await screen.findByText('Tracked companies')).toBeInTheDocument();
   });
 
-  it('renders saved research header when remote fetch fails', async () => {
+  it('renders tracked companies header when remote fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       return { ok: false, status: 500, json: async () => ({}) };
     }));
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText('Saved research')).toBeInTheDocument();
+    expect(await screen.findByText('Tracked companies')).toBeInTheDocument();
   });
 
   it('renders empty-state action buttons when no tickers', async () => {
@@ -82,7 +82,7 @@ describe('WatchlistPage states', () => {
     render(<WatchlistPage />);
 
     await waitFor(() => {
-      const actions = screen.queryAllByText(/Search companies|Browse rankings/);
+      const actions = screen.queryAllByText(/Open scanner|Search companies/);
       expect(actions.length).toBeGreaterThan(0);
     });
   });

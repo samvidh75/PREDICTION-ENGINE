@@ -146,7 +146,7 @@ export function ProductLoadingLine(): JSX.Element {
   return (
     <span className="inline-flex items-center gap-2 text-xs text-[#9AA7B5]">
       <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-      Checking verified data availability
+      Loading
     </span>
   );
 }

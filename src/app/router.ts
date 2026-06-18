@@ -42,9 +42,9 @@ export function getPageKeyFromUrl(): PageKey {
       portfolio: "portfolio",
       watchlist: "watchlist",
       settings: "settings",
-      trust: "trust",
       methodology: "methodology",
-      validation: "validation",
+      trust: "methodology",
+      validation: "methodology",
       predictions: "predictions",
       rankings: "rankings",
       compare: "compare",
@@ -88,8 +88,8 @@ export const PROTECTED_PAGES: PageKey[] = [
 
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
-  "landing", "about", "login", "signup", "trust", "methodology",
-  "validation", "predictions", "rankings", "compare",
+  "landing", "about", "login", "signup", "methodology",
+  "rankings", "compare",
 ];
 
 /**

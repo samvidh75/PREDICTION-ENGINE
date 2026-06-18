@@ -69,17 +69,65 @@ export const TopNav: React.FC = () => {
 
         {isAuthenticated && user ? (
           <>
-            <div className="mx-auto flex max-w-sm flex-1 justify-center lg:max-w-md">
+            <div className="flex flex-1 items-center justify-center gap-1 lg:gap-3">
               <button
-                onClick={triggerSearch}
-                className="flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 text-left text-xs text-[#64748B] hover:border-white/[0.12] hover:text-[#9AA7B5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2962FF]"
+                onClick={() => setPage("dashboard")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
               >
-                <Search className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">Search companies or sectors</span>
+                Dashboard
+              </button>
+              <button
+                onClick={() => setPage("search")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Scanner
+              </button>
+              <button
+                onClick={() => setPage("rankings")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Rankings
+              </button>
+              <button
+                onClick={() => setPage("compare")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Compare
+              </button>
+              <button
+                onClick={() => setPage("watchlist")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Watchlist
+              </button>
+              <button
+                onClick={() => setPage("portfolio")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Portfolio
+              </button>
+              <button
+                onClick={() => setPage("methodology")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Methodology
+              </button>
+              <button
+                onClick={() => setPage("settings")}
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              >
+                Settings
               </button>
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
+              <button
+                onClick={triggerSearch}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#9AA7B5] hover:text-[#E6EDF3]"
+                aria-label="Open search"
+              >
+                <Search className="h-4 w-4" />
+              </button>
               <ProfileButton />
             </div>
           </>
@@ -92,22 +140,10 @@ export const TopNav: React.FC = () => {
               Rankings
             </button>
             <button
-              onClick={() => setPage("predictions")}
+              onClick={() => setPage("about")}
               className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
             >
-              Signals
-            </button>
-            <button
-              onClick={() => setPage("about")}
-              className="hidden cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors sm:inline lg:text-sm"
-            >
               About
-            </button>
-            <button
-              onClick={() => setPage("trust")}
-              className="hidden cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:inline lg:text-sm"
-            >
-              Trust Centre
             </button>
             <button
               onClick={() => setPage("login")}

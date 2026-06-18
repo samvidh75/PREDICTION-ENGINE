@@ -185,7 +185,7 @@ test.describe("Public route smoke", () => {
   test("methodology page renders", async ({ page }) => {
     await page.goto("/?page=methodology");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Gaps & Methodology/i })).toBeVisible();
+    await expect(page.locator('h1').filter({ hasText: 'Research Standards' })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

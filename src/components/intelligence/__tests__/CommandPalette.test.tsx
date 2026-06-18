@@ -10,20 +10,20 @@ afterEach(() => {
 });
 
 describe('CommandPalette', () => {
-  it('renders Open dashboard action', () => {
+  it('renders Search company action', () => {
     render(<CommandPalette open={true} onClose={vi.fn()} />);
-    expect(screen.getByText('Open dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Search company')).toBeInTheDocument();
   });
 
   it('renders all default actions when open', () => {
     render(<CommandPalette open={true} onClose={vi.fn()} />);
-    expect(screen.getByText('Open dashboard')).toBeInTheDocument();
     expect(screen.getByText('Search company')).toBeInTheDocument();
-    expect(screen.getByText('Open rankings')).toBeInTheDocument();
+    expect(screen.getByText('Open scanner')).toBeInTheDocument();
+    expect(screen.getByText('View rankings')).toBeInTheDocument();
     expect(screen.getByText('Compare companies')).toBeInTheDocument();
-    expect(screen.getByText('Open Trust Centre')).toBeInTheDocument();
     expect(screen.getByText('Open watchlist')).toBeInTheDocument();
     expect(screen.getByText('Open portfolio')).toBeInTheDocument();
+    expect(screen.getByText('Open methodology')).toBeInTheDocument();
     expect(screen.getByText('Open About')).toBeInTheDocument();
   });
 
