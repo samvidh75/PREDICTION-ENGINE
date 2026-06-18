@@ -51,7 +51,7 @@ describe('WatchlistPage states', () => {
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText('No companies saved in this list')).toBeInTheDocument();
+    expect(await screen.findByText('No saved research')).toBeInTheDocument();
   });
 
   it('renders watchlist header', async () => {
@@ -61,16 +61,16 @@ describe('WatchlistPage states', () => {
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText('Watchlist')).toBeInTheDocument();
+    expect(await screen.findByText('Saved research')).toBeInTheDocument();
   });
 
-  it('shows offline mode label when remote fetch fails', async () => {
+  it('renders saved research header when remote fetch fails', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       return { ok: false, status: 500, json: async () => ({}) };
     }));
 
     render(<WatchlistPage />);
 
-    expect(await screen.findByText(/offline mode/)).toBeInTheDocument();
+    expect(await screen.findByText('Saved research')).toBeInTheDocument();
   });
 });

@@ -76,6 +76,8 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
   }
   await page.goto(url, { waitUntil: "load", timeout: 15000 }).catch(() => page.goto(url, { waitUntil: "domcontentloaded", timeout: 10000 }).catch(() => {}));
   await page.waitForLoadState("domcontentloaded").catch(() => {});
+  await page.waitForSelector(".ss-page, #root, main", { timeout: 5000 }).catch(() => {});
+  await page.evaluate(() => new Promise((r) => setTimeout(r, 500)));
   const raw = await page.evaluate(`(() => {
     const bodyText = document.body.innerText;
     const overflow = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth;

@@ -1,19 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck, TrendingUp, Database, Clock, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/Button";
-import Card from "../components/ui/Card";
-import Input from "../components/ui/Input";
 import { EmptyState, LoadingState } from "../components/ui/DataState";
-import { MissingDataBadge, PageHeader, ResearchDisclaimer, SectionHeader, DataFreshnessBadge } from "../components/ui/PageHeader";
+import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
 import ScorePill from "../components/ui/ScorePill";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
 import { formatNumber } from "../services/ui/dataFormatting";
-import tokens from "../components/ui/tokens";
-import { OnboardingChecklist, DataReadinessPanel } from "../components/ui/OnboardingComponents";
-import { DataCoveragePanel } from "../components/ui/DataCoveragePanel";
+import { PremiumCommandButton } from "../components/intelligence/PremiumCommandButton";
+import { IntelligencePanel } from "../components/intelligence/IntelligencePanel";
+import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
+import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
+import { ResearchWorkflowRail } from "../components/intelligence/ResearchWorkflowRail";
+import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
+import { DataFreshnessLine } from "../components/intelligence/DataFreshnessLine";
 
 interface SignalItem {
   symbol: string;
@@ -45,11 +47,7 @@ function navigate(pageKey: string, query?: string): void {
   const params = new URLSearchParams(window.location.search);
   params.set("page", pageKey);
   params.delete("id");
-  if (query) {
-    params.set("q", query);
-  } else {
-    params.delete("q");
-  }
+  if (query) params.set("q", query); else params.delete("q");
   window.history.pushState({}, "", `?${params.toString()}`);
   window.dispatchEvent(new Event("urlchange"));
 }
@@ -71,12 +69,6 @@ export const DashboardHub: React.FC = () => {
   const [signalsError, setSignalsError] = useState(false);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [methodologyViewed, setMethodologyViewed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return window.localStorage.getItem("onboarding_methodology_viewed") === "true";
-    }
-    return false;
-  });
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -86,63 +78,29 @@ export const DashboardHub: React.FC = () => {
   }, []);
 
   const [pipelineMetrics, setPipelineMetrics] = useState<OpsHealthMetrics | null>(null);
-
   useEffect(() => {
-    fetch("/api/ops/health")
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "ok" && data.metrics) {
-          setPipelineMetrics(data.metrics);
-        }
-      })
-      .catch(() => {});
+    fetch("/api/ops/health").then(res => res.json()).then(data => { if (data.status === "ok" && data.metrics) setPipelineMetrics(data.metrics); }).catch(() => {});
   }, []);
 
   const [coverageData, setCoverageData] = useState<CoverageData | null>(null);
-
   useEffect(() => {
-    fetch("/api/ops/data-coverage")
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
-          setCoverageData(data);
-        }
-      })
-      .catch(() => {});
+    fetch("/api/ops/data-coverage").then(res => res.json()).then(data => { if (data.ok) setCoverageData(data); }).catch(() => {});
   }, []);
 
   useEffect(() => {
     const controller = new AbortController();
-    setSignalsLoading(true);
-    setSignalsError(false);
-    fetch("/api/predictions/signals?limit=20", {
-      signal: controller.signal,
-      headers: { Accept: "application/json" },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("SIGNALS_UNAVAILABLE");
-        return response.json();
-      })
+    setSignalsLoading(true); setSignalsError(false);
+    fetch("/api/predictions/signals?limit=20", { signal: controller.signal, headers: { Accept: "application/json" } })
+      .then((response) => { if (!response.ok) throw new Error("SIGNALS_UNAVAILABLE"); return response.json(); })
       .then((data) => {
         const payload = data.data || data;
         const items: SignalItem[] = (payload.signals ?? []).map((signal: any) => ({
-          symbol: signal.symbol,
-          type: signal.type,
-          severity: signal.severity,
-          explanation: signal.explanation ?? "",
-          snapshotDate: signal.snapshotDate || payload.snapshotDate || null,
+          symbol: signal.symbol, type: signal.type, severity: signal.severity, explanation: signal.explanation ?? "", snapshotDate: signal.snapshotDate || payload.snapshotDate || null,
         }));
-        setSignals(items);
-        setSymbolsAnalyzed(payload.symbolsAnalyzed ?? 0);
+        setSignals(items); setSymbolsAnalyzed(payload.symbolsAnalyzed ?? 0);
       })
-      .catch(() => {
-        if (controller.signal.aborted) return;
-        setSignalsError(true);
-        setSignals([]);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setSignalsLoading(false);
-      });
+      .catch(() => { if (controller.signal.aborted) return; setSignalsError(true); setSignals([]); })
+      .finally(() => { if (!controller.signal.aborted) setSignalsLoading(false); });
     return () => controller.abort();
   }, []);
 
@@ -151,240 +109,151 @@ export const DashboardHub: React.FC = () => {
     watchlists.forEach((watchlist) => watchlist.tickers.forEach((ticker) => unique.add(ticker)));
     return [...unique].slice(0, 8);
   }, [watchlists]);
-  const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
-  const recentTickers = recentResearch.slice(0, 6);
 
   const cov = coverageData?.coverage;
   const indexedSymbols = cov?.symbols.status === "available" ? cov.symbols.count : null;
   const predictionRows = cov?.predictionRegistry.status === "available" ? cov.predictionRegistry.rowCount ?? null : null;
   const latestPredictionDate = cov?.predictionRegistry.latestPredictionDate ?? null;
-  const financialSnapshots = cov?.financialSnapshots.status === "available" ? cov.financialSnapshots.rowCount ?? null : null;
-  const latestFinancialDate = cov?.financialSnapshots.latestSnapshotDate ?? null;
-  const priceRows = cov?.dailyPrices.status === "available" ? cov.dailyPrices.rowCount ?? null : null;
   const latestPriceDate = cov?.dailyPrices.latestPriceDate ?? null;
-
-  const indexedCompanyCount = indexedSymbols ?? (pipelineMetrics?.symbols_covered ?? null);
   const healthPredictionsToday = pipelineMetrics?.predictions_today ?? null;
-
-  const latestSignalDate = signals[0]?.snapshotDate ?? null;
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate("search", searchQuery.trim());
-    }
+    if (searchQuery.trim()) navigate("search", searchQuery.trim());
   };
-
-  const handleNavigateMethodology = () => {
-    window.localStorage.setItem("onboarding_methodology_viewed", "true");
-    setMethodologyViewed(true);
-    navigate("trust");
-  };
-
-  const onboardingSteps = [
-    {
-      id: "search",
-      title: "Search a company",
-      description: "Find a company by ticker or name.",
-      isCompleted: recentResearch.length > 0,
-      actionLabel: "Search now",
-      onAction: () => navigate("search"),
-    },
-    {
-      id: "methodology",
-      title: "Review the scoring methodology",
-      description: "Review scoring inputs and availability labels.",
-      isCompleted: methodologyViewed,
-      actionLabel: "Read methodology",
-      onAction: handleNavigateMethodology,
-    },
-    {
-      id: "track",
-      title: "Save or track companies",
-      description: "Save companies and notes in a watchlist.",
-      isCompleted: followedTickers.length > 0,
-      actionLabel: "Go to Watchlist",
-      onAction: () => navigate("watchlist"),
-    },
-  ];
 
   return (
-    <div className={`${tokens.layout.container} flex flex-col gap-6`}>
-      <PageHeader
-        title="Dashboard"
-        subtitle="Search companies, review scored records, and track your research."
-        primaryAction={
-          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
-            <Button type="button" variant="secondary" size="sm" onClick={() => navigate("rankings")}>
-              <BarChart3 className="h-4 w-4" aria-hidden="true" />
-              Rankings
-            </Button>
-            <Button type="button" size="sm" onClick={() => navigate("search")}>
-              <Search className="h-4 w-4" aria-hidden="true" />
-              Search
-            </Button>
-          </div>
-        }
-      />
-
-      <OnboardingChecklist steps={onboardingSteps} />
-
-      <DataReadinessPanel />
-
-      <DataCoveragePanel />
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-4">
-          <SectionHeader title="Companies covered" subtitle="Indexed on exchange" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {indexedCompanyCount === null ? "—" : formatNumber(indexedCompanyCount)}
-          </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {cov?.symbols.latestUpdatedAt ? `Updated ${cov.symbols.latestUpdatedAt}` : "Registry pending"}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <SectionHeader title="Scored records" subtitle="Prediction registry" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {predictionRows === null ? "—" : formatNumber(predictionRows)}
-          </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {latestPredictionDate ? `Latest ${latestPredictionDate}` : "No scored records yet"}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <SectionHeader title="Financial records" subtitle="Fundamental data" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {financialSnapshots === null ? "—" : formatNumber(financialSnapshots)}
-          </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {latestFinancialDate ? `Latest ${latestFinancialDate}` : "No financial records yet"}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <SectionHeader title="Price records" subtitle="Daily market data" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">
-            {priceRows === null ? "—" : formatNumber(priceRows)}
-          </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {latestPriceDate ? `Latest ${latestPriceDate}` : "No price records yet"}
-          </p>
-        </Card>
+    <div className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6">
+      {/* Research Command Centre header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+          <h1 className="text-base font-semibold text-[#E6EDF3]">Research Home</h1>
+        </div>
+        <p className="mt-1 text-xs text-[#8B949E]">Search, inspect, compare, and audit Indian equities research.</p>
       </div>
 
-        <Card className="p-6">
-          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-sm font-semibold text-slate-900">Search companies</h2>
-              <p className="mt-1 text-xs text-slate-500">By ticker, company name, or sector.</p>
-            </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="relative flex-1">
-              <Input
-                id="dashboard-search"
-                aria-label="Search stocks"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="e.g. RELIANCE, TCS, INFY..."
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-[11px] h-4 w-4 text-slate-400" aria-hidden="true" />
-            </div>
-            <Button type="submit" className="shrink-0">
-              Search
-            </Button>
-          </div>
-        </form>
-      </Card>
-
-      <div className="grid gap-3 md:grid-cols-3">
-        <Card>
-          <SectionHeader title="Watchlist" subtitle="Saved companies" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">{followedTickers.length}</div>
-          <p className="mt-1 text-xs text-slate-500">Saved to your workspace.</p>
-        </Card>
-        <Card>
-          <SectionHeader title="Portfolio" subtitle="Recorded holdings" />
-          <div className="mt-3 text-3xl font-semibold text-slate-950 tabular-nums">{holdings.length}</div>
-          <p className="mt-1 text-xs text-slate-500">Quotes appear when verified.</p>
-        </Card>
-        <Card>
-          <SectionHeader title="Latest update" subtitle="Scoring cycle" />
-          <div className="mt-3 text-sm font-semibold text-slate-950">
-            {latestSignalDate ? `As of ${latestSignalDate}` : "No update yet"}
-          </div>
-          <p className="mt-1 text-xs text-slate-500">
-            {healthPredictionsToday !== null
-              ? `${formatNumber(healthPredictionsToday)} records scored`
-              : "Pending provider data"}
-          </p>
-        </Card>
+      {/* Premium command search */}
+      <div className="mb-6">
+        <PremiumCommandButton onClick={() => navigate("search")} placeholder="Search symbols, companies, sectors..." />
       </div>
 
-      <div className={tokens.layout.sidebarGrid}>
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <SectionHeader
-            title="Score changes"
-            subtitle="Recent score changes from the latest verified update."
-            action={signals[0]?.snapshotDate ? <DataFreshnessBadge date={signals[0].snapshotDate} /> : <MissingDataBadge />}
-          />
-          <div className="mt-4">
+      {/* Intelligence summary */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <RoundedDepthPanel padding="sm">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Companies covered</div>
+          <div className="mt-1 font-mono text-xl font-bold text-[#E6EDF3]">{indexedSymbols !== null ? formatNumber(indexedSymbols) : "—"}</div>
+        </RoundedDepthPanel>
+        <RoundedDepthPanel padding="sm">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Scored records</div>
+          <div className="mt-1 font-mono text-xl font-bold text-[#E6EDF3]">{predictionRows !== null ? formatNumber(predictionRows) : "—"}</div>
+        </RoundedDepthPanel>
+        <RoundedDepthPanel padding="sm">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Latest run</div>
+          <div className="mt-1 text-xs font-semibold text-[#E6EDF3]">{latestPredictionDate ? new Date(latestPredictionDate).toLocaleDateString("en-IN") : "Pending"}</div>
+        </RoundedDepthPanel>
+        <RoundedDepthPanel padding="sm">
+          <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Data freshness</div>
+          <DataFreshnessLine items={[
+            { label: "Prices", status: latestPriceDate ? "fresh" : "unavailable" },
+            { label: "Predictions", status: latestPredictionDate ? "fresh" : "unavailable" },
+          ]} />
+        </RoundedDepthPanel>
+      </div>
+
+      {/* Next research actions */}
+      <RoundedDepthPanel padding="md" className="mb-6">
+        <h2 className="text-xs font-semibold text-[#E6EDF3]">Next research actions</h2>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("rankings")}>
+            <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Review top ranked research
+          </Button>
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> Inspect data gaps
+          </Button>
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("watchlist")}>
+            <Briefcase className="h-3.5 w-3.5" aria-hidden="true" /> Open watchlist
+          </Button>
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
+            <Database className="h-3.5 w-3.5" aria-hidden="true" /> Audit sources
+          </Button>
+        </div>
+      </RoundedDepthPanel>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-6">
+          {/* Prediction Intelligence */}
+          <IntelligencePanel
+            title="Prediction Intelligence"
+            subtitle="Latest model run and scoring cycle status."
+            statuses={[
+              { label: "Scored", value: predictionRows !== null ? formatNumber(predictionRows) : "—", status: predictionRows ? "ok" : "muted" },
+              { label: "Analyzed", value: symbolsAnalyzed > 0 ? formatNumber(symbolsAnalyzed) : "—", status: symbolsAnalyzed > 0 ? "ok" : "muted" },
+              { label: "Run", value: healthPredictionsToday !== null ? `${formatNumber(healthPredictionsToday)} today` : "—", status: healthPredictionsToday ? "ok" : "muted" },
+            ]}
+          >
+            {/* Score changes */}
             {signalsLoading ? (
               <LoadingState description="Checking for recent score changes…" />
             ) : signalsError ? (
-              <EmptyState
-                title="Score changes unavailable"
-                description="Score change data is not available right now."
-              />
-            ) : signals.length === 0 ? (
-              <EmptyState
-                title="Score changes pending"
-                description={
-                  symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update.`
-                    : "Search for companies to begin tracking score changes."
-                }
-                action={
-                  <Button
-                    type="button"
-                    onClick={() => navigate("search")}
-                    size="sm"
-                  >
-                    Search companies
-                  </Button>
-                }
-              />
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {signals.map((signal, index) => (
+              <div className="flex items-start gap-3 rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF9A09]" />
+                <p className="text-xs text-[#8B949E]">Score changes temporarily unavailable</p>
+              </div>
+            ) : signals.length > 0 ? (
+              <div className="divide-y divide-white/5">
+                {signals.slice(0, 5).map((signal, index) => (
                   <button
-                    key={`${signal.symbol}:${signal.type}:${index}`}
+                    key={`${signal.symbol}:${index}`}
                     type="button"
                     onClick={() => openCompany(signal.symbol)}
-                    className="grid w-full grid-cols-[96px_120px_1fr_20px] items-center gap-3 px-1 py-3 text-left text-sm transition hover:bg-slate-50 rounded-lg"
+                    className="flex w-full items-center gap-3 px-1 py-2.5 text-left text-xs transition-colors hover:bg-white/[0.02] rounded-lg"
                   >
-                    <span className="font-mono text-sm font-semibold text-slate-950">{signal.symbol}</span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{signal.type}</span>
-                    <span className="truncate text-xs text-slate-600">{signal.explanation}</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                    <span className="font-mono font-semibold text-[#E6EDF3]">{signal.symbol}</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-[#EF9A09]">{signal.type}</span>
+                    <span className="flex-1 truncate text-[#8B949E]">{signal.explanation}</span>
+                    <ArrowRight className="h-3 w-3 shrink-0 text-[#484F58]" aria-hidden="true" />
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        </section>
-
-        <div className="space-y-4">
-          <Card>
-            <SectionHeader title="Watchlist" subtitle="Saved tickers" />
-            {followedTickers.length === 0 ? (
-              <div className="mt-4">
-                <EmptyState
-                  description="No companies saved yet. Search and open a company page to track it."
-                />
-              </div>
             ) : (
-              <div className="mt-4 space-y-2">
+              <p className="text-xs text-[#8B949E]">
+                {symbolsAnalyzed > 0
+                  ? `${formatNumber(symbolsAnalyzed)} companies analyzed. Score changes appear after the next verified update.`
+                  : "Search companies to begin tracking score changes."}
+              </p>
+            )}
+          </IntelligencePanel>
+
+          {/* Ranked Research */}
+          <div className="rounded-[22px] border border-white/5 bg-[#0D1117] p-5">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+              <h2 className="text-xs font-semibold text-[#E6EDF3]">Ranked Research</h2>
+            </div>
+            <p className="mt-1 text-xs text-[#8B949E]">Open the full rankings page to browse all scored companies with factor context and explanation.</p>
+            <div className="mt-3">
+              <Button type="button" size="sm" onClick={() => navigate("rankings")}>
+                Open rankings <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right rail - Research Workflow */}
+        <div className="space-y-6">
+          <RoundedDepthPanel padding="sm">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">Research workflow</h3>
+            <ResearchWorkflowRail className="mt-3" />
+          </RoundedDepthPanel>
+
+          {/* Watchlist */}
+          <RoundedDepthPanel padding="sm">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">Saved research</h3>
+            {followedTickers.length === 0 ? (
+              <p className="mt-2 text-xs text-[#8B949E]">No companies saved. Open a company page to track it.</p>
+            ) : (
+              <div className="mt-2 space-y-1">
                 {followedTickers.map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
                   const score = info?.telemetrySnapshot?.healthScore;
@@ -393,14 +262,12 @@ export const DashboardHub: React.FC = () => {
                       key={ticker}
                       type="button"
                       onClick={() => openCompany(ticker)}
-                      className="flex w-full items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5 text-left transition hover:border-slate-200 hover:bg-white"
+                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.04]"
                     >
-                      <span>
-                        <span className="block font-mono text-sm font-semibold text-slate-950">{ticker}</span>
-                        <span className="block max-w-[200px] truncate text-xs text-slate-500">
-                          {info?.companyName || "Metadata loading…"}
-                        </span>
-                      </span>
+                      <div>
+                        <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{ticker}</span>
+                        {info?.companyName && <span className="ml-2 text-[10px] text-[#484F58]">{info.companyName}</span>}
+                      </div>
                       {typeof score === "number" && Number.isFinite(score) ? (
                         <ScorePill score={Math.round(score)} />
                       ) : (
@@ -411,41 +278,31 @@ export const DashboardHub: React.FC = () => {
                 })}
               </div>
             )}
-          </Card>
+          </RoundedDepthPanel>
 
-          <Card>
-            <SectionHeader title="Recently explored" subtitle="Previously opened" />
-            {recentTickers.length === 0 ? (
-              <p className="mt-3 text-xs text-slate-500">No recently viewed tickers.</p>
+          {/* Recently explored */}
+          <RoundedDepthPanel padding="sm">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">Recently explored</h3>
+            {recentResearch.slice(0, 6).length === 0 ? (
+              <p className="mt-2 text-xs text-[#8B949E]">No recently viewed tickers.</p>
             ) : (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {recentTickers.map((ticker) => (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {recentResearch.slice(0, 6).map((ticker) => (
                   <button
                     key={ticker}
                     type="button"
                     onClick={() => openCompany(ticker)}
-                    className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 font-mono text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-white"
+                    className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-1 font-mono text-[10px] font-semibold text-[#8B949E] hover:bg-white/[0.06] transition-colors"
                   >
                     {ticker}
                   </button>
                 ))}
               </div>
             )}
-          </Card>
+          </RoundedDepthPanel>
 
           <div className="hidden lg:block">
             <ResearchDisclaimer />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Button type="button" variant="secondary" className="w-full" onClick={() => navigate("trust")}>
-              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              Trust Centre
-            </Button>
-            <Button type="button" variant="secondary" className="w-full" onClick={() => navigate("portfolio")}>
-              <Briefcase className="h-4 w-4" aria-hidden="true" />
-              Portfolio
-            </Button>
           </div>
         </div>
       </div>

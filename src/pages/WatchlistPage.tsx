@@ -6,13 +6,12 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { api, WatchlistRow } from "../services/api/client";
-import ScorePill from "../components/ui/ScorePill";
-import { EmptyState } from "../components/ui/DataState";
-import { MissingDataBadge } from "../components/ui/PageHeader";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, TrendingUp, Eye } from "lucide-react";
 import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
-import { AppScreen, MobilePageHeader, ResearchEmptyState, WatchlistSearchCard } from "../components/premium/PremiumUI";
+import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
+import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
 
 interface DisplayList {
   id: string;
@@ -32,12 +31,12 @@ export const WatchlistPage: React.FC = () => {
   const [selectedList, setSelectedList] = useState<string>("");
   const toast = useToast();
   const [noteRefresh, setNoteRefresh] = useState(0);
+  const [explanationSymbol, setExplanationSymbol] = useState<string | null>(null);
 
   useEffect(() => {
     const session = loadAuthSession();
-    if (session.uid) {
-      api.getWatchlists().then(lists => { setRemoteLists(lists); setAuthState("authenticated"); }).catch(() => { setRemoteLists(null); setAuthState("authenticated"); });
-    } else { setRemoteLists(null); setAuthState("anonymous"); }
+    if (session.uid) { api.getWatchlists().then(lists => { setRemoteLists(lists); setAuthState("authenticated"); }).catch(() => { setRemoteLists(null); setAuthState("authenticated"); }); }
+    else { setRemoteLists(null); setAuthState("anonymous"); }
   }, []);
 
   useEffect(() => {
@@ -58,11 +57,8 @@ export const WatchlistPage: React.FC = () => {
 
   const displayLists: DisplayList[] = useMemo(() => {
     const lists: DisplayList[] = [];
-    if (remoteLists) {
-      for (const wl of remoteLists) lists.push({ id: `${REMOTE_PREFIX}${wl.id}`, name: wl.name, tickers: wl.tickers, source: "remote" });
-    } else {
-      for (const wl of localLists) lists.push({ id: wl.id, name: wl.name, tickers: wl.tickers, source: "local" });
-    }
+    if (remoteLists) { for (const wl of remoteLists) lists.push({ id: `${REMOTE_PREFIX}${wl.id}`, name: wl.name, tickers: wl.tickers, source: "remote" }); }
+    else { for (const wl of localLists) lists.push({ id: wl.id, name: wl.name, tickers: wl.tickers, source: "local" }); }
     return lists;
   }, [remoteLists, localLists]);
 
@@ -72,11 +68,11 @@ export const WatchlistPage: React.FC = () => {
     if (!list) return;
     if (list.source === "remote") {
       const remoteId = selectedList.replace(REMOTE_PREFIX, "");
-      api.removeWatchlistTicker(remoteId, ticker).then(updated => { setRemoteLists(prev => prev ? prev.map(wl => wl.id === remoteId ? updated : wl) : prev); toast.success(`${ticker} removed from watchlist`); }).catch(() => { toast.error(`Could not remove ${ticker}. Try again.`); api.getWatchlists().then(lists => setRemoteLists(lists)).catch(() => {}); });
+      api.removeWatchlistTicker(remoteId, ticker).then(updated => { setRemoteLists(prev => prev ? prev.map(wl => wl.id === remoteId ? updated : wl) : prev); toast.success(`${ticker} removed`); }).catch(() => { toast.error(`Could not remove ${ticker}.`); api.getWatchlists().then(lists => setRemoteLists(lists)).catch(() => {}); });
     } else {
       WatchlistEngine.removeTicker(selectedList, ticker);
       setLocalLists([...WatchlistEngine.getWatchlists()]);
-      toast.success(`${ticker} removed from watchlist`);
+      toast.success(`${ticker} removed`);
     }
   };
 
@@ -100,125 +96,153 @@ export const WatchlistPage: React.FC = () => {
 
   if (authState === "loading") {
     return (
-      <div className="flex flex-col space-y-6">
-        <header className="pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>Loading watchlists</h1>
-        </header>
+      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
         <div className="flex items-center justify-center min-h-[200px]">
-          <span className="text-sm" style={{ color: "#536471" }}>Loading watchlists...</span>
+          <span className="text-xs text-[#8B949E]">Loading watchlists...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <AppScreen>
-      <MobilePageHeader eyebrow="Watching" title="Watchlist" body={`Tap a row to open the evidence view, or search to add a company.${isAuthenticated && !isBackendActive ? " offline mode saves locally." : ""}`} />
-      <WatchlistSearchCard onSearch={() => {
-        const params = new URLSearchParams(window.location.search);
-        params.set("page", "search");
-        window.history.pushState({}, "", `?${params.toString()}`);
-        window.dispatchEvent(new Event("urlchange"));
-      }} />
+    <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+      <div className="mb-6">
+        <div className="flex items-center gap-2">
+          <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+          <h1 className="text-base font-semibold text-[#E6EDF3]">Saved research</h1>
+        </div>
+        <p className="mt-1 text-xs text-[#8B949E]">Companies you are tracking for research follow-up. Tap a row to inspect the evidence view.</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        <div className="flex flex-col space-y-4 lg:col-span-1">
-          <div className="space-y-1">
-            <span className="text-[11px] uppercase font-semibold tracking-wider" style={{ color: "#536471" }}>My Lists</span>
-            {displayLists.map((wl) => {
+        <div className="flex flex-col space-y-3 lg:col-span-1">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">My Lists</span>
+          {displayLists.length === 0 ? (
+            <p className="text-xs text-[#8B949E]">No lists yet. Search a company to create one.</p>
+          ) : (
+            displayLists.map((wl) => {
               const label = listSourceLabel(wl.source);
               return (
                 <button
                   key={wl.id}
                   onClick={() => setSelectedList(wl.id)}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition cursor-pointer flex items-center justify-between ${
-                    selectedList === wl.id ? "text-white shadow-sm" : "hover:bg-white/40"
+                  className={`w-full text-left rounded-xl px-3 py-2.5 text-xs transition-colors flex items-center justify-between ${
+                    selectedList === wl.id ? "bg-[#2962FF]/10 text-[#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
                   }`}
-                  style={selectedList === wl.id ? { background: "#1a6e4a", color: "white" } : { color: "#536471" }}
                 >
                   <span>{wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span></span>
-                  {label && <span className={`text-[10px] uppercase tracking-wider ml-2 ${selectedList === wl.id ? 'text-white/70' : ''}`} style={selectedList !== wl.id ? { color: "#8b98a5" } : undefined}>{label}</span>}
+                  {label && <span className="text-[10px] uppercase tracking-wider text-[#484F58]">{label}</span>}
                 </button>
               );
-            })}
-          </div>
-          <div className="space-y-1">
-            <span className="text-[11px] uppercase font-semibold tracking-wider" style={{ color: "#536471" }}>Smart Lists</span>
-            {smartWatchlists.map((wl, idx) => (
-              <button
-                key={wl.name}
-                onClick={() => setSelectedList(`${SMART_PREFIX}${idx}`)}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition cursor-pointer ${
-                  selectedList === `${SMART_PREFIX}${idx}` ? "text-white shadow-sm" : "hover:bg-white/40"
-                }`}
-                style={selectedList === `${SMART_PREFIX}${idx}` ? { background: "#1a6e4a", color: "white" } : { color: "#536471" }}
-              >
-                {wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span>
-              </button>
-            ))}
-          </div>
+            })
+          )}
+          {smartWatchlists.length > 0 && (
+            <>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Smart Lists</span>
+              {smartWatchlists.map((wl, idx) => (
+                <button
+                  key={wl.name}
+                  onClick={() => setSelectedList(`${SMART_PREFIX}${idx}`)}
+                  className={`w-full text-left rounded-xl px-3 py-2.5 text-xs transition-colors ${
+                    selectedList === `${SMART_PREFIX}${idx}` ? "bg-[#2962FF]/10 text-[#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
+                  }`}
+                >
+                  {wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span>
+                </button>
+              ))}
+            </>
+          )}
         </div>
 
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
-            <ResearchEmptyState title="No companies saved in this list" body="Search a stock above to add it. Saved companies stay grounded in verified score availability." />
+            <RoundedDepthPanel padding="lg" variant="elevated">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <Eye className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-[#E6EDF3]">No saved research</h2>
+                <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
+                  Search for a company above to add it to this list. Saved companies stay grounded in verified score availability.
+                </p>
+              </div>
+            </RoundedDepthPanel>
           ) : (
-            <>
-              <div className="space-y-3 sm:hidden">
-                {activeTickers.map((ticker) => {
-                  const info = StockRegistry.getStock(ticker);
-                  const score = info?.telemetrySnapshot?.healthScore ?? null;
-                  const scoreState = getScoreState(score);
-                  const noteObj = NoteEngine.getNote(ticker);
-                  return (
-                    <div key={ticker} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-                      <div className="flex items-center justify-between mb-3">
-                        <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="cursor-pointer border-none bg-transparent text-left font-mono font-semibold hover:underline" style={{ color: "#0f1419" }}>
-                          {ticker}
+            <div className="space-y-3">
+              {activeTickers.map((ticker) => {
+                const info = StockRegistry.getStock(ticker);
+                const score = info?.telemetrySnapshot?.healthScore ?? null;
+                const noteObj = NoteEngine.getNote(ticker);
+                return (
+                  <div key={ticker} className="rounded-[22px] border border-white/5 bg-[#0D1117] p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="flex items-center gap-2 text-left">
+                        <span className="font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{ticker}</span>
+                        <ChevronRight className="h-3.5 w-3.5 text-[#484F58]" aria-hidden="true" />
+                      </button>
+                      <div className="flex items-center gap-2">
+                        {typeof score === "number" && Number.isFinite(score) ? (
+                          <span className="inline-flex items-center rounded-full border border-[#2962FF]/10 bg-[#2962FF]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-[#2962FF]">{Math.round(score)}</span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#484F58]">Score pending</span>
+                        )}
+                        <button onClick={() => setExplanationSymbol(ticker)} className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-[#8B949E] hover:bg-white/[0.08] hover:text-[#E6EDF3] transition-colors">
+                          Explain
                         </button>
-                        <button onClick={() => handleRemoveTicker(ticker)} className="text-xs transition-colors cursor-pointer bg-transparent border-none" style={{ color: "#8b98a5" }} disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div><span className="text-xs block" style={{ color: "#8b98a5" }}>Score</span>{scoreState === "available" ? <ScorePill score={Math.round(score!)} /> : <span className="text-xs" style={{ color: "#8b98a5" }}>Unavailable</span>}</div>
-                        <div><span className="text-xs block" style={{ color: "#8b98a5" }}>Freshness</span><span className="font-mono text-xs" style={{ color: "#536471" }}>{noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}</span></div>
-                      </div>
-                      <div className="mt-3">
-                        <input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Add a research note..." className="w-full rounded-xl px-3 py-2 text-sm outline-none placeholder:opacity-60" style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+                        <button onClick={() => handleRemoveTicker(ticker)} className="text-[10px] text-[#484F58] hover:text-[#F23645] transition-colors" disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              <div className="hidden sm:block overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-                <div className="min-w-[720px]">
-                  <div className="grid grid-cols-[100px_80px_80px_1fr_80px] gap-2 p-3 text-[11px] font-semibold uppercase tracking-wider" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#8b98a5" }}>
-                    <span className="pl-3">Ticker</span><span>Score</span><span>Freshness</span><span>My Note</span><span className="text-right pr-3">Actions</span>
-                  </div>
-                  {activeTickers.map((ticker) => {
-                    const info = StockRegistry.getStock(ticker);
-                    const score = info?.telemetrySnapshot?.healthScore ?? null;
-                    const scoreState = getScoreState(score);
-                    const noteObj = NoteEngine.getNote(ticker);
-                    return (
-                      <div key={ticker} className="grid grid-cols-[100px_80px_80px_1fr_80px] items-center gap-2 p-3 last:border-0 hover:bg-white/30 transition-colors" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                        <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono font-semibold hover:underline" style={{ color: "#0f1419" }}>{ticker}</button>
-                        <div>{scoreState === "available" ? <ScorePill score={Math.round(score!)} /> : <MissingDataBadge />}</div>
-                        <span className="font-mono text-xs" style={{ color: "#536471" }}>{noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}</span>
-                        <div><input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Why am I watching?" className="w-full rounded-xl px-2 py-1.5 text-sm outline-none placeholder:opacity-60" style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} /></div>
-                        <div className="flex items-center justify-end gap-2 pr-2">
-                          <button onClick={() => handleRemoveTicker(ticker)} className="text-xs transition-colors cursor-pointer bg-transparent border-none" style={{ color: "#8b98a5" }} disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
-                        </div>
+                    <div className="mt-3 flex items-center gap-4 text-xs">
+                      <div>
+                        <span className="text-[10px] text-[#484F58]">Score</span>
+                        <span className="ml-1.5 font-mono text-xs text-[#8B949E]">{typeof score === "number" && Number.isFinite(score) ? Math.round(score) : "Unavailable"}</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
+                      <div>
+                        <span className="text-[10px] text-[#484F58]">Freshness</span>
+                        <span className="ml-1.5 font-mono text-xs text-[#8B949E]">{noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}</span>
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Why am I watching?" className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
-    </AppScreen>
+
+      {/* Explanation modal */}
+      <IntelligenceModal
+        open={explanationSymbol !== null}
+        onClose={() => setExplanationSymbol(null)}
+        title={explanationSymbol ? `${explanationSymbol} — prediction explanation` : ""}
+        subtitle="Model score and factor context for this symbol."
+      >
+        {explanationSymbol && (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Symbol</span>
+              <div className="mt-1 font-mono text-lg font-bold text-[#E6EDF3]">{explanationSymbol}</div>
+            </div>
+            <PredictionConfidenceBar score={null} />
+            <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <p className="text-[11px] leading-relaxed text-[#8B949E]">
+                <strong>Prediction explanation unavailable</strong> — Explanation data appears after the next completed scoring cycle for this symbol.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => { navigateToStock({ ticker: explanationSymbol, mode: "push" }); setExplanationSymbol(null); }}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-[#E6EDF3] hover:bg-white/[0.08] transition-colors"
+            >
+              <TrendingUp className="h-4 w-4" aria-hidden="true" />
+              Open company research
+            </button>
+            <p className="text-[10px] leading-relaxed text-[#484F58]">Research only. Not investment advice.</p>
+          </div>
+        )}
+      </IntelligenceModal>
+    </div>
   );
 };
 
