@@ -7,18 +7,28 @@
 :root {
   --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --color-bg: #f7f8fb;
-  --color-bg-secondary: #f0f1f5;
+  /* Neutral canvas colors */
+  --color-bg: #F9FAF9; /* warm pearl */
+  --color-bg-secondary: #F0F4F2; /* soft off‑white */
+  /* Surface and glass */
   --color-surface: #ffffff;
-  --color-surface-glass: rgba(255, 255, 255, 0.72);
-  --color-surface-glass-hover: rgba(255, 255, 255, 0.85);
-  --color-text-primary: #0f1419;
+  --color-surface-glass: rgba(255, 255, 255, 0.78);
+  --color-surface-glass-hover: rgba(255, 255, 255, 0.90);
+  /* Text colors */
+  --color-text-primary: #0f1419; /* keep dark for readability */
   --color-text-secondary: #536471;
   --color-text-muted: #8b98a5;
-  --color-accent: #1a6e4a;
-  --color-accent-hover: #15573f;
-  --color-accent-light: rgba(26, 110, 74, 0.08);
-  --color-accent-glow: rgba(26, 110, 74, 0.12);
+  /* Primary accent – Deep Emerald */
+  --color-primary: #087F69;
+  --color-primary-hover: #075F51;
+  --color-primary-light: rgba(8, 127, 105, 0.08);
+  --color-primary-glow: rgba(8, 127, 105, 0.12);
+  /* Intelligence accent – Steel Blue */
+  --color-info: #2C6B9E;
+  /* Soft gold accent */
+  --color-gold: #B7791F;
+  /* Muted red accent */
+  --color-red: #B42318;
   --color-border: rgba(0, 0, 0, 0.04);
   --color-border-light: rgba(0, 0, 0, 0.02);
   --color-aura-1: rgba(26, 110, 74, 0.035);
@@ -343,13 +353,13 @@ a {
 }
 
 .ss-focus-ring:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 

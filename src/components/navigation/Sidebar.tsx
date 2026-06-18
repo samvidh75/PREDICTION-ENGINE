@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Search, Trophy, Eye, ShieldCheck, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Search, Trophy, Eye, ShieldCheck, Settings, LogOut, Sparkles } from "lucide-react";
 import { useNavigation, type ViewType } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -17,8 +17,9 @@ export const Sidebar: React.FC = () => {
     { id: "dashboard" as ViewType, label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
     { id: "search", label: "Search", icon: <Search className="h-4 w-4" /> },
     { id: "rankings", label: "Rankings", icon: <Trophy className="h-4 w-4" /> },
+    { id: "signals" as ViewType, label: "Signals", icon: <Sparkles className="h-4 w-4" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="h-4 w-4" /> },
-    { id: "trust", label: "Research", icon: <ShieldCheck className="h-4 w-4" /> },
+    { id: "trust", label: "Trust Centre", icon: <ShieldCheck className="h-4 w-4" /> },
     { id: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
   ];
 
@@ -37,7 +38,7 @@ export const Sidebar: React.FC = () => {
               onClick={() => MapsTo(link.id)}
               className={`group flex h-11 w-full cursor-pointer items-center gap-3 rounded-2xl px-3 text-left text-sm font-semibold transition ${
                 isActive
-                  ? "text-white shadow-sm" + (isActive ? " bg-[#087f69]" : "")
+                  ? "text-white shadow-sm bg-[#087f69]"
                   : "hover:bg-white/60" 
               }`}
               style={isActive ? { background: "linear-gradient(135deg,#087f69,#0f9f92)", color: "white", boxShadow: "0 14px 28px rgba(8,127,105,0.24)" } : { color: "#24313d" }}

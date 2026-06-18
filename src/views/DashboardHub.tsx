@@ -440,7 +440,7 @@ export const DashboardHub: React.FC = () => {
           <div className="flex flex-col gap-2">
             <Button type="button" variant="secondary" className="w-full" onClick={() => navigate("trust")}>
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              Methodology
+              Trust Centre
             </Button>
             <Button type="button" variant="secondary" className="w-full" onClick={() => navigate("portfolio")}>
               <Briefcase className="h-4 w-4" aria-hidden="true" />

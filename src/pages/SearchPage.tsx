@@ -108,7 +108,7 @@ export const SearchPage: React.FC = () => {
       >
         <div className="mx-auto flex max-w-[620px] flex-col gap-6 text-center">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "#0f1419" }}>Search Indian stocks</h1>
+            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "#0f1419" }}>Search Indian companies</h1>
             <p className="mt-1.5 text-base" style={{ color: "#536471" }}>Start with a ticker, company name, or sector.</p>
           </div>
 
@@ -119,7 +119,7 @@ export const SearchPage: React.FC = () => {
             >
               <Search className="h-4 w-4 shrink-0" style={{ color: "#8b98a5" }} />
               <input
-                aria-label="Search Indian stocks"
+                aria-label="Search Indian companies"
                 ref={inputRef}
                 value={query}
                 onChange={(e) => handleSearchChange(e.target.value)}
@@ -210,7 +210,7 @@ export const SearchPage: React.FC = () => {
                           )}
                           {!prediction && (
                             <span className="inline-flex items-center rounded-lg px-1.5 py-0.5 text-[10px] font-medium font-mono" style={{ background: "rgba(255,255,255,0.6)", color: "#536471" }}>
-                              Source registry
+                              Base listing — no score yet
                             </span>
                           )}
                           {confidenceScore !== null && (

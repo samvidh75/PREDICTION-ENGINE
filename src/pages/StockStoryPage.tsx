@@ -293,7 +293,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
             <button onClick={handleToggleWatchlist} className={`flex h-10 items-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all ${isInWatchlist ? "border-rose-200/50" : "border-emerald-200/50"}`} style={{ background: isInWatchlist ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.6)", color: isInWatchlist ? "#c0392b" : "#1a6e4a" }}>
               <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
-              {isInWatchlist ? "Remove from Watchlist" : "Track via Watchlist"}
+              {isInWatchlist ? "Remove from watchlist" : "Track via watchlist"}
             </button>
             <button type="button" onClick={() => navigateToPage("search")} className="h-10 rounded-xl px-4 text-xs font-semibold text-white transition hover:opacity-90" style={{ background: "#0f1419" }}>
               Search Another Company
@@ -422,7 +422,7 @@ export const StockStoryPage: React.FC = () => {
       <section className="flex flex-wrap items-center gap-3">
         <button onClick={handleToggleWatchlist} className={`flex h-9 items-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all ${isInWatchlist ? "border-rose-200" : "border-emerald-200"}`} style={{ background: isInWatchlist ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.6)", color: isInWatchlist ? "#c0392b" : "#1a6e4a" }}>
           <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
-          {isInWatchlist ? "Remove From Watchlist" : "Add To Watchlist"}
+          {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
         </button>
       </section>
 
@@ -431,13 +431,13 @@ export const StockStoryPage: React.FC = () => {
         <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-        {tabs.map((tab) => (
-          <button key={tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-accent-primary font-extrabold" : "text-ink-muted hover:opacity-80"}`} style={activeTab === tab ? { borderBottomColor: "#1a6e4a", color: "#1a6e4a" } : { borderBottomColor: "transparent", color: "#8b98a5" }}>
-            {TAB_LABELS[tab]}
-          </button>
-        ))}
-      </div>
+        <div className="flex gap-2 overflow-x-auto" role="tablist" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
+          {tabs.map((tab) => (
+            <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-accent-primary font-extrabold" : "text-ink-muted hover:opacity-80"}`} style={activeTab === tab ? { borderBottomColor: "#1a6e4a", color: "#1a6e4a" } : { borderBottomColor: "transparent", color: "#8b98a5" }}>
+              {TAB_LABELS[tab]}
+            </button>
+          ))}
+        </div>
 
       <div className="min-h-[300px] rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
 
@@ -448,11 +448,11 @@ export const StockStoryPage: React.FC = () => {
                 <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("Growth Outlook", storyData.growth, "text-fuchsia-700")}
-                {renderProgressBar("Business Quality", storyData.quality, "text-emerald-700")}
-                {renderProgressBar("Financial Stability", storyData.stability, "text-sky-700")}
-                {renderProgressBar("Market Momentum", storyData.momentum, "text-orange-700")}
-                {renderProgressBar("Value & Margins", storyData.valuation, "text-amber-700")}
+                {renderProgressBar("Growth metrics", storyData.growth, "text-fuchsia-700")}
+                {renderProgressBar("Quality metrics", storyData.quality, "text-emerald-700")}
+                {renderProgressBar("Stability score", storyData.stability, "text-sky-700")}
+                {renderProgressBar("Price trend", storyData.momentum, "text-orange-700")}
+                {renderProgressBar("Value score", storyData.valuation, "text-amber-700")}
               </div>
               <div className="text-[9px] leading-normal mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
                 Composite score is the average of available factor scores. Missing factors are shown as unavailable.
@@ -646,7 +646,7 @@ export const StockStoryPage: React.FC = () => {
               <div className="rounded-lg p-3 text-xs leading-normal flex items-start gap-2" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-extrabold block text-[10px] uppercase mb-1" style={{ color: "#c0392b" }}>{storyData.engineDetails.risk.redFlagCount} RED FLAGS DETECTED</span>
+                  <span className="font-extrabold block text-[10px] uppercase mb-1" style={{ color: "#c0392b" }}>{storyData.engineDetails.risk.redFlagCount} Risk indicators</span>
                   {storyData.engineDetails.risk.commentary}
                 </div>
               </div>
