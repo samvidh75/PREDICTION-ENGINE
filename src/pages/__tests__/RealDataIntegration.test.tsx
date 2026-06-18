@@ -245,7 +245,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/No new signal movement/i)).toBeInTheDocument();
+      expect(screen.getByText(/No score changes/i)).toBeInTheDocument();
     });
   });
 });

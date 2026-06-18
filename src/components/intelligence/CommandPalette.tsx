@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Search, BarChart3, TrendingUp, ShieldCheck, Eye, ArrowLeftRight, BookOpen, Briefcase } from "lucide-react";
+import { Search, BarChart3, TrendingUp, ShieldCheck, Eye, ArrowLeftRight, BookOpen, Briefcase, Home } from "lucide-react";
 import { RoundedDepthPanel } from "./RoundedDepthPanel";
 
 interface Action {
@@ -24,8 +24,9 @@ function navigatePage(pageKey: string, params?: Record<string, string>) {
 }
 
 const DEFAULT_ACTIONS: Action[] = [
+  { id: "dashboard", label: "Open dashboard", description: "Research home", icon: Home, action: () => navigatePage("dashboard") },
   { id: "rankings", label: "Open rankings", description: "Browse scored companies", icon: BarChart3, action: () => navigatePage("rankings") },
-  { id: "signals", label: "Open signals", description: "View prediction intelligence", icon: TrendingUp, action: () => navigatePage("predictions") },
+  { id: "signals", label: "Open score changes", description: "View score changes", icon: TrendingUp, action: () => navigatePage("predictions") },
   { id: "trust", label: "Open Trust Centre", description: "Audit data sources", icon: ShieldCheck, action: () => navigatePage("trust") },
   { id: "watchlist", label: "Open watchlist", description: "Saved research", icon: Eye, action: () => navigatePage("watchlist") },
   { id: "portfolio", label: "Open portfolio", description: "Manual tracking", icon: Briefcase, action: () => navigatePage("portfolio") },

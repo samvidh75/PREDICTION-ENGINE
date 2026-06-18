@@ -63,9 +63,9 @@ export default function PublicPredictionsPage(): JSX.Element {
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Prediction Intelligence</span>
-            <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Signal movement</h1>
+            <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Score changes</h1>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[#8B949E]">
-              Model output and signal movement from the latest research cycle. Source-backed, no buy/sell language.
+              Score changes from the latest research cycle. Source-backed, no buy/sell language.
             </p>
           </div>
           {snapshotDate && <ModelRunBadge runDate={snapshotDate} />}
@@ -79,7 +79,7 @@ export default function PublicPredictionsPage(): JSX.Element {
         )}
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <MetricCard label="Signals visible" value={signals.length.toLocaleString("en-IN")} detail="Source-backed changes only." />
+          <MetricCard label="Changes visible" value={signals.length.toLocaleString("en-IN")} detail="Source-backed score changes." />
           <MetricCard label="Symbols analyzed" value={symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "Unavailable"} detail="Latest cycle metadata." tone={symbolsAnalyzed ? "ok" : "muted"} />
           <MetricCard label="Coverage rows" value={coverageData?.registryRowCount !== null && coverageData?.registryRowCount !== undefined ? coverageData.registryRowCount.toLocaleString("en-IN") : "Pending"} detail="Prediction registry." tone={coverageData?.registryRowCount ? "ok" : "warn"} />
         </div>
@@ -91,11 +91,11 @@ export default function PublicPredictionsPage(): JSX.Element {
             <RoundedDepthPanel padding="lg" variant="elevated">
               <div className="flex flex-col items-center gap-3 text-center">
                 <TrendingUp className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-[#E6EDF3]">No new signal movement in the current run</h2>
+                <h2 className="text-sm font-semibold text-[#E6EDF3]">No score changes in the latest cycle</h2>
                 <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
                   {symbolsAnalyzed && symbolsAnalyzed > 0
                     ? `${symbolsAnalyzed.toLocaleString("en-IN")} companies registered. Score changes appear after the next verified update cycle.`
-                    : "Signal movement appears when provider data has been processed and verified."}
+                    : "Score changes appear when provider data has been processed and verified."}
                 </p>
                 <div className="flex gap-2">
                   <Button type="button" onClick={() => setPage("rankings")} className="h-10 px-4 text-xs">
