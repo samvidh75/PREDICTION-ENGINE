@@ -1,4 +1,4 @@
 jugaad-data==0.28
 nsepython==2.97
 requests-cache==1.2.0
-nselib>=1.0.0
+nselib==1.9
