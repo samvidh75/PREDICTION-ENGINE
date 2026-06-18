@@ -4,7 +4,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import TopNav from "../components/navigation/TopNav";
 import Button from "../components/ui/Button";
 import { api } from "../services/api/client";
-import { IntegrityStrip, MetricCard, PremiumPage, SectionHeader, StatusChip, Surface, navigatePage } from "../components/premium/PremiumUI";
+import { IntegrityStrip, MetricCard, PremiumPage, SectionHeader, StatusBadge, StatusChip, Surface, navigatePage } from "../components/premium/PremiumUI";
 
 const modules = [
   ["Rankings", "Compare the covered universe by verified score, confidence, freshness, and sector context."],
@@ -48,7 +48,7 @@ export const PublicLandingPage: React.FC = () => {
       <section className="ss-grid-texture relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 md:pt-32 lg:pb-24">
         <div className="relative z-10 grid gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white/75 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-sm backdrop-blur">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
               AI-native research terminal for Indian equities
             </div>
@@ -75,36 +75,26 @@ export const PublicLandingPage: React.FC = () => {
           </div>
 
           <div className="perspective-[1200px]">
-            <Surface dark className="ss-lift relative overflow-hidden p-4 sm:p-5 lg:rotate-[-1.5deg]">
-              <div className="relative z-10 rounded-[22px] border border-white/10 bg-white/[0.06] p-4 backdrop-blur">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div>
-                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200">Research command</div>
-                    <div className="mt-1 text-xl font-semibold text-white">Market intelligence</div>
-                  </div>
-                  <StatusChip label="Research only" />
+            <Surface raised className="p-6">
+              <div className="flex items-center justify-between border-b border-[var(--color-border-light)] pb-4">
+                <div>
+                  <div className="label">Research preview</div>
+                  <div className="section-heading mt-1">Market intelligence</div>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Coverage</div>
-                    <div className="ss-metric mt-2 text-2xl font-semibold text-white">{coverage.symbols !== null ? coverage.symbols.toLocaleString("en-IN") : "Unavailable"}</div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Scored</div>
-                    <div className="ss-metric mt-2 text-2xl font-semibold text-white">{coverage.scored !== null ? coverage.scored.toLocaleString("en-IN") : "Pending"}</div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.08] p-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">Freshness</div>
-                    <div className="mt-2 text-sm font-semibold text-white">{coverage.updated ? "Verified cycle" : "Unavailable"}</div>
-                  </div>
+                <StatusBadge label="Research only" variant="muted" />
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                <div>
+                  <div className="label">Coverage</div>
+                  <div className="mono mt-1 text-2xl font-semibold">{coverage.symbols !== null ? coverage.symbols.toLocaleString("en-IN") : "Unavailable"}</div>
                 </div>
-                <div className="mt-4 grid gap-3">
-                  {["Source freshness panel", "Company factor breakdown", "Unavailable data policy"].map((label, index) => (
-                    <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-3">
-                      <span className="text-sm font-medium text-white/86">{label}</span>
-                      <span className={`h-2.5 w-2.5 rounded-full ${index === 2 ? "bg-amber-300" : "bg-emerald-300"}`} />
-                    </div>
-                  ))}
+                <div>
+                  <div className="label">Scored</div>
+                  <div className="mono mt-1 text-2xl font-semibold">{coverage.scored !== null ? coverage.scored.toLocaleString("en-IN") : "Pending"}</div>
+                </div>
+                <div>
+                  <div className="label">Freshness</div>
+                  <div className="mono mt-1 text-sm font-semibold">{coverage.updated ? "Verified cycle" : "Unavailable"}</div>
                 </div>
               </div>
             </Surface>
@@ -126,7 +116,7 @@ export const PublicLandingPage: React.FC = () => {
         <div className="mt-6 grid gap-4 md:grid-cols-4">
           {workflow.map(({ icon: Icon, title, body }) => (
             <Surface key={title} className="ss-lift p-6">
-              <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
+              <Icon className="icon-card text-[var(--color-text-secondary)]" aria-hidden="true" />
               <h3 className="mt-5 text-lg font-semibold text-slate-950">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
             </Surface>
@@ -139,7 +129,7 @@ export const PublicLandingPage: React.FC = () => {
         <div className="mt-6 grid gap-4 lg:grid-cols-5">
           {modules.map(([title, body]) => (
             <Surface key={title} className="ss-lift p-5">
-              <Layers3 className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+              <Layers3 className="icon-card text-[var(--color-text-secondary)]" aria-hidden="true" />
               <h3 className="mt-4 text-base font-semibold text-slate-950">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
             </Surface>
@@ -148,13 +138,13 @@ export const PublicLandingPage: React.FC = () => {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-24 pt-12 sm:px-6">
-        <Surface dark className="grid gap-8 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-9">
+        <Surface raised className="grid gap-8 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-9">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">
-              <Database className="h-4 w-4" aria-hidden="true" /> Data integrity
+            <div className="flex items-center gap-2 label">
+              <Database className="icon-inline" aria-hidden="true" /> Data integrity
             </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">Research without pretending missing evidence exists.</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/70">
+            <h2 className="section-heading mt-3">Research without pretending missing evidence exists.</h2>
+            <p className="body-text mt-4 max-w-2xl">
               The product labels unavailable data, separates confidence from scoring, and avoids buy/sell/hold language. Public NSE and provider-domain status are exposed in plain language.
             </p>
           </div>

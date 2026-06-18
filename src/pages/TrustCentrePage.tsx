@@ -35,31 +35,31 @@ const PROVIDER_LABELS: Record<string, string> = {
 const SKIP_PROVIDERS = new Set(["REDIS_URL"]);
 
 const STATUS_STYLE: Record<string, { dot: string; bg: string; text: string; border: string; label: string }> = {
-  healthy: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Healthy" },
-  active: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Active" },
-  degraded: { dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Degraded" },
-  partial: { dot: "bg-amber-400", bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Partial" },
-  unavailable: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
-  blocked: { dot: "bg-red-400", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Blocked" },
-  manual: { dot: "bg-blue-400", bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", label: "Manual" },
-  local_only: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Local Only" },
-  missing_required: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
-  missing_optional: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Not Configured" },
-  archived_unusable: { dot: "bg-purple-400", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", label: "Archived" },
+  healthy: { dot: "bg-[var(--color-active)]", bg: "bg-[var(--color-active-bg)]", text: "text-[var(--color-active)]", border: "border-[var(--color-active)]/20", label: "Healthy" },
+  active: { dot: "bg-[var(--color-active)]", bg: "bg-[var(--color-active-bg)]", text: "text-[var(--color-active)]", border: "border-[var(--color-active)]/20", label: "Active" },
+  degraded: { dot: "bg-[var(--color-warning)]", bg: "bg-[var(--color-warning-bg)]", text: "text-[var(--color-warning)]", border: "border-[var(--color-warning)]/20", label: "Degraded" },
+  partial: { dot: "bg-[var(--color-warning)]", bg: "bg-[var(--color-warning-bg)]", text: "text-[var(--color-warning)]", border: "border-[var(--color-warning)]/20", label: "Partial" },
+  unavailable: { dot: "bg-[var(--color-danger)]", bg: "bg-[var(--color-danger-bg)]", text: "text-[var(--color-danger)]", border: "border-[var(--color-danger)]/20", label: "Unavailable" },
+  blocked: { dot: "bg-[var(--color-danger)]", bg: "bg-[var(--color-danger-bg)]", text: "text-[var(--color-danger)]", border: "border-[var(--color-danger)]/20", label: "Blocked" },
+  manual: { dot: "bg-[var(--color-intel)]", bg: "bg-[var(--color-intel-light)]", text: "text-[var(--color-intel)]", border: "border-[var(--color-intel)]/20", label: "Manual" },
+  local_only: { dot: "bg-[var(--color-text-muted)]", bg: "bg-[var(--color-muted-bg)]", text: "text-[var(--color-text-muted)]", border: "border-[var(--color-border)]", label: "Local Only" },
+  missing_required: { dot: "bg-[var(--color-danger)]", bg: "bg-[var(--color-danger-bg)]", text: "text-[var(--color-danger)]", border: "border-[var(--color-danger)]/20", label: "Unavailable" },
+  missing_optional: { dot: "bg-[var(--color-text-muted)]", bg: "bg-[var(--color-muted-bg)]", text: "text-[var(--color-text-muted)]", border: "border-[var(--color-border)]", label: "Not Configured" },
+  archived_unusable: { dot: "bg-[var(--color-text-muted)]", bg: "bg-[var(--color-muted-bg)]", text: "text-[var(--color-text-muted)]", border: "border-[var(--color-border)]", label: "Archived" },
 };
 
 const LEFT_BORDER: Record<string, string> = {
-  healthy: "border-l-emerald-400",
-  active: "border-l-emerald-400",
-  degraded: "border-l-amber-400",
-  partial: "border-l-amber-400",
-  unavailable: "border-l-red-400",
-  blocked: "border-l-red-400",
-  manual: "border-l-blue-400",
-  local_only: "border-l-slate-300",
-  missing_required: "border-l-red-400",
-  missing_optional: "border-l-slate-300",
-  archived_unusable: "border-l-purple-400",
+  healthy: "border-l-[var(--color-active)]",
+  active: "border-l-[var(--color-active)]",
+  degraded: "border-l-[var(--color-warning)]",
+  partial: "border-l-[var(--color-warning)]",
+  unavailable: "border-l-[var(--color-danger)]",
+  blocked: "border-l-[var(--color-danger)]",
+  manual: "border-l-[var(--color-intel)]",
+  local_only: "border-l-[var(--color-text-muted)]",
+  missing_required: "border-l-[var(--color-danger)]",
+  missing_optional: "border-l-[var(--color-text-muted)]",
+  archived_unusable: "border-l-[var(--color-text-muted)]",
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -332,10 +332,10 @@ export const TrustCentrePage: React.FC = () => {
                       <div className="flex flex-wrap gap-1.5">
                         {Object.entries(domains).map(([domain, info]) => {
                           const dh = info.healthy;
-                          const pillBg = dh ? "bg-emerald-50" : entry.status === "local_only" ? "bg-slate-50" : "bg-red-50";
-                          const pillText = dh ? "text-emerald-700" : entry.status === "local_only" ? "text-slate-500" : "text-red-700";
-                          const pillBorder = dh ? "border-emerald-200" : entry.status === "local_only" ? "border-slate-200" : "border-red-200";
-                          const pillDot = dh ? "bg-emerald-500" : entry.status === "local_only" ? "bg-slate-400" : "bg-red-500";
+                          const pillBg = dh ? "bg-[var(--color-active-bg)]" : entry.status === "local_only" ? "bg-[var(--color-muted-bg)]" : "bg-[var(--color-danger-bg)]";
+                          const pillText = dh ? "text-[var(--color-active)]" : entry.status === "local_only" ? "text-[var(--color-text-muted)]" : "text-[var(--color-danger)]";
+                          const pillBorder = dh ? "border-[var(--color-active)]/20" : entry.status === "local_only" ? "border-[var(--color-border)]" : "border-[var(--color-danger)]/20";
+                          const pillDot = dh ? "bg-[var(--color-active)]" : entry.status === "local_only" ? "bg-[var(--color-text-muted)]" : "bg-[var(--color-danger)]";
                           return (
                             <span
                               key={domain}
