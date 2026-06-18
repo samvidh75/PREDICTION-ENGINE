@@ -57,8 +57,8 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around px-2 md:hidden"
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-[90] flex h-14 items-center justify-around gap-0 px-1 safe-area-bottom md:hidden"
       style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.5)" }}
     >
       {isPublicMobile
@@ -69,12 +69,12 @@ export const MobileNav: React.FC = () => {
                 key={tab.page}
                 type="button"
                 onClick={() => handlePublicNav(tab.page)}
-                className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
+                className={`flex min-h-[44px] min-w-[44px] flex-1 cursor-pointer flex-col items-center justify-center gap-px transition-all ${
                   isActive ? "text-[#1a6e4a]" : "text-ink-muted"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[10px] font-semibold uppercase tracking-wider">{tab.label}</span>
+                <span className="max-w-[52px] truncate text-[9px] font-semibold uppercase leading-tight tracking-wider">{tab.label}</span>
               </button>
             );
           })
@@ -85,16 +85,16 @@ export const MobileNav: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => handleNav(tab.id)}
-                className={`flex h-full flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 transition-all ${
+                className={`flex min-h-[44px] min-w-[44px] flex-1 cursor-pointer flex-col items-center justify-center gap-px transition-all ${
                   isActive ? "text-[#1a6e4a]" : "text-ink-muted"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[10px] font-semibold uppercase tracking-wider">{tab.label}</span>
+                <span className="max-w-[52px] truncate text-[9px] font-semibold uppercase leading-tight tracking-wider">{tab.label}</span>
               </button>
             );
           })}
-    </div>
+    </nav>
   );
 };
 

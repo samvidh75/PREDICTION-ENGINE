@@ -81,6 +81,7 @@
     "repair:invalid-prices": "tsx scripts/repair-invalid-prices.ts",
     "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
+    "check:python-runtime": "tsx scripts/check-python-runtime.ts",
     "probe:nselib": "tsx scripts/check-nselib-provider.ts",
     "probe:nsepython": "tsx scripts/check-nsepython-provider.ts",
     "probe:jugaad-data": "tsx scripts/check-jugaad-data-provider.ts",

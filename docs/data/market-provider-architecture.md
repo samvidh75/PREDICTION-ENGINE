@@ -9,25 +9,25 @@ All core providers are public, free, or no-credential. No broker tokens needed.
 ### Quote Precedence
 
 ```
-IndianAPI (if configured) → jugaad-data (local/degraded) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
+IndianAPI (if configured) → jugaad-data (degraded) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
 ### Historical Precedence
 
 ```
-jugaad-data (local/degraded, Python 3.9 bug) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
+jugaad-data (degraded, Python 3.10+ OK) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
 ### Bhavcopy Precedence
 
 ```
-jugaad-data (active, CSV file) → nselib (unavailable) → nsepython (active, DataFrame) → unavailable
+jugaad-data (active, CSV file) → nselib (active, Docker Python 3.12) → nsepython (active, DataFrame) → unavailable
 ```
 
 ### Index Precedence
 
 ```
-nselib (unavailable) → nsepython (active) → jugaad-data (active) → unavailable
+nselib (active, Docker Python 3.12) → nsepython (active) → jugaad-data (active) → unavailable
 ```
 
 ### Macro Precedence
@@ -48,7 +48,7 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 |----------|--------|------------|----------|-------|-------|-------------|
 | IndianAPI | ✅ Active | — | — | — | — | — |
 | Jugaad-Data | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | ✅ Active | — |
-| NSELib | ❌ Unavailable | ❌ Unavailable | ❌ Unavailable | ❌ Unavailable | — | ❌ Unavailable |
+| NSELib | ❌ Unavailable | ❌ Unavailable | ✅ Active | ✅ Active | — | ❌ Unavailable |
 | NSEPython | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | — | ❌ Unavailable |
 | Yahoo | ❌ Blocked | ❌ Blocked | — | — | — | — |
 | CSV Import | — | — | — | — | — | ✅ Active |
@@ -60,7 +60,8 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 | Added jugaad-data | New public NSE provider for bhavcopy, RBI rates, market status, indices |
 | Yahoo marked blocked | HTTP 429 — rate-limited, not just unreachable from Railway |
 | NSEPython updated | Package version, bhavcopy confirmed working, more blocked endpoints documented |
-| NSELib unchanged | Still requires Python 3.10+ |
+| NSELib bhavcopy/index enabled | Dockerfile now installs Python 3.12 (Alpine 3.21); nselib bhavcopy and index functions work |
+| NSELib quotes/historical still blocked | NSE blocks server-side equity quote and historical endpoints regardless of Python version |
 | Fundamentals unchanged | Still CSV import only; no automatic source available |
 
 ## Source Files
