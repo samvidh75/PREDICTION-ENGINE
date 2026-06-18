@@ -92,6 +92,12 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     metrics.environment = env.nodeEnv;
     metrics.uptime_seconds = Math.floor(process.uptime());
     metrics.node_version = process.version;
+    try {
+      const py = require('child_process').execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      metrics.python_version = py.replace(/^Python\s+/i, '');
+    } catch {
+      metrics.python_version = 'not_found';
+    }
 
     // Provider health — domain-level
     const providers = {
@@ -878,6 +884,40 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       failed: results.filter(r => !r.ok).length,
       results,
     });
+  });
+
+  app.get("/api/ops/probe/python-runtime", async (_request, reply) => {
+    const report: Record<string, any> = {};
+    try {
+      const pyVer = require('child_process').execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      report.python_version = pyVer.replace(/^Python\s+/i, '');
+    } catch { report.python_version = 'not_found'; }
+    try {
+      const pipVer = require('child_process').execSync('pip3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      report.pip_version = pipVer.split(/\s+/)[1] ?? 'unknown';
+    } catch { report.pip_version = 'not_found'; }
+    const pkgs = ['jugaad_data', 'nselib', 'nsepython'];
+    for (const pkg of pkgs) {
+      try {
+        const out = require('child_process').execSync(`python3 -c "import ${pkg}; print('ok')" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 }).trim();
+        report[pkg] = 'installed';
+      } catch { report[pkg] = 'not_installed'; }
+    }
+    return reply.send(report);
+  });
+
+  app.get("/api/ops/probe/nselib", async (_request, reply) => {
+    const { execSync } = require('child_process');
+    const { join } = require('path');
+    const probePath = join(__dirname, '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
+    try {
+      const output = execSync(`python3 "${probePath}" 2>/dev/null`, { encoding: 'utf-8', timeout: 120_000 });
+      const jsonStart = output.indexOf('{');
+      const data = jsonStart >= 0 ? JSON.parse(output.slice(jsonStart)) : { error: 'no JSON output', raw: output.slice(0, 500) };
+      return reply.send(data);
+    } catch (err: any) {
+      return reply.send({ error: `nselib probe failed: ${err.message}` });
+    }
   });
 };
 
