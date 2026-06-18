@@ -18,7 +18,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  const probeScriptPath = join(__dirname, '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
+  const probeScriptPath = join(__dirname, '..', '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
 
   app.get("/api/ops/health", async (_request, reply) => {
     const metrics: Record<string, any> = {};

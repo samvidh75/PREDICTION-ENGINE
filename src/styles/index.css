@@ -28,6 +28,17 @@
   --glass-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   --glass-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
   --depth-shadow: 0 12px 48px rgba(0, 0, 0, 0.07), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --ss-graphite: #111827;
+  --ss-graphite-2: #24313d;
+  --ss-emerald: #087f69;
+  --ss-teal: #0f9f92;
+  --ss-amber: #b7791f;
+  --ss-red: #b42318;
+  --ss-paper: #f8faf9;
+  --ss-mist: #edf6f3;
+  --ss-line: rgba(17, 24, 39, 0.1);
+  --ss-premium-shadow: 0 28px 80px rgba(15, 23, 42, 0.14), 0 10px 24px rgba(15, 23, 42, 0.08);
+  --ss-premium-shadow-soft: 0 18px 48px rgba(15, 23, 42, 0.1), 0 1px 0 rgba(255, 255, 255, 0.75) inset;
 }
 
 * {
@@ -41,7 +52,10 @@ body {
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  background:
+    linear-gradient(135deg, rgba(8, 127, 105, 0.08), transparent 32%),
+    radial-gradient(circle at 86% 14%, rgba(15, 159, 146, 0.12), transparent 30%),
+    linear-gradient(180deg, #fbfcfb 0%, #edf4f1 52%, #f7f9fb 100%);
   color: var(--color-text-primary);
   font-family: var(--font-body);
   overflow-x: hidden;
@@ -49,6 +63,96 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.ss-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(8, 127, 105, 0.08), transparent 32%),
+    radial-gradient(circle at 83% 12%, rgba(15, 159, 146, 0.14), transparent 26%),
+    radial-gradient(circle at 5% 80%, rgba(183, 121, 31, 0.08), transparent 22%),
+    linear-gradient(180deg, #fbfcfb 0%, #eef6f3 48%, #f8faf9 100%);
+  color: var(--ss-graphite);
+}
+
+.ss-shell-bg {
+  background:
+    linear-gradient(135deg, rgba(8, 127, 105, 0.09), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(15, 159, 146, 0.13), transparent 25%),
+    linear-gradient(180deg, #fbfcfb 0%, #eef6f3 52%, #f8faf9 100%);
+}
+
+.ss-surface {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: var(--ss-premium-shadow-soft);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.ss-surface-strong {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: var(--ss-premium-shadow);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.ss-dark-surface {
+  background:
+    radial-gradient(circle at top right, rgba(15, 159, 146, 0.25), transparent 38%),
+    linear-gradient(135deg, #101820 0%, #17232c 55%, #0c1218 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.34);
+}
+
+.ss-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(8, 127, 105, 0.18);
+  background: rgba(237, 246, 243, 0.9);
+  color: #075f51;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.48rem 0.68rem;
+}
+
+.ss-lift {
+  transform-style: preserve-3d;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.ss-lift:hover {
+  transform: translateY(-3px) rotateX(1deg);
+  box-shadow: var(--ss-premium-shadow);
+  border-color: rgba(8, 127, 105, 0.2);
+}
+
+.ss-grid-texture {
+  position: relative;
+  overflow: hidden;
+}
+
+.ss-grid-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(17, 24, 39, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.045) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), transparent 76%);
+}
+
+.ss-metric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: 0;
 }
 
 #root {
