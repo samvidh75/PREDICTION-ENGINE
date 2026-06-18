@@ -24,8 +24,8 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className="fixed bottom-0 left-0 top-15 z-40 hidden w-[220px] select-none flex-col justify-between py-4 md:flex"
-      style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRight: "1px solid rgba(255,255,255,0.5)" }}
+      className="fixed bottom-0 left-0 top-15 z-40 hidden w-[240px] select-none flex-col justify-between py-5 md:flex"
+      style={{ background: "linear-gradient(180deg,rgba(255,255,255,0.86),rgba(237,246,243,0.76))", backdropFilter: "blur(18px)", borderRight: "1px solid rgba(8,127,105,0.12)", boxShadow: "18px 0 48px rgba(15,23,42,0.08)" }}
     >
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3">
         {links.map((link) => {
@@ -35,12 +35,12 @@ export const Sidebar: React.FC = () => {
               key={link.id}
               type="button"
               onClick={() => MapsTo(link.id)}
-              className={`group flex h-9 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 text-left text-sm font-medium transition ${
+              className={`group flex h-11 w-full cursor-pointer items-center gap-3 rounded-2xl px-3 text-left text-sm font-semibold transition ${
                 isActive
-                  ? "text-white shadow-sm" + (isActive ? " bg-[#1a6e4a]" : "")
+                  ? "text-white shadow-sm" + (isActive ? " bg-[#087f69]" : "")
                   : "hover:bg-white/60" 
               }`}
-              style={isActive ? { background: "#1a6e4a", color: "white" } : { color: "#536471" }}
+              style={isActive ? { background: "linear-gradient(135deg,#087f69,#0f9f92)", color: "white", boxShadow: "0 14px 28px rgba(8,127,105,0.24)" } : { color: "#24313d" }}
             >
               <span className={`shrink-0 ${isActive ? "text-white" : "text-ink-muted"}`}>
                 {link.icon}
@@ -52,7 +52,7 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {isAuthenticated && (
-        <div className="mt-4 border-t px-3 pt-4" style={{ borderColor: "rgba(255,255,255,0.3)" }}>
+        <div className="mt-4 border-t px-3 pt-4" style={{ borderColor: "rgba(8,127,105,0.12)" }}>
           <button
             type="button"
             onClick={() => void logout()}
