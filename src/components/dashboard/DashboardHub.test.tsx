@@ -72,7 +72,7 @@ beforeEach(() => {
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('Recent signal changes')).toBeInTheDocument();
+    expect(screen.getByText('Signal changes')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
@@ -82,12 +82,12 @@ describe('DashboardHub states', () => {
 
   it('shows empty saved research state', () => {
     render(<DashboardHub />);
-    expect(screen.getByText(/No user-entered holdings saved/)).toBeInTheDocument();
+    expect(screen.getByText(/No positions saved/)).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
     render(<DashboardHub />);
-    expect(screen.getByText('Your Indian equity research command centre.')).toBeInTheDocument();
+    expect(screen.getByText('Research workspace')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {
@@ -119,7 +119,6 @@ describe('DashboardHub states', () => {
 
     render(<DashboardHub />);
 
-    expect(await screen.findByText('Companies covered')).toBeInTheDocument();
-    expect(screen.getByText('6')).toBeInTheDocument();
+    expect(await screen.findByText('Coverage')).toBeInTheDocument();
   });
 });

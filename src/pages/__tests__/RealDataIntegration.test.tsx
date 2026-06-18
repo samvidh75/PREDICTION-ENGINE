@@ -86,7 +86,7 @@ describe('Real Data Integration Pages', () => {
     });
   });
 
-  it('SearchPage hides Score pending when leaderboard has entry', async () => {
+  it('SearchPage hides Pending label when leaderboard has entry', async () => {
     window.history.replaceState({}, '', '?page=search&q=RELIANCE');
 
     vi.stubGlobal('fetch', makeMockFetch({
@@ -105,11 +105,11 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText('Score pending')).not.toBeInTheDocument();
+      expect(screen.queryByText('Pending')).not.toBeInTheDocument();
     });
   });
 
-  it('SearchPage shows Score pending for stocks without leaderboard entry', async () => {
+  it('SearchPage shows Pending for stocks without leaderboard entry', async () => {
     window.history.replaceState({}, '', '?page=search&q=TCS');
 
     vi.stubGlobal('fetch', makeMockFetch({
@@ -123,7 +123,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Score pending')).toBeInTheDocument();
+      expect(screen.getByText('Pending')).toBeInTheDocument();
     });
   });
 

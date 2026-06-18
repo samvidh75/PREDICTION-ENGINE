@@ -96,7 +96,7 @@ export const WatchlistPage: React.FC = () => {
 
   if (authState === "loading") {
     return (
-      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
         <div className="flex items-center justify-center min-h-[200px]">
           <span className="text-xs text-[#8B949E]">Loading watchlists...</span>
         </div>
@@ -105,7 +105,7 @@ export const WatchlistPage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+    <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />

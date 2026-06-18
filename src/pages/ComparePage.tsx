@@ -120,7 +120,7 @@ export const ComparePage: React.FC = () => {
 
   return (
     <PremiumPage nav={<><TopNav /><MobileNav /></>}>
-      <div className="mx-auto max-w-7xl px-4 pb-20 pt-24 sm:px-6 md:pt-28">
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
         <div className="mb-6">
           <div className="flex items-center gap-2">
             <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />

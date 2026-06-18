@@ -101,55 +101,39 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
-      <div
-        className="rounded-2xl p-8"
-        style={{ background: "rgba(255,255,255,0.75)", backdropFilter: "blur(20px)", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-      >
-        <div className="mx-auto flex max-w-[620px] flex-col gap-6 text-center">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "#0f1419" }}>Search Indian companies</h1>
-            <p className="mt-1.5 text-base" style={{ color: "#536471" }}>Start with a ticker, company name, or sector.</p>
+    <div className="flex flex-col gap-5 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
+      {/* Compact search header — no bulky glass card */}
+      <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-2.5 shadow-sm">
+        <Search className="h-4 w-4 shrink-0" style={{ color: "#8b98a5" }} />
+        <input
+          aria-label="Search Indian companies"
+          ref={inputRef}
+          value={query}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+          placeholder="Search by ticker, company name, or sector..."
+          className="h-9 w-full bg-transparent text-sm outline-none placeholder:opacity-60"
+          style={{ color: "#0f1419" }}
+        />
+        {recentSearches.length > 0 && !query.trim() && (
+          <div className="hidden items-center gap-1.5 sm:flex">
+            <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#8b98a5" }}>Recent</span>
+            {recentSearches.slice(0, 3).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => handleRecentSearch(item)}
+                className="rounded-lg px-2.5 py-1 text-[11px] font-medium transition hover:bg-white/80"
+                style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
+              >
+                {item}
+              </button>
+            ))}
           </div>
-
-          <div className="relative">
-            <div
-              className="flex items-center gap-3 px-4 rounded-2xl transition-all duration-200 focus-within:shadow-lg"
-              style={{ background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.5)" }}
-            >
-              <Search className="h-4 w-4 shrink-0" style={{ color: "#8b98a5" }} />
-              <input
-                aria-label="Search Indian companies"
-                ref={inputRef}
-                value={query}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-                placeholder="Try RELIANCE, TCS, INFY..."
-                className="h-11 w-full bg-transparent text-sm outline-none placeholder:opacity-60"
-                style={{ color: "#0f1419" }}
-              />
-            </div>
-          </div>
-
-          {recentSearches.length > 0 && !query.trim() && (
-            <div className="flex flex-wrap justify-center gap-2">
-              {recentSearches.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => handleRecentSearch(item)}
-                  className="rounded-xl px-3.5 py-1.5 text-xs transition hover:bg-white/60"
-                  style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      <section className="space-y-5">
+      <section className="space-y-4">
         {query.trim().length >= 2 ? (
           <>
             <div className="text-sm" style={{ color: "#536471" }}>
@@ -157,7 +141,7 @@ export const SearchPage: React.FC = () => {
             </div>
 
             {results.length > 0 ? (
-              <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2">
                 {results.map((stock, idx) => {
                   const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
                   const prediction = predictionsMap[cleanedSym];
@@ -171,79 +155,44 @@ export const SearchPage: React.FC = () => {
                     <button
                       key={stock.symbol}
                       onClick={() => handleOpenStock(stock)}
-                      className="flex cursor-pointer flex-col justify-between rounded-2xl p-6 text-left transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-                      style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+                      className="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-left transition-all duration-200 hover:border-emerald-200 hover:bg-emerald-50/60"
                     >
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <div>
-                          <div className="font-mono text-lg font-semibold" style={{ color: "#0f1419" }}>
-                            {stock.symbol}
-                          </div>
-                          <div className="max-w-[200px] truncate text-sm" style={{ color: "#536471" }}>
-                            {stock.companyName}
-                          </div>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            <Badge variant="info" glass>{stock.sector || predictionSector || "Unavailable"}</Badge>
-                            {stock.exchange && <Badge variant="neutral" glass>{stock.exchange}</Badge>}
-                          </div>
-                        </div>
-                        {score !== null ? (
-                          <div className="flex flex-col items-end gap-1">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm font-bold" style={{ color: "#0f1419" }}>{stock.symbol}</span>
+                          {score !== null ? (
                             <ScorePill score={Math.round(score)} />
-                            {rank !== null && (
-                              <span className="text-xs font-medium" style={{ color: "#536471" }}>{formatRank(rank)}</span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-                            Score pending
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-3.5 text-xs" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-                        <div className="flex flex-wrap gap-2">
-                          {predictionDate && (
-                            <span className="inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold" style={{ background: "#e8f4ee", borderColor: "rgba(26,110,74,0.2)", color: "#1a6e4a" }}>
-                              Updated {formatFreshness(predictionDate)}
-                            </span>
-                          )}
-                          {!prediction && (
-                            <span className="inline-flex items-center rounded-lg px-1.5 py-0.5 text-[10px] font-medium font-mono" style={{ background: "rgba(255,255,255,0.6)", color: "#536471" }}>
-                              Base listing — no score yet
-                            </span>
-                          )}
-                          {confidenceScore !== null && (
-                            <span className="inline-flex items-center rounded-lg px-1.5 py-0.5 text-[10px] font-medium font-mono" style={{ background: "rgba(255,255,255,0.6)", color: "#2c6b9e" }}>
-                              {Math.round(confidenceScore)}% confidence
-                            </span>
+                          ) : (
+                            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>Pending</span>
                           )}
                         </div>
-                        <span className="tabular-nums" style={{ color: "#536471" }}>
-                          {typeof stock.marketCap.numeric === "number" ? formatINR(stock.marketCap.numeric, true) : stock.marketCap.formatted || "Unavailable"}
-                        </span>
+                        <div className="mt-0.5 flex items-center gap-2">
+                          <span className="truncate text-xs" style={{ color: "#536471" }}>{stock.companyName}</span>
+                          <span className="text-[10px] font-medium" style={{ color: "#8b98a5" }}>{stock.sector || predictionSector || ""}</span>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 flex-col items-end gap-0.5">
+                        {rank !== null && <span className="text-[10px] font-medium" style={{ color: "#536471" }}>#{rank}</span>}
+                        {confidenceScore !== null && <span className="text-[10px] font-mono" style={{ color: "#2c6b9e" }}>{Math.round(confidenceScore)}%</span>}
                       </div>
                     </button>
                   );
                 })}
               </div>
             ) : (
-              <div
-                className="flex flex-col items-center justify-center p-10 text-center rounded-2xl"
-                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}
-              >
-                <span className="text-base font-semibold" style={{ color: "#0f1419" }}>No matching equity found</span>
-                <p className="mt-1.5 text-sm max-w-md" style={{ color: "#536471" }}>
-                  We couldn't find any companies matching "{query.trim()}". Try searching for these major Indian companies:
+              <div className="rounded-xl border border-slate-200 bg-white/80 px-6 py-8 text-center">
+                <p className="text-sm font-semibold" style={{ color: "#0f1419" }}>No matching equity found</p>
+                <p className="mt-1 text-xs" style={{ color: "#536471" }}>
+                  Try searching for: 
                 </p>
-                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                <div className="mt-3 flex flex-wrap justify-center gap-1.5">
                   {["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"].map((sym) => (
                     <button
                       key={sym}
                       type="button"
                       onClick={() => handleRecentSearch(sym)}
-                      className="rounded-xl px-3.5 py-1.5 text-xs transition hover:bg-white/60"
-                      style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
+                      className="rounded-lg px-2.5 py-1 text-[11px] font-medium transition hover:bg-white/80"
+                      style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
                     >
                       {sym}
                     </button>

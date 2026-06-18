@@ -22,7 +22,7 @@ const does: Array<[string, LucideIcon]> = [
 
 export const PublicAboutPage: React.FC = () => (
   <PremiumPage nav={<><TopNav /><MobileNav /></>}>
-    <section className="mx-auto max-w-7xl px-4 pb-14 pt-24 sm:px-6 md:pt-32">
+    <section className="w-full px-6 pb-14 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
       <Surface dark className="ss-grid-texture relative overflow-hidden p-6 md:p-10">
         <div className="relative z-10 max-w-4xl">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
@@ -43,7 +43,8 @@ export const PublicAboutPage: React.FC = () => (
       </Surface>
     </section>
 
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
+      <div className="mx-auto w-full max-w-[1440px]">
       <SectionHeader eyebrow="What it does" title="A research terminal, not an advisory desk." body="The interface helps users move from company discovery to source verification while keeping limitations explicit." />
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {does.map(([label, Icon]) => (
@@ -53,10 +54,11 @@ export const PublicAboutPage: React.FC = () => (
           </Surface>
         ))}
       </div>
+      </div>
     </section>
 
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
+      <div className="mx-auto w-full max-w-[1440px]"><div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <Surface className="p-6 md:p-8">
           <XCircle className="h-7 w-7 text-red-700" aria-hidden="true" />
           <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">What StockStory India does not do</h2>
@@ -75,9 +77,11 @@ export const PublicAboutPage: React.FC = () => (
           ))}
         </div>
       </div>
+      </div>
     </section>
 
-    <section className="mx-auto max-w-7xl px-4 pb-24 pt-12 sm:px-6">
+    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
+      <div className="mx-auto w-full max-w-[1440px]">
       <Surface dark className="p-6 md:p-9">
         <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
           <div>
@@ -88,6 +92,7 @@ export const PublicAboutPage: React.FC = () => (
           <Button type="button" onClick={() => navigatePage("trust")} className="h-12 px-6 text-sm">Review data policy</Button>
         </div>
       </Surface>
+      </div>
     </section>
   </PremiumPage>
 );

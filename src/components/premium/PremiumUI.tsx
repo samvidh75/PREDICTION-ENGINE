@@ -19,7 +19,7 @@ export function navigatePage(pageKey: string, id?: string): void {
    ============================================ */
 
 export function AppShell({ children }: { children: React.ReactNode }): JSX.Element {
-  return <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">{children}</div>;
+  return <div className="w-full px-4 py-6 md:px-8 md:py-8">{children}</div>;
 }
 
 export function Section({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
@@ -220,7 +220,7 @@ export function PremiumSkeleton(): JSX.Element {
    ============================================ */
 
 export function AppScreen({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
-  return <div className={`mx-auto w-full max-w-7xl space-y-6 ${className}`}>{children}</div>;
+  return <div className={`w-full space-y-5 ${className}`}>{children}</div>;
 }
 
 export function MobilePageHeader({ eyebrow, title, body, action }: {
