@@ -402,12 +402,12 @@ test.describe("Authenticated shell", () => {
     await assertNoRenderGarbage(page);
   });
 
-  test("sidebar navigation works — navigate to methodology", async ({
+  test("sidebar navigation works — navigate to Trust Centre", async ({
     page,
   }) => {
     await page.goto("/?page=dashboard");
     const sidebar = page.locator("aside");
-    await sidebar.getByRole("button", { name: /research|methodology/i }).click();
+    await sidebar.getByRole("button", { name: /trust centre|trust/i }).click();
     await expect(page).toHaveURL(/page=methodology/);
   });
 

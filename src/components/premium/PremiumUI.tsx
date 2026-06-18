@@ -75,12 +75,29 @@ export function StatusChip({
   label: string;
   tone?: "ok" | "warn" | "muted" | "risk";
 }): JSX.Element {
-  const style = {
-    ok: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    warn: "border-amber-200 bg-amber-50 text-amber-800",
-    muted: "border-slate-200 bg-white/70 text-slate-600",
-    risk: "border-red-200 bg-red-50 text-red-700",
+  const styleMap = {
+    ok: {
+      border: "var(--color-primary-light)",
+      background: "var(--color-primary-light)",
+      color: "var(--color-primary)",
+    },
+    warn: {
+      border: "var(--color-gold)",
+      background: "var(--color-gold)",
+      color: "var(--color-info)",
+    },
+    muted: {
+      border: "var(--color-border-light)",
+      background: "rgba(255,255,255,0.7)",
+      color: "var(--color-text-muted)",
+    },
+    risk: {
+      border: "var(--color-red)",
+      background: "var(--color-red)",
+      color: "var(--color-red)",
+    },
   }[tone];
+  const style = `${styleMap.border ? `border` : ''} ${styleMap.background ? `bg` : ''}`; // placeholder to keep className structure
   return <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${style}`}>{label}</span>;
 }
 
@@ -98,7 +115,7 @@ export function MetricCard({
   return (
     <Surface className="ss-lift p-5">
       <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">{label}</div>
-      <div className={`ss-metric mt-2 text-3xl font-semibold ${tone === "warn" ? "text-amber-800" : tone === "muted" ? "text-slate-500" : "text-slate-950"}`}>
+      <div className={`ss-metric mt-2 text-3xl font-semibold ${tone === "warn" ? "text-[var(--color-gold)]" : tone === "muted" ? "text-[var(--color-text-muted)]" : "text-[var(--color-primary)]"}`}>
         {value}
       </div>
       {detail && <p className="mt-2 text-xs leading-5 text-slate-500">{detail}</p>}
@@ -117,9 +134,9 @@ export function DataUnavailableState({
 }): JSX.Element {
   return (
     <Surface className="flex flex-col items-center justify-center p-8 text-center">
-      <AlertTriangle className="h-7 w-7 text-amber-700" aria-hidden="true" />
-      <h3 className="mt-4 text-lg font-semibold text-slate-950">{title}</h3>
-      <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">{body}</p>
+      <AlertTriangle className="h-7 w-7 text-[var(--color-gold)]" aria-hidden="true" />
+      <h3 className="mt-4 text-lg font-semibold text-[var(--color-primary)]">{title}</h3>
+      <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-muted)]">{body}</p>
       {action && <div className="mt-5">{action}</div>}
     </Surface>
   );
@@ -133,9 +150,9 @@ export function IntegrityStrip(): JSX.Element {
   ];
   return (
     <div className="flex flex-wrap gap-2">
-      {items.map(({ icon: Icon, label }) => (
-        <span key={label} className="ss-pill">
-          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      { items.map(({ icon: Icon, label }) => (
+        <span key={label} className="ss-pill" style={{ background: "var(--color-primary-light)", color: "var(--color-primary)" }}>
+          <Icon className="h-3.5 w-3.5" aria-hidden="true" style={{ color: "var(--color-primary)" }} />
           {label}
         </span>
       ))}
@@ -146,12 +163,12 @@ export function IntegrityStrip(): JSX.Element {
 export function PremiumSkeleton(): JSX.Element {
   return (
     <Surface className="space-y-4 p-6">
-      <div className="skeleton h-5 w-44" />
-      <div className="skeleton h-10 w-full" />
+      <div className="skeleton h-5 w-44" style={{ background: "var(--color-primary-light)" }} />
+      <div className="skeleton h-10 w-full" style={{ background: "var(--color-primary-light)" }} />
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="skeleton h-20" />
-        <div className="skeleton h-20" />
-        <div className="skeleton h-20" />
+        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
+        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
+        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
       </div>
     </Surface>
   );

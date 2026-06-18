@@ -102,9 +102,9 @@ function inferDomains(key: string, entry: ProviderEntry): Record<string, Provide
 }
 
 function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return "N/A";
+  if (!dateStr) return "Not available";
   const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
+  if (isNaN(d.getTime())) return "Not available";
   return d.toLocaleDateString("en-IN", {
     day: "numeric", month: "short", year: "numeric",
     hour: "2-digit", minute: "2-digit",
@@ -233,7 +233,7 @@ export const TrustCentrePage: React.FC = () => {
         {rawState !== "ok" && (
           <div
             className="rounded-xl p-4 text-sm"
-            role="status"
+            role="alert"
             style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
           >
             <p className="font-semibold text-xs">{humanState}</p>
@@ -354,9 +354,11 @@ export const TrustCentrePage: React.FC = () => {
                         {entry.message}
                       </p>
                     )}
-                    <div className="mt-3 text-[10px]" style={{ color: "#8899a6" }}>
-                      As of {formatDate(generatedAt || null)}
-                    </div>
+                    {generatedAt && (
+                      <div className="mt-3 text-[10px]" style={{ color: "#8899a6" }}>
+                        As of {formatDate(generatedAt)}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -383,7 +385,7 @@ export const TrustCentrePage: React.FC = () => {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-semibold" style={{ color: "#0f1419" }}>
-                          {PROVIDER_LABELS[key] || key.replace(/_/g, " ")}
+                        {PROVIDER_LABELS[key] || "Provider"}
                         </h3>
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${s.bg} ${s.text} border ${s.border}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />

@@ -130,7 +130,7 @@ export const PublicRankingsPage: React.FC = () => {
             <select
               value={sectorFilter}
               onChange={(e) => setSectorFilter(e.target.value)}
-              className="h-10 w-full rounded-xl px-3 text-sm focus:outline-none sm:w-48"
+              className="h-10 w-full rounded-xl px-3 text-sm focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:w-48"
               style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#0f1419" }}
             >
               {sectors.map((sec) => (
@@ -141,7 +141,7 @@ export const PublicRankingsPage: React.FC = () => {
         </Surface>
 
         {loading ? (
-          <div className="py-12 text-center text-sm" style={{ color: "#536471" }}>Loading rankings…</div>
+          <div className="py-12 text-center text-sm" style={{ color: "#536471" }} role="status" aria-live="polite">Loading rankings…</div>
         ) : filteredRankings.length === 0 && rankings.length === 0 ? (
           <div className="flex flex-col gap-5">
             <EmptyState
@@ -201,6 +201,9 @@ export const PublicRankingsPage: React.FC = () => {
                   key={r.symbol}
                   className="cursor-pointer transition-colors hover:bg-white/40"
                   onClick={() => setPage("stock", r.symbol)}
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPage("stock", r.symbol); } }}
                 >
                   <td className="p-4 font-semibold" style={{ color: "#536471" }}>{formatRank(r.rank)}</td>
                   <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{r.symbol}</td>

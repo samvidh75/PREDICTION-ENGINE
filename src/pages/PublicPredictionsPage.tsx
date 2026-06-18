@@ -163,11 +163,11 @@ export default function PublicPredictionsPage(): JSX.Element {
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
-                  <th className="p-4">Symbol</th>
-                  <th className="p-4">Signal</th>
-                  <th className="p-4 hidden sm:table-cell">Severity</th>
-                  <th className="p-4 hidden md:table-cell">Explanation</th>
-                  <th className="p-4 hidden lg:table-cell">Freshness</th>
+                  <th scope="col" className="p-4">Symbol</th>
+                  <th scope="col" className="p-4">Signal</th>
+                  <th scope="col" className="p-4 hidden sm:table-cell">Severity</th>
+                  <th scope="col" className="p-4 hidden md:table-cell">Explanation</th>
+                  <th scope="col" className="p-4 hidden lg:table-cell">Freshness</th>
                 </tr>
               </thead>
               <tbody className="divide-y" style={{ borderColor: "rgba(255,255,255,0.2)" }}>
@@ -178,7 +178,10 @@ export default function PublicPredictionsPage(): JSX.Element {
                     <tr
                       key={`${signal.symbol}:${i}`}
                       onClick={() => signal.symbol && navigate(signal.symbol)}
-                      className="cursor-pointer transition-colors hover:bg-white/40"
+                      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && signal.symbol) { e.preventDefault(); navigate(signal.symbol); } }}
+                      tabIndex={0}
+                      role="link"
+                      className="cursor-pointer transition-colors hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
                     >
                       <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{signal.symbol}</td>
                       <td className="p-4">
