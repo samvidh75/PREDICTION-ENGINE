@@ -103,14 +103,38 @@ export class MigrationRunner {
     };
   }
 
+  async listMismatched(): Promise<{ id: string; storedChecksum: string; fileChecksum: string }[]> {
+    const applied = await this.listApplied();
+    const available = await this.listAvailable();
+    const mismatched: { id: string; storedChecksum: string; fileChecksum: string }[] = [];
+    for (const a of applied) {
+      const matching = available.find(av => av.id === a.id);
+      if (matching && a.checksum !== matching.checksum) {
+        mismatched.push({ id: a.id, storedChecksum: a.checksum, fileChecksum: matching.checksum });
+      }
+    }
+    return mismatched;
+  }
+
   async runPending(force?: boolean): Promise<MigrationStatus> {
     await this.ensureTable();
     const statusResult = await this.status();
     if (statusResult.checksumMismatch) {
       if (force) {
-        console.warn('[MigrationRunner] WARNING: checksum mismatch ignored (--force). Running pending migrations anyway.');
+        const mismatched = await this.listMismatched();
+        console.warn('═══════════════════════════════════════════════════════════════════');
+        console.warn('  ⚠️  MIGRATION CHECKSUM MISMATCH — FORCE MODE');
+        console.warn('  The following applied migration files have changed on disk:');
+        for (const m of mismatched) {
+          console.warn(`  - ${m.id}: stored=${m.storedChecksum}  file=${m.fileChecksum}`);
+        }
+        console.warn('');
+        console.warn('  ONLY pending migrations will be applied. Already-applied');
+        console.warn('  migrations will NOT be re-run. This is safe because the');
+        console.warn('  existing schema is already present in the database.');
+        console.warn('═══════════════════════════════════════════════════════════════════');
       } else {
-        throw new Error('Migration checksum mismatch — cannot run pending migrations safely.');
+        throw new Error('Migration checksum mismatch — cannot run pending migrations safely. Use --force to bypass if you have verified safety.');
       }
     }
 
