@@ -157,7 +157,7 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Research Indian equities/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AI-native research intelligence/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -221,7 +221,7 @@ test.describe("Public navigation", () => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-methodology").click();
-    await expect(page).toHaveURL(/page=methodology/);
+    await expect(page).toHaveURL(/page=trust/);
   });
 
   test("landing page has working CTA to signup bottom", async ({ page }) => {
@@ -310,14 +310,14 @@ test.describe("Search route", () => {
   test("search page renders with input", async ({ page }) => {
     await page.goto("/?page=search");
     await expect(page.locator("body")).toBeVisible();
-    const input = page.getByPlaceholder(/reliance|tcs|infy/i);
+    const input = page.getByRole("textbox", { name: /Search Indian companies/i });
     await expect(input).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("search for RELIANCE returns results", async ({ page }) => {
     await page.goto("/?page=search");
-    const input = page.getByPlaceholder(/reliance|tcs|infy/i);
+    const input = page.getByRole("textbox", { name: /Search Indian companies/i });
     await input.fill("RELIANCE");
     // Small wait for local registry search to debounce
     await page.waitForTimeout(300);
@@ -364,7 +364,7 @@ test.describe("Company page", () => {
     await assertNoRenderGarbage(page);
     // Should show prediction unavailable message
     await expect(
-      page.getByText(/company not indexed yet|awaiting prediction indexing|prediction unavailable/i)
+      page.getByText(/company not indexed yet|awaiting prediction indexing|prediction unavailable/i).first()
     ).toBeVisible();
   });
 });
@@ -393,30 +393,29 @@ test.describe("Authenticated shell", () => {
     await mockAllApi(page);
   });
 
-  test("dashboard renders with sidebar", async ({ page }) => {
+  test("dashboard renders with left rail", async ({ page }) => {
     await page.goto("/?page=dashboard");
     await expect(page.locator("body")).toBeVisible();
-    // Sidebar should be on desktop
-    const sidebar = page.locator("aside");
-    await expect(sidebar.getByText(/home/i)).toBeVisible();
+    // Left rail should be on desktop
+    const rail = page.locator("nav[aria-label='Main navigation']").first();
+    await expect(rail).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
-  test("sidebar navigation works — navigate to Trust Centre", async ({
+  test("left rail navigation works — navigate to Trust Centre", async ({
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    const sidebar = page.locator("aside");
-    await sidebar.getByRole("button", { name: /trust centre|trust/i }).click();
-    await expect(page).toHaveURL(/page=methodology/);
+    const rail = page.locator("nav").first();
+    await rail.getByRole("button", { name: /trust/i }).click();
+    await expect(page).toHaveURL(/page=trust/);
   });
 
-  test("sidebar navigation works — navigate to settings", async ({
+  test("top bar navigation works — navigate to settings", async ({
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    const sidebar = page.locator("aside");
-    await sidebar.getByRole("button", { name: /settings/i }).click();
+    await page.getByRole("link", { name: /settings/i }).click();
     await expect(page).toHaveURL(/page=settings/);
     await expect(page.locator("body")).toBeVisible();
     await assertNoRenderGarbage(page);
@@ -445,7 +444,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /Research Indian equities/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AI-native research intelligence/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
