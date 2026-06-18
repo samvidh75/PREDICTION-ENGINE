@@ -17,6 +17,7 @@ const ROUTES: Array<[string, string, boolean]> = [
   ["search-auth", "/?page=search", true],
   ["compare-auth", "/?page=compare", true],
   ["watchlist-auth", "/?page=watchlist", true],
+  ["portfolio-auth", "/?page=portfolio", true],
   ["company-reliance-auth", "/?page=stock&id=RELIANCE", true],
 ];
 
@@ -38,7 +39,7 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
     if (msg.type() === "error") consoleErrors.push(msg.text());
   });
 
-  if (url.includes("auth") || url.includes("dashboard") || url.includes("search") || url.includes("stock")) {
+  if (url.includes("auth") || url.includes("dashboard") || url.includes("search") || url.includes("stock") || url.includes("compare") || url.includes("watchlist") || url.includes("portfolio")) {
     await page.addInitScript(() => {
       window.localStorage.setItem("ss_auth_session_v1", JSON.stringify({
         status: "authenticated", uid: "audit-user", createdAtMs: Date.now(),
@@ -49,48 +50,74 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
   await page.goto(url, { waitUntil: "load", timeout: 15000 }).catch(() =>
     page.goto(url, { waitUntil: "domcontentloaded", timeout: 10000 }).catch(() => {})
   );
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1000);
 
   const audit = await page.evaluate((vw) => {
     const doc = document.documentElement;
     const body = document.body;
     const overflow = Math.max(doc.scrollWidth, body.scrollWidth) - vw;
 
-    // Find main content width
-    const main = document.querySelector("main");
+    // Find the actual content container — try main, then ss-page, then #root, then first large div
+    const main = document.querySelector("main, .ss-page, #root, [class*='page-content'], [class*='content-area']");
     const mainRect = main ? main.getBoundingClientRect() : null;
-    const contentWidth = mainRect ? mainRect.width : 0;
 
-    // Check for bottom nav on desktop
-    const bottomNav = document.querySelector("[class*='bottom-nav'], .ssi-bottom-nav, [class*='bottom dock'], nav.fixed.bottom-0");
-    const bottomNavVisible = bottomNav ? true : false;
+    // Fallback: measure the widest visible block
+    const allBlocks = Array.from(document.querySelectorAll(
+      "main, .ss-page, [class*='max-w'], [class*='w-full'], [class*='container'], #root > div"
+    ));
+    const largest = allBlocks.reduce<number>((acc, el) => {
+      const r = el.getBoundingClientRect();
+      return Math.max(acc, r.width);
+    }, 0);
 
-    // Check for large empty right area (if main content is significantly narrower than viewport)
-    const emptyRight = mainRect ? vw - mainRect.right : vw;
+    // Actual content width: use mainRect if found and reasonable, else use largest block
+    const contentWidth = (mainRect && mainRect.width > 100) ? mainRect.width : largest;
+    const emptyRight = (mainRect && mainRect.width > 100) ? Math.max(0, vw - mainRect.right) : 0;
 
-    // Check for any max-w-7xl or narrow container
-    const containers = document.querySelectorAll("[class*='max-w-7xl'], [class*='max-w-5xl']");
-    const hasNarrowContainer = containers.length > 0;
+    // Visible bottom dock check — not just DOM presence, but actually displayed
+    const bottomNavs = document.querySelectorAll(
+      "nav.fixed.bottom-0, [class*='bottom-nav'], .ssi-bottom-nav, [class*='bottom dock']"
+    );
+    let bottomDockVisible = false;
+    bottomNavs.forEach((nav) => {
+      const style = window.getComputedStyle(nav);
+      const rect = nav.getBoundingClientRect();
+      // Check it's actually visible in the viewport bottom area
+      if (style.display !== "none" && style.visibility !== "hidden" && rect.height > 0 && rect.top < vw * 0.9) {
+        bottomDockVisible = true;
+      }
+    });
 
-    // Check viewport for main content under 900px
+    // Check for narrow max-w-7xl container on desktop
+    const narrowContainers = document.querySelectorAll("[class*='max-w-7xl'], [class*='max-w-5xl']");
+    let hasNarrowContainer = false;
+    narrowContainers.forEach((el) => {
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      if (style.display !== "none" && rect.width > 0 && rect.width < 900) {
+        hasNarrowContainer = true;
+      }
+    });
+
     const contentUnder900 = contentWidth > 0 && contentWidth < 900;
 
-    // Check for raw undefined/null/NaN in text
+    // Raw tokens
     const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(body.innerText);
 
     return {
       contentWidthPx: Math.round(contentWidth),
       viewportWidth: vw,
       emptyRightAreaPx: Math.round(emptyRight),
-      hasBottomDock: bottomNavVisible,
-      bottomDockVisible: bottomNavVisible,
+      hasBottomDock: bottomDockVisible,
+      bottomDockVisible,
       horizontalOverflow: overflow > 8,
       mainContentUnder900: contentUnder900 && vw >= 1440,
       errors: [
         ...(rawToken ? ["raw undefined/null/NaN visible"] : []),
         ...(overflow > 8 ? [`horizontal overflow ${overflow}px`] : []),
         ...(contentUnder900 && vw >= 1440 ? ["main content under 900px on desktop viewport"] : []),
-        ...(bottomNavVisible && vw >= 1024 ? ["bottom nav visible on desktop/tablet"] : []),
+        ...(bottomDockVisible && vw >= 1024 ? ["bottom nav visible on desktop/tablet"] : []),
+        ...(hasNarrowContainer && vw >= 1440 ? ["narrow container (max-w-7xl/5xl) found on desktop"] : []),
       ],
     };
   }, viewportW);
@@ -128,7 +155,7 @@ async function main() {
       results.push(`### ${routeName} @ ${vp.label}`);
       results.push(`- Content: ${audit.contentWidthPx}px / Viewport: ${audit.viewportWidth}px`);
       results.push(`- Empty right: ${audit.emptyRightAreaPx}px`);
-      results.push(`- Bottom dock: ${audit.hasBottomDock ? "YES" : "no"}`);
+      results.push(`- Bottom dock visible: ${audit.bottomDockVisible ? "YES" : "no"}`);
       results.push(`- Overflow: ${audit.horizontalOverflow ? "YES" : "no"}`);
       results.push(`- Status: **${status}**`);
       if (audit.errors.length > 0) {

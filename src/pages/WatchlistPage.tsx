@@ -94,6 +94,15 @@ export const WatchlistPage: React.FC = () => {
     return null;
   };
 
+  const sectorBreakdown = useMemo(() => {
+    const counts: Record<string, number> = {};
+    activeTickers.forEach((t) => {
+      const sec = StockRegistry.getStock(t)?.sector || "Unknown";
+      counts[sec] = (counts[sec] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [activeTickers]);
+
   if (authState === "loading") {
     return (
       <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
@@ -105,13 +114,25 @@ export const WatchlistPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-      <div className="mb-6">
-        <div className="flex items-center gap-2">
-          <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-base font-semibold text-[#E6EDF3]">Saved research</h1>
+    <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-24 lg:px-16 xl:px-24">
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <h1 className="text-base font-semibold text-[#E6EDF3]">Saved research</h1>
+          </div>
+          <p className="mt-1 text-xs text-[#8B949E]">Companies you are tracking for research follow-up. Tap a row to inspect the evidence view.</p>
         </div>
-        <p className="mt-1 text-xs text-[#8B949E]">Companies you are tracking for research follow-up. Tap a row to inspect the evidence view.</p>
+        {sectorBreakdown.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Sectors</span>
+            {sectorBreakdown.map(([sector, count]) => (
+              <span key={sector} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">
+                {sector} <span className="text-[#484F58]">({count})</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">

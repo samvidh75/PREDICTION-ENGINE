@@ -4,13 +4,13 @@ import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { EmptyState } from "../components/ui/DataState";
-import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } from "../components/ui/PageHeader";
+import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
-import { AppScreen, DataSourcePill, MetricCard, MobilePageHeader, PremiumPage, ResearchHeroCard, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
+import { AppScreen, DataSourcePill, MetricCard, PremiumPage, Surface } from "../components/premium/PremiumUI";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
 import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
 import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
@@ -86,22 +86,27 @@ export const PublicRankingsPage: React.FC = () => {
     <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-24 lg:px-16 xl:px-24">
         <AppScreen>
-        <MobilePageHeader eyebrow="AI scanner" title="Research rankings" body="Ranked companies from the latest verified scoring cycle." />
-        <ResearchHeroCard eyebrow="Source-backed" title="Ranked companies with inspectable intelligence." body="Scores, confidence, and freshness from the leaderboard API. Missing values are labelled.">
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research rankings</span>
+            <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Research rankings</h1>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[#8B949E]">
+              Ranked companies from the latest verified scoring cycle. Scores, confidence, and freshness are visible and missing values are labelled.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             <DataSourcePill label={`${rankings.length.toLocaleString("en-IN")} rows loaded`} tone="muted" />
             {freshnessDate ? <DataSourcePill label={`Fresh ${formatFreshness(freshnessDate)}`} tone="ok" /> : <DataSourcePill label="Freshness pending" tone="warn" />}
           </div>
-        </ResearchHeroCard>
+        </div>
 
-        <Surface dark className="ss-grid-texture relative mb-6 hidden overflow-hidden p-6 md:p-8">
-          <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <SectionHeader eyebrow="Leaderboard" title="Research rankings" body="Company rankings from the latest verified scoring cycle, with source freshness visible and missing values labelled." />
-            {freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
-          </div>
-        </Surface>
+        <div className="mb-6 grid gap-3 sm:grid-cols-3">
+          <MetricCard label="Rows loaded" value={rankings.length.toLocaleString("en-IN")} detail="From leaderboard API." />
+          <MetricCard label="Covered symbols" value={symbolCount !== null ? symbolCount.toLocaleString("en-IN") : "Unavailable"} detail="Coverage endpoint." />
+          <MetricCard label="Scored records" value={registryRowCount !== null ? registryRowCount.toLocaleString("en-IN") : "Pending"} detail={latestPredictionDate ? "Latest verified cycle available." : "Latest date unavailable."} tone={registryRowCount ? "ok" : "warn"} />
+        </div>
 
         {error && (
           <div className="mb-4 rounded-xl border border-[#EF9A09]/20 bg-[#EF9A09]/[0.03] p-4 text-xs text-[#EF9A09]" role="status">
@@ -109,12 +114,6 @@ export const PublicRankingsPage: React.FC = () => {
             <p className="mt-1">{error}</p>
           </div>
         )}
-
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <MetricCard label="Rows loaded" value={rankings.length.toLocaleString("en-IN")} detail="From leaderboard API." />
-          <MetricCard label="Covered symbols" value={symbolCount !== null ? symbolCount.toLocaleString("en-IN") : "Unavailable"} detail="Coverage endpoint." />
-          <MetricCard label="Scored records" value={registryRowCount !== null ? registryRowCount.toLocaleString("en-IN") : "Pending"} detail={latestPredictionDate ? "Latest verified cycle available." : "Latest date unavailable."} tone={registryRowCount ? "ok" : "warn"} />
-        </div>
 
         {/* Rank explanation panel */}
         {explanation && (
@@ -153,7 +152,7 @@ export const PublicRankingsPage: React.FC = () => {
 
         <Surface className="my-6 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
           <div className="w-full sm:w-72">
-            <Input aria-label="Search rankings by symbol or sector" placeholder="Search symbol or sector..." glass value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+            <Input aria-label="Search rankings by symbol or sector" placeholder="Search symbol or sector..." value={searchText} onChange={(e) => setSearchText(e.target.value)} />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <span className="whitespace-nowrap text-xs font-medium text-muted">Sector:</span>
@@ -200,7 +199,7 @@ export const PublicRankingsPage: React.FC = () => {
         ) : (
           <>
           <div className="hidden md:block">
-            <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness", ""]}>
+            <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness", ""]}>
               {filteredRankings.map((r) => (
                 <tr
                   key={r.symbol}
@@ -216,7 +215,7 @@ export const PublicRankingsPage: React.FC = () => {
                   <td className="p-4">{typeof r.rankingScore === "number" && Number.isFinite(r.rankingScore) ? <ScorePill score={Math.round(r.rankingScore)} /> : <MissingDataBadge />}</td>
                   <td className="p-4">{typeof r.confidenceScore === "number" && Number.isFinite(r.confidenceScore) ? <ScorePill score={Math.round(r.confidenceScore)} /> : <MissingDataBadge />}</td>
                   <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
-                  <td className="p-4">{r.predictionDate ? <span className="text-[10px] font-semibold whitespace-nowrap text-[var(--color-active)]">{formatFreshness(r.predictionDate)}</span> : <span className="text-[10px] text-[var(--color-text-muted)]">Pending</span>}</td>
+                    <td className="p-4">{r.predictionDate ? <span className="text-[10px] font-medium whitespace-nowrap text-[var(--color-active)]">{formatFreshness(r.predictionDate)}</span> : <span className="text-[10px] text-[var(--color-text-muted)]">Pending</span>}</td>
                   <td className="p-4">
                     <button
                       type="button"
@@ -235,7 +234,7 @@ export const PublicRankingsPage: React.FC = () => {
               <div key={r.symbol} className="rounded-[22px] border border-white/5 bg-[#0D1117] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#484F58]">{formatRank(r.rank)}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#484F58]">{formatRank(r.rank)}</div>
                     <button onClick={() => setPage("stock", r.symbol)} className="mt-1 font-mono text-base font-bold text-[#E6EDF3] hover:underline">{r.symbol}</button>
                     <div className="mt-1 text-xs text-[#8B949E]">{r.companyName || "Unavailable"}</div>
                   </div>

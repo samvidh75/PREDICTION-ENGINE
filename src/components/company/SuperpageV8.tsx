@@ -135,7 +135,7 @@ function TelemetryStatCard({ icon, label, value, sub, colorClass = 'text-cyan-40
         <span className={colorClass}>{icon}</span>
         <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">{label}</span>
       </div>
-      <div className={`text-2xl font-extrabold ${colorClass}`}>{value}</div>
+      <div className={`text-2xl font-semibold ${colorClass}`}>{value}</div>
       {sub && <div className="mt-1 text-[10px] text-white/30">{sub}</div>}
     </div>
   );
@@ -148,7 +148,7 @@ function SectionHeader({ icon, title, subtitle }: { icon: JSX.Element; title: st
         {icon}
       </div>
       <div>
-        <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">{title}</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-white">{title}</h3>
         {subtitle && <p className="text-[10px] text-white/35">{subtitle}</p>}
       </div>
     </div>
@@ -240,7 +240,7 @@ function FutureHealthSection({ story }: { story: StockStoryResult }) {
               {item.outlook.icon}
               <span className="text-[10px] font-bold uppercase tracking-wider">{item.horizon} Outlook</span>
             </div>
-            <div className="text-xl font-extrabold mb-1">{item.outlook.label}</div>
+            <div className="text-xl font-semibold mb-1">{item.outlook.label}</div>
             <div className="text-xs opacity-70">{item.desc}</div>
             <div className="mt-3">
               <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
@@ -571,7 +571,7 @@ export const SuperpageV8: React.FC<SuperpageV8Props> = ({
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1">{ticker} · {sector}</div>
-            <h2 className="text-2xl font-extrabold text-white">{companyName}</h2>
+            <h2 className="text-2xl font-semibold text-white">{companyName}</h2>
             <div className="mt-1 text-xs text-white/40">{marketCap}</div>
           </div>
           <div className="flex items-center gap-4">

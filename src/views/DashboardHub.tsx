@@ -123,7 +123,7 @@ export const DashboardHub: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6">
+    <div className="w-full px-6 pb-20 pt-6">
       {/* Research Command Centre header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">

@@ -209,7 +209,7 @@ function Card({ signal }: { signal: IntelligenceSignal }) {
   return (
     <div className={`border-4 border-black p-4 ${tone}`} style={{ boxShadow: '4px 4px 0px #000' }}>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="font-extrabold uppercase tracking-wide">{signal.symbol}</span>
+        <span className="font-semibold uppercase tracking-wide">{signal.symbol}</span>
         <span className="border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold uppercase">{badge}</span>
       </div>
       <div className="grid grid-cols-3 gap-2 text-xs">
@@ -268,7 +268,7 @@ export default function DailyFeed() {
       <div className="border-4 border-black bg-yellow-300 p-4" style={{ boxShadow: '6px 6px 0px #000' }}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-2xl font-extrabold uppercase tracking-wider">Daily Intelligence</h2>
+            <h2 className="text-2xl font-semibold uppercase tracking-wider">Daily Intelligence</h2>
             <p className="mt-1 text-sm font-bold">Prediction-registry snapshot differences</p>
           </div>
           <span className="border-2 border-black bg-white px-3 py-1 text-xs font-bold uppercase">{state.status}</span>
@@ -289,7 +289,7 @@ export default function DailyFeed() {
         </>
       ) : (
         <div className="border-4 border-dashed border-black bg-gray-50 p-8 text-center">
-          <p className="text-xl font-extrabold">{state.status === 'empty' ? 'No significant changes' : 'Daily intelligence unavailable'}</p>
+          <p className="text-xl font-semibold">{state.status === 'empty' ? 'No significant changes' : 'Daily intelligence unavailable'}</p>
           <p className="mt-1 text-sm text-gray-600">{state.message}</p>
         </div>
       )}
@@ -301,7 +301,7 @@ function SignalSection({ title, items, accent }: { title: string; items: Intelli
   if (items.length === 0) return null;
   return (
     <section>
-      <div className={`mb-3 border-l-4 pl-3 ${accent}`}><h3 className="text-lg font-extrabold uppercase">{title}</h3></div>
+      <div className={`mb-3 border-l-4 pl-3 ${accent}`}><h3 className="text-lg font-semibold uppercase">{title}</h3></div>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">{items.map((signal, index) => <Card key={`${signal.symbol}-${signal.type}-${index}`} signal={signal} />)}</div>
     </section>
   );

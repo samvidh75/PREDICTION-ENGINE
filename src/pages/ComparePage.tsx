@@ -165,12 +165,12 @@ export const ComparePage: React.FC = () => {
         {loading ? (
           <div className="py-12 text-center text-xs text-[#484F58]">Loading company data...</div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {displayedCompanies.map((company, i) => {
               if (company.symbol === "empty") {
                 return (
-                  <RoundedDepthPanel key={`empty-${i}`} padding="lg" variant="elevated" className="flex flex-col items-center justify-center min-h-[300px]">
-                    <Database className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
+                  <RoundedDepthPanel key={`empty-${i}`} padding="lg" variant="elevated" className="flex flex-col items-center justify-center min-h-[280px]">
+                    <Database className="h-7 w-7 text-[#484F58]" aria-hidden="true" />
                     <p className="mt-3 text-xs text-[#484F58]">Search above to add a company</p>
                   </RoundedDepthPanel>
                 );
@@ -188,12 +188,12 @@ export const ComparePage: React.FC = () => {
 
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <span className="font-mono text-sm font-bold text-[#E6EDF3]">{company.symbol}</span>
+                      <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{company.symbol}</span>
                       {company.companyName && <span className="ml-2 text-xs text-[#8B949E]">{company.companyName}</span>}
                     </div>
                     {company.score !== null && company.score !== undefined && (
                       <div className="flex flex-col items-end">
-                        <span className="text-xl font-bold tabular-nums text-[#E6EDF3]">{Math.round(Number(company.score))}</span>
+                        <span className="text-xl font-semibold tabular-nums text-[#E6EDF3]">{Math.round(Number(company.score))}</span>
                         {company.classification && (
                           <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">{company.classification}</span>
                         )}
@@ -203,18 +203,18 @@ export const ComparePage: React.FC = () => {
 
                   {company.predictionDate && <ModelRunBadge runDate={company.predictionDate} className="mt-3" />}
 
-                  <div className="mt-4 space-y-3">
+                  <div className="mt-3">
                     <PredictionConfidenceBar score={company.confidenceScore ?? null} level={company.confidenceLevel ?? null} />
                   </div>
 
                   {company.factors && (
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factors</span>
-                      <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div className="mt-2 grid grid-cols-2 gap-1.5">
                         {Object.entries(company.factors).map(([key, val]) => (
-                          <div key={key} className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] px-2.5 py-1.5">
+                          <div key={key} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.02] px-2.5 py-1.5">
                             <span className="text-[10px] text-[#8B949E] capitalize">{key}</span>
-                            <span className="text-[10px] font-semibold tabular-nums text-[#E6EDF3]">
+                            <span className="font-mono text-[10px] font-semibold tabular-nums text-[#E6EDF3]">
                               {typeof val === "number" && Number.isFinite(val) ? Math.round(val) : "—"}
                             </span>
                           </div>
@@ -223,7 +223,7 @@ export const ComparePage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-3 flex gap-2">
                     <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("stock", company.symbol)} className="flex-1 text-[10px]">
                       <ExternalLink className="h-3 w-3" aria-hidden="true" /> Open
                     </Button>
@@ -234,6 +234,45 @@ export const ComparePage: React.FC = () => {
                 </RoundedDepthPanel>
               );
             })}
+          </div>
+        )}
+
+        {/* Comparison matrix — only when ≥ 2 companies are loaded */}
+        {!loading && companies.length >= 2 && (
+          <div className="mt-6 overflow-hidden rounded-xl border border-white/[0.06]">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">
+                  <th className="px-4 py-3">Metric</th>
+                  {companies.map((c) => (
+                    <th key={c.symbol} className="px-4 py-3 text-right font-mono text-[#E6EDF3]">{c.symbol}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { label: "Score", values: companies.map((c) => c.score) },
+                  { label: "Confidence", values: companies.map((c) => c.confidenceScore) },
+                  { label: "Growth", values: companies.map((c) => c.factors?.growth ?? null) },
+                  { label: "Quality", values: companies.map((c) => c.factors?.quality ?? null) },
+                  { label: "Momentum", values: companies.map((c) => c.factors?.momentum ?? null) },
+                  { label: "Valuation", values: companies.map((c) => c.factors?.valuation ?? null) },
+                  { label: "Stability", values: companies.map((c) => c.factors?.stability ?? null) },
+                  { label: "Risk", values: companies.map((c) => c.factors?.risk ?? null) },
+                  { label: "Classification", values: companies.map((c) => c.classification) },
+                  { label: "Last update", values: companies.map((c) => c.predictionDate) },
+                ].map((row) => (
+                  <tr key={row.label} className="border-t border-white/[0.04] transition-colors hover:bg-white/[0.02]">
+                    <td className="px-4 py-2.5 text-[#8B949E]">{row.label}</td>
+                    {row.values.map((v, i) => (
+                      <td key={i} className="px-4 py-2.5 text-right font-mono text-[11px] text-[#E6EDF3]">
+                        {typeof v === "number" && Number.isFinite(v) ? Math.round(v) : (v ?? "—")}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 

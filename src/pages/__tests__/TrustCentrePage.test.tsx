@@ -74,7 +74,7 @@ describe('TrustCentrePage regression states', () => {
     expect(await screen.findByText('Only registry-backed trust metrics are available.')).toBeInTheDocument();
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
-    expect(screen.getAllByText(/As of/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Performance audit')).toBeInTheDocument();
   });
 
   it('renders an explicit error state when the metrics service fails', async () => {

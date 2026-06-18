@@ -34,7 +34,7 @@ export const SignupPage: React.FC = () => {
       <section className="z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 px-5 py-24 md:grid-cols-[1fr_440px] md:py-32">
         <Surface dark className="hidden min-h-[520px] p-8 md:flex md:flex-col md:justify-between">
           <div>
-            <div className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Start a research workspace</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-[#2962FF]">Start a research workspace</div>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white">Build a watchlist around evidence, not market noise.</h1>
             <p className="mt-4 max-w-md text-sm leading-6 text-white/70">Create an account to save research, revisit companies, and inspect coverage status across devices.</p>
           </div>
@@ -42,7 +42,7 @@ export const SignupPage: React.FC = () => {
         </Surface>
         <Surface strong className="w-full p-6 sm:p-8">
           <div className="mb-6 flex flex-col">
-            <span className="text-base font-black tracking-[0.08em] text-slate-950">StockStory<span className="text-emerald-700">.India</span></span>
+            <span className="text-base font-semibold tracking-tight text-slate-950">StockStory<span className="text-[#2962FF]">.</span></span>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">Create account</h2>
             {contextMessage && (
               <p className="mt-2 text-xs text-slate-600">{contextMessage}</p>
