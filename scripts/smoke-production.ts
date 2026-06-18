@@ -132,9 +132,15 @@ async function main(): Promise<void> {
     await checkEndpoint("LEADERBOARD", `${FRONTEND_URL}/api/intelligence/leaderboard?limit=3`, [])
   );
 
-  // Company endpoint for a known symbol
+  // Company endpoint for known symbols
   results.push(
     await checkEndpoint("COMPANY_RELIANCE", `${FRONTEND_URL}/api/stockstory/RELIANCE`, [])
+  );
+  results.push(
+    await checkEndpoint("COMPANY_BHARTIARTL", `${FRONTEND_URL}/api/stockstory/BHARTIARTL`, [])
+  );
+  results.push(
+    await checkEndpoint("COMPANY_ICICIBANK", `${FRONTEND_URL}/api/stockstory/ICICIBANK`, [])
   );
 
   // Print results

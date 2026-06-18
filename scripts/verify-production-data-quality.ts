@@ -178,6 +178,39 @@ async function main(): Promise<void> {
     },
   ));
 
+  // Scored symbols count
+  results.push(await dqCheck("scored_symbols", "coverage",
+    `${__DQ_FRONTEND}/api/intelligence/leaderboard?limit=200`, undefined,
+    (body) => {
+      const data = (body as any).data;
+      if (!Array.isArray(data)) return "leaderboard data is not an array";
+      if (data.length === 0) return "leaderboard has 0 entries (all symbols unscored)";
+      return null;
+    },
+  ));
+
+  // Scoring gap report (informational — does not fail)
+  {
+    const check = await dqCheck("scoring_gap", "coverage",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const cov = body.coverage as Record<string, any> | undefined;
+        if (!cov) return "no coverage object";
+        const totalSym = cov.symbols?.count;
+        const scoredSym = cov.featureSnapshots?.symbolCount;
+        if (typeof totalSym !== "number") return "symbols count not a number";
+        if (typeof scoredSym !== "number") return "featureSnapshots symbolCount not a number";
+        const gap = totalSym - scoredSym;
+        if (gap > 0) {
+          return `warn (gap=${gap} symbols without features)`;
+        }
+        return null;
+      }
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
   // NaN/Infinity scan
   results.push(await dqCheck("coverage_no_nan", "quality",
     `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,

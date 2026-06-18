@@ -18,7 +18,14 @@ import { IndianMarketProvider } from '../src/services/providers/IndianMarketProv
 import { YahooProvider } from '../src/services/providers/YahooProvider';
 import type { FinancialSnapshot } from '../src/services/data/types';
 
-const DEFAULT_SYMBOLS = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK'];
+const DEFAULT_SYMBOLS = [
+  'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'BHARTIARTL',
+  'SBIN', 'ITC', 'LT', 'AXISBANK', 'KOTAKBANK', 'HINDUNILVR',
+  'MARUTI', 'SUNPHARMA', 'BAJFINANCE', 'HCLTECH', 'WIPRO',
+  'ASIANPAINT', 'ULTRACEMCO', 'TITAN', 'NTPC', 'POWERGRID',
+  'M&M', 'ADANIENT', 'ADANIPORTS', 'TATASTEEL', 'JSWSTEEL',
+  'COALINDIA', 'ONGC', 'NESTLEIND', 'TECHM',
+];
 
 interface PipelineOptions {
   symbols: string[];

@@ -48,6 +48,7 @@
     "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",
     "validate:distributions": "tsx scripts/validate-sector-distributions.ts",
+    "diagnose:scored-symbols": "tsx scripts/diagnose-scored-symbol-gaps.ts",
     "smoke:production": "tsx scripts/smoke-production.ts",
     "verify:data:production": "tsx scripts/verify-production-data-quality.ts",
     "verify:symbols:production": "tsx scripts/verify-symbol-universe.ts",

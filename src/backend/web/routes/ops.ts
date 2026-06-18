@@ -323,12 +323,19 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   });
 
   app.post("/api/ops/pipeline-run", async (request, reply) => {
-    const { apply: rawApply, symbols: rawSymbols, historical: rawHistorical } = request.query as Record<string, string | undefined>;
+    const {
+      apply: rawApply, symbols: rawSymbols, historical: rawHistorical,
+      featuresOnly: rawFeaturesOnly, factorsOnly: rawFactorsOnly,
+      predictionsOnly: rawPredictionsOnly,
+    } = request.query as Record<string, string | undefined>;
     const runId = `api-trigger-${new Date().toISOString().replace(/[:.]/g, '-')}`;
     const startedAt = new Date().toISOString();
     const applyMode = rawApply === "true";
-    const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK")
-      .split(",").map(s => s.trim().toUpperCase()).filter(Boolean).slice(0, 10);
+    const featuresOnly = rawFeaturesOnly === "true";
+    const factorsOnly = rawFactorsOnly === "true";
+    const predictionsOnly = rawPredictionsOnly === "true";
+    const symbols = (rawSymbols || "RELIANCE,TCS,INFY,HDFCBANK,ICICIBANK,BHARTIARTL,SBIN,ITC,LT,AXISBANK,KOTAKBANK,HINDUNILVR,MARUTI,SUNPHARMA,BAJFINANCE,HCLTECH,WIPRO,ASIANPAINT,ULTRACEMCO,TITAN,NTPC,POWERGRID,M&M,ADANIENT,ADANIPORTS,TATASTEEL,JSWSTEEL,COALINDIA,ONGC,NESTLEIND,TECHM")
+      .split(",").map(s => s.trim().toUpperCase()).filter(Boolean);
     const results: Record<string, any> = {};
     const rowsWritten: Record<string, number> = {};
     const pipProviderStatuses = {
@@ -440,6 +447,32 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         INFY: { name: "Infosys Limited", sector: "Technology", industry: "IT Services" },
         HDFCBANK: { name: "HDFC Bank Limited", sector: "Financials", industry: "Banking" },
         ICICIBANK: { name: "ICICI Bank Limited", sector: "Financials", industry: "Banking" },
+        BHARTIARTL: { name: "Bharti Airtel Limited", sector: "Telecommunications", industry: "Telecom Services" },
+        SBIN: { name: "State Bank of India", sector: "Financials", industry: "Banking" },
+        ITC: { name: "ITC Limited", sector: "Consumer Staples", industry: "Tobacco & FMCG" },
+        LT: { name: "Larsen & Toubro Limited", sector: "Industrials", industry: "Construction & Engineering" },
+        AXISBANK: { name: "Axis Bank Limited", sector: "Financials", industry: "Banking" },
+        KOTAKBANK: { name: "Kotak Mahindra Bank Limited", sector: "Financials", industry: "Banking" },
+        HINDUNILVR: { name: "Hindustan Unilever Limited", sector: "Consumer Staples", industry: "FMCG" },
+        MARUTI: { name: "Maruti Suzuki India Limited", sector: "Consumer Discretionary", industry: "Automotive" },
+        SUNPHARMA: { name: "Sun Pharmaceutical Industries Limited", sector: "Healthcare", industry: "Pharmaceuticals" },
+        BAJFINANCE: { name: "Bajaj Finance Limited", sector: "Financials", industry: "NBFC" },
+        HCLTECH: { name: "HCL Technologies Limited", sector: "Technology", industry: "IT Services" },
+        WIPRO: { name: "Wipro Limited", sector: "Technology", industry: "IT Services" },
+        ASIANPAINT: { name: "Asian Paints Limited", sector: "Materials", industry: "Paints & Coatings" },
+        ULTRACEMCO: { name: "UltraTech Cement Limited", sector: "Materials", industry: "Cement" },
+        TITAN: { name: "Titan Company Limited", sector: "Consumer Discretionary", industry: "Retail & Jewelry" },
+        NTPC: { name: "NTPC Limited", sector: "Energy & Oil", industry: "Power Generation" },
+        POWERGRID: { name: "Power Grid Corporation of India Limited", sector: "Energy & Oil", industry: "Power Transmission" },
+        "M&M": { name: "Mahindra & Mahindra Limited", sector: "Consumer Discretionary", industry: "Automotive" },
+        ADANIENT: { name: "Adani Enterprises Limited", sector: "Industrials", industry: "Conglomerate" },
+        ADANIPORTS: { name: "Adani Ports and Special Economic Zone Limited", sector: "Industrials", industry: "Port & Logistics" },
+        TATASTEEL: { name: "Tata Steel Limited", sector: "Materials", industry: "Steel" },
+        JSWSTEEL: { name: "JSW Steel Limited", sector: "Materials", industry: "Steel" },
+        COALINDIA: { name: "Coal India Limited", sector: "Energy & Oil", industry: "Coal Mining" },
+        ONGC: { name: "Oil and Natural Gas Corporation Limited", sector: "Energy & Oil", industry: "Oil & Gas" },
+        NESTLEIND: { name: "Nestlé India Limited", sector: "Consumer Staples", industry: "Food & Beverages" },
+        TECHM: { name: "Tech Mahindra Limited", sector: "Technology", industry: "IT Services" },
       };
 
       for (const symbol of symbols) {
@@ -526,8 +559,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         details: quoteResults.map(r => ({ symbol: r.symbol, ok: r.ok, price: r.price, error: r.error })),
       };
 
-      // Stage 3: Financials (only in apply mode to avoid provider calls on dry-run)
-      if (applyMode) {
+      const runAll = !featuresOnly && !factorsOnly && !predictionsOnly;
+
+      // Stage 3: Financials
+      if (applyMode && (runAll || featuresOnly)) {
         results.financials = { status: "running" };
         const finResults: any[] = [];
         const coordModule = await import("../../../services/providers/ProviderCoordinator.js");
@@ -569,8 +604,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           failed: finResults.filter(r => !r.ok).length,
           details: finResults.map(r => ({ symbol: r.symbol, ok: r.ok, fields: r.fields, error: r.error })),
         };
+      }
 
-        // Stage 4: Features
+      // Stage 4: Features
+      if (applyMode && (runAll || featuresOnly || factorsOnly || predictionsOnly)) {
         try {
           const { FeatureEngine } = await import("../../../services/FeatureEngine.js");
           const featureEngine = new FeatureEngine();
@@ -585,8 +622,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         } catch (err: any) {
           results.features = { status: "failure", error: err.message };
         }
+      }
 
-        // Stage 5: Factors
+      // Stage 5: Factors
+      if (applyMode && (runAll || factorsOnly || predictionsOnly)) {
         try {
           const { FactorEngine } = await import("../../../services/FactorEngine.js");
           const factorEngine = new FactorEngine();
@@ -601,8 +640,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         } catch (err: any) {
           results.factors = { status: "failure", error: err.message };
         }
+      }
 
-        // Stage 6: Predictions
+      // Stage 6: Predictions
+      if (applyMode && (runAll || predictionsOnly)) {
         try {
           const { predictionFactory } = await import("../../../predictions/PredictionFactory.js");
           const predResult = await predictionFactory.generateDaily([30, 90, 365]);
@@ -616,8 +657,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         } catch (err: any) {
           results.predictions = { status: "failure", error: err.message };
         }
+      }
 
-        // Stage 7: Signals
+      // Stage 7: Signals
+      if (applyMode && (runAll || predictionsOnly)) {
         try {
           const signalRes = await query(
             `SELECT symbol, ranking_score, classification, confidence_score
@@ -628,8 +671,19 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         } catch (err: any) {
           results.signals = { status: "failure", error: err.message };
         }
+      }
 
-        // Stage 8: Pipeline health
+      // Fill skipped for non-scope stages
+      if (applyMode && !runAll) {
+        if (!featuresOnly && !results.financials) results.financials = { status: "skipped", message: "Not in scope" };
+        if (!featuresOnly && !results.features) results.features = { status: "skipped", message: "Not in scope" };
+        if (!factorsOnly && !results.factors) results.factors = { status: "skipped", message: "Not in scope" };
+        if (!predictionsOnly && !results.predictions) results.predictions = { status: "skipped", message: "Not in scope" };
+        if (!predictionsOnly && !results.signals) results.signals = { status: "skipped", message: "Not in scope" };
+      }
+
+      // Stage 8: Pipeline health
+      if (applyMode) {
         const failures = Object.values(results).some((r: any) => r.status === "failure");
         const partials = Object.values(results).some((r: any) => r.status === "partial");
         overallStatus = failures ? "failure" : partials ? "partial" : "success";
@@ -707,7 +761,9 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
             results.health = { status: "failed", error: err2.message };
           }
         }
-      } else {
+      }
+
+      if (!applyMode) {
         results.financials = { status: "skipped", message: "Dry-run: financials stage skipped to avoid provider calls" };
         results.features = { status: "skipped", message: "Dry-run: features stage skipped" };
         results.factors = { status: "skipped", message: "Dry-run: factors stage skipped" };

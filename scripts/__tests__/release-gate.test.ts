@@ -63,7 +63,7 @@ describe('release-gate', () => {
       expect(smokeCheck.status).toBe('NOT_EXECUTED_ENVIRONMENT_MISSING');
     });
 
-    it.skipIf(!process.env.CI)('CI missing API with REQUIRE_FULL_RELEASE_GATE=true → FAIL', async () => {
+    it('CI missing API with REQUIRE_FULL_RELEASE_GATE=true → FAIL', async () => {
       vi.stubEnv('REQUIRE_FULL_RELEASE_GATE', 'true');
       const checks = defineChecks();
       const smokeCheck = checks.find(c => c.name === 'API smoke test')!;
@@ -88,7 +88,7 @@ describe('release-gate', () => {
       expect(pgCheck.status).toBe('NOT_EXECUTED_ENVIRONMENT_MISSING');
     });
 
-    it.skipIf(!process.env.CI)('CI missing PostgreSQL → FAIL', async () => {
+    it('CI missing PostgreSQL → FAIL', async () => {
       vi.stubEnv('REQUIRE_FULL_RELEASE_GATE', 'true');
       const checks = defineChecks();
       const pgCheck = checks.find(c => c.name.includes('PostgreSQL integration'))!;
