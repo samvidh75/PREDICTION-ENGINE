@@ -26,6 +26,15 @@ export default function CompanyCompareModal({
     setSecondaryTicker((prev) => (prev.trim().length > 0 ? prev : "INFY"));
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   const cleanedPrimary = useMemo(() => primaryTicker.toUpperCase().trim(), [primaryTicker]);
   const cleanedSecondary = useMemo(() => secondaryTicker.toUpperCase().trim(), [secondaryTicker]);
 
@@ -49,6 +58,7 @@ export default function CompanyCompareModal({
       className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center"
       role="dialog"
       aria-modal="true"
+      aria-label="Compare companies"
       onMouseDown={closeOnBackdrop}
     >
       <div className="absolute inset-0 bg-black/65 backdrop-blur-[10px]" />

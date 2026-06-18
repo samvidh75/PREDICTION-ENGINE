@@ -69,7 +69,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ page, component,
         <div className="fixed bottom-16 right-4 z-50 w-72 rounded-xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl shadow-2xl">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Feedback</span>
-            <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white">
+            <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white" aria-label="Close feedback">
               <X className="h-3 w-3" />
             </button>
           </div>
@@ -96,6 +96,7 @@ export const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ page, component,
             onChange={e => setComment(e.target.value)}
             placeholder="Optional detail... (never attributed)"
             className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] text-white placeholder-white/20 outline-none resize-none h-14 focus:border-cyan-400"
+            aria-label="Optional feedback details"
           />
 
           <div className="mt-2 text-[8px] text-white/20 italic">

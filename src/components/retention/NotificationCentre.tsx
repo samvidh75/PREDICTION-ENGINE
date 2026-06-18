@@ -39,6 +39,15 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
     return () => clearInterval(interval);
   }, [fetchAlerts]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isOpen]);
+
   const markAsRead = async (alertId: number) => {
     await fetch(`/api/alerts/${alertId}/read`, { method: 'POST' });
     fetchAlerts();
@@ -88,7 +97,7 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
 
       {/* Drawer Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setIsOpen(false)}>
+        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setIsOpen(false)} role="dialog" aria-modal="true" aria-label="Notifications">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div
             className="relative z-10 flex h-full w-full max-w-md flex-col border-l border-white/10 bg-[#0A0F17] shadow-2xl"
@@ -109,7 +118,7 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
                     Mark all read
                   </button>
                 )}
-                <button onClick={() => setIsOpen(false)} className="rounded p-1 hover:bg-white/[0.05]">
+                <button onClick={() => setIsOpen(false)} className="rounded p-1 hover:bg-white/[0.05]" aria-label="Close notifications">
                   <X className="h-4 w-4 text-white/40" />
                 </button>
               </div>

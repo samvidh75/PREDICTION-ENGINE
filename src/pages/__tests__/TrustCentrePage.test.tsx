@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { LayoutProvider } from '../../context/LayoutContext';
 import TrustCentrePage from '../TrustCentrePage';
 
@@ -112,5 +112,44 @@ describe('TrustCentrePage regression states', () => {
     render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
 
     expect(await screen.findByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
+  });
+
+  it('renders tab navigation with Overview, Providers, Coverage, Gaps tabs', async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes('trust-metrics')) {
+        return { ok: true, json: async () => ({ status: 'ok', data: { alpha: null, hit_rate: null, sharpe_ratio: null, calibration_score: null, total_predictions: 0, total_outcomes: 0 }, dataState: { asOf: '2026-06-11', missingInputs: [], completenessScore: 0 } }) };
+      }
+      if (url.includes('data-coverage')) {
+        return { ok: true, json: async () => ({ ok: true, generatedAt: '2026-06-11T00:00:00Z', database: { status: 'ready' }, coverage: {}, providers: {} }) };
+      }
+      return { ok: true, json: async () => ({}) };
+    }) as unknown as typeof fetch;
+
+    vi.stubGlobal('fetch', fetchMock);
+    render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
+
+    expect(await screen.findByText('Overview')).toBeInTheDocument();
+    expect(screen.getByText('Providers')).toBeInTheDocument();
+    expect(screen.getByText('Coverage')).toBeInTheDocument();
+    expect(screen.getByText('Gaps & Methodology')).toBeInTheDocument();
+  });
+
+  it('contains no forbidden trading language', async () => {
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes('trust-metrics')) {
+        return { ok: true, json: async () => ({ status: 'ok', data: { alpha: null, hit_rate: null, sharpe_ratio: null, calibration_score: null, total_predictions: 0, total_outcomes: 0 }, dataState: { asOf: '2026-06-11', missingInputs: [], completenessScore: 0 } }) };
+      }
+      if (url.includes('data-coverage')) {
+        return { ok: true, json: async () => ({ ok: true, generatedAt: '2026-06-11T00:00:00Z', database: { status: 'ready' }, coverage: {}, providers: {} }) };
+      }
+      return { ok: true, json: async () => ({}) };
+    }) as unknown as typeof fetch;
+
+    vi.stubGlobal('fetch', fetchMock);
+    render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
+
+    await screen.findByText('Data Intelligence Centre');
+    const body = document.body.textContent || '';
+    expect(body).not.toMatch(/Buy Stock|Sell Stock|Strong Buy|Strong Sell|Try Pro|Unlock Pro|Trade now/i);
   });
 });

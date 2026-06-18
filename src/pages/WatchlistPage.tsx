@@ -238,7 +238,7 @@ export const WatchlistPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="mt-2">
-                      <input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Why am I watching?" className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
+                      <input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Why am I watching?" className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" aria-label="Watchlist note" />
                     </div>
                   </div>
                 );
