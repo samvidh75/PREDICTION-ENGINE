@@ -11,8 +11,6 @@ const __dirname = dirname(__filename);
 
 async function runStartupMigrations(): Promise<MigrationStatus | null> {
   const forceMigrations = process.env.FORCE_MIGRATIONS === "true" || process.env.FORCE_MIGRATIONS === "1";
-  // Use source path (consistent with health check route) since dist doesn't contain migration files.
-  // In production, process.cwd() is the project root, so src/db/migrations/ is accessible.
   const migrationsDir = join(process.cwd(), "src", "db", "migrations");
   try {
     await dbAdapter.initialize();
@@ -45,10 +43,53 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
   return null;
 }
 
+async function runStartupMaintenanceJob(): Promise<void> {
+  const jobName = process.env.RUN_MAINTENANCE_JOB;
+  if (!jobName) return;
+  const confirm = process.env.RUN_MAINTENANCE_CONFIRM;
+  const limit = process.env.RUN_MAINTENANCE_LIMIT || "100";
+  const symbols = process.env.RUN_MAINTENANCE_SYMBOLS || "";
+  const sourceLabel = process.env.RUN_MAINTENANCE_SOURCE_LABEL || "";
+  const sourceUrl = process.env.RUN_MAINTENANCE_SOURCE_URL || "";
+  const exitAfterRun = process.env.MAINTENANCE_EXIT_AFTER_RUN === "true";
+
+  console.log("[maintenance] ═══════════════════════════════════════════");
+  console.log(`[maintenance] Running production maintenance job: ${jobName}`);
+  console.log(`[maintenance] REMOVE ENV VAR RUN_MAINTENANCE_JOB AFTER SUCCESS`);
+  console.log("[maintenance] ═══════════════════════════════════════════");
+
+  try {
+    await dbAdapter.initialize();
+    const { execSync } = await import("child_process");
+    const script = join(process.cwd(), "scripts", "run-production-maintenance-job.ts");
+    const args = [`--job=${jobName}`];
+    if (confirm) args.push(`--confirm=${confirm}`);
+    args.push(`--limit=${limit}`);
+    if (symbols) args.push(`--symbols=${symbols}`);
+    if (sourceLabel) args.push(`--source-label=${sourceLabel}`);
+    if (sourceUrl) args.push(`--source-url=${sourceUrl}`);
+    if (confirm) args.push("--apply"); else args.push("--dry-run");
+
+    const output = execSync(`npx tsx ${script} ${args.join(" ")}`, { encoding: "utf-8", timeout: 120000 });
+    console.log(output);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[maintenance] Job failed: ${msg}`);
+  }
+
+  if (exitAfterRun) {
+    console.log("[maintenance] MAINTENANCE_EXIT_AFTER_RUN=true — exiting.");
+    process.exit(0);
+  }
+}
+
 const port = Number(process.env.PORT ?? 4001);
 const host = process.env.HOST ?? "0.0.0.0";
 
 async function main(): Promise<void> {
+  // Run production maintenance job if env var is set (inside Railway container with PG access).
+  await runStartupMaintenanceJob();
+
   // Run pending migrations on startup.
   await runStartupMigrations();
 

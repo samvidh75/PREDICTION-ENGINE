@@ -106,7 +106,8 @@
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
-    "probe:akshare": "python3 scripts/probe-akshare-provider.py"
+    "probe:akshare": "python3 scripts/probe-akshare-provider.py",
+    "job:maintenance": "tsx scripts/run-production-maintenance-job.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
