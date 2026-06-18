@@ -382,6 +382,56 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         </RoundedDepthPanel>
 
+        {/* Symbol data gaps */}
+        <RoundedDepthPanel padding="md">
+          <h2 className="text-xs font-semibold text-[#E6EDF3]">Symbol data gaps</h2>
+          <p className="mt-1 text-[10px] text-[#8B949E]">Currently tracked symbols with missing data domains.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No quote</span>
+              <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
+              <p className="mt-1 text-[10px] text-[#8B949E]">No real-time price available. Provider coverage incomplete.</p>
+            </div>
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No history</span>
+              <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
+              <p className="mt-1 text-[10px] text-[#8B949E]">Historical price data unavailable. Affects scoring pipeline.</p>
+            </div>
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Not on leaderboard</span>
+              <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">1 symbol</span>
+              <p className="mt-1 text-[10px] text-[#8B949E]">Not in latest scoring slice. Re-run scoring pipeline.</p>
+            </div>
+          </div>
+        </RoundedDepthPanel>
+
+        {/* Lineage coverage */}
+        <RoundedDepthPanel padding="md">
+          <h2 className="text-xs font-semibold text-[#E6EDF3]">Lineage coverage</h2>
+          <p className="mt-1 text-[10px] text-[#8B949E]">Source trace availability per data domain. Lineage_unavailable means no provenance metadata was recorded at ingestion time.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {[
+              { label: "Prediction input lineage", status: "available", detail: "Consumed via GET /api/research/lineage/:symbol" },
+              { label: "Feature snapshots", status: coverage?.featureSnapshots?.status === "available" ? "partial" : "unavailable", detail: "Source columns available after migration 022; backfill pending" },
+              { label: "Factor snapshots", status: coverage?.factorSnapshots?.status === "available" ? "partial" : "unavailable", detail: "Source columns available after migration 022; backfill pending" },
+              { label: "Financial snapshots", status: coverage?.financialSnapshots?.status === "available" ? "partial" : "unavailable", detail: "source_label, source_url, ingestion_timestamp populated" },
+              { label: "Daily prices", status: coverage?.dailyPrices?.status === "available" ? "available" : "unavailable", detail: `Latest: ${formatDate(coverage?.dailyPrices?.latestPriceDate)}` },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#E6EDF3]">{item.label}</span>
+                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    item.status === "available" ? "bg-[#22AB94]/10 text-[#22AB94]" :
+                    item.status === "partial" ? "bg-[#EF9A09]/10 text-[#EF9A09]" :
+                    "bg-[#484F58]/10 text-[#484F58]"
+                  }`}>{item.status}</span>
+                </div>
+                <p className="mt-1 text-[10px] text-[#8B949E]">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </RoundedDepthPanel>
+
         {/* Scoring factors */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Scoring factors</h2>

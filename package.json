@@ -83,8 +83,8 @@
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
     "check:python-runtime": "tsx scripts/check-python-runtime.ts",
     "probe:nselib": "tsx scripts/check-nselib-provider.ts",
-    "probe:nsepython": "tsx scripts/check-nsepython-provider.ts",
-    "probe:jugaad-data": "tsx scripts/check-jugaad-data-provider.ts",
+    "probe:nsepython": "python3 scripts/probe-nsepython-provider.py",
+    "probe:jugaad-data": "python3 scripts/probe-jugaad-data-provider.py",
     "probe:yahoo": "tsx scripts/probe-yahoo-provider.ts",
     "probe:public-fundamentals": "tsx scripts/probe-public-fundamentals.ts",
     "import:public-fundamentals": "tsx scripts/import-public-fundamentals.ts",
@@ -103,7 +103,10 @@
     "ingest:authorized:quotes": "tsx scripts/ingest-authorized-quotes.ts",
     "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
     "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
-    "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts"
+    "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
+    "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
+    "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
+    "probe:akshare": "python3 scripts/probe-akshare-provider.py"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

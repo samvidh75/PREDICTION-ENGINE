@@ -48,6 +48,36 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       );
       const fsRows: any[] = fsRes.rows || [];
 
+      const featureLinRes = await query(
+        `SELECT source_provider, source_domain, source_as_of_date, source_quality, source_notes,
+                trade_date, created_at
+         FROM feature_snapshots
+         WHERE symbol = $1 AND source_provider IS NOT NULL
+         ORDER BY trade_date DESC
+         LIMIT 3`,
+        [sym]
+      );
+      const featureLinRows: any[] = featureLinRes.rows || [];
+
+      const factorLinRes = await query(
+        `SELECT source_provider, source_domain, source_as_of_date, source_quality, source_notes,
+                trade_date, created_at
+         FROM factor_snapshots
+         WHERE symbol = $1 AND source_provider IS NOT NULL
+         ORDER BY trade_date DESC
+         LIMIT 3`,
+        [sym]
+      );
+      const factorLinRows: any[] = factorLinRes.rows || [];
+
+      const dpRes = await query(
+        `SELECT COUNT(*) as cnt, MAX(trade_date) as latest_date
+         FROM daily_prices
+         WHERE symbol = $1`,
+        [sym]
+      );
+      const dpRow = dpRes.rows?.[0] || null;
+
       const compRes = await query(
         `SELECT dataset_type, completeness_score, as_of
          FROM data_completeness_metrics
@@ -57,11 +87,11 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       );
       const compRows: any[] = compRes.rows || [];
 
-      if (lineageRows.length === 0 && fsRows.length === 0) {
+      if (lineageRows.length === 0 && fsRows.length === 0 && featureLinRows.length === 0 && factorLinRows.length === 0) {
         return reply.send(unavailableResponse(
           "LINEAGE_UNAVAILABLE",
           `No input lineage records found for ${sym}.`,
-          ["prediction_input_lineage", "financial_snapshots"]
+          ["prediction_input_lineage", "financial_snapshots", "feature_snapshots", "factor_snapshots"]
         ));
       }
 
@@ -88,7 +118,34 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         });
       });
 
+      featureLinRows.forEach((r) => {
+        entries.push({
+          sourceTable: "feature_snapshots",
+          sourceField: `${r.source_provider} — ${r.source_quality}`,
+          provider: r.source_provider,
+          asOf: r.source_as_of_date || r.trade_date,
+          retrievedAt: r.created_at,
+          isFallback: false,
+          isSynthetic: false as const,
+          notes: r.source_notes || undefined,
+        });
+      });
+
+      factorLinRows.forEach((r) => {
+        entries.push({
+          sourceTable: "factor_snapshots",
+          sourceField: `${r.source_provider} — ${r.source_quality}`,
+          provider: r.source_provider,
+          asOf: r.source_as_of_date || r.trade_date,
+          retrievedAt: r.created_at,
+          isFallback: false,
+          isSynthetic: false as const,
+          notes: r.source_notes || undefined,
+        });
+      });
+
       const modelRunRow = scoringRows[0] || null;
+      const priceCoverage = dpRow ? { rowCount: dpRow.cnt, latestDate: dpRow.latest_date } : null;
 
       const completeness: Record<string, number> = {};
       compRows.forEach((r) => { completeness[r.dataset_type] = r.completeness_score; });
@@ -103,6 +160,13 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         } : null,
         completeness: Object.keys(completeness).length > 0 ? completeness : null,
         entryCount: entries.length,
+        featureLineageCount: featureLinRows.length,
+        factorLineageCount: factorLinRows.length,
+        fundamentalsLineageCount: fsRows.length,
+        priceCoverage: priceCoverage ? {
+          rowCount: Number(priceCoverage.rowCount),
+          latestDate: priceCoverage.latestDate,
+        } : null,
       };
 
       return reply.send(realResponse(
