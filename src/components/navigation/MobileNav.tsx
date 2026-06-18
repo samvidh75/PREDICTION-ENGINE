@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart3, Briefcase, Eye, Home, Info, LogIn, Settings, Sparkles } from "lucide-react";
+import { BarChart3, Briefcase, Eye, Home, Info, LogIn, Search, Settings, Sparkles } from "lucide-react";
 import { useNavigation, type ViewType } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -39,23 +39,23 @@ export const MobileNav: React.FC = () => {
   const handlePublicNav = (page: PublicMobileNavItem["page"]) => setPage(page);
 
   const tabs: MobileNavItem[] = [
-    { id: "dashboard", label: "Home", icon: <Home className="h-5 w-5" /> },
-    { id: "search", label: "Search", icon: <BarChart3 className="h-5 w-5" /> },
-    { id: "rankings", label: "Rankings", icon: <Sparkles className="h-5 w-5" /> },
-    { id: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
-    { id: "trust", label: "Research", icon: <Briefcase className="h-5 w-5" /> },
+    { id: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
+    { id: "search", label: "Search", icon: <Search className="icon-nav" /> },
+    { id: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
+    { id: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
+    { id: "trust", label: "Trust", icon: <Briefcase className="icon-nav" /> },
   ];
 
   const publicTabs: PublicMobileNavItem[] = [
-    { page: "landing", label: "Home", icon: <Home className="h-5 w-5" /> },
-    { page: "rankings", label: "Rankings", icon: <Sparkles className="h-5 w-5" /> },
-    { page: "predictions", label: "Signals", icon: <BarChart3 className="h-5 w-5" /> },
-    { page: "about", label: "About", icon: <Info className="h-5 w-5" /> },
-    { page: "login", label: "Sign in", icon: <LogIn className="h-5 w-5" /> },
+    { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
+    { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
+    { page: "predictions", label: "Signals", icon: <BarChart3 className="icon-nav" /> },
+    { page: "about", label: "About", icon: <Info className="icon-nav" /> },
+    { page: "login", label: "Sign in", icon: <LogIn className="icon-nav" /> },
   ];
 
   return (
-    <nav className="ssi-bottom-nav md:hidden">
+    <nav className="bottom-nav md:hidden" aria-label="Mobile navigation">
       {isPublicMobile
         ? publicTabs.map((tab) => {
             const isActive = currentPage === tab.page;
@@ -64,11 +64,11 @@ export const MobileNav: React.FC = () => {
                 key={tab.page}
                 type="button"
                 onClick={() => handlePublicNav(tab.page)}
-                className={`ssi-bottom-tab ${isActive ? "active" : ""}`}
+                className={`bottom-tab ${isActive ? "bottom-tab-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
                 {tab.icon}
-                <span className="max-w-[58px] truncate text-[10px] leading-tight">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })
@@ -79,11 +79,11 @@ export const MobileNav: React.FC = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => handleNav(tab.id)}
-                className={`ssi-bottom-tab ${isActive ? "active" : ""}`}
+                className={`bottom-tab ${isActive ? "bottom-tab-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
                 {tab.icon}
-                <span className="max-w-[58px] truncate text-[10px] leading-tight">{tab.label}</span>
+                <span>{tab.label}</span>
               </button>
             );
           })}

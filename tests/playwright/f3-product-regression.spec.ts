@@ -398,7 +398,7 @@ test.describe("Authenticated shell", () => {
     await expect(page.locator("body")).toBeVisible();
     // Sidebar should be on desktop
     const sidebar = page.locator("aside");
-    await expect(sidebar.getByText(/dashboard/i)).toBeVisible();
+    await expect(sidebar.getByText(/home/i)).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

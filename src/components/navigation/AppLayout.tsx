@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
 import TopNav from "./TopNav";
-import Sidebar from "./Sidebar";
+import { Sidebar } from "./Sidebar";
 import MobileNav from "./MobileNav";
 import { FloatingHelpButton } from "../premium/PremiumUI";
 

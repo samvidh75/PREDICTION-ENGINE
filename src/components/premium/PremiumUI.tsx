@@ -1,5 +1,9 @@
 import React from "react";
-import { AlertTriangle, CheckCircle2, ChevronRight, Database, HelpCircle, Search, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
+import {
+  AlertTriangle, CheckCircle2, ChevronRight, Database, HelpCircle, Search,
+  ShieldCheck, Sparkles, TrendingUp, TrendingDown, Minus,
+  type LucideIcon,
+} from "lucide-react";
 
 export function navigatePage(pageKey: string, id?: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -10,115 +14,144 @@ export function navigatePage(pageKey: string, id?: string): void {
   window.dispatchEvent(new Event("urlchange"));
 }
 
-export function PremiumPage({
-  children,
-  nav,
-  className = "",
-}: {
-  children: React.ReactNode;
-  nav?: React.ReactNode;
-  className?: string;
-}): JSX.Element {
+/* ============================================
+   Layout Shells
+   ============================================ */
+
+export function AppShell({ children }: { children: React.ReactNode }): JSX.Element {
+  return <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">{children}</div>;
+}
+
+export function Section({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
+  return <section className={`mb-10 ${className}`}>{children}</section>;
+}
+
+export function PageIntro({ title, body }: { title: string; body?: string }): JSX.Element {
   return (
-    <main className={`ss-page min-h-screen antialiased ${className}`}>
-      {nav}
-      {children}
-    </main>
+    <div className="mb-8">
+      <h1 className="page-heading">{title}</h1>
+      {body && <p className="body-text mt-2 max-w-2xl">{body}</p>}
+    </div>
   );
 }
+
+/* ============================================
+   Surfaces
+   ============================================ */
 
 export function Surface({
   children,
   className = "",
-  strong = false,
-  dark = false,
+  raised = false,
+  dark,
+  strong,
 }: {
   children: React.ReactNode;
   className?: string;
-  strong?: boolean;
+  raised?: boolean;
   dark?: boolean;
+  strong?: boolean;
 }): JSX.Element {
-  return (
-    <div className={`${dark ? "ss-dark-surface" : strong ? "ss-surface-strong" : "ss-surface"} rounded-[28px] ${className}`}>
-      {children}
-    </div>
-  );
+  const cls = dark ? "surface-modal" : raised || strong ? "surface-raised" : "surface";
+  return <div className={`${cls} p-5 ${className}`}>{children}</div>;
 }
 
-export function SectionHeader({
-  eyebrow,
-  title,
-  body,
-  action,
-}: {
-  eyebrow?: string;
-  title: string;
-  body?: string;
-  action?: React.ReactNode;
-}): JSX.Element {
-  return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-      <div>
-        {eyebrow && <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">{eyebrow}</div>}
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-950 md:text-3xl">{title}</h2>
-        {body && <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">{body}</p>}
-      </div>
-      {action}
-    </div>
-  );
-}
+/* ============================================
+   Metric Display
+   ============================================ */
 
-export function StatusChip({
-  label,
-  tone = "ok",
-}: {
-  label: string;
-  tone?: "ok" | "warn" | "muted" | "risk";
-}): JSX.Element {
-  const styleMap = {
-    ok: {
-      border: "var(--color-primary-light)",
-      background: "var(--color-primary-light)",
-      color: "var(--color-primary)",
-    },
-    warn: {
-      border: "var(--color-gold)",
-      background: "var(--color-gold)",
-      color: "var(--color-info)",
-    },
-    muted: {
-      border: "var(--color-border-light)",
-      background: "rgba(255,255,255,0.7)",
-      color: "var(--color-text-muted)",
-    },
-    risk: {
-      border: "var(--color-red)",
-      background: "var(--color-red)",
-      color: "var(--color-red)",
-    },
-  }[tone];
-  const style = `${styleMap.border ? `border` : ''} ${styleMap.background ? `bg` : ''}`; // placeholder to keep className structure
-  return <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${style}`}>{label}</span>;
-}
-
-export function MetricCard({
+export function StatCard({
   label,
   value,
   detail,
-  tone = "ok",
+  status,
+  tone,
 }: {
   label: string;
   value: string;
   detail?: string;
-  tone?: "ok" | "warn" | "muted";
+  status?: "active" | "partial" | "muted";
+  tone?: string;
+}): JSX.Element {
+  const resolved = status || (tone === "warn" ? "partial" : tone === "muted" ? "muted" : tone === "ok" ? "active" : undefined);
+  const valueColor =
+    resolved === "active" ? "text-[var(--color-active)]" :
+    resolved === "partial" ? "text-[var(--color-warning)]" :
+    "text-[var(--color-text-primary)]";
+  return (
+    <Surface>
+      <div className="label">{label}</div>
+      <div className={`mono mt-1 text-2xl font-semibold ${valueColor}`}>{value}</div>
+      {detail && <p className="caption mt-2">{detail}</p>}
+    </Surface>
+  );
+}
+
+/* ============================================
+   Status
+   ============================================ */
+
+export function StatusBadge({
+  label,
+  variant = "muted",
+}: {
+  label: string;
+  variant?: "active" | "partial" | "blocked" | "muted";
 }): JSX.Element {
   return (
-    <Surface className="ss-lift p-5">
-      <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">{label}</div>
-      <div className={`ss-metric mt-2 text-3xl font-semibold ${tone === "warn" ? "text-[var(--color-gold)]" : tone === "muted" ? "text-[var(--color-text-muted)]" : "text-[var(--color-primary)]"}`}>
-        {value}
-      </div>
-      {detail && <p className="mt-2 text-xs leading-5 text-slate-500">{detail}</p>}
+    <span className={`status-label status-label-${variant}`}>
+      <span className={`status-dot status-dot-${variant}`} />
+      {label}
+    </span>
+  );
+}
+
+/* ============================================
+   Rank Movement
+   ============================================ */
+
+export function RankMovement({
+  change,
+  label,
+}: {
+  change: number | null;
+  label?: string;
+}): JSX.Element {
+  if (change === null) return <span className="caption">Unavailable</span>;
+  if (change === 0) return <span className="inline-flex items-center gap-1 caption"><Minus className="icon-inline" /> No change</span>;
+  const isUp = change > 0;
+  const Icon = isUp ? TrendingUp : TrendingDown;
+  const color = isUp ? "text-[var(--color-active)]" : "text-[var(--color-danger)]";
+  const prefix = isUp ? "+" : "";
+  return (
+    <span className={`inline-flex items-center gap-1 text-sm font-medium ${color}`}>
+      <Icon className="icon-inline" />
+      {label || `${prefix}${change}`}
+    </span>
+  );
+}
+
+/* ============================================
+   Empty, Error, Blocked States
+   ============================================ */
+
+export function EmptyState({
+  icon: Icon = Database,
+  title,
+  body,
+  action,
+}: {
+  icon?: LucideIcon;
+  title: string;
+  body: string;
+  action?: React.ReactNode;
+}): JSX.Element {
+  return (
+    <Surface className="flex flex-col items-center justify-center p-8 text-center">
+      <Icon className="icon-card text-[var(--color-text-muted)]" aria-hidden="true" />
+      <h3 className="section-heading mt-4">{title}</h3>
+      <p className="body-text mt-2 max-w-md">{body}</p>
+      {action && <div className="mt-5">{action}</div>}
     </Surface>
   );
 }
@@ -134,13 +167,17 @@ export function DataUnavailableState({
 }): JSX.Element {
   return (
     <Surface className="flex flex-col items-center justify-center p-8 text-center">
-      <AlertTriangle className="h-7 w-7 text-[var(--color-gold)]" aria-hidden="true" />
-      <h3 className="mt-4 text-lg font-semibold text-[var(--color-primary)]">{title}</h3>
-      <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-muted)]">{body}</p>
+      <AlertTriangle className="icon-card text-[var(--color-warning)]" aria-hidden="true" />
+      <h3 className="section-heading mt-4">{title}</h3>
+      <p className="body-text mt-2 max-w-md">{body}</p>
       {action && <div className="mt-5">{action}</div>}
     </Surface>
   );
 }
+
+/* ============================================
+   Integrity Banner
+   ============================================ */
 
 export function IntegrityStrip(): JSX.Element {
   const items = [
@@ -150,9 +187,9 @@ export function IntegrityStrip(): JSX.Element {
   ];
   return (
     <div className="flex flex-wrap gap-2">
-      { items.map(({ icon: Icon, label }) => (
-        <span key={label} className="ss-pill" style={{ background: "var(--color-primary-light)", color: "var(--color-primary)" }}>
-          <Icon className="h-3.5 w-3.5" aria-hidden="true" style={{ color: "var(--color-primary)" }} />
+      {items.map(({ icon: Icon, label }) => (
+        <span key={label} className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-muted-bg)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]">
+          <Icon className="icon-inline" aria-hidden="true" />
           {label}
         </span>
       ))}
@@ -160,117 +197,154 @@ export function IntegrityStrip(): JSX.Element {
   );
 }
 
+/* ============================================
+   Skeleton
+   ============================================ */
+
 export function PremiumSkeleton(): JSX.Element {
   return (
-    <Surface className="space-y-4 p-6">
-      <div className="skeleton h-5 w-44" style={{ background: "var(--color-primary-light)" }} />
-      <div className="skeleton h-10 w-full" style={{ background: "var(--color-primary-light)" }} />
+    <Surface className="space-y-4">
+      <div className="h-4 w-36 rounded bg-[var(--color-muted-bg)]" />
+      <div className="h-10 w-full rounded bg-[var(--color-muted-bg)]" />
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
-        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
-        <div className="skeleton h-20" style={{ background: "var(--color-primary-light)" }} />
+        <div className="h-20 rounded bg-[var(--color-muted-bg)]" />
+        <div className="h-20 rounded bg-[var(--color-muted-bg)]" />
+        <div className="h-20 rounded bg-[var(--color-muted-bg)]" />
       </div>
     </Surface>
   );
 }
 
+/* ============================================
+   App-level wrappers (legacy support, minimal)
+   ============================================ */
+
 export function AppScreen({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
-  return <div className={`ssi-app mx-auto w-full max-w-7xl space-y-5 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-7xl space-y-6 ${className}`}>{children}</div>;
 }
 
-export function MobilePageHeader({ eyebrow, title, body, action }: { eyebrow?: string; title: string; body?: string; action?: React.ReactNode }): JSX.Element {
+export function MobilePageHeader({ eyebrow, title, body, action }: {
+  eyebrow?: string; title: string; body?: string; action?: React.ReactNode;
+}): JSX.Element {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        {eyebrow && <div className="ssi-eyebrow">{eyebrow}</div>}
-        <h1 className="text-[1.55rem] font-black leading-tight tracking-normal text-slate-950 md:text-4xl">{title}</h1>
-        {body && <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-600">{body}</p>}
+        {eyebrow && <div className="label mb-1">{eyebrow}</div>}
+        <h1 className="page-heading">{title}</h1>
+        {body && <p className="body-text mt-1">{body}</p>}
       </div>
       {action}
     </div>
   );
 }
 
-export function ResearchHeroCard({ eyebrow, title, body, children }: { eyebrow?: string; title: string; body: string; children?: React.ReactNode }): JSX.Element {
+/* ============================================
+   Re-exported utilities
+   ============================================ */
+
+export function DataSourcePill({ label, variant, tone }: {
+  label: string; variant?: "active" | "partial" | "blocked" | "muted"; tone?: string;
+}): JSX.Element {
+  const v = variant || (tone === "ok" ? "active" : tone === "warn" ? "partial" : "muted");
+  return <StatusBadge label={label} variant={v as "active" | "partial" | "blocked" | "muted"} />;
+}
+
+/* ============================================
+   Deprecated exports (keep for imports, remove later)
+   ============================================ */
+
+export const SectionHeader = ({ eyebrow, title, body, action }: {
+  eyebrow?: string; title: string; body?: string; action?: React.ReactNode;
+}): JSX.Element => (
+  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div>
+      {eyebrow && <div className="label mb-1">{eyebrow}</div>}
+      <h2 className="section-heading">{title}</h2>
+      {body && <p className="body-text mt-2 max-w-2xl">{body}</p>}
+    </div>
+    {action}
+  </div>
+);
+
+export const MetricCard = StatCard;
+
+export function ResearchHeroCard({ eyebrow, title, body, children }: {
+  eyebrow?: string; title: string; body: string; children?: React.ReactNode;
+}): JSX.Element {
   return (
-    <section className="ssi-hero-card">
-      {eyebrow && <div className="ssi-eyebrow text-emerald-100">{eyebrow}</div>}
-      <h2 className="mt-2 text-2xl font-black leading-tight tracking-normal text-white md:text-5xl">{title}</h2>
-      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-white/75 md:text-base">{body}</p>
+    <Surface raised className="p-6">
+      {eyebrow && <div className="label mb-1">{eyebrow}</div>}
+      <h2 className="page-heading">{title}</h2>
+      <p className="body-text mt-2 max-w-3xl">{body}</p>
       {children && <div className="mt-5">{children}</div>}
-    </section>
+    </Surface>
   );
 }
 
-export function DataSourcePill({ label, tone = "ok" }: { label: string; tone?: "ok" | "warn" | "muted" }): JSX.Element {
-  return <span className={`ssi-source-pill ssi-source-pill-${tone}`}>{label}</span>;
+/* ============================================
+   Deprecated exports (keep for backward compat)
+   ============================================ */
+
+/** @deprecated Use `StatusBadge` with `variant` prop instead */
+export function StatusChip({ label, tone }: { label: string; tone?: string }): JSX.Element {
+  const variant = tone === "warn" ? "partial" : tone === "risk" ? "blocked" : "muted";
+  return <StatusBadge label={label} variant={variant as "active" | "partial" | "blocked" | "muted"} />;
 }
 
-export function FloatingHelpButton({ onClick }: { onClick?: () => void }): JSX.Element {
-  return <button type="button" onClick={onClick} className="ssi-fab" aria-label="Open research help"><HelpCircle className="h-5 w-5" /></button>;
-}
-
-export function MetricStoryCard({ icon: Icon = Database, label, value, detail }: { icon?: LucideIcon; label: string; value: string; detail?: string }): JSX.Element {
+export function ResearchEmptyState({ title, body, action }: {
+  title: string; body: string; action?: React.ReactNode;
+}): JSX.Element {
   return (
-    <div className="ssi-card p-4">
-      <Icon className="h-5 w-5 text-emerald-700" />
-      <div className="ssi-eyebrow mt-4">{label}</div>
-      <div className="ssi-number mt-1 text-2xl text-slate-950">{value}</div>
-      {detail && <p className="mt-2 text-xs font-medium leading-5 text-slate-500">{detail}</p>}
+    <div className="surface p-8 text-center">
+      <Sparkles className="icon-card text-[var(--color-text-muted)] mx-auto" />
+      <h3 className="section-heading mt-4">{title}</h3>
+      <p className="body-text mt-2 max-w-md mx-auto">{body}</p>
+      {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }
 
 export function WatchlistSearchCard({ onSearch }: { onSearch?: () => void }): JSX.Element {
   return (
-    <div className="ssi-card p-3">
-      <button type="button" onClick={onSearch} className="ssi-search-field">
-        <Search className="h-4 w-4 text-slate-400" />
-        <span className="truncate text-sm font-semibold text-slate-400">Search NSE / BSE...</span>
+    <div className="surface p-3">
+      <button type="button" onClick={onSearch} className="flex items-center gap-2 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-left text-sm text-[var(--color-text-muted)]">
+        <Search className="icon-action" />
+        <span>Search companies...</span>
       </button>
-      <div className="mt-3 flex gap-2">
-        <DataSourcePill label="Stocks" tone="muted" />
-        <DataSourcePill label="Research" tone="muted" />
+    </div>
+  );
+}
+
+export function SourceAuditCard({ title, rows }: {
+  title: string; rows: Array<{ label: string; value: string; tone?: string }>;
+}): JSX.Element {
+  return (
+    <section className="surface p-4">
+      <div className="flex items-center gap-2 mb-3 font-semibold text-[var(--color-text-primary)]">
+        <ShieldCheck className="icon-card text-[var(--color-text-muted)]" />
+        {title}
       </div>
-    </div>
-  );
-}
-
-export function CompanyTile({ symbol, name, onClick }: { symbol: string; name?: string | null; onClick?: () => void }): JSX.Element {
-  return (
-    <button type="button" onClick={onClick} className="ssi-list-row">
-      <span className="min-w-0">
-        <span className="block font-mono text-sm font-black text-slate-950">{symbol}</span>
-        <span className="block truncate text-xs font-semibold text-slate-500">{name || "Company name unavailable"}</span>
-      </span>
-      <ChevronRight className="h-4 w-4 text-slate-400" />
-    </button>
-  );
-}
-
-export function ResearchEmptyState({ title, body, action }: { title: string; body: string; action?: React.ReactNode }): JSX.Element {
-  return (
-    <div className="ssi-card flex flex-col items-center justify-center p-8 text-center">
-      <Sparkles className="h-7 w-7 text-emerald-700" />
-      <h3 className="mt-4 text-lg font-black text-slate-950">{title}</h3>
-      <p className="mt-2 max-w-md text-sm font-medium leading-6 text-slate-600">{body}</p>
-      {action && <div className="mt-5">{action}</div>}
-    </div>
-  );
-}
-
-export function SourceAuditCard({ title, rows }: { title: string; rows: Array<{ label: string; value: string; tone?: "ok" | "warn" | "muted" }> }): JSX.Element {
-  return (
-    <section className="ssi-card p-4">
-      <div className="mb-3 flex items-center gap-2 font-black text-slate-950"><ShieldCheck className="h-5 w-5 text-emerald-700" />{title}</div>
       <div className="space-y-2">
         {rows.map((row) => (
-          <div key={row.label} className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2">
-            <span className="text-xs font-bold text-slate-500">{row.label}</span>
-            <DataSourcePill label={row.value} tone={row.tone || "muted"} />
+          <div key={row.label} className="flex items-center justify-between gap-3 rounded-lg bg-[var(--color-muted-bg)] px-3 py-2">
+            <span className="label">{row.label}</span>
+            <StatusBadge label={row.value} variant={
+              row.tone === "ok" ? "active" : row.tone === "warn" ? "partial" : "muted"
+            } />
           </div>
         ))}
       </div>
     </section>
   );
+}
+
+export function FloatingHelpButton({ onClick }: { onClick?: () => void }): JSX.Element {
+  return <button type="button" onClick={onClick} className="fixed right-4 bottom-24 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] shadow-md" aria-label="Help"><HelpCircle className="icon-action text-[var(--color-text-secondary)]" /></button>;
+}
+
+/** @deprecated Use plain `<main>` with `AppShell` instead */
+export function PremiumPage({ children, nav, className }: {
+  children: React.ReactNode; nav?: React.ReactNode; className?: string;
+}): JSX.Element {
+  return <main className={`ss-page ${className || ""}`}>{nav}{children}</main>;
 }
