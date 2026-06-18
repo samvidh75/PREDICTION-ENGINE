@@ -132,4 +132,34 @@ export class JugaadDataProvider implements PublicMarketDataProvider {
       return { provider: 'jugaad-data' as ProviderId, status: 'provider_unreachable', latencyMs: Date.now() - start, checkedAt: new Date().toISOString() };
     }
   }
+
+  async checkDomainHealth(): Promise<Record<string, { healthy: boolean; detail?: string }>> {
+    try {
+      const probe = await probeJugaadData();
+      const domain = (name: string, fallback: string) => {
+        const info = (probe as any).domains?.[name] ?? (probe as any)[name];
+        return {
+          healthy: info?.status === 'healthy',
+          detail: info?.detail ?? fallback,
+        };
+      };
+      return {
+        quote: domain('quote', 'Jugaad-Data quote probe unavailable.'),
+        historical: domain('historical', 'Jugaad-Data historical probe unavailable.'),
+        bhavcopy: domain('bhavcopy', 'Jugaad-Data bhavcopy probe unavailable.'),
+        index: domain('index', 'Jugaad-Data index probe unavailable.'),
+        rbi: domain('rbi', 'Jugaad-Data RBI probe unavailable.'),
+        market_status: domain('index', 'Jugaad-Data market-status probe unavailable.'),
+      };
+    } catch {
+      return {
+        quote: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+        historical: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+        bhavcopy: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+        index: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+        rbi: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+        market_status: { healthy: false, detail: 'Jugaad-Data probe failed.' },
+      };
+    }
+  }
 }

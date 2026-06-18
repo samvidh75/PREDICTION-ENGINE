@@ -14,6 +14,9 @@ export {};
 
 import { PublicMarketDataProviderBroker } from '../src/providers/publicMarketData/providerBroker';
 import type { ProviderDomain, PublicProviderId } from '../src/providers/publicMarketData/types';
+import { config as loadDotEnv } from 'dotenv';
+
+loadDotEnv({ path: '.env', quiet: true });
 
 const DOMAIN_LABELS: Record<string, string> = {
   quote: "Quote",
@@ -29,6 +32,11 @@ function domainIcon(status: string): string {
   if (status === "missing_optional") return "⊘";
   if (status === "degraded" || status === "partial") return "△";
   return "✗";
+}
+
+function domainState(status?: { healthy?: boolean }): string {
+  if (!status) return "unavailable";
+  return status.healthy ? "healthy" : "unavailable";
 }
 
 async function main(): Promise<void> {
@@ -53,16 +61,21 @@ async function main(): Promise<void> {
 
   // --- Domain-level health matrix ---
   console.log("--- Domain Health Matrix ---");
-  const domains: ProviderDomain[] = ["quote", "historical", "bhavcopy", "index", "fundamentals", "macro"];
-  for (const domain of domains) {
-    const precedence = broker.getDomainPrecedence(domain);
-    const statuses = await Promise.all(
-      precedence.map(async (pid) => {
-        const health = await broker.getProviderHealth(pid as PublicProviderId);
-        return `${pid}=${health?.status ?? "unavailable"}`;
-      }),
-    );
-    console.log(`  ${DOMAIN_LABELS[domain] || domain}: ${statuses.join(" → ")}`);
+  const providerMatrix = await broker.getProviderStatusMatrix();
+  const domainRows: Array<[string, Array<[string, string]>]> = [
+    ["Quote", [["indianapi", "INDIANAPI_KEY.quote"], ["jugaad-data", "JUGAD_DATA.quote"], ["nsepython", "NSEPYTHON.quote"], ["yahoo", "YAHOO.quote"]]],
+    ["Historical", [["jugaad-data", "JUGAD_DATA.historical"], ["nsepython", "NSEPYTHON.historical"], ["yahoo", "YAHOO.historical"]]],
+    ["Bhavcopy", [["jugaad-data", "JUGAD_DATA.bhavcopy"], ["nsepython", "NSEPYTHON.bhavcopy"]]],
+    ["Index", [["nsepython", "NSEPYTHON.index_quote"], ["jugaad-data", "JUGAD_DATA.index"]]],
+    ["Fundamentals", [["automatic_public", "FUNDAMENTALS_AUTOMATIC.fundamentals"], ["csv_import", "CSV_FALLBACK.fundamentals"]]],
+    ["Macro", [["jugaad-data", "JUGAD_DATA.rbi"]]],
+  ];
+  for (const [label, providers] of domainRows) {
+    const statuses = providers.map(([provider, path]) => {
+      const [key, domain] = path.split(".");
+      return `${provider}=${domainState(providerMatrix[key]?.domains?.[domain])}`;
+    });
+    console.log(`  ${label}: ${statuses.join(" → ")}`);
   }
 
   // --- Quote Fallback Test ---
@@ -104,13 +117,20 @@ async function main(): Promise<void> {
   console.log("\n=== Summary ===");
   const yahooQuoteOk = quoteResult.provider === "yahoo" && !!quoteResult.data;
   const yahooHistOk = histResult.provider === "yahoo" && !!histResult.data?.length;
+  const yahooHealthy = yahooHealth?.status === "healthy";
   const yahooDetail = yahooQuoteOk || yahooHistOk
     ? `Reachable fallback${yahooQuoteOk ? " quote" : ""}${yahooQuoteOk && yahooHistOk ? " +" : ""}${yahooHistOk ? " historical" : ""}; optional and may be delayed/stale`
+    : yahooHealthy
+      ? "Reachable optional fallback; higher-precedence providers served this run"
     : `Unavailable or blocked${yahooHealth?.status ? ` — ${yahooHealth.status}` : ""}`;
+  const healthyDomainList = (key: string) => Object.entries(providerMatrix[key]?.domains ?? {})
+    .filter(([, v]) => v.healthy)
+    .map(([domain]) => domain)
+    .join(", ") || "no usable domains";
   console.log("  ✓ IndianAPI: Active for quotes (when configured)");
-  console.log(`  ${jugaadFlag ? "✓" : "⊘"} Jugaad-Data: ${jugaadFlag ? "Active" : "Configured off"} — bhavcopy, RBI, market_status`);
-  console.log(`  ${nsepythonFlag ? "✓" : "⊘"} NSEPython: ${nsepythonFlag ? "Active" : "Configured off"} — index_quote, bhavcopy`);
-  console.log(`  ${yahooQuoteOk || yahooHistOk ? "✓" : "△"} Yahoo: ${yahooDetail}`);
+  console.log(`  ${jugaadFlag ? "✓" : "⊘"} Jugaad-Data: ${jugaadFlag ? `Active — ${healthyDomainList("JUGAD_DATA")}` : "Configured off"}`);
+  console.log(`  ${nsepythonFlag ? "✓" : "⊘"} NSEPython: ${nsepythonFlag ? `Active — ${healthyDomainList("NSEPYTHON")}` : "Configured off"}`);
+  console.log(`  ${yahooQuoteOk || yahooHistOk || yahooHealthy ? "✓" : "△"} Yahoo: ${yahooDetail}`);
   console.log("  △ Fundamentals: Partial via DB snapshots + CSV/manual import");
   console.log("  △ CSV Import: Manual fundamentals fallback");
   console.log("  ⊘ NSELib: Archived/unusable, not active");
