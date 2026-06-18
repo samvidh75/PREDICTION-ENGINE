@@ -906,11 +906,20 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const pkgs = ['jugaad_data', 'nselib', 'nsepython'];
     for (const pkg of pkgs) {
       try {
-        execSync(`python3 -c "import ${pkg}; print('ok')" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 }).trim();
+        execSync(`python3 -c "import ${pkg}" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 });
         report[pkg] = 'installed';
       } catch { report[pkg] = 'not_installed'; }
     }
     return reply.send(report);
+  });
+
+  app.get("/api/ops/probe/pip-list", async (_request, reply) => {
+    try {
+      const out = execSync('pip3 list 2>&1', { encoding: 'utf-8', timeout: 10000 });
+      return reply.send({ output: out });
+    } catch (err: any) {
+      return reply.send({ error: err.message, output: err.stdout?.toString()?.slice(0, 2000) ?? '' });
+    }
   });
 
   app.get("/api/ops/probe/nselib", async (_request, reply) => {

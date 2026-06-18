@@ -102,7 +102,8 @@
     "ingest:authorized:corporate-actions": "tsx scripts/ingest-authorized-corporate-actions.ts",
     "ingest:authorized:quotes": "tsx scripts/ingest-authorized-quotes.ts",
     "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
-    "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts"
+    "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
+    "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

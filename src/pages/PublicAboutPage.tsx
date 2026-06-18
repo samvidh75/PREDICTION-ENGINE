@@ -1,5 +1,6 @@
 import React from "react";
 import { BarChart3, Database, FileSearch, ShieldCheck, Workflow, XCircle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import MobileNav from "../components/navigation/MobileNav";
 import TopNav from "../components/navigation/TopNav";
 import Button from "../components/ui/Button";
@@ -12,7 +13,7 @@ const principles = [
   ["Indian market context", "Workflows are shaped around Indian equities, provider coverage, and source reliability."],
 ];
 
-const does = [
+const does: Array<[string, LucideIcon]> = [
   ["Structure research", FileSearch],
   ["Show coverage health", Database],
   ["Track score changes", BarChart3],
@@ -46,8 +47,8 @@ export const PublicAboutPage: React.FC = () => (
       <SectionHeader eyebrow="What it does" title="A research terminal, not an advisory desk." body="The interface helps users move from company discovery to source verification while keeping limitations explicit." />
       <div className="mt-6 grid gap-4 md:grid-cols-4">
         {does.map(([label, Icon]) => (
-          <Surface key={label as string} className="ss-lift p-6">
-            {React.createElement(Icon as typeof FileSearch, { className: "h-6 w-6 text-emerald-700", "aria-hidden": true })}
+          <Surface key={label} className="ss-lift p-6">
+            <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
             <h3 className="mt-4 text-lg font-semibold text-slate-950">{label}</h3>
           </Surface>
         ))}

@@ -3,6 +3,7 @@ import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import CinematicAuthGateway from "../components/auth/CinematicAuthGateway";
 import { sanitizeReturnTo, getReturnToContext } from "../app/router";
+import { IntegrityStrip, PremiumPage, Surface } from "../components/premium/PremiumUI";
 
 export const SignupPage: React.FC = () => {
   const returnToParam = useMemo(() => {
@@ -26,29 +27,25 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <main
-      className="flex min-h-screen flex-col justify-between antialiased"
-      style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}
-    >
+    <PremiumPage className="flex flex-col justify-between">
       <TopNav />
       <MobileNav />
 
-      <section className="z-10 flex flex-1 flex-col items-center justify-center px-5 py-12 md:py-24">
-        <div
-          className="w-full max-w-md rounded-2xl p-6 sm:p-8"
-          style={{
-            background: "rgba(255,255,255,0.75)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.6)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)",
-          }}
-        >
-          <div className="mb-6 flex flex-col items-center">
-            <span className="text-base font-semibold tracking-[0.08em]" style={{ color: "#0f1419" }}>
-              StockStory India
-            </span>
+      <section className="z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 px-5 py-24 md:grid-cols-[1fr_440px] md:py-32">
+        <Surface dark className="hidden min-h-[520px] p-8 md:flex md:flex-col md:justify-between">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Start a research workspace</div>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white">Build a watchlist around evidence, not market noise.</h1>
+            <p className="mt-4 max-w-md text-sm leading-6 text-white/70">Create an account to save research, revisit companies, and inspect coverage status across devices.</p>
+          </div>
+          <IntegrityStrip />
+        </Surface>
+        <Surface strong className="w-full p-6 sm:p-8">
+          <div className="mb-6 flex flex-col">
+            <span className="text-base font-black tracking-[0.08em] text-slate-950">StockStory<span className="text-emerald-700">.India</span></span>
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">Create account</h2>
             {contextMessage && (
-              <p className="mt-2 text-xs text-center" style={{ color: "#536471" }}>{contextMessage}</p>
+              <p className="mt-2 text-xs text-slate-600">{contextMessage}</p>
             )}
           </div>
           <CinematicAuthGateway
@@ -57,13 +54,13 @@ export const SignupPage: React.FC = () => {
             restoreOnMount={false}
             contextMessage={contextMessage}
           />
-        </div>
+        </Surface>
       </section>
 
       <footer className="py-6 text-center text-xs" style={{ color: "#8b98a5" }}>
         <p>Research signals only. Not investment advice.</p>
       </footer>
-    </main>
+    </PremiumPage>
   );
 };
 
