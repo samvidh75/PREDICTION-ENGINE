@@ -96,9 +96,9 @@ async function runFundamentalsMetadata(isApply: boolean, limitNum: number, srcLa
   if (isApply) {
     if (!srcLabel) { console.error("[maintenance] FUNDAMENTALS-METADATA APPLY REQUIRES --source-label"); return; }
     const upRes = await query(
-      `UPDATE financial_snapshots SET source_label=$1, ingestion_timestamp=datetime('now'),
-       source_notes='Operator-confirmed provenance: manual backfill' WHERE rowid IN
-       (SELECT rowid FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $2)`,
+      `UPDATE financial_snapshots SET source_label=$1, ingestion_timestamp=NOW(),
+       source_notes='Operator-confirmed provenance: manual backfill'
+       WHERE symbol IN (SELECT symbol FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $2)`,
       [srcLabel, limitNum]
     );
     console.log(`[maintenance] Updated ${upRes.rowCount || 0} rows with source_label='${srcLabel}'`);
