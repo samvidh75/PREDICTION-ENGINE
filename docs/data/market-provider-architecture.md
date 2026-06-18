@@ -9,25 +9,31 @@ All core providers are public, free, or no-credential. No broker tokens needed.
 ### Quote Precedence
 
 ```
-IndianAPI (if configured) → Yahoo fallback → unavailable
+IndianAPI (if configured) → jugaad-data (local/degraded) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
 ### Historical Precedence
 
 ```
-Yahoo fallback → unavailable
+jugaad-data (local/degraded, Python 3.9 bug) → nselib (unavailable) → nsepython (degraded) → Yahoo (blocked) → unavailable
 ```
 
-### NSE Universe Precedence
+### Bhavcopy Precedence
 
 ```
-nsepython (operator tool) → DB registry → unavailable
+jugaad-data (active, CSV file) → nselib (unavailable) → nsepython (active, DataFrame) → unavailable
 ```
 
-### Index / Breadth Precedence
+### Index Precedence
 
 ```
-nsepython (operator tool) → unavailable
+nselib (unavailable) → nsepython (active) → jugaad-data (active) → unavailable
+```
+
+### Macro Precedence
+
+```
+jugaad-data (active, RBI rates) → unavailable
 ```
 
 ### Fundamentals Precedence
@@ -36,29 +42,51 @@ nsepython (operator tool) → unavailable
 CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 ```
 
+## Provider Status Summary
+
+| Provider | Quotes | Historical | Bhavcopy | Index | Macro | Fundamentals |
+|----------|--------|------------|----------|-------|-------|-------------|
+| IndianAPI | ✅ Active | — | — | — | — | — |
+| Jugaad-Data | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | ✅ Active | — |
+| NSELib | ❌ Unavailable | ❌ Unavailable | ❌ Unavailable | ❌ Unavailable | — | ❌ Unavailable |
+| NSEPython | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | — | ❌ Unavailable |
+| Yahoo | ❌ Blocked | ❌ Blocked | — | — | — | — |
+| CSV Import | — | — | — | — | — | ✅ Active |
+
+## What Changed
+
+| Change | Detail |
+|--------|--------|
+| Added jugaad-data | New public NSE provider for bhavcopy, RBI rates, market status, indices |
+| Yahoo marked blocked | HTTP 429 — rate-limited, not just unreachable from Railway |
+| NSEPython updated | Package version, bhavcopy confirmed working, more blocked endpoints documented |
+| NSELib unchanged | Still requires Python 3.10+ |
+| Fundamentals unchanged | Still CSV import only; no automatic source available |
+
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| `src/providers/marketData/providerBroker.ts` | Provider fallback broker |
-| `src/providers/marketData/yahooFallbackProvider.ts` | Yahoo Finance REST adapter |
-| `src/providers/marketData/types.ts` | Provider broker types |
+| `src/providers/publicMarketData/providerBroker.ts` | Provider fallback broker with precedence |
+| `src/providers/publicMarketData/jugaadDataProvider.ts` | Jugaad-Data provider adapter |
+| `src/providers/publicMarketData/jugaadDataBridge.ts` | Python bridge for jugaad-data |
+| `src/providers/publicMarketData/nselibProvider.ts` | NSELib provider adapter |
+| `src/providers/publicMarketData/nsePythonProvider.ts` | NSEPython provider adapter |
+| `src/providers/publicMarketData/yahooProvider.ts` | Yahoo Finance adapter |
+| `src/providers/marketData/providerBroker.ts` | Legacy provider fallback broker |
+| `src/providers/marketData/yahooFallbackProvider.ts` | Legacy Yahoo Finance REST adapter |
+| `src/providers/marketData/types.ts` | Legacy provider broker types |
 
 ## Provider Status Endpoint
 
 `GET /api/ops/data-coverage` returns provider status under `providers` key.
 
-Only active providers are shown:
-- `INDIANAPI_KEY` — active, required, healthy
-- `REDIS_URL` — active, required, healthy
-
 ## Broker Providers (Removed)
 
-The following providers have been removed from active architecture:
+| Provider | Reason | Removal Date |
+|----------|--------|-------------|
+| Dhan | No credentials available | 2026-06-18 |
+| Upstox | Token lifecycle unsuitable | 2026-06-18 |
+| Finnhub | Removed from active pipeline | 2026-06-18 |
 
-- **Dhan** — Removed (no credentials available)
-- **Upstox** — Removed (token lifecycle unsuitable)
-- **Finnhub** — Removed (deprecated, removed from active pipeline)
-
-Their source files remain in the repository for reference but are not imported
-by the active provider broker or displayed in the Trust Centre.
+Source files remain in the repository for reference but are not imported by the active provider broker or displayed in the Trust Centre.
