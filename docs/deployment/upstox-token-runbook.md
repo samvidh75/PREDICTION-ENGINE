@@ -1,116 +1,66 @@
-# Upstox Access Token — Refresh Runbook
+# Upstox Access Token — Operator Runbook
 
-## Summary
+## Overview
 
-StockStory India uses Upstox as a provider for fundamentals data. Access tokens for the Upstox API v2 expire and must be refreshed periodically.
+Upstox is an optional read-only market data provider for StockStory India. The integration uses **Upstox API v2** via a direct TypeScript adapter (no Python bridge).
 
-**Do not** automate login/password flows. Do not bypass Upstox OAuth. The refresh must be performed via the official Upstox OAuth authorization flow.
+## Credentials Required
 
-## Required Environment Variables
+| Variable             | Purpose                       |
+|----------------------|-------------------------------|
+| UPSTOX_ACCESS_TOKEN  | Upstox OAuth access token     |
+| UPSTOX_API_KEY       | Optional — OAuth refresh      |
+| UPSTOX_CLIENT_SECRET | Optional — OAuth refresh      |
+| UPSTOX_REDIRECT_URI  | Optional — OAuth refresh      |
 
-| Variable | Purpose |
-|---|---|
-| `UPSTOX_ACCESS_TOKEN` | Bearer token for Upstox API v2 |
-| `UPSTOX_API_KEY` | Client ID for Upstox OAuth app |
-| `UPSTOX_CLIENT_SECRET` | Client secret for Upstox OAuth app |
-| `UPSTOX_REDIRECT_URI` | OAuth callback URL (must match Upstox Developer Console) |
+## Token Generation
 
-## Checking Token Status
+Follow the [Upstox OAuth flow](https://upstox.com/developer/api-documentation) to generate an access token:
 
-### Local (uses your own Railway-linked env)
+1. Register an app in the Upstox developer console
+2. Direct user through OAuth consent screen
+3. Capture the authorization code from the redirect URI
+4. Exchange the code for an access token
+
+## Token Refresh
+
+- Upstox access tokens expire (typically 1 day).
+- OAuth refresh requires `UPSTOX_API_KEY`, `UPSTOX_CLIENT_SECRET`, and `UPSTOX_REDIRECT_URI`.
+- Tokens are operator-managed secrets — do not store in code.
+
+## Verification
+
 ```bash
 npm run check:upstox
 ```
 
-### Railway production
-```bash
-railway run --service PREDICTION-ENGINE --environment production npm run check:upstox
-```
+Expected output: `UPSTOX_TOKEN=valid` if the token is healthy.
 
-### Expected outputs
+## Expired Token Behavior
 
-| Condition | Exit Code | Output |
-|---|---|---|
-| Token valid | 0 | `UPSTOX_STATUS=valid` |
-| Token missing | 1 | `UPSTOX_STATUS=missing` |
-| Token expired | 2 | `UPSTOX_STATUS=expired` |
-| Token unauthorized | 3 | `UPSTOX_STATUS=unauthorized` |
-| Provider error | 4+ | `UPSTOX_STATUS=provider_error` or `network_error` |
+When the Upstox token is expired:
+- The provider broker classifies Upstox as `expired_or_unauthorized`
+- The broker skips Upstox automatically in fallback chains
+- Falls back to Dhan → IndianAPI → Yahoo
+- **No app failure. No fake data.**
+- The health API shows `upstox=expired` status
 
-### Via production status endpoint
+## Security
 
-```bash
-curl https://prediction-engine-production-f7a8.up.railway.app/api/providers/upstox/status
-```
+- Do not commit `.env` files containing Upstox credentials.
+- Do not log token values in any output.
+- The diagnostic script `scripts/check-upstox-token.ts` never prints the token value.
+- The health endpoint shows only `present`/`expired` status.
 
-Returns JSON with `tokenState`, `healthStatus`, and configuration status — no token values.
+## Rate Limits
 
-## Refreshing the Token
+- Market quotes: 20 requests/minute
+- Historical data: 20 requests/minute
+- The provider adapter enforces timeouts (10s).
 
-### Step 1: Generate authorization URL
+## Fallback
 
-POST to the production backend:
-
-```bash
-curl -X POST https://prediction-engine-production-f7a8.up.railway.app/api/providers/upstox/token/request
-```
-
-Response includes an `authUrl`. Open this URL in a browser.
-
-### Step 2: Authorize via Upstox login
-
-1. Open the `authUrl` in a browser.
-2. Log in to Upstox.
-3. Approve the requested permissions.
-4. Upstox redirects to the configured callback URL with an authorization code.
-
-### Step 3: Exchange code for access token
-
-The callback endpoint handles the exchange automatically. If manual exchange is needed:
-
-```bash
-curl -X POST "https://prediction-engine-production-f7a8.up.railway.app/api/providers/upstox/token/callback?code=AUTH_CODE_HERE"
-```
-
-### Step 4: Set the new token on Railway
-
-```bash
-# Set the refreshed access token (replace NEW_TOKEN with actual value)
-railway variables set UPSTOX_ACCESS_TOKEN="NEW_TOKEN" \
-  --service PREDICTION-ENGINE --environment production
-
-# Redeploy to pick up new env var
-railway redeploy --from-source --service PREDICTION-ENGINE --environment production --yes
-```
-
-### Step 5: Verify
-
-```bash
-# Check token validity
-railway run --service PREDICTION-ENGINE --environment production npm run check:upstox
-
-# Run production smoke
-npm run smoke:production
-
-# Run data quality verification
-npm run verify:data:production
-```
-
-## Pipeline Behavior with Expired Token
-
-When `UPSTOX_ACCESS_TOKEN` is expired:
-- The Upstox fundamentals provider throws `"Upstox token expired"` (401).
-- The pipeline stage records `"partial"` status.
-- Other providers (IndianAPI, Yahoo) continue operating normally.
-- The `scheduler_health` field in the health endpoint shows `api_pipeline_run:partial`.
-- The Trust Centre may show "Some provider data is temporarily unavailable."
-
-An expired Upstox token **does not** block core app functionality. Quotes, historical prices, features, factors, and predictions continue using Yahoo and IndianAPI data. Only fundamentals sourced via Upstox are affected.
-
-## Secret Handling
-
-- Never print, log, or commit `UPSTOX_ACCESS_TOKEN`.
-- Never echo the token value in CI/CD output.
-- The diagnostic script reports `present`/`missing`/`expired`/`valid` only — never the raw token.
-- The health endpoint reports `tokenState` and `healthStatus` without exposing the token value.
-- The status endpoint file (`src/backend/web/routes/upstox.ts`) sanitises error messages.
+If Upstox token is expired or missing:
+- The provider broker skips Upstox automatically.
+- Falls back to Dhan → IndianAPI → Yahoo.
+- **No app failure. No fake data.**

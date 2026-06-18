@@ -230,6 +230,18 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           status: process.env.UPSTOX_NOTIFIER_SECRET ? "present" : "missing_optional",
           message: process.env.UPSTOX_NOTIFIER_SECRET ? "Configured." : "Optional — needed only for Upstox notifier endpoint.",
         },
+        DHAN_CLIENT_ID: {
+          lifecycle: "optional_active",
+          required: false,
+          status: process.env.DHAN_CLIENT_ID && process.env.DHAN_ACCESS_TOKEN ? "present" : "missing_optional",
+          message: process.env.DHAN_CLIENT_ID && process.env.DHAN_ACCESS_TOKEN ? "Dhan provider active." : "Optional — configure for Dhan market data.",
+        },
+        DHAN_ACCESS_TOKEN: {
+          lifecycle: "optional_active",
+          required: false,
+          status: process.env.DHAN_ACCESS_TOKEN ? "present" : "missing_optional",
+          message: process.env.DHAN_ACCESS_TOKEN ? "Dhan token present." : "Optional — needed for Dhan API access.",
+        },
       };
       return matrix;
     };
