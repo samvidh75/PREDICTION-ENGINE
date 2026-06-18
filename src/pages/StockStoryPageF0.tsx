@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, ArrowLeftRight, Bookmark, Shield } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
-import { AppScreen, DataSourcePill, MobilePageHeader, SourceAuditCard } from "../components/premium/PremiumUI";
+import { ProductShell, ProductPage, ProductPanel, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
+import { SourceAuditSheet } from "../components/intelligence/SourceAuditSheet";
+import { useToast } from "../components/feedback/useToast";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
 type PredictionHorizon = (typeof HORIZONS)[number];
@@ -23,6 +27,16 @@ export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
   const ticker = readTickerFromUrl();
   const stockInfo = ticker ? StockRegistry.getStock(ticker) : null;
+  const [auditOpen, setAuditOpen] = useState(false);
+  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
+  const toast = useToast();
+  const isInWatchlist = watchlists.some((w) => w.tickers.includes(ticker));
+
+  useEffect(() => {
+    const handler = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
+    window.addEventListener("watchlistchange", handler);
+    return () => window.removeEventListener("watchlistchange", handler);
+  }, []);
 
   const selectHorizon = (nextHorizon: PredictionHorizon) => {
     const params = new URLSearchParams(window.location.search);
@@ -31,37 +45,118 @@ export default function StockStoryPageF0(): JSX.Element {
     setHorizon(nextHorizon);
   };
 
+  const handleToggleWatchlist = () => {
+    const defaultList = watchlists[0];
+    if (!defaultList) return;
+    if (isInWatchlist) {
+      WatchlistEngine.removeTicker(defaultList.id, ticker);
+      toast.success(`${ticker} removed from watchlist`);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, ticker);
+      toast.success(`${ticker} saved to watchlist`);
+    }
+    setWatchlists([...WatchlistEngine.getWatchlists()]);
+  };
+
+  const companyName = stockInfo?.companyName || "Unavailable";
+  const sector = stockInfo?.sector || null;
+
   return (
-    <AppScreen className="antialiased">
-      <MobilePageHeader eyebrow="Stock details" title={ticker || "Company research"} body={stockInfo?.companyName || "Company identity is shown when registry data is available."} action={<DataSourcePill label="Research only" tone="ok" />} />
-      <SourceAuditCard title="Company source state" rows={[
-        { label: "Registry identity", value: stockInfo ? "Available" : "Unavailable", tone: stockInfo ? "ok" : "warn" },
-        { label: "Forecast horizon", value: `${horizon} days`, tone: "muted" },
-        { label: "Action model", value: "Inspect only", tone: "ok" },
-      ]} />
-      <StockWorkspaceBar ticker={ticker} horizon={horizon} />
-      <section
-        aria-label="Prediction horizon"
-        className="mb-5 flex w-full flex-wrap items-center gap-3 rounded-xl px-5 py-3"
-        style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-      >
-        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Horizon</span>
-        {HORIZONS.map((option) => (
+    <ProductShell>
+      <ProductPage>
+        <div className="mb-5 flex items-center justify-between">
           <button
-            key={option}
-            type="button"
-            onClick={() => selectHorizon(option)}
-            aria-pressed={horizon === option}
-            className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-colors ${
-              horizon === option ? "text-white shadow-sm" : "hover:bg-white/40"
-            }`}
-            style={horizon === option ? { background: "#1a6e4a", color: "white" } : { color: "#536471" }}
+            onClick={() => productNavigate("search")}
+            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#9AA7B5] transition hover:text-[#E6EDF3]"
           >
-            {option}D
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
-        ))}
-      </section>
-      <StockStoryPage key={horizon} />
-    </AppScreen>
+          <div className="flex items-center gap-2">
+            {watchlists.length > 0 && (
+              <button
+                onClick={handleToggleWatchlist}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+              >
+                <Bookmark className={`h-3 w-3 ${isInWatchlist ? "fill-[#2962FF] text-[#2962FF]" : ""}`} />
+                {isInWatchlist ? "Saved" : "Watchlist"}
+              </button>
+            )}
+            <button
+              onClick={() => productNavigate("compare", ticker)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+            >
+              <ArrowLeftRight className="h-3 w-3" /> Compare
+            </button>
+            <button
+              onClick={() => setAuditOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+            >
+              <Shield className="h-3 w-3" /> Source trace
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-5">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">{ticker || "Unavailable"}</h1>
+            <span className="text-sm text-[#9AA7B5]">{companyName}</span>
+          </div>
+          {sector && (
+            <p className="mt-0.5 text-xs text-[#64748B]">{sector}</p>
+          )}
+        </div>
+
+        <div className="mb-5 grid gap-4 sm:grid-cols-2">
+          <ProductPanel className="p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">Score</div>
+            <div className="mt-2 flex items-center gap-2">
+              <ProductStatusPill tone={stockInfo ? "blue" : "muted"}>
+                {stockInfo ? "Registry available" : "Registry unavailable"}
+              </ProductStatusPill>
+            </div>
+          </ProductPanel>
+          <ProductPanel className="p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">Source</div>
+            <div className="mt-2 flex items-center gap-2">
+              <ProductStatusPill tone={ticker ? "verified" : "muted"}>
+                {ticker ? "Symbol resolved" : "No symbol"}
+              </ProductStatusPill>
+              <ProductStatusPill tone="muted">
+                {horizon}D horizon
+              </ProductStatusPill>
+            </div>
+          </ProductPanel>
+        </div>
+
+        <div className="mb-5 flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
+          <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Horizon</span>
+          {HORIZONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => selectHorizon(option)}
+              aria-pressed={horizon === option}
+              className={`rounded-md px-2.5 py-1 text-xs font-bold transition ${
+                horizon === option
+                  ? "bg-[#2962FF] text-white shadow-sm"
+                  : "text-[#9AA7B5] hover:bg-[rgba(148,163,184,0.08)] hover:text-[#E6EDF3]"
+              }`}
+            >
+              {option}D
+            </button>
+          ))}
+        </div>
+
+        <StockWorkspaceBar ticker={ticker} horizon={horizon} />
+
+        <StockStoryPage key={horizon} />
+
+        <SourceAuditSheet
+          open={auditOpen}
+          onClose={() => setAuditOpen(false)}
+          symbol={ticker}
+        />
+      </ProductPage>
+    </ProductShell>
   );
 }
