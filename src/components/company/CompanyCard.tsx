@@ -65,7 +65,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
             onToggleWatchlist?.();
           }}
           className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all bg-transparent border-none cursor-pointer ${
-            isWatched ? "text-cyan-400 font-extrabold" : "text-white/40 hover:text-white"
+            isWatched ? "text-cyan-400 font-semibold" : "text-white/40 hover:text-white"
           }`}
         >
           <Star className={`w-3.5 h-3.5 ${isWatched ? "fill-cyan-400" : ""}`} />

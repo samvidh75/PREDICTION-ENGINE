@@ -127,8 +127,8 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
 
       {/* Mobile layout */}
       <div className="md:hidden">
-        <div className="min-h-dvh pb-20">
-          <main>
+        <div className="min-h-dvh overflow-x-hidden pb-20">
+          <main className="w-full">
             {children}
           </main>
         </div>

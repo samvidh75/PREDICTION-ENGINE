@@ -39,7 +39,7 @@ import { loadUserProfile } from "./services/auth/userProfileStore";
 // Feedback
 import ToastProvider from "./components/feedback/ToastProvider";
 
-// Aura/glass background
+// Background
 import AuraBackground from "./components/ui/AuraBackground";
 
 
