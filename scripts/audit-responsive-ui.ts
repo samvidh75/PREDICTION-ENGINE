@@ -86,7 +86,8 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
     const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(bodyText);
     const secretToken = /\b(REDIS_URL|DATABASE_URL|FIREBASE_PRIVATE_KEY|INDIANAPI_KEY|INDIANAPI_KEY|YAHOO_FINANCE_API_KEY)\b/.test(bodyText);
     const forbiddenTrading = /\b(Buy Stock|Sell Stock|Strong Buy|Strong Sell|Looks Good|Try Pro|Unlock Pro|Trade now|30 days free)\b/i.test(bodyText);
-    const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-page, .ss-surface, .ss-dark-surface, .ssi-card");
+    const productShell = !!document.querySelector("[class*='bg-[#070A0F]'], [class*='bg-\\[\\#070A0F\\]'], [class*='bg-[#0D1117]'], [class*='bg-\\[\\#0D1117\\]']");
+    const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-page, .ss-surface, .ss-dark-surface, .ssi-card") && !productShell;
     const bottomNav = document.querySelector(".ssi-bottom-nav");
     const fab = document.querySelector(".ssi-fab");
     const firstMainControl = document.querySelector("main button, main a");
@@ -101,12 +102,13 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
     });
     const fabCoversControl = !!fabRect && !!controlRect &&
       !(fabRect.right < controlRect.left || fabRect.left > controlRect.right || fabRect.bottom < controlRect.top || fabRect.top > controlRect.bottom);
-    const hasAppShell = !!document.querySelector(".ssi-card, .ssi-hero-card, .ssi-bottom-nav, .ss-page, .ss-surface, .ss-dark-surface");
+    const hasAppShell = !!document.querySelector(".ssi-card, .ssi-hero-card, .ssi-bottom-nav, .ss-page, .ss-surface, .ss-dark-surface") || productShell;
     const isLoginBoundary = /Sign in|Email|Password/i.test(bodyText) && !/What you own right now|Today's research scanner/i.test(bodyText);
     const scannerCards = location.search.includes("rankings") && !isLoginBoundary ? /Research rankings|Rankings pending/.test(bodyText) && !!document.querySelector(".ssi-card, .ss-surface, table") : true;
     const portfolioMobile = location.search.includes("portfolio") && !isLoginBoundary ? /What you own right now|Source audit/.test(bodyText) : true;
     const modalA11y = Array.from(document.querySelectorAll("[role='dialog']")).every((el) => el.getAttribute("aria-modal") === "true");
-    return { overflow, hasNav: !!nav, hasCta: !!cta, rawToken, secretToken, forbiddenTrading, oldPlain, navCoversContent, fabCoversControl, hasAppShell, scannerCards, portfolioMobile, modalA11y };
+    const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => /Start research|View rankings|Check Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(el.textContent || ""));
+    return { overflow, hasNav: !!nav, hasCta: !!cta && primaryCtas.length > 0, rawToken, secretToken, forbiddenTrading, oldPlain, navCoversContent, fabCoversControl, hasAppShell, scannerCards, portfolioMobile, modalA11y };
   })()`).catch(() => null);
   const localResult = raw ?? (await page.evaluate(`"use strict"; (() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false }))()`).catch(() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false })));
   const r = localResult as unknown as AuditResult;

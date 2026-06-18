@@ -16,16 +16,16 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary active:scale-[0.97]";
+    "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2962FF] active:scale-[0.99]";
 
   const variants: Record<string, string> = {
-    primary: "bg-accent-primary text-white hover:bg-accent-hover border border-accent-primary shadow-sm",
+    primary: "bg-[#2962FF] text-white hover:bg-[#3B71FF] border border-[#2962FF]",
     secondary: glass
-      ? "glass-panel text-slate-700 hover:bg-white/90"
-      : "bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200/80 shadow-sm",
-    outline: "bg-transparent border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 hover:bg-white/50",
-    ghost: "bg-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 border border-transparent",
-    danger: "bg-red-50/80 backdrop-blur-sm border border-red-100/60 text-red-700 hover:bg-red-100",
+      ? "border border-[rgba(148,163,184,0.16)] bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60"
+      : "bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60 border border-[rgba(148,163,184,0.16)]",
+    outline: "bg-transparent border border-[rgba(148,163,184,0.16)] text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]/60",
+    ghost: "bg-transparent text-[#9AA7B5] hover:text-[#E6EDF3] hover:bg-white/[0.03] border border-transparent",
+    danger: "bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#FCA5A5] hover:bg-[#EF4444]/15",
   };
 
   const sizes: Record<string, string> = {

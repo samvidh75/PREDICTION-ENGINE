@@ -16,6 +16,14 @@ export {};
 import pool from '../src/db/index';
 
 const SCORING_WINDOW_DAYS = parseInt(process.env.SCORING_WINDOW_DAYS || '365', 10);
+const SYMBOL_FILTER = new Set(
+  process.argv
+    .find((arg) => arg.startsWith('--symbols='))
+    ?.replace('--symbols=', '')
+    .split(',')
+    .map((s) => s.trim().toUpperCase())
+    .filter(Boolean) ?? []
+);
 
 interface SymbolDiagnostic {
   symbol: string;
@@ -74,8 +82,12 @@ async function main(): Promise<void> {
     `SELECT symbol, company_name FROM symbols WHERE listing_status = 'Active' ORDER BY symbol`
   );
 
-  const verifiedSymbols = verifiedResult.rows as { symbol: string; company_name: string }[];
+  const allVerifiedSymbols = verifiedResult.rows as { symbol: string; company_name: string }[];
+  const verifiedSymbols = SYMBOL_FILTER.size > 0
+    ? allVerifiedSymbols.filter((row) => SYMBOL_FILTER.has(row.symbol.toUpperCase()))
+    : allVerifiedSymbols;
   console.log(`Verified symbols in DB: ${verifiedSymbols.length}`);
+  if (SYMBOL_FILTER.size > 0) console.log(`Requested symbols: ${[...SYMBOL_FILTER].join(', ')}`);
   console.log(`Scoring window: ${SCORING_WINDOW_DAYS} days\n`);
 
   const diagnostics: SymbolDiagnostic[] = [];

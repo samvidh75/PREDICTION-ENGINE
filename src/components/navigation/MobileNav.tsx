@@ -10,7 +10,7 @@ interface MobileNavItem {
 }
 
 interface PublicMobileNavItem {
-  page: "landing" | "about" | "rankings" | "predictions" | "login" | "signup";
+  page: "landing" | "about" | "rankings" | "predictions" | "trust" | "login" | "signup";
   label: string;
   icon: React.ReactNode;
 }
@@ -24,7 +24,7 @@ export const MobileNav: React.FC = () => {
     return new URLSearchParams(window.location.search).get("page") ?? "landing";
   })();
 
-  const isPublicMobile = !isAuthenticated || ["landing", "about", "rankings", "predictions", "login", "signup"].includes(currentPage);
+  const isPublicMobile = !isAuthenticated || ["landing", "about", "rankings", "predictions", "trust", "login", "signup"].includes(currentPage);
 
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -54,7 +54,7 @@ export const MobileNav: React.FC = () => {
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
     { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
     { page: "predictions", label: "Signals", icon: <BarChart3 className="icon-nav" /> },
-    { page: "about", label: "About", icon: <Info className="icon-nav" /> },
+    { page: "trust", label: "Trust", icon: <ShieldCheck className="icon-nav" /> },
     { page: "login", label: "Sign in", icon: <LogIn className="icon-nav" /> },
   ];
 

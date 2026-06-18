@@ -48,7 +48,7 @@ export const SettingsPage: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
-        <div className="flex flex-row gap-2 overflow-x-auto pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:pb-0 md:pr-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", borderRight: "none" }} role="tablist" aria-label="Settings tabs">
+        <div className="flex flex-row gap-2 overflow-x-auto pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:pb-0 md:pr-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", borderRight: "none" }} aria-label="Settings tabs">
           {[
             { id: "profile", label: "Profile", icon: <User className="w-4 h-4" aria-hidden="true" /> },
             { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" aria-hidden="true" /> },
@@ -57,7 +57,6 @@ export const SettingsPage: React.FC = () => {
           ].map((tab) => (
             <button
               key={tab.id}
-              role="tab"
               aria-selected={activeTab === tab.id}
               aria-controls={`settings-tabpanel-${tab.id}`}
               onClick={() => setActiveTab(tab.id as SettingsTab)}
