@@ -123,7 +123,7 @@ export const DashboardHub: React.FC = () => {
   };
 
   return (
-    <div className="w-full px-6 pb-20 pt-6">
+    <div className="w-full overflow-x-hidden px-4 pb-20 pt-6 sm:px-6">
       {/* Research Command Centre header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export const DashboardHub: React.FC = () => {
       </div>
 
       {/* Intelligence summary */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <RoundedDepthPanel padding="sm">
           <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Companies covered</div>
           <div className="mt-1 font-mono text-xl font-bold text-[#E6EDF3]">{indexedSymbols !== null ? formatNumber(indexedSymbols) : "—"}</div>
@@ -184,7 +184,7 @@ export const DashboardHub: React.FC = () => {
       <RoundedDepthPanel padding="md" className="mb-6">
         <h2 className="text-xs font-semibold text-[#E6EDF3]">Data operations</h2>
         <p className="mt-1 text-[10px] text-[#8B949E]">Current data coverage and known gaps.</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Fundamentals</span>
             <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">
@@ -208,7 +208,7 @@ export const DashboardHub: React.FC = () => {
             <p className="mt-0.5 text-[10px] text-[#8B949E]">{'>'}Latest: {latestPredictionDate ? new Date(latestPredictionDate).toLocaleDateString("en-IN") : "Pending"}</p>
           </div>
         </div>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> View all in Trust Centre
           </Button>
