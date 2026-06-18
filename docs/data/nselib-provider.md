@@ -34,7 +34,18 @@ If Python were upgraded to 3.10+, nselib would provide:
 | Financial results | `capital_market.financial_results_for_equity()` | Healthy |
 | F&O derivatives | `derivatives.derivatives_data()` | Healthy |
 
+## Railway Deployment
+
+nselib requires Python 3.10+. If Railway runs Python 3.9, nselib is unavailable.
+Upgrade Railway runtime to Python 3.10+ to enable nselib.
+
+## Workaround
+
+Upgrade Railway runtime to Python 3.10+ (from current 3.9).
+
 ## Recommendation
 
 Consider upgrading the Railway runtime to Python 3.10+ to enable nselib.
-Until then, nsepython provides limited NSE data (index quotes, universe list).
+Until then:
+- **jugaad-data** provides bhavcopy CSV, RBI rates, market status, index data
+- **nsepython** provides limited NSE data (index quotes, universe list)

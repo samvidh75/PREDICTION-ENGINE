@@ -211,6 +211,196 @@ async function main(): Promise<void> {
     results.push(check);
   }
 
+  // ── Provider compliance checks ────────────────────────────────
+
+  // No active Dhan/Upstox/Finnhub in provider code
+  results.push(await dqCheck("no_deprecated_providers", "compliance",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const provs = (body as any).providers as Record<string, any> || {};
+      const keys = Object.keys(provs);
+      const forbidden = ["FINNHUB_KEY", "DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
+      const found = forbidden.filter((k) => keys.includes(k));
+      if (found.length > 0) return `deprecated providers present: ${found.join(", ")}`;
+      return null;
+    },
+  ));
+
+  // Active quote provider coverage (IndianAPI or public NSE)
+  results.push(await dqCheck("quote_provider_coverage", "coverage",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const provs = (body as any).providers as Record<string, any> || {};
+      const indian = provs.INDIANAPI_KEY;
+      const nsepython = provs.NSEPYTHON;
+      const indianOk = indian?.status === "healthy";
+      const nsepythonOk = nsepython?.status === "healthy" && nsepython?.domains?.quote?.healthy === true;
+      if (!indianOk && !nsepythonOk) return "no active quote provider: IndianAPI nor NSEPython healthy";
+      return null;
+    },
+  ));
+
+  // Active historical provider coverage (public NSE or DB)
+  results.push(await dqCheck("historical_provider_coverage", "coverage",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const cov = body.coverage as Record<string, any> | undefined;
+      const provs = (body as any).providers as Record<string, any> || {};
+      const nsepython = provs.NSEPYTHON;
+      const nsepythonOk = nsepython?.status === "healthy" && nsepython?.domains?.historical?.healthy === true;
+      const dbHasData = cov?.dailyPrices?.rowCount > 0;
+      if (!nsepythonOk && !dbHasData) return "no active historical provider: NSEPython unhealthy and dailyPrices empty";
+      return null;
+    },
+  ));
+
+  // Bhavcopy/delivery provider coverage (warn-only — requires deployment)
+  {
+    const check = await dqCheck("bhavcopy_delivery_coverage", "coverage",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const provs = (body as any).providers as Record<string, any> || {};
+        const jd = provs.JUGAD_DATA;
+        if (!jd) return "warn (deploy to verify)";
+        const bhavOk = jd?.domains?.bhavcopy?.healthy === true;
+        const delOk = jd?.domains?.delivery?.healthy === true;
+        if (!bhavOk && !delOk) return "warn (Jugaad-Data bhavcopy/delivery unavailable)";
+        if (!bhavOk) return "warn (Jugaad-Data bhavcopy unavailable)";
+        if (!delOk) return "warn (Jugaad-Data delivery unavailable)";
+        return null;
+      },
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
+  // Index/sector provider coverage (warn-only — requires deployment)
+  {
+    const check = await dqCheck("index_sector_coverage", "coverage",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const provs = (body as any).providers as Record<string, any> || {};
+        const jd = provs.JUGAD_DATA;
+        if (!jd) return "warn (deploy to verify)";
+        const idxOk = jd?.domains?.index?.healthy === true;
+        const secOk = jd?.domains?.sector?.healthy === true;
+        if (!idxOk && !secOk) return "warn (Jugaad-Data index/sector unavailable)";
+        if (!idxOk) return "warn (Jugaad-Data index unavailable)";
+        if (!secOk) return "warn (Jugaad-Data sector unavailable)";
+        return null;
+      },
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
+  // Fundamentals automatic provider coverage (warn-only — requires deployment)
+  {
+    const check = await dqCheck("fundamentals_automatic", "coverage",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const provs = (body as any).providers as Record<string, any> || {};
+        const fa = provs.FUNDAMENTALS_AUTOMATIC;
+        if (!fa) return "warn (deploy to verify)";
+        if (fa.status !== "healthy") return `warn (fundamentals automatic status=${fa?.status})`;
+        return null;
+      },
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
+  // CSV fallback readiness (warn-only — requires deployment)
+  {
+    const check = await dqCheck("csv_fallback_readiness", "coverage",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const provs = (body as any).providers as Record<string, any> || {};
+        const csv = provs.CSV_FALLBACK;
+        if (!csv) return "warn (CSV_FALLBACK not yet deployed)";
+        if (csv.status !== "local_only" && csv.status !== "healthy") return `warn (csv_fallback status=${csv.status})`;
+        return null;
+      },
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
+  // Yahoo reachability status (degraded does not fail)
+  {
+    const check = await dqCheck("yahoo_reachability", "quality",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const provs = (body as any).providers as Record<string, any> || {};
+        const yahoo = provs.YAHOO;
+        if (!yahoo) return "YAHOO provider missing from status";
+        if (yahoo.status === "degraded" || yahoo.status === "unavailable") {
+          return `warn (Yahoo ${yahoo.status} — public NSE providers unaffected)`;
+        }
+        return null;
+      }
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
+  // IndianAPI load-sharing status
+  results.push(await dqCheck("indianapi_load_sharing", "coverage",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const provs = (body as any).providers as Record<string, any> || {};
+      const indian = provs.INDIANAPI_KEY;
+      if (!indian) return "INDIANAPI_KEY provider missing";
+      if (indian.status !== "healthy") return `IndianAPI status=${indian.status}`;
+      return null;
+    },
+  ));
+
+  // No provider marked healthy with zero rows
+  results.push(await dqCheck("no_healthy_zero_rows", "quality",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const cov = body.coverage as Record<string, any> | undefined;
+      if (!cov) return "no coverage object";
+      const tables = ["dailyPrices", "financialSnapshots", "featureSnapshots", "factorSnapshots", "predictionRegistry"];
+      const issues: string[] = [];
+      for (const t of tables) {
+        const table = cov[t];
+        if (table && table.status === "available" && typeof table.rowCount === "number" && table.rowCount === 0) {
+          issues.push(`${t} has 0 rows but status=available`);
+        }
+      }
+      if (issues.length > 0) return issues.join("; ");
+      return null;
+    },
+  ));
+
+  // No orphan feature/factor/prediction rows (informational — does not fail)
+  {
+    const check = await dqCheck("orphan_rows", "quality",
+      `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+      (body) => {
+        const cov = body.coverage as Record<string, any> | undefined;
+        if (!cov) return "no coverage object";
+        const symCount = cov.symbols?.count;
+        const featSym = cov.featureSnapshots?.symbolCount;
+        const factSym = cov.factorSnapshots?.symbolCount;
+        const predSym = cov.predictionRegistry?.symbolCount;
+        if (typeof symCount !== "number" || typeof featSym !== "number" || typeof factSym !== "number" || typeof predSym !== "number") {
+          return null; // skip if counts unavailable
+        }
+        const orphans: string[] = [];
+        if (featSym > symCount) orphans.push(`featureSnapshots symbols(${featSym}) > symbols(${symCount})`);
+        if (factSym > symCount) orphans.push(`factorSnapshots symbols(${factSym}) > symbols(${symCount})`);
+        if (predSym > symCount) orphans.push(`predictionRegistry symbols(${predSym}) > symbols(${symCount})`);
+        if (orphans.length > 0) return `warn (${orphans.join("; ")})`;
+        return null;
+      }
+    );
+    if (check.status === "fail") check.status = "warn";
+    results.push(check);
+  }
+
   // NaN/Infinity scan
   results.push(await dqCheck("coverage_no_nan", "quality",
     `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
@@ -218,7 +408,7 @@ async function main(): Promise<void> {
   ));
 
   // Print report
-  const categories = ["coverage", "data", "ops", "quality"];
+  const categories = ["coverage", "data", "ops", "quality", "compliance"];
   let allOk = true;
   let warns = 0;
 

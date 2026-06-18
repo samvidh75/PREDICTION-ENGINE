@@ -1,18 +1,14 @@
 export {};
 /**
- * check-nsepython-provider.ts — TypeScript probe wrapper for nsepython / nsepythonserver.
+ * check-nsepython-provider.ts — TypeScript wrapper that calls probe-nsepython-provider.py.
  *
- * nsepython is available on Python 3.9 (both local and Railway).
- * It provides:
- *   - Index quotes (NIFTY 50, NIFTY BANK, etc.) — healthy
- *   - NSE equity symbols list (2374 symbols) — healthy
- *   - Market status (open/closed) — healthy
- *   - Index list (213 indices) — healthy
- *   - Individual equity quotes — unreliable (NSE requires session cookies)
- *   - Historical data — unreliable (NSE API restrictions)
+ * nsepython v2.97+ provides public NSE data without credentials.
+ * Available on Python 3.9+.
  *
- * This is a no-credential public data provider. Useful for index/sector coverage
- * and NSE universe sync, but not for individual stock quotes or historical data.
+ * Classification:
+ *   - healthy:  module imported, ≥1 endpoint works
+ *   - degraded: module imported but all endpoints fail
+ *   - unavailable: module import failed
  */
 
 import { execSync } from 'child_process';
@@ -23,9 +19,19 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-interface ProbeResult {
-  status: string;
+interface NsepythonReport {
+  probe: string;
+  healthy_probes: number;
+  total_probes: number;
+  results: Record<string, { status: string; elapsed?: number; detail: unknown }>;
+}
+
+interface HealthResult {
+  status: 'healthy' | 'degraded' | 'unavailable';
   detail: string;
+  pythonVersion: string;
+  healthyProbes: number;
+  totalProbes: number;
 }
 
 async function main(): Promise<void> {
@@ -34,23 +40,47 @@ async function main(): Promise<void> {
   let pythonVersion = 'unknown';
   try {
     pythonVersion = execSync('python3 --version 2>&1', { encoding: 'utf-8' }).trim();
-  } catch { pythonVersion = 'not found'; }
-  console.log(`Python: ${pythonVersion}`);
+  } catch {
+    pythonVersion = 'not found';
+  }
+  console.log(`Python: ${pythonVersion}\n`);
+
+  const probePath = join(__dirname, 'probe-nsepython-provider.py');
+
+  let result: HealthResult;
 
   try {
-    const probePath = join(__dirname, 'probe-nsepython-provider.py');
-    const output = execSync(`python3 "${probePath}" 2>&1`, { encoding: 'utf-8', timeout: 120_000 });
-    console.log(output);
+    const output = execSync(`python3 "${probePath}"`, {
+      encoding: 'utf-8',
+      timeout: 120_000,
+    });
 
-    const resultsMatch = output.match(/\{[\s\S]*\}/);
-    if (resultsMatch) {
-      const results = JSON.parse(resultsMatch[0]);
-      const healthy = Object.values(results).filter((r: any) => r.status === 'healthy').length;
-      const total = Object.keys(results).length;
-      console.log(`\n=== NSEPython Result: ${healthy}/${total} domains healthy ===`);
-    }
+    // Extract JSON from stdout (ignore stderr warnings)
+    const jsonStart = output.indexOf('{');
+    const jsonStr = jsonStart >= 0 ? output.slice(jsonStart) : output;
+    const report: NsepythonReport = JSON.parse(jsonStr);
+    result = {
+      status: report.healthy_probes > 0 ? 'healthy' : 'degraded',
+      detail: `${report.healthy_probes}/${report.total_probes} probes healthy`,
+      pythonVersion,
+      healthyProbes: report.healthy_probes,
+      totalProbes: report.total_probes,
+    };
+
+    console.log(JSON.stringify(report, null, 2));
+    console.log(`\nClassification: ${result.status}`);
+    console.log(`Healthy probes: ${result.healthyProbes}/${result.totalProbes}`);
   } catch (err: any) {
-    console.error(`Probe execution failed: ${err.message}`);
+    const isTimeout = err.message?.includes('timeout') ?? false;
+    result = {
+      status: 'unavailable',
+      detail: isTimeout ? 'Python probe timed out after 120s' : `Probe execution failed: ${err.message}`,
+      pythonVersion,
+      healthyProbes: 0,
+      totalProbes: 0,
+    };
+    console.log(`\nClassification: ${result.status}`);
+    console.log(result.detail);
   }
 
   process.exitCode = 0;

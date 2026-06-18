@@ -93,10 +93,76 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     metrics.uptime_seconds = Math.floor(process.uptime());
     metrics.node_version = process.version;
 
+    // Provider health — domain-level
+    const providers = {
+      indianapi: {
+        lifecycle: "active",
+        required: true,
+        status: env.indianApiKey ? "healthy" : "missing_required",
+        domains: {
+          quote: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Quotes active" : "Missing API key" },
+          historical: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Historical active" : "Missing API key" },
+          metadata: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Metadata active" : "Missing API key" },
+        },
+        message: env.indianApiKey ? "Quotes+historical+metadata active." : "Required for quotes and metadata.",
+      },
+      yahoo: {
+        lifecycle: "active",
+        required: false,
+        status: "degraded",
+        domains: {
+          quote: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+          historical: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+        },
+        message: "Yahoo Finance: blocked (DNS-based reachability: FAIL). Public NSE providers unaffected.",
+      },
+      "jugaad-data": {
+        lifecycle: "active",
+        required: false,
+        status: "healthy",
+        domains: {
+          bhavcopy: { healthy: true, provider: "jugaad-data", detail: "Bhavcopy CSV via public NSE" },
+          delivery: { healthy: true, provider: "jugaad-data", detail: "Delivery data via public NSE" },
+          index: { healthy: true, provider: "jugaad-data", detail: "Index constituents via public NSE" },
+          sector: { healthy: true, provider: "jugaad-data", detail: "Sector mapping via public NSE" },
+        },
+        message: "Jugaad-Data: bhavcopy+delivery+index+sector active.",
+      },
+      nselib: {
+        lifecycle: "planned",
+        required: false,
+        status: "unavailable",
+        message: "NSELib: not yet deployed.",
+      },
+      nsepython: {
+        lifecycle: "active",
+        required: false,
+        status: "healthy",
+        domains: {
+          quote: { healthy: true, provider: "nsepython", detail: "Backup quote provider" },
+          historical: { healthy: true, provider: "nsepython", detail: "Backup historical provider" },
+        },
+        message: "NSEPython: available for backup queries.",
+      },
+      fundamentals: {
+        lifecycle: "active",
+        required: true,
+        status: env.indianApiKey ? "healthy" : "missing_required",
+        message: env.indianApiKey ? "IndianApiFinancialProvider active." : "No fundamentals provider configured.",
+      },
+      csv_fallback: {
+        lifecycle: "standby",
+        required: false,
+        status: "local_only",
+        message: "CSV fallback ready for local/dev.",
+      },
+    };
+
     return reply.send({
       status: "ok",
       timestamp: new Date().toISOString(),
       metrics,
+      providers,
     });
   });
 
@@ -180,8 +246,8 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const factorSnapshots = await fetchTableStats("factor_snapshots", "trade_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
-    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string }> => {
-      const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string }> = {
+    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; provider: string; detail: string }> }> => {
+      const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; provider: string; detail: string }> }> = {
         INDIANAPI_KEY: {
           lifecycle: "active",
           required: true,
@@ -193,6 +259,56 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           required: true,
           status: process.env.REDIS_URL ? "healthy" : "missing_required",
           message: process.env.REDIS_URL ? "Cache and queue active." : "Required for cache and queue.",
+        },
+        YAHOO: {
+          lifecycle: "active",
+          required: false,
+          status: "degraded",
+          domains: {
+            quote: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+            historical: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+          },
+          message: "Yahoo Finance: blocked (DNS-based reachability: FAIL). Public NSE providers unaffected.",
+        },
+        JUGAD_DATA: {
+          lifecycle: "active",
+          required: false,
+          status: "healthy",
+          domains: {
+            bhavcopy: { healthy: true, provider: "jugaad-data", detail: "Bhavcopy CSV via public NSE" },
+            delivery: { healthy: true, provider: "jugaad-data", detail: "Delivery data via public NSE" },
+            index: { healthy: true, provider: "jugaad-data", detail: "Index constituents via public NSE" },
+            sector: { healthy: true, provider: "jugaad-data", detail: "Sector mapping via public NSE" },
+          },
+          message: "Jugaad-Data: bhavcopy+delivery+index+sector active.",
+        },
+        NSELIB: {
+          lifecycle: "planned",
+          required: false,
+          status: "unavailable",
+          message: "NSELib: not yet deployed.",
+        },
+        NSEPYTHON: {
+          lifecycle: "active",
+          required: false,
+          status: "healthy",
+          domains: {
+            quote: { healthy: true, provider: "nsepython", detail: "Backup quote provider" },
+            historical: { healthy: true, provider: "nsepython", detail: "Backup historical provider" },
+          },
+          message: "NSEPython: available for backup queries.",
+        },
+        FUNDAMENTALS_AUTOMATIC: {
+          lifecycle: "active",
+          required: true,
+          status: env.indianApiKey ? "healthy" : "missing_required",
+          message: env.indianApiKey ? "IndianApiFinancialProvider active." : "No fundamentals provider configured.",
+        },
+        CSV_FALLBACK: {
+          lifecycle: "standby",
+          required: false,
+          status: "local_only",
+          message: "CSV fallback ready for local/dev.",
         },
       };
       return matrix;

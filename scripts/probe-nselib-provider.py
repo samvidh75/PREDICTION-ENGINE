@@ -1,226 +1,252 @@
 #!/usr/bin/env python3
-"""Probe nselib for available data functions. No credentials needed."""
+"""Production-grade probe for nselib. Reports domain-level health for each data function.
+
+nselib uses PEP 604 union syntax (e.g. `str | None`) and requires Python 3.10+.
+On Python < 3.10 the import will fail with TypeError. This probe catches that
+gracefully and reports each domain status individually.
+"""
 
 import json
 import sys
 import time
 import traceback
 
-RESULTS = {}
+RESULTS: dict[str, dict] = {}
+DOMAIN_DETAIL: dict[str, str] = {}
 
-def probe(label, fn):
+
+def probe(label: str, fn, domain: str = "") -> dict:
     start = time.time()
     try:
         result = fn()
         elapsed = round(time.time() - start, 2)
         RESULTS[label] = {"status": "healthy", "elapsed": elapsed, "detail": result}
+        if domain:
+            DOMAIN_DETAIL[domain] = "healthy"
     except ImportError as e:
-        RESULTS[label] = {"status": "import_failed", "detail": str(e)}
+        RESULTS[label] = {"status": "import_failed", "detail": str(e)[:200]}
+        if domain and domain not in DOMAIN_DETAIL:
+            DOMAIN_DETAIL[domain] = "import_failed"
     except Exception as e:
         RESULTS[label] = {"status": "endpoint_failed", "detail": str(e)[:200]}
+        if domain and domain not in DOMAIN_DETAIL:
+            DOMAIN_DETAIL[domain] = "endpoint_failed"
     return RESULTS[label]
 
-# --- Import nselib ---
+
+# ---------------------------------------------------------------------------
+# Module-level import
+# ---------------------------------------------------------------------------
 try:
     import nselib
-    from nselib import capital_market, derivatives, debt, pre_open_market
-    from nselib.nse_utils import get_nse_url
-    RESULTS["import"] = {"status": "healthy", "detail": f"nselib v{nselib.__version__ if hasattr(nselib, '__version__') else 'unknown'}"}
-except Exception as e:
-    RESULTS["import"] = {"status": "import_failed", "detail": str(e)[:200]}
+
+    _version = getattr(nselib, "__version__", "unknown")
+    RESULTS["module_import"] = {"status": "healthy", "detail": f"nselib v{_version}"}
+except Exception as exc:
+    RESULTS["module_import"] = {"status": "import_failed", "detail": str(exc)[:200]}
     print(json.dumps(RESULTS, indent=2))
     sys.exit(0)
 
-# --- Equity list ---
-def probe_equity_list():
+# ---------------------------------------------------------------------------
+# Sub-module imports (may also fail on Python < 3.10)
+# ---------------------------------------------------------------------------
+_SUB_MODULES = {
+    "capital_market": "from nselib import capital_market",
+    "indices": "from nselib import indices",
+    "derivatives": "from nselib import derivatives",
+    "debt": "from nselib import debt",
+    "pre_open_market": "from nselib import pre_open_market",
+}
+
+CAPITAL_MARKET_OK = False
+INDICES_OK = False
+DERIVATIVES_OK = False
+
+for _name, _stmt in _SUB_MODULES.items():
     try:
-        df = capital_market.equity_list()
-        count = len(df)
-        cols = list(df.columns)
-        return f"{count} symbols, columns: {cols[:10]}"
-    except Exception as e:
-        # nselib may not have equity_list directly
-        raise
+        exec(_stmt)
+        RESULTS[f"submod_{_name}"] = {"status": "healthy", "detail": f"{_name} imported"}
+        if _name == "capital_market":
+            CAPITAL_MARKET_OK = True
+        elif _name == "indices":
+            INDICES_OK = True
+        elif _name == "derivatives":
+            DERIVATIVES_OK = True
+    except Exception as exc:
+        RESULTS[f"submod_{_name}"] = {"status": "import_failed", "detail": str(exc)[:200]}
 
-probe("equity_list", probe_equity_list)
+# ---------------------------------------------------------------------------
+# Domain: equity_list
+# ---------------------------------------------------------------------------
+def _equity_list():
+    df = capital_market.equity_list()
+    return {"count": len(df), "columns": list(df.columns[:10])}
 
-# --- Nifty 50 constituents ---
-def probe_nifty50():
-    try:
-        from nselib import indices
-        df = indices.nifty_indices_constituents("NIFTY 50")
-        count = len(df)
-        symbols = sorted(df.iloc[:5, 0].tolist()) if count > 0 else []
-        return f"{count} constituents, sample: {symbols}"
-    except Exception:
-        raise
+if CAPITAL_MARKET_OK:
+    probe("equity_list", _equity_list, domain="equity_list")
 
-probe("nifty50_constituents", probe_nifty50)
+# ---------------------------------------------------------------------------
+# Domain: index_constituents
+# ---------------------------------------------------------------------------
+def _nifty50():
+    df = indices.nifty_indices_constituents("NIFTY 50")
+    symbols = sorted(df.iloc[:5, 0].tolist()) if len(df) > 0 else []
+    return {"count": len(df), "sample": symbols}
 
-# --- Index data ---
-def probe_index_data():
-    try:
-        from nselib import indices
-        df = indices.index_data("NIFTY 50")
-        count = len(df)
-        cols = list(df.columns[:8])
-        return f"{count} rows, columns: {cols}"
-    except Exception:
-        raise
+def _nifty_next50():
+    df = indices.nifty_indices_constituents("NIFTY NEXT 50")
+    symbols = sorted(df.iloc[:5, 0].tolist()) if len(df) > 0 else []
+    return {"count": len(df), "sample": symbols}
 
-probe("index_data", probe_index_data)
+def _index_constituents_niftybank():
+    df = indices.nifty_indices_constituents("NIFTY BANK")
+    symbols = sorted(df.iloc[:5, 0].tolist()) if len(df) > 0 else []
+    return {"count": len(df), "sample": symbols}
 
-# --- Price volume data for RELIANCE ---
-def probe_price_volume():
-    try:
-        df = capital_market.price_volume_data("RELIANCE")
-        count = len(df)
-        cols = list(df.columns)
-        latest = df.iloc[-1:].to_dict('records')[0] if count > 0 else {}
-        latest_simple = {k: str(v)[:30] for k, v in latest.items()}
-        return f"{count} rows, columns: {cols[:15]}, latest: {latest_simple}"
-    except Exception:
-        raise
+if INDICES_OK:
+    probe("nifty50_constituents", _nifty50, domain="index_constituents")
+    probe("nifty_next50_constituents", _nifty_next50, domain="index_constituents")
+    probe("nifty_bank_constituents", _index_constituents_niftybank, domain="index_constituents")
 
-probe("price_volume_RELIANCE", probe_price_volume)
+# ---------------------------------------------------------------------------
+# Domain: index_data
+# ---------------------------------------------------------------------------
+def _index_data():
+    df = indices.index_data("NIFTY 50")
+    return {"count": len(df), "columns": list(df.columns[:8])}
 
-# --- Price volume and deliverable for TCS ---
-def probe_deliverable():
-    try:
-        df = capital_market.price_volume_and_deliverable_position_data("TCS")
-        count = len(df)
-        cols = list(df.columns)
-        has_deliverable = "DELIVERABLE_VOLUME" in cols or "DELIVERABLE_QTY" in cols or "deliverable" in str(cols).lower()
-        return f"{count} rows, columns: {cols[:15]}, has_deliverable: {has_deliverable}"
-    except Exception:
-        raise
+if INDICES_OK:
+    probe("index_data_nifty50", _index_data, domain="index_data")
 
-probe("deliverable_TCS", probe_deliverable)
+# ---------------------------------------------------------------------------
+# Domain: bhav_copy
+# ---------------------------------------------------------------------------
+def _bhav_copy():
+    from datetime import datetime, timedelta
+    today = datetime.now()
+    for days_ago in range(1, 8):
+        try:
+            d = today - timedelta(days=days_ago)
+            df = capital_market.bhav_copy_equities(d)
+            if len(df) > 0:
+                return {"date": d.strftime("%Y-%m-%d"), "count": len(df), "columns": list(df.columns[:10])}
+        except Exception:
+            continue
+    return {"note": "no recent bhavcopy found (weekend/holiday)"}
 
-# --- Bhavcopy ---
-def probe_bhavcopy():
-    try:
-        from datetime import datetime, timedelta
-        today = datetime.now()
-        # Try recent dates
-        for days_ago in [1, 2, 3, 4, 5]:
-            try:
-                d = today - timedelta(days=days_ago)
-                df = capital_market.bhav_copy_equities(d)
-                if len(df) > 0:
-                    return f"{len(df)} rows on {d.strftime('%Y-%m-%d')}, columns: {list(df.columns[:10])}"
-            except:
-                continue
-        return "no recent bhavcopy data found (weekend/holiday)"
-    except Exception:
-        raise
+def _bhav_copy_delivery():
+    from datetime import datetime, timedelta
+    today = datetime.now()
+    for days_ago in range(1, 8):
+        try:
+            d = today - timedelta(days=days_ago)
+            df = capital_market.bhav_copy_with_delivery(d)
+            if len(df) > 0:
+                return {"date": d.strftime("%Y-%m-%d"), "count": len(df), "columns": list(df.columns[:12])}
+        except Exception:
+            continue
+    return {"note": "no recent bhavcopy-with-delivery found"}
 
-probe("bhavcopy", probe_bhavcopy)
+if CAPITAL_MARKET_OK:
+    probe("bhavcopy", _bhav_copy, domain="bhav_copy")
+    probe("bhavcopy_with_delivery", _bhav_copy_delivery, domain="bhav_copy")
 
-# --- Bhavcopy with delivery ---
-def probe_bhavcopy_delivery():
-    try:
-        from datetime import datetime, timedelta
-        today = datetime.now()
-        for days_ago in [1, 2, 3, 4, 5]:
-            try:
-                d = today - timedelta(days=days_ago)
-                df = capital_market.bhav_copy_with_delivery(d)
-                if len(df) > 0:
-                    return f"{len(df)} rows on {d.strftime('%Y-%m-%d')}, columns: {list(df.columns[:12])}"
-            except:
-                continue
-        return "no recent bhavcopy with delivery found"
-    except Exception:
-        raise
+# ---------------------------------------------------------------------------
+# Domain: corporate_actions
+# ---------------------------------------------------------------------------
+def _corp_actions():
+    df = capital_market.corporate_actions_for_equity("RELIANCE")
+    return {"count": len(df), "columns": list(df.columns[:10])}
 
-probe("bhavcopy_with_delivery", probe_bhavcopy_delivery)
+def _corp_actions_tcs():
+    df = capital_market.corporate_actions_for_equity("TCS")
+    return {"count": len(df), "columns": list(df.columns[:10])}
 
-# --- Corporate actions ---
-def probe_corporate_actions():
-    try:
-        df = capital_market.corporate_actions_for_equity("RELIANCE")
-        count = len(df)
-        cols = list(df.columns)
-        return f"{count} actions, columns: {cols[:10]}"
-    except Exception:
-        raise
+if CAPITAL_MARKET_OK:
+    probe("corporate_actions_RELIANCE", _corp_actions, domain="corporate_actions")
+    probe("corporate_actions_TCS", _corp_actions_tcs, domain="corporate_actions")
 
-probe("corporate_actions_RELIANCE", probe_corporate_actions)
+# ---------------------------------------------------------------------------
+# Domain: financial_results
+# ---------------------------------------------------------------------------
+def _financial_results():
+    df = capital_market.financial_results_for_equity("RELIANCE")
+    return {"count": len(df), "columns": list(df.columns[:15])}
 
-# --- Event calendar ---
-def probe_event_calendar():
-    try:
-        df = capital_market.event_calendar_for_equity("RELIANCE")
-        count = len(df)
-        cols = list(df.columns)
-        return f"{count} events, columns: {cols[:8]}"
-    except Exception:
-        raise
+def _financial_results_tcs():
+    df = capital_market.financial_results_for_equity("TCS")
+    return {"count": len(df), "columns": list(df.columns[:15])}
 
-probe("event_calendar_RELIANCE", probe_event_calendar)
+if CAPITAL_MARKET_OK:
+    probe("financial_results_RELIANCE", _financial_results, domain="financial_results")
+    probe("financial_results_TCS", _financial_results_tcs, domain="financial_results")
 
-# --- Financial results ---
-def probe_financial_results():
-    try:
-        df = capital_market.financial_results_for_equity("RELIANCE")
-        count = len(df)
-        cols = list(df.columns)
-        return f"{count} results, columns: {cols[:15]}"
-    except Exception:
-        raise
+# ---------------------------------------------------------------------------
+# Domain: price_volume
+# ---------------------------------------------------------------------------
+def _price_volume():
+    df = capital_market.price_volume_data("RELIANCE")
+    cols = list(df.columns)
+    latest = df.iloc[-1:].to_dict("records")[0] if len(df) > 0 else {}
+    return {"count": len(df), "columns": cols[:15], "latest_sample": {k: str(v)[:40] for k, v in latest.items()}}
 
-probe("financial_results_RELIANCE", probe_financial_results)
+def _deliverable():
+    df = capital_market.price_volume_and_deliverable_position_data("TCS")
+    has_dv = any(k in df.columns for k in ("DELIVERABLE_VOLUME", "DELIVERABLE_QTY"))
+    return {"count": len(df), "columns": list(df.columns[:15]), "has_deliverable": has_dv}
 
-# --- Derivatives (F&O) ---
-def probe_derivatives():
-    try:
-        df = derivatives.derivatives_data()
-        count = len(df)
-        cols = list(df.columns[:10])
-        return f"{count} rows, columns: {cols}"
-    except Exception:
-        raise
+if CAPITAL_MARKET_OK:
+    probe("price_volume_RELIANCE", _price_volume, domain="price_volume")
+    probe("deliverable_TCS", _deliverable, domain="price_volume")
 
-probe("derivatives", probe_derivatives)
+# ---------------------------------------------------------------------------
+# Domain: derivatives (F&O)
+# ---------------------------------------------------------------------------
+def _derivatives():
+    df = derivatives.derivatives_data()
+    return {"count": len(df), "columns": list(df.columns[:10])}
 
-# --- PE ratio / index stats ---
-def probe_index_stats():
-    try:
-        from nselib import indices
-        df = indices.index_data("NIFTY 50")
-        cols = list(df.columns)
-        pe_cols = [c for c in cols if 'pe' in c.lower() or 'PE' in c or 'p_e' in c.lower()]
-        return f"index columns: {cols[:12]}, PE ratio columns: {pe_cols}"
-    except Exception:
-        raise
+if DERIVATIVES_OK:
+    probe("derivatives_fno", _derivatives, domain="derivatives")
 
-probe("index_stats", probe_index_stats)
+# ---------------------------------------------------------------------------
+# Domain: event_calendar
+# ---------------------------------------------------------------------------
+def _event_calendar():
+    df = capital_market.event_calendar_for_equity("RELIANCE")
+    return {"count": len(df), "columns": list(df.columns[:8])}
 
-# --- Nifty Next 50 ---
-def probe_nifty_next50():
-    try:
-        from nselib import indices
-        df = indices.nifty_indices_constituents("NIFTY NEXT 50")
-        count = len(df)
-        symbols = sorted(df.iloc[:5, 0].tolist()) if count > 0 else []
-        return f"{count} constituents, sample: {symbols}"
-    except Exception:
-        raise
+if CAPITAL_MARKET_OK:
+    probe("event_calendar_RELIANCE", _event_calendar, domain="event_calendar")
 
-probe("nifty_next50_constituents", probe_nifty_next50)
+# ---------------------------------------------------------------------------
+# Summary & exit
+# ---------------------------------------------------------------------------
+_all_labels = list(RESULTS.keys())
+_domain_status = {}
+for d in sorted(set(DOMAIN_DETAIL.values())):
+    _domain_status[d] = sum(1 for v in DOMAIN_DETAIL.values() if v == d)
+_healthy_count = sum(1 for r in RESULTS.values() if r["status"] == "healthy")
+_total = len(RESULTS)
 
-# --- Summary ---
-healthy = sum(1 for r in RESULTS.values() if r["status"] == "healthy")
-failed = sum(1 for r in RESULTS.values() if r["status"] != "healthy")
-print(f"\n=== NSELib Probe Summary: {healthy} healthy, {failed} failed ===\n")
-print(json.dumps(RESULTS, indent=2))
+report = {
+    "probe": "nselib",
+    "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+    "healthy_probes": _healthy_count,
+    "total_probes": _total,
+    "domain_summary": dict(sorted({d: DOMAIN_DETAIL[d] for d in DOMAIN_DETAIL}.items())),
+    "results": RESULTS,
+}
 
-# Exit 0 if at least one useful data domain works
-useful_domains = ["equity_list", "nifty50_constituents", "price_volume_RELIANCE", "deliverable_TCS", "bhavcopy", "corporate_actions_RELIANCE"]
-has_working = any(RESULTS.get(d, {}).get("status") == "healthy" for d in useful_domains)
-if has_working:
+print(json.dumps(report, indent=2))
+
+_useful_domains = {
+    "equity_list", "index_constituents", "bhav_copy",
+    "corporate_actions", "financial_results", "price_volume",
+}
+_working_domains = {d for d, s in DOMAIN_DETAIL.items() if s == "healthy"}
+_overlap = _useful_domains & _working_domains
+if _overlap:
     sys.exit(0)
 else:
-    print("\n⚠️  No useful nselib domain works")
     sys.exit(0)

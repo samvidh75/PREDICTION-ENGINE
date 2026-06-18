@@ -4,35 +4,44 @@
 
 ## Overview
 
-StockStory India uses only public, no-credential, free Indian-market data providers. No broker credentials (Dhan, Upstox) or paid API keys (Finnhub) are required for core app functionality.
+StockStory India uses only public, no-credential, free Indian-market data providers. No broker credentials (Dhan, Upstox) or paid API keys (Finnhub) are required for core app functionality. All providers are accessible via Python packages or direct REST API calls.
 
-## Active Provider Architecture
+## Provider Precedence by Domain
 
-### Quotes (latest price data)
-
-| Precedence | Provider | Type | Status | Notes |
-|-----------|----------|------|--------|-------|
-| 1 | IndianAPI | REST API | Required (production) | Uses `INDIANAPI_KEY` env var |
-| 2 | Yahoo Finance | REST API | Fallback | No credentials needed |
-
-### Historical OHLC / Price-Volume
+### Quotes (Latest Price Data)
 
 | Precedence | Provider | Type | Status | Notes |
 |-----------|----------|------|--------|-------|
-| 1 | Yahoo Finance | REST API | Active | `query1.finance.yahoo.com/v8/finance/chart` |
+| 1 | IndianAPI | REST API | Active (primary) | Requires `INDIANAPI_KEY` |
+| 2 | jugaad-data | Python (NSELive) | Local / degraded | stock_quote blocked by NSE |
+| 3 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 4 | nsepython | Python | Degraded | equity_quote blocked by NSE |
+| 5 | Yahoo Finance | REST API | Blocked | HTTP 429 |
 
-### NSE Symbol Universe
-
-| Precedence | Provider | Type | Status | Notes |
-|-----------|----------|------|--------|-------|
-| 1 | nsepython | Python CLI | Operator tool | `nse_eq_symbols()` — 2374 symbols |
-| 2 | DB registry | SQL | Primary | Existing verified symbols |
-
-### Index / Market Breadth
+### Historical OHLC
 
 | Precedence | Provider | Type | Status | Notes |
 |-----------|----------|------|--------|-------|
-| 1 | nsepython | Python CLI | Operator tool | 213 indices, NIFTY 50 quote, market status |
+| 1 | jugaad-data | Python (stock_df) | Local / degraded | Fails on Python 3.9 |
+| 2 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 3 | nsepython | Python | Degraded | Blocked by NSE |
+| 4 | Yahoo Finance | REST API | Blocked | HTTP 429 |
+
+### Bhavcopy CSV
+
+| Precedence | Provider | Type | Status | Notes |
+|-----------|----------|------|--------|-------|
+| 1 | jugaad-data | Python (bhavcopy_save) | Active (local) | Returns CSV file path |
+| 2 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 3 | nsepython | Python | Active | Returns DataFrame |
+
+### Index Data
+
+| Precedence | Provider | Type | Status | Notes |
+|-----------|----------|------|--------|-------|
+| 1 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 2 | nsepython | Python | Active | Index quote, index list, market status |
+| 3 | jugaad-data | Python (NSELive) | Active | All indices via NSELive |
 
 ### Fundamentals
 
@@ -40,71 +49,115 @@ StockStory India uses only public, no-credential, free Indian-market data provid
 |-----------|----------|------|--------|-------|
 | 1 | CSV import | Operator | Primary | Screener/Moneycontrol exports |
 | 2 | Official filings | Manual | Fallback | BSE/NSE filings, annual reports |
+| 3 | nselib | Python | Unavailable | Requires Python 3.10+ |
+| 4 | nsepython | Python | Unavailable | Returns empty data |
+
+### Macro (RBI Rates)
+
+| Precedence | Provider | Type | Status | Notes |
+|-----------|----------|------|--------|-------|
+| 1 | jugaad-data | Python (RBI) | Active | Repo rate, CRR, reverse repo, etc. |
 
 ## Provider Details
 
-### Yahoo Finance (Fallback)
+### IndianAPI (Primary Quote Provider)
 
-- **Endpoint**: `query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS?range=2y&interval=1d`
-- **Type**: Public, no-credential REST API
-- **Provides**: Quotes, historical OHLC (up to 2 years)
-- **Known issues**: Unreachable from Railway production servers (sfo region)
-- **Implementation**: `src/providers/marketData/yahooFallbackProvider.ts`
-
-### IndianAPI
-
-- **Endpoint**: IndianAPI REST API
-- **Type**: API key required (`INDIANAPI_KEY`)
+- **Type**: REST API with API key (`INDIANAPI_KEY`)
 - **Provides**: Quotes, metadata, company info
-- **Status**: Required in production, configured and healthy
-- **Implementation**: Via `ProviderCoordinator`
+- **Status**: Active, required in production
+- **Implementation**: `ProviderCoordinator`
 
-### nsepython (Operator Tool)
+### Jugaad-Data
 
-- **Package**: `nsepython` (pip install)
-- **Python**: Works on Python 3.9+
+- **Package**: `jugaad-data` v0.28 (pip install)
+- **Python**: 3.9+ (limited)
+- **Credentials**: None
 - **Provides**:
-  - `nse_get_index_quote('NIFTY 50')` — Index quote (healthy)
-  - `nse_eq_symbols()` — All NSE equity symbols (2374 symbols)
-  - `nse_get_index_list()` — All NSE indices (213 indices)
-  - `nse_marketStatus()` — Market open/closed status
-  - `nse_eq(symbol)` — Equity quote (unreliable, requires session)
-  - `equity_history(symbol, series, start, end)` — Historical (unreliable)
-- **Limitations**: No session/cookie storage; individual equity data is unreliable
-- **Usage**: CLI/operator-only for universe sync and index coverage
+  - Bhavcopy CSV (`bhavcopy_save`)
+  - RBI macro rates (`RBI().current_rates()`)
+  - NSE market status (`NSELive().market_status()`)
+  - All indices (`NSELive().all_indices()`)
+- **Limitations**: stock_df fails on Python 3.9, stock_quote blocked by NSE, futures_quote API removed
+- **Status**: local_only / degraded
 
-### nselib (Unavailable)
+### NSELib
 
 - **Package**: `nselib` (pip install)
-- **Python**: Requires Python 3.10+ (PEP 604 union syntax)
-- **Status**: Unavailable on Python 3.9 (both local and Railway)
-- **Would provide**: Equity list, index constituents, bhavcopy, corporate actions, deliverable data, financial results
+- **Python**: 3.10+ required (PEP 604)
+- **Credentials**: None
+- **Provides** (on 3.10+): Equity list, index constituents, bhavcopy, corporate actions, financial results, derivatives
+- **Status**: Unavailable on Python 3.9
 
-## Removed Providers
+### NSEPython
 
-| Provider | Reason | Removal Date |
-|----------|--------|-------------|
-| Dhan | No credentials available; user does not have Dhan account | 2026-06-18 |
-| Upstox | Token lifecycle unsuitable; no daily-token broker dependencies | 2026-06-18 |
-| Finnhub | Removed from active pipeline; deprecated | 2026-06-18 |
+- **Package**: `nsepython` v2.97 (pip install)
+- **Python**: 3.9+
+- **Credentials**: None
+- **Provides**:
+  - NIFTY 50 index quote (`nse_get_index_quote`)
+  - Bhavcopy DataFrame (`nse_get_bhavcopy`)
+  - NSE symbol universe (`nse_eq_symbols`)
+  - Market status (`nse_marketStatus`)
+- **Limitations**: equity_quote, history, market_breadth, financial_results all blocked/broken
+- **Status**: degraded / limited
+
+### Yahoo Finance
+
+- **Endpoint**: `query1.finance.yahoo.com/v8/finance/chart/{symbol}.NS`
+- **Type**: Public, no-credential REST API
+- **Status**: Blocked (HTTP 429 — rate-limited)
+- **Implementation**: `src/providers/marketData/yahooFallbackProvider.ts`
+
+## Railway Deployment Considerations
+
+| Provider | Python Version | Railway Availability |
+|----------|---------------|---------------------|
+| IndianAPI | N/A (REST) | ✅ Available |
+| Jugaad-Data | 3.9+ (limited) | 🔶 Untested |
+| NSELib | 3.10+ required | ❌ Unavailable (3.9) |
+| NSEPython | 3.9+ | 🔶 Untested |
+| Yahoo | N/A (REST) | ❌ Blocked (429) |
+
+## Credentials
+
+| Variable | Provider | Required |
+|----------|----------|----------|
+| `INDIANAPI_KEY` | IndianAPI | Yes |
+| `REDIS_URL` | Redis | Yes |
+
+No broker credentials (Dhan, Upstox) are required.
+
+## No Fake Data
+
+| Principle | Detail |
+|-----------|--------|
+| No fake quotes | Every quote comes from a real provider |
+| No estimated fundamentals | Real data via CSV import only |
+| No stale fallback | Provider marked unhealthy if it returns zero usable data |
+| No silent degradation | Each provider has an accurate status label |
+
+## Provider Source Files
+
+| File | Purpose |
+|------|---------|
+| `src/providers/publicMarketData/providerBroker.ts` | Provider fallback broker with precedence |
+| `src/providers/publicMarketData/jugaadDataProvider.ts` | Jugaad-Data provider adapter |
+| `src/providers/publicMarketData/jugaadDataBridge.ts` | Python bridge for jugaad-data |
+| `src/providers/publicMarketData/nselibProvider.ts` | NSELib provider adapter |
+| `src/providers/publicMarketData/nsePythonProvider.ts` | NSEPython provider adapter |
+| `src/providers/publicMarketData/yahooProvider.ts` | Yahoo Finance adapter |
+| `scripts/probe-jugaad-data-provider.py` | Probe script for jugaad-data |
+| `scripts/check-jugaad-data-provider.ts` | TypeScript wrapper for jugaad-data probe |
 
 ## Commands
 
 ```bash
-# Probe nselib availability
-npm run probe:nselib
-
-# Probe nsepython availability
-npm run probe:nsepython
-
-# Check market provider health
-npm run check:market-providers
-
-# Diagnose scored-symbol gaps
-npm run diagnose:scored-symbols
-
-# Verify production data quality
-npm run verify:data:production
+npm run probe:nselib          # Probe nselib availability
+npm run probe:nsepython       # Probe nsepython availability
+npm run probe:jugaad-data     # Probe jugaad-data availability
+npm run check:market-providers # Health of all configured providers
+npm run diagnose:scored-symbols # Diagnose scoring coverage gaps
+npm run verify:data:production  # Production data quality
 ```
 
 ## Data Loophole Prevention
