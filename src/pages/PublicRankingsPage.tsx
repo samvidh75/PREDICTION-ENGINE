@@ -86,10 +86,10 @@ export const PublicRankingsPage: React.FC = () => {
     <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
         <AppScreen>
-        <MobilePageHeader eyebrow="AI scanner" title="Research rankings" body="Ranked companies from the latest verified scoring cycle. Tap any row to inspect the evidence, or open the explanation modal for factor context." />
-        <ResearchHeroCard eyebrow="Source-backed" title="Ranked companies with inspectable intelligence." body="Scores, confidence, and freshness are shown from the leaderboard API. Missing values are labelled. Each row has an explanation modal for deeper context.">
+        <MobilePageHeader eyebrow="AI scanner" title="Research rankings" body="Ranked companies from the latest verified scoring cycle." />
+        <ResearchHeroCard eyebrow="Source-backed" title="Ranked companies with inspectable intelligence." body="Scores, confidence, and freshness from the leaderboard API. Missing values are labelled.">
           <div className="flex flex-wrap gap-2">
             <DataSourcePill label={`${rankings.length.toLocaleString("en-IN")} rows loaded`} tone="muted" />
             {freshnessDate ? <DataSourcePill label={`Fresh ${formatFreshness(freshnessDate)}`} tone="ok" /> : <DataSourcePill label="Freshness pending" tone="warn" />}

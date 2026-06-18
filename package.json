@@ -104,6 +104,7 @@
     "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
     "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
+    "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
     "probe:akshare": "python3 scripts/probe-akshare-provider.py",

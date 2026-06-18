@@ -61,7 +61,7 @@ export default function PublicPredictionsPage(): JSX.Element {
     <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
 
         {/* Prediction Intelligence header */}
         <IntelligencePanel

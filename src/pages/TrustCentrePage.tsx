@@ -157,7 +157,7 @@ export const TrustCentrePage: React.FC = () => {
 
   return (
     <PremiumPage nav={<><TopNav /><MobileNav /></>} className="ss-page-trust">
-      <div className="mx-auto max-w-5xl space-y-8 p-4 pt-[76px] md:pt-28">
+      <div className="w-full space-y-6 px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
 
         {/* Data Intelligence Centre header */}
         <div>

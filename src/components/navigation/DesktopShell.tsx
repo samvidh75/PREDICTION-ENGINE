@@ -77,7 +77,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
       </header>
 
       {/* 2. Primary Page workspace under header */}
-      <main className="flex-1 pt-24 pb-8 px-8 max-w-7xl mx-auto w-full relative z-10">
+      <main className="flex-1 pt-24 pb-8 px-8 mx-auto w-full relative z-10">
         {children}
       </main>
     </div>

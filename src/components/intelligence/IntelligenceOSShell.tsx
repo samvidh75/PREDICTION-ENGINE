@@ -67,13 +67,22 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
       {/* Desktop layout */}
       <div className="hidden md:flex md:h-dvh md:flex-col">
         {/* Top bar */}
-        <header className="flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#080C10] px-5">
+        <header className="flex h-14 items-center justify-between gap-4 border-b border-white/[0.06] bg-[#080C10] px-5">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold tracking-tight text-[#E6EDF3]">
               StockStory<span className="text-[#2962FF]">.</span>
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          {/* Integrated compact search trigger */}
+          <button
+            onClick={() => setCommandOpen(true)}
+            className="hidden sm:flex flex-1 max-w-md items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-[#484F58] hover:border-white/[0.12] hover:text-[#8B949E] transition-all duration-200"
+          >
+            <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            <span>Search companies...</span>
+            <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58]">⌘K</kbd>
+          </button>
+          <div className="flex items-center gap-2">
             <GlobalCommandButton onClick={() => setCommandOpen(true)} />
             <DataFreshnessOrb />
             <a
@@ -107,9 +116,9 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
               );
             })}
           </nav>
-          {/* Main content */}
+          {/* Main content — full-width workspace, no narrow column */}
           <main className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-7xl px-6 py-6">
+            <div className="w-full px-6 py-6 lg:px-10 xl:px-12">
               {children}
             </div>
           </main>
