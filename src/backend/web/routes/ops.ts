@@ -5,6 +5,8 @@
 import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { loadEnv } from "../../config/env";
 import { query } from "../../../db/index";
+import { execSync } from "child_process";
+import { join } from "path";
 
 interface FreshnessRow extends Record<string, unknown> {
   latest: Date | string | number | null;
@@ -93,7 +95,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     metrics.uptime_seconds = Math.floor(process.uptime());
     metrics.node_version = process.version;
     try {
-      const py = require('child_process').execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      const py = execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
       metrics.python_version = py.replace(/^Python\s+/i, '');
     } catch {
       metrics.python_version = 'not_found';
@@ -889,17 +891,17 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   app.get("/api/ops/probe/python-runtime", async (_request, reply) => {
     const report: Record<string, any> = {};
     try {
-      const pyVer = require('child_process').execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      const pyVer = execSync('python3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
       report.python_version = pyVer.replace(/^Python\s+/i, '');
     } catch { report.python_version = 'not_found'; }
     try {
-      const pipVer = require('child_process').execSync('pip3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
+      const pipVer = execSync('pip3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
       report.pip_version = pipVer.split(/\s+/)[1] ?? 'unknown';
     } catch { report.pip_version = 'not_found'; }
     const pkgs = ['jugaad_data', 'nselib', 'nsepython'];
     for (const pkg of pkgs) {
       try {
-        const out = require('child_process').execSync(`python3 -c "import ${pkg}; print('ok')" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 }).trim();
+        execSync(`python3 -c "import ${pkg}; print('ok')" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 }).trim();
         report[pkg] = 'installed';
       } catch { report[pkg] = 'not_installed'; }
     }
@@ -907,8 +909,6 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   });
 
   app.get("/api/ops/probe/nselib", async (_request, reply) => {
-    const { execSync } = require('child_process');
-    const { join } = require('path');
     const probePath = join(__dirname, '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
     try {
       const output = execSync(`python3 "${probePath}" 2>/dev/null`, { encoding: 'utf-8', timeout: 120_000 });
