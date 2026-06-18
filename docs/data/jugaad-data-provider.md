@@ -1,6 +1,8 @@
 # Jugaad-Data Provider
 
-**Status**: Active by domain (see domain table below)
+**Status**: Active by domain (see domain table below). Requires `JUGAD_DATA_ENABLED=true` feature flag.
+
+**Display in Trust Centre**: Shows status per domain — bhavcopy/rbi/market_status are Active; quote is Blocked (NSE restriction). Never shown as "Unavailable" if any domain is healthy.
 
 **Package**: `jugaad-data` v0.28 (pip install)
 

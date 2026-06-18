@@ -2,19 +2,20 @@
 
 ## Overview
 
-Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **operator-provided data imports**. No public NSE provider currently delivers reliable structured fundamentals — nselib is archived (evaluated and not active), nsepython's `nse_results()` returns no data, and jugaad-data does not provide fundamentals.
+Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **DB financial snapshots** (57 rows across 29 symbols from pipeline runs) supplemented by **operator-provided data imports** for gaps. No public NSE provider currently delivers reliable structured fundamentals — nselib is archived (evaluated and not active), nsepython's `nse_results()` returns no data, and jugaad-data does not provide fundamentals.
 
 ## Data Sources
 
 | Source | Type | Status |
 |--------|------|--------|
-| Operator CSV export | Primary | Ready |
+| DB financial snapshots (57 rows, 29 symbols) | Pipeline | Partial coverage |
+| Operator CSV export | Manual | Ready — fills gaps |
 | Screener.in export | Optional | Permitted |
 | Moneycontrol export | Optional | Permitted |
 | BSE/NSE official filings parser | Planned | Not built |
- | nselib `financial_results_for_equity` | Archived | Evaluated and not active — see nselib-provider.md |
- | nsepython `nse_results()` | N/A | Returns no data |
- | jugaad-data | N/A | Does not provide fundamentals |
+  | nselib `financial_results_for_equity` | Archived | Evaluated and not active — see nselib-provider.md |
+  | nsepython `nse_results()` | N/A | Returns no data |
+  | jugaad-data | N/A | Does not provide fundamentals |
 
 ## Automatic Fundamentals
 

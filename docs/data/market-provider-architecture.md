@@ -51,7 +51,8 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 | NSELib | 🟣 Archived | 🟣 Archived | 🟣 Archived | 🟣 Archived | — | 🟣 Archived |
 | NSEPython | 🔶 Degraded | 🔶 Degraded | ✅ Active | ✅ Active | — | ❌ Unavailable |
 | Yahoo | ❌ Blocked | ❌ Blocked | — | — | — | — |
-| CSV Import | — | — | — | — | — | ✅ Active |
+| DB Snapshots | — | — | — | — | — | 🔶 Partial (29/31 sym) |
+| CSV Import | — | — | — | — | — | 🔵 Manual fallback |
 
 ## What Changed
 
@@ -61,7 +62,9 @@ CSV import (Screener/Moneycontrol exports) → official filings → unavailable
 | Yahoo marked blocked | HTTP 429 — rate-limited, not just unreachable from Railway |
 | NSEPython updated | Package version, bhavcopy confirmed working, more blocked endpoints documented |
 | NSELib archived | nselib evaluated across v0.2–2.5.1 — no domain returns usable data. Removed from active runtime. See [nselib-provider.md](./nselib-provider.md). |
-| Fundamentals unchanged | Still CSV import only; no automatic source available |
+| Fundamentals partial | DB has 57 financial snapshots for 29 symbols; CSV/manual import handles gaps |
+| CSV Import → Manual | CSV Import marked as Manual (not Local Only), correctly tagged for fundamentals (not Bhavcopy) |
+| Provider status domain-level | Status reported per domain, not per provider. New statuses: Partial, Manual, Blocked. |
 
 ## Source Files
 
