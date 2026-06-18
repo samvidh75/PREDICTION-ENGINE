@@ -47,10 +47,14 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
 async function runLineageBackfill(isApply: boolean, limitNum: number, symbolList: string[] | null): Promise<void> {
   console.log(`[maintenance] Running lineage backfill (${isApply ? "APPLY" : "DRY RUN"}) limit=${limitNum}`);
   for (const table of ["feature_snapshots", "factor_snapshots"]) {
-    let sql = `SELECT fs.symbol, fs.trade_date FROM ${table} fs WHERE fs.source_provider IS NULL ORDER BY fs.trade_date DESC`;
+    let sql = `SELECT fs.symbol, fs.trade_date FROM ${table} fs WHERE fs.source_provider IS NULL`;
     const params: any[] = [];
-    if (symbolList) { sql += ` AND fs.symbol = ANY($1)`; params.push(symbolList); }
-    sql += ` LIMIT $${params.length + 1}`; params.push(limitNum);
+    if (symbolList && symbolList.length > 0) {
+      sql += ` AND fs.symbol = ANY($${params.length + 1})`;
+      params.push(symbolList);
+    }
+    sql += ` ORDER BY fs.trade_date DESC LIMIT $${params.length + 1}`;
+    params.push(limitNum);
     const res = await query(sql, params); const rows = res.rows || [];
     console.log(`[maintenance] ${table}: scanned ${rows.length} rows`);
 
@@ -135,7 +139,8 @@ async function runStartupMaintenanceJob(): Promise<void> {
   if (!jobName) return;
   const confirm = process.env.RUN_MAINTENANCE_CONFIRM;
   const limitNum = parseInt(process.env.RUN_MAINTENANCE_LIMIT || "100", 10);
-  const symbolList = (process.env.RUN_MAINTENANCE_SYMBOLS || "").split(",").filter(Boolean) || null;
+  const rawSymbols = process.env.RUN_MAINTENANCE_SYMBOLS || "";
+  const symbolList = rawSymbols ? rawSymbols.split(",").map(s => s.trim()).filter(Boolean) : null;
   const srcLabel = process.env.RUN_MAINTENANCE_SOURCE_LABEL || "";
   const exitAfterRun = process.env.MAINTENANCE_EXIT_AFTER_RUN === "true";
 
