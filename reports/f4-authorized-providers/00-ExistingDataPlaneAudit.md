@@ -3,8 +3,7 @@
 ## Current Provider Priority Order (Financials)
 
 Tier 1: UpstoxFundamentalsProvider (primary Indian fundamentals)
-Tier 2: FinnhubProvider (gap-fill for fields Upstox misses)
-Tier 3: YahooProvider (price/volume only)
+Tier 2: YahooProvider (price/volume only)
 
 ScreenerProvider is QUARANTINED — throws on construction.
 Moneycontrol does not exist anywhere in the codebase.
@@ -23,7 +22,6 @@ Moneycontrol does not exist anywhere in the codebase.
 ## Broker Usage Pattern
 
 Every outbound provider call routes through `getSharedProviderRequestBroker().execute(...)`:
-- `FinnhubProvider` → broker `.execute('finnhub', ...)`
 - `IndianMarketProvider` → broker `.execute('indianapi', ...)`
 - `YahooProvider` → broker `.execute('yahoo', ...)`
 - `UpstoxFundamentalsProvider` → broker `.execute('upstox', ...)`

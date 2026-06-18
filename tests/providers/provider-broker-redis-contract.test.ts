@@ -62,8 +62,8 @@ describe('provider broker Redis contract', () => {
   it('uses provider-broker namespaced keys only', async () => {
     const store = new RedisProviderBrokerStore(process.env.REDIS_URL ?? 'redis://test', await redisClient());
 
-    expect(store.key('quota', 'FinnHub', 'minute')).toBe('provider-broker:quota:finnhub:minute');
-    expect(store.key('cooldown', 'FinnHub')).toBe('provider-broker:cooldown:finnhub');
+    expect(store.key('quota', 'IndianApi', 'minute')).toBe('provider-broker:quota:indianapi:minute');
+    expect(store.key('cooldown', 'IndianApi')).toBe('provider-broker:cooldown:indianapi');
     expect(store.key('cache', 'quote:RELIANCE')).toBe('provider-broker:cache:quote_reliance');
     expect(store.key('negative', 'abc123')).toBe('provider-broker:negative:abc123');
     expect(store.key('lock', 'quote/RELIANCE')).toBe('provider-broker:lock:quote_reliance');
@@ -74,12 +74,12 @@ describe('provider broker Redis contract', () => {
     const client = await redisClient();
     const store = new RedisProviderBrokerStore(process.env.REDIS_URL ?? 'redis://test', client);
 
-    await store.incrementQuotaCounter('finnhub', 'minute', 60);
-    await store.setCooldown('finnhub', 5_000);
+    await store.incrementQuotaCounter('indianapi', 'minute', 60);
+    await store.setCooldown('indianapi', 5_000);
     await store.setNegativeCache('hash123', 30_000);
 
-    expect(await client.ttl(store.key('quota', 'finnhub', 'minute'))).toBeGreaterThan(0);
-    expect(await client.ttl(store.key('cooldown', 'finnhub'))).toBeGreaterThan(0);
+    expect(await client.ttl(store.key('quota', 'indianapi', 'minute'))).toBeGreaterThan(0);
+    expect(await client.ttl(store.key('cooldown', 'indianapi'))).toBeGreaterThan(0);
     expect(await client.ttl(store.key('negative', 'hash123'))).toBeGreaterThan(0);
   });
 

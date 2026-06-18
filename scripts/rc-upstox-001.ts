@@ -7,7 +7,7 @@
  *   - Holdings, Positions, Portfolio Data, Funds
  * 
  * Yahoo remains fallback for price history.
- * Finnhub remains fundamentals provider.
+ * Fundamentals provider chain unchanged.
  * 
  * Read-only: No order placement, no trade execution.
  * 
@@ -55,10 +55,10 @@ const auditMd = `# Upstox Architecture Audit — RC-UPSTOX-001
 | Category | Tier 1 | Tier 2 | Tier 3 | Tier 4 |
 |:---------|:-------|:-------|:-------|:-------|
 | Quotes | Yahoo | IndianMarket | AlphaVantage | — |
-| Metadata | Yahoo | Finnhub | — | — |
+| Metadata | Yahoo | — | — | — |
 | Historical | Yahoo | IndianMarket | AlphaVantage | — |
-| Financials | Finnhub | Yahoo (fallback) | — | — |
-| News | Finnhub | GoogleNewsRSS | — | — |
+| Financials | — | — | — | — |
+| News | — | GoogleNewsRSS | — | — |
 | Portfolio | ❌ None | — | — | — |
 
 ## Target Provider Chain (RC-UPSTOX-001)
@@ -68,8 +68,8 @@ const auditMd = `# Upstox Architecture Audit — RC-UPSTOX-001
 | Quotes | **Upstox** | Yahoo | Registry | — |
 | Metadata | Registry | Provider fallback | — | — |
 | Historical | **Upstox** | Yahoo | — | — |
-| Financials | Finnhub | — | — | — |
-| News | Finnhub | GoogleNewsRSS | — | — |
+| Financials | — | — | — | — |
+| News | — | GoogleNewsRSS | — | — |
 | Portfolio | **Upstox** | — | — | — |
 
 ## Provider Changes
@@ -80,7 +80,7 @@ const auditMd = `# Upstox Architecture Audit — RC-UPSTOX-001
 | Yahoo | Tier 1 (Quotes, Metadata, Historical) | Tier 2 (Quotes, Historical) | Downgraded — Upstox provides more accurate data |
 | IndianMarket | Tier 2 (Quotes, Historical) | ❌ Removed | Upstox replaces; Yahoo covers fallback |
 | AlphaVantage | Tier 3 (Quotes, Historical) | ❌ Removed | Always optional; never reliable for India |
-| Finnhub | Tier 4 (Metadata, Financials, News) | Tier 1 (Financials, News), Tier 2 (Metadata) | Fundamentals unchanged |
+| — | — | — | — |
 | Registry | Tier 2 (Metadata via coordinator) | Tier 1 (Metadata) | MasterCompanyRegistry is authoritative for Indian stocks |
 
 ## Files Modified
@@ -719,7 +719,7 @@ const updatedCoordinatorCode = `// src/services/providers/ProviderCoordinator.ts
 // Orchestrates provider chain with failover, circuit breakers, and health monitoring.
 // 
 // RC-UPSTOX-001: Upstox is now Tier 1 for quotes, historical, and portfolio.
-// Yahoo remains fallback. Finnhub is primary for fundamentals.
+// Yahoo remains fallback.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -729,7 +729,7 @@ import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
 import { UpstoxProvider } from './UpstoxProvider';
-import { FinnhubProvider } from './FinnhubProvider';
+// import { FinnhubProvider } from './FinnhubProvider'; // REMOVED
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
@@ -742,8 +742,7 @@ import ProviderCircuitBreaker from './ProviderCircuitBreaker';
  *   Quotes:      Upstox → Yahoo → Registry fallback
  *   Metadata:    Registry → Provider fallback
  *   Historical:  Upstox → Yahoo
- *   Financials:  Finnhub (primary)
- *   News:        Finnhub → Google News RSS
+ *   News:        Google News RSS
  *   Portfolio:   Upstox (via getHoldings/getPositions/getFunds)
  */
 export class ProviderCoordinator {
@@ -777,19 +776,7 @@ export class ProviderCoordinator {
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
 
-    // ── Tier 3: Finnhub (primary for financials, news) ──────
-    try {
-      const finnhub = new FinnhubProvider();
-      const finnhubBreaker = new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 });
-      this.circuitBreakers.set(finnhub, finnhubBreaker);
-      this.metadataProviders.push(finnhub);
-      this.financialProviders.push(finnhub);
-      this.newsProviders.push(finnhub);
-    } catch {
-      // API key missing – skip
-    }
-
-    // ── Tier 4: Yahoo as FinancialProvider (v8 fallback) ────
+    // ── Tier 3: Yahoo as FinancialProvider (v8 fallback) ────
     this.financialProviders.push(yahoo);
 
     // ── Tier 5: Google News RSS fallback for news ──────────
@@ -892,7 +879,7 @@ const p3Md = `# Provider Priority Report — RC-UPSTOX-001
 
 | Priority | Provider | Coverage | Cost |
 |:---------|:---------|:---------|:-----|
-| Tier 1 | FinnhubProvider | 21 financial fields | Free tier (60 calls/min) |
+| Tier 1 | — | — | — |
 | Tier 2 | Yahoo (v8) | Beta derivation only | $0 |
 | Future | IndianAPI | +10% India coverage | ~$12/mo |
 
@@ -902,7 +889,6 @@ const p3Md = `# Provider Priority Report — RC-UPSTOX-001
 |:---------|:---------|:---------|:-----|
 | Tier 1 | MasterCompanyRegistry | Local JSON, always available | $0 |
 | Tier 2 | YahooProvider | v8 chart meta (name, exchange) | $0 |
-| Tier 3 | FinnhubProvider | profile2 endpoint | Free tier |
 
 ### Portfolio
 
@@ -1559,7 +1545,7 @@ const finalMd = `# Upstox Integration Completion Report — RC-UPSTOX-001
 
 ## Executive Summary
 
-Upstox is now the **primary market-data provider** for StockStory. Live quotes, historical OHLC data, and portfolio holdings/positions/funds are sourced from Upstox API v2. Yahoo remains as a Tier 2 fallback for quotes and historical data. Finnhub is unchanged as the fundamentals provider.
+Upstox is now the **primary market-data provider** for StockStory. Live quotes, historical OHLC data, and portfolio holdings/positions/funds are sourced from Upstox API v2. Yahoo remains as a Tier 2 fallback for quotes and historical data.
 
 **All functionality is strictly read-only.** No order placement, buy/sell execution, or trade routing has been implemented.
 
@@ -1573,7 +1559,7 @@ Upstox is now the **primary market-data provider** for StockStory. Live quotes, 
 Quotes:      Upstox (Tier 1) → Yahoo (Tier 2)
 Historical:  Upstox (Tier 1) → Yahoo (Tier 2)
 Portfolio:   Upstox (Tier 1 only)
-Fundamentals: Finnhub (unchanged)
+Fundamentals: Provider chain
 \`\`\`
 
 The ProviderCoordinator now routes \`getQuote()\` and \`getHistory()\` through Upstox first, with automatic fallback to Yahoo.
@@ -1688,7 +1674,7 @@ Adding Zerodha or Dhan:
 | StockStory calculates portfolio intelligence | ✅ TRACK-7H engines fed with real Upstox data |
 | No trade execution functionality | ✅ Confirmed — zero order placement code |
 | Read-only portfolio intelligence | ✅ All scopes: read_portfolio + read_user_profile only |
-| Existing Yahoo/Finnhub providers intact | ✅ Yahoo + Finnhub unchanged |
+| Existing providers intact | ✅ |
 | Architecture scalable to Zerodha/Dhan | ✅ BrokerProvider interface ready |
 
 `;

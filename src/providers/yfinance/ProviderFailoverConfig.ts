@@ -14,7 +14,6 @@
 // ---------------------------------------------------------------------------
 
 export const PROVIDER_YFINANCE = 'yfinance';
-export const PROVIDER_FINNHUB = 'finnhub';
 export const PROVIDER_UPSTOX = 'upstox';
 // ScreenerProvider removed (QUARANTINED — F3 Phase 0). No SCREENER_ENABLED.
 
@@ -24,7 +23,6 @@ export const PROVIDER_UPSTOX = 'upstox';
 
 const PROVIDER_ENV_KEYS: Record<string, string> = {
   [PROVIDER_YFINANCE]: 'YFINANCE_ENABLED',
-  [PROVIDER_FINNHUB]: 'FINNHUB_ENABLED',
   [PROVIDER_UPSTOX]: 'UPSTOX_ENABLED',
 };
 
@@ -35,22 +33,19 @@ const PROVIDER_ENV_KEYS: Record<string, string> = {
 export class ProviderFailoverConfig {
   /**
    * Priority order for price data providers.
-   * yfinance → finnhub → upstox (optional).
+   * yfinance → upstox (optional).
    */
   static readonly PROVIDER_ORDER_PRICES: string[] = [
     PROVIDER_YFINANCE,
-    PROVIDER_FINNHUB,
     PROVIDER_UPSTOX,
   ];
 
   /**
    * Priority order for fundamental data providers.
    * Screener removed (QUARANTINED — F3 Phase 0).
-   * yfinance → finnhub.
    */
   static readonly PROVIDER_ORDER_FUNDAMENTALS: string[] = [
     PROVIDER_YFINANCE,
-    PROVIDER_FINNHUB,
   ];
 
   /**

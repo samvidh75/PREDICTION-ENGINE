@@ -19,13 +19,6 @@ function main() {
 
   const providers: ProviderInfo[] = [
     {
-      name: 'Finnhub',
-      keyEnvVar: 'FINNHUB_KEY',
-      keySet: !!process.env.FINNHUB_KEY,
-      codeReferences: ['src/services/providers/FinnhubProvider.ts', 'src/services/api/MarketDataOrchestrator.ts'],
-      integrated: true,
-    },
-    {
       name: 'IndianAPI',
       keyEnvVar: 'INDIANAPI_KEY',
       keySet: !!process.env.INDIANAPI_KEY,

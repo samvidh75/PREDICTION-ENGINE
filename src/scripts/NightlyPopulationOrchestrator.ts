@@ -6,7 +6,7 @@
  *
  * Stages:
  *   1. Registry — RegistryUpdater.runUpdate()
- *   2. Financials — Finnhub metrics + statements
+ *   2. Financials — financial metrics + statements
  *   3. Statements — StatementIngestionPipeline
  *   4. TTM — TTMCalculator
  *   5. Derived — DerivedMetricsEngine

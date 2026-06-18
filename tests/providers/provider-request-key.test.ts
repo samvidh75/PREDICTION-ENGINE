@@ -3,28 +3,28 @@ import { buildRequestKey, buildRequestKeyDebugMaterial, requestKeyHash, serializ
 
 describe('provider request key contract', () => {
   it('produces the same hash for different parameter ordering', () => {
-    const a = buildRequestKey('finnhub', 'quote', 'RELIANCE', { b: 2, a: { z: 1, y: 2 } });
-    const b = buildRequestKey('finnhub', 'quote', 'RELIANCE', { a: { y: 2, z: 1 }, b: 2 });
+    const a = buildRequestKey('indianapi', 'quote', 'RELIANCE', { b: 2, a: { z: 1, y: 2 } });
+    const b = buildRequestKey('indianapi', 'quote', 'RELIANCE', { a: { y: 2, z: 1 }, b: 2 });
 
     expect(a.paramsHash).toBe(b.paramsHash);
     expect(requestKeyHash(a)).toBe(requestKeyHash(b));
   });
 
   it('normalizes symbols before hashing', () => {
-    const a = buildRequestKey('finnhub', 'quote', ' reliance.ns ', { range: '1d' });
-    const b = buildRequestKey('FINNHUB', 'quote', 'RELIANCE', { range: '1d' });
+    const a = buildRequestKey('indianapi', 'quote', ' reliance.ns ', { range: '1d' });
+    const b = buildRequestKey('INDIANAPI', 'quote', 'RELIANCE', { range: '1d' });
 
     expect(a).toEqual(b);
   });
 
   it('never exposes token values in canonical material or hash debug output', () => {
     const secret = 'super-secret-token-value';
-    const material = buildRequestKeyDebugMaterial('finnhub', 'quote', 'RELIANCE', {
+    const material = buildRequestKeyDebugMaterial('indianapi', 'quote', 'RELIANCE', {
       token: secret,
       nested: { access_token: secret, visible: 'ok' },
       headers: { authorization: `Bearer ${secret}` },
     });
-    const key = buildRequestKey('finnhub', 'quote', 'RELIANCE', {
+    const key = buildRequestKey('indianapi', 'quote', 'RELIANCE', {
       token: secret,
       nested: { access_token: secret, visible: 'ok' },
       headers: { authorization: `Bearer ${secret}` },
@@ -37,8 +37,8 @@ describe('provider request key contract', () => {
   });
 
   it('produces different hashes for different non-secret params', () => {
-    const a = buildRequestKey('finnhub', 'quote', 'RELIANCE', { range: '1d' });
-    const b = buildRequestKey('finnhub', 'quote', 'RELIANCE', { range: '5d' });
+    const a = buildRequestKey('indianapi', 'quote', 'RELIANCE', { range: '1d' });
+    const b = buildRequestKey('indianapi', 'quote', 'RELIANCE', { range: '5d' });
 
     expect(a.paramsHash).not.toBe(b.paramsHash);
   });

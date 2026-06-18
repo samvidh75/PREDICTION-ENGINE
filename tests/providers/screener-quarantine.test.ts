@@ -47,8 +47,8 @@ describe('ScreenerProvider quarantine (F3 Phase 0)', () => {
     expect(order).not.toContain('screener');
   });
 
-  it('ProviderFailoverConfig fundamentals order is yfinance then finnhub', () => {
-    expect(ProviderFailoverConfig.PROVIDER_ORDER_FUNDAMENTALS).toEqual(['yfinance', 'finnhub']);
+  it('ProviderFailoverConfig fundamentals order is yfinance only', () => {
+    expect(ProviderFailoverConfig.PROVIDER_ORDER_FUNDAMENTALS).toEqual(['yfinance']);
   });
 
   it('ProviderFailoverConfig has no Screener in active fundamental providers', () => {

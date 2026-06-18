@@ -2,7 +2,7 @@
  * REAL FINANCIAL DATA INTEGRATION — TRACK-7A
  *
  * Replaces synthetic/default EngineInputs with actual financial statement data
- * sourced from available providers (Finnhub, Yahoo, etc.).
+ * sourced from available providers (Yahoo, etc.).
  *
  * DOES NOT modify engine logic, scoring, weights, or UI.
  * DOES replace buildEngineInputs() with real provider data.
@@ -116,11 +116,11 @@ const mapMd = `# Financial Data Mapping — Real Financial Data Integration
 
 ## Provider → Field Mapping
 
-### Available from Finnhub (stock/metric endpoint)
+### Available from financial data provider
 
-Finnhub provides 50+ metrics. The current implementation only extracts 5. Expansion plan:
+The financial data provider offers 50+ metrics. The current implementation only extracts 5. Expansion plan:
 
-| EngineInputs Field | Finnhub Metric Key | Type | Availability |
+| EngineInputs Field | Metric Key | Type | Availability |
 |:-------------------|:-------------------|:-----|:-------------|
 | peRatio | peNormalizedAnnual / peBasicExclExtraTTM | Number | ✅ Available |
 | pbRatio | pbAnnual / priceToBookPerShareTTM | Number | ✅ Available |
@@ -150,7 +150,7 @@ Finnhub provides 50+ metrics. The current implementation only extracts 5. Expans
 
 ### Current State
 
-**17 of 18 financial fields ARE available from Finnhub** — they simply haven't been mapped. The FinnhubProvider.getFinancials() extracts only 5 of 50+ metrics. Expanding the extraction and mapping would populate nearly every EngineInputs field with real data.
+**17 of 18 financial fields ARE available from the financial data provider** — they simply haven't been mapped. The provider's getFinancials() extracts only 5 of 50+ metrics. Expanding the extraction and mapping would populate nearly every EngineInputs field with real data.
 
 `;
 
@@ -160,9 +160,8 @@ console.log('   ✅ FinancialDataMapping.md');
 // ── PHASE 3 & 4: PROVIDER INTEGRATION + COVERAGE ──────────────
 console.log('📋 Phase 3+4: Provider Integration + Coverage');
 
-// Since Finnhub may need API key and Yahoo is always available,
-// We'll enrich using Yahoo metadata + Computed financials from price data.
-// This demonstrates the real-data pipeline even without Finnhub API key.
+// Yahoo is always available, so we enrich using Yahoo metadata + computed financials from price data.
+// This demonstrates the real-data pipeline without requiring additional API keys.
 
 const registry = MasterCompanyRegistry.getInstance();
 const SAMPLE_SIZE = 50;
@@ -315,8 +314,8 @@ for (const entry of universe) {
   const marketCap = entry.marketCap ?? null;
 
   // Financials: from registry (market cap is real), rest computed from price if possible
-  // In production, Finnhub.getFinancials() would populate these.
-  // For now we mark what's available vs what needs Finnhub.
+  // In production, getFinancials() would populate these.
+  // For now we mark what's available vs what needs additional provider data.
   const fin: RealFinancials = {
     symbol: sym,
     source: 'Yahoo Price History + Registry Metadata',
@@ -394,14 +393,14 @@ const catMap: Record<string, string> = {
 const sourceMap: Record<string, string> = {
   rsi: '14-day price history', macd: '12/26 EMA price history', adx: '14-day TR price history',
   volatility: '20-day returns', marketCap: 'MasterCompanyRegistry',
-  peRatio: 'Finnhub (API key required)', roe: 'Finnhub (API key required)',
-  debtToEquity: 'Finnhub (API key required)', revenueGrowth: 'Finnhub (API key required)',
-  // ... all financial = Finnhub
+  peRatio: 'API key required', roe: 'API key required',
+  debtToEquity: 'API key required', revenueGrowth: 'API key required',
+  // ... all financial fields require API key
 };
 
 for (const c of coverage) {
   const cat = catMap[c.field] || 'Financial';
-  const src = sourceMap[c.field] || (cat === 'Technical' ? 'Yahoo price history' : 'Finnhub (API key required)');
+  const src = sourceMap[c.field] || (cat === 'Technical' ? 'Yahoo price history' : 'API key required');
   covMd += `| ${c.field} | ${cat} | ${c.populated}/${SAMPLE_SIZE} | ${c.missing}/${SAMPLE_SIZE} | ${c.realPct.toFixed(0)}% | ${src} |\n`;
 }
 
@@ -418,10 +417,10 @@ covMd += `
 | Category | Real % | Missing % | Primary Source |
 |:---------|:-------|:----------|:---------------|
 | **Technicals** (RSI, MACD, ADX, Volatility) | ${(technicalPopulated / technicalTotal * 100).toFixed(0)}% | ${(100 - technicalPopulated / technicalTotal * 100).toFixed(0)}% | Yahoo Finance (always available) |
-| **Financials** (PE, ROE, growth, margins, etc.) | ${(financialPopulated / financialTotal * 100).toFixed(0)}% | ${(100 - financialPopulated / financialTotal * 100).toFixed(0)}% | Finnhub (API key required) |
+| **Financials** (PE, ROE, growth, margins, etc.) | ${(financialPopulated / financialTotal * 100).toFixed(0)}% | ${(100 - financialPopulated / financialTotal * 100).toFixed(0)}% | API key required |
 | **Market Data** (marketCap) | ${(coverage.find(c => c.field === 'marketCap')?.realPct ?? 100).toFixed(0)}% | 0% | MasterCompanyRegistry |
 
-**Key Finding:** Technical indicators can be fully populated from Yahoo price history (no API key needed). Financial statement data requires Finnhub API key. With Finnhub, **17 of 18 financial fields can be populated with real data**.
+**Key Finding:** Technical indicators can be fully populated from Yahoo price history (no API key needed). Financial statement data requires an API key. With a financial data provider, **17 of 18 financial fields can be populated with real data**.
 
 `;
 
@@ -561,7 +560,7 @@ valMd += `| Finding | Detail |\n`;
 valMd += `|:--------|:-------|\n`;
 valMd += `| Momentum score variation | ${momentumVariation > 0.1 ? '✅ Increased — real RSI/MACD/ADX now differentiates companies' : '⚠️ Minimal change — technical inputs still mostly default (need more price data)'} |\n`;
 valMd += `| Risk score variation | ${riskVariation > 0.1 ? '✅ Increased — real volatility computation differentiates companies' : '⚠️ Minimal change'} |\n`;
-valMd += `| Financial score variation | ⚠️ No change — financials still use defaults. Finnhub API key needed for PE, ROE, D/E, growth rates. |\n`;
+valMd += `| Financial score variation | ⚠️ No change — financials still use defaults. API key needed for PE, ROE, D/E, growth rates. |\n`;
 valMd += `| Technicals | ✅ Real RSI, MACD, ADX, Volatility computed from 2Y Yahoo price history |\n`;
 
 fs.writeFileSync(path.join(OUTPUT_DIR, 'EngineInputValidation.md'), valMd);
@@ -604,7 +603,7 @@ ${afterMom.std > beforeMom.std * 1.1 || afterRisk.std > beforeRisk.std * 1.1
   ? '✅ **Technical indicators are now driving meaningful score dispersion.** Momentum and Risk engines benefit from real RSI/MACD/ADX/Volatility computed from Yahoo price history.'
   : '⚠️ **Limited dispersion improvement.** The sample may have thin price history. Expanding to more companies with longer history would increase differentiation.'}
 
-**Financial engines (Growth, Quality, Stability, Valuation) still need Finnhub API key** to populate PE, ROE, D/E, revenue growth, etc. The technical pipeline is fully operational without any API key.
+**Financial engines (Growth, Quality, Stability, Valuation) still need an API key** to populate PE, ROE, D/E, revenue growth, etc. The technical pipeline is fully operational without any API key.
 
 `;
 
@@ -627,7 +626,7 @@ let finalMd = `# Real Financial Integration Report — TRACK-7A
 | Category | Before (Synthetic) | After (Real) | Source |
 |:---------|:-------------------|:-------------|:-------|
 | **Technical indicators** (RSI, MACD, ADX, Volatility) | 0% | ${(technicalPopulated / technicalTotal * 100).toFixed(0)}% | Yahoo Finance price history |
-| **Financial statements** (PE, ROE, D/E, growth, margins) | 0% | ${(financialPopulated / financialTotal * 100).toFixed(0)}% | Finnhub (API key needed) |
+| **Financial statements** (PE, ROE, D/E, growth, margins) | 0% | ${(financialPopulated / financialTotal * 100).toFixed(0)}% | API key needed |
 | **Market Cap** | 100% | 100% | MasterCompanyRegistry |
 
 **Overall:** ${((technicalPopulated + financialPopulated + coverage.find(c => c.field === 'marketCap')!.populated) / (technicalTotal + financialTotal + SAMPLE_SIZE) * 100).toFixed(0)}% of fields now populated with real data (market cap always was).
@@ -639,10 +638,10 @@ let finalMd = `# Real Financial Integration Report — TRACK-7A
 `;
 const stillMissing = coverage.filter(c => c.missing > 0).sort((a, b) => b.missing - a.missing);
 for (const c of stillMissing.slice(0, 5)) {
-  finalMd += `- **${c.field}**: ${c.missing}/${SAMPLE_SIZE} companies (${(100 - c.realPct).toFixed(0)}% fallback). Source: ${sourceMap[c.field] || 'Finnhub'}\n`;
+  finalMd += `- **${c.field}**: ${c.missing}/${SAMPLE_SIZE} companies (${(100 - c.realPct).toFixed(0)}% fallback). Source: ${sourceMap[c.field] || 'API key required'}\n`;
 }
 finalMd += `
-All financial fields (PE, ROE, D/E, revenue growth, margins, etc.) require **Finnhub API key** to populate. The endpoint is already implemented in FinnhubProvider.getFinancials() — it just needs the extraction expanded from 5 fields to 17.
+All financial fields (PE, ROE, D/E, revenue growth, margins, etc.) require an **API key** to populate. The endpoint is already implemented — it just needs the extraction expanded from 5 fields to 17.
 
 ---
 
@@ -652,10 +651,10 @@ All financial fields (PE, ROE, D/E, revenue growth, margins, etc.) require **Fin
 |:-------|:--------|:--------------|
 | **Momentum** | ✅ **Already benefiting** — RSI, MACD, ADX from real Yahoo prices | Real technicals active |
 | **Risk** | ✅ **Already benefiting** — volatility from real price data | Real volatility active |
-| **Stability** | 🟡 Needs Finnhub — D/E, current ratio | Synthetic defaults |
-| **Growth** | 🟡 Needs Finnhub — revenue/EPS/FCF growth rates | Synthetic defaults |
-| **Quality** | 🟡 Needs Finnhub — ROE, ROIC, gross/operating margins | Synthetic defaults |
-| **Valuation** | 🟡 Needs Finnhub — PE, PB, EV/EBITDA | Synthetic defaults |
+| **Stability** | 🟡 Needs API key — D/E, current ratio | Synthetic defaults |
+| **Growth** | 🟡 Needs API key — revenue/EPS/FCF growth rates | Synthetic defaults |
+| **Quality** | 🟡 Needs API key — ROE, ROIC, gross/operating margins | Synthetic defaults |
+| **Valuation** | 🟡 Needs API key — PE, PB, EV/EBITDA | Synthetic defaults |
 
 ---
 
@@ -682,17 +681,17 @@ finalMd += `| Engine | σ Before | σ After | Change |
 | Component | Status |
 |:----------|:-------|
 | InputTrace | ✅ Complete — all 21 fields cataloged |
-| DataMapping | ✅ Complete — Finnhub → EngineInputs mapping documented |
+| DataMapping | ✅ Complete — Provider → EngineInputs mapping documented |
 | Technical Pipeline | ✅ Operational — RSI, MACD, ADX, Volatility from Yahoo |
 | Market Cap Pipeline | ✅ Operational — from MasterCompanyRegistry |
-| Financial Pipeline | ⚠️ Implemented but gated — FinnhubProvider extracts 5 of 50+ metrics. Expanding to 17 requires updating getFinancials() mapping. |
+| Financial Pipeline | ⚠️ Implemented but gated — extracts 5 of 50+ metrics. Expanding to 17 requires updating getFinancials() mapping. |
 | Engine Validation | ✅ Complete — engines produce correct varied scores with real technicals |
 
 ---
 
 ## 6. Next Steps (Highest ROI)
 
-1. **Expand FinnhubProvider.getFinancials()** to extract 17 fields (currently 5). One-time ~2 hour change.
+1. **Expand getFinancials()** to extract 17 fields (currently 5). One-time ~2 hour change.
 2. **Re-run TRACK-6A/B with real financials** — scores will differentiate → Monte Carlo robustness will improve
 3. **Integrate ProviderCoordinator into buildEngineInputs()** — replace hardcoded values with ProviderCoordinator.getFinancials() + YahooProvider.getHistorical() computed technicals
 
@@ -711,7 +710,7 @@ finalMd += `| Engine | σ Before | σ After | Change |
 
 ---
 
-**Success:** ✅ Technical indicators now driven by real Yahoo Finance price data. Momentum and Risk engines receive real inputs. Financial fields documented — Finnhub expansion is the final step.
+**Success:** ✅ Technical indicators now driven by real Yahoo Finance price data. Momentum and Risk engines receive real inputs. Financial fields documented — provider integration is the final step.
 `;
 
 fs.writeFileSync(path.join(OUTPUT_DIR, 'RealFinancialIntegrationReport.md'), finalMd);

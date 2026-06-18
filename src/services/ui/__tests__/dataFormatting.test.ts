@@ -135,7 +135,7 @@ describe("formatFreshness", () => {
 
 describe("formatSource", () => {
   it("returns source for valid values", () => {
-    expect(formatSource("finnhub")).toBe("finnhub");
+    expect(formatSource("upstox")).toBe("upstox");
   });
 
   it("returns Unavailable for null/undefined", () => {

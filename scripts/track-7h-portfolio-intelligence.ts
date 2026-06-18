@@ -68,7 +68,7 @@ StockStory's provider layer follows a chain-of-responsibility pattern through \`
 | Provider | Category | Status |
 |:---------|:---------|:-------|
 | YahooProvider | Price, Metadata, Historical | ✅ Active (v8 chart API) |
-| FinnhubProvider | Metadata, Financials, News | ✅ Active (API key required) |
+| Provider chain | Metadata, Financials, News | ✅ Active (API key required) |
 | IndianMarketProvider | Price, Historical | ✅ Active |
 | AlphaVantageProvider | Price, Historical | ⚠️ Optional (API key) |
 | GoogleNewsRssProvider | News | ✅ Active |

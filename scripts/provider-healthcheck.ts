@@ -17,7 +17,7 @@ const TRACKED_FIELDS = [
 ] as const;
 
 type TrackedField = (typeof TRACKED_FIELDS)[number];
-type ProviderName = 'finnhub' | 'indianapi' | 'yfinance';
+type ProviderName = 'indianapi' | 'yfinance';
 type FieldCoverage = Record<TrackedField, boolean>;
 
 type SymbolResult = {
@@ -47,9 +47,9 @@ type ProviderResult = {
 const argv = process.argv.slice(2);
 const strict = argv.includes('--strict');
 const symbols = parseCsvArg('--symbols=', ['RELIANCE', 'TCS', 'INFY'], 'upper');
-const providers = parseCsvArg('--providers=', ['finnhub', 'indianapi', 'yfinance'], 'lower')
-  .filter((provider): provider is ProviderName => ['finnhub', 'indianapi', 'yfinance'].includes(provider));
-const required = new Set(parseCsvArg('--require=', ['finnhub', 'indianapi'], 'lower'));
+const providers = parseCsvArg('--providers=', ['indianapi', 'yfinance'], 'lower')
+  .filter((provider): provider is ProviderName => ['indianapi', 'yfinance'].includes(provider));
+const required = new Set(parseCsvArg('--require=', ['indianapi'], 'lower'));
 
 function parseCsvArg(prefix: string, fallback: string[], casing: 'upper' | 'lower' | 'preserve' = 'preserve'): string[] {
   const value = argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length);
@@ -78,7 +78,6 @@ function sanitize(value: unknown): string {
   return String(value)
     .replace(/token=[^&\s]+/gi, 'token=<redacted>')
     .replace(/X-Api-Key\s*[:=]\s*[^\s]+/gi, 'X-Api-Key=<redacted>')
-    .replace(/FINNHUB_(?:API_)?KEY=[^\s]+/gi, 'FINNHUB_KEY=<redacted>')
     .replace(/INDIANAPI_KEY=[^\s]+/gi, 'INDIANAPI_KEY=<redacted>');
 }
 
@@ -165,46 +164,6 @@ function firstDeep(value: unknown, aliases: string[]): unknown {
   return null;
 }
 
-async function checkFinnhub(): Promise<ProviderResult> {
-  const token = process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY;
-  const requiredProvider = required.has('finnhub');
-  if (!token) {
-    return { provider: 'finnhub', configured: false, required: requiredProvider, ok: false, status: 'not-configured', endpointLabels: ['stock/metric', 'stock/profile2'], symbols: [], error: 'Set FINNHUB_KEY or FINNHUB_API_KEY.' };
-  }
-  const symbolResults: SymbolResult[] = [];
-  for (const symbol of symbols) {
-    const encoded = encodeURIComponent(`${symbol}.NS`);
-    const [metric, profile] = await Promise.all([
-      fetchJson('Finnhub stock/metric', `https://finnhub.io/api/v1/stock/metric?symbol=${encoded}&metric=all&token=${encodeURIComponent(token)}`),
-      fetchJson('Finnhub stock/profile2', `https://finnhub.io/api/v1/stock/profile2?symbol=${encoded}&token=${encodeURIComponent(token)}`),
-    ]);
-    const metricValues = getObject(getObject(metric.data).metric);
-    const profileValues = getObject(profile.data);
-    const values = {
-      marketCap: firstPresent(profileValues, ['marketCapitalization', 'marketCap']) ?? firstPresent(metricValues, ['marketCapitalization']),
-      peRatio: firstPresent(metricValues, ['peBasicExclExtraTTM', 'peNormalizedAnnual', 'peTTM']),
-      pbRatio: firstPresent(metricValues, ['pbAnnual', 'pbQuarterly', 'priceToBookPerShareTTM']),
-      eps: firstPresent(metricValues, ['epsBasicExclExtraItemsTTM', 'epsNormalizedAnnual', 'epsTTM']),
-      roe: firstPresent(metricValues, ['roeTTM', 'roeRfy', 'roeAnnual']),
-      debtToEquity: firstPresent(metricValues, ['totalDebtOverTotalEquityTTM', 'totalDebtOverTotalEquityQuarterly', 'totalDebtOverTotalEquityAnnual']),
-      revenueGrowth: firstPresent(metricValues, ['revenueGrowthTTMYoy', 'revenueGrowth3Y', 'revenueGrowth5Y']),
-      earningsGrowth: firstPresent(metricValues, ['netIncomeGrowthTTMYoy', 'netIncomeGrowth3Y', 'epsGrowthTTMYoy', 'epsGrowth3Y', 'epsGrowth5Y']),
-      operatingMargin: firstPresent(metricValues, ['operatingMarginTTM', 'operatingMarginAnnual']),
-      netMargin: firstPresent(metricValues, ['netProfitMarginTTM', 'netProfitMarginAnnual']),
-    };
-    const warnings: string[] = [];
-    if (metric.status === 401 || profile.status === 401) warnings.push('Finnhub authentication failed (401). Rotate FINNHUB_KEY or FINNHUB_API_KEY.');
-    if (!metric.ok) warnings.push(`stock/metric HTTP ${metric.status}`);
-    if (!profile.ok) warnings.push(`stock/profile2 HTTP ${profile.status}`);
-    const summary = summarizeCoverage(values, firstPresent(profileValues, ['finnhubIndustry', 'gicSector', 'sector']), warnings);
-    if (strict && summary.coveragePercent < 70) warnings.push(`fundamental coverage ${summary.coveragePercent}% < 70%`);
-    const ok = metric.ok && summary.coverageCount > 0 && (!strict || summary.coveragePercent >= 70);
-    symbolResults.push({ symbol, ok, httpStatus: metric.status, ...summary, error: metric.error ?? profile.error });
-  }
-  const ok = symbolResults.every((result) => result.ok);
-  return { provider: 'finnhub', configured: true, required: requiredProvider, ok, status: ok ? 'passed' : 'failed', endpointLabels: ['stock/metric', 'stock/profile2'], symbols: symbolResults };
-}
-
 async function checkIndianApi(): Promise<ProviderResult> {
   const token = process.env.INDIANAPI_KEY;
   const requiredProvider = required.has('indianapi');
@@ -289,7 +248,6 @@ function checkYfinance(): ProviderResult {
 async function main(): Promise<void> {
   const providerResults: ProviderResult[] = [];
   for (const provider of providers) {
-    if (provider === 'finnhub') providerResults.push(await checkFinnhub());
     if (provider === 'indianapi') providerResults.push(await checkIndianApi());
     if (provider === 'yfinance') providerResults.push(checkYfinance());
   }

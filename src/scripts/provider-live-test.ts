@@ -6,14 +6,13 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { YahooProvider } from '../services/providers/YahooProvider';
-import { FinnhubProvider } from '../services/providers/FinnhubProvider';
 import { IndianMarketProvider } from '../services/providers/IndianMarketProvider';
 import { ProviderCoordinator } from '../services/providers/ProviderCoordinator';
 import { DataValidationEngine } from '../services/data/DataValidationEngine';
 
 dotenv.config();
 
-const requiredEnvVars = ['FINNHUB_KEY', 'INDIANAPI_KEY', 'DATABASE_URL'];
+const requiredEnvVars = ['INDIANAPI_KEY', 'DATABASE_URL'];
 const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
 if (missingEnvVars.length > 0) {
   console.error(`Critical Error: Missing required environment variables: ${missingEnvVars.join(', ')}`);
@@ -93,18 +92,6 @@ async function testYahoo(): Promise<TestResult[]> {
   return results;
 }
 
-async function testFinnhub(): Promise<TestResult[]> {
-  const finnhub = new FinnhubProvider();
-  const results: TestResult[] = [];
-  for (const sym of SYMBOLS) {
-    results.push(await runTest('FinnhubProvider', sym, 'getMetadata', () => finnhub.getMetadata(sym)));
-    results.push(await runTest('FinnhubProvider', sym, 'getFinancials', () => finnhub.getFinancials(sym)));
-    results.push(await runTest('FinnhubProvider', sym, 'getNews', () => finnhub.getNews(sym)));
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  return results;
-}
-
 async function testIndianMarket(): Promise<TestResult[]> {
   const indian = new IndianMarketProvider();
   const results: TestResult[] = [];
@@ -122,9 +109,6 @@ async function main() {
 
   const yahooResults = await testYahoo();
   writeReport('YAHOO_EXECUTION_REPORT.json', yahooResults);
-
-  const finnhubResults = await testFinnhub();
-  writeReport('FINNHUB_EXECUTION_REPORT.json', finnhubResults);
 
   const indianResults = await testIndianMarket();
   writeReport('INDIAN_PROVIDER_EXECUTION_REPORT.json', indianResults);
@@ -146,10 +130,10 @@ async function main() {
     traceLog: coordinator.getTraceLog(),
     chainOrder: {
       quotes: 'Yahoo',
-      metadata: 'Yahoo -> Finnhub',
+      metadata: 'Yahoo',
       historical: 'Yahoo',
-      financials: 'UpstoxFundamentals -> Finnhub -> Yahoo',
-      news: 'Finnhub -> GoogleNewsRss',
+      financials: 'Yahoo',
+      news: 'GoogleNewsRss',
     },
   });
 

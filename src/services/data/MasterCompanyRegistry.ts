@@ -2,7 +2,7 @@
  * MasterCompanyRegistry — The single source of truth for Indian market company metadata.
  *
  * This is a hardcoded registry of verified Indian companies. It serves as the fallback
- * when live providers (Yahoo, Finnhub, IndianMarket) return incomplete or garbage data.
+ * when live providers (Yahoo, IndianMarket) return incomplete or garbage data.
  *
  * Data is manually verified against NSE/BSE listings. This is NOT generated from providers.
  * New entries are added through a verified ingestion pipeline.

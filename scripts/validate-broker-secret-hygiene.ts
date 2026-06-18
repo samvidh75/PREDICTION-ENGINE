@@ -13,7 +13,6 @@ const FILES = [
 ];
 
 const forbiddenPatterns = [
-  /https:\/\/finnhub\.io\/api\/v1\/[^\s'"]*token=/i,
   /authorization:\s*bearer\s+(?!\[REDACTED\])/i,
   /api[_-]?key=[a-z0-9._~+/=-]+/i,
   /access[_-]?token=[a-z0-9._~+/=-]+/i,

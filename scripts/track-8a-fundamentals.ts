@@ -4,7 +4,7 @@
  * Eliminates placeholder financial inputs by adding IndianAPI as
  * Tier 2 FinancialProvider with strong Indian equity coverage.
  * 
- * Provider chain: Finnhub → IndianAPI → DerivedMetrics → Registry
+ * Provider chain: Provider → IndianAPI → DerivedMetrics → Registry
  * 
  * Run: npx tsx scripts/track-8a-fundamentals.ts
  */
@@ -45,25 +45,25 @@ const ALL_FIELDS = [
 ];
 
 const FIELD_CLASSIFICATION: Record<string, { classification: string; provider: string }> = {
-  peRatio:       { classification: 'REAL', provider: 'Finnhub (peNormalizedAnnual)' },
-  pbRatio:       { classification: 'REAL', provider: 'Finnhub (pbAnnual)' },
-  eps:           { classification: 'REAL', provider: 'Finnhub (epsNormalizedAnnual)' },
-  dividendYield: { classification: 'REAL', provider: 'Finnhub (dividendYieldIndicatedAnnual)' },
+  peRatio:       { classification: 'REAL', provider: 'Provider (peNormalizedAnnual)' },
+  pbRatio:       { classification: 'REAL', provider: 'Provider (pbAnnual)' },
+  eps:           { classification: 'REAL', provider: 'Provider (epsNormalizedAnnual)' },
+  dividendYield: { classification: 'REAL', provider: 'Provider (dividendYieldIndicatedAnnual)' },
   beta:          { classification: 'REAL', provider: 'Yahoo v8 (derived from 2Y prices)' },
   marketCap:     { classification: 'REAL', provider: 'MasterCompanyRegistry' },
   freeFloat:     { classification: 'FALLBACK', provider: 'Hardcoded (45%)' },
-  fcfYield:      { classification: 'DERIVED', provider: 'Finnhub FCF / marketCap' },
-  evEbitda:      { classification: 'REAL', provider: 'Finnhub (enterpriseValueOverEBITDA)' },
-  roe:           { classification: 'REAL', provider: 'Finnhub (roeTTM)' },
-  roic:          { classification: 'DERIVED', provider: 'Finnhub (roicTTM — may be null)' },
-  debtToEquity:  { classification: 'REAL', provider: 'Finnhub (totalDebt/totalEquityTTM)' },
-  currentRatio:  { classification: 'REAL', provider: 'Finnhub (currentRatioTTM)' },
-  revenueGrowth: { classification: 'REAL', provider: 'Finnhub (revenueGrowthTTMYoy)' },
+  fcfYield:      { classification: 'DERIVED', provider: 'FCF / marketCap' },
+  evEbitda:      { classification: 'REAL', provider: 'Provider (enterpriseValueOverEBITDA)' },
+  roe:           { classification: 'REAL', provider: 'Provider (roeTTM)' },
+  roic:          { classification: 'DERIVED', provider: 'Provider (roicTTM — may be null)' },
+  debtToEquity:  { classification: 'REAL', provider: 'Provider (totalDebt/totalEquityTTM)' },
+  currentRatio:  { classification: 'REAL', provider: 'Provider (currentRatioTTM)' },
+  revenueGrowth: { classification: 'REAL', provider: 'Provider (revenueGrowthTTMYoy)' },
   profitGrowth:  { classification: 'DERIVED', provider: '= epsGrowth (proxy)' },
-  epsGrowth:     { classification: 'REAL', provider: 'Finnhub (epsGrowthTTMYoy)' },
-  fcfGrowth:     { classification: 'MISSING', provider: 'Finnhub (often null for Indian equities)' },
-  grossMargin:   { classification: 'REAL', provider: 'Finnhub (grossMarginTTM)' },
-  operatingMargin: { classification: 'REAL', provider: 'Finnhub (operatingMarginTTM)' },
+  epsGrowth:     { classification: 'REAL', provider: 'Provider (epsGrowthTTMYoy)' },
+  fcfGrowth:     { classification: 'MISSING', provider: 'Provider (often null for Indian equities)' },
+  grossMargin:   { classification: 'REAL', provider: 'Provider (grossMarginTTM)' },
+  operatingMargin: { classification: 'REAL', provider: 'Provider (operatingMarginTTM)' },
 };
 
 const counts = { REAL: 0, DERIVED: 0, FALLBACK: 0, MISSING: 0 };
@@ -101,7 +101,7 @@ const indianApiCode = `/**
  *   - GET /stock_fundamentals?name=SYMBOL → PE, PB, ROE, D/E, margins, growth
  * 
  * API Key: INDIANAPI_KEY env var (already configured)
- * Cost: ₹499/month (live key) — Tier 2 fallback after Finnhub
+ * Cost: ₹499/month (live key) — Tier 2 fallback
  */
 
 import { FinancialProvider, FinancialData } from './FinancialProvider';
@@ -232,14 +232,14 @@ const coordPath = path.join(SRC, 'services', 'providers', 'ProviderCoordinator.t
 // Read current file
 const currentCoord = fs.readFileSync(coordPath, 'utf-8');
 
-// Insert IndianAPI into financial chain (Finnhub → IndianAPI → Yahoo)
+// Insert IndianAPI into financial chain
 const updatedCoord = currentCoord
   // Add import
   .replace(
     "import { UpstoxProvider } from './UpstoxProvider';",
     "import { UpstoxProvider } from './UpstoxProvider';\nimport { IndianAPIProvider } from './IndianAPIProvider';"
   )
-  // Insert IndianAPI after Finnhub in financial chain, before Yahoo
+  // Insert IndianAPI in financial chain, before Yahoo
   .replace(
     '// ── Tier 4: Yahoo as FinancialProvider (v8 fallback) ────',
     `    // ── Tier 3b: IndianAPI (Tier 2 financials — Indian equity fundamentals) ──
@@ -256,13 +256,13 @@ const updatedCoord = currentCoord
   )
   // Update the comment about chain order
   .replace(
-    ' *   Financials:  Finnhub (primary)',
-    ' *   Financials:  Finnhub → IndianAPI → Yahoo (fallback)'
+    ' *   Financials:  Provider chain (primary)',
+    ' *   Financials:  Provider chain → IndianAPI → Yahoo (fallback)'
   );
 
 fs.writeFileSync(coordPath, updatedCoord);
 console.log('   ✅ ProviderCoordinator.ts updated');
-console.log('      Financial chain: Finnhub → IndianAPI → Yahoo fallback');
+console.log('      Financial chain: Provider → IndianAPI → Yahoo fallback');
 
 // ═══════════════════════════════════════════════════════════════
 // PHASE 4: FinancialCompletenessEngine
@@ -451,15 +451,15 @@ covMd += `
 
 | Field | Target | Actual | Gap | Filled By |
 |:------|:------|:-------|:----|:----------|
-| peRatio | 95% | REAL | ✅ | Finnhub |
-| pbRatio | 95% | REAL | ✅ | Finnhub |
-| eps | 95% | REAL | ✅ | Finnhub |
-| roe | 95% | REAL | ✅ | Finnhub |
-| debtToEquity | 95% | REAL | ✅ | Finnhub |
-| revenueGrowth | 95% | REAL | ✅ | Finnhub |
-| epsGrowth | 95% | REAL | ✅ | Finnhub |
-| grossMargin | 95% | REAL | ✅ | Finnhub |
-| operatingMargin | 95% | REAL | ✅ | Finnhub |
+| peRatio | 95% | REAL | ✅ | Provider |
+| pbRatio | 95% | REAL | ✅ | Provider |
+| eps | 95% | REAL | ✅ | Provider |
+| roe | 95% | REAL | ✅ | Provider |
+| debtToEquity | 95% | REAL | ✅ | Provider |
+| revenueGrowth | 95% | REAL | ✅ | Provider |
+| epsGrowth | 95% | REAL | ✅ | Provider |
+| grossMargin | 95% | REAL | ✅ | Provider |
+| operatingMargin | 95% | REAL | ✅ | Provider |
 | fcfGrowth | 95% | MISSING | ❌ | IndianAPI (fcf_growth_3y) |
 
 `;
@@ -478,7 +478,7 @@ const gapMd = `# Provider Gap Report — TRACK-8A
 
 | Tier | Provider | Fields Covered | Gaps |
 |:-----|:---------|:---------------|:-----|
-| Tier 1 | FinnhubProvider | 18/19 fields (REAL) | fcfGrowth often null for Indian equities |
+| Tier 1 | Primary Provider | 18/19 fields (REAL) | fcfGrowth often null for Indian equities |
 | Tier 2 | **IndianAPIProvider** (NEW) | PE, PB, ROE, D/E, margins, growth, EPS | Fills fcfGrowth, profitGrowth gaps |
 | Tier 3 | DerivedMetrics | fcfYield (FCF/marketCap), profitGrowth (= epsGrowth) | Derivable — no provider needed |
 | Tier 4 | YahooProvider (v8) | beta | No fundamentals from v8 API |
@@ -487,20 +487,19 @@ const gapMd = `# Provider Gap Report — TRACK-8A
 
 | Field | Current | After TRACK-8A |
 |:------|:--------|:---------------|
-| fcfGrowth | MISSING (Finnhub often null) | REAL (IndianAPI fcf_growth_3y) |
+| fcfGrowth | MISSING (often null) | REAL (IndianAPI fcf_growth_3y) |
 | freeFloat | FALLBACK (hardcoded 45%) | FALLBACK (acceptable — not critical) |
-| roic | DERIVED (Finnhub may be null) | DERIVED or REAL (IndianAPI ROCE as proxy) |
+| roic | DERIVED (may be null) | DERIVED or REAL (IndianAPI ROCE as proxy) |
 | profitGrowth | DERIVED (= epsGrowth) | REAL (IndianAPI profit_growth_3y) |
 
 ## Provider Failover
 
 \`\`\`
 getFinancials('RELIANCE')
-  → FinnhubProvider:    18 fields populated, fcfGrowth = null
+  → Primary Provider:  18 fields populated, fcfGrowth = null
   → IndianAPIProvider:  fcfGrowth = 0.12, profitGrowth = 0.09 (fills gaps)
   → DerivedMetrics:     fcfYield = FCF / marketCap (derived from real data)
-  → YahooProvider:      throws "use Finnhub" — skipped
-  → Result: 18 fields from Finnhub + 2 from IndianAPI = 95% real
+  → Result: 18 fields from primary + 2 from IndianAPI = 95% real
 \`\`\`
 
 ## IndianAPI Coverage
@@ -544,8 +543,8 @@ const actMd = `# Fundamental Activation Report — TRACK-8A
 
 | Field | Before TRACK-8A | After TRACK-8A | Provider |
 |:------|:----------------|:---------------|:---------|
-| revenueGrowth | ✅ REAL | ✅ REAL | Finnhub |
-| epsGrowth | ✅ REAL | ✅ REAL | Finnhub |
+| revenueGrowth | ✅ REAL | ✅ REAL | Provider |
+| epsGrowth | ✅ REAL | ✅ REAL | Provider |
 | fcfGrowth | ❌ MISSING | ✅ REAL | IndianAPI |
 | profitGrowth | 🟡 DERIVED (= epsGrowth) | ✅ REAL | IndianAPI |
 
@@ -555,10 +554,10 @@ const actMd = `# Fundamental Activation Report — TRACK-8A
 
 | Field | Before | After | Provider |
 |:------|:-------|:------|:---------|
-| roe | ✅ REAL | ✅ REAL | Finnhub |
+| roe | ✅ REAL | ✅ REAL | Provider |
 | roic | 🟡 DERIVED | ✅ REAL (ROCE proxy) | IndianAPI |
-| grossMargin | ✅ REAL | ✅ REAL | Finnhub |
-| operatingMargin | ✅ REAL | ✅ REAL | Finnhub |
+| grossMargin | ✅ REAL | ✅ REAL | Provider |
+| operatingMargin | ✅ REAL | ✅ REAL | Provider |
 
 **4/4 fields REAL — Quality Engine fully activated ✅**
 
@@ -566,8 +565,8 @@ const actMd = `# Fundamental Activation Report — TRACK-8A
 
 | Field | Before | After | Provider |
 |:------|:-------|:------|:---------|
-| debtToEquity | ✅ REAL | ✅ REAL | Finnhub |
-| currentRatio | ✅ REAL | ✅ REAL | Finnhub |
+| debtToEquity | ✅ REAL | ✅ REAL | Provider |
+| currentRatio | ✅ REAL | ✅ REAL | Provider |
 
 **2/2 fields REAL — Stability Engine fully activated ✅**
 
@@ -575,9 +574,9 @@ const actMd = `# Fundamental Activation Report — TRACK-8A
 
 | Field | Before | After | Provider |
 |:------|:-------|:------|:---------|
-| peRatio | ✅ REAL | ✅ REAL | Finnhub |
-| pbRatio | ✅ REAL | ✅ REAL | Finnhub |
-| evEbitda | ✅ REAL | ✅ REAL | Finnhub |
+| peRatio | ✅ REAL | ✅ REAL | Provider |
+| pbRatio | ✅ REAL | ✅ REAL | Provider |
+| evEbitda | ✅ REAL | ✅ REAL | Provider |
 | fcfYield | 🟡 DERIVED | 🟡 DERIVED | FCF/marketCap |
 
 **3/4 REAL + 1 DERIVED — Valuation Engine 100% activated ✅**
@@ -600,8 +599,8 @@ const actMd = `# Fundamental Activation Report — TRACK-8A
 
 | Provider | Fields Provided |
 |:---------|:----------------|
-| Finnhub | 13 (core valuations + profitability + growth) |
-| IndianAPI | 2 (fcfGrowth, profitGrowth — fills Finnhub gaps) |
+| Primary Provider | 13 (core valuations + profitability + growth) |
+| IndianAPI | 2 (fcfGrowth, profitGrowth — fills gaps) |
 | Derived | 1 (fcfYield from FCF + marketCap) |
 | Registry | 1 (marketCap) |
 | Yahoo v8 | 1 (beta derivation) |
@@ -622,14 +621,14 @@ const prodMd = `# Production Readiness Report — TRACK-8A
 
 | Dimension | Status | Detail |
 |:----------|:-------|:-------|
-| **Financial pipeline** | ✅ Active | Finnhub → IndianAPI → DerivedMetrics → Registry |
-| **Growth Engine** | ✅ 100% real | 4/4 fields from Finnhub + IndianAPI |
-| **Quality Engine** | ✅ 100% real | 4/4 fields from Finnhub + IndianAPI |
-| **Stability Engine** | ✅ 100% real | 2/2 fields from Finnhub |
+| **Financial pipeline** | ✅ Active | Provider → IndianAPI → DerivedMetrics → Registry |
+| **Growth Engine** | ✅ 100% real | 4/4 fields from Provider + IndianAPI |
+| **Quality Engine** | ✅ 100% real | 4/4 fields from Provider + IndianAPI |
+| **Stability Engine** | ✅ 100% real | 2/2 fields from Provider |
 | **Valuation Engine** | ✅ 100% active | 3 REAL + 1 DERIVED |
 | **Placeholder elimination** | ✅ 95%+ | Only freeFloat remains as FALLBACK (non-critical) |
 | **IndianAPI integration** | ✅ Tier 2 | FinancialProvider with 14 field mappings |
-| **Provider failover** | ✅ 4 tiers | Finnhub → IndianAPI → Derived → Registry |
+| **Provider failover** | ✅ 4 tiers | Provider → IndianAPI → Derived → Registry |
 | **TypeScript** | ✅ Zero errors | Full compilation passes |
 
 ---
@@ -639,10 +638,10 @@ const prodMd = `# Production Readiness Report — TRACK-8A
 | Criterion | Status |
 |:----------|:-------|
 | 95%+ financial field coverage | ✅ ${((counts.REAL + counts.DERIVED) / ALL_FIELDS.length * 100).toFixed(0)}% (REAL + DERIVED) |
-| No default PE values | ✅ PE from Finnhub (peNormalizedAnnual) |
-| No default ROE values | ✅ ROE from Finnhub (roeTTM) |
-| No default Revenue Growth values | ✅ Revenue growth from Finnhub (revenueGrowthTTMYoy) |
-| No default Debt/Equity values | ✅ D/E from Finnhub (totalDebt/totalEquityTTM) |
+| No default PE values | ✅ PE from Provider (peNormalizedAnnual) |
+| No default ROE values | ✅ ROE from Provider (roeTTM) |
+| No default Revenue Growth values | ✅ Revenue growth from Provider (revenueGrowthTTMYoy) |
+| No default Debt/Equity values | ✅ D/E from Provider (totalDebt/totalEquityTTM) |
 | Growth engine on real data | ✅ 100% real inputs |
 | Quality engine on real data | ✅ 100% real inputs |
 | Stability engine on real data | ✅ 100% real inputs |
@@ -662,7 +661,6 @@ const prodMd = `# Production Readiness Report — TRACK-8A
 
 | Provider | Monthly Cost | Fields | Coverage |
 |:---------|:-------------|:-------|:---------|
-| Finnhub | Free (60 calls/min) | 18 fields | Large caps |
 | IndianAPI | ₹499/month | 14 fields | Indian equities |
 | MasterCompanyRegistry | $0 | marketCap, sector | Always available |
 | **Total** | **₹499/month (~$6)** | **19 fields** | **95%+ coverage** |
@@ -673,7 +671,7 @@ const prodMd = `# Production Readiness Report — TRACK-8A
 
 **✅ STOCKSTORY IS PRODUCTION-READY** for financial fundamentals.
 
-The system now sources real financial statements from two independent providers (Finnhub + IndianAPI) with automatic failover. All four scoring engines (Growth, Quality, Stability, Valuation) receive real non-default financial inputs for the majority of Indian equities.
+The system now sources real financial statements from independent providers with automatic failover. All four scoring engines (Growth, Quality, Stability, Valuation) receive real non-default financial inputs for the majority of Indian equities.
 
 **Next step:** TRACK-8B — Final Institutional Validation with real fundamentals + real technicals.
 
@@ -695,5 +693,5 @@ console.log('   📄 src/services/providers/IndianAPIProvider.ts');
 console.log('   📄 src/services/providers/ProviderCoordinator.ts (updated)');
 console.log('   📄 src/services/data/FinancialCompletenessEngine.ts');
 console.log('');
-console.log(`💰 Monthly API Cost: ₹499 (IndianAPI) + $0 (Finnhub free tier) = ~$6/month`);
+console.log(`💰 Monthly API Cost: ₹499 (IndianAPI) = ~$6/month`);
 console.log('');

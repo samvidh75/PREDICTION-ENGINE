@@ -27,7 +27,7 @@ function makeValidFinancialData(): FinancialData {
     roa: 0.08,
     netMargin: 0.12,
     freeFloat: 0.48,
-    _sources: { peRatio: 'upstox', eps: 'finnhub' },
+    _sources: { peRatio: 'upstox', eps: 'yfinance' },
     _fieldConfidence: { peRatio: 0.9, eps: 0.85 },
   };
 }

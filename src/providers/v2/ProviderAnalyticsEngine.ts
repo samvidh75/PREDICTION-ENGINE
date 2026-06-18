@@ -11,14 +11,12 @@ export interface ProviderAnalytics {
 
 // ScreenerProvider removed (QUARANTINED — F3 Phase 0).
 const PROVIDER_WEIGHTS: Record<string, number> = {
-  FinnhubProvider: 0.85,
   UpstoxFundamentalsProvider: 0.90,
   YahooProvider: 0.95,
   DerivedMetricsEngine: 0.80,
 };
 
 const PROVIDER_COST: Record<string, string> = {
-  FinnhubProvider: 'Free tier',
   UpstoxFundamentalsProvider: 'Live (Upstox API)',
   YahooProvider: 'Free',
   DerivedMetricsEngine: 'Internal (compute)',

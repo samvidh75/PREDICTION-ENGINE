@@ -34,7 +34,7 @@ export interface IngestionResult {
 
 /**
  * Fetch raw statements from a provider. This interface can be implemented
- * by FinnhubProvider, UpstoxFundamentalsProvider, or any other provider.
+ * by UpstoxFundamentalsProvider or any other provider.
  */
 export interface StatementProvider {
   name: string;

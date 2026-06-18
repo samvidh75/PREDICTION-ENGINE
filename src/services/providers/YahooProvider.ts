@@ -2,7 +2,7 @@
 // Production Yahoo Finance provider — real HTTP requests, no mocks.
 // As of June 2026: Yahoo v10 quoteSummary returns 401 (blocked).
 // Yahoo v8 chart API works for price/volume data.
-// Fundamentals (PE, ROE, D/E, etc.) must come from Finnhub or other providers.
+// Fundamentals (PE, ROE, D/E, etc.) must come from other providers.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -59,7 +59,7 @@ export function marketTimestampFromEpoch(value: unknown): string | undefined {
  *   - beta (from 2Y price history)
  *   - marketCap approximation (price * avg volume — unreliable, prefer Registry)
  *
- * For real fundamentals, use FinnhubProvider or other financial providers.
+ * For real fundamentals, use UpstoxFundamentalsProvider or other financial providers.
  */
 export interface YahooFinancials {
   symbol: string;
@@ -94,7 +94,7 @@ export interface YahooFinancials {
  * Uses Yahoo Finance v8 chart API (public, no key required).
  *
  * Financial fundamentals are NOT available via v8.
- * ProviderCoordinator routes getFinancials() to Finnhub first.
+ * ProviderCoordinator routes getFinancials() to configured providers.
  */
 export class YahooProvider implements PriceProvider, MetadataProvider, HistoricalProvider, FinancialProvider {
 
@@ -254,9 +254,9 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     }
 
     // v10 quoteSummary is blocked (401). v8 chart has no fundamental fields.
-    // Return what we can derive from v8; throw so ProviderCoordinator tries Finnhub.
+    // Return what we can derive from v8; throw so ProviderCoordinator tries next provider.
     throw new Error(
-      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use Finnhub for fundamentals. (symbol=${cleanSym}, beta=${beta?.toFixed(2) ?? 'N/A'})`,
+      `Yahoo Financials: v10 quoteSummary blocked (401). v8 chart API has no PE/ROE/D/E data. Use a financial data provider for fundamentals. (symbol=${cleanSym}, beta=${beta?.toFixed(2) ?? 'N/A'})`,
     );
   }
 }

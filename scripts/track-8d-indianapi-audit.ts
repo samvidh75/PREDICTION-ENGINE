@@ -379,7 +379,7 @@ async function main() {
     report += '### Recommendation:\n';
     report += '- Remove IndianAPIProvider from the financial chain\n';
     report += '- Focus on Upstox Fundamentals API (launched May 2026) as the primary Indian equity source\n';
-    report += '- Or acquire Finnhub premium key ($89/mo)\n';
+    report += '- Or acquire a premium financial data key\n';
   }
 
   report += '\n---\n\n';

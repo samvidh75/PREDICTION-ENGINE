@@ -4,7 +4,7 @@
 
 ## Overview
 
-StockStory India uses only public, no-credential, free Indian-market data providers. No broker credentials (Dhan, Upstox) or paid API keys (Finnhub) are required for core app functionality. All providers are accessible via Python packages or direct REST API calls.
+StockStory India uses only public, no-credential, free Indian-market data providers. No broker credentials (Dhan, Upstox) or paid API keys are required for core app functionality. All providers are accessible via Python packages or direct REST API calls.
 
 ## Provider Precedence by Domain
 

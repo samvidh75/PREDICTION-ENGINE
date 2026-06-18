@@ -192,8 +192,8 @@ async function main(): Promise<void> {
         }
       }
 
-      // No active Dhan/Upstox/Finnhub
-      const forbidden = ["dhan", "upstox", "finnhub"];
+      // No active Dhan/Upstox
+      const forbidden = ["dhan", "upstox"];
       const keys = Object.keys(provs).map((k) => k.toLowerCase());
       const found = forbidden.filter((f) => keys.some((k) => k.includes(f)));
       // Also check the body for any references
@@ -256,7 +256,7 @@ async function main(): Promise<void> {
         continue;
       }
       const keys = Object.keys(provs);
-      const forbidden = ["FINNHUB_KEY", "DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
+      const forbidden = ["DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
       const found = forbidden.filter((k) => keys.includes(k));
       if (found.length > 0) {
         results.push({ name: label, status: "fail", detail: `deprecated: ${found.join(", ")}` });

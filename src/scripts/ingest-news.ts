@@ -3,7 +3,7 @@
 // DEPRECATED — This script was originally a data-seeding helper that inserted
 // hardcoded/hypothetical news articles with fake URLs. The runtime news
 // pipeline now uses DataAcquisitionCoordinator.fetchNews() which pulls real
-// articles from Finnhub (Tier 1) → GoogleNewsRSS (Tier 2) at request time.
+// articles from Yahoo News (Tier 1) → GoogleNewsRSS (Tier 2) at request time.
 //
 // Keep this stub for backwards compat; no-op in production.
 // Remove entirely once all consumers switch to the runtime pipeline.

@@ -21,8 +21,6 @@ export interface AppEnv {
   postgres?: {
     connectionString: string;
   };
-  /** @deprecated Finnhub removed from active pipeline — kept for historical reference */
-  finnhubKey?: string;
   indianApiKey?: string;
   redisUrl?: string;
 }
@@ -60,7 +58,6 @@ export function loadEnv(): AppEnv {
     postgres: process.env.DATABASE_URL
       ? { connectionString: process.env.DATABASE_URL }
       : undefined,
-    finnhubKey: process.env.FINNHUB_KEY ?? process.env.FINNHUB_API_KEY,
     indianApiKey: process.env.INDIANAPI_KEY,
     redisUrl: process.env.REDIS_URL,
   };

@@ -17,7 +17,6 @@ import { errBudgetExhausted, errRateLimited } from './ProviderBrokerErrors';
  * These are broker safety rails, not authoritative vendor limits.
  */
 export const DEFAULT_BUDGETS: Record<string, ProviderBudgetConfig> = {
-  finnhub: { provider: 'finnhub', perMinute: 60, perDay: 500, burst: 10, maxConcurrent: 5, cooldownMs: 60_000 },
   indianapi: { provider: 'indianapi', perMinute: 120, perDay: 1000, burst: 15, maxConcurrent: 5, cooldownMs: 30_000 },
   upstox: { provider: 'upstox', perMinute: 30, perDay: 500, burst: 5, maxConcurrent: 3, cooldownMs: 60_000 },
   yahoo: { provider: 'yahoo', perMinute: 100, perDay: 2000, burst: 20, maxConcurrent: 10, cooldownMs: 30_000 },

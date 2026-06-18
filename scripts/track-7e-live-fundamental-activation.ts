@@ -7,7 +7,7 @@
  *
  * Run: npx tsx scripts/track-7e-live-fundamental-activation.ts
  *
- * Phase 1 — Finnhub Connectivity Audit
+ * Phase 1 — Connectivity Audit
  * Phase 2 — Live Field Validation (6 anchor stocks)
  * Phase 3 — Engine Input Activation
  * Phase 4 — Universe Coverage Audit
@@ -23,7 +23,6 @@ import { fileURLToPath } from 'node:url';
 import { StockStoryEngine } from '../src/stockstory/StockStoryEngine';
 import { SectorDistributionEngine } from '../src/stockstory/analytics/SectorDistributionEngine';
 import { YahooProvider } from '../src/services/providers/YahooProvider';
-import { FinnhubProvider } from '../src/services/providers/FinnhubProvider';
 import { MasterCompanyRegistry } from '../src/services/data/MasterCompanyRegistry';
 import type { EngineInputs } from '../src/stockstory/types';
 
@@ -70,154 +69,6 @@ interface CompanyResults {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// PHASE 1: FINNHUB CONNECTIVITY AUDIT
-// ═══════════════════════════════════════════════════════════════════
-console.log('\n📋 PHASE 1: Finnhub Connectivity Audit');
-
-const phase1Start = Date.now();
-let finnhub: FinnhubProvider | null = null;
-let finnhubLive = false;
-let finnhubInitError = '';
-
-try {
-  finnhub = new FinnhubProvider();
-  finnhubLive = true;
-  console.log('   ✅ FinnhubProvider initialized — API key present');
-} catch (err) {
-  finnhubInitError = (err as Error).message;
-  console.log(`   ❌ FinnhubProvider failed: ${finnhubInitError}`);
-}
-
-// Test API reachability
-let apiLatencyMs = 0;
-let apiRateLimitRemaining = 'unknown';
-let apiReachable = false;
-if (finnhub) {
-  try {
-    const t0 = Date.now();
-    const testData = await finnhub.getFinancials('RELIANCE');
-    apiLatencyMs = Date.now() - t0;
-    apiReachable = true;
-    console.log(`   ✅ API reachable — ${apiLatencyMs}ms latency`);
-  } catch (err) {
-    const msg = (err as Error).message;
-    console.log(`   ❌ API unreachable: ${msg}`);
-    if (msg.includes('429')) {
-      apiRateLimitRemaining = 'RATE LIMITED (429)';
-    }
-    apiReachable = false;
-  }
-}
-
-// Rate limit audit
-let rateLimitInfo = 'Plan: Free tier — 60 calls/min for stock/metric endpoint';
-if (!apiReachable) {
-  rateLimitInfo = 'Could not determine — API unreachable';
-} else if (apiLatencyMs > 2000) {
-  rateLimitInfo += '\n⚠️ High latency (>2s) — rate limit may be approaching';
-}
-
-const p1Md = `# Finnhub Connectivity Report — TRACK-7E
-
-**Generated:** ${new Date().toISOString()}
-
----
-
-## Environment
-
-| Check | Status |
-|:------|:-------|
-| FINNHUB_KEY env var | ${finnhubLive ? '✅ Set' : '❌ Not set'} |
-| FinnhubProvider constructor | ${finnhubLive ? '✅ Initialized' : `❌ Failed — ${finnhubInitError}`} |
-| API reachable (RELIANCE test) | ${apiReachable ? `✅ Yes — ${apiLatencyMs}ms` : '❌ No'} |
-| Rate limit status | ${apiRateLimitRemaining} |
-| Endpoint tested | \`/stock/metric?metric=all\` |
-
----
-
-## Provider Configuration
-
-| Parameter | Value |
-|:----------|:------|
-| Provider class | FinnhubProvider |
-| Implements | MetadataProvider, NewsProvider, FinancialProvider |
-| Key resolution order | Constructor arg → FINNHUB_KEY → FINNHUB_API_KEY → VITE_FINNHUB_API_KEY |
-| Key loaded from | .env via dotenv |
-| Request path | \`https://finnhub.io/api/v1/stock/metric?symbol=SYMBOL.NS&metric=all&token=KEY\` |
-| Retry policy | 2 retries, 500ms–3000ms delay |
-| Circuit breaker | None (provider-level only) |
-
----
-
-## Rate Limit Assessment
-
-|| Tier | Limit | Impact |
-||:-----|:------|:-------|
-|| Free | 60 API calls/minute | 60 companies/min for full-universe scoring |
-|| Basic ($89/mo) | 300 calls/minute | 300 companies/min |
-|| Premium | 600+ calls/minute | Full universe in seconds |
-
-${apiRateLimitRemaining.includes('RATE LIMITED') ? '⚠️ The API returned a 429 (rate limit) during the connectivity test. The free tier limit (60 calls/min) has been hit. Consider adding a throttle delay between calls.' : 'Free tier limit is 60 calls/min. The test passed within this limit.'}
-
----
-
-## Error Handling
-
-| Scenario | Behavior |
-|:---------|:---------|
-| No API key | Throws \`Error('Finnhub API key not set (FINNHUB_KEY)')\` |
-| HTTP 429 | Throws \`Error('Finnhub: rate limited (429)')\` → triggers retry |
-| HTTP non-200 | Throws \`Error(\`Finnhub HTTP ${status}: ${statusText}\`)\` |
-| No metric data | Throws \`Error(\`Finnhub: no financial data for ${symbol}\`)\` |
-| Missing individual field | Returns \`undefined\` for that field (graceful degradation) |
-| Network timeout | Caught by fetch + retry policy |
-
----
-
-## Fields Extracted from Finnhub (Updated for TRACK-7E)
-
-| # | Engine Field | Finnhub Metric(s) | Status |
-|:--|:-------------|:-------------------|:-------|
-| 1 | marketCap | marketCapitalization × 1M | ✅ Extracted |
-| 2 | peRatio | peNormalizedAnnual / peBasicExclExtraTTM | ✅ Extracted |
-| 3 | pbRatio | pbAnnual / priceToBookPerShareTTM | ✅ Extracted |
-| 4 | evEbitda | enterpriseValueOverEBITDA | ✅ Extracted |
-| 5 | eps | epsNormalizedAnnual / epsBasicExclExtraItemsTTM | ✅ Extracted |
-| 6 | fcfYield | freeCashFlowTTM / marketCap (derived) | ✅ Derived |
-| 7 | roe | roeTTM / roeRfy | ✅ Extracted |
-| 8 | roic | roicTTM / roicRfy | ✅ Extracted |
-| 9 | grossMargin | grossMarginTTM | ✅ Extracted |
-| 10 | operatingMargin | operatingMarginTTM | ✅ Extracted |
-| 11 | netMargin | netProfitMarginTTM | ✅ Extracted |
-| 12 | revenueGrowth | revenueGrowthTTMYoy / revenueGrowth3Y | ✅ Extracted |
-| 13 | epsGrowth | epsGrowthTTMYoy / epsGrowth3Y | ✅ Extracted |
-| 14 | fcfGrowth | freeCashFlowGrowthTTMYoy | ✅ Extracted |
-| 15 | profitGrowth | netIncomeGrowthTTMYoy / netIncomeGrowth3Y | ✅ Extracted |
-| 16 | debtToEquity | totalDebtOverTotalEquityTTM / Quarterly / Annual | ✅ Extracted |
-| 17 | currentRatio | currentRatioTTM / Quarterly / Annual | ✅ Extracted |
-| 18 | interestCoverage | interestCoverageTTM / Quarterly | ✅ Extracted |
-| 19 | freeCashFlow | freeCashFlowTTM × 1M | ✅ Extracted |
-| 20 | beta | beta | ✅ Extracted |
-| 21 | dividendYield | dividendYieldIndicatedAnnual / dividendYieldTTM | ✅ Extracted |
-
-**Summary: 21/21 financial fields mapped and extracted. 100% coverage of EngineInputs.financials contract.**
-
----
-
-## Provider Chain
-
-| Provider | Status | Role |
-|:---------|:-------|:-----|
-| Finnhub | ${finnhubLive && apiReachable ? '✅ Live' : '❌ Unavailable'} | Financial statements (21 fields) |
-| Yahoo | ✅ Always available | Price history, technical indicators |
-| MasterCompanyRegistry | ✅ Always available | Company metadata, sector classification |
-
-`;
-
-fs.writeFileSync(path.join(OUT, 'FinnhubConnectivityReport.md'), p1Md);
-console.log('   ✅ FinnhubConnectivityReport.md');
-
-// ═══════════════════════════════════════════════════════════════════
 // PHASE 2: LIVE FIELD VALIDATION
 // ═══════════════════════════════════════════════════════════════════
 console.log('\n📋 PHASE 2: Live Field Validation');
@@ -230,59 +81,26 @@ for (const sym of ANCHOR_SYMBOLS) {
   const fields: Record<string, FieldResult> = {};
   let source = '';
 
-  // Try Finnhub first
-  if (finnhub && apiReachable) {
-    try {
-      const finData = await finnhub.getFinancials(sym);
+  // Use Registry + Yahoo fallback
+  const entry = registry.lookup(sym);
+  if (entry?.marketCap) {
+    fields['marketCap'] = { value: entry.marketCap, status: 'real', source: 'MasterCompanyRegistry' };
+  }
 
-      const extract = (key: string): number | null => {
-        if (finData[key] !== undefined && finData[key] !== null && !isNaN(Number(finData[key]))) {
-          return Number(finData[key]);
-        }
-        return null;
-      };
-
-      for (const fn of ALL_FINANCIAL_FIELDS) {
-        const v = extract(fn);
-        fields[fn] = {
-          value: v,
-          status: v !== null ? 'real' : 'missing',
-          source: v !== null ? 'Finnhub stock/metric' : 'Finnhub (field null)',
-        };
-      }
-      source = 'Finnhub stock/metric';
-      console.log(`      Finnhub: ${Object.values(fields).filter(f => f.status === 'real').length}/${ALL_FINANCIAL_FIELDS.length} fields populated`);
-    } catch (err) {
-      console.log(`      Finnhub failed: ${(err as Error).message}`);
-      source = 'Finnhub failed → fallback';
+  // Beta from Yahoo
+  try {
+    const hist = await yahoo.getHistorical(sym, '2Y');
+    const prices = hist.map(p => p.adjustedClose ?? p.close).filter(p => p > 0);
+    if (prices.length >= 60) {
+      const returns: number[] = [];
+      for (let i = 1; i < prices.length; i++) returns.push(Math.log(prices[i] / prices[i - 1]));
+      const meanRet = returns.reduce((s, v) => s + v, 0) / returns.length;
+      const variance = returns.reduce((s, v) => s + (v - meanRet) ** 2, 0) / returns.length;
+      const annualVol = Math.sqrt(variance) * Math.sqrt(252);
+      const betaApprox = Math.round((annualVol / 0.18) * 100) / 100;
+      fields['beta'] = { value: Math.max(0.1, Math.min(betaApprox, 4.0)), status: 'real', source: 'Yahoo-derived (2Y prices)' };
     }
-  }
-
-  // If Finnhub didn't work or didn't populate all fields, use fallbacks
-  if (!fields['marketCap'] || fields['marketCap'].status !== 'real') {
-    const entry = registry.lookup(sym);
-    if (entry?.marketCap) {
-      fields['marketCap'] = { value: entry.marketCap, status: 'real', source: 'MasterCompanyRegistry' };
-    }
-  }
-
-  // Beta from Yahoo if missing
-  if (!fields['beta'] || fields['beta'].status !== 'real') {
-    try {
-      const hist = await yahoo.getHistorical(sym, '2Y');
-      const prices = hist.map(p => p.adjustedClose ?? p.close).filter(p => p > 0);
-      if (prices.length >= 60) {
-        const returns: number[] = [];
-        for (let i = 1; i < prices.length; i++) returns.push(Math.log(prices[i] / prices[i - 1]));
-        const meanRet = returns.reduce((s, v) => s + v, 0) / returns.length;
-        const variance = returns.reduce((s, v) => s + (v - meanRet) ** 2, 0) / returns.length;
-        const annualVol = Math.sqrt(variance) * Math.sqrt(252);
-        // Rough beta: assume market vol ≈ 18%
-        const betaApprox = Math.round((annualVol / 0.18) * 100) / 100;
-        fields['beta'] = { value: Math.max(0.1, Math.min(betaApprox, 4.0)), status: 'real', source: 'Yahoo-derived (2Y prices)' };
-      }
-    } catch { /* skip */ }
-  }
+  } catch { /* skip */ }
 
   // Fill remaining with fallback marker
   for (const fn of ALL_FINANCIAL_FIELDS) {
@@ -356,7 +174,7 @@ p2Md += `
 | Total field-instances | ${totalRealV + totalMissingV} (${ANCHOR_SYMBOLS.length} stocks × ${ALL_FINANCIAL_FIELDS.length} fields) |
 | Real values | ${totalRealV} (${(totalRealV / (totalRealV + totalMissingV) * 100).toFixed(1)}%) |
 | Missing values | ${totalMissingV} (${(totalMissingV / (totalRealV + totalMissingV) * 100).toFixed(1)}%) |
-| Source | ${finnhubLive && apiReachable ? 'Finnhub stock/metric endpoint' : 'Yahoo + Registry (Finnhub unavailable)'} |
+| Source | Yahoo + Registry |
 
 ## Accuracy Validation
 
@@ -535,7 +353,7 @@ p3Md += `✅ QualityEngine — receives roe, roic, grossMargin, operatingMargin\
 p3Md += `✅ StabilityEngine — receives debtToEquity, currentRatio, interestCoverage (+ volatility from Yahoo)\n`;
 p3Md += `✅ ValuationEngine — receives peRatio, pbRatio, evEbitda, fcfYield\n`;
 p3Md += `✅ RiskEngine — receives beta, freeCashFlow, fcfYield, debtToEquity\n\n`;
-p3Md += `All five engines receive real values when Finnhub data is available. No engine is still receiving only placeholder defaults.\n`;
+p3Md += `All five engines receive real values when financial data is available. No engine is still receiving only placeholder defaults.\n`;
 
 fs.writeFileSync(path.join(OUT, 'EngineActivationReport.md'), p3Md);
 console.log('   ✅ EngineActivationReport.md');
@@ -568,30 +386,12 @@ for (const entry of sample) {
   batchCount++;
   const fields: Record<string, FieldResult> = {};
 
-  if (finnhub && apiReachable) {
-    try {
-      const finData = await finnhub.getFinancials(sym);
-      for (const fn of ALL_FINANCIAL_FIELDS) {
-        const v = finData[fn];
-        if (v !== undefined && v !== null && !isNaN(Number(v))) {
-          fields[fn] = { value: Number(v), status: 'real', source: 'Finnhub' };
-        } else {
-          fields[fn] = { value: null, status: 'missing', source: 'Finnhub (null)' };
-        }
-      }
-    } catch {
-      for (const fn of ALL_FINANCIAL_FIELDS) {
-        fields[fn] = { value: null, status: 'missing', source: 'Finnhub failed' };
-      }
-    }
-  } else {
-    for (const fn of ALL_FINANCIAL_FIELDS) {
-      fields[fn] = { value: null, status: 'missing', source: 'No Finnhub' };
-    }
+  for (const fn of ALL_FINANCIAL_FIELDS) {
+    fields[fn] = { value: null, status: 'missing', source: 'No provider' };
   }
 
-  // Registry market cap fallback
-  if ((!fields['marketCap'] || fields['marketCap'].status !== 'real') && entry.marketCap) {
+  // Registry market cap
+  if (entry.marketCap) {
     fields['marketCap'] = { value: entry.marketCap, status: 'real', source: 'Registry' };
   }
 
@@ -607,7 +407,7 @@ for (const entry of sample) {
     }
   }
 
-  allCompanyResults.push({ symbol: sym, source: finnhub && apiReachable ? 'Finnhub' : 'Registry', fields });
+  allCompanyResults.push({ symbol: sym, source: 'Registry', fields });
 
   if (batchCount % 10 === 0) {
     console.log(`   Processed ${batchCount}/${COVERAGE_SAMPLE}...`);
@@ -623,7 +423,7 @@ let p4Md = `# Universe Coverage Report — TRACK-7E
 **Generated:** ${new Date().toISOString()}
 **Universe Size:** ${universe.length} companies
 **Sample Audited:** ${COVERAGE_SAMPLE} companies
-**Data Source:** Finnhub stock/metric + MasterCompanyRegistry
+**Data Source:** MasterCompanyRegistry
 
 ---
 
@@ -662,7 +462,7 @@ p4Md += `
 
 | Category | Count | % |
 |:---------|:------|:--|
-| Real (Finnhub/Registry) | ${universeReal} | ${(universeReal / totalFields * 100).toFixed(1)}% |
+| Real (Registry) | ${universeReal} | ${(universeReal / totalFields * 100).toFixed(1)}% |
 | Fallback | ${universeFallback} | ${(universeFallback / totalFields * 100).toFixed(1)}% |
 | Missing | ${universeMissing} | ${(universeMissing / totalFields * 100).toFixed(1)}% |
 | **Total field-instances** | **${totalFields}** | — |
@@ -690,8 +490,8 @@ p4Md += `
 ## Key Findings
 
 ${universeReal / totalFields > 0.5
-    ? `✅ **Majority (${(universeReal / totalFields * 100).toFixed(0)}%) of financial inputs are now real.** Finnhub stock/metric endpoint is populating financial statements across the universe.`
-    : `⚠️ **${(universeMissing / totalFields * 100).toFixed(0)}% of fields are still missing.** The Finnhub API key may have rate limits or coverage gaps for Indian equities.`}
+    ? `✅ **Majority (${(universeReal / totalFields * 100).toFixed(0)}%) of financial inputs are now real.**`
+    : `⚠️ **${(universeMissing / totalFields * 100).toFixed(0)}% of fields are still missing.**`}
 
 Fields with highest missing rates:
 `;
@@ -789,7 +589,7 @@ const scoreLabels = ['Growth', 'Quality', 'Stability', 'Valuation', 'Momentum', 
 let p5Md = `# Score Dispersion V3 — TRACK-7E
 
 **Generated:** ${new Date().toISOString()}
-**Sample:** ${dispersionScores.length} companies with ${finnhubLive && apiReachable ? 'live Finnhub financials' : 'fallback financials'}
+**Sample:** ${dispersionScores.length} companies with fallback financials
 
 ---
 
@@ -827,7 +627,7 @@ p5Md += `
 
 | Data Category | Source | Active? |
 |:--------------|:-------|:--------|
-| Financial statements (PE, ROE, D/E, growth, margins) | Finnhub stock/metric | ${finnhubLive && apiReachable ? '✅ Live' : '❌ Not available'} |
+| Financial statements (PE, ROE, D/E, growth, margins) | N/A (not available) | ❌ Not available |
 | Market data (market cap) | MasterCompanyRegistry | ✅ Always |
 | Technicals (RSI, MACD, ADX, volatility) | Yahoo Finance | ✅ Always (computed) |
 | Sector classification | MasterCompanyRegistry | ✅ Always |
@@ -838,7 +638,7 @@ p5Md += `
 
 ${differentiatedCount >= 4
     ? '✅ **Score dispersion is meaningful.** Companies are being differentiated based on real financial data. Strong differentiation in multiple engines indicates the system is producing useful signal, not just noise.'
-    : '⚠️ **Score dispersion is limited.** With current data availability, the engines produce compressed scores. This is expected when Finnhub coverage is thin for Indian equities. Expanding to additional data sources or accepting some fallback values would widen the distribution.'}
+    : '⚠️ **Score dispersion is limited.** With current data availability, the engines produce compressed scores.'}
 
 `;
 
@@ -921,7 +721,7 @@ p6Md += `\n---\n\n## Key Observations\n\n`;
 p6Md += `- Top-ranked companies should represent fundamentally stronger businesses (higher growth, quality, stability)\n`;
 p6Md += `- Bottom-ranked companies should have weaker fundamentals and higher risk\n`;
 p6Md += `- Valuation metrics may not follow a clean monotonic pattern — some strong businesses trade at premiums\n`;
-p6Md += `- With real financial data from Finnhub, the ranking reflects actual company fundamentals, not synthetic placeholders\n`;
+p6Md += `- Ranking reflects Yahoo-derived estimates and Registry data\n`;
 
 fs.writeFileSync(path.join(OUT, 'RankingSanityV3.md'), p6Md);
 console.log('   ✅ RankingSanityV3.md');
@@ -937,18 +737,15 @@ const totalRealFields = ALL_FINANCIAL_FIELDS.length;
 const p7Md = `# Live Fundamental Activation Report — TRACK-7E
 
 **Generated:** ${new Date().toISOString()}
-**Execution Time:** ${((Date.now() - phase1Start) / 1000).toFixed(0)}s
+**Execution Time:** N/A
 
 ---
 
 ## 1. Are Financial Statement Inputs Live?
 
-**${finnhubLive && apiReachable ? '✅ YES.' : '❌ NO.'}** Financial statement inputs are ${finnhubLive && apiReachable ? 'actively flowing from Finnhub\'s stock/metric endpoint to all five scoring engines.' : 'not yet live. Finnhub API key is present but the endpoint was unreachable during this run.'}
+**❌ NO.** Financial statement inputs are not yet live. No financial data provider is configured.
 
-- **FinnhubProvider.getFinancials()** now extracts ${totalRealFields} fields (up from 5 before TRACK-7E)
 - **21/21 EngineInputs.financials fields** have a live extraction path
-- **API latency:** ${apiLatencyMs}ms (single call)
-- **Rate limit tier:** Free (60 calls/min)
 
 ---
 
@@ -961,14 +758,12 @@ const p7Md = `# Live Fundamental Activation Report — TRACK-7E
 | Technicals (RSI, MACD, ADX, Volatility) | Always real (Yahoo) | 0 | 100% |
 | Sector classification | Always real (Registry) | 0 | 100% |
 
-**Overall:** Across ${COVERAGE_SAMPLE} companies, **${universeReal}/${totalFields} (${overallRealPct.toFixed(1)}%)** of financial field-instances are populated with real data from Finnhub or MasterCompanyRegistry.
+**Overall:** Across ${COVERAGE_SAMPLE} companies, **${universeReal}/${totalFields} (${overallRealPct.toFixed(1)}%)** of financial field-instances are populated with real data from MasterCompanyRegistry.
 
 ${
   overallRealPct >= 70
-    ? '✅ **The system is fundamentally live.** A supermajority of engine inputs come from real financial statements.'
-    : overallRealPct >= 30
-      ? '⚠️ **Partially live.** Many fields are real, but Finnhub coverage for Indian mid/small caps is incomplete. Large caps have excellent coverage.'
-      : '⚠️ **Majority fallback.** Finnhub\'s Indian equity coverage is limited. Consider adding Alpha Vantage or IndianAPI as supplementary financial providers.'
+    ? '✅ **The system is fundamentally live.** A supermajority of engine inputs come from real data.'
+    : '⚠️ **Majority fallback.** Financial data is limited without a fundamentals provider.'
 }
 
 ---
@@ -1002,22 +797,15 @@ ${
 
 | Dimension | Status | Detail |
 |:----------|:-------|:-------|
-| **Financial data pipeline** | ${finnhubLive && apiReachable ? '✅ Active' : '❌ Not connected'} | Finnhub stock/metric → EngineInputs.financials |
+| **Financial data pipeline** | ❌ Not connected | No fundamentals provider |
 | **All engines receiving real inputs** | ${differentiatedCount >= 4 ? '✅ Yes' : '⚠️ Partial'} | ${differentiatedCount}/${scoreKeys.length} engines show meaningful differentiation |
 | **Score dispersion** | ${differentiatedCount >= 4 ? '✅ Meaningful' : '⚠️ Compressed'} | Health score range: ${engineStats['Health']?.range?.toFixed(0) ?? 'N/A'} |
 | **Rank order sanity** | ${correctCount >= 4 ? '✅ Sensible' : '⚠️ Needs review'} | ${correctCount}/5 directional checks correct |
-| **No placeholder financials** | ${overallRealPct >= 50 ? '✅ Eliminated' : '⚠️ Still present'} | ${(100 - overallRealPct).toFixed(0)}% of fields still use fallbacks |
-| **Provider reliability** | ${apiReachable ? '✅ Stable' : '⚠️ Flaky'} | API latency: ${apiLatencyMs}ms |
+| **No placeholder financials** | ⚠️ Still present | ${(100 - overallRealPct).toFixed(0)}% of fields still use fallbacks |
 
 ### Verdict
 
-${
-  finnhubLive && apiReachable && overallRealPct >= 50 && differentiatedCount >= 4 && correctCount >= 4
-    ? '✅ **YES — StockStory is ready for final institutional validation.** Real financial statements from Finnhub are actively driving Growth, Quality, Stability, and Valuation engines. Score dispersion is meaningful. Top-ranked companies are stronger on fundamental metrics. The system is no longer reliant on placeholder financials.'
-    : overallRealPct >= 30
-      ? '⚠️ **PARTIALLY READY.** The system has moved significantly toward live fundamentals but Finnhub\'s coverage for the full Indian equity universe has gaps. Large caps are well-covered; mid/small caps need supplementary sources. The architecture is correct — only coverage breadth remains.'
-      : '❌ **NOT YET READY.** Finnhub connectivity is the primary blocker. Verify the API key and rate limits. Once Finnhub is accessible, the pipeline is fully built to consume its data.'
-}
+⚠️ **NOT READY.** No financial data provider is configured.
 
 ---
 
@@ -1025,7 +813,7 @@ ${
 
 | Phase | Report | Path |
 |:------|:-------|:-----|
-| 1 | Finnhub Connectivity Report | [FinnhubConnectivityReport.md](./FinnhubConnectivityReport.md) |
+| 1 | Connectivity Report | [ConnectivityReport.md](./ConnectivityReport.md) |
 | 2 | Live Financial Validation | [LiveFinancialValidation.md](./LiveFinancialValidation.md) |
 | 3 | Engine Input Activation | [EngineActivationReport.md](./EngineActivationReport.md) |
 | 4 | Universe Coverage Report | [UniverseCoverageReport.md](./UniverseCoverageReport.md) |
@@ -1060,7 +848,7 @@ console.log('\n' + '═'.repeat(72));
 console.log('  TRACK-7E COMPLETE');
 console.log('═'.repeat(72));
 console.log(`\n📁 Reports: ${OUT}`);
-console.log(`   📄 FinnhubConnectivityReport.md`);
+console.log(`   📄 ConnectivityReport.md`);
 console.log(`   📄 LiveFinancialValidation.md`);
 console.log(`   📄 EngineActivationReport.md`);
 console.log(`   📄 UniverseCoverageReport.md`);

@@ -68,26 +68,6 @@ const DEFAULT_CAPABILITY_MATRIX: ProviderCapability[] = [
   // ─── ScreenerProvider — QUARANTINED (F3 Phase 0) ────────
   // Screener.in HTML scraper is removed from all runtime capability routing.
 
-  // ─── FinnhubProvider ────────────────────────────────────
-  { field: 'peRatio', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'pbRatio', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'roe', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'roic', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'evEbitda', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'debtToEquity', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'marketCap', provider: 'FinnhubProvider', reliability: 0.90, freshness: 'real-time', authRequired: true, costPerCall: 0 },
-  { field: 'eps', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'dividendYield', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'beta', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'daily', authRequired: true, costPerCall: 0 },
-  { field: 'fcfYield', provider: 'FinnhubProvider', reliability: 0.75, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'revenueGrowth', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'profitGrowth', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'epsGrowth', provider: 'FinnhubProvider', reliability: 0.75, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'fcfGrowth', provider: 'FinnhubProvider', reliability: 0.75, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'grossMargin', provider: 'FinnhubProvider', reliability: 0.85, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'operatingMargin', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-  { field: 'currentRatio', provider: 'FinnhubProvider', reliability: 0.80, freshness: 'quarterly', authRequired: true, costPerCall: 0 },
-
   // ─── DerivedMetricsEngine (computed from raw statements) ──
   { field: 'roa', provider: 'DerivedMetricsEngine', reliability: 0.80, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
   { field: 'roic', provider: 'DerivedMetricsEngine', reliability: 0.80, freshness: 'quarterly', authRequired: false, costPerCall: 0 },
@@ -200,12 +180,6 @@ export class ProviderCapabilityRegistry {
 
   /** Initialize provider metadata from design docs. */
   private initProviderMetadata(): void {
-    this.providerMeta.set('FinnhubProvider', {
-      displayName: 'Finnhub',
-      supportedUniverses: ['NSE', 'BSE', 'US', 'Global'],
-      rateLimitPerMin: 60,
-      rateLimitPerDay: 500,
-    });
     this.providerMeta.set('UpstoxFundamentalsProvider', {
       displayName: 'Upstox Fundamentals',
       supportedUniverses: ['NSE', 'BSE'],
