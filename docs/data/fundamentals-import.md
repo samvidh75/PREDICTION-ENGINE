@@ -2,7 +2,7 @@
 
 ## Overview
 
-Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **operator-provided data imports**. Broker APIs (Dhan, Upstox) do **not** provide fundamentals.
+Fundamentals (financial statements, ratios, company data) for StockStory India are sourced through **operator-provided data imports**. Public NSE providers (nselib, nsepython) could not reliably provide structured financial results — nselib requires Python 3.10+, and nsepython's `nse_results()` returns no data.
 
 ## Data Sources
 
@@ -12,8 +12,8 @@ Fundamentals (financial statements, ratios, company data) for StockStory India a
 | Screener.in export              | Optional | Permitted   |
 | Moneycontrol export             | Optional | Permitted   |
 | BSE/NSE official filings parser | Planned  | Not built   |
-| Dhan API                        | N/A      | Unavailable |
-| Upstox API                      | N/A      | Unavailable |
+| nselib financial_results       | N/A      | Requires Python 3.10+ (unavailable) |
+| nsepython nse_results          | N/A      | Returns no data |
 
 ## Import Pipeline
 
@@ -45,10 +45,11 @@ The `financial_snapshots` table stores:
 - Symbols with imported fundamentals show real values with source labels.
 - Symbols without fundamentals show `awaiting fundamentals import`.
 - No fake or estimated fundamentals are shown.
+- Public NSE providers (nselib, nsepython) do not provide fundamentals on current infrastructure.
 - Broker APIs do not populate fundamentals fields.
 
 ## Limitations
 
-- Dhan and Upstox are market-data/broker APIs only.
-- They do not return financial statements, balance sheets, income statements, or derived ratios.
-- Fundamentals must be supplied via operator export or trusted third-party source.
+- nselib (`financial_results_for_equity`) requires Python 3.10+ (current: 3.9.6)
+- nsepython (`nse_results()`) returns no data — NSE API restrictions
+- Fundamentals must be supplied via operator export or trusted third-party source

@@ -7,14 +7,18 @@ afterEach(() => {
 
 describe('ProviderBroker', () => {
   describe('fallback precedence', () => {
-    it('quotePrecedence is in correct order', () => {
+    it('quotePrecedence is in correct order — no broker credentials required', () => {
       const broker = new ProviderBroker();
-      expect(broker.quotePrecedence).toEqual(['dhan', 'upstox', 'indianapi', 'yahoo']);
+      expect(broker.quotePrecedence).toEqual(['indianapi', 'yahoo']);
+      expect(broker.quotePrecedence).not.toContain('dhan');
+      expect(broker.quotePrecedence).not.toContain('upstox');
     });
 
-    it('historicalPrecedence is in correct order', () => {
+    it('historicalPrecedence is in correct order — no broker credentials required', () => {
       const broker = new ProviderBroker();
-      expect(broker.historicalPrecedence).toEqual(['dhan', 'upstox', 'yahoo']);
+      expect(broker.historicalPrecedence).toEqual(['yahoo']);
+      expect(broker.historicalPrecedence).not.toContain('dhan');
+      expect(broker.historicalPrecedence).not.toContain('upstox');
     });
   });
 
@@ -32,9 +36,8 @@ describe('ProviderBroker', () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('ENOTFOUND'));
       const broker = new ProviderBroker();
       const result = await broker.getQuote('RELIANCE');
-      expect(result.fallbackChain).toContain('dhan');
-      expect(result.fallbackChain).toContain('upstox');
       expect(result.fallbackChain).toContain('yahoo');
+      expect(result.fallbackChain).not.toContain('dhan');
     });
 
     it('returns null data when all historical providers fail', async () => {
@@ -65,23 +68,13 @@ describe('ProviderBroker', () => {
   });
 
   describe('provider status summary', () => {
-    it('returns summary with all providers', async () => {
+    it('returns summary with public providers only', async () => {
       const broker = new ProviderBroker();
       const summary = await broker.getStatusSummary();
-      expect(summary.dhan).toBeDefined();
-      expect(summary.upstox).toBeDefined();
       expect(summary.yahoo).toBeDefined();
       expect(summary.indianapi).toBeDefined();
-    });
-
-    it('reports missing_optional for missing credentials', async () => {
-      delete process.env.DHAN_CLIENT_ID;
-      delete process.env.DHAN_ACCESS_TOKEN;
-      delete process.env.UPSTOX_ACCESS_TOKEN;
-      const broker = new ProviderBroker();
-      const summary = await broker.getStatusSummary();
-      expect(summary.dhan.status).toBe('missing_optional');
-      expect(summary.upstox.status).toBe('missing_optional');
+      expect(Object.keys(summary)).not.toContain('dhan');
+      expect(Object.keys(summary)).not.toContain('upstox');
     });
   });
 

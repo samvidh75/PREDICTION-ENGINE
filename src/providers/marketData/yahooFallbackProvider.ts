@@ -2,7 +2,7 @@
  * yahooFallbackProvider.ts — Yahoo Finance fallback market data provider.
  *
  * Wraps the existing YFinanceProvider to expose MarketDataProvider interface.
- * Used as last-resort fallback when Dhan/Upstox/IndianAPI are unavailable.
+ * Used as fallback when IndianAPI is unavailable.
  */
 
 import type { NormalizedQuote, NormalizedCandle, ProviderHealth, ProviderId, MarketDataProvider } from './types';

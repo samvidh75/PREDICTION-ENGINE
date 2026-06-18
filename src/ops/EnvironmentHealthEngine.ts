@@ -24,26 +24,11 @@ export class EnvironmentHealthEngine {
       missingRequired.push('DATABASE_URL');
     }
 
-    const upstox = process.env.UPSTOX_ACCESS_TOKEN || process.env.VITE_UPSTOX_ACCESS_TOKEN;
-    checks.push({
-      variable: 'UPSTOX_ACCESS_TOKEN',
-      status: upstox ? (upstox.length > 20 ? 'ok' : 'invalid') : 'missing',
-      detail: upstox ? `Configured (${upstox.length} chars)` : 'Not set',
-    });
-    if (!upstox) missingRequired.push('UPSTOX_ACCESS_TOKEN');
-
     const indianapi = process.env.INDIANAPI_KEY;
     checks.push({
       variable: 'INDIANAPI_KEY',
       status: indianapi ? 'ok' : 'missing',
       detail: indianapi ? 'Configured' : 'Not set',
-    });
-
-    const finnhub = process.env.FINNHUB_API_KEY || process.env.VITE_FINNHUB_API_KEY;
-    checks.push({
-      variable: 'FINNHUB_API_KEY',
-      status: finnhub ? 'ok' : 'missing',
-      detail: finnhub ? 'Configured (deprecated — Finnhub removed from active pipeline)' : 'Not set (removed)',
     });
 
     const yahoo = process.env.YAHOO_API_KEY || process.env.VITE_YAHOO_API_KEY;

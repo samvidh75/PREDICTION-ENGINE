@@ -3,15 +3,13 @@ export {};
  * check-market-data-providers.ts
  *
  * Safe market data provider diagnostic.
- * Tests all configured providers: Dhan, Upstox, Yahoo fallback.
+ * Tests public/no-credential providers: Yahoo fallback, IndianAPI.
  * Reports health per provider and fallback behavior for known symbols.
  *
  * Usage:
  *   npx tsx scripts/check-market-data-providers.ts
  *
  * Environment:
- *   DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN
- *   UPSTOX_ACCESS_TOKEN
  *   CHECK_TIMEOUT_MS  — per-request timeout (default: 10000)
  *
  * Exits non-zero only for script/code failure, not for optional missing provider.

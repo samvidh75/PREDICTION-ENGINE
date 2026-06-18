@@ -30,7 +30,6 @@ const DEFAULT_SYMBOLS = [
 interface PipelineOptions {
   symbols: string[];
   apply: boolean;
-  skipUpstox: boolean;
   skipIndianApi: boolean;
   quotesOnly: boolean;
   historical: boolean;
@@ -63,7 +62,6 @@ function parseArgs(): PipelineOptions {
     const opts: PipelineOptions = {
       symbols: DEFAULT_SYMBOLS,
       apply: false,
-      skipUpstox: false,
       skipIndianApi: false,
       quotesOnly: false,
       historical: false,
@@ -77,7 +75,6 @@ function parseArgs(): PipelineOptions {
   for (const arg of args) {
     if (arg === '--apply') opts.apply = true;
     else if (arg === '--dry-run') opts.apply = false;
-    else if (arg === '--skip-upstox') opts.skipUpstox = true;
     else if (arg === '--skip-indianapi') opts.skipIndianApi = true;
     else if (arg === '--quotes-only') opts.quotesOnly = true;
     else if (arg === '--historical') opts.historical = true;
@@ -650,8 +647,6 @@ class ProductionPipeline {
 
     this.providerStatuses = {
       indianapi: process.env.INDIANAPI_KEY ? 'present' : 'missing',
-      upstox: process.env.UPSTOX_ACCESS_TOKEN ? 'present' : 'missing',
-      finnhub: 'deprecated-removed',
       redis: process.env.REDIS_URL ? 'present' : 'missing',
     };
 

@@ -81,6 +81,8 @@
     "repair:invalid-prices": "tsx scripts/repair-invalid-prices.ts",
     "repair:prediction-registry": "tsx scripts/repair-prediction-registry.ts",
     "check:score-collapse": "tsx scripts/check-score-collapse.ts",
+    "probe:nselib": "tsx scripts/check-nselib-provider.ts",
+    "probe:nsepython": "tsx scripts/check-nsepython-provider.ts",
     "pipeline:predictions": "tsx scripts/run-prediction-pipeline.ts",
     "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
     "backtest:unified-engine": "tsx scripts/backtest-unified-engine.ts",

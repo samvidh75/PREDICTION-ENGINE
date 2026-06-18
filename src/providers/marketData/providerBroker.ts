@@ -1,18 +1,18 @@
 /**
- * providerBroker.ts — Market data provider broker with fallback precedence.
+ * providerBroker.ts — Public market data provider broker with fallback precedence.
+ *
+ * No broker credentials required. All providers are free/public/no-credential.
  *
  * Fallback order for quotes:
- *   1. Dhan (if credentials present + healthy)
- *   2. Upstox (if token valid)
- *   3. IndianAPI (if configured)
- *   4. Yahoo fallback
- *   5. unavailable
- *
- * Fallback order for historical:
- *   1. Dhan
- *   2. Upstox
+ *   1. nselib (planned)
+ *   2. IndianAPI (if configured)
  *   3. Yahoo fallback
  *   4. unavailable
+ *
+ * Fallback order for historical:
+ *   1. nselib (planned)
+ *   2. Yahoo fallback
+ *   3. unavailable
  *
  * No trading/order methods exposed.
  */
@@ -21,18 +21,12 @@ import type {
   NormalizedQuote, NormalizedCandle, ProviderHealth, ProviderId,
   MarketDataProvider, ProviderBrokerResult,
 } from './types';
-import { DhanProvider } from './dhanProvider';
-import { UpstoxProvider } from './upstoxProvider';
 import { YahooFallbackProvider } from './yahooFallbackProvider';
 
 function classifyError(err: unknown): { code: string; message: string } {
   const msg = err instanceof Error ? err.message : String(err);
   const name = err instanceof Error ? err.name : '';
 
-  if (name === 'DhanProviderError' || name === 'UpstoxProviderError') {
-    const safeCode = (err as any).safeCode || 'provider_error';
-    return { code: safeCode, message: msg };
-  }
   if (msg.includes('missing_optional')) return { code: 'missing_optional', message: msg };
   if (msg.includes('expired') || msg.includes('401')) return { code: 'expired_or_unauthorized', message: msg };
   if (msg.includes('rate_limited') || msg.includes('429')) return { code: 'rate_limited', message: msg };
@@ -49,19 +43,17 @@ export class ProviderBroker {
 
   constructor() {
     this.providers = [
-      new DhanProvider(),
-      new UpstoxProvider(),
       new YahooFallbackProvider(),
     ];
     this.providerMap = new Map(this.providers.map(p => [p.providerId, p]));
   }
 
   get quotePrecedence(): ProviderId[] {
-    return ['dhan', 'upstox', 'indianapi', 'yahoo'];
+    return ['indianapi', 'yahoo'];
   }
 
   get historicalPrecedence(): ProviderId[] {
-    return ['dhan', 'upstox', 'yahoo'];
+    return ['yahoo'];
   }
 
   private getProvider(id: ProviderId): MarketDataProvider | null {
