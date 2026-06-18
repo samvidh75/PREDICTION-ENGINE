@@ -85,7 +85,7 @@ describe("Ops Data Coverage Endpoint Route", () => {
       status: "available",
     });
 
-    expect(body.providers).toHaveProperty("FINNHUB_KEY");
+    expect(body.providers).toHaveProperty("INDIANAPI_KEY");
     expect(body.providers).toHaveProperty("REDIS_URL");
     // Validate structured provider status format
     Object.values(body.providers).forEach((val: any) => {
@@ -97,9 +97,10 @@ describe("Ops Data Coverage Endpoint Route", () => {
       expect(typeof val.required).toBe("boolean");
       expect(typeof val.status).toBe("string");
     });
-    // Finnhub must never be required (deprecated)
-    expect(body.providers.FINNHUB_KEY.lifecycle).toBe("deprecated");
-    expect(body.providers.FINNHUB_KEY.required).toBe(false);
+    // Only active providers should appear in health check
+    expect(Object.keys(body.providers)).not.toContain("FINNHUB_KEY");
+    expect(Object.keys(body.providers)).not.toContain("DHAN_CLIENT_ID");
+    expect(Object.keys(body.providers)).not.toContain("UPSTOX_ACCESS_TOKEN");
 
     await app.close();
   });

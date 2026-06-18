@@ -30,7 +30,7 @@ export interface NormalizedCandle {
   sourceQuality: 'exchange' | 'adjusted' | 'fallback';
 }
 
-export type ProviderId = 'dhan' | 'upstox' | 'indianapi' | 'yahoo' | 'unavailable';
+export type ProviderId = 'indianapi' | 'yahoo' | 'unavailable' | 'dhan' | 'upstox';
 
 export type ProviderHealthStatus =
   | 'healthy'

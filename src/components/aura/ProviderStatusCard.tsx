@@ -7,8 +7,6 @@ interface ProviderStatusCardProps {
 }
 
 const providerLabels: Record<string, string> = {
-  finnhub: "Finnhub",
-  upstox: "Upstox",
   indianapi: "IndianAPI",
   redis: "Redis",
   screener: "Screener.in",
