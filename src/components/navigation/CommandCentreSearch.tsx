@@ -86,7 +86,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-black/82 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none">
+    <div className="fixed inset-0 z-[1000] bg-black/82 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none" role="dialog" aria-modal="true" aria-label="Search companies">
       <div className="w-full md:w-[760px] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] border border-white/10 bg-[#161B22]">
         <div className="flex items-center gap-3.5 px-4 h-[58px] bg-white/[0.045] border-b border-white/10">
           <Search className="w-4 h-4 text-[#b2b5be]" />
@@ -97,6 +97,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
             onChange={(event) => handleSearch(event.target.value)}
             placeholder="Search Indian companies, tickers, or sectors..."
             className="flex-1 bg-transparent text-[#f0f3fa] border-none outline-none text-[14px] placeholder-[#787b86] font-medium"
+            aria-label="Search companies, tickers, or sectors"
           />
           <button
             type="button"

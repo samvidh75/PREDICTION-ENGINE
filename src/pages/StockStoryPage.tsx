@@ -320,7 +320,7 @@ export const StockStoryPage: React.FC = () => {
 
         <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
           <div className="mb-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>My Research Notes</div>
-          <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+          <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} aria-label="Research notes" />
         </div>
       </div>
     );
@@ -444,7 +444,7 @@ export const StockStoryPage: React.FC = () => {
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">My Research Notes</div>
-        <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-xs text-[#E6EDF3] outline-none transition placeholder-[#484F58]" />
+        <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-xs text-[#E6EDF3] outline-none transition placeholder-[#484F58]" aria-label="Research notes" />
       </div>
 
         <div className="flex gap-2 overflow-x-auto border-b border-white/[0.06]" role="tablist">

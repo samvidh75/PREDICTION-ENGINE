@@ -73,4 +73,30 @@ describe('WatchlistPage states', () => {
 
     expect(await screen.findByText('Saved research')).toBeInTheDocument();
   });
+
+  it('renders empty-state action buttons when no tickers', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      return { ok: true, json: async () => [] };
+    }));
+
+    render(<WatchlistPage />);
+
+    await waitFor(() => {
+      const actions = screen.queryAllByText(/Search companies|Browse rankings/);
+      expect(actions.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('contains no forbidden trading language', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      return { ok: true, json: async () => [] };
+    }));
+
+    render(<WatchlistPage />);
+
+    await waitFor(() => {
+      const body = document.body.textContent || '';
+      expect(body).not.toMatch(/Buy Stock|Sell Stock|Strong Buy|Strong Sell|Try Pro|Unlock Pro|Trade now/i);
+    });
+  });
 });

@@ -48,15 +48,18 @@ export const SettingsPage: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
-        <div className="flex flex-row gap-2 overflow-x-auto pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:pb-0 md:pr-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", borderRight: "none" }}>
+        <div className="flex flex-row gap-2 overflow-x-auto pb-4 pr-0 md:flex-col md:overflow-visible md:border-b-0 md:pb-0 md:pr-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", borderRight: "none" }} role="tablist" aria-label="Settings tabs">
           {[
-            { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
-            { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" /> },
-            { id: "appearance", label: "Appearance", icon: <Eye className="w-4 h-4" /> },
-            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" /> },
+            { id: "profile", label: "Profile", icon: <User className="w-4 h-4" aria-hidden="true" /> },
+            { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" aria-hidden="true" /> },
+            { id: "appearance", label: "Appearance", icon: <Eye className="w-4 h-4" aria-hidden="true" /> },
+            { id: "security", label: "Security", icon: <Lock className="w-4 h-4" aria-hidden="true" /> },
           ].map((tab) => (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`settings-tabpanel-${tab.id}`}
               onClick={() => setActiveTab(tab.id as SettingsTab)}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold text-left transition shrink-0 cursor-pointer ${
                 activeTab === tab.id ? "text-white shadow-sm" : "hover:bg-white/40"
@@ -71,7 +74,7 @@ export const SettingsPage: React.FC = () => {
 
         <div className="md:col-span-3 min-h-[300px]">
           {activeTab === "profile" && (
-            <div className="space-y-6">
+            <div id="settings-tabpanel-profile" role="tabpanel" aria-labelledby="settings-tab-profile" className="space-y-6">
               <div><h2 className="text-lg font-semibold mb-1" style={{ color: "#0f1419" }}>Profile information</h2><p className="text-sm" style={{ color: "#536471" }}>Review your workspace identity details.</p></div>
               <div className="space-y-4 max-w-md">
                 <Input label="Full Name" type="text" value={name} glass onChange={(e) => { setName(e.target.value); setSaveNotice(""); }} />
@@ -86,7 +89,7 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {activeTab === "notifications" && (
-            <div className="space-y-6">
+            <div id="settings-tabpanel-notifications" role="tabpanel" aria-labelledby="settings-tab-notifications" className="space-y-6">
               <div><h2 className="text-lg font-semibold mb-1" style={{ color: "#0f1419" }}>Notifications channel</h2><p className="text-sm" style={{ color: "#536471" }}>Control alert categories monitored for watchlists.</p></div>
               <div className="space-y-3 max-w-md">
                 {(["Factor", "Risk", "Momentum", "News", "Market"] as AlertCategory[]).map((cat) => (
@@ -95,8 +98,15 @@ export const SettingsPage: React.FC = () => {
                       <span className="block text-sm font-semibold" style={{ color: "#0f1419" }}>{cat} Alerts</span>
                       <span className="mt-0.5 block text-xs" style={{ color: "#536471" }}>Monitors {cat.toLowerCase()} analysis updates.</span>
                     </div>
-                    <button onClick={() => toggleAlertCategory(cat)} className={`w-10 h-5 rounded-full transition relative cursor-pointer ${alertCategories[cat] ? 'bg-accent-success' : ''}`} style={{ background: alertCategories[cat] ? "#1a6e4a" : "#cbd5e1" }}>
-                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition ${alertCategories[cat] ? "left-[22px]" : "left-[2px]"}`} />
+                    <button
+                      onClick={() => toggleAlertCategory(cat)}
+                      role="switch"
+                      aria-checked={alertCategories[cat]}
+                      aria-label={`${cat} alerts`}
+                      className={`w-10 h-5 rounded-full transition relative cursor-pointer ${alertCategories[cat] ? 'bg-accent-success' : ''}`}
+                      style={{ background: alertCategories[cat] ? "#1a6e4a" : "#cbd5e1" }}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition ${alertCategories[cat] ? 'left-[22px]' : 'left-[2px]'}`} />
                     </button>
                   </div>
                 ))}
@@ -105,7 +115,7 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {activeTab === "appearance" && (
-            <div className="space-y-6">
+            <div id="settings-tabpanel-appearance" role="tabpanel" aria-labelledby="settings-tab-appearance" className="space-y-6">
               <div><h2 className="text-lg font-semibold mb-1" style={{ color: "#0f1419" }}>Appearance settings</h2><p className="text-sm" style={{ color: "#536471" }}>Configure your workspace interface theme.</p></div>
               <div className="max-w-md">
                 <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
@@ -117,7 +127,7 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {activeTab === "security" && (
-            <div className="space-y-6">
+            <div id="settings-tabpanel-security" role="tabpanel" aria-labelledby="settings-tab-security" className="space-y-6">
               <div><h2 className="text-lg font-semibold mb-1" style={{ color: "#0f1419" }}>Security and credentials</h2><p className="text-sm" style={{ color: "#536471" }}>Manage password and credentials security.</p></div>
               <div className="max-w-md">
                 <div className="space-y-4 rounded-xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>

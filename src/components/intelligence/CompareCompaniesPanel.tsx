@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X, ArrowLeftRight } from "lucide-react";
 import { PredictionInsightCard, PredictionData } from "./PredictionInsightCard";
 
@@ -18,6 +18,14 @@ interface CompareCompaniesPanelProps {
 }
 
 export function CompareCompaniesPanel({ open, onClose, primary, secondary, onSelectSecondary, className = "" }: CompareCompaniesPanelProps) {
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
   if (!open) return null;
 
   return (

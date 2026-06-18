@@ -45,7 +45,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-md">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Search company universe">
       <div 
         className="relative border border-white/10 p-6 flex flex-col justify-between overflow-hidden"
         style={{
@@ -77,6 +77,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full h-[48px] bg-black/40 border border-white/10 rounded-[14px] px-5 text-white text-[14px] outline-none focus:border-cyan-500/50 transition font-sans"
+              aria-label="Search companies"
             />
           </div>
 

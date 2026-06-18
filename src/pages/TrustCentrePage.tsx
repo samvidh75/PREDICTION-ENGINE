@@ -174,7 +174,7 @@ export const TrustCentrePage: React.FC = () => {
         </div>
 
         {/* Tab navigation */}
-        <div className="flex gap-1 overflow-x-auto border-b border-white/[0.06] pb-px">
+        <div className="flex gap-1 overflow-x-auto border-b border-white/[0.06] pb-px" role="tablist" aria-label="Trust centre tabs">
           {[
             { key: "overview" as const, label: "Overview" },
             { key: "providers" as const, label: "Providers" },
@@ -184,6 +184,9 @@ export const TrustCentrePage: React.FC = () => {
             <button
               key={tab.key}
               type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              aria-controls={`trust-tabpanel-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}
               className={`shrink-0 rounded-t-lg px-4 py-2 text-[10px] font-medium uppercase tracking-wider transition-colors ${
                 activeTab === tab.key
@@ -207,7 +210,7 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         )}
 
-        {activeTab === "overview" && (<>
+        {activeTab === "overview" && (<div id="trust-tabpanel-overview" role="tabpanel" aria-labelledby="trust-tab-overview">
         {/* Performance audit */}
         <RoundedDepthPanel padding="md">
           <div className="flex items-center gap-2">
@@ -231,13 +234,13 @@ export const TrustCentrePage: React.FC = () => {
             <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Total predictions generated</span>
               <div className="mt-1 font-mono text-xl font-bold text-[#E6EDF3]">
-                {metrics?.total_predictions ? metrics.total_predictions >= 1000 ? `${(metrics.total_predictions / 1000).toFixed(1)}K` : metrics.total_predictions.toLocaleString("en-IN") : "N/A"}
+                {metrics?.total_predictions != null ? metrics.total_predictions >= 1000 ? `${(metrics.total_predictions / 1000).toFixed(1)}K` : metrics.total_predictions.toLocaleString("en-IN") : "N/A"}
               </div>
             </div>
             <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Total outcomes tracked</span>
               <div className="mt-1 font-mono text-xl font-bold text-[#E6EDF3]">
-                {metrics?.total_outcomes ? metrics.total_outcomes >= 1000 ? `${(metrics.total_outcomes / 1000).toFixed(1)}K` : metrics.total_outcomes.toLocaleString("en-IN") : "N/A"}
+                {metrics?.total_outcomes != null ? metrics.total_outcomes >= 1000 ? `${(metrics.total_outcomes / 1000).toFixed(1)}K` : metrics.total_outcomes.toLocaleString("en-IN") : "N/A"}
               </div>
             </div>
           </div>
@@ -256,9 +259,9 @@ export const TrustCentrePage: React.FC = () => {
             <ModelRunBadge runDate={coverage.predictionRegistry.latestPredictionDate} className="mt-2" />
           )}
         </RoundedDepthPanel>
-        </>)} {/* end overview tab */}
+        </div>)} {/* end overview tab */}
 
-        {activeTab === "providers" && (<>
+        {activeTab === "providers" && (<div id="trust-tabpanel-providers" role="tabpanel" aria-labelledby="trust-tab-providers">
         {/* Provider Domain Health — Active Sources */}
         {activeProviderEntries.length > 0 && (
           <section>
@@ -331,9 +334,9 @@ export const TrustCentrePage: React.FC = () => {
             </details>
           </section>
         )} {/* end providers tab */}
-        </>)} {/* end providers tab */}
+        </div>)} {/* end providers tab */}
 
-        {activeTab === "coverage" && (<>
+        {activeTab === "coverage" && (<div id="trust-tabpanel-coverage" role="tabpanel" aria-labelledby="trust-tab-coverage">
         {/* Data Coverage Summary */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Data coverage summary</h2>
@@ -457,9 +460,9 @@ export const TrustCentrePage: React.FC = () => {
             <span>View fundamentals gap details and import workflow</span>
           </button>
         </RoundedDepthPanel>
-        </>)} {/* end coverage tab */}
+        </div>)} {/* end coverage tab */}
 
-        {activeTab === "gaps" && (<>
+        {activeTab === "gaps" && (<div id="trust-tabpanel-gaps" role="tabpanel" aria-labelledby="trust-tab-gaps">
         {/* Symbol data gaps */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Symbol data gaps</h2>
@@ -529,7 +532,7 @@ export const TrustCentrePage: React.FC = () => {
             ))}
           </div>
         </RoundedDepthPanel>
-        </>)} {/* end gaps tab */}
+        </div>)} {/* end gaps tab */}
 
         <div className="border-t border-white/5 pt-6">
           <p className="text-[10px] leading-relaxed text-[#484F58]">
