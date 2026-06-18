@@ -6,7 +6,8 @@ import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 import { loadEnv } from "../../config/env";
 import { query } from "../../../db/index";
 import { execSync } from "child_process";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 interface FreshnessRow extends Record<string, unknown> {
   latest: Date | string | number | null;
@@ -14,6 +15,10 @@ interface FreshnessRow extends Record<string, unknown> {
 
 const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   const env = loadEnv();
+
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const probeScriptPath = join(__dirname, '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
 
   app.get("/api/ops/health", async (_request, reply) => {
     const metrics: Record<string, any> = {};
@@ -909,9 +914,8 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   });
 
   app.get("/api/ops/probe/nselib", async (_request, reply) => {
-    const probePath = join(__dirname, '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
     try {
-      const output = execSync(`python3 "${probePath}" 2>/dev/null`, { encoding: 'utf-8', timeout: 120_000 });
+      const output = execSync(`python3 "${probeScriptPath}" 2>/dev/null`, { encoding: 'utf-8', timeout: 120_000 });
       const jsonStart = output.indexOf('{');
       const data = jsonStart >= 0 ? JSON.parse(output.slice(jsonStart)) : { error: 'no JSON output', raw: output.slice(0, 500) };
       return reply.send(data);
