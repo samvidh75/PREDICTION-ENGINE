@@ -24,19 +24,14 @@ export const PublicRankingsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [sectorFilter, setSectorFilter] = useState("all");
-  const [symbolCount, setSymbolCount] = useState<number | null>(null);
-  const [registryRowCount, setRegistryRowCount] = useState<number | null>(null);
-  const [latestPredictionDate, setLatestPredictionDate] = useState<string | null>(null);
+
   const [explanation, setExplanation] = useState<ExplanationState | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
     api.getLeaderboard(100)
       .then((res) => { if (ctrl.signal.aborted) return; setRankings(res.data ?? []); setLoading(false); })
-      .catch((err) => { if (ctrl.signal.aborted) return; setError(err instanceof ApiError ? err.message : "Rankings unavailable"); setRankings([]); setLoading(false); });
-    api.getDataCoverage()
-      .then((cov) => { if (ctrl.signal.aborted) return; setSymbolCount(cov.coverage?.symbols?.count ?? null); setRegistryRowCount(cov.coverage?.predictionRegistry?.rowCount ?? null); setLatestPredictionDate(cov.coverage?.predictionRegistry?.latestPredictionDate ?? null); })
-      .catch(() => {});
+      .catch((err) => { if (ctrl.signal.aborted) return; setError(err instanceof ApiError ? err.message : "Rankings are being calculated"); setRankings([]); setLoading(false); });
     return () => ctrl.abort();
   }, []);
 
@@ -133,29 +128,11 @@ export const PublicRankingsPage: React.FC = () => {
         </ProductPanel>
 
         {loading ? (
-          <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Loading rankings...</div>
+          <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Loading...</div>
         ) : filteredRankings.length === 0 && rankings.length === 0 ? (
           <div className="flex flex-col gap-5">
             <ProductEmptyState title="Rankings pending" body="Rankings appear after verified scoring has completed for the latest cycle." />
-            {(symbolCount !== null || registryRowCount !== null) && (
-              <ProductPanel className="p-5">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Data coverage</div>
-                <div className="mt-3 grid grid-cols-3 gap-4">
-                  <div>
-                    <span className="text-xs text-[#9AA7B5] font-medium">Companies covered</span>
-                    <span className="block text-lg font-bold tabular-nums text-[#E6EDF3]">{symbolCount !== null ? symbolCount.toLocaleString() : "—"}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-[#9AA7B5] font-medium">Scored records</span>
-                    <span className="block text-lg font-bold tabular-nums text-[#E6EDF3]">{registryRowCount !== null ? registryRowCount.toLocaleString() : "—"}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-[#9AA7B5] font-medium">Latest update</span>
-                    <span className="block text-lg font-bold tabular-nums text-[#E6EDF3]">{latestPredictionDate || "—"}</span>
-                  </div>
-                </div>
-              </ProductPanel>
-            )}
+
             <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
               <Button type="button" onClick={() => productNavigate("signup")} className="h-10 px-4 text-xs">Create free account</Button>
               <Button type="button" onClick={() => productNavigate("methodology")} variant="secondary" className="h-10 px-4 text-xs">View scoring methodology</Button>

@@ -27,8 +27,8 @@ export const SignupPage: React.FC = () => {
         <ProductProofPanel
           title="Create a workspace around evidence, not market noise."
           rows={[
-            { icon: FileSearch, label: "Company research", body: "Search companies and inspect model inputs, confidence, freshness, and gaps." },
-            { icon: Database, label: "Honest data states", body: "Unavailable coverage stays visible. No fake rankings or filler metrics.", tone: "warning" },
+            { icon: FileSearch, label: "Company research", body: "Search companies and inspect model inputs, confidence, and model context." },
+            { icon: Database, label: "Honest data states", body: "No fabricated rankings or filler metrics.", tone: "warning" },
             { icon: ShieldCheck, label: "Trust-first workflow", body: "Use the Trust Centre to inspect source availability and methodology.", tone: "verified" },
           ]}
         />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Search, BarChart3, TrendingUp, ShieldCheck, Eye, ArrowLeftRight, BookOpen, Briefcase, Home, Command } from "lucide-react";
+import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, Home, Command } from "lucide-react";
 import { RoundedDepthPanel } from "./RoundedDepthPanel";
 
 interface Action {
@@ -24,14 +24,13 @@ function navigatePage(pageKey: string, params?: Record<string, string>) {
 }
 
 const DEFAULT_ACTIONS: Action[] = [
-  { id: "dashboard", label: "Open dashboard", description: "Research home", icon: Home, action: () => navigatePage("dashboard") },
-  { id: "search", label: "Search company", description: "Find companies by ticker or name", icon: Search, action: () => navigatePage("search") },
-  { id: "rankings", label: "Open rankings", description: "Browse scored companies", icon: BarChart3, action: () => navigatePage("rankings") },
+  { id: "search-company", label: "Search company", description: "Find companies by ticker or name", icon: Search, action: () => navigatePage("search") },
+  { id: "open-scanner", label: "Open scanner", description: "Browse and filter companies", icon: BarChart3, action: () => navigatePage("search") },
+  { id: "rankings", label: "View rankings", description: "Browse scored companies", icon: TrendingUp, action: () => navigatePage("rankings") },
   { id: "compare", label: "Compare companies", description: "Compare scores and factors", icon: ArrowLeftRight, action: () => navigatePage("compare") },
-  { id: "trust", label: "Open Trust Centre", description: "Audit data sources", icon: ShieldCheck, action: () => navigatePage("trust") },
   { id: "watchlist", label: "Open watchlist", description: "Saved research", icon: Eye, action: () => navigatePage("watchlist") },
   { id: "portfolio", label: "Open portfolio", description: "Manual tracking", icon: Briefcase, action: () => navigatePage("portfolio") },
-  { id: "methodology", label: "View methodology", description: "Scoring methodology", icon: BookOpen, action: () => navigatePage("methodology") },
+  { id: "methodology", label: "Open methodology", description: "Scoring methodology", icon: BookOpen, action: () => navigatePage("methodology") },
   { id: "about", label: "Open About", description: "Product mission and team", icon: Command, action: () => navigatePage("about") },
 ];
 
