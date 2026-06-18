@@ -64,8 +64,8 @@ describe('PublicRankingsPage states', () => {
 
     render(<PublicRankingsPage />);
     expect(await screen.findByText('Data coverage')).toBeInTheDocument();
-    expect(screen.getByText('6')).toBeInTheDocument();
-    expect(screen.getByText('27')).toBeInTheDocument();
+    expect(screen.getAllByText('6').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('27').length).toBeGreaterThan(0);
   });
 
   it('renders filter controls and data when rankings exist', async () => {

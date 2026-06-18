@@ -29,7 +29,7 @@ export const PublicAboutPage: React.FC = () => (
             <Workflow className="h-3.5 w-3.5" aria-hidden="true" /> Mission
           </div>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white md:text-6xl">
-            Evidence-first research infrastructure for Indian equities.
+            Research intelligence for Indian equities, built around evidence.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
             StockStory India exists because equity research should make source quality, freshness, and missing evidence visible. It is a workflow product for inspection, not a venue for tips.
