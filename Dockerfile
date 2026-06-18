@@ -22,11 +22,22 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 RUN mkdir -p data
 
+# Install Python 3.11+ for public NSE data providers
+# (nselib, nsepython, jugaad-data — no credentials needed)
+RUN apk add --no-cache python3 py3-pip && \
+    python3 --version
+
 ENV NODE_ENV=production
 
 # Only install production dependencies
 COPY package.json package-lock.json ./
 RUN npm ci --frozen-lockfile --omit=dev
+
+# Install Python dependencies for public NSE data providers
+# jugaad-data, nsepython — no credentials required
+COPY requirements-nse.txt ./
+RUN python3 -m pip install --no-cache-dir -r requirements-nse.txt 2>&1 || \
+    echo "⚠️ Python NSE packages not installed — public providers unavailable"
 
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist

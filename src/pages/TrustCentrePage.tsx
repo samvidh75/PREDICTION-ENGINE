@@ -4,13 +4,111 @@ import { LoadingState } from "../components/ui/DataState";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { api, ApiError, type TrustMetricsEnvelope, type DataCoverage } from "../services/api/client";
 
-function formatMetric(value: number | null | undefined, suffix = ""): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "Data unavailable";
-  return `${value.toFixed(2)}${suffix}`;
+interface ProviderDomainEntry {
+  healthy: boolean;
+  provider: string;
+  detail: string;
+}
+
+interface ProviderEntry {
+  lifecycle: string;
+  required: boolean;
+  status: string;
+  message: string;
+  domains?: Record<string, ProviderDomainEntry>;
+}
+
+const PROVIDER_LABELS: Record<string, string> = {
+  INDIANAPI_KEY: "Indian API",
+  YAHOO: "Yahoo Finance",
+  JUGAD_DATA: "Jugaad Data",
+  NSELIB: "NSELib",
+  NSEPYTHON: "NSE Python",
+  FUNDAMENTALS_AUTOMATIC: "Fundamentals",
+  CSV_FALLBACK: "CSV Import",
+};
+
+const SKIP_PROVIDERS = new Set(["REDIS_URL"]);
+
+const STATUS_STYLE: Record<string, { dot: string; bg: string; text: string; border: string; label: string }> = {
+  healthy: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Healthy" },
+  degraded: { dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Degraded" },
+  unavailable: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
+  local_only: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Local Only" },
+  missing_required: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
+};
+
+const LEFT_BORDER: Record<string, string> = {
+  healthy: "border-l-emerald-400",
+  degraded: "border-l-amber-400",
+  unavailable: "border-l-red-400",
+  local_only: "border-l-slate-300",
+  missing_required: "border-l-red-400",
+};
+
+const DOMAIN_LABELS: Record<string, string> = {
+  quote: "Quote",
+  historical: "Historical",
+  bhavcopy: "Bhavcopy",
+  index: "Index",
+  fundamentals: "Fundamentals",
+  macro: "Macro",
+  delivery: "Delivery",
+  sector: "Sector",
+  nse_lib: "NSELib",
+};
+
+function getStatusStyle(status: string) {
+  return STATUS_STYLE[status] || STATUS_STYLE.unavailable;
+}
+
+function inferDomains(key: string, entry: ProviderEntry): Record<string, ProviderDomainEntry> {
+  if (entry.domains && Object.keys(entry.domains).length > 0) return entry.domains;
+  switch (key) {
+    case "INDIANAPI_KEY": {
+      const h = entry.status === "healthy";
+      return {
+        quote: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
+        fundamentals: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
+        macro: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
+      };
+    }
+    case "FUNDAMENTALS_AUTOMATIC": {
+      const h = entry.status === "healthy";
+      return { fundamentals: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" } };
+    }
+    case "CSV_FALLBACK":
+      return { bhavcopy: { healthy: false, provider: key, detail: "Local/dev only" } };
+    case "NSELIB":
+      return { nse_lib: { healthy: false, provider: key, detail: entry.message } };
+    default:
+      return {};
+  }
+}
+
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "N/A";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-IN", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
 }
 
 function formatCount(value: number | null | undefined): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) return "Data unavailable";
+  if (typeof value !== "number" || !Number.isFinite(value)) return "---";
+  return value.toLocaleString("en-IN");
+}
+
+function formatMetric(value: number | null | undefined, suffix = ""): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "---";
+  return `${value.toFixed(2)}${suffix}`;
+}
+
+function formatOrdinal(value: number): string {
+  if (value <= 0) return "N/A";
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
   return value.toLocaleString("en-IN");
 }
 
@@ -60,7 +158,7 @@ export const TrustCentrePage: React.FC = () => {
 
   const metrics = envelope?.data;
   const rawState = error ? "error" : envelope?.status ?? "unavailable";
-  const asOf = envelope?.dataState?.asOf || coverageData?.generatedAt || "Data unavailable";
+  const asOf = envelope?.dataState?.asOf || coverageData?.generatedAt || null;
   const missingInputs = envelope?.dataState?.missingInputs || [];
   const completenessScore = envelope?.dataState?.completenessScore;
 
@@ -74,13 +172,39 @@ export const TrustCentrePage: React.FC = () => {
   };
   const humanState = stateLabel[rawState] ?? rawState;
 
+  const providersRaw = coverageData?.providers as Record<string, ProviderEntry> | undefined;
+  const providerEntries = providersRaw
+    ? Object.entries(providersRaw).filter(([key]) => !SKIP_PROVIDERS.has(key))
+    : [];
+
+  const coverage = coverageData?.coverage;
+  const generatedAt = coverageData?.generatedAt;
+
+  const coverageTables = [
+    { key: "symbols" as const, label: "Companies" },
+    { key: "dailyPrices" as const, label: "Daily Prices" },
+    { key: "financialSnapshots" as const, label: "Financial Snapshots" },
+    { key: "featureSnapshots" as const, label: "Features" },
+    { key: "factorSnapshots" as const, label: "Factors" },
+    { key: "predictionRegistry" as const, label: "Predictions" },
+  ];
+
+  const freshnessItems = [
+    { label: "Companies", date: coverage?.symbols?.latestUpdatedAt ?? null },
+    { label: "Daily Prices", date: coverage?.dailyPrices?.latestPriceDate ?? null },
+    { label: "Financial Snapshots", date: coverage?.financialSnapshots?.latestSnapshotDate ?? null },
+    { label: "Features", date: coverage?.featureSnapshots?.latestSnapshotDate ?? null },
+    { label: "Factors", date: coverage?.factorSnapshots?.latestSnapshotDate ?? null },
+    { label: "Predictions", date: coverage?.predictionRegistry?.latestPredictionDate ?? null },
+  ];
+
   return (
     <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <div className="mx-auto max-w-4xl space-y-8 p-4 pt-[76px] md:pt-28">
+      <div className="mx-auto max-w-5xl space-y-8 p-4 pt-[76px] md:pt-28">
 
         <PageHeader
-          title="Research Methodology & Trust Centre"
-          subtitle="Scoring inputs, availability labels, and verified performance metrics."
+          title="Trust Centre"
+          subtitle="Methodology, provider health, data coverage, pipeline freshness, and verified performance metrics."
         />
 
         {rawState !== "ok" && (
@@ -124,58 +248,213 @@ export const TrustCentrePage: React.FC = () => {
             style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
           >
             <span className="text-[11px] uppercase tracking-wider font-semibold block mb-1" style={{ color: "#536471" }}>Total predictions generated</span>
-            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatCount(metrics?.total_predictions)}</span>
+            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatOrdinal(metrics?.total_predictions ?? 0)}</span>
           </div>
           <div
             className="rounded-xl p-6"
             style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
           >
             <span className="text-[11px] uppercase tracking-wider font-semibold block mb-1" style={{ color: "#536471" }}>Total outcomes tracked</span>
-            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatCount(metrics?.total_outcomes)}</span>
+            <span className="text-2xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatOrdinal(metrics?.total_outcomes ?? 0)}</span>
           </div>
         </section>
 
+        {/* Scored Symbols Coverage */}
+        <section>
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            <span className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "#536471" }}>Scored symbols coverage</span>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-3xl font-semibold tabular-nums" style={{ color: "#0f1419" }}>
+                {formatCount(coverage?.predictionRegistry?.symbolCount)}
+              </span>
+              <span className="text-sm" style={{ color: "#536471" }}>symbols scored</span>
+            </div>
+            {coverage?.predictionRegistry?.latestPredictionDate && (
+              <p className="mt-1 text-[11px]" style={{ color: "#536471" }}>
+                Latest: {formatDate(coverage.predictionRegistry.latestPredictionDate)}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* Provider Domain Health Cards */}
+        {providerEntries.length > 0 && (
+          <section className="space-y-5">
+            <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Provider domain health</h2>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {providerEntries.map(([key, entry]) => {
+                const domains = inferDomains(key, entry);
+                const s = getStatusStyle(entry.status);
+                const border = LEFT_BORDER[entry.status] || "border-l-slate-300";
+                return (
+                  <div
+                    key={key}
+                    className={`rounded-xl p-5 border-l-4 ${border}`}
+                    style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", borderWidth: "1px 1px 1px 0", borderStyle: "solid", borderColor: "rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold" style={{ color: "#0f1419" }}>
+                        {PROVIDER_LABELS[key] || key.replace(/_/g, " ")}
+                      </h3>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${s.bg} ${s.text} border ${s.border}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                        {s.label}
+                      </span>
+                    </div>
+                    {Object.keys(domains).length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {Object.entries(domains).map(([domain, info]) => {
+                          const dh = info.healthy;
+                          const pillBg = dh ? "bg-emerald-50" : entry.status === "local_only" ? "bg-slate-50" : "bg-red-50";
+                          const pillText = dh ? "text-emerald-700" : entry.status === "local_only" ? "text-slate-500" : "text-red-700";
+                          const pillBorder = dh ? "border-emerald-200" : entry.status === "local_only" ? "border-slate-200" : "border-red-200";
+                          const pillDot = dh ? "bg-emerald-500" : entry.status === "local_only" ? "bg-slate-400" : "bg-red-500";
+                          return (
+                            <span
+                              key={domain}
+                              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium border ${pillBg} ${pillText} ${pillBorder}`}
+                              title={info.detail}
+                            >
+                              <span className={`w-1 h-1 rounded-full ${pillDot}`} />
+                              {DOMAIN_LABELS[domain] || domain}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {entry.message && (
+                      <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "#536471" }}>
+                        {entry.message}
+                      </p>
+                    )}
+                    <div className="mt-3 text-[10px]" style={{ color: "#8899a6" }}>
+                      As of {formatDate(generatedAt || null)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Data Coverage Summary Table */}
         <section className="space-y-5">
           <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data coverage summary</h2>
           {coverageLoading ? (
-            <div
-              className="rounded-xl p-6"
-              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}
-            >
+            <div className="rounded-xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}>
               <p className="text-sm" style={{ color: "#536471" }}>Loading coverage data...</p>
             </div>
-          ) : coverageData?.coverage ? (
+          ) : coverage ? (
             <div
-              className="rounded-xl p-6"
+              className="rounded-xl overflow-hidden"
               style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
             >
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  { label: "Companies covered", value: coverageData.coverage.symbols?.status === "available" ? formatNumber(coverageData.coverage.symbols?.count ?? 0) : "Unavailable" },
-                  { label: "Price rows", value: coverageData.coverage.dailyPrices?.status === "available" ? formatNumber(coverageData.coverage.dailyPrices?.rowCount ?? 0) : "Unavailable" },
-                  { label: "Financial records", value: coverageData.coverage.financialSnapshots?.status === "available" ? formatNumber(coverageData.coverage.financialSnapshots?.rowCount ?? 0) : "Unavailable" },
-                  { label: "Scored records", value: coverageData.coverage.predictionRegistry?.status === "available" ? formatNumber(coverageData.coverage.predictionRegistry?.rowCount ?? 0) : "Unavailable" },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                    <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
-                    <span className="block text-sm font-semibold tabular-nums" style={{ color: "#0f1419" }}>{item.value}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <DataFreshnessBadge date={coverageData.generatedAt ?? null} />
-              </div>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+                    <th className="text-left px-5 py-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>Table</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>Rows</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>Symbols</th>
+                    <th className="text-right px-5 py-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {coverageTables.map((row, i) => {
+                    const stats = coverage[row.key];
+                    const avail = stats?.status === "available";
+                    return (
+                      <tr key={row.key} className="border-t border-white/20">
+                        <td className="px-5 py-3 font-medium" style={{ color: "#0f1419" }}>{row.label}</td>
+                        <td className="px-5 py-3 text-right tabular-nums" style={{ color: "#536471" }}>
+                          {formatCount(stats?.rowCount ?? stats?.count ?? null)}
+                        </td>
+                        <td className="px-5 py-3 text-right tabular-nums" style={{ color: "#536471" }}>
+                          {formatCount(stats?.symbolCount ?? null)}
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            avail
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-slate-50 text-slate-400"
+                          }`}>
+                            {avail ? "Available" : "Unavailable"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {generatedAt && (
+                <div className="px-5 py-3 border-t border-white/20">
+                  <DataFreshnessBadge date={generatedAt} />
+                </div>
+              )}
             </div>
           ) : (
-            <div
-              className="rounded-xl p-6"
-              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}
-            >
+            <div className="rounded-xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)" }}>
               <p className="text-sm" style={{ color: "#536471" }}>Coverage data is temporarily unavailable.</p>
             </div>
           )}
         </section>
 
+        {/* Freshness Dashboard */}
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Freshness dashboard</h2>
+          <div
+            className="rounded-xl p-5"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            {coverage ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {freshnessItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-xl p-3"
+                    style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}
+                  >
+                    <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
+                    <span className="text-sm font-semibold tabular-nums" style={{ color: "#0f1419" }}>{formatDate(item.date)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm" style={{ color: "#536471" }}>Freshness data is temporarily unavailable.</p>
+            )}
+            {generatedAt && (
+              <div className="mt-4">
+                <DataFreshnessBadge date={generatedAt} />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Data status */}
+        <section className="space-y-5">
+          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data status</h2>
+          <div
+            className="rounded-xl p-6"
+            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+          >
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                { label: "Scoring database", value: rawState === "ok" || rawState === "partial" ? "Connected" : "Pending" },
+                { label: "As of date", value: asOf !== "N/A" ? asOf : "Pending" },
+                { label: "Evidence completeness", value: completenessScore ? `${completenessScore}% verified` : "Pending" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                  <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#0f1419" }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Scoring factors */}
         <section className="space-y-5">
           <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Scoring factors</h2>
           <div className="grid gap-4 md:grid-cols-2">
@@ -199,46 +478,10 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         </section>
 
-        <section className="space-y-5">
-          <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data status</h2>
-          <div
-            className="rounded-xl p-6"
-            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-          >
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                { label: "Scoring database", value: rawState === "ok" || rawState === "partial" ? "Connected" : "Pending" },
-                { label: "As of date", value: asOf !== "Data unavailable" ? asOf : "Pending" },
-                { label: "Evidence completeness", value: completenessScore ? `${completenessScore}% verified` : "Pending" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
-                  <span className="text-sm font-semibold" style={{ color: "#0f1419" }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {coverageData?.providers && Object.keys(coverageData.providers).length > 0 && (
-          <section className="space-y-5">
-            <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Provider status</h2>
-            <div
-              className="rounded-xl p-6"
-              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-            >
-              <div className="rounded-xl overflow-hidden" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                {Object.entries(coverageData.providers).map(([key, val]) => (
-                  <ProviderStatusPill key={key} name={key} status={val} />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
           <ResearchDisclaimer />
         </section>
+
       </div>
     </main>
   );

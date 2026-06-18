@@ -96,65 +96,47 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     // Provider health — domain-level
     const providers = {
       indianapi: {
-        lifecycle: "active",
-        required: true,
-        status: env.indianApiKey ? "healthy" : "missing_required",
+        status: env.indianApiKey ? "healthy" : "missing_optional",
         domains: {
-          quote: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Quotes active" : "Missing API key" },
-          historical: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Historical active" : "Missing API key" },
-          metadata: { healthy: !!env.indianApiKey, provider: "indianapi", detail: env.indianApiKey ? "Metadata active" : "Missing API key" },
+          quote: { healthy: !!env.indianApiKey, provider: "indianapi" },
         },
-        message: env.indianApiKey ? "Quotes+historical+metadata active." : "Required for quotes and metadata.",
       },
       yahoo: {
-        lifecycle: "active",
-        required: false,
         status: "degraded",
         domains: {
-          quote: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
-          historical: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+          quote: { healthy: false, detail: "Blocked HTTP 429" },
+          historical: { healthy: false, detail: "Blocked HTTP 429" },
         },
-        message: "Yahoo Finance: blocked (DNS-based reachability: FAIL). Public NSE providers unaffected.",
       },
       "jugaad-data": {
-        lifecycle: "active",
-        required: false,
-        status: "healthy",
+        status: process.env.JUGAD_DATA_ENABLED === "true" ? "healthy" : "missing_optional",
         domains: {
-          bhavcopy: { healthy: true, provider: "jugaad-data", detail: "Bhavcopy CSV via public NSE" },
-          delivery: { healthy: true, provider: "jugaad-data", detail: "Delivery data via public NSE" },
-          index: { healthy: true, provider: "jugaad-data", detail: "Index constituents via public NSE" },
-          sector: { healthy: true, provider: "jugaad-data", detail: "Sector mapping via public NSE" },
+          bhavcopy: { healthy: true },
+          rbi: { healthy: true },
+          market_status: { healthy: true },
+          quote: { healthy: false, detail: "NSE blocks equity quotes" },
+          stock_df: { healthy: false, detail: "Python 3.9 bug, local only" },
         },
-        message: "Jugaad-Data: bhavcopy+delivery+index+sector active.",
       },
       nselib: {
-        lifecycle: "planned",
-        required: false,
         status: "unavailable",
-        message: "NSELib: not yet deployed.",
+        detail: "Requires Python 3.10+",
       },
       nsepython: {
-        lifecycle: "active",
-        required: false,
-        status: "healthy",
+        status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
         domains: {
-          quote: { healthy: true, provider: "nsepython", detail: "Backup quote provider" },
-          historical: { healthy: true, provider: "nsepython", detail: "Backup historical provider" },
+          index_quote: { healthy: true },
+          bhavcopy: { healthy: true },
+          quote: { healthy: false, detail: "NSE blocks equity quotes" },
         },
-        message: "NSEPython: available for backup queries.",
       },
       fundamentals: {
-        lifecycle: "active",
-        required: true,
-        status: env.indianApiKey ? "healthy" : "missing_required",
-        message: env.indianApiKey ? "IndianApiFinancialProvider active." : "No fundamentals provider configured.",
+        status: "unavailable",
+        detail: "No automatic public source available. Use CSV import.",
       },
       csv_fallback: {
-        lifecycle: "standby",
-        required: false,
         status: "local_only",
-        message: "CSV fallback ready for local/dev.",
+        detail: "CSV import available for manual fundamentals.",
       },
     };
 
@@ -246,13 +228,13 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const factorSnapshots = await fetchTableStats("factor_snapshots", "trade_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
-    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; provider: string; detail: string }> }> => {
-      const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; provider: string; detail: string }> }> = {
+    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; detail?: string }> }> => {
+      const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; detail?: string }> }> = {
         INDIANAPI_KEY: {
           lifecycle: "active",
-          required: true,
-          status: env.indianApiKey ? "healthy" : "missing_required",
-          message: env.indianApiKey ? "Quotes and metadata active." : "Required for quotes and metadata.",
+          required: false,
+          status: env.indianApiKey ? "healthy" : "missing_optional",
+          message: env.indianApiKey ? "Quotes active." : "Optional — set INDIANAPI_KEY for live quotes.",
         },
         REDIS_URL: {
           lifecycle: "active",
@@ -265,50 +247,52 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           required: false,
           status: "degraded",
           domains: {
-            quote: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
-            historical: { healthy: false, provider: "yahoo", detail: "Blocked/unreachable from India" },
+            quote: { healthy: false, detail: "Blocked HTTP 429" },
+            historical: { healthy: false, detail: "Blocked HTTP 429" },
           },
-          message: "Yahoo Finance: blocked (DNS-based reachability: FAIL). Public NSE providers unaffected.",
+          message: "Yahoo Finance: blocked (HTTP 429). Public NSE providers unaffected.",
         },
         JUGAD_DATA: {
           lifecycle: "active",
           required: false,
-          status: "healthy",
+          status: process.env.JUGAD_DATA_ENABLED === "true" ? "healthy" : "missing_optional",
           domains: {
-            bhavcopy: { healthy: true, provider: "jugaad-data", detail: "Bhavcopy CSV via public NSE" },
-            delivery: { healthy: true, provider: "jugaad-data", detail: "Delivery data via public NSE" },
-            index: { healthy: true, provider: "jugaad-data", detail: "Index constituents via public NSE" },
-            sector: { healthy: true, provider: "jugaad-data", detail: "Sector mapping via public NSE" },
+            bhavcopy: { healthy: true },
+            rbi: { healthy: true },
+            market_status: { healthy: true },
+            quote: { healthy: false, detail: "NSE blocks equity quotes" },
+            stock_df: { healthy: false, detail: "Python 3.9 bug, local only" },
           },
-          message: "Jugaad-Data: bhavcopy+delivery+index+sector active.",
+          message: process.env.JUGAD_DATA_ENABLED === "true" ? "Bhavcopy+RBI+market_status active. Quotes blocked (NSE)." : "Optional — set JUGAD_DATA_ENABLED for bhavcopy/RBI/market status.",
         },
         NSELIB: {
           lifecycle: "planned",
           required: false,
           status: "unavailable",
-          message: "NSELib: not yet deployed.",
+          message: "Requires Python 3.10+. Not yet deployed.",
         },
         NSEPYTHON: {
           lifecycle: "active",
           required: false,
-          status: "healthy",
+          status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
           domains: {
-            quote: { healthy: true, provider: "nsepython", detail: "Backup quote provider" },
-            historical: { healthy: true, provider: "nsepython", detail: "Backup historical provider" },
+            index_quote: { healthy: true },
+            bhavcopy: { healthy: true },
+            quote: { healthy: false, detail: "NSE blocks equity quotes" },
           },
-          message: "NSEPython: available for backup queries.",
+          message: process.env.NSEPYTHON_ENABLED === "true" ? "Index quote + bhavcopy active. Equity quotes blocked (NSE)." : "Optional — set NSEPYTHON_ENABLED for index/bhavcopy.",
         },
         FUNDAMENTALS_AUTOMATIC: {
           lifecycle: "active",
-          required: true,
-          status: env.indianApiKey ? "healthy" : "missing_required",
-          message: env.indianApiKey ? "IndianApiFinancialProvider active." : "No fundamentals provider configured.",
+          required: false,
+          status: "unavailable",
+          message: "No automatic public source available. Use CSV import.",
         },
         CSV_FALLBACK: {
           lifecycle: "standby",
           required: false,
           status: "local_only",
-          message: "CSV fallback ready for local/dev.",
+          message: "CSV import available for manual fundamentals.",
         },
       };
       return matrix;

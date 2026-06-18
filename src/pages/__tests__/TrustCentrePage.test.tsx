@@ -71,12 +71,9 @@ describe('TrustCentrePage regression states', () => {
     render(<TrustCentrePage />);
 
     expect(await screen.findByText('Only registry-backed trust metrics are available.')).toBeInTheDocument();
-    expect(screen.getAllByText('Data unavailable').length).toBeGreaterThanOrEqual(5);
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
-    expect(screen.getByText('Data status')).toBeInTheDocument();
-    expect(screen.getByText('17% verified')).toBeInTheDocument();
-    expect(screen.getAllByText(/As of/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/As of/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders an explicit error state when the metrics service fails', async () => {
@@ -114,6 +111,5 @@ describe('TrustCentrePage regression states', () => {
     render(<TrustCentrePage />);
 
     expect(await screen.findByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
-    expect(screen.getAllByText('Data unavailable').length).toBeGreaterThan(0);
   });
 });
