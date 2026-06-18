@@ -17,40 +17,35 @@ const getClassificationStyle = (cls: string) => {
   switch (cls) {
     case "Exceptional":
     case "Excellent":
-      return "bg-emerald-50 border-emerald-200 text-emerald-800";
+      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
     case "Good":
-      return "bg-sky-50 border-sky-200 text-sky-800";
-    case "Fair":
-      return "bg-amber-50 border-amber-200 text-amber-800";
-    case "Weak":
-      return "bg-orange-50 border-orange-200 text-orange-800";
-    case "Critical":
-      return "bg-rose-50 border-rose-200 text-rose-800";
     case "Healthy":
-      return "bg-sky-50 border-sky-200 text-sky-800";
-    case "Stable":
-      return "bg-neutral-50 border-neutral-200 text-neutral-700";
+      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
+    case "Fair":
     case "Weakening":
-      return "bg-amber-50 border-amber-200 text-amber-800";
+      return "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]";
+    case "Stable":
+      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-secondary)]";
+    case "Weak":
+    case "Critical":
     case "At Risk":
-      return "bg-rose-50 border-rose-200 text-rose-800";
+      return "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]";
     default:
-      return "bg-slate-50 border-slate-200 text-slate-500";
+      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-muted)]";
   }
 };
 
 const getConfidenceStyle = (conf: string) => {
   switch (conf) {
     case "Very High":
-      return "bg-indigo-50 border-indigo-200 text-indigo-800";
     case "High":
-      return "bg-sky-50 border-sky-200 text-sky-800";
+      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
     case "Medium":
-      return "bg-amber-50 border-amber-200 text-amber-800";
+      return "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]";
     case "Low":
-      return "bg-rose-50 border-rose-200 text-rose-800";
+      return "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]";
     default:
-      return "bg-slate-50 border-slate-200 text-slate-500";
+      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-muted)]";
   }
 };
 
@@ -271,7 +266,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Live Quote</div>
                 <div className="mt-1 font-mono text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-accent-success' : 'text-rose-700'}`}>{changeLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[var(--color-active)]' : 'text-[var(--color-danger)]'}`}>{changeLabel}</div>
               </div>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Volume</div>
@@ -291,8 +286,8 @@ export const StockStoryPage: React.FC = () => {
           </div>
 
           <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
-            <button onClick={handleToggleWatchlist} className={`flex h-10 items-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all ${isInWatchlist ? "border-rose-200/50" : "border-emerald-200/50"}`} style={{ background: isInWatchlist ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.6)", color: isInWatchlist ? "#c0392b" : "#1a6e4a" }}>
-              <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
+            <button onClick={handleToggleWatchlist} className={`btn btn-sm ${isInWatchlist ? "btn-ghost text-[var(--color-danger)]" : "btn-secondary"}`}>
+              <Star className={`icon-action ${isInWatchlist ? "text-[var(--color-danger)]" : ""}`} />
               {isInWatchlist ? "Remove from watchlist" : "Track via watchlist"}
             </button>
             <button type="button" onClick={() => navigateToPage("search")} className="h-10 rounded-xl px-4 text-xs font-semibold text-white transition hover:opacity-90" style={{ background: "#0f1419" }}>
@@ -331,8 +326,8 @@ export const StockStoryPage: React.FC = () => {
   const renderProgressBar = (label: string, score: number | null, colorClass: string) => {
     const hasScore = typeof score === "number" && Number.isFinite(score);
     const barColors: Record<string, string> = {
-      "text-fuchsia-700": "bg-fuchsia-500", "text-emerald-700": "bg-emerald-500", "text-sky-700": "bg-sky-500",
-      "text-orange-700": "bg-orange-500", "text-amber-700": "bg-amber-500", "text-rose-700": "bg-rose-500", "text-indigo-700": "bg-indigo-500",
+      "text-primary": "bg-[var(--color-accent)]", "text-secondary": "bg-[var(--color-text-muted)]",
+      "text-warning": "bg-[var(--color-warning)]", "text-danger": "bg-[var(--color-danger)]",
     };
     const barColor = barColors[colorClass] || "bg-slate-400";
     return (
@@ -351,7 +346,7 @@ export const StockStoryPage: React.FC = () => {
   const formatGrowthValue = (val: number | null) => {
     if (val === null || val === undefined) return <span style={{ color: "#8b98a5" }}>Unavailable</span>;
     const isPos = val >= 0;
-    return <span className={`font-mono font-bold ${isPos ? "text-accent-success" : "text-rose-700"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
+    return <span className={`font-mono font-bold ${isPos ? "text-[var(--color-active)]" : "text-[var(--color-danger)]"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
   };
 
   return (
@@ -395,7 +390,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Live Price</div>
                 <div className="mt-1 font-mono text-xl font-bold tabular-nums" style={{ color: "#0f1419" }}>{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-accent-success' : 'text-rose-700'}`}>{changeLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[var(--color-active)]' : 'text-[var(--color-danger)]'}`}>{changeLabel}</div>
               </div>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Volume</div>
@@ -420,8 +415,8 @@ export const StockStoryPage: React.FC = () => {
       </section>
 
       <section className="flex flex-wrap items-center gap-3">
-        <button onClick={handleToggleWatchlist} className={`flex h-9 items-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all ${isInWatchlist ? "border-rose-200" : "border-emerald-200"}`} style={{ background: isInWatchlist ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.6)", color: isInWatchlist ? "#c0392b" : "#1a6e4a" }}>
-          <Star className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-rose-700" : ""}`} />
+        <button onClick={handleToggleWatchlist} className={`btn btn-sm ${isInWatchlist ? "btn-ghost text-[var(--color-danger)]" : "btn-secondary"}`}>
+          <Star className={`icon-action ${isInWatchlist ? "text-[var(--color-danger)]" : ""}`} />
           {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
         </button>
       </section>
@@ -448,11 +443,11 @@ export const StockStoryPage: React.FC = () => {
                 <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("Growth metrics", storyData.growth, "text-fuchsia-700")}
-                {renderProgressBar("Quality metrics", storyData.quality, "text-emerald-700")}
-                {renderProgressBar("Stability score", storyData.stability, "text-sky-700")}
-                {renderProgressBar("Price trend", storyData.momentum, "text-orange-700")}
-                {renderProgressBar("Value score", storyData.valuation, "text-amber-700")}
+                {renderProgressBar("Growth metrics", storyData.growth, "text-primary")}
+                {renderProgressBar("Quality metrics", storyData.quality, "text-primary")}
+                {renderProgressBar("Stability score", storyData.stability, "text-secondary")}
+                {renderProgressBar("Price trend", storyData.momentum, "text-warning")}
+                {renderProgressBar("Value score", storyData.valuation, "text-secondary")}
               </div>
               <div className="text-[9px] leading-normal mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
                 Composite score is the average of available factor scores. Missing factors are shown as unavailable.
@@ -556,10 +551,10 @@ export const StockStoryPage: React.FC = () => {
                 </span>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("PE Multiples Rating", storyData.engineDetails.valuation.peScore, "text-amber-700")}
-                {renderProgressBar("Price to Book (PB) Rating", storyData.engineDetails.valuation.pbScore, "text-amber-700")}
-                {renderProgressBar("EV/EBITDA Rating", storyData.engineDetails.valuation.evEbitdaScore, "text-amber-700")}
-                {renderProgressBar("Free Cash Flow Yield Rating", storyData.engineDetails.valuation.fcfYieldScore, "text-amber-700")}
+                {renderProgressBar("PE Multiples", storyData.engineDetails.valuation.peScore, "text-secondary")}
+                {renderProgressBar("Price to Book (PB)", storyData.engineDetails.valuation.pbScore, "text-secondary")}
+                {renderProgressBar("EV/EBITDA", storyData.engineDetails.valuation.evEbitdaScore, "text-secondary")}
+                {renderProgressBar("Free Cash Flow Yield", storyData.engineDetails.valuation.fcfYieldScore, "text-secondary")}
               </div>
               <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
                 {storyData.engineDetails.valuation.commentary}
@@ -603,7 +598,7 @@ export const StockStoryPage: React.FC = () => {
                             <span style={{ color: "#536471" }}>{c.share} <span className="text-[10px] font-normal" style={{ color: "#0369a1" }}>({c.change})</span></span>
                           </div>
                           <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "#f0f1f5" }}>
-                            <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
+                            <div className="h-full rounded-full bg-[var(--color-accent)]" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       );
@@ -638,10 +633,10 @@ export const StockStoryPage: React.FC = () => {
                 </span>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Accounting Anomalies", storyData.engineDetails.risk.accountingAnomalyScore, "text-rose-700")}
-                {renderProgressBar("Leverage Stress Score", storyData.engineDetails.risk.debtStressScore, "text-rose-700")}
-                {renderProgressBar("Cash Flow Strains", storyData.engineDetails.risk.cashFlowStressScore, "text-rose-700")}
-                {renderProgressBar("Price Volatility Risk", storyData.engineDetails.risk.volatilityRiskScore, "text-rose-700")}
+                {renderProgressBar("Accounting Anomalies", storyData.engineDetails.risk.accountingAnomalyScore, "text-danger")}
+                {renderProgressBar("Leverage Stress", storyData.engineDetails.risk.debtStressScore, "text-danger")}
+                {renderProgressBar("Cash Flow Strains", storyData.engineDetails.risk.cashFlowStressScore, "text-danger")}
+                {renderProgressBar("Price Volatility", storyData.engineDetails.risk.volatilityRiskScore, "text-danger")}
               </div>
               <div className="rounded-lg p-3 text-xs leading-normal flex items-start gap-2" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
@@ -661,10 +656,10 @@ export const StockStoryPage: React.FC = () => {
                 </span>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Data Completeness", storyData.engineDetails.confidence.dataCompleteness, "text-indigo-700")}
-                {renderProgressBar("Signal Agreement", storyData.engineDetails.confidence.signalAgreement, "text-indigo-700")}
-                {renderProgressBar("Risk Consistency", storyData.engineDetails.confidence.riskConsistency, "text-indigo-700")}
-                {renderProgressBar("Historical Stability", storyData.engineDetails.confidence.historicalStability, "text-indigo-700")}
+                {renderProgressBar("Data Completeness", storyData.engineDetails.confidence.dataCompleteness, "text-primary")}
+                {renderProgressBar("Signal Agreement", storyData.engineDetails.confidence.signalAgreement, "text-primary")}
+                {renderProgressBar("Risk Consistency", storyData.engineDetails.confidence.riskConsistency, "text-primary")}
+                {renderProgressBar("Historical Stability", storyData.engineDetails.confidence.historicalStability, "text-primary")}
               </div>
               <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
                 {storyData.engineDetails.confidence.commentary}
@@ -692,7 +687,7 @@ export const StockStoryPage: React.FC = () => {
                 <div className="relative ml-3.5 pl-5 space-y-6 text-xs" style={{ borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
                   {timeline.map((evt, idx) => (
                     <div key={idx} className="relative">
-                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-emerald-600 ring-4 ring-white" />
+                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-[var(--color-accent)] ring-4 ring-[var(--color-canvas)]" />
                       <div className="font-mono text-[10px] font-extrabold mb-1" style={{ color: "#1a6e4a" }}>{evt.date}</div>
                       <div className="font-bold text-sm mb-1" style={{ color: "#0f1419" }}>{evt.event}</div>
                       <p className="leading-relaxed" style={{ color: "#536471" }}>{evt.detail}</p>

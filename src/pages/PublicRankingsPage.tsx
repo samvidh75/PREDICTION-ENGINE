@@ -100,9 +100,8 @@ export const PublicRankingsPage: React.FC = () => {
 
         {error && (
           <div
-            className="mb-4 rounded-xl p-4 text-sm"
+            className="mb-4 rounded-xl p-4 text-sm border border-[var(--color-warning)]/20 bg-[var(--color-warning-bg)] text-[var(--color-warning)]"
             role="status"
-            style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
           >
             <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
             <p className="mt-1 text-xs">{error}</p>
@@ -126,12 +125,11 @@ export const PublicRankingsPage: React.FC = () => {
             />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <span className="whitespace-nowrap text-xs font-medium" style={{ color: "#536471" }}>Sector:</span>
+            <span className="whitespace-nowrap text-xs font-medium text-muted">Sector:</span>
             <select
               value={sectorFilter}
               onChange={(e) => setSectorFilter(e.target.value)}
-              className="h-10 w-full rounded-xl px-3 text-sm focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:w-48"
-              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#0f1419" }}
+              className="surface surface-raised h-10 w-full rounded-xl px-3 text-sm sm:w-48"
             >
               {sectors.map((sec) => (
                 <option key={sec} value={sec}>{sec === "all" ? "All Sectors" : sec}</option>
@@ -141,7 +139,7 @@ export const PublicRankingsPage: React.FC = () => {
         </Surface>
 
         {loading ? (
-          <div className="py-12 text-center text-sm" style={{ color: "#536471" }} role="status" aria-live="polite">Loading rankings…</div>
+          <div className="py-12 text-center text-sm text-muted" role="status" aria-live="polite">Loading rankings…</div>
         ) : filteredRankings.length === 0 && rankings.length === 0 ? (
           <div className="flex flex-col gap-5">
             <EmptyState
@@ -149,27 +147,24 @@ export const PublicRankingsPage: React.FC = () => {
               description="Rankings appear after verified scoring has completed for the latest cycle."
             />
             {(symbolCount !== null || registryRowCount !== null) && (
-              <div
-                className="rounded-xl p-5"
-                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-              >
-                <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#536471" }}>Data coverage</h4>
+              <div className="surface surface-raised rounded-xl p-5">
+                <h4 className="label mb-3">Data coverage</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Companies covered</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Companies covered</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {symbolCount !== null ? symbolCount.toLocaleString() : "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Scored records</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Scored records</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {registryRowCount !== null ? registryRowCount.toLocaleString() : "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Latest update</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Latest update</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {latestPredictionDate || "—"}
                     </span>
                   </div>
@@ -183,8 +178,8 @@ export const PublicRankingsPage: React.FC = () => {
           </div>
         ) : filteredRankings.length === 0 && rankings.length > 0 ? (
           <div className="py-12 text-center">
-            <p className="text-sm" style={{ color: "#536471" }}>No rankings match your search or sector filter.</p>
-            <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer" style={{ color: "#1a6e4a" }}>
+            <p className="text-sm text-muted">No rankings match your search or sector filter.</p>
+            <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="btn btn-sm btn-ghost">
               Clear filters
             </button>
           </div>
@@ -205,9 +200,9 @@ export const PublicRankingsPage: React.FC = () => {
                   role="button"
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPage("stock", r.symbol); } }}
                 >
-                  <td className="p-4 font-semibold" style={{ color: "#536471" }}>{formatRank(r.rank)}</td>
-                  <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{r.symbol}</td>
-                  <td className="max-w-[200px] truncate p-4" style={{ color: "#536471" }}>{r.companyName || "Unavailable"}</td>
+                  <td className="p-4 font-semibold text-muted">{formatRank(r.rank)}</td>
+                  <td className="p-4 font-mono font-bold hover:underline text">{r.symbol}</td>
+                  <td className="max-w-[200px] truncate p-4 text-muted">{r.companyName || "Unavailable"}</td>
                   <td className="p-4">
                     {typeof rankingScore === "number" && Number.isFinite(rankingScore) ? (
                       <ScorePill score={Math.round(rankingScore)} />
@@ -225,11 +220,11 @@ export const PublicRankingsPage: React.FC = () => {
                   <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
                   <td className="p-4">
                     {r.predictionDate ? (
-                      <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "#1a6e4a" }}>
+                      <span className="text-[10px] font-semibold whitespace-nowrap text-[var(--color-active)]">
                         {formatFreshness(r.predictionDate)}
                       </span>
                     ) : (
-                      <span className="text-[10px]" style={{ color: "#8b98a5" }}>Pending</span>
+                      <span className="text-[10px] text-[var(--color-text-muted)]">Pending</span>
                     )}
                   </td>
                 </tr>
