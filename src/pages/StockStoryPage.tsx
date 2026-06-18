@@ -12,6 +12,11 @@ import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore } from "../services/ui/dataFormatting";
 import { DataFreshnessBadge, SourceBadge, CoverageStatusBadge } from "../components/ui/PageHeader";
 import { useToast } from "../components/feedback/useToast";
+import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
+import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
+import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
+import { MethodologyLink } from "../components/intelligence/MethodologyLink";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -154,6 +159,7 @@ export const StockStoryPage: React.FC = () => {
   const [storyError, setStoryError] = useState<string | null>(null);
   const [ownership, setOwnership] = useState<any | null>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
+  const [explanationModalOpen, setExplanationModalOpen] = useState(false);
 
   useEffect(() => { RecentSearchStore.addTicker(ticker); }, [ticker]);
 
@@ -411,6 +417,16 @@ export const StockStoryPage: React.FC = () => {
           <p className="mt-3 max-w-5xl rounded-lg p-3 text-[11px] leading-relaxed" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
             Research signals are for informational purposes only. Not personalised investment advice.
           </p>
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => setExplanationModalOpen(true)}
+              className="rounded-xl border border-[var(--color-border)] bg-white/60 px-4 py-2 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-white/80 transition-colors"
+            >
+              <Activity className="mr-1.5 inline h-3 w-3" aria-hidden="true" />
+              Open full explanation
+            </button>
+          </div>
         </div>
       </section>
 
@@ -762,6 +778,83 @@ export const StockStoryPage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Prediction explanation modal */}
+      <IntelligenceModal
+        open={explanationModalOpen}
+        onClose={() => setExplanationModalOpen(false)}
+        title={ticker ? `${ticker} — prediction explanation` : ""}
+        subtitle="Model output, factor context, and data coverage for this company."
+      >
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Score</span>
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-2xl font-bold tabular-nums text-[#E6EDF3]">
+                  {healthScore !== null ? Math.round(healthScore) : "—"}
+                </span>
+                <span className="text-xs text-[#8B949E]">/ 100</span>
+              </div>
+              {storyData?.classification && (
+                <span className="mt-1 inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#8B949E]">
+                  {storyData.classification}
+                </span>
+              )}
+            </div>
+            <PredictionConfidenceBar
+              score={storyData?.engineDetails?.confidence?.score ?? null}
+              level={storyData?.engineDetails?.confidence?.level ?? null}
+            />
+          </div>
+
+          {/* What this score means */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor context</span>
+            <p className="mt-2 text-xs leading-relaxed text-[#8B949E]">
+              {storyData?.narrative || "Factor scoring details are pending. Scores are derived from verified market data and model calculations."}
+            </p>
+          </div>
+
+          {/* Factor drivers */}
+          <div>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor scores</span>
+            <div className="mt-2 grid gap-2 sm:grid-cols-3">
+              <FactorDriverCard label="Growth" score={storyData?.growth ?? null} />
+              <FactorDriverCard label="Quality" score={storyData?.quality ?? null} />
+              <FactorDriverCard label="Stability" score={storyData?.stability ?? null} />
+              <FactorDriverCard label="Momentum" score={storyData?.momentum ?? null} />
+              <FactorDriverCard label="Valuation" score={storyData?.valuation ?? null} />
+              <FactorDriverCard label="Risk" score={storyData?.risk ?? null} />
+            </div>
+            <p className="mt-2 text-[10px] text-[#484F58]">Factor context is shown for reference, not as causal attribution.</p>
+          </div>
+
+          {/* Data coverage */}
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Data coverage</span>
+            <div className="mt-2 space-y-1.5">
+              {[
+                { label: "Model run", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Pending" },
+                { label: "Data completeness", value: storyData?.dataState?.completenessScore ? `${Math.round(storyData.dataState.completenessScore)}%` : "Pending" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between">
+                  <span className="text-xs text-[#8B949E]">{item.label}</span>
+                  <span className="text-xs font-medium text-[#E6EDF3]">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <MethodologyLink />
+          </div>
+
+          <p className="text-[10px] leading-relaxed text-[#484F58]">
+            Research only. This prediction explanation shows model inputs and outputs for reference. It is not investment advice.
+          </p>
+        </div>
+      </IntelligenceModal>
     </div>
   );
 };

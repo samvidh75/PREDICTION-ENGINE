@@ -157,7 +157,7 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Indian equity research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Research Indian equities/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -224,10 +224,10 @@ test.describe("Public navigation", () => {
     await expect(page).toHaveURL(/page=methodology/);
   });
 
-  test("landing page has working CTA to onboarding signup", async ({ page }) => {
+  test("landing page has working CTA to signup bottom", async ({ page }) => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
-    await page.locator("#onboarding-cta-signup").waitFor({ state: "visible", timeout: 10000 });
-    await page.locator("#onboarding-cta-signup").click();
+    await page.locator("#hero-cta-start").waitFor({ state: "visible", timeout: 10000 });
+    await page.locator("#hero-cta-start").click();
     await expect(page).toHaveURL(/page=signup/);
   });
 
@@ -445,7 +445,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /Indian equity research/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Research Indian equities/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 

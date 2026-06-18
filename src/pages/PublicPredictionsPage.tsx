@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { LoadingState, EmptyState } from "../components/ui/DataState";
-import { MissingDataBadge, PageHeader, ResearchDisclaimer, DataFreshnessBadge } from "../components/ui/PageHeader";
+import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type Signal } from "../services/api/client";
-import { DataUnavailableState, MetricCard, PremiumPage, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
+import { PremiumPage, MetricCard, StatusChip } from "../components/premium/PremiumUI";
+import { IntelligencePanel } from "../components/intelligence/IntelligencePanel";
+import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
+import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
+import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
+import { MethodologyLink } from "../components/intelligence/MethodologyLink";
+import { TrendingUp, BarChart3 } from "lucide-react";
 
 interface CoverageInfo {
   symbolCount: number | null;
@@ -24,7 +30,6 @@ export default function PublicPredictionsPage(): JSX.Element {
 
   useEffect(() => {
     const ctrl = new AbortController();
-
     api.getSignals(50)
       .then((data) => {
         if (ctrl.signal.aborted) return;
@@ -33,46 +38,23 @@ export default function PublicPredictionsPage(): JSX.Element {
         setSymbolsAnalyzed(data?.symbolsAnalyzed ?? null);
         setLoading(false);
       })
-      .catch((err) => {
-        if (ctrl.signal.aborted) return;
-        setError(err instanceof ApiError ? err.message : "Signals unavailable");
-        setLoading(false);
-      });
-
+      .catch((err) => { if (ctrl.signal.aborted) return; setError(err instanceof ApiError ? err.message : "Signals unavailable"); setLoading(false); });
     api.getDataCoverage()
-      .then((cov) => {
-        if (ctrl.signal.aborted) return;
-        setCoverageData({
-          symbolCount: cov.coverage?.symbols?.count ?? null,
-          registryRowCount: cov.coverage?.predictionRegistry?.rowCount ?? null,
-          latestPredictionDate: cov.coverage?.predictionRegistry?.latestPredictionDate ?? null,
-        });
-      })
+      .then((cov) => { if (ctrl.signal.aborted) return; setCoverageData({ symbolCount: cov.coverage?.symbols?.count ?? null, registryRowCount: cov.coverage?.predictionRegistry?.rowCount ?? null, latestPredictionDate: cov.coverage?.predictionRegistry?.latestPredictionDate ?? null }); })
       .catch(() => {});
-
     return () => ctrl.abort();
   }, []);
 
   const navigate = (symbol: string) => {
     const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock");
-    params.set("id", symbol);
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
+    params.set("page", "stock"); params.set("id", symbol);
+    window.history.pushState({}, "", `?${params.toString()}`); window.dispatchEvent(new Event("urlchange"));
   };
 
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
-    params.set("page", pageKey);
-    params.delete("id");
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
-  };
-
-  const severityColors: Record<string, string> = {
-    critical: "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]",
-    important: "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]",
-    monitor: "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]",
+    params.set("page", pageKey); params.delete("id");
+    window.history.pushState({}, "", `?${params.toString()}`); window.dispatchEvent(new Event("urlchange"));
   };
 
   return (
@@ -81,24 +63,23 @@ export default function PublicPredictionsPage(): JSX.Element {
       <MobileNav />
       <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
 
-        <Surface dark className="mb-6 p-6 md:p-8">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="label">Signals</div>
-              <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Research signal changes</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 md:text-base">Signals are research changes from verified updates. They are not investment advice or buy/sell/hold recommendations.</p>
-            </div>
-            {snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
-          </div>
-        </Surface>
+        {/* Prediction Intelligence header */}
+        <IntelligencePanel
+          title="Prediction Intelligence"
+          subtitle="Model output, signal movement, and data freshness from the latest research cycle."
+          statuses={[
+            { label: "Signals visible", value: signals.length.toLocaleString("en-IN"), status: signals.length > 0 ? "ok" : "muted" },
+            { label: "Symbols analyzed", value: symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "—", status: symbolsAnalyzed ? "ok" : "muted" },
+            { label: "Coverage records", value: coverageData?.registryRowCount !== null && coverageData?.registryRowCount !== undefined ? coverageData.registryRowCount.toLocaleString("en-IN") : "—", status: coverageData?.registryRowCount ? "ok" : "muted" },
+          ]}
+        >
+          {snapshotDate && <ModelRunBadge runDate={snapshotDate} />}
+        </IntelligencePanel>
 
         {error && (
-          <div
-            className="mb-4 rounded-xl p-4 text-sm border border-[var(--color-warning)]/20 bg-[var(--color-warning-bg)] text-[var(--color-warning)]"
-            role="status"
-          >
-            <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
-            <p className="mt-1 text-xs">{error}</p>
+          <div className="mb-4 rounded-xl border border-[#EF9A09]/20 bg-[#EF9A09]/[0.03] p-4 text-xs text-[#EF9A09]" role="status">
+            <p className="font-semibold">Some data is temporarily unavailable</p>
+            <p className="mt-1">{error}</p>
           </div>
         )}
 
@@ -112,53 +93,49 @@ export default function PublicPredictionsPage(): JSX.Element {
           <LoadingState description="Checking for recent score changes…" />
         ) : signals.length === 0 ? (
           <div className="flex flex-col gap-5">
-            <DataUnavailableState
-              title="Score changes pending"
-              body={
-                symbolsAnalyzed && symbolsAnalyzed > 0
-                  ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update cycle.`
-                  : "Score changes appear when provider data has been processed and verified."
-              }
-            />
+            <RoundedDepthPanel padding="lg" variant="elevated">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <TrendingUp className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
+                <h2 className="text-sm font-semibold text-[#E6EDF3]">No new signal movement in the current run</h2>
+                <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
+                  {symbolsAnalyzed && symbolsAnalyzed > 0
+                    ? `${symbolsAnalyzed.toLocaleString("en-IN")} companies registered. Score changes appear after the next verified update cycle.`
+                    : "Signal movement appears when provider data has been processed and verified."}
+                </p>
+                <div className="flex gap-2">
+                  <Button type="button" onClick={() => setPage("rankings")} className="h-10 px-4 text-xs">
+                    <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Browse rankings
+                  </Button>
+                  <MethodologyLink onClick={() => setPage("methodology")} label="View methodology" />
+                </div>
+              </div>
+            </RoundedDepthPanel>
             {coverageData && (
-              <div className="surface surface-raised rounded-xl p-5">
-                <h4 className="label mb-3">Data coverage</h4>
-                <div className="grid grid-cols-3 gap-4">
+              <div className="rounded-2xl border border-white/5 bg-[#0D1117] p-5">
+                <h4 className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Data coverage</h4>
+                <div className="mt-3 grid grid-cols-3 gap-4">
                   <div>
-                    <span className="text-muted text-[10px] font-medium">Companies covered</span>
-                    <span className="block text-lg font-bold tabular-nums text">
-                      {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
-                    </span>
+                    <span className="text-[10px] text-[#484F58]">Companies covered</span>
+                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}</span>
                   </div>
                   <div>
-                    <span className="text-muted text-[10px] font-medium">Scored records</span>
-                    <span className="block text-lg font-bold tabular-nums text">
-                      {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
-                    </span>
+                    <span className="text-[10px] text-[#484F58]">Scored records</span>
+                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}</span>
                   </div>
                   <div>
-                    <span className="text-muted text-[10px] font-medium">Latest update</span>
-                    <span className="block text-lg font-bold tabular-nums text">
-                      {coverageData.latestPredictionDate || "—"}
-                    </span>
+                    <span className="text-[10px] text-[#484F58]">Latest update</span>
+                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.latestPredictionDate || "—"}</span>
                   </div>
                 </div>
-                <p className="text-muted mt-3 text-xs leading-relaxed">
-                  Score changes appear once updated provider data has been verified.
-                </p>
               </div>
             )}
-            <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
-              <Button type="button" onClick={() => setPage("signup")} className="h-10 px-4 text-xs">Create free account</Button>
-              <Button type="button" onClick={() => setPage("methodology")} variant="secondary" className="h-10 px-4 text-xs">View scoring methodology</Button>
-            </div>
           </div>
         ) : (
-          <Surface className="mt-8 overflow-hidden">
+          <div className="rounded-[22px] border border-white/5 bg-[#0D1117] overflow-hidden">
             <div className="hidden md:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-[var(--color-surface-raised)] text-xs font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>
+                <tr className="border-b border-white/5 text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">
                   <th scope="col" className="p-4">Symbol</th>
                   <th scope="col" className="p-4">Signal</th>
                   <th scope="col" className="p-4 hidden sm:table-cell">Severity</th>
@@ -166,73 +143,69 @@ export default function PublicPredictionsPage(): JSX.Element {
                   <th scope="col" className="p-4 hidden lg:table-cell">Freshness</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-surface-raised)]">
-                {signals.map((signal, i) => {
-                  const severityClass = severityColors[signal.severity] || "bg-white/60 border-white/30 text-ink-secondary";
-
-                  return (
-                    <tr
-                      key={`${signal.symbol}:${i}`}
-                      onClick={() => signal.symbol && navigate(signal.symbol)}
-                      onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && signal.symbol) { e.preventDefault(); navigate(signal.symbol); } }}
-                      tabIndex={0}
-                      role="link"
-                      className="cursor-pointer transition-colors hover:bg-white/40"
-                    >
-                      <td className="p-4 font-mono font-bold hover:underline text">{signal.symbol}</td>
-                      <td className="p-4">
-                        <span
-                          className="badge"
-                        >
-                          {signal.type || "Signal pending"}
-                        </span>
-                      </td>
-                      <td className="hidden p-4 sm:table-cell">
-                        <span className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${severityClass}`}>
-                          {signal.severity || "Unknown"}
-                        </span>
-                      </td>
-                      <td className="hidden max-w-xs truncate p-4 md:table-cell">
-                        <span style={{ color: "#536471" }}>{signal.explanation || "No explanation"}</span>
-                      </td>
-                      <td className="hidden p-4 lg:table-cell">
-                        {signal.snapshotDate || snapshotDate ? (
-                          <span className="text-[10px] font-semibold whitespace-nowrap text-[var(--color-active)]">
-                            {formatFreshness(signal.snapshotDate || snapshotDate)}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-[var(--color-text-muted)]">Pending</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
+              <tbody className="divide-y divide-white/5">
+                {signals.map((signal, i) => (
+                  <tr
+                    key={`${signal.symbol}:${i}`}
+                    onClick={() => signal.symbol && navigate(signal.symbol)}
+                    onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && signal.symbol) { e.preventDefault(); navigate(signal.symbol); } }}
+                    tabIndex={0}
+                    role="link"
+                    className="cursor-pointer transition-colors hover:bg-white/[0.02]"
+                  >
+                    <td className="p-4 font-mono font-bold text-[#E6EDF3] hover:underline">{signal.symbol}</td>
+                    <td className="p-4">
+                      <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#8B949E]">
+                        {signal.type || "Signal pending"}
+                      </span>
+                    </td>
+                    <td className="hidden p-4 sm:table-cell">
+                      <span className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
+                        signal.severity === "critical" ? "border-[#F23645]/20 bg-[#F23645]/10 text-[#F23645]" :
+                        signal.severity === "important" ? "border-[#EF9A09]/20 bg-[#EF9A09]/10 text-[#EF9A09]" :
+                        "border-white/5 bg-white/[0.03] text-[#8B949E]"
+                      }`}>
+                        {signal.severity || "Unknown"}
+                      </span>
+                    </td>
+                    <td className="hidden max-w-xs truncate p-4 md:table-cell text-[#8B949E]">{signal.explanation || "No explanation"}</td>
+                    <td className="hidden p-4 lg:table-cell">
+                      {signal.snapshotDate || snapshotDate ? (
+                        <span className="text-[10px] font-semibold whitespace-nowrap text-[#22AB94]">{formatFreshness(signal.snapshotDate || snapshotDate)}</span>
+                      ) : (
+                        <span className="text-[10px] text-[#484F58]">Pending</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             </div>
-            <div className="grid gap-4 p-4 md:hidden">
+            <div className="grid gap-3 p-4 md:hidden">
               {signals.map((signal, i) => (
-                <button key={`${signal.symbol}:mobile:${i}`} onClick={() => signal.symbol && navigate(signal.symbol)} className="rounded-2xl border border-slate-200/70 bg-white/75 p-4 text-left">
+                <button key={`${signal.symbol}:mobile:${i}`} onClick={() => signal.symbol && navigate(signal.symbol)} className="rounded-2xl border border-white/5 bg-[#0D1117] p-4 text-left">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-mono text-lg font-bold text-slate-950">{signal.symbol}</div>
-                      <div className="mt-1 text-sm text-slate-600">{signal.explanation || "No explanation available"}</div>
+                      <div className="font-mono text-base font-bold text-[#E6EDF3]">{signal.symbol}</div>
+                      <div className="mt-1 text-xs text-[#8B949E]">{signal.explanation || "No explanation available"}</div>
                     </div>
                     <StatusChip label={signal.severity || "Unknown"} tone={signal.severity === "critical" ? "risk" : signal.severity === "important" ? "warn" : "muted"} />
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <StatusChip label={signal.type || "Signal pending"} tone="muted" />
-                    <StatusChip label={signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Freshness pending"} tone={signal.snapshotDate || snapshotDate ? "ok" : "warn"} />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-[#8B949E]">{signal.type || "Signal pending"}</span>
+                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${signal.snapshotDate || snapshotDate ? "border-[#22AB94]/10 text-[#22AB94]" : "border-[#EF9A09]/10 text-[#EF9A09]"}`}>
+                      {signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Freshness pending"}
+                    </span>
                   </div>
                 </button>
               ))}
             </div>
             {symbolsAnalyzed !== null && (
-              <div className="border-t border-[var(--color-surface-raised)] px-4 py-2 text-xs text-muted">
-                {symbolsAnalyzed} companies in latest cycle
+              <div className="border-t border-white/5 px-4 py-2 text-[10px] text-[#484F58]">
+                {symbolsAnalyzed.toLocaleString("en-IN")} companies in latest cycle
               </div>
             )}
-          </Surface>
+          </div>
         )}
 
         <div className="mt-6">
