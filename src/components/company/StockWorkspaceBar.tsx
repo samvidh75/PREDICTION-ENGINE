@@ -96,12 +96,12 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
   const quoteTimestamp = quoteState.loading ? "Loading quote timestamp" : formatDateTime(quoteState.quote?.updatedAt);
 
   return (
-    <section aria-label="Stock workspace context" className="mx-auto mb-4 w-full max-w-7xl rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm">
+    <section aria-label="Stock workspace context" className="mb-4 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4 text-emerald-700" />
           <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-800">Stock workspace</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800">Stock workspace</div>
             <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D prediction horizon · registry-backed scores only</div>
           </div>
         </div>

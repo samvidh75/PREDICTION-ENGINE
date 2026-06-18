@@ -140,14 +140,14 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
         <div className="flex flex-wrap items-center gap-6">
           <div className="text-center">
             <p className="mb-1 text-[10px] uppercase text-slate-400">Yesterday</p>
-            <p className={`text-4xl font-extrabold tabular-nums ${hs.delta !== null && hs.delta > 0 ? "text-emerald-600" : "text-slate-600"}`}>
+            <p className={`text-4xl font-semibold tabular-nums ${hs.delta !== null && hs.delta > 0 ? "text-emerald-600" : "text-slate-600"}`}>
               {hs.from ?? "—"}
             </p>
           </div>
           <p className="text-2xl font-bold text-slate-300">→</p>
           <div className="text-center">
             <p className="mb-1 text-[10px] uppercase text-slate-400">Today</p>
-            <p className="text-4xl font-extrabold tabular-nums text-slate-900">{hs.to}</p>
+            <p className="text-4xl font-semibold tabular-nums text-slate-900">{hs.to}</p>
           </div>
           {hs.delta !== null && (
             <div className={`rounded-lg border px-3 py-1 ${hs.delta > 0 ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"}`}>
@@ -274,7 +274,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
           <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500">Historical Reliability</p>
           <div className="flex flex-wrap items-center gap-5">
             <div>
-              <p className="text-3xl font-extrabold text-slate-800">{data.historicalReliability.successRate}%</p>
+              <p className="text-3xl font-semibold text-slate-800">{data.historicalReliability.successRate}%</p>
               <p className="text-[10px] text-slate-400">Success Rate</p>
             </div>
             <div className="h-10 w-px bg-violet-200" />

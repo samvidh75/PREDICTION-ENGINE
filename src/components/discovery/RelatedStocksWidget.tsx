@@ -145,10 +145,10 @@ export default function RelatedStocksWidget({ symbol, sectorScore = 50, limit = 
           >
             <span style={{ fontWeight: 600, minWidth: 90 }}>{p.symbol}</span>
             <span style={{
-              background: p.classification === "Strong Buy" ? "rgba(0,209,122,0.12)" :
-                p.classification === "Buy" ? "rgba(87,185,255,0.12)" : "rgba(255,179,71,0.12)",
-              color: p.classification === "Strong Buy" ? "#00D17A" :
-                p.classification === "Buy" ? "#57B9FF" : "#FFB347",
+              background: p.classification === "Exceptional" || p.classification === "Excellent" || p.classification === "Good" ? "rgba(0,209,122,0.12)" :
+                p.classification === "Fair" || p.classification === "Healthy" ? "rgba(87,185,255,0.12)" : "rgba(255,179,71,0.12)",
+              color: p.classification === "Exceptional" || p.classification === "Excellent" || p.classification === "Good" ? "#00D17A" :
+                p.classification === "Fair" || p.classification === "Healthy" ? "#57B9FF" : "#FFB347",
               padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600,
             }}>
               {p.classification}

@@ -80,7 +80,7 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
       >
         <Bell className="h-4 w-4 text-white/60" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-extrabold text-white shadow-lg shadow-cyan-500/30">
+          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500 text-[10px] font-semibold text-white shadow-lg shadow-cyan-500/30">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -98,7 +98,7 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
             <div className="flex items-center justify-between border-b border-white/10 p-4">
               <div className="flex items-center gap-2">
                 <Bell className="h-5 w-5 text-cyan-400" />
-                <h2 className="text-sm font-extrabold uppercase tracking-wider text-white">Notifications</h2>
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-white">Notifications</h2>
                 {unreadCount > 0 && (
                   <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-bold text-cyan-400">{unreadCount} new</span>
                 )}

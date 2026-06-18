@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, FileSearch, Eye, ShieldCheck, Search, TrendingUp, Database, Activity } from "lucide-react";
+import { ArrowRight, FileSearch, Eye, ShieldCheck, Search, Database, Activity } from "lucide-react";
 import TopNav from "../components/navigation/TopNav";
 import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { api } from "../services/api/client";
 import { PremiumPage, navigatePage } from "../components/premium/PremiumUI";
-import { GlobalCommandButton } from "../components/intelligence/GlobalCommandButton";
-import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
-import { DataFreshnessOrb } from "../components/intelligence/DataFreshnessOrb";
 import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
 import { SourceTracePill } from "../components/intelligence/SourceTracePill";
@@ -117,29 +114,31 @@ export const PublicLandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Full-width Workflow — compact */}
+      {/* Full-width Workflow — 2-col on desktop, 4-col only on xl+ */}
       <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
         <div className="mx-auto w-full max-w-[1440px]">
           <div className="mb-5 flex items-center gap-2">
             <Activity className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
             <h2 className="text-xs font-semibold text-[#E6EDF3]">Research workflow</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {workflow.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-4">
-                <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-                <h3 className="mt-3 text-xs font-semibold text-[#E6EDF3]">{title}</h3>
-                <p className="mt-1 text-[11px] leading-relaxed text-[#8B949E]">{body}</p>
+              <div key={title} className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-3.5">
+                <div className="flex items-center gap-2">
+                  <Icon className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
+                  <h3 className="text-xs font-semibold text-[#E6EDF3]">{title}</h3>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-[#8B949E]">{body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Full-width Integrity — compact */}
+      {/* Full-width Integrity — left/right composition, not a single block */}
       <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-        <div className="mx-auto w-full max-w-[1440px]">
-          <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-5 md:p-6">
+        <div className="mx-auto grid w-full max-w-[1440px] gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+          <div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
               <h2 className="text-xs font-semibold text-[#E6EDF3]">Data integrity</h2>
@@ -150,6 +149,21 @@ export const PublicLandingPage: React.FC = () => {
             <div className="mt-4 flex flex-wrap gap-2">
               <Button id="hero-cta-start" type="button" onClick={() => navigatePage("signup")} className="h-9 px-4 text-[11px]">Sign in / Get started</Button>
               <Button id="onboarding-cta-about" type="button" onClick={() => navigatePage("about")} variant="secondary" className="h-9 px-4 text-[11px]">Read mission</Button>
+            </div>
+          </div>
+          <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-4">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">
+              <span>What you will see</span>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Source-backed</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Fresh / stale</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Confidence</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Gaps labelled</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Provider status</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Lineage trace</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">No advice</span>
+              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">No forecasts</span>
             </div>
           </div>
         </div>

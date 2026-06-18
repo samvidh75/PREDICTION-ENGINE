@@ -101,10 +101,10 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
+    <div className="flex flex-col gap-5 antialiased">
       {/* Compact search header — no bulky glass card */}
-      <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white/80 px-4 py-2.5 shadow-sm">
-        <Search className="h-4 w-4 shrink-0" style={{ color: "#8b98a5" }} />
+      <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-[#0D1117] px-4 py-2.5">
+        <Search className="h-4 w-4 shrink-0 text-[#8B949E]" />
         <input
           aria-label="Search Indian companies"
           ref={inputRef}
@@ -112,19 +112,18 @@ export const SearchPage: React.FC = () => {
           onChange={(e) => handleSearchChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
           placeholder="Search by ticker, company name, or sector..."
-          className="h-9 w-full bg-transparent text-sm outline-none placeholder:opacity-60"
-          style={{ color: "#0f1419" }}
+          className="h-9 w-full bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:opacity-50 placeholder:text-[#8B949E]"
         />
+        <kbd className="hidden md:inline-flex h-5 items-center rounded border border-white/[0.06] bg-white/[0.03] px-1.5 font-mono text-[10px] text-[#8B949E]">⌘K</kbd>
         {recentSearches.length > 0 && !query.trim() && (
           <div className="hidden items-center gap-1.5 sm:flex">
-            <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: "#8b98a5" }}>Recent</span>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Recent</span>
             {recentSearches.slice(0, 3).map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => handleRecentSearch(item)}
-                className="rounded-lg px-2.5 py-1 text-[11px] font-medium transition hover:bg-white/80"
-                style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
+                className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] font-medium text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
               >
                 {item}
               </button>
@@ -136,13 +135,13 @@ export const SearchPage: React.FC = () => {
       <section className="space-y-4">
         {query.trim().length >= 2 ? (
           <>
-            <div className="text-sm" style={{ color: "#536471" }}>
-              {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-medium" style={{ color: "#0f1419" }}>"{query.trim()}"</span>
+            <div className="text-xs text-[#8B949E]">
+              {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-mono text-[#E6EDF3]">"{query.trim()}"</span>
             </div>
 
             {results.length > 0 ? (
-              <div className="grid gap-3 md:grid-cols-2">
-                {results.map((stock, idx) => {
+              <div className="grid gap-2 md:grid-cols-2">
+                {results.map((stock) => {
                   const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
                   const prediction = predictionsMap[cleanedSym];
                   const score = prediction?.rankingScore ?? null;
@@ -155,35 +154,36 @@ export const SearchPage: React.FC = () => {
                     <button
                       key={stock.symbol}
                       onClick={() => handleOpenStock(stock)}
-                      className="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-left transition-all duration-200 hover:border-emerald-200 hover:bg-emerald-50/60"
+                      className="flex cursor-pointer items-center gap-4 rounded-xl border border-white/[0.06] bg-[#0D1117] px-4 py-2.5 text-left transition-colors hover:border-white/[0.12] hover:bg-white/[0.02]"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm font-bold" style={{ color: "#0f1419" }}>{stock.symbol}</span>
+                          <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{stock.symbol}</span>
                           {score !== null ? (
                             <ScorePill score={Math.round(score)} />
                           ) : (
-                            <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>Pending</span>
+                            <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-[#8B949E]">Pending</span>
                           )}
                         </div>
                         <div className="mt-0.5 flex items-center gap-2">
-                          <span className="truncate text-xs" style={{ color: "#536471" }}>{stock.companyName}</span>
-                          <span className="text-[10px] font-medium" style={{ color: "#8b98a5" }}>{stock.sector || predictionSector || ""}</span>
+                          <span className="truncate text-xs text-[#8B949E]">{stock.companyName}</span>
+                          <span className="text-[10px] font-medium text-[#484F58]">{stock.sector || predictionSector || ""}</span>
                         </div>
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-0.5">
-                        {rank !== null && <span className="text-[10px] font-medium" style={{ color: "#536471" }}>#{rank}</span>}
-                        {confidenceScore !== null && <span className="text-[10px] font-mono" style={{ color: "#2c6b9e" }}>{Math.round(confidenceScore)}%</span>}
+                        {rank !== null && <span className="text-[10px] font-medium text-[#8B949E]">#{rank}</span>}
+                        {confidenceScore !== null && <span className="font-mono text-[10px] text-[#2962FF]">{Math.round(confidenceScore)}%</span>}
+                        {predictionDate && <span className="text-[10px] text-[#484F58]">{formatFreshness(predictionDate)}</span>}
                       </div>
                     </button>
                   );
                 })}
               </div>
             ) : (
-              <div className="rounded-xl border border-slate-200 bg-white/80 px-6 py-8 text-center">
-                <p className="text-sm font-semibold" style={{ color: "#0f1419" }}>No matching equity found</p>
-                <p className="mt-1 text-xs" style={{ color: "#536471" }}>
-                  Try searching for: 
+              <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] px-6 py-8 text-center">
+                <p className="text-sm font-semibold text-[#E6EDF3]">No matching equity found</p>
+                <p className="mt-1 text-xs text-[#8B949E]">
+                  Try searching for:
                 </p>
                 <div className="mt-3 flex flex-wrap justify-center gap-1.5">
                   {["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK"].map((sym) => (
@@ -191,8 +191,7 @@ export const SearchPage: React.FC = () => {
                       key={sym}
                       type="button"
                       onClick={() => handleRecentSearch(sym)}
-                      className="rounded-lg px-2.5 py-1 text-[11px] font-medium transition hover:bg-white/80"
-                      style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
+                      className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 font-mono text-[11px] font-medium text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
                     >
                       {sym}
                     </button>
@@ -202,7 +201,50 @@ export const SearchPage: React.FC = () => {
             )}
           </>
         ) : (
-          <EmptyState title="Search the company universe" description="Type at least 2 characters to begin." />
+          <div className="space-y-4">
+            <EmptyState title="Search the company universe" description="Type at least 2 characters to begin. Search by ticker, company name, or sector." />
+            {recentSearches.length > 0 && (
+              <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Recent searches</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {recentSearches.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => handleRecentSearch(item)}
+                      className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 font-mono text-[11px] font-medium text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {Object.keys(predictionsMap).length > 0 && (
+              <div className="hidden md:block rounded-xl border border-white/[0.06] bg-[#0D1117] p-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Top ranked today</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {Object.values(predictionsMap)
+                    .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999))
+                    .slice(0, 8)
+                    .map((p) => (
+                      <button
+                        key={p.symbol}
+                        type="button"
+                        onClick={() => handleOpenStock({ symbol: p.symbol, companyName: p.companyName, sector: p.sector } as RegisteredStock)}
+                        className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-0.5 font-mono text-[11px] font-medium text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
+                      >
+                        {p.symbol.replace(/\.NS$/, "")}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </section>
     </div>

@@ -9,12 +9,12 @@ import { navigateTrustWorkflow } from './ResearchTrustLinks';
  */
 export default function AcademyReviewNotice() {
   return (
-    <section aria-label="Academy content review status" className="mx-auto mb-5 w-full max-w-7xl rounded-xl border border-amber-400/25 bg-amber-400/[0.06] px-4 py-3 text-white">
+    <section aria-label="Academy content review status" className="mb-5 w-full rounded-xl border border-amber-400/25 bg-amber-400/[0.06] px-4 py-3 text-white">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-2">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
           <div>
-            <div className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-amber-300">Educational content · source review required</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-300">Educational content · source review required</div>
             <p className="mt-1 max-w-4xl text-[11px] leading-relaxed text-white/55">
               Academy lessons are educational context, not investment advice. Market processes, tax treatment and regulatory references may change. Verify current rules with authoritative sources before acting.
             </p>

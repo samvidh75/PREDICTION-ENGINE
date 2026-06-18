@@ -99,12 +99,13 @@ export const TrustCentrePage: React.FC = () => {
   const [envelope, setEnvelope] = useState<TrustMetricsEnvelope | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [coverageData, setCoverageData] = useState<DataCoverage | null>(null);
-  const [coverageLoading, setCoverageLoading] = useState(true);
-  const [detailSheet, setDetailSheet] = useState<{ provider: string; entry: ProviderEntry } | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "providers" | "coverage" | "gaps">("overview");
   const [fundamentalsGapSheet, setFundamentalsGapSheet] = useState(false);
   const [symbolGapSheet, setSymbolGapSheet] = useState(false);
+  const [detailSheet, setDetailSheet] = useState<{ provider: string; entry: ProviderEntry } | null>(null);
   const [fundamentalsCoverage, setFundamentalsCoverage] = useState<{ total: number; covered: number; missing: number; coveredSymbols: string[]; missingSymbols: string[] } | null>(null);
+  const [coverageData, setCoverageData] = useState<any>(null);
+  const [coverageLoading, setCoverageLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/research/fundamentals-coverage").then(r => r.json()).then(d => {
@@ -172,6 +173,29 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         </div>
 
+        {/* Tab navigation */}
+        <div className="flex gap-1 overflow-x-auto border-b border-white/[0.06] pb-px">
+          {[
+            { key: "overview" as const, label: "Overview" },
+            { key: "providers" as const, label: "Providers" },
+            { key: "coverage" as const, label: "Coverage" },
+            { key: "gaps" as const, label: "Gaps & Methodology" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`shrink-0 rounded-t-lg px-4 py-2 text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                activeTab === tab.key
+                  ? "bg-white/[0.04] text-[#E6EDF3] border-b-2 border-[#2962FF]"
+                  : "text-[#484F58] hover:text-[#8B949E]"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {rawState !== "ok" && (
           <div className="flex items-start gap-3 rounded-2xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-4 text-xs" role="alert">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF9A09]" />
@@ -183,6 +207,7 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         )}
 
+        {activeTab === "overview" && (<>
         {/* Performance audit */}
         <RoundedDepthPanel padding="md">
           <div className="flex items-center gap-2">
@@ -231,7 +256,9 @@ export const TrustCentrePage: React.FC = () => {
             <ModelRunBadge runDate={coverage.predictionRegistry.latestPredictionDate} className="mt-2" />
           )}
         </RoundedDepthPanel>
+        </>)} {/* end overview tab */}
 
+        {activeTab === "providers" && (<>
         {/* Provider Domain Health — Active Sources */}
         {activeProviderEntries.length > 0 && (
           <section>
@@ -303,8 +330,10 @@ export const TrustCentrePage: React.FC = () => {
               </div>
             </details>
           </section>
-        )}
+        )} {/* end providers tab */}
+        </>)} {/* end providers tab */}
 
+        {activeTab === "coverage" && (<>
         {/* Data Coverage Summary */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Data coverage summary</h2>
@@ -428,7 +457,9 @@ export const TrustCentrePage: React.FC = () => {
             <span>View fundamentals gap details and import workflow</span>
           </button>
         </RoundedDepthPanel>
+        </>)} {/* end coverage tab */}
 
+        {activeTab === "gaps" && (<>
         {/* Symbol data gaps */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Symbol data gaps</h2>
@@ -498,6 +529,7 @@ export const TrustCentrePage: React.FC = () => {
             ))}
           </div>
         </RoundedDepthPanel>
+        </>)} {/* end gaps tab */}
 
         <div className="border-t border-white/5 pt-6">
           <p className="text-[10px] leading-relaxed text-[#484F58]">

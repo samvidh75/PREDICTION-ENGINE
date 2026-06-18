@@ -231,7 +231,7 @@ export const StockStoryPage: React.FC = () => {
 
   if (storyLoading) {
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 antialiased" style={{ color: "#0f1419" }}>
+      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased" style={{ color: "#0f1419" }}>
         <div className="flex items-center justify-between gap-3 text-xs">
           <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider hover:opacity-80 animate-pulse" style={{ color: "#1a6e4a" }}>
             <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
@@ -252,7 +252,7 @@ export const StockStoryPage: React.FC = () => {
   if (!storyData || (storyUnavailable && !hasFinancials)) {
     const missingInputs = Array.isArray(storyData?.dataState?.missingInputs) ? storyData.dataState.missingInputs.filter(Boolean) : [];
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 antialiased" style={{ color: "#0f1419" }}>
+      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased" style={{ color: "#0f1419" }}>
         <div className="flex items-center justify-between gap-3 text-xs">
           <button onClick={() => navigateToPage("dashboard")} className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider transition-colors hover:opacity-80" style={{ color: "#1a6e4a" }}>
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
@@ -358,72 +358,72 @@ export const StockStoryPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-16 antialiased" style={{ color: "#0f1419" }}>
+    <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased text-[#E6EDF3]">
       <div className="flex items-center justify-between gap-3 text-xs">
-        <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider transition-colors hover:opacity-80" style={{ color: "#1a6e4a" }}>
+        <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-semibold uppercase tracking-wider transition-colors hover:opacity-80 text-[#8B949E]">
           <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
         </button>
       </div>
 
-      <section className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+      <section className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-6">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border" style={{ background: "rgba(255,255,255,0.6)", borderColor: "rgba(255,255,255,0.3)" }}>
+            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04]">
               <svg className="h-full w-full -rotate-90">
-                <circle cx="56" cy="56" r={radius} className="stroke-slate-200" strokeWidth="8" fill="transparent" />
-                <circle cx="56" cy="56" r={radius} stroke="#059669" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
+                <circle cx="56" cy="56" r={radius} className="stroke-white/[0.08]" strokeWidth="8" fill="transparent" />
+                <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-extrabold tracking-tight tabular-nums" style={{ color: "#0f1419" }}>{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
-                <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: "#1a6e4a" }}>Score</span>
+                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
               </div>
             </div>
             <div className="min-w-0">
               <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#8b98a5" }}>
                 <span>{ticker}</span><span>•</span><span>{exchange}</span><span>•</span><span>{currency}</span>
               </div>
-              <h1 className="max-w-xl text-2xl font-extrabold tracking-tight md:text-3xl truncate" style={{ color: "#0f1419" }}>{companyName}</h1>
+              <h1 className="max-w-xl text-2xl font-semibold tracking-tight md:text-3xl truncate text-[#E6EDF3]">{companyName}</h1>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
+                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
                   {storyData.classification ?? "Unavailable"}
                 </span>
-                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${getConfidenceStyle(storyData.confidence)}`}>
+                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getConfidenceStyle(storyData.confidence)}`}>
                   {storyData.confidence} Confidence
                 </span>
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-4 lg:items-end">
-            <div className="grid grid-cols-2 gap-6 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+            <div className="grid grid-cols-2 gap-6 rounded-xl border border-white/[0.06] bg-white/[0.04] p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Live Price</div>
-                <div className="mt-1 font-mono text-xl font-bold tabular-nums" style={{ color: "#0f1419" }}>{priceLabel}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Live Price</div>
+                <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">{priceLabel}</div>
                 <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[var(--color-active)]' : 'text-[var(--color-danger)]'}`}>{changeLabel}</div>
               </div>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Volume</div>
-                <div className="mt-1 font-mono text-xl font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Volume</div>
+                <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">
                   {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px]" style={{ color: "#8b98a5" }}>Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-[#484F58]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-          <div className="text-[9px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5" style={{ color: "#1a6e4a" }}>
+        <div className="mt-5 pt-4 border-t border-white/[0.06]">
+          <div className="text-[9px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-[#8B949E]">
             <Activity className="h-3 w-3" /> Explanation
           </div>
-          <p className="text-xs leading-relaxed max-w-5xl" style={{ color: "#0f1419" }}>{storyData.narrative}</p>
-          <p className="mt-3 max-w-5xl rounded-lg p-3 text-[11px] leading-relaxed" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
+          <p className="text-xs leading-relaxed max-w-5xl text-[#E6EDF3]">{storyData.narrative}</p>
+          <p className="mt-3 max-w-5xl rounded-lg border border-white/[0.06] bg-white/[0.03] p-3 text-[11px] leading-relaxed text-[#8B949E]">
             Research signals are for informational purposes only. Not personalised investment advice.
           </p>
           <div className="mt-3">
             <button
               type="button"
               onClick={() => setExplanationModalOpen(true)}
-              className="rounded-xl border border-[var(--color-border)] bg-white/60 px-4 py-2 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-white/80 transition-colors"
+              className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[10px] font-semibold text-[#8B949E] hover:bg-white/[0.08] hover:text-[#E6EDF3] transition-colors"
             >
               <Activity className="mr-1.5 inline h-3 w-3" aria-hidden="true" />
               Open full explanation
@@ -433,34 +433,34 @@ export const StockStoryPage: React.FC = () => {
       </section>
 
       <section className="flex flex-wrap items-center gap-3">
-        <button onClick={handleToggleWatchlist} className={`btn btn-sm ${isInWatchlist ? "btn-ghost text-[var(--color-danger)]" : "btn-secondary"}`}>
-          <Star className={`icon-action ${isInWatchlist ? "text-[var(--color-danger)]" : ""}`} />
+        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#F23645] bg-white/[0.04]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
+          <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#F23645]" : ""}`} />
           {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
         </button>
-        <button type="button" onClick={() => setAuditDrawerOpen(true)} className="btn btn-sm btn-secondary">
+        <button type="button" onClick={() => setAuditDrawerOpen(true)} className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[10px] font-semibold text-[#8B949E] hover:bg-white/[0.06] hover:text-[#E6EDF3] transition-colors">
           Trace inputs
         </button>
       </section>
 
-      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>My Research Notes</div>
-        <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+      <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">My Research Notes</div>
+        <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-xs text-[#E6EDF3] outline-none transition placeholder-[#484F58]" />
       </div>
 
-        <div className="flex gap-2 overflow-x-auto" role="tablist" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
+        <div className="flex gap-2 overflow-x-auto border-b border-white/[0.06]" role="tablist">
           {tabs.map((tab) => (
-            <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-accent-primary font-extrabold" : "text-ink-muted hover:opacity-80"}`} style={activeTab === tab ? { borderBottomColor: "#1a6e4a", color: "#1a6e4a" } : { borderBottomColor: "transparent", color: "#8b98a5" }}>
+            <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-[#2962FF] border-[#2962FF] font-semibold" : "text-[#484F58] border-transparent hover:text-[#8B949E]"}`}>
               {TAB_LABELS[tab]}
             </button>
           ))}
         </div>
 
-      <div className="min-h-[300px] rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+      <div className="min-h-[300px] rounded-2xl border border-white/[0.08] bg-[#0D1117] p-6">
 
         {activeTab === "overview" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-5 rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-1.5" style={{ color: "#1a6e4a" }}>
+            <div className="md:col-span-2 space-y-5 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <div className="text-[10px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 text-[#8B949E]">
                 <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -470,27 +470,27 @@ export const StockStoryPage: React.FC = () => {
                 {renderProgressBar("Price trend", storyData.momentum, "text-warning")}
                 {renderProgressBar("Value score", storyData.valuation, "text-secondary")}
               </div>
-              <div className="text-[9px] leading-normal mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
+              <div className="text-[9px] leading-normal mt-3 pt-3 border-t border-white/[0.06] text-[#484F58]">
                 Composite score is the average of available factor scores. Missing factors are shown as unavailable.
               </div>
             </div>
             <div className="space-y-4">
-              <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#8b98a5" }}>
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
                   <Building2 className="h-3.5 w-3.5" /> Corporate Profile
                 </div>
                 <dl className="space-y-3 text-xs">
-                  <div className="flex justify-between gap-4 pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                    <dt style={{ color: "#536471" }}>Sector</dt><dd className="text-right font-semibold" style={{ color: "#0f1419" }}>{sector}</dd>
+                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
+                    <dt className="text-[#484F58]">Sector</dt><dd className="text-right font-semibold text-[#E6EDF3]">{sector}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                    <dt style={{ color: "#536471" }}>Industry</dt><dd className="text-right font-semibold truncate max-w-[180px]" style={{ color: "#0f1419" }}>{industry}</dd>
+                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
+                    <dt className="text-[#484F58]">Industry</dt><dd className="text-right font-semibold truncate max-w-[180px] text-[#E6EDF3]">{industry}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                    <dt style={{ color: "#536471" }}>Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums" style={{ color: "#0f1419" }}>{marketCap}</dd>
+                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
+                    <dt className="text-[#484F58]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[#E6EDF3]">{marketCap}</dd>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <dt style={{ color: "#536471" }}>Data Policy</dt><dd className="text-right font-semibold" style={{ color: "#0f1419" }}>Source-backed only</dd>
+                    <dt className="text-[#484F58]">Data Policy</dt><dd className="text-right font-semibold text-[#E6EDF3]">Source-backed only</dd>
                   </div>
                 </dl>
               </div>
@@ -500,9 +500,9 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "financials" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#d946ef" }}>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
                   <Sparkles className="h-4 w-4" /> Growth Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#d946ef" }}>
@@ -529,7 +529,7 @@ export const StockStoryPage: React.FC = () => {
             </div>
             <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
               <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#1a6e4a" }}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#1a6e4a" }}>
                   <Trophy className="h-4 w-4" /> Quality Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#1a6e4a" }}>
@@ -564,7 +564,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-2 rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
               <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#b8860b" }}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#b8860b" }}>
                   <TrendingUp className="h-4 w-4" /> Valuation Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
@@ -608,7 +608,7 @@ export const StockStoryPage: React.FC = () => {
             {ownership ? (
               <div className="grid gap-6 md:grid-cols-3">
                 <div className="md:col-span-2 rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <h3 className="text-sm font-extrabold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#0369a1" }}>Shareholding Breakdown</h3>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#0369a1" }}>Shareholding Breakdown</h3>
                   <div className="space-y-4">
                     {ownership.categories && ownership.categories.map((c: any) => {
                       const pct = parseFloat(c.share) || 0;
@@ -646,7 +646,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
               <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#c0392b" }}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#c0392b" }}>
                   <AlertCircle className="h-4 w-4" /> Risk Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
@@ -662,14 +662,14 @@ export const StockStoryPage: React.FC = () => {
               <div className="rounded-lg p-3 text-xs leading-normal flex items-start gap-2" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
                 <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-extrabold block text-[10px] uppercase mb-1" style={{ color: "#c0392b" }}>{storyData.engineDetails.risk.redFlagCount} Risk indicators</span>
+                  <span className="font-semibold block text-[10px] uppercase mb-1" style={{ color: "#c0392b" }}>{storyData.engineDetails.risk.redFlagCount} Risk indicators</span>
                   {storyData.engineDetails.risk.commentary}
                 </div>
               </div>
             </div>
             <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
               <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#4338ca" }}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#4338ca" }}>
                   <Activity className="h-4 w-4" /> Confidence Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
@@ -709,7 +709,7 @@ export const StockStoryPage: React.FC = () => {
                   {timeline.map((evt, idx) => (
                     <div key={idx} className="relative">
                       <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-[var(--color-accent)] ring-4 ring-[var(--color-canvas)]" />
-                      <div className="font-mono text-[10px] font-extrabold mb-1" style={{ color: "#1a6e4a" }}>{evt.date}</div>
+                      <div className="font-mono text-[10px] font-semibold mb-1" style={{ color: "#1a6e4a" }}>{evt.date}</div>
                       <div className="font-bold text-sm mb-1" style={{ color: "#0f1419" }}>{evt.event}</div>
                       <p className="leading-relaxed" style={{ color: "#536471" }}>{evt.detail}</p>
                     </div>

@@ -7,8 +7,6 @@ import Button from "../components/ui/Button";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type Signal } from "../services/api/client";
 import { PremiumPage, MetricCard, StatusChip } from "../components/premium/PremiumUI";
-import { IntelligencePanel } from "../components/intelligence/IntelligencePanel";
-import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
 import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
 import { MethodologyLink } from "../components/intelligence/MethodologyLink";
@@ -61,20 +59,17 @@ export default function PublicPredictionsPage(): JSX.Element {
     <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-
-        {/* Prediction Intelligence header */}
-        <IntelligencePanel
-          title="Prediction Intelligence"
-          subtitle="Model output, signal movement, and data freshness from the latest research cycle."
-          statuses={[
-            { label: "Signals visible", value: signals.length.toLocaleString("en-IN"), status: signals.length > 0 ? "ok" : "muted" },
-            { label: "Symbols analyzed", value: symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "—", status: symbolsAnalyzed ? "ok" : "muted" },
-            { label: "Coverage records", value: coverageData?.registryRowCount !== null && coverageData?.registryRowCount !== undefined ? coverageData.registryRowCount.toLocaleString("en-IN") : "—", status: coverageData?.registryRowCount ? "ok" : "muted" },
-          ]}
-        >
+      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-24 lg:px-16 xl:px-24">
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Prediction Intelligence</span>
+            <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Signal movement</h1>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[#8B949E]">
+              Model output and signal movement from the latest research cycle. Source-backed, no buy/sell language.
+            </p>
+          </div>
           {snapshotDate && <ModelRunBadge runDate={snapshotDate} />}
-        </IntelligencePanel>
+        </div>
 
         {error && (
           <div className="mb-4 rounded-xl border border-[#EF9A09]/20 bg-[#EF9A09]/[0.03] p-4 text-xs text-[#EF9A09]" role="status">

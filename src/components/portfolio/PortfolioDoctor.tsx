@@ -173,7 +173,7 @@ function StatePanel({ title, message, tone }: { title: string; message: string; 
 
   return (
     <div className={`p-8 border-4 ${border} border-black ${background} text-center`} style={{ boxShadow: '6px 6px 0px #000' }}>
-      <p className="font-extrabold text-2xl mb-2">{title}</p>
+      <p className="font-semibold text-2xl mb-2">{title}</p>
       <p className="text-sm text-gray-700">{message}</p>
     </div>
   );
@@ -258,8 +258,8 @@ export default function PortfolioDoctor() {
     <div className="space-y-6">
       <div className="border-4 border-black bg-yellow-300 p-4" style={{ boxShadow: '6px 6px 0px #000' }}>
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="font-extrabold text-2xl uppercase tracking-wider">Portfolio Doctor</h2>
-          {data.isDemo && <span className="border-2 border-black bg-white px-2 py-1 text-xs font-extrabold uppercase">Demo</span>}
+          <h2 className="font-semibold text-2xl uppercase tracking-wider">Portfolio Doctor</h2>
+          {data.isDemo && <span className="border-2 border-black bg-white px-2 py-1 text-xs font-semibold uppercase">Demo</span>}
         </div>
         <p className="text-sm font-bold mt-2">{intelligence.riskConcentration}</p>
       </div>
@@ -276,14 +276,14 @@ export default function PortfolioDoctor() {
       </div>
 
       <div className="border-4 border-black bg-white p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
-        <h3 className="font-extrabold text-lg uppercase mb-4">Factor Exposure</h3>
+        <h3 className="font-semibold text-lg uppercase mb-4">Factor Exposure</h3>
         {factorEntries.length > 0 ? factorEntries.map(([key, value]) => (
           <Bar key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={value} color={toPercent(value) >= 60 ? 'bg-green-500' : toPercent(value) >= 40 ? 'bg-amber-400' : 'bg-red-400'} />
         )) : <p className="text-sm text-gray-500">No factor exposure data available.</p>}
       </div>
 
       <div className="border-4 border-black bg-white p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
-        <h3 className="font-extrabold text-lg uppercase mb-4">Sector Exposure</h3>
+        <h3 className="font-semibold text-lg uppercase mb-4">Sector Exposure</h3>
         {sectorEntries.length > 0 ? sectorEntries.map(([sector, value]) => (
           <Bar key={sector} label={sector} value={value} color="bg-blue-500" />
         )) : <p className="text-sm text-gray-500">No sector exposure data available.</p>}
@@ -291,7 +291,7 @@ export default function PortfolioDoctor() {
 
       {data.neutralizedFields.length > 0 && (
         <div className="border-4 border-black bg-amber-100 p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
-          <h3 className="font-extrabold text-lg uppercase mb-2">Data Caveats</h3>
+          <h3 className="font-semibold text-lg uppercase mb-2">Data Caveats</h3>
           <p className="text-sm mb-3">Some factor inputs were unavailable and were neutralized by the portfolio engine. Review these holdings before acting on the analysis.</p>
           <ul className="space-y-1 text-sm">
             {data.neutralizedFields.map((entry) => <li key={entry.symbol}><strong>{entry.symbol}:</strong> {entry.neutralizedFactors.join(', ') || 'unspecified factors'}</li>)}
@@ -303,9 +303,9 @@ export default function PortfolioDoctor() {
 }
 
 function MetricCard({ label, value }: { label: string; value: string }) {
-  return <div className="border-4 border-black bg-white p-3 text-center" style={{ boxShadow: '4px 4px 0px #000' }}><p className="text-xs font-bold uppercase text-gray-500">{label}</p><p className="text-2xl font-extrabold">{value}</p></div>;
+  return <div className="border-4 border-black bg-white p-3 text-center" style={{ boxShadow: '4px 4px 0px #000' }}><p className="text-xs font-bold uppercase text-gray-500">{label}</p><p className="text-2xl font-semibold">{value}</p></div>;
 }
 
 function StatusCard({ label, status }: { label: string; status: string }) {
-  return <div className="border-4 border-black bg-blue-100 p-3 text-center" style={{ boxShadow: '4px 4px 0px #000' }}><p className="text-xs font-bold uppercase text-gray-500">{label}</p><p className="text-lg font-extrabold">{status}</p></div>;
+  return <div className="border-4 border-black bg-blue-100 p-3 text-center" style={{ boxShadow: '4px 4px 0px #000' }}><p className="text-xs font-bold uppercase text-gray-500">{label}</p><p className="text-lg font-semibold">{status}</p></div>;
 }

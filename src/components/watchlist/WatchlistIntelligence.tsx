@@ -66,7 +66,7 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <div className="text-sm font-mono font-extrabold text-white">{change.symbol}</div>
+          <div className="text-sm font-mono font-semibold text-white">{change.symbol}</div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className={`h-1.5 w-1.5 rounded-full ${
               healthTrend === 'improving' ? 'bg-emerald-400' :
@@ -77,7 +77,7 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg font-extrabold text-white">{change.healthScoreCurrent}</div>
+          <div className="text-lg font-semibold text-white">{change.healthScoreCurrent}</div>
           {healthDelta !== null && (
             <div className={`text-[9px] font-bold ${healthDelta > 0 ? 'text-emerald-400' : healthDelta < 0 ? 'text-rose-400' : 'text-white/30'}`}>
               {healthDelta > 0 ? '+' : ''}{healthDelta}
@@ -177,7 +177,7 @@ export const WatchlistIntelligence: React.FC<{ symbols: string[] }> = ({ symbols
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <Zap className="h-4 w-4 text-cyan-400" />
-        <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">What Changed Since Yesterday?</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-white">What Changed Since Yesterday?</h3>
         <span className="text-[9px] text-white/30 ml-2">
           {changes.filter(c => c.alerts.length > 0).length} stock(s) with changes
         </span>

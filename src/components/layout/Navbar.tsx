@@ -30,7 +30,7 @@ export const Navbar: React.FC = () => {
       initial={{ opacity: 1 }}
       className="fixed left-0 top-0 z-50 w-full border-b border-white/10 bg-[#05070A]/95 backdrop-blur-xl"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+      <div className="flex w-full items-center justify-between px-4 py-3">
         <button
           type="button"
           onClick={() => setPage("dashboard")}

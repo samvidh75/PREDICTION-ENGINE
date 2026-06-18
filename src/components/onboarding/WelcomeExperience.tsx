@@ -103,7 +103,7 @@ export const WelcomeExperience: React.FC<WelcomeExperienceProps> = ({ onComplete
         </div>
 
         {/* Content */}
-        <h2 className="text-xl font-extrabold text-white mb-3">{step.title}</h2>
+        <h2 className="text-xl font-semibold text-white mb-3">{step.title}</h2>
         <p className="text-sm text-white/60 leading-relaxed mb-4">{step.description}</p>
         <div className="rounded-lg bg-white/[0.02] border border-white/5 px-4 py-3 text-xs text-white/40 italic">
           {step.detail}

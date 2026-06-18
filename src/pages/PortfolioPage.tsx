@@ -16,15 +16,15 @@ import { SpatialSheet } from '../components/intelligence/SpatialSheet';
 import { AppScreen, MobilePageHeader, ResearchEmptyState, SourceAuditCard } from '../components/premium/PremiumUI';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
-  if (status === 'real') return 'text-accent-success';
-  if (status === 'partial') return 'text-amber-700';
-  return 'text-ink-muted';
+  if (status === 'real') return 'text-[#22AB94]';
+  if (status === 'partial') return 'text-[#EF9A09]';
+  return 'text-[#8B949E]';
 }
 
 function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string {
-  if (severity === 'attention') return 'border-rose-200 bg-rose-50 text-rose-800';
-  if (severity === 'review') return 'border-amber-200 bg-amber-50 text-amber-800';
-  return 'border-emerald-200 bg-emerald-50 text-emerald-800';
+  if (severity === 'attention') return 'border-[#F23645]/20 bg-[#F23645]/[0.04] text-[#F23645]';
+  if (severity === 'review') return 'border-[#EF9A09]/20 bg-[#EF9A09]/[0.04] text-[#EF9A09]';
+  return 'border-[#22AB94]/20 bg-[#22AB94]/[0.04] text-[#22AB94]';
 }
 
 export const PortfolioPage: React.FC = () => {

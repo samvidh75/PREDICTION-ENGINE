@@ -195,7 +195,7 @@ export const StockCompare: React.FC = () => {
         <div className="relative text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Scale className="h-5 w-5 text-cyan-400" />
-            <h2 className="text-xl font-extrabold text-white">Stock Compare</h2>
+            <h2 className="text-xl font-semibold text-white">Stock Compare</h2>
           </div>
           <p className="text-xs text-white/40">Compare two companies across key dimensions — data-driven, not opinion</p>
         </div>
