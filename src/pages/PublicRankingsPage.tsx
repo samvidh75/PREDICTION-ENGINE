@@ -10,6 +10,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
+import { MetricCard, PremiumPage, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
 
 export const PublicRankingsPage: React.FC = () => {
   const [rankings, setRankings] = useState<LeaderboardEntry[]>([]);
@@ -76,16 +77,17 @@ export const PublicRankingsPage: React.FC = () => {
   const freshnessDate = rankings[0]?.predictionDate ?? null;
 
   return (
-    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="mx-auto max-w-6xl px-4 pt-[76px] md:pt-28 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
 
-        <PageHeader
-          title="Research rankings"
-          subtitle="Company rankings from the latest verified scoring cycle."
-          primaryAction={freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
-        />
+        <Surface dark className="ss-grid-texture relative mb-6 overflow-hidden p-6 md:p-8">
+          <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <SectionHeader eyebrow="Leaderboard" title="Research rankings" body="Company rankings from the latest verified scoring cycle, with source freshness visible and missing values labelled." />
+            {freshnessDate ? <DataFreshnessBadge date={freshnessDate} /> : <MissingDataBadge />}
+          </div>
+        </Surface>
 
         {error && (
           <div
@@ -98,10 +100,13 @@ export const PublicRankingsPage: React.FC = () => {
           </div>
         )}
 
-        <div
-          className="my-6 flex flex-col items-center justify-between gap-4 rounded-xl p-4 sm:flex-row"
-          style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-        >
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <MetricCard label="Rows loaded" value={rankings.length.toLocaleString("en-IN")} detail="From leaderboard API." />
+          <MetricCard label="Covered symbols" value={symbolCount !== null ? symbolCount.toLocaleString("en-IN") : "Unavailable"} detail="Coverage endpoint." />
+          <MetricCard label="Scored records" value={registryRowCount !== null ? registryRowCount.toLocaleString("en-IN") : "Pending"} detail={latestPredictionDate ? "Latest verified cycle available." : "Latest date unavailable."} tone={registryRowCount ? "ok" : "warn"} />
+        </div>
+
+        <Surface className="my-6 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
           <div className="w-full sm:w-72">
             <Input
               aria-label="Search rankings by symbol or sector"
@@ -124,7 +129,7 @@ export const PublicRankingsPage: React.FC = () => {
               ))}
             </select>
           </div>
-        </div>
+        </Surface>
 
         {loading ? (
           <div className="py-12 text-center text-sm" style={{ color: "#536471" }}>Loading rankings…</div>
@@ -175,8 +180,10 @@ export const PublicRankingsPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
-            {filteredRankings.map((r) => {
+          <>
+          <div className="hidden md:block">
+            <Table glass headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness"]}>
+              {filteredRankings.map((r) => {
               const rankingScore = r.rankingScore;
               const confidenceScore = r.confidenceScore;
 
@@ -216,14 +223,36 @@ export const PublicRankingsPage: React.FC = () => {
                 </tr>
               );
             })}
-          </Table>
+            </Table>
+          </div>
+          <div className="grid gap-4 md:hidden">
+            {filteredRankings.map((r) => (
+              <Surface key={r.symbol} className="p-4" strong>
+                <button onClick={() => setPage("stock", r.symbol)} className="w-full text-left">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">{formatRank(r.rank)}</div>
+                      <div className="mt-1 font-mono text-xl font-bold text-slate-950">{r.symbol}</div>
+                      <div className="mt-1 text-sm text-slate-600">{r.companyName || "Unavailable"}</div>
+                    </div>
+                    {typeof r.rankingScore === "number" && Number.isFinite(r.rankingScore) ? <ScorePill score={Math.round(r.rankingScore)} /> : <MissingDataBadge />}
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <StatusChip label={r.sector || "Sector unavailable"} tone="muted" />
+                    <StatusChip label={r.predictionDate ? formatFreshness(r.predictionDate) : "Freshness pending"} tone={r.predictionDate ? "ok" : "warn"} />
+                  </div>
+                </button>
+              </Surface>
+            ))}
+          </div>
+          </>
         )}
 
         <div className="mt-6">
           <ResearchDisclaimer />
         </div>
       </div>
-    </main>
+    </PremiumPage>
   );
 };
 

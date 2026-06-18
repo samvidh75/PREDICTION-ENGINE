@@ -6,6 +6,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type Signal } from "../services/api/client";
+import { DataUnavailableState, MetricCard, PremiumPage, SectionHeader, StatusChip, Surface } from "../components/premium/PremiumUI";
 
 interface CoverageInfo {
   symbolCount: number | null;
@@ -75,16 +76,21 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   return (
-    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <PremiumPage>
       <TopNav />
       <MobileNav />
-      <div className="mx-auto max-w-6xl px-4 pt-[76px] md:pt-28 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 pb-20 pt-[76px] sm:px-6 md:pt-28">
 
-        <PageHeader
-          title="Score changes"
-          subtitle="Score changes from the latest verified data update cycle."
-          primaryAction={snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
-        />
+        <Surface dark className="mb-6 p-6 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Signals</div>
+              <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Research signal changes</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 md:text-base">Signals are research changes from verified updates. They are not investment advice or buy/sell/hold recommendations.</p>
+            </div>
+            {snapshotDate ? <DataFreshnessBadge date={snapshotDate} /> : <MissingDataBadge />}
+          </div>
+        </Surface>
 
         {error && (
           <div
@@ -97,13 +103,19 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         )}
 
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <MetricCard label="Signals visible" value={signals.length.toLocaleString("en-IN")} detail="Source-backed changes only." />
+          <MetricCard label="Symbols analyzed" value={symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "Unavailable"} detail="Latest cycle metadata." tone={symbolsAnalyzed ? "ok" : "muted"} />
+          <MetricCard label="Coverage rows" value={coverageData?.registryRowCount !== null && coverageData?.registryRowCount !== undefined ? coverageData.registryRowCount.toLocaleString("en-IN") : "Pending"} detail="Prediction registry." tone={coverageData?.registryRowCount ? "ok" : "warn"} />
+        </div>
+
         {loading ? (
           <LoadingState description="Checking for recent score changes…" />
         ) : signals.length === 0 ? (
           <div className="flex flex-col gap-5">
-            <EmptyState
+            <DataUnavailableState
               title="Score changes pending"
-              description={
+              body={
                 symbolsAnalyzed && symbolsAnalyzed > 0
                   ? `${symbolsAnalyzed} companies registered. Score changes appear after the next verified update cycle.`
                   : "Score changes appear when provider data has been processed and verified."
@@ -146,7 +158,8 @@ export default function PublicPredictionsPage(): JSX.Element {
             </div>
           </div>
         ) : (
-          <div className="mt-8 overflow-hidden rounded-xl" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+          <Surface className="mt-8 overflow-hidden">
+            <div className="hidden md:block">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
@@ -198,18 +211,36 @@ export default function PublicPredictionsPage(): JSX.Element {
                 })}
               </tbody>
             </table>
+            </div>
+            <div className="grid gap-4 p-4 md:hidden">
+              {signals.map((signal, i) => (
+                <button key={`${signal.symbol}:mobile:${i}`} onClick={() => signal.symbol && navigate(signal.symbol)} className="rounded-2xl border border-slate-200/70 bg-white/75 p-4 text-left">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-mono text-lg font-bold text-slate-950">{signal.symbol}</div>
+                      <div className="mt-1 text-sm text-slate-600">{signal.explanation || "No explanation available"}</div>
+                    </div>
+                    <StatusChip label={signal.severity || "Unknown"} tone={signal.severity === "critical" ? "risk" : signal.severity === "important" ? "warn" : "muted"} />
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <StatusChip label={signal.type || "Signal pending"} tone="muted" />
+                    <StatusChip label={signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Freshness pending"} tone={signal.snapshotDate || snapshotDate ? "ok" : "warn"} />
+                  </div>
+                </button>
+              ))}
+            </div>
             {symbolsAnalyzed !== null && (
               <div className="border-t px-4 py-2 text-xs" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
                 {symbolsAnalyzed} companies in latest cycle
               </div>
             )}
-          </div>
+          </Surface>
         )}
 
         <div className="mt-6">
           <ResearchDisclaimer />
         </div>
       </div>
-    </main>
+    </PremiumPage>
   );
 }
