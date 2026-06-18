@@ -53,7 +53,7 @@ export const PublicLandingPage: React.FC = () => {
               AI-native research terminal for Indian equities
             </div>
             <h1 className="max-w-4xl text-5xl font-semibold leading-[0.98] tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-              Evidence-first equity research with a premium command surface.
+              Indian equity research with a premium command surface.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
               StockStory India turns verified market, fundamentals, and scoring data into inspectable research workflows. No recommendations, no fabricated values, no hidden missing data.
@@ -159,7 +159,7 @@ export const PublicLandingPage: React.FC = () => {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-            <Button type="button" onClick={() => navigatePage("trust")} className="h-12 px-6 text-sm">Open Trust Centre</Button>
+            <Button id="onboarding-cta-signup" type="button" onClick={() => navigatePage("signup")} className="h-12 px-6 text-sm">Create free account</Button>
             <Button id="onboarding-cta-about" type="button" onClick={() => navigatePage("about")} variant="secondary" className="h-12 px-6 text-sm">Read mission</Button>
           </div>
         </Surface>
