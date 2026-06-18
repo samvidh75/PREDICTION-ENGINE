@@ -204,7 +204,7 @@ export const TrustCentrePage: React.FC = () => {
   ];
 
   return (
-    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
+    <main className="ss-page min-h-screen antialiased" style={{ color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
       <TopNav /><MobileNav />
       <div className="mx-auto max-w-5xl space-y-8 p-4 pt-[76px] md:pt-28">
 

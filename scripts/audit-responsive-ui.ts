@@ -55,7 +55,7 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
     const cta = document.querySelector("button, a");
     const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(bodyText);
     const secretToken = /\b(REDIS_URL|DATABASE_URL|FIREBASE_PRIVATE_KEY|INDIANAPI_KEY)\b/.test(bodyText);
-    const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-surface, .ss-dark-surface");
+    const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-page, .ss-surface, .ss-dark-surface");
     return { overflow, hasNav: !!nav, hasCta: !!cta, rawToken, secretToken, oldPlain };
   });
   if (result.overflow > 8) failures.push(`horizontal overflow ${result.overflow}px`);
