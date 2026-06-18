@@ -14,42 +14,42 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Canvas & Surfaces */
-  --color-canvas: #F7F5EF;
-  --color-surface: #FFFFFF;
-  --color-surface-raised: #FFFFFF;
-  --color-surface-modal: #FFFFFF;
+  --color-canvas: #070A0F;
+  --color-surface: #0D1117;
+  --color-surface-raised: #111827;
+  --color-surface-modal: #0D1117;
 
   /* Borders */
-  --color-border: #E4E2DC;
-  --color-border-light: #EEEDE8;
+  --color-border: rgba(148, 163, 184, 0.16);
+  --color-border-light: rgba(148, 163, 184, 0.1);
 
   /* Text */
-  --color-text-primary: #1A1D24;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  --color-text-primary: #E6EDF3;
+  --color-text-secondary: #9AA7B5;
+  --color-text-muted: #64748B;
 
   /* Accent — Deep Emerald (used sparingly) */
-  --color-accent: #065F46;
-  --color-accent-light: rgba(6, 95, 70, 0.06);
-  --color-accent-border: rgba(6, 95, 70, 0.15);
+  --color-accent: #2962FF;
+  --color-accent-light: rgba(41, 98, 255, 0.12);
+  --color-accent-border: rgba(41, 98, 255, 0.28);
 
   /* Intelligence — Slate Blue */
-  --color-intel: #4F46E5;
-  --color-intel-light: rgba(79, 70, 229, 0.06);
+  --color-intel: #2962FF;
+  --color-intel-light: rgba(41, 98, 255, 0.12);
 
   /* Semantic Status */
-  --color-active: #059669;
-  --color-active-bg: rgba(5, 150, 105, 0.08);
-  --color-warning: #D97706;
-  --color-warning-bg: rgba(217, 119, 6, 0.08);
-  --color-danger: #DC2626;
-  --color-danger-bg: rgba(220, 38, 38, 0.08);
-  --color-muted-bg: #F3F4F6;
+  --color-active: #16A34A;
+  --color-active-bg: rgba(22, 163, 74, 0.12);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-muted-bg: rgba(148, 163, 184, 0.08);
 
   /* Shadows — Subtle */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.07);
+  --shadow-sm: none;
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.32);
 
   /* Spacing scale (applied via Tailwind) */
   --space-unit: 4px;
@@ -84,8 +84,8 @@ body {
 }
 
 ::selection {
-  background: var(--color-accent-light);
-  color: var(--color-text-primary);
+  background: var(--color-accent);
+  color: white;
 }
 
 /* ============================================
@@ -138,20 +138,20 @@ body {
 .surface {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .surface-raised {
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
 
 .surface-modal {
   background: var(--color-surface-modal);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
+  border-radius: 8px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -236,7 +236,7 @@ body {
 }
 
 .table-row:hover {
-  background: var(--color-accent-light);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .table-row:focus-visible {
@@ -326,7 +326,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #054f3a;
+  background: #3B71FF;
 }
 
 .btn-secondary {

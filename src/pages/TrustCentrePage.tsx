@@ -174,7 +174,7 @@ export const TrustCentrePage: React.FC = () => {
         </div>
 
         {/* Tab navigation */}
-        <div className="flex gap-1 overflow-x-auto border-b border-white/[0.06] pb-px" role="tablist" aria-label="Trust centre tabs">
+        <div className="flex gap-1 overflow-x-auto border-b border-white/[0.06] pb-px" aria-label="Trust centre tabs">
           {[
             { key: "overview" as const, label: "Overview" },
             { key: "providers" as const, label: "Providers" },
@@ -184,7 +184,6 @@ export const TrustCentrePage: React.FC = () => {
             <button
               key={tab.key}
               type="button"
-              role="tab"
               aria-selected={activeTab === tab.key}
               aria-controls={`trust-tabpanel-${tab.key}`}
               onClick={() => setActiveTab(tab.key)}

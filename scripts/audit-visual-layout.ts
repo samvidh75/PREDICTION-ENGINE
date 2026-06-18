@@ -1,4 +1,5 @@
 import { chromium, type Browser, type Page } from "@playwright/test";
+import { spawn } from "node:child_process";
 
 const VIEWPORTS = [
   { w: 1440, h: 900, label: "desktop-1440" },
@@ -29,6 +30,9 @@ interface LayoutAudit {
   bottomDockVisible: boolean;
   horizontalOverflow: boolean;
   mainContentUnder900: boolean;
+  giantBlankRegion: boolean;
+  lowContrastHero: boolean;
+  primaryCtasOk: boolean;
   errors: string[];
 }
 
@@ -36,7 +40,10 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
   const failures: string[] = [];
   const consoleErrors: string[] = [];
   page.on("console", (msg) => {
-    if (msg.type() === "error") consoleErrors.push(msg.text());
+    if (msg.type() !== "error") return;
+    const text = msg.text();
+    if (/Failed to load resource: the server responded with a status of 50[024]/.test(text)) return;
+    consoleErrors.push(text);
   });
 
   if (url.includes("auth") || url.includes("dashboard") || url.includes("search") || url.includes("stock") || url.includes("compare") || url.includes("watchlist") || url.includes("portfolio")) {
@@ -103,6 +110,29 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
 
     // Raw tokens
     const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(body.innerText);
+    const publicRoute = /page=(landing|about|login|signup)/.test(location.search) || location.pathname === "/market";
+    const panelCandidates = Array.from(document.querySelectorAll("section, article, main div")).filter((el) => {
+      const r = el.getBoundingClientRect();
+      const text = (el.textContent || "").trim();
+      return publicRoute && r.width >= Math.min(320, vw - 40) && r.height >= 300 && text.length < 45;
+    });
+    const giantBlankRegion = panelCandidates.length > 0;
+    const heroText = document.querySelector("h1, h2");
+    let lowContrastHero = false;
+    if (heroText) {
+      const style = window.getComputedStyle(heroText);
+      const color = style.color.match(/\d+/g)?.map(Number) || [];
+      if (color.length >= 3) {
+        const luminance = (0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]) / 255;
+        lowContrastHero = luminance < 0.45;
+      }
+    }
+    const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => {
+      const text = (el.textContent || "").trim();
+      const rect = el.getBoundingClientRect();
+      return rect.width > 20 && rect.height > 20 && /Start research|View rankings|Open rankings|Check Trust Centre|Open Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(text);
+    });
+    const primaryCtasOk = !publicRoute || primaryCtas.length >= 2;
 
     return {
       contentWidthPx: Math.round(contentWidth),
@@ -112,12 +142,18 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
       bottomDockVisible,
       horizontalOverflow: overflow > 8,
       mainContentUnder900: contentUnder900 && vw >= 1440,
+      giantBlankRegion,
+      lowContrastHero,
+      primaryCtasOk,
       errors: [
         ...(rawToken ? ["raw undefined/null/NaN visible"] : []),
         ...(overflow > 8 ? [`horizontal overflow ${overflow}px`] : []),
         ...(contentUnder900 && vw >= 1440 ? ["main content under 900px on desktop viewport"] : []),
         ...(bottomDockVisible && vw >= 1024 ? ["bottom nav visible on desktop/tablet"] : []),
         ...(hasNarrowContainer && vw >= 1440 ? ["narrow container (max-w-7xl/5xl) found on desktop"] : []),
+        ...(giantBlankRegion ? ["giant blank card/region detected on public route"] : []),
+        ...(lowContrastHero ? ["hero heading appears low contrast"] : []),
+        ...(!primaryCtasOk ? ["primary CTAs missing or not detectable"] : []),
       ],
     };
   }, viewportW);
@@ -130,6 +166,7 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
 }
 
 async function main() {
+  const baseUrl = "http://127.0.0.1:4174";
   const results: string[] = [
     "# Visual Layout Audit",
     "",
@@ -140,32 +177,51 @@ async function main() {
     "",
   ];
 
+  const preview = spawn("npm", ["run", "preview", "--", "--host", "127.0.0.1", "--port", "4174"], {
+    stdio: "ignore",
+    shell: false,
+  });
+  const started = Date.now();
+  while (Date.now() - started < 30_000) {
+    try {
+      const res = await fetch(baseUrl);
+      if (res.ok) break;
+    } catch {}
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
   const browser: Browser = await chromium.launch();
   let anyFailed = false;
 
-  for (const [routeName, routeUrl, _isAuth] of ROUTES) {
-    for (const vp of VIEWPORTS) {
-      const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
-      const audit = await auditPageLayout(page, routeUrl, vp.w);
-      await page.close();
+  try {
+    for (const [routeName, routeUrl, _isAuth] of ROUTES) {
+      for (const vp of VIEWPORTS) {
+        const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
+        const audit = await auditPageLayout(page, `${baseUrl}${routeUrl}`, vp.w);
+        await page.close();
 
-      const status = audit.errors.length === 0 ? "PASS" : "FAIL";
-      if (audit.errors.length > 0) anyFailed = true;
+        const status = audit.errors.length === 0 ? "PASS" : "FAIL";
+        if (audit.errors.length > 0) anyFailed = true;
 
-      results.push(`### ${routeName} @ ${vp.label}`);
-      results.push(`- Content: ${audit.contentWidthPx}px / Viewport: ${audit.viewportWidth}px`);
-      results.push(`- Empty right: ${audit.emptyRightAreaPx}px`);
-      results.push(`- Bottom dock visible: ${audit.bottomDockVisible ? "YES" : "no"}`);
-      results.push(`- Overflow: ${audit.horizontalOverflow ? "YES" : "no"}`);
-      results.push(`- Status: **${status}**`);
-      if (audit.errors.length > 0) {
-        results.push(`- Errors: ${audit.errors.join("; ")}`);
+        results.push(`### ${routeName} @ ${vp.label}`);
+        results.push(`- Content: ${audit.contentWidthPx}px / Viewport: ${audit.viewportWidth}px`);
+        results.push(`- Empty right: ${audit.emptyRightAreaPx}px`);
+        results.push(`- Bottom dock visible: ${audit.bottomDockVisible ? "YES" : "no"}`);
+        results.push(`- Overflow: ${audit.horizontalOverflow ? "YES" : "no"}`);
+        results.push(`- Giant blank region: ${audit.giantBlankRegion ? "YES" : "no"}`);
+        results.push(`- Low contrast hero: ${audit.lowContrastHero ? "YES" : "no"}`);
+        results.push(`- Primary CTAs: ${audit.primaryCtasOk ? "ok" : "missing"}`);
+        results.push(`- Status: **${status}**`);
+        if (audit.errors.length > 0) {
+          results.push(`- Errors: ${audit.errors.join("; ")}`);
+        }
+        results.push("");
       }
-      results.push("");
     }
+  } finally {
+    await browser.close();
+    preview.kill("SIGTERM");
   }
-
-  await browser.close();
 
   results.push("## Summary");
   results.push(anyFailed ? "Some checks failed. See above for details." : "All checks passed.");

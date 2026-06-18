@@ -26,7 +26,7 @@ function titleForStage(stage: Stage): string {
 
 function subtitleForStage(stage: Stage): string {
   if (stage === "signup") {
-    return "Start exploring Indian companies through clear, research-driven analysis.";
+    return "Start exploring Indian companies through source-backed research states.";
   }
   if (stage === "forgot") {
     return "We'll send a password reset link to your email.";
@@ -184,13 +184,13 @@ export default function CinematicAuthGateway({
 
   return (
     <div className="w-full antialiased [text-rendering:geometricPrecision]">
-      <div className="p-2" aria-live="polite">
-        <div className="text-[24px] font-semibold tracking-tight text-slate-950">{titleForStage(stage)}</div>
-        <div className="mt-2 text-[14px] leading-relaxed text-slate-600">
+      <div aria-live="polite">
+        <div className="text-[18px] font-semibold tracking-tight text-[#E6EDF3]">{titleForStage(stage)}</div>
+        <div className="mt-2 text-[13px] leading-relaxed text-[#9AA7B5]">
           {contextMessage || subtitleForStage(stage)}
         </div>
         {contextMessage && stage === "signup" && (
-          <div className="mt-1 text-[13px] leading-relaxed text-slate-500">
+          <div className="mt-1 text-[13px] leading-relaxed text-[#64748B]">
             {subtitleForStage(stage)}
           </div>
         )}
@@ -198,35 +198,36 @@ export default function CinematicAuthGateway({
         <div className="mt-8">
           {stage === "login" && (
             <div className="flex flex-col gap-4">
-              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-12 text-sm font-semibold">
+              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-11 text-sm font-semibold" title={busy ? "Authentication is in progress." : undefined}>
                 Continue with Google
               </Button>
 
               <div className="flex items-center my-2">
-                <div className="flex-grow border-t border-slate-200" />
-                <span className="mx-3 text-[11px] uppercase tracking-wider text-slate-500 font-medium">Or email</span>
-                <div className="flex-grow border-t border-slate-200" />
+                <div className="flex-grow border-t border-[rgba(148,163,184,0.16)]" />
+                <span className="mx-3 text-[11px] uppercase tracking-wider text-[#64748B] font-medium">Or email</span>
+                <div className="flex-grow border-t border-[rgba(148,163,184,0.16)]" />
               </div>
 
-              <Input aria-label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
+              <Input aria-label="Email address" label="Email address" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} placeholder="name@example.com" type="email" className="h-11" disabled={busy} />
               <div className="relative">
-                <Input aria-label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Password" type={showLoginPassword ? "text" : "password"} className="h-12 pr-10" disabled={busy} />
-                <button type="button" tabIndex={-1} onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-transparent border-none text-slate-400 hover:text-slate-600" disabled={busy} aria-label={showLoginPassword ? "Hide password" : "Show password"}>
+                <Input aria-label="Password" label="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Minimum 6 characters" type={showLoginPassword ? "text" : "password"} className="h-11 pr-10" disabled={busy} />
+                <button type="button" tabIndex={-1} onClick={() => setShowLoginPassword(!showLoginPassword)} className="absolute right-3 top-[38px] cursor-pointer bg-transparent border-none text-[#64748B] hover:text-[#E6EDF3]" disabled={busy} aria-label={showLoginPassword ? "Hide password" : "Show password"}>
                   {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
 
-              <Button type="button" disabled={busy || !canLogin} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className="w-full h-12 text-sm font-semibold">
+              <Button type="button" disabled={busy || !canLogin} title={!canLogin ? "Enter an email address and a password with at least 6 characters." : undefined} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className="w-full h-11 text-sm font-semibold">
                 Sign in
               </Button>
+              {!canLogin && <p className="text-center text-[11px] text-[#64748B]">Enter an email and password to enable sign in.</p>}
 
-              <button type="button" className="text-[13px] text-slate-500 hover:text-slate-800 transition" disabled={busy} onClick={() => goToStage("forgot")}>
+              <button type="button" className="text-[13px] text-[#9AA7B5] hover:text-[#E6EDF3] transition" disabled={busy} onClick={() => goToStage("forgot")}>
                 Forgot your password?
               </button>
 
-              <div className="text-center text-[13px] text-slate-500">
+              <div className="text-center text-[13px] text-[#9AA7B5]">
                 Don't have an account?{" "}
-                <button type="button" className="text-slate-800 underline transition hover:text-slate-950" disabled={busy} onClick={() => goToStage("signup")}>
+                <button type="button" className="text-[#E6EDF3] underline transition hover:text-white" disabled={busy} onClick={() => goToStage("signup")}>
                   Create account
                 </button>
               </div>
@@ -235,32 +236,33 @@ export default function CinematicAuthGateway({
 
           {stage === "signup" && (
             <div className="flex flex-col gap-4">
-              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-12 text-sm font-semibold">
+              <Button type="button" disabled={busy} onClick={() => void startGoogle()} variant="secondary" className="w-full h-11 text-sm font-semibold" title={busy ? "Authentication is in progress." : undefined}>
                 Continue with Google
               </Button>
 
               <div className="flex items-center my-2">
-                <div className="flex-grow border-t border-slate-200" />
-                <span className="mx-3 text-[11px] uppercase tracking-wider text-slate-500 font-medium">Or email</span>
-                <div className="flex-grow border-t border-slate-200" />
+                <div className="flex-grow border-t border-[rgba(148,163,184,0.16)]" />
+                <span className="mx-3 text-[11px] uppercase tracking-wider text-[#64748B] font-medium">Or email</span>
+                <div className="flex-grow border-t border-[rgba(148,163,184,0.16)]" />
               </div>
 
-              <Input aria-label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Full name" className="h-12" disabled={busy} />
-              <Input aria-label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
+              <Input aria-label="Full name" label="Full name" value={signupName} onChange={(e) => setSignupName(e.target.value)} placeholder="Your name" className="h-11" disabled={busy} />
+              <Input aria-label="Email address" label="Email address" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} placeholder="name@example.com" type="email" className="h-11" disabled={busy} />
               <div className="relative">
-                <Input aria-label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Password (min 6 characters)" type={showSignupPassword ? "text" : "password"} className="h-12 pr-10" disabled={busy} />
-                <button type="button" tabIndex={-1} onClick={() => setShowSignupPassword(!showSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-transparent border-none text-slate-400 hover:text-slate-600" disabled={busy} aria-label={showSignupPassword ? "Hide password" : "Show password"}>
+                <Input aria-label="Password" label="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} placeholder="Minimum 6 characters" type={showSignupPassword ? "text" : "password"} className="h-11 pr-10" disabled={busy} />
+                <button type="button" tabIndex={-1} onClick={() => setShowSignupPassword(!showSignupPassword)} className="absolute right-3 top-[38px] cursor-pointer bg-transparent border-none text-[#64748B] hover:text-[#E6EDF3]" disabled={busy} aria-label={showSignupPassword ? "Hide password" : "Show password"}>
                   {showSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
 
-              <Button type="button" disabled={busy || !canSignup} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className="w-full h-12 text-sm font-semibold">
+              <Button type="button" disabled={busy || !canSignup} title={!canSignup ? "Enter a name, email address, and password with at least 6 characters." : undefined} onClick={() => void runAuth(() => authService.signUpWithEmail(signupName, signupEmail, signupPassword), "email")} className="w-full h-11 text-sm font-semibold">
                 Create account
               </Button>
+              {!canSignup && <p className="text-center text-[11px] text-[#64748B]">Name, email, and a 6 character password are required.</p>}
 
-              <div className="text-center text-[13px] text-slate-500">
+              <div className="text-center text-[13px] text-[#9AA7B5]">
                 Already have an account?{" "}
-                <button type="button" className="text-slate-800 underline transition hover:text-slate-950" disabled={busy} onClick={() => goToStage("login")}>
+                <button type="button" className="text-[#E6EDF3] underline transition hover:text-white" disabled={busy} onClick={() => goToStage("login")}>
                   Sign in
                 </button>
               </div>
@@ -269,11 +271,11 @@ export default function CinematicAuthGateway({
 
           {stage === "forgot" && (
             <div className="flex flex-col gap-4">
-              <Input aria-label="Recovery email address" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="Email address" type="email" className="h-12" disabled={busy} />
-              <Button type="button" disabled={busy || !canReset} onClick={() => void sendPasswordReset()} className="w-full h-12 text-sm font-semibold">
+              <Input aria-label="Recovery email address" label="Recovery email" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} placeholder="name@example.com" type="email" className="h-11" disabled={busy} />
+              <Button type="button" disabled={busy || !canReset} title={!canReset ? "Enter the email address for the account." : undefined} onClick={() => void sendPasswordReset()} className="w-full h-11 text-sm font-semibold">
                 Send reset link
               </Button>
-              <button type="button" disabled={busy} className="text-center text-[13px] text-slate-500 transition hover:text-slate-800" onClick={() => goToStage("login")}>
+              <button type="button" disabled={busy} className="text-center text-[13px] text-[#9AA7B5] transition hover:text-[#E6EDF3]" onClick={() => goToStage("login")}>
                 Back to sign in
               </button>
             </div>
@@ -282,26 +284,26 @@ export default function CinematicAuthGateway({
 
         {error && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-[13px] leading-[1.5] text-red-700"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-[13px] leading-[1.5] text-[#FCA5A5]"
             role="alert"
           >
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" />
             <span>{error}</span>
           </div>
         )}
         {success && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-[13px] leading-[1.5] text-emerald-700"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-[#16A34A]/30 bg-[#16A34A]/10 p-3 text-[13px] leading-[1.5] text-[#86EFAC]"
             role="status"
           >
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
             <span>{success}</span>
           </div>
         )}
 
         {busy && (
-          <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-slate-500">
-            <Loader2 className="h-4 w-4 animate-spin text-emerald-700" />
+          <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-[#9AA7B5]">
+            <Loader2 className="h-4 w-4 animate-spin text-[#2962FF]" />
             Loading...
           </div>
         )}

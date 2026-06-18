@@ -1,100 +1,83 @@
 import React from "react";
-import { BarChart3, Database, FileSearch, ShieldCheck, Workflow, XCircle } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import MobileNav from "../components/navigation/MobileNav";
-import TopNav from "../components/navigation/TopNav";
-import Button from "../components/ui/Button";
-import { IntegrityStrip, PremiumPage, SectionHeader, Surface, navigatePage } from "../components/premium/PremiumUI";
+import { Database, FileSearch, Scale, ShieldCheck, Workflow, XCircle } from "lucide-react";
+import {
+  ProductAction,
+  ProductHero,
+  ProductPage,
+  ProductPanel,
+  ProductSection,
+  ProductShell,
+  ProductStatusPill,
+  productNavigate,
+} from "../components/product/ProductUI";
 
-const principles = [
-  ["Evidence before narrative", "Scores and signals must be traceable to available provider or registry data."],
-  ["Missing data stays visible", "Unavailable fundamentals, freshness, or coverage are labelled instead of filled with placeholders."],
-  ["Research, not advice", "The product does not issue buy, sell, or hold recommendations."],
-  ["Indian market context", "Workflows are shaped around Indian equities, provider coverage, and source reliability."],
+const does = [
+  { icon: FileSearch, title: "Structures research", body: "Company pages organize model state, source freshness, and missing inputs." },
+  { icon: Database, title: "Shows coverage health", body: "Unavailable data remains explicit instead of being replaced by decorative numbers." },
+  { icon: Workflow, title: "Connects workflows", body: "Search, rankings, compare, watchlist, and Trust Centre stay one step apart." },
+  { icon: ShieldCheck, title: "Keeps trust visible", body: "Provider status and methodology live in the product flow, not buried in fine print." },
 ];
 
-const does: Array<[string, LucideIcon]> = [
-  ["Structure research", FileSearch],
-  ["Show coverage health", Database],
-  ["Track score changes", BarChart3],
-  ["Separate confidence", ShieldCheck],
+const principles = [
+  "No buy, sell, hold, or trading advice.",
+  "No fabricated metrics, rankings, signals, provider health, or source labels.",
+  "No hiding unavailable fundamentals or coverage gaps.",
+  "No broker execution or paywall-first product framing.",
 ];
 
 export const PublicAboutPage: React.FC = () => (
-  <PremiumPage nav={<><TopNav /><MobileNav /></>}>
-    <section className="w-full px-6 pb-14 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-      <Surface dark className="ss-grid-texture relative overflow-hidden p-6 md:p-10">
-        <div className="relative z-10 max-w-4xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
-            <Workflow className="h-3.5 w-3.5" aria-hidden="true" /> Mission
-          </div>
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white md:text-6xl">
-            Research intelligence for Indian equities, built around evidence.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
-            StockStory India exists because equity research should make source quality, freshness, and missing evidence visible. It is a workflow product for inspection, not a venue for tips.
-          </p>
-          <div className="mt-7"><IntegrityStrip /></div>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button type="button" onClick={() => navigatePage("signup")} className="h-11 px-6 text-sm">Create free account</Button>
-            <Button type="button" onClick={() => navigatePage("trust")} variant="secondary" className="h-11 px-6 text-sm">Open Trust Centre</Button>
-          </div>
+  <ProductShell>
+    <ProductPage>
+      <ProductHero
+        eyebrow="Mission"
+        title="Research intelligence for Indian equities, built around evidence."
+        body="StockStory India is a research workspace for understanding companies through source-backed model context. The product is built around traceability, coverage limits, and clear next steps."
+        actions={(
+          <>
+            <ProductAction onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>
+            <ProductAction variant="secondary" onClick={() => productNavigate("trust")}>Open Trust Centre</ProductAction>
+          </>
+        )}
+        aside={(
+          <ProductPanel className="flex min-h-[360px] flex-col justify-between p-5 md:p-6">
+            <div>
+              <Scale className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
+              <h2 className="mt-4 text-xl font-semibold text-[#E6EDF3]">Research-only operating principles</h2>
+              <div className="mt-5 space-y-2">
+                {principles.map((item) => (
+                  <div key={item} className="flex gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-xs leading-5 text-[#9AA7B5]">
+                    <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#F59E0B]" aria-hidden="true" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-5 pt-4">
+              <ProductStatusPill tone="verified">Unavailable data labelled</ProductStatusPill>
+            </div>
+          </ProductPanel>
+        )}
+      />
+
+      <ProductSection>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-[#E6EDF3]">What the product does</h2>
+          <p className="mt-1 text-sm text-[#9AA7B5]">Compact product rows instead of empty hero slabs.</p>
         </div>
-      </Surface>
-    </section>
-
-    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto w-full max-w-[1440px]">
-      <SectionHeader eyebrow="What it does" title="A research terminal, not an advisory desk." body="The interface helps users move from company discovery to source verification while keeping limitations explicit." />
-      <div className="mt-6 grid gap-4 md:grid-cols-4">
-        {does.map(([label, Icon]) => (
-          <Surface key={label} className="ss-lift p-6">
-            <Icon className="h-6 w-6 text-emerald-700" aria-hidden="true" />
-            <h3 className="mt-4 text-lg font-semibold text-slate-950">{label}</h3>
-          </Surface>
-        ))}
-      </div>
-      </div>
-    </section>
-
-    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto w-full max-w-[1440px]"><div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-        <Surface className="p-6 md:p-8">
-          <XCircle className="h-7 w-7 text-red-700" aria-hidden="true" />
-          <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">What StockStory India does not do</h2>
-          <div className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
-            <p>No buy, sell, or hold recommendations.</p>
-            <p>No fabricated user counts, testimonials, provider claims, portfolio values, or stock predictions.</p>
-            <p>No hiding raw unavailability behind polished-looking numbers.</p>
-          </div>
-        </Surface>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {principles.map(([title, body]) => (
-            <Surface key={title} className="ss-lift p-6">
-              <h3 className="text-lg font-semibold text-slate-950">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{body}</p>
-            </Surface>
+        <div className="grid gap-3 md:grid-cols-2">
+          {does.map(({ icon: Icon, title, body }) => (
+            <ProductPanel key={title} className="flex gap-3 p-4">
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
+              <div>
+                <h3 className="text-sm font-semibold text-[#E6EDF3]">{title}</h3>
+                <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">{body}</p>
+              </div>
+            </ProductPanel>
           ))}
         </div>
-      </div>
-      </div>
-    </section>
-
-    <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto w-full max-w-[1440px]">
-      <Surface dark className="p-6 md:p-9">
-        <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Trust and safety</div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Every premium surface still tells the truth about the data.</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">Provider limits, fundamentals availability, historical coverage, and freshness state belong in the workflow, not in fine print.</p>
-          </div>
-          <Button type="button" onClick={() => navigatePage("trust")} className="h-12 px-6 text-sm">Review data policy</Button>
-        </div>
-      </Surface>
-      </div>
-    </section>
-  </PremiumPage>
+      </ProductSection>
+    </ProductPage>
+  </ProductShell>
 );
 
 export default PublicAboutPage;

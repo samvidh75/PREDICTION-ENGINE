@@ -1,174 +1,132 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, FileSearch, Eye, ShieldCheck, Search, Database, Activity } from "lucide-react";
-import TopNav from "../components/navigation/TopNav";
-import MobileNav from "../components/navigation/MobileNav";
-import Button from "../components/ui/Button";
+import { Activity, Database, FileSearch, Search, ShieldCheck } from "lucide-react";
 import { api } from "../services/api/client";
-import { PremiumPage, navigatePage } from "../components/premium/PremiumUI";
-import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
-import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
-import { SourceTracePill } from "../components/intelligence/SourceTracePill";
-import { DataFreshnessLine } from "../components/intelligence/DataFreshnessLine";
+import {
+  ProductAction,
+  ProductHero,
+  ProductIntegrityRow,
+  ProductLoadingLine,
+  ProductPage,
+  ProductPanel,
+  ProductSection,
+  ProductShell,
+  ProductStatusPill,
+  productNavigate,
+} from "../components/product/ProductUI";
 
-const workflow = [
-  { icon: Search, title: "Search", body: "Search Indian equities by symbol, company, or sector." },
-  { icon: FileSearch, title: "Inspect", body: "Review model scores, factor context, provider freshness, and gaps." },
-  { icon: Eye, title: "Track", body: "Save companies to watchlists and revisit research changes over time." },
-  { icon: ShieldCheck, title: "Audit", body: "Check provider domain health, data lineage, and scoring methodology." },
+const steps = [
+  { icon: Search, title: "Find a company", body: "Search by symbol, company, or sector and open the research workspace." },
+  { icon: FileSearch, title: "Inspect evidence", body: "Review scores with freshness, confidence, and unavailable inputs kept visible." },
+  { icon: ShieldCheck, title: "Check trust", body: "Use the Trust Centre to inspect provider domains and data limitations." },
 ];
 
 export const PublicLandingPage: React.FC = () => {
-  const [coverage, setCoverage] = useState<{ symbols: number | null; scored: number | null; updated: string | null; registryRows: number | null }>({
-    symbols: null, scored: null, updated: null, registryRows: null,
+  const [coverage, setCoverage] = useState<{ symbols: number | null; scored: number | null; updated: string | null; registryRows: number | null; loading: boolean }>({
+    symbols: null,
+    scored: null,
+    updated: null,
+    registryRows: null,
+    loading: true,
   });
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    api.getDataCoverage().then((cov) => {
-      if (ctrl.signal.aborted) return;
-      setCoverage({
-        symbols: cov.coverage?.symbols?.count ?? null,
-        scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
-        updated: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
-        registryRows: cov.coverage?.predictionRegistry?.rowCount ?? null,
+    let alive = true;
+    api.getDataCoverage()
+      .then((cov) => {
+        if (!alive) return;
+        setCoverage({
+          symbols: cov.coverage?.symbols?.count ?? null,
+          scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
+          updated: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
+          registryRows: cov.coverage?.predictionRegistry?.rowCount ?? null,
+          loading: false,
+        });
+      })
+      .catch(() => {
+        if (alive) setCoverage((prev) => ({ ...prev, loading: false }));
       });
-    }).catch(() => {});
-    return () => ctrl.abort();
+    return () => { alive = false; };
   }, []);
 
+  const metrics = [
+    { label: "Universe", value: coverage.symbols, suffix: "companies" },
+    { label: "Scored", value: coverage.scored, suffix: "symbols" },
+    { label: "Registry", value: coverage.registryRows, suffix: "rows" },
+  ];
+
   return (
-    <PremiumPage nav={<><TopNav /><MobileNav /></>}>
-      {/* Full-width Hero — no narrow column */}
-      <section className="relative w-full px-6 pb-14 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-        <div className="mx-auto grid w-full max-w-[1440px] gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] font-medium text-[#8B949E]">
-              <Activity className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
-              Research Intelligence OS
-            </div>
-            <h1 className="max-w-3xl text-4xl font-semibold leading-[1.02] tracking-tight text-[#E6EDF3] sm:text-5xl lg:text-6xl">
-              AI-native research intelligence for Indian equities.
-            </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-[#8B949E] sm:text-base">
-              Evidence-first, transparent, no advice. Every score shows its inputs, confidence, freshness, and gaps.
-            </p>
-            <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-              <Button id="hero-cta-rankings" type="button" onClick={() => navigatePage("rankings")} className="h-10 px-5 text-xs">
-                Explore rankings <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Button>
-              <Button id="hero-cta-methodology" type="button" onClick={() => navigatePage("trust")} variant="secondary" glass className="h-10 px-5 text-xs">
-                View Trust Centre
-              </Button>
-            </div>
-          </div>
-
-          {/* Compact product preview */}
-          <div className="space-y-3">
-            <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
-              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                <div className="flex items-center gap-2">
+    <ProductShell>
+      <ProductPage>
+        <ProductHero
+          eyebrow="Source-backed Indian equity research"
+          title="AI-native research intelligence for Indian equities."
+          body="StockStory India helps you search companies, inspect model inputs, compare coverage, and verify source trust. It does not issue trading calls or hide missing data."
+          actions={(
+            <>
+              <ProductAction id="hero-cta-start" onClick={() => productNavigate("signup")}>Start research</ProductAction>
+              <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
+              <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("trust")}>Check Trust Centre</ProductAction>
+            </>
+          )}
+          aside={(
+            <ProductPanel className="flex min-h-[360px] flex-col justify-between p-5 md:p-6">
+              <div>
+                <div className="flex items-center justify-between gap-3 border-b border-[rgba(148,163,184,0.12)] pb-4">
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                    <span className="text-sm font-semibold text-[#E6EDF3]">Research state</span>
+                  </div>
+                  <ProductStatusPill tone="blue">Research only</ProductStatusPill>
+                </div>
+                <div className="mt-5 grid gap-3">
+                  {coverage.loading ? (
+                    <ProductLoadingLine />
+                  ) : metrics.map((metric) => (
+                    <div key={metric.label} className="flex items-center justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-3 py-3">
+                      <div>
+                        <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#64748B]">{metric.label}</div>
+                        <div className="mt-1 text-xs text-[#9AA7B5]">{metric.value === null ? "Unavailable from verified coverage API" : metric.suffix}</div>
+                      </div>
+                      <div className="font-mono text-lg font-semibold text-[#E6EDF3]">
+                        {metric.value === null ? "Unavailable" : metric.value.toLocaleString("en-IN")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-5 border-t border-[rgba(148,163,184,0.12)] pt-4">
+                <div className="flex items-center gap-2 text-xs text-[#9AA7B5]">
                   <Database className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
-                  <span className="text-[11px] font-semibold text-[#E6EDF3]">Model intelligence</span>
-                </div>
-                <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-[#8B949E]">Research only</span>
-              </div>
-              <div className="mt-3 grid gap-4 sm:grid-cols-3">
-                <div>
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Coverage</div>
-                  <div className="mt-0.5 font-mono text-lg font-bold text-[#E6EDF3]">{coverage.symbols !== null ? coverage.symbols.toLocaleString("en-IN") : "—"}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Scored</div>
-                  <div className="mt-0.5 font-mono text-lg font-bold text-[#E6EDF3]">{coverage.scored !== null ? coverage.scored.toLocaleString("en-IN") : "—"}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Records</div>
-                  <div className="mt-0.5 font-mono text-lg font-bold text-[#E6EDF3]">{coverage.registryRows !== null ? coverage.registryRows.toLocaleString("en-IN") : "—"}</div>
+                  {coverage.updated ? `Latest verified coverage: ${coverage.updated}` : "Latest coverage timestamp unavailable"}
                 </div>
               </div>
-              <div className="mt-3 space-y-2">
-                <PredictionConfidenceBar score={
-                  coverage.registryRows !== null && coverage.scored !== null
-                    ? Math.min(100, Math.round((coverage.scored / (coverage.symbols || 1)) * 100))
-                    : null
-                } label="Coverage completeness" />
-                {coverage.updated && <ModelRunBadge runDate={coverage.updated} />}
-              </div>
+            </ProductPanel>
+          )}
+        />
+
+        <ProductSection>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#E6EDF3]">Research flow</h2>
+              <p className="mt-1 text-sm text-[#9AA7B5]">Three steps, no decorative filler.</p>
             </div>
-
-            {(coverage.symbols || coverage.scored) && (
-              <DataFreshnessLine items={[
-                { label: "Prices", status: coverage.symbols ? "fresh" as const : "unavailable" as const },
-                { label: "Factors", status: coverage.scored ? "fresh" as const : "unavailable" as const },
-                { label: "Predictions", status: coverage.updated ? "fresh" as const : "unavailable" as const },
-              ]} />
-            )}
-
-            <div className="flex flex-wrap gap-1.5">
-              <SourceTracePill provider="Indian API" status="healthy" domain="quote" />
-              <SourceTracePill provider="Yahoo" status="unavailable" domain="blocked" />
-              <SourceTracePill provider="Jugaad" status="degraded" domain="fallback" />
-              <SourceTracePill provider="NSELib" status="archived" domain="evaluated" />
-            </div>
+            <ProductIntegrityRow />
           </div>
-        </div>
-      </section>
-
-      {/* Full-width Workflow — 2-col on desktop, 4-col only on xl+ */}
-      <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-        <div className="mx-auto w-full max-w-[1440px]">
-          <div className="mb-5 flex items-center gap-2">
-            <Activity className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
-            <h2 className="text-xs font-semibold text-[#E6EDF3]">Research workflow</h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {workflow.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-3.5">
-                <div className="flex items-center gap-2">
-                  <Icon className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
-                  <h3 className="text-xs font-semibold text-[#E6EDF3]">{title}</h3>
-                </div>
-                <p className="mt-1.5 text-[11px] leading-relaxed text-[#8B949E]">{body}</p>
-              </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {steps.map(({ icon: Icon, title, body }) => (
+              <ProductPanel key={title} className="p-4">
+                <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
+                <p className="mt-2 text-xs leading-5 text-[#9AA7B5]">{body}</p>
+              </ProductPanel>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Full-width Integrity — left/right composition, not a single block */}
-      <section className="w-full border-t border-white/[0.04] px-6 py-10 md:px-10 lg:px-16 xl:px-24">
-        <div className="mx-auto grid w-full max-w-[1440px] gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">Data integrity</h2>
-            </div>
-            <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-[#8B949E]">
-              Every data gap, unavailable field, and model confidence level is labelled. No buy/sell/hold, no fabricated predictions, no hidden missing data. Provider status is exposed in plain language.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button id="hero-cta-start" type="button" onClick={() => navigatePage("signup")} className="h-9 px-4 text-[11px]">Sign in / Get started</Button>
-              <Button id="onboarding-cta-about" type="button" onClick={() => navigatePage("about")} variant="secondary" className="h-9 px-4 text-[11px]">Read mission</Button>
-            </div>
+          <div className="mt-4">
+            <ProductAction id="onboarding-cta-about" variant="ghost" onClick={() => productNavigate("about")}>Read about StockStory India</ProductAction>
           </div>
-          <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-4">
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">
-              <span>What you will see</span>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Source-backed</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Fresh / stale</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Confidence</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Gaps labelled</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Provider status</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">Lineage trace</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">No advice</span>
-              <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">No forecasts</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    </PremiumPage>
+        </ProductSection>
+      </ProductPage>
+    </ProductShell>
   );
 };
 

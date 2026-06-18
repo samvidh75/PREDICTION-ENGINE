@@ -70,17 +70,17 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
         <header className="flex h-14 items-center justify-between gap-4 border-b border-white/[0.06] bg-[#080C10] px-5">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold tracking-tight text-[#E6EDF3]">
-              StockStory<span className="text-[#2962FF]">.</span>
+              StockStory<span className="text-[#16A34A]">.</span>India
             </span>
           </div>
           {/* Integrated compact search trigger */}
           <button
             onClick={() => setCommandOpen(true)}
-            className="hidden sm:flex flex-1 max-w-md items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-[#484F58] hover:border-white/[0.12] hover:text-[#8B949E] transition-all duration-200"
+            className="hidden sm:flex flex-1 max-w-md items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-[#64748B] hover:border-white/[0.12] hover:text-[#9AA7B5] transition-all duration-200"
           >
             <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>Search companies...</span>
-            <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58]">⌘K</kbd>
+            <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">⌘K</kbd>
           </button>
           <div className="flex items-center gap-2">
             <GlobalCommandButton onClick={() => setCommandOpen(true)} />
@@ -88,7 +88,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); navigatePage("settings"); }}
-              className="flex h-8 w-8 items-center justify-center rounded-xl text-[#484F58] hover:bg-white/[0.04] hover:text-[#8B949E] transition-all duration-200"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-white/[0.04] hover:text-[#9AA7B5] transition-all duration-200"
               aria-label="Settings"
             >
               <Settings className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
                   type="button"
                   onClick={() => navigatePage(route.pageKey)}
                   className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                    isActive ? "bg-white/[0.08] text-[#E6EDF3]" : "text-[#484F58] hover:bg-white/[0.04] hover:text-[#8B949E]"
+                    isActive ? "bg-white/[0.08] text-[#E6EDF3]" : "text-[#64748B] hover:bg-white/[0.04] hover:text-[#9AA7B5]"
                   }`}
                   aria-label={route.label}
                   title={route.label}
@@ -142,7 +142,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
                 type="button"
                 onClick={() => navigatePage(route.pageKey)}
                 className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-all duration-200 ${
-                  isActive ? "text-[#E6EDF3]" : "text-[#484F58]"
+                  isActive ? "text-[#E6EDF3]" : "text-[#64748B]"
                 }`}
                 aria-label={route.label}
               >
