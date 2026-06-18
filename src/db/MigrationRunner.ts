@@ -103,11 +103,15 @@ export class MigrationRunner {
     };
   }
 
-  async runPending(): Promise<MigrationStatus> {
+  async runPending(force?: boolean): Promise<MigrationStatus> {
     await this.ensureTable();
     const statusResult = await this.status();
     if (statusResult.checksumMismatch) {
-      throw new Error('Migration checksum mismatch — cannot run pending migrations safely.');
+      if (force) {
+        console.warn('[MigrationRunner] WARNING: checksum mismatch ignored (--force). Running pending migrations anyway.');
+      } else {
+        throw new Error('Migration checksum mismatch — cannot run pending migrations safely.');
+      }
     }
 
     const available = await this.listAvailable();
