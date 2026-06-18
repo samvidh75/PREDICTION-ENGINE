@@ -19,7 +19,8 @@ export type PageKey =
   | "methodology"
   | "validation"
   | "predictions"
-  | "rankings";
+  | "rankings"
+  | "compare";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {
@@ -46,6 +47,7 @@ export function getPageKeyFromUrl(): PageKey {
       validation: "validation",
       predictions: "predictions",
       rankings: "rankings",
+      compare: "compare",
     };
 
     return mapping[raw] ?? "landing";
@@ -87,7 +89,7 @@ export const PROTECTED_PAGES: PageKey[] = [
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "trust", "methodology",
-  "validation", "predictions", "rankings",
+  "validation", "predictions", "rankings", "compare",
 ];
 
 /**

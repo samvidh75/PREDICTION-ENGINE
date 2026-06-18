@@ -23,6 +23,7 @@ import PortfolioPage from "../pages/PortfolioPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import SettingsPage from "../pages/SettingsPage";
 import TrustCentrePage from "../pages/TrustCentrePage";
+import ComparePage from "../pages/ComparePage";
 import AppLayout from "../components/navigation/AppLayout";
 
 interface PageRendererProps {
@@ -41,6 +42,7 @@ const PUBLIC_PAGES: Record<string, boolean> = {
   validation: true,
   predictions: true,
   rankings: true,
+  compare: true,
 };
 
 function renderPublicPage(pageKey: PageKey): JSX.Element {
@@ -59,6 +61,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
+    case "compare":
+      return <ComparePage />;
     default:
       return <PublicLandingPage />;
   }
@@ -85,6 +89,8 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
       return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
+    case "compare":
+      return <ComparePage />;
     case "dashboard":
     default:
       return <DashboardHub />;

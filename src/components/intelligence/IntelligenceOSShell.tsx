@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search } from "lucide-react";
+import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight } from "lucide-react";
 import { GlobalCommandButton } from "./GlobalCommandButton";
 import { CommandPalette } from "./CommandPalette";
 import { DataFreshnessOrb } from "./DataFreshnessOrb";
@@ -18,6 +18,7 @@ const ROUTES: ShellRoute[] = [
   { id: "watchlist", label: "Watchlist", icon: Eye, pageKey: "watchlist" },
   { id: "portfolio", label: "Portfolio", icon: Briefcase, pageKey: "portfolio" },
   { id: "trust", label: "Trust", icon: ShieldCheck, pageKey: "trust" },
+  { id: "compare", label: "Compare", icon: ArrowLeftRight, pageKey: "compare" },
 ];
 
 function navigatePage(pageKey: string) {
