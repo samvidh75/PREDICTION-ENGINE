@@ -332,12 +332,14 @@ export class PublicMarketDataProviderBroker {
     const timeoutMs = providerHealthTimeoutMs();
     const jugaadProvider = this.getProvider('jugaad-data');
     const nsepythonProvider = this.getProvider('nsepython');
-    const jugaadDomains = jugaadEnabled && jugaadProvider instanceof JugaadDataProvider
-      ? await withTimeout(jugaadProvider.checkDomainHealth(), timeoutMs, null)
-      : null;
-    const nsepythonDomains = nsepythonEnabled && nsepythonProvider instanceof NsePythonProvider
-      ? await withTimeout(nsepythonProvider.checkDomainHealth(), timeoutMs, null)
-      : null;
+    const [jugaadDomains, nsepythonDomains] = await Promise.all([
+      jugaadEnabled && jugaadProvider instanceof JugaadDataProvider
+        ? withTimeout(jugaadProvider.checkDomainHealth(), timeoutMs, null)
+        : Promise.resolve(null),
+      nsepythonEnabled && nsepythonProvider instanceof NsePythonProvider
+        ? withTimeout(nsepythonProvider.checkDomainHealth(), timeoutMs, null)
+        : Promise.resolve(null),
+    ]);
 
     return {
       INDIANAPI_KEY: {
