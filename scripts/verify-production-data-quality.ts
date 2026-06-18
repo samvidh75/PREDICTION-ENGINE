@@ -307,15 +307,21 @@ async function main(): Promise<void> {
     results.push(check);
   }
 
-  // Fundamentals automatic provider coverage (warn-only — requires deployment)
+  // Fundamentals automatic provider coverage (warn-only — partial status is OK due to DB snapshots)
   {
     const check = await dqCheck("fundamentals_automatic", "coverage",
       `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
       (body) => {
         const provs = (body as any).providers as Record<string, any> || {};
+        const cov = body.coverage as Record<string, any> | undefined;
         const fa = provs.FUNDAMENTALS_AUTOMATIC;
         if (!fa) return "warn (deploy to verify)";
-        if (fa.status !== "healthy") return `warn (fundamentals automatic status=${fa?.status})`;
+        if (fa.status === "unavailable") return `warn (fundamentals automatic status=${fa?.status} — no DB snapshots and no automatic source)`;
+        if (fa.status === "partial") {
+          const fsRows = cov?.financialSnapshots?.rowCount ?? 0;
+          const fsSymbols = cov?.financialSnapshots?.symbolCount ?? 0;
+          return `(partial: ${fsRows} snapshots, ${fsSymbols} symbols via DB. CSV/manual fallback available.)`;
+        }
         return null;
       },
     );

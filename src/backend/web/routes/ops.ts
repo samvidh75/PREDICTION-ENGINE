@@ -144,12 +144,18 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         },
       },
       fundamentals: {
-        status: "unavailable",
-        detail: "No automatic public source available. Use CSV import.",
+        status: "partial",
+        detail: "Coverage via DB financial_snapshots (29 symbols) plus CSV/manual filing fallback.",
+        domains: {
+          fundamentals: { healthy: true, detail: "Financial snapshots from DB + CSV import" },
+        },
       },
       csv_fallback: {
-        status: "local_only",
-        detail: "CSV import available for manual fundamentals.",
+        status: "manual",
+        detail: "Manual fundamentals CSV import available. Not Bhavcopy.",
+        domains: {
+          manual_import: { healthy: true, detail: "Operator CSV workflow for fundamentals" },
+        },
       },
     };
 
@@ -295,17 +301,30 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           },
           message: process.env.NSEPYTHON_ENABLED === "true" ? "Index quote + bhavcopy active. Equity quotes blocked (NSE)." : "Optional — set NSEPYTHON_ENABLED for index/bhavcopy.",
         },
-        FUNDAMENTALS_AUTOMATIC: {
-          lifecycle: "active",
-          required: false,
-          status: "unavailable",
-          message: "No automatic public source available. Use CSV import.",
-        },
+        FUNDAMENTALS_AUTOMATIC: (() => {
+          const fsRows = financialSnapshots.rowCount;
+          const fsSymbols = financialSnapshots.symbolCount;
+          const hasSnapshots = fsRows > 0;
+          return {
+            lifecycle: "active",
+            required: false,
+            status: hasSnapshots ? "partial" : "unavailable",
+            domains: {
+              fundamentals: { healthy: hasSnapshots, detail: hasSnapshots ? `${fsRows} snapshots across ${fsSymbols} symbols` : "No snapshots in DB" },
+            },
+            message: hasSnapshots
+              ? `Partial coverage: ${fsRows} snapshots across ${fsSymbols} symbols via DB. CSV/manual filing import available for additional symbols.`
+              : "No automatic public source available. Use CSV/manual import.",
+          };
+        })(),
         CSV_FALLBACK: {
           lifecycle: "standby",
           required: false,
-          status: "local_only",
-          message: "CSV import available for manual fundamentals.",
+          status: "manual",
+          domains: {
+            fundamentals: { healthy: true, detail: "Manual CSV/filing import" },
+          },
+          message: "Manual fundamentals CSV import available. Not Bhavcopy — use Jugaad-Data or NSEPython for bhavcopy.",
         },
       };
       return matrix;

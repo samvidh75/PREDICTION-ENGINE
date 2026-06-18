@@ -36,19 +36,29 @@ const SKIP_PROVIDERS = new Set(["REDIS_URL"]);
 
 const STATUS_STYLE: Record<string, { dot: string; bg: string; text: string; border: string; label: string }> = {
   healthy: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Healthy" },
+  active: { dot: "bg-emerald-500", bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Active" },
   degraded: { dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Degraded" },
+  partial: { dot: "bg-amber-400", bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Partial" },
   unavailable: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
+  blocked: { dot: "bg-red-400", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Blocked" },
+  manual: { dot: "bg-blue-400", bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", label: "Manual" },
   local_only: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Local Only" },
   missing_required: { dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Unavailable" },
+  missing_optional: { dot: "bg-slate-400", bg: "bg-slate-50", text: "text-slate-500", border: "border-slate-200", label: "Not Configured" },
   archived_unusable: { dot: "bg-purple-400", bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", label: "Archived" },
 };
 
 const LEFT_BORDER: Record<string, string> = {
   healthy: "border-l-emerald-400",
+  active: "border-l-emerald-400",
   degraded: "border-l-amber-400",
+  partial: "border-l-amber-400",
   unavailable: "border-l-red-400",
+  blocked: "border-l-red-400",
+  manual: "border-l-blue-400",
   local_only: "border-l-slate-300",
   missing_required: "border-l-red-400",
+  missing_optional: "border-l-slate-300",
   archived_unusable: "border-l-purple-400",
 };
 
@@ -57,8 +67,12 @@ const DOMAIN_LABELS: Record<string, string> = {
   historical: "Historical",
   bhavcopy: "Bhavcopy",
   index: "Index",
+  index_quote: "Index Quote",
   fundamentals: "Fundamentals",
   macro: "Macro",
+  rbi: "RBI Rates",
+  market_status: "Market Status",
+  manual_import: "Manual Import",
   delivery: "Delivery",
   sector: "Sector",
 };
@@ -73,17 +87,15 @@ function inferDomains(key: string, entry: ProviderEntry): Record<string, Provide
     case "INDIANAPI_KEY": {
       const h = entry.status === "healthy";
       return {
-        quote: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
-        fundamentals: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
-        macro: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" },
+        quote: { healthy: h, provider: key, detail: h ? "Live quote source" : "Not configured" },
       };
     }
     case "FUNDAMENTALS_AUTOMATIC": {
-      const h = entry.status === "healthy";
-      return { fundamentals: { healthy: h, provider: key, detail: h ? "Available" : "Not configured" } };
+      const h = entry.status === "healthy" || entry.status === "partial";
+      return { fundamentals: { healthy: h, provider: key, detail: h ? "DB snapshots + CSV import" : "Not configured" } };
     }
     case "CSV_FALLBACK":
-      return { bhavcopy: { healthy: false, provider: key, detail: "Local/dev only" } };
+      return { manual_import: { healthy: true, provider: key, detail: "Operator CSV workflow for fundamentals" } };
     default:
       return {};
   }
@@ -180,6 +192,8 @@ export const TrustCentrePage: React.FC = () => {
   const providerEntries = providersRaw
     ? Object.entries(providersRaw).filter(([key]) => !SKIP_PROVIDERS.has(key))
     : [];
+  const activeProviderEntries = providerEntries.filter(([, entry]) => entry.lifecycle !== "archived");
+  const archivedProviderEntries = providerEntries.filter(([, entry]) => entry.lifecycle === "archived");
 
   const coverage = coverageData?.coverage;
   const generatedAt = coverageData?.generatedAt;
@@ -289,12 +303,13 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Provider Domain Health Cards */}
-        {providerEntries.length > 0 && (
+        {/* Provider Domain Health Cards — Active Sources */}
+        {activeProviderEntries.length > 0 && (
           <section className="space-y-5">
-            <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Provider domain health</h2>
+            <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Active data sources</h2>
+            <p className="text-xs" style={{ color: "#536471" }}>Provider status is reported per domain, not per provider. A single provider may be Active for some domains and Blocked/Unavailable for others.</p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {providerEntries.map(([key, entry]) => {
+              {activeProviderEntries.map(([key, entry]) => {
                 const domains = inferDomains(key, entry);
                 const s = getStatusStyle(entry.status);
                 const border = LEFT_BORDER[entry.status] || "border-l-slate-300";
@@ -349,6 +364,45 @@ export const TrustCentrePage: React.FC = () => {
           </section>
         )}
 
+        {/* Archived / evaluated providers */}
+        {archivedProviderEntries.length > 0 && (
+          <section className="space-y-4">
+            <details className="group">
+              <summary className="text-sm font-semibold cursor-pointer" style={{ color: "#536471" }}>
+                Archived evaluations ({archivedProviderEntries.length})
+              </summary>
+              <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {archivedProviderEntries.map(([key, entry]) => {
+                  const s = getStatusStyle(entry.status);
+                  const border = LEFT_BORDER[entry.status] || "border-l-slate-300";
+                  return (
+                    <div
+                      key={key}
+                      className={`rounded-xl p-5 border-l-4 ${border} opacity-70`}
+                      style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", borderWidth: "1px 1px 1px 0", borderStyle: "solid", borderColor: "rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-semibold" style={{ color: "#0f1419" }}>
+                          {PROVIDER_LABELS[key] || key.replace(/_/g, " ")}
+                        </h3>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold ${s.bg} ${s.text} border ${s.border}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                          {s.label}
+                        </span>
+                      </div>
+                      {entry.message && (
+                        <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "#536471" }}>
+                          {entry.message}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </details>
+          </section>
+        )}
+
         {/* Data Coverage Summary Table */}
         <section className="space-y-5">
           <h2 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Data coverage summary</h2>
@@ -374,6 +428,11 @@ export const TrustCentrePage: React.FC = () => {
                   {coverageTables.map((row, i) => {
                     const stats = coverage[row.key];
                     const avail = stats?.status === "available";
+                    const isFinancialSnapshots = row.key === "financialSnapshots";
+                    const hasPartialRows = isFinancialSnapshots && (stats?.rowCount ?? 0) > 0;
+                    const label = hasPartialRows ? "Partial" : avail ? "Available" : "Unavailable";
+                    const bg = hasPartialRows ? "bg-amber-50" : avail ? "bg-emerald-50" : "bg-slate-50";
+                    const text = hasPartialRows ? "text-amber-700" : avail ? "text-emerald-700" : "text-slate-400";
                     return (
                       <tr key={row.key} className="border-t border-white/20">
                         <td className="px-5 py-3 font-medium" style={{ color: "#0f1419" }}>{row.label}</td>
@@ -384,12 +443,8 @@ export const TrustCentrePage: React.FC = () => {
                           {formatCount(stats?.symbolCount ?? null)}
                         </td>
                         <td className="px-5 py-3 text-right">
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                            avail
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-slate-50 text-slate-400"
-                          }`}>
-                            {avail ? "Available" : "Unavailable"}
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${bg} ${text}`}>
+                            {label}
                           </span>
                         </td>
                       </tr>
@@ -453,13 +508,20 @@ export const TrustCentrePage: React.FC = () => {
                 { label: "Scoring database", value: rawState === "ok" || rawState === "partial" ? "Connected" : "Pending" },
                 { label: "As of date", value: asOf !== "N/A" ? asOf : "Pending" },
                 { label: "Evidence completeness", value: completenessScore ? `${completenessScore}% verified` : "Pending" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
-                  <span className="text-sm font-semibold" style={{ color: "#0f1419" }}>{item.value}</span>
-                </div>
-              ))}
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                <span className="block text-[11px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "#536471" }}>{item.label}</span>
+                <span className="text-sm font-semibold" style={{ color: "#0f1419" }}>{item.value}</span>
+              </div>
+            ))}
             </div>
+            {completenessScore !== null && completenessScore !== undefined && (
+              <div className="mt-3 rounded-xl p-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+                <p className="text-[11px] leading-relaxed" style={{ color: "#536471" }}>
+                  <strong>Note:</strong> Evidence completeness measures the fraction of fundamental data fields (market cap, PE, ROE, etc.) that have been populated. Scores can exist when price/history/factor data is complete, even if fundamentals coverage is partial. Currently, <strong>{formatCount(coverage?.predictionRegistry?.symbolCount)} symbols scored</strong> while <strong>{formatCount(coverage?.financialSnapshots?.symbolCount)} symbols have financial snapshots</strong>. The remaining fundamentals data can be supplemented via CSV/manual filing import.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 

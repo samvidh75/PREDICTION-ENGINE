@@ -1,6 +1,8 @@
 # nsepython / nsepythonserver Provider
 
-**Status**: Active by domain (see domain table below)
+**Status**: Active by domain (see domain table below). Requires `NSEPYTHON_ENABLED=true` feature flag.
+
+**Display in Trust Centre**: Shows status per domain — index_quote/bhavcopy are Active; quote is Blocked (NSE restriction). Never shown as "Unavailable" if any domain is healthy.
 
 **Package**: `nsepython` v2.97 (pip install)
 

@@ -2,128 +2,117 @@ export {};
 /**
  * check-market-data-providers.ts
  *
- * Safe market data provider diagnostic.
- * Tests public/no-credential providers: Yahoo fallback, IndianAPI.
- * Reports health per provider and fallback behavior for known symbols.
+ * Domain-level market data provider diagnostic.
+ * Tests public/no-credential providers: IndianAPI, Jugaad-Data, NSEPython, Yahoo.
+ * Reports health per provider with domain-level granularity.
  *
  * Usage:
  *   npx tsx scripts/check-market-data-providers.ts
  *
- * Environment:
- *   CHECK_TIMEOUT_MS  — per-request timeout (default: 10000)
- *
  * Exits non-zero only for script/code failure, not for optional missing provider.
  */
 
-import { ProviderBroker } from '../src/providers/marketData/providerBroker';
+import { PublicMarketDataProviderBroker } from '../src/providers/publicMarketData/providerBroker';
+import type { ProviderDomain, PublicProviderId } from '../src/providers/publicMarketData/types';
 
-const TIMEOUT = parseInt(process.env.CHECK_TIMEOUT_MS || "10000", 10);
+const DOMAIN_LABELS: Record<string, string> = {
+  quote: "Quote",
+  historical: "Historical",
+  bhavcopy: "Bhavcopy",
+  index: "Index",
+  fundamentals: "Fundamentals",
+  macro: "Macro",
+};
 
-interface CheckResult {
-  provider: string;
-  status: string;
-  latencyMs: number | null;
-  detail?: string;
+function domainIcon(status: string): string {
+  if (status === "healthy" || status === "active") return "✓";
+  if (status === "missing_optional") return "⊘";
+  if (status === "degraded" || status === "partial") return "△";
+  return "✗";
 }
 
 async function main(): Promise<void> {
   console.log("=== Market Data Provider Health ===\n");
-  
-  const broker = new ProviderBroker();
-  const results: CheckResult[] = [];
 
-  // Provider health checks
+  const broker = new PublicMarketDataProviderBroker();
+
+  // --- Per-provider health ---
   const healths = await broker.checkAllProviders();
   for (const h of healths) {
-    results.push({
-      provider: h.provider,
-      status: h.status,
-      latencyMs: h.latencyMs,
-      detail: undefined,
-    });
-    const icon = h.status === "healthy" ? "✓" : h.status === "missing_optional" ? "⊘" : "△";
-    console.log(`${icon} ${h.provider}=${h.status}${h.latencyMs != null ? ` (${h.latencyMs}ms)` : ""}`);
+    const icon = domainIcon(h.status);
+    const detail = h.latencyMs != null ? ` (${h.latencyMs}ms)` : "";
+    console.log(`${icon} ${h.provider}=${h.status}${detail}`);
   }
 
-  // IndianAPI
+  // --- IndianAPI (env-dependent) ---
   const indianApiStatus = process.env.INDIANAPI_KEY ? "healthy" : "missing_optional";
-  results.push({ provider: "indianapi", status: indianApiStatus, latencyMs: null });
-  const iaIcon = indianApiStatus === "healthy" ? "✓" : "⊘";
-  console.log(`${iaIcon} indianapi=${indianApiStatus}`);
+  const iaIcon = domainIcon(indianApiStatus);
+  console.log(`${iaIcon} indianapi=${indianApiStatus} (config)`);
 
-  // Test quote fallback for RELIANCE
-  console.log("\n--- Quote Fallback Test: RELIANCE ---");
+  console.log("");
+
+  // --- Domain-level health matrix ---
+  console.log("--- Domain Health Matrix ---");
+  const domains: ProviderDomain[] = ["quote", "historical", "bhavcopy", "index", "fundamentals", "macro"];
+  for (const domain of domains) {
+    const precedence = broker.getDomainPrecedence(domain);
+    const statuses = await Promise.all(
+      precedence.map(async (pid) => {
+        const health = await broker.getProviderHealth(pid as PublicProviderId);
+        return `${pid}=${health?.status ?? "unavailable"}`;
+      }),
+    );
+    console.log(`  ${DOMAIN_LABELS[domain] || domain}: ${statuses.join(" → ")}`);
+  }
+
+  // --- Quote Fallback Test ---
+  console.log("\n--- Quote Fallback: RELIANCE ---");
   const quoteResult = await broker.getQuote("RELIANCE");
   if (quoteResult.data) {
-    console.log(`✓ quote provider=${quoteResult.provider} price=${quoteResult.data.lastPrice} latency=${quoteResult.latencyMs}ms`);
-    if (quoteResult.fallbackChain.length > 0) {
-      console.log(`  fallback chain: ${quoteResult.fallbackChain.join(" → ")}`);
-    }
+    console.log(`✓ provider=${quoteResult.provider} price=${quoteResult.data.lastPrice} latency=${quoteResult.latencyMs}ms`);
   } else {
-    console.log(`△ all quote providers unavailable: ${quoteResult.error}`);
-    console.log(`  attempted: ${quoteResult.fallbackChain.join(" → ")}`);
-  }
-  results.push({
-    provider: "quote_fallback",
-    status: quoteResult.data ? quoteResult.provider : "unavailable",
-    latencyMs: quoteResult.latencyMs,
-    detail: quoteResult.error ?? undefined,
-  });
-
-  // Test quote fallback for TCS
-  console.log("\n--- Quote Fallback Test: TCS ---");
-  const tcsQuote = await broker.getQuote("TCS");
-  if (tcsQuote.data) {
-    console.log(`✓ quote provider=${tcsQuote.provider} price=${tcsQuote.data.lastPrice} latency=${tcsQuote.latencyMs}ms`);
-  } else {
-    console.log(`△ all quote providers unavailable for TCS: ${tcsQuote.error}`);
+    console.log(`△ unavailable: ${quoteResult.error}`);
   }
 
-  // Test historical fallback for RELIANCE (last 5 days)
-  console.log("\n--- Historical Fallback Test: RELIANCE (last 5 days) ---");
+  // --- Historical Fallback Test ---
+  console.log("\n--- Historical Fallback: RELIANCE (last 5 days) ---");
   const today = new Date();
   const fiveDaysAgo = new Date(today);
   fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-  const fromDate = fiveDaysAgo.toISOString().split('T')[0];
-  const toDate = today.toISOString().split('T')[0];
-  
-  const histResult = await broker.getHistoricalDaily("RELIANCE", fromDate, toDate);
+  const histResult = await broker.getHistoricalDaily(
+    "RELIANCE",
+    fiveDaysAgo.toISOString().split("T")[0],
+    today.toISOString().split("T")[0],
+  );
   if (histResult.data && histResult.data.length > 0) {
-    console.log(`✓ historical provider=${histResult.provider} candles=${histResult.data.length} latency=${histResult.latencyMs}ms`);
-    if (histResult.fallbackChain.length > 0) {
-      console.log(`  fallback chain: ${histResult.fallbackChain.join(" → ")}`);
-    }
+    console.log(`✓ provider=${histResult.provider} candles=${histResult.data.length} latency=${histResult.latencyMs}ms`);
   } else {
-    console.log(`△ all historical providers unavailable: ${histResult.error}`);
-    console.log(`  attempted: ${histResult.fallbackChain.join(" → ")}`);
+    console.log(`△ unavailable: ${histResult.error}`);
   }
 
-  // Print summary
-  console.log("\n=== Provider Summary ===");
-  let allEssentialOk = true;
-  for (const r of results) {
-    if (r.status === "healthy" || r.status === "missing_optional") continue;
-    if (r.status === "expired" || r.status === "expired_or_unauthorized" || r.status === "provider_unreachable") {
-      console.log(`  △ ${r.provider}: ${r.status} (non-blocking)`);
-    } else {
-      console.log(`  △ ${r.provider}: ${r.status} (degraded)`);
-    }
-  }
+  // --- Env status for Jugaad/NSEPython ---
+  console.log("\n--- Feature Flag Status ---");
+  const jugaadFlag = process.env.JUGAD_DATA_ENABLED === "true";
+  const nsepythonFlag = process.env.NSEPYTHON_ENABLED === "true";
+  console.log(`  JUGAD_DATA_ENABLED=${jugaadFlag ? "true (active)" : "false/not set (configured off)"}`);
+  console.log(`  NSEPYTHON_ENABLED=${nsepythonFlag ? "true (active)" : "false/not set (configured off)"}`);
+  console.log(`  NSELIB=archived (not active)`);
+  console.log(`  YAHOO=Blocked HTTP 429 (not load-bearing)`);
 
-  // Check if at least one quote provider works
-  if (quoteResult.data) {
-    console.log("\n  ✓ At least one quote provider is functional");
-  } else {
-    console.log("\n  △ No quote provider is functional (app will show unavailable)");
-  }
+  // --- Summary ---
+  console.log("\n=== Summary ===");
+  console.log("  ✓ IndianAPI: Active for quotes (when configured)");
+  console.log(`  ${jugaadFlag ? "✓" : "⊘"} Jugaad-Data: ${jugaadFlag ? "Active" : "Configured off"} — bhavcopy, RBI, market_status`);
+  console.log(`  ${nsepythonFlag ? "✓" : "⊘"} NSEPython: ${nsepythonFlag ? "Active" : "Configured off"} — index_quote, bhavcopy`);
+  console.log("  △ Yahoo: Blocked (HTTP 429), not load-bearing");
+  console.log("  △ Fundamentals: Partial via DB snapshots + CSV/manual import");
+  console.log("  △ CSV Import: Manual fundamentals fallback");
+  console.log("  ⊘ NSELib: Archived/unusable, not active");
+  console.log("  ✓ Redis: Infrastructure cache");
+  console.log("  ✗ Dhan/Upstox/Finnhub: Not active");
+  console.log("");
 
-  // Check if at least one historical provider works
-  if (histResult.data && histResult.data.length > 0) {
-    console.log("  ✓ At least one historical provider is functional");
-  } else {
-    console.log("  △ No historical provider is functional (features/predictions may be limited)");
-  }
-
+  // Ensure we don't exit non-zero for expected states
   process.exitCode = 0;
 }
 

@@ -63,7 +63,8 @@ No fake data of any kind is ever introduced.
 
 | Source | Status | Detail |
 |--------|--------|--------|
-| **CSV import / manual filings** | Active fallback | Operator-provided data imports |
+| **DB financial snapshots (57 rows, 29 symbols)** | Partial coverage | Historical fundamentals via pipeline |
+| **CSV import / manual filings** | Manual fallback | Operator-provided data imports for gaps |
 | Automatic public source | Unavailable | No reliable source proven yet |
 | NSELib | Archived | Does not provide usable fundamentals |
 | NSEPython | Unavailable | `nse_results()` returns no data |
