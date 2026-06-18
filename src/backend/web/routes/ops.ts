@@ -399,55 +399,46 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       if (rawHistorical === "true") {
         results.historical = { status: "running" };
         let histRows = 0;
+        const failures: string[] = [];
+        const { ProviderBroker } = await import("../../../providers/marketData/providerBroker.js");
+        const broker = new ProviderBroker();
+        const fromDate = new Date(Date.now() - 730 * 86400000).toISOString().split("T")[0];
+        const toDate = new Date().toISOString().split("T")[0];
+
         for (const symbol of symbols) {
           try {
-            const ticker = symbol + ".NS";
-            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=2y&interval=1d`;
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 20000);
-            const resp = await fetch(url, {
-              headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockStoryBot/1.0)' },
-              signal: controller.signal,
-            });
-            clearTimeout(timeoutId);
-            if (!resp.ok) {
-              console.error(`Yahoo chart API returned ${resp.status} for ${symbol}`);
+            const result = await broker.getHistoricalDaily(symbol, fromDate, toDate);
+            if (!result.data || result.data.length === 0) {
+              console.error(`Historical backfill returned no data for ${symbol} (provider: ${result.provider})`);
+              failures.push(symbol);
               continue;
             }
-            const data = await resp.json() as any;
-            const result = data?.chart?.result?.[0];
-            if (!result) continue;
-            const timestamps: number[] = result.timestamp || [];
-            const q = result.indicators?.quote?.[0] || {};
-            const points = timestamps.map((ts: number, i: number) => ({
-              date: new Date(ts * 1000).toISOString().split('T')[0],
-              open: q.open?.[i] ?? 0,
-              high: q.high?.[i] ?? 0,
-              low: q.low?.[i] ?? 0,
-              close: q.close?.[i] ?? 0,
-              volume: q.volume?.[i] ?? 0,
-            })).filter((p: any) => p.close !== null && p.close !== 0);
 
             if (applyMode) {
-              for (const point of points) {
-                const volume = point.volume !== null && point.volume !== undefined ? Math.round(Number(point.volume)) : null;
+              for (const candle of result.data) {
+                const volume = candle.volume !== null && candle.volume !== undefined ? Math.round(Number(candle.volume)) : null;
                 await query(
                   `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, volume)
                    VALUES ($1, $2, $3, $4, $5, $6, $7)
                    ON CONFLICT (symbol, trade_date) DO UPDATE SET
                      close = EXCLUDED.close, volume = COALESCE(EXCLUDED.volume, daily_prices.volume)`,
-                  [symbol, point.date, point.open, point.high, point.low, point.close, volume]
+                  [symbol, candle.date, candle.open, candle.high, candle.low, candle.close, volume]
                 );
                 histRows++;
               }
             }
-            console.log(`Historical backfill for ${symbol}: ${points.length} rows` + (applyMode ? ' written' : ' would write'));
+            console.log(`Historical backfill for ${symbol}: ${result.data.length} rows via ${result.provider}` + (applyMode ? ' written' : ' would write'));
           } catch (err: any) {
             console.error(`Historical backfill failed for ${symbol}: ${err.message}`);
+            failures.push(symbol);
           }
         }
         rowsWritten["daily_prices"] = (rowsWritten["daily_prices"] ?? 0) + histRows;
-        results.historical = { status: applyMode ? "success" : "dry-run", rowsWritten: histRows };
+        results.historical = {
+          status: applyMode ? (failures.length === symbols.length ? "failure" : failures.length > 0 ? "partial" : "success") : "dry-run",
+          rowsWritten: histRows,
+          details: failures.length > 0 ? { failedSymbols: failures } : undefined,
+        };
       }
 
       // Stage 1: Registry (verify symbols exist, insert missing in apply mode)
