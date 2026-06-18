@@ -10,6 +10,7 @@ import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
 import { DataFreshnessLine } from "../components/intelligence/DataFreshnessLine";
 import { MethodologyLink } from "../components/intelligence/MethodologyLink";
+import { ResearchAuditDrawer } from "../components/intelligence/SourceTraceTimeline";
 
 interface CompareCompany {
   symbol: string;
@@ -58,6 +59,7 @@ export const ComparePage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<{ symbol: string; name?: string }[]>([]);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [auditSymbol, setAuditSymbol] = useState<string | null>(null);
 
   // Hydrate from URL
   useEffect(() => {
@@ -225,6 +227,9 @@ export const ComparePage: React.FC = () => {
                     <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("stock", company.symbol)} className="flex-1 text-[10px]">
                       <ExternalLink className="h-3 w-3" aria-hidden="true" /> Open
                     </Button>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => setAuditSymbol(company.symbol)} className="flex-1 text-[10px]">
+                      <Database className="h-3 w-3" aria-hidden="true" /> Trace
+                    </Button>
                   </div>
                 </RoundedDepthPanel>
               );
@@ -246,6 +251,8 @@ export const ComparePage: React.FC = () => {
           </p>
         </div>
       </div>
+
+      <ResearchAuditDrawer open={auditSymbol !== null} onClose={() => setAuditSymbol(null)} symbol={auditSymbol || ""} />
     </PremiumPage>
   );
 };
