@@ -12,7 +12,7 @@ import { EmptyState } from '../components/ui/DataState';
 import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { useToast } from '../components/feedback/useToast';
-import GlassModal from '../components/aura/GlassModal';
+import { SpatialSheet } from '../components/intelligence/SpatialSheet';
 import { AppScreen, MobilePageHeader, ResearchEmptyState, SourceAuditCard } from '../components/premium/PremiumUI';
 
 function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
@@ -225,36 +225,36 @@ export const PortfolioPage: React.FC = () => {
         { label: "Advice state", value: "Research only", tone: "ok" },
       ]} />
 
-      <GlassModal open={isAddOpen} onClose={() => { setIsAddOpen(false); resetHoldingForm(); }} title="Add holding" maxWidth="max-w-sm">
+      <SpatialSheet open={isAddOpen} onClose={() => { setIsAddOpen(false); resetHoldingForm(); }} title="Add holding" subtitle="Record a manual holding for research tracking.">
         <form onSubmit={handleAddHolding} className="space-y-3">
-          <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+          <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
           <div className="grid grid-cols-2 gap-3">
-            <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
-            <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
+            <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
+            <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
           </div>
-          <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-xl px-3 py-2.5 text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
-          {formError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{formError}</div>}
-          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Save holding</button>
+          <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
+          {formError && <div className="rounded-lg border border-[#F23645]/10 bg-[#F23645]/[0.03] p-2.5 text-[10px] text-[#F23645]">{formError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#2962FF" }}>Save holding</button>
         </form>
-      </GlassModal>
+      </SpatialSheet>
 
-      <GlassModal open={editingHolding !== null} onClose={() => { setEditingHolding(null); setFormError(''); }} title={`Edit ${editingHolding?.symbol || ''}`} maxWidth="max-w-sm">
+      <SpatialSheet open={editingHolding !== null} onClose={() => { setEditingHolding(null); setFormError(''); }} title={`Edit ${editingHolding?.symbol || ''}`} subtitle="Update shares or average buy price.">
         <form onSubmit={handleEditHolding} className="space-y-3">
-          <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} placeholder="Shares" />
-          <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} placeholder="Avg Buy Price" />
-          {formError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{formError}</div>}
-          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Save</button>
+          <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" placeholder="Shares" />
+          <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" placeholder="Avg Buy Price" />
+          {formError && <div className="rounded-lg border border-[#F23645]/10 bg-[#F23645]/[0.03] p-2.5 text-[10px] text-[#F23645]">{formError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#2962FF" }}>Save</button>
         </form>
-      </GlassModal>
+      </SpatialSheet>
 
-      <GlassModal open={isImportOpen} onClose={() => setIsImportOpen(false)} title="Import CSV" maxWidth="max-w-md">
+      <SpatialSheet open={isImportOpen} onClose={() => setIsImportOpen(false)} title="Import CSV" subtitle="TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]">
         <form onSubmit={handleCSVImport} className="space-y-3">
-          <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-xl px-3 py-2.5 font-mono text-xs outline-none" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} />
-          <p className="text-[10px] leading-relaxed" style={{ color: "#536471" }}>Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
-          {importError && <div className="rounded-lg p-2.5 text-[10px]" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>{importError}</div>}
-          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#1a6e4a" }}>Parse and import</button>
+          <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" />
+          <p className="text-[10px] leading-relaxed text-[#8B949E]">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Missing sectors remain explicitly unavailable.</p>
+          {importError && <div className="rounded-lg border border-[#F23645]/10 bg-[#F23645]/[0.03] p-2.5 text-[10px] text-[#F23645]">{importError}</div>}
+          <button type="submit" className="w-full rounded-xl px-4 py-2.5 text-xs font-medium text-white transition hover:opacity-90" style={{ background: "#2962FF" }}>Parse and import</button>
         </form>
-      </GlassModal>
+      </SpatialSheet>
 
       <ConfirmDialog
         open={deleteConfirmSymbol !== null}

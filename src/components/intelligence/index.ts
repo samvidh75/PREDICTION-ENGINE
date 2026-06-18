@@ -23,3 +23,4 @@ export { CommandPalette } from "./CommandPalette";
 export { IntelligenceOSShell } from "./IntelligenceOSShell";
 export { GlobalCommandButton } from "./GlobalCommandButton";
 export { DataFreshnessOrb } from "./DataFreshnessOrb";
+export { SourceTraceTimeline, ResearchAuditDrawer } from "./SourceTraceTimeline";

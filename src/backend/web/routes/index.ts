@@ -18,6 +18,7 @@ import companyRoutes from "./company";
 import { validationRoutes } from "./validation";
 import { trustMetricsRoutes } from "./trustMetrics";
 import upstoxRoutes from "./upstox";
+import { researchRoutes } from "./research";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
@@ -38,6 +39,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(validationRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(trustMetricsRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(upstoxRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(researchRoutes as unknown as never, { encapsulate: false } as never);
 };
 
 export default routes;
