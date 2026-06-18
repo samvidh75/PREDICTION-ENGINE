@@ -71,6 +71,16 @@ export const PublicLandingPage: React.FC = () => {
               >
                 View live rankings
               </Button>
+              <Button
+                id="hero-cta-methodology"
+                type="button"
+                onClick={() => setPage("methodology")}
+                variant="secondary"
+                glass
+                className="h-12 px-6 text-sm"
+              >
+                Scoring methodology
+              </Button>
             </div>
           </div>
 
