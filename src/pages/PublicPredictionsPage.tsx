@@ -70,9 +70,9 @@ export default function PublicPredictionsPage(): JSX.Element {
   };
 
   const severityColors: Record<string, string> = {
-    critical: "bg-rose-50 border-rose-200 text-rose-700",
-    important: "bg-amber-50 border-amber-200 text-amber-700",
-    monitor: "bg-sky-50 border-sky-200 text-sky-700",
+    critical: "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]",
+    important: "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]",
+    monitor: "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]",
   };
 
   return (
@@ -84,7 +84,7 @@ export default function PublicPredictionsPage(): JSX.Element {
         <Surface dark className="mb-6 p-6 md:p-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Signals</div>
+              <div className="label">Signals</div>
               <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Research signal changes</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 md:text-base">Signals are research changes from verified updates. They are not investment advice or buy/sell/hold recommendations.</p>
             </div>
@@ -94,9 +94,8 @@ export default function PublicPredictionsPage(): JSX.Element {
 
         {error && (
           <div
-            className="mb-4 rounded-xl p-4 text-sm"
+            className="mb-4 rounded-xl p-4 text-sm border border-[var(--color-warning)]/20 bg-[var(--color-warning-bg)] text-[var(--color-warning)]"
             role="status"
-            style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}
           >
             <p className="font-semibold text-xs">Some data is temporarily unavailable</p>
             <p className="mt-1 text-xs">{error}</p>
@@ -122,32 +121,29 @@ export default function PublicPredictionsPage(): JSX.Element {
               }
             />
             {coverageData && (
-              <div
-                className="rounded-xl p-5"
-                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-              >
-                <h4 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#536471" }}>Data coverage</h4>
+              <div className="surface surface-raised rounded-xl p-5">
+                <h4 className="label mb-3">Data coverage</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Companies covered</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Companies covered</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Scored records</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Scored records</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-medium" style={{ color: "#8b98a5" }}>Latest update</span>
-                    <span className="block text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                    <span className="text-muted text-[10px] font-medium">Latest update</span>
+                    <span className="block text-lg font-bold tabular-nums text">
                       {coverageData.latestPredictionDate || "—"}
                     </span>
                   </div>
                 </div>
-                <p className="mt-3 text-xs leading-relaxed" style={{ color: "#536471" }}>
+                <p className="text-muted mt-3 text-xs leading-relaxed">
                   Score changes appear once updated provider data has been verified.
                 </p>
               </div>
@@ -162,7 +158,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             <div className="hidden md:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
+                <tr className="border-b border-[var(--color-surface-raised)] text-xs font-semibold uppercase tracking-wider" style={{ color: "#536471" }}>
                   <th scope="col" className="p-4">Symbol</th>
                   <th scope="col" className="p-4">Signal</th>
                   <th scope="col" className="p-4 hidden sm:table-cell">Severity</th>
@@ -170,7 +166,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                   <th scope="col" className="p-4 hidden lg:table-cell">Freshness</th>
                 </tr>
               </thead>
-              <tbody className="divide-y" style={{ borderColor: "rgba(255,255,255,0.2)" }}>
+              <tbody className="divide-y divide-[var(--color-surface-raised)]">
                 {signals.map((signal, i) => {
                   const severityClass = severityColors[signal.severity] || "bg-white/60 border-white/30 text-ink-secondary";
 
@@ -181,13 +177,12 @@ export default function PublicPredictionsPage(): JSX.Element {
                       onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && signal.symbol) { e.preventDefault(); navigate(signal.symbol); } }}
                       tabIndex={0}
                       role="link"
-                      className="cursor-pointer transition-colors hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                      className="cursor-pointer transition-colors hover:bg-white/40"
                     >
-                      <td className="p-4 font-mono font-bold hover:underline" style={{ color: "#0f1419" }}>{signal.symbol}</td>
+                      <td className="p-4 font-mono font-bold hover:underline text">{signal.symbol}</td>
                       <td className="p-4">
                         <span
-                          className="inline-flex items-center rounded-lg border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                          style={{ background: "rgba(255,255,255,0.6)", borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}
+                          className="badge"
                         >
                           {signal.type || "Signal pending"}
                         </span>
@@ -202,11 +197,11 @@ export default function PublicPredictionsPage(): JSX.Element {
                       </td>
                       <td className="hidden p-4 lg:table-cell">
                         {signal.snapshotDate || snapshotDate ? (
-                          <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "#1a6e4a" }}>
+                          <span className="text-[10px] font-semibold whitespace-nowrap text-[var(--color-active)]">
                             {formatFreshness(signal.snapshotDate || snapshotDate)}
                           </span>
                         ) : (
-                          <span className="text-[10px]" style={{ color: "#8b98a5" }}>Pending</span>
+                          <span className="text-[10px] text-[var(--color-text-muted)]">Pending</span>
                         )}
                       </td>
                     </tr>
@@ -233,7 +228,7 @@ export default function PublicPredictionsPage(): JSX.Element {
               ))}
             </div>
             {symbolsAnalyzed !== null && (
-              <div className="border-t px-4 py-2 text-xs" style={{ borderColor: "rgba(255,255,255,0.3)", color: "#536471" }}>
+              <div className="border-t border-[var(--color-surface-raised)] px-4 py-2 text-xs text-muted">
                 {symbolsAnalyzed} companies in latest cycle
               </div>
             )}
