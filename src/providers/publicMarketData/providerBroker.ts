@@ -12,6 +12,7 @@ const BHAVCOPY_PRECEDENCE: PublicProviderId[] = ['jugaad-data', 'nsepython'];
 const INDEX_PRECEDENCE: PublicProviderId[] = ['nsepython', 'jugaad-data'];
 const FUNDAMENTALS_PRECEDENCE: string[] = ['automatic_public', 'csv_import'];
 const MACRO_PRECEDENCE: PublicProviderId[] = ['jugaad-data'];
+const DEFAULT_PROVIDER_HEALTH_TIMEOUT_MS = 8_000;
 
 const DOMAIN_PRECEDENCE: Record<ProviderDomain, (PublicProviderId | string)[]> = {
   quote: QUOTE_PRECEDENCE,
@@ -85,6 +86,34 @@ function domainStatus(
   fallback: ProviderDomainStatusEntry,
 ): ProviderDomainStatusEntry {
   return domains?.[key] ?? fallback;
+}
+
+function providerHealthTimeoutMs(): number {
+  const parsed = Number(process.env.PUBLIC_PROVIDER_HEALTH_TIMEOUT_MS);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_PROVIDER_HEALTH_TIMEOUT_MS;
+}
+
+function timeoutProviderHealth(provider: PublicProviderId): ProviderHealth {
+  return {
+    provider: provider as ProviderId,
+    status: 'provider_unreachable',
+    latencyMs: providerHealthTimeoutMs(),
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 export class PublicMarketDataProviderBroker {
@@ -237,8 +266,9 @@ export class PublicMarketDataProviderBroker {
   }
 
   async checkAllProviders(): Promise<ProviderHealth[]> {
+    const timeoutMs = providerHealthTimeoutMs();
     return Promise.all(
-      this.providers.map(p => p.checkHealth()),
+      this.providers.map(p => withTimeout(p.checkHealth(), timeoutMs, timeoutProviderHealth(p.providerId))),
     );
   }
 
@@ -299,11 +329,14 @@ export class PublicMarketDataProviderBroker {
 
     const jugaadEnabled = process.env.JUGAD_DATA_ENABLED === 'true';
     const nsepythonEnabled = process.env.NSEPYTHON_ENABLED === 'true';
-    const jugaadDomains = jugaadEnabled && this.getProvider('jugaad-data') instanceof JugaadDataProvider
-      ? await (this.getProvider('jugaad-data') as JugaadDataProvider).checkDomainHealth()
+    const timeoutMs = providerHealthTimeoutMs();
+    const jugaadProvider = this.getProvider('jugaad-data');
+    const nsepythonProvider = this.getProvider('nsepython');
+    const jugaadDomains = jugaadEnabled && jugaadProvider instanceof JugaadDataProvider
+      ? await withTimeout(jugaadProvider.checkDomainHealth(), timeoutMs, null)
       : null;
-    const nsepythonDomains = nsepythonEnabled && this.getProvider('nsepython') instanceof NsePythonProvider
-      ? await (this.getProvider('nsepython') as NsePythonProvider).checkDomainHealth()
+    const nsepythonDomains = nsepythonEnabled && nsepythonProvider instanceof NsePythonProvider
+      ? await withTimeout(nsepythonProvider.checkDomainHealth(), timeoutMs, null)
       : null;
 
     return {
