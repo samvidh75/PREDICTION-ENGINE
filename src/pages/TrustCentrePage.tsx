@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ShieldCheck, Database, TrendingUp, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Database, TrendingUp, AlertTriangle, HelpCircle, MinusCircle } from "lucide-react";
 import { LoadingState } from "../components/ui/DataState";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { api, ApiError, type TrustMetricsEnvelope, type DataCoverage } from "../services/api/client";
@@ -8,6 +8,7 @@ import MobileNav from "../components/navigation/MobileNav";
 import Button from "../components/ui/Button";
 import { navigatePage, PremiumPage } from "../components/premium/PremiumUI";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
 import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { DataFreshnessLine } from "../components/intelligence/DataFreshnessLine";
@@ -101,6 +102,8 @@ export const TrustCentrePage: React.FC = () => {
   const [coverageData, setCoverageData] = useState<DataCoverage | null>(null);
   const [coverageLoading, setCoverageLoading] = useState(true);
   const [detailSheet, setDetailSheet] = useState<{ provider: string; entry: ProviderEntry } | null>(null);
+  const [fundamentalsGapSheet, setFundamentalsGapSheet] = useState(false);
+  const [symbolGapSheet, setSymbolGapSheet] = useState(false);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -388,7 +391,7 @@ export const TrustCentrePage: React.FC = () => {
           <p className="mt-1 text-[10px] text-[#8B949E]">Financial snapshots are the primary source for fundamentals. Coverage is tracked per-symbol with source provenance.</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             {[
-              { label: "Symbols with snapshots", value: coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—", detail: "Financial snapshots available", tone: (coverage?.financialSnapshots?.symbolCount ?? 0) > 0 ? "ok" : "warn" },
+              { label: "Symbols with snapshots", value: coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—", detail: `${coverage?.financialSnapshots?.rowCount?.toLocaleString("en-IN") || "—"} total rows`, tone: (coverage?.financialSnapshots?.symbolCount ?? 0) > 0 ? "ok" : "warn" },
               { label: "Total tracked symbols", value: coverage?.symbols?.count?.toLocaleString("en-IN") || "—", detail: "In company registry", tone: "ok" },
               { label: "Coverage gap", value: `${Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols`, detail: "No financial snapshot available", tone: "warn" },
             ].map((item) => (
@@ -399,28 +402,31 @@ export const TrustCentrePage: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="mt-3 rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
-            <p className="text-[10px] leading-relaxed text-[#8B949E]">
-              <strong className="text-[#E6EDF3]">Source:</strong> Financial snapshots are populated via DB snapshots and optional CSV/manual import. The project <code>probe:fundamentals</code> confirms Screener.in is a viable source, but HTML parsing is brittle. Automated scraping of Moneycontrol financials and NSE company info is blocked. The recommended workflow is CSV/manual import for reliable structured data.
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setFundamentalsGapSheet(true)}
+            className="mt-3 flex w-full items-center gap-2 rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] px-4 py-2.5 text-left text-[10px] leading-relaxed text-[#8B949E] hover:bg-[#EF9A09]/[0.06] transition-colors"
+          >
+            <MinusCircle className="h-3.5 w-3.5 shrink-0 text-[#EF9A09]" aria-hidden="true" />
+            <span>View fundamentals gap details and import workflow</span>
+          </button>
         </RoundedDepthPanel>
 
         {/* Symbol data gaps */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Symbol data gaps</h2>
-          <p className="mt-1 text-[10px] text-[#8B949E]">Currently tracked symbols with missing data domains.</p>
+          <p className="mt-1 text-[10px] text-[#8B949E]">Currently tracked symbols with missing data domains. These are known limitations — no provider returns reliable data for these symbols without bypassing restrictions.</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <button type="button" onClick={() => setSymbolGapSheet(true)} className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-left hover:bg-white/[0.04] transition-colors">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No quote</span>
               <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
-              <p className="mt-1 text-[10px] text-[#8B949E]">No real-time price available. Provider coverage incomplete.</p>
-            </div>
-            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <p className="mt-1 text-[10px] text-[#8B949E]">No real-time price available. Provider coverage incomplete. Tap for details.</p>
+            </button>
+            <button type="button" onClick={() => setSymbolGapSheet(true)} className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-left hover:bg-white/[0.04] transition-colors">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No history</span>
               <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
-              <p className="mt-1 text-[10px] text-[#8B949E]">Historical price data unavailable. Affects scoring pipeline.</p>
-            </div>
+              <p className="mt-1 text-[10px] text-[#8B949E]">Historical price data unavailable. Affects scoring pipeline. Tap for details.</p>
+            </button>
             <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Not on leaderboard</span>
               <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">1 symbol</span>
@@ -482,6 +488,71 @@ export const TrustCentrePage: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* Fundamentals gap sheet */}
+      <SpatialSheet open={fundamentalsGapSheet} onClose={() => setFundamentalsGapSheet(false)} title="Fundamentals coverage gap" subtitle="Financial snapshots are the primary fundamentals data source.">
+        <div className="space-y-4">
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Coverage</span>
+              <span className="text-xs font-semibold text-[#E6EDF3]">{coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—"} / {coverage?.symbols?.count?.toLocaleString("en-IN") || "—"} symbols</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Missing</span>
+              <span className="text-xs font-semibold text-[#EF9A09]">{Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Total rows</span>
+              <span className="text-xs font-semibold text-[#E6EDF3]">{coverage?.financialSnapshots?.rowCount?.toLocaleString("en-IN") || "—"}</span>
+            </div>
+          </div>
+          <div className="rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
+            <p className="text-[10px] leading-relaxed text-[#8B949E]">
+              <strong>Why is there a gap?</strong> Financial snapshots are populated via DB ingestion and CSV/manual import. The project has verified these sources:
+            </p>
+            <ul className="mt-2 space-y-1 text-[10px] text-[#8B949E]">
+              <li className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#22AB94]" /> Screener.in (company page, consolidated, quarterly) — viable but HTML parsing is brittle</li>
+              <li className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#F23645]" /> Moneycontrol (financials) — blocked</li>
+              <li className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#F23645]" /> NSE (company info) — blocked</li>
+              <li className="flex items-center gap-1.5"><span className="h-1 w-1 rounded-full bg-[#2962FF]" /> CSV/manual import — preferred workflow</li>
+            </ul>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">Next steps</h3>
+            <p className="mt-1 text-[10px] text-[#8B949E]">
+              To fill fundamentals gaps, use the CSV import workflow. Run <code>npm run import:fundamentals</code> with a properly formatted CSV containing ticker, period, and field values. The importer validates and stores source_label, source_url, and period_type automatically.
+            </p>
+          </div>
+          <MethodologyLink />
+        </div>
+      </SpatialSheet>
+
+      {/* Symbol gap sheet */}
+      <SpatialSheet open={symbolGapSheet} onClose={() => setSymbolGapSheet(false)} title="Symbol data gaps" subtitle="Known limitations for which no safe provider source exists.">
+        <div className="space-y-4">
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">No quote (3 symbols)</h3>
+            <p className="mt-1 text-[10px] leading-relaxed text-[#8B949E]">
+              Real-time price is not available for these symbols from any configured provider. Indian API (primary quote source) does not return data for these tickers. Yahoo Finance is blocked. No other verified provider covers these symbols.
+            </p>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">No history (3 symbols)</h3>
+            <p className="mt-1 text-[10px] leading-relaxed text-[#8B949E]">
+              Historical price data is not available for these symbols. This affects the feature/factor scoring pipeline. tanpa historical data, these symbols cannot receive a complete score.
+            </p>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <h3 className="text-xs font-semibold text-[#E6EDF3]">Not on leaderboard (1 symbol)</h3>
+            <p className="mt-1 text-[10px] leading-relaxed text-[#8B949E]">
+              This symbol is in the company registry and has a prediction registry entry but is not included in the current scoring leaderboard slice. The scoring pipeline needs to be re-run to include it.
+            </p>
+          </div>
+          <p className="text-[10px] leading-relaxed text-[#484F58]">
+            These gaps are known limitations. No provider bypass (proxy, CAPTCHA evasion, cookie theft) is used. The gaps are surfaced honestly so you can decide whether to include these symbols in your research.
+          </p>
+        </div>
+      </SpatialSheet>
 
       {/* Provider detail sheet */}
       <IntelligenceModal

@@ -13,7 +13,7 @@ import { MigrationRunner, type MigrationStatus } from "./MigrationRunner";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export async function runMigrations(): Promise<MigrationStatus> {
+export async function runMigrations(force?: boolean): Promise<MigrationStatus> {
   await dbAdapter.initialize();
   const migrationsDir = join(__dirname, "migrations");
   const runner = new MigrationRunner(dbAdapter, migrationsDir);
@@ -22,7 +22,11 @@ export async function runMigrations(): Promise<MigrationStatus> {
   console.log(`[migrate] Applied: ${status.appliedCount}, Pending: ${status.pendingCount}`);
 
   if (status.checksumMismatch) {
-    throw new Error(`Checksum mismatch: ${status.detail}`);
+    if (force) {
+      console.warn("[migrate] WARNING: checksum mismatch ignored (--force).");
+    } else {
+      throw new Error(`Checksum mismatch: ${status.detail}`);
+    }
   }
 
   if (status.pendingCount === 0) {
@@ -31,7 +35,7 @@ export async function runMigrations(): Promise<MigrationStatus> {
   }
 
   console.log("[migrate] Running pending migrations...");
-  return runner.runPending();
+  return runner.runPending(force);
 }
 
 // CLI entry — always runs shutdown in finally
@@ -40,7 +44,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
   (async () => {
     try {
-      const result = await runMigrations();
+      const force = process.argv.includes("--force");
+      const result = await runMigrations(force);
       console.log("[migrate] Complete.");
       console.log(`  Latest: ${result.latestAppliedId}, Applied: ${result.appliedCount}`);
     } catch (err: unknown) {
