@@ -922,6 +922,15 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     }
   });
 
+  app.get("/api/ops/probe/install-nse-packages", async (_request, reply) => {
+    try {
+      const out = execSync('pip3 install --no-cache-dir -r /app/requirements-nse.txt 2>&1', { encoding: 'utf-8', timeout: 120_000 });
+      return reply.send({ success: true, output: out.slice(0, 2000) });
+    } catch (err: any) {
+      return reply.send({ success: false, error: err.message, output: err.stdout?.toString()?.slice(0, 2000) ?? '' });
+    }
+  });
+
   app.get("/api/ops/probe/nselib", async (_request, reply) => {
     try {
       const output = execSync(`python3 "${probeScriptPath}"`, { encoding: 'utf-8', timeout: 120_000 });

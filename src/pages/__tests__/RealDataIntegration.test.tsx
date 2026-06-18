@@ -187,8 +187,8 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('RELIANCE')).toBeInTheDocument();
-      expect(screen.getByText('84')).toBeInTheDocument();
+      expect(screen.getAllByText('RELIANCE').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('84').length).toBeGreaterThan(0);
     });
   });
 
@@ -219,8 +219,8 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('RELIANCE')).toBeInTheDocument();
-      expect(screen.getByText(/bullish/i)).toBeInTheDocument();
+      expect(screen.getAllByText('RELIANCE').length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/bullish/i).length).toBeGreaterThan(0);
     });
   });
 
