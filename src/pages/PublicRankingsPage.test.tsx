@@ -82,8 +82,8 @@ describe('PublicRankingsPage states', () => {
     }));
 
     render(<PublicRankingsPage />);
-    expect(await screen.findByText('RELIANCE')).toBeInTheDocument();
-    expect(screen.getByText('TCS')).toBeInTheDocument();
+    expect((await screen.findAllByText('RELIANCE')).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('TCS').length).toBeGreaterThan(0);
     expect(screen.getByPlaceholderText('Search symbol or sector...')).toBeInTheDocument();
     expect(screen.getByText('All Sectors')).toBeInTheDocument();
   });

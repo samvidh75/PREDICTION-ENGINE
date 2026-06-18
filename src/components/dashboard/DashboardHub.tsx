@@ -69,16 +69,18 @@ export const DashboardHub: React.FC = () => {
         if (!ctrl.signal.aborted) setSignalsLoading(false);
       });
 
-    api.getDataCoverage()
-      .then((cov) => {
-        if (ctrl.signal.aborted) return;
-        setCoverage({
-          symbols: cov.coverage?.symbols?.count ?? null,
-          scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
-          latest: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
-        });
-      })
-      .catch(() => {});
+    if (typeof api.getDataCoverage === "function") {
+      api.getDataCoverage()
+        .then((cov) => {
+          if (ctrl.signal.aborted) return;
+          setCoverage({
+            symbols: cov.coverage?.symbols?.count ?? null,
+            scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
+            latest: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
+          });
+        })
+        .catch(() => {});
+    }
     return () => ctrl.abort();
   }, []);
 
