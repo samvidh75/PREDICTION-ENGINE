@@ -1,16 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { ArrowLeftRight, X, Search, TrendingUp, Database, BarChart3, ExternalLink } from "lucide-react";
-import TopNav from "../components/navigation/TopNav";
-import MobileNav from "../components/navigation/MobileNav";
-import Button from "../components/ui/Button";
-import { PremiumPage, navigatePage } from "../components/premium/PremiumUI";
-import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
-import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
-import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
-import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
-import { DataFreshnessLine } from "../components/intelligence/DataFreshnessLine";
-import { MethodologyLink } from "../components/intelligence/MethodologyLink";
-import { ResearchAuditDrawer } from "../components/intelligence/SourceTraceTimeline";
+import React, { useEffect, useState } from "react";
+import { ArrowLeftRight, X, Search, Database, BarChart3, Activity, Calendar, ChevronRight, AlertTriangle, Loader2, ExternalLink } from "lucide-react";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
 
 interface CompareCompany {
   symbol: string;
@@ -53,6 +43,79 @@ function fetchCompanyData(symbol: string): Promise<CompareCompany | null> {
 
 const MAX_COMPANIES = 3;
 
+function SourceTraceModal({ symbol, onClose }: { symbol: string; onClose: () => void }) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!symbol) return;
+    setLoading(true);
+    fetch(`/api/research/lineage/${encodeURIComponent(symbol)}`)
+      .then((r) => r.json())
+      .then((res) => { setData(res?.data || res); setLoading(false); })
+      .catch(() => { setData(null); setLoading(false); });
+  }, [symbol]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-5" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Database className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <span className="text-xs font-semibold text-[#E6EDF3]">Source trace — {symbol}</span>
+          </div>
+          <button type="button" onClick={onClose} className="rounded p-1 text-[#64748B] hover:text-[#E6EDF3] transition-colors" aria-label="Close trace">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        {loading ? (
+          <div className="flex items-center gap-2 py-6 text-xs text-[#9AA7B5]">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+            Loading lineage data...
+          </div>
+        ) : data?.entries && data.entries.length > 0 ? (
+          <div className="divide-y divide-[rgba(148,163,184,0.08)] rounded-lg border border-[rgba(148,163,184,0.08)]">
+            {data.entries.map((entry: any, i: number) => (
+              <div key={i} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-medium text-[#E6EDF3]">{entry.sourceField || entry.sourceTable}</div>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(148,163,184,0.12)] px-2 py-0.5 text-[10px] font-medium text-[#9AA7B5]">{entry.provider || "Unknown"}</span>
+                    {entry.isFallback && <span className="text-[10px] text-[#EF9A09]">fallback</span>}
+                    {entry.asOf && (
+                      <span className="text-[10px] text-[#64748B]">
+                        <Calendar className="mr-0.5 inline h-3 w-3" aria-hidden="true" />
+                        {(() => { try { return new Date(entry.asOf).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); } catch { return "—"; } })()}
+                      </span>
+                    )}
+                  </div>
+                  {entry.notes && <p className="mt-0.5 text-[10px] text-[#EF9A09]">{entry.notes}</p>}
+                </div>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#64748B]" aria-hidden="true" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-6 text-center">
+            <AlertTriangle className="mx-auto h-5 w-5 text-[#64748B]" aria-hidden="true" />
+            <p className="mt-2 text-xs text-[#9AA7B5]">Source audit data unavailable for {symbol}.</p>
+            <p className="mt-1 text-[10px] text-[#64748B]">No input lineage records found.</p>
+          </div>
+        )}
+        <div className="mt-4 border-t border-[rgba(148,163,184,0.08)] pt-4">
+          <p className="text-[10px] leading-relaxed text-[#64748B]">Source trace shows data provenance from the prediction pipeline. Missing entries mean the data was not recorded at ingestion time.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const ComparePage: React.FC = () => {
   const [companies, setCompanies] = useState<CompareCompany[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,10 +124,11 @@ export const ComparePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [auditSymbol, setAuditSymbol] = useState<string | null>(null);
 
-  // Hydrate from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const ids = (params.get("ids") || "").split(",").filter(Boolean);
+    const idsParam = params.get("ids") || "";
+    const idParam = params.get("id") || "";
+    const ids = idsParam ? idsParam.split(",").filter(Boolean) : (idParam ? [idParam] : []);
     if (ids.length > 0) {
       setLoading(true);
       Promise.all(ids.map(fetchCompanyData)).then((results) => {
@@ -97,7 +161,6 @@ export const ComparePage: React.FC = () => {
     if (data) {
       const updated = [...companies, data];
       setCompanies(updated);
-      // Update URL
       const params = new URLSearchParams(window.location.search);
       params.set("ids", updated.map((c) => c.symbol).join(","));
       window.history.replaceState({}, "", `?${params.toString()}`);
@@ -113,194 +176,305 @@ export const ComparePage: React.FC = () => {
     window.history.replaceState({}, "", `?${params.toString()}`);
   };
 
-  const displayedCompanies = [...companies];
-  while (displayedCompanies.length < MAX_COMPANIES) {
-    displayedCompanies.push({ symbol: "empty", companyName: "Add company" });
-  }
+  const factorLabels: Record<string, string> = {
+    growth: "Growth",
+    quality: "Quality",
+    stability: "Stability",
+    momentum: "Momentum",
+    valuation: "Valuation",
+    risk: "Risk",
+  };
+
+  const factorKeys = ["growth", "quality", "stability", "momentum", "valuation", "risk"];
+
+  const fmt = (v: number | null | undefined): string | null => {
+    if (typeof v === "number" && Number.isFinite(v)) return String(Math.round(v));
+    return null;
+  };
+
+  const formatDate = (d: string | null | undefined): string => {
+    if (!d) return "—";
+    try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
+    catch { return "—"; }
+  };
 
   return (
-    <PremiumPage nav={<><TopNav /><MobileNav /></>}>
-      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-        <div className="mb-6">
+    <ProductShell>
+      <ProductPage>
+        <div className="mb-5">
           <div className="flex items-center gap-2">
             <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-base font-semibold text-[#E6EDF3]">Compare research</h1>
+            <h1 className="text-sm font-semibold text-[#E6EDF3]">Compare research</h1>
           </div>
-          <p className="mt-1 text-xs text-[#8B949E]">Compare up to {MAX_COMPANIES} companies by score, factors, and data coverage.</p>
+          <p className="mt-1 text-xs text-[#9AA7B5]">Compare up to {MAX_COMPANIES} companies by score, factors, and data coverage.</p>
         </div>
 
-        {/* Search to add */}
         {companies.length < MAX_COMPANIES && (
-          <RoundedDepthPanel padding="sm" className="mb-6">
-            <div className="flex items-center gap-3">
-              <Search className="h-4 w-4 shrink-0 text-[#484F58]" aria-hidden="true" />
+          <ProductPanel className="mb-5 p-0">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <Search className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search a company to add..."
-                className="w-full bg-transparent text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none"
+                className="w-full bg-transparent text-xs text-[#E6EDF3] outline-none placeholder:text-[#64748B]"
                 aria-label="Search company to compare"
               />
+              {searching && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />}
             </div>
             {searchResults.length > 0 && (
-              <div className="mt-2 divide-y divide-white/[0.04] border-t border-white/[0.04] pt-2">
+              <div className="border-t border-[rgba(148,163,184,0.08)] px-2 pb-2 pt-1">
                 {searchResults.map((r) => (
                   <button
                     key={r.symbol}
                     type="button"
                     onClick={() => addCompany(r.symbol)}
-                    className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left text-xs text-[#8B949E] hover:bg-white/[0.04] hover:text-[#E6EDF3] transition-colors"
+                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-xs text-[#9AA7B5] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#E6EDF3] transition-colors"
                   >
-                    <Search className="h-3.5 w-3.5 shrink-0 text-[#484F58]" aria-hidden="true" />
+                    <Search className="h-3.5 w-3.5 shrink-0 text-[#64748B]" aria-hidden="true" />
                     <span className="font-mono font-semibold">{r.symbol}</span>
-                    {r.name && <span className="text-[10px] text-[#484F58]">{r.name}</span>}
+                    {r.name && <span className="text-[10px] text-[#64748B]">{r.name}</span>}
                   </button>
                 ))}
               </div>
             )}
-          </RoundedDepthPanel>
+          </ProductPanel>
         )}
 
         {loading ? (
-          <div className="py-12 text-center text-xs text-[#484F58]">Loading company data...</div>
+          <div className="flex items-center justify-center gap-2 py-12 text-xs text-[#9AA7B5]">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+            Loading company data...
+          </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {displayedCompanies.map((company, i) => {
-              if (company.symbol === "empty") {
-                return (
-                  <RoundedDepthPanel key={`empty-${i}`} padding="lg" variant="elevated" className="flex flex-col items-center justify-center min-h-[280px]">
-                    <Database className="h-7 w-7 text-[#484F58]" aria-hidden="true" />
-                    <p className="mt-3 text-xs text-[#484F58]">Search above to add a company</p>
-                  </RoundedDepthPanel>
-                );
-              }
-              return (
-                <RoundedDepthPanel key={company.symbol} padding="md" className="relative">
-                  <button
-                    type="button"
-                    onClick={() => removeCompany(company.symbol)}
-                    className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-lg bg-white/[0.04] text-[#484F58] hover:bg-white/[0.08] hover:text-[#E6EDF3] transition-colors"
-                    aria-label={`Remove ${company.symbol}`}
+          <>
+            {companies.length > 0 && (
+              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {companies.map((company) => (
+                  <div
+                    key={company.symbol}
+                    className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{company.symbol}</span>
-                      {company.companyName && <span className="ml-2 text-xs text-[#8B949E]">{company.companyName}</span>}
-                    </div>
-                    {company.score !== null && company.score !== undefined && (
-                      <div className="flex flex-col items-end">
-                        <span className="text-xl font-semibold tabular-nums text-[#E6EDF3]">{Math.round(Number(company.score))}</span>
-                        {company.classification && (
-                          <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">{company.classification}</span>
-                        )}
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => productNavigate("stock", company.symbol)}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <span className="block truncate font-mono text-xs font-semibold text-[#E6EDF3] hover:underline">{company.symbol}</span>
+                      {company.score !== null && company.score !== undefined && (
+                        <span className="block text-[10px] tabular-nums text-[#9AA7B5]">{Math.round(Number(company.score))}</span>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuditSymbol(company.symbol)}
+                      className="rounded p-1 text-[#64748B] hover:text-[#E6EDF3] transition-colors"
+                      aria-label={`Trace ${company.symbol}`}
+                    >
+                      <Database className="h-3 w-3" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeCompany(company.symbol)}
+                      className="rounded p-1 text-[#64748B] hover:text-[#E6EDF3] transition-colors"
+                      aria-label={`Remove ${company.symbol}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </div>
-
-                  {company.predictionDate && <ModelRunBadge runDate={company.predictionDate} className="mt-3" />}
-
-                  <div className="mt-3">
-                    <PredictionConfidenceBar score={company.confidenceScore ?? null} level={company.confidenceLevel ?? null} />
+                ))}
+                {companies.length < MAX_COMPANIES && (
+                  <div className="flex items-center gap-2 rounded-lg border border-dashed border-[rgba(148,163,184,0.12)] px-3 py-2 text-xs text-[#64748B]">
+                    <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                    <span>Add company</span>
                   </div>
+                )}
+              </div>
+            )}
 
-                  {company.factors && (
-                    <div className="mt-3">
-                      <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factors</span>
-                      <div className="mt-2 grid grid-cols-2 gap-1.5">
-                        {Object.entries(company.factors).map(([key, val]) => (
-                          <div key={key} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.02] px-2.5 py-1.5">
-                            <span className="text-[10px] text-[#8B949E] capitalize">{key}</span>
-                            <span className="font-mono text-[10px] font-semibold tabular-nums text-[#E6EDF3]">
-                              {typeof val === "number" && Number.isFinite(val) ? Math.round(val) : "—"}
-                            </span>
-                          </div>
+            {companies.length === 0 && (
+              <div className="flex flex-col items-center gap-5 py-12 text-center">
+                <ArrowLeftRight className="h-8 w-8 text-[#64748B]" aria-hidden="true" />
+                <div>
+                  <h2 className="text-sm font-semibold text-[#E6EDF3]">No companies to compare</h2>
+                  <p className="mt-1 max-w-md text-xs text-[#9AA7B5]">Search for a company above or pick from rankings to compare up to {MAX_COMPANIES} side by side.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <ProductAction onClick={() => productNavigate("rankings")}>
+                    <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
+                  </ProductAction>
+                  <ProductAction variant="secondary" onClick={() => productNavigate("search")}>
+                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
+                  </ProductAction>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {!loading && companies.length >= 2 && companies.every((c) => c.symbol !== "empty") && (
+          <div className="space-y-5">
+            <ProductPanel className="overflow-hidden">
+              <div className="divide-y divide-[rgba(148,163,184,0.08)]">
+                {/* Score & Context */}
+                <div className="px-4 py-3.5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Score &amp; Context</div>
+                  <div className="-mx-2 overflow-x-auto">
+                    <div className="min-w-[400px] px-2">
+                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Score</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right font-mono text-xs font-semibold tabular-nums text-[#E6EDF3] py-1.5">{fmt(c.score) ?? "—"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Confidence</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">{c.confidenceScore !== null && c.confidenceScore !== undefined ? `${Math.round(c.confidenceScore)}%` : "—"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Classification</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.classification || "—"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Last update</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-[10px] text-[#E6EDF3] py-1.5">{c.predictionDate ? formatDate(c.predictionDate) : "—"}</div>
                         ))}
                       </div>
                     </div>
-                  )}
-
-                  <div className="mt-3 flex gap-2">
-                    <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("stock", company.symbol)} className="flex-1 text-[10px]">
-                      <ExternalLink className="h-3 w-3" aria-hidden="true" /> Open
-                    </Button>
-                    <Button type="button" size="sm" variant="secondary" onClick={() => setAuditSymbol(company.symbol)} className="flex-1 text-[10px]">
-                      <Database className="h-3 w-3" aria-hidden="true" /> Trace
-                    </Button>
                   </div>
-                </RoundedDepthPanel>
-              );
-            })}
-          </div>
-        )}
+                </div>
 
-        {/* Comparison matrix — only when ≥ 2 companies are loaded */}
-        {!loading && companies.length >= 2 && (
-          <div className="mt-6 overflow-hidden rounded-xl border border-white/[0.06]">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">
-                  <th className="px-4 py-3">Metric</th>
-                  {companies.map((c) => (
-                    <th key={c.symbol} className="px-4 py-3 text-right font-mono text-[#E6EDF3]">{c.symbol}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { label: "Score", values: companies.map((c) => c.score) },
-                  { label: "Confidence", values: companies.map((c) => c.confidenceScore) },
-                  { label: "Growth", values: companies.map((c) => c.factors?.growth ?? null) },
-                  { label: "Quality", values: companies.map((c) => c.factors?.quality ?? null) },
-                  { label: "Momentum", values: companies.map((c) => c.factors?.momentum ?? null) },
-                  { label: "Valuation", values: companies.map((c) => c.factors?.valuation ?? null) },
-                  { label: "Stability", values: companies.map((c) => c.factors?.stability ?? null) },
-                  { label: "Risk", values: companies.map((c) => c.factors?.risk ?? null) },
-                  { label: "Classification", values: companies.map((c) => c.classification) },
-                  { label: "Last update", values: companies.map((c) => c.predictionDate) },
-                ].map((row) => (
-                  <tr key={row.label} className="border-t border-white/[0.04] transition-colors hover:bg-white/[0.02]">
-                    <td className="px-4 py-2.5 text-[#8B949E]">{row.label}</td>
-                    {row.values.map((v, i) => (
-                      <td key={i} className="px-4 py-2.5 text-right font-mono text-[11px] text-[#E6EDF3]">
-                        {typeof v === "number" && Number.isFinite(v) ? Math.round(v) : (v ?? "—")}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                {/* Fundamentals Coverage */}
+                <div className="px-4 py-3.5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Fundamentals Coverage</div>
+                  <div className="-mx-2 overflow-x-auto">
+                    <div className="min-w-[400px] px-2">
+                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Score available</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.score !== null && c.score !== undefined ? "Yes" : "No"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Classification</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.classification ? "Yes" : "No"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Confidence</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.confidenceScore !== null && c.confidenceScore !== undefined ? "Yes" : "No"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Prediction date</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.predictionDate ? formatDate(c.predictionDate) : "No"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Factors</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.factors ? `${Object.keys(c.factors).length}/6` : "0/6"}</div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-        {companies.length === 0 && !loading && (
-          <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <ArrowLeftRight className="h-10 w-10 text-[#484F58]" aria-hidden="true" />
-            <h2 className="text-sm font-semibold text-[#E6EDF3]">No companies to compare</h2>
-            <p className="max-w-md text-xs text-[#8B949E]">Search for a company above or pick from rankings to compare up to {MAX_COMPANIES} side by side.</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("rankings")}>
-                <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
-              </Button>
-              <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("search")}>
-                <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
-              </Button>
+                {/* Factor Breakdown */}
+                {companies.some((c) => c.factors) && (
+                  <div className="px-4 py-3.5">
+                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Factor Breakdown</div>
+                    <div className="-mx-2 overflow-x-auto">
+                      <div className="min-w-[400px] px-2">
+                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
+                          {factorKeys.map((key) => (
+                            <React.Fragment key={key}>
+                              <div className="text-[10px] font-medium text-[#64748B] py-1.5 capitalize">{factorLabels[key]}</div>
+                              {companies.map((c) => (
+                                <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
+                                  {c.factors && typeof c.factors[key] === "number" && Number.isFinite(c.factors[key]) ? Math.round(c.factors[key]!) : "—"}
+                                </div>
+                              ))}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Source Freshness */}
+                <div className="px-4 py-3.5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Source Freshness</div>
+                  <div className="-mx-2 overflow-x-auto">
+                    <div className="min-w-[400px] px-2">
+                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Prediction date</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-[10px] text-[#E6EDF3] py-1.5">{c.predictionDate ? formatDate(c.predictionDate) : "—"}</div>
+                        ))}
+                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Data status</div>
+                        {companies.map((c) => (
+                          <div key={c.symbol} className="text-right text-[10px] text-[#E6EDF3] py-1.5">{c.predictionDate ? "Recorded" : "Pending"}</div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gaps */}
+                <div className="px-4 py-3.5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Data Gaps</div>
+                  {companies.every((c) => c.factors && factorKeys.every((k) => typeof c.factors![k] === "number" && Number.isFinite(c.factors![k]))) ? (
+                    <p className="text-xs text-[#16A34A]">No missing factor data</p>
+                  ) : (
+                    <div className="-mx-2 overflow-x-auto">
+                      <div className="min-w-[400px] px-2">
+                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
+                          {factorKeys.map((key) => {
+                            const hasMissing = companies.some((c) => !c.factors || typeof c.factors[key] !== "number" || !Number.isFinite(c.factors[key]));
+                            if (!hasMissing) return null;
+                            return (
+                              <React.Fragment key={key}>
+                                <div className="text-[10px] font-medium text-[#64748B] py-1.5 capitalize">{factorLabels[key]}</div>
+                                {companies.map((c) => (
+                                  <div key={c.symbol} className="text-right text-[10px] text-[#E6EDF3] py-1.5">
+                                    {!c.factors || typeof c.factors[key] !== "number" || !Number.isFinite(c.factors[key]) ? (
+                                      <span className="text-[#EF9A09]">Missing</span>
+                                    ) : (
+                                      <span className="text-[#16A34A]">Present</span>
+                                    )}
+                                  </div>
+                                ))}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ProductPanel>
+
+            <div className="flex flex-wrap gap-2">
+              {companies.map((company) => (
+                <ProductAction key={company.symbol} variant="secondary" onClick={() => setAuditSymbol(company.symbol)}>
+                  <Database className="h-3.5 w-3.5" aria-hidden="true" /> Trace source — {company.symbol}
+                </ProductAction>
+              ))}
             </div>
           </div>
         )}
 
-        <div className="mt-6 border-t border-white/[0.04] pt-4">
-          <p className="text-[10px] leading-relaxed text-[#484F58]">
-            Compare shows real scores, factors, and data coverage for each company. Missing values are marked as unavailable. Not investment advice.
-          </p>
-        </div>
-      </div>
+        {!loading && companies.length > 0 && (
+          <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
+            <p className="text-[10px] leading-relaxed text-[#64748B]">
+              Compare shows real scores, factors, and data coverage for each company. Missing values are marked as unavailable. Not investment advice.
+            </p>
+          </div>
+        )}
+      </ProductPage>
 
-      <ResearchAuditDrawer open={auditSymbol !== null} onClose={() => setAuditSymbol(null)} symbol={auditSymbol || ""} />
-    </PremiumPage>
+      {auditSymbol && (
+        <SourceTraceModal symbol={auditSymbol} onClose={() => setAuditSymbol(null)} />
+      )}
+    </ProductShell>
   );
 };
 

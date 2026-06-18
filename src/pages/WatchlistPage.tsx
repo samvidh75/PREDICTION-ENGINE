@@ -6,12 +6,10 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { api, WatchlistRow } from "../services/api/client";
-import { ChevronRight, TrendingUp, Eye } from "lucide-react";
-import { getScoreState, formatFreshness } from "../services/ui/dataFormatting";
+import { ChevronRight, Eye } from "lucide-react";
+import { formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
-import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
-import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
-import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
+import { ProductPanel, ProductEmptyState, ProductAction, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 
 interface DisplayList {
   id: string;
@@ -121,7 +119,7 @@ export const WatchlistPage: React.FC = () => {
             <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
             <h1 className="text-base font-semibold text-[#E6EDF3]">Saved research</h1>
           </div>
-          <p className="mt-1 text-xs text-[#8B949E]">Companies you are tracking for research follow-up. Tap a row to inspect the evidence view.</p>
+          <p className="mt-1 text-xs text-[#8B949E]">Companies you are tracking for research follow-up.</p>
         </div>
         {sectorBreakdown.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
@@ -177,108 +175,80 @@ export const WatchlistPage: React.FC = () => {
 
         <div className="lg:col-span-3">
           {activeTickers.length === 0 ? (
-            <RoundedDepthPanel padding="lg" variant="elevated">
-              <div className="flex flex-col items-center gap-3 text-center">
-                <Eye className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
-                <h2 className="text-sm font-semibold text-[#E6EDF3]">No saved research</h2>
-                <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
-                  Search for a company to add it to your research list. You can save companies from rankings or the company page.
-                </p>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "search"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
-                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
-                  >
-                    Search companies
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "rankings"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
-                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
-                  >
-                    Browse rankings
-                  </button>
+            <ProductEmptyState
+              icon={Eye}
+              title="No saved research"
+              body="Search for a company to add it to your research list. You can save companies from rankings or the company page."
+              action={
+                <div className="flex flex-wrap gap-2">
+                  <ProductAction onClick={() => productNavigate("search")}>Search companies</ProductAction>
+                  <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Browse rankings</ProductAction>
                 </div>
-              </div>
-            </RoundedDepthPanel>
+              }
+            />
           ) : (
             <div className="space-y-3">
               {activeTickers.map((ticker) => {
                 const info = StockRegistry.getStock(ticker);
                 const score = info?.telemetrySnapshot?.healthScore ?? null;
                 const noteObj = NoteEngine.getNote(ticker);
+                const hasScore = typeof score === "number" && Number.isFinite(score);
                 return (
-                  <div key={ticker} className="rounded-[22px] border border-white/5 bg-[#0D1117] p-4">
+                  <ProductPanel key={ticker} className="p-4">
                     <div className="flex items-start justify-between gap-3">
-                      <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="flex items-center gap-2 text-left">
-                        <span className="font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{ticker}</span>
-                        <ChevronRight className="h-3.5 w-3.5 text-[#484F58]" aria-hidden="true" />
-                      </button>
                       <div className="flex items-center gap-2">
-                        {typeof score === "number" && Number.isFinite(score) ? (
-                          <span className="inline-flex items-center rounded-full border border-[#2962FF]/10 bg-[#2962FF]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-[#2962FF]">{Math.round(score)}</span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-[#484F58]">Score pending</span>
-                        )}
-                        <button onClick={() => setExplanationSymbol(ticker)} className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-[#8B949E] hover:bg-white/[0.08] hover:text-[#E6EDF3] transition-colors">
-                          Explain
+                        <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="flex items-center gap-2 text-left">
+                          <span className="font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{ticker}</span>
+                          <ChevronRight className="h-3.5 w-3.5 text-[#484F58]" aria-hidden="true" />
                         </button>
+                        <div className="flex items-center gap-1.5">
+                          {hasScore ? (
+                            <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
+                          ) : (
+                            <ProductStatusPill tone="muted">Score pending</ProductStatusPill>
+                          )}
+                          <ProductStatusPill tone={noteObj.lastUpdated ? "verified" : "muted"}>
+                            {noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "No data"}
+                          </ProductStatusPill>
+                          <ProductStatusPill tone={hasScore ? "blue" : "muted"}>
+                            {hasScore ? "Analyzed" : "Queued"}
+                          </ProductStatusPill>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ProductAction variant="ghost" onClick={() => navigateToStock({ ticker, mode: "push" })}>Open</ProductAction>
+                        <ProductAction variant="ghost" onClick={() => productNavigate("compare", ticker)}>Compare</ProductAction>
                         <button onClick={() => handleRemoveTicker(ticker)} className="text-[10px] text-[#484F58] hover:text-[#F23645] transition-colors" disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
                       </div>
                     </div>
-                    <div className="mt-3 flex items-center gap-4 text-xs">
-                      <div>
-                        <span className="text-[10px] text-[#484F58]">Score</span>
-                        <span className="ml-1.5 font-mono text-xs text-[#8B949E]">{typeof score === "number" && Number.isFinite(score) ? Math.round(score) : "Unavailable"}</span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-[#484F58]">Freshness</span>
-                        <span className="ml-1.5 font-mono text-xs text-[#8B949E]">{noteObj.lastUpdated ? formatFreshness(noteObj.lastUpdated) : "Unavailable"}</span>
-                      </div>
-                    </div>
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <input type="text" value={noteObj.note} onChange={(e) => handleNoteChange(ticker, e.target.value)} placeholder="Why am I watching?" className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none" aria-label="Watchlist note" />
                     </div>
-                  </div>
+                    <div className="mt-2 flex items-center gap-3">
+                      <button onClick={() => setExplanationSymbol(explanationSymbol === ticker ? null : ticker)} className="text-[10px] text-[#2962FF] hover:text-[#3B71FF] transition-colors">
+                        {explanationSymbol === ticker ? "Hide explanation" : "Explain"}
+                      </button>
+                      {explanationSymbol === ticker && (
+                        <button onClick={() => { navigateToStock({ ticker, mode: "push" }); setExplanationSymbol(null); }} className="text-[10px] text-[#8B949E] hover:text-[#E6EDF3] transition-colors">
+                          Open full research
+                        </button>
+                      )}
+                    </div>
+                    {explanationSymbol === ticker && (
+                      <div className="mt-3 space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+                        <p className="text-[11px] leading-relaxed text-[#8B949E]">
+                          <strong>Prediction explanation unavailable</strong> — Explanation data appears after the next completed scoring cycle for this symbol.
+                        </p>
+                        <p className="text-[10px] leading-relaxed text-[#484F58]">Research only. Not investment advice.</p>
+                      </div>
+                    )}
+                  </ProductPanel>
                 );
               })}
             </div>
           )}
         </div>
       </div>
-
-      {/* Explanation modal */}
-      <IntelligenceModal
-        open={explanationSymbol !== null}
-        onClose={() => setExplanationSymbol(null)}
-        title={explanationSymbol ? `${explanationSymbol} — prediction explanation` : ""}
-        subtitle="Model score and factor context for this symbol."
-      >
-        {explanationSymbol && (
-          <div className="space-y-4">
-            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Symbol</span>
-              <div className="mt-1 font-mono text-lg font-bold text-[#E6EDF3]">{explanationSymbol}</div>
-            </div>
-            <PredictionConfidenceBar score={null} />
-            <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3">
-              <p className="text-[11px] leading-relaxed text-[#8B949E]">
-                <strong>Prediction explanation unavailable</strong> — Explanation data appears after the next completed scoring cycle for this symbol.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => { navigateToStock({ ticker: explanationSymbol, mode: "push" }); setExplanationSymbol(null); }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-xs font-semibold text-[#E6EDF3] hover:bg-white/[0.08] transition-colors"
-            >
-              <TrendingUp className="h-4 w-4" aria-hidden="true" />
-              Open company research
-            </button>
-            <p className="text-[10px] leading-relaxed text-[#484F58]">Research only. Not investment advice.</p>
-          </div>
-        )}
-      </IntelligenceModal>
     </div>
   );
 };

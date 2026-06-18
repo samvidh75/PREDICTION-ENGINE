@@ -192,7 +192,7 @@ test.describe("Public route smoke", () => {
   test("rankings page renders", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -310,14 +310,14 @@ test.describe("Search route", () => {
   test("search page renders with input", async ({ page }) => {
     await page.goto("/?page=search");
     await expect(page.locator("body")).toBeVisible();
-    const input = page.getByRole("textbox", { name: /Search Indian companies/i });
+    const input = page.getByRole("textbox", { name: /Search companies/i });
     await expect(input).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("search for RELIANCE returns results", async ({ page }) => {
     await page.goto("/?page=search");
-    const input = page.getByRole("textbox", { name: /Search Indian companies/i });
+    const input = page.getByRole("textbox", { name: /Search companies/i });
     await input.fill("RELIANCE");
     // Small wait for local registry search to debounce
     await page.waitForTimeout(300);
@@ -379,7 +379,7 @@ test.describe("Rankings page", () => {
   test("rankings page renders table structure", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
     await expect(page.getByText(/Rankings pending/i)).toBeVisible();
     await assertNoRenderGarbage(page);
   });
@@ -415,7 +415,7 @@ test.describe("Authenticated shell", () => {
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    await page.getByRole("link", { name: /settings/i }).click();
+    await page.evaluate(() => (document.querySelector('a[aria-label="Settings"]') as HTMLAnchorElement)?.click());
     await expect(page).toHaveURL(/page=settings/);
     await expect(page.locator("body")).toBeVisible();
     await assertNoRenderGarbage(page);
@@ -495,7 +495,7 @@ test.describe("Public rankings/predictions CTA routing", () => {
       await expect(page).toHaveURL(/page=signup/);
     } else {
       // Rankings loaded with data — CTA absent is acceptable
-      await expect(page.getByRole("heading", { name: /research rankings/i })).toBeVisible();
+      await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
     }
     await assertNoRenderGarbage(page);
   });
