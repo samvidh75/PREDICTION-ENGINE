@@ -271,6 +271,12 @@ async function main(): Promise<void> {
         continue;
       }
 
+      // NSELIB must be archived_unusable
+      const nselibEntry = provs.NSELIB;
+      if (nselibEntry && nselibEntry.status !== "archived_unusable") {
+        results.push({ name: label, status: "warn", detail: `NSELIB status=${nselibEntry.status} (expected archived_unusable)` });
+      }
+
       results.push({ name: label, status: "ok" });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

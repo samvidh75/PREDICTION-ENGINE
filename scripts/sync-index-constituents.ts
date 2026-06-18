@@ -3,13 +3,12 @@ export {};
  * sync-index-constituents.ts — Sync index constituents from public NSE sources.
  *
  * Gets NIFTY 50, NIFTY NEXT 50, Bank Nifty, and sector index constituents
- * from nselib (indices.nifty_indices_constituents) and nsepython.
+ * from nsepython. nselib source removed — evaluated and not active.
  * Dry-run by default. --apply flag to write.
  *
  * Usage:
  *   npx tsx scripts/sync-index-constituents.ts
  *   npx tsx scripts/sync-index-constituents.ts --apply
- *   npx tsx scripts/sync-index-constituents.ts --apply --source=nselib
  */
 
 import { dbAdapter } from "../src/db/DatabaseAdapter";
@@ -55,38 +54,9 @@ function parseArgs(): CliOptions {
   return { source, apply: apply && !dryRun };
 }
 
-function fetchIndexConstituents(indexName: string): IndexConstituent[] {
-  try {
-    const output = execSync(`python3 -c "
-import json, sys
-try:
-    from nselib import indices
-    df = indices.nifty_indices_constituents('${indexName.replace(/'/g, "\\\\'")}')
-    if not hasattr(df, 'shape') or df.shape[0] == 0:
-        print(json.dumps([]))
-        sys.exit(0)
-    cols = list(df.columns)
-    symbol_col = next((c for c in cols if 'symbol' in c.lower() or 'ticker' in c.lower()), cols[0])
-    name_col = next((c for c in cols if 'name' in c.lower() or 'company' in c.lower()), symbol_col)
-    weight_col = next((c for c in cols if 'weight' in c.lower()), None)
-    rows = []
-    for _, r in df.iterrows():
-        weight = float(r[weight_col]) if weight_col and str(r[weight_col]).replace('.','').replace('-','').isdigit() else None
-        rows.append({'symbol': str(r[symbol_col]).upper().strip(), 'company_name': str(r[name_col])[:200], 'weight_pct': round(weight, 4) if weight else None})
-    print(json.dumps(rows))
-except Exception:
-    print(json.dumps([]))
-"`, { encoding: "utf-8", timeout: 30_000, maxBuffer: 1024 * 1024 });
-    const parsed: Record<string, unknown>[] = JSON.parse(output.trim());
-    return parsed.map((r) => ({
-      indexName,
-      symbol: String(r.symbol ?? "").replace(/-/g, "").toUpperCase(),
-      companyName: String(r.company_name ?? ""),
-      weightPct: r.weight_pct != null ? Number(r.weight_pct) : null,
-    }));
-  } catch {
-    return [];
-  }
+function fetchIndexConstituents(_indexName: string): IndexConstituent[] {
+  // NSELib source removed — evaluated and not active. See docs/data/nselib-provider.md
+  return [];
 }
 
 function fetchFromNsepython(indexName: string): IndexConstituent[] {
@@ -178,10 +148,8 @@ async function main(): Promise<void> {
 
   for (const indexName of INDEX_NAMES) {
     let constituents: IndexConstituent[] = [];
-    if (options.source === "auto" || options.source === "nselib") {
-      constituents = fetchIndexConstituents(indexName);
-    }
-    if (constituents.length === 0 && (options.source === "auto" || options.source === "nsepython")) {
+    // NSELib source removed — evaluated and not active
+    if (options.source === "auto" || options.source === "nsepython") {
       const nsepythonConstituents = fetchFromNsepython(indexName);
       if (nsepythonConstituents.length > 0) constituents = nsepythonConstituents;
     }

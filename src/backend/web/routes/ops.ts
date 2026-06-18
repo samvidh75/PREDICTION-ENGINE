@@ -18,7 +18,6 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  const probeScriptPath = join(__dirname, '..', '..', '..', '..', '..', 'scripts', 'probe-nselib-provider.py');
 
   app.get("/api/ops/health", async (_request, reply) => {
     const metrics: Record<string, any> = {};
@@ -132,8 +131,9 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         },
       },
       nselib: {
-        status: "unavailable",
-        detail: "Python 3.10+ available on Railway but nselib v1.9 lacks capital_market/indices data-fetching API",
+        status: "archived_unusable",
+        lifecycle: "archived",
+        detail: "Evaluated and not active — nselib provides no usable data-fetching domains in this context. See docs/data/nselib-provider.md",
       },
       nsepython: {
         status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
@@ -279,10 +279,10 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           message: process.env.JUGAD_DATA_ENABLED === "true" ? "Bhavcopy+RBI+market_status active. Quotes blocked (NSE)." : "Optional — set JUGAD_DATA_ENABLED for bhavcopy/RBI/market status.",
         },
         NSELIB: {
-          lifecycle: "planned",
+          lifecycle: "archived",
           required: false,
-          status: "unavailable",
-          message: "Requires Python 3.10+. Not yet deployed.",
+          status: "archived_unusable",
+          message: "Evaluated and not active. Provides no usable data-fetching domains. See docs/data/nselib-provider.md",
         },
         NSEPYTHON: {
           lifecycle: "active",
@@ -903,13 +903,14 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       const pipVer = execSync('pip3 --version 2>&1', { encoding: 'utf-8', timeout: 5000 }).trim();
       report.pip_version = pipVer.split(/\s+/)[1] ?? 'unknown';
     } catch { report.pip_version = 'not_found'; }
-    const pkgs = ['jugaad_data', 'nselib', 'nsepython'];
+    const pkgs = ['jugaad_data', 'nsepython'];
     for (const pkg of pkgs) {
       try {
         execSync(`python3 -c "import ${pkg}" 2>/dev/null`, { encoding: 'utf-8', timeout: 5000 });
         report[pkg] = 'installed';
       } catch { report[pkg] = 'not_installed'; }
     }
+    report.nselib = 'archived_unusable';
     return reply.send(report);
   });
 
@@ -932,14 +933,12 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   });
 
   app.get("/api/ops/probe/nselib", async (_request, reply) => {
-    try {
-      const output = execSync(`python3 "${probeScriptPath}"`, { encoding: 'utf-8', timeout: 120_000 });
-      const jsonStart = output.indexOf('{');
-      const data = jsonStart >= 0 ? JSON.parse(output.slice(jsonStart)) : { error: 'no JSON output', raw: output.slice(0, 500) };
-      return reply.send(data);
-    } catch (err: any) {
-      return reply.send({ error: `nselib probe failed: ${err.message}` });
-    }
+    return reply.send({
+      status: "archived_unusable",
+      provider: "nselib",
+      detail: "NSELib evaluated and not active. See docs/data/nselib-provider.md for evidence.",
+      checkedAt: new Date().toISOString(),
+    });
   });
 };
 

@@ -1,12 +1,14 @@
 # Jugaad-Data Provider
 
-**Status**: local_only / degraded
+**Status**: Active by domain (see domain table below)
 
 **Package**: `jugaad-data` v0.28 (pip install)
 
-**Python**: 3.9+ (limited — stock_df fails on 3.9; Dockerfile installs Python 3.12, so stock_df works on Railway)
+**Python**: 3.9+ (stock_df fails on 3.9 locally; Railway venv Python 3.12 so stock_df may work)
 
 **Credentials**: None required
+
+**Role**: Bhavcopy primary, RBI/macro source, index data, market status
 
 ## Probe Result (2026-06-18)
 

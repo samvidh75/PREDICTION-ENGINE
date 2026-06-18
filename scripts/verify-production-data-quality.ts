@@ -219,9 +219,22 @@ async function main(): Promise<void> {
     (body) => {
       const provs = (body as any).providers as Record<string, any> || {};
       const keys = Object.keys(provs);
-      const forbidden = ["DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN"];
+      const forbidden = ["DHAN_CLIENT_ID", "UPSTOX_ACCESS_TOKEN", "DHAN", "UPSTOX"];
       const found = forbidden.filter((k) => keys.includes(k));
       if (found.length > 0) return `deprecated providers present: ${found.join(", ")}`;
+      return null;
+    },
+  ));
+
+  // NSELib must be archived_unusable, not active
+  results.push(await dqCheck("nselib_archived", "compliance",
+    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
+    (body) => {
+      const provs = (body as any).providers as Record<string, any> || {};
+      const nselib = provs.NSELIB;
+      if (!nselib) return "NSELIB provider missing from status";
+      if (nselib.status !== "archived_unusable") return `NSELIB status=${nselib.status} (expected archived_unusable)`;
+      if (nselib.lifecycle !== "archived") return `NSELIB lifecycle=${nselib.lifecycle} (expected archived)`;
       return null;
     },
   ));
@@ -344,7 +357,7 @@ async function main(): Promise<void> {
     results.push(check);
   }
 
-  // IndianAPI load-sharing status
+  // IndianAPI load-sharing status with cache protection
   results.push(await dqCheck("indianapi_load_sharing", "coverage",
     `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
     (body) => {

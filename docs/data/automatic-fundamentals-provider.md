@@ -9,7 +9,7 @@
 | Source | Result | Issue |
 |--------|--------|-------|
 | `nsepython.nse_results("RELIANCE")` | ❌ Empty | Returns no data for any symbol |
-| `nselib.financial_results_for_equity()` | ❌ Unavailable | Requires Python 3.10+ (PEP 604) |
+| `nselib.financial_results_for_equity()` | 🟣 Archived | Evaluated — no domain returns usable data even on Python 3.12. See [nselib-provider.md](./nselib-provider.md). |
 | Public NSE/BSE results pages | ❌ Not machine-readable | Requires scraping / session |
 | Official filings / XBRL | ❌ Not yet implemented | Future work |
 
@@ -33,4 +33,4 @@ See [fundamentals-import.md](./fundamentals-import.md) for import instructions.
 |------|--------|
 | XBRL parser for BSE/NSE filings | Planned |
 | BSE filings API (if available) | Research |
-| Python 3.10+ upgrade (enables nselib) | Considered |
+| Python 3.10+ upgrade (was: enables nselib) | Cancelled — nselib archived (no usable domains) |

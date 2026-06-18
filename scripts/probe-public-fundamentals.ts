@@ -2,8 +2,9 @@ export {};
 /**
  * probe-public-fundamentals.ts — Probes all available public fundamentals sources.
  *
- * Calls Python probes (nsepython, nselib) to discover which financial data
- * functions are available and what fields they return. Reports results as JSON.
+ * Calls Python probes (nsepython) to discover which financial data
+ * functions are available and what fields they return. nselib archived — see docs.
+ * Reports results as JSON.
  * No scraping, no credentials, no fake data.
  *
  * Usage:
@@ -129,43 +130,16 @@ except Exception as e:
   }
 }
 
-function probeNselibFinancialResults(symbol: string): ProbeResult {
-  const start = Date.now();
-  try {
-    const output = execSync(`python3 -c "
-import json, sys
-try:
-    from nselib import capital_market
-    df = capital_market.financial_results_for_equity('${symbol}')
-    if hasattr(df, 'shape'):
-        cols = list(df.columns[:25])
-        nulls = {c: int(df[c].isna().sum()) for c in cols[:10]} if hasattr(df, 'isna') else {}
-        print(json.dumps({'status': 'healthy', 'rows': int(df.shape[0]), 'columns': cols, 'column_count': len(cols), 'null_counts': nulls}))
-    elif df is not None:
-        print(json.dumps({'status': 'healthy', 'data_type': type(df).__name__, 'sample': str(df)[:300]}))
-    else:
-        print(json.dumps({'status': 'no_data', 'detail': 'financial_results_for_equity returned None'}))
-except Exception as e:
-    print(json.dumps({'status': 'endpoint_failed', 'detail': str(e)[:200]}))
-"`, { encoding: "utf-8", timeout: 30_000, maxBuffer: 1024 * 1024 });
-    return { source: "nselib.financial_results_for_equity", ...JSON.parse(output.trim()), elapsedSec: (Date.now() - start) / 1000 };
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("timeout")) return { source: "nselib.financial_results_for_equity", status: "timeout", detail: "timed out after 30s", elapsedSec: (Date.now() - start) / 1000 };
-    return { source: "nselib.financial_results_for_equity", status: "endpoint_failed", detail: msg.slice(0, 200), elapsedSec: (Date.now() - start) / 1000 };
-  }
-}
-
 async function main(): Promise<void> {
   const symbol = getSymbol();
   console.log(JSON.stringify({
     probe: "public-fundamentals-sources",
     symbol,
     timestamp: new Date().toISOString(),
+    note: "NSELib not probed — evaluated and not active. See docs/data/nselib-provider.md",
     sources: [
       probeNsepythonFinancialResults(symbol),
       probeNsepythonPastResults(symbol),
-      probeNselibFinancialResults(symbol),
     ],
   }, null, 2));
 }

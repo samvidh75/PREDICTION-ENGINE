@@ -1,12 +1,14 @@
 # nsepython / nsepythonserver Provider
 
-**Status**: Degraded / limited
+**Status**: Active by domain (see domain table below)
 
 **Package**: `nsepython` v2.97 (pip install)
 
 **Python**: 3.9+ compatible
 
 **Credentials**: None required
+
+**Role**: Index quote primary, bhavcopy fallback
 
 ## Probe Result (2026-06-18)
 
