@@ -36,7 +36,13 @@ export const DashboardHub: React.FC = () => {
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [signalsError, setSignalsError] = useState(false);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState<number | null>(null);
-  const [coverage, setCoverage] = useState<{ symbols: number | null; scored: number | null; latest: string | null }>({ symbols: null, scored: null, latest: null });
+  const [coverage, setCoverage] = useState<{
+    symbols: number | null;
+    scored: number | null;
+    latest: string | null;
+    quoteStatus: string | null;
+    fallbackStatus: string | null;
+  }>({ symbols: null, scored: null, latest: null, quoteStatus: null, fallbackStatus: null });
   const [showGuide, setShowGuide] = useState(() => {
     try { return localStorage.getItem("ssi-guide-dismissed") !== "true"; } catch { return true; }
   });
@@ -71,6 +77,8 @@ export const DashboardHub: React.FC = () => {
           symbols: cov.coverage?.symbols?.count ?? null,
           scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
           latest: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
+          quoteStatus: cov.providers?.INDIANAPI_KEY?.status ?? cov.providers?.YAHOO?.status ?? null,
+          fallbackStatus: cov.providers?.YAHOO?.status ?? null,
         });
       })
       .catch(() => {});
@@ -138,10 +146,10 @@ export const DashboardHub: React.FC = () => {
             Missing fundamentals: not tracked
           </ProductStatusPill>
           <ProductStatusPill tone={coverage.latest ? "verified" : "warning"}>
-            Provider: {coverage.latest ? "active" : "no timestamp"}
+            Provider: {coverage.quoteStatus ?? "unchecked"}
           </ProductStatusPill>
-          <ProductStatusPill tone="muted">
-            Quote/history gaps: not measured
+          <ProductStatusPill tone={coverage.fallbackStatus === "healthy" ? "verified" : "warning"}>
+            Quote/history fallback: {coverage.fallbackStatus ?? "unchecked"}
           </ProductStatusPill>
         </div>
 

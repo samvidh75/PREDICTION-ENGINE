@@ -147,7 +147,20 @@ export interface DataCoverage {
     factorSnapshots: CoverageStats;
     predictionRegistry: CoverageStats;
   };
-  providers: Record<string, string>;
+  providers: Record<string, ProviderStatusEntry>;
+}
+
+export interface ProviderDomainEntry {
+  healthy?: boolean;
+  detail?: string;
+}
+
+export interface ProviderStatusEntry {
+  lifecycle: string;
+  required: boolean;
+  status: string;
+  message: string;
+  domains?: Record<string, ProviderDomainEntry>;
 }
 
 export interface CoverageStats {

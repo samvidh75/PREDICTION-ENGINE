@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import DashboardHub from './DashboardHub';
+import { LayoutProvider } from '../../context/LayoutContext';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -62,31 +63,36 @@ vi.mock('../../services/api/client', () => ({
 }));
 
 const pending = () => new Promise(() => {});
+const renderDashboard = () => render(<LayoutProvider><DashboardHub /></LayoutProvider>);
 
 beforeEach(() => {
   mockGetSignals.mockReturnValue(pending());
   mockGetOpsHealth.mockReturnValue(pending());
-  mockGetDataCoverage.mockResolvedValue({ coverage: { symbols: { count: 6 }, predictionRegistry: { symbolCount: 5 } }, generatedAt: '2026-06-17T00:00:00.000Z' });
+  mockGetDataCoverage.mockResolvedValue({
+    coverage: { symbols: { count: 6 }, predictionRegistry: { symbolCount: 5 } },
+    providers: { YAHOO: { status: 'healthy' }, INDIANAPI_KEY: { status: 'missing_optional' } },
+    generatedAt: '2026-06-17T00:00:00.000Z'
+  });
 });
 
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
-    render(<DashboardHub />);
+    renderDashboard();
     expect(screen.getByText('Signal changes')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
-    render(<DashboardHub />);
+    renderDashboard();
     expect(screen.getByText(/No companies saved yet/)).toBeInTheDocument();
   });
 
   it('shows empty saved research state', () => {
-    render(<DashboardHub />);
+    renderDashboard();
     expect(screen.getByText(/No positions saved/)).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
-    render(<DashboardHub />);
+    renderDashboard();
     expect(screen.getByText('Research workspace')).toBeInTheDocument();
   });
 
@@ -94,7 +100,7 @@ describe('DashboardHub states', () => {
     mockGetSignals.mockRejectedValue(new Error('API error'));
     mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 0, db_health: 'connected' } });
 
-    render(<DashboardHub />);
+    renderDashboard();
 
     expect(await screen.findByText('Signals temporarily unavailable')).toBeInTheDocument();
   });
@@ -107,7 +113,7 @@ describe('DashboardHub states', () => {
     });
     mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
-    render(<DashboardHub />);
+    renderDashboard();
 
     expect(await screen.findByText('No significant signal changes')).toBeInTheDocument();
     expect(screen.getByText(/5 companies were analyzed/)).toBeInTheDocument();
@@ -117,8 +123,8 @@ describe('DashboardHub states', () => {
     mockGetSignals.mockResolvedValue({ signals: [], symbolsAnalyzed: 0 });
     mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
-    render(<DashboardHub />);
+    renderDashboard();
 
-    expect(await screen.findByText('Coverage')).toBeInTheDocument();
+    expect(await screen.findByText(/fundamentals coverage/i)).toBeInTheDocument();
   });
 });

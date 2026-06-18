@@ -97,14 +97,20 @@ async function main(): Promise<void> {
   console.log(`  JUGAD_DATA_ENABLED=${jugaadFlag ? "true (active)" : "false/not set (configured off)"}`);
   console.log(`  NSEPYTHON_ENABLED=${nsepythonFlag ? "true (active)" : "false/not set (configured off)"}`);
   console.log(`  NSELIB=archived (not active)`);
-  console.log(`  YAHOO=Blocked HTTP 429 (not load-bearing)`);
+  const yahooHealth = healths.find((h) => h.provider === "yahoo");
+  console.log(`  YAHOO=${yahooHealth?.status ?? "unavailable"} (optional fallback, not primary)`);
 
   // --- Summary ---
   console.log("\n=== Summary ===");
+  const yahooQuoteOk = quoteResult.provider === "yahoo" && !!quoteResult.data;
+  const yahooHistOk = histResult.provider === "yahoo" && !!histResult.data?.length;
+  const yahooDetail = yahooQuoteOk || yahooHistOk
+    ? `Reachable fallback${yahooQuoteOk ? " quote" : ""}${yahooQuoteOk && yahooHistOk ? " +" : ""}${yahooHistOk ? " historical" : ""}; optional and may be delayed/stale`
+    : `Unavailable or blocked${yahooHealth?.status ? ` — ${yahooHealth.status}` : ""}`;
   console.log("  ✓ IndianAPI: Active for quotes (when configured)");
   console.log(`  ${jugaadFlag ? "✓" : "⊘"} Jugaad-Data: ${jugaadFlag ? "Active" : "Configured off"} — bhavcopy, RBI, market_status`);
   console.log(`  ${nsepythonFlag ? "✓" : "⊘"} NSEPython: ${nsepythonFlag ? "Active" : "Configured off"} — index_quote, bhavcopy`);
-  console.log("  △ Yahoo: Blocked (HTTP 429), not load-bearing");
+  console.log(`  ${yahooQuoteOk || yahooHistOk ? "✓" : "△"} Yahoo: ${yahooDetail}`);
   console.log("  △ Fundamentals: Partial via DB snapshots + CSV/manual import");
   console.log("  △ CSV Import: Manual fundamentals fallback");
   console.log("  ⊘ NSELib: Archived/unusable, not active");

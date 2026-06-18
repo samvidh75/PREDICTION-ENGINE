@@ -71,7 +71,7 @@ describe('TrustCentrePage regression states', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
 
-    expect(await screen.findByText('Only registry-backed trust metrics are available.')).toBeInTheDocument();
+    expect(await screen.findByText(/Only registry-backed trust metrics are available\./)).toBeInTheDocument();
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
     expect(screen.getByText('125')).toBeInTheDocument();
     expect(screen.getByText('Performance audit')).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('TrustCentrePage regression states', () => {
     vi.stubGlobal('fetch', fetchMock);
     render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
 
-    expect(await screen.findByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
+    expect(await screen.findByText(/Trust metrics are temporarily unavailable\./)).toBeInTheDocument();
   });
 
   it('renders tab navigation with Overview, Providers, Coverage, Gaps tabs', async () => {
