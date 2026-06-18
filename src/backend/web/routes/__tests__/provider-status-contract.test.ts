@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
  * - IndianAPI: Active/Healthy for quotes only
  * - Jugaad Data: Partial/Active fallback for bhavcopy, RBI, market_status
  * - NSEPython: Partial/Active fallback for index_quote, bhavcopy
- * - Yahoo: Blocked/Degraded, not load-bearing
+ * - Yahoo: Optional fallback, not load-bearing
  * - NSELib: Archived, not active
  * - Fundamentals: Partial coverage with DB snapshots + CSV/manual
  * - CSV Import: Manual fundamentals fallback
@@ -62,25 +62,24 @@ describe('Provider Status Contract', () => {
     });
   });
 
-  describe('Yahoo — blocked/degraded, not load-bearing', () => {
-    const entry: ProviderEntry = { lifecycle: 'active', required: false, status: 'degraded', message: 'Yahoo Finance: blocked (HTTP 429).', domains: { quote: { healthy: false, detail: 'Blocked HTTP 429' }, historical: { healthy: false, detail: 'Blocked HTTP 429' } } };
+  describe('Yahoo — optional fallback, not load-bearing', () => {
+    const healthyEntry: ProviderEntry = { lifecycle: 'active', required: false, status: 'healthy', message: 'Yahoo fallback is reachable for quote and historical requests. It is optional and may return delayed/stale public data.', domains: { quote: { healthy: true, detail: 'Yahoo fallback quote reachable.' }, historical: { healthy: true, detail: 'Yahoo fallback historical endpoint reachable.' } } };
+    const blockedEntry: ProviderEntry = { lifecycle: 'active', required: false, status: 'blocked', message: 'rate_limited: HTTP 429', domains: { quote: { healthy: false, detail: 'Blocked HTTP 429' }, historical: { healthy: false, detail: 'Blocked HTTP 429' } } };
 
-    it('status is degraded or blocked (never healthy)', () => {
-      expect(entry.status).not.toBe('healthy');
-      expect(entry.status).not.toBe('active');
-      expect(['degraded', 'blocked', 'unavailable']).toContain(entry.status);
+    it('status reflects live reachability', () => {
+      expect(VALID_STATUSES).toContain(healthyEntry.status);
+      expect(['degraded', 'blocked', 'unavailable']).toContain(blockedEntry.status);
     });
 
-    it('domains are all blocked', () => {
-      if (entry.domains) {
-        for (const [, domain] of Object.entries(entry.domains)) {
-          expect(domain.healthy).toBe(false);
-        }
-      }
+    it('does not claim primary/load-bearing coverage', () => {
+      expect(healthyEntry.required).toBe(false);
+      expect(healthyEntry.message).toMatch(/optional/i);
+      expect(healthyEntry.message).toMatch(/delayed|stale/i);
     });
 
     it('is optional, not required', () => {
-      expect(entry.required).toBe(false);
+      expect(healthyEntry.required).toBe(false);
+      expect(blockedEntry.required).toBe(false);
     });
   });
 
@@ -172,7 +171,7 @@ describe('Provider Status Contract', () => {
     it('Dhan, Upstox, Finnhub are not in active provider set', () => {
       const activeProviders: Record<string, ProviderEntry> = {
         INDIANAPI_KEY: { lifecycle: 'active', required: false, status: 'healthy', message: '' },
-        YAHOO: { lifecycle: 'active', required: false, status: 'degraded', message: '' },
+        YAHOO: { lifecycle: 'active', required: false, status: 'healthy', message: 'Optional fallback.' },
         JUGAD_DATA: { lifecycle: 'active', required: false, status: 'healthy', message: '' },
         NSEPYTHON: { lifecycle: 'active', required: false, status: 'healthy', message: '' },
         FUNDAMENTALS_AUTOMATIC: { lifecycle: 'active', required: false, status: 'partial', message: '' },

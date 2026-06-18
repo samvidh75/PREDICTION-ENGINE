@@ -8,9 +8,22 @@ import { query } from "../../../db/index";
 import { execSync } from "child_process";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { PublicMarketDataProviderBroker, type ProviderStatusMatrix } from "../../../providers/publicMarketData/providerBroker";
 
 interface FreshnessRow extends Record<string, unknown> {
   latest: Date | string | number | null;
+}
+
+const PROVIDER_STATUS_CACHE_MS = 60_000;
+let providerStatusCache: { expiresAt: number; data: ProviderStatusMatrix } | null = null;
+
+async function getLiveProviderStatuses(): Promise<ProviderStatusMatrix> {
+  const now = Date.now();
+  if (providerStatusCache && providerStatusCache.expiresAt > now) return providerStatusCache.data;
+  const broker = new PublicMarketDataProviderBroker();
+  const data = await broker.getProviderStatusMatrix();
+  providerStatusCache = { expiresAt: now + PROVIDER_STATUS_CACHE_MS, data };
+  return data;
 }
 
 const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
@@ -105,59 +118,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       metrics.python_version = 'not_found';
     }
 
-    // Provider health — domain-level
-    const providers = {
-      indianapi: {
-        status: env.indianApiKey ? "healthy" : "missing_optional",
-        domains: {
-          quote: { healthy: !!env.indianApiKey, provider: "indianapi" },
-        },
-      },
-      yahoo: {
-        status: "degraded",
-        domains: {
-          quote: { healthy: false, detail: "Blocked HTTP 429" },
-          historical: { healthy: false, detail: "Blocked HTTP 429" },
-        },
-      },
-      "jugaad-data": {
-        status: process.env.JUGAD_DATA_ENABLED === "true" ? "healthy" : "missing_optional",
-        domains: {
-          bhavcopy: { healthy: true },
-          rbi: { healthy: true },
-          market_status: { healthy: true },
-          quote: { healthy: false, detail: "NSE blocks equity quotes" },
-          stock_df: { healthy: false, detail: "Python 3.9 bug, local only" },
-        },
-      },
-      nselib: {
-        status: "archived_unusable",
-        lifecycle: "archived",
-        detail: "Evaluated and not active — nselib provides no usable data-fetching domains in this context. See docs/data/nselib-provider.md",
-      },
-      nsepython: {
-        status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
-        domains: {
-          index_quote: { healthy: true },
-          bhavcopy: { healthy: true },
-          quote: { healthy: false, detail: "NSE blocks equity quotes" },
-        },
-      },
-      fundamentals: {
-        status: "partial",
-        detail: "Coverage via DB financial_snapshots (29 symbols) plus CSV/manual filing fallback.",
-        domains: {
-          fundamentals: { healthy: true, detail: "Financial snapshots from DB + CSV import" },
-        },
-      },
-      csv_fallback: {
-        status: "manual",
-        detail: "Manual fundamentals CSV import available. Not Bhavcopy.",
-        domains: {
-          manual_import: { healthy: true, detail: "Operator CSV workflow for fundamentals" },
-        },
-      },
-    };
+    const providers = await getLiveProviderStatuses();
 
     return reply.send({
       status: "ok",
@@ -247,59 +208,15 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const factorSnapshots = await fetchTableStats("factor_snapshots", "trade_date");
     const predictionRegistry = await fetchTableStats("prediction_registry", "prediction_date");
 
-    const providerStatuses = (): Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; detail?: string }> }> => {
+    const providerStatuses = async (): Promise<Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; detail?: string }> }>> => {
+      const liveProviders = await getLiveProviderStatuses();
       const matrix: Record<string, { lifecycle: string; required: boolean; status: string; message: string; domains?: Record<string, { healthy: boolean; detail?: string }> }> = {
-        INDIANAPI_KEY: {
-          lifecycle: "active",
-          required: false,
-          status: env.indianApiKey ? "healthy" : "missing_optional",
-          message: env.indianApiKey ? "Quotes active." : "Optional — set INDIANAPI_KEY for live quotes.",
-        },
+        ...liveProviders,
         REDIS_URL: {
           lifecycle: "active",
           required: true,
           status: process.env.REDIS_URL ? "healthy" : "missing_required",
           message: process.env.REDIS_URL ? "Cache and queue active." : "Required for cache and queue.",
-        },
-        YAHOO: {
-          lifecycle: "active",
-          required: false,
-          status: "degraded",
-          domains: {
-            quote: { healthy: false, detail: "Blocked HTTP 429" },
-            historical: { healthy: false, detail: "Blocked HTTP 429" },
-          },
-          message: "Yahoo Finance: blocked (HTTP 429). Public NSE providers unaffected.",
-        },
-        JUGAD_DATA: {
-          lifecycle: "active",
-          required: false,
-          status: process.env.JUGAD_DATA_ENABLED === "true" ? "healthy" : "missing_optional",
-          domains: {
-            bhavcopy: { healthy: true },
-            rbi: { healthy: true },
-            market_status: { healthy: true },
-            quote: { healthy: false, detail: "NSE blocks equity quotes" },
-            stock_df: { healthy: false, detail: "Python 3.9 bug, local only" },
-          },
-          message: process.env.JUGAD_DATA_ENABLED === "true" ? "Bhavcopy+RBI+market_status active. Quotes blocked (NSE)." : "Optional — set JUGAD_DATA_ENABLED for bhavcopy/RBI/market status.",
-        },
-        NSELIB: {
-          lifecycle: "archived",
-          required: false,
-          status: "archived_unusable",
-          message: "Evaluated and not active. Provides no usable data-fetching domains. See docs/data/nselib-provider.md",
-        },
-        NSEPYTHON: {
-          lifecycle: "active",
-          required: false,
-          status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
-          domains: {
-            index_quote: { healthy: true },
-            bhavcopy: { healthy: true },
-            quote: { healthy: false, detail: "NSE blocks equity quotes" },
-          },
-          message: process.env.NSEPYTHON_ENABLED === "true" ? "Index quote + bhavcopy active. Equity quotes blocked (NSE)." : "Optional — set NSEPYTHON_ENABLED for index/bhavcopy.",
         },
         FUNDAMENTALS_AUTOMATIC: (() => {
           const fsRows = financialSnapshots.rowCount;
@@ -329,7 +246,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       };
       return matrix;
     };
-    const providers = providerStatuses();
+    const providers = await providerStatuses();
 
     return reply.send({
       ok: true,

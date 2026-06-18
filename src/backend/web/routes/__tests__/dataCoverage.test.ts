@@ -2,10 +2,27 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import Fastify from "fastify";
 
 const { queryMock } = vi.hoisted(() => ({ queryMock: vi.fn() }));
+const { providerMatrixMock } = vi.hoisted(() => ({
+  providerMatrixMock: vi.fn().mockResolvedValue({
+    INDIANAPI_KEY: { lifecycle: "active", required: false, status: "missing_optional", message: "Optional quote provider.", domains: { quote: { healthy: false, detail: "not configured" } } },
+    YAHOO: { lifecycle: "active", required: false, status: "healthy", message: "Yahoo fallback reachable.", domains: { quote: { healthy: true }, historical: { healthy: true } } },
+    JUGAD_DATA: { lifecycle: "active", required: false, status: "missing_optional", message: "Configured off.", domains: { bhavcopy: { healthy: false } } },
+    NSEPYTHON: { lifecycle: "active", required: false, status: "missing_optional", message: "Configured off.", domains: { index_quote: { healthy: false } } },
+    NSELIB: { lifecycle: "archived", required: false, status: "archived_unusable", message: "Archived." },
+  }),
+}));
 
 vi.mock("../../../../db/index", () => ({
   default: { query: queryMock },
   query: queryMock,
+}));
+
+vi.mock("../../../../providers/publicMarketData/providerBroker", () => ({
+  PublicMarketDataProviderBroker: vi.fn(function PublicMarketDataProviderBrokerMock() {
+    return {
+    getProviderStatusMatrix: providerMatrixMock,
+    };
+  }),
 }));
 
 import opsRoutes from "../ops";

@@ -17,12 +17,14 @@ describe('CommandPalette', () => {
 
   it('renders all default actions when open', () => {
     render(<CommandPalette open={true} onClose={vi.fn()} />);
+    expect(screen.getByText('Open dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Search company')).toBeInTheDocument();
     expect(screen.getByText('Open rankings')).toBeInTheDocument();
-    expect(screen.getByText('Open score changes')).toBeInTheDocument();
+    expect(screen.getByText('Compare companies')).toBeInTheDocument();
     expect(screen.getByText('Open Trust Centre')).toBeInTheDocument();
     expect(screen.getByText('Open watchlist')).toBeInTheDocument();
     expect(screen.getByText('Open portfolio')).toBeInTheDocument();
-    expect(screen.getByText('Compare companies')).toBeInTheDocument();
+    expect(screen.getByText('Open About')).toBeInTheDocument();
   });
 
   it('does not render when closed', () => {
