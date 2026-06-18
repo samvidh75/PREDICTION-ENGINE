@@ -17,6 +17,7 @@ import { PredictionConfidenceBar } from "../components/intelligence/PredictionCo
 import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
 import { MethodologyLink } from "../components/intelligence/MethodologyLink";
+import { ResearchAuditDrawer } from "../components/intelligence/SourceTraceTimeline";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -160,6 +161,7 @@ export const StockStoryPage: React.FC = () => {
   const [ownership, setOwnership] = useState<any | null>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [explanationModalOpen, setExplanationModalOpen] = useState(false);
+  const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
 
   useEffect(() => { RecentSearchStore.addTicker(ticker); }, [ticker]);
 
@@ -434,6 +436,9 @@ export const StockStoryPage: React.FC = () => {
         <button onClick={handleToggleWatchlist} className={`btn btn-sm ${isInWatchlist ? "btn-ghost text-[var(--color-danger)]" : "btn-secondary"}`}>
           <Star className={`icon-action ${isInWatchlist ? "text-[var(--color-danger)]" : ""}`} />
           {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+        </button>
+        <button type="button" onClick={() => setAuditDrawerOpen(true)} className="btn btn-sm btn-secondary">
+          Trace inputs
         </button>
       </section>
 
@@ -778,6 +783,9 @@ export const StockStoryPage: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Source trace drawer */}
+      <ResearchAuditDrawer open={auditDrawerOpen} onClose={() => setAuditDrawerOpen(false)} symbol={ticker} />
 
       {/* Prediction explanation modal */}
       <IntelligenceModal
