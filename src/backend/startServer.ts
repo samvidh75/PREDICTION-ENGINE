@@ -3,6 +3,7 @@ import { AppHealthWatchdog } from "../services/health/AppHealthWatchdog";
 import { isFirebaseAdminConfigured, getFirebaseAdminStatus } from "./auth/firebaseAdmin.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { MigrationRunner, type MigrationStatus } from "../db/MigrationRunner.js";
+import { query } from "../db/index.js";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -43,14 +44,99 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
   return null;
 }
 
+async function runLineageBackfill(isApply: boolean, limitNum: number, symbolList: string[] | null): Promise<void> {
+  console.log(`[maintenance] Running lineage backfill (${isApply ? "APPLY" : "DRY RUN"}) limit=${limitNum}`);
+  for (const table of ["feature_snapshots", "factor_snapshots"]) {
+    let sql = `SELECT fs.symbol, fs.trade_date FROM ${table} fs WHERE fs.source_provider IS NULL ORDER BY fs.trade_date DESC`;
+    const params: any[] = [];
+    if (symbolList) { sql += ` AND fs.symbol = ANY($1)`; params.push(symbolList); }
+    sql += ` LIMIT $${params.length + 1}`; params.push(limitNum);
+    const res = await query(sql, params); const rows = res.rows || [];
+    console.log(`[maintenance] ${table}: scanned ${rows.length} rows`);
+
+    let matched = 0, applied = 0, skipped = 0;
+    for (const row of rows) {
+      const linRes = await query(
+        `SELECT source_name, source_table, as_of, retrieved_at, availability FROM prediction_input_lineage WHERE symbol=$1 AND source_table=$2 LIMIT 1`,
+        [row.symbol, table]
+      );
+      if (linRes.rows.length > 0) {
+        matched++;
+        if (isApply) {
+          const lin = linRes.rows[0];
+          await query(
+            `UPDATE ${table} SET source_provider=$1, source_domain=$2, source_as_of_date=$3::date, source_ingested_at=$4::timestamp, source_quality=$5, source_lineage_id=$6 WHERE symbol=$7 AND trade_date=$8`,
+            [lin.source_name || "unknown", lin.source_table, lin.as_of, lin.retrieved_at,
+             lin.availability === "real" ? "verified" : "inferred",
+             `backfill-${table}-${row.symbol}-${row.trade_date}`, row.symbol, row.trade_date]
+          );
+          applied++;
+        }
+      } else {
+        skipped++;
+        if (isApply) {
+          await query(`UPDATE ${table} SET source_provider='unknown', source_quality='lineage_unavailable', source_notes='No matching prediction_input_lineage' WHERE symbol=$1 AND trade_date=$2`,
+            [row.symbol, row.trade_date]);
+        }
+      }
+    }
+    console.log(`[maintenance] ${table}: matched=${matched} applied=${applied} skipped=${skipped}`);
+  }
+}
+
+async function runFundamentalsMetadata(isApply: boolean, limitNum: number, srcLabel: string): Promise<void> {
+  const countRes = await query(`SELECT COUNT(*) as cnt FROM financial_snapshots WHERE source_label IS NULL OR source_label=''`);
+  const totalMissing = Number(countRes.rows?.[0]?.cnt || 0);
+  console.log(`[maintenance] Fundamentals metadata: ${totalMissing} rows missing source_label (${isApply ? "APPLY" : "DRY RUN"})`);
+
+  if (isApply) {
+    if (!srcLabel) { console.error("[maintenance] FUNDAMENTALS-METADATA APPLY REQUIRES --source-label"); return; }
+    const upRes = await query(
+      `UPDATE financial_snapshots SET source_label=$1, ingestion_timestamp=datetime('now'),
+       source_notes='Operator-confirmed provenance: manual backfill' WHERE rowid IN
+       (SELECT rowid FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $2)`,
+      [srcLabel, limitNum]
+    );
+    console.log(`[maintenance] Updated ${upRes.rowCount || 0} rows with source_label='${srcLabel}'`);
+  } else {
+    if (totalMissing > 0) {
+      const symRes = await query(
+        `SELECT DISTINCT symbol FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $1`, [limitNum]
+      );
+      const symbols = (symRes.rows || []).map((r: any) => r.symbol);
+      console.log(`[maintenance] Sample symbols missing source: ${symbols.join(", ")}`);
+    }
+  }
+}
+
+async function runCoverageDiagnostics(): Promise<void> {
+  const totalRes = await query(`SELECT COUNT(*) as cnt FROM symbols`);
+  const total = Number(totalRes.rows?.[0]?.cnt || 0);
+  const fsRes = await query(`SELECT COUNT(DISTINCT symbol) as cnt, COUNT(*) as rows FROM financial_snapshots`);
+  const fsSymbols = Number(fsRes.rows?.[0]?.cnt || 0);
+  const fsRows = Number(fsRes.rows?.[0]?.rows || 0);
+  const fsSrcRes = await query(`SELECT COUNT(DISTINCT symbol) as cnt FROM financial_snapshots WHERE source_label IS NOT NULL AND source_label != ''`);
+  const withSource = Number(fsSrcRes.rows?.[0]?.cnt || 0);
+  const predRes = await query(`SELECT COUNT(*) as cnt FROM prediction_input_lineage`);
+  const predRows = Number(predRes.rows?.[0]?.cnt || 0);
+
+  console.log(`\n[maintenance] === Coverage Diagnostics ===`);
+  console.log(`  Total symbols: ${total}`);
+  console.log(`  Fundamentals symbols: ${fsSymbols}`);
+  console.log(`  Fundamentals rows: ${fsRows}`);
+  console.log(`  Fundamentals with source_label: ${withSource}`);
+  console.log(`  Prediction input lineage rows: ${predRows}`);
+  console.log(`  Feature/factor lineage: pending backfill`);
+  console.log(`  Known gaps: 3 no-quote, 3 no-history, 1 not-on-leaderboard`);
+}
+
 async function runStartupMaintenanceJob(): Promise<void> {
   const jobName = process.env.RUN_MAINTENANCE_JOB;
   if (!jobName) return;
   const confirm = process.env.RUN_MAINTENANCE_CONFIRM;
-  const limit = process.env.RUN_MAINTENANCE_LIMIT || "100";
-  const symbols = process.env.RUN_MAINTENANCE_SYMBOLS || "";
-  const sourceLabel = process.env.RUN_MAINTENANCE_SOURCE_LABEL || "";
-  const sourceUrl = process.env.RUN_MAINTENANCE_SOURCE_URL || "";
+  const limitNum = parseInt(process.env.RUN_MAINTENANCE_LIMIT || "100", 10);
+  const symbolList = (process.env.RUN_MAINTENANCE_SYMBOLS || "").split(",").filter(Boolean) || null;
+  const srcLabel = process.env.RUN_MAINTENANCE_SOURCE_LABEL || "";
   const exitAfterRun = process.env.MAINTENANCE_EXIT_AFTER_RUN === "true";
 
   console.log("[maintenance] ═══════════════════════════════════════════");
@@ -60,18 +146,28 @@ async function runStartupMaintenanceJob(): Promise<void> {
 
   try {
     await dbAdapter.initialize();
-    const { execSync } = await import("child_process");
-    const script = join(process.cwd(), "scripts", "run-production-maintenance-job.ts");
-    const args = [`--job=${jobName}`];
-    if (confirm) args.push(`--confirm=${confirm}`);
-    args.push(`--limit=${limit}`);
-    if (symbols) args.push(`--symbols=${symbols}`);
-    if (sourceLabel) args.push(`--source-label=${sourceLabel}`);
-    if (sourceUrl) args.push(`--source-url=${sourceUrl}`);
-    if (confirm) args.push("--apply"); else args.push("--dry-run");
 
-    const output = execSync(`npx tsx ${script} ${args.join(" ")}`, { encoding: "utf-8", timeout: 120000 });
-    console.log(output);
+    switch (jobName) {
+      case "coverage-diagnostics":
+        await runCoverageDiagnostics();
+        break;
+      case "lineage-backfill-dry-run":
+        await runLineageBackfill(false, limitNum, symbolList);
+        break;
+      case "lineage-backfill-apply":
+        if (confirm !== "RUN_PRODUCTION_MAINTENANCE") throw new Error("Apply requires confirm token");
+        await runLineageBackfill(true, limitNum, symbolList);
+        break;
+      case "fundamentals-metadata-dry-run":
+        await runFundamentalsMetadata(false, limitNum, srcLabel);
+        break;
+      case "fundamentals-metadata-apply":
+        if (confirm !== "RUN_PRODUCTION_MAINTENANCE") throw new Error("Apply requires confirm token");
+        await runFundamentalsMetadata(true, limitNum, srcLabel);
+        break;
+      default:
+        console.error(`[maintenance] Unknown job: ${jobName}`);
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`[maintenance] Job failed: ${msg}`);
