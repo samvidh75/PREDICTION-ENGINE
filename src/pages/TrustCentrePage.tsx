@@ -382,6 +382,30 @@ export const TrustCentrePage: React.FC = () => {
           </div>
         </RoundedDepthPanel>
 
+        {/* Fundamentals coverage */}
+        <RoundedDepthPanel padding="md">
+          <h2 className="text-xs font-semibold text-[#E6EDF3]">Fundamentals coverage</h2>
+          <p className="mt-1 text-[10px] text-[#8B949E]">Financial snapshots are the primary source for fundamentals. Coverage is tracked per-symbol with source provenance.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "Symbols with snapshots", value: coverage?.financialSnapshots?.symbolCount?.toLocaleString("en-IN") || "—", detail: "Financial snapshots available", tone: (coverage?.financialSnapshots?.symbolCount ?? 0) > 0 ? "ok" : "warn" },
+              { label: "Total tracked symbols", value: coverage?.symbols?.count?.toLocaleString("en-IN") || "—", detail: "In company registry", tone: "ok" },
+              { label: "Coverage gap", value: `${Math.max(0, (coverage?.symbols?.count ?? 0) - (coverage?.financialSnapshots?.symbolCount ?? 0))} symbols`, detail: "No financial snapshot available", tone: "warn" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">{item.label}</span>
+                <div className="mt-1 font-mono text-sm font-bold text-[#E6EDF3]">{item.value}</div>
+                <p className="mt-0.5 text-[10px] text-[#8B949E]">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 rounded-xl border border-[#EF9A09]/10 bg-[#EF9A09]/[0.03] p-3">
+            <p className="text-[10px] leading-relaxed text-[#8B949E]">
+              <strong className="text-[#E6EDF3]">Source:</strong> Financial snapshots are populated via DB snapshots and optional CSV/manual import. The project <code>probe:fundamentals</code> confirms Screener.in is a viable source, but HTML parsing is brittle. Automated scraping of Moneycontrol financials and NSE company info is blocked. The recommended workflow is CSV/manual import for reliable structured data.
+            </p>
+          </div>
+        </RoundedDepthPanel>
+
         {/* Symbol data gaps */}
         <RoundedDepthPanel padding="md">
           <h2 className="text-xs font-semibold text-[#E6EDF3]">Symbol data gaps</h2>

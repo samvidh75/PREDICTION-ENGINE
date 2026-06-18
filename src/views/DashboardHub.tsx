@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck, TrendingUp, Database, Clock, AlertCircle } from "lucide-react";
+import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck, TrendingUp, Database, Clock, AlertCircle, ArrowLeftRight } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { EmptyState, LoadingState } from "../components/ui/DataState";
 import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
@@ -176,6 +176,44 @@ export const DashboardHub: React.FC = () => {
           </Button>
           <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
             <Database className="h-3.5 w-3.5" aria-hidden="true" /> Audit sources
+          </Button>
+        </div>
+      </RoundedDepthPanel>
+
+      {/* Data Operations - Coverage Gaps */}
+      <RoundedDepthPanel padding="md" className="mb-6">
+        <h2 className="text-xs font-semibold text-[#E6EDF3]">Data operations</h2>
+        <p className="mt-1 text-[10px] text-[#8B949E]">Current data coverage and known gaps.</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Fundamentals</span>
+            <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">
+              {cov?.financialSnapshots?.status === "available" ? `${((cov?.financialSnapshots?.symbolCount ?? 0) / Math.max(cov?.symbols?.count ?? 1, 1) * 100).toFixed(0)}%` : "Partial"}
+            </span>
+            <p className="mt-0.5 text-[10px] text-[#8B949E]">Snapshots available</p>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No quote</span>
+            <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
+            <p className="mt-0.5 text-[10px] text-[#8B949E]">Real-time price missing</p>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">No history</span>
+            <span className="mt-1 block text-xs font-semibold text-[#EF9A09]">3 symbols</span>
+            <p className="mt-0.5 text-[10px] text-[#8B949E]">Historical data pending</p>
+          </div>
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Scored records</span>
+            <span className="mt-1 block text-xs font-semibold text-[#E6EDF3]">{predictionRows?.toLocaleString("en-IN") || "—"}</span>
+            <p className="mt-0.5 text-[10px] text-[#8B949E]">{'>'}Latest: {latestPredictionDate ? new Date(latestPredictionDate).toLocaleDateString("en-IN") : "Pending"}</p>
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> View all in Trust Centre
+          </Button>
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("compare")}>
+            <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies
           </Button>
         </div>
       </RoundedDepthPanel>
