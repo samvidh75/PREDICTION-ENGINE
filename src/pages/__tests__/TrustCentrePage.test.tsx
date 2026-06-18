@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { LayoutProvider } from '../../context/LayoutContext';
 import TrustCentrePage from '../TrustCentrePage';
 
 afterEach(() => {
@@ -68,7 +69,7 @@ describe('TrustCentrePage regression states', () => {
     }) as unknown as typeof fetch;
 
     vi.stubGlobal('fetch', fetchMock);
-    render(<TrustCentrePage />);
+    render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
 
     expect(await screen.findByText('Only registry-backed trust metrics are available.')).toBeInTheDocument();
     expect(screen.queryByText('0.00')).not.toBeInTheDocument();
@@ -108,7 +109,7 @@ describe('TrustCentrePage regression states', () => {
     }) as unknown as typeof fetch;
 
     vi.stubGlobal('fetch', fetchMock);
-    render(<TrustCentrePage />);
+    render(<LayoutProvider><TrustCentrePage /></LayoutProvider>);
 
     expect(await screen.findByText('Trust metrics are temporarily unavailable.')).toBeInTheDocument();
   });

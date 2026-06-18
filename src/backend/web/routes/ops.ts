@@ -133,7 +133,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       },
       nselib: {
         status: "unavailable",
-        detail: "Requires Python 3.10+",
+        detail: "Python 3.10+ available on Railway but nselib v1.9 lacks capital_market/indices data-fetching API",
       },
       nsepython: {
         status: process.env.NSEPYTHON_ENABLED === "true" ? "healthy" : "missing_optional",
