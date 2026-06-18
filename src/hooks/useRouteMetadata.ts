@@ -72,6 +72,10 @@ const ROUTE_META: Record<PageKey, RouteMeta> = {
     title: "Research rankings — StockStory India",
     description: "Company rankings from the latest verified scoring cycle.",
   },
+  compare: {
+    title: "Compare companies — StockStory India",
+    description: "Compare companies by score, factors, and data coverage.",
+  },
 };
 
 const BASE_URL = "https://stockstory-india.com";

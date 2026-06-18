@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Search, BarChart3, TrendingUp, ShieldCheck, Eye, Database, ArrowLeftRight, BookOpen, Upload, Briefcase } from "lucide-react";
+import { Search, BarChart3, TrendingUp, ShieldCheck, Eye, ArrowLeftRight, BookOpen, Briefcase } from "lucide-react";
 import { RoundedDepthPanel } from "./RoundedDepthPanel";
 
 interface Action {
@@ -30,6 +30,7 @@ const DEFAULT_ACTIONS: Action[] = [
   { id: "watchlist", label: "Open watchlist", description: "Saved research", icon: Eye, action: () => navigatePage("watchlist") },
   { id: "portfolio", label: "Open portfolio", description: "Manual tracking", icon: Briefcase, action: () => navigatePage("portfolio") },
   { id: "methodology", label: "View methodology", description: "Scoring methodology", icon: BookOpen, action: () => navigatePage("methodology") },
+  { id: "compare", label: "Compare companies", description: "Compare scores and factors", icon: ArrowLeftRight, action: () => navigatePage("compare") },
 ];
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
