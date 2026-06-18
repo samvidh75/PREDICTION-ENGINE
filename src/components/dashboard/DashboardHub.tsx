@@ -1,46 +1,33 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { ArrowRight, TrendingUp, Activity, Star, Eye, AlertTriangle, Search } from 'lucide-react';
-import { StockRegistry } from '../../services/stocks/StockRegistry';
-import { WatchlistEngine } from '../../services/portfolio/WatchlistEngine';
-import { PortfolioEngine } from '../../services/portfolio/PortfolioEngine';
-import { RecentSearchStore } from '../../services/search/RecentSearchStore';
-import { api, ApiError, type Signal as ApiSignal } from '../../services/api/client';
-import { navigateToStock } from '../../architecture/navigation/routeCoordinator';
+import React, { useEffect, useMemo, useState } from "react";
+import { Activity, AlertTriangle, ArrowRight, Database, Eye, Search, ShieldCheck, Star, TrendingUp } from "lucide-react";
+import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
+import { RecentSearchStore } from "../../services/search/RecentSearchStore";
+import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
+import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
+import { StockRegistry } from "../../services/stocks/StockRegistry";
+import { api, type Signal as ApiSignal } from "../../services/api/client";
+import { DataUnavailableState, MetricCard, PremiumSkeleton, SectionHeader, StatusChip, Surface, navigatePage } from "../premium/PremiumUI";
 
-function navigate(pageKey: string): void {
-  const params = new URLSearchParams(window.location.search);
-  params.set('page', pageKey);
-  window.history.pushState({}, '', `?${params.toString()}`);
-  window.dispatchEvent(new Event('urlchange'));
+interface SignalItem {
+  symbol: string;
+  type: string;
+  severity: "critical" | "important" | "monitor";
+  explanation: string;
 }
+
+const typeLabel: Record<string, string> = {
+  classification_upgrade: "Classification upgrade",
+  classification_downgrade: "Classification downgrade",
+  confidence_increase: "Confidence increased",
+  confidence_decrease: "Confidence decreased",
+  factor_change: "Factor change",
+  ranking_change: "Ranking change",
+};
 
 function openCompany(symbol: string): void {
   RecentSearchStore.addTicker(symbol);
   navigateToStock({ ticker: symbol, mode: "push" });
 }
-
-interface SignalItem {
-  symbol: string;
-  type: string;
-  severity: 'critical' | 'important' | 'monitor';
-  explanation: string;
-  delta: number | string;
-}
-
-const SEVERITY_DOT = {
-  critical: 'bg-rose-500',
-  important: 'bg-amber-500',
-  monitor: 'bg-slate-400',
-} as const;
-
-const TYPE_LABEL: Record<string, string> = {
-  classification_upgrade: 'Upgrade',
-  classification_downgrade: 'Downgrade',
-  confidence_increase: 'Confidence increased',
-  confidence_decrease: 'Confidence decreased',
-  factor_change: 'Factor change',
-  ranking_change: 'Ranking change',
-};
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -48,44 +35,47 @@ export const DashboardHub: React.FC = () => {
   const [signals, setSignals] = useState<SignalItem[]>([]);
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [signalsError, setSignalsError] = useState(false);
-  const [symbolsAnalyzed, setSymbolsAnalyzed] = useState(0);
-  const [healthData, setHealthData] = useState<{ symbolsCovered: number; dbConnected: boolean; } | null>(null);
+  const [symbolsAnalyzed, setSymbolsAnalyzed] = useState<number | null>(null);
+  const [coverage, setCoverage] = useState<{ symbols: number | null; scored: number | null; latest: string | null }>({
+    symbols: null,
+    scored: null,
+    latest: null,
+  });
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
     const h = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
-    window.addEventListener('watchlistchange', h);
-    return () => window.removeEventListener('watchlistchange', h);
-  }, []);
-
-  useEffect(() => {
-    setSignalsLoading(true);
-    setSignalsError(false);
-    api.getSignals(20)
-      .then(data => {
-        if (!data.signals) { setSignals([]); return; }
-        const items: SignalItem[] = data.signals.map((s: ApiSignal) => ({
-          symbol: s.symbol,
-          type: s.type,
-          severity: s.severity,
-          explanation: s.explanation ?? '',
-          delta: s.delta ?? '',
-        }));
-        setSignals(items);
-        setSymbolsAnalyzed(data.symbolsAnalyzed ?? 0);
-      })
-      .catch(() => { setSignalsError(true); setSignals([]); })
-      .finally(() => setSignalsLoading(false));
+    window.addEventListener("watchlistchange", h);
+    return () => window.removeEventListener("watchlistchange", h);
   }, []);
 
   useEffect(() => {
     const ctrl = new AbortController();
-    api.getOpsHealth()
-      .then(res => {
+    api.getSignals(12)
+      .then((data) => {
         if (ctrl.signal.aborted) return;
-        setHealthData({
-          symbolsCovered: res.metrics.symbols_covered,
-          dbConnected: res.metrics.db_health === 'connected',
+        setSignals((data.signals ?? []).map((s: ApiSignal) => ({
+          symbol: s.symbol,
+          type: s.type,
+          severity: s.severity,
+          explanation: s.explanation ?? "Source-backed research change",
+        })));
+        setSymbolsAnalyzed(data.symbolsAnalyzed ?? null);
+      })
+      .catch(() => {
+        if (!ctrl.signal.aborted) setSignalsError(true);
+      })
+      .finally(() => {
+        if (!ctrl.signal.aborted) setSignalsLoading(false);
+      });
+
+    api.getDataCoverage()
+      .then((cov) => {
+        if (ctrl.signal.aborted) return;
+        setCoverage({
+          symbols: cov.coverage?.symbols?.count ?? null,
+          scored: cov.coverage?.predictionRegistry?.symbolCount ?? null,
+          latest: cov.coverage?.predictionRegistry?.latestPredictionDate ?? cov.generatedAt ?? null,
         });
       })
       .catch(() => {});
@@ -93,204 +83,127 @@ export const DashboardHub: React.FC = () => {
   }, []);
 
   const followedTickers = useMemo(() => {
-    const u = new Set<string>();
-    watchlists.forEach(w => w.tickers.forEach(t => u.add(t)));
-    return [...u].slice(0, 8);
+    const unique = new Set<string>();
+    watchlists.forEach((w) => w.tickers.forEach((ticker) => unique.add(ticker)));
+    return [...unique].slice(0, 8);
   }, [watchlists]);
-
-  const recentTickers = useMemo(() => recentResearch.slice(0, 4), [recentResearch]);
   const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
+  const recentTickers = recentResearch.slice(0, 6);
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-0 antialiased" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#0f1419" }}>
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Activity className="h-5 w-5" style={{ color: "#1a6e4a" }} />
+    <div className="space-y-6 antialiased">
+      <Surface dark className="ss-grid-texture relative overflow-hidden p-5 sm:p-7">
+        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-lg font-semibold" style={{ color: "#0f1419" }}>Research workspace</h1>
-            <p className="text-sm" style={{ color: "#536471" }}>Review signals, saved companies, and recent activity</p>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
+              <Activity className="h-3.5 w-3.5" aria-hidden="true" /> Research workspace
+            </div>
+            <h1 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Your Indian equity research command centre.</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
+              Track source-backed signal changes, saved companies, and coverage freshness without advisory language or fabricated portfolio values.
+            </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate('search')} className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium transition hover:opacity-80" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#536471" }}>
-            <Search className="h-3.5 w-3.5" /> Search
-          </button>
-          <button onClick={() => navigate('watchlist')} className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium transition hover:opacity-80" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#536471" }}>
-            <Star className="h-3.5 w-3.5" /> Watchlists
-          </button>
-        </div>
-      </div>
-
-      {healthData && (
-        <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl px-5 py-3 text-xs" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)", color: "#536471" }}>
-          <span className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${healthData.dbConnected ? 'bg-accent-success' : 'bg-amber-500'}`} />
-            {healthData.symbolsCovered} companies in coverage universe
-          </span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-            <div className="flex items-center gap-2.5">
-              <Eye className="h-4 w-4" style={{ color: "#1a6e4a" }} />
-              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Watchlist</h2>
-            </div>
-            <span className="text-xs font-mono tabular-nums" style={{ color: "#8b98a5" }}>{followedTickers.length}</span>
-          </div>
-          {followedTickers.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <p className="text-sm" style={{ color: "#536471" }}>No companies saved yet.</p>
-              <button onClick={() => navigate('search')} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
-                Search companies to follow
-              </button>
-            </div>
-          ) : (
-            followedTickers.map(ticker => {
-              const info = StockRegistry.getStock(ticker);
-              const score = info?.telemetrySnapshot?.healthScore ?? null;
-              return (
-                <button
-                  key={ticker}
-                  onClick={() => openCompany(ticker)}
-                  className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
-                >
-                  <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{ticker}</span>
-                  <span className="flex-1 text-xs truncate" style={{ color: "#536471" }}>{info?.companyName || ''}</span>
-                  {score !== null && (
-                    <span className={`font-mono text-xs font-semibold tabular-nums ${score >= 70 ? 'text-accent-success' : score >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
-                      {score}
-                    </span>
-                  )}
-                  <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
-                </button>
-              );
-            })
-          )}
-        </section>
-
-        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-            <div className="flex items-center gap-2.5">
-              <TrendingUp className="h-4 w-4" style={{ color: "#1a6e4a" }} />
-              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Latest signals</h2>
-            </div>
-            <span className="text-xs font-mono tabular-nums" style={{ color: "#8b98a5" }}>
-              {signalsLoading ? 'Loading' : signalsError ? 'Unavailable' : `${signals.length}/${symbolsAnalyzed}`}
-            </span>
-          </div>
-
-          {signalsLoading ? (
-            <div className="px-5 py-8 text-center text-sm" style={{ color: "#536471" }}>
-              <p>Loading source-backed signal changes...</p>
-            </div>
-          ) : signalsError ? (
-            <div className="px-5 py-8 text-center">
-              <AlertTriangle className="h-5 w-5 mx-auto mb-2" style={{ color: "#b8860b" }} />
-              <p className="text-sm" style={{ color: "#536471" }}>Signal changes not available right now.</p>
-              <p className="text-xs mt-1" style={{ color: "#8b98a5" }}>The dashboard will update when prediction data is reachable.</p>
-            </div>
-          ) : signals.length === 0 ? (
-            <div className="px-5 py-8 text-center">
-              <p className="text-sm" style={{ color: "#536471" }}>No significant signal changes detected.</p>
-              <p className="text-xs mt-1" style={{ color: "#8b98a5" }}>
-                {symbolsAnalyzed > 0 ? `${symbolsAnalyzed} symbols analyzed — markets are stable.` : 'Signals update after the daily pipeline run.'}
-              </p>
-            </div>
-          ) : (
-            signals.map((s, i) => (
-              <button
-                key={`${s.symbol}:${s.type}:${i}`}
-                onClick={() => openCompany(s.symbol)}
-                className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
-              >
-                <span className={`w-2 h-2 rounded-full shrink-0 ${SEVERITY_DOT[s.severity]}`} />
-                <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{s.symbol}</span>
-                <span className="text-xs uppercase tracking-wider" style={{ color: "#8b98a5" }}>{TYPE_LABEL[s.type] ?? s.type}</span>
-                <span className="flex-1 text-xs truncate" style={{ color: "#536471" }}>{s.explanation}</span>
-                <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
-              </button>
-            ))
-          )}
-
-          {signals.length > 0 && (
-            <div className="px-5 py-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-              <button onClick={() => navigate('rankings')} className="flex items-center gap-1 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
-                View all rankings <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-          <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-            <div className="flex items-center gap-2.5">
-              <Star className="h-4 w-4" style={{ color: "#1a6e4a" }} />
-              <h2 className="text-xs font-semibold" style={{ color: "#0f1419" }}>Saved research</h2>
-            </div>
-          </div>
-
-          {holdings.length === 0 ? (
-            <div className="px-5 py-6 text-center">
-              <p className="text-sm" style={{ color: "#536471" }}>No saved research items yet.</p>
-              <button onClick={() => navigate('watchlist')} className="mt-2 text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
-                Open watchlist
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="px-5 py-2 text-xs uppercase font-semibold tracking-wider" style={{ color: "#8b98a5", borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                {holdings.length} position{holdings.length !== 1 ? 's' : ''}
-              </div>
-              {holdings.slice(0, 5).map(h => (
-                <button
-                  key={h.symbol}
-                  onClick={() => openCompany(h.symbol)}
-                  className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm last:border-0 bg-transparent cursor-pointer hover:bg-white/30 transition-colors"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}
-                >
-                  <span className="font-mono font-semibold text-sm min-w-[64px]" style={{ color: "#0f1419" }}>{h.symbol}</span>
-                  <span className="text-xs" style={{ color: "#536471" }}>{h.shares} @ {h.avgBuyPrice}</span>
-                  <span className="text-xs" style={{ color: "#8b98a5" }}>→</span>
-                </button>
-              ))}
-            </>
-          )}
-
-          <div className="px-5 py-3.5" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <Eye className="h-3.5 w-3.5" style={{ color: "#8b98a5" }} />
-              <span className="text-xs font-semibold" style={{ color: "#536471" }}>Recently viewed</span>
-            </div>
-            {recentTickers.length === 0 ? (
-              <p className="text-xs" style={{ color: "#8b98a5" }}>No recently viewed companies.</p>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {recentTickers.map(t => (
-                  <button
-                    key={t}
-                    onClick={() => openCompany(t)}
-                    className="rounded-xl px-2.5 py-1 font-mono text-xs transition hover:bg-white/60"
-                    style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between px-5 py-3" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-            <span className="text-xs" style={{ color: "#536471" }}>Research methodology</span>
-            <button onClick={() => navigate('methodology')} className="text-xs hover:underline bg-transparent border-none cursor-pointer font-medium" style={{ color: "#1a6e4a" }}>
-              View →
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <button onClick={() => navigatePage("search")} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-white px-4 text-sm font-bold text-slate-950 shadow-lg">
+              <Search className="h-4 w-4" /> Search
+            </button>
+            <button onClick={() => navigatePage("rankings")} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 text-sm font-bold text-white backdrop-blur">
+              Rankings <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-        </section>
+        </div>
+      </Surface>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <MetricCard label="Companies covered" value={coverage.symbols !== null ? coverage.symbols.toLocaleString("en-IN") : "Unavailable"} detail="Live coverage metadata." />
+        <MetricCard label="Scored symbols" value={coverage.scored !== null ? coverage.scored.toLocaleString("en-IN") : "Pending"} detail="Latest verified scoring cycle." tone={coverage.scored ? "ok" : "warn"} />
+        <MetricCard label="Signals analyzed" value={symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "Unavailable"} detail="Research changes, not advice." tone={symbolsAnalyzed ? "ok" : "muted"} />
       </div>
+
+      <div className="grid gap-5 xl:grid-cols-[1.3fr_0.9fr]">
+        <Surface className="overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-200/70 px-5 py-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-emerald-700" />
+              <h2 className="font-semibold text-slate-950">Recent signal changes</h2>
+            </div>
+            <StatusChip label={signalsError ? "Unavailable" : "Source backed"} tone={signalsError ? "warn" : "ok"} />
+          </div>
+          {signalsLoading ? (
+            <div className="p-5"><PremiumSkeleton /></div>
+          ) : signalsError ? (
+            <DataUnavailableState title="Signals temporarily unavailable" body="The dashboard will update when verified prediction data is reachable." />
+          ) : signals.length === 0 ? (
+            <DataUnavailableState title="No significant signal changes" body={symbolsAnalyzed ? `${symbolsAnalyzed} companies were analyzed in the latest cycle. No research changes crossed the display threshold.` : "Signals appear after the daily verified update cycle."} action={<button onClick={() => navigatePage("rankings")} className="text-sm font-bold text-emerald-800">Open rankings</button>} />
+          ) : (
+            <div className="divide-y divide-slate-200/70">
+              {signals.map((signal, index) => (
+                <button key={`${signal.symbol}-${signal.type}-${index}`} onClick={() => openCompany(signal.symbol)} className="grid w-full gap-3 px-5 py-4 text-left transition hover:bg-emerald-50/50 sm:grid-cols-[110px_180px_1fr_auto] sm:items-center">
+                  <span className="font-mono text-sm font-bold text-slate-950">{signal.symbol}</span>
+                  <StatusChip label={typeLabel[signal.type] ?? signal.type} tone={signal.severity === "critical" ? "risk" : signal.severity === "important" ? "warn" : "muted"} />
+                  <span className="min-w-0 truncate text-sm text-slate-600">{signal.explanation}</span>
+                  <ArrowRight className="hidden h-4 w-4 text-slate-400 sm:block" />
+                </button>
+              ))}
+            </div>
+          )}
+        </Surface>
+
+        <div className="space-y-5">
+          <Surface className="p-5">
+            <SectionHeader eyebrow="Saved" title="Watchlist" body="Real saved companies only." />
+            <div className="mt-5 space-y-2">
+              {followedTickers.length === 0 ? (
+                <p className="text-sm text-slate-600">No companies saved yet. Search the universe to start tracking research.</p>
+              ) : followedTickers.map((ticker) => {
+                const info = StockRegistry.getStock(ticker);
+                return (
+                  <button key={ticker} onClick={() => openCompany(ticker)} className="flex w-full items-center justify-between rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50/60">
+                    <span>
+                      <span className="block font-mono text-sm font-bold text-slate-950">{ticker}</span>
+                      <span className="block max-w-[220px] truncate text-xs text-slate-500">{info?.companyName || "Company name unavailable"}</span>
+                    </span>
+                    <Eye className="h-4 w-4 text-emerald-700" />
+                  </button>
+                );
+              })}
+            </div>
+          </Surface>
+
+          <Surface className="p-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-semibold text-slate-950"><Star className="h-5 w-5 text-emerald-700" /> Portfolio quick view</div>
+              <StatusChip label="User entered" tone="muted" />
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              {holdings.length === 0 ? "No user-entered holdings saved. Broker data is not shown as active." : `${holdings.length} user-entered position${holdings.length === 1 ? "" : "s"} saved.`}
+            </p>
+          </Surface>
+
+          <Surface className="p-5">
+            <div className="flex items-center gap-2 font-semibold text-slate-950"><Database className="h-5 w-5 text-emerald-700" /> Data freshness</div>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{coverage.latest ? "Latest verified coverage metadata is available." : "Coverage freshness is unavailable right now."}</p>
+            <button onClick={() => navigatePage("trust")} className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-emerald-800">Open Trust Centre <ShieldCheck className="h-4 w-4" /></button>
+          </Surface>
+        </div>
+      </div>
+
+      {recentTickers.length > 0 && (
+        <Surface className="p-5">
+          <div className="mb-4 text-sm font-semibold text-slate-950">Recently viewed research</div>
+          <div className="flex flex-wrap gap-2">
+            {recentTickers.map((ticker) => (
+              <button key={ticker} onClick={() => openCompany(ticker)} className="rounded-full border border-slate-200 bg-white/70 px-3 py-1.5 font-mono text-xs font-bold text-slate-700 hover:border-emerald-200 hover:text-emerald-800">{ticker}</button>
+            ))}
+          </div>
+        </Surface>
+      )}
+
+      {signalsError && (
+        <div className="flex items-center gap-2 text-xs text-amber-800">
+          <AlertTriangle className="h-4 w-4" /> Signal panel degraded; no fake signal cards were added.
+        </div>
+      )}
     </div>
   );
 };

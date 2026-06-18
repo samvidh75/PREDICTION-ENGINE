@@ -1,138 +1,94 @@
 import React from "react";
-import { BarChart3, Database, FileSearch, LineChart, ShieldCheck } from "lucide-react";
+import { BarChart3, Database, FileSearch, ShieldCheck, Workflow, XCircle } from "lucide-react";
 import MobileNav from "../components/navigation/MobileNav";
 import TopNav from "../components/navigation/TopNav";
 import Button from "../components/ui/Button";
+import { IntegrityStrip, PremiumPage, SectionHeader, Surface, navigatePage } from "../components/premium/PremiumUI";
 
-function setPage(pageKey: string): void {
-  const params = new URLSearchParams(window.location.search);
-  params.set("page", pageKey);
-  params.delete("id");
-  window.history.pushState({}, "", `?${params.toString()}`);
-  window.dispatchEvent(new Event("urlchange"));
-}
-
-const architecture = [
-  {
-    icon: <Database className="h-4 w-4" aria-hidden="true" />,
-    title: "Financial data",
-    body: "Provider snapshots, ratios, market data and freshness metadata feed company pages when available. Missing data is clearly labelled.",
-  },
-  {
-    icon: <LineChart className="h-4 w-4" aria-hidden="true" />,
-    title: "Technical signals",
-    body: "Momentum, volatility, trend and risk-sensitive signals are mapped into engine inputs only when source data exists.",
-  },
-  {
-    icon: <BarChart3 className="h-4 w-4" aria-hidden="true" />,
-    title: "Factor models",
-    body: "Quality, value, growth, risk and sector factors create a repeatable ranking structure for the covered universe.",
-  },
-  {
-    icon: <ShieldCheck className="h-4 w-4" aria-hidden="true" />,
-    title: "Risk separation",
-    body: "Confidence and availability are shown separately from score outputs so missing evidence is visible and accounted for.",
-  },
+const principles = [
+  ["Evidence before narrative", "Scores and signals must be traceable to available provider or registry data."],
+  ["Missing data stays visible", "Unavailable fundamentals, freshness, or coverage are labelled instead of filled with placeholders."],
+  ["Research, not advice", "The product does not issue buy, sell, or hold recommendations."],
+  ["Indian market context", "Workflows are shaped around Indian equities, provider coverage, and source reliability."],
 ];
 
-const methodologySteps = [
-  { number: "01", title: "Collect data" },
-  { number: "02", title: "Generate features" },
-  { number: "03", title: "Generate factors" },
-  { number: "04", title: "Run engines" },
-  { number: "05", title: "Publish rankings" },
+const does = [
+  ["Structure research", FileSearch],
+  ["Show coverage health", Database],
+  ["Track score changes", BarChart3],
+  ["Separate confidence", ShieldCheck],
 ];
 
-export const PublicAboutPage: React.FC = () => {
-  return (
-    <main className="min-h-screen antialiased" style={{ background: "#f7f8fb", color: "#0f1419", fontFamily: "Inter, system-ui, sans-serif" }}>
-      <TopNav />
-      <MobileNav />
-
-      <section className="mx-auto max-w-6xl px-6 pb-12 pt-24 md:pt-32">
-        <div className="max-w-3xl">
-          <div
-            className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
-            style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", color: "#536471" }}
-          >
-            <FileSearch className="h-3.5 w-3.5" style={{ color: "#1a6e4a" }} aria-hidden="true" />
-            Research platform
+export const PublicAboutPage: React.FC = () => (
+  <PremiumPage nav={<><TopNav /><MobileNav /></>}>
+    <section className="mx-auto max-w-7xl px-4 pb-14 pt-24 sm:px-6 md:pt-32">
+      <Surface dark className="ss-grid-texture relative overflow-hidden p-6 md:p-10">
+        <div className="relative z-10 max-w-4xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-emerald-100">
+            <Workflow className="h-3.5 w-3.5" aria-hidden="true" /> Mission
           </div>
-          <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl" style={{ color: "#0f1419" }}>
-            Research intelligence for Indian equities
+          <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white md:text-6xl">
+            Evidence-first research infrastructure for Indian equities.
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 sm:text-lg" style={{ color: "#536471" }}>
-            StockStory India turns available financial data into structured research signals with clear source and availability labels.
-            This is a research tool, not an advisory service.
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
+            StockStory India exists because equity research should make source quality, freshness, and missing evidence visible. It is a workflow product for inspection, not a venue for tips.
           </p>
+          <div className="mt-7"><IntegrityStrip /></div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button type="button" onClick={() => setPage("signup")} className="h-11 px-6 text-sm">
-              Create free account
-            </Button>
-            <Button type="button" onClick={() => setPage("landing")} variant="secondary" glass className="h-11 px-6 text-sm">
-              Back to home
-            </Button>
+            <Button type="button" onClick={() => navigatePage("signup")} className="h-11 px-6 text-sm">Create free account</Button>
+            <Button type="button" onClick={() => navigatePage("trust")} variant="secondary" className="h-11 px-6 text-sm">Open Trust Centre</Button>
           </div>
         </div>
-      </section>
+      </Surface>
+    </section>
 
-      <section className="py-16" style={{ borderTop: "1px solid rgba(255,255,255,0.3)", borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-center text-xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>
-            What the research measures
-          </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {architecture.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl p-6 transition-all duration-200 hover:shadow-lg"
-                style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-              >
-                <div
-                  className="mb-4 inline-flex rounded-xl p-2.5"
-                  style={{ background: "#e8f4ee", border: "1px solid rgba(26,110,74,0.15)", color: "#1a6e4a" }}
-                >
-                  {item.icon}
-                </div>
-                <h3 className="text-base font-semibold" style={{ color: "#0f1419" }}>{item.title}</h3>
-                <p className="mt-2 text-sm leading-6" style={{ color: "#536471" }}>{item.body}</p>
-              </div>
-            ))}
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <SectionHeader eyebrow="What it does" title="A research terminal, not an advisory desk." body="The interface helps users move from company discovery to source verification while keeping limitations explicit." />
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        {does.map(([label, Icon]) => (
+          <Surface key={label as string} className="ss-lift p-6">
+            {React.createElement(Icon as typeof FileSearch, { className: "h-6 w-6 text-emerald-700", "aria-hidden": true })}
+            <h3 className="mt-4 text-lg font-semibold text-slate-950">{label}</h3>
+          </Surface>
+        ))}
+      </div>
+    </section>
+
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+      <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+        <Surface className="p-6 md:p-8">
+          <XCircle className="h-7 w-7 text-red-700" aria-hidden="true" />
+          <h2 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">What StockStory India does not do</h2>
+          <div className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+            <p>No buy, sell, or hold recommendations.</p>
+            <p>No fabricated user counts, testimonials, provider claims, portfolio values, or stock predictions.</p>
+            <p>No hiding raw unavailability behind polished-looking numbers.</p>
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-6 py-16">
-        <h2 className="text-center text-xl font-semibold tracking-tight" style={{ color: "#0f1419" }}>
-          From raw data to ranking
-        </h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-5">
-          {methodologySteps.map((step) => (
-            <div
-              key={step.number}
-              className="rounded-2xl p-5 text-center"
-              style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
-            >
-              <div className="font-mono text-sm font-semibold" style={{ color: "#8b98a5" }}>{step.number}</div>
-              <div className="mt-3 text-sm font-semibold" style={{ color: "#0f1419" }}>{step.title}</div>
-            </div>
+        </Surface>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {principles.map(([title, body]) => (
+            <Surface key={title} className="ss-lift p-6">
+              <h3 className="text-lg font-semibold text-slate-950">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{body}</p>
+            </Surface>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section className="mx-auto max-w-3xl px-6 pb-16">
-        <div
-          className="rounded-2xl p-6 text-sm leading-relaxed"
-          style={{ background: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.3)", color: "#8b98a5" }}
-        >
-          <strong>Research signals only.</strong> StockStory India provides structured equity research signals.
-          All data is sourced from public financial data providers and clearly labelled with source and freshness.
-          Nothing on this platform constitutes investment advice, a recommendation to buy or sell securities, or a solicitation.
-          Past scoring patterns do not guarantee future outcomes. Verify all data independently before making investment decisions.
+    <section className="mx-auto max-w-7xl px-4 pb-24 pt-12 sm:px-6">
+      <Surface dark className="p-6 md:p-9">
+        <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Trust and safety</div>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Every premium surface still tells the truth about the data.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">Provider limits, fundamentals availability, historical coverage, and freshness state belong in the workflow, not in fine print.</p>
+          </div>
+          <Button type="button" onClick={() => navigatePage("trust")} className="h-12 px-6 text-sm">Review data policy</Button>
         </div>
-      </section>
-    </main>
-  );
-};
+      </Surface>
+    </section>
+  </PremiumPage>
+);
 
 export default PublicAboutPage;

@@ -34,10 +34,14 @@ COPY package.json package-lock.json ./
 RUN npm ci --frozen-lockfile --omit=dev
 
 # Install Python dependencies for public NSE data providers
-# jugaad-data, nsepython — no credentials required
+# jugaad-data, nsepython, nselib — no credentials required
 COPY requirements-nse.txt ./
-RUN python3 -m pip install --no-cache-dir -r requirements-nse.txt 2>&1 || \
-    echo "⚠️ Python NSE packages not installed — public providers unavailable"
+RUN python3 -m pip install --no-cache-dir -r requirements-nse.txt 2>&1; \
+    echo "pip_exit=$?"
+
+# Copy probe scripts for runtime diagnostics
+COPY scripts/probe-nselib-provider.py ./scripts/probe-nselib-provider.py
+COPY scripts/check-python-runtime.ts ./scripts/check-python-runtime.ts
 
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist
