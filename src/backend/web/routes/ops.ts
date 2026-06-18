@@ -915,7 +915,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
   app.get("/api/ops/probe/nselib", async (_request, reply) => {
     try {
-      const output = execSync(`python3 "${probeScriptPath}" 2>/dev/null`, { encoding: 'utf-8', timeout: 120_000 });
+      const output = execSync(`python3 "${probeScriptPath}"`, { encoding: 'utf-8', timeout: 120_000 });
       const jsonStart = output.indexOf('{');
       const data = jsonStart >= 0 ? JSON.parse(output.slice(jsonStart)) : { error: 'no JSON output', raw: output.slice(0, 500) };
       return reply.send(data);
