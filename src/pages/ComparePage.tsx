@@ -280,7 +280,15 @@ export const ComparePage: React.FC = () => {
           <div className="flex flex-col items-center gap-4 py-12 text-center">
             <ArrowLeftRight className="h-10 w-10 text-[#484F58]" aria-hidden="true" />
             <h2 className="text-sm font-semibold text-[#E6EDF3]">No companies to compare</h2>
-            <p className="max-w-md text-xs text-[#8B949E]">Search for companies above to add them to the comparison. You can compare up to {MAX_COMPANIES} companies side by side.</p>
+            <p className="max-w-md text-xs text-[#8B949E]">Search for a company above or pick from rankings to compare up to {MAX_COMPANIES} side by side.</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("rankings")}>
+                <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
+              </Button>
+              <Button type="button" size="sm" variant="secondary" onClick={() => navigatePage("search")}>
+                <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
+              </Button>
+            </div>
           </div>
         )}
 

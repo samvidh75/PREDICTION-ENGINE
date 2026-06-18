@@ -181,7 +181,7 @@ export const SearchPage: React.FC = () => {
               </div>
             ) : (
               <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] px-6 py-8 text-center">
-                <p className="text-sm font-semibold text-[#E6EDF3]">No matching equity found</p>
+                <p className="text-sm font-semibold text-[#E6EDF3]">No matching company found</p>
                 <p className="mt-1 text-xs text-[#8B949E]">
                   Try searching for:
                 </p>

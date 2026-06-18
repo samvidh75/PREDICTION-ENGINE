@@ -10,6 +10,7 @@ import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { PremiumCommandButton } from "../components/intelligence/PremiumCommandButton";
+import { FirstRunGuide } from "../components/onboarding/FirstRunGuide";
 import { IntelligencePanel } from "../components/intelligence/IntelligencePanel";
 import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
@@ -124,6 +125,7 @@ export const DashboardHub: React.FC = () => {
 
   return (
     <div className="w-full overflow-x-hidden px-4 pb-20 pt-6 sm:px-6">
+      <FirstRunGuide />
       {/* Research Command Centre header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
@@ -174,8 +176,8 @@ export const DashboardHub: React.FC = () => {
           <Button type="button" size="sm" variant="secondary" onClick={() => navigate("watchlist")}>
             <Briefcase className="h-3.5 w-3.5" aria-hidden="true" /> Open watchlist
           </Button>
-          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("trust")}>
-            <Database className="h-3.5 w-3.5" aria-hidden="true" /> Audit sources
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("compare")}>
+            <ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies
           </Button>
         </div>
       </RoundedDepthPanel>

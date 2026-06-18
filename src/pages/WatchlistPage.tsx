@@ -182,8 +182,24 @@ export const WatchlistPage: React.FC = () => {
                 <Eye className="h-8 w-8 text-[#484F58]" aria-hidden="true" />
                 <h2 className="text-sm font-semibold text-[#E6EDF3]">No saved research</h2>
                 <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
-                  Search for a company above to add it to this list. Saved companies stay grounded in verified score availability.
+                  Search for a company to add it to your research list. You can save companies from rankings or the company page.
                 </p>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "search"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
+                  >
+                    Search companies
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "rankings"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] hover:bg-white/[0.06] transition-colors"
+                  >
+                    Browse rankings
+                  </button>
+                </div>
               </div>
             </RoundedDepthPanel>
           ) : (

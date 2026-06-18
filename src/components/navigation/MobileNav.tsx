@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart3, Briefcase, Eye, Home, Info, LogIn, Search, Settings, Sparkles } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Eye, Home, Info, LogIn, Search, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 import { useNavigation, type ViewType } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -43,8 +43,12 @@ export const MobileNav: React.FC = () => {
     { id: "search", label: "Search", icon: <Search className="icon-nav" /> },
     { id: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
-    { id: "trust", label: "Trust", icon: <Briefcase className="icon-nav" /> },
+    { id: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },
   ];
+
+  // Compare uses URL navigation since ViewType doesn't include it
+  const compareRoute = { id: "compare" as const, label: "Compare", icon: <ArrowLeftRight className="icon-nav" /> };
+  const trustRoute = { id: "trust" as const, label: "Trust", icon: <ShieldCheck className="icon-nav" /> };
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
@@ -72,7 +76,7 @@ export const MobileNav: React.FC = () => {
               </button>
             );
           })
-        : tabs.map((tab) => {
+        : (<>{tabs.map((tab) => {
             const isActive = currentView === tab.id;
             return (
               <button
@@ -87,6 +91,27 @@ export const MobileNav: React.FC = () => {
               </button>
             );
           })}
+          <button
+            key={compareRoute.id}
+            type="button"
+            onClick={() => setPage("compare")}
+            className={`bottom-tab ${currentPage === "compare" ? "bottom-tab-active" : ""}`}
+            aria-current={currentPage === "compare" ? "page" : undefined}
+          >
+            {compareRoute.icon}
+            <span>{compareRoute.label}</span>
+          </button>
+          <button
+            key={trustRoute.id}
+            type="button"
+            onClick={() => setPage("trust")}
+            className={`bottom-tab ${currentPage === "trust" ? "bottom-tab-active" : ""}`}
+            aria-current={currentPage === "trust" ? "page" : undefined}
+          >
+            {trustRoute.icon}
+            <span>{trustRoute.label}</span>
+          </button>
+          </>)}
     </nav>
   );
 };
