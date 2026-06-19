@@ -26,6 +26,8 @@ import { FinancialMetricGrid } from "../components/research/FinancialMetricGrid"
 import ValuationContextPanel from "../components/research/ValuationContextPanel";
 import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter";
 import PredictionEnginePanel from "../components/research/PredictionEnginePanel";
+import { buildCompanyResearchViewModel } from "../lib/product/viewModels/companyResearchViewModel";
+
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -224,6 +226,18 @@ export const StockStoryPage: React.FC = () => {
   const factorView = useMemo(() => pageData.factors ?? storyDataToFactorScoresView(storyData), [pageData.factors, storyData]);
   const financialSnapshot = useMemo(() => buildFinancialSnapshot(financials), [financials]);
   const isInWatchlist = useMemo(() => watchlists.some((w) => w.tickers.includes(ticker)), [watchlists, ticker]);
+
+  const researchViewModel = useMemo(() => {
+    const score = researchData?.score ?? storyData?.healthScore ?? null;
+    const financialGroups = financials ? buildFinancialSnapshot(financials).groups : [];
+    return buildCompanyResearchViewModel(
+      ticker,
+      companyName,
+      sector,
+      { score, financialGroups },
+      isInWatchlist
+    );
+  }, [ticker, companyName, sector, researchData, storyData, financials, isInWatchlist]);
 
   const relatedCompanies = useMemo(() => {
     if (!registryStock?.sector) return [];
