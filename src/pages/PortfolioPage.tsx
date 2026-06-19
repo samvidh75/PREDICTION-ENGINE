@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
 import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
 import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
+import type { PortfolioHoldingReview } from '../services/portfolio/PortfolioReviewEngine';
 import { navigateToStock } from '../architecture/navigation/routeCoordinator';
 import { loadAuthSession } from '../services/auth/sessionStore';
 import { AlertCircle, ArrowLeftRight, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide-react';
@@ -21,6 +22,15 @@ function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string 
   if (severity === 'attention') return 'border-[#EF4444]/30 bg-[rgba(239,68,68,0.06)] text-[#EF4444]';
   if (severity === 'review') return 'border-[#F59E0B]/30 bg-[rgba(245,158,11,0.06)] text-[#F59E0B]';
   return 'border-[#16A34A]/30 bg-[rgba(22,163,74,0.06)] text-[#16A34A]';
+}
+
+function thesisStatus(holding: PortfolioHoldingReview): { label: string; dot: string } {
+  if (holding.gainLossPct === null) return { label: 'Pending', dot: '#64748B' };
+  if (holding.gainLossPct >= 30) return { label: 'Matured', dot: '#16A34A' };
+  if (holding.gainLossPct >= 10) return { label: 'Progressing', dot: '#16A34A' };
+  if (holding.gainLossPct >= 0) return { label: 'Early', dot: '#2962FF' };
+  if (holding.gainLossPct >= -10) return { label: 'Pulling back', dot: '#F59E0B' };
+  return { label: 'Needs review', dot: '#EF4444' };
 }
 
 export const PortfolioPage: React.FC = () => {
@@ -87,6 +97,9 @@ export const PortfolioPage: React.FC = () => {
   const handleOpenStock = (ticker: string) => navigateToStock({ ticker, mode: "push" });
   const largest = review.concentration.largestPosition;
 
+  const attentionCount = review.reviewQueue.filter((item) => item.severity === 'attention').length;
+  const reviewCount = review.reviewQueue.filter((item) => item.severity === 'review').length;
+
   return (
     <ProductShell>
       <ProductPage>
@@ -94,12 +107,13 @@ export const PortfolioPage: React.FC = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Tracked thesis</div>
-              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#E6EDF3]">Monitoring your thesis</h1>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#E6EDF3]">Manual thesis monitor</h1>
               <p className="mt-1 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
                 Manual tracking. No broker connection.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <ProductAction variant="primary" disabled={true}>Invest with broker</ProductAction>
               <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="h-3.5 w-3.5" /> Add position</ProductAction>
               <ProductAction variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="h-3.5 w-3.5" /> Import CSV</ProductAction>
               <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
@@ -108,10 +122,10 @@ export const PortfolioPage: React.FC = () => {
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Entry price", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Not enough information' },
-              { label: "Current value", value: review.livePortfolioValue === null ? 'Not enough information' : uiFormatINR(review.livePortfolioValue) },
-              { label: "Price status", value: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions}`, detail: `${review.quoteCoverage.coveragePct.toFixed(0)}% of holdings` },
-              { label: "Largest position", value: largest ? largest.symbol : 'Not enough information', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry price` : undefined },
+              { label: "Total entry", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Not enough information' },
+              { label: "Market value", value: review.livePortfolioValue === null ? 'Not enough information' : uiFormatINR(review.livePortfolioValue) },
+              { label: "Monitored", value: `${review.holdings.length} thesis${review.holdings.length !== 1 ? 'es' : ''}`, detail: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions} with live quotes` },
+              { label: "Largest thesis", value: largest ? largest.symbol : 'Not enough information', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry price` : undefined },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{item.label}</div>
@@ -181,10 +195,26 @@ export const PortfolioPage: React.FC = () => {
         )}
 
         {review.reviewQueue.length > 0 && (
-          <section aria-label="Portfolio review queue" className="space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-[#F59E0B]" />
-              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">Review queue</h2>
+          <section aria-label="Thesis changes" className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="h-4 w-4 text-[#F59E0B]" />
+                <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">What changed</h2>
+              </div>
+              <div className="flex gap-2">
+                {attentionCount > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-[#EF4444]/30 bg-[rgba(239,68,68,0.06)] px-2 py-0.5 text-[10px] font-medium text-[#EF4444]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#EF4444]" />
+                    {attentionCount} risk{attentionCount !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {reviewCount > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-[#F59E0B]/30 bg-[rgba(245,158,11,0.06)] px-2 py-0.5 text-[10px] font-medium text-[#F59E0B]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
+                    {reviewCount} to review
+                  </span>
+                )}
+              </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               {review.reviewQueue.map((item) => (
@@ -197,9 +227,103 @@ export const PortfolioPage: React.FC = () => {
           </section>
         )}
 
+        {review.holdings.length === 0 ? (
+          <ProductEmptyState
+            icon={AlertCircle}
+            title="No thesis tracked yet"
+            body="Monitor companies after you decide to track an investment thesis."
+            action={
+              <div className="flex gap-2">
+                <ProductAction variant="primary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
+                <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
+                <ProductAction variant="ghost" onClick={() => productNavigate("watchlist")}>Open watchlist</ProductAction>
+              </div>
+            }
+          />
+        ) : (
+          <ProductPanel className="overflow-hidden" as="section" aria-label="Monitored positions">
+            <div className="hidden sm:block">
+              <div className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] gap-2 border-b border-[rgba(148,163,184,0.12)] p-3 text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">
+                <span className="pl-3">Ticker</span><span>Thesis</span><span>Sector</span><span>Shares</span><span>Entry price</span><span>Current value</span><span>Return</span><span className="text-right pr-3"></span>
+              </div>
+              {review.holdings.map((holding) => {
+                const thesis = thesisStatus(holding);
+                return (
+                  <div key={holding.symbol} className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] items-center gap-2 border-b border-[rgba(148,163,184,0.06)] p-3 last:border-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                    <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] text-[#9AA7B5]">
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
+                      {thesis.label}
+                    </span>
+                    <span className="truncate text-[11px] text-[#9AA7B5]">{holding.sector}</span>
+                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.shares}</span>
+                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</span>
+                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</span>
+                    <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
+                      {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                    </span>
+                    <div className="flex items-center justify-end gap-1">
+                      <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
+                        <ArrowLeftRight className="h-3 w-3" />
+                      </button>
+                      <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3 w-3" /></button>
+                      <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3 w-3" /></button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="space-y-3 sm:hidden p-4">
+              {review.holdings.map((holding) => {
+                const thesis = thesisStatus(holding);
+                return (
+                  <div key={holding.symbol} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
+                        <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[#9AA7B5]">
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
+                          {thesis.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><ArrowLeftRight className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                      <div className="col-span-2">
+                        <span className="text-[#9AA7B5]">Thesis</span>
+                        <p className="font-medium text-[#E6EDF3]">
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
+                            {thesis.label}
+                          </span>
+                        </p>
+                      </div>
+                      <div><span className="text-[#9AA7B5]">Sector</span><p className="font-medium truncate text-[#E6EDF3]">{holding.sector}</p></div>
+                      <div><span className="text-[#9AA7B5]">Shares</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.shares}</p></div>
+                      <div><span className="text-[#9AA7B5]">Entry price</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</p></div>
+                      <div><span className="text-[#9AA7B5]">Current value</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</p></div>
+                      <div className="col-span-2">
+                        <span className="text-[#9AA7B5]">Return</span>
+                        <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
+                          {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ProductPanel>
+        )}
+
         {review.concentration.sectorExposure.length > 0 && (
           <ProductPanel className="p-5" as="section" aria-label="Cost basis sector exposure">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">Sector exposure - entry price</h2>
+            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">Sector exposure — entry price</h2>
             <div className="mt-3 space-y-2">
               {review.concentration.sectorExposure.map((item) => (
                 <div key={item.sector} className="flex items-center gap-3 text-[11px]">
@@ -208,74 +332,6 @@ export const PortfolioPage: React.FC = () => {
                     <div className="h-full rounded-full bg-[#16A34A]" style={{ width: `${Math.min(100, item.weightPct)}%` }} />
                   </div>
                   <span className="w-16 text-right font-mono tabular-nums text-[#E6EDF3]">{item.weightPct.toFixed(2)}%</span>
-                </div>
-              ))}
-            </div>
-          </ProductPanel>
-        )}
-
-        {review.holdings.length === 0 ? (
-          <ProductEmptyState
-            icon={AlertCircle}
-            title="No open positions"
-            body="Use the Add position form or CSV import to record research holdings and start tracking data availability."
-            action={
-              <div className="flex gap-2">
-                <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}>Add position</ProductAction>
-                <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
-              </div>
-            }
-          />
-        ) : (
-          <ProductPanel className="overflow-hidden" as="section" aria-label="Portfolio holdings">
-            <div className="hidden sm:block">
-              <div className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_130px] gap-2 border-b border-[rgba(148,163,184,0.12)] p-3 text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">
-                <span className="pl-3">Ticker</span><span>Sector</span><span>Shares</span><span>Entry price</span><span>Current value</span><span>Return</span><span className="text-right pr-3"></span>
-              </div>
-              {review.holdings.map((holding) => (
-                <div key={holding.symbol} className="grid grid-cols-[1fr_100px_70px_100px_100px_80px_130px] items-center gap-2 border-b border-[rgba(148,163,184,0.06)] p-3 last:border-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-                  <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
-                  <span className="truncate text-[11px] text-[#9AA7B5]">{holding.sector}</span>
-                  <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.shares}</span>
-                  <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</span>
-                  <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</span>
-                  <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                    {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
-                  </span>
-                  <div className="flex items-center justify-end gap-1">
-                    <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
-                      <ArrowLeftRight className="h-3 w-3" />
-                    </button>
-                    <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3 w-3" /></button>
-                    <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3 w-3" /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-3 sm:hidden p-4">
-              {review.holdings.map((holding) => (
-                <div key={holding.symbol} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
-                    <div className="flex items-center gap-2">
-                      <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><ArrowLeftRight className="h-3.5 w-3.5" /></button>
-                      <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
-                      <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
-                    <div><span className="text-[#9AA7B5]">Sector</span><p className="font-medium truncate text-[#E6EDF3]">{holding.sector}</p></div>
-                    <div><span className="text-[#9AA7B5]">Shares</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.shares}</p></div>
-                    <div><span className="text-[#9AA7B5]">Entry price</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</p></div>
-                    <div><span className="text-[#9AA7B5]">Current value</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</p></div>
-                    <div className="col-span-2">
-                      <span className="text-[#9AA7B5]">Return</span>
-                      <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                        {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               ))}
             </div>

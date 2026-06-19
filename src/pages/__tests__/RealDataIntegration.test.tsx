@@ -82,7 +82,7 @@ describe('Real Data Integration Pages', () => {
     render(<LayoutProvider><DashboardHub /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Research workspace')).toBeInTheDocument();
+      expect(screen.getByText('Command centre')).toBeInTheDocument();
     });
   });
 

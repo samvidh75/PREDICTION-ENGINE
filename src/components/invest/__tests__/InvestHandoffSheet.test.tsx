@@ -28,7 +28,7 @@ describe('InvestHandoffSheet', () => {
 
   it('shows broker disclaimer', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
-    expect(screen.getByText('Final order will be placed with your broker.')).toBeInTheDocument();
+    expect(screen.getByText(/The final order will be placed with your broker/)).toBeInTheDocument();
   });
 
   it('shows Continue to broker button', () => {
@@ -47,7 +47,7 @@ describe('InvestHandoffSheet', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     fireEvent.click(screen.getByText('Continue to broker'));
     expect(screen.getByText('Broker handoff is being prepared')).toBeInTheDocument();
-    expect(screen.getByText('No broker credentials are stored')).toBeInTheDocument();
+    expect(screen.getByText(/do not store.*broker credentials/i)).toBeInTheDocument();
   });
 
   it('contains no backend/provider vocabulary', () => {

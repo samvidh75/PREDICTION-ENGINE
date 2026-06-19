@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, Home, Command } from "lucide-react";
+import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, Home, Command, History } from "lucide-react";
 import { RoundedDepthPanel } from "./RoundedDepthPanel";
 
 interface Action {
@@ -21,6 +21,25 @@ function navigatePage(pageKey: string, params?: Record<string, string>) {
   if (params) Object.entries(params).forEach(([k, v]) => urlParams.set(k, v));
   window.history.pushState({}, "", `?${urlParams.toString()}`);
   window.dispatchEvent(new Event("urlchange"));
+  if (pageKey === "stock" && params?.id) trackRecentTicker(params.id);
+}
+
+const RECENT_TICKERS_KEY = 'ss_recent_tickers';
+
+function getRecentTickers(): string[] {
+  try {
+    const stored = localStorage.getItem(RECENT_TICKERS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch { return []; }
+}
+
+function trackRecentTicker(ticker: string): void {
+  if (!ticker) return;
+  try {
+    const recents = getRecentTickers().filter(t => t !== ticker.toUpperCase());
+    recents.unshift(ticker.toUpperCase());
+    localStorage.setItem(RECENT_TICKERS_KEY, JSON.stringify(recents.slice(0, 20)));
+  } catch { /* noop */ }
 }
 
 const DEFAULT_ACTIONS: Action[] = [
@@ -45,7 +64,18 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredActions = DEFAULT_ACTIONS.filter((a) =>
+  const recentTickers = getRecentTickers();
+  const researchAction: Action | null = recentTickers.length > 0 ? {
+    id: "continue-last-research",
+    label: "Continue last research",
+    description: recentTickers[0],
+    icon: History,
+    action: () => { navigatePage("stock", { id: recentTickers[0] }); onClose(); },
+  } : null;
+
+  const dynamicActions = researchAction ? [researchAction] : [];
+
+  const filteredActions = [...dynamicActions, ...DEFAULT_ACTIONS].filter((a) =>
     a.label.toLowerCase().includes(query.toLowerCase()) ||
     (a.description && a.description.toLowerCase().includes(query.toLowerCase()))
   );
@@ -63,6 +93,14 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       e.preventDefault();
       allItems[selectedIndex].action();
       onClose();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key >= "1" && e.key <= "9") {
+      const idx = parseInt(e.key, 10) - 1;
+      if (idx < allItems.length) {
+        e.preventDefault();
+        allItems[idx].action();
+        onClose();
+      }
     }
   }, [onClose, selectedIndex, allItems]);
 
@@ -132,8 +170,17 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           )}
 
           {!searching && query.trim() && searchResults.length === 0 && filteredActions.length === 0 && (
-            <div className="px-3 py-3 text-xs text-[#484F58]">
-              {query.trim() ? "No results found" : "Type to search"}
+            <div className="flex flex-col items-center px-3 py-6 text-center">
+              <Search className="h-6 w-6 text-[#2D333B] mb-2" aria-hidden="true" />
+              <p className="text-xs text-[#484F58]">No commands match &ldquo;{query}&rdquo;</p>
+              <p className="mt-1 max-w-[260px] text-[10px] leading-relaxed text-[#484F58]">Try searching for a company name or ticker instead</p>
+              <button
+                type="button"
+                onClick={() => { setQuery(""); }}
+                className="mt-3 text-[10px] font-medium text-[#2962FF] hover:text-[#3B71FF] transition-colors"
+              >
+                Clear search
+              </button>
             </div>
           )}
 
@@ -152,6 +199,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 <span className="font-medium">{item.label}</span>
                 {item.description && <span className="ml-2 text-[10px] text-[#484F58]">{item.description}</span>}
               </div>
+              {i < 9 && (
+                <kbd className="shrink-0 ml-auto rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58]">⌘{i + 1}</kbd>
+              )}
             </button>
           ))}
 
@@ -184,7 +234,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
         {/* Footer hint */}
         <div className="border-t border-white/[0.04] px-5 py-2.5 text-[10px] text-[#484F58]">
-          <span className="hidden sm:inline">↑↓ navigate · ↵ select · esc close</span>
+          <span className="hidden sm:inline">↑↓ navigate · ↵ select · esc close · ⌘1-9 quick select</span>
           <span className="sm:hidden">Tap a result to navigate</span>
         </div>
       </div>
