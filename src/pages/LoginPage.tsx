@@ -32,10 +32,10 @@ export const LoginPage: React.FC = () => {
             { icon: ShieldCheck, label: "Research only", body: "The product does not provide trading calls, execution, or fabricated confidence.", tone: "verified" },
           ]}
         />
-        <ProductFormPanel title="Sign in" body={contextMessage || "Access your StockStory India research workspace."}>
+        <ProductFormPanel title="Sign in" body={contextMessage || "Sign in to continue your research."}>
           <CinematicAuthGateway onAuthed={onAuthed} initialStage="login" restoreOnMount={false} contextMessage={contextMessage} />
           <div className="mt-4 flex justify-center">
-            <ProductAction variant="ghost" onClick={() => productNavigate("landing")}>Back to landing</ProductAction>
+            <ProductAction variant="ghost" onClick={() => productNavigate("signup")}>Need an account? Create one</ProductAction>
           </div>
         </ProductFormPanel>
       </ProductPage>

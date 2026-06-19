@@ -27,7 +27,7 @@ function cleanNumber(value: unknown): number | null {
 }
 
 function scoreLabel(score: number | null): string {
-  if (score === null) return "Research signals pending";
+  if (score === null) return "";
   return `${Math.round(score)}`;
 }
 
@@ -45,7 +45,7 @@ function leadingFactor(entry: LeaderboardEntry): string {
     .filter((item): item is { key: string; value: number } => item.value !== null)
     .sort((a, b) => b.value - a.value);
 
-  if (factors.length === 0) return "Research signals pending";
+  if (factors.length === 0) return "";
   const label: Record<string, string> = {
     quality: "Quality",
     growth: "Growth",
@@ -60,7 +60,7 @@ function leadingFactor(entry: LeaderboardEntry): string {
 export function leaderboardEntryToResearchListItem(entry: LeaderboardEntry): ResearchListItem {
   const score = cleanNumber(entry.rankingScore);
   const confidence = cleanNumber(entry.confidenceScore);
-  const sector = cleanText(entry.sector, "Sector pending");
+  const sector = cleanText(entry.sector, "");
   const risk = cleanNumber(entry.factors.risk);
 
   return {
@@ -70,10 +70,10 @@ export function leaderboardEntryToResearchListItem(entry: LeaderboardEntry): Res
     conviction: convictionLabel(score, confidence),
     score: scoreLabel(score),
     thesis: score === null
-      ? "Awaiting research signals."
-      : `${sector} company with ${convictionLabel(score, confidence).toLowerCase()} context.`,
+      ? ""
+      : `${sector || "Company"} with ${convictionLabel(score, confidence).toLowerCase()} context.`,
     keyReason: leadingFactor(entry),
-    riskMarker: risk !== null && risk < 40 ? "Risk rising" : "Risk review normal",
+    riskMarker: risk !== null && risk < 40 ? "Risk rising" : "",
   };
 }
 
@@ -131,24 +131,26 @@ export function alertChangeToResearchAlert(alert: AlertChangeView): ResearchAler
 }
 
 export function scannerResultToResearchListItem(result: ScannerResultView): ResearchListItem {
+  const sector = result.sector ?? "";
+  const cleanSector = sector.trim().length > 0 ? sector : "";
   return {
     symbol: result.symbol,
     company: result.companyName,
-    sector: result.sector ?? "Sector pending",
+    sector: cleanSector,
     conviction: result.conviction,
     score: scoreLabel(result.score),
     thesis: result.oneLineThesis,
     keyReason: result.keyReason,
-    riskMarker: result.riskMarker ?? "Risk review normal",
+    riskMarker: result.riskMarker ?? "",
   };
 }
 
 export function thesisToStatusText(thesis: CompanyThesisView): string {
-  return thesis.thesis ?? "Research signals pending";
+  return thesis.thesis ?? "";
 }
 
 export function convictionToLabel(convictionScore: number | null): string {
-  if (convictionScore === null) return "Research signals pending";
+  if (convictionScore === null) return "";
   if (convictionScore >= 75) return "High conviction research case";
   if (convictionScore >= 55) return "Moderate conviction";
   if (convictionScore >= 35) return "Needs review";
@@ -156,7 +158,7 @@ export function convictionToLabel(convictionScore: number | null): string {
 }
 
 export function factorDescription(factor: string, score: number | null): string {
-  if (score === null) return "Pending data";
+  if (score === null) return "";
   const labels: Record<string, string> = {
     quality: "Quality", valuation: "Valuation", growth: "Growth",
     risk: "Risk", momentum: "Momentum", stability: "Stability",

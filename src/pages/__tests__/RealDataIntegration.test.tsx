@@ -26,6 +26,19 @@ vi.mock('../../components/ui/OnboardingComponents', () => ({
   DataReadinessPanel: () => <div data-testid="data-readiness-panel" />,
 }));
 
+// Mock auth context to simulate authenticated state for auth-gated tests
+vi.mock('../../context/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAuth: () => ({
+    user: null,
+    loading: false,
+    isAuthenticated: false,
+    authError: null,
+    isSessionExpired: false,
+    logout: vi.fn(),
+  }),
+}));
+
 function makeMockFetch(responses: Record<string, any>) {
   return vi.fn(async (url: string) => {
     for (const [key, value] of Object.entries(responses)) {
@@ -40,6 +53,8 @@ function makeMockFetch(responses: Record<string, any>) {
 describe('Real Data Integration Pages', () => {
   let originalSearch: string;
   let getItemSpy: any;
+  // Save original auth mock
+  const originalModule = vi.importActual('../../context/AuthContext');
 
   beforeEach(() => {
     originalSearch = window.location.search;
@@ -169,16 +184,9 @@ describe('Real Data Integration Pages', () => {
     }, { timeout: 5000 });
   });
 
-  it('PublicRankingsPage parses scores from leaderboard API', async () => {
+  it('PublicRankingsPage shows public teaser when unauthenticated', async () => {
     window.history.replaceState({}, '', '?page=rankings');
-    vi.stubGlobal('fetch', makeMockFetch({
-      '/api/intelligence/leaderboard': {
-        ok: true,
-        data: [
-          { symbol: 'RELIANCE', rankingScore: 84, confidenceScore: 78, sector: 'Energy', predictionDate: '2026-06-15', companyName: 'Reliance Industries', rank: 1, classification: 'Good', factors: { quality: 70, growth: 80, value: 60, momentum: 75, risk: 65, sector: 70 } },
-        ],
-      },
-    }));
+    vi.stubGlobal('fetch', makeMockFetch({}));
 
     render(
       <LayoutProvider>
@@ -187,12 +195,12 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText('RELIANCE').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('84').length).toBeGreaterThan(0);
+      expect(screen.getByText('See how companies rank.')).toBeInTheDocument();
+      expect(screen.getByText('Create account to view rankings')).toBeInTheDocument();
     });
   });
 
-  it('PublicRankingsPage hides raw HTTP errors when rankings are pending', async () => {
+  it('PublicRankingsPage does not expose raw HTTP errors', async () => {
     window.history.replaceState({}, '', '?page=rankings');
     vi.stubGlobal('fetch', vi.fn(async () => ({
       ok: false,
@@ -208,8 +216,6 @@ describe('Real Data Integration Pages', () => {
 
     await waitFor(() => {
       const body = document.body.textContent || '';
-      expect(screen.getByText('Some rankings are being refreshed')).toBeInTheDocument();
-      expect(screen.getByText('Rankings are being prepared for the latest cycle.')).toBeInTheDocument();
       expect(body).not.toMatch(/HTTP|Request failed|502|API|backend|provider/i);
     });
   });

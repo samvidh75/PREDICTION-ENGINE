@@ -134,10 +134,16 @@ export const TopNav: React.FC = () => {
         ) : (
           <div className="ml-auto flex shrink-0 items-center gap-3 lg:gap-6">
             <button
-              onClick={() => setPage("rankings")}
+              onClick={() => setPage("scanner")}
               className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
             >
-              Rankings
+              Scanner
+            </button>
+            <button
+              onClick={() => setPage("methodology")}
+              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+            >
+              Research Standards
             </button>
             <button
               onClick={() => setPage("about")}
