@@ -75,3 +75,108 @@ No fake rankings, signals, predictions, company facts, broker integrations, aler
 - No credentials stored
 - No fake broker list
 - "Broker handoff is being prepared" for non-configured accounts
+
+## Completion Results
+
+### Final Commit
+`7cf829905` — Deepen frontend intelligence and conversion experience (pushed to origin/main)
+
+### Scanner Result (Phase 3)
+- 10 presets including "High quality, expensive"
+- Scrollable preset row with horizontal overflow
+- Client-side sorting (score asc/desc, name A-Z/Z-A)
+- Grouped advanced filters: Company, Score, Factors, Dividend sections
+- Collapsible "How to use scanner" micro-guide
+- Compact result cards with sector tags
+- Actions: Research, Compare, Track, Invest (gated)
+
+### Company Page Result (Phase 4)
+- Already had Thesis/Fundamentals/Risk/Peers/History tabs from Part E
+- No further changes needed (was already comprehensive)
+
+### Compare Result (Phase 5)
+- Empty state with product copy
+- Summary, Thesis, Quality, Valuation, Growth, Risk, Momentum sections
+- Decision helper with labels: Stronger research case, Needs review, Higher risk, Better quality profile, Better valuation context
+- Per-company actions: Research, Track
+
+### Watchlist Result (Phase 6)
+- Thesis tabs: Needs review, Thesis improving, Risk rising, Unchanged, Tracked companies
+- Smart categorization by score/note freshness
+- Thesis summary input per item
+- "What changed" toggle with invitation to track
+- Actions: Research, Compare, Invest (gated), Remove
+- Empty state: "Track companies you are researching"
+
+### Portfolio Result (Phase 7)
+- "Manual thesis monitor" framing
+- Thesis status labels per position (Early, Progressing, Matured, Pulling back, Needs review)
+- What changed / Risk review sections
+- Compare alternatives per holding
+- Empty state: "Monitor companies after you decide to track an investment thesis."
+
+### Alerts Result (Phase 8)
+- Alert categories: Thesis changed, Score changed, Risk changed, Valuation changed, Watchlist review
+- "Alerts are displayed here. No email or push notifications yet."
+- Empty state with Open scanner / Search company actions
+
+### Invest Handoff Result (Phase 9)
+- Stage 1: Thesis review with strengthened broker disclaimer
+- Stage 2: "Broker handoff is being prepared" with "We do not store, process, or access your broker credentials"
+- Stage 3: "Order preview — no order has been placed"
+- Actions: Track instead, Compare first, Back to research
+
+### Dashboard Result (Phase 10)
+- "Command centre" framing
+- Action row: Open scanner, Research company, Compare companies, Review watchlist, Track thesis
+- What changed signals section
+- Scanner presets quick pick
+- Tracked companies / Portfolio thesis monitor sections
+- Methodology link
+
+### Command Palette Result (Phase 15)
+- 13 commands including "Continue last research"
+- Keyboard shortcut hints (⌘1-⌘9)
+- Improved "no results" state
+- No debug/admin commands
+
+### Tests Added/Updated
+| File | Tests |
+|------|-------|
+| `src/components/dashboard/DashboardHub.test.tsx` | Updated for new text (3 fixes) |
+| `src/pages/__tests__/RealDataIntegration.test.tsx` | Updated for DashboardHub text |
+| `src/pages/WatchlistPage.test.tsx` | Updated for new heading |
+| `src/components/invest/__tests__/InvestHandoffSheet.test.tsx` | Updated for new disclaimer text |
+
+### Verification Results
+| Check | Result |
+|-------|--------|
+| typecheck:all | PASS |
+| lint | PASS |
+| test:unit | PASS (99 files, 1025 tests) |
+| validate:hygiene | PASS |
+| build:frontend | PASS |
+| build:backend | PASS |
+| audit:visual-layout | PASS |
+| smoke:production | PASS |
+
+### Backend Untouched Confirmation
+- No backend routes, schema, migrations, providers, broker APIs, alert delivery, or scoring changed
+
+### No Fake Data Confirmation
+- No fake rankings, signals, predictions, company facts, broker integrations, alerts, portfolio holdings, P&L, order status
+
+### No Secrets Confirmation
+- No secrets committed
+
+### No Branch/PR Confirmation
+- Worked directly on main, committed and pushed to origin/main
+
+### Remaining Next-Phase Work
+- E2E Playwright tests for new Scanner/Compare/Dashboard flows
+- Onboarding guide polish (Phase 11)
+- Empty state standardization across all pages (Phase 12)
+- Mobile responsiveness audit for new layouts
+- Desktop density check for 1280-1440px content width
+- Screenshots at multiple viewports
+- Audit script expansion for backend vocabulary regression
