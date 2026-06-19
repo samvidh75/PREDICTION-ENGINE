@@ -368,6 +368,142 @@ export interface WatchlistRow {
   updated_at: string;
 }
 
+// -- Research Response Contracts --
+
+export interface CompanyResearchData {
+  symbol: string;
+  companyName: string;
+  sector: string | null;
+  industry: string | null;
+  quote: {
+    lastPrice: number | null;
+    change: number | null;
+    changePercent: number | null;
+    open: number | null;
+    high: number | null;
+    low: number | null;
+    close: number | null;
+    volume: number | null;
+    marketCap: number | null;
+    week52High: number | null;
+    week52Low: number | null;
+  } | null;
+  fundamentals: {
+    peRatio: number | null;
+    pbRatio: number | null;
+    evEbitda: number | null;
+    dividendYield: number | null;
+    eps: number | null;
+    bookValue: number | null;
+    roe: number | null;
+    roa: number | null;
+    roic: number | null;
+    debtToEquity: number | null;
+    currentRatio: number | null;
+    grossMargin: number | null;
+    operatingMargin: number | null;
+    netMargin: number | null;
+    revenueGrowth: number | null;
+    profitGrowth: number | null;
+    epsGrowth: number | null;
+    sales: number | null;
+    netProfit: number | null;
+  } | null;
+  candles: Array<{ date: string; close: number; high: number | null; low: number | null; volume: number | null }>;
+  factorScores: Array<{ name: string; score: number | null; explanation: string | null }>;
+  thesis: { status: string; thesis: string | null; bullCase: string | null; bearCase: string | null; topStrengths: string[]; topRisks: string[] } | null;
+  risk: { overallRisk: string; keyRiskFlags: string[] } | null;
+  history: Array<{ date: string; price: number }>;
+  investContext: { conviction: string; score: number | null; thesis: string | null; keyRisks: string[]; keyStrengths: string[]; whatToWatch: string[] } | null;
+}
+
+export interface CompanyResearchResponse {
+  ok: true;
+  data: CompanyResearchData;
+}
+
+export interface ScannerResultItem {
+  symbol: string;
+  companyName: string;
+  sector: string | null;
+  rank: number;
+  conviction: string;
+  score: number | null;
+  oneLineThesis: string;
+  keyReason: string;
+  riskMarker: string | null;
+}
+
+export interface ScannerResponse {
+  ok: true;
+  data: ScannerResultItem[];
+  preset: string;
+}
+
+export interface CompareResponse {
+  ok: true;
+  data: {
+    companies: Array<{ symbol: string; companyName: string; scores: Record<string, number | null>; strengths: string[]; risks: string[] }>;
+    recommendation: string | null;
+    factorComparison: Array<{ factor: string; winner: string | null; explanation: string }>;
+    missingDataCaveat: string | null;
+  };
+}
+
+export interface WatchlistThesisResponse {
+  ok: true;
+  data: {
+    symbol: string;
+    companyName: string;
+    currentStatus: string;
+    previousStatus: string | null;
+    conviction: string;
+    score: number | null;
+    lastUpdated: string | null;
+  };
+}
+
+export interface PortfolioReviewResponse {
+  ok: true;
+  data: {
+    holdings: Array<{ symbol: string; companyName: string; conviction: string; score: number | null; flags: string[] }>;
+    reviewPriority: Array<{ symbol: string; companyName: string; reason: string }>;
+    summary: string;
+  };
+}
+
+export interface AlertItem {
+  id: string;
+  symbol: string;
+  type: string;
+  title: string;
+  body: string;
+  timestamp: string;
+  acknowledged: boolean;
+}
+
+export interface AlertsResponse {
+  ok: true;
+  data: AlertItem[];
+  symbol: string;
+  companyName: string;
+}
+
+export interface InvestContextResponse {
+  ok: true;
+  data: {
+    symbol: string;
+    companyName: string;
+    conviction: string;
+    score: number | null;
+    thesis: string | null;
+    keyRisks: string[];
+    keyStrengths: string[];
+    whatToWatch: string[];
+    missingCriticalData: string[];
+  };
+}
+
 // ── API Methods ──────────────────────────────────────────────────────
 
 export const api = {
@@ -421,49 +557,54 @@ export const api = {
       `/api/intelligence/company/${encodeURIComponent(symbol)}`,
     ),
 
+  getInsight: (symbol: string) =>
+    apiFetch<{ ok: boolean; data: Record<string, unknown> }>(
+      `/api/intelligence/insight/${encodeURIComponent(symbol)}`,
+    ),
+
   // -- Predictions Explain --
   getPredictionExplain: (symbol: string, horizon = 30) =>
     apiFetch<{ ok: boolean; data: Record<string, unknown> }>(
       `/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${horizon}`,
     ),
 
-  // -- Research Engine --
+  // -- Research Contracts --
   getCompanyResearch: (symbol: string, options?: ApiRequestOptions) =>
-    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+    apiFetch<CompanyResearchResponse>(
       `/api/research/company/${encodeURIComponent(symbol)}`, options,
     ),
 
   getScanner: (preset = "Quality compounders", limit = 50, symbols?: string) =>
-    apiFetch<{ ok: true; data: Record<string, unknown>[]; preset: string }>(
+    apiFetch<ScannerResponse>(
       `/api/research/scanner?preset=${encodeURIComponent(preset)}&limit=${limit}${symbols ? `&symbols=${encodeURIComponent(symbols)}` : ""}`,
     ),
 
   compareCompanies: (symbols: string[]) =>
-    apiFetch<{ ok: true; data: Record<string, unknown> }>("/api/research/compare", {
+    apiFetch<CompareResponse>("/api/research/compare", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ symbols }),
     }),
 
   getWatchlistThesis: (symbol: string) =>
-    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+    apiFetch<WatchlistThesisResponse>(
       `/api/research/watchlist/${encodeURIComponent(symbol)}/thesis`,
     ),
 
   monitorPortfolio: (holdings: Array<{ symbol: string; companyName?: string }>) =>
-    apiFetch<{ ok: true; data: Record<string, unknown> }>("/api/research/portfolio", {
+    apiFetch<PortfolioReviewResponse>("/api/research/portfolio", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ holdings }),
     }),
 
   getAlerts: (symbol: string) =>
-    apiFetch<{ ok: true; data: Record<string, unknown>[]; symbol: string; companyName: string }>(
+    apiFetch<AlertsResponse>(
       `/api/research/alerts/${encodeURIComponent(symbol)}`,
     ),
 
   getInvestContext: (symbol: string) =>
-    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+    apiFetch<InvestContextResponse>(
       `/api/research/invest/${encodeURIComponent(symbol)}`,
     ),
 

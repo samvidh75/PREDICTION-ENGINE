@@ -4,6 +4,7 @@ import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate
 import { CompareShareRecap } from "../components/share/CompareShareRecap";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
+import { api, type SearchResult } from "../services/api/client";
 
 interface CompareCompany {
   symbol: string;
@@ -17,31 +18,31 @@ interface CompareCompany {
   factors?: Record<string, number | null>;
 }
 
-function fetchCompanyData(symbol: string): Promise<CompareCompany | null> {
-  return fetch(`/api/intelligence/insight/${encodeURIComponent(symbol)}`)
-    .then((r) => r.json())
-    .then((res) => {
-      const d = res?.data;
-      if (!d) return null;
-      return {
-        symbol: symbol.toUpperCase(),
-        companyName: d.companyName || d.company_name,
-        score: typeof d.healthScore === "number" ? d.healthScore : d.rankingScore ?? null,
-        classification: d.classification || null,
-        confidenceScore: d.confidence?.score ?? d.confidenceScore ?? null,
-        confidenceLevel: d.confidence?.level ?? d.confidenceLevel ?? null,
-        predictionDate: d.predictionDate || d.prediction_date || null,
-        factors: d.factors ? {
-          growth: d.factors.growth?.score ?? null,
-          quality: d.factors.quality?.score ?? null,
-          stability: d.factors.stability?.score ?? null,
-          momentum: d.factors.momentum?.score ?? null,
-          valuation: d.factors.value?.score ?? d.factors.valuation?.score ?? null,
-          risk: d.factors.risk?.score ?? null,
-        } : undefined,
-      };
-    })
-    .catch(() => null);
+async function fetchCompanyData(symbol: string): Promise<CompareCompany | null> {
+  try {
+    const res = await api.getInsight(symbol);
+    const d = res?.data;
+    if (!d) return null;
+    return {
+      symbol: symbol.toUpperCase(),
+      companyName: (d as any).companyName || (d as any).company_name,
+      score: typeof (d as any).healthScore === "number" ? (d as any).healthScore : (d as any).rankingScore ?? null,
+      classification: (d as any).classification || null,
+      confidenceScore: (d as any).confidence?.score ?? (d as any).confidenceScore ?? null,
+      confidenceLevel: (d as any).confidence?.level ?? (d as any).confidenceLevel ?? null,
+      predictionDate: (d as any).predictionDate || (d as any).prediction_date || null,
+      factors: (d as any).factors ? {
+        growth: (d as any).factors.growth?.score ?? null,
+        quality: (d as any).factors.quality?.score ?? null,
+        stability: (d as any).factors.stability?.score ?? null,
+        momentum: (d as any).factors.momentum?.score ?? null,
+        valuation: (d as any).factors.value?.score ?? (d as any).factors.valuation?.score ?? null,
+        risk: (d as any).factors.risk?.score ?? null,
+      } : undefined,
+    };
+  } catch {
+    return null;
+  }
 }
 
 const MAX_COMPANIES = 3;
@@ -49,7 +50,7 @@ const MAX_COMPANIES = 3;
 export const ComparePage: React.FC = () => {
   const [companies, setCompanies] = useState<CompareCompany[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<{ symbol: string; name?: string }[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
   const [shareRecapOpen, setShareRecapOpen] = useState(false);
@@ -71,16 +72,17 @@ export const ComparePage: React.FC = () => {
   useEffect(() => {
     if (!searchQuery.trim() || companies.length >= MAX_COMPANIES) { setSearchResults([]); return; }
     setSearching(true);
-    const ctrl = new AbortController();
-    fetch(`/api/search?q=${encodeURIComponent(searchQuery.trim())}`, { signal: ctrl.signal })
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        const results = Array.isArray(data) ? data.slice(0, 5) : data?.results?.slice(0, 5) || [];
-        setSearchResults(results);
-        setSearching(false);
-      })
-      .catch(() => { setSearchResults([]); setSearching(false); });
-    return () => ctrl.abort();
+    const timer = setTimeout(async () => {
+      try {
+        const res = await api.searchUniversal(searchQuery.trim());
+        const results = res?.data?.results ?? [];
+        setSearchResults(results.slice(0, 5));
+      } catch {
+        setSearchResults([]);
+      }
+      setSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
   }, [searchQuery, companies.length]);
 
   const addCompany = async (symbol: string) => {
@@ -195,7 +197,7 @@ export const ComparePage: React.FC = () => {
                   >
                     <Search className="h-3.5 w-3.5 shrink-0 text-[#64748B]" aria-hidden="true" />
                     <span className="font-mono font-semibold">{r.symbol}</span>
-                    {r.name && <span className="text-[10px] text-[#64748B]">{r.name}</span>}
+                    {r.companyName && <span className="text-[10px] text-[#64748B]">{r.companyName}</span>}
                   </button>
                 ))}
               </div>
