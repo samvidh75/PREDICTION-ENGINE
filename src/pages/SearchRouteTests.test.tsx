@@ -1,6 +1,9 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { LayoutProvider } from "../context/LayoutContext";
 import SearchPage from "./SearchPage";
+
+const renderWithLayout = (ui: React.ReactElement) => render(<LayoutProvider>{ui}</LayoutProvider>);
 
 vi.mock("../services/stocks/StockSearchEngine", () => ({
   StockSearchEngine: {
@@ -47,14 +50,14 @@ describe("SearchPage routing", () => {
   });
 
   it("hydrates from the deep-linked q param", () => {
-    render(<SearchPage />);
+    renderWithLayout(<SearchPage />);
 
     expect(screen.getByDisplayValue("REL")).toBeTruthy();
     expect(screen.getByText("Reliance Industries Limited")).toBeTruthy();
   });
 
   it("keeps the browser URL in sync while editing the query", () => {
-    render(<SearchPage />);
+    renderWithLayout(<SearchPage />);
 
     const input = screen.getByDisplayValue("REL");
     fireEvent.change(input, { target: { value: "INF" } });

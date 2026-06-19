@@ -70,7 +70,7 @@ export function FirstRunGuide() {
         >
           <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
           <h3 className="mt-2 text-[11px] font-semibold text-[#E6EDF3]">Compare companies</h3>
-          <p className="mt-0.5 text-[10px] text-[#8B949E]">Compare scores, factors, and coverage side by side.</p>
+          <p className="mt-0.5 text-[10px] text-[#8B949E]">Compare scores, factors, and research depth side by side.</p>
         </button>
         <button
           type="button"
@@ -79,7 +79,7 @@ export function FirstRunGuide() {
         >
           <ShieldCheck className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
           <h3 className="mt-2 text-[11px] font-semibold text-[#E6EDF3]">Check source trust</h3>
-          <p className="mt-0.5 text-[10px] text-[#8B949E]">Review provider health, data gaps, and methodology.</p>
+          <p className="mt-0.5 text-[10px] text-[#8B949E]">Review methodology, scores, and research depth.</p>
         </button>
       </div>
     </div>

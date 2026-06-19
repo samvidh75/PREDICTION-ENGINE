@@ -106,7 +106,7 @@ function normalizeSignal(value: unknown): IntelligenceSignal | null {
 
 export function normalizeFeedEnvelope(value: unknown): FeedViewState {
   if (!isRecord(value)) {
-    return unavailableState('Daily intelligence is unavailable because the backend returned an invalid response.');
+    return unavailableState('Daily intelligence is unavailable because the research feed returned an invalid response.');
   }
 
   const status = text(value.status);
@@ -250,7 +250,7 @@ export default function DailyFeed() {
       .then((body) => setState(normalizeFeedEnvelope(body)))
       .catch(() => {
         if (controller.signal.aborted) return;
-        setState(unavailableState('Daily intelligence is unavailable from the backend right now.'));
+        setState(unavailableState('Daily intelligence is unavailable from the research feed right now.'));
       });
     return () => controller.abort();
   }, []);

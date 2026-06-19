@@ -231,16 +231,16 @@ export const StockStoryPage: React.FC = () => {
 
   if (storyLoading) {
     return (
-      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased" style={{ color: "#0f1419" }}>
+      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased bg-[#070A0F] text-[#E6EDF3] min-h-screen">
         <div className="flex items-center justify-between gap-3 text-xs">
-          <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider hover:opacity-80 animate-pulse" style={{ color: "#1a6e4a" }}>
-            <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
+          <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider hover:opacity-80 text-[#E6EDF3]">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </button>
         </div>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4" style={{ borderColor: "#e2e8f0", borderTopColor: "#1a6e4a" }} />
-            <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: "#536471" }}>Loading company research...</span>
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/[0.08] border-t-[#2962FF]" />
+            <span className="text-sm font-semibold tracking-wider text-[#9AA7B5]">Loading company research...</span>
           </div>
         </div>
       </div>
@@ -251,67 +251,67 @@ export const StockStoryPage: React.FC = () => {
 
   if (!storyData || (storyUnavailable && !hasFinancials)) {
     return (
-      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased" style={{ color: "#0f1419" }}>
+      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased bg-[#070A0F] text-[#E6EDF3] min-h-screen">
         <div className="flex items-center justify-between gap-3 text-xs">
-          <button onClick={() => navigateToPage("dashboard")} className="flex w-fit items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider transition-colors hover:opacity-80" style={{ color: "#1a6e4a" }}>
+          <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-[#E6EDF3] hover:opacity-80">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
           </button>
         </div>
 
-        <section className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
+        <div className="rounded-2xl border border-white/[0.06] bg-[#0D1117] p-6">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0">
-              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide" style={{ color: "#536471" }}>
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-[#9AA7B5]">
                 <span>{ticker}</span><span>•</span><span>{exchange !== "Insufficient information" ? exchange : "NSE / BSE"}</span><span>•</span><span>{currency}</span>
               </div>
-              <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight md:text-3xl" style={{ color: "#0f1419" }}>{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#0369a1" }}>
+              <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-[#E6EDF3] md:text-3xl">{companyName}</h1>
+              <div className="mt-3 inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5]">
                 Company not indexed yet
               </div>
             </div>
-            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl p-3.5" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
+            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Live Quote</div>
-                <div className="mt-1 font-mono text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[var(--color-active)]' : 'text-[var(--color-danger)]'}`}>{changeLabel}</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Live Quote</div>
+                <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[#E6EDF3]">{priceLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{changeLabel}</div>
               </div>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Volume</div>
-                <div className="mt-1 font-mono text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Volume</div>
+                <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[#E6EDF3]">
                   {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Insufficient information"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px]" style={{ color: "#8b98a5" }}>Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-[#64748B]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl p-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "#0f1419" }}>Why scoring is unavailable</h3>
-            <p className="mt-2 max-w-3xl text-xs leading-5" style={{ color: "#536471" }}>
+          <div className="mt-6 rounded-xl border border-[#b8860b]/30 bg-[rgba(184,134,11,0.08)] p-4 text-[#b8860b]">
+            <h3 className="text-sm font-semibold text-[#E6EDF3]">Why scoring is unavailable</h3>
+            <p className="mt-2 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
               This company is recognised but verified scoring factors are not yet ready. Live quotes may still appear when market data is available.
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
-            <button onClick={handleToggleWatchlist} className={`btn btn-sm ${isInWatchlist ? "btn-ghost text-[var(--color-danger)]" : "btn-secondary"}`}>
-              <Star className={`icon-action ${isInWatchlist ? "text-[var(--color-danger)]" : ""}`} />
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button onClick={handleToggleWatchlist} className={`h-10 rounded-xl px-4 text-xs font-semibold transition ${isInWatchlist ? "border border-red-500/30 bg-red-500/10 text-red-400" : "border border-white/[0.12] bg-white/[0.06] text-[#E6EDF3] hover:bg-white/[0.10]"}`}>
+              <Star className={`mr-1.5 inline-block h-4 w-4 ${isInWatchlist ? "text-red-400" : ""}`} />
               {isInWatchlist ? "Remove from watchlist" : "Track via watchlist"}
             </button>
-            <button type="button" onClick={() => navigateToPage("search")} className="h-10 rounded-xl px-4 text-xs font-semibold text-white transition hover:opacity-90" style={{ background: "#0f1419" }}>
+            <button type="button" onClick={() => navigateToPage("search")} className="h-10 rounded-xl bg-[#2962FF] px-4 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">
               Search Another Company
             </button>
-            <button type="button" onClick={() => navigateToPage("methodology")} className="h-10 rounded-xl border px-4 text-xs font-semibold transition hover:bg-white/60" style={{ background: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.4)", color: "#536471" }}>
+            <button type="button" onClick={() => navigateToPage("methodology")} className="h-10 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 text-xs font-semibold text-[#9AA7B5] transition hover:bg-white/[0.08]">
               View Scoring Methodology
             </button>
           </div>
-        </section>
-
-        <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>My Research Notes</div>
-          <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} aria-label="Research notes" />
         </div>
 
-        <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#8b98a5] uppercase">Research only. Not investment advice.</p>
+        <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-5">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">My Research Notes</div>
+          <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.08] bg-[#0D1117] p-3 text-xs text-[#E6EDF3] placeholder:text-[#64748B] outline-none transition focus:border-[#2962FF]" aria-label="Research notes" />
+        </div>
+
+        <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#64748B] uppercase">Research only. Not investment advice.</p>
       </div>
     );
   }
