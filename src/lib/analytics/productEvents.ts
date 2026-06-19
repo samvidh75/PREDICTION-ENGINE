@@ -20,6 +20,14 @@ export const PRODUCT_EVENTS = {
   LANDING_VIEWED: "landing_viewed",
   SIGN_UP_STARTED: "sign_up_started",
   SIGN_IN_VIEWED: "sign_in_viewed",
+  RESEARCH_SUMMARY_COPIED: "research_summary_copied",
+  COMPANY_SHARE_OPENED: "company_share_opened",
+  COMPARE_SUMMARY_COPIED: "compare_summary_copied",
+  INVITE_LINK_COPIED: "invite_link_copied",
+  EARLY_ACCESS_OPENED: "early_access_opened",
+  CTA_CLICKED: "cta_clicked",
+  MOBILE_NAV_OPENED: "mobile_nav_opened",
+  EMPTY_STATE_CTA_CLICKED: "empty_state_cta_clicked",
 } as const;
 
 export type ProductEvent = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS];
@@ -46,6 +54,14 @@ export const PRODUCT_EVENT_LABELS: Record<ProductEvent, string> = {
   landing_viewed: "Landing viewed",
   sign_up_started: "Sign up started",
   sign_in_viewed: "Sign in viewed",
+  research_summary_copied: "Research summary copied",
+  company_share_opened: "Company share opened",
+  compare_summary_copied: "Comparison summary copied",
+  invite_link_copied: "Invite link copied",
+  early_access_opened: "Early access opened",
+  cta_clicked: "CTA clicked",
+  mobile_nav_opened: "Mobile nav opened",
+  empty_state_cta_clicked: "Empty state CTA clicked",
 };
 
 export const PRODUCT_EVENT_DESCRIPTIONS: Record<ProductEvent, string> = {
@@ -70,6 +86,14 @@ export const PRODUCT_EVENT_DESCRIPTIONS: Record<ProductEvent, string> = {
   landing_viewed: "User visited the landing page",
   sign_up_started: "User initiated the sign-up flow",
   sign_in_viewed: "User viewed the sign-in page",
+  research_summary_copied: "User copied a research summary to clipboard",
+  company_share_opened: "User opened the share sheet for a company",
+  compare_summary_copied: "User copied a comparison summary to clipboard",
+  invite_link_copied: "User copied the invite link to clipboard",
+  early_access_opened: "User opened the early access / share page",
+  cta_clicked: "User clicked a primary CTA button",
+  mobile_nav_opened: "User opened the mobile navigation",
+  empty_state_cta_clicked: "User clicked a CTA from an empty state",
 };
 
 declare global {

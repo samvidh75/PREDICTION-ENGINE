@@ -122,7 +122,7 @@ export const SearchPage: React.FC = () => {
 
   const handleCompare = (symbol: string) => {
     UserJourneyEngine.trackEvent("feature_discover", { action: "compare", symbol, source: "search_page" });
-    productNavigate("explore", `compare:${symbol}`);
+    productNavigate("compare", symbol);
   };
 
   const handleSave = async (symbol: string) => {
@@ -231,7 +231,7 @@ export const SearchPage: React.FC = () => {
                                 <span className="truncate text-[10px] font-medium text-[#64748B]">{stock.sector}</span>
                               )}
                               <ProductStatusPill tone={predictionDate ? "blue" : "muted"}>
-                                {predictionDate ? formatFreshness(predictionDate) : "No data"}
+                                {predictionDate ? formatFreshness(predictionDate) : "Research signals pending"}
                               </ProductStatusPill>
                               {confidenceScore !== null && (
                                 <ProductStatusPill tone="blue">{Math.round(confidenceScore)}% confidence</ProductStatusPill>
@@ -265,7 +265,7 @@ export const SearchPage: React.FC = () => {
                   title="No matching company found"
                   body={`No results for "${query.trim()}". Try a different ticker, company name, or sector. Browse the top ranked companies instead.`}
                   action={
-                    <ProductAction variant="secondary" onClick={() => productNavigate("explore", "rankings")}>
+                    <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>
                       View Top Rankings
                     </ProductAction>
                   }
@@ -279,7 +279,7 @@ export const SearchPage: React.FC = () => {
                 title="Search the company universe"
                 body="Type at least 2 characters to begin. Search by ticker, company name, or sector to find investment opportunities."
                 action={
-                  <ProductAction variant="secondary" onClick={() => productNavigate("explore", "rankings")}>
+                  <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>
                     Browse Top Rankings
                   </ProductAction>
                 }

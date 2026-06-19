@@ -89,14 +89,14 @@ export function notifyUrlChange(): void {
 
 /** Protected pages that require authentication. */
 export const PROTECTED_PAGES: PageKey[] = [
-  "dashboard", "search", "scanner", "stock", "company",
+  "dashboard", "search", "stock", "company",
   "watchlist", "portfolio", "settings", "alerts", "invest",
 ];
 
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "methodology",
-  "rankings", "compare",
+  "rankings", "compare", "scanner",
 ];
 
 /**

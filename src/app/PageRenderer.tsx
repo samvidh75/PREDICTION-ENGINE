@@ -44,6 +44,7 @@ const PUBLIC_PAGES: Record<string, boolean> = {
   validation: true,
   predictions: true,
   rankings: true,
+  scanner: true,
   compare: true,
 };
 
@@ -63,6 +64,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
+    case "scanner":
+      return <ScannerPage />;
     case "compare":
       return <ComparePage />;
     default:

@@ -13,7 +13,7 @@ import {
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
-  { icon: FileSearch, title: "Research a company", body: "Open any company page for AI-powered scores, conviction ratings, and fundamental analysis." },
+  { icon: FileSearch, title: "Research a company", body: "Open any company page for scores, conviction context, and fundamental analysis." },
   { icon: GitCompare, title: "Compare alternatives", body: "Side-by-side peer comparison shows which stock fits your thesis better." },
   { icon: Eye, title: "Track thesis changes", body: "Save companies to your watchlist and monitor score changes that affect your thesis." },
   { icon: ArrowRight, title: "Continue through your broker", body: "Take your research and invest through your broker — StockStory never handles your money." },
@@ -34,11 +34,11 @@ export const PublicLandingPage: React.FC = () => {
         <ProductHero
           eyebrow="AI research for Indian equities"
           title="Understand the stock before you invest."
-          body="For Indian equity investors who want clearer research. Search companies, review scores, compare peers, track your thesis — then invest through your broker. StockStory is the AI research layer between you and the market."
+          body="For Indian equity investors who want clearer research. Search companies, review scores, compare peers, track your thesis, then continue through your broker. StockStory is the AI research layer between you and the market."
           actions={(
             <>
               <ProductAction id="hero-cta-start" onClick={() => productNavigate("signup")}>Start research</ProductAction>
-              <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
+              <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("scanner")}>View scanner</ProductAction>
               <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
             </>
           )}
@@ -51,7 +51,7 @@ export const PublicLandingPage: React.FC = () => {
                 {[
                   { label: "Approach", value: "Research-driven" },
                   { label: "Framework", value: "Multi-factor" },
-                  { label: "Coverage", value: "Indian equities" },
+                  { label: "Universe", value: "Indian equities" },
                   { label: "Status", value: "Research, not advice" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-3 py-2">
@@ -123,6 +123,9 @@ export const PublicLandingPage: React.FC = () => {
                   We evaluate Indian equities using a consistent multi-factor framework. Every score is derived from public data with transparent rationale. No black boxes, no fabricated metrics.
                 </p>
               </div>
+              <ProductAction id="onboarding-cta-about" variant="ghost" onClick={() => productNavigate("about")}>
+                About StockStory
+              </ProductAction>
               <ProductAction id="methodology-cta" variant="secondary" onClick={() => productNavigate("methodology")}>
                 Read the methodology
               </ProductAction>
@@ -132,7 +135,7 @@ export const PublicLandingPage: React.FC = () => {
 
         <footer className="mt-8 border-t border-[rgba(148,163,184,0.12)] py-6">
           <p className="text-xs leading-5 text-[#64748B]">
-            StockStory provides AI-powered research and analysis for informational purposes only. It is not financial advice, a recommendation to buy or sell, or a solicitation of any kind. Past performance does not guarantee future results. Always do your own research and consult a licensed financial advisor before making investment decisions. StockStory does not execute trades, custody funds, or have any affiliation with any broker. All data is sourced from publicly available information and may contain errors or omissions.
+            StockStory provides research and analysis for informational purposes only. It is not financial advice, a recommendation, or a solicitation of any kind. Past performance does not indicate future results. Always do your own research and consult a licensed financial advisor before making investment decisions. StockStory does not execute trades, custody funds, or have any affiliation with any broker. Information may contain errors or omissions.
           </p>
         </footer>
       </ProductPage>

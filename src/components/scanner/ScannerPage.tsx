@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
 import { api, type LeaderboardEntry } from "../../services/api/client";
+import { leaderboardEntryToResearchListItem } from "../../lib/product/productViewAdapters";
 
 const SCANNER_PRESETS = [
   { label: "Quality compounders", icon: Shield, filters: { qualityMin: 70, growthMin: 60 } },
@@ -129,28 +130,6 @@ export default function ScannerPage() {
     );
     setResults(filtered);
   }, [query, allEntries]);
-
-  const generateThesis = useCallback((entry: LeaderboardEntry): string => {
-    const sector = entry.sector ?? "diversified";
-    const score = entry.rankingScore ?? 50;
-    if (score >= 70) return `Leading ${sector} company with strong quality metrics`;
-    if (score >= 55) return `Improving momentum in ${sector} sector`;
-    if (score >= 40) return `${sector} company with developing fundamentals`;
-    return `${sector} company under evaluation`;
-  }, []);
-
-  const generateKeyReason = useCallback((entry: LeaderboardEntry): string => {
-    const factors = entry.factors;
-    const entries = Object.entries(factors).filter(([, v]) => v !== null && v !== undefined) as [string, number][];
-    if (entries.length === 0) return "Not enough information";
-    entries.sort(([, a], [, b]) => b - a);
-    const [topKey] = entries[0];
-    const factorLabel = topKey === "quality" ? "Quality" : topKey === "growth" ? "Growth" : topKey === "value" ? "Valuation" : topKey === "momentum" ? "Momentum" : topKey === "risk" ? "Risk profile" : topKey === "sector" ? "Sector strength" : topKey;
-    const topVal = entries[0][1];
-    if (topVal >= 70) return `Strong ${factorLabel.toLowerCase()} score (${Math.round(topVal)})`;
-    if (topVal >= 50) return `Adequate ${factorLabel.toLowerCase()} score (${Math.round(topVal)})`;
-    return `${factorLabel} at ${Math.round(topVal)}`;
-  }, []);
 
   const convictionLabel = useCallback((entry: LeaderboardEntry): string => {
     const score = entry.rankingScore ?? null;
@@ -438,13 +417,12 @@ export default function ScannerPage() {
               </div>
               {sortedResults.slice(0, 50).map((entry) => {
                 const fullSymbol = entry.symbol;
-                const thesis = generateThesis(entry);
-                const reason = generateKeyReason(entry);
+                const item = leaderboardEntryToResearchListItem(entry);
                 const score = entry.rankingScore;
                 const convLabel = convictionLabel(entry);
                 const convTone = convictionTone(entry);
                 const risky = hasRiskFlag(entry);
-                const sector = entry.sector;
+                const sector = item.sector;
                 return (
                   <ProductPanel key={fullSymbol} as="article" className="p-3">
                     <div className="flex items-start justify-between gap-3">
@@ -458,10 +436,8 @@ export default function ScannerPage() {
                             <span className="text-[10px] font-medium text-[#64748B]">#{entry.rank}</span>
                           )}
                         </div>
-                        {entry.companyName && (
-                          <p className="truncate text-xs text-[#9AA7B5]">{entry.companyName}</p>
-                        )}
-                        <p className="mt-1.5 text-xs leading-5 text-[#E6EDF3]">{thesis}</p>
+                        <p className="truncate text-xs text-[#9AA7B5]">{item.company}</p>
+                        <p className="mt-1.5 text-xs leading-5 text-[#E6EDF3]">{item.thesis}</p>
                         <div className="mt-1 flex flex-wrap items-center gap-1.5">
                           <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
                           {score !== null && (
@@ -471,14 +447,14 @@ export default function ScannerPage() {
                             <ProductStatusPill tone="warning">Risk flag</ProductStatusPill>
                           )}
                         </div>
-                        <p className="mt-0.5 text-[11px] leading-4 text-[#64748B]">{reason}</p>
+                        <p className="mt-0.5 text-[11px] leading-4 text-[#64748B]">{item.keyReason}</p>
                       </div>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-2">
                       <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>Research</ProductAction>
                       <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>Compare</ProductAction>
                       <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>Track</ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled={!brokerConnected} disabledReason={!brokerConnected ? "Connect broker" : undefined}>Invest</ProductAction>
+                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled={!brokerConnected} disabledReason={!brokerConnected ? "Broker handoff being prepared" : undefined}>Invest</ProductAction>
                     </div>
                   </ProductPanel>
                 );

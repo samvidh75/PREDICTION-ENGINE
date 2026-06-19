@@ -5,6 +5,7 @@ import {
   hasRenderGarbage,
   hasBackendProviderNames,
   hasProductForbiddenTerms,
+  hasForbiddenSocialProof,
 } from '../../src/lib/compliance/forbiddenCopyAudit';
 
 describe('Forbidden copy audit utilities', () => {
@@ -261,6 +262,123 @@ describe('Render garbage prevention', () => {
   it('product copy does not contain render garbage', () => {
     for (const text of productTextSamples) {
       expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+});
+
+describe('Share and referral compliance', () => {
+  const shareResearchSummaryCopy = [
+    "Research Summary",
+    "Before You Invest",
+    "Review scores on StockStory India",
+    "Compare with peers",
+    "Track thesis changes",
+    "Final execution through your broker",
+    "Research only. Not investment advice.",
+  ];
+
+  const compareRecapCopy = [
+    "Comparison Recap",
+    "Decision Summary",
+    "Stronger research case",
+    "Needs review",
+    "Track before investing",
+    "Before You Invest",
+    "Research only. Not investment advice.",
+  ];
+
+  const earlyAccessCopy = [
+    "Share StockStory",
+    "Invite early users to review StockStory",
+    "No trading rewards. No investment promises.",
+    "Request access is not connected yet",
+    "StockStory is research-only, not a brokerage",
+    "What to expect",
+  ];
+
+  it('share research summary copy has no backend vocabulary', () => {
+    for (const text of shareResearchSummaryCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('share research summary copy has no render garbage', () => {
+    for (const text of shareResearchSummaryCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+
+  it('share research summary copy has no forbidden trading language', () => {
+    for (const text of shareResearchSummaryCopy) {
+      expect(hasForbiddenTradingLanguage(text)).toBeNull();
+    }
+  });
+
+  it('compare recap copy has no backend vocabulary', () => {
+    for (const text of compareRecapCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('compare recap copy has no render garbage', () => {
+    for (const text of compareRecapCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+
+  it('compare recap copy has no fake social proof', () => {
+    const fakeSocialProof = [
+      "trusted by thousands", "number one platform", "award-winning",
+      "official recommendation", "verified by SEBI", "broker partner",
+    ];
+    for (const text of fakeSocialProof) {
+      expect(hasForbiddenSocialProof(text)).not.toBeNull();
+    }
+  });
+
+  it('early access copy has no backend vocabulary', () => {
+    for (const text of earlyAccessCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('early access copy has no fake social proof', () => {
+    const fakeSocialProof = [
+      "trusted by thousands", "trusted by millions", "number one platform",
+      "award-winning", "broker partner", "verified by SEBI",
+      "official recommendation", "real user testimonial",
+    ];
+    for (const text of fakeSocialProof) {
+      expect(hasForbiddenSocialProof(text), `${text} should be detected`).not.toBeNull();
+    }
+  });
+
+  it('early access copy has no render garbage', () => {
+    for (const text of earlyAccessCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+});
+
+describe('Share/referral accessibility', () => {
+  it('copy/share buttons have accessible labels', () => {
+    const labels = [
+      "Copy research summary", "Summary copied",
+      "Copy page link", "Link copied",
+      "Copy comparison summary", "Comparison copied",
+      "Copy invite link",
+      "Share research summary",
+      "Share comparison",
+    ];
+    for (const label of labels) {
+      expect(hasRenderGarbage(label)).toBeNull();
+      expect(hasProductForbiddenTerms(label)).toBeNull();
     }
   });
 });

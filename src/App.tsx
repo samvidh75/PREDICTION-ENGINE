@@ -120,7 +120,7 @@ function AppContent(): JSX.Element {
 
   const isPublicPage =
     pageKey === "landing" || pageKey === "about" || pageKey === "login" || pageKey === "signup" ||
-    pageKey === "trust" || pageKey === "methodology" || pageKey === "validation" ||
+    pageKey === "trust" || pageKey === "methodology" || pageKey === "validation" || pageKey === "scanner" ||
     pageKey === "predictions" || pageKey === "rankings";
   const isAuthLoading = loading;
   const isAuthed = isAuthenticated && !!user;

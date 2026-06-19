@@ -331,10 +331,10 @@ export const StockStoryPage: React.FC = () => {
     return (
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
-          <span style={{ color: "#536471" }}>{label}</span>
+          <span className="text-[#64748B]">{label}</span>
           <span className={colorClass}>{hasScore ? formatScore(scoreValue) : "Insufficient information"}</span>
         </div>
-        <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "#f0f1f5" }}>
+        <div className="h-1.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.06)]">
           <div className={`h-full rounded-full transition-all duration-1000 ${barColor}`} style={{ width: hasScore ? `${scoreValue}%` : "0%" }} />
         </div>
       </div>
@@ -342,7 +342,7 @@ export const StockStoryPage: React.FC = () => {
   };
 
   const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span style={{ color: "#8b98a5" }}>Insufficient information</span>;
+    if (val === null || val === undefined) return <span className="text-[#64748B]">Insufficient information</span>;
     const isPos = val >= 0;
     return <span className={`font-mono font-bold ${isPos ? "text-[var(--color-active)]" : "text-[var(--color-danger)]"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
   };
@@ -369,7 +369,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
             <div className="min-w-0">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#8b98a5" }}>
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9AA7B5]">
                 <span>{ticker}</span><span>•</span><span>{exchange}</span><span>•</span><span>{currency}</span>
               </div>
               <h1 className="max-w-xl text-2xl font-semibold tracking-tight md:text-3xl truncate text-[#E6EDF3]">{companyName}</h1>
@@ -423,8 +423,8 @@ export const StockStoryPage: React.FC = () => {
       </section>
 
       <section className="flex flex-wrap items-center gap-3">
-        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#F23645] bg-white/[0.04]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
-          <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#F23645]" : ""}`} />
+        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#EF4444] bg-white/[0.04]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
+          <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#EF4444]" : ""}`} />
           {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
         </button>
       </section>

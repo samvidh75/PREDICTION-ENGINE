@@ -1,6 +1,6 @@
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, CheckCircle2, Info, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle2, Info, Loader2 } from "lucide-react";
 import TopNav from "../navigation/TopNav";
 import MobileNav from "../navigation/MobileNav";
 
@@ -41,13 +41,13 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
   return (
     <section className="grid gap-6 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-12">
-      <div className="flex min-h-[360px] flex-col justify-center rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 md:p-8">
+      <div className="flex min-h-[360px] flex-col justify-center rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 md:p-8">
         {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">{eyebrow}</div>}
         <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#E6EDF3] sm:text-4xl md:text-5xl">{title}</h1>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-[#9AA7B5] md:text-base">{body}</p>
@@ -71,7 +71,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
     </>
   );
   if (href) {
-    return <a id={id} href={href} className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-xs font-semibold transition ${classes} ${className}`}>{content}</a>;
+    return <a id={id} href={href} className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition ${classes} ${className}`}>{content}</a>;
   }
   return (
     <button
@@ -81,7 +81,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
       disabled={disabled}
       title={disabled ? disabledReason : undefined}
       aria-disabled={disabled}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-xs font-semibold transition disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[#111827] disabled:text-[#64748B] ${classes} ${className}`}
+      className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[#111827] disabled:text-[#64748B] ${classes} ${className}`}
     >
       {disabled && disabledReason ? disabledReason : content}
     </button>
@@ -92,6 +92,27 @@ export function ProductEmptyState({ icon: Icon = Info, title, body, action }: { 
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
       <Icon className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
+      <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
+      <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">{body}</p>
+      {action && <div className="mt-4">{action}</div>}
+    </ProductPanel>
+  );
+}
+
+export function ProductLoadingState({ title = "Preparing research", body = "We are assembling the available research signals for this view." }: { title?: string; body?: string }): JSX.Element {
+  return (
+    <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
+      <Loader2 className="h-5 w-5 animate-spin text-[#2962FF]" aria-hidden="true" />
+      <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
+      <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">{body}</p>
+    </ProductPanel>
+  );
+}
+
+export function ProductErrorState({ title = "Research signals pending", body = "This view could not be prepared right now. Try another company or come back shortly.", action }: { title?: string; body?: string; action?: React.ReactNode }): JSX.Element {
+  return (
+    <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
+      <AlertCircle className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />
       <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
       <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">{body}</p>
       {action && <div className="mt-4">{action}</div>}
@@ -155,7 +176,7 @@ export function ProductIntegrityRow(): JSX.Element {
   return (
     <div className="flex flex-wrap gap-2">
       <ProductStatusPill tone="verified"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Research only</ProductStatusPill>
-      <ProductStatusPill tone="warning">Unavailable labelled</ProductStatusPill>
+      <ProductStatusPill tone="warning">Absence labelled</ProductStatusPill>
       <ProductStatusPill tone="muted">No fabricated metrics</ProductStatusPill>
     </div>
   );

@@ -62,7 +62,7 @@ export default function StockStoryPageF0(): JSX.Element {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const companyName = stockInfo?.companyName || "Unavailable";
+  const companyName = stockInfo?.companyName || "Needs research";
   const sector = stockInfo?.sector || null;
 
   const convictionLevel: ConvictionLevel = !ticker ? "none" : stockInfo && sector ? "moderate" : "low";
@@ -124,7 +124,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
         <div className="mb-5">
           <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">{ticker || "Unavailable"}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">{ticker || "Needs research"}</h1>
             <span className="text-sm text-[#9AA7B5]">{companyName}</span>
           </div>
           {sector && (
@@ -154,7 +154,7 @@ export default function StockStoryPageF0(): JSX.Element {
                   <ProductStatusPill key={item} tone="blue">{item}</ProductStatusPill>
                 ))
               ) : (
-                <ProductStatusPill tone="muted">Awaiting data</ProductStatusPill>
+                <ProductStatusPill tone="muted">Awaiting research</ProductStatusPill>
               )}
               <ProductStatusPill tone="muted">
                 {horizon}D horizon

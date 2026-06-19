@@ -478,7 +478,7 @@ export const ComparePage: React.FC = () => {
         {!loading && companies.length > 0 && (
           <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
             <p className="text-[10px] leading-relaxed text-[#64748B]">
-              Compare shows real scores and factors for each company. Missing values are marked as unavailable. Decision labels are suggestions based on available data — not investment advice.
+              Compare shows real scores and factors for each company. Missing values are noted as pending. Decision labels are suggestions based on available data — not investment advice.
             </p>
           </div>
         )}

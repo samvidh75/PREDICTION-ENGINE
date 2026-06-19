@@ -120,7 +120,7 @@ export const DashboardHub: React.FC = () => {
                   Loading signals...
                 </div>
               ) : signalsError ? (
-                <ProductEmptyState icon={AlertTriangle} title="Signals temporarily unavailable" body="Research changes will appear once the signal feed is available." />
+                <ProductEmptyState icon={AlertTriangle} title="Something went wrong" body="We're working on restoring research signals. Check back shortly." />
               ) : signals.length === 0 ? (
                 <ProductEmptyState title="No notable changes" body="No research changes crossed the display threshold for tracked companies." action={<ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>} />
               ) : (
