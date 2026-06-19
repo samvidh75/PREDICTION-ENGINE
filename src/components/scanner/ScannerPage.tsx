@@ -409,6 +409,10 @@ export default function ScannerPage() {
               <Search className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
               <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">No results found</h3>
               <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">Adjust your filters or try a different search.</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
+                <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
+              </div>
             </ProductPanel>
           ) : (
             <div className="space-y-2">

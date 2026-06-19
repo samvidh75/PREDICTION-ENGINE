@@ -21,6 +21,13 @@ const ROUTES: ShellRoute[] = [
   { id: "compare", label: "Compare", icon: ArrowLeftRight, pageKey: "compare" },
 ];
 
+const MOBILE_ROUTES: ShellRoute[] = [
+  { id: "home", label: "Home", icon: Home, pageKey: "dashboard" },
+  { id: "scanner", label: "Scanner", icon: Search, pageKey: "scanner" },
+  { id: "compare", label: "Compare", icon: ArrowLeftRight, pageKey: "compare" },
+  { id: "watchlist", label: "Track", icon: Eye, pageKey: "watchlist" },
+];
+
 function navigatePage(pageKey: string) {
   const params = new URLSearchParams(window.location.search);
   params.set("page", pageKey);
@@ -63,11 +70,11 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
   }, [handleKeyDown]);
 
   return (
-    <div className="min-h-screen bg-[#080C10] text-[#E6EDF3] antialiased">
+    <div className="min-h-screen bg-[#070A0F] text-[#E6EDF3] antialiased">
       {/* Desktop layout */}
       <div className="hidden md:flex md:h-dvh md:flex-col">
         {/* Top bar */}
-        <header className="flex h-14 items-center justify-between gap-4 border-b border-white/[0.06] bg-[#080C10] px-5">
+        <header className="flex h-14 items-center justify-between gap-4 border-b border-white/[0.06] bg-[#080C10]/95 px-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold tracking-tight text-[#E6EDF3]">
               StockStory<span className="text-[#16A34A]">.</span>India
@@ -76,7 +83,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
           {/* Integrated compact search trigger */}
           <button
             onClick={() => setCommandOpen(true)}
-            className="hidden sm:flex flex-1 max-w-md items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-[#64748B] hover:border-white/[0.12] hover:text-[#9AA7B5] transition-all duration-200"
+            className="hidden h-9 flex-1 max-w-md items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.035] px-3 text-xs text-[#64748B] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition-all duration-200 hover:border-[#2962FF]/40 hover:text-[#9AA7B5] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 sm:flex"
           >
             <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             <span>Search companies or open a workflow...</span>
@@ -87,7 +94,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); navigatePage("settings"); }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-white/[0.04] hover:text-[#9AA7B5] transition-all duration-200"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] transition-all duration-200 hover:bg-white/[0.04] hover:text-[#9AA7B5] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"
               aria-label="Settings"
             >
               <Settings className="h-4 w-4" />
@@ -96,7 +103,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
         </header>
         <div className="flex flex-1 overflow-hidden">
           {/* Left rail */}
-          <nav className="flex w-14 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#080C10] pt-3" aria-label="Main navigation">
+          <nav className="flex w-14 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#080C10]/95 pt-3 backdrop-blur-xl" aria-label="Main navigation">
             {ROUTES.map((route) => {
               const isActive = currentPage === route.pageKey;
               return (
@@ -104,8 +111,8 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
                   key={route.id}
                   type="button"
                   onClick={() => navigatePage(route.pageKey)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                    isActive ? "bg-white/[0.08] text-[#E6EDF3]" : "text-[#64748B] hover:bg-white/[0.04] hover:text-[#9AA7B5]"
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 ${
+                    isActive ? "bg-[#111827] text-[#E6EDF3] shadow-[inset_3px_0_0_#2962FF]" : "text-[#64748B] hover:bg-white/[0.04] hover:text-[#9AA7B5]"
                   }`}
                   aria-label={route.label}
                   title={route.label}
@@ -133,15 +140,15 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
         </div>
         {/* Bottom dock */}
         <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-white/[0.06] bg-[#080C10] px-2 py-2 safe-area-bottom" aria-label="Main navigation">
-          {ROUTES.map((route) => {
+          {MOBILE_ROUTES.map((route) => {
             const isActive = currentPage === route.pageKey;
             return (
               <button
                 key={route.id}
                 type="button"
                 onClick={() => navigatePage(route.pageKey)}
-                className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-all duration-200 ${
-                  isActive ? "text-[#E6EDF3]" : "text-[#64748B]"
+                className={`flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 ${
+                  isActive ? "bg-white/[0.06] text-[#E6EDF3]" : "text-[#64748B]"
                 }`}
                 aria-label={route.label}
               >
@@ -153,7 +160,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
           <button
             type="button"
             onClick={() => setCommandOpen(true)}
-            className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 text-[#2962FF] transition-all duration-200"
+            className="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 text-[#2962FF] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"
             aria-label="Command"
           >
             <Search className="h-5 w-5" aria-hidden="true" />

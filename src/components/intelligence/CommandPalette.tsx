@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, Home, Command, History } from "lucide-react";
-import { RoundedDepthPanel } from "./RoundedDepthPanel";
+import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, History } from "lucide-react";
 
 interface Action {
   id: string;
@@ -44,7 +43,7 @@ function trackRecentTicker(ticker: string): void {
 
 const DEFAULT_ACTIONS: Action[] = [
   { id: "search-company", label: "Search company", description: "Find companies by ticker or name", icon: Search, action: () => navigatePage("search") },
-  { id: "open-scanner", label: "Open scanner", description: "Discover companies matching criteria", icon: BarChart3, action: () => navigatePage("search") },
+  { id: "open-scanner", label: "Open scanner", description: "Discover companies matching criteria", icon: BarChart3, action: () => navigatePage("scanner") },
   { id: "rankings", label: "View rankings", description: "Browse scored companies", icon: TrendingUp, action: () => navigatePage("rankings") },
   { id: "compare", label: "Compare companies", description: "Compare scores and factors", icon: ArrowLeftRight, action: () => navigatePage("compare") },
   { id: "watchlist", label: "Open watchlist", description: "Tracked companies thesis tracker", icon: Eye, action: () => navigatePage("watchlist") },
@@ -135,21 +134,21 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center pt-[15vh] sm:pt-[20vh]"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(16px)" }}
+      className="fixed inset-0 z-[60] flex items-start justify-center px-3 pt-[12vh] sm:pt-[18vh]"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(18px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
     >
       <div
-        className="w-full max-w-lg mx-4 rounded-[32px] bg-[#0D1117] border border-white/[0.08] shadow-[0_24px_80px_rgba(0,0,0,0.6),0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden transition-all duration-300 ease-out"
+        className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0D1117] shadow-[0_28px_90px_rgba(0,0,0,0.58),0_8px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.055)] transition-all duration-200 ease-out"
         style={{ transform: "translateZ(0)" }}
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
         {/* Search input */}
-        <div className="flex items-center gap-3 border-b border-white/[0.06] px-5 py-4">
+        <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#111827]/55 px-5 py-4">
           <Search className="h-5 w-5 shrink-0 text-[#484F58]" aria-hidden="true" />
           <input
             ref={inputRef}
@@ -157,23 +156,23 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
             placeholder="Search companies or type a command..."
-            className="w-full bg-transparent text-sm text-[#E6EDF3] placeholder:text-[#484F58] outline-none"
+            className="h-8 w-full bg-transparent text-sm text-[#E6EDF3] placeholder:text-[#64748B] outline-none"
             aria-label="Command search"
           />
           <kbd className="hidden shrink-0 rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58] sm:inline-block">esc</kbd>
         </div>
 
         {/* Results */}
-        <div className="max-h-[320px] overflow-y-auto px-2 py-2">
+        <div className="max-h-[min(54vh,380px)] overflow-y-auto px-2 py-2">
           {searching && (
-            <div className="px-3 py-3 text-xs text-[#484F58]">Searching...</div>
+            <div className="px-3 py-3 text-xs text-[#64748B]">Searching...</div>
           )}
 
           {!searching && query.trim() && searchResults.length === 0 && filteredActions.length === 0 && (
             <div className="flex flex-col items-center px-3 py-6 text-center">
-              <Search className="h-6 w-6 text-[#2D333B] mb-2" aria-hidden="true" />
-              <p className="text-xs text-[#484F58]">No commands match &ldquo;{query}&rdquo;</p>
-              <p className="mt-1 max-w-[260px] text-[10px] leading-relaxed text-[#484F58]">Try searching for a company name or ticker instead</p>
+              <Search className="h-6 w-6 text-[#64748B] mb-2" aria-hidden="true" />
+              <p className="text-xs text-[#9AA7B5]">No commands match &ldquo;{query}&rdquo;</p>
+              <p className="mt-1 max-w-[260px] text-[10px] leading-relaxed text-[#64748B]">Try searching for a company name or ticker instead</p>
               <button
                 type="button"
                 onClick={() => { setQuery(""); }}
@@ -191,13 +190,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               type="button"
               onClick={() => { item.action(); onClose(); }}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs transition-all duration-150 ${
-                selectedIndex === i ? "bg-white/[0.08] text-[#E6EDF3]" : "text-[#8B949E] hover:bg-white/[0.04]"
+                selectedIndex === i ? "bg-[#111827] text-[#E6EDF3] shadow-[inset_3px_0_0_#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
               }`}
             >
-              <item.icon className="h-4 w-4 shrink-0 text-[#484F58]" aria-hidden="true" />
+              <item.icon className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <span className="font-medium">{item.label}</span>
-                {item.description && <span className="ml-2 text-[10px] text-[#484F58]">{item.description}</span>}
+                {item.description && <span className="ml-2 text-[10px] text-[#64748B]">{item.description}</span>}
               </div>
               {i < 9 && (
                 <kbd className="shrink-0 ml-auto rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58]">⌘{i + 1}</kbd>
@@ -217,13 +216,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     type="button"
                     onClick={() => { navigatePage("stock", { id: r.symbol }); onClose(); }}
                     className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs transition-all duration-150 ${
-                      selectedIndex === idx ? "bg-white/[0.08] text-[#E6EDF3]" : "text-[#8B949E] hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <Search className="h-4 w-4 shrink-0 text-[#484F58]" aria-hidden="true" />
+                    selectedIndex === idx ? "bg-[#111827] text-[#E6EDF3] shadow-[inset_3px_0_0_#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
+                  }`}
+                >
+                    <Search className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
                     <div className="min-w-0 flex-1">
                       <span className="font-mono font-semibold">{r.symbol}</span>
-                      {r.name && <span className="ml-2 text-[10px] text-[#484F58]">{r.name}</span>}
+                      {r.name && <span className="ml-2 text-[10px] text-[#64748B]">{r.name}</span>}
                     </div>
                   </button>
                 );
@@ -233,7 +232,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         {/* Footer hint */}
-        <div className="border-t border-white/[0.04] px-5 py-2.5 text-[10px] text-[#484F58]">
+        <div className="border-t border-white/[0.04] bg-[#080C10]/45 px-5 py-2.5 text-[10px] text-[#64748B]">
           <span className="hidden sm:inline">↑↓ navigate · ↵ select · esc close · ⌘1-9 quick select</span>
           <span className="sm:hidden">Tap a result to navigate</span>
         </div>

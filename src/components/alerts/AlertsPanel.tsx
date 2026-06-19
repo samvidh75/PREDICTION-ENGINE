@@ -22,7 +22,7 @@ export const AlertsPanel: React.FC = () => {
             Alerts are displayed here. No email or push notifications yet.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <ProductAction onClick={() => productNavigate("search")}>Open scanner</ProductAction>
+            <ProductAction onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
             <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
           </div>
         </div>

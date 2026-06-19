@@ -1,10 +1,9 @@
 import React from "react";
-import { ArrowLeftRight, BarChart3, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp } from "lucide-react";
-import { useNavigation, type ViewType } from "../../context/LayoutContext";
+import { ArrowLeftRight, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 interface MobileNavItem {
-  id: ViewType;
+  page: "dashboard" | "search" | "rankings" | "watchlist" | "portfolio" | "compare";
   label: string;
   icon: React.ReactNode;
 }
@@ -16,7 +15,6 @@ interface PublicMobileNavItem {
 }
 
 export const MobileNav: React.FC = () => {
-  const { currentView, MapsTo } = useNavigation();
   const { isAuthenticated } = useAuth();
 
   const currentPage = (() => {
@@ -34,19 +32,17 @@ export const MobileNav: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
-  const handleNav = (id: ViewType) => MapsTo(id);
-
   const handlePublicNav = (page: PublicMobileNavItem["page"]) => setPage(page);
 
   const tabs: MobileNavItem[] = [
-    { id: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
-    { id: "search", label: "Scanner", icon: <Search className="icon-nav" /> },
-    { id: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
-    { id: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
-    { id: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },
+    { page: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
+    { page: "search", label: "Scanner", icon: <Search className="icon-nav" /> },
+    { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
+    { page: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
+    { page: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },
   ];
 
-  const compareRoute = { id: "compare" as const, label: "Compare", icon: <ArrowLeftRight className="icon-nav" /> };
+  const compareRoute = { page: "compare" as const, label: "Compare", icon: <ArrowLeftRight className="icon-nav" /> };
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
@@ -74,12 +70,12 @@ export const MobileNav: React.FC = () => {
             );
           })
         : (<>{tabs.map((tab) => {
-            const isActive = currentView === tab.id;
+            const isActive = currentPage === tab.page;
             return (
               <button
-                key={tab.id}
+                key={tab.page}
                 type="button"
-                onClick={() => handleNav(tab.id)}
+                onClick={() => setPage(tab.page)}
                 className={`bottom-tab ${isActive ? "bottom-tab-active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
               >
@@ -89,9 +85,9 @@ export const MobileNav: React.FC = () => {
             );
           })}
           <button
-            key={compareRoute.id}
+            key={compareRoute.page}
             type="button"
-            onClick={() => setPage("compare")}
+            onClick={() => setPage(compareRoute.page)}
             className={`bottom-tab ${currentPage === "compare" ? "bottom-tab-active" : ""}`}
             aria-current={currentPage === "compare" ? "page" : undefined}
           >
