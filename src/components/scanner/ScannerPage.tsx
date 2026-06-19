@@ -6,6 +6,7 @@ import { scannerResultToResearchListItem } from "../../lib/product/productViewAd
 import { HelpPopover } from "../ui/HelpPopover";
 import { signalToneToStatusColor, toneToSeverityClass } from "../../lib/research/researchSignalModel";
 import CustomSelect from "../ui/CustomSelect";
+import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewModel";
 
 function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
   if (score === null) return null;
@@ -88,6 +89,25 @@ export default function ScannerPage() {
     volatility: "Any",
     dividendYield: "Any",
   });
+
+  const viewModel = useMemo(() => {
+    return buildScannerViewModel(
+      query,
+      results.map((r) => ({
+        symbol: r.symbol,
+        companyName: r.companyName || "",
+        sector: r.sector || "",
+        score: typeof r.score === "number" ? r.score : null,
+        rank: r.rank ?? 0,
+        conviction: r.conviction || "",
+        keyReason: r.keyReason || "",
+        riskMarker: r.riskMarker || "",
+        hasRealData: true,
+      })),
+      loading,
+      activePreset
+    );
+  }, [query, results, loading, activePreset]);
 
   // Derive sectors from real data only, excluding pending/not available
   const sectors = useMemo(() => {

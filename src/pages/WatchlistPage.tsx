@@ -10,6 +10,7 @@ import { ChevronRight, Eye, TrendingUp, TrendingDown, AlertTriangle, Minus } fro
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
 import { ProductPanel, ProductEmptyState, ProductAction, ProductPage, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import { buildWatchlistViewModel } from "../lib/product/viewModels/watchlistViewModel";
 
 interface DisplayList {
   id: string;
@@ -87,6 +88,27 @@ export const WatchlistPage: React.FC = () => {
     else { for (const wl of localLists) lists.push({ id: wl.id, name: wl.name, tickers: wl.tickers, source: "local" }); }
     return lists;
   }, [remoteLists, localLists]);
+
+  const allTrackedTickers = useMemo(() => {
+    const list = displayLists.find(l => l.id === selectedList);
+    return list?.tickers ?? [];
+  }, [displayLists, selectedList]);
+
+  const categories = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    for (const tab of THESIS_TABS) {
+      if (tab === "Tracked companies") {
+        map[tab] = allTrackedTickers;
+      } else {
+        map[tab] = allTrackedTickers.filter((t) => categorizeTicker(t) === tab);
+      }
+    }
+    return map;
+  }, [allTrackedTickers]);
+
+  const viewModel = useMemo(() => {
+    return buildWatchlistViewModel(allTrackedTickers, categories);
+  }, [allTrackedTickers, categories]);
 
   const handleRemoveTicker = (ticker: string) => {
     if (selectedList.startsWith(SMART_PREFIX)) return;

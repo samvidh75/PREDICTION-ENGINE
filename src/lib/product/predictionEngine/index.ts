@@ -5,3 +5,7 @@ export * from "./factorCoverage";
 export * from "./recommendationPolicy";
 export * from "./predictionViewModel";
 export * from "./healthometerViewModel";
+export * from "./factorScoring";
+export * from "./dimensionScoring";
+export * from "./researchScore";
+export * from "./inputMapping";

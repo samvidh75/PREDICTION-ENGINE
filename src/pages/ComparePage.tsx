@@ -6,6 +6,7 @@ import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 import { api, type SearchResult, type ScannerResultItem } from "../services/api/client";
 import ResearchContextLink from "../components/research/ResearchContextLink";
+import { buildCompareViewModel } from "../lib/product/viewModels/compareViewModel";
 
 interface CompareCompany {
   symbol: string;
@@ -46,6 +47,26 @@ export const ComparePage: React.FC = () => {
   const [routeLoading, setRouteLoading] = useState(false);
 
   const [shareRecapOpen, setShareRecapOpen] = useState(false);
+
+  const companyViews = useMemo(() => {
+    return companies.map((c) => ({
+      symbol: c.symbol,
+      companyName: c.companyName || "",
+      score: c.score !== null && c.score !== undefined ? c.score : null,
+      classification: c.classification || null,
+    }));
+  }, [companies]);
+
+  const viewModel = useMemo(() => {
+    return buildCompareViewModel(
+      companyViews,
+      routeData?.factorComparison?.map((c: any) => ({
+        factor: c.factor,
+        values: c.values ?? [],
+        winner: typeof c.winner === "number" ? c.winner : null,
+      })) ?? []
+    );
+  }, [companyViews, routeData]);
 
   const fetchCompare = useCallback(async (syms: string[]) => {
     setRouteLoading(true);
