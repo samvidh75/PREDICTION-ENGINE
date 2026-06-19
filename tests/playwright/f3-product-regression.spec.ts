@@ -402,12 +402,12 @@ test.describe("About page", () => {
   test("about page contains required product sections", async ({ page }) => {
     await page.goto("/?page=about");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText("What is StockStory?").first()).toBeVisible();
-    await expect(page.getByText("Product workflow").first()).toBeVisible();
-    await expect(page.getByText("What unlocks after sign-in").first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Research standards" })).toBeVisible();
-    await expect(page.getByText("Broker-neutral execution model").first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: "What StockStory does not do" })).toBeVisible();
+    await expect(page.getByText("About StockStory").first()).toBeVisible();
+    await expect(page.getByText("How the research workflow works").first()).toBeVisible();
+    await expect(page.getByText("What you get inside").first()).toBeVisible();
+    await expect(page.getByText("Why StockStory is different").first()).toBeVisible();
+    await expect(page.getByText("Research Standards").first()).toBeVisible();
+    await expect(page.getByText("Terms & Disclosures").first()).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
