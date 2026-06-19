@@ -16,14 +16,15 @@ export function productNavigate(pageKey: string, id?: string): void {
 
 export function ProductShell({ children, nav = true, className = "" }: { children: React.ReactNode; nav?: boolean; className?: string }): JSX.Element {
   return (
-    <div className={`min-h-screen bg-[#070A0F] text-[#E6EDF3] antialiased ${className}`}>
+    <div className={`min-h-screen bg-[#060A10] text-[#E8EDF2] antialiased ${className}`}>
+      <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41,98,255,0.03) 0%, transparent 60%)' }} />
       {nav && (
         <>
           <TopNav />
           <MobileNav />
         </>
       )}
-      <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14">
+      <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14 z-10">
         {children}
       </main>
     </div>
@@ -41,7 +42,7 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_18px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors duration-200 ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-200 ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
