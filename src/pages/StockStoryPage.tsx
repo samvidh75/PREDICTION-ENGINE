@@ -15,6 +15,8 @@ import ThesisHealthMeter from "../components/research/ThesisHealthMeter";
 import FactorScorePanel from "../components/research/FactorScorePanel";
 import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
 import { buildCompanyPageData, companyResearchToFactorScores } from "../lib/product/researchDataAdapter";
+import { ThesisSnapshotEngine } from "../services/portfolio/ThesisSnapshotEngine";
+import { getSnapshotChangeLabel } from "../services/ui/freshnessLabels";
 import SignalExplanationPanel from "../components/research/SignalExplanationPanel";
 import FactorDriverList from "../components/research/FactorDriverList";
 import RiskReviewPanel from "../components/research/RiskReviewPanel";
@@ -226,10 +228,30 @@ export const StockStoryPage: React.FC = () => {
   const handleToggleWatchlist = () => {
     const defaultList = watchlists[0];
     if (!defaultList) return;
-    if (isInWatchlist) { WatchlistEngine.removeTicker(defaultList.id, ticker); toast.success(`${ticker} removed from watchlist`); }
-    else { WatchlistEngine.addTicker(defaultList.id, ticker); toast.success(`${ticker} saved to watchlist`); }
+    if (isInWatchlist) {
+      WatchlistEngine.removeTicker(defaultList.id, ticker);
+      toast.success(`${ticker} removed from watchlist`);
+    } else {
+      WatchlistEngine.addTicker(defaultList.id, ticker);
+      toast.success(`${ticker} saved to watchlist`);
+      if (signal && signal !== null) {
+        ThesisSnapshotEngine.saveSnapshot({
+          symbol: ticker,
+          score: signal.score,
+          label: signal.label,
+          confidence: signal.confidence,
+          timestamp: new Date().toISOString(),
+          factors: {},
+        });
+      }
+    }
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
+
+  const snapshotLabel = useMemo(() => {
+    if (!isInWatchlist) return null;
+    return getSnapshotChangeLabel(ticker, signal?.score ?? null, signal?.label === "Risk rising" || signal?.label === "Avoid for now" ? 30 : null);
+  }, [isInWatchlist, ticker, signal]);
 
   const handleSaveNote = (value: string) => { setNoteText(value); NoteEngine.saveNote(ticker, value); };
 
@@ -332,7 +354,12 @@ export const StockStoryPage: React.FC = () => {
         </div>
 
         <div className="rounded-xl border border-white/[0.06] bg-[#0D1117] p-5">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">My Research Notes</div>
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Your Notes</span>
+            {noteText && noteText.trim().length > 0 && (
+              <span className="text-[9px] text-[#64748B]">Saved on this device</span>
+            )}
+          </div>
           <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.08] bg-[#0D1117] p-3 text-xs text-[#E6EDF3] placeholder:text-[#64748B] outline-none transition focus:border-[#2962FF]" aria-label="Research notes" />
         </div>
         <div className="mt-4 text-center">
@@ -460,14 +487,24 @@ export const StockStoryPage: React.FC = () => {
       </section>
 
       <section className="flex flex-wrap items-center gap-3">
-        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#EF4444] bg-white/[0.04]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
+        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#EF4444] bg-white/[0.04] border-[rgba(239,68,68,0.2)]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
           <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#EF4444]" : ""}`} />
-          {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
+          {isInWatchlist ? "Remove from watchlist" : "Track thesis"}
         </button>
+        {isInWatchlist && snapshotLabel && (
+          <span className="rounded-lg border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.06)] px-2.5 py-1.5 text-[10px] font-medium text-[#2962FF]">
+            {snapshotLabel}
+          </span>
+        )}
       </section>
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">My Research Notes</div>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Your Notes</span>
+          {noteText && noteText.trim().length > 0 && (
+            <span className="text-[9px] text-[#64748B]">Saved on this device</span>
+          )}
+        </div>
         <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-xs text-[#E6EDF3] outline-none transition placeholder-[#484F58]" aria-label="Research notes" />
       </div>
 
