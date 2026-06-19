@@ -31,7 +31,7 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
 
   const isLoading = isLoadingTelemetry || isProcessing;
   const hasError = !!telemetryError || !!predictiveError;
-  const errorMessage = 'Company health analysis is temporarily unavailable.';
+  const errorMessage = 'Health analysis pending';
 
   // Confidence indicator styling
   const confidenceColor = useMemo(() => {

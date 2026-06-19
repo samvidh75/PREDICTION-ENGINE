@@ -142,7 +142,7 @@ export function ResearchAuditDrawer({ open, onClose, symbol }: { open: boolean; 
         />
       ) : (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
-          <p className="text-xs text-[#8B949E]">Source audit data unavailable.</p>
+          <p className="text-xs text-[#8B949E]">Audit information pending.</p>
           <p className="mt-1 text-[10px] text-[#484F58]">No input lineage records found for {symbol}.</p>
         </div>
       )}

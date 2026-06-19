@@ -64,7 +64,7 @@ export const PublicRankingsPage: React.FC = () => {
       <ProductPage>
         {error && (
           <div className="mb-4 rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-4 text-xs text-[#EF4444]" role="status">
-            <p className="font-semibold">Some data is temporarily unavailable</p>
+            <p className="font-semibold">Some rankings are being refreshed</p>
             <p className="mt-1">{error}</p>
           </div>
         )}

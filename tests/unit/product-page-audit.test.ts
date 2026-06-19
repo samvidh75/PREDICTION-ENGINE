@@ -66,10 +66,13 @@ describe('Forbidden copy audit utilities', () => {
       expect(hasBackendProviderNames('IndianAPI')).not.toBeNull();
       expect(hasBackendProviderNames('Upstox')).not.toBeNull();
       expect(hasBackendProviderNames('Screener')).not.toBeNull();
+      expect(hasBackendProviderNames('Finnhub')).not.toBeNull();
     });
 
     it('passes clean product copy', () => {
       expect(hasBackendProviderNames('StockStory India')).toBeNull();
+      expect(hasBackendProviderNames('Research')).toBeNull();
+      expect(hasBackendProviderNames('Thesis')).toBeNull();
     });
   });
 
@@ -82,6 +85,7 @@ describe('Forbidden copy audit utilities', () => {
     });
 
     it('detects backend/ops vocabulary', () => {
+      expect(hasProductForbiddenTerms('provider health')).not.toBeNull();
       expect(hasProductForbiddenTerms('provider status')).not.toBeNull();
       expect(hasProductForbiddenTerms('data coverage')).not.toBeNull();
       expect(hasProductForbiddenTerms('freshness')).not.toBeNull();
@@ -100,6 +104,15 @@ describe('Forbidden copy audit utilities', () => {
       expect(hasProductForbiddenTerms('Buy now')).not.toBeNull();
     });
 
+    it('detects forbidden empty-state wording', () => {
+      expect(hasProductForbiddenTerms('data unavailable')).not.toBeNull();
+      expect(hasProductForbiddenTerms('quote unavailable')).not.toBeNull();
+      expect(hasProductForbiddenTerms('history unavailable')).not.toBeNull();
+      expect(hasProductForbiddenTerms('API unavailable')).not.toBeNull();
+      expect(hasProductForbiddenTerms('backend error')).not.toBeNull();
+      expect(hasProductForbiddenTerms('provider unavailable')).not.toBeNull();
+    });
+
     it('passes clean product copy', () => {
       expect(hasProductForbiddenTerms('Research this company')).toBeNull();
       expect(hasProductForbiddenTerms('How StockStory thinks')).toBeNull();
@@ -109,6 +122,8 @@ describe('Forbidden copy audit utilities', () => {
       expect(hasProductForbiddenTerms('Before you invest')).toBeNull();
       expect(hasProductForbiddenTerms('Continue with broker')).toBeNull();
       expect(hasProductForbiddenTerms('Track instead')).toBeNull();
+      expect(hasProductForbiddenTerms('Awaiting data')).toBeNull();
+      expect(hasProductForbiddenTerms('Research signals pending')).toBeNull();
     });
   });
 });

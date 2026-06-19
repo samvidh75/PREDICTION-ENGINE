@@ -268,7 +268,7 @@ export const WatchlistPage: React.FC = () => {
                             <div className="flex items-center gap-1 shrink-0">
                               <ProductAction variant="ghost" onClick={() => navigateToStock({ ticker, mode: "push" })}>Research</ProductAction>
                               <ProductAction variant="ghost" onClick={() => productNavigate("compare", ticker)}>Compare</ProductAction>
-                              <ProductAction variant="ghost" disabled>Invest</ProductAction>
+                              <ProductAction variant="ghost" disabled disabledReason="Connect broker">Invest</ProductAction>
                               <button onClick={() => handleRemoveTicker(ticker)} className="text-[10px] text-[#484F58] hover:text-[#F23645] transition-colors ml-1" disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
                             </div>
                           </div>

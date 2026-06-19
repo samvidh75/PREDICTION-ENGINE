@@ -117,8 +117,8 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
     return (
       <div className="bg-[#0D1117] border border-red-500/10 rounded-xl p-6 text-center">
         <div className="text-2xl mb-2">⚠️</div>
-        <div className="text-[#E6EDF3] text-sm font-medium">Signal data unavailable</div>
-        <div className="text-white/30 text-xs mt-1">Research signals are temporarily unavailable.</div>
+        <div className="text-[#E6EDF3] text-sm font-medium">Research signals pending</div>
+        <div className="text-white/30 text-xs mt-1">Research signals pending.</div>
       </div>
     );
   }

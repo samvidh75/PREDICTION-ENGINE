@@ -326,6 +326,7 @@ function StageTwo({
         <button
           type="button"
           disabled
+          title="Broker integration not yet available"
           className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#111827] px-4 text-xs font-semibold text-[#64748B] cursor-not-allowed"
         >
           Select a broker

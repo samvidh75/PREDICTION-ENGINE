@@ -69,7 +69,7 @@ export function SourceAuditSheet({ open, onClose, symbol, providers, dataSources
 
         {(!providers || providers.length === 0) && (!dataSources || dataSources.length === 0) && (!evidence || evidence.length === 0) && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-center">
-            <p className="text-sm font-medium text-[#8B949E]">Source audit data unavailable</p>
+            <p className="text-sm font-medium text-[#8B949E]">Audit information pending</p>
             <p className="mt-1 text-xs text-[#484F58]">Source metadata will appear once provider health data and input lineage are available for {symbol}.</p>
           </div>
         )}

@@ -83,7 +83,7 @@ export default function CompanyProgressiveFinancialAnalysis({
 
     if (financialsState.kind === "error" || financialsState.kind === "unavailable") {
       return {
-        marketCapExact: "Financial data unavailable",
+        marketCapExact: "Awaiting financial data",
         peFormatted: "—",
         industryPe: null as number | null,
         fiveYearPeAvg: null as number | null,

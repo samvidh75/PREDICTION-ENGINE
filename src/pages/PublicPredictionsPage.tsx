@@ -60,7 +60,7 @@ export default function PublicPredictionsPage(): JSX.Element {
 
         {error && (
           <div className="mb-4 rounded-xl border border-[#EF9A09]/20 bg-[#EF9A09]/[0.03] p-4 text-xs text-[#EF9A09]" role="status">
-            <p className="font-semibold">Some data is temporarily unavailable</p>
+            <p className="font-semibold">Some data is being refreshed</p>
             <p className="mt-1">{error}</p>
           </div>
         )}

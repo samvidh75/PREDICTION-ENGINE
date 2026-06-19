@@ -11,36 +11,52 @@ afterEach(() => {
 
 describe('FirstRunGuide', () => {
   it('renders when not dismissed', () => {
-    localStorage.setItem('ss_first_run_guide_dismissed', 'false');
+    localStorage.setItem('ss_onboarding_completed', 'false');
     render(<FirstRunGuide />);
-    expect(screen.getByText('Get started with StockStory India')).toBeInTheDocument();
+    expect(screen.getByText('Search a company')).toBeInTheDocument();
   });
 
   it('does not render when dismissed', () => {
-    localStorage.setItem('ss_first_run_guide_dismissed', 'true');
+    localStorage.setItem('ss_onboarding_completed', 'true');
     render(<FirstRunGuide />);
-    expect(screen.queryByText('Get started with StockStory India')).not.toBeInTheDocument();
+    expect(screen.queryByText('Step 1 of 5')).not.toBeInTheDocument();
   });
 
   it('dismisses on close button click', () => {
-    localStorage.setItem('ss_first_run_guide_dismissed', 'false');
+    localStorage.setItem('ss_onboarding_completed', 'false');
     render(<FirstRunGuide />);
     const dismissButton = screen.getByLabelText('Dismiss guide');
     fireEvent.click(dismissButton);
-    expect(screen.queryByText('Get started with StockStory India')).not.toBeInTheDocument();
-    expect(localStorage.getItem('ss_first_run_guide_dismissed')).toBe('true');
+    expect(screen.queryByText('Step 1 of 5')).not.toBeInTheDocument();
+    expect(localStorage.getItem('ss_onboarding_completed')).toBe('true');
   });
 
-  it('renders search, compare, and trust action buttons', () => {
-    localStorage.setItem('ss_first_run_guide_dismissed', 'false');
+  it('renders the first step by default', () => {
+    localStorage.setItem('ss_onboarding_completed', 'false');
     render(<FirstRunGuide />);
     expect(screen.getByText('Search a company')).toBeInTheDocument();
-    expect(screen.getByText('Compare companies')).toBeInTheDocument();
-    expect(screen.getByText('Check source trust')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 of 5')).toBeInTheDocument();
+  });
+
+  it('navigates to the next step on next click', () => {
+    localStorage.setItem('ss_onboarding_completed', 'false');
+    render(<FirstRunGuide />);
+    fireEvent.click(screen.getByLabelText('Next step'));
+    expect(screen.getByText('Read the thesis')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 of 5')).toBeInTheDocument();
+  });
+
+  it('shows start exploring on last step', () => {
+    localStorage.setItem('ss_onboarding_completed', 'false');
+    render(<FirstRunGuide />);
+    for (let i = 0; i < 4; i++) {
+      fireEvent.click(screen.getByLabelText('Next step'));
+    }
+    expect(screen.getByText('Start exploring')).toBeInTheDocument();
   });
 
   it('contains no forbidden trading language', () => {
-    localStorage.setItem('ss_first_run_guide_dismissed', 'false');
+    localStorage.setItem('ss_onboarding_completed', 'false');
     render(<FirstRunGuide />);
     const body = document.body.textContent || '';
     expect(body).not.toMatch(/Buy Stock|Sell Stock|Strong Buy|Strong Sell|Try Pro|Unlock Pro|Trade now/i);

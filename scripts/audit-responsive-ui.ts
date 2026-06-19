@@ -3,6 +3,10 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 
+const FORBIDDEN_BACKEND_VOCAB = /IndianAPI|Yahoo|Jugaad|NSEPython|Upstox|Screener|Finnhub|provider health|provider status|source pending|source verified|manual CSV|lineage|migration|backfill|diagnostics|data operations|quote unavailable|history unavailable|API unavailable|symbol gaps|verify:data|production verification|production diagnostics/i;
+
+const FORBIDDEN_FAKE_WORDING = /paper trading|simulated (trading|alert|P&L|PnL)|demo account|virtual trading|mock (trading|alert|PnL)|placeholder (alert|P&L|PnL)/i;
+
 const viewports = [
   [320, 568],
   [375, 812],
@@ -54,6 +58,8 @@ interface AuditResult {
   scannerCards: boolean;
   portfolioMobile: boolean;
   modalA11y: boolean;
+  backendVocab: boolean;
+  fakeWording: boolean;
 }
 
 async function auditPage(page: Page, url: string): Promise<string[]> {
@@ -86,6 +92,8 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
     const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(bodyText);
     const secretToken = /\b(REDIS_URL|DATABASE_URL|FIREBASE_PRIVATE_KEY|INDIANAPI_KEY|INDIANAPI_KEY|YAHOO_FINANCE_API_KEY)\b/.test(bodyText);
     const forbiddenTrading = /\b(Buy Stock|Sell Stock|Strong Buy|Strong Sell|Looks Good|Try Pro|Unlock Pro|Trade now|30 days free)\b/i.test(bodyText);
+    const backendVocab = /IndianAPI|Yahoo|Jugaad|NSEPython|Upstox|Screener|Finnhub|provider health|provider status|source pending|source verified|manual CSV|lineage|migration|backfill|diagnostics|data operations|quote unavailable|history unavailable|API unavailable|symbol gaps|verify:data|production verification|production diagnostics/i.test(bodyText);
+    const fakeWording = /paper trading|simulated (trading|alert|P&L|PnL)|demo account|virtual trading|mock (trading|alert|PnL)|placeholder (alert|P&L|PnL)/i.test(bodyText);
     const productShell = !!document.querySelector("[class*='bg-[#070A0F]'], [class*='bg-\\[\\#070A0F\\]'], [class*='bg-[#0D1117]'], [class*='bg-\\[\\#0D1117\\]']");
     const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-page, .ss-surface, .ss-dark-surface, .ssi-card") && !productShell;
     const bottomNav = document.querySelector(".ssi-bottom-nav");
@@ -108,9 +116,9 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
     const portfolioMobile = location.search.includes("portfolio") && !isLoginBoundary ? /What you own right now|Source audit/.test(bodyText) : true;
     const modalA11y = Array.from(document.querySelectorAll("[role='dialog']")).every((el) => el.getAttribute("aria-modal") === "true");
     const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => /Start research|View rankings|Check Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(el.textContent || ""));
-    return { overflow, hasNav: !!nav, hasCta: !!cta && primaryCtas.length > 0, rawToken, secretToken, forbiddenTrading, oldPlain, navCoversContent, fabCoversControl, hasAppShell, scannerCards, portfolioMobile, modalA11y };
+    return { overflow, hasNav: !!nav, hasCta: !!cta && primaryCtas.length > 0, rawToken, secretToken, forbiddenTrading, oldPlain, navCoversContent, fabCoversControl, hasAppShell, scannerCards, portfolioMobile, modalA11y, backendVocab, fakeWording };
   })()`).catch(() => null);
-  const localResult = raw ?? (await page.evaluate(`"use strict"; (() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false }))()`).catch(() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false })));
+  const localResult = raw ?? (await page.evaluate(`"use strict"; (() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false, backendVocab: false, fakeWording: false }))()`).catch(() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false, backendVocab: false, fakeWording: false } as AuditResult)));
   const r = localResult as unknown as AuditResult;
   if (r.overflow > 8) failures.push(`horizontal overflow ${r.overflow}px`);
   const authRoute = /[?&]page=(search|dashboard|watchlist|portfolio|stock)/.test(url);
@@ -119,6 +127,8 @@ async function auditPage(page: Page, url: string): Promise<string[]> {
   if (r.rawToken) failures.push("raw undefined/null/NaN/Infinity visible");
   if (r.secretToken) failures.push("provider secret/env name visible");
   if (r.forbiddenTrading) failures.push("forbidden trading/prototype monetization language visible");
+  if (r.backendVocab) failures.push("backend vocabulary (provider names/ops language) leaked");
+  if (r.fakeWording) failures.push("fake broker/alert/P&L wording detected");
   if (!authRoute && !url.includes("page=trust") && r.oldPlain) failures.push("premium surface selectors missing");
   if (false && r.navCoversContent) failures.push("bottom navigation overlaps actionable content");
   if (r.fabCoversControl) failures.push("floating help button overlaps first actionable control");
