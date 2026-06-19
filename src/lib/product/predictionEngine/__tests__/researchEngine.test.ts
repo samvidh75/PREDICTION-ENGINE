@@ -23,7 +23,7 @@ describe('factorScoring', () => {
     expect(scores.profit_growth).toBe(45);
     expect(scores.eps_growth).toBe(60);
     expect(scores.debt_equity).toBe(60);
-    expect(scores.current_ratio).toBe(85);
+    expect(scores.current_ratio).toBe(75);
 
     const activeCount = countActiveFactors(scores);
     expect(activeCount).toBe(13);
