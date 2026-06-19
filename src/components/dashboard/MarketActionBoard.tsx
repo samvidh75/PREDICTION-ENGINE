@@ -37,7 +37,7 @@ function formatPrice(value: number): string {
 }
 
 function formatPercent(value: number | null): string {
-  if (value === null) return 'Data unavailable';
+  if (value === null) return 'Awaiting data';
   return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
 }
 
@@ -184,7 +184,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
         {snapshot && (
           <div className="text-right text-[9px] text-white/30">
             <div className={`font-bold uppercase tracking-wider ${stateClass(snapshot.status)}`}>{snapshot.status}</div>
-            <div className="mt-1">As of {snapshot.asOf || 'Data unavailable'}</div>
+            <div className="mt-1">As of {snapshot.asOf || 'Awaiting update'}</div>
           </div>
         )}
       </div>

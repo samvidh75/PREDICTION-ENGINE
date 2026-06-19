@@ -75,7 +75,7 @@ export default function StockStoryPageF0(): JSX.Element {
     high: "High conviction",
     moderate: "Moderate conviction",
     low: "Under review",
-    none: "Insufficient information",
+    none: "Not enough information",
   };
 
   const convictionTone: Record<ConvictionLevel, "verified" | "blue" | "warning" | "muted"> = {

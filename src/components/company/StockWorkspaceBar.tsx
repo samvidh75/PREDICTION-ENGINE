@@ -4,9 +4,9 @@ import { useLiveQuote } from "../../hooks/useLiveQuotes";
 import { api, type CompanyMetadata } from "../../services/api/client";
 
 function formatDateTime(value?: string): string {
-  if (!value) return "Research signals pending";
+  if (!value) return "Updated information pending";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Research signals pending";
+  if (Number.isNaN(date.getTime())) return "Updated information pending";
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
@@ -57,8 +57,8 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
     return () => controller.abort();
   }, [ticker]);
 
-  const verification = metadataLoading ? "Loading" : metadata?.verificationStatus || "Pending";
-  const freshness = quoteState.loading ? "Loading" : metadata?.verificationStatus ? "Available" : "Pending";
+  const researchStatus = metadataLoading ? "Loading research" : metadata?.verificationStatus === "VERIFIED" ? "Research active" : "Research pending";
+  const dataStatus = quoteState.loading ? "Loading" : metadata?.verificationStatus === "VERIFIED" ? "Available" : "Awaiting data";
 
   return (
     <section aria-label="Stock workspace context" className="mb-4 w-full rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#0C1119] px-4 py-3 shadow-sm">
@@ -75,11 +75,11 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
       <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         <TrustItem
           label="Research status"
-          value={verification}
-          valueClass={stateClass(verification)}
+          value={researchStatus}
+          valueClass={stateClass(researchStatus)}
           detail={metadata?.verificationReasons?.length ? metadata.verificationReasons.join(", ") : undefined}
         />
-        <TrustItem label="Quote availability" value={freshness} valueClass={stateClass(freshness)} />
+        <TrustItem label="Market data" value={dataStatus} valueClass={stateClass(dataStatus)} />
       </div>
 
       <div className="mt-2 text-[9px] leading-relaxed text-[#64748B]">

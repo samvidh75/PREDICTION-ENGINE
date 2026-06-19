@@ -37,6 +37,8 @@ export const BACKEND_VOCABULARY_PATTERNS = [
   /verify:data/i,
   /production verification/i,
   /production diagnostics/i,
+  /Insufficient information/i,
+  /Quote availability/i,
 ] as const;
 
 export const FORBIDDEN_TRADING_PATTERNS = [
@@ -107,6 +109,8 @@ export const PRODUCT_FORBIDDEN_TERMS = [
   /sure shot/i,
   /\bmultibagger\b/i,
   /Buy now/i,
+  /Insufficient information/i,
+  /Quote availability/i,
 ] as const;
 
 export const FORBIDDEN_SOCIAL_PROOF_PATTERNS = [
