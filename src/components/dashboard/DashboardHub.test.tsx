@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import DashboardHub from './DashboardHub';
 import { LayoutProvider } from '../../context/LayoutContext';
@@ -21,6 +21,14 @@ vi.mock('../../services/portfolio/WatchlistEngine', () => ({
 vi.mock('../../services/portfolio/PortfolioEngine', () => ({
   PortfolioEngine: {
     getHoldings: vi.fn(() => []),
+    removeHolding: vi.fn(),
+  },
+}));
+
+vi.mock('../../services/portfolio/NoteEngine', () => ({
+  NoteEngine: {
+    getNote: vi.fn(() => ({ note: '', lastUpdated: '' })),
+    saveNote: vi.fn(),
   },
 }));
 
@@ -34,8 +42,11 @@ vi.mock('../../services/search/RecentSearchStore', () => ({
 vi.mock('../../services/stocks/StockRegistry', () => ({
   StockRegistry: {
     getStock: vi.fn(() => null),
+    getAllStocks: vi.fn(() => []),
   },
 }));
+
+
 
 vi.mock('../../architecture/navigation/routeCoordinator', () => ({
   navigateToStock: vi.fn(),
@@ -46,6 +57,7 @@ const mockGetSignals = vi.fn();
 vi.mock('../../services/api/client', () => ({
   api: {
     getSignals: (...args: unknown[]) => mockGetSignals(...args),
+    getScanner: vi.fn(() => Promise.resolve({ data: [] })),
   },
   ApiError: class ApiError extends Error {
     status: number;
