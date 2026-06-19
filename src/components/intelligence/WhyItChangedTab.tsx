@@ -94,9 +94,9 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
     return (
       <div className="flex flex-col gap-4" aria-busy="true" aria-live="polite">
         {[1, 2, 3].map(i => (
-          <div key={i} className="animate-pulse rounded-xl border border-slate-200 bg-white p-4">
-            <div className="mb-2 h-3 w-2/5 rounded bg-slate-200" />
-            <div className="h-2 w-3/5 rounded bg-slate-100" />
+          <div key={i} className="animate-pulse rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.03)] p-4">
+            <div className="mb-2 h-3 w-2/5 rounded bg-[rgba(148,163,184,0.12)]" />
+            <div className="h-2 w-3/5 rounded bg-[rgba(148,163,184,0.08)]" />
           </div>
         ))}
       </div>
@@ -105,18 +105,18 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
 
   if (error || !data) {
     return (
-      <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-center">
-        <p className="mb-1 text-sm font-bold text-slate-700">Explanation Unavailable</p>
-        <p className="text-xs text-slate-500">{error || "Unable to load prediction explanation for this symbol."}</p>
+      <div className="rounded-xl border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] p-5 text-center">
+        <p className="mb-1 text-sm font-bold text-[#E6EDF3]">Research signals pending</p>
+        <p className="text-xs text-[#9AA7B5]">{error || "Research signals are being prepared for this company."}</p>
       </div>
     );
   }
 
   if (!data.classification.from) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-5 text-center">
-        <p className="mb-1 text-sm font-bold text-slate-600">First Prediction</p>
-        <p className="text-xs leading-relaxed text-slate-400">
+      <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.03)] p-5 text-center">
+        <p className="mb-1 text-sm font-bold text-[#E6EDF3]">Research signals pending</p>
+        <p className="text-xs leading-relaxed text-[#9AA7B5]">
           This is the first prediction for {data.symbol}. Change tracking begins with the next prediction cycle.
         </p>
       </div>

@@ -313,6 +313,7 @@ export const StockStoryPage: React.FC = () => {
         <div className="rounded-2xl border border-white/[0.06] bg-[#0D1117] p-6">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3] mb-1">{companyName}</h1>
               <div className="inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
                 Research signals pending
               </div>
@@ -426,6 +427,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
             <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3] mb-1">{companyName}</h1>
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
                   {storyData.classification ?? "Not enough information"}

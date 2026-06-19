@@ -94,16 +94,16 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
                 Symbol
               </span>
               <span className="font-mono text-sm font-bold text-[#0A0A0A]">
-                {symbol || 'N/A'}
+                {symbol || '—'}
               </span>
             </div>
 
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">
-                Data Source
+                Status
               </span>
               <span className="font-mono text-[10px] text-[#525252]">
-                {telemetry?.dataSource || 'Awaiting...'}
+                {telemetry?.dataSource ? 'Research signals pending' : 'Research signals pending'}
               </span>
             </div>
 
