@@ -337,14 +337,14 @@ export const StockStoryPage: React.FC = () => {
             </div>
             <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Live Quote</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Price context</div>
                 <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[#E6EDF3]">{priceLabel}</div>
                 <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{changeLabel}</div>
               </div>
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Volume</div>
                 <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Awaiting market data"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "—"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-[#64748B]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -458,16 +458,16 @@ export const StockStoryPage: React.FC = () => {
           <div className="flex flex-col gap-4 lg:items-end">
             <div className="grid grid-cols-2 gap-6 rounded-xl border border-white/[0.06] bg-white/[0.04] p-3.5">
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Live Price</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Price context</div>
                 <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[var(--color-active)]' : 'text-[var(--color-danger)]'}`}>{changeLabel}</div>
+                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{changeLabel}</div>
               </div>
               <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Volume</div>
+                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Volume</div>
                 <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Awaiting market data"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "—"}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] text-[#484F58]">Updated {formatDateTime(quote?.updatedAt)}</div>
+                <div className="mt-0.5 font-mono text-[9px] text-[#64748B]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
             </div>
           </div>

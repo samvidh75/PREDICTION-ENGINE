@@ -55,7 +55,7 @@ function getFactorValue(factorScores: UnifiedPredictionOutput['factorScores'], g
 
 function mapUnifiedOutputToContractInput(output: UnifiedPredictionOutput): Record<string, unknown> {
   return {
-    healthScore: output.rankingScore ?? 50,
+    healthScore: output.rankingScore,
     classification: UNIFIED_TO_STOCKSTORY_CLASSIFICATION[output.classification],
     quality: getFactorValue(output.factorScores, 'quality'),
     growth: getFactorValue(output.factorScores, 'growth'),
@@ -134,19 +134,25 @@ export class PredictionFactory {
           const classification = mapStockStoryClassification(engineResult.classification);
 
           // P0-MEGA: Correct confidence formula — risk REDUCES confidence
-          const riskStrength = Math.max(0, 100 - (typeof engineResult.risk === 'number' ? engineResult.risk : 50));
-          const valuationScore = typeof engineResult.valuation === 'number' ? engineResult.valuation : 50;
-          const growthScore = typeof engineResult.growth === 'number' ? engineResult.growth : 50;
-          const momentumScore = typeof engineResult.momentum === 'number' ? engineResult.momentum : 50;
-          const qualityScore = typeof engineResult.quality === 'number' ? engineResult.quality : 50;
+          const riskStrength = Math.max(0, 100 - criticalScores.risk);
+          const valuationScore = typeof engineResult.valuation === 'number' ? engineResult.valuation : null;
+          const growthScore = criticalScores.growth;
+          const momentumScore = typeof engineResult.momentum === 'number' ? engineResult.momentum : null;
+          const qualityScore = criticalScores.quality;
 
-          const calibratedConfidence = Math.min(95, Math.max(5, Math.round(
-            (riskStrength * 0.35) +
-            (valuationScore * 0.25) +
-            (growthScore * 0.20) +
-            (momentumScore * 0.15) +
-            (qualityScore * 0.05)
-          )));
+          const confidenceInputs = [
+            { score: riskStrength, weight: 0.35 },
+            { score: valuationScore, weight: 0.25 },
+            { score: growthScore, weight: 0.20 },
+            { score: momentumScore, weight: 0.15 },
+            { score: qualityScore, weight: 0.05 },
+          ].filter(c => c.score !== null);
+
+          const calibratedConfidence = confidenceInputs.length > 0
+            ? Math.min(95, Math.max(5, Math.round(
+                confidenceInputs.reduce((sum, c) => sum + c.score! * c.weight, 0)
+              )))
+            : 5;
 
           // Sector score: use factor snapshot if available, else null
           const sectorScore = (engineResult._sectorStrengthFactor != null)
@@ -184,7 +190,7 @@ export class PredictionFactory {
             valueScore: Math.round(valuationScore),
             momentumScore: Math.round(momentumScore),
             riskScore: Math.round(criticalScores.risk),
-            sectorScore: sectorScore !== null ? Math.round(sectorScore) : 50,
+            sectorScore: sectorScore !== null ? Math.round(sectorScore) : 0,
             priceAtPrediction: null,
             benchmarkLevel: null,
             predictionHorizon: horizon as RegistryPredictionHorizon,

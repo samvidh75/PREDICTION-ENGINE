@@ -29,15 +29,16 @@ export class AntiCheatingAuditor {
          FROM prediction_registry
          WHERE validation_status = 'validated'
            AND validated_at IS NOT NULL
-           AND validated_at::date <= prediction_date`
+           AND prediction_horizon IS NOT NULL
+           AND validated_at <= (prediction_date::timestamp + (prediction_horizon || ' days')::interval)`
       );
       const lookAheadCount = parseInt(lookAheadResult.rows[0].cnt, 10);
       if (lookAheadCount > 0) {
         passed = false;
-        findings.push(`Look-ahead bias detected: ${lookAheadCount} validated records have validated_at <= prediction_date.`);
+        findings.push(`Look-ahead bias detected: ${lookAheadCount} validated records have validated_at <= prediction_date + horizon days.`);
         recommendations.push('Investigate and correct timestamps. All validated_at must be strictly after prediction_date + horizon days.');
       } else {
-        findings.push('No look-ahead bias: all validated_at > prediction_date for validated records.');
+        findings.push('No look-ahead bias: all validated_at > prediction_date + horizon for validated records.');
       }
     } catch (err: any) {
       findings.push(`Look-ahead bias check failed (DB error): ${err.message}`);
