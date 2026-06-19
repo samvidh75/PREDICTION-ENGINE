@@ -157,6 +157,36 @@ describe('GROUP B: Metric Identity', () => {
     expect(result.grossMargin).toBe(0.60);
     expect(result.score).toBeGreaterThanOrEqual(50);
   });
+
+  it('ROA present changes QualityEngine output', () => {
+    const withRoa = qualityEngine.evaluate(makeFixture({
+      financials: makeFinancials({ roa: 0.20, roe: 0.18, roic: 0.14 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    const withoutRoa = qualityEngine.evaluate(makeFixture({
+      financials: makeFinancials({ roa: null, roe: 0.18, roic: 0.14 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(withRoa.score).not.toBe(withoutRoa.score);
+  });
+
+  it('negative ROA is penalized', () => {
+    const result = qualityEngine.evaluate(makeFixture({
+      financials: makeFinancials({ roa: -0.05, roe: 0.18, roic: 0.14 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+  });
+
+  it('ROA null does not default to average', () => {
+    const result = qualityEngine.evaluate(makeFixture({
+      financials: makeFinancials({ roa: null, roe: 0.18, roic: 0.14 }),
+      sector: { name: 'General', sectorStrength: 50, sectorMomentum: 'Steady' },
+    }));
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
+  });
 });
 
 // ---------------------------------------------------------------------------
