@@ -12,6 +12,7 @@ export type PageKey =
   | "company"
   | "dashboard"
   | "search"
+  | "scanner"
   | "portfolio"
   | "watchlist"
   | "settings"
@@ -20,7 +21,9 @@ export type PageKey =
   | "validation"
   | "predictions"
   | "rankings"
-  | "compare";
+  | "compare"
+  | "alerts"
+  | "invest";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {
@@ -39,6 +42,8 @@ export function getPageKeyFromUrl(): PageKey {
       dashboard: "dashboard",
       market: "dashboard",
       search: "search",
+      scanner: "scanner",
+      scan: "scanner",
       portfolio: "portfolio",
       watchlist: "watchlist",
       settings: "settings",
@@ -48,6 +53,8 @@ export function getPageKeyFromUrl(): PageKey {
       predictions: "predictions",
       rankings: "rankings",
       compare: "compare",
+      alerts: "alerts",
+      invest: "invest",
     };
 
     return mapping[raw] ?? "landing";
@@ -82,8 +89,8 @@ export function notifyUrlChange(): void {
 
 /** Protected pages that require authentication. */
 export const PROTECTED_PAGES: PageKey[] = [
-  "dashboard", "search", "stock", "company",
-  "watchlist", "portfolio", "settings",
+  "dashboard", "search", "scanner", "stock", "company",
+  "watchlist", "portfolio", "settings", "alerts", "invest",
 ];
 
 /** Public pages that don't require authentication. */

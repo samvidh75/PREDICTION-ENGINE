@@ -209,7 +209,7 @@ function StageOne({
         </h3>
         <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">
           {thesisSummary ||
-            `Investment thesis for ${displayName} is being evaluated based on market positioning, financial health, and sector tailwinds.`}
+            `Investment thesis for ${displayName} is being evaluated based on market positioning, fundamentals, and sector context.`}
         </p>
       </ProductPanel>
 

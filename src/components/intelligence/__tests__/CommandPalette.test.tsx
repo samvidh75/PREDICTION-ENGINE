@@ -24,7 +24,11 @@ describe('CommandPalette', () => {
     expect(screen.getByText('Open watchlist')).toBeInTheDocument();
     expect(screen.getByText('Open portfolio')).toBeInTheDocument();
     expect(screen.getByText('Open methodology')).toBeInTheDocument();
-    expect(screen.getByText('Open About')).toBeInTheDocument();
+    expect(screen.getByText('Open alerts')).toBeInTheDocument();
+    expect(screen.getByText('Find quality compounders')).toBeInTheDocument();
+    expect(screen.getByText('Find undervalued quality')).toBeInTheDocument();
+    expect(screen.getByText('Find improving momentum')).toBeInTheDocument();
+    expect(screen.getByText('Review tracked companies')).toBeInTheDocument();
   });
 
   it('does not render when closed', () => {

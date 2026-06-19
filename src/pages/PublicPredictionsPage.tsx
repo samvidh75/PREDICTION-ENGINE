@@ -7,16 +7,8 @@ import Button from "../components/ui/Button";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { api, ApiError, type Signal } from "../services/api/client";
 import { PremiumPage, MetricCard, StatusChip } from "../components/premium/PremiumUI";
-import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
 import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
-import { MethodologyLink } from "../components/intelligence/MethodologyLink";
 import { TrendingUp, BarChart3 } from "lucide-react";
-
-interface CoverageInfo {
-  symbolCount: number | null;
-  registryRowCount: number | null;
-  latestPredictionDate: string | null;
-}
 
 export default function PublicPredictionsPage(): JSX.Element {
   const [signals, setSignals] = useState<Signal[]>([]);
@@ -24,7 +16,6 @@ export default function PublicPredictionsPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [snapshotDate, setSnapshotDate] = useState<string | null>(null);
   const [symbolsAnalyzed, setSymbolsAnalyzed] = useState<number | null>(null);
-  const [coverageData, setCoverageData] = useState<CoverageInfo | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -37,9 +28,6 @@ export default function PublicPredictionsPage(): JSX.Element {
         setLoading(false);
       })
       .catch((err) => { if (ctrl.signal.aborted) return; setError(err instanceof ApiError ? err.message : "Signals unavailable"); setLoading(false); });
-    api.getDataCoverage()
-      .then((cov) => { if (ctrl.signal.aborted) return; setCoverageData({ symbolCount: cov.coverage?.symbols?.count ?? null, registryRowCount: cov.coverage?.predictionRegistry?.rowCount ?? null, latestPredictionDate: cov.coverage?.predictionRegistry?.latestPredictionDate ?? null }); })
-      .catch(() => {});
     return () => ctrl.abort();
   }, []);
 
@@ -62,13 +50,12 @@ export default function PublicPredictionsPage(): JSX.Element {
       <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-24 lg:px-16 xl:px-24">
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Prediction Intelligence</span>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research Intelligence</span>
             <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Score changes</h1>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[#8B949E]">
-              Score changes from the latest research cycle. Source-backed, no buy/sell language.
+              Score changes from the latest research cycle. Research only, not investment advice.
             </p>
           </div>
-          {snapshotDate && <ModelRunBadge runDate={snapshotDate} />}
         </div>
 
         {error && (
@@ -78,10 +65,9 @@ export default function PublicPredictionsPage(): JSX.Element {
           </div>
         )}
 
-        <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <MetricCard label="Changes visible" value={signals.length.toLocaleString("en-IN")} detail="Source-backed score changes." />
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
+          <MetricCard label="Changes visible" value={signals.length.toLocaleString("en-IN")} detail="Score changes from latest cycle." />
           <MetricCard label="Symbols analyzed" value={symbolsAnalyzed !== null ? symbolsAnalyzed.toLocaleString("en-IN") : "Unavailable"} detail="Latest cycle metadata." tone={symbolsAnalyzed ? "ok" : "muted"} />
-          <MetricCard label="Coverage rows" value={coverageData?.registryRowCount !== null && coverageData?.registryRowCount !== undefined ? coverageData.registryRowCount.toLocaleString("en-IN") : "Pending"} detail="Prediction registry." tone={coverageData?.registryRowCount ? "ok" : "warn"} />
         </div>
 
         {loading ? (
@@ -94,36 +80,19 @@ export default function PublicPredictionsPage(): JSX.Element {
                 <h2 className="text-sm font-semibold text-[#E6EDF3]">No score changes in the latest cycle</h2>
                 <p className="max-w-md text-xs leading-relaxed text-[#8B949E]">
                   {symbolsAnalyzed && symbolsAnalyzed > 0
-                    ? `${symbolsAnalyzed.toLocaleString("en-IN")} companies registered. Score changes appear after the next verified update cycle.`
-                    : "Score changes appear when provider data has been processed and verified."}
+                    ? `${symbolsAnalyzed.toLocaleString("en-IN")} companies analysed. Score changes appear after the next completed research cycle.`
+                    : "Score changes appear after the next research cycle."}
                 </p>
                 <div className="flex gap-2">
                   <Button type="button" onClick={() => setPage("rankings")} className="h-10 px-4 text-xs">
                     <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Browse rankings
                   </Button>
-                  <MethodologyLink onClick={() => setPage("methodology")} label="View methodology" />
+                  <Button type="button" onClick={() => setPage("methodology")} className="h-10 border border-white/5 bg-transparent px-4 text-xs text-[#8B949E] hover:text-[#E6EDF3]">
+                    View methodology
+                  </Button>
                 </div>
               </div>
             </RoundedDepthPanel>
-            {coverageData && (
-              <div className="rounded-2xl border border-white/5 bg-[#0D1117] p-5">
-                <h4 className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Data coverage</h4>
-                <div className="mt-3 grid grid-cols-3 gap-4">
-                  <div>
-                    <span className="text-[10px] text-[#484F58]">Companies covered</span>
-                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.symbolCount !== null ? coverageData.symbolCount.toLocaleString() : "—"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#484F58]">Scored records</span>
-                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.registryRowCount !== null ? coverageData.registryRowCount.toLocaleString() : "—"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#484F58]">Latest update</span>
-                    <span className="block font-mono text-sm font-bold text-[#E6EDF3]">{coverageData.latestPredictionDate || "—"}</span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           <div className="rounded-[22px] border border-white/5 bg-[#0D1117] overflow-hidden">
@@ -135,7 +104,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                   <th scope="col" className="p-4">Signal</th>
                   <th scope="col" className="p-4 hidden sm:table-cell">Severity</th>
                   <th scope="col" className="p-4 hidden md:table-cell">Explanation</th>
-                  <th scope="col" className="p-4 hidden lg:table-cell">Freshness</th>
+                  <th scope="col" className="p-4 hidden lg:table-cell">Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -189,7 +158,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-[#8B949E]">{signal.type || "Signal pending"}</span>
                     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${signal.snapshotDate || snapshotDate ? "border-[#22AB94]/10 text-[#22AB94]" : "border-[#EF9A09]/10 text-[#EF9A09]"}`}>
-                      {signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Freshness pending"}
+                      {signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Pending"}
                     </span>
                   </div>
                 </button>
