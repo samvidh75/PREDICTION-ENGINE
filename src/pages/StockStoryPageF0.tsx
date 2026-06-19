@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ArrowLeftRight, Bookmark, TrendingUp, Activity, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Bookmark, TrendingUp } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
-import { ProductShell, ProductPage, ProductPanel, ProductStatusPill, productNavigate, ProductAction } from "../components/product/ProductUI";
+import { ProductShell, ProductPage, productNavigate, ProductAction } from "../components/product/ProductUI";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { useToast } from "../components/feedback/useToast";
@@ -10,6 +10,7 @@ import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { ShareResearchSummary } from "../components/share/ShareResearchSummary";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
+import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
 type PredictionHorizon = (typeof HORIZONS)[number];
@@ -62,16 +63,7 @@ export default function StockStoryPageF0(): JSX.Element {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const companyName = stockInfo?.companyName || ticker || "Company";
-  const sector = stockInfo?.sector || null;
-  const snapshot = stockInfo?.telemetrySnapshot ?? null;
-
-  const hasPredictionEngine = snapshot !== null;
-  const score = snapshot?.healthScore ?? null;
-  const confidence = snapshot?.confidenceScore ?? null;
-
-  const signalTone: "constructive" | "caution" | "severe" | null = score !== null ? (score >= 60 ? "constructive" : score >= 40 ? "caution" : "severe") : null;
-  const signalLabel = score !== null ? (score >= 60 ? "Healthy" : score >= 40 ? "Unhealthy" : "Very Unhealthy") : "Research signals pending";
+  const runtimeResult = buildCompanyResearch(ticker, stockInfo?.companyName, stockInfo?.sector, stockInfo ? { sector: stockInfo.sector } : null, isInWatchlist);
 
   return (
     <ProductShell>
@@ -86,56 +78,11 @@ export default function StockStoryPageF0(): JSX.Element {
         </div>
 
         <div className="mb-6">
-          <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{companyName}</h1>
-          {ticker && (
+          <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{runtimeResult.identity.displayName}</h1>
+          {ticker && runtimeResult.identity.displayName !== ticker && (
             <span className="mt-0.5 inline-block font-mono text-xs font-medium text-[#9AA7B5]">{ticker}</span>
           )}
         </div>
-
-        {hasPredictionEngine && (
-          <div className="mb-5 grid gap-4 sm:grid-cols-2">
-            <ProductPanel className="p-4">
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">
-                <Activity className="h-3 w-3" /> Prediction Engine
-              </div>
-              <div className="mt-2">
-                <ProductStatusPill tone={signalTone === "constructive" ? "verified" : signalTone === "severe" ? "danger" : "warning"}>
-                  {signalLabel}
-                </ProductStatusPill>
-              </div>
-              {score !== null && (
-                <p className="mt-1.5 text-xs text-[#9AA7B5]">Score: {Math.round(score)}/100 &middot; {confidence !== null ? `${Math.round(confidence)}% confidence` : "No confidence data"}</p>
-              )}
-            </ProductPanel>
-            <ProductPanel className="p-4">
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">
-                <ShieldAlert className="h-3 w-3" /> Healthometer
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {snapshot && (
-                  <>
-                    <ProductStatusPill tone={snapshot.healthScore >= 60 ? "verified" : snapshot.healthScore >= 40 ? "warning" : "danger"}>
-                      Health: {Math.round(snapshot.healthScore)}
-                    </ProductStatusPill>
-                    <ProductStatusPill tone={snapshot.confidenceScore >= 60 ? "verified" : snapshot.confidenceScore >= 40 ? "blue" : "muted"}>
-                      Confidence: {Math.round(snapshot.confidenceScore)}
-                    </ProductStatusPill>
-                  </>
-                )}
-              </div>
-            </ProductPanel>
-          </div>
-        )}
-
-        {!hasPredictionEngine && ticker && (
-          <div className="mb-5">
-            <ProductPanel className="p-4">
-              <div className="flex items-center gap-1.5 text-xs text-[#9AA7B5]">
-                Research data is being prepared for this company.
-              </div>
-            </ProductPanel>
-          </div>
-        )}
 
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
