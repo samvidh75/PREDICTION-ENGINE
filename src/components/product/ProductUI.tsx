@@ -36,6 +36,33 @@ export function ProductPage({ children, className = "", as = "div" }: { children
   return <Component className={`mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 lg:px-8 ${className}`}>{children}</Component>;
 }
 
+export function ProductPageHeader({
+  title,
+  subtitle,
+  actions,
+  status,
+  className = "",
+}: {
+  title: string;
+  subtitle?: string;
+  actions?: React.ReactNode;
+  status?: React.ReactNode;
+  className?: string;
+}): JSX.Element {
+  return (
+    <div className={`mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.04] pb-4 ${className}`}>
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{title}</h1>
+        {subtitle && <p className="mt-1 text-xs text-[#9AA7B5]">{subtitle}</p>}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {status}
+        {actions}
+      </div>
+    </div>
+  );
+}
+
 export function ProductSection({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
   return <section className={`py-5 md:py-7 ${className}`}>{children}</section>;
 }
