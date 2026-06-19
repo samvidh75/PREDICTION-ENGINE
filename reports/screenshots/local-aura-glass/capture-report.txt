@@ -1,0 +1,119 @@
+=== UI Screenshot Capture Report ===
+Source: http://localhost:5173
+Output: /Users/samvidhmehta/Desktop/PREDICTION-ENGINE/reports/screenshots/local-aura-glass
+Captured: 2026-06-19T14:10:52.876Z
+
+  [ERR] landing_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=landing
+Call log:
+  - navigating to "http://localhost:5173/?page=landing", waiting until "networkidle"
+
+  [ERR] landing_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=landing
+Call log:
+  - navigating to "http://localhost:5173/?page=landing", waiting until "networkidle"
+
+  [ERR] landing_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=landing
+Call log:
+  - navigating to "http://localhost:5173/?page=landing", waiting until "networkidle"
+
+  [ERR] landing_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=landing
+Call log:
+  - navigating to "http://localhost:5173/?page=landing", waiting until "networkidle"
+
+  [ERR] about_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=about
+Call log:
+  - navigating to "http://localhost:5173/?page=about", waiting until "networkidle"
+
+  [ERR] about_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=about
+Call log:
+  - navigating to "http://localhost:5173/?page=about", waiting until "networkidle"
+
+  [ERR] about_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=about
+Call log:
+  - navigating to "http://localhost:5173/?page=about", waiting until "networkidle"
+
+  [ERR] about_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=about
+Call log:
+  - navigating to "http://localhost:5173/?page=about", waiting until "networkidle"
+
+  [ERR] rankings_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=rankings
+Call log:
+  - navigating to "http://localhost:5173/?page=rankings", waiting until "networkidle"
+
+  [ERR] rankings_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=rankings
+Call log:
+  - navigating to "http://localhost:5173/?page=rankings", waiting until "networkidle"
+
+  [ERR] rankings_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=rankings
+Call log:
+  - navigating to "http://localhost:5173/?page=rankings", waiting until "networkidle"
+
+  [ERR] rankings_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=rankings
+Call log:
+  - navigating to "http://localhost:5173/?page=rankings", waiting until "networkidle"
+
+  [ERR] predictions_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=predictions
+Call log:
+  - navigating to "http://localhost:5173/?page=predictions", waiting until "networkidle"
+
+  [ERR] predictions_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=predictions
+Call log:
+  - navigating to "http://localhost:5173/?page=predictions", waiting until "networkidle"
+
+  [ERR] predictions_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=predictions
+Call log:
+  - navigating to "http://localhost:5173/?page=predictions", waiting until "networkidle"
+
+  [ERR] predictions_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=predictions
+Call log:
+  - navigating to "http://localhost:5173/?page=predictions", waiting until "networkidle"
+
+  [ERR] trust-centre_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=trust
+Call log:
+  - navigating to "http://localhost:5173/?page=trust", waiting until "networkidle"
+
+  [ERR] trust-centre_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=trust
+Call log:
+  - navigating to "http://localhost:5173/?page=trust", waiting until "networkidle"
+
+  [ERR] trust-centre_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=trust
+Call log:
+  - navigating to "http://localhost:5173/?page=trust", waiting until "networkidle"
+
+  [ERR] trust-centre_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=trust
+Call log:
+  - navigating to "http://localhost:5173/?page=trust", waiting until "networkidle"
+
+  [ERR] login_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=login
+Call log:
+  - navigating to "http://localhost:5173/?page=login", waiting until "networkidle"
+
+  [ERR] login_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=login
+Call log:
+  - navigating to "http://localhost:5173/?page=login", waiting until "networkidle"
+
+  [ERR] login_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=login
+Call log:
+  - navigating to "http://localhost:5173/?page=login", waiting until "networkidle"
+
+  [ERR] login_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=login
+Call log:
+  - navigating to "http://localhost:5173/?page=login", waiting until "networkidle"
+
+  [ERR] signup_mobile-375: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=signup
+Call log:
+  - navigating to "http://localhost:5173/?page=signup", waiting until "networkidle"
+
+  [ERR] signup_mobile-430: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=signup
+Call log:
+  - navigating to "http://localhost:5173/?page=signup", waiting until "networkidle"
+
+  [ERR] signup_tablet-768: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=signup
+Call log:
+  - navigating to "http://localhost:5173/?page=signup", waiting until "networkidle"
+
+  [ERR] signup_desktop-1440: Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/?page=signup
+Call log:
+  - navigating to "http://localhost:5173/?page=signup", waiting until "networkidle"
+
+
+Total: 7 routes × 4 viewports = 28 screenshots

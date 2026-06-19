@@ -15,6 +15,11 @@ import ThesisHealthMeter from "../components/research/ThesisHealthMeter";
 import FactorScorePanel from "../components/research/FactorScorePanel";
 import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
 import { buildCompanyPageData, companyResearchToFactorScores } from "../lib/product/researchDataAdapter";
+import SignalExplanationPanel from "../components/research/SignalExplanationPanel";
+import FactorDriverList from "../components/research/FactorDriverList";
+import RiskReviewPanel from "../components/research/RiskReviewPanel";
+import NextBestActionPanel from "../components/research/NextBestActionPanel";
+import ResearchContextLink from "../components/research/ResearchContextLink";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -475,6 +480,7 @@ export const StockStoryPage: React.FC = () => {
         {activeTab === "thesis" && (
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="space-y-5 lg:col-span-2">
+              <SignalExplanationPanel signal={signal} />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Thesis</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[#E6EDF3]">
@@ -533,8 +539,17 @@ export const StockStoryPage: React.FC = () => {
                   </ul>
                 </div>
               )}
+              <RiskReviewPanel
+                riskFlags={pageData?.keyRiskFlags ?? []}
+                overallRisk={pageData?.overallRisk ?? null}
+                riskScore={factorView?.riskScore ?? null}
+              />
+              <NextBestActionPanel symbol={ticker} hasSignal={signal !== null && signal.label !== "Research signals pending"} hasSector={sector !== "Insufficient information"} />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
-                <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Before You Invest</h2>
+                <h2 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
+                  Before You Invest
+                  <ResearchContextLink label="How scores work" />
+                </h2>
                 <ul className="mt-3 space-y-2">
                   {[
                     "Understand the business model and how it makes money.",
@@ -552,7 +567,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
             <div className="space-y-4">
-              <FactorScorePanel factors={factorView} />
+              <FactorDriverList factors={factorView} />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
                   <Building2 className="h-3.5 w-3.5" /> Profile
@@ -568,6 +583,9 @@ export const StockStoryPage: React.FC = () => {
                     <dt className="text-[#64748B]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[#E6EDF3]">{marketCap}</dd>
                   </div>
                 </dl>
+              </div>
+              <div className="flex justify-center">
+                <ResearchContextLink />
               </div>
             </div>
           </div>
@@ -802,27 +820,13 @@ export const StockStoryPage: React.FC = () => {
             </p>
           </div>
 
-          <div>
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor scores</span>
-            <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              {[
-                { label: "Growth", value: storyData?.growth ?? null },
-                { label: "Quality", value: storyData?.quality ?? null },
-                { label: "Stability", value: storyData?.stability ?? null },
-                { label: "Momentum", value: storyData?.momentum ?? null },
-                { label: "Valuation", value: storyData?.valuation ?? null },
-                { label: "Risk", value: storyData?.risk ?? null },
-              ].map((f) => (
-                <div key={f.label} className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
-                  <div className="text-[10px] text-[#8B949E]">{f.label}</div>
-                  <div className="mt-1 text-base font-bold tabular-nums text-[#E6EDF3]">
-                    {f.value !== null ? formatScore(f.value) : "—"}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="mt-2 text-[10px] text-[#484F58]">Factor scores are shown for reference, not as causal attribution.</p>
-          </div>
+          {signal && <SignalExplanationPanel signal={signal} />}
+          <FactorDriverList factors={factorView} />
+          <RiskReviewPanel
+            riskFlags={pageData?.keyRiskFlags ?? []}
+            overallRisk={pageData?.overallRisk ?? null}
+            riskScore={factorView?.riskScore ?? null}
+          />
 
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research basis</span>

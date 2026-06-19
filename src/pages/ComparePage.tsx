@@ -5,6 +5,7 @@ import { CompareShareRecap } from "../components/share/CompareShareRecap";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 import { api, type SearchResult, type ScannerResultItem } from "../services/api/client";
+import ResearchContextLink from "../components/research/ResearchContextLink";
 
 interface CompareCompany {
   symbol: string;
@@ -384,9 +385,12 @@ export const ComparePage: React.FC = () => {
 
         {!loading && companies.length > 0 && (
           <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
-            <p className="text-[10px] leading-relaxed text-[#64748B]">
-              Compare shows structured research output for the selected companies. Missing values are omitted. Research cues are reading aids based on available values, not investment advice.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] leading-relaxed text-[#64748B]">
+                Compare shows structured research output for the selected companies. Missing values are omitted. Research cues are reading aids based on available values, not investment advice.
+              </p>
+              <ResearchContextLink label="How scores work" />
+            </div>
           </div>
         )}
 

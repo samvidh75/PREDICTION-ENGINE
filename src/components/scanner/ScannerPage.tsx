@@ -435,6 +435,9 @@ export default function ScannerPage() {
                         {item.keyReason && (
                           <p className="mt-1 text-[11px] leading-4 text-[#64748B]">{item.keyReason}</p>
                         )}
+                        {item.riskMarker && (
+                          <p className="mt-1 text-[11px] leading-4 text-[#EF4444]">{item.riskMarker}</p>
+                        )}
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-3">
