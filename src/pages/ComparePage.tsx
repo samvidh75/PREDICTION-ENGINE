@@ -295,7 +295,7 @@ export const ComparePage: React.FC = () => {
         {routeLoading && (
           <div className="flex items-center justify-center gap-2 py-6 text-xs text-[#9AA7B5]">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-            Loading comparison data from research engine...
+            Loading comparison...
           </div>
         )}
 
@@ -375,7 +375,7 @@ export const ComparePage: React.FC = () => {
 
         {!loading && !routeLoading && companies.length >= 2 && !routeData && (
           <ProductPanel className="p-6 text-center">
-            <p className="text-sm text-[#9AA7B5]">Research comparison is being prepared for these companies. Check back after the next research cycle.</p>
+            <p className="text-sm text-[#9AA7B5]">Comparison is being prepared for these companies. Check back shortly.</p>
             <div className="mt-4 flex justify-center gap-2">
               <ProductAction variant="secondary" onClick={() => fetchCompare(companies.map((c) => c.symbol))}>Try again</ProductAction>
             </div>
@@ -385,7 +385,7 @@ export const ComparePage: React.FC = () => {
         {!loading && companies.length > 0 && (
           <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
             <p className="text-[10px] leading-relaxed text-[#64748B]">
-              Compare shows research engine output for the selected companies. Missing values are marked as pending. Research cues are reading aids based on available values, not investment advice.
+              Compare shows structured research output for the selected companies. Missing values are omitted. Research cues are reading aids based on available values, not investment advice.
             </p>
           </div>
         )}

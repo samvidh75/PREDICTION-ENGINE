@@ -209,7 +209,7 @@ export const PublicRankingsPage: React.FC = () => {
                             r.score !== null && r.score !== undefined ? (
                               <ScorePill score={Math.round(r.score)} />
                             ) : (
-                              <span className="text-[10px] text-[#64748B] italic">Awaiting data</span>
+                              <span className="text-[10px] text-[#64748B]">—</span>
                             )
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
@@ -223,7 +223,7 @@ export const PublicRankingsPage: React.FC = () => {
                           {isAuthenticated ? (
                             (() => {
                               const sig = rankingsSignalLabel(r.score);
-                              if (!sig) return <span className="text-[#64748B] italic">Pending</span>;
+                              if (!sig) return <span className="text-[#64748B]">—</span>;
                               return (
                                 <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${sig.color}33`, backgroundColor: `${sig.color}15`, color: sig.color }}>
                                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sig.color }} aria-hidden="true" />

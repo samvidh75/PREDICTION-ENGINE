@@ -168,3 +168,30 @@ Provider/backend data must be normalized before reaching product UI. Product API
 - Overall score adjusts to represent verified data available
 - Ranking page shows "—" for missing sector on desktop
 - Mobile ranking cards omit sector chip when missing
+
+## Dark Table Styling
+
+- All app tables must use dark graphite background (`bg-[#0D1117]`)
+- No `bg-white` or light table backgrounds anywhere in product UI
+- Headers: dark subtle background with light muted text (`text-[#8B949E]`)
+- Body rows: dark subtle dividers, light text (`text-[#E6EDF3]`)
+- Row hover: subtle highlight state
+- Tabular numeric cells use `tabular-nums` font variant
+- Responsive overflow container with dark scrollbar styling
+- Table container uses dark border + subtle inner shadow
+
+## Scanner Chip Rail Styling
+
+- Horizontal chip rails use `scrollbar-none` class to hide native scrollbar
+- Chips are dark styled with borders matching the design system
+- No default white/light scrollbar visible
+- Missing sector chips are omitted entirely (not rendered as "Sector pending")
+- Chip wrapping rows on small screens instead of clipping
+
+## Verification & Testing
+
+- Unit tests verify forbidden copy audit patterns across all product surfaces
+- E2E tests verify public rankings gating, scanner chip rail, auth copy, and about page completeness
+- Compliance audit covers: backend/provider terms, trading language, social proof, render garbage
+- Tests assert no "Not available", "Sector pending", or "Awaiting pricing" in product UI
+- Tests assert no Buy/Sell/Hold labels visible to users

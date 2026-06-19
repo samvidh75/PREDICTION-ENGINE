@@ -138,8 +138,8 @@ describe("formatSource", () => {
     expect(formatSource("upstox")).toBe("upstox");
   });
 
-  it("returns Unavailable for null/undefined", () => {
-    expect(formatSource(null)).toBe("Unavailable");
-    expect(formatSource(undefined)).toBe("Unavailable");
+  it("returns dash for null/undefined", () => {
+    expect(formatSource(null)).toBe("—");
+    expect(formatSource(undefined)).toBe("—");
   });
 });
