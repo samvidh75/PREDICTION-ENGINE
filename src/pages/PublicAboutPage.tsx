@@ -15,7 +15,7 @@ const does = [
   { icon: FileSearch, title: "Structures research", body: "Company pages organize model state, source availability, and model context." },
   { icon: Database, title: "Transparent about limits", body: "Data limits stay visible. Nothing is fabricated." },
   { icon: Workflow, title: "Connects workflows", body: "Search, rankings, compare, watchlist, and Trust Centre stay one step apart." },
-  { icon: ShieldCheck, title: "Keeps trust visible", body: "Provider status and methodology live in the product flow, not buried in fine print." },
+  { icon: ShieldCheck, title: "Transparent research", body: "Methodology, scores, and what we know stay visible. Nothing is hidden." },
 ];
 
 const principles = [
@@ -35,7 +35,7 @@ export const PublicAboutPage: React.FC = () => (
         actions={(
           <>
             <ProductAction onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>
-            <ProductAction variant="secondary" onClick={() => productNavigate("trust")}>Open Trust Centre</ProductAction>
+            <ProductAction variant="secondary" onClick={() => productNavigate("methodology")}>Open Methodology</ProductAction>
           </>
         )}
         aside={(
@@ -53,7 +53,7 @@ export const PublicAboutPage: React.FC = () => (
               </div>
             </div>
             <div className="mt-5 pt-4">
-              <ProductStatusPill tone="verified">Unavailable data labelled</ProductStatusPill>
+              <ProductStatusPill tone="verified">Research only</ProductStatusPill>
             </div>
           </ProductPanel>
         )}
