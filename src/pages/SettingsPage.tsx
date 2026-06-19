@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { User, Bell, Eye, Lock } from "lucide-react";
+import React, { useState, useCallback } from "react";
+import { User, Bell, Eye, Lock, Trash2, FileText, BookOpen } from "lucide-react";
 import { AlertEngine, AlertCategory } from "../services/portfolio/AlertEngine";
 import { useAuth } from "../context/AuthContext";
 import { authService } from "../services/auth/authService";
 import { mapAuthError } from "../services/auth/authErrorMapper";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import { ProductPanel, ProductPage, ProductShell } from "../components/product/ProductUI";
+import { ProductPanel, ProductAction, ProductPage, ProductShell, productNavigate } from "../components/product/ProductUI";
+import { PortfolioEngine } from "../services/portfolio/PortfolioEngine";
+import { NoteEngine } from "../services/portfolio/NoteEngine";
+import { thesisSnapshotStore } from "../lib/workspace/thesisSnapshotStore";
 
-type SettingsTab = "profile" | "notifications" | "appearance" | "security";
+type SettingsTab = "profile" | "notifications" | "appearance" | "security" | "workspace";
 
 export const SettingsPage: React.FC = () => {
   const { user } = useAuth();
@@ -56,6 +59,7 @@ export const SettingsPage: React.FC = () => {
               { id: "notifications", label: "Notifications", icon: <Bell className="w-4 h-4" aria-hidden="true" /> },
               { id: "appearance", label: "Appearance", icon: <Eye className="w-4 h-4" aria-hidden="true" /> },
               { id: "security", label: "Security", icon: <Lock className="w-4 h-4" aria-hidden="true" /> },
+              { id: "workspace", label: "Workspace", icon: <FileText className="w-4 h-4" aria-hidden="true" /> },
             ] as const).map((tab) => (
               <button
                 key={tab.id}
@@ -132,6 +136,54 @@ export const SettingsPage: React.FC = () => {
                     <span className="block text-sm font-semibold text-[#E6EDF3]">Research workspace theme</span>
                     <span className="mt-1 block text-xs text-[#9AA7B5]">The interface uses a fixed dark theme optimised for equity research.</span>
                   </ProductPanel>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "workspace" && (
+              <div id="settings-tabpanel-workspace" role="tabpanel" className="space-y-6">
+                <div>
+                  <h2 className="text-sm font-semibold text-[#E6EDF3]">Workspace data</h2>
+                  <p className="mt-1 text-xs text-[#9AA7B5]">Manage your research workspace and stored data.</p>
+                </div>
+                <div className="space-y-4 max-w-md">
+                  <ProductPanel className="p-4">
+                    <span className="block text-sm font-semibold text-[#E6EDF3]">Portfolio thesis positions</span>
+                    <span className="mt-1 block text-xs text-[#9AA7B5]">{PortfolioEngine.getHoldings().length} position(s) saved locally.</span>
+                  </ProductPanel>
+                  <ProductPanel className="p-4">
+                    <span className="block text-sm font-semibold text-[#E6EDF3]">Thesis snapshots</span>
+                    <span className="mt-1 block text-xs text-[#9AA7B5]">{Object.keys(thesisSnapshotStore.getSnapshots()).length} company snapshots saved locally.</span>
+                  </ProductPanel>
+                  <ProductPanel className="border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.04)] p-4">
+                    <div className="flex items-start gap-3">
+                      <Trash2 className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" aria-hidden="true" />
+                      <div>
+                        <span className="block text-sm font-semibold text-[#E6EDF3]">Clear local workspace data</span>
+                        <p className="mt-1 text-xs text-[#9AA7B5]">Remove all locally stored workspace data including notes, snapshots, and preferences. This cannot be undone.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            PortfolioEngine.clearHoldings();
+                            NoteEngine.clearAll();
+                            thesisSnapshotStore.clearAll();
+                          }}
+                          className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[rgba(239,68,68,0.3)] bg-[rgba(239,68,68,0.08)] px-3 py-1.5 text-[11px] font-semibold text-[#EF4444] hover:bg-[rgba(239,68,68,0.12)] transition-colors"
+                        >
+                          <Trash2 className="h-3 w-3" aria-hidden="true" />
+                          Clear local data
+                        </button>
+                      </div>
+                    </div>
+                  </ProductPanel>
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <button type="button" onClick={() => productNavigate("terms")} className="inline-flex items-center gap-1.5 text-xs text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">
+                      <FileText className="h-3 w-3" /> Terms & Disclosures
+                    </button>
+                    <button type="button" onClick={() => productNavigate("methodology")} className="inline-flex items-center gap-1.5 text-xs text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">
+                      <BookOpen className="h-3 w-3" /> Research Standards
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
