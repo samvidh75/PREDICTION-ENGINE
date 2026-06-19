@@ -1,4 +1,9 @@
 import type { LeaderboardEntry, Signal } from "../../services/api/client";
+import type {
+  CompanyThesisView,
+  ScannerResultView,
+  AlertChangeView,
+} from "../../research/contracts/productContracts";
 
 export interface ResearchListItem {
   symbol: string;
@@ -87,4 +92,74 @@ export function signalToProductAlert(signal: Signal): ProductAlert {
     body,
     tone,
   };
+}
+
+export interface ResearchAlertView {
+  id: string;
+  symbol: string;
+  title: string;
+  body: string;
+  type: string;
+  timestamp: string;
+  acknowledged: boolean;
+}
+
+function productAlertTone(type: string): "caution" | "risk" | "neutral" {
+  if (type === "risk_change" || type === "price_move") return "risk";
+  if (type === "thesis_change" || type === "watchlist_review") return "caution";
+  return "neutral";
+}
+
+export function alertChangeToProductAlert(alert: AlertChangeView): ProductAlert {
+  return {
+    title: alert.title,
+    body: alert.body,
+    tone: productAlertTone(alert.type),
+  };
+}
+
+export function alertChangeToResearchAlert(alert: AlertChangeView): ResearchAlertView {
+  return {
+    id: alert.id,
+    symbol: alert.symbol,
+    title: alert.title,
+    body: alert.body,
+    type: alert.type,
+    timestamp: alert.timestamp,
+    acknowledged: alert.acknowledged,
+  };
+}
+
+export function scannerResultToResearchListItem(result: ScannerResultView): ResearchListItem {
+  return {
+    symbol: result.symbol,
+    company: result.companyName,
+    sector: result.sector ?? "Sector pending",
+    conviction: result.conviction,
+    score: scoreLabel(result.score),
+    thesis: result.oneLineThesis,
+    keyReason: result.keyReason,
+    riskMarker: result.riskMarker ?? "Risk review normal",
+  };
+}
+
+export function thesisToStatusText(thesis: CompanyThesisView): string {
+  return thesis.thesis ?? "Research signals pending";
+}
+
+export function convictionToLabel(convictionScore: number | null): string {
+  if (convictionScore === null) return "Research signals pending";
+  if (convictionScore >= 75) return "High conviction research case";
+  if (convictionScore >= 55) return "Moderate conviction";
+  if (convictionScore >= 35) return "Needs review";
+  return "Track before investing";
+}
+
+export function factorDescription(factor: string, score: number | null): string {
+  if (score === null) return "Pending data";
+  const labels: Record<string, string> = {
+    quality: "Quality", valuation: "Valuation", growth: "Growth",
+    risk: "Risk", momentum: "Momentum", stability: "Stability",
+  };
+  return `${labels[factor] ?? factor}: ${Math.round(score)}`;
 }

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { leaderboardEntryToResearchListItem, signalToProductAlert } from "./productViewAdapters";
+import {
+  leaderboardEntryToResearchListItem, signalToProductAlert,
+  alertChangeToProductAlert, scannerResultToResearchListItem,
+  convictionToLabel, factorDescription, thesisToStatusText,
+} from "./productViewAdapters";
 import type { LeaderboardEntry, Signal } from "../../services/api/client";
+import type { AlertChangeView, ScannerResultView, CompanyThesisView } from "../../research/contracts/productContracts";
 
 const baseEntry: LeaderboardEntry = {
   rank: 1,
@@ -65,5 +70,52 @@ describe("product view adapters", () => {
       body: "Risk changed after the latest review.",
       tone: "caution",
     });
+  });
+
+  it("alertChangeToProductAlert converts without provider wording", () => {
+    const alert: AlertChangeView = {
+      id: "1", symbol: "TCS", type: "thesis_change",
+      title: "TCS: research thesis changed",
+      body: "Thesis moved from strengthening to stable.",
+      timestamp: "2024-01-01T00:00:00Z", acknowledged: false,
+    };
+    const r = alertChangeToProductAlert(alert);
+    expect(r.title).toContain("TCS");
+    const json = JSON.stringify(r);
+    expect(json).not.toMatch(/provider|backend|api|source/i);
+  });
+
+  it("scannerResultToResearchListItem uses product-safe labels", () => {
+    const result: ScannerResultView = {
+      symbol: "TCS", companyName: "TCS Ltd", sector: "IT",
+      rank: 1, conviction: "High conviction", score: 82,
+      oneLineThesis: "Strong quality profile", keyReason: "Quality leads",
+      riskMarker: null,
+    };
+    const item = scannerResultToResearchListItem(result);
+    expect(item.conviction).toBe("High conviction");
+    expect(JSON.stringify(item)).not.toMatch(/provider|backend|api|source/i);
+  });
+
+  it("convictionToLabel handles all score ranges", () => {
+    expect(convictionToLabel(null)).toBe("Research signals pending");
+    expect(convictionToLabel(80)).toBe("High conviction research case");
+    expect(convictionToLabel(60)).toBe("Moderate conviction");
+    expect(convictionToLabel(40)).toBe("Needs review");
+    expect(convictionToLabel(20)).toBe("Track before investing");
+  });
+
+  it("factorDescription stays product-safe", () => {
+    expect(factorDescription("quality", 80)).toBe("Quality: 80");
+    expect(factorDescription("risk", null)).toBe("Pending data");
+  });
+
+  it("thesisToStatusText returns fallback for null thesis", () => {
+    const thesis: CompanyThesisView = {
+      symbol: "X", status: "Research signals pending",
+      thesis: null, bullCase: null, bearCase: null,
+      topStrengths: [], topRisks: [], whatWouldChange: [], priorStatus: null,
+    };
+    expect(thesisToStatusText(thesis)).toBe("Research signals pending");
   });
 });
