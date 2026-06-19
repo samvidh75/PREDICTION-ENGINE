@@ -519,8 +519,8 @@ test.describe("Authenticated shell", () => {
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    await page.locator('a[aria-label="Settings"]').waitFor({ state: "attached" });
-    await page.evaluate(() => (document.querySelector('a[aria-label="Settings"]') as HTMLAnchorElement)?.click());
+    await page.locator('nav button[aria-label="Account menu"]').first().click();
+    await page.locator('div.absolute button:has-text("Settings")').first().click();
     await expect(page).toHaveURL(/page=settings/);
     await expect(page.locator("body")).toBeVisible();
     await assertNoRenderGarbage(page);

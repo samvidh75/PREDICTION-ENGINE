@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight } from "lucide-react";
 import { GlobalCommandButton } from "./GlobalCommandButton";
 import { CommandPalette } from "./CommandPalette";
+import ProfileButton from "../navigation/ProfileButton";
 
 interface ShellRoute {
   id: string;
@@ -89,16 +90,9 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             <span>Search companies or open a workflow...</span>
             <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">⌘K</kbd>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <GlobalCommandButton onClick={() => setCommandOpen(true)} />
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); navigatePage("settings"); }}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-[#64748B] transition-all duration-200 hover:bg-white/[0.04] hover:text-[#9AA7B5] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"
-              aria-label="Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </a>
+            <ProfileButton />
           </div>
         </header>
         <div className="flex flex-1 overflow-hidden">

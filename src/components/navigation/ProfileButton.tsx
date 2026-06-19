@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, FileText, BookOpen } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { productNavigate } from "../product/ProductUI";
 
@@ -41,7 +41,7 @@ export const ProfileButton: React.FC = () => {
             <div className="text-xs font-medium text-[#E6EDF3]">{user.displayName || "User"}</div>
             {user.email && <div className="mt-0.5 text-[10px] text-[#64748B]">{user.email}</div>}
           </div>
-          <div className="p-1.5">
+          <div className="p-1.5 space-y-0.5">
             <button
               type="button"
               onClick={() => { setOpen(false); productNavigate("settings"); }}
@@ -50,6 +50,23 @@ export const ProfileButton: React.FC = () => {
               <Settings className="h-3.5 w-3.5" />
               Settings
             </button>
+            <button
+              type="button"
+              onClick={() => { setOpen(false); productNavigate("terms"); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-[#9AA7B5] transition-colors hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Terms & Disclosures
+            </button>
+            <button
+              type="button"
+              onClick={() => { setOpen(false); productNavigate("methodology"); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-[#9AA7B5] transition-colors hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              Research Standards
+            </button>
+            <div className="h-px bg-white/[0.06] my-1" />
             <button
               type="button"
               disabled={isConnecting}

@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield, BookOpen } from "lucide-react";
+import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield, BookOpen, Briefcase } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
-import { api, type Signal as ApiSignal } from "../../services/api/client";
+import { api, type Signal as ApiSignal, type ScannerResultItem } from "../../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
 import ResearchContextLink from "../research/ResearchContextLink";
 
@@ -47,12 +47,24 @@ function openCompany(symbol: string): void {
   navigateToStock({ ticker: symbol, mode: "push" });
 }
 
+import { WorkspaceSummary } from "./WorkspaceSummary";
+
+function scannerSignalLabel(score: number | null): { label: string; color: string } | null {
+  if (score === null) return null;
+  if (score >= 75) return { label: "High conviction", color: "#16A34A" };
+  if (score >= 55) return { label: "Worth researching", color: "#2962FF" };
+  if (score >= 40) return { label: "Track", color: "#F59E0B" };
+  return { label: "Needs review", color: "#EF4444" };
+}
+
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [recentResearch, setRecentResearch] = useState<string[]>([]);
   const [signals, setSignals] = useState<SignalItem[]>([]);
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [signalsError, setSignalsError] = useState(false);
+  const [opportunities, setOpportunities] = useState<ScannerResultItem[]>([]);
+  const [oppsLoading, setOppsLoading] = useState(true);
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -78,6 +90,13 @@ export const DashboardHub: React.FC = () => {
     return () => ctrl.abort();
   }, []);
 
+  useEffect(() => {
+    api.getScanner("Quality compounders", 3)
+      .then((res) => setOpportunities(res.data ?? []))
+      .catch(() => setOpportunities([]))
+      .finally(() => setOppsLoading(false));
+  }, []);
+
   const followedTickers = useMemo(() => {
     const unique = new Set<string>();
     watchlists.forEach((w) => w.tickers.forEach((ticker) => unique.add(ticker)));
@@ -97,8 +116,8 @@ export const DashboardHub: React.FC = () => {
               <BookOpen className="mr-1.5 inline h-3.5 w-3.5" aria-hidden="true" />
               Research briefing
             </div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">Today's research overview</h1>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Review changes, scan opportunities, and track thesis progress across your universe.</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">Research cockpit</h1>
+            <p className="mt-1 text-xs text-[#9AA7B5]">Welcome back. Review signals, evaluate opportunities, and track your thesis progress.</p>
           </div>
           <div className="relative flex-1 sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" aria-hidden="true" />
@@ -115,16 +134,22 @@ export const DashboardHub: React.FC = () => {
         <div className="mb-5 flex flex-wrap gap-2">
           <ProductAction onClick={() => productNavigate("scanner")}><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Open scanner</ProductAction>
           <ProductAction variant="secondary" onClick={() => productNavigate("search")}><Search className="h-3.5 w-3.5" aria-hidden="true" /> Research company</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("compare")}><GitCompare className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("watchlist")}><Eye className="h-3.5 w-3.5" aria-hidden="true" /> Review watchlist</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("portfolio")}><Star className="h-3.5 w-3.5" aria-hidden="true" /> Track thesis</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("compare")}> <GitCompare className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("watchlist")}><Eye className="h-3.5 w-3.5" aria-hidden="true" /> Watchlist</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("portfolio")}><TrendingUp className="h-3.5 w-3.5" aria-hidden="true" /> Portfolio monitor</ProductAction>
+          <ProductPanel className="p-4">
+            <h2 className="text-sm font-semibold text-[#E6EDF3]">Portfolio thesis monitor</h2>
+            <p className="mt-2 text-xs text-[#9AA7B5]">Monitor your portfolio's thesis progress here.</p>
+          </ProductPanel>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-[1.3fr_0.8fr]">
           <div className="space-y-4">
+            {/* What Changed Signal Feed */}
             <ProductPanel className="overflow-hidden">
               <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] px-4 py-3">
                 <div className="flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
                   <h2 className="text-sm font-semibold text-[#E6EDF3]">What changed</h2>
                   <ResearchContextLink label="How signals work" />
                 </div>
@@ -164,6 +189,61 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
+            {/* Opportunity Queue */}
+            <ProductPanel className="p-4">
+              <div className="mb-3 flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] pb-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                  <h2 className="text-sm font-semibold text-[#E6EDF3]">Opportunity queue</h2>
+                </div>
+                <span className="text-[11px] text-[#64748B]">Top compounders</span>
+              </div>
+              {oppsLoading ? (
+                <div className="flex items-center gap-2 p-3 text-xs text-[#9AA7B5]">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+                  Compiling scanner opportunities...
+                </div>
+              ) : opportunities.length === 0 ? (
+                <p className="p-3 text-xs text-[#9AA7B5]">No opportunities found.</p>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {opportunities.map((opp) => {
+                    const labelInfo = scannerSignalLabel(opp.score);
+                    return (
+                      <div
+                        key={opp.symbol}
+                        onClick={() => openCompany(opp.symbol)}
+                        className="group flex cursor-pointer flex-col justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.015)] p-3 transition hover:border-[#2962FF]/40 hover:bg-white/[0.01]"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-xs font-semibold text-[#E6EDF3] group-hover:text-[#2962FF]">{opp.symbol}</span>
+                            {opp.score !== null && (
+                              <span className="text-xs font-bold text-[#2962FF]">{Math.round(opp.score)}</span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-[10px] text-[#9AA7B5]">{opp.companyName}</p>
+                          {labelInfo && (
+                            <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[9px] font-medium" style={{ borderColor: `${labelInfo.color}33`, backgroundColor: `${labelInfo.color}15`, color: labelInfo.color }}>
+                              <span className="h-1 w-1 rounded-full" style={{ backgroundColor: labelInfo.color }} />
+                              {labelInfo.label}
+                            </span>
+                          )}
+                          {opp.keyReason && (
+                            <p className="mt-2 text-[10px] leading-relaxed text-[#64748B] line-clamp-2">{opp.keyReason}</p>
+                          )}
+                        </div>
+                        <div className="mt-3 flex items-center justify-between border-t border-white/[0.04] pt-2 text-[9px] text-[#64748B]">
+                          <span>{opp.sector || "General"}</span>
+                          <span className="group-hover:text-[#E6EDF3] flex items-center gap-0.5 transition-colors">Research <ArrowRight className="h-2.5 w-2.5" /></span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </ProductPanel>
+
             <ProductPanel className="p-4">
               <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Scanner presets</div>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -189,6 +269,16 @@ export const DashboardHub: React.FC = () => {
           </div>
 
           <div className="space-y-4">
+            {/* Workspace State Indicators */}
+            <ProductPanel className="p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                <span className="text-sm font-semibold text-[#E6EDF3]">Workspace status</span>
+              </div>
+              <WorkspaceSummary />
+            </ProductPanel>
+
+            {/* Tracked Companies */}
             <ProductPanel className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
@@ -219,9 +309,27 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
+            {/* Next Actions */}
             <ProductPanel className="p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#E6EDF3]"><Star className="h-4 w-4 text-[#2962FF]" aria-hidden="true" /> Portfolio thesis monitor</div>
-              <p className="mt-2 text-xs text-[#9AA7B5]">{holdings.length === 0 ? "Track thesis positions from the portfolio page." : `${holdings.length} thesis position${holdings.length === 1 ? "" : "s"} being monitored.`}</p>
+              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Next actions</div>
+              <div className="grid gap-2 text-xs">
+                <button type="button" onClick={() => productNavigate("search")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
+                  <span>1. Research a company</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
+                </button>
+                <button type="button" onClick={() => productNavigate("scanner")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
+                  <span>2. Run scanner presets</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
+                </button>
+                <button type="button" onClick={() => productNavigate("compare")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
+                  <span>3. Compare alternatives</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
+                </button>
+                <button type="button" onClick={() => productNavigate("watchlist")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
+                  <span>4. Review watchlist changes</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
+                </button>
+              </div>
             </ProductPanel>
 
             <button type="button" onClick={() => productNavigate("methodology")} className="flex w-full items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#0D1117] px-4 py-3 text-xs text-[#64748B] transition hover:border-[#2962FF]/40 hover:text-[#E6EDF3]">
