@@ -1,34 +1,4 @@
 import { normalizeNumericValue } from "./factorNormalization";
-import type { FactorCategory } from "./factorTypes";
-
-export interface FactorScore {
-  factorId: string;
-  label: string;
-  category: FactorCategory;
-  rawValue: number | null;
-  normalizedScore: number | null;
-  isAvailable: boolean;
-}
-
-export interface FactorScoringResult {
-  factors: FactorScore[];
-  activeCount: number;
-  plannedCount: number;
-  unavailableCount: number;
-}
-
-function scoreFactor(rawValue: number | null, lowerBetter: boolean = false, min: number = 0, max: number = 100): number | null {
-  if (rawValue === null) return null;
-  const clamped = Math.max(min, Math.min(max, rawValue));
-  if (lowerBetter) {
-    return Math.round((1 - (clamped - min) / (max - min)) * 100);
-  }
-  return Math.round(((clamped - min) / (max - min)) * 100);
-}
-
-function isHighQualityFactor(value: number): boolean {
-  return !Number.isNaN(value) && Number.isFinite(value);
-}
 
 function scorePE(pe: number | null): number | null {
   if (pe === null || pe <= 0) return null;
@@ -63,7 +33,8 @@ function scoreEVEBITDA(ev: number | null): number | null {
 
 function scoreDividendYield(dy: number | null): number | null {
   if (dy === null || dy < 0) return null;
-  if (dy >= 0.04) return 80;
+  if (dy >= 0.06) return 60;
+  if (dy >= 0.04) return 75;
   if (dy >= 0.025) return 65;
   if (dy >= 0.01) return 50;
   if (dy > 0) return 35;
@@ -92,6 +63,16 @@ function scoreROIC(roic: number | null): number | null {
   return 10;
 }
 
+function scoreROA(roa: number | null): number | null {
+  if (roa === null) return null;
+  if (roa >= 0.12) return 80;
+  if (roa >= 0.08) return 70;
+  if (roa >= 0.05) return 55;
+  if (roa >= 0.02) return 40;
+  if (roa > 0) return 25;
+  return 10;
+}
+
 function scoreOperatingMargin(om: number | null): number | null {
   if (om === null) return null;
   if (om >= 0.25) return 85;
@@ -100,6 +81,16 @@ function scoreOperatingMargin(om: number | null): number | null {
   if (om >= 0.06) return 45;
   if (om >= 0.02) return 30;
   return 15;
+}
+
+function scoreNetMargin(nm: number | null): number | null {
+  if (nm === null) return null;
+  if (nm >= 0.15) return 80;
+  if (nm >= 0.10) return 70;
+  if (nm >= 0.06) return 55;
+  if (nm >= 0.02) return 40;
+  if (nm > 0) return 25;
+  return 10;
 }
 
 function scoreRevenueGrowth(rg: number | null): number | null {
@@ -161,6 +152,38 @@ function scoreMarketCap(mc: number | null): number | null {
   return 35;
 }
 
+function scoreEPS(eps: number | null): number | null {
+  if (eps === null || eps <= 0) return null;
+  if (eps >= 100) return 80;
+  if (eps >= 50) return 70;
+  if (eps >= 20) return 60;
+  if (eps >= 10) return 50;
+  if (eps >= 5) return 40;
+  if (eps >= 1) return 30;
+  return 20;
+}
+
+function scoreSales(sales: number | null): number | null {
+  if (sales === null || sales <= 0) return null;
+  if (sales >= 500000000000) return 85;
+  if (sales >= 100000000000) return 75;
+  if (sales >= 10000000000) return 65;
+  if (sales >= 5000000000) return 55;
+  if (sales >= 1000000000) return 45;
+  if (sales >= 500000000) return 35;
+  return 25;
+}
+
+function scoreBookValue(bv: number | null): number | null {
+  if (bv === null || bv <= 0) return null;
+  if (bv >= 1000) return 75;
+  if (bv >= 500) return 65;
+  if (bv >= 100) return 55;
+  if (bv >= 50) return 45;
+  if (bv >= 10) return 35;
+  return 25;
+}
+
 export interface FactorScoreMap {
   [factorId: string]: number | null;
 }
@@ -174,13 +197,18 @@ export function computeFactorScores(rawData: Record<string, unknown> | null | un
   const dy = normalizeNumericValue(rawData.dividend_yield ?? rawData.dividendYield);
   const roe = normalizeNumericValue(rawData.roe);
   const roic = normalizeNumericValue(rawData.roic);
+  const roa = normalizeNumericValue(rawData.roa);
   const om = normalizeNumericValue(rawData.operating_margin ?? rawData.operatingMargin);
+  const nm = normalizeNumericValue(rawData.net_margin ?? rawData.netMargin);
   const rg = normalizeNumericValue(rawData.revenue_growth ?? rawData.revenueGrowth);
   const pg = normalizeNumericValue(rawData.profit_growth ?? rawData.profitGrowth);
   const eg = normalizeNumericValue(rawData.eps_growth ?? rawData.epsGrowth);
   const de = normalizeNumericValue(rawData.debt_equity ?? rawData.debtToEquity);
   const cr = normalizeNumericValue(rawData.current_ratio ?? rawData.currentRatio);
   const mc = normalizeNumericValue(rawData.market_cap ?? rawData.marketCap);
+  const eps = normalizeNumericValue(rawData.eps);
+  const sales = normalizeNumericValue(rawData.sales);
+  const bv = normalizeNumericValue(rawData.book_value ?? rawData.bookValue);
 
   return {
     pe_ratio: scorePE(pe),
@@ -189,13 +217,18 @@ export function computeFactorScores(rawData: Record<string, unknown> | null | un
     dividend_yield: scoreDividendYield(dy),
     roe: scoreROE(roe),
     roic: scoreROIC(roic),
+    roa: scoreROA(roa),
     operating_margin: scoreOperatingMargin(om),
+    net_margin: scoreNetMargin(nm),
     revenue_growth: scoreRevenueGrowth(rg),
     profit_growth: scoreProfitGrowth(pg),
     eps_growth: scoreEPSGrowth(eg),
     debt_equity: scoreDebtEquity(de),
     current_ratio: scoreCurrentRatio(cr),
     market_cap: scoreMarketCap(mc),
+    eps: scoreEPS(eps),
+    sales: scoreSales(sales),
+    book_value: scoreBookValue(bv),
   };
 }
 
@@ -207,18 +240,36 @@ export function countActiveFactorsByCategory(scores: FactorScoreMap): Record<str
   const cats: Record<string, number> = {};
   Object.entries(scores).forEach(([id, score]) => {
     if (score !== null) {
-      const cat = idToCategory(id);
-      cats[cat] = (cats[cat] || 0) + 1;
+      cats[idToCategory(id)] = (cats[idToCategory(id)] || 0) + 1;
     }
   });
   return cats;
 }
 
+export function getTopFactors(scores: FactorScoreMap, count: number = 3): Array<{ id: string; score: number }> {
+  return Object.entries(scores)
+    .filter(([_, v]) => v !== null)
+    .map(([id, v]) => ({ id, score: v as number }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, count);
+}
+
+export function getBottomFactors(scores: FactorScoreMap, count: number = 3): Array<{ id: string; score: number }> {
+  return Object.entries(scores)
+    .filter(([_, v]) => v !== null)
+    .map(([id, v]) => ({ id, score: v as number }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, count);
+}
+
+const CATEGORY_MAP: Record<string, string> = {
+  pe_ratio: "valuation", pb_ratio: "valuation", ev_ebitda: "valuation", dividend_yield: "valuation",
+  roe: "profitability", roic: "profitability", roa: "profitability", operating_margin: "profitability", net_margin: "profitability",
+  revenue_growth: "growth", profit_growth: "growth", eps_growth: "growth",
+  debt_equity: "balance_sheet", current_ratio: "balance_sheet",
+  market_cap: "sector_context", eps: "profitability", sales: "profitability", book_value: "valuation",
+};
+
 function idToCategory(id: string): string {
-  if (["pe_ratio", "pb_ratio", "ev_ebitda", "dividend_yield"].includes(id)) return "valuation";
-  if (["roe", "roic", "operating_margin"].includes(id)) return "profitability";
-  if (["revenue_growth", "profit_growth", "eps_growth"].includes(id)) return "growth";
-  if (["debt_equity", "current_ratio"].includes(id)) return "balance_sheet";
-  if (["market_cap"].includes(id)) return "sector_context";
-  return "other";
+  return CATEGORY_MAP[id] || "other";
 }
