@@ -9,12 +9,12 @@ interface RouteMeta {
 
 const ROUTE_META: Record<PageKey, RouteMeta> = {
   landing: {
-    title: "StockStory India — Indian Equity Research Workspace",
-    description: "Search Indian companies, review source-backed scoring signals, and track your research with clear data availability labels.",
+    title: "StockStory India — AI Research for Indian Equities",
+    description: "Search Indian companies, review scores and conviction, compare peers, and track your thesis. Research, not advice.",
   },
   about: {
     title: "About — StockStory India",
-    description: "StockStory turns available financial data into structured research signals with clear source and availability labels.",
+    description: "AI research layer between Indian investors and brokers. Understand the stock before you invest.",
   },
   login: {
     title: "Sign in — StockStory India",
@@ -26,55 +26,67 @@ const ROUTE_META: Record<PageKey, RouteMeta> = {
   },
   dashboard: {
     title: "Dashboard — StockStory India",
-    description: "Your research workspace. Search companies, review scored records, and track your research.",
+    description: "Your research workspace. Search companies, review scores, and track your thesis.",
   },
   search: {
-    title: "Search — StockStory India",
-    description: "Search Indian companies by ticker, name, or sector.",
+    title: "Scanner — StockStory India",
+    description: "Search and filter Indian companies by sector, score, and research factors.",
+  },
+  scanner: {
+    title: "Scanner — StockStory India",
+    description: "Find companies worth researching. Search by strategy, sector, score, and research factors.",
   },
   company: {
     title: "Company — StockStory India",
-    description: "Research signals, fundamentals, and source-backed data for an Indian company.",
+    description: "Company research, thesis, conviction, and factor scores. Research only, not investment advice.",
   },
   stock: {
     title: "Company — StockStory India",
-    description: "Research signals, fundamentals, and source-backed data for an Indian company.",
+    description: "Company research, thesis, conviction, and factor scores. Research only, not investment advice.",
   },
   portfolio: {
     title: "Portfolio — StockStory India",
-    description: "Track your recorded holdings and research notes.",
+    description: "Monitor your thesis. Manual portfolio tracking with research notes and review prompts.",
   },
   watchlist: {
     title: "Watchlist — StockStory India",
-    description: "Saved companies and research notes in one place.",
+    description: "Track companies you are researching. Thesis tracker with what changed and review prompts.",
   },
   settings: {
     title: "Settings — StockStory India",
     description: "Manage your StockStory India account and preferences.",
   },
   trust: {
-    title: "Methodology & Trust Centre — StockStory India",
-    description: "Scoring inputs, availability labels, and verified performance metrics.",
+    title: "Methodology — StockStory India",
+    description: "How StockStory evaluates businesses, interprets conviction, and conducts research responsibly.",
   },
   methodology: {
     title: "Methodology — StockStory India",
-    description: "Scoring methodology and research approach for Indian equities.",
+    description: "How StockStory evaluates businesses, interprets conviction, and conducts research responsibly.",
   },
   validation: {
-    title: "Methodology & Trust Centre — StockStory India",
-    description: "Scoring inputs, availability labels, and verified performance metrics.",
+    title: "Methodology — StockStory India",
+    description: "How StockStory evaluates businesses, interprets conviction, and conducts research responsibly.",
   },
   predictions: {
     title: "Score changes — StockStory India",
-    description: "Verified score changes from the latest data update cycle.",
+    description: "Score changes from the latest research cycle. Research only, not investment advice.",
   },
   rankings: {
     title: "Research rankings — StockStory India",
-    description: "Company rankings from the latest verified scoring cycle.",
+    description: "Company rankings from the latest research cycle.",
   },
   compare: {
     title: "Compare companies — StockStory India",
-    description: "Compare companies by score, factors, and data coverage.",
+    description: "Compare companies by score and factors side by side.",
+  },
+  alerts: {
+    title: "What Changed — StockStory India",
+    description: "Thesis changes, score movements, and review prompts for tracked companies.",
+  },
+  invest: {
+    title: "Invest — StockStory India",
+    description: "Review and invest through your broker. Research only, not investment advice.",
   },
 };
 

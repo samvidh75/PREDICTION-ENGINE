@@ -28,7 +28,7 @@ export const LoginPage: React.FC = () => {
           title="Return to a source-backed research workspace."
           rows={[
             { icon: FileSearch, label: "Saved research flow", body: "Open company research, watchlists, rankings, and comparison from one shell." },
-            { icon: Database, label: "Coverage limits visible", body: "Missing fundamentals and provider gaps remain labelled in the workspace.", tone: "warning" },
+            { icon: Database, label: "Research transparent", body: "What we know and what we don't is clearly shown.", tone: "warning" },
             { icon: ShieldCheck, label: "Research only", body: "The product does not provide trading calls, execution, or fabricated confidence.", tone: "verified" },
           ]}
         />

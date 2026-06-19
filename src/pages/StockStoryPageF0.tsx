@@ -69,9 +69,9 @@ export default function StockStoryPageF0(): JSX.Element {
 
   const convictionLabel: Record<ConvictionLevel, string> = {
     high: "High conviction",
-    moderate: "Research coverage available",
+    moderate: "Moderate conviction",
     low: "Under review",
-    none: "Not enough information for this view yet",
+    none: "Insufficient information",
   };
 
   const convictionTone: Record<ConvictionLevel, "verified" | "blue" | "warning" | "muted"> = {
@@ -142,7 +142,7 @@ export default function StockStoryPageF0(): JSX.Element {
             </div>
             {convictionLevel === "none" && (
               <p className="mt-2 text-xs leading-relaxed text-[#64748B]">
-                We are still gathering research data for this ticker. Check back once coverage is complete.
+                We are still gathering research data for this ticker. Check back once research is complete.
               </p>
             )}
           </ProductPanel>
@@ -198,9 +198,9 @@ export default function StockStoryPageF0(): JSX.Element {
           subtitle="Why this stock page looks the way it does and what research supports it."
         >
           <div className="space-y-5">
-            <div>
+              <div>
               <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#8B949E]">
-                <BarChart3 className="h-3.5 w-3.5" /> Coverage
+                <BarChart3 className="h-3.5 w-3.5" /> Research basis
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
                 <div className="flex items-center justify-between">

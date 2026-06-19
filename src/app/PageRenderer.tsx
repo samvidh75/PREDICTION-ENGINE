@@ -18,12 +18,14 @@ import SignupPage from "../pages/SignupPage";
 // Authenticated pages (intentional nav targets)
 import DashboardHub from "../components/dashboard/DashboardHub";
 import SearchPage from "../pages/SearchPage";
+import ScannerPage from "../components/scanner/ScannerPage";
 import StockStoryPage from "../pages/StockStoryPageF0";
 import PortfolioPage from "../pages/PortfolioPage";
 import WatchlistPage from "../pages/WatchlistPage";
 import SettingsPage from "../pages/SettingsPage";
 import TrustCentrePage from "../pages/TrustCentrePage";
 import ComparePage from "../pages/ComparePage";
+import AlertsPage from "../pages/AlertsPage";
 import AppLayout from "../components/navigation/AppLayout";
 
 interface PageRendererProps {
@@ -78,8 +80,11 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
       return <SettingsPage />;
     case "search":
       return <SearchPage />;
+    case "scanner":
+      return <ScannerPage />;
     case "company":
     case "stock":
+    case "invest":
       return hasStockId ? <StockStoryPage /> : <DashboardHub />;
     case "trust":
     case "methodology":
@@ -91,6 +96,8 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
       return <PublicRankingsPage />;
     case "compare":
       return <ComparePage />;
+    case "alerts":
+      return <AlertsPage />;
     case "dashboard":
     default:
       return <DashboardHub />;

@@ -3,59 +3,64 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import TrustCentrePage from '../TrustCentrePage';
+import { LayoutProvider } from '../../context/LayoutContext';
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+function renderWithProviders(ui: React.ReactElement) {
+  return render(<LayoutProvider>{ui}</LayoutProvider>);
+}
+
 describe('TrustCentrePage (Research Standards)', () => {
-  it('renders Research Standards heading', () => {
-    render(<TrustCentrePage />);
-    expect(screen.getByText('Research Standards')).toBeInTheDocument();
+  it('renders Methodology heading', () => {
+    renderWithProviders(<TrustCentrePage />);
+    expect(screen.getByText('Methodology')).toBeInTheDocument();
   });
 
   it('renders methodology sections', () => {
-    render(<TrustCentrePage />);
-    expect(screen.getByText('How StockStory Evaluates Companies')).toBeInTheDocument();
-    expect(screen.getByText('What the Scores Mean')).toBeInTheDocument();
-    expect(screen.getByText('How to Use This Research')).toBeInTheDocument();
-    expect(screen.getByText('Research Standards')).toBeInTheDocument();
-    expect(screen.getByText('Why Execution Happens Through Brokers')).toBeInTheDocument();
+    renderWithProviders(<TrustCentrePage />);
+    expect(screen.getByText('How StockStory Evaluates Businesses')).toBeInTheDocument();
+    expect(screen.getByText('How to Interpret Conviction')).toBeInTheDocument();
+    expect(screen.getByText('Why Research Is Not a Guarantee')).toBeInTheDocument();
+    expect(screen.getByText('How to Use the Product Responsibly')).toBeInTheDocument();
+    expect(screen.getByText('Why Final Execution Happens Through Brokers')).toBeInTheDocument();
     expect(screen.getByText('Compliance Statement')).toBeInTheDocument();
   });
 
   it('renders score dimensions', () => {
-    render(<TrustCentrePage />);
+    renderWithProviders(<TrustCentrePage />);
     expect(screen.getByText('Quality')).toBeInTheDocument();
     expect(screen.getByText('Growth')).toBeInTheDocument();
     expect(screen.getByText('Valuation')).toBeInTheDocument();
     expect(screen.getByText('Momentum')).toBeInTheDocument();
     expect(screen.getByText('Risk')).toBeInTheDocument();
-    expect(screen.getByText('Confidence')).toBeInTheDocument();
+    expect(screen.getByText('Conviction')).toBeInTheDocument();
   });
 
   it('renders compliance pills', () => {
-    render(<TrustCentrePage />);
+    renderWithProviders(<TrustCentrePage />);
     expect(screen.getByText('Research only')).toBeInTheDocument();
     expect(screen.getByText('Transparent methodology')).toBeInTheDocument();
     expect(screen.getByText('No fabricated data')).toBeInTheDocument();
   });
 
   it('renders action buttons', () => {
-    render(<TrustCentrePage />);
+    renderWithProviders(<TrustCentrePage />);
     expect(screen.getByText('View rankings')).toBeInTheDocument();
     expect(screen.getByText('Read mission')).toBeInTheDocument();
   });
 
   it('contains no backend/provider vocabulary', () => {
-    render(<TrustCentrePage />);
+    renderWithProviders(<TrustCentrePage />);
     const body = document.body.textContent || '';
     expect(body).not.toMatch(/IndianAPI|Yahoo|Jugaad|NSEPython|Upstox|Screener|Finnhub/i);
     expect(body).not.toMatch(/coverage|freshness|lineage|migration|backfill|diagnostics/i);
   });
 
   it('contains no forbidden trading language', () => {
-    render(<TrustCentrePage />);
+    renderWithProviders(<TrustCentrePage />);
     const body = document.body.textContent || '';
     expect(body).not.toMatch(/Buy Stock|Sell Stock|Strong Buy|Strong Sell|Try Pro|Unlock Pro|Trade now/i);
   });

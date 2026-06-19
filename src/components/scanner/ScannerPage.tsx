@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
 import { api, type LeaderboardEntry } from "../../services/api/client";
-import { TokenStore } from "../../services/brokers/TokenStore";
 
 const SCANNER_PRESETS = [
   { label: "Quality compounders", icon: Shield, filters: { qualityMin: 70, growthMin: 60 } },
@@ -10,8 +9,11 @@ const SCANNER_PRESETS = [
   { label: "Improving momentum", icon: TrendingUp, filters: { momentumMin: 70 } },
   { label: "Low debt leaders", icon: Briefcase, filters: { riskMin: 60, qualityMin: 50 } },
   { label: "Earnings acceleration", icon: BarChart3, filters: { growthMin: 70 } },
-  { label: "Turnaround watch", icon: Activity, filters: { qualityMin: 0, valueMin: 50, growthMin: 40 } },
+  { label: "Dividend stability", icon: Shield, filters: { riskMin: 50, qualityMin: 50 } },
   { label: "Risk rising", icon: AlertTriangle, filters: { riskMax: 35 } },
+  { label: "Turnaround watch", icon: Activity, filters: { qualityMin: 0, valueMin: 50, growthMin: 40 } },
+  { label: "Good businesses out of favour", icon: DollarSign, filters: { qualityMin: 60, valueMin: 65 } },
+  { label: "High quality, expensive", icon: BarChart3, filters: { qualityMin: 70, valueMax: 45 } },
 ];
 
 const MARKET_CAP_OPTIONS = ["All", "Large", "Mid", "Small", "Micro"];
@@ -19,12 +21,24 @@ const SECTOR_OPTIONS = ["All", "Automobile", "Banking", "Cement", "Chemicals", "
 const SCORE_RANGES = ["All", "80-100", "60-79", "40-59", "Below 40"];
 const FACTOR_LEVELS = ["Any", "High", "Medium", "Low"];
 
+function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
+  return (
+    <div>
+      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none">
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+}
+
 export default function ScannerPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<LeaderboardEntry[]>([]);
   const [allEntries, setAllEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [activePreset, setActivePreset] = useState<string | null>(null);
 
   const [filters, setFilters] = useState({
@@ -39,8 +53,6 @@ export default function ScannerPage() {
     volatility: "Any",
   });
 
-  const [brokerConnected, setBrokerConnected] = useState(false);
-
   useEffect(() => {
     let cancelled = false;
     api.getLeaderboard(200)
@@ -52,20 +64,9 @@ export default function ScannerPage() {
         setLoading(false);
       })
       .catch(() => {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const uid = window.localStorage.getItem("ss_uid");
-    if (uid) {
-      const brokers = TokenStore.getConnectedBrokers(uid);
-      setBrokerConnected(brokers.length > 0);
-    }
   }, []);
 
   const handlePresetClick = useCallback((label: string) => {
@@ -87,6 +88,7 @@ export default function ScannerPage() {
       if (f.momentumMin !== undefined && (e.factors.momentum ?? 0) < f.momentumMin) return false;
       if (f.riskMin !== undefined && (e.factors.risk ?? 0) < f.riskMin) return false;
       if (f.riskMax !== undefined && (e.factors.risk ?? 100) > f.riskMax) return false;
+      if (f.valueMax !== undefined && (e.factors.value ?? 100) > f.valueMax) return false;
       return true;
     });
     setResults(filtered);
@@ -121,8 +123,9 @@ export default function ScannerPage() {
     const entries = Object.entries(factors).filter(([, v]) => v !== null && v !== undefined) as [string, number][];
     if (entries.length === 0) return "Not enough information";
     entries.sort(([, a], [, b]) => b - a);
-    const [topKey, topVal] = entries[0];
+    const [topKey] = entries[0];
     const factorLabel = topKey === "quality" ? "Quality" : topKey === "growth" ? "Growth" : topKey === "value" ? "Valuation" : topKey === "momentum" ? "Momentum" : topKey === "risk" ? "Risk profile" : topKey === "sector" ? "Sector strength" : topKey;
+    const topVal = entries[0][1];
     if (topVal >= 70) return `Strong ${factorLabel.toLowerCase()} score (${Math.round(topVal)})`;
     if (topVal >= 50) return `Adequate ${factorLabel.toLowerCase()} score (${Math.round(topVal)})`;
     return `${factorLabel} at ${Math.round(topVal)}`;
@@ -145,6 +148,11 @@ export default function ScannerPage() {
     if (label === "Developing") return "warning";
     return "muted";
   }, [convictionLabel]);
+
+  const hasRiskFlag = useCallback((entry: LeaderboardEntry): boolean => {
+    const risk = entry.factors.risk;
+    return risk !== null && risk !== undefined && risk < 40;
+  }, []);
 
   const filteredResults = useMemo(() => {
     let filtered = [...results];
@@ -186,39 +194,41 @@ export default function ScannerPage() {
     setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handleResearch = useCallback((symbol: string) => {
-    productNavigate("stock", symbol);
-  }, []);
-
-  const handleCompare = useCallback((symbol: string) => {
-    productNavigate("compare", symbol);
-  }, []);
-
+  const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
+  const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
   const handleTrack = useCallback(async (symbol: string) => {
     try {
       const watchlists = await api.getWatchlists();
-      if (watchlists.length > 0) {
-        await api.addWatchlistTicker(watchlists[0].id, symbol);
-      }
-    } catch {
-    }
+      if (watchlists.length > 0) await api.addWatchlistTicker(watchlists[0].id, symbol);
+    } catch { /* quiet */ }
   }, []);
-
-  const handleInvest = useCallback((symbol: string) => {
-    productNavigate("invest", symbol);
-  }, []);
+  const handleInvest = useCallback((symbol: string) => productNavigate("invest", symbol), []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleQuerySubmit();
   }, [handleQuerySubmit]);
+
+  const filterContent = (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <FilterSelect label="Market cap" value={filters.marketCap} options={MARKET_CAP_OPTIONS} onChange={(v) => updateFilter("marketCap", v)} />
+      <FilterSelect label="Sector" value={filters.sector} options={SECTOR_OPTIONS} onChange={(v) => updateFilter("sector", v)} />
+      <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => updateFilter("scoreRange", v)} />
+      <FilterSelect label="Valuation" value={filters.valuation} options={FACTOR_LEVELS} onChange={(v) => updateFilter("valuation", v)} />
+      <FilterSelect label="Growth" value={filters.growth} options={FACTOR_LEVELS} onChange={(v) => updateFilter("growth", v)} />
+      <FilterSelect label="Profitability" value={filters.profitability} options={FACTOR_LEVELS} onChange={(v) => updateFilter("profitability", v)} />
+      <FilterSelect label="Balance sheet" value={filters.balanceSheet} options={FACTOR_LEVELS} onChange={(v) => updateFilter("balanceSheet", v)} />
+      <FilterSelect label="Momentum" value={filters.momentum} options={FACTOR_LEVELS} onChange={(v) => updateFilter("momentum", v)} />
+      <FilterSelect label="Volatility / Risk" value={filters.volatility} options={FACTOR_LEVELS} onChange={(v) => updateFilter("volatility", v)} />
+    </div>
+  );
 
   return (
     <ProductShell>
       <ProductPage>
         <div className="flex flex-col gap-5">
           <div>
-            <h1 className="text-lg font-semibold text-[#E6EDF3]">Scanner</h1>
-            <p className="mt-0.5 text-xs text-[#9AA7B5]">Discover companies matching your criteria</p>
+            <h1 className="text-lg font-semibold text-[#E6EDF3]">Find companies worth researching.</h1>
+            <p className="mt-0.5 text-xs text-[#9AA7B5]">Describe what you are looking for or browse by strategy.</p>
           </div>
 
           <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
@@ -236,14 +246,15 @@ export default function ScannerPage() {
                 type="button"
                 onClick={() => { setQuery(""); setResults(allEntries); }}
                 className="mr-1 shrink-0 rounded p-0.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                aria-label="Clear search"
               >
-                <Search className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </button>
             )}
             <button
               type="button"
               onClick={handleQuerySubmit}
-              className="shrink-0 rounded-md border border-[rgba(148,163,184,0.2)] bg-[#111827] px-3 py-1.5 text-[11px] font-semibold text-[#E6EDF3] hover:border-[#2962FF]/60 transition-colors"
+              className="shrink-0 rounded-md bg-[#2962FF] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#3B71FF] transition-colors"
             >
               Scan
             </button>
@@ -270,113 +281,50 @@ export default function ScannerPage() {
             })}
           </div>
 
-          <ProductPanel className="overflow-hidden">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setAdvancedOpen(!advancedOpen)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[#E6EDF3] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors md:hidden"
             >
-              <span className="inline-flex items-center gap-2">
-                <Filter className="h-3.5 w-3.5 text-[#9AA7B5]" aria-hidden="true" />
-                Advanced Filters
-              </span>
-              {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#9AA7B5]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#9AA7B5]" />}
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              Filters
+              {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
-            {advancedOpen && (
-              <div className="grid gap-4 border-t border-[rgba(148,163,184,0.08)] px-4 py-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Market cap</label>
-                  <select
-                    value={filters.marketCap}
-                    onChange={(e) => updateFilter("marketCap", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {MARKET_CAP_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Sector</label>
-                  <select
-                    value={filters.sector}
-                    onChange={(e) => updateFilter("sector", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {SECTOR_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Score range</label>
-                  <select
-                    value={filters.scoreRange}
-                    onChange={(e) => updateFilter("scoreRange", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {SCORE_RANGES.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Valuation</label>
-                  <select
-                    value={filters.valuation}
-                    onChange={(e) => updateFilter("valuation", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Growth</label>
-                  <select
-                    value={filters.growth}
-                    onChange={(e) => updateFilter("growth", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Profitability</label>
-                  <select
-                    value={filters.profitability}
-                    onChange={(e) => updateFilter("profitability", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Balance sheet</label>
-                  <select
-                    value={filters.balanceSheet}
-                    onChange={(e) => updateFilter("balanceSheet", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Momentum</label>
-                  <select
-                    value={filters.momentum}
-                    onChange={(e) => updateFilter("momentum", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Volatility</label>
-                  <select
-                    value={filters.volatility}
-                    onChange={(e) => updateFilter("volatility", e.target.value)}
-                    className="h-9 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 text-[11px] text-[#E6EDF3] outline-none"
-                  >
-                    {FACTOR_LEVELS.map((o) => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-              </div>
+            <button
+              type="button"
+              onClick={() => setFilterDrawerOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors md:hidden"
+            >
+              <ArrowUpDown className="h-3.5 w-3.5" />
+              Sort & Filter
+            </button>
+            <div className="hidden md:block flex-1" />
+            {!loading && (
+              <span className="text-[11px] text-[#64748B]">{filteredResults.length} result{filteredResults.length === 1 ? "" : "s"}</span>
             )}
-          </ProductPanel>
+          </div>
+
+          <div className="hidden md:block">
+            <ProductPanel className="overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen(!advancedOpen)}
+                className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[#E6EDF3] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Filter className="h-3.5 w-3.5 text-[#9AA7B5]" aria-hidden="true" />
+                  Advanced Filters
+                </span>
+                {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#9AA7B5]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#9AA7B5]" />}
+              </button>
+              {advancedOpen && (
+                <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-4">
+                  {filterContent}
+                </div>
+              )}
+            </ProductPanel>
+          </div>
 
           {loading ? (
             <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Scanning companies...</div>
@@ -384,57 +332,55 @@ export default function ScannerPage() {
             <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
               <Search className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
               <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">No results found</h3>
-              <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">Adjust your filters or try a different search</p>
+              <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">Adjust your filters or try a different search.</p>
             </ProductPanel>
           ) : (
             <div className="space-y-3">
-              <div className="text-xs text-[#9AA7B5]">
+              <div className="hidden max-md:flex text-xs text-[#9AA7B5]">
                 {filteredResults.length} result{filteredResults.length === 1 ? "" : "s"} found
               </div>
               {filteredResults.slice(0, 50).map((entry) => {
                 const fullSymbol = entry.symbol;
-                const label = entry.companyName || fullSymbol;
                 const thesis = generateThesis(entry);
                 const reason = generateKeyReason(entry);
                 const score = entry.rankingScore;
                 const convLabel = convictionLabel(entry);
                 const convTone = convictionTone(entry);
+                const risky = hasRiskFlag(entry);
                 return (
                   <ProductPanel key={fullSymbol} as="article" className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{fullSymbol}</span>
+                          {entry.sector && (
+                            <span className="text-[10px] font-medium text-[#64748B]">{entry.sector}</span>
+                          )}
                           {entry.rank && (
                             <span className="text-[10px] font-medium text-[#64748B]">#{entry.rank}</span>
-                          )}
-                          <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
-                          {score !== null && (
-                            <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
                           )}
                         </div>
                         {entry.companyName && (
                           <p className="mt-0.5 truncate text-xs text-[#9AA7B5]">{entry.companyName}</p>
                         )}
                         <p className="mt-2 text-xs leading-5 text-[#E6EDF3]">{thesis}</p>
-                        <p className="mt-0.5 text-[11px] leading-4 text-[#64748B]">{reason}</p>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
+                          {score !== null && (
+                            <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
+                          )}
+                          {risky && (
+                            <ProductStatusPill tone="warning">Risk flag</ProductStatusPill>
+                          )}
+                        </div>
+                        <p className="mt-1 text-[11px] leading-4 text-[#64748B]">{reason}</p>
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[rgba(148,163,184,0.08)] pt-3">
-                      <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>
-                        Research
-                      </ProductAction>
-                      <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>
-                        Compare
-                      </ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>
-                        Track
-                      </ProductAction>
-                      {brokerConnected && (
-                        <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)}>
-                          Invest
-                        </ProductAction>
-                      )}
+                      <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>Research</ProductAction>
+                      <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>Compare</ProductAction>
+                      <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>Track</ProductAction>
+                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)}>Invest</ProductAction>
                     </div>
                   </ProductPanel>
                 );
@@ -442,6 +388,28 @@ export default function ScannerPage() {
             </div>
           )}
         </div>
+
+        {filterDrawerOpen && (
+          <div className="fixed inset-0 z-[100] flex items-end md:hidden" role="dialog" aria-modal="true" aria-label="Filters">
+            <div className="absolute inset-0 bg-black/60" onClick={() => setFilterDrawerOpen(false)} />
+            <div className="relative max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-[#0D1117] p-5 shadow-xl">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-[#E6EDF3]">Filters</h2>
+                <button type="button" onClick={() => setFilterDrawerOpen(false)} className="rounded-md p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors" aria-label="Close filters">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {filterContent}
+              <button
+                type="button"
+                onClick={() => setFilterDrawerOpen(false)}
+                className="mt-5 w-full rounded-lg bg-[#2962FF] py-3 text-sm font-semibold text-white hover:bg-[#3B71FF] transition-colors"
+              >
+                Apply filters
+              </button>
+            </div>
+          </div>
+        )}
       </ProductPage>
     </ProductShell>
   );

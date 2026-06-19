@@ -102,7 +102,7 @@ export const PortfolioPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="h-3.5 w-3.5" /> Add position</ProductAction>
               <ProductAction variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="h-3.5 w-3.5" /> Import CSV</ProductAction>
-              <ProductAction variant="ghost" onClick={() => productNavigate("trust")}>Trust Centre</ProductAction>
+              <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
             </div>
           </div>
 
@@ -222,7 +222,7 @@ export const PortfolioPage: React.FC = () => {
             action={
               <div className="flex gap-2">
                 <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}>Add position</ProductAction>
-                <ProductAction variant="ghost" onClick={() => productNavigate("trust")}>Trust Centre</ProductAction>
+                <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
               </div>
             }
           />

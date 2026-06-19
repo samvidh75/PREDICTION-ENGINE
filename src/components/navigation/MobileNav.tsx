@@ -40,7 +40,7 @@ export const MobileNav: React.FC = () => {
 
   const tabs: MobileNavItem[] = [
     { id: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
-    { id: "search", label: "Search", icon: <Search className="icon-nav" /> },
+    { id: "search", label: "Scanner", icon: <Search className="icon-nav" /> },
     { id: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
     { id: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
     { id: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },

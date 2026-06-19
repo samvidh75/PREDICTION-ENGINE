@@ -14,12 +14,13 @@ export const AlertsPanel: React.FC = () => {
       <ProductPanel className="p-6">
         <div className="flex flex-col items-center text-center">
           <Bell className="h-6 w-6 text-[#64748B]" />
-          <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">Alerts are being prepared</h3>
+          <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">What Changed</h3>
           <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">
-            Track companies to get notified when something changes.
+            Track a company to review important changes — thesis shifts, score movements, risk changes, and valuation updates.
           </p>
-          <div className="mt-4">
-            <ProductAction onClick={() => productNavigate("search")}>Track company</ProductAction>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <ProductAction onClick={() => productNavigate("search")}>Open scanner</ProductAction>
+            <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
           </div>
         </div>
       </ProductPanel>

@@ -25,13 +25,17 @@ function navigatePage(pageKey: string, params?: Record<string, string>) {
 
 const DEFAULT_ACTIONS: Action[] = [
   { id: "search-company", label: "Search company", description: "Find companies by ticker or name", icon: Search, action: () => navigatePage("search") },
-  { id: "open-scanner", label: "Open scanner", description: "Browse and filter companies", icon: BarChart3, action: () => navigatePage("search") },
+  { id: "open-scanner", label: "Open scanner", description: "Discover companies matching criteria", icon: BarChart3, action: () => navigatePage("search") },
   { id: "rankings", label: "View rankings", description: "Browse scored companies", icon: TrendingUp, action: () => navigatePage("rankings") },
   { id: "compare", label: "Compare companies", description: "Compare scores and factors", icon: ArrowLeftRight, action: () => navigatePage("compare") },
-  { id: "watchlist", label: "Open watchlist", description: "Saved research", icon: Eye, action: () => navigatePage("watchlist") },
-  { id: "portfolio", label: "Open portfolio", description: "Manual tracking", icon: Briefcase, action: () => navigatePage("portfolio") },
-  { id: "methodology", label: "Open methodology", description: "Scoring methodology", icon: BookOpen, action: () => navigatePage("methodology") },
-  { id: "about", label: "Open About", description: "Product mission and team", icon: Command, action: () => navigatePage("about") },
+  { id: "watchlist", label: "Open watchlist", description: "Tracked companies thesis tracker", icon: Eye, action: () => navigatePage("watchlist") },
+  { id: "portfolio", label: "Open portfolio", description: "Monitor your thesis", icon: Briefcase, action: () => navigatePage("portfolio") },
+  { id: "alerts", label: "Open alerts", description: "What changed for tracked companies", icon: BookOpen, action: () => navigatePage("alerts") },
+  { id: "methodology", label: "Open methodology", description: "How StockStory thinks", icon: BookOpen, action: () => navigatePage("methodology") },
+  { id: "quality-compounders", label: "Find quality compounders", description: "High quality, strong growth", icon: TrendingUp, action: () => navigatePage("search") },
+  { id: "undervalued-quality", label: "Find undervalued quality", description: "Good companies at reasonable prices", icon: BarChart3, action: () => navigatePage("search") },
+  { id: "improving-momentum", label: "Find improving momentum", description: "Companies gaining strength", icon: TrendingUp, action: () => navigatePage("search") },
+  { id: "review-tracked", label: "Review tracked companies", description: "Watchlist thesis status", icon: Eye, action: () => navigatePage("watchlist") },
 ];
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {

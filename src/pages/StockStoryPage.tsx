@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Star, Trophy, Sparkles, TrendingUp, Activity } from "lucide-react";
-import { navigateToStock } from "../architecture/navigation/routeCoordinator";
+import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Sparkles, Star, TrendingUp, Trophy } from "lucide-react";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
@@ -9,15 +8,9 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import { api, ApiError } from "../services/api/client";
 import type { CompanyMetadata } from "../services/api/client";
 import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
-import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, normalizeDate, formatScore } from "../services/ui/dataFormatting";
-import { DataFreshnessBadge, SourceBadge, CoverageStatusBadge } from "../components/ui/PageHeader";
+import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, formatScore } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
-import { PredictionConfidenceBar } from "../components/intelligence/PredictionConfidenceBar";
-import { ModelRunBadge } from "../components/intelligence/ModelRunBadge";
-import { FactorDriverCard } from "../components/intelligence/FactorDriverCard";
-import { MethodologyLink } from "../components/intelligence/MethodologyLink";
-import { ResearchAuditDrawer } from "../components/intelligence/SourceTraceTimeline";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -55,12 +48,13 @@ const getConfidenceStyle = (conf: string) => {
   }
 };
 
-type TabKey = "overview" | "financials" | "valuation" | "ownership" | "risks" | "documents" | "whychange";
+type TabKey = "thesis" | "fundamentals" | "risk" | "peers" | "history";
 
 type MetadataState = { data: CompanyMetadata | null; loading: boolean; error: string | null; };
 
-const tabs: TabKey[] = ["overview", "financials", "valuation", "ownership", "risks", "documents", "whychange"];
-const TAB_LABELS: Record<TabKey, string> = { overview: "Overview", financials: "Fundamentals", valuation: "Valuation", ownership: "Quality", risks: "Risk", documents: "Data freshness", whychange: "Score changes" };
+const tabs: TabKey[] = ["thesis", "fundamentals", "risk", "peers", "history"];
+const TAB_LABELS: Record<TabKey, string> = { thesis: "Thesis", fundamentals: "Fundamentals", risk: "Risk", peers: "Peers", history: "History" };
+const TAB_ICONS: Record<TabKey, string> = { thesis: "Activity", fundamentals: "BarChart3", risk: "AlertCircle", peers: "Building2", history: "FileText" };
 
 function readTickerFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -69,9 +63,9 @@ function readTickerFromUrl(): string {
 }
 
 function readTabFromUrl(): TabKey {
-  if (typeof window === "undefined") return "overview";
+  if (typeof window === "undefined") return "thesis";
   const tab = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
-  return tab && tabs.includes(tab) ? tab : "overview";
+  return tab && tabs.includes(tab) ? tab : "thesis";
 }
 
 function formatLargeINR(value?: number | null): string {
@@ -79,9 +73,9 @@ function formatLargeINR(value?: number | null): string {
 }
 
 function formatDateTime(value?: string): string {
-  if (!value) return "Data unavailable";
+  if (!value) return "Insufficient information";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Data unavailable";
+  if (Number.isNaN(date.getTime())) return "Insufficient information";
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
@@ -135,13 +129,13 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
     growth, quality, stability, valuation, momentum, risk,
     financials: financialsObj || {},
     engineDetails: {
-      growth: { score: growth, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: `Source: ${factors.growth.source} (${factors.growth.snapshotDate}).` },
-      quality: { score: quality, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: quality, commentary: `Source: ${factors.quality.source} (${factors.quality.snapshotDate}).` },
-      stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: `Source: ${factors.stability.source} (${factors.stability.snapshotDate}).` },
-      momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: `Source: ${factors.momentum.source} (${factors.momentum.snapshotDate}).` },
-      valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: `Source: ${factors.value.source} (${factors.value.snapshotDate}).` },
-      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: typeof risk === "number" && risk >= 65 ? 1 : 0, commentary: `Source: ${factors.risk.source} (${factors.risk.snapshotDate}).` },
-      confidence: { level: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable", score: typeof confidenceScore === "number" ? confidenceScore : null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: `Source: ${payload.confidence?.source ?? "prediction_registry"} (${payload.confidence?.snapshotDate ?? payload.predictionDate ?? "Unavailable"}).` },
+      growth: { score: growth, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Growth metrics reflect revenue and earnings trends." },
+      quality: { score: quality, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: quality, commentary: "Quality metrics assess profitability and capital efficiency." },
+      stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: "Stability measures balance sheet strength and earnings consistency." },
+      momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: "Momentum tracks recent price trends and market sentiment." },
+      valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: "Valuation compares market price to fundamental business value." },
+      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: typeof risk === "number" && risk >= 65 ? 1 : 0, commentary: "Risk metrics flag potential accounting, leverage, and volatility concerns." },
+      confidence: { level: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable", score: typeof confidenceScore === "number" ? confidenceScore : null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Confidence reflects the overall reliability of the current score assessment." },
     },
   };
 }
@@ -161,7 +155,6 @@ export const StockStoryPage: React.FC = () => {
   const [ownership, setOwnership] = useState<any | null>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [explanationModalOpen, setExplanationModalOpen] = useState(false);
-  const [auditDrawerOpen, setAuditDrawerOpen] = useState(false);
 
   useEffect(() => { RecentSearchStore.addTicker(ticker); }, [ticker]);
 
@@ -176,7 +169,7 @@ export const StockStoryPage: React.FC = () => {
     const controller = new AbortController();
     setStoryLoading(true); setStoryError(null);
     const horizon = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "30", 10);
-    api.getStockStory(ticker, horizon, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setStory(data); setStoryLoading(false); }).catch(() => { if (controller.signal.aborted) return; setStoryError("Company health analysis is temporarily unavailable."); setStoryLoading(false); });
+    api.getStockStory(ticker, horizon, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setStory(data); setStoryLoading(false); }).catch(() => { if (controller.signal.aborted) return; setStoryError("Company research is temporarily unavailable."); setStoryLoading(false); });
     return () => controller.abort();
   }, [ticker]);
 
@@ -184,14 +177,14 @@ export const StockStoryPage: React.FC = () => {
   useEffect(() => { api.getCompanyFinancials(ticker).then(data => setFinancials(data)).catch(() => setFinancials(null)); }, [ticker]);
 
   const companyName = metadata.data?.companyName && metadata.data.companyName !== ticker ? metadata.data.companyName : registryStock?.companyName || ticker;
-  const sector = metadata.data?.sector || registryStock?.sector || "Data unavailable";
-  const industry = metadata.data?.industry || "Data unavailable";
-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Data unavailable";
+  const sector = metadata.data?.sector || registryStock?.sector || "Insufficient information";
+  const industry = metadata.data?.industry || "Insufficient information";
+  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Insufficient information";
   const marketCap = formatLargeINR(metadata.data?.marketCap);
   const currency = metadata.data?.currency || "INR";
   const quote = liveQuote.quote;
-  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Data unavailable";
-  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Data unavailable";
+  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Insufficient information";
+  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Insufficient information";
 
   const storyData = useMemo(() => {
     if (!story) { if (financials && financials.snapshot_date) return adaptStockStoryResponse({ status: "unavailable" }, financials); return null; }
@@ -218,6 +211,13 @@ export const StockStoryPage: React.FC = () => {
   const navigateToPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", pageKey); params.delete("id"); params.delete("tab");
+    window.history.pushState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
+  const navigateToTicker = (symbol: string) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "stock"); params.set("id", symbol); params.delete("tab");
     window.history.pushState({}, "", `?${params.toString()}`);
     window.dispatchEvent(new Event("urlchange"));
   };
@@ -250,7 +250,6 @@ export const StockStoryPage: React.FC = () => {
   const hasFinancials = financials && financials.snapshot_date;
 
   if (!storyData || (storyUnavailable && !hasFinancials)) {
-    const missingInputs = Array.isArray(storyData?.dataState?.missingInputs) ? storyData.dataState.missingInputs.filter(Boolean) : [];
     return (
       <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased" style={{ color: "#0f1419" }}>
         <div className="flex items-center justify-between gap-3 text-xs">
@@ -263,7 +262,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0">
               <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide" style={{ color: "#536471" }}>
-                <span>{ticker}</span><span>•</span><span>{exchange !== "Data unavailable" ? exchange : "NSE / BSE"}</span><span>•</span><span>{currency}</span>
+                <span>{ticker}</span><span>•</span><span>{exchange !== "Insufficient information" ? exchange : "NSE / BSE"}</span><span>•</span><span>{currency}</span>
               </div>
               <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight md:text-3xl" style={{ color: "#0f1419" }}>{companyName}</h1>
               <div className="mt-3 inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#0369a1" }}>
@@ -279,7 +278,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Volume</div>
                 <div className="mt-1 font-mono text-lg font-bold tabular-nums" style={{ color: "#0f1419" }}>
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Insufficient information"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px]" style={{ color: "#8b98a5" }}>Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -305,34 +304,25 @@ export const StockStoryPage: React.FC = () => {
               View Scoring Methodology
             </button>
           </div>
-
-          {missingInputs.length > 0 && (
-            <div className="mt-6 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#8b98a5" }}>Data sources pending</div>
-              <div className="flex flex-wrap gap-2">
-                {missingInputs.map((input: string) => (
-                  <span key={input} className="rounded-lg px-2 py-1 text-[10px] font-semibold font-mono" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>{input}</span>
-                ))}
-              </div>
-            </div>
-          )}
         </section>
 
         <div className="rounded-xl p-5" style={{ background: "rgba(255,255,255,0.72)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
           <div className="mb-2 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>My Research Notes</div>
           <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl p-3 text-xs outline-none transition" style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.4)", color: "#0f1419" }} aria-label="Research notes" />
         </div>
+
+        <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#8b98a5] uppercase">Research only. Not investment advice.</p>
       </div>
     );
   }
 
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
-  const healthScore = typeof storyData.healthScore === "number" && Number.isFinite(storyData.healthScore) ? storyData.healthScore : null;
-  const strokeDashoffset = circumference - ((healthScore ?? 0) / 100) * circumference;
+  const score = typeof storyData.healthScore === "number" && Number.isFinite(storyData.healthScore) ? storyData.healthScore : null;
+  const strokeDashoffset = circumference - ((score ?? 0) / 100) * circumference;
 
-  const renderProgressBar = (label: string, score: number | null, colorClass: string) => {
-    const hasScore = typeof score === "number" && Number.isFinite(score);
+  const renderProgressBar = (label: string, scoreValue: number | null, colorClass: string) => {
+    const hasScore = typeof scoreValue === "number" && Number.isFinite(scoreValue);
     const barColors: Record<string, string> = {
       "text-primary": "bg-[var(--color-accent)]", "text-secondary": "bg-[var(--color-text-muted)]",
       "text-warning": "bg-[var(--color-warning)]", "text-danger": "bg-[var(--color-danger)]",
@@ -342,17 +332,17 @@ export const StockStoryPage: React.FC = () => {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
           <span style={{ color: "#536471" }}>{label}</span>
-          <span className={colorClass}>{hasScore ? formatScore(score) : "Not available"}</span>
+          <span className={colorClass}>{hasScore ? formatScore(scoreValue) : "Insufficient information"}</span>
         </div>
         <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "#f0f1f5" }}>
-          <div className={`h-full rounded-full transition-all duration-1000 ${barColor}`} style={{ width: hasScore ? `${score}%` : "0%" }} />
+          <div className={`h-full rounded-full transition-all duration-1000 ${barColor}`} style={{ width: hasScore ? `${scoreValue}%` : "0%" }} />
         </div>
       </div>
     );
   };
 
   const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span style={{ color: "#8b98a5" }}>Unavailable</span>;
+    if (val === null || val === undefined) return <span style={{ color: "#8b98a5" }}>Insufficient information</span>;
     const isPos = val >= 0;
     return <span className={`font-mono font-bold ${isPos ? "text-[var(--color-active)]" : "text-[var(--color-danger)]"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
   };
@@ -374,7 +364,7 @@ export const StockStoryPage: React.FC = () => {
                 <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{healthScore !== null ? Math.round(healthScore) : "N/A"}</span>
+                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "N/A"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
               </div>
             </div>
@@ -385,7 +375,7 @@ export const StockStoryPage: React.FC = () => {
               <h1 className="max-w-xl text-2xl font-semibold tracking-tight md:text-3xl truncate text-[#E6EDF3]">{companyName}</h1>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
-                  {storyData.classification ?? "Unavailable"}
+                  {storyData.classification ?? "Not enough information"}
                 </span>
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getConfidenceStyle(storyData.confidence)}`}>
                   {storyData.confidence} Confidence
@@ -403,7 +393,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Volume</div>
                 <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Data unavailable"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Insufficient information"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-[#484F58]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -437,9 +427,6 @@ export const StockStoryPage: React.FC = () => {
           <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#F23645]" : ""}`} />
           {isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
         </button>
-        <button type="button" onClick={() => setAuditDrawerOpen(true)} className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-[10px] font-semibold text-[#8B949E] hover:bg-white/[0.06] hover:text-[#E6EDF3] transition-colors">
-          Trace inputs
-        </button>
       </section>
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
@@ -447,13 +434,13 @@ export const StockStoryPage: React.FC = () => {
         <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-xs text-[#E6EDF3] outline-none transition placeholder-[#484F58]" aria-label="Research notes" />
       </div>
 
-        <div className="flex gap-2 overflow-x-auto border-b border-white/[0.06]" role="tablist">
-          {tabs.map((tab) => (
-            <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-[#2962FF] border-[#2962FF] font-semibold" : "text-[#484F58] border-transparent hover:text-[#8B949E]"}`}>
-              {TAB_LABELS[tab]}
-            </button>
-          ))}
-        </div>
+      <div className="flex gap-2 overflow-x-auto border-b border-white/[0.06]" role="tablist">
+        {tabs.map((tab) => (
+          <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-[#2962FF] border-[#2962FF] font-semibold" : "text-[#484F58] border-transparent hover:text-[#8B949E]"}`}>
+            {TAB_LABELS[tab]}
+          </button>
+        ))}
+      </div>
 
       <div className="min-h-[300px] rounded-2xl border border-white/[0.08] bg-[#0D1117] p-6">
 
@@ -471,7 +458,7 @@ export const StockStoryPage: React.FC = () => {
                 {renderProgressBar("Value score", storyData.valuation, "text-secondary")}
               </div>
               <div className="text-[9px] leading-normal mt-3 pt-3 border-t border-white/[0.06] text-[#484F58]">
-                Composite score is the average of available factor scores. Missing factors are shown as unavailable.
+                Composite score is the average of available factor scores. Missing factors are shown as insufficient information.
               </div>
             </div>
             <div className="space-y-4">
@@ -488,9 +475,6 @@ export const StockStoryPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
                     <dt className="text-[#484F58]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[#E6EDF3]">{marketCap}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-[#484F58]">Data Policy</dt><dd className="text-right font-semibold text-[#E6EDF3]">Source-backed only</dd>
                   </div>
                 </dl>
               </div>
@@ -527,9 +511,9 @@ export const StockStoryPage: React.FC = () => {
                 {storyData.engineDetails.growth.commentary}
               </div>
             </div>
-            <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#1a6e4a" }}>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
                   <Trophy className="h-4 w-4" /> Quality Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#1a6e4a" }}>
@@ -562,9 +546,9 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "valuation" && (
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#b8860b" }}>
+            <div className="md:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
                   <TrendingUp className="h-4 w-4" /> Valuation Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
@@ -581,22 +565,22 @@ export const StockStoryPage: React.FC = () => {
                 {storyData.engineDetails.valuation.commentary}
               </div>
             </div>
-            <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="text-[10px] font-bold uppercase tracking-wider pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-3">
+              <div className="text-[10px] font-bold uppercase tracking-wider pb-2 text-[#8B949E]">
                 Raw Valuation Multiples
               </div>
               <dl className="space-y-3 text-xs">
-                <div className="flex justify-between pb-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>P/E Ratio</dt><dd className="font-mono font-bold tabular-nums" style={{ color: "#0f1419" }}>{formatNumber(storyData.financials.peRatio)}</dd>
+                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
+                  <dt className="text-[#484F58]">P/E Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.peRatio)}</dd>
                 </div>
-                <div className="flex justify-between pb-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>P/B Ratio</dt><dd className="font-mono font-bold tabular-nums" style={{ color: "#0f1419" }}>{formatNumber(storyData.financials.pbRatio)}</dd>
+                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
+                  <dt className="text-[#484F58]">P/B Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.pbRatio)}</dd>
                 </div>
-                <div className="flex justify-between pb-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>EV/EBITDA</dt><dd className="font-mono font-bold tabular-nums" style={{ color: "#0f1419" }}>{formatNumber(storyData.financials.evEbitda)}</dd>
+                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
+                  <dt className="text-[#484F58]">EV/EBITDA</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.evEbitda)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt style={{ color: "#536471" }}>FCF Yield</dt><dd className="font-mono font-bold tabular-nums" style={{ color: "#0f1419" }}>{localFormatPercent(storyData.financials.fcfYield)}</dd>
+                  <dt className="text-[#484F58]">FCF Yield</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{localFormatPercent(storyData.financials.fcfYield)}</dd>
                 </div>
               </dl>
             </div>
@@ -607,8 +591,8 @@ export const StockStoryPage: React.FC = () => {
           <div className="space-y-6">
             {ownership ? (
               <div className="grid gap-6 md:grid-cols-3">
-                <div className="md:col-span-2 rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#0369a1" }}>Shareholding Breakdown</h3>
+                <div className="md:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider pb-3 text-[#E6EDF3]">Shareholding Breakdown</h3>
                   <div className="space-y-4">
                     {ownership.categories && ownership.categories.map((c: any) => {
                       const pct = parseFloat(c.share) || 0;
@@ -626,17 +610,17 @@ export const StockStoryPage: React.FC = () => {
                     })}
                   </div>
                 </div>
-                <div className="rounded-2xl p-5 flex flex-col justify-between" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <div className="text-[10px] font-bold uppercase tracking-wider pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 flex flex-col justify-between">
+                  <div className="text-[10px] font-bold uppercase tracking-wider pb-2 text-[#8B949E]">
                     Institutional Stance
                   </div>
-                  <p className="text-xs leading-relaxed my-4" style={{ color: "#0f1419" }}>{ownership.comment}</p>
-                  <div className="text-[9px] italic" style={{ color: "#8b98a5" }}>* Sourced from quarterly shareholding declarations to the stock exchange.</div>
+                  <p className="text-xs leading-relaxed my-4 text-[#E6EDF3]">{ownership.comment}</p>
+                  <div className="text-[9px] italic text-[#484F58]">* Based on quarterly shareholding declarations to the stock exchange.</div>
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl p-5 text-sm" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-                Ownership and shareholding data is not available from the connected data providers yet.
+              <div className="rounded-xl p-5 text-sm border border-white/[0.06] bg-white/[0.04] text-[#8B949E]">
+                Ownership and shareholding data is not currently available.
               </div>
             )}
           </div>
@@ -644,9 +628,9 @@ export const StockStoryPage: React.FC = () => {
 
         {activeTab === "risks" && (
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#c0392b" }}>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
                   <AlertCircle className="h-4 w-4" /> Risk Engine
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
@@ -667,20 +651,14 @@ export const StockStoryPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}>
-              <div className="flex items-center justify-between pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#4338ca" }}>
-                  <Activity className="h-4 w-4" /> Confidence Engine
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
+                  <Activity className="h-4 w-4" /> Alert Check
                 </h3>
                 <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
-                  Reliability: {storyData.confidence}
+                  Confidence: {storyData.confidence}
                 </span>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Data Completeness", storyData.engineDetails.confidence.dataCompleteness, "text-primary")}
-                {renderProgressBar("Signal Agreement", storyData.engineDetails.confidence.signalAgreement, "text-primary")}
-                {renderProgressBar("Risk Consistency", storyData.engineDetails.confidence.riskConsistency, "text-primary")}
-                {renderProgressBar("Historical Stability", storyData.engineDetails.confidence.historicalStability, "text-primary")}
               </div>
               <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
                 {storyData.engineDetails.confidence.commentary}
@@ -716,83 +694,43 @@ export const StockStoryPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-xl p-5 text-sm" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-                  Corporate actions timeline is not available from the connected data providers yet.
+                <div className="rounded-xl p-5 text-sm border border-white/[0.06] bg-white/[0.04] text-[#8B949E]">
+                  Corporate actions timeline is not currently available.
                 </div>
               )}
-            </div>
-            <div>
-              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-                <FileText className="h-4 w-4" style={{ color: "#1a6e4a" }} /> Data Source & Freshness
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Financial Data</div>
-                  <dl className="mt-2 space-y-2 text-xs">
-                    <div className="flex justify-between">
-                      <dt style={{ color: "#536471" }}>Snapshot date</dt>
-                      <dd className="font-mono tabular-nums" style={{ color: "#0f1419" }}>{normalizeDate(financials?.snapshot_date) || "Unavailable"}</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt style={{ color: "#536471" }}>Sources</dt>
-                      <dd><SourceBadge source="Provider filings" /></dd>
-                    </div>
-                  </dl>
-                </div>
-                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)" }}>
-                  <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Prediction Data</div>
-                  <dl className="mt-2 space-y-2 text-xs">
-                    <div className="flex justify-between">
-                      <dt style={{ color: "#536471" }}>Prediction date</dt>
-                      <dd className="font-mono tabular-nums" style={{ color: "#0f1419" }}>{normalizeDate(storyData?.dataState?.asOf) || normalizeDate(storyData?.predictionDate) || "Unavailable"}</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt style={{ color: "#536471" }}>Freshness</dt>
-                      <dd><DataFreshnessBadge date={storyData?.predictionDate ?? null} /></dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt style={{ color: "#536471" }}>Status</dt>
-                      <dd><CoverageStatusBadge status={storyData?.apiStatus === "ok" ? "available" : null} /></dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
             </div>
           </div>
         )}
       </div>
 
       {relatedCompanies.length > 0 && (
-        <section className="pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.3)" }}>
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider" style={{ color: "#536471" }}>Same Sector Companies</div>
+        <section className="pt-6">
+          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Same Sector Companies</div>
           <div className="flex flex-wrap gap-3">
             {relatedCompanies.map((company) => (
               <button
                 key={company.symbol}
-                onClick={() => navigateToStock({ ticker: company.symbol, mode: "push" })}
-                className="flex items-center justify-between gap-4 rounded-xl px-4 py-2.5 text-left transition-all hover:bg-white/80"
-                style={{ background: "rgba(255,255,255,0.6)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.3)" }}
+                onClick={() => navigateToTicker(company.symbol)}
+                className="flex items-center justify-between gap-4 rounded-xl px-4 py-2.5 text-left transition-all hover:bg-white/80 border border-white/[0.08] bg-[#0D1117]"
               >
                 <div>
-                  <div className="font-mono text-xs font-bold" style={{ color: "#0f1419" }}>{company.symbol}</div>
-                  <div className="max-w-[160px] truncate text-[10px]" style={{ color: "#536471" }}>{company.companyName}</div>
+                  <div className="font-mono text-xs font-bold text-[#E6EDF3]">{company.symbol}</div>
+                  <div className="max-w-[160px] truncate text-[10px] text-[#8B949E]">{company.companyName}</div>
                 </div>
-                <ArrowRight className="h-3.5 w-3.5" style={{ color: "#1a6e4a" }} />
+                <ArrowRight className="h-3.5 w-3.5 text-[#1a6e4a]" />
               </button>
             ))}
           </div>
         </section>
       )}
 
-      {/* Source trace drawer */}
-      <ResearchAuditDrawer open={auditDrawerOpen} onClose={() => setAuditDrawerOpen(false)} symbol={ticker} />
+      <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#484F58] uppercase">Research only. Not investment advice.</p>
 
-      {/* Prediction explanation modal */}
       <IntelligenceModal
         open={explanationModalOpen}
         onClose={() => setExplanationModalOpen(false)}
-        title={ticker ? `${ticker} — prediction explanation` : ""}
-        subtitle="Model output, factor context, and data coverage for this company."
+        title={ticker ? `${ticker} — score explanation` : ""}
+        subtitle="Factor context and score details for this company."
       >
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -800,7 +738,7 @@ export const StockStoryPage: React.FC = () => {
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Score</span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-bold tabular-nums text-[#E6EDF3]">
-                  {healthScore !== null ? Math.round(healthScore) : "—"}
+                  {score !== null ? Math.round(score) : "—"}
                 </span>
                 <span className="text-xs text-[#8B949E]">/ 100</span>
               </div>
@@ -810,13 +748,8 @@ export const StockStoryPage: React.FC = () => {
                 </span>
               )}
             </div>
-            <PredictionConfidenceBar
-              score={storyData?.engineDetails?.confidence?.score ?? null}
-              level={storyData?.engineDetails?.confidence?.level ?? null}
-            />
           </div>
 
-          {/* What this score means */}
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor context</span>
             <p className="mt-2 text-xs leading-relaxed text-[#8B949E]">
@@ -824,27 +757,33 @@ export const StockStoryPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Factor drivers */}
           <div>
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor scores</span>
             <div className="mt-2 grid gap-2 sm:grid-cols-3">
-              <FactorDriverCard label="Growth" score={storyData?.growth ?? null} />
-              <FactorDriverCard label="Quality" score={storyData?.quality ?? null} />
-              <FactorDriverCard label="Stability" score={storyData?.stability ?? null} />
-              <FactorDriverCard label="Momentum" score={storyData?.momentum ?? null} />
-              <FactorDriverCard label="Valuation" score={storyData?.valuation ?? null} />
-              <FactorDriverCard label="Risk" score={storyData?.risk ?? null} />
+              {[
+                { label: "Growth", value: storyData?.growth ?? null },
+                { label: "Quality", value: storyData?.quality ?? null },
+                { label: "Stability", value: storyData?.stability ?? null },
+                { label: "Momentum", value: storyData?.momentum ?? null },
+                { label: "Valuation", value: storyData?.valuation ?? null },
+                { label: "Risk", value: storyData?.risk ?? null },
+              ].map((f) => (
+                <div key={f.label} className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
+                  <div className="text-[10px] text-[#8B949E]">{f.label}</div>
+                  <div className="mt-1 text-base font-bold tabular-nums text-[#E6EDF3]">
+                    {f.value !== null ? formatScore(f.value) : "—"}
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="mt-2 text-[10px] text-[#484F58]">Factor context is shown for reference, not as causal attribution.</p>
+            <p className="mt-2 text-[10px] text-[#484F58]">Factor scores are shown for reference, not as causal attribution.</p>
           </div>
 
-          {/* Data coverage */}
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Data coverage</span>
+            <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research basis</span>
             <div className="mt-2 space-y-1.5">
               {[
-                { label: "Model run", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Pending" },
-                { label: "Data completeness", value: storyData?.dataState?.completenessScore ? `${Math.round(storyData.dataState.completenessScore)}%` : "Pending" },
+                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Pending" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
                   <span className="text-xs text-[#8B949E]">{item.label}</span>
@@ -854,12 +793,8 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <MethodologyLink />
-          </div>
-
           <p className="text-[10px] leading-relaxed text-[#484F58]">
-            Research only. This prediction explanation shows model inputs and outputs for reference. It is not investment advice.
+            Research only. This score explanation shows model inputs and outputs for reference. It is not investment advice.
           </p>
         </div>
       </IntelligenceModal>

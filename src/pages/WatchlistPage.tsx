@@ -244,7 +244,7 @@ export const WatchlistPage: React.FC = () => {
                       {explanationSymbol === ticker && (
                         <div className="mt-3 space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
                           <p className="text-[11px] leading-relaxed text-[#8B949E]">
-                            <strong>Not enough information</strong> — Explanation data appears after the next completed scoring cycle for this symbol.
+                            <strong>Not enough information</strong> — What changed analysis will appear after the next completed research cycle.
                           </p>
                           <p className="text-[10px] leading-relaxed text-[#484F58]">Research only. Not investment advice.</p>
                         </div>
