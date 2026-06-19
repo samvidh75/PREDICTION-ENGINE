@@ -127,3 +127,140 @@ describe('Forbidden copy audit utilities', () => {
     });
   });
 });
+
+describe('Route-specific compliance (static text)', () => {
+  const landingCopy = [
+    "AI research for Indian equities",
+    "Understand the stock before you invest",
+    "How StockStory works",
+    "Five steps from discovery to execution",
+    "StockStory provides AI-powered research and analysis for informational purposes only",
+    "Not financial advice",
+  ];
+
+  const methodologyCopy = [
+    "How StockStory Evaluates Businesses",
+    "multi-factor research framework",
+    "Quality, Growth, Valuation, Momentum, and Risk",
+    "How to Interpret Conviction",
+    "Why Research Is Not a Guarantee",
+    "How to Use the Product Responsibly",
+    "What 'Track Thesis' Means",
+    "Why Final Execution Happens Through Brokers",
+    "Compliance Statement",
+  ];
+
+  const onboardingCopy = [
+    "Search a company",
+    "Read the thesis",
+    "Compare with peers",
+    "Track the thesis",
+    "Review before investing",
+  ];
+
+  it('landing copy has no backend vocabulary', () => {
+    for (const text of landingCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('landing copy has no forbidden trading language', () => {
+    for (const text of landingCopy) {
+      expect(hasForbiddenTradingLanguage(text)).toBeNull();
+    }
+  });
+
+  it('landing copy has no render garbage', () => {
+    for (const text of landingCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+
+  it('methodology copy has no backend vocabulary', () => {
+    for (const text of methodologyCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('methodology copy has no forbidden trading language', () => {
+    for (const text of methodologyCopy) {
+      expect(hasForbiddenTradingLanguage(text)).toBeNull();
+    }
+  });
+
+  it('methodology copy has no render garbage', () => {
+    for (const text of methodologyCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+
+  it('onboarding copy has no backend vocabulary', () => {
+    for (const text of onboardingCopy) {
+      expect(hasBackendVocabulary(text)).toBeNull();
+      expect(hasBackendProviderNames(text)).toBeNull();
+      expect(hasProductForbiddenTerms(text)).toBeNull();
+    }
+  });
+
+  it('onboarding copy has no render garbage', () => {
+    for (const text of onboardingCopy) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+});
+
+describe('Empty state and gated UI compliance', () => {
+  const forbiddenEmptyStatePhrases = [
+    "data unavailable", "provider unavailable", "quote unavailable",
+    "history unavailable", "API unavailable", "backend error",
+    "diagnostics failed", "coverage incomplete", "source unavailable",
+  ];
+
+  const allowedEmptyStatePhrases = [
+    "Awaiting research signals", "Research signals pending",
+    "Needs research", "Search a company to begin research",
+    "Track a company to review changes over time",
+    "Monitor companies after you decide to track an investment thesis",
+  ];
+
+  it('all forbidden empty-state phrases are detected', () => {
+    for (const phrase of forbiddenEmptyStatePhrases) {
+      expect(hasProductForbiddenTerms(phrase), `${phrase} should be detected`).not.toBeNull();
+    }
+  });
+
+  it('allowed empty-state phrases pass', () => {
+    for (const phrase of allowedEmptyStatePhrases) {
+      expect(hasProductForbiddenTerms(phrase), `${phrase} should pass`).toBeNull();
+      expect(hasBackendVocabulary(phrase), `${phrase} should not have backend vocab`).toBeNull();
+    }
+  });
+
+  it('no bot framework language in empty states', () => {
+    const botIndicators = ["loading", "fetching data", "please wait", "initialising"];
+    for (const indicator of botIndicators) {
+      expect(hasProductForbiddenTerms(indicator)).toBeNull();
+    }
+  });
+});
+
+describe('Render garbage prevention', () => {
+  const productTextSamples = [
+    "Research score: 75",
+    "Conviction: High",
+    "Track this company",
+    "Compare alternatives",
+    "Review before investing",
+    "Research Standards & Methodology",
+  ];
+
+  it('product copy does not contain render garbage', () => {
+    for (const text of productTextSamples) {
+      expect(hasRenderGarbage(text)).toBeNull();
+    }
+  });
+});

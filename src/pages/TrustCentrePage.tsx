@@ -32,9 +32,14 @@ const sections = [
     body: "StockStory is committed to research integrity. Scores are computed from observable data through documented methodology. No fabricated values are introduced. When information is unavailable, the score reflects that honestly. The same evaluation framework is applied uniformly across all companies, allowing for fair comparison and informed review. Always verify key facts independently."
   },
   {
+    icon: BookOpen,
+    title: "What 'Track Thesis' Means",
+    body: "Tracking a thesis means saving a company to your watchlist so you can monitor changes over time. StockStory alerts you when scores move, risk factors change, or valuation context shifts — so you know when it is time to review your reasoning. Thesis tracking is a research aid, not a portfolio management system."
+  },
+  {
     icon: ArrowRightLeft,
     title: "Why Final Execution Happens Through Brokers",
-    body: "StockStory is a research platform, not a brokerage. All trading, order placement, and portfolio execution occur through your registered broker. StockStory provides research and analysis — the decision and action remain yours. This separation keeps research objective and free from execution conflicts."
+    body: "StockStory is a research platform, not a brokerage. All trading, order placement, and portfolio execution occur through your registered broker. StockStory never stores, processes, or accesses your broker credentials. The Invest handoff prepares your research summary, but the final decision and action remain yours. This separation keeps research objective and free from execution conflicts."
   },
   {
     icon: Scale,
