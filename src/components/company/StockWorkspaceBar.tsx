@@ -29,19 +29,6 @@ function formatDateTime(value?: string): string {
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
-function sourceLabel(source?: CompanyMetadata["enrichmentSource"]): string {
-  switch (source) {
-    case "provider":
-      return "Research metadata";
-    case "registry":
-      return "Verified registry";
-    case "fallback":
-      return "Structured fallback";
-    default:
-      return "Data unavailable";
-  }
-}
-
 function stateClass(value: string): string {
   if (value === "VERIFIED" || value === "Recent") return "text-emerald-700";
   if (value === "PARTIAL" || value === "Delayed") return "text-amber-700";
@@ -90,10 +77,10 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
   }, [ticker]);
 
   const registryStock = StockRegistry.getStock(ticker);
-  const exchange = metadata?.exchange || quoteState.quote?.exchange || registryStock?.exchange || "Data unavailable";
-  const verification = metadataLoading ? "Loading" : metadata?.verificationStatus || "Unavailable";
+  const exchange = metadata?.exchange || quoteState.quote?.exchange || registryStock?.exchange || "Not available";
+  const verification = metadataLoading ? "Loading" : metadata?.verificationStatus || "Pending";
   const freshness = quoteState.loading ? "Loading" : getQuoteFreshness(quoteState.quote?.updatedAt);
-  const quoteTimestamp = quoteState.loading ? "Loading quote timestamp" : formatDateTime(quoteState.quote?.updatedAt);
+  const quoteTimestamp = quoteState.loading ? "Loading timestamp" : formatDateTime(quoteState.quote?.updatedAt);
 
   return (
     <section aria-label="Stock workspace context" className="mb-4 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm">
@@ -101,8 +88,8 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
         <div className="flex items-center gap-2">
           <Database className="h-4 w-4 text-emerald-700" />
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800">Stock workspace</div>
-            <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D research horizon · registry-backed scores only</div>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800">Research workspace</div>
+            <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D research horizon</div>
           </div>
         </div>
 
@@ -111,25 +98,17 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
       <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         <TrustItem label="Exchange" value={exchange} />
         <TrustItem
-          label="Metadata verification"
+          label="Research status"
           value={verification}
           valueClass={stateClass(verification)}
           detail={metadata?.verificationReasons?.length ? metadata.verificationReasons.join(", ") : undefined}
         />
-        <TrustItem label="Metadata source" value={sourceLabel(metadata?.enrichmentSource)} />
-        <TrustItem
-          label="Quote freshness"
-          value={freshness}
-          valueClass={stateClass(freshness)}
-          detail={quoteState.error || undefined}
-        />
-        <TrustItem label="Quote timestamp" value={quoteTimestamp} />
+        <TrustItem label="Quote availability" value={freshness} valueClass={stateClass(freshness)} />
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 text-[9px] leading-relaxed text-slate-500">
-        <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-700" />
-        Missing market data remains unavailable. Exchange labels use research metadata when available, then the local company registry.
-        <Clock3 className="ml-1 h-3 w-3 shrink-0 text-slate-400" />
+      <div className="mt-2 text-[9px] leading-relaxed text-slate-500">
+        <ShieldCheck className="inline h-3 w-3 mr-1 shrink-0 text-emerald-700" />
+        Research context is based on available data.
       </div>
     </section>
   );

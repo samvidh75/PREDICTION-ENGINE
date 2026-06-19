@@ -36,7 +36,7 @@ export default function CompanyMethodologyAndRegistry(): JSX.Element {
           <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
             <span className="text-sm font-semibold text-slate-900">4. Summary</span>
             <p className="mt-1 text-xs leading-relaxed text-slate-600">
-              Results are presented as readable summaries alongside source and freshness labels.
+              Results are presented as readable summaries with clear indicators for each dimension.
             </p>
           </div>
         </div>
