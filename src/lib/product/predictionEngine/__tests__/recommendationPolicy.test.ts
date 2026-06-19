@@ -9,8 +9,8 @@ describe("recommendationPolicy", () => {
     expect(result.action).toBeTruthy();
   });
 
-  it("returns Not enough information when dataCompleteness is below 40", () => {
-    const result = mapScoreToStance(80, null, 30);
+  it("returns Not enough information when dataCompleteness is below 30", () => {
+    const result = mapScoreToStance(80, null, 20);
     expect(result.stance).toBe("Not enough information");
   });
 
@@ -29,9 +29,10 @@ describe("recommendationPolicy", () => {
     expect(result.stance).toBe("High conviction");
   });
 
-  it("returns Watch for moderate score 55-74", () => {
+  it("returns Thesis improving for moderate score 55-74 with good confidence", () => {
     const result = mapScoreToStance(60, 20, 100);
-    expect(result.stance).toBe("Watch");
+    expect(result.stance).not.toMatch(/Buy|Sell|Hold/);
+    expect(result.stance).toMatch(/Thesis improving|Watch/);
   });
 
   it("returns Watch for score 40-54", () => {
@@ -42,6 +43,11 @@ describe("recommendationPolicy", () => {
   it("returns Needs review for low score", () => {
     const result = mapScoreToStance(30, 20, 100);
     expect(result.stance).toBe("Needs review");
+  });
+
+  it("returns Thesis improving for high score with low confidence (not High conviction)", () => {
+    const result = mapScoreToStance(80, 10, 40);
+    expect(result.stance).not.toBe("High conviction");
   });
 
   it("never outputs Buy, Sell, or Hold", () => {

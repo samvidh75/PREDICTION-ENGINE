@@ -9,6 +9,30 @@ export interface MappedResearchData {
   researchScore: ResearchScoreResult;
 }
 
+function extractResearchData(rawData: Record<string, unknown>): Record<string, unknown> {
+  return {
+    pe: normalizeNumericValue(rawData.pe) ?? normalizeNumericValue(rawData.peRatio),
+    pb: normalizeNumericValue(rawData.pb) ?? normalizeNumericValue(rawData.pbRatio),
+    ev_ebitda: normalizeNumericValue(rawData.ev_ebitda ?? rawData.evEbitda),
+    dividend_yield: normalizeNumericValue(rawData.dividend_yield ?? rawData.dividendYield),
+    roe: normalizeNumericValue(rawData.roe),
+    roic: normalizeNumericValue(rawData.roic),
+    roa: normalizeNumericValue(rawData.roa),
+    operating_margin: normalizeNumericValue(rawData.operating_margin ?? rawData.operatingMargin),
+    net_margin: normalizeNumericValue(rawData.net_margin ?? rawData.netMargin),
+    revenue_growth: normalizeNumericValue(rawData.revenue_growth ?? rawData.revenueGrowth),
+    profit_growth: normalizeNumericValue(rawData.profit_growth ?? rawData.profitGrowth),
+    eps_growth: normalizeNumericValue(rawData.eps_growth ?? rawData.epsGrowth),
+    debt_equity: normalizeNumericValue(rawData.debt_equity ?? rawData.debtToEquity),
+    current_ratio: normalizeNumericValue(rawData.current_ratio ?? rawData.currentRatio),
+    market_cap: normalizeNumericValue(rawData.market_cap ?? rawData.marketCap),
+    eps: normalizeNumericValue(rawData.eps),
+    sales: normalizeNumericValue(rawData.sales),
+    book_value: normalizeNumericValue(rawData.book_value ?? rawData.bookValue),
+    risk_score: normalizeNumericValue(rawData.risk_score ?? rawData.riskScore),
+  };
+}
+
 export function mapCompanyDataToResearch(
   symbol: string,
   rawData: Record<string, unknown> | null | undefined,
@@ -22,44 +46,27 @@ export function mapCompanyDataToResearch(
     };
   }
 
-  const score = normalizeNumericValue(rawData.score) ?? normalizeNumericValue(rawData.research_score);
-  const risk = riskScore ?? normalizeNumericValue(rawData.risk_score);
+  const data = extractResearchData(rawData);
+  const risk = riskScore ?? (data.risk_score as number | null);
 
-  const researchScore = computeResearchScore(rawData, risk);
-  const healthoScores = computeHealthometerFromResearch(rawData);
+  const researchScore = computeResearchScore(data, risk);
+  const healthoScores = computeHealthometerFromResearch(data);
 
   return {
-    predictionView: buildPredictionViewModel(symbol, researchScore.overallScore, risk, rawData),
+    predictionView: buildPredictionViewModel(symbol, researchScore.overallScore, risk, data),
     healthometerView: buildHealthometerViewModel(
-      healthoScores.quality,
-      healthoScores.valuation,
-      healthoScores.growth,
-      healthoScores.stability,
-      healthoScores.risk,
-      healthoScores.momentum
+      healthoScores.quality, healthoScores.valuation, healthoScores.growth,
+      healthoScores.stability, healthoScores.risk, healthoScores.momentum
     ),
     researchScore,
   };
 }
 
-export function mapScannerItemToResearch(
-  item: Record<string, unknown>
-): ResearchScoreResult {
-  const rawData: Record<string, unknown> = {
-    pe: normalizeNumericValue(item.pe) ?? normalizeNumericValue(item.pe_ratio),
-    pb: normalizeNumericValue(item.pb) ?? normalizeNumericValue(item.pb_ratio),
-    ev_ebitda: normalizeNumericValue(item.ev_ebitda),
-    dividend_yield: normalizeNumericValue(item.dividend_yield),
-    roe: normalizeNumericValue(item.roe),
-    roic: normalizeNumericValue(item.roic),
-    operating_margin: normalizeNumericValue(item.operating_margin),
-    revenue_growth: normalizeNumericValue(item.revenue_growth),
-    profit_growth: normalizeNumericValue(item.profit_growth),
-    eps_growth: normalizeNumericValue(item.eps_growth),
-    debt_equity: normalizeNumericValue(item.debt_equity),
-    current_ratio: normalizeNumericValue(item.current_ratio),
-    market_cap: normalizeNumericValue(item.market_cap),
-  };
+export function mapScannerItemToResearch(item: Record<string, unknown>): ResearchScoreResult {
+  return computeResearchScore(extractResearchData(item), normalizeNumericValue(item.risk_score));
+}
 
-  return computeResearchScore(rawData, normalizeNumericValue(item.risk_score));
+export function mapFinancialsToResearch(financials: Record<string, unknown> | null | undefined): ResearchScoreResult {
+  if (!financials) return computeResearchScore(null, null);
+  return computeResearchScore(extractResearchData(financials), null);
 }

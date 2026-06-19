@@ -124,7 +124,7 @@ export function computeDimensionScores(factorScores: FactorScoreMap): DimensionS
     {
       id: "risk",
       label: "Risk context",
-      score: factorScores.debt_equity !== null ? 100 - factorScores.debt_equity : null,
+      score: factorScores.debt_equity !== null ? factorScores.debt_equity : null,
       activeFactorCount: factorScores.debt_equity !== null ? 1 : 0,
       totalPlannedCount: 1,
       confidence: "low",
