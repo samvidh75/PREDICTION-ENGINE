@@ -2,7 +2,10 @@ import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { LayoutProvider } from '../context/LayoutContext';
 import WatchlistPage from './WatchlistPage';
+
+const renderWithLayout = (ui: React.ReactElement) => render(<LayoutProvider>{ui}</LayoutProvider>);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -49,7 +52,7 @@ describe('WatchlistPage states', () => {
       return { ok: true, json: async () => [] };
     }));
 
-    render(<WatchlistPage />);
+    renderWithLayout(<WatchlistPage />);
 
     expect(await screen.findByText('Track companies you are researching')).toBeInTheDocument();
   });
@@ -59,7 +62,7 @@ describe('WatchlistPage states', () => {
       return { ok: true, json: async () => [] };
     }));
 
-    render(<WatchlistPage />);
+    renderWithLayout(<WatchlistPage />);
 
     expect(await screen.findByText('Tracked companies')).toBeInTheDocument();
   });
@@ -69,7 +72,7 @@ describe('WatchlistPage states', () => {
       return { ok: false, status: 500, json: async () => ({}) };
     }));
 
-    render(<WatchlistPage />);
+    renderWithLayout(<WatchlistPage />);
 
     expect(await screen.findByText('Tracked companies')).toBeInTheDocument();
   });
@@ -79,7 +82,7 @@ describe('WatchlistPage states', () => {
       return { ok: true, json: async () => [] };
     }));
 
-    render(<WatchlistPage />);
+    renderWithLayout(<WatchlistPage />);
 
     await waitFor(() => {
       const actions = screen.queryAllByText(/Open scanner|Search companies/);
@@ -92,7 +95,7 @@ describe('WatchlistPage states', () => {
       return { ok: true, json: async () => [] };
     }));
 
-    render(<WatchlistPage />);
+    renderWithLayout(<WatchlistPage />);
 
     await waitFor(() => {
       const body = document.body.textContent || '';

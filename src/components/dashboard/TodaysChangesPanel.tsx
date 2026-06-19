@@ -121,7 +121,7 @@ export default function TodaysChangesPanel(): JSX.Element {
           Today's Intelligence
         </div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "16px 0", textAlign: "center", lineHeight: 1.6 }}>
-          Prediction engine backend unavailable.<br />
+          Research signals are currently unavailable.<br />
           Signals will appear when the data pipeline is active.
         </div>
         {summary && summary.watchlistMonitored > 0 && (

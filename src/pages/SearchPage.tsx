@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, Search, X } from "lucide-react";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
-import { productNavigate, ProductAction, ProductEmptyState, ProductPanel, ProductStatusPill } from "../components/product/ProductUI";
+import { productNavigate, ProductAction, ProductEmptyState, ProductPanel, ProductPage, ProductShell, ProductStatusPill } from "../components/product/ProductUI";
 import { UserJourneyEngine } from "../services/behavior/UserJourneyEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { RegisteredStock } from "../services/stocks/StockRegistry";
@@ -167,8 +167,8 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-5">
+    <ProductShell>
+      <ProductPage>
         <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
           <Search className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
           <input
@@ -365,8 +365,8 @@ export const SearchPage: React.FC = () => {
             </>
           )}
         </section>
-      </div>
-    </div>
+      </ProductPage>
+    </ProductShell>
   );
 };
 

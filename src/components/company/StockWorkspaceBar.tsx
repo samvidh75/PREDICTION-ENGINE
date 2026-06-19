@@ -32,7 +32,7 @@ function formatDateTime(value?: string): string {
 function sourceLabel(source?: CompanyMetadata["enrichmentSource"]): string {
   switch (source) {
     case "provider":
-      return "Provider metadata";
+      return "Research metadata";
     case "registry":
       return "Verified registry";
     case "fallback":
@@ -102,7 +102,7 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
           <Database className="h-4 w-4 text-emerald-700" />
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-wider text-emerald-800">Stock workspace</div>
-            <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D prediction horizon · registry-backed scores only</div>
+            <div className="mt-0.5 text-[10px] text-slate-500">{ticker} · {horizon}D research horizon · registry-backed scores only</div>
           </div>
         </div>
 
@@ -128,7 +128,7 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
 
       <div className="mt-2 flex items-center gap-1.5 text-[9px] leading-relaxed text-slate-500">
         <ShieldCheck className="h-3 w-3 shrink-0 text-emerald-700" />
-        Missing market data remains unavailable. Exchange labels use provider metadata when available, then the local company registry.
+        Missing market data remains unavailable. Exchange labels use research metadata when available, then the local company registry.
         <Clock3 className="ml-1 h-3 w-3 shrink-0 text-slate-400" />
       </div>
     </section>

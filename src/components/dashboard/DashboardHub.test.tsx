@@ -43,13 +43,9 @@ vi.mock('../../architecture/navigation/routeCoordinator', () => ({
 
 // Mock the API client
 const mockGetSignals = vi.fn();
-const mockGetOpsHealth = vi.fn();
-const mockGetDataCoverage = vi.fn();
 vi.mock('../../services/api/client', () => ({
   api: {
     getSignals: (...args: unknown[]) => mockGetSignals(...args),
-    getOpsHealth: (...args: unknown[]) => mockGetOpsHealth(...args),
-    getDataCoverage: (...args: unknown[]) => mockGetDataCoverage(...args),
   },
   ApiError: class ApiError extends Error {
     status: number;
@@ -67,28 +63,22 @@ const renderDashboard = () => render(<LayoutProvider><DashboardHub /></LayoutPro
 
 beforeEach(() => {
   mockGetSignals.mockReturnValue(pending());
-  mockGetOpsHealth.mockReturnValue(pending());
-  mockGetDataCoverage.mockResolvedValue({
-    coverage: { symbols: { count: 6 }, predictionRegistry: { symbolCount: 5 } },
-    providers: { YAHOO: { status: 'healthy' }, INDIANAPI_KEY: { status: 'missing_optional' } },
-    generatedAt: '2026-06-17T00:00:00.000Z'
-  });
 });
 
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     renderDashboard();
-    expect(screen.getByText('Signal changes')).toBeInTheDocument();
+    expect(screen.getByText('Loading signals...')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
     renderDashboard();
-    expect(screen.getByText(/No companies saved yet/)).toBeInTheDocument();
+    expect(screen.getByText('No companies tracked')).toBeInTheDocument();
   });
 
-  it('shows empty saved research state', () => {
+  it('shows thesis monitoring panel', () => {
     renderDashboard();
-    expect(screen.getByText(/No positions saved/)).toBeInTheDocument();
+    expect(screen.getByText('Thesis monitoring')).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
@@ -98,7 +88,6 @@ describe('DashboardHub states', () => {
 
   it('shows signals error state when API fails', async () => {
     mockGetSignals.mockRejectedValue(new Error('API error'));
-    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 0, db_health: 'connected' } });
 
     renderDashboard();
 
@@ -111,20 +100,19 @@ describe('DashboardHub states', () => {
       symbolsAnalyzed: 5,
       snapshotDate: new Date().toISOString(),
     });
-    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
     renderDashboard();
 
-    expect(await screen.findByText('No significant signal changes')).toBeInTheDocument();
-    expect(screen.getByText(/5 companies were analyzed/)).toBeInTheDocument();
+    expect(await screen.findByText('No notable changes')).toBeInTheDocument();
+    expect(screen.getByText('No research changes crossed the display threshold for tracked companies.')).toBeInTheDocument();
   });
 
-  it('shows status bar when health data loads', async () => {
+  it('shows signals section heading', async () => {
     mockGetSignals.mockResolvedValue({ signals: [], symbolsAnalyzed: 0 });
-    mockGetOpsHealth.mockResolvedValue({ status: 'ok', metrics: { symbols_covered: 6, db_health: 'connected' } });
 
     renderDashboard();
 
-    expect(await screen.findByText(/fundamentals coverage/i)).toBeInTheDocument();
+    expect(await screen.findByText('What Changed')).toBeInTheDocument();
+    expect(screen.getByText('Research signals')).toBeInTheDocument();
   });
 });

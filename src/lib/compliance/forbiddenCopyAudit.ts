@@ -61,6 +61,42 @@ export const BACKEND_PROVIDER_NAMES = [
   /Finnhub/i,
 ] as const;
 
+export const PRODUCT_FORBIDDEN_TERMS = [
+  /IndianAPI/i,
+  /Yahoo/i,
+  /Jugaad/i,
+  /NSEPython/i,
+  /Upstox/i,
+  /Screener/i,
+  /Finnhub/i,
+  /\bprovider\b/i,
+  /\bcoverage\b/i,
+  /\bfreshness\b/i,
+  /source pending/i,
+  /source verified/i,
+  /manual CSV/i,
+  /\blineage\b/i,
+  /\bmigration\b/i,
+  /\bbackfill\b/i,
+  /\bdiagnostics\b/i,
+  /data operations/i,
+  /quote unavailable/i,
+  /history unavailable/i,
+  /API unavailable/i,
+  /production verification/i,
+  /symbol gaps/i,
+  /\bbackend\b/i,
+  /\bdebug\b/i,
+  /test fixture/i,
+  /Strong Buy/i,
+  /AI picks/i,
+  /Top picks/i,
+  /\bguaranteed\b/i,
+  /sure shot/i,
+  /\bmultibagger\b/i,
+  /Buy now/i,
+] as const;
+
 export function hasBackendVocabulary(text: string): string | null {
   for (const pattern of BACKEND_VOCABULARY_PATTERNS) {
     if (pattern.test(text)) return pattern.source;
@@ -77,6 +113,13 @@ export function hasForbiddenTradingLanguage(text: string): string | null {
 
 export function hasBackendProviderNames(text: string): string | null {
   for (const pattern of BACKEND_PROVIDER_NAMES) {
+    if (pattern.test(text)) return pattern.source;
+  }
+  return null;
+}
+
+export function hasProductForbiddenTerms(text: string): string | null {
+  for (const pattern of PRODUCT_FORBIDDEN_TERMS) {
     if (pattern.test(text)) return pattern.source;
   }
   return null;

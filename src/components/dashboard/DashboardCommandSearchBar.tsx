@@ -113,7 +113,7 @@ export default function DashboardCommandSearchBar({
           <div>•</div>
           <div>Beginner-friendly stock analysis</div>
           <div>•</div>
-          <div>NSE · BSE · SME coverage</div>
+          <div>NSE · BSE · SME research</div>
         </div>
       </div>
     </div>

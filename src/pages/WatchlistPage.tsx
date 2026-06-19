@@ -9,7 +9,7 @@ import { api, WatchlistRow } from "../services/api/client";
 import { ChevronRight, Eye } from "lucide-react";
 import { formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
-import { ProductPanel, ProductEmptyState, ProductAction, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import { ProductPanel, ProductEmptyState, ProductAction, ProductPage, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 
 interface DisplayList {
   id: string;
@@ -101,17 +101,20 @@ export const WatchlistPage: React.FC = () => {
 
   if (authState === "loading") {
     return (
-      <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-28 lg:px-16 xl:px-24">
-        <div className="flex items-center justify-center min-h-[200px]">
-          <span className="text-xs text-[#8B949E]">Loading watchlists...</span>
-        </div>
-      </div>
+      <ProductShell>
+        <ProductPage>
+          <div className="flex items-center justify-center min-h-[200px]">
+            <span className="text-xs text-[#8B949E]">Loading watchlists...</span>
+          </div>
+        </ProductPage>
+      </ProductShell>
     );
   }
 
   return (
-    <div className="w-full px-6 pb-16 pt-20 md:px-10 md:pt-24 lg:px-16 xl:px-24">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <ProductShell>
+      <ProductPage>
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="flex items-center gap-2">
             <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
@@ -255,9 +258,10 @@ export const WatchlistPage: React.FC = () => {
               </div>
             </>
           )}
+          </div>
         </div>
-      </div>
-    </div>
+      </ProductPage>
+    </ProductShell>
   );
 };
 

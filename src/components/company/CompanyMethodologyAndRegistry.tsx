@@ -18,7 +18,7 @@ export default function CompanyMethodologyAndRegistry(): JSX.Element {
           <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
             <span className="text-sm font-semibold text-slate-900">1. Raw data</span>
             <p className="mt-1 text-xs leading-relaxed text-slate-600">
-              Price movements, trading volumes, and fundamental ratios are collected from provider sources when available.
+              Price movements, trading volumes, and fundamental ratios are collected from public sources when available.
             </p>
           </div>
           <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">

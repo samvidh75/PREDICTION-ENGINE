@@ -78,7 +78,7 @@ export const DataCoveragePanel: React.FC = () => {
     return (
       <Card className="p-6 border-slate-200/60 bg-white">
         <div className="text-center py-4">
-          <p className="text-sm text-slate-500 font-medium">Coverage metrics currently unavailable</p>
+          <p className="text-sm text-slate-500 font-medium">Research metrics currently unavailable</p>
         </div>
       </Card>
     );
@@ -124,7 +124,7 @@ export const DataCoveragePanel: React.FC = () => {
       {/* Coverage stats block */}
       <div className="md:col-span-2 rounded-xl glass-panel p-6">
         <SectionHeader
-          title="Data coverage"
+          title="Research depth"
           subtitle="Aggregate data volumes across all connected sources."
           action={
             <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
