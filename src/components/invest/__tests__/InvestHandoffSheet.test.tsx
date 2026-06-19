@@ -3,7 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { InvestHandoffSheet } from '../InvestHandoffSheet';
-import { hasBackendVocabulary, hasForbiddenTradingLanguage, hasRenderGarbage } from '../../../lib/compliance/forbiddenCopyAudit';
+import { hasBackendVocabulary, hasForbiddenTradingLanguage, hasProductForbiddenTerms, hasRenderGarbage } from '../../../lib/compliance/forbiddenCopyAudit';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -26,14 +26,14 @@ describe('InvestHandoffSheet', () => {
     expect(symbolElements.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows broker disclaimer', () => {
+  it('shows research-only disclaimer', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
-    expect(screen.getByText(/Final order will be placed with your broker/)).toBeInTheDocument();
+    expect(screen.getByText(/StockStory is a research workspace/)).toBeInTheDocument();
   });
 
-  it('shows Continue to broker button', () => {
+  it('shows continue review button', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
-    expect(screen.getByText('Continue to broker')).toBeInTheDocument();
+    expect(screen.getByText('Continue review')).toBeInTheDocument();
   });
 
   it('shows alternative actions', () => {
@@ -43,11 +43,11 @@ describe('InvestHandoffSheet', () => {
     expect(screen.getByText('Back to research')).toBeInTheDocument();
   });
 
-  it('shows broker handoff is being prepared on stage 2', () => {
+  it('shows external handoff is being prepared on stage 2', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
-    fireEvent.click(screen.getByText('Continue to broker'));
-    expect(screen.getByText('Broker handoff is being prepared')).toBeInTheDocument();
-    expect(screen.getByText('No broker credentials are stored in StockStory.')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Continue review'));
+    expect(screen.getByText('External handoff is being prepared')).toBeInTheDocument();
+    expect(screen.getByText('No external account credentials are stored in StockStory.')).toBeInTheDocument();
   });
 
   it('contains no backend/provider vocabulary', () => {
@@ -61,6 +61,13 @@ describe('InvestHandoffSheet', () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     const body = document.body.textContent || '';
     const violation = hasForbiddenTradingLanguage(body);
+    expect(violation).toBeNull();
+  });
+
+  it('contains no product-forbidden terms', () => {
+    render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
+    const body = document.body.textContent || '';
+    const violation = hasProductForbiddenTerms(body);
     expect(violation).toBeNull();
   });
 

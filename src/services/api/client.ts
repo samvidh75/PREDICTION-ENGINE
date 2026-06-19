@@ -427,6 +427,46 @@ export const api = {
       `/api/predictions/explain/${encodeURIComponent(symbol)}?horizon=${horizon}`,
     ),
 
+  // -- Research Engine --
+  getCompanyResearch: (symbol: string, options?: ApiRequestOptions) =>
+    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+      `/api/research/company/${encodeURIComponent(symbol)}`, options,
+    ),
+
+  getScanner: (preset = "Quality compounders", limit = 50, symbols?: string) =>
+    apiFetch<{ ok: true; data: Record<string, unknown>[]; preset: string }>(
+      `/api/research/scanner?preset=${encodeURIComponent(preset)}&limit=${limit}${symbols ? `&symbols=${encodeURIComponent(symbols)}` : ""}`,
+    ),
+
+  compareCompanies: (symbols: string[]) =>
+    apiFetch<{ ok: true; data: Record<string, unknown> }>("/api/research/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ symbols }),
+    }),
+
+  getWatchlistThesis: (symbol: string) =>
+    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+      `/api/research/watchlist/${encodeURIComponent(symbol)}/thesis`,
+    ),
+
+  monitorPortfolio: (holdings: Array<{ symbol: string; companyName?: string }>) =>
+    apiFetch<{ ok: true; data: Record<string, unknown> }>("/api/research/portfolio", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ holdings }),
+    }),
+
+  getAlerts: (symbol: string) =>
+    apiFetch<{ ok: true; data: Record<string, unknown>[]; symbol: string; companyName: string }>(
+      `/api/research/alerts/${encodeURIComponent(symbol)}`,
+    ),
+
+  getInvestContext: (symbol: string) =>
+    apiFetch<{ ok: true; data: Record<string, unknown> }>(
+      `/api/research/invest/${encodeURIComponent(symbol)}`,
+    ),
+
   // -- Watchlists (authenticated) --
   getWatchlists: () =>
     authenticatedFetchJSON<WatchlistRow[]>("/api/watchlists"),

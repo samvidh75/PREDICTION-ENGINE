@@ -109,11 +109,10 @@ export const PortfolioPage: React.FC = () => {
               <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Tracked thesis</div>
               <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#E6EDF3]">Manual thesis monitor</h1>
               <p className="mt-1 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
-                Manual tracking. No broker connection.
+                Record positions locally, monitor thesis progress, and keep execution outside StockStory.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ProductAction variant="primary" disabled={true} disabledReason="Connect broker">Invest with broker</ProductAction>
               <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="h-3.5 w-3.5" /> Add position</ProductAction>
               <ProductAction variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="h-3.5 w-3.5" /> Import CSV</ProductAction>
               <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
@@ -124,7 +123,7 @@ export const PortfolioPage: React.FC = () => {
             {[
               { label: "Total entry", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Awaiting pricing' },
               { label: "Market value", value: review.livePortfolioValue === null ? 'Awaiting pricing' : uiFormatINR(review.livePortfolioValue) },
-              { label: "Monitored", value: `${review.holdings.length} thesis${review.holdings.length !== 1 ? 'es' : ''}`, detail: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions} with live quotes` },
+              { label: "Monitored", value: `${review.holdings.length} thesis${review.holdings.length !== 1 ? 'es' : ''}`, detail: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions} with current pricing` },
               { label: "Largest thesis", value: largest ? largest.symbol : 'Awaiting pricing', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry price` : undefined },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">

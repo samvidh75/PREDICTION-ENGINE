@@ -7,7 +7,7 @@ import { EmptyState } from "../components/ui/DataState";
 import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
-import { api, ApiError, type LeaderboardEntry } from "../services/api/client";
+import { api, type LeaderboardEntry } from "../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductEmptyState, productNavigate } from "../components/product/ProductUI";
 
 interface ExplanationState {
@@ -31,7 +31,7 @@ export const PublicRankingsPage: React.FC = () => {
     const ctrl = new AbortController();
     api.getLeaderboard(100)
       .then((res) => { if (ctrl.signal.aborted) return; setRankings(res.data ?? []); setLoading(false); })
-      .catch((err) => { if (ctrl.signal.aborted) return; setError(err instanceof ApiError ? err.message : "Rankings are being calculated"); setRankings([]); setLoading(false); });
+      .catch(() => { if (ctrl.signal.aborted) return; setError("Rankings are being prepared for the latest cycle."); setRankings([]); setLoading(false); });
     return () => ctrl.abort();
   }, []);
 
@@ -146,7 +146,7 @@ export const PublicRankingsPage: React.FC = () => {
         ) : (
           <>
             <div className="hidden md:block">
-              <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Freshness", ""]}>
+              <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Updated", ""]}>
                 {filteredRankings.map((r) => (
                   <tr
                     key={r.symbol}

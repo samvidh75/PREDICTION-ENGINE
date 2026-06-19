@@ -27,15 +27,15 @@ type Stage = 1 | 2 | 3;
 
 const STAGE_1_RISKS = [
   "Market volatility may affect entry price and position sizing.",
-  "Liquidity constraints could impact order execution during high-volume periods.",
+  "Liquidity constraints could affect external execution during high-volume periods.",
   "Sector-wide regulatory changes may alter the investment thesis over time.",
 ];
 
 const STAGE_1_CHECKLIST = [
-  "Verify the current price and available liquidity before placing an order.",
+  "Verify the current price and available liquidity before making any external decision.",
   "Confirm position size aligns with your portfolio allocation strategy.",
   "Review any recent company announcements or earnings reports.",
-  "Ensure your brokerage account has sufficient funds for the trade.",
+  "Confirm account details directly in your external brokerage platform.",
 ];
 
 export function InvestHandoffSheet({
@@ -247,7 +247,7 @@ function StageOne({
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />
           <p className="text-sm leading-5 text-[#E6EDF3]">
-            Final order will be placed with your broker. No order is submitted until you confirm outside StockStory.
+            StockStory is a research workspace. Any execution decision happens outside StockStory after your own review.
           </p>
         </div>
       </ProductPanel>
@@ -258,7 +258,7 @@ function StageOne({
           onClick={onContinue}
           className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 text-xs font-semibold text-white hover:bg-[#3B71FF] transition-colors"
         >
-          Continue to broker
+          Continue review
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
         <div className="grid grid-cols-3 gap-2">
@@ -306,17 +306,17 @@ function StageTwo({
           <ExternalLink className="h-5 w-5 text-[#2962FF]" />
         </div>
         <h3 className="mt-4 text-base font-semibold text-[#E6EDF3]">
-          Broker handoff is being prepared
+          External handoff is being prepared
         </h3>
         <p className="mt-2 max-w-sm text-sm leading-5 text-[#9AA7B5]">
-          Broker handoff is being prepared for this account.
-          Track instead or compare first while the handoff is prepared.
+          External handoff is being prepared for this account.
+          Track instead or compare first while this workspace stays in review mode.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-4 py-2.5">
             <Shield className="h-4 w-4 text-[#64748B]" />
             <span className="text-xs text-[#64748B]">
-              No broker credentials are stored in StockStory.
+              No external account credentials are stored in StockStory.
             </span>
           </div>
         </div>
@@ -326,10 +326,10 @@ function StageTwo({
         <button
           type="button"
           disabled
-          title="Broker integration not yet available"
+          title="External handoff is not yet available"
           className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#111827] px-4 text-xs font-semibold text-[#64748B] cursor-not-allowed"
         >
-          Select a broker
+          Open external handoff
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
         <button
@@ -337,7 +337,7 @@ function StageTwo({
           onClick={onContinue}
           className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[rgba(148,163,184,0.2)] bg-[#111827] px-4 text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]/60 transition-colors"
         >
-          Continue to confirmation
+          Continue to summary
           <ArrowRight className="h-3.5 w-3.5" />
         </button>
         <button
@@ -369,7 +369,7 @@ function StageThree({
       <ProductPanel className="p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
           <FileText className="h-3 w-3" />
-          Order preview
+          Review summary
         </div>
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between text-sm">
@@ -382,13 +382,13 @@ function StageThree({
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#9AA7B5]">Action</span>
-            <span className="font-medium text-[#16A34A]">Buy</span>
+            <span className="text-[#9AA7B5]">Mode</span>
+            <span className="font-medium text-[#16A34A]">Research review</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[#9AA7B5]">Execution</span>
+            <span className="text-[#9AA7B5]">Next step</span>
             <span className="font-medium text-[#E6EDF3]">
-              Via your broker
+              Decide outside StockStory
             </span>
           </div>
         </div>
@@ -399,12 +399,11 @@ function StageThree({
           <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
           <div>
             <p className="text-sm font-semibold text-[#E6EDF3]">
-              No order has been placed.
+              No external action has been taken.
             </p>
             <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
-              Final order will be placed with your broker.
-              StockStory India does not execute trades on your behalf.
-              This is not a confirmation of execution.
+              StockStory India does not execute orders or send instructions on your behalf.
+              This is not a confirmation of any external action.
             </p>
           </div>
         </div>
@@ -424,7 +423,7 @@ function StageThree({
           className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-4 text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Back to broker selection
+          Back to handoff review
         </button>
       </div>
     </div>

@@ -192,6 +192,28 @@ describe('Real Data Integration Pages', () => {
     });
   });
 
+  it('PublicRankingsPage hides raw HTTP errors when rankings are pending', async () => {
+    window.history.replaceState({}, '', '?page=rankings');
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: false,
+      status: 502,
+      json: async () => ({}),
+    })) as unknown as typeof fetch);
+
+    render(
+      <LayoutProvider>
+        <PublicRankingsPage />
+      </LayoutProvider>
+    );
+
+    await waitFor(() => {
+      const body = document.body.textContent || '';
+      expect(screen.getByText('Some rankings are being refreshed')).toBeInTheDocument();
+      expect(screen.getByText('Rankings are being prepared for the latest cycle.')).toBeInTheDocument();
+      expect(body).not.toMatch(/HTTP|Request failed|502|API|backend|provider/i);
+    });
+  });
+
   it('PublicPredictionsPage parses signals from predictions API', async () => {
     window.history.replaceState({}, '', '?page=predictions');
     vi.stubGlobal('fetch', makeMockFetch({

@@ -458,7 +458,7 @@ export default function ScannerPage() {
                       <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>Research</ProductAction>
                       <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>Compare</ProductAction>
                       <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>Track</ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled={!brokerConnected} disabledReason={!brokerConnected ? "Broker handoff being prepared" : undefined}>Invest</ProductAction>
+                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled={!brokerConnected} disabledReason={!brokerConnected ? "External handoff is being prepared" : undefined}>Handoff</ProductAction>
                     </div>
                   </ProductPanel>
                 );
