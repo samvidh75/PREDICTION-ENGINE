@@ -7,13 +7,33 @@ export interface ResearchNote {
   timestamp?: number;
 }
 
+function getStorageKey(): string {
+  const uid = getUserId();
+  return uid ? `stockstory_watchlist_notes_v1_${uid}` : "stockstory_watchlist_notes_v1";
+}
+
+function getUserId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("ss_auth_session_v1");
+    if (raw) {
+      const session = JSON.parse(raw);
+      return session.uid || null;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export class NoteEngine {
   private static getNotesMap(): Record<string, ResearchNote> {
     const defaultNotes: Record<string, ResearchNote> = {};
     if (typeof window === "undefined") return defaultNotes;
-    const raw = localStorage.getItem("stockstory_watchlist_notes_v1");
+    const key = getStorageKey();
+    const raw = localStorage.getItem(key);
     if (!raw) {
-      localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(defaultNotes));
+      localStorage.setItem(key, JSON.stringify(defaultNotes));
       return defaultNotes;
     }
     try {
@@ -34,11 +54,12 @@ export class NoteEngine {
     map[sym] = {
       symbol: sym,
       note,
-      lastUpdated: new Date().toLocaleDateString(),
+      lastUpdated: new Date().toISOString(),
       timestamp: Date.now()
     };
     if (typeof window !== "undefined") {
-      localStorage.setItem("stockstory_watchlist_notes_v1", JSON.stringify(map));
+      const key = getStorageKey();
+      localStorage.setItem(key, JSON.stringify(map));
       window.dispatchEvent(new Event("watchlistchange"));
     }
   }
