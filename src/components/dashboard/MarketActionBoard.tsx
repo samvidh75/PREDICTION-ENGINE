@@ -194,7 +194,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
       ) : error || !snapshot ? (
         <div className="flex items-start gap-2 rounded-lg border border-rose-400/20 bg-rose-400/5 px-3 py-4 text-[11px] text-rose-200/70">
           <AlertTriangle className="h-4 w-4 shrink-0" />
-          Market action is temporarily unavailable.
+          Market analysis pending.
         </div>
       ) : snapshot.status === 'unavailable' ? (
         <div className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-4 text-[11px] text-amber-100/70">

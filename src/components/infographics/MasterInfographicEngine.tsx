@@ -96,7 +96,7 @@ export default function MasterInfographicEngine({
         pe: null,
         industryPe: null,
         fiveYearPeAvg: null,
-        marketCapExact: "Financial data unavailable",
+        marketCapExact: "Awaiting financial data",
         marketCapWords: "",
         peFormatted: "—",
       };

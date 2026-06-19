@@ -10,11 +10,11 @@ interface RouteMeta {
 const ROUTE_META: Record<PageKey, RouteMeta> = {
   landing: {
     title: "StockStory India — AI Research for Indian Equities",
-    description: "Search Indian companies, review scores and conviction, compare peers, and track your thesis. Research, not advice.",
+    description: "Discover smarter equity research for Indian stocks. AI-powered scores, conviction ratings, peer comparisons, and thesis tracking — all in one workspace.",
   },
   about: {
     title: "About — StockStory India",
-    description: "AI research layer between Indian investors and brokers. Understand the stock before you invest.",
+    description: "StockStory is an AI research platform that helps Indian investors evaluate companies with clarity and conviction. Deeper research, better decisions.",
   },
   login: {
     title: "Sign in — StockStory India",
@@ -26,31 +26,31 @@ const ROUTE_META: Record<PageKey, RouteMeta> = {
   },
   dashboard: {
     title: "Dashboard — StockStory India",
-    description: "Your research workspace. Search companies, review scores, and track your thesis.",
+    description: "Your central research hub. Search companies, review AI-powered scores, and track your investment thesis in one place.",
   },
   search: {
     title: "Scanner — StockStory India",
-    description: "Search and filter Indian companies by sector, score, and research factors.",
+    description: "Search and filter Indian companies by sector, AI scores, and fundamental factors to find your next research opportunity.",
   },
   scanner: {
     title: "Scanner — StockStory India",
-    description: "Find companies worth researching. Search by strategy, sector, score, and research factors.",
+    description: "Find companies worth researching. Filter by strategy, sector, AI conviction scores, and key research factors.",
   },
   company: {
     title: "Company — StockStory India",
-    description: "Company research, thesis, conviction, and factor scores. Research only, not investment advice.",
+    description: "Deep-dive company research with AI-powered signals, conviction scores, and factor analysis. Research smarter, invest with clarity.",
   },
   stock: {
     title: "Company — StockStory India",
-    description: "Company research, thesis, conviction, and factor scores. Research only, not investment advice.",
+    description: "Deep-dive company research with AI-powered signals, conviction scores, and factor analysis. Research smarter, invest with clarity.",
   },
   portfolio: {
     title: "Portfolio — StockStory India",
-    description: "Monitor your thesis. Manual portfolio tracking with research notes and review prompts.",
+    description: "Track your investment thesis with confidence. Portfolio monitoring with research notes, conviction scores, and review prompts.",
   },
   watchlist: {
     title: "Watchlist — StockStory India",
-    description: "Track companies you are researching. Thesis tracker with what changed and review prompts.",
+    description: "Stay on top of companies you are researching. Thesis tracker with change alerts, score movements, and review prompts.",
   },
   settings: {
     title: "Settings — StockStory India",
@@ -70,23 +70,23 @@ const ROUTE_META: Record<PageKey, RouteMeta> = {
   },
   predictions: {
     title: "Score changes — StockStory India",
-    description: "Score changes from the latest research cycle. Research only, not investment advice.",
+    description: "Track the latest score changes from our research cycle. See which companies moved and why.",
   },
   rankings: {
     title: "Research rankings — StockStory India",
-    description: "Company rankings from the latest research cycle.",
+    description: "Explore company rankings powered by AI-driven research scores and fundamental analysis.",
   },
   compare: {
     title: "Compare companies — StockStory India",
-    description: "Compare companies by score and factors side by side.",
+    description: "Compare Indian companies side by side using AI scores, factor ratings, and key research metrics.",
   },
   alerts: {
     title: "What Changed — StockStory India",
-    description: "Thesis changes, score movements, and review prompts for tracked companies.",
+    description: "Stay informed on thesis changes, score movements, and review prompts for your tracked companies.",
   },
   invest: {
     title: "Invest — StockStory India",
-    description: "Review and invest through your broker. Research only, not investment advice.",
+    description: "Review your research and take action through your broker. Confident decisions start here.",
   },
 };
 
@@ -126,13 +126,14 @@ export function useRouteMetadata(): void {
         const ticker = getStockTicker();
         if (ticker) {
           const companyTitle = `${ticker} — StockStory India`;
-          const companyDesc = `Research signals, fundamentals, and source-backed data for ${ticker}.`;
+          const companyDesc = `Deep-dive AI research for ${ticker} — signals, conviction scores, and factor analysis.`;
           document.title = companyTitle;
           updateMetaTag("og:title", companyTitle, true);
           updateMetaTag("og:description", companyDesc, true);
         }
       }
 
+      updateMetaTag("twitter:card", "summary_large_image");
       updateMetaTag("twitter:title", document.title);
       updateMetaTag("twitter:description", meta.description);
 

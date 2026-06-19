@@ -161,7 +161,7 @@ export const StockStoryPage: React.FC = () => {
   useEffect(() => {
     const controller = new AbortController();
     setMetadata({ data: null, loading: true, error: null });
-    api.getMetadata(ticker, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setMetadata({ data, loading: false, error: null }); }).catch(() => { if (controller.signal.aborted) return; setMetadata({ data: null, loading: false, error: "Company metadata is temporarily unavailable." }); });
+    api.getMetadata(ticker, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setMetadata({ data, loading: false, error: null }); }).catch(() => { if (controller.signal.aborted) return; setMetadata({ data: null, loading: false, error: "Company metadata needs research." }); });
     return () => controller.abort();
   }, [ticker]);
 
@@ -169,7 +169,7 @@ export const StockStoryPage: React.FC = () => {
     const controller = new AbortController();
     setStoryLoading(true); setStoryError(null);
     const horizon = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "30", 10);
-    api.getStockStory(ticker, horizon, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setStory(data); setStoryLoading(false); }).catch(() => { if (controller.signal.aborted) return; setStoryError("Company research is temporarily unavailable."); setStoryLoading(false); });
+    api.getStockStory(ticker, horizon, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setStory(data); setStoryLoading(false); }).catch(() => { if (controller.signal.aborted) return; setStoryError("Company research needs review."); setStoryLoading(false); });
     return () => controller.abort();
   }, [ticker]);
 

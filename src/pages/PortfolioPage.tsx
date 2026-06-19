@@ -113,7 +113,7 @@ export const PortfolioPage: React.FC = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ProductAction variant="primary" disabled={true}>Invest with broker</ProductAction>
+              <ProductAction variant="primary" disabled={true} disabledReason="Connect broker">Invest with broker</ProductAction>
               <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="h-3.5 w-3.5" /> Add position</ProductAction>
               <ProductAction variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="h-3.5 w-3.5" /> Import CSV</ProductAction>
               <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
@@ -122,10 +122,10 @@ export const PortfolioPage: React.FC = () => {
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Total entry", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Not enough information' },
-              { label: "Market value", value: review.livePortfolioValue === null ? 'Not enough information' : uiFormatINR(review.livePortfolioValue) },
+              { label: "Total entry", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : 'Awaiting data' },
+              { label: "Market value", value: review.livePortfolioValue === null ? 'Awaiting data' : uiFormatINR(review.livePortfolioValue) },
               { label: "Monitored", value: `${review.holdings.length} thesis${review.holdings.length !== 1 ? 'es' : ''}`, detail: `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions} with live quotes` },
-              { label: "Largest thesis", value: largest ? largest.symbol : 'Not enough information', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry price` : undefined },
+              { label: "Largest thesis", value: largest ? largest.symbol : 'Awaiting data', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry price` : undefined },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{item.label}</div>
@@ -258,9 +258,9 @@ export const PortfolioPage: React.FC = () => {
                     <span className="truncate text-[11px] text-[#9AA7B5]">{holding.sector}</span>
                     <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.shares}</span>
                     <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</span>
-                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</span>
+                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Awaiting data</span> : uiFormatINR(holding.liveValue)}</span>
                     <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                      {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                      {holding.gainLossPct === null ? 'Awaiting data' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                     </span>
                     <div className="flex items-center justify-end gap-1">
                       <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
@@ -306,11 +306,11 @@ export const PortfolioPage: React.FC = () => {
                       <div><span className="text-[#9AA7B5]">Sector</span><p className="font-medium truncate text-[#E6EDF3]">{holding.sector}</p></div>
                       <div><span className="text-[#9AA7B5]">Shares</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.shares}</p></div>
                       <div><span className="text-[#9AA7B5]">Entry price</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</p></div>
-                      <div><span className="text-[#9AA7B5]">Current value</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Not enough information</span> : uiFormatINR(holding.liveValue)}</p></div>
+                      <div><span className="text-[#9AA7B5]">Current value</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">Awaiting data</span> : uiFormatINR(holding.liveValue)}</p></div>
                       <div className="col-span-2">
                         <span className="text-[#9AA7B5]">Return</span>
                         <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                          {holding.gainLossPct === null ? 'Not enough information' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
+                          {holding.gainLossPct === null ? 'Awaiting data' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                         </p>
                       </div>
                     </div>
