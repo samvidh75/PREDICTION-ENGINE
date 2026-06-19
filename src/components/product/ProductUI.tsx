@@ -127,7 +127,7 @@ export function ProductEmptyState({ icon: Icon = Info, title, body, action }: { 
   );
 }
 
-export function ProductLoadingState({ title = "Preparing research", body = "We are assembling the available research signals for this view." }: { title?: string; body?: string }): JSX.Element {
+export function ProductLoadingState({ title = "Preparing research context…", body = "Preparing research context…" }: { title?: string; body?: string }): JSX.Element {
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
       <Loader2 className="h-5 w-5 animate-spin text-[#2962FF]" aria-hidden="true" />
@@ -137,7 +137,7 @@ export function ProductLoadingState({ title = "Preparing research", body = "We a
   );
 }
 
-export function ProductErrorState({ title = "Research signals pending", body = "This view could not be prepared right now. Try another company or come back shortly.", action }: { title?: string; body?: string; action?: React.ReactNode }): JSX.Element {
+export function ProductErrorState({ title = "This view could not be prepared right now.", body = "This view could not be prepared right now.", action }: { title?: string; body?: string; action?: React.ReactNode }): JSX.Element {
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
       <AlertCircle className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />

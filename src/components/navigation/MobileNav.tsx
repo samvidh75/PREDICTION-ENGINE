@@ -1,9 +1,9 @@
 import React from "react";
-import { ArrowLeftRight, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowLeftRight, BookOpen, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp, Activity } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 interface MobileNavItem {
-  page: "dashboard" | "search" | "rankings" | "watchlist" | "portfolio" | "compare";
+  page: "dashboard" | "search" | "rankings" | "watchlist" | "portfolio" | "compare" | "alerts" | "methodology";
   label: string;
   icon: React.ReactNode;
 }
@@ -36,13 +36,14 @@ export const MobileNav: React.FC = () => {
 
   const tabs: MobileNavItem[] = [
     { page: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
-    { page: "search", label: "Scanner", icon: <Search className="icon-nav" /> },
+    { page: "search", label: "Search", icon: <Search className="icon-nav" /> },
     { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
     { page: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
     { page: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },
   ];
 
   const compareRoute = { page: "compare" as const, label: "Compare", icon: <ArrowLeftRight className="icon-nav" /> };
+  const alertsRoute = { page: "alerts" as const, label: "Alerts", icon: <Activity className="icon-nav" /> };
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
@@ -85,14 +86,24 @@ export const MobileNav: React.FC = () => {
             );
           })}
           <button
-            key={compareRoute.page}
+            key="compare"
             type="button"
-            onClick={() => setPage(compareRoute.page)}
+            onClick={() => setPage("compare")}
             className={`bottom-tab ${currentPage === "compare" ? "bottom-tab-active" : ""}`}
             aria-current={currentPage === "compare" ? "page" : undefined}
           >
             {compareRoute.icon}
             <span>{compareRoute.label}</span>
+          </button>
+          <button
+            key="alerts"
+            type="button"
+            onClick={() => setPage("alerts")}
+            className={`bottom-tab ${currentPage === "alerts" ? "bottom-tab-active" : ""}`}
+            aria-current={currentPage === "alerts" ? "page" : undefined}
+          >
+            {alertsRoute.icon}
+            <span>{alertsRoute.label}</span>
           </button>
           </>)}
     </nav>

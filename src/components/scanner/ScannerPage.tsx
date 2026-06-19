@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info, ExternalLink, Bookmark } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info, ExternalLink, Bookmark, TrendingUp as InvestIcon } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
@@ -253,8 +253,8 @@ export default function ScannerPage() {
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="text-xl font-semibold text-[#E6EDF3]">Company scanner</h1>
-              <p className="mt-1 text-sm text-[#9AA7B5]">Find companies worth researching. Search by name, browse by strategy, or filter by fundamentals.</p>
+              <h1 className="text-xl font-semibold text-[#E6EDF3]">Research scanner</h1>
+              <p className="mt-1 text-sm text-[#9AA7B5]">Discover companies worth researching. Select a strategy, search by name, or filter by fundamentals.</p>
             </div>
             <div className="hidden sm:block shrink-0">
               <HelpPopover title="How to use the scanner" storageKey="scanner-help-dismissed">
@@ -464,6 +464,13 @@ export default function ScannerPage() {
                       >
                         <Bookmark className="h-3 w-3" aria-hidden="true" />
                         Track
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleInvest(fullSymbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                      >
+                        Invest
                       </button>
                     </div>
                   </ProductPanel>

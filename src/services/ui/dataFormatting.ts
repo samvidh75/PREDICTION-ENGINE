@@ -78,10 +78,10 @@ export function normalizeFieldName(key: string): string {
 }
 
 export function formatFreshness(dateVal: string | null | undefined): string {
-  if (!dateVal) return "Freshness pending";
+  if (!dateVal) return "Pending";
   try {
     const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return "Freshness pending";
+    if (isNaN(d.getTime())) return "Pending";
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffDays = Math.floor(diffMs / 86400000);
@@ -90,7 +90,7 @@ export function formatFreshness(dateVal: string | null | undefined): string {
     if (diffDays < 30) return `${diffDays}d ago`;
     return d.toISOString().split("T")[0];
   } catch {
-    return "Freshness pending";
+    return "Pending";
   }
 }
 

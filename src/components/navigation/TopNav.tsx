@@ -29,7 +29,7 @@ export const TopNav: React.FC = () => {
         <button
           type="button"
           onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
-          className="max-w-[60%] shrink truncate border-none bg-transparent p-0 text-left text-[13px] font-semibold tracking-tight text-[#E6EDF3]"
+          className="max-w-[60%] shrink truncate border-none bg-transparent p-0 text-left text-[13px] font-semibold tracking-tight text-[#E6EDF2]"
         >
           StockStory<span className="text-[#16A34A]">.</span>India
         </button>
@@ -38,7 +38,7 @@ export const TopNav: React.FC = () => {
           <button
             type="button"
             onClick={triggerSearch}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF2]"
             aria-label="Open search"
           >
             <Search className="h-4 w-4" />
@@ -61,7 +61,7 @@ export const TopNav: React.FC = () => {
           <button
             type="button"
             onClick={() => setPage(isAuthenticated ? "dashboard" : "landing")}
-            className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-tight text-[#E6EDF3]"
+            className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-tight text-[#E6EDF2]"
           >
             StockStory<span className="text-[#16A34A]">.</span>India
           </button>
@@ -72,49 +72,49 @@ export const TopNav: React.FC = () => {
             <div className="flex flex-1 items-center justify-center gap-1 lg:gap-3">
               <button
                 onClick={() => setPage("dashboard")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
-                Dashboard
+                Home
               </button>
               <button
                 onClick={() => setPage("search")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Scanner
               </button>
               <button
                 onClick={() => setPage("rankings")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Rankings
               </button>
               <button
                 onClick={() => setPage("compare")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Compare
               </button>
               <button
                 onClick={() => setPage("watchlist")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Watchlist
               </button>
               <button
                 onClick={() => setPage("portfolio")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Portfolio
               </button>
               <button
                 onClick={() => setPage("methodology")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Methodology
               </button>
               <button
                 onClick={() => setPage("settings")}
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
               >
                 Settings
               </button>
@@ -123,7 +123,7 @@ export const TopNav: React.FC = () => {
             <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
               <button
                 onClick={triggerSearch}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF2]"
                 aria-label="Open search"
               >
                 <Search className="h-4 w-4" />
@@ -135,25 +135,25 @@ export const TopNav: React.FC = () => {
           <div className="ml-auto flex shrink-0 items-center gap-3 lg:gap-6">
             <button
               onClick={() => setPage("scanner")}
-              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
             >
               Scanner
             </button>
             <button
               onClick={() => setPage("about")}
-              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
             >
               Product
             </button>
             <button
               onClick={() => setPage("methodology")}
-              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
             >
               Research Standards
             </button>
             <button
               onClick={() => setPage("login")}
-              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors lg:text-sm"
+              className="cursor-pointer border-none bg-transparent text-xs font-medium text-[#8B949E] hover:text-[#E6EDF2] transition-colors lg:text-sm"
             >
               Sign in
             </button>

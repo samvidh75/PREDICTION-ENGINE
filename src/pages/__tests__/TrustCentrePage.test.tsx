@@ -13,29 +13,29 @@ function renderWithProviders(ui: React.ReactElement) {
   return render(<LayoutProvider>{ui}</LayoutProvider>);
 }
 
-describe('TrustCentrePage (Research Standards)', () => {
-  it('renders Research Standards heading', () => {
+describe('TrustCentrePage (How StockStory Thinks)', () => {
+  it('renders How StockStory Thinks heading', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getAllByText('Research Standards')[0]).toBeInTheDocument();
+    expect(screen.getByText('How StockStory Thinks')).toBeInTheDocument();
   });
 
   it('renders methodology sections', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('How StockStory Evaluates Businesses')).toBeInTheDocument();
-    expect(screen.getByText('Score Interpretation & Conviction Dimensions')).toBeInTheDocument();
-    expect(screen.getByText('Why We Do Not Issue Buy, Sell, or Hold Calls')).toBeInTheDocument();
-    expect(screen.getByText('Missing Data and Omissions')).toBeInTheDocument();
-    expect(screen.getByText('Why Final Execution Happens Through Brokers')).toBeInTheDocument();
-    expect(screen.getByText('Compliance Statement & SEBI Disclaimer')).toBeInTheDocument();
+    expect(screen.getByText('Research workflow')).toBeInTheDocument();
+    expect(screen.getByText('Conviction and research dimensions')).toBeInTheDocument();
+    expect(screen.getByText('Research is not a recommendation')).toBeInTheDocument();
+    expect(screen.getByText('Handling of partial information')).toBeInTheDocument();
+    expect(screen.getByText('Broker handoff philosophy')).toBeInTheDocument();
+    expect(screen.getByText('Compliance statement')).toBeInTheDocument();
   });
 
   it('renders score dimensions', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Quality')).toBeInTheDocument();
+    expect(screen.getByText('Financial strength')).toBeInTheDocument();
     expect(screen.getByText('Growth')).toBeInTheDocument();
-    expect(screen.getByText('Valuation')).toBeInTheDocument();
+    expect(screen.getByText('Valuation context')).toBeInTheDocument();
     expect(screen.getByText('Momentum')).toBeInTheDocument();
-    expect(screen.getByText('Risk')).toBeInTheDocument();
+    expect(screen.getByText('Risk context')).toBeInTheDocument();
     expect(screen.getByText('Conviction')).toBeInTheDocument();
   });
 
