@@ -51,10 +51,10 @@ describe("product view adapters", () => {
     });
 
     expect(item.company).toBe("TCS");
-    expect(item.sector).toBe("Sector pending");
-    expect(item.conviction).toBe("Needs research");
-    expect(item.score).toBe("Research signals pending");
-    expect(item.thesis).toBe("Awaiting research signals.");
+    expect(item.sector).toBe("");
+    expect(item.conviction).toBe("");
+    expect(item.score).toBe("");
+    expect(item.thesis).toBe("");
   });
 
   it("maps research changes without exposing internal fields", () => {
@@ -98,7 +98,7 @@ describe("product view adapters", () => {
   });
 
   it("convictionToLabel handles all score ranges", () => {
-    expect(convictionToLabel(null)).toBe("Research signals pending");
+    expect(convictionToLabel(null)).toBe("");
     expect(convictionToLabel(80)).toBe("High conviction research case");
     expect(convictionToLabel(60)).toBe("Moderate conviction");
     expect(convictionToLabel(40)).toBe("Needs review");
@@ -107,7 +107,7 @@ describe("product view adapters", () => {
 
   it("factorDescription stays product-safe", () => {
     expect(factorDescription("quality", 80)).toBe("Quality: 80");
-    expect(factorDescription("risk", null)).toBe("Pending data");
+    expect(factorDescription("risk", null)).toBe("");
   });
 
   it("thesisToStatusText returns fallback for null thesis", () => {
@@ -116,6 +116,6 @@ describe("product view adapters", () => {
       thesis: null, bullCase: null, bearCase: null,
       topStrengths: [], topRisks: [], whatWouldChange: [], priorStatus: null,
     };
-    expect(thesisToStatusText(thesis)).toBe("Research signals pending");
+    expect(thesisToStatusText(thesis)).toBe("");
   });
 });

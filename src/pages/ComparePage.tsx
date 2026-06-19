@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark, Copy } from "lucide-react";
+import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark, Copy, TrendingUp, Star } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
 import { CompareShareRecap } from "../components/share/CompareShareRecap";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
-import { api, type SearchResult } from "../services/api/client";
+import { api, type SearchResult, type ScannerResultItem } from "../services/api/client";
 
 interface CompareCompany {
   symbol: string;
@@ -14,6 +14,11 @@ interface CompareCompany {
 }
 
 const MAX_COMPANIES = 3;
+const SUGGESTED_PAIRS = [
+  { label: "Quality vs Value", description: "Compare top quality and top value companies" },
+  { label: "Growth vs Stability", description: "Compare growth leaders vs stable compounders" },
+  { label: "Large cap vs Mid cap", description: "Compare companies by market cap tier" },
+];
 
 export const ComparePage: React.FC = () => {
   const [companies, setCompanies] = useState<CompareCompany[]>([]);
@@ -21,6 +26,15 @@ export const ComparePage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [suggestedRankings, setSuggestedRankings] = useState<ScannerResultItem[]>([]);
+  const [suggestedLoading, setSuggestedLoading] = useState(true);
+
+  useEffect(() => {
+    api.getScanner("Quality compounders", 10)
+      .then((res) => { setSuggestedRankings(res.data ?? []); })
+      .catch(() => { setSuggestedRankings([]); })
+      .finally(() => setSuggestedLoading(false));
+  }, []);
 
   // Compare route response state
   const [routeData, setRouteData] = useState<{
@@ -207,22 +221,72 @@ export const ComparePage: React.FC = () => {
             )}
 
             {companies.length === 0 && (
-              <div className="flex flex-col items-center gap-5 py-16 text-center">
-                <ArrowLeftRight className="h-10 w-10 text-[#2D333B]" aria-hidden="true" />
-                <div>
-                  <h2 className="text-sm font-semibold text-[#E6EDF3]">Search companies above to compare</h2>
-                  <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#9AA7B5]">
-                    Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown. Use this to decide which company deserves deeper investigation.
-                  </p>
+              <div className="flex flex-col gap-6 py-6">
+                <div className="flex flex-col items-center gap-5 text-center">
+                  <ArrowLeftRight className="h-10 w-10 text-[#2D333B]" aria-hidden="true" />
+                  <div>
+                    <h2 className="text-sm font-semibold text-[#E6EDF3]">Search companies above to compare</h2>
+                    <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#9AA7B5]">
+                      Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown. Use this to decide which company deserves deeper investigation.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <ProductAction onClick={() => productNavigate("rankings")}>
+                      <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
+                    </ProductAction>
+                    <ProductAction variant="secondary" onClick={() => productNavigate("search")}>
+                      <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
+                    </ProductAction>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <ProductAction onClick={() => productNavigate("rankings")}>
-                    <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
-                  </ProductAction>
-                  <ProductAction variant="secondary" onClick={() => productNavigate("search")}>
-                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
-                  </ProductAction>
-                </div>
+
+                {!suggestedLoading && suggestedRankings.length >= 3 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                      <h3 className="text-xs font-semibold text-[#E6EDF3]">Suggested comparisons</h3>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {suggestedRankings.slice(0, 6).map((r) => (
+                        <button
+                          key={r.symbol}
+                          type="button"
+                          onClick={() => addCompany(r.symbol)}
+                          className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{r.symbol}</span>
+                              {r.rank && <span className="text-[10px] text-[#64748B]">#{r.rank}</span>}
+                            </div>
+                            <p className="truncate text-[10px] text-[#9AA7B5]">{r.companyName}</p>
+                          </div>
+                          {r.score !== null && (
+                            <span className="shrink-0 text-[11px] font-semibold text-[#2962FF]">{Math.round(r.score)}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {SUGGESTED_PAIRS.map((pair) => (
+                        <button
+                          key={pair.label}
+                          type="button"
+                          onClick={() => {
+                            if (suggestedRankings.length >= 2) {
+                              addCompany(suggestedRankings[0].symbol);
+                              setTimeout(() => addCompany(suggestedRankings[1].symbol), 100);
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[rgba(148,163,184,0.12)] px-2.5 py-1.5 text-[10px] text-[#9AA7B5] hover:border-[#2962FF]/40 hover:text-[#E6EDF3] transition-colors"
+                        >
+                          <Star className="h-3 w-3" aria-hidden="true" />
+                          {pair.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </>

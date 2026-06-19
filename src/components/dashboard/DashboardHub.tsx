@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity } from "lucide-react";
+import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
@@ -7,6 +7,12 @@ import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
+
+function trackedSignalDot(ticker: string): { color: string; label: string } {
+  const info = StockRegistry.getStock(ticker);
+  if (!info?.sector) return { color: "#64748B", label: "Tracked" };
+  return { color: "#2962FF", label: "Researching" };
+}
 
 interface SignalItem {
   symbol: string;
@@ -181,13 +187,20 @@ export const DashboardHub: React.FC = () => {
               ) : (
                 followedTickers.map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
+                  const dot = trackedSignalDot(ticker);
                   return (
                     <button key={ticker} type="button" onClick={() => openCompany(ticker)} className="mb-2 flex w-full items-center justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-3 py-2 text-left last:mb-0 hover:border-[#2962FF]/40">
-                      <span className="min-w-0">
-                        <span className="block font-mono text-xs font-semibold text-[#E6EDF3]">{ticker}</span>
-                        <span className="block truncate text-[11px] text-[#9AA7B5]">{info?.companyName || "Company"}</span>
+                      <span className="min-w-0 flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: dot.color }} aria-hidden="true" />
+                        <span>
+                          <span className="block font-mono text-xs font-semibold text-[#E6EDF3]">{ticker}</span>
+                          <span className="block truncate text-[11px] text-[#9AA7B5]">{info?.companyName || "Company"}</span>
+                        </span>
                       </span>
-                      <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" aria-hidden="true" />
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#64748B]">{dot.label}</span>
+                        <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" aria-hidden="true" />
+                      </div>
                     </button>
                   );
                 })

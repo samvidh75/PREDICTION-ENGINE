@@ -195,8 +195,8 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('See how companies rank.')).toBeInTheDocument();
-      expect(screen.getByText('Create account to view rankings')).toBeInTheDocument();
+      expect(screen.getByText('Research Rankings')).toBeInTheDocument();
+      expect(screen.getByText('Create free account')).toBeInTheDocument();
     });
   });
 
