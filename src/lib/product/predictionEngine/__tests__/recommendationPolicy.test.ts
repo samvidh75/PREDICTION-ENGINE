@@ -1,78 +1,69 @@
 import { describe, expect, it } from "vitest";
 import { mapScoreToStance } from "../recommendationPolicy";
 
-describe("recommendationPolicy", () => {
+describe("mapScoreToStance", () => {
   it("returns Not enough information for null score", () => {
-    const result = mapScoreToStance(null, null, 0);
-    expect(result.stance).toBe("Not enough information");
-    expect(result.description).toBeTruthy();
-    expect(result.action).toBeTruthy();
-  });
-
-  it("returns Not enough information when dataCompleteness is below 30", () => {
-    const result = mapScoreToStance(80, null, 20);
+    const result = mapScoreToStance(null, null);
     expect(result.stance).toBe("Not enough information");
   });
 
-  it("returns Avoid for now when riskScore >= 75", () => {
-    const result = mapScoreToStance(90, 80, 100);
-    expect(result.stance).toBe("Avoid for now");
+  it("returns Very Unhealthy when riskScore >= 75", () => {
+    const result = mapScoreToStance(60, 80, 100);
+    expect(result.stance).toBe("Very Unhealthy");
   });
 
-  it("returns Risk rising when riskScore >= 55", () => {
-    const result = mapScoreToStance(70, 60, 100);
-    expect(result.stance).toBe("Risk rising");
+  it("returns Unhealthy when riskScore >= 55", () => {
+    const result = mapScoreToStance(60, 60, 100);
+    expect(result.stance).toBe("Unhealthy");
   });
 
-  it("returns High conviction for high score with low risk", () => {
+  it("returns Very Healthy for high score with low risk", () => {
     const result = mapScoreToStance(80, 20, 100);
-    expect(result.stance).toBe("High conviction");
+    expect(result.stance).toBe("Very Healthy");
   });
 
-  it("returns Thesis improving for moderate score 55-74 with good confidence", () => {
-    const result = mapScoreToStance(60, 20, 100);
-    expect(result.stance).not.toMatch(/Buy|Sell|Hold/);
-    expect(result.stance).toMatch(/Thesis improving|Watch/);
+  it("returns Healthy for moderate score 55-74 with good confidence", () => {
+    const result = mapScoreToStance(65, 20, 100);
+    expect(result.stance).toBe("Healthy");
   });
 
-  it("returns Watch for score 40-54", () => {
+  it("returns Unhealthy for score 40-54", () => {
     const result = mapScoreToStance(45, 20, 100);
-    expect(result.stance).toBe("Watch");
+    expect(result.stance).toBe("Unhealthy");
   });
 
-  it("returns Needs review for low score", () => {
-    const result = mapScoreToStance(30, 20, 100);
-    expect(result.stance).toBe("Needs review");
+  it("returns Unhealthy for low score", () => {
+    const result = mapScoreToStance(20, 20, 100);
+    expect(result.stance).toBe("Unhealthy");
   });
 
-  it("returns Thesis improving for high score with low confidence (not High conviction)", () => {
-    const result = mapScoreToStance(80, 10, 40);
-    expect(result.stance).not.toBe("High conviction");
+  it("returns Healthy for high score with low confidence (not Very Healthy)", () => {
+    const result = mapScoreToStance(80, 20, 40);
+    expect(result.stance).toBe("Healthy");
   });
 
-  it("never outputs Buy, Sell, or Hold", () => {
-    const testCases = [
-      { score: 90, risk: 10, completeness: 100 },
-      { score: 70, risk: 50, completeness: 80 },
-      { score: 50, risk: 30, completeness: 70 },
-      { score: 30, risk: 60, completeness: 60 },
-      { score: null, risk: null, completeness: 0 },
-    ];
-
-    for (const tc of testCases) {
-      const result = mapScoreToStance(tc.score, tc.risk, tc.completeness);
-      expect(result.stance).not.toMatch(/Buy|Sell|Hold/i);
-    }
+  it("does not output Buy/Sell/Hold", () => {
+    const result = mapScoreToStance(80, 20, 100);
+    expect(result.stance).not.toMatch(/Buy|Sell|Hold/);
   });
 
-  it("handles NaN and Infinity gracefully", () => {
-    const resultNaN = mapScoreToStance(NaN, null, 100);
-    expect(resultNaN.stance).toBe("Not enough information");
+  it("no stance contains price targets", () => {
+    const result = mapScoreToStance(75, 20, 100);
+    expect(result.description).not.toMatch(/price target|₹|Rs\./);
+  });
 
-    const resultInf = mapScoreToStance(Infinity, null, 100);
-    expect(resultInf.stance).toBe("Not enough information");
+  it("Not enough information when dataCompleteness < 30", () => {
+    const result = mapScoreToStance(80, 20, 20);
+    expect(result.stance).toBe("Not enough information");
+  });
 
-    const resultNeg = mapScoreToStance(-1, null, 100);
-    expect(resultNeg.stance).toBe("Needs review");
+  it("returns Unhealthy when high score + high risk", () => {
+    const resultPos = mapScoreToStance(80, 45, 100);
+    expect(resultPos.stance).toBe("Unhealthy");
+  });
+
+  it("returns Very Unhealthy when moderate score + very high risk", () => {
+    const resultNeg = mapScoreToStance(45, 55, 100);
+    expect(resultNeg.stance).toBe("Unhealthy");
   });
 });

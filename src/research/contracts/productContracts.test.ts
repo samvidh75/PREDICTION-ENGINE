@@ -153,8 +153,8 @@ describe("Canonical product data contracts", () => {
     const peers: CompanyPeersView = {
       symbol: "TCS",
       peers: [
-        { symbol: "INFY", companyName: "Infosys Ltd", score: 72, conviction: "Moderate conviction" },
-        { symbol: "HCLT", companyName: "HCL Tech", score: 65, conviction: "Needs review" },
+        { symbol: "INFY", companyName: "Infosys Ltd", score: 72, conviction: "Healthy" },
+        { symbol: "HCLT", companyName: "HCL Tech", score: 65, conviction: "Unhealthy" },
       ],
     };
     expect(peers.peers).toHaveLength(2);
@@ -179,14 +179,14 @@ describe("Canonical product data contracts", () => {
       companyName: "Reliance Industries Ltd",
       sector: "Oil & Gas",
       rank: 1,
-      conviction: "High conviction",
+      conviction: "Very Healthy",
       score: 82,
       oneLineThesis: "Strong business quality with improving digital segment margins",
       keyReason: "Quality is the clearest current signal",
       riskMarker: "Risk review normal",
     };
     expect(JSON.stringify(r)).not.toMatch(/buy|sell|hold|target|guaranteed|multibagger/i);
-    expect(r.conviction).toBe("High conviction");
+    expect(r.conviction).toBe("Very Healthy");
   });
 
   it("CompareResultView allows null recommendation", () => {
@@ -237,7 +237,7 @@ describe("Canonical product data contracts", () => {
     const ctx: InvestReviewContextView = {
       symbol: "TCS",
       companyName: "Tata Consultancy Services",
-      conviction: "High conviction",
+      conviction: "Very Healthy",
       score: 78,
       thesis: "Strong IT services leader with consistent execution",
       keyRisks: ["Wage inflation", "Currency headwinds"],
@@ -247,6 +247,6 @@ describe("Canonical product data contracts", () => {
     };
     const json = JSON.stringify(ctx);
     expect(json).not.toMatch(/provider|backend|api|source|diagnostic|internal|lineage/i);
-    expect(ctx.conviction).toBe("High conviction");
+    expect(ctx.conviction).toBe("Very Healthy");
   });
 });

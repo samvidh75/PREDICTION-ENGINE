@@ -135,9 +135,9 @@ async function mockAllApi(page: import("@playwright/test").Page): Promise<void> 
         contentType: "application/json",
         body: JSON.stringify({
           data: [
-            { symbol: "RELIANCE", companyName: "Reliance Industries", sector: "Energy", rank: 1, score: 75, conviction: "High conviction", oneLineThesis: "Strong market position in energy and telecom", keyReason: "Quality is the clearest current signal", riskMarker: null },
-            { symbol: "TCS", companyName: "Tata Consultancy Services", sector: "Technology", rank: 2, score: 70, conviction: "Moderate conviction", oneLineThesis: "Leading IT services player", keyReason: "Growth is the clearest current signal", riskMarker: null },
-            { symbol: "HDFCBANK", companyName: "HDFC Bank", sector: "Financial Services", rank: 3, score: 80, conviction: "High conviction", oneLineThesis: "Strong fundamentals in banking", keyReason: "Quality is the clearest current signal", riskMarker: null },
+            { symbol: "RELIANCE", companyName: "Reliance Industries", sector: "Energy", rank: 1, score: 75, conviction: "Very Healthy", oneLineThesis: "Strong market position in energy and telecom", keyReason: "Quality is the clearest current signal", riskMarker: null },
+            { symbol: "TCS", companyName: "Tata Consultancy Services", sector: "Technology", rank: 2, score: 70, conviction: "Healthy", oneLineThesis: "Leading IT services player", keyReason: "Growth is the clearest current signal", riskMarker: null },
+            { symbol: "HDFCBANK", companyName: "HDFC Bank", sector: "Financial Services", rank: 3, score: 80, conviction: "Very Healthy", oneLineThesis: "Strong fundamentals in banking", keyReason: "Quality is the clearest current signal", riskMarker: null },
           ],
           preset: "Quality compounders",
         }),

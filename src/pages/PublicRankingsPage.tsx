@@ -13,10 +13,10 @@ import { dedupeRankings } from "../lib/product/rankingsDedupe";
 
 function rankingsSignalLabel(score: number | null): { label: string; color: string } | null {
   if (score === null) return null;
-  if (score >= 75) return { label: "High conviction", color: "#16A34A" };
-  if (score >= 55) return { label: "Worth researching", color: "#2962FF" };
-  if (score >= 40) return { label: "Track", color: "#F59E0B" };
-  return { label: "Needs review", color: "#EF4444" };
+  if (score >= 75) return { label: "Very Healthy", color: "#16A34A" };
+  if (score >= 55) return { label: "Healthy", color: "#2962FF" };
+  if (score >= 40) return { label: "Unhealthy", color: "#F59E0B" };
+  return { label: "Very Unhealthy", color: "#EF4444" };
 }
 
 function isRealSector(sector: string | null | undefined): boolean {

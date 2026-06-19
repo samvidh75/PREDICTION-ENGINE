@@ -34,7 +34,7 @@ describe("product view adapters", () => {
 
     expect(item.company).toBe("Tata Consultancy Services");
     expect(item.symbol).toBe("TCS");
-    expect(item.conviction).toBe("High conviction");
+    expect(item.conviction).toBe("Very Healthy");
     expect(item.score).toBe("78");
     expect(item.keyReason).toContain("Quality");
     expect(JSON.stringify(item)).not.toMatch(/undefined|null|NaN|\[object Object\]/);
@@ -88,21 +88,21 @@ describe("product view adapters", () => {
   it("scannerResultToResearchListItem uses product-safe labels", () => {
     const result: ScannerResultView = {
       symbol: "TCS", companyName: "TCS Ltd", sector: "IT",
-      rank: 1, conviction: "High conviction", score: 82,
+      rank: 1, conviction: "Very Healthy", score: 82,
       oneLineThesis: "Strong quality profile", keyReason: "Quality leads",
       riskMarker: null,
     };
     const item = scannerResultToResearchListItem(result);
-    expect(item.conviction).toBe("High conviction");
+    expect(item.conviction).toBe("Very Healthy");
     expect(JSON.stringify(item)).not.toMatch(/provider|backend|api|source/i);
   });
 
   it("convictionToLabel handles all score ranges", () => {
     expect(convictionToLabel(null)).toBe("");
-    expect(convictionToLabel(80)).toBe("High conviction research case");
-    expect(convictionToLabel(60)).toBe("Moderate conviction");
-    expect(convictionToLabel(40)).toBe("Needs review");
-    expect(convictionToLabel(20)).toBe("Track before investing");
+    expect(convictionToLabel(80)).toBe("Very Healthy");
+    expect(convictionToLabel(60)).toBe("Healthy");
+    expect(convictionToLabel(40)).toBe("Unhealthy");
+    expect(convictionToLabel(20)).toBe("Very Unhealthy");
   });
 
   it("factorDescription stays product-safe", () => {

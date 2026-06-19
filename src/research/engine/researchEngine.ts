@@ -14,18 +14,18 @@ export interface ResearchConvictionScore {
 }
 
 export type ConvictionLabel =
-  | "High conviction research case"
-  | "Moderate conviction"
-  | "Needs review"
-  | "Track before investing"
+  | "Very Healthy"
+  | "Healthy"
+  | "Unhealthy"
+  | "Very Unhealthy"
   | "Research signals pending";
 
 function convictionLabel(score: number | null, confidence: number): ConvictionLabel {
   if (score === null) return "Research signals pending";
-  if (score >= 75 && confidence >= 50) return "High conviction research case";
-  if (score >= 55) return "Moderate conviction";
-  if (score >= 35) return "Needs review";
-  return "Track before investing";
+  if (score >= 75 && confidence >= 50) return "Very Healthy";
+  if (score >= 55) return "Healthy";
+  if (score >= 35) return "Unhealthy";
+  return "Very Unhealthy";
 }
 
 export function computeResearchConviction(

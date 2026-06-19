@@ -1,7 +1,5 @@
 import type { PublicResearchStance } from "./factorTypes";
 
-export const ENABLE_FORMAL_RECOMMENDATION_LABELS = false;
-
 export interface StanceEvaluation {
   stance: PublicResearchStance;
   description: string;
@@ -33,16 +31,16 @@ export function mapScoreToStance(
 
   if (isHighRisk && riskScore! >= 75) {
     return {
-      stance: "Avoid for now",
-      description: "Highly elevated risk vectors identified.",
+      stance: "Very Unhealthy",
+      description: "Critical risk indicators identified — review carefully before proceeding.",
       action: "Compare first",
     };
   }
 
   if (isHighRisk && riskScore! >= 55) {
     return {
-      stance: "Risk rising",
-      description: "Risk indicators are showing negative deviation.",
+      stance: "Unhealthy",
+      description: "Elevated risk indicators require closer examination.",
       action: "Review before investing",
     };
   }
@@ -52,21 +50,21 @@ export function mapScoreToStance(
   if (score >= 75) {
     if (lowConfidence) {
       return {
-        stance: "Thesis improving",
+        stance: "Healthy",
         description: "Indicators look promising but data coverage is limited.",
         action: "Track instead",
       };
     }
     if (isHighRisk && riskScore! >= 40) {
       return {
-        stance: "Needs review",
+        stance: "Unhealthy",
         description: "Positive signals exist alongside elevated risk indicators.",
         action: "Review before investing",
       };
     }
     return {
-      stance: "High conviction",
-      description: "Favourable alignment across quality and valuation dimensions.",
+      stance: "Very Healthy",
+      description: "Strong alignment across quality, valuation, and risk dimensions.",
       action: "Continue with broker",
     };
   }
@@ -74,21 +72,21 @@ export function mapScoreToStance(
   if (score >= 55) {
     if (lowConfidence) {
       return {
-        stance: "Watch",
-        description: "Moderate signals but limited data coverage.",
+        stance: "Healthy",
+        description: "Moderate signals with limited data coverage — track for changes.",
         action: "Track instead",
       };
     }
     if (isHighRisk && riskScore! >= 40) {
       return {
-        stance: "Needs review",
+        stance: "Unhealthy",
         description: "Moderate scores with elevated risk context.",
         action: "Review before investing",
       };
     }
     return {
-      stance: "Thesis improving",
-      description: "Key metrics indicate improving fundamentals.",
+      stance: "Healthy",
+      description: "Key metrics indicate sound fundamentals with manageable risk.",
       action: "Track instead",
     };
   }
@@ -96,28 +94,28 @@ export function mapScoreToStance(
   if (score >= 40) {
     if (isHighRisk && riskScore! >= 50) {
       return {
-        stance: "Risk rising",
+        stance: "Very Unhealthy",
         description: "Below-threshold scores combined with elevated risk.",
         action: "Compare first",
       };
     }
     return {
-      stance: "Watch",
-      description: "Moderate parameters. Add to watchlist to monitor changes.",
+      stance: "Unhealthy",
+      description: "Below-threshold metrics. Monitor for improvement before deciding.",
       action: "Track instead",
     };
   }
 
   if (isHighRisk && riskScore! >= 40) {
     return {
-      stance: "Risk rising",
-      description: "Below-threshold scores with elevated risk indicators.",
+      stance: "Very Unhealthy",
+      description: "Critical fundamental scores with elevated risk indicators.",
       action: "Compare first",
     };
   }
 
   return {
-    stance: "Needs review",
+    stance: "Unhealthy",
     description: "Fundamental scores are below the coverage threshold.",
     action: "Compare first",
   };

@@ -124,7 +124,7 @@ function buildScannerResult(
     };
   }
 
-  const convictionLabel = conviction.overallScore >= 75 ? "High conviction" : conviction.overallScore >= 55 ? "Moderate conviction" : conviction.overallScore >= 35 ? "Needs review" : "Track before investing";
+  const convictionLabel = conviction.overallScore >= 75 ? "Very Healthy" : conviction.overallScore >= 55 ? "Healthy" : conviction.overallScore >= 35 ? "Unhealthy" : "Very Unhealthy";
 
   return {
     symbol: input.symbol, companyName: input.companyName, sector: input.sector,

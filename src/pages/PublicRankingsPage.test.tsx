@@ -57,8 +57,8 @@ describe('PublicRankingsPage states', () => {
   it('renders data when rankings exist', async () => {
     mockGetScanner.mockResolvedValue({
       data: [
-        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'High conviction research case', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'TCS', companyName: 'Tata Consultancy Services', sector: 'Technology', rank: 2, score: 70, conviction: 'Worth researching', oneLineThesis: '', keyReason: '', riskMarker: null },
+        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'Very Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
+        { symbol: 'TCS', companyName: 'Tata Consultancy Services', sector: 'Technology', rank: 2, score: 70, conviction: 'Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
       ],
       preset: "Quality compounders",
     });
@@ -137,7 +137,7 @@ describe('PublicRankingsPage states', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false });
     mockGetScanner.mockResolvedValue({
       data: [
-        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'High conviction research case', oneLineThesis: '', keyReason: '', riskMarker: null },
+        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'Very Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
       ],
       preset: "Quality compounders",
     });

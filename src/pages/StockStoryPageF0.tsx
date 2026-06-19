@@ -72,9 +72,9 @@ export default function StockStoryPageF0(): JSX.Element {
   const convictionLevel: ConvictionLevel = !ticker ? "none" : stockInfo && sector ? "moderate" : "low";
 
   const convictionLabel: Record<ConvictionLevel, string> = {
-    high: "High conviction",
-    moderate: "Moderate conviction",
-    low: "Under review",
+    high: "Very Healthy",
+    moderate: "Healthy",
+    low: "Unhealthy",
     none: "Not enough information",
   };
 
