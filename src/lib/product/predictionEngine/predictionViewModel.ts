@@ -20,7 +20,7 @@ export function buildPredictionViewModel(
 ): PredictionViewState {
   const coverage = computeFactorCoverage(rawStockMetrics);
   const activeFactorCount = coverage.activeCount;
-  const isReady = activeFactorCount >= 3 && score !== null && score !== undefined;
+  const isReady = activeFactorCount >= 2 && score !== null && score !== undefined;
 
   const stance = mapScoreToStance(score, riskScore, isReady ? 100 : 0);
 
