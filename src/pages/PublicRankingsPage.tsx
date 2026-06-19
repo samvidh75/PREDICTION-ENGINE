@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { api, type ScannerResultItem } from "../services/api/client";
 import Table from "../components/ui/Table";
 import Input from "../components/ui/Input";
+import CustomSelect from "../components/ui/CustomSelect";
 import ScorePill from "../components/ui/ScorePill";
 import { formatRank } from "../services/ui/dataFormatting";
 import ResearchContextLink from "../components/research/ResearchContextLink";
@@ -124,10 +125,10 @@ export const PublicRankingsPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <span className="whitespace-nowrap text-xs font-medium text-[#9AA7B5]">Sector:</span>
                   <div className="relative">
-                    <select
+                    <CustomSelect
                       value={sectorFilter}
                       onChange={(e) => setSectorFilter(e.target.value)}
-                      className="h-10 w-full min-w-[160px] cursor-pointer rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-1.5 pr-8 text-sm text-[#E6EDF3] transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
+                      className="appearance-none bg-[#1e1e2f] text-[#E6EDF3] border border-[#2b2b3a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4c6ef5]"
                     >
                       <option value="all">All Sectors</option>
                       {sectors.map((sec) => (
@@ -135,7 +136,7 @@ export const PublicRankingsPage: React.FC = () => {
                           {sec}
                         </option>
                       ))}
-                    </select>
+                    </CustomSelect>
                   </div>
                 </div>
               )}

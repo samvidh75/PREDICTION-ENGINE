@@ -1,5 +1,6 @@
 // src/components/dashboard/PersonalDashboard.tsx
 import React, { useState, useEffect } from "react";
+import CustomSelect from "../ui/CustomSelect";
 import { getWatchlists, CustomWatchlist } from "../../services/portfolio/watchlistStore";
 import { AlertEngine, SmartAlert } from "../../services/portfolio/AlertEngine";
 import { InvestorMemoryEngine, MemoryData } from "../../services/portfolio/InvestorMemoryEngine";
@@ -174,7 +175,7 @@ export default function PersonalDashboard({
             <div className="space-y-3 text-xs">
               <div>
                 <label className="block text-white/60 mb-1">Risk Profile</label>
-                <select
+                <CustomSelect
                   value={riskProfile}
                   onChange={e => handleSaveProfileSettings(e.target.value, investStyle, favSector)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white outline-none cursor-pointer"
@@ -182,12 +183,12 @@ export default function PersonalDashboard({
                   <option value="Conservative">Conservative (Low Volatility)</option>
                   <option value="Balanced">Balanced</option>
                   <option value="Aggressive">Aggressive (High Momentum)</option>
-                </select>
+                </CustomSelect>
               </div>
 
               <div>
                 <label className="block text-white/60 mb-1">Investing Style</label>
-                <select
+                <CustomSelect
                   value={investStyle}
                   onChange={e => handleSaveProfileSettings(riskProfile, e.target.value, favSector)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white outline-none cursor-pointer"
@@ -196,7 +197,7 @@ export default function PersonalDashboard({
                   <option value="Value">Value-oriented</option>
                   <option value="Momentum">Momentum Breakouts</option>
                   <option value="Quality">High ROE / Quality</option>
-                </select>
+                </CustomSelect>
               </div>
 
               <div>

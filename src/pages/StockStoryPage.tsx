@@ -22,6 +22,9 @@ import FactorDriverList from "../components/research/FactorDriverList";
 import RiskReviewPanel from "../components/research/RiskReviewPanel";
 import NextBestActionPanel from "../components/research/NextBestActionPanel";
 import ResearchContextLink from "../components/research/ResearchContextLink";
+import { FinancialMetricGrid } from "../components/research/FinancialMetricGrid";
+import ValuationContextPanel from "../components/research/ValuationContextPanel";
+import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -218,6 +221,7 @@ export const StockStoryPage: React.FC = () => {
   const pageData = useMemo(() => buildCompanyPageData(researchData, storyData, financials), [researchData, storyData, financials]);
   const signal = useMemo(() => pageData.signal ?? computeSignalFromStoryData(storyData), [pageData.signal, storyData]);
   const factorView = useMemo(() => pageData.factors ?? storyDataToFactorScoresView(storyData), [pageData.factors, storyData]);
+  const financialSnapshot = useMemo(() => buildFinancialSnapshot(financials), [financials]);
   const isInWatchlist = useMemo(() => watchlists.some((w) => w.tickers.includes(ticker)), [watchlists, ticker]);
 
   const relatedCompanies = useMemo(() => {
@@ -609,6 +613,15 @@ export const StockStoryPage: React.FC = () => {
             </div>
             <div className="space-y-4">
               <FactorDriverList factors={factorView} />
+              {financialSnapshot.groups.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Financial Strength</h3>
+                  <FinancialMetricGrid groups={financialSnapshot.groups} />
+                </div>
+              )}
+              {financialSnapshot.valuation && (
+                <ValuationContextPanel context={financialSnapshot.valuation} />
+              )}
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
                   <Building2 className="h-3.5 w-3.5" /> Profile
