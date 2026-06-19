@@ -27,41 +27,41 @@ import ValuationContextPanel from "../components/research/ValuationContextPanel"
 import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter";
 import PredictionEnginePanel from "../components/research/PredictionEnginePanel";
 import { buildCompanyResearchViewModel } from "../lib/product/viewModels/companyResearchViewModel";
+import { buildPredictionViewModel } from "../lib/product/predictionEngine/predictionViewModel";
+
 
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
-    case "Exceptional":
-    case "Excellent":
-      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
-    case "Good":
-    case "Healthy":
-      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
-    case "Fair":
-    case "Weakening":
-      return "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]";
-    case "Stable":
-      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-secondary)]";
-    case "Weak":
-    case "Critical":
-    case "At Risk":
-      return "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]";
+    case "High conviction":
+    case "Thesis improving":
+      return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
+    case "Watch":
+    case "Partial research context":
+    case "Research context is based on available data":
+      return "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.2)] text-[#2962FF]";
+    case "Needs review":
+      return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.2)] text-[#F59E0B]";
+    case "Risk rising":
+    case "Avoid for now":
+      return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.2)] text-[#EF4444]";
     default:
-      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-muted)]";
+      return "bg-white/[0.04] border-white/[0.08] text-[#9AA7B5]";
   }
 };
 
 const getConfidenceStyle = (conf: string) => {
-  switch (conf) {
-    case "Very High":
-    case "High":
-      return "bg-[var(--color-active-bg)] border-[var(--color-active)]/20 text-[var(--color-active)]";
-    case "Medium":
-      return "bg-[var(--color-warning-bg)] border-[var(--color-warning)]/20 text-[var(--color-warning)]";
-    case "Low":
-      return "bg-[var(--color-danger-bg)] border-[var(--color-danger)]/20 text-[var(--color-danger)]";
+  const norm = String(conf).toLowerCase();
+  switch (norm) {
+    case "very high":
+    case "high":
+      return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
+    case "medium":
+      return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.2)] text-[#F59E0B]";
+    case "low":
+      return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.2)] text-[#EF4444]";
     default:
-      return "bg-[var(--color-muted-bg)] border-[var(--color-border)] text-[var(--color-text-muted)]";
+      return "bg-white/[0.04] border-white/[0.08] text-[#9AA7B5]";
   }
 };
 
@@ -90,9 +90,9 @@ function formatLargeINR(value?: number | null): string {
 }
 
 function formatDateTime(value?: string): string {
-  if (!value) return "Insufficient information";
+  if (!value) return "Awaiting updated information";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Insufficient information";
+  if (Number.isNaN(date.getTime())) return "Awaiting updated information";
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
@@ -206,14 +206,14 @@ export const StockStoryPage: React.FC = () => {
   }, [ticker]);
 
   const companyName = metadata.data?.companyName && metadata.data.companyName !== ticker ? metadata.data.companyName : registryStock?.companyName || ticker;
-  const sector = metadata.data?.sector || registryStock?.sector || "Insufficient information";
-  const industry = metadata.data?.industry || "Insufficient information";
-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Insufficient information";
+  const sector = metadata.data?.sector || registryStock?.sector || "Awaiting classification";
+  const industry = metadata.data?.industry || "Awaiting classification";
+  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Awaiting classification";
   const marketCap = formatLargeINR(metadata.data?.marketCap);
   const currency = metadata.data?.currency || "INR";
   const quote = liveQuote.quote;
-  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Insufficient information";
-  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Insufficient information";
+  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Awaiting market data";
+  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Awaiting market data";
 
   const storyData = useMemo(() => {
     if (!story) { if (financials && financials.snapshot_date) return adaptStockStoryResponse({ status: "unavailable" }, financials); return null; }
@@ -238,6 +238,15 @@ export const StockStoryPage: React.FC = () => {
       isInWatchlist
     );
   }, [ticker, companyName, sector, researchData, storyData, financials, isInWatchlist]);
+
+  const predictionModel = useMemo(() => {
+    return buildPredictionViewModel(
+      ticker,
+      researchViewModel.research?.score,
+      researchData?.riskScore ?? factorView?.riskScore,
+      financials
+    );
+  }, [ticker, researchViewModel.research?.score, researchData?.riskScore, factorView?.riskScore, financials]);
 
   const relatedCompanies = useMemo(() => {
     if (!registryStock?.sector) return [];
@@ -313,9 +322,7 @@ export const StockStoryPage: React.FC = () => {
     );
   }
 
-  const hasFinancials = financials && financials.snapshot_date;
-
-  if (!storyData || (storyUnavailable && !hasFinancials)) {
+  if (!researchViewModel.hasEnoughData) {
     return (
       <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased bg-[#070A0F] text-[#E6EDF3] min-h-screen">
         <div className="flex items-center justify-between gap-3 text-xs">
@@ -329,7 +336,7 @@ export const StockStoryPage: React.FC = () => {
             <div className="min-w-0">
               <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3] mb-1">{companyName}</h1>
               <div className="inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
-                Research signals pending
+                Not enough information for this view yet.
               </div>
             </div>
             <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5">
@@ -341,7 +348,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Volume</div>
                 <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Insufficient information"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Awaiting market data"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-[#64748B]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -349,9 +356,9 @@ export const StockStoryPage: React.FC = () => {
           </div>
 
           <div className="mt-6 rounded-xl border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.08)] p-4">
-            <h3 className="text-sm font-semibold text-[#E6EDF3]">Research signals pending</h3>
+            <h3 className="text-sm font-semibold text-[#E6EDF3]">Not enough information for this view yet.</h3>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
-              Research signals pending — not enough data inputs for a reliable research case. Track this company to review changes over time.
+              Not enough information for this view yet. Research context is based on available data. Track this company to review changes over time.
             </p>
           </div>
 
@@ -404,7 +411,7 @@ export const StockStoryPage: React.FC = () => {
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs font-semibold">
           <span className="text-[#64748B]">{label}</span>
-          <span className={colorClass}>{hasScore ? formatScore(scoreValue) : "Insufficient information"}</span>
+          <span className={colorClass}>{hasScore ? formatScore(scoreValue) : "Awaiting data"}</span>
         </div>
         <div className="h-1.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.06)]">
           <div className={`h-full rounded-full transition-all duration-1000 ${barColor}`} style={{ width: hasScore ? `${scoreValue}%` : "0%" }} />
@@ -414,7 +421,7 @@ export const StockStoryPage: React.FC = () => {
   };
 
   const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span className="text-[#64748B]">Insufficient information</span>;
+    if (val === null || val === undefined) return <span className="text-[#64748B]">Awaiting data</span>;
     const isPos = val >= 0;
     return <span className={`font-mono font-bold ${isPos ? "text-[var(--color-active)]" : "text-[var(--color-danger)]"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
   };
@@ -436,7 +443,7 @@ export const StockStoryPage: React.FC = () => {
                 <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Pending"}</span>
+                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Score pending"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
               </div>
             </div>
@@ -462,7 +469,7 @@ export const StockStoryPage: React.FC = () => {
               <div>
                 <div className="text-[9px] font-bold uppercase tracking-wider text-[#8B949E]">Volume</div>
                 <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Insufficient information"}
+                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "Awaiting market data"}
                 </div>
                 <div className="mt-0.5 font-mono text-[9px] text-[#484F58]">Updated {formatDateTime(quote?.updatedAt)}</div>
               </div>
@@ -608,7 +615,7 @@ export const StockStoryPage: React.FC = () => {
                 overallRisk={pageData?.overallRisk ?? null}
                 riskScore={factorView?.riskScore ?? null}
               />
-              <NextBestActionPanel symbol={ticker} hasSignal={signal !== null && signal.label !== "Research signals pending"} hasSector={sector !== "Insufficient information"} />
+              <NextBestActionPanel symbol={ticker} hasSignal={signal !== null && signal.label !== "Research signals pending"} hasSector={sector !== "Awaiting classification"} />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
                   Before You Invest
@@ -909,7 +916,7 @@ export const StockStoryPage: React.FC = () => {
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research basis</span>
             <div className="mt-2 space-y-1.5">
               {[
-                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Pending" },
+                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Assessment pending" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
                   <span className="text-xs text-[#8B949E]">{item.label}</span>
