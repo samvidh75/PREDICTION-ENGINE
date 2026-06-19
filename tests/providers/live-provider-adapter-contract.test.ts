@@ -13,6 +13,10 @@ function textResponse(body: string, status = 200, headers: Record<string, string
 }
 
 describe('live provider adapter contracts', () => {
+  beforeEach(() => {
+    delete process.env.INDIANAPI_KEY;
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     delete process.env.INDIANAPI_KEY;

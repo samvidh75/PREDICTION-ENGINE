@@ -12,8 +12,11 @@ import {
   ExternalLink,
   Shield,
   Info,
+  Loader2,
 } from "lucide-react";
 import { ProductPanel } from "../product/ProductUI";
+import { api } from "../../services/api/client";
+import type { InvestContextResponse } from "../../services/api/client";
 
 interface InvestHandoffSheetProps {
   open: boolean;
@@ -24,12 +27,6 @@ interface InvestHandoffSheetProps {
 }
 
 type Stage = 1 | 2 | 3;
-
-const STAGE_1_RISKS = [
-  "Market volatility may affect entry price and position sizing.",
-  "Liquidity constraints could affect external execution during high-volume periods.",
-  "Sector-wide regulatory changes may alter the investment thesis over time.",
-];
 
 const STAGE_1_CHECKLIST = [
   "Verify the current price and available liquidity before making any external decision.",
@@ -43,15 +40,23 @@ export function InvestHandoffSheet({
   onClose,
   symbol,
   companyName,
-  thesisSummary,
+  thesisSummary: propThesis,
 }: InvestHandoffSheetProps) {
   const [stage, setStage] = useState<Stage>(1);
+  const [loadingContext, setLoadingContext] = useState(false);
+  const [context, setContext] = useState<InvestContextResponse["data"] | null>(null);
 
   useEffect(() => {
     if (open) {
       setStage(1);
+      setLoadingContext(true);
+      setContext(null);
+      api.getInvestContext(symbol)
+        .then((res) => setContext(res.data))
+        .catch(() => {})
+        .finally(() => setLoadingContext(false));
     }
-  }, [open]);
+  }, [open, symbol]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -73,108 +78,82 @@ export function InvestHandoffSheet({
 
   if (!open) return null;
 
-  const displayName = companyName || symbol.toUpperCase();
+  const displayName = companyName || context?.companyName || symbol.toUpperCase();
+  const thesis = context?.thesis || propThesis || `Investment thesis for ${displayName} is being evaluated based on market positioning, fundamentals, and sector context.`;
+  const risks = context?.keyRisks && context.keyRisks.length > 0
+    ? context.keyRisks
+    : [
+        "Market volatility may affect entry price and position sizing.",
+        "Liquidity constraints could affect external execution during high-volume periods.",
+        "Sector-wide regulatory changes may alter the investment thesis over time.",
+      ];
+  const conviction = context?.conviction || null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
-      style={{
-        background: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(8px)",
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Invest handoff — ${symbol.toUpperCase()}`}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div
-        className="relative w-full max-h-[90vh] overflow-y-auto rounded-t-[32px] sm:rounded-[28px] bg-[#0D1117] border border-white/10 shadow-depth sm:max-w-xl"
-        tabIndex={-1}
-      >
-        <Header
-          symbol={symbol}
-          displayName={displayName}
-          onClose={onClose}
-        />
-
-        <div className="px-6 py-5">
-          <StageIndicator current={stage} />
-
-          <div className="mt-6">
-            {stage === 1 && (
-              <StageOne
-                symbol={symbol}
-                displayName={displayName}
-                thesisSummary={thesisSummary}
-                onContinue={() => setStage(2)}
-                onTrack={onClose}
-                onCompare={onClose}
-                onBack={onClose}
-              />
-            )}
-            {stage === 2 && (
-              <StageTwo
-                onBack={() => setStage(1)}
-                onContinue={() => setStage(3)}
-              />
-            )}
-            {stage === 3 && (
-              <StageThree
-                symbol={symbol}
-                displayName={displayName}
-                onBack={() => setStage(2)}
-                onClose={onClose}
-              />
-            )}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="relative z-10 flex max-h-[90vh] w-full flex-col overflow-y-auto rounded-t-2xl border border-b-0 border-[rgba(148,163,184,0.12)] bg-[#0D1117] shadow-2xl sm:max-h-[85vh] sm:w-[480px] sm:rounded-2xl sm:border-b">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[rgba(148,163,184,0.08)] bg-[#0D1117] px-5 py-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#2962FF]/10">
+              <FileText className="h-3.5 w-3.5 text-[#2962FF]" />
+            </div>
+            <h2 className="text-xs font-semibold text-[#E6EDF3]">Invest review</h2>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded p-1 text-[#64748B] hover:text-[#E6EDF3] transition-colors"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          {loadingContext ? (
+            <div className="flex items-center justify-center gap-2 py-12 text-xs text-[#9AA7B5]">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" />
+              Loading research context...
+            </div>
+          ) : (
+            <>
+              {stage === 1 && (
+                <StageOne
+                  symbol={symbol}
+                  displayName={displayName}
+                  thesisSummary={thesis}
+                  conviction={conviction}
+                  risks={risks}
+                  strengths={context?.keyStrengths ?? []}
+                  watchItems={context?.whatToWatch ?? []}
+                  onContinue={() => setStage(2)}
+                  onTrack={() => { onClose(); }}
+                  onCompare={() => { onClose(); }}
+                  onBack={onClose}
+                />
+              )}
+              {stage === 2 && (
+                <StageTwo
+                  onBack={() => setStage(1)}
+                  onContinue={() => setStage(3)}
+                />
+              )}
+              {stage === 3 && (
+                <StageThree
+                  symbol={symbol}
+                  displayName={displayName}
+                  onBack={() => setStage(2)}
+                  onClose={onClose}
+                />
+              )}
+            </>
+          )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function Header({
-  symbol,
-  displayName,
-  onClose,
-}: {
-  symbol: string;
-  displayName: string;
-  onClose: () => void;
-}) {
-  return (
-    <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-white/5 bg-[#0D1117] px-6 py-5">
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 text-sm text-[#8B949E]">
-          <FileText className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">Invest — {displayName}</span>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/5 text-[#8B949E] hover:bg-white/10 hover:text-[#E6EDF3] transition-colors"
-        aria-label="Close"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  );
-}
-
-function StageIndicator({ current }: { current: Stage }) {
-  return (
-    <div className="flex items-center gap-2">
-      {([1, 2, 3] as const).map((s) => (
-        <div
-          key={s}
-          className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-            s <= current ? "bg-[#2962FF]" : "bg-white/10"
-          }`}
-        />
-      ))}
     </div>
   );
 }
@@ -183,6 +162,10 @@ function StageOne({
   symbol,
   displayName,
   thesisSummary,
+  conviction,
+  risks,
+  strengths,
+  watchItems,
   onContinue,
   onTrack,
   onCompare,
@@ -190,7 +173,11 @@ function StageOne({
 }: {
   symbol: string;
   displayName: string;
-  thesisSummary?: string;
+  thesisSummary: string;
+  conviction: string | null;
+  risks: string[];
+  strengths: string[];
+  watchItems: string[];
   onContinue: () => void;
   onTrack: () => void;
   onCompare: () => void;
@@ -207,19 +194,38 @@ function StageOne({
           {displayName}
           <span className="ml-1.5 text-[#9AA7B5]">({symbol.toUpperCase()})</span>
         </h3>
-        <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">
-          {thesisSummary ||
-            `Investment thesis for ${displayName} is being evaluated based on market positioning, fundamentals, and sector context.`}
-        </p>
+        {conviction && (
+          <span className="mt-1 inline-block rounded-full bg-[#2962FF]/10 px-2.5 py-0.5 text-[10px] font-medium text-[#2962FF]">
+            {conviction}
+          </span>
+        )}
+        <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{thesisSummary}</p>
       </ProductPanel>
+
+      {strengths.length > 0 && (
+        <ProductPanel className="p-4">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#16A34A]">
+            <CheckCircle2 className="h-3 w-3" />
+            Key strengths
+          </div>
+          <ul className="mt-3 space-y-2">
+            {strengths.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm leading-5 text-[#9AA7B5]">
+                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#16A34A]/60" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </ProductPanel>
+      )}
 
       <ProductPanel className="p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
           <AlertTriangle className="h-3 w-3" />
-          Key risks
+          {risks.length > 0 ? "Key risks" : "Risk context"}
         </div>
         <ul className="mt-3 space-y-2">
-          {STAGE_1_RISKS.map((risk, i) => (
+          {risks.map((risk, i) => (
             <li key={i} className="flex items-start gap-2 text-sm leading-5 text-[#9AA7B5]">
               <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#F59E0B]/60" />
               {risk}
@@ -227,6 +233,23 @@ function StageOne({
           ))}
         </ul>
       </ProductPanel>
+
+      {watchItems.length > 0 && (
+        <ProductPanel className="p-4">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2962FF]">
+            <Info className="h-3 w-3" />
+            What to watch
+          </div>
+          <ul className="mt-3 space-y-2">
+            {watchItems.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm leading-5 text-[#9AA7B5]">
+                <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#2962FF]/60" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </ProductPanel>
+      )}
 
       <ProductPanel className="p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#16A34A]">
@@ -246,9 +269,14 @@ function StageOne({
       <ProductPanel className="border-[#2962FF]/20 bg-[#2962FF]/5 p-4">
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />
-          <p className="text-sm leading-5 text-[#E6EDF3]">
-            StockStory is a research workspace. Any execution decision happens outside StockStory after your own review.
-          </p>
+          <div>
+            <p className="text-sm leading-5 text-[#E6EDF3]">
+              Final order will be placed with your broker.
+            </p>
+            <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
+              No broker credentials are stored in StockStory. No order has been placed.
+            </p>
+          </div>
         </div>
       </ProductPanel>
 
@@ -306,17 +334,16 @@ function StageTwo({
           <ExternalLink className="h-5 w-5 text-[#2962FF]" />
         </div>
         <h3 className="mt-4 text-base font-semibold text-[#E6EDF3]">
-          External handoff is being prepared
+          Review your research before deciding
         </h3>
         <p className="mt-2 max-w-sm text-sm leading-5 text-[#9AA7B5]">
-          External handoff is being prepared for this account.
-          Track instead or compare first while this workspace stays in review mode.
+          Research review is complete. Any execution decision happens outside StockStory after your own review. Track or compare first while you evaluate.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-4 py-2.5">
             <Shield className="h-4 w-4 text-[#64748B]" />
             <span className="text-xs text-[#64748B]">
-              No external account credentials are stored in StockStory.
+              No broker credentials are stored in StockStory.
             </span>
           </div>
         </div>
@@ -325,17 +352,8 @@ function StageTwo({
       <div className="flex flex-col gap-2 pt-2">
         <button
           type="button"
-          disabled
-          title="External handoff is not yet available"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#111827] px-4 text-xs font-semibold text-[#64748B] cursor-not-allowed"
-        >
-          Open external handoff
-          <ArrowRight className="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
           onClick={onContinue}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[rgba(148,163,184,0.2)] bg-[#111827] px-4 text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]/60 transition-colors"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 text-xs font-semibold text-white hover:bg-[#3B71FF] transition-colors"
         >
           Continue to summary
           <ArrowRight className="h-3.5 w-3.5" />
@@ -399,11 +417,10 @@ function StageThree({
           <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
           <div>
             <p className="text-sm font-semibold text-[#E6EDF3]">
-              No external action has been taken.
+              No order has been placed.
             </p>
             <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
-              StockStory India does not execute orders or send instructions on your behalf.
-              This is not a confirmation of any external action.
+              StockStory India does not execute orders or send instructions on your behalf. This is not a confirmation of any external action.
             </p>
           </div>
         </div>
