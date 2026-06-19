@@ -7,7 +7,6 @@ import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
-import { signalToneToStatusColor } from "../../lib/research/researchSignalModel";
 import ResearchContextLink from "../research/ResearchContextLink";
 
 function trackedSignalDot(ticker: string): { color: string; label: string } {
