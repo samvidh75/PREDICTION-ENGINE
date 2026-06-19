@@ -1,5 +1,87 @@
 # Product Data Display Contract
 
+## Research Signal Computation Rules
+
+- `score` = average of available factor scores (quality, growth, stability, momentum, valuation)
+- `confidence` = (present factor count / 6) * 100
+- `label` = deterministic from score + confidence + riskScore thresholds
+- `tone` = deterministic from label
+- `topDrivers` = top 2 highest factor scores → "{Factor} is a key contributor"
+- `topRisks` = factors < 40 + riskScore < 40 → "{Factor} concerns" / "Risk profile elevated"
+- missing inputs reduce confidence, never create fake certainty
+- insufficient data (< 3 factors) returns "Research signals pending"
+
+## Thesis Health Display Rules
+
+- ThesisHealthMeter shows score ring, label chip, confidence, drivers, risks
+- FactorScorePanel shows per-factor bars (omit missing)
+- Company page: meter above fold, factor panel in right rail of thesis tab
+- Scanner cards: signal chip + score badge + risk marker
+- Rankings: signal chip per row
+- Dashboard: signal dot on tracked companies
+- Compare: suggested companies from real API data
+- Invest handoff: signal meter in thesis review panel
+- Alerts: tone chips for change type
+
+## Factor Score Display Rules
+
+- Show each available factor as a bar with label and numeric value
+- Bar colors: >= 70 green, >= 50 blue, >= 35 amber, < 35 red
+- Omit missing optional scores (don't show dashes)
+- If all missing, show section-level pending state
+
+## Driver/Risk Display Rules
+
+- Drivers: green chips with "{Factor} is a key contributor"
+- Risks: red chips with "{Factor} concerns" or "Risk profile elevated"
+- Only show when real factor data exists
+- Omit if no data
+
+## Compare Signal Display Rules
+
+- Suggested companies come from real getScanner API call
+- Each suggestion shows symbol, rank, name, score
+- Category buttons (Quality vs Value etc.) use first 2 ranked companies
+- Selected compare state shows signal labels and factor comparison
+
+## Dashboard Signal Display Rules
+
+- Research briefing header with today's overview
+- What Changed panel with severity-colored tone chips
+- Tracked companies with signal dots (green = researching, grey = tracked)
+- Scanner presets panel
+- Portfolio thesis monitor summary
+
+## Watchlist/Portfolio/Alerts Signal Display Rules
+
+- Watchlist items: signal label chip
+- Portfolio thesis monitor: status indicator
+- Alerts: tone-based severity chips on change type
+
+## Invest Handoff Signal Context Rules
+
+- ThesisHealthMeter in StageOne review
+- Score/confidence from invest context API
+- Key risks from invest context
+- Before-you-invest checklist
+- "Final order will be placed with your broker" disclaimer
+- No Buy/Sell/Hold
+
+## Fallback Hierarchy
+
+1. Show real data from API response
+2. Omit optional missing fields quietly
+3. Section-level pending state only when core data insufficient
+4. Never show "prediction registry", "provider unavailable", backend error codes
+
+## No Buy/Sell/Hold Rule
+
+All labels must be from the allowed set: High conviction research case, Worth researching, Track, Needs review, Risk rising, Avoid for now, Research signals pending.
+
+## No Provider/Backend Leakage Rule
+
+No provider names, API names, backend error codes, HTTP statuses, raw exceptions, JSON, or diagnostic language.
+
 ## Core Principle
 
 Provider/backend data must be normalized before reaching product UI. Product APIs expose only product concepts. Frontend adapters must not drop real data. Optional missing fields are omitted quietly. Pending states appear only at section level when core data is genuinely insufficient.

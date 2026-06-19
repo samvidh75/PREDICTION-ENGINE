@@ -83,7 +83,7 @@ describe('DashboardHub states', () => {
 
   it('shows empty recent state', () => {
     renderDashboard();
-    expect(screen.getByText('Command centre')).toBeInTheDocument();
+    expect(screen.getByText('Research briefing')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {

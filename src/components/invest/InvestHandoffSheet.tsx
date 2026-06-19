@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   X,
   FileText,
@@ -17,6 +17,8 @@ import {
 import { ProductPanel } from "../product/ProductUI";
 import { api } from "../../services/api/client";
 import type { InvestContextResponse } from "../../services/api/client";
+import ThesisHealthMeter from "../research/ThesisHealthMeter";
+import { computeResearchSignal, type ResearchSignalView } from "../../lib/research/researchSignalModel";
 
 interface InvestHandoffSheetProps {
   open: boolean;
@@ -89,6 +91,27 @@ export function InvestHandoffSheet({
       ];
   const conviction = context?.conviction || null;
 
+  const investSignal = useMemo(() => {
+    if (!context) return null;
+    const factorScores = {
+      symbol,
+      qualityScore: null,
+      growthScore: null,
+      stabilityScore: null,
+      momentumScore: null,
+      valuationScore: null,
+      riskScore: null,
+      convictionScore: context.score ?? null,
+      qualityExplanation: null,
+      valuationExplanation: null,
+      growthExplanation: null,
+      riskExplanation: null,
+      momentumExplanation: null,
+      stabilityExplanation: null,
+    };
+    return computeResearchSignal(factorScores, null);
+  }, [context, symbol]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
@@ -130,6 +153,7 @@ export function InvestHandoffSheet({
                   risks={risks}
                   strengths={context?.keyStrengths ?? []}
                   watchItems={context?.whatToWatch ?? []}
+                  signal={investSignal}
                   onContinue={() => setStage(2)}
                   onTrack={() => { onClose(); }}
                   onCompare={() => { onClose(); }}
@@ -166,6 +190,7 @@ function StageOne({
   risks,
   strengths,
   watchItems,
+  signal,
   onContinue,
   onTrack,
   onCompare,
@@ -178,6 +203,7 @@ function StageOne({
   risks: string[];
   strengths: string[];
   watchItems: string[];
+  signal: ResearchSignalView | null;
   onContinue: () => void;
   onTrack: () => void;
   onCompare: () => void;
@@ -198,6 +224,11 @@ function StageOne({
           <span className="mt-1 inline-block rounded-full bg-[#2962FF]/10 px-2.5 py-0.5 text-[10px] font-medium text-[#2962FF]">
             {conviction}
           </span>
+        )}
+        {signal && (
+          <div className="mt-3">
+            <ThesisHealthMeter signal={signal} size="sm" showDetails={true} />
+          </div>
         )}
         <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{thesisSummary}</p>
       </ProductPanel>

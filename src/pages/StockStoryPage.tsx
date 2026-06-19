@@ -14,6 +14,7 @@ import { IntelligenceModal } from "../components/intelligence/IntelligenceModal"
 import ThesisHealthMeter from "../components/research/ThesisHealthMeter";
 import FactorScorePanel from "../components/research/FactorScorePanel";
 import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
+import { buildCompanyPageData, companyResearchToFactorScores } from "../lib/product/researchDataAdapter";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -179,6 +180,18 @@ export const StockStoryPage: React.FC = () => {
   const [financials, setFinancials] = useState<any>(null);
   useEffect(() => { api.getCompanyFinancials(ticker).then(data => setFinancials(data)).catch(() => setFinancials(null)); }, [ticker]);
 
+  const [researchData, setResearchData] = useState<any>(null);
+  const [researchDataLoading, setResearchDataLoading] = useState(false);
+  useEffect(() => {
+    const ctrl = new AbortController();
+    setResearchDataLoading(true);
+    api.getCompanyResearch(ticker, { signal: ctrl.signal })
+      .then((res) => { if (!ctrl.signal.aborted) setResearchData(res.data); })
+      .catch(() => { if (!ctrl.signal.aborted) setResearchData(null); })
+      .finally(() => { if (!ctrl.signal.aborted) setResearchDataLoading(false); });
+    return () => ctrl.abort();
+  }, [ticker]);
+
   const companyName = metadata.data?.companyName && metadata.data.companyName !== ticker ? metadata.data.companyName : registryStock?.companyName || ticker;
   const sector = metadata.data?.sector || registryStock?.sector || "Insufficient information";
   const industry = metadata.data?.industry || "Insufficient information";
@@ -194,8 +207,10 @@ export const StockStoryPage: React.FC = () => {
     return adaptStockStoryResponse(story, financials);
   }, [story, financials]);
   const storyUnavailable = !story || storyData?.apiStatus === "unavailable";
-  const signal = useMemo(() => computeSignalFromStoryData(storyData), [storyData]);
-  const factorView = useMemo(() => storyDataToFactorScoresView(storyData), [storyData]);
+
+  const pageData = useMemo(() => buildCompanyPageData(researchData, storyData, financials), [researchData, storyData, financials]);
+  const signal = useMemo(() => pageData.signal ?? computeSignalFromStoryData(storyData), [pageData.signal, storyData]);
+  const factorView = useMemo(() => pageData.factors ?? storyDataToFactorScoresView(storyData), [pageData.factors, storyData]);
   const isInWatchlist = useMemo(() => watchlists.some((w) => w.tickers.includes(ticker)), [watchlists, ticker]);
 
   const relatedCompanies = useMemo(() => {
@@ -463,31 +478,61 @@ export const StockStoryPage: React.FC = () => {
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Thesis</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[#E6EDF3]">
-                  {storyData?.narrative || "Thesis details are being prepared."}
+                  {pageData?.narrative || storyData?.narrative || "Thesis details are being prepared."}
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-4">
                   <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#16A34A]">Bull Case</h3>
                   <p className="mt-2 text-xs leading-relaxed text-[#E6EDF3]">
-                    {storyData?.growth !== null && storyData?.growth >= 60
-                      ? "Strong growth metrics and quality indicators suggest the company has favourable fundamentals."
-                      : storyData?.valuation !== null && storyData?.valuation >= 60
-                        ? "Attractive valuation relative to fundamentals may present a reasonable entry point for further research."
-                        : "Review fundamentals and risk tabs for a complete picture before forming a thesis."}
+                    {pageData?.bullCase
+                      ? pageData.bullCase
+                      : storyData?.growth !== null && storyData?.growth >= 60
+                        ? "Strong growth metrics and quality indicators suggest the company has favourable fundamentals."
+                        : storyData?.valuation !== null && storyData?.valuation >= 60
+                          ? "Attractive valuation relative to fundamentals may present a reasonable entry point for further research."
+                          : "Review fundamentals and risk tabs for a complete picture before forming a thesis."}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-4">
                   <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#EF4444]">Bear Case</h3>
                   <p className="mt-2 text-xs leading-relaxed text-[#E6EDF3]">
-                    {storyData?.risk !== null && storyData?.risk < 40
-                      ? "Elevated risk indicators warrant closer review of leverage, volatility, and cash flow stability."
-                      : storyData?.momentum !== null && storyData?.momentum < 40
-                        ? "Weak price momentum may reflect broader sector or market concerns."
-                        : "Research the risk tab to identify potential concerns before making any decision."}
+                    {pageData?.bearCase
+                      ? pageData.bearCase
+                      : storyData?.risk !== null && storyData?.risk < 40
+                        ? "Elevated risk indicators warrant closer review of leverage, volatility, and cash flow stability."
+                        : storyData?.momentum !== null && storyData?.momentum < 40
+                          ? "Weak price momentum may reflect broader sector or market concerns."
+                          : "Research the risk tab to identify potential concerns before making any decision."}
                   </p>
                 </div>
               </div>
+              {pageData?.topStrengths && pageData.topStrengths.length > 0 && (
+                <div className="rounded-2xl border border-[rgba(22,163,74,0.15)] bg-[rgba(22,163,74,0.04)] p-4">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#16A34A]">Key Strengths</h3>
+                  <ul className="mt-2 space-y-1.5">
+                    {pageData.topStrengths.map((s: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[#9AA7B5]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#16A34A]/60" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {pageData?.topRisks && pageData.topRisks.length > 0 && (
+                <div className="rounded-2xl border border-[rgba(239,68,68,0.15)] bg-[rgba(239,68,68,0.04)] p-4">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#EF4444]">Key Risks</h3>
+                  <ul className="mt-2 space-y-1.5">
+                    {pageData.topRisks.map((r: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[#9AA7B5]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#EF4444]/60" />
+                        {r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Before You Invest</h2>
                 <ul className="mt-3 space-y-2">
