@@ -105,20 +105,20 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
     return {
       apiStatus: "unavailable",
       unavailableReason: null,
-      unavailableMessage: "Research signals pending — not enough data inputs for a reliable research case.",
+      unavailableMessage: "Not enough information for a reliable research case yet.",
       dataState: data.dataState ?? null,
       confidence: "Unavailable", healthScore: null, rankingScore: null, classification: null,
       growth: null, quality: null, stability: null, valuation: null, momentum: null, risk: null,
-      narrative: "Research signals pending — not enough data inputs for a reliable research case.",
+      narrative: "Not enough information for a reliable research case yet.",
       factors: {}, financials: financialsObj || {},
       engineDetails: {
-        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Factor scoring details are pending." },
-        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Factor scoring details are pending." },
-        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Factor scoring details are pending." },
-        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Factor scoring details are pending." },
-        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Factor scoring details are pending." },
-        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Factor scoring details are pending." },
-        confidence: { level: "Unavailable", score: null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Research signals pending due to insufficient data." },
+        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Factor scoring details are not yet available." },
+        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Factor scoring details are not yet available." },
+        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Factor scoring details are not yet available." },
+        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Factor scoring details are not yet available." },
+        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Factor scoring details are not yet available." },
+        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Factor scoring details are not yet available." },
+        confidence: { level: "Unavailable", score: null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Not enough information for this view yet." },
       },
     };
   }
@@ -439,7 +439,7 @@ export const StockStoryPage: React.FC = () => {
                 <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Score pending"}</span>
+                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Score not yet available"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
               </div>
             </div>
@@ -896,7 +896,7 @@ export const StockStoryPage: React.FC = () => {
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Factor context</span>
             <p className="mt-2 text-xs leading-relaxed text-[#8B949E]">
-              {storyData?.narrative || "Factor scoring details are pending. Scores are derived from verified market data and model calculations."}
+              {storyData?.narrative || "Factor scoring details are not yet available."}
             </p>
           </div>
 
@@ -912,7 +912,7 @@ export const StockStoryPage: React.FC = () => {
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research basis</span>
             <div className="mt-2 space-y-1.5">
               {[
-                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Assessment pending" },
+                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Assessment not yet available" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
                   <span className="text-xs text-[#8B949E]">{item.label}</span>

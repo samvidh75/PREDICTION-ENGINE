@@ -82,7 +82,7 @@ export function ResearchWorkflowCard({
   };
 
   const statusLabels = {
-    pending: "Pending",
+    pending: "Awaiting",
     active: "Active",
     completed: "Completed",
   };

@@ -23,7 +23,7 @@ export const MarketIndexCard: React.FC<IndexCardProps> = ({
     <button
       type="button"
       onClick={onSelect}
-      className="group w-full text-left bg-white border border-[#E5E5E5] rounded-none p-6 relative overflow-hidden transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.02)] active:scale-[0.98] select-none cursor-pointer"
+      className="group w-full text-left bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6 relative overflow-hidden transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.02)] active:scale-[0.98] select-none cursor-pointer"
     >
       {/* Micro Laser Underline Gradient Shift on Hover */}
       <div
@@ -33,12 +33,12 @@ export const MarketIndexCard: React.FC<IndexCardProps> = ({
       />
 
       {/* Exchange Monospace Label */}
-      <span className="text-[11px] font-mono font-medium tracking-wider text-[#525252] uppercase block">
+      <span className="text-[11px] font-mono font-medium tracking-wider text-[#9AA7B5] uppercase block">
         {exchange} INDEX // {name}
       </span>
 
       {/* Live Value Token */}
-      <h3 className="text-2xl font-semibold tracking-tight text-[#0A0A0A] font-mono mt-1">
+      <h3 className="text-2xl font-semibold tracking-tight text-[#E6EDF3] font-mono mt-1">
         {value}
       </h3>
 

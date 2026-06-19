@@ -36,7 +36,7 @@ export function formatINR(val: number | string | null | undefined, compact = fal
 }
 
 export function normalizeDate(val: string | number | Date | null | undefined): string {
-  if (!val) return "Date pending";
+  if (!val) return "Date not yet available";
   try {
     const d = new Date(val);
     if (isNaN(d.getTime())) return String(val);
@@ -55,7 +55,7 @@ export function getCleanLabel(key: string): string {
 }
 
 export function formatScore(val: number | null | undefined): string {
-  if (typeof val !== "number" || !isFinite(val)) return "Score pending";
+  if (typeof val !== "number" || !isFinite(val)) return "Score not yet available";
   return `${Math.round(val)}/100`;
 }
 
@@ -78,10 +78,10 @@ export function normalizeFieldName(key: string): string {
 }
 
 export function formatFreshness(dateVal: string | null | undefined): string {
-  if (!dateVal) return "Pending";
+  if (!dateVal) return "Not yet available";
   try {
     const d = new Date(dateVal);
-    if (isNaN(d.getTime())) return "Pending";
+    if (isNaN(d.getTime())) return "Not yet available";
     const now = new Date();
     const diffMs = now.getTime() - d.getTime();
     const diffDays = Math.floor(diffMs / 86400000);
@@ -90,7 +90,7 @@ export function formatFreshness(dateVal: string | null | undefined): string {
     if (diffDays < 30) return `${diffDays}d ago`;
     return d.toISOString().split("T")[0];
   } catch {
-    return "Pending";
+    return "Not yet available";
   }
 }
 

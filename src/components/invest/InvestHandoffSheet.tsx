@@ -14,7 +14,7 @@ import {
   Info,
   Loader2,
 } from "lucide-react";
-import { ProductPanel } from "../product/ProductUI";
+import { ProductPanel, productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
 import type { InvestContextResponse } from "../../services/api/client";
 import ThesisHealthMeter from "../research/ThesisHealthMeter";
@@ -81,15 +81,10 @@ export function InvestHandoffSheet({
 
   if (!open) return null;
 
+  const hasRealContext = context !== null;
   const displayName = companyName || context?.companyName || symbol.toUpperCase();
-  const thesis = context?.thesis || propThesis || `Investment thesis for ${displayName} is being evaluated based on market positioning, fundamentals, and sector context.`;
-  const risks = context?.keyRisks && context.keyRisks.length > 0
-    ? context.keyRisks
-    : [
-        "Market volatility may affect entry price and position sizing.",
-        "Liquidity constraints could affect external execution during high-volume periods.",
-        "Sector-wide regulatory changes may alter the investment thesis over time.",
-      ];
+  const thesis = context?.thesis || propThesis || null;
+  const risks = context?.keyRisks?.length ? context.keyRisks : null;
   const conviction = context?.conviction || null;
 
   const investSignal = useMemo(() => {
@@ -145,7 +140,44 @@ export function InvestHandoffSheet({
             </div>
           ) : (
             <>
-              {stage === 1 && (
+              {!hasRealContext && (
+                <div className="space-y-5 py-4">
+                  <div className="flex flex-col items-center gap-3 rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-6 text-center">
+                    <Info className="h-6 w-6 text-[#2962FF]" />
+                    <h3 className="text-sm font-semibold text-[#E6EDF3]">Broker handoff is being prepared.</h3>
+                    <p className="max-w-xs text-xs leading-5 text-[#9AA7B5]">
+                      Broker integration is not yet available for this company. Track or compare first while you evaluate.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); productNavigate("watchlist"); }}
+                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.2)] bg-[#111827] px-3 text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]/60 transition-colors"
+                    >
+                      <TrendingUp className="h-3.5 w-3.5" />
+                      Track instead
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { onClose(); productNavigate("compare", symbol); }}
+                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.2)] bg-[#111827] px-3 text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]/60 transition-colors"
+                    >
+                      <BarChart3 className="h-3.5 w-3.5" />
+                      Compare first
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-3 text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" />
+                      Back to research
+                    </button>
+                  </div>
+                </div>
+              )}
+              {hasRealContext && stage === 1 && (
                 <StageOne
                   symbol={symbol}
                   displayName={displayName}
@@ -161,13 +193,13 @@ export function InvestHandoffSheet({
                   onBack={onClose}
                 />
               )}
-              {stage === 2 && (
+              {hasRealContext && stage === 2 && (
                 <StageTwo
                   onBack={() => setStage(1)}
                   onContinue={() => setStage(3)}
                 />
               )}
-              {stage === 3 && (
+              {hasRealContext && stage === 3 && (
                 <StageThree
                   symbol={symbol}
                   displayName={displayName}
@@ -199,9 +231,9 @@ function StageOne({
 }: {
   symbol: string;
   displayName: string;
-  thesisSummary: string;
+  thesisSummary: string | null;
   conviction: string | null;
-  risks: string[];
+  risks: string[] | null;
   strengths: string[];
   watchItems: string[];
   signal: ResearchSignalView | null;
@@ -234,7 +266,9 @@ function StageOne({
             <ThesisHealthMeter signal={signal} size="sm" showDetails={true} />
           </div>
         )}
-        <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{thesisSummary}</p>
+        {thesisSummary && (
+          <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{thesisSummary}</p>
+        )}
       </ProductPanel>
 
       {strengths.length > 0 && (
@@ -254,20 +288,22 @@ function StageOne({
         </ProductPanel>
       )}
 
-      <ProductPanel className="p-4">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
-          <AlertTriangle className="h-3 w-3" />
-          {risks.length > 0 ? "Key risks" : "Risk context"}
-        </div>
-        <ul className="mt-3 space-y-2">
-          {risks.map((risk, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm leading-5 text-[#9AA7B5]">
-              <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#F59E0B]/60" />
-              {risk}
-            </li>
-          ))}
-        </ul>
-      </ProductPanel>
+      {risks && risks.length > 0 && (
+        <ProductPanel className="p-4">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
+            <AlertTriangle className="h-3 w-3" />
+            Key risks
+          </div>
+          <ul className="mt-3 space-y-2">
+            {risks.map((risk, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm leading-5 text-[#9AA7B5]">
+                <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[#F59E0B]/60" />
+                {risk}
+              </li>
+            ))}
+          </ul>
+        </ProductPanel>
+      )}
 
       {watchItems.length > 0 && (
         <ProductPanel className="p-4">
@@ -306,7 +342,7 @@ function StageOne({
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />
           <div>
             <p className="text-sm leading-5 text-[#E6EDF3]">
-              Final order will be placed with your broker.
+              Final order placement happens with your broker.
             </p>
             <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
               No broker credentials are stored in StockStory. No order has been placed.

@@ -401,8 +401,8 @@ function PredictionTrackRecordSection({ ticker }: { ticker: string }) {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <TelemetryStatCard icon={<BarChart3 className="h-4 w-4" />} label="Total Predictions" value={loading ? '...' : totalPredictions} colorClass="text-amber-400" />
-        <TelemetryStatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Hit Rate" value={hitRate !== null ? `${hitRate}%` : 'N/A'} sub="Directionally correct" colorClass="text-emerald-400" />
-        <TelemetryStatCard icon={<Activity className="h-4 w-4" />} label="Avg Return" value={validatedPredictions.length > 0 ? `${(validatedPredictions.reduce((s, p) => s + (p.actual3m ?? 0), 0) / validatedPredictions.length * 100).toFixed(1)}%` : 'N/A'} sub="Post-prediction" colorClass="text-cyan-400" />
+        <TelemetryStatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Hit Rate" value={hitRate !== null ? `${hitRate}%` : '—'} sub="Directionally correct" colorClass="text-emerald-400" />
+        <TelemetryStatCard icon={<Activity className="h-4 w-4" />} label="Avg Return" value={validatedPredictions.length > 0 ? `${(validatedPredictions.reduce((s, p) => s + (p.actual3m ?? 0), 0) / validatedPredictions.length * 100).toFixed(1)}%` : '—'} sub="Post-prediction" colorClass="text-cyan-400" />
         <TelemetryStatCard icon={<Clock className="h-4 w-4" />} label="Since" value={predictions.length > 0 ? predictions[predictions.length - 1].date : '—'} sub="First recorded prediction" colorClass="text-white/60" />
       </div>
 
@@ -433,7 +433,7 @@ function PredictionTrackRecordSection({ ticker }: { ticker: string }) {
                   </td>
                   <td className="p-3 text-white/60">{p.confidence}</td>
                   <td className={`p-3 font-mono font-bold ${(p.actual3m ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {p.actual3m !== null && p.actual3m !== undefined ? `${(p.actual3m * 100).toFixed(1)}%` : 'Pending'}
+                    {p.actual3m !== null && p.actual3m !== undefined ? `${(p.actual3m * 100).toFixed(1)}%` : 'Awaiting outcome'}
                   </td>
                 </tr>
               ))}
@@ -452,7 +452,7 @@ function TransparencySection({ story }: { story: StockStoryResult }) {
 
   return (
     <section className="space-y-4">
-      <SectionHeader icon={<Globe className="h-4 w-4 text-blue-400" />} title="Transparency" subtitle="Data sources, methodology, and freshness" />
+      <SectionHeader icon={<Globe className="h-4 w-4 text-blue-400" />} title="Transparency" subtitle="Data sources, methodology, and recency" />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">

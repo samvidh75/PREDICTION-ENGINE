@@ -25,7 +25,7 @@ function formatFreshness(dateStr: string): string {
 export default function SourceFreshnessChip({ date, label }: SourceFreshnessChipProps) {
   if (!date) {
     return (
-      <span className="inline-flex items-center rounded-lg bg-white/60 border border-white/30 px-2 py-0.5 text-[11px] font-medium text-ink-muted">
+      <span className="inline-flex items-center rounded-lg bg-[#0D1117]/60 border border-white/30 px-2 py-0.5 text-[11px] font-medium text-ink-muted">
         {label || "Pending"}
       </span>
     );
@@ -39,7 +39,7 @@ export default function SourceFreshnessChip({ date, label }: SourceFreshnessChip
       className={`inline-flex items-center rounded-lg border px-2 py-0.5 text-[11px] font-medium ${
         isFresh
           ? "bg-accent-subtle border-accent-primary/20 text-accent-success"
-          : "bg-white/60 border-white/30 text-ink-secondary"
+          : "bg-[#0D1117]/60 border-white/30 text-ink-secondary"
       }`}
     >
       {label ? `${label}: ` : ""}{freshness}

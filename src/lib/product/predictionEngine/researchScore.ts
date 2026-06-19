@@ -125,13 +125,15 @@ export function computeResearchScore(rawData: Record<string, unknown> | null | u
 export function computeHealthometerFromResearch(rawData: Record<string, unknown> | null | undefined): {
   quality: number | null; valuation: number | null; growth: number | null;
   stability: number | null; risk: number | null; momentum: number | null;
+  financialStrength: number | null;
 } {
-  if (!rawData) return { quality: null, valuation: null, growth: null, stability: null, risk: null, momentum: null };
+  if (!rawData) return { quality: null, valuation: null, growth: null, stability: null, risk: null, momentum: null, financialStrength: null };
   const factorScores = computeFactorScores(rawData);
   const dimResults = computeDimensionScores(factorScores);
   const getScore = (id: string): number | null => dimResults.dimensions.find((d) => d.id === id)?.score ?? null;
   return {
     quality: getScore("quality"), valuation: getScore("valuation"), growth: getScore("growth"),
     stability: getScore("stability"), risk: getScore("risk"), momentum: getScore("momentum"),
+    financialStrength: getScore("financial_strength"),
   };
 }

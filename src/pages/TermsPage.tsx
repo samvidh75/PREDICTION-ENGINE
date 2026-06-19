@@ -42,7 +42,7 @@ export const TermsPage: React.FC = () => (
         <ProductPanel className="p-5 md:p-6">
           <h2 className="text-base font-semibold text-[#E8EDF2]">No Broker Credential Storage</h2>
           <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">
-            StockStory does not request, store, or transmit broker login credentials, API keys, or trading tokens. No broker connection is established through StockStory.
+            StockStory does not request, store, or transmit broker login credentials or trading tokens. No broker connection is established through StockStory.
           </p>
         </ProductPanel>
       </ProductSection>

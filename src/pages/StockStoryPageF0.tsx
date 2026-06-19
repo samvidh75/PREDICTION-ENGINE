@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ArrowLeftRight, Bookmark, TrendingUp, FileText, BarChart3, Building2, LineChart } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Bookmark, TrendingUp, Activity, ShieldAlert } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
 import { ProductShell, ProductPage, ProductPanel, ProductStatusPill, productNavigate, ProductAction } from "../components/product/ProductUI";
@@ -7,7 +7,6 @@ import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { useToast } from "../components/feedback/useToast";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
-import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { ShareResearchSummary } from "../components/share/ShareResearchSummary";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
@@ -27,13 +26,10 @@ function readTickerFromUrl(): string {
   return (params.get("id") ?? params.get("symbol") ?? params.get("ticker") ?? params.get("companyId") ?? "").toUpperCase().trim();
 }
 
-type ConvictionLevel = "high" | "moderate" | "low" | "none";
-
 export default function StockStoryPageF0(): JSX.Element {
   const [horizon, setHorizon] = useState<PredictionHorizon>(() => readHorizonFromUrl());
   const ticker = readTickerFromUrl();
   const stockInfo = ticker ? StockRegistry.getStock(ticker) : null;
-  const [whyThisViewOpen, setWhyThisViewOpen] = useState(false);
   const [investOpen, setInvestOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -66,30 +62,16 @@ export default function StockStoryPageF0(): JSX.Element {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
-  const companyName = stockInfo?.companyName || "Needs research";
+  const companyName = stockInfo?.companyName || ticker || "Company";
   const sector = stockInfo?.sector || null;
+  const snapshot = stockInfo?.telemetrySnapshot ?? null;
 
-  const convictionLevel: ConvictionLevel = !ticker ? "none" : stockInfo && sector ? "moderate" : "low";
+  const hasPredictionEngine = snapshot !== null;
+  const score = snapshot?.healthScore ?? null;
+  const confidence = snapshot?.confidenceScore ?? null;
 
-  const convictionLabel: Record<ConvictionLevel, string> = {
-    high: "Very Healthy",
-    moderate: "Healthy",
-    low: "Unhealthy",
-    none: "Not enough information",
-  };
-
-  const convictionTone: Record<ConvictionLevel, "verified" | "blue" | "warning" | "muted"> = {
-    high: "verified",
-    moderate: "blue",
-    low: "warning",
-    none: "muted",
-  };
-
-  const whatThisIsBasedOn = stockInfo && sector
-    ? ["Company fundamentals", "Sector analysis", "Market data"]
-    : ticker
-      ? ["Company identification"]
-      : [];
+  const signalTone: "constructive" | "caution" | "severe" | null = score !== null ? (score >= 60 ? "constructive" : score >= 40 ? "caution" : "severe") : null;
+  const signalLabel = score !== null ? (score >= 60 ? "Healthy" : score >= 40 ? "Unhealthy" : "Very Unhealthy") : "Research signals pending";
 
   return (
     <ProductShell>
@@ -101,141 +83,127 @@ export default function StockStoryPageF0(): JSX.Element {
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
+        </div>
+
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{companyName}</h1>
+          {ticker && (
+            <span className="mt-0.5 inline-block font-mono text-xs font-medium text-[#9AA7B5]">{ticker}</span>
+          )}
+        </div>
+
+        {hasPredictionEngine && (
+          <div className="mb-5 grid gap-4 sm:grid-cols-2">
+            <ProductPanel className="p-4">
+              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">
+                <Activity className="h-3 w-3" /> Prediction Engine
+              </div>
+              <div className="mt-2">
+                <ProductStatusPill tone={signalTone === "constructive" ? "verified" : signalTone === "severe" ? "danger" : "warning"}>
+                  {signalLabel}
+                </ProductStatusPill>
+              </div>
+              {score !== null && (
+                <p className="mt-1.5 text-xs text-[#9AA7B5]">Score: {Math.round(score)}/100 &middot; {confidence !== null ? `${Math.round(confidence)}% confidence` : "No confidence data"}</p>
+              )}
+            </ProductPanel>
+            <ProductPanel className="p-4">
+              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">
+                <ShieldAlert className="h-3 w-3" /> Healthometer
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {snapshot && (
+                  <>
+                    <ProductStatusPill tone={snapshot.healthScore >= 60 ? "verified" : snapshot.healthScore >= 40 ? "warning" : "danger"}>
+                      Health: {Math.round(snapshot.healthScore)}
+                    </ProductStatusPill>
+                    <ProductStatusPill tone={snapshot.confidenceScore >= 60 ? "verified" : snapshot.confidenceScore >= 40 ? "blue" : "muted"}>
+                      Confidence: {Math.round(snapshot.confidenceScore)}
+                    </ProductStatusPill>
+                  </>
+                )}
+              </div>
+            </ProductPanel>
+          </div>
+        )}
+
+        {!hasPredictionEngine && ticker && (
+          <div className="mb-5">
+            <ProductPanel className="p-4">
+              <div className="flex items-center gap-1.5 text-xs text-[#9AA7B5]">
+                Research data is being prepared for this company.
+              </div>
+            </ProductPanel>
+          </div>
+        )}
+
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Horizon</span>
+            <div className="flex items-center gap-1 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-1.5">
+              {HORIZONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => selectHorizon(option)}
+                  aria-pressed={horizon === option}
+                  className={`rounded-md px-2 py-1 text-xs font-bold transition ${
+                    horizon === option
+                      ? "bg-[#2962FF] text-white shadow-sm"
+                      : "text-[#9AA7B5] hover:bg-[rgba(148,163,184,0.08)] hover:text-[#E6EDF3]"
+                  }`}
+                >
+                  {option}D
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             {watchlists.length > 0 && (
               <button
                 onClick={handleToggleWatchlist}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
               >
-                <Bookmark className={`h-3 w-3 ${isInWatchlist ? "fill-[#2962FF] text-[#2962FF]" : ""}`} />
-                {isInWatchlist ? "Saved" : "Watchlist"}
+                <Bookmark className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-[#2962FF] text-[#2962FF]" : ""}`} />
+                {isInWatchlist ? "Tracked" : "Track"}
               </button>
             )}
-            <button
-              onClick={() => { setShareOpen(true); trackEvent(PRODUCT_EVENTS.COMPANY_SHARE_OPENED); }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
-              aria-label="Share research summary"
-            >
-              <ArrowLeftRight className="h-3 w-3" /> Share
-            </button>
             <button
               onClick={() => productNavigate("compare", ticker)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
             >
-              <ArrowLeftRight className="h-3 w-3" /> Compare
+              <ArrowLeftRight className="h-3.5 w-3.5" /> Compare
             </button>
             <button
-              onClick={() => setWhyThisViewOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+              onClick={() => setInvestOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#2962FF] bg-[#2962FF] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#3B71FF]"
             >
-              <FileText className="h-3 w-3" /> Why this view
+              <TrendingUp className="h-3.5 w-3.5" /> Invest
+            </button>
+            <button
+              onClick={() => { setShareOpen(true); trackEvent(PRODUCT_EVENTS.COMPANY_SHARE_OPENED); }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" /> Share
             </button>
           </div>
-        </div>
-
-
-
-        <div className="mb-5 grid gap-4 sm:grid-cols-2">
-          <ProductPanel className="p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">Conviction</div>
-            <div className="mt-2 flex items-center gap-2">
-              <ProductStatusPill tone={convictionTone[convictionLevel]}>
-                {convictionLabel[convictionLevel]}
-              </ProductStatusPill>
-            </div>
-            {convictionLevel === "none" && (
-              <p className="mt-2 text-xs leading-relaxed text-[#64748B]">
-                Research signals are being prepared for this company. Check back once the research cycle completes.
-              </p>
-            )}
-          </ProductPanel>
-          <ProductPanel className="p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9AA7B5]">What this is based on</div>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              {whatThisIsBasedOn.length > 0 ? (
-                whatThisIsBasedOn.map((item) => (
-                  <ProductStatusPill key={item} tone="blue">{item}</ProductStatusPill>
-                ))
-              ) : (
-                <ProductStatusPill tone="muted">Awaiting research</ProductStatusPill>
-              )}
-              <ProductStatusPill tone="muted">
-                {horizon}D horizon
-              </ProductStatusPill>
-            </div>
-          </ProductPanel>
-        </div>
-
-        <div className="mb-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
-            <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Horizon</span>
-            {HORIZONS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => selectHorizon(option)}
-                aria-pressed={horizon === option}
-                className={`rounded-md px-2.5 py-1 text-xs font-bold transition ${
-                  horizon === option
-                    ? "bg-[#2962FF] text-white shadow-sm"
-                    : "text-[#9AA7B5] hover:bg-[rgba(148,163,184,0.08)] hover:text-[#E6EDF3]"
-                }`}
-              >
-                {option}D
-              </button>
-            ))}
-          </div>
-          <ProductAction onClick={() => setInvestOpen(true)} variant="primary">
-            Invest through broker
-          </ProductAction>
         </div>
 
         <StockWorkspaceBar ticker={ticker} horizon={horizon} />
 
         <StockStoryPage key={horizon} />
 
-        <IntelligenceModal
-          open={whyThisViewOpen}
-          onClose={() => setWhyThisViewOpen(false)}
-          title={`Research basis — ${ticker || "current view"}`}
-          subtitle="Why this stock page looks the way it does and what research supports it."
-        >
-          <div className="space-y-5">
-              <div>
-              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#8B949E]">
-                <BarChart3 className="h-3.5 w-3.5" /> Research basis
-              </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#E6EDF3]">Company fundamentals</span>
-                  <ProductStatusPill tone={stockInfo ? "verified" : "muted"}>
-                    {stockInfo ? "Available" : "Pending"}
-                  </ProductStatusPill>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#E6EDF3]">Sector context</span>
-                  <ProductStatusPill tone={sector ? "verified" : "muted"}>
-                    {sector || "Unclassified"}
-                  </ProductStatusPill>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#E6EDF3]">Prediction horizon</span>
-                  <ProductStatusPill tone="blue">{horizon}D</ProductStatusPill>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#8B949E]">
-                <LineChart className="h-3.5 w-3.5" /> Methodology
-              </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                <p className="text-xs leading-relaxed text-[#9AA7B5]">
-                  Predictions are model-generated based on available data. Scores reflect relative conviction within the selected horizon and are not financial advice. Always conduct your own research before investing.
-                </p>
-              </div>
-            </div>
-          </div>
-        </IntelligenceModal>
+        <div className="mt-8 border-t border-[rgba(148,163,184,0.08)] pt-5">
+          <p className="text-[10px] leading-relaxed text-[#64748B]">
+            Scores reflect relative research conviction within the selected horizon and are not financial advice. Always conduct your own research before investing. StockStory is a research workspace.
+          </p>
+          <button
+            onClick={() => productNavigate("methodology")}
+            className="mt-2 text-[10px] font-medium text-[#2962FF] hover:text-[#3B71FF] transition-colors underline underline-offset-2"
+          >
+            How research methodology works
+          </button>
+        </div>
 
         <InvestHandoffSheet
           open={investOpen}

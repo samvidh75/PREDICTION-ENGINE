@@ -61,7 +61,7 @@ export default function ConfirmDialog({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">{message}</p>
+        <p className="mt-3 text-sm leading-relaxed text-[#64748B]">{message}</p>
         <div className="mt-6 flex items-center justify-end gap-3">
           <Button variant="secondary" size="sm" glass onClick={onCancel}>
             {cancelLabel}

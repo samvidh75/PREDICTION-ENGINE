@@ -43,17 +43,17 @@ export const MacroNewsFeed: React.FC = () => {
   ];
 
   return (
-    <div className="bg-white border border-[#E5E5E5] rounded-none p-6 flex flex-col space-y-5 select-none">
+    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6 flex flex-col space-y-5 select-none">
       
       {/* Feed Header */}
-      <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+      <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <Rss className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#0A0A0A]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
             Macro System Notices
           </span>
         </div>
-        <Bell className="w-4 h-4 text-neutral-400" />
+        <Bell className="w-4 h-4 text-[#9AA7B5]" />
       </div>
 
       {/* Announcements Timeline List */}
@@ -61,27 +61,27 @@ export const MacroNewsFeed: React.FC = () => {
         {macroUpdates.map((item) => (
           <div
             key={item.id}
-            className="group flex flex-col space-y-1.5 p-3.5 border border-[#E5E5E5] bg-[#FAFAFA] hover:bg-white hover:shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200"
+            className="group flex flex-col space-y-1.5 p-3.5 border border-[rgba(148,163,184,0.16)] bg-[#0D1117] hover:bg-[#111827] hover:shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200"
           >
             <div className="flex items-center justify-between font-mono text-[9px]">
-              <span className="text-neutral-400">SYS.TIME // {item.time}</span>
-              <span className="font-semibold text-neutral-500 uppercase tracking-widest">
+              <span className="text-[#9AA7B5]">SYS.TIME // {item.time}</span>
+              <span className="font-semibold text-[#64748B] uppercase tracking-widest">
                 {item.source}
               </span>
             </div>
             
-            <h4 className="text-[13px] font-semibold text-[#0A0A0A] leading-tight">
+            <h4 className="text-[13px] font-semibold text-[#E6EDF3] leading-tight">
               {item.title}
             </h4>
             
-            <p className="text-[11px] leading-relaxed text-[#525252]">
+            <p className="text-[11px] leading-relaxed text-[#9AA7B5]">
               {item.description}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="pt-2 text-[10px] font-mono text-neutral-400 text-center tracking-widest uppercase">
+      <div className="pt-2 text-[10px] font-mono text-[#9AA7B5] text-center tracking-widest uppercase">
         MACRO FEED ONLY // NO INDIVIDUAL TICKERS
       </div>
     </div>

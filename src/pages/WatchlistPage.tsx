@@ -58,7 +58,6 @@ export const WatchlistPage: React.FC = () => {
   const [thesisTab, setThesisTab] = useState<ThesisTab>("Tracked companies");
   const toast = useToast();
   const [noteRefresh, setNoteRefresh] = useState(0);
-  const [explanationSymbol, setExplanationSymbol] = useState<string | null>(null);
 
   useEffect(() => {
     const session = loadAuthSession();
@@ -321,23 +320,12 @@ export const WatchlistPage: React.FC = () => {
 
                           <div className="mt-3">
                             <button
-                              onClick={() => setExplanationSymbol(explanationSymbol === ticker ? null : ticker)}
+                              onClick={() => productNavigate("alerts")}
                               className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[rgba(148,163,184,0.25)] transition-colors"
                             >
-                              <ChevronRight
-                                className={`h-3 w-3 transition-transform ${explanationSymbol === ticker ? "rotate-90" : ""}`}
-                                aria-hidden="true"
-                              />
+                              <ChevronRight className="h-3 w-3" aria-hidden="true" />
                               What changed
                             </button>
-                            {explanationSymbol === ticker && (
-                              <div className="mt-3 space-y-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-                                <p className="text-[11px] leading-relaxed text-[#8B949E]">
-                                  <strong>Track recent developments</strong> — Note any news, earnings, or shifts in your thesis. This section will help surface what is changing with this company over time.
-                                </p>
-                                <button type="button" onClick={() => productNavigate("terms")} className="text-[10px] leading-relaxed text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Informational research tool — Read Terms & Disclosures</button>
-                              </div>
-                            )}
                           </div>
                         </ProductPanel>
                       );

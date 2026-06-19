@@ -34,7 +34,7 @@ function SourcePill({ provider, isFallback }: { provider?: string | null; isFall
       isFallback ? "border-[#EF9A09]/10 text-[#EF9A09]" : "border-[#22AB94]/10 text-[#22AB94]"
     }`}>
       {provider}
-      {isFallback && <span className="text-[#484F58]">(fallback)</span>}
+      {isFallback && <span className="text-[#484F58]">(secondary)</span>}
     </span>
   );
 }
@@ -49,8 +49,8 @@ export function SourceTraceTimeline({ entries, modelRun, completeness, symbol, c
         </div>
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center">
           <AlertTriangle className="mx-auto h-5 w-5 text-[#484F58]" aria-hidden="true" />
-          <p className="mt-2 text-xs text-[#8B949E]">Lineage unavailable for this symbol.</p>
-          <p className="mt-1 text-[10px] text-[#484F58]">Source trace pending for this input.</p>
+          <p className="mt-2 text-xs text-[#8B949E]">Research trace not yet available for this symbol.</p>
+          <p className="mt-1 text-[10px] text-[#484F58]">Source trace not yet available for this input.</p>
         </div>
       </div>
     );
@@ -130,9 +130,9 @@ export function ResearchAuditDrawer({ open, onClose, symbol }: { open: boolean; 
   }, [open, symbol]);
 
   return (
-    <SpatialSheet open={open} onClose={onClose} title={`Research audit — ${symbol}`} subtitle="Data source trace, input lineage, model run, and freshness information.">
+    <SpatialSheet open={open} onClose={onClose} title={`Research audit — ${symbol}`} subtitle="Data source trace, model run, and recency information.">
       {loading ? (
-        <div className="py-8 text-center text-xs text-[#484F58]">Loading lineage data...</div>
+        <div className="py-8 text-center text-xs text-[#484F58]">Loading research trace data...</div>
       ) : data?.entries ? (
         <SourceTraceTimeline
           entries={data.entries}
@@ -142,13 +142,13 @@ export function ResearchAuditDrawer({ open, onClose, symbol }: { open: boolean; 
         />
       ) : (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
-          <p className="text-xs text-[#8B949E]">Audit information pending.</p>
-          <p className="mt-1 text-[10px] text-[#484F58]">No input lineage records found for {symbol}.</p>
+          <p className="text-xs text-[#8B949E]">Audit information not yet available.</p>
+          <p className="mt-1 text-[10px] text-[#484F58]">No input trace records found for {symbol}.</p>
         </div>
       )}
       <div className="mt-4 border-t border-white/5 pt-4">
         <p className="text-[10px] leading-relaxed text-[#484F58]">
-          Source trace shows data provenance from the prediction pipeline. Missing entries mean the data was not recorded at ingestion time or the source is pending configuration.
+          Source trace shows data provenance from the prediction pipeline. Missing entries mean the data was not recorded at processing time or the source is not yet configured.
         </p>
       </div>
     </SpatialSheet>

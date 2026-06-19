@@ -18,7 +18,7 @@ export default function LoadingSkeleton({ lines = 3, className = "" }: LoadingSk
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-white/40 p-5 space-y-3">
+    <div className="rounded-2xl bg-[#0D1117]/70 backdrop-blur-sm border border-white/40 p-5 space-y-3">
       <div className="skeleton h-4 w-1/3" />
       <div className="skeleton h-6 w-1/2" />
       <div className="skeleton h-3 w-3/4" />

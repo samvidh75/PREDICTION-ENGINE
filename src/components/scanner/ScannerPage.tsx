@@ -356,6 +356,7 @@ export default function ScannerPage() {
               <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider">Sort</span>
               <div className="relative">
                 <CustomSelect
+                  aria-label="Sort results"
                   value={sortValue}
                   onChange={(e) => setSortValue(e.target.value)}
                   className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-2.5 py-1 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"

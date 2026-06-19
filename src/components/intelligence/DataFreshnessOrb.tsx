@@ -31,7 +31,7 @@ export function DataFreshnessOrb({ className = "" }: { className?: string }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium text-[#484F58] ${className}`}
-      title={`Data freshness: ${state.label}`}
+      title={`Data recency: ${state.label}`}
     >
       <span className={`relative flex h-2 w-2 ${pulseClass}`}>
         <span className={`h-2 w-2 rounded-full ${dotColor}`} />

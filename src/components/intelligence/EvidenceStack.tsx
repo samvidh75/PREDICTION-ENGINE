@@ -36,7 +36,7 @@ export function EvidenceStack({ items, className = "" }: EvidenceStackProps) {
               <span className="text-xs text-[#8B949E]">{item.label}</span>
               <span className={`flex items-center gap-1.5 text-xs font-medium ${valueClass}`}>
                 {item.status && <span className={`h-1 w-1 rounded-full ${dotClass}`} />}
-                {item.value || "Pending"}
+                {item.value || "Not enough information"}
               </span>
             </div>
           );

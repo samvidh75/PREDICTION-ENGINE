@@ -21,7 +21,7 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <ProductShell nav={false}>
+    <ProductShell>
       <TopNav />
       <ProductPage className="grid min-h-[calc(100vh-4rem)] items-center gap-4 md:grid-cols-[0.95fr_440px]" as="section">
         <div className="space-y-5">

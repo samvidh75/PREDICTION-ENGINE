@@ -25,9 +25,9 @@ export const HealthometerDisplay: React.FC<HealthometerDisplayProps> = ({ status
         return {
           color: "#525252",
           label: "STABLE CORE BOUNDARIES",
-          bg: "bg-neutral-50",
-          border: "border-neutral-200",
-          icon: <ShieldCheck className="w-5 h-5 text-neutral-500" />,
+          bg: "bg-[#111827]",
+          border: "border-[rgba(148,163,184,0.16)]",
+          icon: <ShieldCheck className="w-5 h-5 text-[#64748B]" />,
           description: "Enterprise operations track standard parameters with robust margin reserves."
         };
       case "WEAKENING":
@@ -53,17 +53,17 @@ export const HealthometerDisplay: React.FC<HealthometerDisplayProps> = ({ status
   }, [status]);
 
   return (
-    <div className="bg-white border border-[#E5E5E5] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-5 select-none">
+    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-5 select-none">
       
       {/* Title */}
-      <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+      <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <Cpu className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#0A0A0A]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
             Healthometer Deep-Scan Layer
           </span>
         </div>
-        <span className="font-mono text-[9px] text-neutral-400">
+        <span className="font-mono text-[9px] text-[#9AA7B5]">
           SYS.SCAN: ~150 METRIC RUNS
         </span>
       </div>
@@ -82,13 +82,13 @@ export const HealthometerDisplay: React.FC<HealthometerDisplayProps> = ({ status
           </span>
         </div>
         
-        <p className="text-[13px] leading-relaxed text-[#525252]">
+        <p className="text-[13px] leading-relaxed text-[#9AA7B5]">
           {healthMeta.description}
         </p>
       </div>
 
       {/* Subtext info */}
-      <div className="font-mono text-[9px] text-neutral-400 text-center tracking-widest uppercase">
+      <div className="font-mono text-[9px] text-[#9AA7B5] text-center tracking-widest uppercase">
         ADVISORY EXCLUDED // COMPLIANCE MATRIX SAFE
       </div>
 

@@ -16,7 +16,7 @@ export function getFinancialCompleteness(
   pb: number | null,
 ): CompletenessResult {
   const present = [revenueGrowth, profitGrowth, epsGrowth, pe, pb].filter((v) => v !== null).length;
-  if (present >= 4) return { hasData: true, label: "Sufficient", fallbackCopy: "Good financial data coverage." };
+  if (present >= 4) return { hasData: true, label: "Sufficient", fallbackCopy: "Good financial context available for this company." };
   if (present >= 2) return { hasData: true, label: "Partial", fallbackCopy: "Limited financial context available for this company." };
   return { hasData: false, label: "Limited", fallbackCopy: "Limited financial context available for this company." };
 }
@@ -86,9 +86,9 @@ export function hasUsefulHistory(snapshot: CompanyFinancialSnapshot | null): boo
 export function getCompletenessLabel(snapshot: CompanyFinancialSnapshot | null): string {
   if (!snapshot) return "Research signals pending";
   const score = snapshot.completenessScore;
-  if (score >= 70) return "Good data coverage";
-  if (score >= 40) return "Partial data coverage";
-  return "Limited data coverage";
+  if (score >= 70) return "Good research context";
+  if (score >= 40) return "Partial research context";
+  return "Limited research context";
 }
 
 export function shouldRenderSection(hasData: boolean, snapshot: CompanyFinancialSnapshot | null, sectionCheck: (s: CompanyFinancialSnapshot | null) => boolean): boolean {

@@ -28,11 +28,11 @@ interface SourceAuditSheetProps {
 
 export function SourceAuditSheet({ open, onClose, symbol, providers, dataSources, evidence, className = "" }: SourceAuditSheetProps) {
   return (
-    <IntelligenceModal open={open} onClose={onClose} title={`Source audit — ${symbol}`} subtitle="Data sources, provider health, and evidence freshness for this symbol.">
+    <IntelligenceModal open={open} onClose={onClose} title={`Source audit — ${symbol}`} subtitle="Data sources and evidence recency for this symbol.">
       <div className={`space-y-5 ${className}`}>
         {providers && providers.length > 0 && (
           <div>
-            <span className="text-[11px] font-medium uppercase tracking-wider text-[#8B949E]">Providers</span>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-[#8B949E]">Data sources</span>
             <div className="mt-2 divide-y divide-white/5 rounded-xl border border-white/5 bg-white/[0.02]">
               {providers.map((p) => (
                 <div key={p.name} className="flex items-center justify-between gap-3 px-3 py-2.5">
@@ -69,8 +69,8 @@ export function SourceAuditSheet({ open, onClose, symbol, providers, dataSources
 
         {(!providers || providers.length === 0) && (!dataSources || dataSources.length === 0) && (!evidence || evidence.length === 0) && (
           <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-center">
-            <p className="text-sm font-medium text-[#8B949E]">Audit information pending</p>
-            <p className="mt-1 text-xs text-[#484F58]">Source metadata will appear once provider health data and input lineage are available for {symbol}.</p>
+            <p className="text-sm font-medium text-[#8B949E]">Audit information not yet available</p>
+            <p className="mt-1 text-xs text-[#484F58]">Source information will appear once research context data is available for {symbol}.</p>
           </div>
         )}
       </div>

@@ -252,7 +252,7 @@ export const StockCompare: React.FC = () => {
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-4">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent" />
-            <span className="text-sm font-semibold text-cyan-400 uppercase animate-pulse">Analyzing...</span>
+            <span className="text-sm font-semibold text-[#9AA7B5]">Preparing research context...</span>
           </div>
         </div>
       )}

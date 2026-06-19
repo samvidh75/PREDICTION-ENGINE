@@ -241,7 +241,7 @@ export default function PortfolioDoctor() {
     return (
       <div className="p-8 text-center">
         <div className="inline-block w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 font-bold uppercase text-sm text-gray-600">Analyzing portfolio...</p>
+        <p className="mt-4 font-bold uppercase text-sm text-[#64748B]">Analyzing portfolio...</p>
       </div>
     );
   }

@@ -222,7 +222,7 @@ export const SearchPage: React.FC = () => {
                               {score !== null ? (
                                 <ProductStatusPill tone="verified">{Math.round(score)}</ProductStatusPill>
                               ) : (
-                                <ProductStatusPill tone="muted">Pending</ProductStatusPill>
+                                <ProductStatusPill tone="muted">Not enough information</ProductStatusPill>
                               )}
                             </div>
                             <p className="mt-0.5 truncate text-xs text-[#9AA7B5]">{stock.companyName}</p>
@@ -231,7 +231,7 @@ export const SearchPage: React.FC = () => {
                                 <span className="truncate text-[10px] font-medium text-[#64748B]">{stock.sector}</span>
                               )}
                               <ProductStatusPill tone={predictionDate ? "blue" : "muted"}>
-                                {predictionDate ? formatFreshness(predictionDate) : "Research signals pending"}
+                                {predictionDate ? formatFreshness(predictionDate) : "Research signals not yet available"}
                               </ProductStatusPill>
                               {confidenceScore !== null && (
                                 <ProductStatusPill tone="blue">{Math.round(confidenceScore)}% confidence</ProductStatusPill>

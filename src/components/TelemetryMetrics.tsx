@@ -49,34 +49,34 @@ export const TelemetryMetrics: React.FC<TelemetryMetricsProps> = ({
   const isUnderValued = peVariance < 0;
 
   return (
-    <div className="bg-white border border-[#E5E5E5] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-6 select-none">
+    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-6 select-none">
       
       {/* 1. Bilingual Market Capitalization Metadata Block */}
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
           <Scale className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[11px] font-mono font-medium tracking-wider text-[#525252] uppercase">
+          <span className="text-[11px] font-mono font-medium tracking-wider text-[#9AA7B5] uppercase">
             Bilingual Market Cap Telemetry
           </span>
         </div>
 
-        <div className="p-4 bg-[#FAFAFA] border border-[#E5E5E5] space-y-2">
+        <div className="p-4 bg-[#0D1117] border border-[rgba(148,163,184,0.16)] space-y-2">
           <div className="flex flex-col">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-[#9AA7B5] uppercase tracking-widest">
               Numeric Representation:
             </span>
-            <span className="text-xl font-bold text-neutral-900 font-mono mt-0.5">
+            <span className="text-xl font-bold text-[#E6EDF3] font-mono mt-0.5">
               {formattedCapNumeric}
             </span>
           </div>
 
-          <div className="h-[1px] bg-neutral-200" />
+          <div className="h-[1px] bg-[rgba(148,163,184,0.16)]" />
 
           <div className="flex flex-col">
-            <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-[#9AA7B5] uppercase tracking-widest">
               Traditional Indian Nomenclature:
             </span>
-            <span className="text-[13px] font-medium text-[#525252] leading-tight mt-0.5">
+            <span className="text-[13px] font-medium text-[#9AA7B5] leading-tight mt-0.5">
               {formattedCapVerbal}
             </span>
           </div>
@@ -87,26 +87,26 @@ export const TelemetryMetrics: React.FC<TelemetryMetricsProps> = ({
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
           <TrendingUp className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[11px] font-mono font-medium tracking-wider text-[#525252] uppercase">
+          <span className="text-[11px] font-mono font-medium tracking-wider text-[#9AA7B5] uppercase">
             Industry P/E Comparator Loop
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-[#FAFAFA] border border-[#E5E5E5]">
-            <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">
+          <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+            <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
               Asset P/E
             </span>
-            <span className="text-lg font-bold text-[#0A0A0A] font-mono block mt-1">
+            <span className="text-lg font-bold text-[#E6EDF3] font-mono block mt-1">
               {peStock.toFixed(2)}
             </span>
           </div>
           
-          <div className="p-3 bg-[#FAFAFA] border border-[#E5E5E5]">
-            <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">
+          <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+            <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
               Industry P/E
             </span>
-            <span className="text-lg font-bold text-[#0A0A0A] font-mono block mt-1">
+            <span className="text-lg font-bold text-[#E6EDF3] font-mono block mt-1">
               {peIndustry.toFixed(2)}
             </span>
           </div>

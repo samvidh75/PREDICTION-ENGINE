@@ -12,12 +12,6 @@ import ConfirmDialog from '../components/ui/ConfirmDialog';
 import { useToast } from '../components/feedback/useToast';
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from '../components/product/ProductUI';
 
-function statusClass(status: 'real' | 'partial' | 'unavailable'): string {
-  if (status === 'real') return 'text-[#16A34A]';
-  if (status === 'partial') return 'text-[#F59E0B]';
-  return 'text-[#64748B]';
-}
-
 function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string {
   if (severity === 'attention') return 'border-[#EF4444]/30 bg-[rgba(239,68,68,0.06)] text-[#EF4444]';
   if (severity === 'review') return 'border-[#F59E0B]/30 bg-[rgba(245,158,11,0.06)] text-[#F59E0B]';
@@ -25,7 +19,7 @@ function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string 
 }
 
 function thesisStatus(holding: PortfolioHoldingReview): { label: string; dot: string } {
-  if (holding.gainLossPct === null) return { label: 'Pending', dot: '#64748B' };
+  if (holding.gainLossPct === null) return { label: 'Awaiting outcome', dot: '#64748B' };
   if (holding.gainLossPct >= 30) return { label: 'Matured', dot: '#16A34A' };
   if (holding.gainLossPct >= 10) return { label: 'Progressing', dot: '#16A34A' };
   if (holding.gainLossPct >= 0) return { label: 'Early', dot: '#2962FF' };

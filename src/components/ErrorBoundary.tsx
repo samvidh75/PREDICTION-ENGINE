@@ -72,14 +72,14 @@ export class ErrorBoundary extends Component<Props, State> {
       const currentRetry = this.state.retryCount;
 
       return (
-        <div className="bg-white border border-[#E5E5E5] rounded-none p-6">
+        <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-[#D946EF]" strokeWidth={2} />
             <div className="flex flex-col gap-1">
-              <h3 className="font-mono text-sm font-semibold text-[#0A0A0A] uppercase">
+              <h3 className="font-mono text-sm font-semibold text-[#E6EDF3] uppercase">
                 Live market data is currently refreshing
               </h3>
-              <p className="text-xs text-[#525252]">
+              <p className="text-xs text-[#9AA7B5]">
                 Displaying last verified intelligence snapshot.
               </p>
               <p className="text-[9px] text-[#888888] font-mono mt-1">

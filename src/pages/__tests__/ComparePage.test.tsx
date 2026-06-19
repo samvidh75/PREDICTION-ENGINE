@@ -106,9 +106,9 @@ describe('ComparePage empty state', () => {
     render(<LayoutProvider><ComparePage /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Lower risk score')).toBeInTheDocument();
-      expect(screen.queryByText('Higher risk')).not.toBeInTheDocument();
-      expect(screen.getByText('Highest research score')).toBeInTheDocument();
+      expect(screen.getByText('Risk')).toBeInTheDocument();
+      expect(screen.getByText('Quality')).toBeInTheDocument();
+      expect(screen.getByText('AAA has a significantly lower risk score (22) compared to BBB (58).')).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 });

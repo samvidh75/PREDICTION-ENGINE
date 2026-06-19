@@ -24,7 +24,7 @@ export default function ProviderStatusCard({ name, status, className = "" }: Pro
       return { dot: "bg-amber-400", text: "text-amber-700", bg: "bg-amber-50 border-amber-200/40" };
     if (s === "unhealthy" || s === "disconnected" || s === "unavailable")
       return { dot: "bg-rose-400", text: "text-rose-700", bg: "bg-rose-50 border-rose-200/40" };
-    return { dot: "bg-slate-300", text: "text-ink-muted", bg: "bg-white/60 border-white/30" };
+    return { dot: "bg-slate-300", text: "text-ink-muted", bg: "bg-[#0D1117]/60 border-white/30" };
   })();
 
   return (

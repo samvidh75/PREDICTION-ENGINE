@@ -10,8 +10,8 @@ interface EmptyStateProps {
 
 export default function EmptyState({ title, description, action, icon }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl bg-white/50 backdrop-blur-sm border border-white/30 px-8 py-12 text-center">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 border border-white/40 shadow-sm">
+    <div className="flex flex-col items-center justify-center rounded-2xl bg-[#0D1117]/50 backdrop-blur-sm border border-white/30 px-8 py-12 text-center">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0D1117]/70 border border-white/40 shadow-sm">
         {icon || <FileSearch className="h-5 w-5 text-ink-muted" />}
       </div>
       <h3 className="text-base font-semibold text-ink">{title}</h3>
