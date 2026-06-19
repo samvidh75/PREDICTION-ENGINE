@@ -3,6 +3,16 @@ import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriang
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
+import { HelpPopover } from "../ui/HelpPopover";
+import { signalToneToStatusColor, toneToSeverityClass } from "../../lib/research/researchSignalModel";
+
+function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
+  if (score === null) return null;
+  if (score >= 75) return { label: "High conviction research case", color: "#16A34A", toneClass: "status-dot-active" };
+  if (score >= 55) return { label: "Worth researching", color: "#2962FF", toneClass: "status-dot-active" };
+  if (score >= 40) return { label: "Track", color: "#F59E0B", toneClass: "status-dot-partial" };
+  return { label: "Needs review", color: "#EF4444", toneClass: "status-dot-blocked" };
+}
 
 const SCANNER_PRESETS = [
   { label: "Quality compounders", icon: Shield, filters: { qualityMin: 70, growthMin: 60 } },
@@ -32,10 +42,16 @@ const SORT_OPTIONS = [
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="h-8 w-full rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2 text-[11px] text-[#E6EDF3] outline-none">
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
+      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{label}</label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-full cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-1.5 pr-8 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
+        >
+          {options.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+      </div>
     </div>
   );
 }
@@ -43,7 +59,7 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h4 className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748B]">{title}</h4>
+      <h4 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#64748B]">{title}</h4>
       {children}
     </div>
   );
@@ -72,10 +88,21 @@ export default function ScannerPage() {
     dividendYield: "Any",
   });
 
-  // Derive sectors from real data only
+  // Derive sectors from real data only, excluding pending/not available
   const sectors = useMemo(() => {
     const set = new Set<string>();
-    allEntries.forEach((r) => { if (r.sector && r.sector.trim().length > 0) set.add(r.sector); });
+    allEntries.forEach((r) => {
+      const sec = r.sector?.trim();
+      if (
+        sec &&
+        sec.toLowerCase() !== "not available" &&
+        sec.toLowerCase() !== "sector pending" &&
+        sec.toLowerCase() !== "unavailable" &&
+        sec.toLowerCase() !== "pending"
+      ) {
+        set.add(sec);
+      }
+    });
     return Array.from(set);
   }, [allEntries]);
 
@@ -223,9 +250,22 @@ export default function ScannerPage() {
       <ProductPage>
         <div className="flex flex-col gap-5">
           {/* Header */}
-          <div>
-            <h1 className="text-xl font-semibold text-[#E6EDF3]">Company scanner</h1>
-            <p className="mt-1 text-sm text-[#9AA7B5]">Find companies worth researching. Search by name, browse by strategy, or filter by fundamentals.</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-xl font-semibold text-[#E6EDF3]">Company scanner</h1>
+              <p className="mt-1 text-sm text-[#9AA7B5]">Find companies worth researching. Search by name, browse by strategy, or filter by fundamentals.</p>
+            </div>
+            <div className="hidden sm:block shrink-0">
+              <HelpPopover title="How to use the scanner" storageKey="scanner-help-dismissed">
+                <ul className="list-inside space-y-1.5">
+                  <li>• Select a strategy preset to scan by research theme</li>
+                  <li>• Search by symbol, company name, or sector</li>
+                  <li>• Use filters to narrow by score, valuation, or growth</li>
+                  <li>• Click Research to open a company's full thesis</li>
+                  <li>• Use Compare to evaluate companies side by side</li>
+                </ul>
+              </HelpPopover>
+            </div>
           </div>
 
           {/* Command-style search */}
@@ -292,16 +332,18 @@ export default function ScannerPage() {
               {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
             <div className="hidden md:flex items-center gap-1.5">
-              <span className="text-[10px] text-[#64748B] font-medium uppercase tracking-wider">Sort</span>
-              <select
-                value={sortValue}
-                onChange={(e) => setSortValue(e.target.value)}
-                className="h-7 rounded-md border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2 text-[11px] text-[#E6EDF3] outline-none"
-              >
-                {SORT_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider">Sort</span>
+              <div className="relative">
+                <select
+                  value={sortValue}
+                  onChange={(e) => setSortValue(e.target.value)}
+                  className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-2.5 py-1 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
+                >
+                  {SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="hidden md:block flex-1" />
             {!loading && (
@@ -357,6 +399,8 @@ export default function ScannerPage() {
                 const convTone = convictionTone(entry);
                 const risky = hasRiskFlag(entry);
                 const sector = item.sector;
+                const signalInfo = scannerSignalLabel(score);
+                const signalColor = signalInfo?.color ?? "#64748B";
                 return (
                   <ProductPanel key={fullSymbol} as="article" className="p-4">
                     <div className="flex items-start justify-between gap-3">
@@ -375,14 +419,17 @@ export default function ScannerPage() {
                           {sector && (
                             <span className="rounded-sm bg-[rgba(148,163,184,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">{sector}</span>
                           )}
-                          {convLabel && (
-                            <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
+                          {signalInfo && (
+                            <span className="inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${signalColor}33`, backgroundColor: `${signalColor}15`, color: signalColor }}>
+                              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
+                              {signalInfo.label}
+                            </span>
                           )}
                           {score !== null && (
                             <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
                           )}
                           {risky && (
-                            <ProductStatusPill tone="warning">Risk flag</ProductStatusPill>
+                            <ProductStatusPill tone="warning">Risk rising</ProductStatusPill>
                           )}
                         </div>
                         {item.keyReason && (

@@ -47,7 +47,7 @@ export const MobileNav: React.FC = () => {
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
     { page: "scanner", label: "Scanner", icon: <Search className="icon-nav" /> },
-    { page: "about", label: "About", icon: <Info className="icon-nav" /> },
+    { page: "about", label: "Product", icon: <Info className="icon-nav" /> },
     { page: "login", label: "Sign in", icon: <LogIn className="icon-nav" /> },
   ];
 

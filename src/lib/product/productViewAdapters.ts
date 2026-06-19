@@ -32,11 +32,11 @@ function scoreLabel(score: number | null): string {
 }
 
 function convictionLabel(score: number | null, confidence: number | null): string {
-  if (score === null) return "Needs research";
+  if (score === null) return "";
   if (score >= 75 && (confidence === null || confidence >= 60)) return "High conviction";
   if (score >= 55) return "Moderate conviction";
-  if (score >= 40) return "Needs review";
-  return "Needs research";
+  if (score >= 40) return "Developing";
+  return "";
 }
 
 function leadingFactor(entry: LeaderboardEntry): string {
@@ -57,10 +57,26 @@ function leadingFactor(entry: LeaderboardEntry): string {
   return `${label[factors[0].key] ?? "Research"} is the clearest current signal`;
 }
 
+function cleanSectorName(sec: string | null | undefined): string {
+  if (!sec) return "";
+  const cleaned = sec.trim();
+  const lower = cleaned.toLowerCase();
+  if (
+    lower === "sector pending" ||
+    lower === "not available" ||
+    lower === "unavailable" ||
+    lower === "pending" ||
+    lower === "none"
+  ) {
+    return "";
+  }
+  return cleaned;
+}
+
 export function leaderboardEntryToResearchListItem(entry: LeaderboardEntry): ResearchListItem {
   const score = cleanNumber(entry.rankingScore);
   const confidence = cleanNumber(entry.confidenceScore);
-  const sector = cleanText(entry.sector, "");
+  const sector = cleanSectorName(entry.sector);
   const risk = cleanNumber(entry.factors.risk);
 
   return {
@@ -71,7 +87,7 @@ export function leaderboardEntryToResearchListItem(entry: LeaderboardEntry): Res
     score: scoreLabel(score),
     thesis: score === null
       ? ""
-      : `${sector || "Company"} with ${convictionLabel(score, confidence).toLowerCase()} context.`,
+      : convictionLabel(score, confidence) ? `${sector || ""} with ${convictionLabel(score, confidence).toLowerCase()} context.` : "",
     keyReason: leadingFactor(entry),
     riskMarker: risk !== null && risk < 40 ? "Risk rising" : "",
   };
@@ -131,18 +147,36 @@ export function alertChangeToResearchAlert(alert: AlertChangeView): ResearchAler
 }
 
 export function scannerResultToResearchListItem(result: ScannerResultView): ResearchListItem {
-  const sector = result.sector ?? "";
-  const cleanSector = sector.trim().length > 0 ? sector : "";
+  const sector = cleanSectorName(result.sector);
+  const cleanedThesis = cleanThesisLine(result.oneLineThesis, sector);
   return {
     symbol: result.symbol,
     company: result.companyName,
-    sector: cleanSector,
+    sector,
     conviction: result.conviction,
     score: scoreLabel(result.score),
-    thesis: result.oneLineThesis,
+    thesis: cleanedThesis,
     keyReason: result.keyReason,
     riskMarker: result.riskMarker ?? "",
   };
+}
+
+function cleanThesisLine(thesis: string, sector: string): string {
+  if (!thesis) return "";
+  const lower = thesis.toLowerCase();
+  if (
+    lower.includes("sector pending") ||
+    lower.includes("not available") ||
+    lower.includes("unavailable")
+  ) {
+    if (sector) {
+      return thesis.replace(/sector pending|not available|unavailable/gi, sector);
+    }
+    const score = thesis.match(/\b(\d+)\b/);
+    if (score) return `Moderate conviction research case.`;
+    return "Research signals pending.";
+  }
+  return thesis;
 }
 
 export function thesisToStatusText(thesis: CompanyThesisView): string {

@@ -11,6 +11,9 @@ import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, formatScore } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import ThesisHealthMeter from "../components/research/ThesisHealthMeter";
+import FactorScorePanel from "../components/research/FactorScorePanel";
+import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -91,12 +94,12 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
   if (data.status === "unavailable" || !payload) {
     return {
       apiStatus: "unavailable",
-      unavailableReason: data.reason ?? data.code ?? "PREDICTION_NOT_FOUND",
-      unavailableMessage: data.message ?? "No production prediction snapshot is available for this company.",
+      unavailableReason: null,
+      unavailableMessage: "Research signals pending — not enough data inputs for a reliable research case.",
       dataState: data.dataState ?? null,
       confidence: "Unavailable", healthScore: null, rankingScore: null, classification: null,
       growth: null, quality: null, stability: null, valuation: null, momentum: null, risk: null,
-      narrative: data.message ?? "No production prediction snapshot is available for this company.",
+      narrative: "Research signals pending — not enough data inputs for a reliable research case.",
       factors: {}, financials: financialsObj || {},
       engineDetails: {
         growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Factor scoring details are pending." },
@@ -105,7 +108,7 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
         momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Factor scoring details are pending." },
         valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Factor scoring details are pending." },
         risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Factor scoring details are pending." },
-        confidence: { level: "Unavailable", score: null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "No confidence score is shown because the prediction system did not provide a usable production snapshot." },
+        confidence: { level: "Unavailable", score: null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Research signals pending due to insufficient data." },
       },
     };
   }
@@ -191,6 +194,8 @@ export const StockStoryPage: React.FC = () => {
     return adaptStockStoryResponse(story, financials);
   }, [story, financials]);
   const storyUnavailable = !story || storyData?.apiStatus === "unavailable";
+  const signal = useMemo(() => computeSignalFromStoryData(storyData), [storyData]);
+  const factorView = useMemo(() => storyDataToFactorScoresView(storyData), [storyData]);
   const isInWatchlist = useMemo(() => watchlists.some((w) => w.tickers.includes(ticker)), [watchlists, ticker]);
 
   const relatedCompanies = useMemo(() => {
@@ -265,8 +270,8 @@ export const StockStoryPage: React.FC = () => {
                 <span>{ticker}</span><span>•</span><span>{exchange !== "Insufficient information" ? exchange : "NSE / BSE"}</span><span>•</span><span>{currency}</span>
               </div>
               <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-[#E6EDF3] md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5]">
-                Company not indexed yet
+              <div className="mt-3 inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
+                Research signals pending
               </div>
             </div>
             <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3.5">
@@ -285,10 +290,10 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl border border-[#b8860b]/30 bg-[rgba(184,134,11,0.08)] p-4 text-[#b8860b]">
-            <h3 className="text-sm font-semibold text-[#E6EDF3]">Why scoring is unavailable</h3>
+          <div className="mt-6 rounded-xl border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.08)] p-4">
+            <h3 className="text-sm font-semibold text-[#E6EDF3]">Research signals pending</h3>
             <p className="mt-2 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
-              This company is recognised but verified scoring factors are not yet ready. Live quotes may still appear when market data is available.
+              Research signals pending — not enough data inputs for a reliable research case. Track this company to review changes over time.
             </p>
           </div>
 
@@ -402,6 +407,9 @@ export const StockStoryPage: React.FC = () => {
         </div>
 
         <div className="mt-5 pt-4 border-t border-white/[0.06]">
+          <div className="mb-4">
+            <ThesisHealthMeter signal={signal} size="md" showDetails={true} />
+          </div>
           <div className="text-[9px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-[#8B949E]">
             <Activity className="h-3 w-3" /> Explanation
           </div>
@@ -409,7 +417,7 @@ export const StockStoryPage: React.FC = () => {
           <p className="mt-3 max-w-5xl rounded-lg border border-white/[0.06] bg-white/[0.03] p-3 text-[11px] leading-relaxed text-[#8B949E]">
             Research signals are for informational purposes only. Not personalised investment advice.
           </p>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => setExplanationModalOpen(true)}
@@ -418,6 +426,11 @@ export const StockStoryPage: React.FC = () => {
               <Activity className="mr-1.5 inline h-3 w-3" aria-hidden="true" />
               Open full explanation
             </button>
+            {signal && signal.action !== "Continue with broker" && (
+              <span className="rounded-lg border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.08)] px-3 py-1.5 text-[10px] font-semibold text-[#2962FF]">
+                Next: {signal.action}
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -494,28 +507,7 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
             <div className="space-y-4">
-              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
-                <h2 className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Factor Scores</h2>
-                <div className="space-y-3">
-                  {[
-                    { label: "Quality", value: storyData.quality, key: "quality" },
-                    { label: "Growth", value: storyData.growth, key: "growth" },
-                    { label: "Stability", value: storyData.stability, key: "stability" },
-                    { label: "Momentum", value: storyData.momentum, key: "momentum" },
-                    { label: "Valuation", value: storyData.valuation, key: "valuation" },
-                  ].map((f) => (
-                    <div key={f.key}>
-                      <div className="flex justify-between text-[11px]">
-                        <span className="text-[#9AA7B5]">{f.label}</span>
-                        <span className="font-mono font-semibold tabular-nums text-[#E6EDF3]">{f.value != null ? `${Math.round(f.value)}` : "—"}</span>
-                      </div>
-                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
-                        <div className="h-full rounded-full bg-[#2962FF] transition-all" style={{ width: f.value != null ? `${f.value}%` : "0%" }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <FactorScorePanel factors={factorView} />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
                   <Building2 className="h-3.5 w-3.5" /> Profile

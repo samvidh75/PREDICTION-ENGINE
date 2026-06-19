@@ -1,23 +1,23 @@
 export function formatNumber(val: number | string | null | undefined): string {
-  if (val === null || val === undefined || val === "") return "Unavailable";
+  if (val === null || val === undefined || val === "") return "—";
   const num = Number(val);
-  if (isNaN(num) || !isFinite(num)) return "Unavailable";
+  if (isNaN(num) || !isFinite(num)) return "—";
   return num.toLocaleString("en-IN");
 }
 
 export function formatPercentage(val: number | string | null | undefined): string {
-  if (val === null || val === undefined || val === "") return "Unavailable";
+  if (val === null || val === undefined || val === "") return "—";
   const num = Number(val);
-  if (isNaN(num) || !isFinite(num)) return "Unavailable";
+  if (isNaN(num) || !isFinite(num)) return "—";
   const sign = num > 0 ? "+" : "";
   const finalVal = Math.abs(num) < 1.0 && num !== 0 ? num * 100 : num;
   return `${sign}${finalVal.toFixed(2)}%`;
 }
 
 export function formatINR(val: number | string | null | undefined, compact = false): string {
-  if (val === null || val === undefined || val === "") return "Unavailable";
+  if (val === null || val === undefined || val === "") return "—";
   const num = Number(val);
-  if (isNaN(num) || !isFinite(num)) return "Unavailable";
+  if (isNaN(num) || !isFinite(num)) return "—";
 
   if (compact) {
     if (num >= 10000000) {

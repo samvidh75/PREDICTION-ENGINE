@@ -8,7 +8,7 @@ import { ProductAction, ProductFormPanel, ProductPage, ProductProofPanel, Produc
 export const LoginPage: React.FC = () => {
   const returnToParam = useMemo(() => new URLSearchParams(window.location.search).get("returnTo"), []);
   const safeReturnTo = useMemo(() => sanitizeReturnTo(returnToParam), [returnToParam]);
-  const contextMessage = useMemo(() => getReturnToContext(returnToParam), [returnToParam]);
+  const contextMessage = useMemo(() => getReturnToContext(returnToParam, false), [returnToParam]);
 
   const onAuthed = () => {
     if (safeReturnTo) {

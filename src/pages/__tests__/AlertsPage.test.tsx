@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import AlertsPage from '../AlertsPage';
 import { LayoutProvider } from '../../context/LayoutContext';
 import { hasBackendVocabulary, hasForbiddenTradingLanguage, hasRenderGarbage } from '../../lib/compliance/forbiddenCopyAudit';
@@ -21,15 +21,27 @@ describe('AlertsPage', () => {
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders alert categories in panel', () => {
+  it('renders alert categories in panel', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, data: [] })
+    }));
     renderWithProviders(<AlertsPage />);
-    expect(screen.getByText(/Track a company to review important changes/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Track a company to review important changes/)).toBeInTheDocument();
+    });
   });
 
-  it('renders action buttons', () => {
+  it('renders action buttons', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, data: [] })
+    }));
     renderWithProviders(<AlertsPage />);
-    expect(screen.getByText('Open scanner')).toBeInTheDocument();
-    expect(screen.getByText('Search company')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Open scanner')).toBeInTheDocument();
+      expect(screen.getByText('Search company')).toBeInTheDocument();
+    });
   });
 
   it('contains no backend/provider vocabulary', () => {

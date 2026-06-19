@@ -121,19 +121,20 @@ export function sanitizeReturnTo(returnTo: string | null): string | null {
 /**
  * Get a human-readable context message for the auth page based on the returnTo URL.
  */
-export function getReturnToContext(returnTo: string | null): string | null {
+export function getReturnToContext(returnTo: string | null, isSignup = false): string | null {
   if (!returnTo) return null;
   try {
     const params = new URLSearchParams(returnTo.replace(/^\?/, ""));
     const targetPage = params.get("page");
     const symbol = params.get("id") || params.get("symbol");
+    const action = isSignup ? "Create an account" : "Sign in";
     if (targetPage === "company" || targetPage === "stock") {
-      return symbol ? `Sign in to open research for ${symbol.toUpperCase()}.` : "Sign in to open this research view.";
+      return symbol ? `${action} to continue researching ${symbol.toUpperCase()}.` : `${action} to continue your research.`;
     }
-    if (targetPage === "portfolio") return "Sign in to view your portfolio.";
-    if (targetPage === "watchlist") return "Sign in to manage your watchlist.";
-    if (targetPage === "dashboard") return "Sign in to access your dashboard.";
-    return "Sign in to continue using StockStory India.";
+    if (targetPage === "portfolio") return `${action} to view your portfolio.`;
+    if (targetPage === "watchlist") return `${action} to manage your watchlist.`;
+    if (targetPage === "dashboard") return `${action} to access your dashboard.`;
+    return `${action} to continue your research.`;
   } catch {
     return null;
   }

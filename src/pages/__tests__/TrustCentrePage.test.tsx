@@ -14,19 +14,19 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe('TrustCentrePage (Research Standards)', () => {
-  it('renders Methodology heading', () => {
+  it('renders Research Standards heading', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Methodology')).toBeInTheDocument();
+    expect(screen.getAllByText('Research Standards')[0]).toBeInTheDocument();
   });
 
   it('renders methodology sections', () => {
     renderWithProviders(<TrustCentrePage />);
     expect(screen.getByText('How StockStory Evaluates Businesses')).toBeInTheDocument();
-    expect(screen.getByText('How to Interpret Conviction')).toBeInTheDocument();
-    expect(screen.getByText('Why Research Is Not a Guarantee')).toBeInTheDocument();
-    expect(screen.getByText('How to Use the Product Responsibly')).toBeInTheDocument();
+    expect(screen.getByText('Score Interpretation & Conviction Dimensions')).toBeInTheDocument();
+    expect(screen.getByText('Why We Do Not Issue Buy, Sell, or Hold Calls')).toBeInTheDocument();
+    expect(screen.getByText('Missing Data and Omissions')).toBeInTheDocument();
     expect(screen.getByText('Why Final Execution Happens Through Brokers')).toBeInTheDocument();
-    expect(screen.getByText('Compliance Statement')).toBeInTheDocument();
+    expect(screen.getByText('Compliance Statement & SEBI Disclaimer')).toBeInTheDocument();
   });
 
   it('renders score dimensions', () => {

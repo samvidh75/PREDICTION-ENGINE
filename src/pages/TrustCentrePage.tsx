@@ -11,8 +11,8 @@ const sections = [
   },
   {
     icon: BarChart3,
-    title: "How to Interpret Conviction",
-    body: null,
+    title: "Score Interpretation & Conviction Dimensions",
+    body: "Each company is assigned an overall Research Score from 0 to 100 based on its performance across our core dimensions. We evaluate information across six key vectors:",
     subsections: [
       { label: "Quality", detail: "How efficiently the company generates returns on capital. Considers profitability, margins, and asset efficiency." },
       { label: "Growth", detail: "Revenue, earnings, and cash flow trajectory over time. Captures both historical trends and forward signals." },
@@ -23,14 +23,9 @@ const sections = [
     ]
   },
   {
-    icon: BookOpen,
-    title: "Why Research Is Not a Guarantee",
-    body: "Research scores are designed to help you understand, compare, and review companies more systematically. Use them as a starting point — a structured lens, not a verdict. Scores reflect a snapshot of available information evaluated against a consistent standard. Always conduct your own due diligence before making any investment decision. Past research does not guarantee future outcomes."
-  },
-  {
     icon: Shield,
-    title: "How to Use the Product Responsibly",
-    body: "StockStory is committed to research integrity. Scores are computed from observable data through documented methodology. No fabricated values are introduced. When information is unavailable, the score reflects that honestly. The same evaluation framework is applied uniformly across all companies, allowing for fair comparison and informed review. Always verify key facts independently."
+    title: "Why We Do Not Issue Buy, Sell, or Hold Calls",
+    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or guaranteed returns. We believe that investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own execution decisions through your broker."
   },
   {
     icon: BookOpen,
@@ -39,12 +34,22 @@ const sections = [
   },
   {
     icon: ArrowRightLeft,
+    title: "Why Compare Matters",
+    body: "Compare allows you to look at peer companies side-by-side on the exact same multi-factor dimensions, helping you see where one business excels or poses a higher relative risk. This neutral, standardized comparison helps remove emotional bias from your research and focuses your attention on verified metrics."
+  },
+  {
+    icon: Shield,
+    title: "Missing Data and Omissions",
+    body: "When certain financial fields are missing or not applicable (for example, debt metrics for banking institutions, or historical numbers for recently listed companies), StockStory omits them quietly to present a clean, un-fabricated view rather than using generic filler text. The overall score adjusts automatically to represent the verified data available."
+  },
+  {
+    icon: ArrowRightLeft,
     title: "Why Final Execution Happens Through Brokers",
     body: "StockStory is a research platform, not a brokerage. All trading, order placement, and portfolio execution occur through your registered broker. StockStory never stores, processes, or accesses your broker credentials. The Invest handoff prepares your research summary, but the final decision and action remain yours. This separation keeps research objective and free from execution conflicts."
   },
   {
     icon: Scale,
-    title: "Compliance Statement",
+    title: "Compliance Statement & SEBI Disclaimer",
     body: "StockStory provides research, analysis, and educational content. Nothing on this platform constitutes investment advice, a recommendation, or solicitation to buy or sell securities. All investment decisions should be made with the advice of a qualified financial professional."
   }
 ];
@@ -56,7 +61,7 @@ export const TrustCentrePage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-base font-semibold text-[#E6EDF3]">Methodology</h1>
+            <h1 className="text-base font-semibold text-[#E6EDF3]">Research Standards</h1>
           </div>
           <p className="mt-1 text-xs text-[#9AA7B5]">How StockStory thinks, evaluates businesses, and how to use the product responsibly.</p>
           <div className="mt-3 flex flex-wrap gap-2">

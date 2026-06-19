@@ -36,7 +36,7 @@ describe("sanitizeReturnTo", () => {
 describe("getReturnToContext", () => {
   it("returns stock context for company page", () => {
     const msg = getReturnToContext("?page=stock&id=RELIANCE");
-    expect(msg).toBe("Sign in to open research for RELIANCE.");
+    expect(msg).toBe("Sign in to continue researching RELIANCE.");
   });
 
   it("returns portfolio context", () => {
