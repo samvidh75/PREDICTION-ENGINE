@@ -14,6 +14,7 @@ import PublicPredictionsPage from "../pages/PublicPredictionsPage";
 import PublicRankingsPage from "../pages/PublicRankingsPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
+import TermsPage from "../pages/TermsPage";
 
 // Authenticated pages (intentional nav targets)
 import DashboardHub from "../components/dashboard/DashboardHub";
@@ -46,6 +47,7 @@ const PUBLIC_PAGES: Record<string, boolean> = {
   rankings: true,
   scanner: true,
   compare: true,
+  terms: true,
 };
 
 function renderPublicPage(pageKey: PageKey): JSX.Element {
@@ -68,6 +70,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <ScannerPage />;
     case "compare":
       return <ComparePage />;
+    case "terms":
+      return <TermsPage />;
     default:
       return <PublicLandingPage />;
   }

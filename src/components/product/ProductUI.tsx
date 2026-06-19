@@ -176,9 +176,7 @@ export function ProductLoadingLine(): JSX.Element {
 export function ProductIntegrityRow(): JSX.Element {
   return (
     <div className="flex flex-wrap gap-2">
-      <ProductStatusPill tone="verified"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Research only</ProductStatusPill>
-      <ProductStatusPill tone="warning">Absence labelled</ProductStatusPill>
-      <ProductStatusPill tone="muted">No fabricated metrics</ProductStatusPill>
+      <ProductStatusPill tone="blue"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Research workspace</ProductStatusPill>
     </div>
   );
 }

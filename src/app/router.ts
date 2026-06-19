@@ -23,7 +23,8 @@ export type PageKey =
   | "rankings"
   | "compare"
   | "alerts"
-  | "invest";
+  | "invest"
+  | "terms";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {

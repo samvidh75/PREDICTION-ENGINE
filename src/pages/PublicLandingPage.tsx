@@ -53,7 +53,7 @@ export const PublicLandingPage: React.FC = () => {
                   { label: "Approach", value: "Research-driven" },
                   { label: "Framework", value: "Multi-factor" },
                   { label: "Universe", value: "Indian equities" },
-                  { label: "Status", value: "Research, not advice" },
+                  { label: "Status", value: "Structured research" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-3 py-2">
                     <span className="text-[11px] font-medium text-[#64748B]">{item.label}</span>
@@ -140,8 +140,12 @@ export const PublicLandingPage: React.FC = () => {
 
         <footer className="mt-8 border-t border-[rgba(148,163,184,0.12)] py-6">
           <p className="text-xs leading-5 text-[#64748B]">
-            StockStory provides research and analysis for informational purposes only. It is not financial advice, a recommendation, or a solicitation of any kind. Past performance does not indicate future results. Always do your own research and consult a licensed financial advisor before making investment decisions. StockStory does not execute trades, custody funds, or have any affiliation with any broker. Information may contain errors or omissions.
+            StockStory provides research and analysis for informational purposes only. It is not financial advice, a recommendation, or a solicitation of any kind. Always do your own research before making investment decisions. StockStory does not execute trades, custody funds, or have any affiliation with any broker.
           </p>
+          <div className="mt-3 flex gap-4 text-xs">
+            <button type="button" onClick={() => productNavigate("terms")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Terms & Disclosures</button>
+            <button type="button" onClick={() => productNavigate("methodology")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Research Standards</button>
+          </div>
         </footer>
       </ProductPage>
     </ProductShell>

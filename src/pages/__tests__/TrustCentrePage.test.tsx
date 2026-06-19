@@ -41,9 +41,9 @@ describe('TrustCentrePage (Research Standards)', () => {
 
   it('renders compliance pills', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Research only')).toBeInTheDocument();
+    expect(screen.getByText('Research workspace')).toBeInTheDocument();
     expect(screen.getByText('Transparent methodology')).toBeInTheDocument();
-    expect(screen.getByText('No fabricated data')).toBeInTheDocument();
+    expect(screen.getByText('Structured factor view')).toBeInTheDocument();
   });
 
   it('renders action buttons', () => {

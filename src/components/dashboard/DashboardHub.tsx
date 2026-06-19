@@ -222,7 +222,7 @@ export const DashboardHub: React.FC = () => {
 
             <ProductPanel className="p-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#E6EDF3]"><Star className="h-4 w-4 text-[#2962FF]" aria-hidden="true" /> Portfolio thesis monitor</div>
-              <p className="mt-2 text-xs text-[#9AA7B5]">{holdings.length === 0 ? "Track thesis positions from the portfolio page. Research only." : `${holdings.length} thesis position${holdings.length === 1 ? "" : "s"} being monitored.`}</p>
+              <p className="mt-2 text-xs text-[#9AA7B5]">{holdings.length === 0 ? "Track thesis positions from the portfolio page." : `${holdings.length} thesis position${holdings.length === 1 ? "" : "s"} being monitored.`}</p>
             </ProductPanel>
 
             <button type="button" onClick={() => productNavigate("methodology")} className="flex w-full items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#0D1117] px-4 py-3 text-xs text-[#64748B] transition hover:border-[#2962FF]/40 hover:text-[#E6EDF3]">

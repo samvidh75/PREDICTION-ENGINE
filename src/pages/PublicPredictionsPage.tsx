@@ -53,7 +53,7 @@ export default function PublicPredictionsPage(): JSX.Element {
             <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Research Intelligence</span>
             <h1 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-[#E6EDF3] md:text-3xl">Score changes</h1>
             <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[#8B949E]">
-              Score changes from the latest research cycle. Research only, not investment advice.
+              Score changes from the latest research cycle.
             </p>
           </div>
         </div>

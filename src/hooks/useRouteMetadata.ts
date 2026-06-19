@@ -88,6 +88,10 @@ const ROUTE_META: Record<PageKey, RouteMeta> = {
     title: "Invest — StockStory India",
     description: "Review your research and take action through your broker. Confident decisions start here.",
   },
+  terms: {
+    title: "Terms & Disclosures — StockStory India",
+    description: "Terms and informational disclosures for the StockStory India research workspace.",
+  },
 };
 
 const BASE_URL = "https://stockstory-india.com";
