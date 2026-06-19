@@ -4,6 +4,7 @@ dotenv.config();
 
 /** Allowed CORS origins — always includes the production domain. */
 const PROD_ORIGIN = "https://stockstory-india.com";
+const PROD_WWW_ORIGIN = "https://www.stockstory-india.com";
 const DEV_ORIGINS = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -29,12 +30,12 @@ export function loadEnv(): AppEnv {
   const nodeEnv = (process.env.NODE_ENV ?? "development") as AppEnv["nodeEnv"];
   const isProduction = nodeEnv === "production";
 
-  const allowedOrigins: string[] = [PROD_ORIGIN];
+  const allowedOrigins: string[] = [PROD_ORIGIN, PROD_WWW_ORIGIN];
 
   const extraOrigins = (process.env.EXTRA_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((o) => o.trim())
-    .filter((o) => o.length > 0 && o !== PROD_ORIGIN);
+    .filter((o) => o.length > 0 && o !== PROD_ORIGIN && o !== PROD_WWW_ORIGIN);
 
   // Deduplicate
   const seen = new Set(extraOrigins);
