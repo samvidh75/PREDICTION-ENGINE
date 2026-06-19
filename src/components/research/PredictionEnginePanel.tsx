@@ -1,5 +1,5 @@
 import React from "react";
-import { Activity, ShieldAlert, CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
+import { Activity, ShieldAlert } from "lucide-react";
 import { buildPredictionViewModel } from "../../lib/product/predictionEngine/predictionViewModel";
 import { buildHealthometerViewModel } from "../../lib/product/predictionEngine/healthometerViewModel";
 import { ProductPanel, ProductStatusPill } from "../product/ProductUI";
@@ -17,29 +17,17 @@ interface PredictionEnginePanelProps {
 }
 
 export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
-  symbol,
-  score,
-  riskScore,
-  qualityScore,
-  valuationScore,
-  growthScore,
-  stabilityScore,
-  momentumScore,
-  rawMetrics,
+  symbol, score, riskScore, qualityScore, valuationScore,
+  growthScore, stabilityScore, momentumScore, rawMetrics,
 }) => {
   const model = buildPredictionViewModel(symbol, score, riskScore, rawMetrics);
   const health = buildHealthometerViewModel(
-    qualityScore,
-    valuationScore,
-    growthScore,
-    stabilityScore,
-    riskScore,
-    momentumScore
+    qualityScore, valuationScore, growthScore,
+    stabilityScore, riskScore, momentumScore
   );
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      {/* 1. Prediction Engine Panel */}
       <ProductPanel className="p-5 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-4">
@@ -54,36 +42,60 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
             <div>
               <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-1">Research Stance</span>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-[#E6EDF3]">{model.stance.stance}</span>
-                <ProductStatusPill tone={model.stance.stance === "High conviction" || model.stance.stance === "Thesis improving" ? "verified" : model.stance.stance === "Watch" ? "blue" : "warning"}>
-                  {model.isReady ? "Ready" : "Preparing context"}
+                <span className="text-lg font-bold text-[#E6EDF3]">{model.publicResearchStance}</span>
+                <ProductStatusPill tone={
+                  model.readiness === "ready" ? "verified"
+                  : model.readiness === "partial" ? "blue"
+                  : "warning"
+                }>
+                  {model.readiness === "ready" ? "Ready"
+                   : model.readiness === "partial" ? "Partial context"
+                   : "Limited"}
                 </ProductStatusPill>
               </div>
-              <p className="mt-1 text-xs text-[#9AA7B5] leading-relaxed">{model.stance.description}</p>
+              {model.overallScore !== null && (
+                <p className="mt-0.5 text-[11px] text-[#9AA7B5]">
+                  Score: {model.overallScore}/100 · {model.activeDimensionCount} of {model.totalDimensionCount} dimensions active
+                </p>
+              )}
+              {model.productSafeNote && (
+                <p className="mt-1 text-xs text-[#9AA7B5] leading-relaxed">{model.productSafeNote}</p>
+              )}
             </div>
 
-            {model.categoriesUsed.length > 0 && (
+            {model.topPositiveDrivers.length > 0 && (
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-2">Evaluated Categories</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-1">Positive drivers</span>
                 <div className="flex flex-wrap gap-1.5">
-                  {model.categoriesUsed.map((cat) => (
-                    <span key={cat} className="rounded border border-white/[0.06] bg-white/[0.02] px-2 py-0.5 text-[9px] font-mono capitalize text-[#9AA7B5]">
-                      {cat.replace("_", " ")}
-                    </span>
+                  {model.topPositiveDrivers.map((d) => (
+                    <span key={d} className="rounded border border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.06)] px-2 py-0.5 text-[9px] font-medium text-[#16A34A]">{d}</span>
                   ))}
                 </div>
               </div>
             )}
-          </div>
-        </div>
 
-        <div className="mt-6 border-t border-white/[0.04] pt-3 text-[10px] text-[#64748B] flex items-center gap-1.5">
-          <HelpCircle className="h-3.5 w-3.5" />
-          <span>Research context is based on available data.</span>
+            {model.topRiskDrivers.length > 0 && (
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-1">Risk factors</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {model.topRiskDrivers.map((d) => (
+                    <span key={d} className="rounded border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] px-2 py-0.5 text-[9px] font-medium text-[#EF4444]">{d}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {model.explanationBullets.length > 0 && (
+              <div className="text-[10px] text-[#64748B] space-y-1">
+                {model.explanationBullets.map((b, i) => (
+                  <p key={i}>{b}</p>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </ProductPanel>
 
-      {/* 2. Healthometer Panel */}
       <ProductPanel className="p-5">
         <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-4">
           <div className="flex items-center gap-2">
@@ -105,7 +117,7 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
                       {Math.round(dim.score!)}
                     </span>
                   ) : (
-                    <span className="text-[9px] text-[#64748B]">Pending</span>
+                    <span className="text-[9px] text-[#64748B]">—</span>
                   )}
                 </div>
                 <div className="mt-2 h-1 w-full rounded-full overflow-hidden bg-white/[0.06]">

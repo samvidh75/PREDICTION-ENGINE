@@ -115,18 +115,18 @@ describe('recommendationPolicy', () => {
 });
 
 describe('predictionViewModel', () => {
-  it('builds a valid view model with minimal data', () => {
+  it('builds a valid view model with real number data', () => {
     const vm = buildPredictionViewModel('RELIANCE', 75, 20, { pe: 15.5, roe: 18 });
     expect(vm.symbol).toBe('RELIANCE');
-    expect(vm.isReady).toBe(true);
+    expect(vm.readiness).toBe('partial');
     expect(vm.activeFactorCount).toBeGreaterThanOrEqual(2);
-    expect(vm.stance.stance).toBe('High conviction');
+    expect(vm.publicResearchStance).toBe('High conviction');
   });
 
-  it('returns not ready state without data', () => {
+  it('returns limited state without data', () => {
     const vm = buildPredictionViewModel('UNKNOWN', null, null, null);
-    expect(vm.isReady).toBe(false);
-    expect(vm.stance.stance).toBe('Not enough information');
+    expect(vm.readiness).toBe('limited');
+    expect(vm.publicResearchStance).toBe('Not enough information');
     expect(vm.activeFactorCount).toBe(0);
   });
 });

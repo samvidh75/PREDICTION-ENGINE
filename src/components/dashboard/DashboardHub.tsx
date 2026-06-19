@@ -46,6 +46,7 @@ function openCompany(symbol: string): void {
 }
 
 import { WorkspaceSummary } from "./WorkspaceSummary";
+import { buildDashboardViewModel } from "../../lib/product/viewModels/dashboardViewModel";
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -95,6 +96,33 @@ export const DashboardHub: React.FC = () => {
 
   const topSignals = signals.slice(0, 4);
   const remainingCount = signals.length - topSignals.length;
+
+  const trackedCompaniesList = useMemo(() => {
+    return followedTickers.map((ticker) => {
+      const stock = StockRegistry.getStock(ticker);
+      return {
+        symbol: ticker,
+        companyName: stock?.companyName || "",
+        score: null,
+      };
+    });
+  }, [followedTickers]);
+
+  const viewModel = useMemo(() => {
+    return buildDashboardViewModel(
+      recentResearch,
+      trackedCompaniesList,
+      signals.map(s => ({
+        symbol: s.symbol,
+        type: s.type,
+        severity: s.severity,
+        explanation: s.explanation,
+      })),
+      watchlists.length > 0,
+      PortfolioEngine.getHoldings().length > 0,
+      signals.length > 0
+    );
+  }, [recentResearch, trackedCompaniesList, signals, watchlists.length]);
 
   return (
     <ProductShell>
