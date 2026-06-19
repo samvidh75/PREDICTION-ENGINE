@@ -98,9 +98,9 @@ export const TrustCentrePage: React.FC = () => {
 
         <ProductPanel className="mt-4 p-5 md:p-6" as="section">
           <div className="flex flex-wrap gap-2">
-            <ProductStatusPill tone="verified">Research only</ProductStatusPill>
+            <ProductStatusPill tone="blue">Research workspace</ProductStatusPill>
             <ProductStatusPill tone="verified">Transparent methodology</ProductStatusPill>
-            <ProductStatusPill tone="verified">No fabricated data</ProductStatusPill>
+            <ProductStatusPill tone="blue">Structured factor view</ProductStatusPill>
             <ProductStatusPill tone="blue">Compare systematically</ProductStatusPill>
           </div>
         </ProductPanel>

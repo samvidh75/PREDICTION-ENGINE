@@ -181,9 +181,9 @@ export function DataUnavailableState({
 
 export function IntegrityStrip(): JSX.Element {
   const items = [
-    { icon: ShieldCheck, label: "Research only" },
-    { icon: Database, label: "Unavailable data labelled" },
-    { icon: CheckCircle2, label: "No fabricated metrics" },
+    { icon: ShieldCheck, label: "Research workspace" },
+    { icon: Database, label: "Clear signal confidence" },
+    { icon: CheckCircle2, label: "Structured factor view" },
   ];
   return (
     <div className="flex flex-wrap gap-2">

@@ -335,8 +335,12 @@ export const StockStoryPage: React.FC = () => {
           <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">My Research Notes</div>
           <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-white/[0.08] bg-[#0D1117] p-3 text-xs text-[#E6EDF3] placeholder:text-[#64748B] outline-none transition focus:border-[#2962FF]" aria-label="Research notes" />
         </div>
+        <div className="mt-4 text-center">
+          <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="text-[9px] font-medium tracking-wider text-[#64748B] uppercase hover:text-[#9AA7B5] transition-colors">
+            Informational research tool — Read Terms & Disclosures
+          </button>
+        </div>
 
-        <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#64748B] uppercase">Research only. Not investment advice.</p>
       </div>
     );
   }
@@ -787,7 +791,11 @@ export const StockStoryPage: React.FC = () => {
         )}
       </div>
 
-      <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#484F58] uppercase">Research only. Not investment advice.</p>
+      <div className="mt-4 text-center">
+        <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="text-[9px] font-medium tracking-wider text-[#64748B] uppercase hover:text-[#9AA7B5] transition-colors">
+          Informational research tool — Read Terms & Disclosures
+        </button>
+      </div>
 
       <IntelligenceModal
         open={explanationModalOpen}
@@ -842,8 +850,8 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-[10px] leading-relaxed text-[#484F58]">
-            Research only. This score explanation shows model inputs and outputs for reference. It is not investment advice.
+          <p className="text-[10px] leading-relaxed text-[#64748B]">
+            This score explanation shows model inputs and outputs for reference. <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="underline hover:text-[#9AA7B5] transition-colors">Read Terms & Disclosures</button>
           </p>
         </div>
       </IntelligenceModal>

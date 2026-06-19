@@ -313,7 +313,7 @@ export const WatchlistPage: React.FC = () => {
                                 <p className="text-[11px] leading-relaxed text-[#8B949E]">
                                   <strong>Track recent developments</strong> — Note any news, earnings, or shifts in your thesis. This section will help surface what is changing with this company over time.
                                 </p>
-                                <p className="text-[10px] leading-relaxed text-[#484F58]">Research only. Not investment advice.</p>
+                                <button type="button" onClick={() => productNavigate("terms")} className="text-[10px] leading-relaxed text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Informational research tool — Read Terms & Disclosures</button>
                               </div>
                             )}
                           </div>
