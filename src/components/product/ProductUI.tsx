@@ -199,3 +199,102 @@ export function ProductIntegrityRow(): JSX.Element {
     </div>
   );
 }
+
+export function ProductCard({ children, className = "", onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }): JSX.Element {
+  return (
+    <div onClick={onClick} className={`rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4 transition-all ${onClick ? "cursor-pointer hover:border-[rgba(148,163,184,0.25)] hover:bg-[rgba(255,255,255,0.02)]" : ""} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+export function ProductSectionWithHeader({ title, subtitle, children, className = "" }: { title?: string; subtitle?: string; children: React.ReactNode; className?: string }): JSX.Element {
+  return (
+    <section className={`py-5 ${className}`}>
+      {title && <h2 className="mb-4 text-sm font-semibold tracking-tight text-[#E6EDF3]">{title}</h2>}
+      {subtitle && <p className="mb-4 text-xs text-[#9AA7B5]">{subtitle}</p>}
+      {children}
+    </section>
+  );
+}
+
+export function ProductMetric({ label, value, trend }: { label: string; value: string | number | null; trend?: "up" | "down" | "neutral" }): JSX.Element {
+  return (
+    <div className="space-y-1">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-[#64748B]">{label}</div>
+      <div className="font-mono text-sm font-bold tabular-nums text-[#E6EDF3]">
+        {value ?? <span className="text-[#64748B]">—</span>}
+      </div>
+    </div>
+  );
+}
+
+export function ProductMatrix({ headers, rows }: { headers: string[]; rows: Array<Array<string | number | null>> }): JSX.Element {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="border-b border-[rgba(148,163,184,0.1)]">
+            {headers.map((h, i) => (
+              <th key={i} className="py-2.5 pr-4 text-left text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, ri) => (
+            <tr key={ri} className="border-b border-[rgba(148,163,184,0.06)] last:border-0">
+              {row.map((cell, ci) => (
+                <td key={ci} className="py-2.5 pr-4 font-mono text-sm tabular-nums text-[#E6EDF3]">
+                  {cell ?? <span className="text-[#64748B]">—</span>}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function ProductToolbar({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
+  return (
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>{children}</div>
+  );
+}
+
+export function ProductActionRow({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
+  return (
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>{children}</div>
+  );
+}
+
+export function ProductRail({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
+  return (
+    <aside className={`space-y-4 ${className}`}>{children}</aside>
+  );
+}
+
+export function ProductInsightCard({ icon: Icon, title, body, tone = "blue" }: { icon: LucideIcon; title: string; body: string; tone?: "blue" | "green" | "amber" | "red" | "muted" }): JSX.Element {
+  const borderColor = tone === "green" ? "rgba(22,163,74,0.2)" : tone === "amber" ? "rgba(245,158,11,0.2)" : tone === "red" ? "rgba(239,68,68,0.2)" : "rgba(41,98,255,0.2)";
+  const bgColor = tone === "green" ? "rgba(22,163,74,0.06)" : tone === "amber" ? "rgba(245,158,11,0.06)" : tone === "red" ? "rgba(239,68,68,0.06)" : "rgba(41,98,255,0.06)";
+  const iconColor = tone === "green" ? "#16A34A" : tone === "amber" ? "#F59E0B" : tone === "red" ? "#EF4444" : "#2962FF";
+  return (
+    <ProductCard className={`border-[${borderColor}] bg-[${bgColor}]`}>
+      <div className="flex items-start gap-3">
+        {React.createElement(Icon, { className: "h-4 w-4 shrink-0 mt-0.5", style: { color: iconColor } })}
+        <div className="min-w-0">
+          <div className="text-xs font-semibold text-[#E6EDF3]">{title}</div>
+          <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">{body}</p>
+        </div>
+      </div>
+    </ProductCard>
+  );
+}
+
+export function ProductPageNote({ children }: { children: React.ReactNode }): JSX.Element {
+  return (
+    <div className="rounded-xl border border-[rgba(41,98,255,0.15)] bg-[rgba(41,98,255,0.06)] px-4 py-3">
+      <p className="text-xs leading-5 text-[#9AA7B5]">{children}</p>
+    </div>
+  );
+}

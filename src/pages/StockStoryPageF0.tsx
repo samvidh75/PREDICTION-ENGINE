@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Activity, ArrowLeft, ArrowLeftRight, Bookmark, ShieldAlert, TrendingUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Activity, ArrowLeft, Bookmark, ShieldAlert, TrendingUp, GitCompare } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
-import { ProductShell, ProductPage, productNavigate, ProductAction } from "../components/product/ProductUI";
+import { ProductShell, ProductPage, productNavigate } from "../components/product/ProductUI";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { useToast } from "../components/feedback/useToast";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
-import { SpatialSheet } from "../components/intelligence/SpatialSheet";
-import { ShareResearchSummary } from "../components/share/ShareResearchSummary";
-import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
 import { useLiveQuote, formatINR, formatPercent } from "../hooks/useLiveQuotes";
 import type { PriceTick } from "../services/realtime/RealtimeStateManager";
@@ -34,7 +31,6 @@ export default function StockStoryPageF0(): JSX.Element {
   const ticker = readTickerFromUrl();
   const stockInfo = ticker ? StockRegistry.getStock(ticker) : null;
   const [investOpen, setInvestOpen] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const toast = useToast();
   const isInWatchlist = watchlists.some((w) => w.tickers.includes(ticker));
@@ -141,32 +137,26 @@ export default function StockStoryPageF0(): JSX.Element {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setInvestOpen(true)}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#2962FF] bg-[#2962FF] px-5 text-xs font-semibold text-white shadow-[0_8px_24px_rgba(41,98,255,0.2)] transition hover:bg-[#3B71FF]"
+            >
+              <TrendingUp className="h-3.5 w-3.5" /> Invest
+            </button>
             {watchlists.length > 0 && (
               <button
                 onClick={handleToggleWatchlist}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 text-xs font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
               >
                 <Bookmark className={`h-3.5 w-3.5 ${isInWatchlist ? "fill-[#2962FF] text-[#2962FF]" : ""}`} />
-                {isInWatchlist ? "Tracked" : "Track"}
+                {isInWatchlist ? "Tracking" : "Track"}
               </button>
             )}
             <button
               onClick={() => productNavigate("compare", ticker)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 text-xs font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
             >
-              <ArrowLeftRight className="h-3.5 w-3.5" /> Compare
-            </button>
-            <button
-              onClick={() => setInvestOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#2962FF] bg-[#2962FF] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#3B71FF]"
-            >
-              <TrendingUp className="h-3.5 w-3.5" /> Invest
-            </button>
-            <button
-              onClick={() => { setShareOpen(true); trackEvent(PRODUCT_EVENTS.COMPANY_SHARE_OPENED); }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
-            >
-              <ArrowLeftRight className="h-3.5 w-3.5" /> Share
+              <GitCompare className="h-3.5 w-3.5" /> Compare
             </button>
           </div>
         </div>
@@ -228,23 +218,16 @@ export default function StockStoryPageF0(): JSX.Element {
           symbol={ticker}
         />
 
-        <SpatialSheet open={shareOpen} onClose={() => setShareOpen(false)} title="Share Research Summary">
-          {stockInfo ? (
-            <ShareResearchSummary
-              data={{
-                ticker,
-                companyName: stockInfo.companyName || ticker,
-                sector: stockInfo.sector,
-              }}
-              onClose={() => setShareOpen(false)}
-              onOpenMethodology={() => { setShareOpen(false); productNavigate("methodology"); }}
-            />
-          ) : (
-            <div className="flex items-center justify-center py-8 text-xs text-[#9AA7B5]">
-              Research summary pending...
-            </div>
-          )}
-        </SpatialSheet>
+        {stockInfo && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => productNavigate("methodology")}
+              className="text-[9px] font-medium uppercase tracking-wider text-[#64748B] transition hover:text-[#9AA7B5]"
+            >
+              How research methodology works
+            </button>
+          </div>
+        )}
       </ProductPage>
     </ProductShell>
   );
