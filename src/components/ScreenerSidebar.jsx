@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import CustomSelect from './ui/CustomSelect';
 
 /**
  * ScreenerSidebar — Filter Selector Engine Rail
@@ -74,7 +75,7 @@ const FilterGroup = ({ label, children }) => (
 );
 
 const SelectFilter = ({ value, options, onChange, idKey = 'id', labelKey = 'label' }) => (
-  <select
+  <CustomSelect
     value={value}
     onChange={(e) => onChange(e.target.value)}
     className="
@@ -101,7 +102,7 @@ const SelectFilter = ({ value, options, onChange, idKey = 'id', labelKey = 'labe
         </option>
       );
     })}
-  </select>
+  </CustomSelect>
 );
 
 // ─── Component ───────────────────────────────────────────────────────────────

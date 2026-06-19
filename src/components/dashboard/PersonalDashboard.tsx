@@ -202,7 +202,7 @@ export default function PersonalDashboard({
 
               <div>
                 <label className="block text-white/60 mb-1">Favorite Sector</label>
-                <select
+                <CustomSelect
                   value={favSector}
                   onChange={e => handleSaveProfileSettings(riskProfile, investStyle, e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white outline-none cursor-pointer"
@@ -211,7 +211,7 @@ export default function PersonalDashboard({
                   <option value="Defense">Defense</option>
                   <option value="Banking">Banking</option>
                   <option value="Energy">Energy</option>
-                </select>
+                </CustomSelect>
               </div>
             </div>
           </div>
