@@ -272,11 +272,11 @@ export default function PortfolioDoctor() {
         <StatusCard label="Diversification" status={intelligence.diversificationStatus} />
         <MetricCard label="Holdings" value={String(data.holdingsCount)} />
         <MetricCard label="Sectors" value={String(sectorEntries.length)} />
-        <MetricCard label="Data completeness" value={data.completenessScore === null ? 'N/A' : `${Math.round(data.completenessScore)}%`} />
+        <MetricCard label="Data completeness" value={data.completenessScore === null ? '—' : `${Math.round(data.completenessScore)}%`} />
       </div>
 
-      <div className="border-4 border-black bg-white p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
-        <h3 className="font-semibold text-lg uppercase mb-4">Factor Exposure</h3>
+      <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-5">
+        <h3 className="font-semibold text-lg uppercase mb-4 text-[#E6EDF3]">Factor Exposure</h3>
         {factorEntries.length > 0 ? factorEntries.map(([key, value]) => (
           <Bar key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={value} color={toPercent(value) >= 60 ? 'bg-green-500' : toPercent(value) >= 40 ? 'bg-amber-400' : 'bg-red-400'} />
         )) : <p className="text-sm text-gray-500">No factor exposure data available.</p>}

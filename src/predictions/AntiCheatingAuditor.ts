@@ -24,6 +24,22 @@ export class AntiCheatingAuditor {
 
     // ── 1. Look-ahead bias ───────────────────────────────
     try {
+      // Check records with missing horizon — must fail closed
+      const missingHorizonResult = await pool.query(
+        `SELECT COUNT(*) AS cnt
+         FROM prediction_registry
+         WHERE validation_status = 'validated'
+           AND validated_at IS NOT NULL
+           AND prediction_horizon IS NULL`
+      );
+      const missingHorizonCount = parseInt(missingHorizonResult.rows[0].cnt, 10);
+      if (missingHorizonCount > 0) {
+        passed = false;
+        findings.push(`Look-ahead bias: ${missingHorizonCount} validated records have NULL prediction_horizon — cannot verify horizon integrity.`);
+        recommendations.push('All validated predictions must have a non-null prediction_horizon.');
+      }
+
+      // Check records where validated_at is not strictly after prediction_date + horizon
       const lookAheadResult = await pool.query(
         `SELECT COUNT(*) AS cnt
          FROM prediction_registry
@@ -37,7 +53,7 @@ export class AntiCheatingAuditor {
         passed = false;
         findings.push(`Look-ahead bias detected: ${lookAheadCount} validated records have validated_at <= prediction_date + horizon days.`);
         recommendations.push('Investigate and correct timestamps. All validated_at must be strictly after prediction_date + horizon days.');
-      } else {
+      } else if (missingHorizonCount === 0) {
         findings.push('No look-ahead bias: all validated_at > prediction_date + horizon for validated records.');
       }
     } catch (err: any) {

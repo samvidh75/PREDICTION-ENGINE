@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, Sparkles, Star, TrendingUp, Trophy } from "lucide-react";
+import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, ShieldAlert, Sparkles, Star, TrendingUp, Trophy } from "lucide-react";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
@@ -351,12 +351,9 @@ export const StockStoryPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 rounded-xl border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.08)] p-4">
-            <h3 className="text-sm font-semibold text-[#E6EDF3]">Not enough information for this view yet.</h3>
-            <p className="mt-2 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
-              Not enough information for this view yet. Research context is based on available data. Track this company to review changes over time.
-            </p>
-          </div>
+          <p className="mt-4 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
+            Research context is based on available data. Track this company to review changes over time.
+          </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <button onClick={handleToggleWatchlist} className={`h-10 rounded-xl px-4 text-xs font-semibold transition ${isInWatchlist ? "border border-red-500/30 bg-red-500/10 text-red-400" : "border border-white/[0.12] bg-white/[0.06] text-[#E6EDF3] hover:bg-white/[0.10]"}`}>
@@ -512,6 +509,40 @@ export const StockStoryPage: React.FC = () => {
             {snapshotLabel}
           </span>
         )}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="h-3.5 w-3.5 text-[#2962FF]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Prediction Engine</span>
+          </div>
+          {predictionModel.overallScore !== null ? (
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold text-[#E6EDF3]">{predictionModel.overallScore}</span>
+              <span className="text-[10px] text-[#9AA7B5]">/ 100 &middot; {predictionModel.publicResearchStance}</span>
+            </div>
+          ) : (
+            <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
+          )}
+          {predictionModel.activeFactorCount > 0 && (
+            <p className="mt-1 text-[10px] text-[#64748B]">{predictionModel.activeFactorCount} active parameters</p>
+          )}
+        </div>
+        <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <ShieldAlert className="h-3.5 w-3.5 text-[#16A34A]" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Healthometer</span>
+          </div>
+          {score !== null ? (
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold text-[#E6EDF3]">{Math.round(score)}</span>
+              <span className="text-[10px] text-[#9AA7B5]">/ 100 &middot; {storyData.classification ?? "Assessment"}</span>
+            </div>
+          ) : (
+            <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
+          )}
+        </div>
       </section>
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">

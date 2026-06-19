@@ -125,7 +125,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
                   name={stock.companyName}
                   sector={stock.sector}
                   marketCap={stock.marketCap.formatted}
-                  score={getScore(stock) ?? "N/A"}
+                  score={getScore(stock) ?? "—"}
                   whyItMatters={getOneLineReason(stock)}
                   onOpenBriefing={() => handleSelect(stock)}
                 />
