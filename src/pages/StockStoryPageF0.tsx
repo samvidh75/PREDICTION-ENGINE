@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { ArrowLeft, ArrowLeftRight, Bookmark, TrendingUp } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Activity, ArrowLeft, ArrowLeftRight, Bookmark, ShieldAlert, TrendingUp } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
 import { ProductShell, ProductPage, productNavigate, ProductAction } from "../components/product/ProductUI";
@@ -11,6 +11,8 @@ import { SpatialSheet } from "../components/intelligence/SpatialSheet";
 import { ShareResearchSummary } from "../components/share/ShareResearchSummary";
 import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
+import { useLiveQuote, formatINR, formatPercent } from "../hooks/useLiveQuotes";
+import type { PriceTick } from "../services/realtime/RealtimeStateManager";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
 type PredictionHorizon = (typeof HORIZONS)[number];
@@ -36,6 +38,8 @@ export default function StockStoryPageF0(): JSX.Element {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const toast = useToast();
   const isInWatchlist = watchlists.some((w) => w.tickers.includes(ticker));
+  const liveQuote = useLiveQuote(ticker);
+  const [liveTick, setLiveTick] = useState<PriceTick | null>(null);
 
   useEffect(() => {
     const handler = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
@@ -63,7 +67,24 @@ export default function StockStoryPageF0(): JSX.Element {
     setWatchlists([...WatchlistEngine.getWatchlists()]);
   };
 
+  useEffect(() => {
+    if (!ticker) return;
+    const { RealtimeCoordinator } = require("../services/realtime/RealtimeCoordinator");
+    const unsub = RealtimeCoordinator.subscribeToStock(ticker, (tick: PriceTick) => {
+      setLiveTick(tick);
+    });
+    return unsub;
+  }, [ticker]);
+
   const runtimeResult = buildCompanyResearch(ticker, stockInfo?.companyName, stockInfo?.sector, stockInfo ? { sector: stockInfo.sector } : null, isInWatchlist);
+
+  const quotePrice = liveTick ? `Rs ${liveTick.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : liveQuote.quote ? formatINR(liveQuote.quote.price) : "—";
+  const quoteChange = liveTick
+    ? `${liveTick.change >= 0 ? "+" : ""}${liveTick.change.toFixed(2)} (${liveTick.changePercent >= 0 ? "+" : ""}${liveTick.changePercent.toFixed(2)}%)`
+    : liveQuote.quote
+      ? `${formatINR(liveQuote.quote.change)} (${formatPercent(liveQuote.quote.changePercent)})`
+      : null;
+  const isPositive = liveTick ? liveTick.change >= 0 : liveQuote.quote ? liveQuote.quote.changePercent >= 0 : true;
 
   return (
     <ProductShell>
@@ -77,11 +98,25 @@ export default function StockStoryPageF0(): JSX.Element {
           </button>
         </div>
 
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{runtimeResult.identity.displayName}</h1>
-          {ticker && runtimeResult.identity.displayName !== ticker && (
-            <span className="mt-0.5 inline-block font-mono text-xs font-medium text-[#9AA7B5]">{ticker}</span>
-          )}
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-[#E6EDF3]">{runtimeResult.identity.displayName}</h1>
+            {ticker && runtimeResult.identity.displayName !== ticker && (
+              <span className="mt-0.5 inline-block font-mono text-xs font-medium text-[#9AA7B5]">{ticker}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 rounded-xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] px-4 py-2.5">
+            <div className="text-right">
+              <div className="font-mono text-base font-bold tabular-nums text-[#E6EDF3]">{quotePrice}</div>
+              {quoteChange && (
+                <div className={`font-mono text-[10px] font-bold ${isPositive ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{quoteChange}</div>
+              )}
+            </div>
+            <div className="h-8 w-px bg-[rgba(148,163,184,0.14)]" />
+            <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">
+              {liveTick ? "Live" : "Price"}
+            </div>
+          </div>
         </div>
 
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -133,6 +168,41 @@ export default function StockStoryPageF0(): JSX.Element {
             >
               <ArrowLeftRight className="h-3.5 w-3.5" /> Share
             </button>
+          </div>
+        </div>
+
+        <div className="mb-5 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Activity className="h-3.5 w-3.5 text-[#2962FF]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Prediction Engine</span>
+            </div>
+            {runtimeResult.prediction.overallScore !== null ? (
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-bold text-[#E6EDF3]">{runtimeResult.prediction.overallScore}</span>
+                <span className="text-[10px] text-[#9AA7B5]">/ 100</span>
+                <span className="rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2 py-0.5 text-[9px] font-semibold text-[#2962FF]">{runtimeResult.prediction.readiness}</span>
+              </div>
+            ) : (
+              <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
+            )}
+          </div>
+          <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldAlert className="h-3.5 w-3.5 text-[#16A34A]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Healthometer</span>
+            </div>
+            {runtimeResult.healthometer.overallScore !== null ? (
+              <div className="flex items-baseline gap-2">
+                <span className="text-xl font-bold text-[#E6EDF3]">{Math.round(runtimeResult.healthometer.overallScore)}</span>
+                <span className="text-[10px] text-[#9AA7B5]">/ 100</span>
+                {runtimeResult.healthometer.dimensions.length > 0 && (
+                  <span className="text-[9px] text-[#64748B]">{runtimeResult.healthometer.dimensions.filter((d: any) => d.score !== null).length} active</span>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
+            )}
           </div>
         </div>
 
