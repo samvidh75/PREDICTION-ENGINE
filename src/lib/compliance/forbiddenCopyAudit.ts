@@ -109,6 +109,17 @@ export const PRODUCT_FORBIDDEN_TERMS = [
   /Buy now/i,
 ] as const;
 
+export const FORBIDDEN_SOCIAL_PROOF_PATTERNS = [
+  /trusted by thousands/i,
+  /trusted by millions/i,
+  /number one platform/i,
+  /award-winning/i,
+  /broker partner/i,
+  /verified by SEBI/i,
+  /official recommendation/i,
+  /real user testimonial/i,
+] as const;
+
 export function hasBackendVocabulary(text: string): string | null {
   for (const pattern of BACKEND_VOCABULARY_PATTERNS) {
     if (pattern.test(text)) return pattern.source;
@@ -132,6 +143,13 @@ export function hasBackendProviderNames(text: string): string | null {
 
 export function hasProductForbiddenTerms(text: string): string | null {
   for (const pattern of PRODUCT_FORBIDDEN_TERMS) {
+    if (pattern.test(text)) return pattern.source;
+  }
+  return null;
+}
+
+export function hasForbiddenSocialProof(text: string): string | null {
+  for (const pattern of FORBIDDEN_SOCIAL_PROOF_PATTERNS) {
     if (pattern.test(text)) return pattern.source;
   }
   return null;

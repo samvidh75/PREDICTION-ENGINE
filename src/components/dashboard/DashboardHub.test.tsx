@@ -91,7 +91,7 @@ describe('DashboardHub states', () => {
 
     renderDashboard();
 
-    expect(await screen.findByText('Signals temporarily unavailable')).toBeInTheDocument();
+    expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
   });
 
   it('shows signals empty state when API returns no signals', async () => {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight } from "lucide-react";
 import { GlobalCommandButton } from "./GlobalCommandButton";
 import { CommandPalette } from "./CommandPalette";
-import { DataFreshnessOrb } from "./DataFreshnessOrb";
 
 interface ShellRoute {
   id: string;
@@ -14,10 +13,11 @@ interface ShellRoute {
 const ROUTES: ShellRoute[] = [
   { id: "home", label: "Home", icon: Home, pageKey: "dashboard" },
   { id: "rankings", label: "Rankings", icon: BarChart3, pageKey: "rankings" },
-  { id: "signals", label: "Signals", icon: TrendingUp, pageKey: "predictions" },
+  { id: "scanner", label: "Scanner", icon: Search, pageKey: "scanner" },
+  { id: "alerts", label: "Alerts", icon: TrendingUp, pageKey: "alerts" },
   { id: "watchlist", label: "Watchlist", icon: Eye, pageKey: "watchlist" },
   { id: "portfolio", label: "Portfolio", icon: Briefcase, pageKey: "portfolio" },
-  { id: "trust", label: "Trust", icon: ShieldCheck, pageKey: "trust" },
+  { id: "methodology", label: "Methodology", icon: ShieldCheck, pageKey: "methodology" },
   { id: "compare", label: "Compare", icon: ArrowLeftRight, pageKey: "compare" },
 ];
 
@@ -79,12 +79,11 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             className="hidden sm:flex flex-1 max-w-md items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-[#64748B] hover:border-white/[0.12] hover:text-[#9AA7B5] transition-all duration-200"
           >
             <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span>Search companies...</span>
+            <span>Search companies or open a workflow...</span>
             <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">⌘K</kbd>
           </button>
           <div className="flex items-center gap-2">
             <GlobalCommandButton onClick={() => setCommandOpen(true)} />
-            <DataFreshnessOrb />
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); navigatePage("settings"); }}

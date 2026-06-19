@@ -121,8 +121,8 @@ export default function TodaysChangesPanel(): JSX.Element {
           Today's Intelligence
         </div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", padding: "16px 0", textAlign: "center", lineHeight: 1.6 }}>
-          Research signals are currently unavailable.<br />
-          Signals will appear when the data pipeline is active.
+          Research signals are pending.<br />
+          Signals will appear as data is processed.
         </div>
         {summary && summary.watchlistMonitored > 0 && (
           <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textAlign: "center", paddingTop: 8 }}>

@@ -157,7 +157,7 @@ test.describe("Public route smoke", () => {
   test("landing page renders without blank screen", async ({ page }) => {
     await page.goto("/?page=landing");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /AI-native research intelligence/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Understand the stock before you invest/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -221,7 +221,7 @@ test.describe("Public navigation", () => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-methodology").click();
-    await expect(page).toHaveURL(/page=trust/);
+    await expect(page).toHaveURL(/page=methodology/);
   });
 
   test("landing page has working CTA to signup bottom", async ({ page }) => {
@@ -402,13 +402,13 @@ test.describe("Authenticated shell", () => {
     await assertNoRenderGarbage(page);
   });
 
-  test("left rail navigation works — navigate to Trust Centre", async ({
+  test("left rail navigation works — navigate to Methodology", async ({
     page,
   }) => {
     await page.goto("/?page=dashboard");
     const rail = page.locator("nav").first();
-    await rail.getByRole("button", { name: /trust/i }).click();
-    await expect(page).toHaveURL(/page=trust/);
+    await rail.getByRole("button", { name: /methodology/i }).click();
+    await expect(page).toHaveURL(/page=methodology/);
   });
 
   test("top bar navigation works — navigate to settings", async ({
@@ -444,7 +444,7 @@ test.describe("Route fallback", () => {
     await page.goto("/?page=some-non-existent-route");
     await expect(page.locator("body")).toBeVisible();
     // Should show landing page
-    await expect(page.getByRole("heading", { name: /AI-native research intelligence/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Understand the stock before you invest/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
