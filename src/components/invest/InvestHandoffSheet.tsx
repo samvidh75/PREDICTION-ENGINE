@@ -247,7 +247,7 @@ function StageOne({
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />
           <p className="text-sm leading-5 text-[#E6EDF3]">
-            The final order will be placed with your broker. No order is submitted until you confirm in the next step.
+            Final order will be placed with your broker. No order is submitted until you confirm outside StockStory.
           </p>
         </div>
       </ProductPanel>
@@ -309,14 +309,14 @@ function StageTwo({
           Broker handoff is being prepared
         </h3>
         <p className="mt-2 max-w-sm text-sm leading-5 text-[#9AA7B5]">
-          Direct broker integration is not yet available for this account.
-          You will be notified once broker handoff is ready.
+          Broker handoff is being prepared for this account.
+          Track instead or compare first while the handoff is prepared.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-4 py-2.5">
             <Shield className="h-4 w-4 text-[#64748B]" />
             <span className="text-xs text-[#64748B]">
-              We do not store, process, or access your broker credentials
+              No broker credentials are stored in StockStory.
             </span>
           </div>
         </div>
@@ -399,10 +399,10 @@ function StageThree({
           <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
           <div>
             <p className="text-sm font-semibold text-[#E6EDF3]">
-              This is a preview — no order has been placed
+              No order has been placed.
             </p>
             <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
-              Your broker will execute the trade once received.
+              Final order will be placed with your broker.
               StockStory India does not execute trades on your behalf.
               This is not a confirmation of execution.
             </p>

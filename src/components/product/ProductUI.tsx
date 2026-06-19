@@ -41,13 +41,13 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_18px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors duration-200 ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
   return (
     <section className="grid gap-6 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-12">
-      <div className="flex min-h-[360px] flex-col justify-center rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 md:p-8">
+      <div className="flex min-h-[360px] flex-col justify-center rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] md:p-8">
         {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">{eyebrow}</div>}
         <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#E6EDF3] sm:text-4xl md:text-5xl">{title}</h1>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-[#9AA7B5] md:text-base">{body}</p>
@@ -60,10 +60,10 @@ export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?
 
 export function ProductAction({ children, onClick, href, variant = "primary", className = "", disabled = false, disabledReason, id }: { children: React.ReactNode; onClick?: () => void; href?: string; variant?: "primary" | "secondary" | "ghost"; className?: string; disabled?: boolean; disabledReason?: string; id?: string }): JSX.Element {
   const classes = variant === "primary"
-    ? "border-[#2962FF] bg-[#2962FF] text-white hover:bg-[#3B71FF]"
+    ? "border-[#2962FF] bg-[#2962FF] text-white shadow-[0_10px_30px_rgba(41,98,255,0.18)] hover:bg-[#1F4FE0] hover:shadow-[0_14px_36px_rgba(41,98,255,0.22)]"
     : variant === "secondary"
-      ? "border-[rgba(148,163,184,0.2)] bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60"
-      : "border-transparent bg-transparent text-[#9AA7B5] hover:text-[#E6EDF3]";
+      ? "border-[rgba(148,163,184,0.2)] bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60 hover:bg-[#161B22]"
+      : "border-transparent bg-transparent text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3]";
   const content = (
     <>
       <span>{children}</span>
@@ -71,7 +71,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
     </>
   );
   if (href) {
-    return <a id={id} href={href} className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition ${classes} ${className}`}>{content}</a>;
+    return <a id={id} href={href} className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] ${classes} ${className}`}>{content}</a>;
   }
   return (
     <button
@@ -81,7 +81,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
       disabled={disabled}
       title={disabled ? disabledReason : undefined}
       aria-disabled={disabled}
-      className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[#111827] disabled:text-[#64748B] ${classes} ${className}`}
+      className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 active:translate-y-px focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] disabled:translate-y-0 disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[#111827] disabled:text-[#64748B] ${classes} ${className}`}
     >
       {disabled && disabledReason ? disabledReason : content}
     </button>
@@ -123,7 +123,7 @@ export function ProductErrorState({ title = "Research signals pending", body = "
 export function ProductStatusPill({ children, tone = "muted" }: { children: React.ReactNode; tone?: "verified" | "warning" | "danger" | "blue" | "muted" }): JSX.Element {
   const color = tone === "verified" ? "#16A34A" : tone === "warning" ? "#F59E0B" : tone === "danger" ? "#EF4444" : tone === "blue" ? "#2962FF" : "#64748B";
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-1 text-[11px] font-medium text-[#9AA7B5]">
+    <span className="inline-flex min-h-6 items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.035)] px-2 py-1 text-[11px] font-medium text-[#9AA7B5] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
       {children}
     </span>

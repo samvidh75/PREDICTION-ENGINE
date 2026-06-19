@@ -54,7 +54,7 @@ describe('SettingsPage states', () => {
     render(<SettingsPage />);
     fireEvent.click(screen.getByText('Appearance'));
     expect(screen.getByText('Research workspace theme')).toBeInTheDocument();
-    expect(screen.getByText(/fixed light theme/)).toBeInTheDocument();
+    expect(screen.getByText(/fixed dark theme/)).toBeInTheDocument();
     expect(screen.queryByText('Locked')).not.toBeInTheDocument();
   });
 
