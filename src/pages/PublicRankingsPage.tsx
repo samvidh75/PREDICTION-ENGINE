@@ -3,11 +3,11 @@ import Table from "../components/ui/Table";
 import Badge from "../components/ui/Badge";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
-import { EmptyState } from "../components/ui/DataState";
 import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
-import { api, type LeaderboardEntry } from "../services/api/client";
+import { api, type ScannerResultItem } from "../services/api/client";
+import { scannerResultToResearchListItem } from "../lib/product/productViewAdapters";
 import { ProductShell, ProductPage, ProductPanel, ProductEmptyState, productNavigate } from "../components/product/ProductUI";
 
 interface ExplanationState {
@@ -19,7 +19,7 @@ interface ExplanationState {
 }
 
 export const PublicRankingsPage: React.FC = () => {
-  const [rankings, setRankings] = useState<LeaderboardEntry[]>([]);
+  const [rankings, setRankings] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
@@ -29,9 +29,19 @@ export const PublicRankingsPage: React.FC = () => {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    api.getLeaderboard(100)
-      .then((res) => { if (ctrl.signal.aborted) return; setRankings(res.data ?? []); setLoading(false); })
-      .catch(() => { if (ctrl.signal.aborted) return; setError("Rankings are being prepared for the latest cycle."); setRankings([]); setLoading(false); });
+    api.getScanner("Quality compounders", 100)
+      .then((res) => {
+        if (ctrl.signal.aborted) return;
+        const data = res.data ?? [];
+        setRankings(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (ctrl.signal.aborted) return;
+        setError("Rankings are being prepared for the latest cycle.");
+        setRankings([]);
+        setLoading(false);
+      });
     return () => ctrl.abort();
   }, []);
 
@@ -49,14 +59,22 @@ export const PublicRankingsPage: React.FC = () => {
     });
   }, [rankings, searchText, sectorFilter]);
 
-  const openExplanation = useCallback((entry: LeaderboardEntry) => {
+  const openExplanation = useCallback((entry: ScannerResultItem) => {
     setExplanation({
       symbol: entry.symbol,
       companyName: entry.companyName || undefined,
-      rankingScore: entry.rankingScore ?? null,
-      confidenceScore: entry.confidenceScore ?? null,
-      predictionDate: entry.predictionDate || null,
+      rankingScore: entry.score ?? null,
+      confidenceScore: null,
     });
+  }, []);
+
+  const convictionLabel = useCallback((entry: ScannerResultItem): string => {
+    const score = entry.score ?? null;
+    if (score === null) return "Pending";
+    if (score >= 75) return "High conviction";
+    if (score >= 55) return "Moderate conviction";
+    if (score >= 40) return "Needs review";
+    return "Track before investing";
   }, []);
 
   return (
@@ -92,9 +110,11 @@ export const PublicRankingsPage: React.FC = () => {
                 </span>
               </div>
               <div>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Confidence</span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Conviction</span>
                 <span className="ml-2 font-mono text-sm font-bold text-[#E6EDF3]">
-                  {typeof explanation.confidenceScore === "number" && Number.isFinite(explanation.confidenceScore) ? `${Math.round(explanation.confidenceScore)}%` : "—"}
+                  {typeof explanation.rankingScore === "number" && Number.isFinite(explanation.rankingScore)
+                    ? convictionLabel({ symbol: explanation.symbol, companyName: explanation.companyName ?? explanation.symbol, sector: null, rank: 0, conviction: "", score: explanation.rankingScore, oneLineThesis: "", keyReason: "", riskMarker: null })
+                    : "—"}
                 </span>
               </div>
               {explanation.predictionDate && (
@@ -146,90 +166,104 @@ export const PublicRankingsPage: React.FC = () => {
         ) : (
           <>
             <div className="hidden md:block">
-              <Table headers={["Rank", "Symbol", "Company", "Score", "Confidence", "Sector", "Updated", ""]}>
-                {filteredRankings.map((r) => (
-                  <tr
-                    key={r.symbol}
-                    className="cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
-                    onClick={() => productNavigate("stock", r.symbol)}
-                    tabIndex={0}
-                    role="button"
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); productNavigate("stock", r.symbol); } }}
-                  >
-                    <td className="p-4 text-sm font-semibold text-[#9AA7B5]">{formatRank(r.rank)}</td>
-                    <td className="p-4 font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{r.symbol}</td>
-                    <td className="max-w-[200px] truncate p-4 text-sm text-[#9AA7B5]">{r.companyName || <span className="text-[#64748B]">Unavailable</span>}</td>
-                    <td className="p-4">{typeof r.rankingScore === "number" && Number.isFinite(r.rankingScore) ? <ScorePill score={Math.round(r.rankingScore)} /> : <MissingDataBadge />}</td>
-                    <td className="p-4">{typeof r.confidenceScore === "number" && Number.isFinite(r.confidenceScore) ? <ScorePill score={Math.round(r.confidenceScore)} /> : <MissingDataBadge />}</td>
-                    <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
-                    <td className="p-4">{r.predictionDate ? <span className="text-[11px] font-medium whitespace-nowrap text-[#16A34A]">{formatFreshness(r.predictionDate)}</span> : <span className="text-[11px] text-[#64748B]">Pending</span>}</td>
-                    <td className="p-4">
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); openExplanation(r); }}
-                          className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                        >
-                          Explain
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); productNavigate("stock", r.symbol); }}
-                          className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                        >
-                          Open
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); productNavigate("compare", r.symbol); }}
-                          className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                        >
-                          Compare
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+              <Table headers={["Rank", "Symbol", "Company", "Score", "Conviction", "Sector", "Thesis", ""]}>
+                {filteredRankings.map((r) => {
+                  const item = scannerResultToResearchListItem(r);
+                  const score = r.score;
+                  const conv = r.conviction || convictionLabel(r);
+                  return (
+                    <tr
+                      key={r.symbol}
+                      className="cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
+                      onClick={() => productNavigate("stock", r.symbol)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); productNavigate("stock", r.symbol); } }}
+                    >
+                      <td className="p-4 text-sm font-semibold text-[#9AA7B5]">{formatRank(r.rank)}</td>
+                      <td className="p-4 font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{r.symbol}</td>
+                      <td className="max-w-[200px] truncate p-4 text-sm text-[#9AA7B5]">{r.companyName || <span className="text-[#64748B]">Unavailable</span>}</td>
+                      <td className="p-4">{score !== null && Number.isFinite(score) ? <ScorePill score={Math.round(score)} /> : <MissingDataBadge />}</td>
+                      <td className="p-4 text-xs text-[#9AA7B5]">{conv}</td>
+                      <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
+                      <td className="max-w-[200px] truncate p-4 text-xs text-[#64748B]">{r.oneLineThesis || item.thesis}</td>
+                      <td className="p-4">
+                        <div className="flex gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); openExplanation(r); }}
+                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                          >
+                            Explain
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); productNavigate("stock", r.symbol); }}
+                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                          >
+                            Open
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); productNavigate("compare", r.symbol); }}
+                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                          >
+                            Compare
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </Table>
             </div>
             <div className="grid gap-4 md:hidden">
-              {filteredRankings.map((r) => (
-                <ProductPanel key={r.symbol} className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{formatRank(r.rank)}</span>
-                      <button onClick={() => productNavigate("stock", r.symbol)} className="font-mono text-base font-bold text-[#E6EDF3] hover:underline">{r.symbol}</button>
+              {filteredRankings.map((r) => {
+                const item = scannerResultToResearchListItem(r);
+                const score = r.score;
+                const conv = r.conviction || convictionLabel(r);
+                return (
+                  <ProductPanel key={r.symbol} className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{formatRank(r.rank)}</span>
+                        <button onClick={() => productNavigate("stock", r.symbol)} className="font-mono text-base font-bold text-[#E6EDF3] hover:underline">{r.symbol}</button>
+                      </div>
+                      {score !== null && Number.isFinite(score) ? <ScorePill score={Math.round(score)} /> : <MissingDataBadge />}
                     </div>
-                    {typeof r.rankingScore === "number" && Number.isFinite(r.rankingScore) ? <ScorePill score={Math.round(r.rankingScore)} /> : <MissingDataBadge />}
-                  </div>
-                  <div className="mt-1 text-xs text-[#9AA7B5]">{r.companyName || "Unavailable"}</div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-0.5 text-[10px] font-medium text-[#9AA7B5]">{r.sector || "Sector unavailable"}</span>
-                    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${r.predictionDate ? "border-[rgba(22,163,74,0.2)] text-[#16A34A]" : "border-[rgba(245,158,11,0.2)] text-[#F59E0B]"}`}>
-                      {r.predictionDate ? formatFreshness(r.predictionDate) : "Freshness pending"}
-                    </span>
-                  </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => { openExplanation(r); }}
-                      className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                    >
-                      Trace
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => productNavigate("compare", r.symbol)}
-                      className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                    >
-                      Compare
-                    </button>
-                    <Button type="button" size="sm" onClick={() => productNavigate("stock", r.symbol)}>
-                      Open
-                    </Button>
-                  </div>
-                </ProductPanel>
-              ))}
+                    <div className="mt-1 text-xs text-[#9AA7B5]">{r.companyName || "Unavailable"}</div>
+                    <div className="mt-1 text-[11px] text-[#64748B]">{conv}</div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-0.5 text-[10px] font-medium text-[#9AA7B5]">{r.sector || "Sector unavailable"}</span>
+                      {r.riskMarker && r.riskMarker !== "Risk review normal" && (
+                        <span className="inline-flex items-center rounded-md border border-[rgba(239,68,68,0.2)] px-2 py-0.5 text-[10px] font-medium text-[#EF4444]">
+                          {r.riskMarker}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 text-[11px] leading-4 text-[#64748B]">{item.thesis}</div>
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { openExplanation(r); }}
+                        className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                      >
+                        Trace
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => productNavigate("compare", r.symbol)}
+                        className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                      >
+                        Compare
+                      </button>
+                      <Button type="button" size="sm" onClick={() => productNavigate("stock", r.symbol)}>
+                        Open
+                      </Button>
+                    </div>
+                  </ProductPanel>
+                );
+              })}
             </div>
           </>
         )}
