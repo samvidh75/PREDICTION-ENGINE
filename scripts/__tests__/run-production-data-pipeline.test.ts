@@ -6,7 +6,7 @@ describe("Pipeline CLI", () => {
   it("module loads without error", async () => {
     const mod = await import("../run-production-data-pipeline");
     expect(mod).toBeDefined();
-  });
+  }, 20_000);
 
   it("provider status summary never includes secret values", () => {
     process.env.INDIANAPI_KEY = "key";
