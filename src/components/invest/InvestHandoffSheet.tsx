@@ -19,6 +19,7 @@ import { api } from "../../services/api/client";
 import type { InvestContextResponse } from "../../services/api/client";
 import ThesisHealthMeter from "../research/ThesisHealthMeter";
 import { computeResearchSignal, type ResearchSignalView } from "../../lib/research/researchSignalModel";
+import ResearchContextLink from "../research/ResearchContextLink";
 
 interface InvestHandoffSheetProps {
   open: boolean;
@@ -212,9 +213,12 @@ function StageOne({
   return (
     <div className="space-y-5">
       <ProductPanel className="p-4">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
-          <BookOpen className="h-3 w-3" />
-          Thesis review
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
+            <BookOpen className="h-3 w-3" />
+            Thesis review
+          </div>
+          <ResearchContextLink label="How scores work" />
         </div>
         <h3 className="mt-3 text-base font-semibold text-[#E6EDF3]">
           {displayName}

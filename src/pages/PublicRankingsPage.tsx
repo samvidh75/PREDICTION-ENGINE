@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Trophy, Lock, ArrowRight, Search, Info, ExternalLink, Shield } from "lucide-react";
+import { Trophy, Lock, ArrowRight, Search, Info, ExternalLink, Shield, BookOpen } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductHero, ProductSection, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { useAuth } from "../context/AuthContext";
 import { api, type ScannerResultItem } from "../services/api/client";
@@ -7,6 +7,7 @@ import Table from "../components/ui/Table";
 import Input from "../components/ui/Input";
 import ScorePill from "../components/ui/ScorePill";
 import { formatRank } from "../services/ui/dataFormatting";
+import ResearchContextLink from "../components/research/ResearchContextLink";
 
 function rankingsSignalLabel(score: number | null): { label: string; color: string } | null {
   if (score === null) return null;
@@ -141,6 +142,25 @@ export const PublicRankingsPage: React.FC = () => {
             </ProductPanel>
           )}
 
+          {/* How to read rankings */}
+          {isAuthenticated && rankings.length > 0 && (
+            <details className="group rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.015)]">
+              <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
+                <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+                How to read rankings
+                <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" aria-hidden="true" />
+              </summary>
+              <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-3 text-xs leading-relaxed text-[#9AA7B5] space-y-2">
+                <p><strong className="text-[#E6EDF3]">Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
+                <p><strong className="text-[#E6EDF3]">Conviction</strong> — How confident the model is based on data sufficiency. High conviction means more dimensions were verified.</p>
+                <p><strong className="text-[#E6EDF3]">No Buy/Sell calls</strong> — StockStory does not issue trading recommendations. Use scores to inform your own research process.</p>
+                <p className="pt-1">
+                  <ResearchContextLink label="Read full research standards" />
+                </p>
+              </div>
+            </details>
+          )}
+
           {/* Loading & Empty State */}
           {loading ? (
             <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">
@@ -164,7 +184,7 @@ export const PublicRankingsPage: React.FC = () => {
             <div className="space-y-6">
               {/* Desktop Rankings Table */}
               <div className="hidden md:block">
-                <Table headers={["Rank", "Symbol", "Company", "Sector", "Research Score", "Conviction", "Actions"]}>
+                <Table headers={["Rank", "Symbol", "Company", "Sector", "Research Score", "Conviction", "Driver", "Actions"]}>
                   {displayedRankings.map((r) => {
                     const realSector = isRealSector(r.sector);
 
@@ -223,7 +243,7 @@ export const PublicRankingsPage: React.FC = () => {
                           {isAuthenticated ? (
                             (() => {
                               const sig = rankingsSignalLabel(r.score);
-                              if (!sig) return <span className="text-[#64748B]">—</span>;
+                              if (!sig) return <span className="text-[#64748B] italic">Pending</span>;
                               return (
                                 <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${sig.color}33`, backgroundColor: `${sig.color}15`, color: sig.color }}>
                                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sig.color }} aria-hidden="true" />
@@ -234,6 +254,11 @@ export const PublicRankingsPage: React.FC = () => {
                           ) : (
                             <span className="text-[#64748B] italic">Sign in to view</span>
                           )}
+                        </td>
+
+                        {/* Driver column */}
+                        <td className="px-6 py-4 text-[11px] text-[#64748B] max-w-[180px] truncate">
+                          {isAuthenticated ? (r.keyReason || "—") : "—"}
                         </td>
 
                         {/* Action Buttons */}

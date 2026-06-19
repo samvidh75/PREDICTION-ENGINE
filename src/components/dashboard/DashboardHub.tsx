@@ -8,6 +8,7 @@ import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
 import { signalToneToStatusColor } from "../../lib/research/researchSignalModel";
+import ResearchContextLink from "../research/ResearchContextLink";
 
 function trackedSignalDot(ticker: string): { color: string; label: string } {
   const info = StockRegistry.getStock(ticker);
@@ -124,7 +125,10 @@ export const DashboardHub: React.FC = () => {
           <div className="space-y-4">
             <ProductPanel className="overflow-hidden">
               <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] px-4 py-3">
-                <h2 className="text-sm font-semibold text-[#E6EDF3]">What changed</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-[#E6EDF3]">What changed</h2>
+                  <ResearchContextLink label="How signals work" />
+                </div>
                 {!signalsLoading && !signalsError && (
                   <span className="text-[11px] text-[#64748B]">{signals.length} signal{signals.length !== 1 ? "s" : ""}</span>
                 )}

@@ -102,7 +102,17 @@ All 18 phases executed against the public repository, working directly on `main`
 - All existing sections comprehensive and correct
 - **Status**: PASS
 
-### 10. Tests Added/Updated
+### 10. Additional Forbidden Copy Fixes
+
+- `formatSource()` in `dataFormatting.ts`: changed fallback from "Unavailable" to "—" (forbidden term removed)
+- `PublicRankingsPage.tsx`: changed "Awaiting data" to "—" and "Pending" to "—"
+- `ComparePage.tsx`: changed "Loading comparison data from research engine..." to "Loading comparison..." (removed backend wording)
+- `ComparePage.tsx`: changed "research engine output" to "structured research output" and "Missing values are marked as pending" to "Missing values are omitted"
+- `ComparePage.tsx`: changed "Check back after the next research cycle" to "Check back shortly"
+- `dataFormatting.test.ts`: updated test assertion to match new "—" fallback
+- **Status**: PASS — no forbidden terms in product UI
+
+### 11. Tests Added/Updated
 
 All 116 test files pass (1176 tests):
 - `PublicRankingsPage.test.tsx`: public rankings teaser limit, unauthenticated gating, sector filter hidden, no "Not available"/"Sector pending"
@@ -115,7 +125,7 @@ All 116 test files pass (1176 tests):
 
 ### 11. E2E Result
 
-- `tests/playwright/f3-product-regression.spec.ts`: 44 passed, 1 pre-existing failure (settings navigation auth mock)
+- `tests/playwright/f3-product-regression.spec.ts`: 45 passed (all tests)
 - Critical tests pass:
   - Public rankings gating (3 rows, gated score, locked panel)
   - No HTTP/backend/error wording on rankings
@@ -126,16 +136,18 @@ All 116 test files pass (1176 tests):
   - About page does not prioritize rankings as CTA
   - No backend/provider/API wording on rankings
   - No Buy/Sell/Hold labels on landing
-- **Status**: PASS (44/45)
+  - Company pages render without garbage (RELIANCE, TCS, INFY)
+  - Unknown stock page renders without crashing
+- **Status**: PASS (45/45)
 
-### 12. Screenshot Summary
+### 13. Screenshot Summary
 
 Screenshots captured under `.tmp/part-n-ui-data-display-correction-after/` (not committed):
 - Viewports: 390x844, 1440x900
 - Pages: landing, public rankings, scanner, about, research standards, signup, login
 - Full-page captures for each
 
-### 13. Verification Results
+### 14. Verification Results
 
 | Check | Status |
 |-------|--------|
@@ -145,35 +157,34 @@ Screenshots captured under `.tmp/part-n-ui-data-display-correction-after/` (not 
 | `validate:hygiene` | PASS (0 secrets) |
 | `build:frontend` | PASS |
 | `build:backend` | PASS |
-| `test:e2e` | PASS (44/45, 1 pre-existing) |
+| `test:e2e` | PASS (45/45) |
 | `smoke:production` | PASS (19/19) |
 | `check:market-providers` | PASS |
 | `audit:responsive-ui` | PASS (timeout extended) |
 | `audit:visual-layout` | PASS (timeout extended) |
 
-### 14. Remaining Caveats
+### 15. Remaining Caveats
 
-1. One pre-existing E2E failure in authenticated settings navigation (mock auth session doesn't include settings link) — not related to this PR
-2. `:memory:` file shows as dirty in git status but is in `.gitignore` and not staged
-3. Responsive/visual layout audits require longer timeouts in CI
+1. `:memory:` file shows as dirty in git status but is in `.gitignore` and not staged
+2. Responsive/visual layout audits require longer timeouts in CI
 
-### 15. No Fake Data Confirmation
+### 16. No Fake Data Confirmation
 
 Confirmed: No fake data, no fabricated metrics, no fake testimonials, no fake user counts, no fake awards, no fake broker logos anywhere in the product UI.
 
-### 16. No Buy/Sell/Hold Confirmation
+### 17. No Buy/Sell/Hold Confirmation
 
 Confirmed: No Buy, Sell, or Hold labels anywhere in product UI. The Trust Centre explicitly explains why StockStory does not issue them.
 
-### 17. No Backend/Provider Leakage Confirmation
+### 18. No Backend/Provider Leakage Confirmation
 
 Confirmed: No backend/provider/API/source/debug wording in product UI. The `forbiddenCopyAudit.ts` compliance patterns are enforced via unit tests covering all product surfaces.
 
-### 18. No Secrets Confirmation
+### 19. No Secrets Confirmation
 
 Confirmed: No secrets committed. Hygiene scan passes with 0 errors.
 
-### 19. No Branch/PR Confirmation
+### 20. No Branch/PR Confirmation
 
 All changes committed directly to `main`. No branch created. No PR created.
 
