@@ -70,31 +70,36 @@ describe('ComparePage empty state', () => {
     window.history.pushState({}, '', '/?page=compare&ids=AAA,BBB');
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes('/api/intelligence/insight/AAA')) {
+      // Mock the research company endpoint and compare endpoint
+      if (url.includes('/api/research/compare')) {
         return {
           ok: true,
           json: async () => ({
+            ok: true,
             data: {
-              companyName: 'Alpha Limited',
-              healthScore: 81,
-              classification: 'Watch',
-              confidence: { score: 72, level: 'medium' },
-              factors: { quality: { score: 70 }, value: { score: 66 }, risk: { score: 22 } },
+              companies: [
+                { symbol: 'AAA', companyName: 'Alpha Limited', scores: { quality: 70, value: 66, risk: 22 }, strengths: ['Strong margins'], risks: [] },
+                { symbol: 'BBB', companyName: 'Beta Limited', scores: { quality: 64, value: 60, risk: 58 }, strengths: ['Stable cash flow'], risks: [] },
+              ],
+              factorComparison: [
+                { factor: 'Risk', winner: 'Lower risk score', explanation: 'AAA has a significantly lower risk score (22) compared to BBB (58).' },
+                { factor: 'Quality', winner: 'Highest research score', explanation: 'AAA scores higher (70) than BBB (64) on quality.' },
+              ],
+              recommendation: 'AAA presents the stronger research case across risk and quality.',
+              missingDataCaveat: null,
             },
           }),
         };
       }
+      if (url.includes('/api/search/universal')) {
+        return {
+          ok: true,
+          json: async () => ({ ok: true, data: { query: '', results: [] } }),
+        };
+      }
       return {
         ok: true,
-        json: async () => ({
-          data: {
-            companyName: 'Beta Limited',
-            healthScore: 75,
-            classification: 'Watch',
-            confidence: { score: 68, level: 'medium' },
-            factors: { quality: { score: 64 }, value: { score: 60 }, risk: { score: 58 } },
-          },
-        }),
+        json: async () => ({}),
       };
     }));
 

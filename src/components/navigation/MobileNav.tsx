@@ -9,7 +9,7 @@ interface MobileNavItem {
 }
 
 interface PublicMobileNavItem {
-  page: "landing" | "about" | "rankings" | "login" | "signup";
+  page: "landing" | "about" | "rankings" | "login" | "signup" | "scanner";
   label: string;
   icon: React.ReactNode;
 }
@@ -46,7 +46,7 @@ export const MobileNav: React.FC = () => {
 
   const publicTabs: PublicMobileNavItem[] = [
     { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
-    { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
+    { page: "scanner", label: "Scanner", icon: <Search className="icon-nav" /> },
     { page: "about", label: "About", icon: <Info className="icon-nav" /> },
     { page: "login", label: "Sign in", icon: <LogIn className="icon-nav" /> },
   ];

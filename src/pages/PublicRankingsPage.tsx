@@ -1,276 +1,172 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import Table from "../components/ui/Table";
-import Badge from "../components/ui/Badge";
-import Input from "../components/ui/Input";
-import ScorePill from "../components/ui/ScorePill";
-import { MissingDataBadge, ResearchDisclaimer } from "../components/ui/PageHeader";
-import Button from "../components/ui/Button";
-import { formatRank, formatFreshness } from "../services/ui/dataFormatting";
+import { Trophy, Lock, ArrowRight, Search, Info } from "lucide-react";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductHero, ProductSection, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import { useAuth } from "../context/AuthContext";
 import { api, type ScannerResultItem } from "../services/api/client";
-import { scannerResultToResearchListItem } from "../lib/product/productViewAdapters";
-import { ProductShell, ProductPage, ProductPanel, ProductEmptyState, productNavigate } from "../components/product/ProductUI";
-
-interface ExplanationState {
-  symbol: string;
-  companyName?: string;
-  rankingScore: number | null;
-  confidenceScore: number | null;
-  predictionDate?: string | null;
-}
 
 export const PublicRankingsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [rankings, setRankings] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchText, setSearchText] = useState("");
-  const [sectorFilter, setSectorFilter] = useState("all");
-
-  const [explanation, setExplanation] = useState<ExplanationState | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
-    api.getScanner("Quality compounders", 100)
-      .then((res) => {
-        if (ctrl.signal.aborted) return;
-        const data = res.data ?? [];
-        setRankings(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (ctrl.signal.aborted) return;
-        setError("Rankings are being prepared for the latest cycle.");
-        setRankings([]);
-        setLoading(false);
-      });
+    if (isAuthenticated) {
+      api.getScanner("Quality compounders", 50)
+        .then((res) => {
+          if (ctrl.signal.aborted) return;
+          setRankings(res.data ?? []);
+          setLoading(false);
+        })
+        .catch(() => {
+          if (ctrl.signal.aborted) return;
+          setRankings([]);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
     return () => ctrl.abort();
-  }, []);
-
-  const sectors = useMemo(() => {
-    const set = new Set<string>();
-    rankings.forEach((r) => { if (r.sector) set.add(r.sector); });
-    return ["all", ...Array.from(set)];
-  }, [rankings]);
-
-  const filteredRankings = useMemo(() => {
-    return rankings.filter((r) => {
-      const matchSearch = r.symbol.toLowerCase().includes(searchText.toLowerCase()) || (r.sector && r.sector.toLowerCase().includes(searchText.toLowerCase()));
-      const matchSector = sectorFilter === "all" || r.sector === sectorFilter;
-      return matchSearch && matchSector;
-    });
-  }, [rankings, searchText, sectorFilter]);
-
-  const openExplanation = useCallback((entry: ScannerResultItem) => {
-    setExplanation({
-      symbol: entry.symbol,
-      companyName: entry.companyName || undefined,
-      rankingScore: entry.score ?? null,
-      confidenceScore: null,
-    });
-  }, []);
-
-  const convictionLabel = useCallback((entry: ScannerResultItem): string => {
-    const score = entry.score ?? null;
-    if (score === null) return "Pending";
-    if (score >= 75) return "High conviction";
-    if (score >= 55) return "Moderate conviction";
-    if (score >= 40) return "Needs review";
-    return "Track before investing";
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <ProductShell>
       <ProductPage>
-        {error && (
-          <div className="mb-4 rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-4 text-xs text-[#EF4444]" role="status">
-            <p className="font-semibold">Some rankings are being refreshed</p>
-            <p className="mt-1">{error}</p>
-          </div>
-        )}
-
-        {explanation && (
-          <ProductPanel className="mb-6 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-semibold text-[#E6EDF3]">{explanation.symbol}</span>
-                {explanation.companyName && <span className="ml-2 text-xs text-[#9AA7B5]">{explanation.companyName}</span>}
-              </div>
-              <button
-                type="button"
-                onClick={() => setExplanation(null)}
-                className="text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
-              >
-                Dismiss
-              </button>
-            </div>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              <div>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Score</span>
-                <span className="ml-2 font-mono text-sm font-bold text-[#E6EDF3]">
-                  {typeof explanation.rankingScore === "number" && Number.isFinite(explanation.rankingScore) ? Math.round(explanation.rankingScore) : "—"}
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Conviction</span>
-                <span className="ml-2 font-mono text-sm font-bold text-[#E6EDF3]">
-                  {typeof explanation.rankingScore === "number" && Number.isFinite(explanation.rankingScore)
-                    ? convictionLabel({ symbol: explanation.symbol, companyName: explanation.companyName ?? explanation.symbol, sector: null, rank: 0, conviction: "", score: explanation.rankingScore, oneLineThesis: "", keyReason: "", riskMarker: null })
-                    : "—"}
-                </span>
-              </div>
-              {explanation.predictionDate && (
-                <div>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-[#9AA7B5]">Run date</span>
-                  <span className="ml-2 text-sm font-bold text-[#E6EDF3]">{explanation.predictionDate}</span>
-                </div>
+        {!isAuthenticated ? (
+          <>
+            <ProductHero
+              eyebrow="Research rankings"
+              title="See how companies rank."
+              body="Full research rankings, scores, conviction labels, and peer comparisons are available after signing in. Sign up to unlock the full view."
+              actions={(
+                <>
+                  <ProductAction onClick={() => productNavigate("signup")}>Create account to view rankings</ProductAction>
+                  <ProductAction variant="secondary" onClick={() => productNavigate("login")}>Sign in</ProductAction>
+                </>
               )}
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button type="button" size="sm" variant="secondary" onClick={() => { productNavigate("stock", explanation.symbol); }}>
-                Open company research
-              </Button>
-              <Button type="button" size="sm" variant="secondary" onClick={() => { productNavigate("methodology"); }}>
-                View methodology
-              </Button>
-            </div>
-          </ProductPanel>
-        )}
+              aside={(
+                <ProductPanel className="flex min-h-[240px] flex-col justify-between p-5 md:p-6">
+                  <div>
+                    <Lock className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />
+                    <h2 className="mt-3 text-lg font-semibold text-[#E6EDF3]">Rankings are part of the product experience.</h2>
+                    <p className="mt-2 text-xs leading-5 text-[#9AA7B5]">
+                      After signing in, you get full access to company rankings, research scores, sector breakdowns, conviction labels, and comparison tools.
+                    </p>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <ProductStatusPill tone="verified">Research scores</ProductStatusPill>
+                    <ProductStatusPill tone="blue">Sector breakdown</ProductStatusPill>
+                    <ProductStatusPill tone="muted">Peer comparison</ProductStatusPill>
+                  </div>
+                </ProductPanel>
+              )}
+            />
 
-        <ProductPanel className="mb-6 flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-          <div className="w-full sm:w-72">
-            <Input aria-label="Search rankings by symbol or sector" placeholder="Search symbol or sector..." value={searchText} onChange={(e) => setSearchText(e.target.value)} />
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <span className="whitespace-nowrap text-xs font-medium text-[#9AA7B5]">Sector:</span>
-            <select value={sectorFilter} onChange={(e) => setSectorFilter(e.target.value)} className="h-10 w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 text-sm text-[#E6EDF3] sm:w-48">
-              {sectors.map((sec) => (<option key={sec} value={sec}>{sec === "all" ? "All Sectors" : sec}</option>))}
-            </select>
-          </div>
-        </ProductPanel>
-
-        {loading ? (
-          <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Loading...</div>
-        ) : filteredRankings.length === 0 && rankings.length === 0 ? (
+            <ProductSection>
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-[#E6EDF3]">What unlocks after sign-in</h2>
+                <p className="mt-1 text-sm text-[#9AA7B5]">Rankings are one part of a broader research workflow.</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <ProductPanel className="p-4">
+                  <Trophy className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                  <h3 className="mt-2 text-sm font-semibold text-[#E6EDF3]">Full rankings table</h3>
+                  <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">See every scored company with rank, score, conviction, and sector context.</p>
+                </ProductPanel>
+                <ProductPanel className="p-4">
+                  <Search className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                  <h3 className="mt-2 text-sm font-semibold text-[#E6EDF3]">Company research pages</h3>
+                  <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">Open any company to see scores, fundamentals, thesis, and risk factors.</p>
+                </ProductPanel>
+                <ProductPanel className="p-4">
+                  <ArrowRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                  <h3 className="mt-2 text-sm font-semibold text-[#E6EDF3]">Compare & track</h3>
+                  <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">Compare companies side-by-side and track thesis changes over time.</p>
+                </ProductPanel>
+              </div>
+            </ProductSection>
+          </>
+        ) : loading ? (
+          <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Loading rankings...</div>
+        ) : rankings.length === 0 ? (
           <div className="flex flex-col gap-5">
-            <ProductEmptyState title="Rankings pending" body="Rankings appear after verified scoring has completed for the latest cycle." />
-
-            <div className="grid gap-3 sm:flex sm:flex-wrap sm:justify-center">
-              <Button type="button" onClick={() => productNavigate("signup")} className="h-10 px-4 text-xs">Create free account</Button>
-              <Button type="button" onClick={() => productNavigate("methodology")} variant="secondary" className="h-10 px-4 text-xs">View scoring methodology</Button>
+            <div className="py-12 text-center">
+              <Info className="mx-auto h-6 w-6 text-[#64748B]" aria-hidden="true" />
+              <h2 className="mt-3 text-sm font-semibold text-[#E6EDF3]">Rankings pending</h2>
+              <p className="mt-2 text-xs text-[#9AA7B5]">Rankings appear after the research engine completes its latest cycle.</p>
             </div>
-          </div>
-        ) : filteredRankings.length === 0 && rankings.length > 0 ? (
-          <div className="py-12 text-center">
-            <p className="text-sm text-[#9AA7B5]">No rankings match your search or sector filter.</p>
-            <button onClick={() => { setSearchText(""); setSectorFilter("all"); }} className="mt-3 text-xs font-medium text-[#2962FF] hover:text-[#3B71FF] transition-colors">Clear filters</button>
           </div>
         ) : (
-          <>
-            <div className="hidden md:block">
-              <Table headers={["Rank", "Symbol", "Company", "Score", "Conviction", "Sector", "Thesis", ""]}>
-                {filteredRankings.map((r) => {
-                  const item = scannerResultToResearchListItem(r);
-                  const score = r.score;
-                  const conv = r.conviction || convictionLabel(r);
-                  return (
-                    <tr
-                      key={r.symbol}
-                      className="cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.03)]"
-                      onClick={() => productNavigate("stock", r.symbol)}
-                      tabIndex={0}
-                      role="button"
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); productNavigate("stock", r.symbol); } }}
-                    >
-                      <td className="p-4 text-sm font-semibold text-[#9AA7B5]">{formatRank(r.rank)}</td>
-                      <td className="p-4 font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{r.symbol}</td>
-                      <td className="max-w-[200px] truncate p-4 text-sm text-[#9AA7B5]">{r.companyName || <span className="text-[#64748B]">Unavailable</span>}</td>
-                      <td className="p-4">{score !== null && Number.isFinite(score) ? <ScorePill score={Math.round(score)} /> : <MissingDataBadge />}</td>
-                      <td className="p-4 text-xs text-[#9AA7B5]">{conv}</td>
-                      <td className="p-4"><Badge variant="info">{r.sector || "Not available"}</Badge></td>
-                      <td className="max-w-[200px] truncate p-4 text-xs text-[#64748B]">{r.oneLineThesis || item.thesis}</td>
-                      <td className="p-4">
-                        <div className="flex gap-1.5">
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); openExplanation(r); }}
-                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                          >
-                            Explain
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); productNavigate("stock", r.symbol); }}
-                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                          >
-                            Open
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); productNavigate("compare", r.symbol); }}
-                            className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
-                          >
-                            Compare
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </Table>
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-xl font-semibold text-[#E6EDF3]">Research rankings</h1>
+              <p className="mt-1 text-sm text-[#9AA7B5]">Companies ranked by research score. Click any entry to open research.</p>
             </div>
-            <div className="grid gap-4 md:hidden">
-              {filteredRankings.map((r) => {
-                const item = scannerResultToResearchListItem(r);
-                const score = r.score;
-                const conv = r.conviction || convictionLabel(r);
+            <div className="space-y-2">
+              {rankings.slice(0, 50).map((entry) => {
+                const score = entry.score;
                 return (
-                  <ProductPanel key={r.symbol} className="p-4">
+                  <ProductPanel key={entry.symbol} as="article" className="p-4">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{formatRank(r.rank)}</span>
-                        <button onClick={() => productNavigate("stock", r.symbol)} className="font-mono text-base font-bold text-[#E6EDF3] hover:underline">{r.symbol}</button>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          <span className="font-mono text-base font-semibold text-[#E6EDF3]">{entry.symbol}</span>
+                          {entry.rank && (
+                            <span className="text-[10px] font-medium text-[#64748B]">#{entry.rank}</span>
+                          )}
+                        </div>
+                        <p className="truncate text-sm text-[#9AA7B5]">{entry.companyName}</p>
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          {entry.sector && (
+                            <span className="rounded-sm bg-[rgba(148,163,184,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">{entry.sector}</span>
+                          )}
+                          {score !== null && (
+                            <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${
+                              score >= 70 ? "bg-[rgba(22,163,74,0.12)] text-[#16A34A]" :
+                              score >= 50 ? "bg-[rgba(245,158,11,0.12)] text-[#F59E0B]" :
+                              "bg-[rgba(148,163,184,0.08)] text-[#64748B]"
+                            }`}>
+                              {Math.round(score)}
+                            </span>
+                          )}
+                          {entry.conviction && (
+                            <span className="rounded-sm bg-[rgba(41,98,255,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#2962FF]">{entry.conviction}</span>
+                          )}
+                        </div>
+                        {entry.oneLineThesis && (
+                          <p className="mt-2 text-[11px] leading-4 text-[#64748B]">{entry.oneLineThesis}</p>
+                        )}
                       </div>
-                      {score !== null && Number.isFinite(score) ? <ScorePill score={Math.round(score)} /> : <MissingDataBadge />}
                     </div>
-                    <div className="mt-1 text-xs text-[#9AA7B5]">{r.companyName || "Unavailable"}</div>
-                    <div className="mt-1 text-[11px] text-[#64748B]">{conv}</div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="inline-flex items-center rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-0.5 text-[10px] font-medium text-[#9AA7B5]">{r.sector || "Sector unavailable"}</span>
-                      {r.riskMarker && r.riskMarker !== "Risk review normal" && (
-                        <span className="inline-flex items-center rounded-md border border-[rgba(239,68,68,0.2)] px-2 py-0.5 text-[10px] font-medium text-[#EF4444]">
-                          {r.riskMarker}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-1 text-[11px] leading-4 text-[#64748B]">{item.thesis}</div>
-                    <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-3">
                       <button
                         type="button"
-                        onClick={() => { openExplanation(r); }}
-                        className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                        onClick={() => productNavigate("stock", entry.symbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#2962FF] bg-[rgba(41,98,255,0.12)] px-3 text-[11px] font-semibold text-white hover:bg-[rgba(41,98,255,0.2)] transition-colors"
                       >
-                        Trace
+                        Research
                       </button>
                       <button
                         type="button"
-                        onClick={() => productNavigate("compare", r.symbol)}
-                        className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] py-2 text-[10px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/60 hover:text-[#E6EDF3] transition-colors"
+                        onClick={() => productNavigate("compare", entry.symbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
                       >
                         Compare
                       </button>
-                      <Button type="button" size="sm" onClick={() => productNavigate("stock", r.symbol)}>
+                      <button
+                        type="button"
+                        onClick={() => productNavigate("stock", entry.symbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                      >
                         Open
-                      </Button>
+                      </button>
                     </div>
                   </ProductPanel>
                 );
               })}
             </div>
-          </>
+          </div>
         )}
-
-        <div className="mt-6">
-          <ResearchDisclaimer />
-        </div>
       </ProductPage>
     </ProductShell>
   );

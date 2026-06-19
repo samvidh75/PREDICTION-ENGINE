@@ -32,10 +32,10 @@ export const SignupPage: React.FC = () => {
             { icon: ShieldCheck, label: "Trust-first workflow", body: "Use the Trust Centre to inspect source availability and methodology.", tone: "verified" },
           ]}
         />
-        <ProductFormPanel title="Create account" body={contextMessage || "Save research state and continue across sessions."}>
+        <ProductFormPanel title="Create your account" body={contextMessage || "Create an account to continue your research."}>
           <CinematicAuthGateway onAuthed={onAuthed} initialStage="signup" restoreOnMount={false} contextMessage={contextMessage} />
           <div className="mt-4 flex justify-center">
-            <ProductAction variant="ghost" onClick={() => productNavigate("landing")}>Back to landing</ProductAction>
+            <ProductAction variant="ghost" onClick={() => productNavigate("login")}>Already have an account? Sign in</ProductAction>
           </div>
         </ProductFormPanel>
       </ProductPage>

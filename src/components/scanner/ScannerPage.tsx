@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info, ExternalLink, Bookmark } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
@@ -18,7 +18,6 @@ const SCANNER_PRESETS = [
 ];
 
 const MARKET_CAP_OPTIONS = ["All", "Large", "Mid", "Small", "Micro"];
-const SECTOR_OPTIONS = ["All", "Automobile", "Banking", "Cement", "Chemicals", "Consumer", "Energy", "Financials", "FMCG", "Healthcare", "IT", "Media", "Metals", "Pharmaceuticals", "Power", "Real Estate", "Retail", "Telecom", "Textiles"];
 const SCORE_RANGES = ["All", "80-100", "60-79", "40-59", "Below 40"];
 const FACTOR_LEVELS = ["Any", "High", "Medium", "Low"];
 const DIVIDEND_OPTIONS = ["Any", "High (>4%)", "Medium (2-4%)", "Low (<2%)"];
@@ -63,7 +62,6 @@ export default function ScannerPage() {
 
   const [filters, setFilters] = useState({
     marketCap: "All",
-    sector: "All",
     scoreRange: "All",
     valuation: "Any",
     growth: "Any",
@@ -74,7 +72,13 @@ export default function ScannerPage() {
     dividendYield: "Any",
   });
 
-  // Fetch from the research scanner route
+  // Derive sectors from real data only
+  const sectors = useMemo(() => {
+    const set = new Set<string>();
+    allEntries.forEach((r) => { if (r.sector && r.sector.trim().length > 0) set.add(r.sector); });
+    return Array.from(set);
+  }, [allEntries]);
+
   const fetchScanner = useCallback(async (preset: string) => {
     setLoading(true);
     try {
@@ -95,12 +99,11 @@ export default function ScannerPage() {
 
   const handlePresetClick = useCallback((label: string) => {
     if (activePreset === label) {
-      // Re-fetch with same preset
       fetchScanner(label);
       return;
     }
     setActivePreset(label);
-    setFilters({ marketCap: "All", sector: "All", scoreRange: "All", valuation: "Any", growth: "Any", profitability: "Any", balanceSheet: "Any", momentum: "Any", volatility: "Any", dividendYield: "Any" });
+    setFilters({ marketCap: "All", scoreRange: "All", valuation: "Any", growth: "Any", profitability: "Any", balanceSheet: "Any", momentum: "Any", volatility: "Any", dividendYield: "Any" });
   }, [activePreset, fetchScanner]);
 
   const handleQuerySubmit = useCallback(() => {
@@ -119,7 +122,7 @@ export default function ScannerPage() {
 
   const convictionLabel = useCallback((entry: ScannerResultItem): string => {
     const score = entry.score ?? null;
-    if (score === null) return "Insufficient data";
+    if (score === null) return "";
     if (score >= 75) return "High conviction";
     if (score >= 55) return "Moderate conviction";
     if (score >= 40) return "Developing";
@@ -140,9 +143,6 @@ export default function ScannerPage() {
 
   const filteredResults = useMemo(() => {
     let filtered = [...results];
-    if (filters.sector !== "All") {
-      filtered = filtered.filter((e) => e.sector === filters.sector);
-    }
     if (filters.scoreRange !== "All") {
       filtered = filtered.filter((e) => {
         if (e.score === null || e.score === undefined) return false;
@@ -181,9 +181,7 @@ export default function ScannerPage() {
 
   const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
   const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
-  const handleTrack = useCallback(async (_symbol: string) => {
-    // Track currently disabled for non-authenticated scanner view
-  }, []);
+  const handleTrack = useCallback(async (_symbol: string) => {}, []);
   const handleInvest = useCallback((symbol: string) => productNavigate("invest", symbol), []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -192,17 +190,16 @@ export default function ScannerPage() {
 
   const filterContent = (
     <div className="space-y-5">
-      <FilterSection title="Company">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <FilterSelect label="Market cap" value={filters.marketCap} options={MARKET_CAP_OPTIONS} onChange={(v) => updateFilter("marketCap", v)} />
-          <FilterSelect label="Sector" value={filters.sector} options={SECTOR_OPTIONS} onChange={(v) => updateFilter("sector", v)} />
-        </div>
-      </FilterSection>
       <FilterSection title="Score">
         <div className="grid gap-3 sm:max-w-xs">
           <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => updateFilter("scoreRange", v)} />
         </div>
       </FilterSection>
+      {sectors.length > 1 && (
+        <FilterSection title="Sector">
+          <FilterSelect label="Sector" value={filters.marketCap} options={["All", ...sectors]} onChange={(v) => updateFilter("marketCap", v)} />
+        </FilterSection>
+      )}
       <FilterSection title="Factors">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <FilterSelect label="Valuation" value={filters.valuation} options={FACTOR_LEVELS} onChange={(v) => updateFilter("valuation", v)} />
@@ -225,45 +222,22 @@ export default function ScannerPage() {
     <ProductShell>
       <ProductPage>
         <div className="flex flex-col gap-5">
+          {/* Header */}
           <div>
-            <h1 className="text-lg font-semibold text-[#E6EDF3]">Find companies worth researching.</h1>
-            <p className="mt-0.5 text-xs text-[#9AA7B5]">Describe what you are looking for or browse by strategy.</p>
+            <h1 className="text-xl font-semibold text-[#E6EDF3]">Company scanner</h1>
+            <p className="mt-1 text-sm text-[#9AA7B5]">Find companies worth researching. Search by name, browse by strategy, or filter by fundamentals.</p>
           </div>
 
-          {/* Micro-guide */}
-          <div className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)]">
-            <button
-              type="button"
-              onClick={() => setGuideOpen(!guideOpen)}
-              className="flex w-full items-center justify-between px-3 py-2 text-left"
-            >
-              <span className="inline-flex items-center gap-2 text-[11px] font-medium text-[#9AA7B5]">
-                <Info className="h-3.5 w-3.5" aria-hidden="true" />
-                How to use the scanner
-              </span>
-              {guideOpen ? <ChevronUp className="h-3 w-3 text-[#9AA7B5]" /> : <ChevronDown className="h-3 w-3 text-[#9AA7B5]" />}
-            </button>
-            {guideOpen && (
-              <div className="border-t border-[rgba(148,163,184,0.08)] px-3 py-3 text-[11px] leading-5 text-[#9AA7B5] space-y-2">
-                <p><strong className="text-[#E6EDF3]">Search</strong> — Type a name, symbol, or sector to find specific companies.</p>
-                <p><strong className="text-[#E6EDF3]">Strategies</strong> — Click a preset to instantly filter by theme. Click again to clear.</p>
-                <p><strong className="text-[#E6EDF3]">Filters</strong> — Narrow by market cap, sector, scores, and fundamental factors.</p>
-                <p><strong className="text-[#E6EDF3]">Sort</strong> — Reorder results by score or name.</p>
-                <p><strong className="text-[#E6EDF3]">Actions</strong> — Research in detail, Compare across peers, Track in watchlist, or Invest.</p>
-              </div>
-            )}
-          </div>
-
-          {/* Search */}
+          {/* Command-style search */}
           <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
             <Search className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Describe what you're looking for..."
+              placeholder="Search symbol, company, or sector..."
               className="h-9 w-full min-w-0 bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
-              aria-label="Describe what you're looking for"
+              aria-label="Search symbol, company, or sector"
             />
             {query && (
               <button
@@ -284,8 +258,8 @@ export default function ScannerPage() {
             </button>
           </div>
 
-          {/* Presets - scrollable row */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+          {/* Strategy presets - dark styled horizontal chip rail with hidden scrollbar */}
+          <div className="scrollbar-none -mx-4 flex items-center gap-1.5 overflow-x-auto px-4">
             {SCANNER_PRESETS.map((preset) => {
               const active = activePreset === preset.label;
               return (
@@ -317,14 +291,6 @@ export default function ScannerPage() {
               Filters
               {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
-            <button
-              type="button"
-              onClick={() => setFilterDrawerOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors md:hidden"
-            >
-              <ArrowUpDown className="h-3.5 w-3.5" />
-              Sort & Filter
-            </button>
             <div className="hidden md:flex items-center gap-1.5">
               <span className="text-[10px] text-[#64748B] font-medium uppercase tracking-wider">Sort</span>
               <select
@@ -353,7 +319,7 @@ export default function ScannerPage() {
               >
                 <span className="inline-flex items-center gap-2">
                   <Filter className="h-3.5 w-3.5 text-[#9AA7B5]" aria-hidden="true" />
-                  Advanced Filters
+                  Advanced filters
                 </span>
                 {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#9AA7B5]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#9AA7B5]" />}
               </button>
@@ -392,22 +358,26 @@ export default function ScannerPage() {
                 const risky = hasRiskFlag(entry);
                 const sector = item.sector;
                 return (
-                  <ProductPanel key={fullSymbol} as="article" className="p-3">
+                  <ProductPanel key={fullSymbol} as="article" className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{fullSymbol}</span>
-                          {sector && (
-                            <span className="rounded-sm bg-[rgba(148,163,184,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">{sector}</span>
-                          )}
+                          <span className="font-mono text-base font-semibold text-[#E6EDF3]">{fullSymbol}</span>
                           {entry.rank && (
                             <span className="text-[10px] font-medium text-[#64748B]">#{entry.rank}</span>
                           )}
                         </div>
-                        <p className="truncate text-xs text-[#9AA7B5]">{item.company}</p>
-                        <p className="mt-1.5 text-xs leading-5 text-[#E6EDF3]">{item.thesis}</p>
-                        <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                          <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
+                        <p className="truncate text-sm text-[#9AA7B5]">{item.company}</p>
+                        {item.thesis && (
+                          <p className="mt-1.5 text-xs leading-5 text-[#E6EDF3]">{item.thesis}</p>
+                        )}
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          {sector && (
+                            <span className="rounded-sm bg-[rgba(148,163,184,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">{sector}</span>
+                          )}
+                          {convLabel && (
+                            <ProductStatusPill tone={convTone}>{convLabel}</ProductStatusPill>
+                          )}
                           {score !== null && (
                             <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
                           )}
@@ -415,14 +385,35 @@ export default function ScannerPage() {
                             <ProductStatusPill tone="warning">Risk flag</ProductStatusPill>
                           )}
                         </div>
-                        <p className="mt-0.5 text-[11px] leading-4 text-[#64748B]">{item.keyReason}</p>
+                        {item.keyReason && (
+                          <p className="mt-1 text-[11px] leading-4 text-[#64748B]">{item.keyReason}</p>
+                        )}
                       </div>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-2">
-                      <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>Research</ProductAction>
-                      <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>Compare</ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>Track</ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled disabledReason="Review before deciding">Handoff</ProductAction>
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-3">
+                      <button
+                        type="button"
+                        onClick={() => handleResearch(fullSymbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#2962FF] bg-[rgba(41,98,255,0.12)] px-3 text-[11px] font-semibold text-white hover:bg-[rgba(41,98,255,0.2)] transition-colors"
+                      >
+                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                        Research
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCompare(fullSymbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                      >
+                        Compare
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleTrack(fullSymbol)}
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                      >
+                        <Bookmark className="h-3 w-3" aria-hidden="true" />
+                        Track
+                      </button>
                     </div>
                   </ProductPanel>
                 );
