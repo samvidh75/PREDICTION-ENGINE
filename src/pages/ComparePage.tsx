@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark, Copy } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
 import { CompareShareRecap } from "../components/share/CompareShareRecap";
@@ -11,38 +11,6 @@ interface CompareCompany {
   companyName?: string;
   score?: number | null;
   classification?: string | null;
-  confidenceScore?: number | null;
-  confidenceLevel?: string | null;
-  rank?: number | null;
-  predictionDate?: string | null;
-  factors?: Record<string, number | null>;
-}
-
-async function fetchCompanyData(symbol: string): Promise<CompareCompany | null> {
-  try {
-    const res = await api.getInsight(symbol);
-    const d = res?.data;
-    if (!d) return null;
-    return {
-      symbol: symbol.toUpperCase(),
-      companyName: (d as any).companyName || (d as any).company_name,
-      score: typeof (d as any).healthScore === "number" ? (d as any).healthScore : (d as any).rankingScore ?? null,
-      classification: (d as any).classification || null,
-      confidenceScore: (d as any).confidence?.score ?? (d as any).confidenceScore ?? null,
-      confidenceLevel: (d as any).confidence?.level ?? (d as any).confidenceLevel ?? null,
-      predictionDate: (d as any).predictionDate || (d as any).prediction_date || null,
-      factors: (d as any).factors ? {
-        growth: (d as any).factors.growth?.score ?? null,
-        quality: (d as any).factors.quality?.score ?? null,
-        stability: (d as any).factors.stability?.score ?? null,
-        momentum: (d as any).factors.momentum?.score ?? null,
-        valuation: (d as any).factors.value?.score ?? (d as any).factors.valuation?.score ?? null,
-        risk: (d as any).factors.risk?.score ?? null,
-      } : undefined,
-    };
-  } catch {
-    return null;
-  }
 }
 
 const MAX_COMPANIES = 3;
@@ -53,7 +21,27 @@ export const ComparePage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Compare route response state
+  const [routeData, setRouteData] = useState<{
+    factorComparison: Array<{ factor: string; winner: string | null; explanation: string }>;
+    recommendation: string | null;
+    missingDataCaveat: string | null;
+  } | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+
   const [shareRecapOpen, setShareRecapOpen] = useState(false);
+
+  const fetchCompare = useCallback(async (syms: string[]) => {
+    setRouteLoading(true);
+    try {
+      const res = await api.compareCompanies(syms);
+      setRouteData(res.data);
+    } catch {
+      setRouteData(null);
+    }
+    setRouteLoading(false);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -62,12 +50,18 @@ export const ComparePage: React.FC = () => {
     const ids = idsParam ? idsParam.split(",").filter(Boolean) : (idParam ? [idParam] : []);
     if (ids.length > 0) {
       setLoading(true);
-      Promise.all(ids.map(fetchCompanyData)).then((results) => {
-        setCompanies(results.filter(Boolean) as CompareCompany[]);
-        setLoading(false);
-      });
+      const resolved: CompareCompany[] = ids.map((sym) => ({
+        symbol: sym.toUpperCase(),
+        companyName: sym,
+        score: null,
+      }));
+      setCompanies(resolved);
+      setLoading(false);
+      if (resolved.length >= 2) {
+        fetchCompare(resolved.map((c) => c.symbol));
+      }
     }
-  }, []);
+  }, [fetchCompare]);
 
   useEffect(() => {
     if (!searchQuery.trim() || companies.length >= MAX_COMPANIES) { setSearchResults([]); return; }
@@ -89,13 +83,13 @@ export const ComparePage: React.FC = () => {
     if (companies.find((c) => c.symbol === symbol.toUpperCase())) return;
     setSearchQuery("");
     setSearchResults([]);
-    const data = await fetchCompanyData(symbol);
-    if (data) {
-      const updated = [...companies, data];
-      setCompanies(updated);
-      const params = new URLSearchParams(window.location.search);
-      params.set("ids", updated.map((c) => c.symbol).join(","));
-      window.history.replaceState({}, "", `?${params.toString()}`);
+    const updated = [...companies, { symbol: symbol.toUpperCase(), companyName: symbol, score: null }];
+    setCompanies(updated);
+    const params = new URLSearchParams(window.location.search);
+    params.set("ids", updated.map((c) => c.symbol).join(","));
+    window.history.replaceState({}, "", `?${params.toString()}`);
+    if (updated.length >= 2) {
+      fetchCompare(updated.map((c) => c.symbol));
     }
   };
 
@@ -106,52 +100,17 @@ export const ComparePage: React.FC = () => {
     if (updated.length > 0) params.set("ids", updated.map((c) => c.symbol).join(","));
     else params.delete("ids");
     window.history.replaceState({}, "", `?${params.toString()}`);
+    if (updated.length >= 2) {
+      fetchCompare(updated.map((c) => c.symbol));
+    } else {
+      setRouteData(null);
+    }
   };
 
-  const factorLabels: Record<string, string> = {
-    growth: "Growth",
-    quality: "Quality",
-    stability: "Stability",
-    momentum: "Momentum",
-    valuation: "Valuation",
-    risk: "Risk",
-  };
-
-  const factorKeys = ["growth", "quality", "stability", "momentum", "valuation", "risk"];
-
-  const fmt = (v: number | null | undefined): string | null => {
+  const fmt = (v: number | null | undefined): string => {
     if (typeof v === "number" && Number.isFinite(v)) return String(Math.round(v));
-    return null;
+    return "—";
   };
-
-  const formatDate = (d: string | null | undefined): string => {
-    if (!d) return "—";
-    try { return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
-    catch { return "—"; }
-  };
-
-  const hasFactor = (key: string): boolean =>
-    companies.some((c) => typeof c.factors?.[key] === "number");
-
-  function getDecisionLabels(company: CompareCompany): string[] {
-    const labels: string[] = [];
-    const scores = companies.map((c) => c.score ?? -Infinity);
-    const maxScore = Math.max(...scores);
-    const qualityScores = companies.map((c) => c.factors?.quality ?? -Infinity);
-    const maxQuality = Math.max(...qualityScores);
-    const valuationScores = companies.map((c) => c.factors?.valuation ?? -Infinity);
-    const maxValuation = Math.max(...valuationScores);
-    const riskScores = companies.map((c) => c.factors?.risk ?? Infinity);
-    const minRisk = Math.min(...riskScores);
-
-    if (company.score === maxScore) labels.push("Highest research score");
-    else labels.push("Needs review");
-    if (company.factors?.quality === maxQuality && qualityScores.some((s) => s !== maxQuality && s !== -Infinity)) labels.push("Better quality profile");
-    if (company.factors?.valuation === maxValuation && valuationScores.some((s) => s !== maxValuation && s !== -Infinity)) labels.push("Better valuation context");
-    if (company.factors?.risk === minRisk && riskScores.some((s) => s !== minRisk && s !== Infinity)) labels.push("Lower risk score");
-
-    return labels;
-  }
 
   const decisionLabelColors: Record<string, string> = {
     "Highest research score": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -159,6 +118,8 @@ export const ComparePage: React.FC = () => {
     "Better quality profile": "bg-sky-500/10 text-sky-400 border-sky-500/20",
     "Better valuation context": "bg-violet-500/10 text-violet-400 border-violet-500/20",
     "Lower risk score": "bg-sky-500/10 text-sky-400 border-sky-500/20",
+    "Stronger research case": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    "Higher risk": "bg-amber-500/10 text-amber-400 border-amber-500/20",
   };
 
   return (
@@ -225,9 +186,6 @@ export const ComparePage: React.FC = () => {
                       className="min-w-0 flex-1 text-left"
                     >
                       <span className="block truncate font-mono text-xs font-semibold text-[#E6EDF3] hover:underline">{company.symbol}</span>
-                      {company.score !== null && company.score !== undefined && (
-                        <span className="block text-[10px] tabular-nums text-[#9AA7B5]">{Math.round(Number(company.score))}</span>
-                      )}
                     </button>
                     <button
                       type="button"
@@ -254,8 +212,7 @@ export const ComparePage: React.FC = () => {
                 <div>
                   <h2 className="text-sm font-semibold text-[#E6EDF3]">Search companies above to compare</h2>
                   <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#9AA7B5]">
-                    Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown of scores, factors, and
-                    research narratives. Use this to decide which company deserves deeper investigation.
+                    Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown. Use this to decide which company deserves deeper investigation.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -271,189 +228,57 @@ export const ComparePage: React.FC = () => {
           </>
         )}
 
-        {!loading && companies.length >= 2 && (
+        {routeLoading && (
+          <div className="flex items-center justify-center gap-2 py-6 text-xs text-[#9AA7B5]">
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+            Loading comparison data from research engine...
+          </div>
+        )}
+
+        {!loading && !routeLoading && companies.length >= 2 && routeData && (
           <div className="space-y-5">
-            <ProductPanel className="overflow-hidden">
-              <div className="divide-y divide-[rgba(148,163,184,0.08)]">
-                {/* Summary */}
+            {/* Factor Comparison from Research Engine */}
+            {routeData.factorComparison && routeData.factorComparison.length > 0 && (
+              <ProductPanel className="overflow-hidden">
                 <div className="px-4 py-3.5">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Summary</div>
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Factor Comparison</div>
                   <div className="-mx-2 overflow-x-auto">
-                    <div className="min-w-[400px] px-2">
-                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Score</div>
-                        {companies.map((c) => (
-                          <div key={c.symbol} className="text-right font-mono text-xs font-semibold tabular-nums text-[#E6EDF3] py-1.5">{fmt(c.score) ?? "—"}</div>
-                        ))}
-                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Conviction</div>
-                        {companies.map((c) => (
-                          <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">{c.confidenceScore !== null && c.confidenceScore !== undefined ? `${Math.round(c.confidenceScore)}%` : "—"}</div>
-                        ))}
-                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Classification</div>
-                        {companies.map((c) => (
-                          <div key={c.symbol} className="text-right text-xs text-[#E6EDF3] py-1.5">{c.classification || "—"}</div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thesis Comparison */}
-                <div className="px-4 py-3.5">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Thesis Comparison</div>
-                  <div className="-mx-2 overflow-x-auto">
-                    <div className="min-w-[400px] px-2">
-                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Narrative</div>
-                        {companies.map((c) => (
-                          <div key={c.symbol} className="text-right text-[10px] text-[#9AA7B5] py-1.5 italic">
-                            {c.classification
-                              ? `${c.symbol} classified as ${c.classification.toLowerCase()} with a score of ${fmt(c.score) ?? "—"}`
-                              : "Narrative not available in compare mode"}
+                    <div className="min-w-[400px] px-2 space-y-3">
+                      {routeData.factorComparison.map((fc) => (
+                        <div key={fc.factor} className="rounded-lg border border-[rgba(148,163,184,0.08)] bg-[rgba(255,255,255,0.02)] p-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-[#E6EDF3]">{fc.factor}</span>
+                            {fc.winner && (
+                              <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium leading-tight ${decisionLabelColors[fc.winner] || "bg-[rgba(148,163,184,0.08)] text-[#9AA7B5] border-[rgba(148,163,184,0.16)]"}`}>
+                                {fc.winner}
+                              </span>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quality Comparison */}
-                {hasFactor("quality") && (
-                  <div className="px-4 py-3.5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Quality Comparison</div>
-                    <div className="-mx-2 overflow-x-auto">
-                      <div className="min-w-[400px] px-2">
-                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                          <div className="text-[10px] font-medium text-[#64748B] py-1.5">Quality</div>
-                          {companies.map((c) => (
-                            <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
-                              {c.factors && typeof c.factors.quality === "number" && Number.isFinite(c.factors.quality) ? Math.round(c.factors.quality) : "—"}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Valuation Comparison */}
-                {hasFactor("valuation") && (
-                  <div className="px-4 py-3.5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Valuation Comparison</div>
-                    <div className="-mx-2 overflow-x-auto">
-                      <div className="min-w-[400px] px-2">
-                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                          <div className="text-[10px] font-medium text-[#64748B] py-1.5">Valuation</div>
-                          {companies.map((c) => (
-                            <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
-                              {c.factors && typeof c.factors.valuation === "number" && Number.isFinite(c.factors.valuation) ? Math.round(c.factors.valuation) : "—"}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Growth Comparison */}
-                {hasFactor("growth") && (
-                  <div className="px-4 py-3.5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Growth Comparison</div>
-                    <div className="-mx-2 overflow-x-auto">
-                      <div className="min-w-[400px] px-2">
-                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                          <div className="text-[10px] font-medium text-[#64748B] py-1.5">Growth</div>
-                          {companies.map((c) => (
-                            <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
-                              {c.factors && typeof c.factors.growth === "number" && Number.isFinite(c.factors.growth) ? Math.round(c.factors.growth) : "—"}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Risk Comparison */}
-                {hasFactor("risk") && (
-                  <div className="px-4 py-3.5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Risk Comparison</div>
-                    <div className="-mx-2 overflow-x-auto">
-                      <div className="min-w-[400px] px-2">
-                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                          <div className="text-[10px] font-medium text-[#64748B] py-1.5">Risk</div>
-                          {companies.map((c) => (
-                            <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
-                              {c.factors && typeof c.factors.risk === "number" && Number.isFinite(c.factors.risk) ? Math.round(c.factors.risk) : "—"}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Momentum Comparison (if available) */}
-                {hasFactor("momentum") && (
-                  <div className="px-4 py-3.5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Momentum Comparison</div>
-                    <div className="-mx-2 overflow-x-auto">
-                      <div className="min-w-[400px] px-2">
-                        <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                          <div className="text-[10px] font-medium text-[#64748B] py-1.5">Momentum</div>
-                          {companies.map((c) => (
-                            <div key={c.symbol} className="text-right font-mono text-xs tabular-nums text-[#E6EDF3] py-1.5">
-                              {c.factors && typeof c.factors.momentum === "number" && Number.isFinite(c.factors.momentum) ? Math.round(c.factors.momentum) : "—"}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Research date */}
-                <div className="px-4 py-3.5">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Research date</div>
-                  <div className="-mx-2 overflow-x-auto">
-                    <div className="min-w-[400px] px-2">
-                      <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                        <div className="text-[10px] font-medium text-[#64748B] py-1.5">Prediction date</div>
-                        {companies.map((c) => (
-                          <div key={c.symbol} className="text-right text-[10px] text-[#E6EDF3] py-1.5">{c.predictionDate ? formatDate(c.predictionDate) : "—"}</div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ProductPanel>
-
-            {/* Decision helper */}
-            <ProductPanel className="overflow-hidden">
-              <div className="px-4 py-3.5">
-                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Research cues</div>
-                <div className="-mx-2 overflow-x-auto">
-                  <div className="min-w-[400px] px-2">
-                    <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                      <div className="text-[10px] font-medium text-[#64748B] py-1.5">Labels</div>
-                      {companies.map((c) => (
-                        <div key={c.symbol} className="flex flex-col items-end gap-1 py-1.5">
-                          {getDecisionLabels(c).map((label) => (
-                            <span
-                              key={label}
-                              className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium leading-tight ${decisionLabelColors[label] || "bg-[rgba(148,163,184,0.08)] text-[#9AA7B5] border-[rgba(148,163,184,0.16)]"}`}
-                            >
-                              {label}
-                            </span>
-                          ))}
+                          <p className="mt-1 text-[11px] leading-4 text-[#9AA7B5]">{fc.explanation}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
+              </ProductPanel>
+            )}
+
+            {/* Recommendation */}
+            {routeData.recommendation && (
+              <ProductPanel className="overflow-hidden">
+                <div className="px-4 py-3.5">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Research Cue</div>
+                  <p className="text-sm leading-5 text-[#E6EDF3]">{routeData.recommendation}</p>
+                </div>
+              </ProductPanel>
+            )}
+
+            {/* Missing data caveat */}
+            {routeData.missingDataCaveat && (
+              <div className="rounded-lg border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.06)] p-3 text-xs text-[#F59E0B]">
+                {routeData.missingDataCaveat}
               </div>
-            </ProductPanel>
+            )}
 
             {/* Actions per company */}
             <ProductPanel className="overflow-hidden">
@@ -484,20 +309,29 @@ export const ComparePage: React.FC = () => {
           </div>
         )}
 
+        {!loading && !routeLoading && companies.length >= 2 && !routeData && (
+          <ProductPanel className="p-6 text-center">
+            <p className="text-sm text-[#9AA7B5]">Research comparison is being prepared for these companies. Check back after the next research cycle.</p>
+            <div className="mt-4 flex justify-center gap-2">
+              <ProductAction variant="secondary" onClick={() => fetchCompare(companies.map((c) => c.symbol))}>Try again</ProductAction>
+            </div>
+          </ProductPanel>
+        )}
+
         {!loading && companies.length > 0 && (
           <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
             <p className="text-[10px] leading-relaxed text-[#64748B]">
-              Compare shows recorded scores and factors for each company. Missing values are marked as pending. Research cues are reading aids based on available values, not investment advice.
+              Compare shows research engine output for the selected companies. Missing values are marked as pending. Research cues are reading aids based on available values, not investment advice.
             </p>
           </div>
         )}
 
         <SpatialSheet open={shareRecapOpen} onClose={() => setShareRecapOpen(false)} title="Comparison Summary">
-          {companies.length >= 2 ? (
+          {companies.length >= 2 && routeData ? (
             <CompareShareRecap
-              companyA={{ symbol: companies[0].symbol, companyName: companies[0].companyName, score: companies[0].score }}
-              companyB={{ symbol: companies[1].symbol, companyName: companies[1].companyName, score: companies[1].score }}
-              decisionLabels={[...new Set(companies.flatMap((c) => getDecisionLabels(c)))]}
+              companyA={{ symbol: companies[0].symbol, companyName: companies[0].companyName, score: null }}
+              companyB={{ symbol: companies[1].symbol, companyName: companies[1].companyName, score: null }}
+              decisionLabels={routeData.factorComparison?.map((fc) => fc.winner).filter((w): w is string => w !== null) ?? []}
             />
           ) : (
             <div className="flex items-center justify-center py-8 text-xs text-[#9AA7B5]">

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, Filter, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
-import { api, type LeaderboardEntry } from "../../services/api/client";
-import { leaderboardEntryToResearchListItem } from "../../lib/product/productViewAdapters";
+import { api, type ScannerResultItem } from "../../services/api/client";
+import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
 
 const SCANNER_PRESETS = [
   { label: "Quality compounders", icon: Shield, filters: { qualityMin: 70, growthMin: 60 } },
@@ -24,8 +24,8 @@ const FACTOR_LEVELS = ["Any", "High", "Medium", "Low"];
 const DIVIDEND_OPTIONS = ["Any", "High (>4%)", "Medium (2-4%)", "Low (<2%)"];
 
 const SORT_OPTIONS = [
-  { value: "score-desc", label: "Score \u2193" },
-  { value: "score-asc", label: "Score \u2191" },
+  { value: "score-desc", label: "Score ↓" },
+  { value: "score-asc", label: "Score ↑" },
   { value: "name-asc", label: "Name A-Z" },
   { value: "name-desc", label: "Name Z-A" },
 ] as const;
@@ -52,15 +52,14 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 
 export default function ScannerPage() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<LeaderboardEntry[]>([]);
-  const [allEntries, setAllEntries] = useState<LeaderboardEntry[]>([]);
+  const [results, setResults] = useState<ScannerResultItem[]>([]);
+  const [allEntries, setAllEntries] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [activePreset, setActivePreset] = useState<string>("Quality compounders");
   const [sortValue, setSortValue] = useState("score-desc");
-  const [brokerConnected] = useState(false);
 
   const [filters, setFilters] = useState({
     marketCap: "All",
@@ -75,46 +74,34 @@ export default function ScannerPage() {
     dividendYield: "Any",
   });
 
-  useEffect(() => {
-    let cancelled = false;
-    api.getLeaderboard(200)
-      .then((res) => {
-        if (cancelled) return;
-        const data = res.data ?? [];
-        setAllEntries(data);
-        setResults(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
+  // Fetch from the research scanner route
+  const fetchScanner = useCallback(async (preset: string) => {
+    setLoading(true);
+    try {
+      const res = await api.getScanner(preset, 200);
+      const data = res.data ?? [];
+      setAllEntries(data);
+      setResults(data);
+    } catch {
+      setAllEntries([]);
+      setResults([]);
+    }
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchScanner(activePreset);
+  }, [fetchScanner, activePreset]);
 
   const handlePresetClick = useCallback((label: string) => {
     if (activePreset === label) {
-      setActivePreset(null);
-      setFilters({ marketCap: "All", sector: "All", scoreRange: "All", valuation: "Any", growth: "Any", profitability: "Any", balanceSheet: "Any", momentum: "Any", volatility: "Any", dividendYield: "Any" });
-      setResults(allEntries);
+      // Re-fetch with same preset
+      fetchScanner(label);
       return;
     }
     setActivePreset(label);
     setFilters({ marketCap: "All", sector: "All", scoreRange: "All", valuation: "Any", growth: "Any", profitability: "Any", balanceSheet: "Any", momentum: "Any", volatility: "Any", dividendYield: "Any" });
-    const preset = SCANNER_PRESETS.find((p) => p.label === label);
-    if (!preset) return;
-    const f = preset.filters;
-    const filtered = allEntries.filter((e) => {
-      if (f.qualityMin !== undefined && (e.factors.quality ?? 0) < f.qualityMin) return false;
-      if (f.growthMin !== undefined && (e.factors.growth ?? 0) < f.growthMin) return false;
-      if (f.valueMin !== undefined && (e.factors.value ?? 0) < f.valueMin) return false;
-      if (f.momentumMin !== undefined && (e.factors.momentum ?? 0) < f.momentumMin) return false;
-      if (f.riskMin !== undefined && (e.factors.risk ?? 0) < f.riskMin) return false;
-      if (f.riskMax !== undefined && (e.factors.risk ?? 100) > f.riskMax) return false;
-      if (f.valueMax !== undefined && (e.factors.value ?? 100) > f.valueMax) return false;
-      return true;
-    });
-    setResults(filtered);
-  }, [activePreset, allEntries]);
+  }, [activePreset, fetchScanner]);
 
   const handleQuerySubmit = useCallback(() => {
     const trimmed = query.trim().toLowerCase();
@@ -125,33 +112,30 @@ export default function ScannerPage() {
     const filtered = allEntries.filter((e) =>
       e.companyName?.toLowerCase().includes(trimmed) ||
       e.symbol?.toLowerCase().includes(trimmed) ||
-      e.sector?.toLowerCase().includes(trimmed) ||
-      e.industry?.toLowerCase().includes(trimmed)
+      e.sector?.toLowerCase().includes(trimmed)
     );
     setResults(filtered);
   }, [query, allEntries]);
 
-  const convictionLabel = useCallback((entry: LeaderboardEntry): string => {
-    const score = entry.rankingScore ?? null;
-    const confidence = entry.confidenceScore ?? null;
-    if (score === null && confidence === null) return "Insufficient data";
-    if (score !== null && score >= 75 && confidence !== null && confidence >= 70) return "High conviction";
-    if (score !== null && score >= 55 && confidence !== null && confidence >= 50) return "Moderate conviction";
-    if (score !== null && score >= 40) return "Developing";
+  const convictionLabel = useCallback((entry: ScannerResultItem): string => {
+    const score = entry.score ?? null;
+    if (score === null) return "Insufficient data";
+    if (score >= 75) return "High conviction";
+    if (score >= 55) return "Moderate conviction";
+    if (score >= 40) return "Developing";
     return "Speculative";
   }, []);
 
-  const convictionTone = useCallback((entry: LeaderboardEntry): "verified" | "blue" | "warning" | "muted" => {
-    const label = convictionLabel(entry);
+  const convictionTone = useCallback((_entry: ScannerResultItem): "verified" | "blue" | "warning" | "muted" => {
+    const label = convictionLabel(_entry);
     if (label === "High conviction") return "verified";
     if (label === "Moderate conviction") return "blue";
     if (label === "Developing") return "warning";
     return "muted";
   }, [convictionLabel]);
 
-  const hasRiskFlag = useCallback((entry: LeaderboardEntry): boolean => {
-    const risk = entry.factors.risk;
-    return risk !== null && risk !== undefined && risk < 40;
+  const hasRiskFlag = useCallback((entry: ScannerResultItem): boolean => {
+    return entry.riskMarker !== null && entry.riskMarker !== "Risk review normal";
   }, []);
 
   const filteredResults = useMemo(() => {
@@ -161,31 +145,14 @@ export default function ScannerPage() {
     }
     if (filters.scoreRange !== "All") {
       filtered = filtered.filter((e) => {
-        if (e.rankingScore === null || e.rankingScore === undefined) return false;
-        if (filters.scoreRange === "80-100") return e.rankingScore >= 80;
-        if (filters.scoreRange === "60-79") return e.rankingScore >= 60 && e.rankingScore < 80;
-        if (filters.scoreRange === "40-59") return e.rankingScore >= 40 && e.rankingScore < 60;
-        if (filters.scoreRange === "Below 40") return e.rankingScore < 40;
+        if (e.score === null || e.score === undefined) return false;
+        if (filters.scoreRange === "80-100") return e.score >= 80;
+        if (filters.scoreRange === "60-79") return e.score >= 60 && e.score < 80;
+        if (filters.scoreRange === "40-59") return e.score >= 40 && e.score < 60;
+        if (filters.scoreRange === "Below 40") return e.score < 40;
         return true;
       });
     }
-    const factorFilter = (key: keyof typeof filters, factorKey: keyof LeaderboardEntry["factors"]) => {
-      const val = filters[key];
-      if (val === "Any") return;
-      filtered = filtered.filter((e) => {
-        const fv = e.factors[factorKey];
-        if (fv === null || fv === undefined) return false;
-        if (val === "High") return fv >= 65;
-        if (val === "Medium") return fv >= 40 && fv < 65;
-        if (val === "Low") return fv < 40;
-        return true;
-      });
-    };
-    factorFilter("valuation", "value");
-    factorFilter("growth", "growth");
-    factorFilter("profitability", "quality");
-    factorFilter("balanceSheet", "risk");
-    factorFilter("momentum", "momentum");
     return filtered;
   }, [results, filters]);
 
@@ -194,8 +161,8 @@ export default function ScannerPage() {
     const [field, dir] = sortValue.split("-") as [string, string];
     sorted.sort((a, b) => {
       if (field === "score") {
-        const sa = a.rankingScore ?? 0;
-        const sb = b.rankingScore ?? 0;
+        const sa = a.score ?? 0;
+        const sb = b.score ?? 0;
         return dir === "desc" ? sb - sa : sa - sb;
       }
       const na = (a.companyName ?? a.symbol ?? "").toLowerCase();
@@ -208,17 +175,14 @@ export default function ScannerPage() {
   }, [filteredResults, sortValue]);
 
   const updateFilter = useCallback((key: string, value: string) => {
-    setActivePreset(null);
+    setActivePreset("");
     setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
   const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
-  const handleTrack = useCallback(async (symbol: string) => {
-    try {
-      const watchlists = await api.getWatchlists();
-      if (watchlists.length > 0) await api.addWatchlistTicker(watchlists[0].id, symbol);
-    } catch { /* quiet */ }
+  const handleTrack = useCallback(async (_symbol: string) => {
+    // Track currently disabled for non-authenticated scanner view
   }, []);
   const handleInvest = useCallback((symbol: string) => productNavigate("invest", symbol), []);
 
@@ -421,8 +385,8 @@ export default function ScannerPage() {
               </div>
               {sortedResults.slice(0, 50).map((entry) => {
                 const fullSymbol = entry.symbol;
-                const item = leaderboardEntryToResearchListItem(entry);
-                const score = entry.rankingScore;
+                const item = scannerResultToResearchListItem(entry);
+                const score = entry.score;
                 const convLabel = convictionLabel(entry);
                 const convTone = convictionTone(entry);
                 const risky = hasRiskFlag(entry);
@@ -458,7 +422,7 @@ export default function ScannerPage() {
                       <ProductAction variant="primary" onClick={() => handleResearch(fullSymbol)}>Research</ProductAction>
                       <ProductAction variant="secondary" onClick={() => handleCompare(fullSymbol)}>Compare</ProductAction>
                       <ProductAction variant="ghost" onClick={() => handleTrack(fullSymbol)}>Track</ProductAction>
-                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled={!brokerConnected} disabledReason={!brokerConnected ? "External handoff is being prepared" : undefined}>Handoff</ProductAction>
+                      <ProductAction variant="ghost" onClick={() => handleInvest(fullSymbol)} disabled disabledReason="Review before deciding">Handoff</ProductAction>
                     </div>
                   </ProductPanel>
                 );
