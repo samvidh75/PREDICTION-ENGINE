@@ -38,11 +38,19 @@ Created `src/lib/product/dataCompleteness.ts` with:
 - Fallback copy is product-safe: "Financial data is limited for this company."
 - `usesForbiddenTerms()` — integrates with forbiddenCopyAudit
 
+## Financial Metric Components
+
+Created reusable components:
+
+- `FinancialMetricGrid` — displays grouped financial metrics with icons, values, and interpretations; handles empty/null states with product-safe "limited" copy
+- `ValuationContextPanel` — shows P/E, P/B, EV/EBITDA, dividend yield in compact grid; includes valuation interpretation; shows "limited" state when no data available
+
 ## Tests Added
 
-28 new tests:
+35 new tests (28 + 7):
 - `financialDataModel.test.ts` — interpretValuation (5), interpretMargin (4), formatRatio (3), formatPercent (2), formatCurrency (3), buildFinancialGroups (4), no provider leakage
 - `dataCompleteness.test.ts` — all completeness functions, null handling, partial data
+- `metricComponents.test.tsx` — FinancialMetricGrid empty state, full data, null metrics; ValuationContextPanel limited state, PE ratio, multiple metrics, interpretation
 
 ## Verification
 
@@ -50,7 +58,7 @@ Created `src/lib/product/dataCompleteness.ts` with:
 |-------|--------|
 | `typecheck:all` | PASS |
 | `lint` | PASS |
-| `test:unit` | 121 files, 1230 passed |
+| `test:unit` | 122 files, 1237 passed |
 | `validate:hygiene` | PASS |
 | `build:frontend` | PASS |
 | `build:backend` | PASS |
@@ -68,6 +76,8 @@ Created `src/lib/product/dataCompleteness.ts` with:
 | Valuation context without Buy/Sell/Hold | PASS |
 | Data completeness utilities exist | PASS |
 | Fallback copy is product-safe | PASS |
+| Financial metric components render correctly | PASS |
+| Valuation component handles null data | PASS |
 | No provider/backend leakage | PASS |
 | No raw null/undefined/NaN | PASS |
 | No secrets | PASS |
