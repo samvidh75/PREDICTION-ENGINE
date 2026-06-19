@@ -5,6 +5,7 @@ import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
 import { HelpPopover } from "../ui/HelpPopover";
 import { signalToneToStatusColor, toneToSeverityClass } from "../../lib/research/researchSignalModel";
+import CustomSelect from "../ui/CustomSelect";
 
 function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
   if (score === null) return null;
@@ -44,13 +45,13 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
     <div>
       <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{label}</label>
       <div className="relative">
-        <select
+        <CustomSelect
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="h-9 w-full cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-1.5 pr-8 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
         >
           {options.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
+        </CustomSelect>
       </div>
     </div>
   );
@@ -334,7 +335,7 @@ export default function ScannerPage() {
             <div className="hidden md:flex items-center gap-1.5">
               <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider">Sort</span>
               <div className="relative">
-                <select
+                <CustomSelect
                   value={sortValue}
                   onChange={(e) => setSortValue(e.target.value)}
                   className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-2.5 py-1 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
@@ -342,7 +343,7 @@ export default function ScannerPage() {
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
-                </select>
+                </CustomSelect>
               </div>
             </div>
             <div className="hidden md:block flex-1" />

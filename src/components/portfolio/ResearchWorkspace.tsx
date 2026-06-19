@@ -4,6 +4,7 @@ import { NoteEngine, ResearchNote } from "../../services/portfolio/NoteEngine";
 import { ExportEngine } from "../../services/portfolio/ExportEngine";
 import { WorkspaceEngine, TeamMember } from "../../services/portfolio/WorkspaceEngine";
 import { FeatureGate } from "../subscriptions/FeatureGate";
+import CustomSelect from "../ui/CustomSelect";
 
 export const ResearchWorkspace: React.FC = () => {
   const [activeSymbol, setActiveSymbol] = useState("RELIANCE");
@@ -129,7 +130,7 @@ export const ResearchWorkspace: React.FC = () => {
                 className="w-full h-[40px] bg-white/5 border border-white/10 rounded-[12px] px-3 text-xs outline-none focus:border-purple-400 text-white"
               />
               <div className="flex gap-2">
-                <select
+                <CustomSelect
                   value={newMemberRole}
                   onChange={(e) => setNewMemberRole(e.target.value as any)}
                   className="bg-white/5 border border-white/10 rounded-[12px] px-3 text-xs text-white/70 outline-none flex-1"
@@ -137,7 +138,7 @@ export const ResearchWorkspace: React.FC = () => {
                   <option value="Admin">Admin</option>
                   <option value="Analyst">Analyst</option>
                   <option value="Viewer">Viewer</option>
-                </select>
+                </CustomSelect>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white rounded-full text-xs font-bold transition-all cursor-pointer"
