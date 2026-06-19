@@ -19,7 +19,6 @@ export type PageKey =
   | "trust"
   | "methodology"
   | "validation"
-  | "predictions"
   | "rankings"
   | "compare"
   | "alerts"
@@ -51,7 +50,7 @@ export function getPageKeyFromUrl(): PageKey {
       methodology: "methodology",
       trust: "methodology",
       validation: "methodology",
-      predictions: "predictions",
+      predictions: "landing",
       rankings: "rankings",
       compare: "compare",
       alerts: "alerts",
