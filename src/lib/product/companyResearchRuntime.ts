@@ -21,14 +21,68 @@ export interface FinancialSnapshotView {
   currentRatio: number | null;
 }
 
+export interface ValuationContext {
+  peContext: string | null;
+  pbContext: string | null;
+  overall: string | null;
+}
+
+export interface RiskContext {
+  debtWarning: string | null;
+  volatilityNote: string | null;
+  overall: string | null;
+}
+
+export type ResearchState = "ready" | "partial" | "limited" | "empty" | "error";
+
 export interface CompanyResearchResult {
   identity: ProductIdentity;
+  state: ResearchState;
+  message: string;
   prediction: PredictionViewState;
   healthometer: HealthometerViewState;
-  actions: ProductActionResult;
   financialSnapshot: FinancialSnapshotView;
-  state: ProductDataState;
-  message: string;
+  valuationContext: ValuationContext;
+  riskContext: RiskContext;
+  actions: ProductActionResult;
+  methodologyNote: string;
+}
+
+function buildValuationContext(financialSnapshot: FinancialSnapshotView): ValuationContext {
+  let peContext: string | null = null;
+  let pbContext: string | null = null;
+
+  if (financialSnapshot.pe !== null) {
+    if (financialSnapshot.pe <= 15) peContext = "Below market average";
+    else if (financialSnapshot.pe <= 25) peContext = "In line with market";
+    else peContext = "Above market average";
+  }
+
+  if (financialSnapshot.pb !== null) {
+    if (financialSnapshot.pb <= 2) pbContext = "Below book multiple";
+    else if (financialSnapshot.pb <= 5) pbContext = "Moderate book multiple";
+    else pbContext = "Premium book multiple";
+  }
+
+  const overall = peContext || pbContext
+    ? [peContext, pbContext].filter(Boolean).join("; ")
+    : null;
+
+  return { peContext, pbContext, overall };
+}
+
+function buildRiskContext(financialSnapshot: FinancialSnapshotView): RiskContext {
+  let debtWarning: string | null = null;
+  let volatilityNote: string | null = null;
+
+  if (financialSnapshot.debtEquity !== null) {
+    if (financialSnapshot.debtEquity > 1.5) debtWarning = "Above-average leverage";
+    else if (financialSnapshot.debtEquity > 0.5) debtWarning = "Moderate leverage";
+  }
+
+  const overall = [debtWarning, volatilityNote].filter(Boolean).join("; ") || null;
+
+  return { debtWarning, volatilityNote, overall };
 }
 
 export function buildFinancialSnapshotView(raw: Record<string, unknown> | null | undefined): FinancialSnapshotView {
@@ -74,6 +128,8 @@ export function buildCompanyResearch(
 ): CompanyResearchResult {
   const identity = buildProductIdentity(symbol, companyName, sector);
   const financialSnapshot = buildFinancialSnapshotView(rawMetrics);
+  const valuationContext = buildValuationContext(financialSnapshot);
+  const riskContext = buildRiskContext(financialSnapshot);
   const prediction = buildPredictionViewModel(symbol, null, null, rawMetrics);
   const healthometerInput = computeHealthometerFromResearch(rawMetrics);
   const healthometer = buildHealthometerViewModel(
@@ -86,13 +142,18 @@ export function buildCompanyResearch(
     healthometerInput.financialStrength
   );
 
-  const hasRealData = rawMetrics !== null && rawMetrics !== undefined;
-  const state: ProductDataState = !symbol ? "empty" : hasRealData ? "ready" : "partial";
+  const hasRealData = rawMetrics !== null && rawMetrics !== undefined && Object.keys(rawMetrics).length > 0;
+  const state: ResearchState = !symbol ? "empty" : hasRealData ? "ready" : "partial";
 
   const actions = buildProductActionResult(isTracked, state === "ready");
   const message = state === "empty" ? "Not enough information for this view yet."
     : state === "partial" ? "Research context is based on available data."
     : "";
 
-  return { identity, prediction, healthometer, actions, financialSnapshot, state, message };
+  const methodologyNote = "Research scores reflect relative conviction based on available factors. Always conduct your own research before investing. StockStory is a research workspace.";
+
+  return {
+    identity, prediction, healthometer, actions, financialSnapshot,
+    valuationContext, riskContext, state, message, methodologyNote,
+  };
 }
