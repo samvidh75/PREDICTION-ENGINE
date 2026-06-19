@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Copy, Check, Share2, ArrowLeftRight, Scale } from "lucide-react";
 import { ProductPanel, ProductAction, productNavigate } from "../product/ProductUI";
+import { PRODUCT_EVENTS, trackEvent } from "../../lib/analytics/productEvents";
 
 interface ComparedCompany {
   symbol: string;
@@ -43,6 +44,7 @@ export function CompareShareRecap({ companyA, companyB, decisionLabels }: Compar
     try {
       await navigator.clipboard.writeText(buildRecapText());
       setCopied(true);
+      trackEvent(PRODUCT_EVENTS.COMPARE_SUMMARY_COPIED, { companyA: companyA.symbol, companyB: companyB.symbol });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);

@@ -10,6 +10,7 @@ import {
   ProductShell,
   productNavigate,
 } from "../components/product/ProductUI";
+import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
@@ -131,6 +132,10 @@ export const PublicLandingPage: React.FC = () => {
               </ProductAction>
             </div>
           </ProductPanel>
+        </ProductSection>
+
+        <ProductSection>
+          <EarlyAccessPanel />
         </ProductSection>
 
         <footer className="mt-8 border-t border-[rgba(148,163,184,0.12)] py-6">

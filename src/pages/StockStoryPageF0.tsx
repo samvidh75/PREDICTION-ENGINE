@@ -8,6 +8,9 @@ import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { useToast } from "../components/feedback/useToast";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import { SpatialSheet } from "../components/intelligence/SpatialSheet";
+import { ShareResearchSummary } from "../components/share/ShareResearchSummary";
+import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 
 const HORIZONS = [7, 30, 90, 180, 365] as const;
 type PredictionHorizon = (typeof HORIZONS)[number];
@@ -32,6 +35,7 @@ export default function StockStoryPageF0(): JSX.Element {
   const stockInfo = ticker ? StockRegistry.getStock(ticker) : null;
   const [whyThisViewOpen, setWhyThisViewOpen] = useState(false);
   const [investOpen, setInvestOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const toast = useToast();
   const isInWatchlist = watchlists.some((w) => w.tickers.includes(ticker));
@@ -108,6 +112,13 @@ export default function StockStoryPageF0(): JSX.Element {
               </button>
             )}
             <button
+              onClick={() => { setShareOpen(true); trackEvent(PRODUCT_EVENTS.COMPANY_SHARE_OPENED); }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
+              aria-label="Share research summary"
+            >
+              <ArrowLeftRight className="h-3 w-3" /> Share
+            </button>
+            <button
               onClick={() => productNavigate("compare", ticker)}
               className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-2.5 py-1.5 text-[11px] font-semibold text-[#9AA7B5] transition hover:border-[#2962FF]/60 hover:text-[#E6EDF3]"
             >
@@ -142,7 +153,7 @@ export default function StockStoryPageF0(): JSX.Element {
             </div>
             {convictionLevel === "none" && (
               <p className="mt-2 text-xs leading-relaxed text-[#64748B]">
-                We are still gathering research data for this ticker. Check back once research is complete.
+                Research signals are being prepared for this company. Check back once the research cycle completes.
               </p>
             )}
           </ProductPanel>
@@ -239,6 +250,24 @@ export default function StockStoryPageF0(): JSX.Element {
           onClose={() => setInvestOpen(false)}
           symbol={ticker}
         />
+
+        <SpatialSheet open={shareOpen} onClose={() => setShareOpen(false)} title="Share Research Summary">
+          {stockInfo ? (
+            <ShareResearchSummary
+              data={{
+                ticker,
+                companyName: stockInfo.companyName || ticker,
+                sector: stockInfo.sector,
+              }}
+              onClose={() => setShareOpen(false)}
+              onOpenMethodology={() => { setShareOpen(false); productNavigate("methodology"); }}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-8 text-xs text-[#9AA7B5]">
+              Research summary pending...
+            </div>
+          )}
+        </SpatialSheet>
       </ProductPage>
     </ProductShell>
   );
