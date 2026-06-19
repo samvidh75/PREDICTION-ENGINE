@@ -444,37 +444,91 @@ export const StockStoryPage: React.FC = () => {
 
       <div className="min-h-[300px] rounded-2xl border border-white/[0.08] bg-[#0D1117] p-6">
 
-        {activeTab === "overview" && (
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 space-y-5 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
-              <div className="text-[10px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5 text-[#8B949E]">
-                <Trophy className="h-3.5 w-3.5" /> Factor Breakdown
+        {activeTab === "thesis" && (
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-5 lg:col-span-2">
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+                <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Thesis</h2>
+                <p className="mt-3 text-sm leading-relaxed text-[#E6EDF3]">
+                  {storyData?.narrative || "Thesis details are being prepared."}
+                </p>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("Growth metrics", storyData.growth, "text-primary")}
-                {renderProgressBar("Quality metrics", storyData.quality, "text-primary")}
-                {renderProgressBar("Stability score", storyData.stability, "text-secondary")}
-                {renderProgressBar("Price trend", storyData.momentum, "text-warning")}
-                {renderProgressBar("Value score", storyData.valuation, "text-secondary")}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-4">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#16A34A]">Bull Case</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-[#E6EDF3]">
+                    {storyData?.growth !== null && storyData?.growth >= 60
+                      ? "Strong growth metrics and quality indicators suggest the company has favourable fundamentals."
+                      : storyData?.valuation !== null && storyData?.valuation >= 60
+                        ? "Attractive valuation relative to fundamentals may present a reasonable entry point for further research."
+                        : "Review fundamentals and risk tabs for a complete picture before forming a thesis."}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-4">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#EF4444]">Bear Case</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-[#E6EDF3]">
+                    {storyData?.risk !== null && storyData?.risk < 40
+                      ? "Elevated risk indicators warrant closer review of leverage, volatility, and cash flow stability."
+                      : storyData?.momentum !== null && storyData?.momentum < 40
+                        ? "Weak price momentum may reflect broader sector or market concerns."
+                        : "Research the risk tab to identify potential concerns before making any decision."}
+                  </p>
+                </div>
               </div>
-              <div className="text-[9px] leading-normal mt-3 pt-3 border-t border-white/[0.06] text-[#484F58]">
-                Composite score is the average of available factor scores. Missing factors are shown as insufficient information.
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+                <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Before You Invest</h2>
+                <ul className="mt-3 space-y-2">
+                  {[
+                    "Understand the business model and how it makes money.",
+                    "Compare this company with its peers in the same sector.",
+                    "Review the risk factors, leverage, and volatility metrics.",
+                    "Decide your position size and risk tolerance with your broker or adviser.",
+                    "Research is not advice — always verify independently.",
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[#9AA7B5]">
+                      <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-[rgba(41,98,255,0.15)] text-center text-[9px] font-bold text-[#2962FF] flex items-center justify-center">{i + 1}</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
             <div className="space-y-4">
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
-                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
-                  <Building2 className="h-3.5 w-3.5" /> Corporate Profile
+                <h2 className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Factor Scores</h2>
+                <div className="space-y-3">
+                  {[
+                    { label: "Quality", value: storyData.quality, key: "quality" },
+                    { label: "Growth", value: storyData.growth, key: "growth" },
+                    { label: "Stability", value: storyData.stability, key: "stability" },
+                    { label: "Momentum", value: storyData.momentum, key: "momentum" },
+                    { label: "Valuation", value: storyData.valuation, key: "valuation" },
+                  ].map((f) => (
+                    <div key={f.key}>
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-[#9AA7B5]">{f.label}</span>
+                        <span className="font-mono font-semibold tabular-nums text-[#E6EDF3]">{f.value != null ? `${Math.round(f.value)}` : "—"}</span>
+                      </div>
+                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+                        <div className="h-full rounded-full bg-[#2962FF] transition-all" style={{ width: f.value != null ? `${f.value}%` : "0%" }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <dl className="space-y-3 text-xs">
-                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
-                    <dt className="text-[#484F58]">Sector</dt><dd className="text-right font-semibold text-[#E6EDF3]">{sector}</dd>
+              </div>
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
+                  <Building2 className="h-3.5 w-3.5" /> Profile
+                </div>
+                <dl className="mt-3 space-y-2 text-xs">
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-[#64748B]">Sector</dt><dd className="text-right font-semibold text-[#E6EDF3]">{sector}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
-                    <dt className="text-[#484F58]">Industry</dt><dd className="text-right font-semibold truncate max-w-[180px] text-[#E6EDF3]">{industry}</dd>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-[#64748B]">Industry</dt><dd className="text-right font-semibold truncate max-w-[160px] text-[#E6EDF3]">{industry}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 pb-2 border-b border-white/[0.06]">
-                    <dt className="text-[#484F58]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[#E6EDF3]">{marketCap}</dd>
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-[#64748B]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[#E6EDF3]">{marketCap}</dd>
                   </div>
                 </dl>
               </div>
@@ -482,247 +536,201 @@ export const StockStoryPage: React.FC = () => {
           </div>
         )}
 
-        {activeTab === "financials" && (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
-                  <Sparkles className="h-4 w-4" /> Growth Engine
-                </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#d946ef" }}>
-                  Score: {formatScore(storyData.growth)}
-                </span>
-              </div>
-              <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Revenue Growth (QoQ/YoY)</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.revenueGrowth)}</dd>
+        {activeTab === "fundamentals" && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Growth</h3>
+              <dl className="mt-3 space-y-3 text-xs">
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">Revenue Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.revenueGrowth)}</dd>
                 </div>
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>EPS Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.epsGrowth)}</dd>
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">EPS Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.epsGrowth)}</dd>
                 </div>
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Profit Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.profitGrowth)}</dd>
-                </div>
-                <div className="flex justify-between pb-1">
-                  <dt style={{ color: "#536471" }}>Free Cash Flow (FCF) Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.fcfGrowth)}</dd>
-                </div>
-              </dl>
-              <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#d946ef" }}>
-                {storyData.engineDetails.growth.commentary}
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
-                  <Trophy className="h-4 w-4" /> Quality Engine
-                </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#1a6e4a" }}>
-                  Score: {formatScore(storyData.quality)}
-                </span>
-              </div>
-              <dl className="space-y-3.5 text-xs">
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Return on Equity (ROE)</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roe)}</dd>
-                </div>
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Return on Invested Capital (ROIC)</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roic)}</dd>
-                </div>
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Gross Profit Margin</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.grossMargin)}</dd>
-                </div>
-                <div className="flex justify-between pb-2" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  <dt style={{ color: "#536471" }}>Operating Profit Margin</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.operatingMargin)}</dd>
-                </div>
-                <div className="flex justify-between pb-1">
-                  <dt style={{ color: "#536471" }}>Asset Efficiency Score</dt><dd className="font-mono font-bold tabular-nums" style={{ color: "#0f1419" }}>{formatScore(storyData.engineDetails.quality.efficiencyScore)}</dd>
-                </div>
-              </dl>
-              <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#1a6e4a" }}>
-                {storyData.engineDetails.quality.commentary}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "valuation" && (
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="md:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
-                  <TrendingUp className="h-4 w-4" /> Valuation Engine
-                </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
-                  Score: {formatScore(storyData.valuation)}
-                </span>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                {renderProgressBar("PE Multiples", storyData.engineDetails.valuation.peScore, "text-secondary")}
-                {renderProgressBar("Price to Book (PB)", storyData.engineDetails.valuation.pbScore, "text-secondary")}
-                {renderProgressBar("EV/EBITDA", storyData.engineDetails.valuation.evEbitdaScore, "text-secondary")}
-                {renderProgressBar("Free Cash Flow Yield", storyData.engineDetails.valuation.fcfYieldScore, "text-secondary")}
-              </div>
-              <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#b8860b" }}>
-                {storyData.engineDetails.valuation.commentary}
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-3">
-              <div className="text-[10px] font-bold uppercase tracking-wider pb-2 text-[#8B949E]">
-                Raw Valuation Multiples
-              </div>
-              <dl className="space-y-3 text-xs">
-                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
-                  <dt className="text-[#484F58]">P/E Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.peRatio)}</dd>
-                </div>
-                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
-                  <dt className="text-[#484F58]">P/B Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.pbRatio)}</dd>
-                </div>
-                <div className="flex justify-between pb-1.5 border-b border-white/[0.06]">
-                  <dt className="text-[#484F58]">EV/EBITDA</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.evEbitda)}</dd>
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">Profit Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.profitGrowth)}</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-[#484F58]">FCF Yield</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{localFormatPercent(storyData.financials.fcfYield)}</dd>
+                  <dt className="text-[#64748B]">FCF Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.fcfGrowth)}</dd>
                 </div>
               </dl>
+              <p className="mt-3 text-[11px] leading-relaxed text-[#64748B]">{storyData.engineDetails.growth.commentary}</p>
             </div>
-          </div>
-        )}
-
-        {activeTab === "ownership" && (
-          <div className="space-y-6">
-            {ownership ? (
-              <div className="grid gap-6 md:grid-cols-3">
-                <div className="md:col-span-2 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider pb-3 text-[#E6EDF3]">Shareholding Breakdown</h3>
-                  <div className="space-y-4">
-                    {ownership.categories && ownership.categories.map((c: any) => {
-                      const pct = parseFloat(c.share) || 0;
-                      return (
-                        <div key={c.category} className="space-y-1">
-                          <div className="flex justify-between text-xs font-semibold">
-                            <span style={{ color: "#0f1419" }}>{c.category}</span>
-                            <span style={{ color: "#536471" }}>{c.share} <span className="text-[10px] font-normal" style={{ color: "#0369a1" }}>({c.change})</span></span>
-                          </div>
-                          <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "#f0f1f5" }}>
-                            <div className="h-full rounded-full bg-[var(--color-accent)]" style={{ width: `${pct}%` }} />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Quality</h3>
+              <dl className="mt-3 space-y-3 text-xs">
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">ROE</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roe)}</dd>
                 </div>
-                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 flex flex-col justify-between">
-                  <div className="text-[10px] font-bold uppercase tracking-wider pb-2 text-[#8B949E]">
-                    Institutional Stance
-                  </div>
-                  <p className="text-xs leading-relaxed my-4 text-[#E6EDF3]">{ownership.comment}</p>
-                  <div className="text-[9px] italic text-[#484F58]">* Based on quarterly shareholding declarations to the stock exchange.</div>
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">ROIC</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roic)}</dd>
                 </div>
-              </div>
-            ) : (
-              <div className="rounded-xl p-5 text-sm border border-white/[0.06] bg-white/[0.04] text-[#8B949E]">
-                Ownership and shareholding data is not currently available.
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">Operating Margin</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.operatingMargin)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-[#64748B]">Efficiency Score</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatScore(storyData.engineDetails.quality.efficiencyScore)}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-[11px] leading-relaxed text-[#64748B]">{storyData.engineDetails.quality.commentary}</p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Valuation</h3>
+              <dl className="mt-3 space-y-3 text-xs">
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">P/E Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.peRatio)}</dd>
+                </div>
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">P/B Ratio</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.pbRatio)}</dd>
+                </div>
+                <div className="flex justify-between border-b border-white/[0.06] pb-2">
+                  <dt className="text-[#64748B]">EV/EBITDA</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{formatNumber(storyData.financials.evEbitda)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-[#64748B]">FCF Yield</dt><dd className="font-mono font-bold tabular-nums text-[#E6EDF3]">{localFormatPercent(storyData.financials.fcfYield)}</dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-[11px] leading-relaxed text-[#64748B]">{storyData.engineDetails.valuation.commentary}</p>
+            </div>
+            {ownership && (
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Shareholding</h3>
+                <div className="mt-3 space-y-3">
+                  {ownership.categories?.map((c: any) => (
+                    <div key={c.category} className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-[#9AA7B5]">{c.category}</span>
+                        <span className="text-[#E6EDF3]">{c.share}</span>
+                      </div>
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+                        <div className="h-full rounded-full bg-[#2962FF]" style={{ width: `${parseFloat(c.share) || 0}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {activeTab === "risks" && (
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
-                  <AlertCircle className="h-4 w-4" /> Risk Engine
-                </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
-                  Risk Level: {formatScore(storyData.risk)}
-                </span>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {renderProgressBar("Accounting Anomalies", storyData.engineDetails.risk.accountingAnomalyScore, "text-danger")}
-                {renderProgressBar("Leverage Stress", storyData.engineDetails.risk.debtStressScore, "text-danger")}
-                {renderProgressBar("Cash Flow Strains", storyData.engineDetails.risk.cashFlowStressScore, "text-danger")}
-                {renderProgressBar("Price Volatility", storyData.engineDetails.risk.volatilityRiskScore, "text-danger")}
-              </div>
-              <div className="rounded-lg p-3 text-xs leading-normal flex items-start gap-2" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#c0392b" }}>
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold block text-[10px] uppercase mb-1" style={{ color: "#c0392b" }}>{storyData.engineDetails.risk.redFlagCount} Risk indicators</span>
-                  {storyData.engineDetails.risk.commentary}
-                </div>
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <h3 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[#E6EDF3]">
-                  <Activity className="h-4 w-4" /> Alert Check
-                </h3>
-                <span className="font-mono text-xs px-2 py-0.5 rounded font-bold" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
-                  Confidence: {storyData.confidence}
-                </span>
-              </div>
-              <div className="rounded-lg p-3 text-xs leading-normal" style={{ background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.3)", color: "#4338ca" }}>
-                {storyData.engineDetails.confidence.commentary}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "whychange" && (
-          <div>
-            <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-              <Activity className="h-4 w-4" style={{ color: "#1a6e4a" }} /> Why It Changed
-            </div>
-            <WhyItChangedTab symbol={ticker} />
-          </div>
-        )}
-
-        {activeTab === "documents" && (
-          <div className="space-y-6">
-            <div>
-              <div className="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider pb-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)", color: "#536471" }}>
-                <FileText className="h-4 w-4" style={{ color: "#1a6e4a" }} /> Corporate Actions & Timeline
-              </div>
-              {timeline.length > 0 ? (
-                <div className="relative ml-3.5 pl-5 space-y-6 text-xs" style={{ borderLeft: "1px solid rgba(255,255,255,0.3)" }}>
-                  {timeline.map((evt, idx) => (
-                    <div key={idx} className="relative">
-                      <span className="absolute -left-[27px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-[var(--color-accent)] ring-4 ring-[var(--color-canvas)]" />
-                      <div className="font-mono text-[10px] font-semibold mb-1" style={{ color: "#1a6e4a" }}>{evt.date}</div>
-                      <div className="font-bold text-sm mb-1" style={{ color: "#0f1419" }}>{evt.event}</div>
-                      <p className="leading-relaxed" style={{ color: "#536471" }}>{evt.detail}</p>
+        {activeTab === "risk" && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#EF4444]">
+                <AlertCircle className="h-3 w-3" /> Risk Factors
+              </h3>
+              <div className="mt-4 space-y-4">
+                {[
+                  { label: "Accounting", value: storyData.engineDetails.risk.accountingAnomalyScore },
+                  { label: "Leverage", value: storyData.engineDetails.risk.debtStressScore },
+                  { label: "Cash Flow", value: storyData.engineDetails.risk.cashFlowStressScore },
+                  { label: "Volatility", value: storyData.engineDetails.risk.volatilityRiskScore },
+                ].map((r) => (
+                  <div key={r.label}>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-[#9AA7B5]">{r.label}</span>
+                      <span className="font-mono font-semibold tabular-nums text-[#E6EDF3]">{r.value != null ? `${Math.round(r.value)}` : "—"}</span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl p-5 text-sm border border-white/[0.06] bg-white/[0.04] text-[#8B949E]">
-                  Corporate actions timeline is not currently available.
-                </div>
-              )}
+                    <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
+                      <div className={`h-full rounded-full transition-all ${r.value != null && r.value >= 60 ? 'bg-[#EF4444]' : 'bg-[#2962FF]'}`} style={{ width: r.value != null ? `${r.value}%` : "0%" }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-[11px] leading-relaxed text-[#64748B]">{storyData.engineDetails.risk.commentary}</p>
+            </div>
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">
+                <Activity className="h-3 w-3" /> Confidence
+              </h3>
+              <dl className="mt-4 space-y-3 text-xs">
+                {[
+                  { label: "Data completeness", value: storyData.engineDetails.confidence.dataCompleteness },
+                  { label: "Signal agreement", value: storyData.engineDetails.confidence.signalAgreement },
+                  { label: "Risk consistency", value: storyData.engineDetails.confidence.riskConsistency },
+                  { label: "Historical stability", value: storyData.engineDetails.confidence.historicalStability },
+                ].map((c) => (
+                  <div key={c.label} className="flex justify-between border-b border-white/[0.06] pb-2">
+                    <dt className="text-[#64748B]">{c.label}</dt>
+                    <dd className="font-mono font-semibold tabular-nums text-[#E6EDF3]">{c.value != null ? `${Math.round(c.value)}%` : "—"}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-3 text-[11px] leading-relaxed text-[#64748B]">{storyData.engineDetails.confidence.commentary}</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "peers" && (
+          <div className="space-y-4">
+            {relatedCompanies.length > 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {relatedCompanies.map((company) => (
+                  <button
+                    key={company.symbol}
+                    type="button"
+                    onClick={() => navigateToTicker(company.symbol)}
+                    className="flex items-center justify-between gap-4 rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-left transition hover:bg-white/[0.06]"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold text-[#E6EDF3]">{company.symbol}</span>
+                        <span className="text-[10px] text-[#64748B]">{company.sector}</span>
+                      </div>
+                      <p className="mt-0.5 truncate text-xs text-[#9AA7B5]">{company.companyName}</p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-[#2962FF]" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.04] p-5 text-sm text-[#8B949E]">
+                Peer companies in the same sector are not available for comparison.
+              </div>
+            )}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Compare with Peers</h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#9AA7B5]">
+                Use the compare tool to evaluate this company against others in the same sector side by side.
+              </p>
+              <button
+                type="button"
+                onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "compare"); p.set("id", ticker); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#2962FF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#3B71FF] transition-colors"
+              >
+                Compare companies
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "history" && (
+          <div className="space-y-6">
+            {timeline.length > 0 ? (
+              <div className="relative ml-3 space-y-6 border-l border-white/[0.08] pl-6 text-xs">
+                {timeline.map((evt, idx) => (
+                  <div key={idx} className="relative">
+                    <span className="absolute -left-[25px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#2962FF] ring-4 ring-[#0D1117]" />
+                    <div className="mb-1 font-mono text-[10px] font-semibold text-[#2962FF]">{evt.date}</div>
+                    <div className="mb-1 text-sm font-semibold text-[#E6EDF3]">{evt.event}</div>
+                    <p className="leading-relaxed text-[#9AA7B5]">{evt.detail}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.04] p-5 text-sm text-[#8B949E]">
+                Corporate actions timeline is not currently available.
+              </div>
+            )}
+            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Basis</h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#9AA7B5]">
+                Research is based on company fundamentals, market data, and sector analysis. All scores are computed through documented methodology.
+              </p>
             </div>
           </div>
         )}
       </div>
-
-      {relatedCompanies.length > 0 && (
-        <section className="pt-6">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Same Sector Companies</div>
-          <div className="flex flex-wrap gap-3">
-            {relatedCompanies.map((company) => (
-              <button
-                key={company.symbol}
-                onClick={() => navigateToTicker(company.symbol)}
-                className="flex items-center justify-between gap-4 rounded-xl px-4 py-2.5 text-left transition-all hover:bg-white/80 border border-white/[0.08] bg-[#0D1117]"
-              >
-                <div>
-                  <div className="font-mono text-xs font-bold text-[#E6EDF3]">{company.symbol}</div>
-                  <div className="max-w-[160px] truncate text-[10px] text-[#8B949E]">{company.companyName}</div>
-                </div>
-                <ArrowRight className="h-3.5 w-3.5 text-[#1a6e4a]" />
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
 
       <p className="mt-4 text-center text-[9px] font-medium tracking-wider text-[#484F58] uppercase">Research only. Not investment advice.</p>
 
