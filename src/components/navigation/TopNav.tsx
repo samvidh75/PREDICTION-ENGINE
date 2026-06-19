@@ -38,7 +38,7 @@ export const TopNav: React.FC = () => {
           <button
             type="button"
             onClick={triggerSearch}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#9AA7B5] hover:text-[#E6EDF3]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
             aria-label="Open search"
           >
             <Search className="h-4 w-4" />
@@ -123,7 +123,7 @@ export const TopNav: React.FC = () => {
             <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
               <button
                 onClick={triggerSearch}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.04] border border-white/[0.08] text-[#9AA7B5] hover:text-[#E6EDF3]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[#E6EDF3]"
                 aria-label="Open search"
               >
                 <Search className="h-4 w-4" />

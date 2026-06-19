@@ -13,43 +13,49 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Canvas & Surfaces */
-  --color-canvas: #070A0F;
-  --color-surface: #0D1117;
+  /* Canvas & Surfaces — Deep Graphite Navy */
+  --color-canvas: #060A10;
+  --color-surface: #0C1119;
   --color-surface-raised: #111827;
   --color-surface-modal: #0D1117;
+  --color-surface-elevated: #161D29;
+  --color-surface-active: rgba(41, 98, 255, 0.08);
+  --color-canvas-gradient-start: #060A10;
+  --color-canvas-gradient-end: #0A1019;
 
-  /* Borders */
-  --color-border: rgba(148, 163, 184, 0.16);
-  --color-border-light: rgba(148, 163, 184, 0.1);
+  /* Borders — Blue-grey tone */
+  --color-border: rgba(148, 163, 184, 0.14);
+  --color-border-light: rgba(148, 163, 184, 0.08);
+  --color-border-accent: rgba(41, 98, 255, 0.25);
 
   /* Text */
-  --color-text-primary: #E6EDF3;
+  --color-text-primary: #E8EDF2;
   --color-text-secondary: #9AA7B5;
-  --color-text-muted: #64748B;
+  --color-text-muted: #5A6A7A;
 
-  /* Accent — Deep Emerald (used sparingly) */
-  --color-accent: #2962FF;
-  --color-accent-light: rgba(41, 98, 255, 0.12);
-  --color-accent-border: rgba(41, 98, 255, 0.28);
-
-  /* Intelligence — Slate Blue */
-  --color-intel: #2962FF;
-  --color-intel-light: rgba(41, 98, 255, 0.12);
+  /* Accent — Refined Blue */
+  --color-accent: #2A6AFF;
+  --color-accent-hover: #1F52D0;
+  --color-accent-light: rgba(42, 106, 255, 0.12);
+  --color-accent-border: rgba(42, 106, 255, 0.28);
 
   /* Semantic Status */
   --color-active: #16A34A;
   --color-active-bg: rgba(22, 163, 74, 0.12);
+  --color-active-border: rgba(22, 163, 74, 0.2);
   --color-warning: #F59E0B;
   --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-border: rgba(245, 158, 11, 0.2);
   --color-danger: #EF4444;
   --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-danger-border: rgba(239, 68, 68, 0.2);
   --color-muted-bg: rgba(148, 163, 184, 0.08);
 
-  /* Shadows — Subtle */
-  --shadow-sm: none;
-  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.18);
-  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.32);
+  /* Shadows — Layered depth */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.24);
+  --shadow-glow-blue: 0 0 20px rgba(42, 106, 255, 0.08);
 
   /* Spacing scale (applied via Tailwind) */
   --space-unit: 4px;
@@ -79,8 +85,23 @@ body {
   overflow-x: hidden;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41, 98, 255, 0.03) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 80% 100%, rgba(22, 163, 74, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 #root {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -130,6 +151,42 @@ body {
   font-weight: 500;
   line-height: 1;
   color: var(--color-text-secondary);
+}
+
+/* Card & Data Display */
+.data-value {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.data-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.micro-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
 }
 
 .mono {
@@ -395,17 +452,17 @@ body {
   }
 }
 
-/* Focus */
+/* Focus — Soft Glow */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent), 0 0 16px rgba(42, 106, 255, 0.15);
 }
 
 button:focus-visible,
 a:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent), 0 0 16px rgba(42, 106, 255, 0.15);
 }
 
 button,
