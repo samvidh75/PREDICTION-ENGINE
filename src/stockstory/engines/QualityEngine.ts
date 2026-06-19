@@ -45,9 +45,7 @@ export class QualityEngine {
       } else {
         const roa = financials.roa;
         if (roa >= 0.15) roaNormalized = 95;
-        else if (roa >= 0.10) roaNormalized = 80;
-        else if (roa >= 0.07) roaNormalized = 65;
-        else if (roa >= 0.04) roaNormalized = 45;
+        else if (roa >= 0.05) roaNormalized = 65;
         else if (roa >= 0) roaNormalized = 30;
         else roaNormalized = 10;
       }

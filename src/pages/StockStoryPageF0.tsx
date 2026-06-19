@@ -109,9 +109,7 @@ export default function StockStoryPageF0(): JSX.Element {
               )}
             </div>
             <div className="h-8 w-px bg-[rgba(148,163,184,0.14)]" />
-            <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">
-              {liveTick ? "Live" : "Price"}
-            </div>
+            <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Price context</div>
           </div>
         </div>
 
