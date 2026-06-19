@@ -168,19 +168,19 @@ export interface FactorScoreMap {
 export function computeFactorScores(rawData: Record<string, unknown> | null | undefined): FactorScoreMap {
   if (!rawData) return {};
 
-  const pe = normalizeNumericValue(rawData.pe);
-  const pb = normalizeNumericValue(rawData.pb);
-  const ev = normalizeNumericValue(rawData.ev_ebitda);
-  const dy = normalizeNumericValue(rawData.dividend_yield);
+  const pe = normalizeNumericValue(rawData.pe ?? rawData.peRatio);
+  const pb = normalizeNumericValue(rawData.pb ?? rawData.pbRatio);
+  const ev = normalizeNumericValue(rawData.ev_ebitda ?? rawData.evEbitda);
+  const dy = normalizeNumericValue(rawData.dividend_yield ?? rawData.dividendYield);
   const roe = normalizeNumericValue(rawData.roe);
   const roic = normalizeNumericValue(rawData.roic);
-  const om = normalizeNumericValue(rawData.operating_margin);
-  const rg = normalizeNumericValue(rawData.revenue_growth);
-  const pg = normalizeNumericValue(rawData.profit_growth);
-  const eg = normalizeNumericValue(rawData.eps_growth);
-  const de = normalizeNumericValue(rawData.debt_equity);
-  const cr = normalizeNumericValue(rawData.current_ratio);
-  const mc = normalizeNumericValue(rawData.market_cap);
+  const om = normalizeNumericValue(rawData.operating_margin ?? rawData.operatingMargin);
+  const rg = normalizeNumericValue(rawData.revenue_growth ?? rawData.revenueGrowth);
+  const pg = normalizeNumericValue(rawData.profit_growth ?? rawData.profitGrowth);
+  const eg = normalizeNumericValue(rawData.eps_growth ?? rawData.epsGrowth);
+  const de = normalizeNumericValue(rawData.debt_equity ?? rawData.debtToEquity);
+  const cr = normalizeNumericValue(rawData.current_ratio ?? rawData.currentRatio);
+  const mc = normalizeNumericValue(rawData.market_cap ?? rawData.marketCap);
 
   return {
     pe_ratio: scorePE(pe),
