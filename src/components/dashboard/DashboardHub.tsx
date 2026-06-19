@@ -302,6 +302,41 @@ export const DashboardHub: React.FC = () => {
               </div>
             </ProductPanel>
 
+            {/* Prediction Engine & Healthometer Previews */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <ProductPanel className="p-4 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 text-[#E6EDF3]">
+                    <Activity className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                    <h3 className="text-xs font-semibold">Prediction Engine</h3>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-[#9AA7B5]">
+                    Evaluates corporate business quality, relative valuations, risk vectors, and market timing using our advanced multi-factor model.
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
+                  <ProductAction variant="ghost" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
+                </div>
+              </ProductPanel>
+
+              <ProductPanel className="p-4 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 text-[#E6EDF3]">
+                    <Shield className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                    <h3 className="text-xs font-semibold">Healthometer</h3>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-[#9AA7B5]">
+                    Measures stock quality across key dimensions including financial strength, stability, risk indicators, valuation context, and momentum.
+                  </p>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Research a company</ProductAction>
+                  <ProductAction variant="ghost" onClick={() => productNavigate("compare")}>Compare companies</ProductAction>
+                </div>
+              </ProductPanel>
+            </div>
+
             {/* Compare prompt */}
             <ProductPanel className="p-4">
               <div className="flex items-start gap-3">

@@ -88,7 +88,7 @@ export default function StockStoryPageF0(): JSX.Element {
   const whatThisIsBasedOn = stockInfo && sector
     ? ["Company fundamentals", "Sector analysis", "Market data"]
     : ticker
-      ? ["Symbol lookup"]
+      ? ["Company identification"]
       : [];
 
   return (
@@ -135,8 +135,8 @@ export default function StockStoryPageF0(): JSX.Element {
 
         <div className="mb-5">
           <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">{ticker || "Needs research"}</h1>
-            <span className="text-sm text-[#9AA7B5]">{companyName}</span>
+            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">{stockInfo?.companyName || ticker || "Needs research"}</h1>
+            <span className="text-sm text-[#9AA7B5]">{ticker && ticker !== stockInfo?.companyName ? ticker : ""}</span>
           </div>
           {sector && (
             <p className="mt-0.5 text-xs text-[#64748B]">{sector}</p>

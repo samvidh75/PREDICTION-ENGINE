@@ -103,7 +103,7 @@ export const AlertsPanel: React.FC = () => {
                     </ProductStatusPill>
                   </div>
                   <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">{alert.body}</p>
-                  <span className="mt-1 block text-[10px] text-[#64748B]">{new Date(alert.timestamp).toLocaleString("en-IN")}</span>
+                  <span className="mt-1 block text-[10px] text-[#64748B]">{(() => { try { return new Date(alert.timestamp).toLocaleString("en-IN"); } catch { return ""; } })()}</span>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <button

@@ -25,6 +25,7 @@ import ResearchContextLink from "../components/research/ResearchContextLink";
 import { FinancialMetricGrid } from "../components/research/FinancialMetricGrid";
 import ValuationContextPanel from "../components/research/ValuationContextPanel";
 import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter";
+import PredictionEnginePanel from "../components/research/PredictionEnginePanel";
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
@@ -312,11 +313,7 @@ export const StockStoryPage: React.FC = () => {
         <div className="rounded-2xl border border-white/[0.06] bg-[#0D1117] p-6">
           <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
             <div className="min-w-0">
-              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-wide text-[#9AA7B5]">
-                <span>{ticker}</span><span>•</span><span>{exchange !== "Insufficient information" ? exchange : "NSE / BSE"}</span><span>•</span><span>{currency}</span>
-              </div>
-              <h1 className="max-w-2xl truncate text-2xl font-bold tracking-tight text-[#E6EDF3] md:text-3xl">{companyName}</h1>
-              <div className="mt-3 inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
+              <div className="inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
                 Research signals pending
               </div>
             </div>
@@ -424,16 +421,12 @@ export const StockStoryPage: React.FC = () => {
                 <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "N/A"}</span>
+                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Pending"}</span>
                 <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
               </div>
             </div>
             <div className="min-w-0">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9AA7B5]">
-                <span>{ticker}</span><span>•</span><span>{exchange}</span><span>•</span><span>{currency}</span>
-              </div>
-              <h1 className="max-w-xl text-2xl font-semibold tracking-tight md:text-3xl truncate text-[#E6EDF3]">{companyName}</h1>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
                   {storyData.classification ?? "Not enough information"}
                 </span>
@@ -525,7 +518,17 @@ export const StockStoryPage: React.FC = () => {
         {activeTab === "thesis" && (
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="space-y-5 lg:col-span-2">
-              <SignalExplanationPanel signal={signal} />
+              <PredictionEnginePanel
+                symbol={ticker}
+                score={score}
+                riskScore={factorView?.riskScore}
+                qualityScore={factorView?.qualityScore}
+                valuationScore={factorView?.valuationScore}
+                growthScore={factorView?.growthScore}
+                stabilityScore={factorView?.stabilityScore}
+                momentumScore={factorView?.momentumScore}
+                rawMetrics={financials}
+              />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Thesis</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[#E6EDF3]">
