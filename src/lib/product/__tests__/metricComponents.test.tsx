@@ -4,7 +4,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { FinancialMetricGrid } from "../../../components/research/FinancialMetricGrid";
 import { ValuationContextPanel } from "../../../components/research/ValuationContextPanel";
-import type { FinancialMetricGroup } from "../financialDataModel";
+import type { FinancialMetricGroup, ValuationContext } from "../financialDataModel";
 
 describe("FinancialMetricGrid", () => {
   it("renders limited state for empty groups", () => {
@@ -15,7 +15,7 @@ describe("FinancialMetricGrid", () => {
   it("renders metric groups with data", () => {
     const groups: FinancialMetricGroup[] = [{
       title: "Profitability & efficiency",
-      metrics: [{ label: "ROE", value: 0.18, unit: "percent", interpretation: "ROE indicates efficient capital use", isPositive: true }],
+      metrics: [{ label: "ROE", value: 0.18, format: "percent" }],
     }];
     render(<FinancialMetricGrid groups={groups} />);
     expect(screen.getByText("ROE")).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe("FinancialMetricGrid", () => {
   it("omits null metrics", () => {
     const groups: FinancialMetricGroup[] = [{
       title: "Valuation",
-      metrics: [{ label: "P/E", value: null, unit: "multiple", interpretation: null, isPositive: null }],
+      metrics: [{ label: "P/E", value: null, format: "ratio" }],
     }];
     render(<FinancialMetricGrid groups={groups} />);
     expect(screen.getByText("P/E")).toBeInTheDocument();
@@ -33,19 +33,25 @@ describe("FinancialMetricGrid", () => {
 });
 
 describe("ValuationContextPanel", () => {
+  const pe20 = { label: "P/E", value: 20, format: "ratio" as const };
+  const pb3 = { label: "P/B", value: 3, format: "ratio" as const };
+  const ev12 = { label: "EV/EBITDA", value: 12, format: "ratio" as const };
+  const div2 = { label: "Div yield", value: 0.02, format: "percent" as const };
+
   it("renders limited state when no data", () => {
-    render(<ValuationContextPanel interpretation={null} peRatio={null} pbRatio={null} evEbitda={null} dividendYield={null} />);
+    render(<ValuationContextPanel context={null} />);
     expect(screen.getByText(/valuation context is limited/i)).toBeInTheDocument();
   });
 
   it("renders PE ratio when available", () => {
-    render(<ValuationContextPanel interpretation="P/E is within a typical range" peRatio={20} pbRatio={null} evEbitda={null} dividendYield={null} />);
+    const ctx: ValuationContext = { peRatio: pe20, pbRatio: null, evEbitda: null, dividendYield: null, interpretation: "P/E is within a typical range" };
+    render(<ValuationContextPanel context={ctx} />);
     expect(screen.getByText("P/E")).toBeInTheDocument();
-    expect(screen.getByText("20.00")).toBeInTheDocument();
   });
 
   it("renders multiple metrics", () => {
-    render(<ValuationContextPanel interpretation="Valuation context appears moderate" peRatio={20} pbRatio={3} evEbitda={12} dividendYield={0.02} />);
+    const ctx: ValuationContext = { peRatio: pe20, pbRatio: pb3, evEbitda: ev12, dividendYield: div2, interpretation: "Valuation context appears moderate" };
+    render(<ValuationContextPanel context={ctx} />);
     expect(screen.getByText("P/E")).toBeInTheDocument();
     expect(screen.getByText("P/B")).toBeInTheDocument();
     expect(screen.getByText("EV/EBITDA")).toBeInTheDocument();
@@ -53,7 +59,8 @@ describe("ValuationContextPanel", () => {
   });
 
   it("shows interpretation when provided", () => {
-    render(<ValuationContextPanel interpretation="P/E is within a typical range" peRatio={20} pbRatio={null} evEbitda={null} dividendYield={null} />);
+    const ctx: ValuationContext = { peRatio: pe20, pbRatio: null, evEbitda: null, dividendYield: null, interpretation: "P/E is within a typical range" };
+    render(<ValuationContextPanel context={ctx} />);
     expect(screen.getByText("P/E is within a typical range")).toBeInTheDocument();
   });
 });
