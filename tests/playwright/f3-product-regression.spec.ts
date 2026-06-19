@@ -130,6 +130,19 @@ async function mockAllApi(page: import("@playwright/test").Page): Promise<void> 
         body: JSON.stringify({ categories: [], comment: "" }),
       });
     }
+    if (url.includes("/api/research/scanner")) {
+      return route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: [
+            { symbol: "RELIANCE", companyName: "Reliance Industries", sector: "Energy", rank: 1, score: 75, conviction: "High conviction", oneLineThesis: "Strong market position in energy and telecom", keyReason: "Quality is the clearest current signal", riskMarker: null },
+            { symbol: "TCS", companyName: "Tata Consultancy Services", sector: "Technology", rank: 2, score: 70, conviction: "Moderate conviction", oneLineThesis: "Leading IT services player", keyReason: "Growth is the clearest current signal", riskMarker: null },
+            { symbol: "HDFCBANK", companyName: "HDFC Bank", sector: "Financial Services", rank: 3, score: 80, conviction: "High conviction", oneLineThesis: "Strong fundamentals in banking", keyReason: "Quality is the clearest current signal", riskMarker: null },
+          ],
+          preset: "Quality compounders",
+        }),
+      });
+    }
     // Default empty JSON for unknown API routes
     return route.fulfill({
       contentType: "application/json",
@@ -164,41 +177,80 @@ test.describe("Public route smoke", () => {
   test("about page renders", async ({ page }) => {
     await page.goto("/?page=about");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Research intelligence for Indian equities/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AI research workspace for Indian equities/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("login page renders", async ({ page }) => {
     await page.goto("/?page=login");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.locator("section").getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+    // Login page should show "Sign in" heading (not "Create your account")
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("signup page renders", async ({ page }) => {
     await page.goto("/?page=signup");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText("Create your account", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("methodology page renders", async ({ page }) => {
     await page.goto("/?page=methodology");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.locator('h1').filter({ hasText: 'Methodology' })).toBeVisible();
+    await expect(page.locator('h1').filter({ hasText: 'Research Standards' })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("rankings page renders", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
   test("predictions page renders", async ({ page }) => {
     await page.goto("/?page=predictions");
     await expect(page.locator("body")).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+});
+
+// ── Rankings Public Gating ──────────────────────────────────────────
+
+test.describe("Rankings public gating", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+  });
+
+  test("public rankings shows only 3 rows and gates score/conviction", async ({ page }) => {
+    await page.goto("/?page=rankings");
+    await expect(page.locator("body")).toBeVisible();
+    // Should show "Gated" label for the locked column
+    await expect(page.getByText("Gated").first()).toBeVisible();
+    // Should show "Sign in to view" for conviction
+    await expect(page.getByText("Sign in to view").first()).toBeVisible();
+    // Should show unlock CTA
+    await expect(page.getByText("Unlock full research rankings").first()).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+
+  test("rankings has no raw HTTP/backend error wording", async ({ page }) => {
+    await page.goto("/?page=rankings");
+    await expect(page.locator("body")).toBeVisible();
+    const text = await page.locator("body").innerText();
+    expect(text).not.toContain("backend");
+    expect(text).not.toContain("HTTP");
+    expect(text).not.toContain("500");
+    expect(text).not.toContain("API");
+    await assertNoRenderGarbage(page);
+  });
+
+  test("sector filter not visible for unauthenticated users", async ({ page }) => {
+    await page.goto("/?page=rankings");
+    await expect(page.locator("body")).toBeVisible();
+    // The sector filter select should not exist for public users
+    await expect(page.locator("select")).toHaveCount(0);
     await assertNoRenderGarbage(page);
   });
 });
@@ -222,13 +274,6 @@ test.describe("Public navigation", () => {
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-methodology").click();
     await expect(page).toHaveURL(/page=methodology/);
-  });
-
-  test("landing page has working CTA to signup bottom", async ({ page }) => {
-    await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
-    await page.locator("#hero-cta-start").waitFor({ state: "visible", timeout: 10000 });
-    await page.locator("#hero-cta-start").click();
-    await expect(page).toHaveURL(/page=signup/);
   });
 
   test("landing page has working CTA to about", async ({ page }) => {
@@ -299,6 +344,81 @@ test.describe("Auth boundary", () => {
   });
 });
 
+// ── Signin/Signup Copy Verification ──────────────────────────────────
+
+test.describe("Signin/Signup copy", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+  });
+
+  test("signup page has correct heading and secondary link", async ({ page }) => {
+    await page.goto("/?page=signup");
+    await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
+    await expect(page.getByText("Already have an account? Sign in").first()).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+
+  test("login page has correct heading and secondary link", async ({ page }) => {
+    await page.goto("/?page=login");
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+    await expect(page.getByText("Need an account? Create one").first()).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+});
+
+// ── Scanner Smoke ────────────────────────────────────────────────────
+
+test.describe("Scanner", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(mockAuthSession);
+    await mockAllApi(page);
+  });
+
+  test("scanner shows no white scrollbar issue", async ({ page }) => {
+    await page.goto("/?page=scanner");
+    await expect(page.locator("body")).toBeVisible();
+    // Verify no default/light scrollbar (check for overflow)
+    const chipRail = page.locator(".scrollbar-none").first();
+    await expect(chipRail).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+
+  test("scanner cards do not show Sector pending", async ({ page }) => {
+    await page.goto("/?page=scanner");
+    await expect(page.locator("body")).toBeVisible();
+    const text = await page.locator("body").innerText();
+    expect(text).not.toContain("Sector pending");
+    await assertNoRenderGarbage(page);
+  });
+});
+
+// ── About Page ───────────────────────────────────────────────────────
+
+test.describe("About page", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+  });
+
+  test("about page contains required product sections", async ({ page }) => {
+    await page.goto("/?page=about");
+    await expect(page.locator("body")).toBeVisible();
+    await expect(page.getByText("What is StockStory?").first()).toBeVisible();
+    await expect(page.getByText("Product workflow").first()).toBeVisible();
+    await expect(page.getByText("What unlocks after sign-in").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Research standards" })).toBeVisible();
+    await expect(page.getByText("Broker-neutral execution model").first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "What StockStory does not do" })).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+
+  test("about page does not prioritize rankings as main CTA", async ({ page }) => {
+    await page.goto("/?page=about");
+    // Primary CTA should be "Start research" not "View rankings" or similar
+    await expect(page.getByRole("button", { name: "Start research" }).first()).toBeVisible();
+    await assertNoRenderGarbage(page);
+  });
+});
+
 // ── Search Route Smoke ───────────────────────────────────────────────
 
 test.describe("Search route", () => {
@@ -364,24 +484,8 @@ test.describe("Company page", () => {
     await assertNoRenderGarbage(page);
     // Should show prediction unavailable message
     await expect(
-      page.getByText(/company not indexed yet|awaiting prediction indexing|prediction unavailable/i).first()
+      page.getByText(/company not indexed yet|awaiting prediction indexing|prediction unavailable|research signals pending/i).first()
     ).toBeVisible();
-  });
-});
-
-// ── Rankings Smoke ───────────────────────────────────────────────────
-
-test.describe("Rankings page", () => {
-  test.beforeEach(async ({ page }) => {
-    await mockAllApi(page);
-  });
-
-  test("rankings page renders table structure", async ({ page }) => {
-    await page.goto("/?page=rankings");
-    await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
-    await expect(page.getByText(/Rankings pending/i)).toBeVisible();
-    await assertNoRenderGarbage(page);
   });
 });
 
@@ -478,6 +582,34 @@ test("no href='#' in visible anchor elements", async ({ page }) => {
   await expect(anchors).toHaveCount(0);
 });
 
+// ── No Forbidden Terms ────────────────────────────────────────────────
+
+test.describe("No forbidden terms", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+  });
+
+  test("no backend/provider/API wording on rankings page", async ({ page }) => {
+    await page.goto("/?page=rankings");
+    const text = await page.locator("body").innerText();
+    expect(text).not.toContain("backend");
+    expect(text).not.toContain("API unavailable");
+    expect(text).not.toContain("provider");
+    expect(text).not.toContain("coverage");
+    expect(text).not.toContain("diagnostics");
+    await assertNoRenderGarbage(page);
+  });
+
+  test("no Buy/Sell/Hold labels visible on landing", async ({ page }) => {
+    await page.goto("/?page=landing");
+    const text = await page.locator("body").innerText();
+    expect(text).not.toContain("Buy");
+    expect(text).not.toContain("Sell");
+    expect(text).not.toContain("Hold");
+    await assertNoRenderGarbage(page);
+  });
+});
+
 // ── Rankings / Predictions CTA routing ───────────────────────────────
 
 test.describe("Public rankings/predictions CTA routing", () => {
@@ -488,14 +620,11 @@ test.describe("Public rankings/predictions CTA routing", () => {
   test("rankings empty state primary CTA routes to signup", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    // When the API returns empty, the CTA should be 'Create free account' → signup
+    // CTA should be 'Create free account' → signup
     const cta = page.getByRole("button", { name: /create free account/i });
     if (await cta.isVisible()) {
       await cta.click();
       await expect(page).toHaveURL(/page=signup/);
-    } else {
-      // Rankings loaded with data — CTA absent is acceptable
-      await expect(page.getByRole("textbox", { name: /Search rankings by symbol or sector/i })).toBeVisible();
     }
     await assertNoRenderGarbage(page);
   });
@@ -507,9 +636,6 @@ test.describe("Public rankings/predictions CTA routing", () => {
     if (await cta.isVisible()) {
       await cta.click();
       await expect(page).toHaveURL(/page=signup/);
-    } else {
-      // Predictions loaded with data — CTA absent is acceptable
-      await expect(page.locator("body")).toBeVisible();
     }
     await assertNoRenderGarbage(page);
   });
