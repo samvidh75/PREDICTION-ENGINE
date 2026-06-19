@@ -63,4 +63,12 @@ export class NoteEngine {
       window.dispatchEvent(new Event("watchlistchange"));
     }
   }
+
+  public static clearAll(): void {
+    if (typeof window !== "undefined") {
+      const key = getStorageKey();
+      localStorage.removeItem(key);
+      window.dispatchEvent(new Event("watchlistchange"));
+    }
+  }
 }

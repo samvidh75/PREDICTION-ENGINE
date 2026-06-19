@@ -107,6 +107,22 @@ StockStory is the AI research layer between Indian investors and brokers. Copy s
 - No price targets
 - Explain as informational review flow
 
+## Persistence Language Rules
+- Local-only storage: "Saved on this device"
+- Cloud-backed storage: "Saved to your account"
+- Local + cloud sync: "Saved locally and synced to your account"
+- No "synced" or "backed up" unless persistence is verified
+- No "cloud" or "server" for local-only data
+- Save states: "Saved" | "Saving..." | "Saved on this device" | "Could not save, try again"
+- No raw storage errors shown to users
+
+## Freshness Wording (no provider/backend wording)
+- "Updated today" (<24h)
+- "Updated yesterday" (24-48h)
+- "Updated N days ago" (3-7 days)
+- "Needs review" (7-30 days)
+- "Awaiting latest research cycle" (>30 days or missing)
+
 ## Backend/Provider Wording
 ### Never show in product UI:
 - Provider names (IndianAPI, Yahoo, Jugaad, etc.)
