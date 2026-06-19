@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield } from "lucide-react";
+import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield, BookOpen } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
@@ -7,11 +7,16 @@ import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
+import { signalToneToStatusColor } from "../../lib/research/researchSignalModel";
 
 function trackedSignalDot(ticker: string): { color: string; label: string } {
   const info = StockRegistry.getStock(ticker);
   if (!info?.sector) return { color: "#64748B", label: "Tracked" };
   return { color: "#2962FF", label: "Researching" };
+}
+
+function severityColor(severity: string): string {
+  return severity === "critical" ? "#EF4444" : severity === "important" ? "#F59E0B" : "#64748B";
 }
 
 interface SignalItem {
@@ -88,8 +93,12 @@ export const DashboardHub: React.FC = () => {
       <ProductPage>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Command centre</div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">What do you want to do?</h1>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+              <BookOpen className="mr-1.5 inline h-3.5 w-3.5" aria-hidden="true" />
+              Research briefing
+            </div>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">Today's research overview</h1>
+            <p className="mt-1 text-xs text-[#9AA7B5]">Review changes, scan opportunities, and track thesis progress across your universe.</p>
           </div>
           <div className="relative flex-1 sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" aria-hidden="true" />
@@ -134,8 +143,8 @@ export const DashboardHub: React.FC = () => {
                   {topSignals.map((signal, index) => (
                     <button key={`${signal.symbol}-${signal.type}-${index}`} type="button" onClick={() => openCompany(signal.symbol)} className="grid w-full gap-2 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[100px_150px_1fr_auto] sm:items-center">
                       <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{signal.symbol}</span>
-                      <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-1 text-[11px] font-medium text-[#9AA7B5]">
-                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signal.severity === "critical" ? "#EF4444" : signal.severity === "important" ? "#F59E0B" : "#64748B" }} />
+                      <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium" style={{ borderColor: `${severityColor(signal.severity)}33`, backgroundColor: `${severityColor(signal.severity)}15`, color: severityColor(signal.severity) }}>
+                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: severityColor(signal.severity) }} />
                         {typeLabel[signal.type] ?? "Research change"}
                       </span>
                       <span className="min-w-0 truncate text-xs text-[#9AA7B5]">{signal.explanation}</span>
