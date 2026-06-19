@@ -142,21 +142,21 @@ export const ComparePage: React.FC = () => {
     const riskScores = companies.map((c) => c.factors?.risk ?? Infinity);
     const minRisk = Math.min(...riskScores);
 
-    if (company.score === maxScore) labels.push("Stronger research case");
+    if (company.score === maxScore) labels.push("Highest research score");
     else labels.push("Needs review");
     if (company.factors?.quality === maxQuality && qualityScores.some((s) => s !== maxQuality && s !== -Infinity)) labels.push("Better quality profile");
     if (company.factors?.valuation === maxValuation && valuationScores.some((s) => s !== maxValuation && s !== -Infinity)) labels.push("Better valuation context");
-    if (company.factors?.risk === minRisk && riskScores.some((s) => s !== minRisk && s !== Infinity)) labels.push("Higher risk");
+    if (company.factors?.risk === minRisk && riskScores.some((s) => s !== minRisk && s !== Infinity)) labels.push("Lower risk score");
 
     return labels;
   }
 
   const decisionLabelColors: Record<string, string> = {
-    "Stronger research case": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    "Highest research score": "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     "Needs review": "bg-amber-500/10 text-amber-400 border-amber-500/20",
     "Better quality profile": "bg-sky-500/10 text-sky-400 border-sky-500/20",
     "Better valuation context": "bg-violet-500/10 text-violet-400 border-violet-500/20",
-    "Higher risk": "bg-red-500/10 text-red-400 border-red-500/20",
+    "Lower risk score": "bg-sky-500/10 text-sky-400 border-sky-500/20",
   };
 
   return (
@@ -206,7 +206,7 @@ export const ComparePage: React.FC = () => {
         {loading ? (
           <div className="flex items-center justify-center gap-2 py-12 text-xs text-[#9AA7B5]">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-            Loading company data...
+            Loading research comparison...
           </div>
         ) : (
           <>
@@ -253,7 +253,7 @@ export const ComparePage: React.FC = () => {
                   <h2 className="text-sm font-semibold text-[#E6EDF3]">Search companies above to compare</h2>
                   <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#9AA7B5]">
                     Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown of scores, factors, and
-                    research narratives. Use this to decide which stock deserves deeper investigation.
+                    research narratives. Use this to decide which company deserves deeper investigation.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -430,7 +430,7 @@ export const ComparePage: React.FC = () => {
             {/* Decision helper */}
             <ProductPanel className="overflow-hidden">
               <div className="px-4 py-3.5">
-                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Decision Helper</div>
+                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Research cues</div>
                 <div className="-mx-2 overflow-x-auto">
                   <div className="min-w-[400px] px-2">
                     <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
@@ -485,7 +485,7 @@ export const ComparePage: React.FC = () => {
         {!loading && companies.length > 0 && (
           <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
             <p className="text-[10px] leading-relaxed text-[#64748B]">
-              Compare shows real scores and factors for each company. Missing values are noted as pending. Decision labels are suggestions based on available data — not investment advice.
+              Compare shows recorded scores and factors for each company. Missing values are marked as pending. Research cues are reading aids based on available values, not investment advice.
             </p>
           </div>
         )}
