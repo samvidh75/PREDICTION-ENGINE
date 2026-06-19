@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { ProductPanel, ProductAction, ProductStatusPill, productNavigate } from "../product/ProductUI";
 
-const ALERT_TABS = ["All", "Thesis changed", "Score changed", "Risk changed", "Valuation changed"] as const;
+const ALERT_TABS = ["All", "Thesis changed", "Score changed", "Risk changed", "Valuation changed", "Watchlist review"] as const;
 type AlertTab = typeof ALERT_TABS[number];
 
 export const AlertsPanel: React.FC = () => {
@@ -17,6 +17,9 @@ export const AlertsPanel: React.FC = () => {
           <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">What Changed</h3>
           <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">
             Track a company to review important changes — thesis shifts, score movements, risk changes, and valuation updates.
+          </p>
+          <p className="mt-3 text-xs text-[#64748B]">
+            Alerts are displayed here. No email or push notifications yet.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <ProductAction onClick={() => productNavigate("search")}>Open scanner</ProductAction>

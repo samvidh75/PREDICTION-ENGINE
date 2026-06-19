@@ -247,7 +247,7 @@ function StageOne({
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />
           <p className="text-sm leading-5 text-[#E6EDF3]">
-            Final order will be placed with your broker.
+            The final order will be placed with your broker. No order is submitted until you confirm in the next step.
           </p>
         </div>
       </ProductPanel>
@@ -316,7 +316,7 @@ function StageTwo({
           <div className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-4 py-2.5">
             <Shield className="h-4 w-4 text-[#64748B]" />
             <span className="text-xs text-[#64748B]">
-              No broker credentials are stored
+              We do not store, process, or access your broker credentials
             </span>
           </div>
         </div>
@@ -368,7 +368,7 @@ function StageThree({
       <ProductPanel className="p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
           <FileText className="h-3 w-3" />
-          Order summary
+          Order preview
         </div>
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between text-sm">
@@ -398,12 +398,12 @@ function StageThree({
           <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
           <div>
             <p className="text-sm font-semibold text-[#E6EDF3]">
-              Order will be forwarded to your broker
+              This is a preview — no order has been placed
             </p>
             <p className="mt-1 text-sm leading-5 text-[#9AA7B5]">
-              No order has been placed. Your broker will execute the
-              trade once received. StockStory India does not execute
-              trades on your behalf.
+              Your broker will execute the trade once received.
+              StockStory India does not execute trades on your behalf.
+              This is not a confirmation of execution.
             </p>
           </div>
         </div>

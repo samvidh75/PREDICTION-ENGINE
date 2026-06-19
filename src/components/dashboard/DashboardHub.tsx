@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, ShieldCheck, Star, TrendingUp, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal } from "../../services/api/client";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, ProductStatusPill, productNavigate } from "../product/ProductUI";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
 
 interface SignalItem {
   symbol: string;
@@ -24,6 +24,13 @@ const typeLabel: Record<string, string> = {
   ranking_change: "Ranking changed",
 };
 
+const SCANNER_PRESETS = [
+  { id: "positive-momentum", label: "Positive momentum", description: "Momentum above zero, highest first", icon: TrendingUp },
+  { id: "lower-volatility", label: "Lower volatility", description: "Lowest volatility first", icon: Activity },
+  { id: "value-watch", label: "Value watch", description: "Lowest positive PE ratios", icon: BarChart3 },
+  { id: "large-cap", label: "Large cap", description: "Highest market capitalisation", icon: Star },
+] as const;
+
 function openCompany(symbol: string): void {
   RecentSearchStore.addTicker(symbol);
   navigateToStock({ ticker: symbol, mode: "push" });
@@ -35,9 +42,6 @@ export const DashboardHub: React.FC = () => {
   const [signals, setSignals] = useState<SignalItem[]>([]);
   const [signalsLoading, setSignalsLoading] = useState(true);
   const [signalsError, setSignalsError] = useState(false);
-  const [showGuide, setShowGuide] = useState(() => {
-    try { return localStorage.getItem("ssi-guide-dismissed") !== "true"; } catch { return true; }
-  });
 
   useEffect(() => {
     setRecentResearch(RecentSearchStore.getRecent());
@@ -70,19 +74,15 @@ export const DashboardHub: React.FC = () => {
   }, [watchlists]);
 
   const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
-  const recentTickers = recentResearch.slice(0, 8);
-
-  function dismissGuide() {
-    setShowGuide(false);
-    try { localStorage.setItem("ssi-guide-dismissed", "true"); } catch {}
-  }
+  const topSignals = signals.slice(0, 4);
+  const remainingCount = signals.length - topSignals.length;
 
   return (
     <ProductShell>
       <ProductPage>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Research workspace</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Command centre</div>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">What do you want to do?</h1>
           </div>
           <div className="relative flex-1 sm:max-w-xs">
@@ -97,53 +97,78 @@ export const DashboardHub: React.FC = () => {
           </div>
         </div>
 
-        {showGuide && (
-          <ProductPanel className="mb-5 p-4">
-            <div className="flex items-start gap-3">
-              <Info className="mt-0.5 h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <div className="flex-1">
-                <p className="text-sm text-[#E6EDF3]">StockStory<span className="text-[#16A34A]">.</span>India is a research-only product. Evaluate companies, compare peers, and track your thesis — no fabricated data.</p>
-                <button type="button" onClick={dismissGuide} className="mt-2 text-xs font-medium text-[#2962FF] hover:text-[#3B71FF]">Dismiss</button>
-              </div>
-            </div>
-          </ProductPanel>
-        )}
-
-        <div className="mb-5 grid gap-2 sm:grid-cols-4">
+        <div className="mb-5 flex flex-wrap gap-2">
           <ProductAction onClick={() => productNavigate("scanner")}><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Open scanner</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("search")}><Search className="h-3.5 w-3.5" aria-hidden="true" /> Research company</ProductAction>
           <ProductAction variant="secondary" onClick={() => productNavigate("compare")}><GitCompare className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}><TrendingUp className="h-3.5 w-3.5" aria-hidden="true" /> View rankings</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("methodology")}><ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> View methodology</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("watchlist")}><Eye className="h-3.5 w-3.5" aria-hidden="true" /> Review watchlist</ProductAction>
+          <ProductAction variant="secondary" onClick={() => productNavigate("portfolio")}><Star className="h-3.5 w-3.5" aria-hidden="true" /> Track thesis</ProductAction>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-[1.3fr_0.8fr]">
-          <ProductPanel className="overflow-hidden">
-            <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] px-4 py-3">
-              <h2 className="text-sm font-semibold text-[#E6EDF3]">What Changed</h2>
-              <ProductStatusPill tone="blue">Research signals</ProductStatusPill>
-            </div>
-            {signalsLoading ? (
-              <div className="flex items-center gap-2 p-4 text-sm text-[#9AA7B5]">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-                Loading signals...
+          <div className="space-y-4">
+            <ProductPanel className="overflow-hidden">
+              <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] px-4 py-3">
+                <h2 className="text-sm font-semibold text-[#E6EDF3]">What changed</h2>
+                {!signalsLoading && !signalsError && (
+                  <span className="text-[11px] text-[#64748B]">{signals.length} signal{signals.length !== 1 ? "s" : ""}</span>
+                )}
               </div>
-            ) : signalsError ? (
-              <ProductEmptyState icon={AlertTriangle} title="Signals temporarily unavailable" body="Research changes will appear once the signal feed is available." />
-            ) : signals.length === 0 ? (
-              <ProductEmptyState title="No notable changes" body="No research changes crossed the display threshold for tracked companies." action={<ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>} />
-            ) : (
-              <div className="divide-y divide-[rgba(148,163,184,0.1)]">
-                {signals.map((signal, index) => (
-                  <button key={`${signal.symbol}-${signal.type}-${index}`} type="button" onClick={() => openCompany(signal.symbol)} className="grid w-full gap-2 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[100px_150px_1fr_auto] sm:items-center">
-                    <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{signal.symbol}</span>
-                    <ProductStatusPill tone={signal.severity === "critical" ? "danger" : signal.severity === "important" ? "warning" : "muted"}>{typeLabel[signal.type] ?? "Research change"}</ProductStatusPill>
-                    <span className="min-w-0 truncate text-xs text-[#9AA7B5]">{signal.explanation}</span>
-                    <ArrowRight className="hidden h-3.5 w-3.5 text-[#64748B] sm:block" aria-hidden="true" />
-                  </button>
-                ))}
+              {signalsLoading ? (
+                <div className="flex items-center gap-2 p-4 text-sm text-[#9AA7B5]">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+                  Loading signals...
+                </div>
+              ) : signalsError ? (
+                <ProductEmptyState icon={AlertTriangle} title="Signals temporarily unavailable" body="Research changes will appear once the signal feed is available." />
+              ) : signals.length === 0 ? (
+                <ProductEmptyState title="No notable changes" body="No research changes crossed the display threshold for tracked companies." action={<ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>} />
+              ) : (
+                <div className="divide-y divide-[rgba(148,163,184,0.1)]">
+                  {topSignals.map((signal, index) => (
+                    <button key={`${signal.symbol}-${signal.type}-${index}`} type="button" onClick={() => openCompany(signal.symbol)} className="grid w-full gap-2 px-4 py-3 text-left transition hover:bg-white/[0.03] sm:grid-cols-[100px_150px_1fr_auto] sm:items-center">
+                      <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{signal.symbol}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2 py-1 text-[11px] font-medium text-[#9AA7B5]">
+                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signal.severity === "critical" ? "#EF4444" : signal.severity === "important" ? "#F59E0B" : "#64748B" }} />
+                        {typeLabel[signal.type] ?? "Research change"}
+                      </span>
+                      <span className="min-w-0 truncate text-xs text-[#9AA7B5]">{signal.explanation}</span>
+                      <ArrowRight className="hidden h-3.5 w-3.5 text-[#64748B] sm:block" aria-hidden="true" />
+                    </button>
+                  ))}
+                  {remainingCount > 0 && (
+                    <button type="button" onClick={() => productNavigate("scanner")} className="flex w-full items-center justify-center gap-1 px-4 py-2.5 text-xs font-medium text-[#2962FF] transition hover:bg-white/[0.02]">
+                      View {remainingCount} more signal{remainingCount !== 1 ? "s" : ""}
+                      <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </ProductPanel>
+
+            <ProductPanel className="p-4">
+              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Scanner presets</div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {SCANNER_PRESETS.map((preset) => {
+                  const Icon = preset.icon;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => productNavigate("scanner")}
+                      className="flex items-start gap-3 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40"
+                    >
+                      <Icon className="mt-0.5 h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-[#E6EDF3]">{preset.label}</div>
+                        <div className="mt-0.5 text-[11px] leading-4 text-[#9AA7B5]">{preset.description}</div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
-            )}
-          </ProductPanel>
+            </ProductPanel>
+          </div>
 
           <div className="space-y-4">
             <ProductPanel className="p-4">
@@ -169,23 +194,16 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-              <ProductPanel className="p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#E6EDF3]"><Star className="h-4 w-4 text-[#2962FF]" aria-hidden="true" /> Thesis monitoring</div>
-                <p className="mt-2 text-xs text-[#9AA7B5]">{holdings.length === 0 ? "Track thesis positions from the portfolio page. Research only." : `${holdings.length} thesis position${holdings.length === 1 ? "" : "s"} being monitored.`}</p>
-              </ProductPanel>
+            <ProductPanel className="p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#E6EDF3]"><Star className="h-4 w-4 text-[#2962FF]" aria-hidden="true" /> Portfolio thesis monitor</div>
+              <p className="mt-2 text-xs text-[#9AA7B5]">{holdings.length === 0 ? "Track thesis positions from the portfolio page. Research only." : `${holdings.length} thesis position${holdings.length === 1 ? "" : "s"} being monitored.`}</p>
+            </ProductPanel>
 
-              {recentTickers.length > 0 && (
-                <ProductPanel className="p-4">
-                  <div className="mb-2 text-sm font-semibold text-[#E6EDF3]">Recent</div>
-                  <div className="flex flex-wrap gap-2">
-                    {recentTickers.map((ticker) => (
-                      <button key={ticker} type="button" onClick={() => openCompany(ticker)} className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.025)] px-2 py-1 font-mono text-[11px] text-[#E6EDF3] hover:border-[#2962FF]/50">{ticker}</button>
-                    ))}
-                  </div>
-                </ProductPanel>
-              )}
-            </div>
+            <button type="button" onClick={() => productNavigate("methodology")} className="flex w-full items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#0D1117] px-4 py-3 text-xs text-[#64748B] transition hover:border-[#2962FF]/40 hover:text-[#E6EDF3]">
+              <Info className="h-3.5 w-3.5" aria-hidden="true" />
+              View research methodology
+              <ArrowRight className="ml-auto h-3.5 w-3.5" aria-hidden="true" />
+            </button>
           </div>
         </div>
       </ProductPage>

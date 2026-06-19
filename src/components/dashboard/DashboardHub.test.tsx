@@ -78,12 +78,12 @@ describe('DashboardHub states', () => {
 
   it('shows thesis monitoring panel', () => {
     renderDashboard();
-    expect(screen.getByText('Thesis monitoring')).toBeInTheDocument();
+    expect(screen.getByText('Portfolio thesis monitor')).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
     renderDashboard();
-    expect(screen.getByText('Research workspace')).toBeInTheDocument();
+    expect(screen.getByText('Command centre')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {
@@ -112,7 +112,6 @@ describe('DashboardHub states', () => {
 
     renderDashboard();
 
-    expect(await screen.findByText('What Changed')).toBeInTheDocument();
-    expect(screen.getByText('Research signals')).toBeInTheDocument();
+    expect(await screen.findByText('What changed')).toBeInTheDocument();
   });
 });
