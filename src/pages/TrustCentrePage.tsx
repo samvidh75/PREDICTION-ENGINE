@@ -6,50 +6,50 @@ import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
 const sections = [
   {
     icon: Search,
-    title: "How StockStory Evaluates Businesses",
-    body: "StockStory applies a structured, multi-factor research framework to evaluate publicly traded companies. Each company is assessed across five core dimensions — Quality, Growth, Valuation, Momentum, and Risk — using a consistent methodology. The goal is to surface a balanced, repeatable view of a company's fundamentals and market position."
+    title: "Research workflow",
+    body: "StockStory applies a structured, multi-factor research framework to evaluate publicly traded companies. Each company is assessed across five core dimensions — Financial strength, Growth, Valuation context, Momentum, and Risk — using a consistent methodology. The goal is to surface a balanced, repeatable view of a company's fundamentals and market position."
   },
   {
     icon: BarChart3,
-    title: "Score Interpretation & Conviction Dimensions",
-    body: "Each company is assigned an overall Research Score from 0 to 100 based on its performance across our core dimensions. We evaluate information across six key vectors:",
+    title: "Conviction and research dimensions",
+    body: "Each company is assigned an overall Research Score from 0 to 100 based on factors across our core dimensions:",
     subsections: [
-      { label: "Quality", detail: "How efficiently the company generates returns on capital. Considers profitability, margins, and asset efficiency." },
+      { label: "Financial strength", detail: "How efficiently the company generates returns on capital. Considers profitability, margins, and asset efficiency." },
       { label: "Growth", detail: "Revenue, earnings, and cash flow trajectory over time. Captures both historical trends and forward signals." },
-      { label: "Valuation", detail: "Pricing relative to earnings, book value, and cash yields. Contextualised against industry peers." },
+      { label: "Valuation context", detail: "Pricing relative to earnings, book value, and cash yields. Contextualised against industry peers." },
       { label: "Momentum", detail: "Price trend strength and relative market performance." },
-      { label: "Risk", detail: "Leverage, cash buffers, accounting consistency, and price volatility that may affect the thesis." },
+      { label: "Risk context", detail: "Leverage, cash buffers, accounting consistency, and price volatility that may affect the thesis." },
       { label: "Conviction", detail: "Reflects the breadth and consistency of information behind the overall thesis. Higher conviction means more dimensions were evaluated." },
     ]
   },
   {
     icon: Shield,
-    title: "Why We Do Not Issue Buy, Sell, or Hold Calls",
-    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or guaranteed returns. We believe that investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own execution decisions through your broker."
+    title: "Research is not a recommendation",
+    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or guaranteed returns. Investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own informed decisions."
   },
   {
     icon: BookOpen,
-    title: "What 'Track Thesis' Means",
-    body: "Tracking a thesis means saving a company to your watchlist so you can monitor changes over time. StockStory alerts you when scores move, risk factors change, or valuation context shifts — so you know when it is time to review your reasoning. Thesis tracking is a research aid, not a portfolio management system."
+    title: "What thesis tracking means",
+    body: "Tracking a thesis means saving a company to your watchlist so you can monitor changes over time. StockStory helps you identify when scores move, risk factors change, or valuation context shifts — so you know when it is time to review your reasoning. Thesis tracking is a research aid, not a portfolio management system."
   },
   {
     icon: ArrowRightLeft,
-    title: "Why Compare Matters",
-    body: "Compare allows you to look at peer companies side-by-side on the exact same multi-factor dimensions, helping you see where one business excels or poses a higher relative risk. This neutral, standardized comparison helps remove emotional bias from your research and focuses your attention on verified metrics."
+    title: "Why compare matters",
+    body: "Compare allows you to look at peer companies side-by-side on the exact same multi-factor dimensions, helping you see where one business excels or poses a higher relative risk. This neutral, standardised comparison helps remove emotional bias from your research and focuses your attention on verified metrics."
   },
   {
     icon: Shield,
-    title: "Missing Data and Omissions",
-    body: "When certain financial fields are missing or not applicable (for example, debt metrics for banking institutions, or historical numbers for recently listed companies), StockStory omits them quietly to present a clean, un-fabricated view rather than using generic filler text. The overall score adjusts automatically to represent the verified data available."
+    title: "Handling of partial information",
+    body: "When certain financial fields are not available or not applicable, StockStory omits them quietly to present a clean, un-fabricated view rather than using generic filler text. The overall score adjusts automatically to represent the information available."
   },
   {
     icon: ArrowRightLeft,
-    title: "Why Final Execution Happens Through Brokers",
-    body: "StockStory is a research platform, not a brokerage. All trading, order placement, and portfolio execution occur through your registered broker. StockStory never stores, processes, or accesses your broker credentials. The Invest handoff prepares your research summary, but the final decision and action remain yours. This separation keeps research objective and free from execution conflicts."
+    title: "Broker handoff philosophy",
+    body: "StockStory is a research platform, not a brokerage. All order placement and execution occur through your registered broker. StockStory never stores, processes, or accesses your broker credentials. The Invest handoff prepares your research summary, but the final decision and action remain yours. This separation keeps research objective and free from execution conflicts."
   },
   {
     icon: Scale,
-    title: "Compliance Statement & SEBI Disclaimer",
+    title: "Compliance statement",
     body: "StockStory provides research, analysis, and educational content. Nothing on this platform constitutes investment advice, a recommendation, or solicitation to buy or sell securities. All investment decisions should be made with the advice of a qualified financial professional."
   }
 ];
@@ -60,10 +60,10 @@ export const TrustCentrePage: React.FC = () => {
       <ProductPage>
         <div>
           <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-base font-semibold text-[#E6EDF3]">Research Standards</h1>
+            <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <h1 className="text-base font-semibold text-[#E6EDF3]">How StockStory Thinks</h1>
           </div>
-          <p className="mt-1 text-xs text-[#9AA7B5]">How StockStory thinks, evaluates businesses, and how to use the product responsibly.</p>
+          <p className="mt-1 text-xs text-[#9AA7B5]">Research methodology — how we evaluate businesses and how to use the product responsibly.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <ProductAction onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
             <ProductAction onClick={() => productNavigate("about")} variant="secondary">Read mission</ProductAction>

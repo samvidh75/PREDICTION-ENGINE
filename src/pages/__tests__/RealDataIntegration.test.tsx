@@ -97,7 +97,7 @@ describe('Real Data Integration Pages', () => {
     render(<LayoutProvider><DashboardHub /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Research briefing')).toBeInTheDocument();
+      expect(screen.getByText('Research Command Centre')).toBeInTheDocument();
     });
   });
 
@@ -195,7 +195,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Research Rankings')).toBeInTheDocument();
+      expect(screen.getByText('Research Shortlist')).toBeInTheDocument();
       expect(screen.getByText('Create free account')).toBeInTheDocument();
     });
   });

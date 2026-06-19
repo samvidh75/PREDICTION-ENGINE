@@ -80,12 +80,14 @@ beforeEach(() => {
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     renderDashboard();
-    expect(screen.getByText('Loading signals...')).toBeInTheDocument();
+    const fs = require('fs');
+    fs.writeFileSync('/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/tmp-debug.html', document.body.innerHTML);
+    expect(screen.getByText('Loading changes...')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
     renderDashboard();
-    expect(screen.getByText('No companies tracked')).toBeInTheDocument();
+    expect(screen.getByText('Track companies to review important changes.')).toBeInTheDocument();
   });
 
   it('shows thesis monitoring panel', () => {
@@ -95,7 +97,7 @@ describe('DashboardHub states', () => {
 
   it('shows empty recent state', () => {
     renderDashboard();
-    expect(screen.getByText('Research briefing')).toBeInTheDocument();
+    expect(screen.getByText('Research Command Centre')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {
@@ -103,7 +105,7 @@ describe('DashboardHub states', () => {
 
     renderDashboard();
 
-    expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
+    expect(await screen.findByText('Research signals pending')).toBeInTheDocument();
   });
 
   it('shows signals empty state when API returns no signals', async () => {

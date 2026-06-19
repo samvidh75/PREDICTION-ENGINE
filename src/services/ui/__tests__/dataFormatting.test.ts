@@ -126,10 +126,10 @@ describe("formatFreshness", () => {
     expect(formatFreshness(oldDate)).toBe("2026-01-01");
   });
 
-  it("returns Freshness pending for null/undefined", () => {
-    expect(formatFreshness(null)).toBe("Freshness pending");
-    expect(formatFreshness(undefined)).toBe("Freshness pending");
-    expect(formatFreshness("")).toBe("Freshness pending");
+  it("returns Pending for null/undefined", () => {
+    expect(formatFreshness(null)).toBe("Pending");
+    expect(formatFreshness(undefined)).toBe("Pending");
+    expect(formatFreshness("")).toBe("Pending");
   });
 });
 

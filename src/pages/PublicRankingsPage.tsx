@@ -92,10 +92,10 @@ export const PublicRankingsPage: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research Rankings</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research Shortlist</h1>
               <p className="mt-1 text-sm text-[#9AA7B5]">
-                {isAuthenticated 
-                  ? "Indian equities ranked by verified quantitative research assessment."
+                {isAuthenticated
+                  ? "Scored Indian equities — use the shortlist to identify companies worth researching."
                   : "Institutional-grade research models applied to Indian equities."}
               </p>
             </div>
@@ -287,6 +287,28 @@ export const PublicRankingsPage: React.FC = () => {
                             >
                               Compare
                             </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isAuthenticated) productNavigate("stock", r.symbol);
+                                else handleActionRedirect();
+                              }}
+                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
+                            >
+                              Track
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isAuthenticated) productNavigate("invest", r.symbol);
+                                else handleActionRedirect();
+                              }}
+                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
+                            >
+                              Invest
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -340,14 +362,14 @@ export const PublicRankingsPage: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[rgba(148,163,184,0.06)]">
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-[rgba(148,163,184,0.06)]">
                         <button
                           type="button"
                           onClick={() => {
                             if (isAuthenticated) productNavigate("stock", r.symbol);
                             else handleActionRedirect();
                           }}
-                          className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]"
+                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]"
                         >
                           Research
                         </button>
@@ -357,9 +379,29 @@ export const PublicRankingsPage: React.FC = () => {
                             if (isAuthenticated) productNavigate("compare", r.symbol);
                             else handleActionRedirect();
                           }}
-                          className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
+                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
                         >
                           Compare
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isAuthenticated) productNavigate("stock", r.symbol);
+                            else handleActionRedirect();
+                          }}
+                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
+                        >
+                          Track
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isAuthenticated) productNavigate("invest", r.symbol);
+                            else handleActionRedirect();
+                          }}
+                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
+                        >
+                          Invest
                         </button>
                       </div>
                     </ProductPanel>

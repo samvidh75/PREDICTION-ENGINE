@@ -93,7 +93,7 @@ function formatDateTime(value?: string): string {
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
-function scoreFromLineage(factor: any): number | null {
+function extractScore(factor: any): number | null {
   if (!factor || typeof factor.score !== "number" || !Number.isFinite(factor.score)) return null;
   return factor.score;
 }
@@ -127,12 +127,12 @@ function adaptStockStoryResponse(data: any, financialsObj: any = null) {
   const factors = payload.factors;
   if (!factors) throw new Error("STOCKSTORY_FACTORS_MISSING");
 
-  const growth = scoreFromLineage(factors.growth);
-  const quality = scoreFromLineage(factors.quality);
-  const stability = scoreFromLineage(factors.stability);
-  const momentum = scoreFromLineage(factors.momentum);
-  const valuation = scoreFromLineage(factors.value);
-  const risk = scoreFromLineage(factors.risk);
+  const growth = extractScore(factors.growth);
+  const quality = extractScore(factors.quality);
+  const stability = extractScore(factors.stability);
+  const momentum = extractScore(factors.momentum);
+  const valuation = extractScore(factors.value);
+  const risk = extractScore(factors.risk);
   const confidenceScore = payload.confidence?.score ?? payload.confidenceScore ?? null;
 
   return {

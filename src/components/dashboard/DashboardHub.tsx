@@ -1,17 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, Star, TrendingUp, BarChart3, Activity, Shield, BookOpen, Briefcase } from "lucide-react";
+import { AlertTriangle, ArrowRight, Eye, GitCompare, Info, Loader2, Search, Sparkles, TrendingUp, BarChart3, Activity, Shield, BookOpen, Briefcase, Star } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 import { WatchlistEngine } from "../../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
 import { api, type Signal as ApiSignal, type ScannerResultItem } from "../../services/api/client";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../product/ProductUI";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../product/ProductUI";
 import ResearchContextLink from "../research/ResearchContextLink";
 
-function trackedSignalDot(ticker: string): { color: string; label: string } {
-  const info = StockRegistry.getStock(ticker);
-  if (!info?.sector) return { color: "#64748B", label: "Tracked" };
+function trackedSignalDot(_ticker: string): { color: string; label: string } {
   return { color: "#2962FF", label: "Researching" };
 }
 
@@ -27,15 +25,15 @@ interface SignalItem {
 }
 
 const typeLabel: Record<string, string> = {
-  classification_upgrade: "Classification change",
-  classification_downgrade: "Classification change",
-  confidence_increase: "Confidence changed",
-  confidence_decrease: "Confidence changed",
+  classification_upgrade: "Thesis improved",
+  classification_downgrade: "Thesis weakened",
+  confidence_increase: "Confidence increased",
+  confidence_decrease: "Confidence decreased",
   factor_change: "Factor changed",
   ranking_change: "Ranking changed",
 };
 
-const SCANNER_PRESETS = [
+const RESEARCH_STRATEGIES = [
   { id: "positive-momentum", label: "Positive momentum", description: "Momentum above zero, highest first", icon: TrendingUp },
   { id: "lower-volatility", label: "Lower volatility", description: "Lowest volatility first", icon: Activity },
   { id: "value-watch", label: "Value watch", description: "Lowest positive PE ratios", icon: BarChart3 },
@@ -48,14 +46,6 @@ function openCompany(symbol: string): void {
 }
 
 import { WorkspaceSummary } from "./WorkspaceSummary";
-
-function scannerSignalLabel(score: number | null): { label: string; color: string } | null {
-  if (score === null) return null;
-  if (score >= 75) return { label: "High conviction", color: "#16A34A" };
-  if (score >= 55) return { label: "Worth researching", color: "#2962FF" };
-  if (score >= 40) return { label: "Track", color: "#F59E0B" };
-  return { label: "Needs review", color: "#EF4444" };
-}
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -82,7 +72,7 @@ export const DashboardHub: React.FC = () => {
           symbol: s.symbol,
           type: s.type,
           severity: s.severity,
-          explanation: s.explanation ?? "Research change detected. Details available on company page.",
+          explanation: s.explanation ?? "Research change detected.",
         })));
       })
       .catch(() => { if (!ctrl.signal.aborted) setSignalsError(true); })
@@ -103,7 +93,6 @@ export const DashboardHub: React.FC = () => {
     return [...unique].slice(0, 6);
   }, [watchlists]);
 
-  const holdings = useMemo(() => PortfolioEngine.getHoldings(), []);
   const topSignals = signals.slice(0, 4);
   const remainingCount = signals.length - topSignals.length;
 
@@ -112,18 +101,18 @@ export const DashboardHub: React.FC = () => {
       <ProductPage>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-              <BookOpen className="mr-1.5 inline h-3.5 w-3.5" aria-hidden="true" />
-              Research briefing
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+              <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+              Research Command Centre
             </div>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#E6EDF3]">Research cockpit</h1>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Welcome back. Review signals, evaluate opportunities, and track your thesis progress.</p>
+            <h1 className="mt-2 text-xl font-semibold tracking-tight text-[#E6EDF3]">Understand the stock before you invest</h1>
+            <p className="mt-1 text-xs text-[#9AA7B5]">Search, discover, compare, and track — AI research for Indian equities.</p>
           </div>
           <div className="relative flex-1 sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search by symbol or company..."
+              placeholder="Search company to begin research..."
               className="h-10 w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] pl-10 pr-4 text-sm text-[#E6EDF3] placeholder:text-[#64748B] outline-none transition focus:border-[#2962FF]"
               onFocus={() => productNavigate("search")}
               readOnly
@@ -131,16 +120,44 @@ export const DashboardHub: React.FC = () => {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-wrap gap-2">
-          <ProductAction onClick={() => productNavigate("scanner")}><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Open scanner</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("search")}><Search className="h-3.5 w-3.5" aria-hidden="true" /> Research company</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("compare")}> <GitCompare className="h-3.5 w-3.5" aria-hidden="true" /> Compare companies</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("watchlist")}><Eye className="h-3.5 w-3.5" aria-hidden="true" /> Watchlist</ProductAction>
-          <ProductAction variant="secondary" onClick={() => productNavigate("portfolio")}><TrendingUp className="h-3.5 w-3.5" aria-hidden="true" /> Portfolio monitor</ProductAction>
-          <ProductPanel className="p-4">
-            <h2 className="text-sm font-semibold text-[#E6EDF3]">Portfolio thesis monitor</h2>
-            <p className="mt-2 text-xs text-[#9AA7B5]">Monitor your portfolio's thesis progress here.</p>
-          </ProductPanel>
+        {/* Research actions cluster */}
+        <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <button type="button" onClick={() => productNavigate("scanner")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
+            <Search className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Open scanner</span>
+            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Discover research candidates</span>
+          </button>
+          <button type="button" onClick={() => productNavigate("rankings")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
+            <BarChart3 className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">View rankings</span>
+            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Browse scored companies</span>
+          </button>
+          <button type="button" onClick={() => productNavigate("compare")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
+            <GitCompare className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Compare companies</span>
+            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Side-by-side research</span>
+          </button>
+          <button type="button" onClick={() => productNavigate("watchlist")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
+            <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Review watchlist</span>
+            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Track thesis changes</span>
+          </button>
+        </div>
+
+        {/* Start with research - strategy chips */}
+        <div className="mb-5">
+          <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+              <h2 className="text-xs font-semibold text-[#E6EDF3]">Start with research</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><Sparkles className="h-3.5 w-3.5" /> Quality compounders</ProductAction>
+              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><BarChart3 className="h-3.5 w-3.5" /> Undervalued quality</ProductAction>
+              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><TrendingUp className="h-3.5 w-3.5" /> Improving momentum</ProductAction>
+              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><Shield className="h-3.5 w-3.5" /> Low debt leaders</ProductAction>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-[1.3fr_0.8fr]">
@@ -160,12 +177,21 @@ export const DashboardHub: React.FC = () => {
               {signalsLoading ? (
                 <div className="flex items-center gap-2 p-4 text-sm text-[#9AA7B5]">
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-                  Loading signals...
+                  Loading changes...
                 </div>
               ) : signalsError ? (
-                <ProductEmptyState icon={AlertTriangle} title="Something went wrong" body="We're working on restoring research signals. Check back shortly." />
+                <div className="flex flex-col items-center p-6 text-center">
+                  <AlertTriangle className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />
+                  <h3 className="mt-2 text-sm font-semibold text-[#E6EDF3]">Research signals pending</h3>
+                  <p className="mt-1 text-xs text-[#9AA7B5]">Track companies to review important changes.</p>
+                </div>
               ) : signals.length === 0 ? (
-                <ProductEmptyState title="No notable changes" body="No research changes crossed the display threshold for tracked companies." action={<ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Open rankings</ProductAction>} />
+                <div className="flex flex-col items-center p-6 text-center">
+                  <Activity className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
+                  <h3 className="mt-2 text-sm font-semibold text-[#E6EDF3]">No notable changes</h3>
+                  <p className="mt-1 text-xs text-[#9AA7B5]">No research changes crossed the display threshold for tracked companies.</p>
+                  <div className="mt-3"><ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>Open rankings</ProductAction></div>
+                </div>
               ) : (
                 <div className="divide-y divide-[rgba(148,163,184,0.1)]">
                   {topSignals.map((signal, index) => (
@@ -180,7 +206,7 @@ export const DashboardHub: React.FC = () => {
                     </button>
                   ))}
                   {remainingCount > 0 && (
-                    <button type="button" onClick={() => productNavigate("scanner")} className="flex w-full items-center justify-center gap-1 px-4 py-2.5 text-xs font-medium text-[#2962FF] transition hover:bg-white/[0.02]">
+                    <button type="button" onClick={() => productNavigate("alerts")} className="flex w-full items-center justify-center gap-1 px-4 py-2.5 text-xs font-medium text-[#2962FF] transition hover:bg-white/[0.02]">
                       View {remainingCount} more signal{remainingCount !== 1 ? "s" : ""}
                       <ArrowRight className="h-3 w-3" aria-hidden="true" />
                     </button>
@@ -189,26 +215,34 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
-            {/* Opportunity Queue */}
+            {/* Research candidates */}
             <ProductPanel className="p-4">
               <div className="mb-3 flex items-center justify-between border-b border-[rgba(148,163,184,0.12)] pb-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-                  <h2 className="text-sm font-semibold text-[#E6EDF3]">Opportunity queue</h2>
+                  <h2 className="text-sm font-semibold text-[#E6EDF3]">Research candidates</h2>
                 </div>
                 <span className="text-[11px] text-[#64748B]">Top compounders</span>
               </div>
               {oppsLoading ? (
                 <div className="flex items-center gap-2 p-3 text-xs text-[#9AA7B5]">
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-                  Compiling scanner opportunities...
+                  Compiling research candidates...
                 </div>
               ) : opportunities.length === 0 ? (
-                <p className="p-3 text-xs text-[#9AA7B5]">No opportunities found.</p>
+                <div className="p-3 text-xs text-[#9AA7B5]">
+                  Open the scanner to discover research candidates.
+                  <div className="mt-3"><ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction></div>
+                </div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-3">
                   {opportunities.map((opp) => {
-                    const labelInfo = scannerSignalLabel(opp.score);
+                    const labelInfo = opp.score !== null && opp.score !== undefined
+                      ? opp.score >= 75 ? { label: "High conviction", color: "#16A34A" }
+                        : opp.score >= 55 ? { label: "Worth researching", color: "#2962FF" }
+                          : opp.score >= 40 ? { label: "Track", color: "#F59E0B" }
+                            : { label: "Needs review", color: "#EF4444" }
+                      : null;
                     return (
                       <div
                         key={opp.symbol}
@@ -244,32 +278,62 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
+            {/* Research strategies */}
             <ProductPanel className="p-4">
-              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Scanner presets</div>
+              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Research strategies</div>
               <div className="grid gap-2 sm:grid-cols-2">
-                {SCANNER_PRESETS.map((preset) => {
-                  const Icon = preset.icon;
+                {RESEARCH_STRATEGIES.map((strategy) => {
+                  const Icon = strategy.icon;
                   return (
                     <button
-                      key={preset.id}
+                      key={strategy.id}
                       type="button"
                       onClick={() => productNavigate("scanner")}
                       className="flex items-start gap-3 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40"
                     >
                       <Icon className="mt-0.5 h-4 w-4 text-[#2962FF]" aria-hidden="true" />
                       <div className="min-w-0">
-                        <div className="text-xs font-semibold text-[#E6EDF3]">{preset.label}</div>
-                        <div className="mt-0.5 text-[11px] leading-4 text-[#9AA7B5]">{preset.description}</div>
+                        <div className="text-xs font-semibold text-[#E6EDF3]">{strategy.label}</div>
+                        <div className="mt-0.5 text-[11px] leading-4 text-[#9AA7B5]">{strategy.description}</div>
                       </div>
                     </button>
                   );
                 })}
               </div>
             </ProductPanel>
+
+            {/* Compare prompt */}
+            <ProductPanel className="p-4">
+              <div className="flex items-start gap-3">
+                <GitCompare className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-semibold text-[#E6EDF3]">Compare companies</h3>
+                  <p className="mt-1 text-xs text-[#9AA7B5]">Side-by-side research to evaluate which company deserves deeper investigation.</p>
+                  <div className="mt-3">
+                    <ProductAction variant="secondary" onClick={() => productNavigate("compare")}>
+                      <GitCompare className="h-3.5 w-3.5" aria-hidden="true" /> Open compare
+                    </ProductAction>
+                  </div>
+                </div>
+              </div>
+            </ProductPanel>
           </div>
 
           <div className="space-y-4">
-            {/* Workspace State Indicators */}
+            {/* Portfolio thesis monitor */}
+            <ProductPanel className="p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Star className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+                <h3 className="text-sm font-semibold text-[#E6EDF3]">Portfolio thesis monitor</h3>
+              </div>
+              <p className="text-xs text-[#9AA7B5]">
+                {PortfolioEngine.getHoldings().length === 0
+                  ? "Track thesis positions from the portfolio page. Research only."
+                  : `${PortfolioEngine.getHoldings().length} thesis position${PortfolioEngine.getHoldings().length === 1 ? "" : "s"} being monitored.`}
+              </p>
+            </ProductPanel>
+
+            {/* Workspace status */}
             <ProductPanel className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Briefcase className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
@@ -278,14 +342,20 @@ export const DashboardHub: React.FC = () => {
               <WorkspaceSummary />
             </ProductPanel>
 
-            {/* Tracked Companies */}
+            {/* Tracked companies */}
             <ProductPanel className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
                 <span className="text-sm font-semibold text-[#E6EDF3]">Tracked companies</span>
               </div>
               {followedTickers.length === 0 ? (
-                <ProductEmptyState title="No companies tracked" body="Track companies from search or company pages to monitor changes." action={<ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>} />
+                <div className="flex flex-col items-center p-4 text-center">
+                  <p className="text-xs text-[#9AA7B5]">Track companies to review important changes.</p>
+                  <div className="mt-3">
+                    <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
+                    <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
+                  </div>
+                </div>
               ) : (
                 followedTickers.map((ticker) => {
                   const info = StockRegistry.getStock(ticker);
@@ -309,31 +379,31 @@ export const DashboardHub: React.FC = () => {
               )}
             </ProductPanel>
 
-            {/* Next Actions */}
+            {/* Research workflow */}
             <ProductPanel className="p-4">
-              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Next actions</div>
+              <div className="mb-3 text-sm font-semibold text-[#E6EDF3]">Research workflow</div>
               <div className="grid gap-2 text-xs">
                 <button type="button" onClick={() => productNavigate("search")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
-                  <span>1. Research a company</span>
+                  <span>1. Discover — Open scanner</span>
                   <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
                 </button>
-                <button type="button" onClick={() => productNavigate("scanner")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
-                  <span>2. Run scanner presets</span>
+                <button type="button" onClick={() => productNavigate("rankings")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
+                  <span>2. Research — Browse rankings</span>
                   <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
                 </button>
                 <button type="button" onClick={() => productNavigate("compare")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
-                  <span>3. Compare alternatives</span>
+                  <span>3. Compare — Evaluate alternatives</span>
                   <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
                 </button>
                 <button type="button" onClick={() => productNavigate("watchlist")} className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2 text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3] transition">
-                  <span>4. Review watchlist changes</span>
+                  <span>4. Review — Track thesis changes</span>
                   <ArrowRight className="h-3.5 w-3.5 text-[#64748B]" />
                 </button>
               </div>
             </ProductPanel>
 
             <button type="button" onClick={() => productNavigate("methodology")} className="flex w-full items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[#0D1117] px-4 py-3 text-xs text-[#64748B] transition hover:border-[#2962FF]/40 hover:text-[#E6EDF3]">
-              <Info className="h-3.5 w-3.5" aria-hidden="true" />
+              <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
               View research methodology
               <ArrowRight className="ml-auto h-3.5 w-3.5" aria-hidden="true" />
             </button>
