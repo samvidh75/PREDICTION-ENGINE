@@ -227,7 +227,7 @@ export const WatchlistPage: React.FC = () => {
             {activeTickers.length === 0 ? (
               <ProductEmptyState
                 icon={Eye}
-                title="Track companies you are researching"
+                title="Track companies you are researching."
                 body="Open the scanner or search for a company to start tracking."
                 action={
                   <div className="flex flex-wrap gap-2">

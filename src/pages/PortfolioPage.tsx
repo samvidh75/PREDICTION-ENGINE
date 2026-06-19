@@ -224,7 +224,7 @@ export const PortfolioPage: React.FC = () => {
           <ProductEmptyState
             icon={AlertCircle}
             title="No thesis tracked yet"
-            body="Add positions to monitor companies you are researching and track thesis progress."
+            body="Track companies to monitor whether the thesis still holds."
             action={
               <div className="flex gap-2">
                 <ProductAction variant="primary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>

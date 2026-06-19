@@ -54,7 +54,7 @@ describe('WatchlistPage states', () => {
 
     renderWithLayout(<WatchlistPage />);
 
-    expect(await screen.findByText('Track companies you are researching')).toBeInTheDocument();
+    expect(await screen.findByText('Track companies you are researching.')).toBeInTheDocument();
   });
 
   it('renders watchlist header', async () => {

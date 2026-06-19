@@ -115,9 +115,9 @@ export const SettingsPage: React.FC = () => {
                         role="switch"
                         aria-checked={alertCategories[cat]}
                         aria-label={`${cat} alerts`}
-                        className={`w-10 h-5 rounded-full transition relative cursor-pointer ${alertCategories[cat] ? 'bg-[#2962FF]' : 'bg-[#333]'}`}
+                        className={`w-10 h-5 rounded-full transition relative cursor-pointer ${alertCategories[cat] ? 'bg-[#2962FF]' : 'bg-[rgba(148,163,184,0.16)]'}`}
                       >
-                        <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition ${alertCategories[cat] ? 'left-[22px]' : 'left-[2px]'}`} />
+                        <div className={`w-4 h-4 rounded-full bg-[#E6EDF3] absolute top-0.5 transition ${alertCategories[cat] ? 'left-[22px]' : 'left-[2px]'}`} />
                       </button>
                     </ProductPanel>
                   ))}

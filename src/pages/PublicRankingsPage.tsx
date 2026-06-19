@@ -135,7 +135,7 @@ export const PublicRankingsPage: React.FC = () => {
                       aria-label="Sector"
                       value={sectorFilter}
                       onChange={(e) => setSectorFilter(e.target.value)}
-                      className="appearance-none bg-[#1e1e2f] text-[#E6EDF3] border border-[#2b2b3a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4c6ef5]"
+                      className="appearance-none bg-[#0D1117] text-[#E6EDF3] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#2962FF]/60"
                     >
                       <option value="all">All Sectors</option>
                       {sectors.map((sec) => (
@@ -251,7 +251,7 @@ export const PublicRankingsPage: React.FC = () => {
                           {isAuthenticated ? (
                             (() => {
                               const sig = rankingsSignalLabel(r.score);
-                              if (!sig) return <span className="text-[#64748B] italic">Not enough information</span>;
+                              if (!sig) return <span className="text-[#64748B]">—</span>;
                               return (
                                 <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${sig.color}33`, backgroundColor: `${sig.color}15`, color: sig.color }}>
                                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sig.color }} aria-hidden="true" />
@@ -342,7 +342,7 @@ export const PublicRankingsPage: React.FC = () => {
                         <div className="flex flex-col items-end gap-1">
                           {isAuthenticated ? (
                             <>
-                              {r.score !== null ? <ScorePill score={Math.round(r.score)} /> : <span className="text-[10px] text-[#64748B] italic">Awaiting data</span>}
+                              {r.score !== null ? <ScorePill score={Math.round(r.score)} /> : <span className="text-[10px] text-[#64748B]">—</span>}
                               {(rankingsSignalLabel(r.score)) && (
                                 <span className="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] font-medium" style={{ borderColor: `${rankingsSignalLabel(r.score)!.color}33`, backgroundColor: `${rankingsSignalLabel(r.score)!.color}15`, color: rankingsSignalLabel(r.score)!.color }}>
                                   <span className="h-1 w-1 rounded-full" style={{ backgroundColor: rankingsSignalLabel(r.score)!.color }} aria-hidden="true" />
