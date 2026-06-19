@@ -5,7 +5,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import DashboardHub from '../../components/dashboard/DashboardHub';
 import { SearchPage } from '../SearchPage';
 import { PublicRankingsPage } from '../PublicRankingsPage';
-import PublicPredictionsPage from '../PublicPredictionsPage';
 import StockStoryPage from '../StockStoryPage';
 import { LayoutProvider } from '../../context/LayoutContext';
 
@@ -220,60 +219,4 @@ describe('Real Data Integration Pages', () => {
     });
   });
 
-  it('PublicPredictionsPage parses signals from predictions API', async () => {
-    window.history.replaceState({}, '', '?page=predictions');
-    vi.stubGlobal('fetch', makeMockFetch({
-      '/api/predictions/signals': {
-        status: 'ok',
-        mode: 'production_real',
-        data: {
-          signals: [
-            { symbol: 'RELIANCE', type: 'bullish', severity: 'important', explanation: 'Strong revenue growth', snapshotDate: '2026-06-15' },
-          ],
-          snapshotDate: '2026-06-15',
-          symbolsAnalyzed: 116,
-        },
-        reason: 'OK',
-        message: null,
-        generatedAt: '2026-06-15T00:00:00.000Z',
-        dataState: {},
-      },
-    }));
-
-    render(
-      <LayoutProvider>
-        <PublicPredictionsPage />
-      </LayoutProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getAllByText('RELIANCE').length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/bullish/i).length).toBeGreaterThan(0);
-    });
-  });
-
-  it('PublicPredictionsPage shows empty state when no signals', async () => {
-    window.history.replaceState({}, '', '?page=predictions');
-    vi.stubGlobal('fetch', makeMockFetch({
-      '/api/predictions/signals': {
-        status: 'ok',
-        mode: 'production_real',
-        data: { signals: [], snapshotDate: null, symbolsAnalyzed: 0 },
-        reason: 'OK',
-        message: null,
-        generatedAt: new Date().toISOString(),
-        dataState: {},
-      },
-    }));
-
-    render(
-      <LayoutProvider>
-        <PublicPredictionsPage />
-      </LayoutProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/No score changes/i)).toBeInTheDocument();
-    });
-  });
 });

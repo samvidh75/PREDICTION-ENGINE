@@ -7,7 +7,6 @@ import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { api, WatchlistRow } from "../services/api/client";
 import { ChevronRight, Eye, TrendingUp, TrendingDown, AlertTriangle, Minus } from "lucide-react";
-import { formatFreshness } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
 import { ProductPanel, ProductEmptyState, ProductAction, ProductPage, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { buildWatchlistViewModel } from "../lib/product/viewModels/watchlistViewModel";
@@ -303,7 +302,7 @@ export const WatchlistPage: React.FC = () => {
                                "Unchanged"}
                             </ProductStatusPill>
                             {noteObj.timestamp ? (
-                              <span className="text-[10px] text-[#484F58]">Note updated {formatFreshness(noteObj.lastUpdated)}</span>
+                              <span className="text-[10px] text-[#484F58]">Note saved</span>
                             ) : null}
                           </div>
 

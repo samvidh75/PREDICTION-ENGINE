@@ -10,7 +10,6 @@ import type { PageKey } from "./router";
 // Public pages
 import PublicLandingPage from "../pages/PublicLandingPage";
 import PublicAboutPage from "../pages/PublicAboutPage";
-import PublicPredictionsPage from "../pages/PublicPredictionsPage";
 import PublicRankingsPage from "../pages/PublicRankingsPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
@@ -43,7 +42,6 @@ const PUBLIC_PAGES: Record<string, boolean> = {
   trust: true,
   methodology: true,
   validation: true,
-  predictions: true,
   rankings: true,
   scanner: true,
   compare: true,
@@ -62,8 +60,6 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
     case "methodology":
     case "validation":
       return <TrustCentrePage />;
-    case "predictions":
-      return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
     case "scanner":
@@ -97,8 +93,6 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
     case "methodology":
     case "validation":
       return <TrustCentrePage />;
-    case "predictions":
-      return <PublicPredictionsPage />;
     case "rankings":
       return <PublicRankingsPage />;
     case "compare":

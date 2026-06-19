@@ -7,7 +7,7 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { RegisteredStock } from "../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../services/stocks/StockSearchEngine";
 import { api, type LeaderboardEntry, type WatchlistRow } from "../services/api/client";
-import { formatFreshness, formatRank } from "../services/ui/dataFormatting";
+import { formatRank } from "../services/ui/dataFormatting";
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -231,7 +231,7 @@ export const SearchPage: React.FC = () => {
                                 <span className="truncate text-[10px] font-medium text-[#64748B]">{stock.sector}</span>
                               )}
                               <ProductStatusPill tone={predictionDate ? "blue" : "muted"}>
-                                {predictionDate ? formatFreshness(predictionDate) : "Research signals not yet available"}
+                                {predictionDate ? "Updated" : "Research signals not yet available"}
                               </ProductStatusPill>
                               {confidenceScore !== null && (
                                 <ProductStatusPill tone="blue">{Math.round(confidenceScore)}% confidence</ProductStatusPill>
