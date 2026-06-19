@@ -9,6 +9,7 @@ import CustomSelect from "../components/ui/CustomSelect";
 import ScorePill from "../components/ui/ScorePill";
 import { formatRank } from "../services/ui/dataFormatting";
 import ResearchContextLink from "../components/research/ResearchContextLink";
+import { dedupeRankings } from "../lib/product/rankingsDedupe";
 
 function rankingsSignalLabel(score: number | null): { label: string; color: string } | null {
   if (score === null) return null;
@@ -37,7 +38,12 @@ export const PublicRankingsPage: React.FC = () => {
     api.getScanner("Quality compounders", 50)
       .then((res) => {
         if (ctrl.signal.aborted) return;
-        setRankings(res.data ?? []);
+        const raw = res.data ?? [];
+        setRankings(dedupeRankings(raw.map((item) => ({
+          ...item,
+          rank: item.rank ?? 0,
+          displayRank: 0,
+        }))));
         setLoading(false);
       })
       .catch(() => {
