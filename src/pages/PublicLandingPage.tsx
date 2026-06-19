@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, Scale, Search, ShieldCheck, Target } from "lucide-react";
+import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, Scale, Search, ShieldCheck, Target, Users } from "lucide-react";
 import {
   ProductAction,
   ProductHero,
@@ -12,11 +12,11 @@ import {
 } from "../components/product/ProductUI";
 
 const steps = [
-  { icon: Search, title: "Discover opportunities", body: "Screen and scan the market to find Indian equities that match your investment criteria." },
-  { icon: FileSearch, title: "Research a company", body: "Open any company page for AI-powered scores, conviction ratings, and full fundamental analysis." },
-  { icon: GitCompare, title: "Compare alternatives", body: "Side-by-side comparison of peers to see which stock fits your thesis better." },
+  { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
+  { icon: FileSearch, title: "Research a company", body: "Open any company page for AI-powered scores, conviction ratings, and fundamental analysis." },
+  { icon: GitCompare, title: "Compare alternatives", body: "Side-by-side peer comparison shows which stock fits your thesis better." },
   { icon: Eye, title: "Track thesis changes", body: "Save companies to your watchlist and monitor score changes that affect your thesis." },
-  { icon: ArrowRight, title: "Continue through your broker", body: "Take your research to your broker and invest with confidence." },
+  { icon: ArrowRight, title: "Continue through your broker", body: "Take your research and invest through your broker — StockStory never handles your money." },
 ];
 
 const differentiators = [
@@ -24,6 +24,7 @@ const differentiators = [
   { icon: BookOpen, title: "Transparent methodology", body: "Every score has a cited rationale. You can see why a company scores what it scores." },
   { icon: Scale, title: "Compare before you decide", body: "Side-by-side peer comparison shows you the trade-offs before you commit capital." },
   { icon: Target, title: "Thesis tracking", body: "Watchlist and portfolio tools help you monitor your thesis and know when your reasoning needs updating." },
+  { icon: Users, title: "Built for Indian equity investors", body: "Designed specifically for investors who research Indian stocks. From discovery to broker handoff." },
 ];
 
 export const PublicLandingPage: React.FC = () => {
@@ -33,7 +34,7 @@ export const PublicLandingPage: React.FC = () => {
         <ProductHero
           eyebrow="AI research for Indian equities"
           title="Understand the stock before you invest."
-          body="Discover, research, compare, track, and continue through your broker. StockStory is the AI research layer for Indian equities."
+          body="For Indian equity investors who want clearer research. Search companies, review scores, compare peers, track your thesis — then invest through your broker. StockStory is the AI research layer between you and the market."
           actions={(
             <>
               <ProductAction id="hero-cta-start" onClick={() => productNavigate("signup")}>Start research</ProductAction>
@@ -62,6 +63,14 @@ export const PublicLandingPage: React.FC = () => {
             </ProductPanel>
           )}
         />
+
+        <ProductSection>
+          <div className="mb-5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(41,98,255,0.04)] p-4">
+            <p className="text-xs leading-relaxed text-[#9AA7B5]">
+              <strong className="text-[#E6EDF3]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
+            </p>
+          </div>
+        </ProductSection>
 
         <ProductSection>
           <div className="mb-4 flex items-center justify-between gap-4">
