@@ -95,6 +95,6 @@ export function formatFreshness(dateVal: string | null | undefined): string {
 }
 
 export function formatSource(source: string | null | undefined): string {
-  if (!source) return "Unavailable";
+  if (!source) return "—";
   return source;
 }

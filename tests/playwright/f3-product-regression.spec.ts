@@ -519,7 +519,7 @@ test.describe("Authenticated shell", () => {
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    await page.evaluate(() => (document.querySelector('a[aria-label="Settings"]') as HTMLAnchorElement)?.click());
+    await page.locator("nav").first().getByRole("button", { name: "Settings" }).click();
     await expect(page).toHaveURL(/page=settings/);
     await expect(page.locator("body")).toBeVisible();
     await assertNoRenderGarbage(page);
