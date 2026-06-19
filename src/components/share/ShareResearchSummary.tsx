@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Copy, Check, Share2, ExternalLink, FileText, Shield, AlertTriangle } from "lucide-react";
 import { ProductPanel, ProductAction, ProductStatusPill } from "../product/ProductUI";
+import { PRODUCT_EVENTS, trackEvent } from "../../lib/analytics/productEvents";
 
 interface ShareData {
   ticker: string;
@@ -61,6 +62,7 @@ export function ShareResearchSummary({ data, onClose, onOpenMethodology }: Share
     try {
       await navigator.clipboard.writeText(buildSummaryText());
       setCopied("summary");
+      trackEvent(PRODUCT_EVENTS.RESEARCH_SUMMARY_COPIED, { ticker: data.ticker });
       setTimeout(() => setCopied(null), 2000);
     } catch {
       setCopied(null);
@@ -71,6 +73,7 @@ export function ShareResearchSummary({ data, onClose, onOpenMethodology }: Share
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied("link");
+      trackEvent(PRODUCT_EVENTS.INVITE_LINK_COPIED, { ticker: data.ticker });
       setTimeout(() => setCopied(null), 2000);
     } catch {
       setCopied(null);

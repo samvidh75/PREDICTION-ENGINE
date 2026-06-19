@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark } from "lucide-react";
+import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark, Copy } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
+import { CompareShareRecap } from "../components/share/CompareShareRecap";
+import { SpatialSheet } from "../components/intelligence/SpatialSheet";
+import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 
 interface CompareCompany {
   symbol: string;
@@ -49,6 +52,7 @@ export const ComparePage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<{ symbol: string; name?: string }[]>([]);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [shareRecapOpen, setShareRecapOpen] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -465,6 +469,9 @@ export const ComparePage: React.FC = () => {
                           <ProductAction variant="secondary" onClick={() => productNavigate("stock", c.symbol)}>
                             <Bookmark className="h-3 w-3" aria-hidden="true" /> Track
                           </ProductAction>
+                          <ProductAction variant="secondary" onClick={() => { setShareRecapOpen(true); trackEvent(PRODUCT_EVENTS.COMPARE_SHARE_OPENED); }}>
+                            <Copy className="h-3 w-3" aria-hidden="true" /> Recap
+                          </ProductAction>
                         </div>
                       ))}
                     </div>
@@ -482,6 +489,20 @@ export const ComparePage: React.FC = () => {
             </p>
           </div>
         )}
+
+        <SpatialSheet open={shareRecapOpen} onClose={() => setShareRecapOpen(false)} title="Comparison Summary">
+          {companies.length >= 2 ? (
+            <CompareShareRecap
+              companyA={{ symbol: companies[0].symbol, companyName: companies[0].companyName, score: companies[0].score }}
+              companyB={{ symbol: companies[1].symbol, companyName: companies[1].companyName, score: companies[1].score }}
+              decisionLabels={[...new Set(companies.flatMap((c) => getDecisionLabels(c)))]}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-8 text-xs text-[#9AA7B5]">
+              Add at least two companies to see a comparison recap.
+            </div>
+          )}
+        </SpatialSheet>
       </ProductPage>
     </ProductShell>
   );

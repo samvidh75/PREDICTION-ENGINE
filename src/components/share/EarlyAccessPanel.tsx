@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Copy, Check, Users, Mail, Shield } from "lucide-react";
+import { Copy, Check, Users, Shield } from "lucide-react";
 import { ProductPanel, ProductAction, productNavigate } from "../product/ProductUI";
+import { PRODUCT_EVENTS, trackEvent } from "../../lib/analytics/productEvents";
 
 export function EarlyAccessPanel() {
   const [copied, setCopied] = useState(false);
@@ -11,6 +12,7 @@ export function EarlyAccessPanel() {
     try {
       await navigator.clipboard.writeText(inviteLink);
       setCopied(true);
+      trackEvent(PRODUCT_EVENTS.INVITE_LINK_COPIED, { source: "early-access-panel" });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
@@ -65,7 +67,7 @@ export function EarlyAccessPanel() {
           {[
             "Request access is not connected yet — for now, share the link",
             "No trading rewards or referral bonuses",
-            "No investment promises or guarantees",
+            "No investment promises",
             "StockStory is research-only, not a brokerage",
           ].map((item) => (
             <li key={item} className="flex items-start gap-2 text-xs text-[#9AA7B5]">

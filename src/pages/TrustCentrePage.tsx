@@ -1,6 +1,7 @@
 import React from "react";
 import { Search, BarChart3, BookOpen, Shield, ArrowRightLeft, Scale } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
 
 const sections = [
   {
@@ -98,6 +99,10 @@ export const TrustCentrePage: React.FC = () => {
             <ProductStatusPill tone="blue">Compare systematically</ProductStatusPill>
           </div>
         </ProductPanel>
+
+        <div className="mt-8 space-y-4">
+          <EarlyAccessPanel />
+        </div>
 
         <div className="mt-8 border-t border-[rgba(148,163,184,0.16)] pt-6">
           <p className="text-[10px] leading-relaxed text-[#64748B]">
