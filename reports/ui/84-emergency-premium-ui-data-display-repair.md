@@ -3,7 +3,7 @@
 ## Baseline Context
 
 - **Baseline Commit**: `07fb1c80e` ("Harden product data display and premium research surfaces")
-- **Final Commit**: `<commit-hash>` (to be filled on commit)
+- **Final Commit**: `ca46936a66b7fe7b2359e7bd493aec8ce1270858`
 
 ---
 
