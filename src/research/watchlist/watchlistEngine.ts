@@ -25,16 +25,16 @@ export function trackThesis(input: ThesisTrackingInput): WatchlistThesisView {
   let conviction: string;
 
   if (currentScore >= 75) {
-    conviction = "High conviction";
+    conviction = "Very Healthy";
     currentStatus = "Strengthening";
   } else if (currentScore >= 55) {
-    conviction = "Moderate conviction";
+    conviction = "Healthy";
     currentStatus = previousScore !== null ? (currentScore > previousScore + 5 ? "Strengthening" : "Stable") : "Tracking begins now";
   } else if (currentScore >= 35) {
-    conviction = "Needs review";
+    conviction = "Unhealthy";
     currentStatus = previousScore !== null ? (currentScore < previousScore - 5 ? "Weakening" : "Needs review") : "Tracking begins now";
   } else {
-    conviction = "Track before investing";
+    conviction = "Very Unhealthy";
     currentStatus = "Weakening";
   }
 

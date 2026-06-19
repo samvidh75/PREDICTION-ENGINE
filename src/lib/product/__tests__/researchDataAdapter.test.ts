@@ -48,7 +48,7 @@ describe("computeSignalFromResearchData", () => {
       ],
     } as any);
 
-    expect(signal.label).toBe("High conviction research case");
+    expect(signal.label).toBe("Very Healthy");
     expect(signal.score).not.toBeNull();
     expect(signal.tone).toBe("constructive");
   });
@@ -95,7 +95,7 @@ describe("buildCompanyPageData", () => {
     );
 
     expect(result.signal).not.toBeNull();
-    expect(result.signal!.label).toBe("High conviction research case");
+    expect(result.signal!.label).toBe("Very Healthy");
     expect(result.factors).not.toBeNull();
     expect(result.narrative).toBe("Strong case");
     expect(result.bullCase).toBe("Bull");

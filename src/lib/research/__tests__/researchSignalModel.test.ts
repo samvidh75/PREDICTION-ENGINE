@@ -39,7 +39,7 @@ describe("computeResearchSignal", () => {
     expect(result.dataSufficiency).toBe("Insufficient");
   });
 
-  it("returns High conviction research case for high scores with sufficient data", () => {
+  it("returns Very Healthy for high scores with sufficient data", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 85,
       growthScore: 80,
@@ -48,14 +48,14 @@ describe("computeResearchSignal", () => {
       valuationScore: 65,
       riskScore: 60,
     }), null);
-    expect(result.label).toBe("High conviction research case");
+    expect(result.label).toBe("Very Healthy");
     expect(result.tone).toBe("constructive");
     expect(result.action).toBe("Research deeper");
     expect(result.score).not.toBeNull();
     expect(result.confidence).toBeGreaterThanOrEqual(60);
   });
 
-  it("returns Worth researching for moderate scores", () => {
+  it("returns Healthy for moderate scores", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 68,
       growthScore: 65,
@@ -64,34 +64,34 @@ describe("computeResearchSignal", () => {
       valuationScore: 50,
       riskScore: 45,
     }), null);
-    expect(result.label).toBe("Worth researching");
+    expect(result.label).toBe("Healthy");
     expect(result.tone).toBe("constructive");
     expect(result.action).toBe("Research deeper");
   });
 
-  it("returns Track for average scores", () => {
+  it("returns Unhealthy for average scores", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 55,
       growthScore: 50,
       stabilityScore: 45,
       momentumScore: 40,
     }), null);
-    expect(result.label).toBe("Track");
+    expect(result.label).toBe("Unhealthy");
     expect(result.tone).toBe("neutral");
   });
 
-  it("returns Needs review for low scores", () => {
+  it("returns Very Unhealthy for low scores", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 40,
       growthScore: 35,
       stabilityScore: 30,
       momentumScore: 25,
     }), null);
-    expect(result.label).toBe("Needs review");
+    expect(result.label).toBe("Very Unhealthy");
     expect(result.tone).toBe("caution");
   });
 
-  it("returns Risk rising when risk score is low", () => {
+  it("returns Unhealthy when risk score is low", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 70,
       growthScore: 65,
@@ -100,12 +100,12 @@ describe("computeResearchSignal", () => {
       valuationScore: 50,
       riskScore: 35,
     }), null);
-    expect(result.label).toBe("Risk rising");
+    expect(result.label).toBe("Unhealthy");
     expect(result.tone).toBe("caution");
     expect(result.action).toBe("Review risks");
   });
 
-  it("returns Avoid for now when risk score is very low", () => {
+  it("returns Very Unhealthy when risk score is very low", () => {
     const result = computeResearchSignal(makeFactors({
       qualityScore: 70,
       growthScore: 65,
@@ -114,7 +114,7 @@ describe("computeResearchSignal", () => {
       valuationScore: 50,
       riskScore: 20,
     }), null);
-    expect(result.label).toBe("Avoid for now");
+    expect(result.label).toBe("Very Unhealthy");
     expect(result.tone).toBe("severe");
     expect(result.action).toBe("Review risks");
   });
@@ -135,12 +135,10 @@ describe("computeResearchSignal", () => {
 
   it("never returns Buy/Hold/Sell labels", () => {
     const labels = [
-      "High conviction research case",
-      "Worth researching",
-      "Track",
-      "Needs review",
-      "Risk rising",
-      "Avoid for now",
+      "Very Healthy",
+      "Healthy",
+      "Unhealthy",
+      "Very Unhealthy",
       "Research signals pending",
     ];
     const resultLabels = [

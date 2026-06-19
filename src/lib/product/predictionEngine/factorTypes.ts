@@ -36,10 +36,8 @@ export interface FactorDefinition {
 }
 
 export type PublicResearchStance =
-  | "High conviction"
-  | "Watch"
-  | "Needs review"
-  | "Risk rising"
-  | "Thesis improving"
-  | "Avoid for now"
+  | "Very Healthy"
+  | "Healthy"
+  | "Unhealthy"
+  | "Very Unhealthy"
   | "Not enough information";

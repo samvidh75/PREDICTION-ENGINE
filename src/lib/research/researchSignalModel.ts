@@ -1,12 +1,10 @@
 import type { CompanyFactorScoresView, CompanyThesisView, ThesisStatus, RiskLevel } from "../../research/contracts/productContracts";
 
 export type ResearchSignalLabel =
-  | "High conviction research case"
-  | "Worth researching"
-  | "Track"
-  | "Needs review"
-  | "Risk rising"
-  | "Avoid for now"
+  | "Very Healthy"
+  | "Healthy"
+  | "Unhealthy"
+  | "Very Unhealthy"
   | "Research signals pending";
 
 export type SignalTone = "constructive" | "neutral" | "caution" | "severe";
@@ -33,30 +31,30 @@ function computeLabel(score: number | null, confidence: number, riskScore: numbe
   }
 
   if (riskScore !== null && riskScore < 25) {
-    return { label: "Avoid for now", tone: "severe", action: "Review risks" };
+    return { label: "Very Unhealthy", tone: "severe", action: "Review risks" };
   }
 
   if (riskScore !== null && riskScore < 40) {
-    return { label: "Risk rising", tone: "caution", action: "Review risks" };
+    return { label: "Unhealthy", tone: "caution", action: "Review risks" };
   }
 
   if (score >= 75 && confidence >= 60) {
-    return { label: "High conviction research case", tone: "constructive", action: "Research deeper" };
+    return { label: "Very Healthy", tone: "constructive", action: "Research deeper" };
   }
 
   if (score >= 55 && confidence >= 40) {
-    return { label: "Worth researching", tone: "constructive", action: "Research deeper" };
+    return { label: "Healthy", tone: "constructive", action: "Research deeper" };
   }
 
   if (score >= 40) {
-    return { label: "Track", tone: "neutral", action: "Track thesis" };
+    return { label: "Unhealthy", tone: "neutral", action: "Track thesis" };
   }
 
   if (score >= 25) {
-    return { label: "Needs review", tone: "caution", action: "Review risks" };
+    return { label: "Very Unhealthy", tone: "caution", action: "Review risks" };
   }
 
-  return { label: "Track", tone: "neutral", action: "Compare first" };
+  return { label: "Unhealthy", tone: "neutral", action: "Compare first" };
 }
 
 export function computeResearchSignal(
@@ -153,19 +151,15 @@ export function computeResearchSignal(
   const { label, tone, action } = computeLabel(avgScore, confidence, riskScore);
 
   const summary =
-    label === "High conviction research case"
+    label === "Very Healthy"
       ? `Strong research case supported by multiple factors.`
-      : label === "Worth researching"
+      : label === "Healthy"
         ? `Moderate research case with identifiable strengths and risks.`
-        : label === "Track"
-          ? `Average research case worth tracking for changes.`
-          : label === "Needs review"
-            ? `Below-average metrics warrant closer review of risks.`
-            : label === "Risk rising"
-              ? `Elevated risk indicators detected — review before proceeding.`
-              : label === "Avoid for now"
-                ? `Significant risk concerns identified. Exercise caution.`
-                : "Research signals pending — not enough data inputs for a reliable research case.";
+        : label === "Unhealthy"
+          ? `Below-average metrics or elevated risk indicators detected — review before proceeding.`
+          : label === "Very Unhealthy"
+            ? `Significant risk concerns identified. Exercise caution.`
+            : "Research signals pending — not enough data inputs for a reliable research case.";
 
   const missingInputs: string[] = [];
   if (factorScores.qualityScore === null) missingInputs.push("Quality score");

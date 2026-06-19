@@ -10,11 +10,11 @@ describe("trackThesis", () => {
   it("tracks strengthening thesis", () => {
     const r = trackThesis({ symbol: "TCS", companyName: "TCS", currentScore: 80, previousScore: 70, factorChanges: ["quality"], riskChanges: [], lastUpdated: "2024-01-01" });
     expect(r.currentStatus).toBe("Strengthening");
-    expect(r.conviction).toBe("High conviction");
+    expect(r.conviction).toBe("Very Healthy");
   });
 
   it("flags Needs review when risks change", () => {
-    const r = trackThesis({ symbol: "RISK", companyName: "Risk Co", currentScore: 65, previousScore: 70, factorChanges: [], riskChanges: ["debt"], lastUpdated: null });
+    const r = trackThesis({ symbol: "RISK", companyName: "Risk Co", currentScore: 60, previousScore: 65, riskChanges: ["New regulation"], factorChanges: [], lastUpdated: new Date().toISOString() });
     expect(r.currentStatus).toBe("Needs review");
   });
 

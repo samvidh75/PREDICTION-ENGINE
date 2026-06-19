@@ -51,7 +51,7 @@ describe("workspaceModels", () => {
 describe("changeDetection", () => {
   const baseSnapshot: ThesisSnapshot = {
     symbol: "RELIANCE",
-    signalLabel: "High conviction research case",
+    signalLabel: "Very Healthy",
     score: 80,
     confidence: 75,
     qualityScore: 85,

@@ -10,10 +10,10 @@ import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewM
 
 function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
   if (score === null) return null;
-  if (score >= 75) return { label: "High conviction research case", color: "#16A34A", toneClass: "status-dot-active" };
-  if (score >= 55) return { label: "Worth researching", color: "#2962FF", toneClass: "status-dot-active" };
-  if (score >= 40) return { label: "Track", color: "#F59E0B", toneClass: "status-dot-partial" };
-  return { label: "Needs review", color: "#EF4444", toneClass: "status-dot-blocked" };
+  if (score >= 75) return { label: "Very Healthy", color: "#16A34A", toneClass: "status-dot-active" };
+  if (score >= 55) return { label: "Healthy", color: "#2962FF", toneClass: "status-dot-active" };
+  if (score >= 40) return { label: "Unhealthy", color: "#F59E0B", toneClass: "status-dot-partial" };
+  return { label: "Very Unhealthy", color: "#EF4444", toneClass: "status-dot-blocked" };
 }
 
 const SCANNER_PRESETS = [
@@ -171,17 +171,17 @@ export default function ScannerPage() {
   const convictionLabel = useCallback((entry: ScannerResultItem): string => {
     const score = entry.score ?? null;
     if (score === null) return "";
-    if (score >= 75) return "High conviction";
-    if (score >= 55) return "Moderate conviction";
-    if (score >= 40) return "Developing";
-    return "Speculative";
+    if (score >= 75) return "Very Healthy";
+    if (score >= 55) return "Healthy";
+    if (score >= 40) return "Unhealthy";
+    return "Very Unhealthy";
   }, []);
 
   const convictionTone = useCallback((_entry: ScannerResultItem): "verified" | "blue" | "warning" | "muted" => {
     const label = convictionLabel(_entry);
-    if (label === "High conviction") return "verified";
-    if (label === "Moderate conviction") return "blue";
-    if (label === "Developing") return "warning";
+    if (label === "Very Healthy") return "verified";
+    if (label === "Healthy") return "blue";
+    if (label === "Unhealthy") return "warning";
     return "muted";
   }, [convictionLabel]);
 

@@ -22,7 +22,7 @@ describe("generateAlerts", () => {
     const alerts = generateAlerts({
       symbol: "RISK",
       previousThesisStatus: "Stable",
-      currentThesisStatus: "Needs review",
+      currentThesisStatus: "Weakening",
       previousRiskLevel: "Low",
       currentRiskLevel: "High",
       scoreChange: null,

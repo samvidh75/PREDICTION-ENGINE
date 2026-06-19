@@ -33,17 +33,13 @@ import { buildPredictionViewModel } from "../lib/product/predictionEngine/predic
 
 const getClassificationStyle = (cls: string) => {
   switch (cls) {
-    case "High conviction":
-    case "Thesis improving":
+    case "Very Healthy":
       return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
-    case "Watch":
-    case "Partial research context":
-    case "Research context is based on available data":
+    case "Healthy":
       return "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.2)] text-[#2962FF]";
-    case "Needs review":
+    case "Unhealthy":
       return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.2)] text-[#F59E0B]";
-    case "Risk rising":
-    case "Avoid for now":
+    case "Very Unhealthy":
       return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.2)] text-[#EF4444]";
     default:
       return "bg-white/[0.04] border-white/[0.08] text-[#9AA7B5]";
@@ -278,7 +274,7 @@ export const StockStoryPage: React.FC = () => {
 
   const snapshotLabel = useMemo(() => {
     if (!isInWatchlist) return null;
-    return getSnapshotChangeLabel(ticker, signal?.score ?? null, signal?.label === "Risk rising" || signal?.label === "Avoid for now" ? 30 : null);
+    return getSnapshotChangeLabel(ticker, signal?.score ?? null, signal?.label === "Unhealthy" || signal?.label === "Very Unhealthy" ? 30 : null);
   }, [isInWatchlist, ticker, signal]);
 
   const handleSaveNote = (value: string) => { setNoteText(value); NoteEngine.saveNote(ticker, value); };
