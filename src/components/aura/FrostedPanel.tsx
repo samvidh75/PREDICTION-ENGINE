@@ -19,7 +19,7 @@ export default function FrostedPanel({
     <Tag
       role={role}
       aria-label={ariaLabel}
-      className={`rounded-2xl bg-white/70 backdrop-blur-glass border border-white/50 shadow-glass ${className}`}
+      className={`rounded-2xl bg-[#0D1117]/70 backdrop-blur-glass border border-white/50 shadow-glass ${className}`}
       style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02), inset 0 1px 0 rgba(255,255,255,0.8)" }}
     >
       {children}
@@ -30,7 +30,7 @@ export default function FrostedPanel({
 export function FrostedPanelLg({ children, className = "", as: Tag = "div" }: FrostedPanelProps) {
   return (
     <Tag
-      className={`rounded-2xl bg-white/75 backdrop-blur-glassLg border border-white/50 shadow-glassLg ${className}`}
+      className={`rounded-2xl bg-[#0D1117]/75 backdrop-blur-glassLg border border-white/50 shadow-glassLg ${className}`}
       style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)" }}
     >
       {children}
@@ -41,7 +41,7 @@ export function FrostedPanelLg({ children, className = "", as: Tag = "div" }: Fr
 export function FrostedPanelStrong({ children, className = "", as: Tag = "div" }: FrostedPanelProps) {
   return (
     <Tag
-      className={`rounded-2xl bg-white/85 backdrop-blur-glass border border-white/60 shadow-glassLg ${className}`}
+      className={`rounded-2xl bg-[#0D1117]/85 backdrop-blur-glass border border-white/60 shadow-glassLg ${className}`}
       style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)" }}
     >
       {children}

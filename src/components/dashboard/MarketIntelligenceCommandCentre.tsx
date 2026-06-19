@@ -168,7 +168,7 @@ export default function MarketIntelligenceCommandCentre(): JSX.Element {
           </div>
         </div>
 
-        <div className="mt-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-10 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 shadow-sm">
           <div className="mb-5 text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
             Company Health
           </div>

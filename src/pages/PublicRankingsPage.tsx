@@ -132,6 +132,7 @@ export const PublicRankingsPage: React.FC = () => {
                   <span className="whitespace-nowrap text-xs font-medium text-[#9AA7B5]">Sector:</span>
                   <div className="relative">
                     <CustomSelect
+                      aria-label="Sector"
                       value={sectorFilter}
                       onChange={(e) => setSectorFilter(e.target.value)}
                       className="appearance-none bg-[#1e1e2f] text-[#E6EDF3] border border-[#2b2b3a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4c6ef5]"
@@ -250,7 +251,7 @@ export const PublicRankingsPage: React.FC = () => {
                           {isAuthenticated ? (
                             (() => {
                               const sig = rankingsSignalLabel(r.score);
-                              if (!sig) return <span className="text-[#64748B] italic">Pending</span>;
+                              if (!sig) return <span className="text-[#64748B] italic">Not enough information</span>;
                               return (
                                 <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${sig.color}33`, backgroundColor: `${sig.color}15`, color: sig.color }}>
                                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sig.color }} aria-hidden="true" />

@@ -29,7 +29,7 @@ export function DataFreshnessLine({ items, className = "" }: DataFreshnessLinePr
 
   return (
     <div className={`space-y-1.5 ${className}`}>
-      <span className="text-[11px] font-medium uppercase tracking-wider text-[#8B949E]">Data freshness</span>
+      <span className="text-[11px] font-medium uppercase tracking-wider text-[#8B949E]">Data recency</span>
       <div className="flex flex-wrap gap-2">
         {items.map((item) => {
           const config = STATUS_CONFIG[item.status] || STATUS_CONFIG.unavailable;

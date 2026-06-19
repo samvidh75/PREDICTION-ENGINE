@@ -627,7 +627,7 @@ export default function IntelligenceHUD(): JSX.Element {
               <div className="hidden lg:flex items-center gap-3">
                 <div className="relative h-2 w-2">
                   <motion.span
-                    className="absolute inset-0 rounded-full bg-white/70"
+                    className="absolute inset-0 rounded-full bg-[#0D1117]/70"
                     animate={
                       prefersReducedMotion
                         ? undefined

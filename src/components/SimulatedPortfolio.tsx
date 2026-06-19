@@ -74,13 +74,13 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
   const isHealthyState = portfolioHealth === "VERY HEALTHY" || portfolioHealth === "HEALTHY" || portfolioHealth === "STABLE";
 
   return (
-    <div className="bg-white border border-[#E5E5E5] p-6 rounded-none flex flex-col space-y-6 select-none">
+    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none flex flex-col space-y-6 select-none">
       
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+      <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <PieChart className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#0A0A0A]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
             Simulated Margin Overview
           </span>
         </div>
@@ -98,20 +98,20 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
 
       {/* Margin Account Balances */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-3 bg-[#FAFAFA] border border-[#E5E5E5]">
-          <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">
+        <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+          <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
             Virtual Cash Bal
           </span>
-          <span className="text-[15px] font-bold text-[#0A0A0A] font-mono block mt-1">
+          <span className="text-[15px] font-bold text-[#E6EDF3] font-mono block mt-1">
             ₹{virtualBalance.toLocaleString("en-IN")}
           </span>
         </div>
 
-        <div className="p-3 bg-[#FAFAFA] border border-[#E5E5E5]">
-          <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider block">
+        <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+          <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
             Net Equity Val
           </span>
-          <span className="text-[15px] font-bold text-[#0A0A0A] font-mono block mt-1">
+          <span className="text-[15px] font-bold text-[#E6EDF3] font-mono block mt-1">
             ₹{totalEquityValue.toLocaleString("en-IN")}
           </span>
         </div>
@@ -119,13 +119,13 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
 
       {/* Holdings List table */}
       <div className="space-y-2">
-        <span className="text-[10px] font-mono font-medium text-neutral-400 uppercase tracking-widest block">
+        <span className="text-[10px] font-mono font-medium text-[#9AA7B5] uppercase tracking-widest block">
           Position List
         </span>
         
-        <div className="divide-y divide-[#E5E5E5] border-t border-[#E5E5E5]">
+        <div className="divide-y divide-[rgba(148,163,184,0.16)] border-t border-[rgba(148,163,184,0.16)]">
           {holdings.length === 0 ? (
-            <div className="py-6 text-center text-xs text-neutral-400 font-mono">
+            <div className="py-6 text-center text-xs text-[#9AA7B5] font-mono">
               NO VIRTUAL HOLDINGS HELD
             </div>
           ) : (
@@ -139,11 +139,11 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
               return (
                 <div
                   key={h.ticker}
-                  className="py-3 flex items-center justify-between text-xs text-[#0A0A0A]"
+                  className="py-3 flex items-center justify-between text-xs text-[#E6EDF3]"
                 >
                   <div className="flex flex-col">
-                    <span className="font-bold font-mono text-neutral-800">{h.ticker}</span>
-                    <span className="text-[9px] font-mono text-neutral-400">
+                    <span className="font-bold font-mono text-[#E6EDF3]">{h.ticker}</span>
+                    <span className="text-[9px] font-mono text-[#9AA7B5]">
                       QTY: {h.quantity} // AVG: ₹{h.averagePrice}
                     </span>
                   </div>

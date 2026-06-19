@@ -34,7 +34,7 @@ export default function CommandSurface({
 
   return (
     <div
-      className={`relative w-full rounded-2xl bg-white/75 backdrop-blur-glassLg border border-white/60 shadow-lg transition-all duration-200 focus-within:shadow-xl focus-within:border-accent-primary/30 focus-within:ring-2 focus-within:ring-accent-primary/10 ${
+      className={`relative w-full rounded-2xl bg-[#0D1117]/75 backdrop-blur-glassLg border border-white/60 shadow-lg transition-all duration-200 focus-within:shadow-xl focus-within:border-accent-primary/30 focus-within:ring-2 focus-within:ring-accent-primary/10 ${
         large ? "py-1" : ""
       } ${className}`}
       style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)" }}

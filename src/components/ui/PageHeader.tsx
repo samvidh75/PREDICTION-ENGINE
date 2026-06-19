@@ -52,23 +52,23 @@ export function MetricCard({ label, value, detail, trend }: MetricCardProps) {
   const trendColors = {
     up: "text-emerald-700",
     down: "text-red-600",
-    neutral: "text-slate-500",
+    neutral: "text-[#64748B]",
   };
   return (
     <div className="rounded-xl glass-panel p-5">
-      <div className="text-[11px] font-medium uppercase tracking-wider text-slate-400 mb-1.5">{label}</div>
-      <div className={`text-2xl font-semibold leading-tight tracking-tight ${trend ? trendColors[trend] : "text-slate-900"}`}>
+      <div className="text-[11px] font-medium uppercase tracking-wider text-[#64748B] mb-1.5">{label}</div>
+      <div className={`text-2xl font-semibold leading-tight tracking-tight ${trend ? trendColors[trend] : "text-[#E6EDF3]"}`}>
         {value}
       </div>
-      {detail && <div className="mt-1 text-xs text-slate-400">{detail}</div>}
+      {detail && <div className="mt-1 text-xs text-[#64748B]">{detail}</div>}
     </div>
   );
 }
 
 export function ResearchDisclaimer({ context: _context = "research" }: { context?: string }) {
   return (
-    <div className="rounded-xl glass-panel px-5 py-4 text-sm leading-6 text-slate-500">
-      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+    <div className="rounded-xl glass-panel px-5 py-4 text-sm leading-6 text-[#64748B]">
+      <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
         Research only — not investment advice
       </p>
       Analytical research signals only. Nothing here is a recommendation to buy or sell securities.
@@ -78,7 +78,7 @@ export function ResearchDisclaimer({ context: _context = "research" }: { context
 
 export function MissingDataBadge() {
   return (
-    <span className="inline-flex items-center rounded-lg bg-slate-50/60 backdrop-blur-sm border border-slate-200/50 px-2 py-0.5 text-[11px] font-medium text-slate-400 select-none">
+    <span className="inline-flex items-center rounded-lg bg-[#111827]/60 backdrop-blur-sm border border-[rgba(148,163,184,0.16)] px-2 py-0.5 text-[11px] font-medium text-[#64748B] select-none">
       Not available
     </span>
   );
@@ -97,7 +97,7 @@ interface FreshnessBadgeProps {
 export function DataFreshnessBadge({ date }: FreshnessBadgeProps) {
   if (!date) {
     return (
-      <span className="inline-flex items-center rounded-lg bg-slate-50/60 backdrop-blur-sm border border-slate-200/50 px-2 py-0.5 text-[10px] font-medium text-slate-400 select-none">
+      <span className="inline-flex items-center rounded-lg bg-[#111827]/60 backdrop-blur-sm border border-[rgba(148,163,184,0.16)] px-2 py-0.5 text-[10px] font-medium text-[#64748B] select-none">
         Pending
       </span>
     );
@@ -115,7 +115,7 @@ interface SourceBadgeProps {
 
 export function SourceBadge({ source }: SourceBadgeProps) {
   return (
-    <span className="inline-flex items-center rounded-lg bg-slate-100/60 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-slate-500 font-mono select-none">
+    <span className="inline-flex items-center rounded-lg bg-[#111827]/80 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-[#64748B] font-mono select-none">
       {source || "Unavailable"}
     </span>
   );
@@ -136,9 +136,9 @@ function providerPillStyle(status: string): { bg: string; text: string; border: 
       return { bg: "bg-emerald-50/60", text: "text-emerald-700", border: "border-emerald-200/50", label: "Configured" };
     case "disabled":
     case "deprecated":
-      return { bg: "bg-slate-50/60", text: "text-slate-400", border: "border-slate-200/50", label: "Deprecated" };
+      return { bg: "bg-[#111827]/60", text: "text-[#64748B]", border: "border-[rgba(148,163,184,0.16)]", label: "Deprecated" };
     case "missing_optional":
-      return { bg: "bg-slate-50/60", text: "text-slate-500", border: "border-slate-200/50", label: "Optional" };
+      return { bg: "bg-[#111827]/60", text: "text-[#64748B]", border: "border-[rgba(148,163,184,0.16)]", label: "Optional" };
     case "missing_required":
       return { bg: "bg-amber-50/60", text: "text-amber-700", border: "border-amber-200/50", label: "Required" };
     default:
@@ -161,7 +161,7 @@ export function ProviderStatusPill({ name, status }: ProviderStatusPillProps) {
   return (
     <div className="flex flex-col gap-0.5 px-3 py-2 text-xs border-b border-white/20 last:border-0">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-slate-600 font-medium">{displayName(name)}</span>
+        <span className="text-[#64748B] font-medium">{displayName(name)}</span>
         <span
           className={`inline-flex items-center rounded-lg px-1.5 py-0.5 text-[10px] font-semibold select-none backdrop-blur-sm ${style.bg} ${style.text} ${style.border} border`}
         >
@@ -169,7 +169,7 @@ export function ProviderStatusPill({ name, status }: ProviderStatusPillProps) {
         </span>
       </div>
       {parsed.message && (
-        <span className="text-[11px] text-slate-400 leading-relaxed">{parsed.message}</span>
+        <span className="text-[11px] text-[#64748B] leading-relaxed">{parsed.message}</span>
       )}
     </div>
   );
@@ -186,7 +186,7 @@ export function CoverageStatusBadge({ status }: CoverageStatusBadgeProps) {
       className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-semibold select-none backdrop-blur-sm ${
         isAvailable
           ? "bg-emerald-50/60 text-emerald-800 border border-emerald-200/50"
-          : "bg-slate-50/60 text-slate-400 border border-slate-200/50"
+          : "bg-[#111827]/60 text-[#64748B] border border-[rgba(148,163,184,0.16)]"
       }`}
     >
       {isAvailable ? "Indexed" : "Unavailable"}

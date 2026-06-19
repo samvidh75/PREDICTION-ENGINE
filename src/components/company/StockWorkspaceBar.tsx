@@ -4,9 +4,9 @@ import { useLiveQuote } from "../../hooks/useLiveQuotes";
 import { api, type CompanyMetadata } from "../../services/api/client";
 
 function formatDateTime(value?: string): string {
-  if (!value) return "Updated information pending";
+  if (!value) return "Updated information not yet available";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Updated information pending";
+  if (Number.isNaN(date.getTime())) return "Updated information not yet available";
   return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
 }
 
@@ -57,7 +57,7 @@ export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string;
     return () => controller.abort();
   }, [ticker]);
 
-  const researchStatus = metadataLoading ? "Loading research" : metadata?.verificationStatus === "VERIFIED" ? "Research active" : "Research pending";
+  const researchStatus = metadataLoading ? "Loading research" : metadata?.verificationStatus === "VERIFIED" ? "Research active" : "Awaiting research";
   const dataStatus = quoteState.loading ? "Loading" : metadata?.verificationStatus === "VERIFIED" ? "Available" : "Awaiting data";
 
   return (

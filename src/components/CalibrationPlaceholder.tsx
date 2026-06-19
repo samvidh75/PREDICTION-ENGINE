@@ -8,7 +8,7 @@ const CalibrationPlaceholder: React.FC = () => (
     <div className="max-w-sm text-sm leading-6 mb-2">
       Displaying last verified intelligence snapshot.
     </div>
-    <div className="text-[10px] text-slate-600">
+    <div className="text-[10px] text-[#64748B]">
       Snapshot Timestamp: {new Date().toISOString()}
     </div>
   </div>

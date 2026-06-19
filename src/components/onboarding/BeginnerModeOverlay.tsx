@@ -128,7 +128,7 @@ export default function BeginnerModeOverlay({
                               </div>
                             </div>
 
-                            <div className="shrink-0 h-[10px] w-[10px] rounded-full bg-white/70" aria-hidden="true" />
+                            <div className="shrink-0 h-[10px] w-[10px] rounded-full bg-[#0D1117]/70" aria-hidden="true" />
                           </div>
 
                           <BodyText className="mt-3">

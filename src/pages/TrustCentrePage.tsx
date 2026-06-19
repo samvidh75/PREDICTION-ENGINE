@@ -23,9 +23,19 @@ const sections = [
     ]
   },
   {
+    icon: BarChart3,
+    title: "Prediction Engine",
+    body: "The Prediction Engine synthesises available factor data into a single research stance — Healthy, Unhealthy, or Very Unhealthy — along with a numerical score and confidence level. It reflects how much information is available and how consistently the dimensions align. The Prediction Engine does not predict future prices or returns."
+  },
+  {
+    icon: Shield,
+    title: "Healthometer",
+    body: "The Healthometer breaks the research stance into individual factor scores so you can see which dimensions are driving the view. Each factor — quality, growth, valuation, momentum, stability, risk — is scored independently. The Healthometer makes it easy to spot where a company excels and where it carries elevated risk."
+  },
+  {
     icon: Shield,
     title: "Research is not a recommendation",
-    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or guaranteed returns. Investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own informed decisions."
+    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or specific outcomes. Investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own informed decisions."
   },
   {
     icon: BookOpen,

@@ -20,7 +20,8 @@ export function buildHealthometerViewModel(
   growth: number | null | undefined,
   stability: number | null | undefined,
   risk: number | null | undefined,
-  momentum: number | null | undefined
+  momentum: number | null | undefined,
+  financialStrength?: number | null | undefined
 ): HealthometerViewState {
   const qNorm = normalizeNumericValue(quality);
   const vNorm = normalizeNumericValue(valuation);
@@ -28,27 +29,21 @@ export function buildHealthometerViewModel(
   const sNorm = normalizeNumericValue(stability);
   const rNorm = normalizeNumericValue(risk);
   const mNorm = normalizeNumericValue(momentum);
+  const fsNorm = normalizeNumericValue(financialStrength);
 
-  const inputScores = [qNorm, vNorm, gNorm, sNorm, rNorm, mNorm];
-  const validScores = inputScores.filter((s): s is number => s !== null && s !== undefined && !Number.isNaN(s) && Number.isFinite(s));
+  const inputScores = [qNorm, vNorm, gNorm, sNorm, rNorm, mNorm, fsNorm];
+  const validScores = inputScores.filter((s): s is number => s !== null && s !== undefined && !Number.isNaN(s) && Number.isFinite(s) && !Number.isNaN(s));
 
   const overallScore = validScores.length > 0
     ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length)
     : null;
 
-  const overallStatus = validScores.length === 6
+  const totalDimensionCount = 7;
+  const overallStatus = validScores.length === totalDimensionCount
     ? "Complete"
     : validScores.length > 0
       ? "Partial research context"
       : "Not enough information for this view yet";
-
-  const colorForScore = (s: number | null): string => {
-    if (s === null) return "#64748B";
-    if (s >= 75) return "#16A34A";
-    if (s >= 50) return "#2962FF";
-    if (s >= 35) return "#F59E0B";
-    return "#EF4444";
-  };
 
   const getDimensionStatus = (s: number | null | undefined): "verified" | "partial" | "insufficient" => {
     if (s === null || s === undefined || Number.isNaN(s) || !Number.isFinite(s)) {
@@ -57,14 +52,21 @@ export function buildHealthometerViewModel(
     return "verified";
   };
 
-  const dimensions: HealthometerDimension[] = [
-    { id: "quality", label: "Business quality", score: qNorm, status: getDimensionStatus(qNorm), color: colorForScore(qNorm) },
-    { id: "valuation", label: "Valuation context", score: vNorm, status: getDimensionStatus(vNorm), color: colorForScore(vNorm) },
-    { id: "growth", label: "Growth", score: gNorm, status: getDimensionStatus(gNorm), color: colorForScore(gNorm) },
-    { id: "stability", label: "Stability", score: sNorm, status: getDimensionStatus(sNorm), color: colorForScore(sNorm) },
-    { id: "risk", label: "Risk context", score: rNorm, status: getDimensionStatus(rNorm), color: colorForScore(rNorm) },
-    { id: "momentum", label: "Momentum", score: mNorm, status: getDimensionStatus(mNorm), color: colorForScore(mNorm) },
+  const dims: Array<{ id: string; label: string; score: number | null }> = [
+    { id: "quality", label: "Business quality", score: qNorm },
+    { id: "financial_strength", label: "Financial strength", score: fsNorm },
+    { id: "valuation", label: "Valuation context", score: vNorm },
+    { id: "growth", label: "Growth", score: gNorm },
+    { id: "stability", label: "Stability", score: sNorm },
+    { id: "risk", label: "Risk context", score: rNorm },
+    { id: "momentum", label: "Momentum", score: mNorm },
   ];
+
+  const dimensions: HealthometerDimension[] = dims.map((d) => ({
+    ...d,
+    status: getDimensionStatus(d.score),
+    color: "#64748B",
+  }));
 
   return {
     overallScore,

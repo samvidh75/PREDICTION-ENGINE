@@ -89,7 +89,7 @@ export const ResearchWorkspace: React.FC = () => {
             <span className="text-[10px] text-gray-500">Last updated: {noteObj.lastUpdated}</span>
             <button
               onClick={handleSaveNote}
-              className="px-4 py-2 bg-white text-[#020304] rounded-full text-xs font-bold hover:bg-white/90 active:scale-95 transition-all cursor-pointer shadow-lg"
+              className="px-4 py-2 bg-[#0D1117] text-[#E6EDF3] rounded-full text-xs font-bold hover:bg-[#111827] active:scale-95 transition-all cursor-pointer shadow-lg"
             >
               Save Workbook Note
             </button>
@@ -131,6 +131,7 @@ export const ResearchWorkspace: React.FC = () => {
               />
               <div className="flex gap-2">
                 <CustomSelect
+                  aria-label="Select role"
                   value={newMemberRole}
                   onChange={(e) => setNewMemberRole(e.target.value as any)}
                   className="bg-white/5 border border-white/10 rounded-[12px] px-3 text-xs text-white/70 outline-none flex-1"

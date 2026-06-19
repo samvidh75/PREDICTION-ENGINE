@@ -50,14 +50,14 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
         className={`flex flex-col gap-4 ${
           compact
             ? ''
-            : 'bg-white border border-[#E5E5E5] rounded-none p-6'
+            : 'bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6'
         }`}
       >
         {/* Header with Engine Status */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Brain className="w-4 h-4 text-[#0A0A0A]" strokeWidth={2} />
-            <span className="font-mono text-[11px] font-medium tracking-wider text-[#525252] uppercase">
+            <Brain className="w-4 h-4 text-[#E6EDF3]" strokeWidth={2} />
+            <span className="font-mono text-[11px] font-medium tracking-wider text-[#9AA7B5] uppercase">
               Company Health Analysis
             </span>
           </div>
@@ -75,25 +75,25 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
 
         {/* Error State */}
         {hasError && (
-          <div className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-none p-3 flex items-start gap-3">
+          <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-3 flex items-start gap-3">
             <AlertCircle className="w-4 h-4 text-[#D946EF] flex-shrink-0 mt-0.5" />
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[10px] font-medium text-[#D946EF] uppercase">
                 Analysis Error
               </span>
-              <span className="text-[11px] text-[#525252]">{errorMessage}</span>
+              <span className="text-[11px] text-[#9AA7B5]">{errorMessage}</span>
             </div>
           </div>
         )}
 
         {/* Metadata (if not compact) */}
         {showMetadata && !compact && (
-          <div className="flex items-center justify-between pt-2 border-t border-[#E5E5E5]">
+          <div className="flex items-center justify-between pt-2 border-t border-[rgba(148,163,184,0.16)]">
             <div className="flex flex-col gap-1">
               <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">
                 Symbol
               </span>
-              <span className="font-mono text-sm font-bold text-[#0A0A0A]">
+              <span className="font-mono text-sm font-bold text-[#E6EDF3]">
                 {symbol || '—'}
               </span>
             </div>
@@ -102,7 +102,7 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
               <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">
                 Status
               </span>
-              <span className="font-mono text-[10px] text-[#525252]">
+              <span className="font-mono text-[10px] text-[#9AA7B5]">
                 {telemetry?.dataSource ? 'Research signals pending' : 'Research signals pending'}
               </span>
             </div>
@@ -111,7 +111,7 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
               <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">
                 Last Updated
               </span>
-              <span className="font-mono text-[10px] text-[#525252]">
+              <span className="font-mono text-[10px] text-[#9AA7B5]">
                 {telemetry
                   ? new Date(telemetry.timestamp).toLocaleTimeString()
                   : 'Awaiting...'}
@@ -136,7 +136,7 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
               <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase">
                 Confidence
               </span>
-              <p className="text-[11px] text-[#525252] leading-relaxed">
+              <p className="text-[11px] text-[#9AA7B5] leading-relaxed">
                 Engine indicates{' '}
                 <span style={{ color: confidenceColor }} className="font-semibold">
                   {Math.round(predictiveResult.confidenceScore * 100)}% confidence
@@ -156,8 +156,8 @@ const PredictivePanel: React.FC<PredictivePanelProps> = ({
 
         {/* SEBI Disclaimer */}
         {!compact && (
-          <div className="bg-[#FAFAFA] border border-[#E5E5E5] rounded-none p-3 mt-2">
-            <p className="text-[9px] text-[#525252] leading-relaxed italic">
+          <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-3 mt-2">
+            <p className="text-[9px] text-[#9AA7B5] leading-relaxed italic">
               StockStory provides research intelligence and health assessments.
               It does not provide personalised investment advice.
             </p>

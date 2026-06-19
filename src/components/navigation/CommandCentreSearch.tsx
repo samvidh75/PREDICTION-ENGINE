@@ -82,7 +82,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
 
   const getOneLineReason = (stock: RegisteredStock): string => {
     const sector = stock.sector.toLowerCase();
-    return "Data unavailable";
+    return "Not enough information";
   };
 
   return (

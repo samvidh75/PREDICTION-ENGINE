@@ -50,7 +50,7 @@ export default function GlassModal({
       <div
         ref={modalRef}
         tabIndex={-1}
-        className={`w-full ${maxWidth} rounded-2xl bg-white/85 backdrop-blur-glassLg border border-white/60 shadow-depth ${className}`}
+        className={`w-full ${maxWidth} rounded-2xl bg-[#0D1117]/85 backdrop-blur-glassLg border border-white/60 shadow-depth ${className}`}
         style={{ boxShadow: "0 12px 48px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.8)" }}
       >
         {title && (
@@ -59,7 +59,7 @@ export default function GlassModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/60 text-ink-muted hover:bg-white/80 hover:text-ink transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0D1117]/60 text-ink-muted hover:bg-[#0D1117]/80 hover:text-ink transition-colors"
               aria-label="Close dialog"
             >
               <X className="h-4 w-4" />

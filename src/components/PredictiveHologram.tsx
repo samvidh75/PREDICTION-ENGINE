@@ -65,7 +65,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
   if (isLoading) {
     return (
       <div className={`flex flex-col gap-3 ${compact ? '' : 'p-4'}`}>
-        <div className="text-[11px] font-mono text-[#525252] uppercase">
+        <div className="text-[11px] font-mono text-[#9AA7B5] uppercase">
           Analyzing metrics...
         </div>
         <motion.div
@@ -101,7 +101,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
   };
 
   return (
-    <div className={`flex flex-col gap-4 ${compact ? '' : 'bg-white border border-[#E5E5E5] rounded-none p-4'}`}>
+    <div className={`flex flex-col gap-4 ${compact ? '' : 'bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-4'}`}>
       {/* Health classification range chart */}
       <div className="flex flex-col gap-2">
         <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase tracking-wider">
@@ -188,7 +188,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
                 className="w-2 h-2 rounded-none"
                 style={{ backgroundColor: getBarColor(status as any) }}
               />
-              <span className="text-[#525252] uppercase truncate">
+              <span className="text-[#9AA7B5] uppercase truncate">
                 {(value * 100).toFixed(0)}%
               </span>
             </div>
@@ -197,7 +197,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
       </div>
 
       {/* Risk Metrics */}
-      <div className="flex flex-col gap-3 pt-3 border-t border-[#E5E5E5]">
+      <div className="flex flex-col gap-3 pt-3 border-t border-[rgba(148,163,184,0.16)]">
         <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase tracking-wider">
           Risk Metrics
         </span>
@@ -211,7 +211,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
             transition={{ delay: 0.2 }}
           >
             <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">Volatility</span>
-            <span className="font-mono text-lg font-bold text-[#0A0A0A]">
+            <span className="font-mono text-lg font-bold text-[#E6EDF3]">
               {riskMetrics.volatilityIndex}
             </span>
             <div className="w-full h-1 bg-[#F5F5F5] rounded-none overflow-hidden">
@@ -233,7 +233,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
             transition={{ delay: 0.3 }}
           >
             <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">Liquidity</span>
-            <span className="font-mono text-lg font-bold text-[#0A0A0A]">
+            <span className="font-mono text-lg font-bold text-[#E6EDF3]">
               {riskMetrics.liquidityScore}
             </span>
             <div className="w-full h-1 bg-[#F5F5F5] rounded-none overflow-hidden">
@@ -255,7 +255,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
             transition={{ delay: 0.4 }}
           >
             <span className="font-mono text-[9px] text-[#A3A3A3] uppercase">Correlation</span>
-            <span className="font-mono text-lg font-bold text-[#0A0A0A]">
+            <span className="font-mono text-lg font-bold text-[#E6EDF3]">
               {riskMetrics.correlationIndex}
             </span>
             <div className="w-full h-1 bg-[#F5F5F5] rounded-none overflow-hidden">
@@ -272,7 +272,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
       </div>
 
       {/* Market trend context */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#E5E5E5]">
+      <div className="flex items-center justify-between pt-3 border-t border-[rgba(148,163,184,0.16)]">
         <div className="flex flex-col gap-1">
           <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase">
             Market Trend
@@ -296,7 +296,7 @@ const PredictiveHologram: React.FC<PredictiveHologramProps> = ({
           <span className="font-mono text-[10px] font-medium text-[#A3A3A3] uppercase">
             Momentum
           </span>
-          <span className="font-mono text-sm font-bold text-[#0A0A0A]">
+          <span className="font-mono text-sm font-bold text-[#E6EDF3]">
             {(trendVector.momentum * 100).toFixed(0)}%
           </span>
         </div>

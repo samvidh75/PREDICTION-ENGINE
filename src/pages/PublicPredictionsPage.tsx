@@ -137,7 +137,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                       {signal.snapshotDate || snapshotDate ? (
                         <span className="text-[10px] font-semibold whitespace-nowrap text-[#22AB94]">{formatFreshness(signal.snapshotDate || snapshotDate)}</span>
                       ) : (
-                        <span className="text-[10px] text-[#484F58]">Pending</span>
+                        <span className="text-[10px] text-[#484F58]">Not enough information</span>
                       )}
                     </td>
                   </tr>
@@ -158,7 +158,7 @@ export default function PublicPredictionsPage(): JSX.Element {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="inline-flex items-center rounded-full border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-[#8B949E]">{signal.type || "Signal pending"}</span>
                     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${signal.snapshotDate || snapshotDate ? "border-[#22AB94]/10 text-[#22AB94]" : "border-[#EF9A09]/10 text-[#EF9A09]"}`}>
-                      {signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Pending"}
+                      {signal.snapshotDate || snapshotDate ? formatFreshness(signal.snapshotDate || snapshotDate) : "Not enough information"}
                     </span>
                   </div>
                 </button>

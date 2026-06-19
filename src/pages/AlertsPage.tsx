@@ -1,6 +1,18 @@
 import React from "react";
-import { Bell, Activity } from "lucide-react";
+import { Activity } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
+
+const ALLOWED_CATEGORIES = [
+  "thesis changed",
+  "score changed",
+  "risk changed",
+  "valuation changed",
+  "financial strength changed",
+  "Healthometer changed",
+  "watchlist review",
+  "price moved",
+  "peer became more attractive",
+];
 
 export const AlertsPage: React.FC = () => {
   return (
@@ -15,8 +27,15 @@ export const AlertsPage: React.FC = () => {
             <Activity className="h-6 w-6 text-[#64748B]" />
             <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">What Changed</h3>
             <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">
-              Track a company to review important changes — thesis shifts, score movements, risk changes, and valuation updates.
+              Track a company to review important changes.
             </p>
+            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+              {ALLOWED_CATEGORIES.map((cat) => (
+                <span key={cat} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-2 py-0.5 text-[10px] text-[#9AA7B5]">
+                  {cat}
+                </span>
+              ))}
+            </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <ProductAction onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
               <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>

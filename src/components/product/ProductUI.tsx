@@ -1,8 +1,6 @@
 import React from "react";
 import type { LucideIcon } from "lucide-react";
 import { AlertCircle, ArrowRight, CheckCircle2, Info, Loader2 } from "lucide-react";
-import TopNav from "../navigation/TopNav";
-import MobileNav from "../navigation/MobileNav";
 
 export function productNavigate(pageKey: string, id?: string): void {
   const params = new URLSearchParams(window.location.search);
@@ -14,16 +12,10 @@ export function productNavigate(pageKey: string, id?: string): void {
   window.dispatchEvent(new Event("urlchange"));
 }
 
-export function ProductShell({ children, nav = true, className = "" }: { children: React.ReactNode; nav?: boolean; className?: string }): JSX.Element {
+export function ProductShell({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
   return (
     <div className={`min-h-screen bg-[#060A10] text-[#E8EDF2] antialiased ${className}`}>
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41,98,255,0.03) 0%, transparent 60%)' }} />
-      {nav && (
-        <>
-          <TopNav />
-          <MobileNav />
-        </>
-      )}
       <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14 z-10">
         {children}
       </main>

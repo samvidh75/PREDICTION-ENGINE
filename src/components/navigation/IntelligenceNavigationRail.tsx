@@ -296,7 +296,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
             <div className="mt-1 text-[12px] text-white/85 font-medium truncate">StockStory India</div>
           </div>
           {!prefersReducedMotion && (
-            <div className="h-2 w-2 rounded-full bg-white/70" style={{ boxShadow: `0 0 22px ${glow.main}` }} />
+            <div className="h-2 w-2 rounded-full bg-[#0D1117]/70" style={{ boxShadow: `0 0 22px ${glow.main}` }} />
           )}
         </div>
 

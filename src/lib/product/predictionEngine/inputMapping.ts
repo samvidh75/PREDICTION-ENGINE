@@ -1,72 +1,113 @@
+// Canonical input mapping for Prediction Engine across all product routes
+
+export interface CompanyDetailInput {
+  symbol: string;
+  pe?: number | null;
+  pb?: number | null;
+  evEbitda?: number | null;
+  dividendYield?: number | null;
+  roe?: number | null;
+  roic?: number | null;
+  roa?: number | null;
+  operatingMargin?: number | null;
+  revenueGrowth?: number | null;
+  profitGrowth?: number | null;
+  debtEquity?: number | null;
+  marketCap?: number | null;
+  eps?: number | null;
+  currentRatio?: number | null;
+  volatility?: number | null;
+  momentum?: number | null;
+  rsi?: number | null;
+  macd?: number | null;
+  factorScores?: Record<string, number> | null;
+}
+
+export interface ScannerRowInput {
+  symbol: string;
+  score?: number | null;
+  rank?: number | null;
+  conviction?: string | null;
+}
+
+export interface RankingsRowInput {
+  symbol: string;
+  score?: number | null;
+  rank?: number | null;
+  companyName?: string | null;
+  sector?: string | null;
+}
+
+export interface CompareCompanyInput {
+  symbol: string;
+  companyName?: string | null;
+  score?: number | null;
+}
+
+export interface WatchlistCompanyInput {
+  symbol: string;
+  companyName?: string | null;
+  score?: number | null;
+}
+
 import { normalizeNumericValue } from "./factorNormalization";
-import { computeResearchScore, computeHealthometerFromResearch, type ResearchScoreResult } from "./researchScore";
-import { buildPredictionViewModel, type PredictionViewState } from "./predictionViewModel";
-import { buildHealthometerViewModel, type HealthometerViewState } from "./healthometerViewModel";
 
-export interface MappedResearchData {
-  predictionView: PredictionViewState;
-  healthometerView: HealthometerViewState;
-  researchScore: ResearchScoreResult;
-}
-
-function extractResearchData(rawData: Record<string, unknown>): Record<string, unknown> {
+export function normalizeCompanyDetail(input: Partial<CompanyDetailInput>): CompanyDetailInput {
   return {
-    pe: normalizeNumericValue(rawData.pe) ?? normalizeNumericValue(rawData.peRatio),
-    pb: normalizeNumericValue(rawData.pb) ?? normalizeNumericValue(rawData.pbRatio),
-    ev_ebitda: normalizeNumericValue(rawData.ev_ebitda ?? rawData.evEbitda),
-    dividend_yield: normalizeNumericValue(rawData.dividend_yield ?? rawData.dividendYield),
-    roe: normalizeNumericValue(rawData.roe),
-    roic: normalizeNumericValue(rawData.roic),
-    roa: normalizeNumericValue(rawData.roa),
-    operating_margin: normalizeNumericValue(rawData.operating_margin ?? rawData.operatingMargin),
-    net_margin: normalizeNumericValue(rawData.net_margin ?? rawData.netMargin),
-    revenue_growth: normalizeNumericValue(rawData.revenue_growth ?? rawData.revenueGrowth),
-    profit_growth: normalizeNumericValue(rawData.profit_growth ?? rawData.profitGrowth),
-    eps_growth: normalizeNumericValue(rawData.eps_growth ?? rawData.epsGrowth),
-    debt_equity: normalizeNumericValue(rawData.debt_equity ?? rawData.debtToEquity),
-    current_ratio: normalizeNumericValue(rawData.current_ratio ?? rawData.currentRatio),
-    market_cap: normalizeNumericValue(rawData.market_cap ?? rawData.marketCap),
-    eps: normalizeNumericValue(rawData.eps),
-    sales: normalizeNumericValue(rawData.sales),
-    book_value: normalizeNumericValue(rawData.book_value ?? rawData.bookValue),
-    risk_score: normalizeNumericValue(rawData.risk_score ?? rawData.riskScore),
+    symbol: input.symbol || "",
+    pe: normalizeNumericValue(input.pe),
+    pb: normalizeNumericValue(input.pb),
+    evEbitda: normalizeNumericValue(input.evEbitda),
+    dividendYield: normalizeNumericValue(input.dividendYield),
+    roe: normalizeNumericValue(input.roe),
+    roic: normalizeNumericValue(input.roic),
+    roa: normalizeNumericValue(input.roa),
+    operatingMargin: normalizeNumericValue(input.operatingMargin),
+    revenueGrowth: normalizeNumericValue(input.revenueGrowth),
+    profitGrowth: normalizeNumericValue(input.profitGrowth),
+    debtEquity: normalizeNumericValue(input.debtEquity),
+    marketCap: normalizeNumericValue(input.marketCap),
+    eps: normalizeNumericValue(input.eps),
+    currentRatio: normalizeNumericValue(input.currentRatio),
+    volatility: normalizeNumericValue(input.volatility),
+    momentum: normalizeNumericValue(input.momentum),
+    rsi: normalizeNumericValue(input.rsi),
+    macd: normalizeNumericValue(input.macd),
+    factorScores: input.factorScores || null,
   };
 }
 
-export function mapCompanyDataToResearch(
-  symbol: string,
-  rawData: Record<string, unknown> | null | undefined,
-  riskScore?: number | null
-): MappedResearchData {
-  if (!rawData) {
-    return {
-      predictionView: buildPredictionViewModel(symbol, null, null, null),
-      healthometerView: buildHealthometerViewModel(null, null, null, null, null, null),
-      researchScore: computeResearchScore(null, null),
-    };
-  }
-
-  const data = extractResearchData(rawData);
-  const risk = riskScore ?? (data.risk_score as number | null);
-
-  const researchScore = computeResearchScore(data, risk);
-  const healthoScores = computeHealthometerFromResearch(data);
-
+export function normalizeScannerRow(input: Partial<ScannerRowInput>): ScannerRowInput {
   return {
-    predictionView: buildPredictionViewModel(symbol, researchScore.overallScore, risk, data),
-    healthometerView: buildHealthometerViewModel(
-      healthoScores.quality, healthoScores.valuation, healthoScores.growth,
-      healthoScores.stability, healthoScores.risk, healthoScores.momentum
-    ),
-    researchScore,
+    symbol: input.symbol || "",
+    score: normalizeNumericValue(input.score),
+    rank: normalizeNumericValue(input.rank),
+    conviction: input.conviction || null,
   };
 }
 
-export function mapScannerItemToResearch(item: Record<string, unknown>): ResearchScoreResult {
-  return computeResearchScore(extractResearchData(item), normalizeNumericValue(item.risk_score));
+export function normalizeRankingsRow(input: Partial<RankingsRowInput>): RankingsRowInput {
+  return {
+    symbol: input.symbol || "",
+    score: normalizeNumericValue(input.score),
+    rank: normalizeNumericValue(input.rank),
+    companyName: input.companyName || null,
+    sector: input.sector || null,
+  };
 }
 
-export function mapFinancialsToResearch(financials: Record<string, unknown> | null | undefined): ResearchScoreResult {
-  if (!financials) return computeResearchScore(null, null);
-  return computeResearchScore(extractResearchData(financials), null);
+export function normalizeCompareCompany(input: Partial<CompareCompanyInput>): CompareCompanyInput {
+  return {
+    symbol: input.symbol || "",
+    companyName: input.companyName || null,
+    score: normalizeNumericValue(input.score),
+  };
+}
+
+export function normalizeWatchlistCompany(input: Partial<WatchlistCompanyInput>): WatchlistCompanyInput {
+  return {
+    symbol: input.symbol || "",
+    companyName: input.companyName || null,
+    score: normalizeNumericValue(input.score),
+  };
 }

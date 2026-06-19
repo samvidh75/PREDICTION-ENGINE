@@ -25,7 +25,7 @@ export function ModelRunBadge({ modelVersion, runDate, className = "" }: ModelRu
     return (
       <span className={`inline-flex items-center gap-1.5 rounded-full border border-white/5 bg-white/[0.03] px-2.5 py-1 text-[10px] font-medium text-[#484F58] ${className}`}>
         <Cpu className="h-3 w-3" aria-hidden="true" />
-        Model run metadata unavailable
+        Model run details not available
       </span>
     );
   }

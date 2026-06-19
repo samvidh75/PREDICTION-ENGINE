@@ -39,9 +39,9 @@ describe("Frontend dataFormatting Utilities", () => {
 
   it("normalizes date bounds safely into YYYY-MM-DD format", () => {
     expect(normalizeDate("2026-06-15T12:00:00.000Z")).toBe("2026-06-15");
-    expect(normalizeDate(null)).toBe("Date pending");
-    expect(normalizeDate(undefined)).toBe("Date pending");
-    expect(normalizeDate("")).toBe("Date pending");
+    expect(normalizeDate(null)).toBe("Date not yet available");
+    expect(normalizeDate(undefined)).toBe("Date not yet available");
+    expect(normalizeDate("")).toBe("Date not yet available");
   });
 
   it("converts raw snake_case or camelCase variables to clean display labels", () => {
@@ -56,11 +56,11 @@ describe("formatScore", () => {
     expect(formatScore(0)).toBe("0/100");
   });
 
-  it("returns Score pending for null/undefined/non-finite", () => {
-    expect(formatScore(null)).toBe("Score pending");
-    expect(formatScore(undefined)).toBe("Score pending");
-    expect(formatScore(NaN)).toBe("Score pending");
-    expect(formatScore(Infinity)).toBe("Score pending");
+  it("returns not yet available for null/undefined/non-finite", () => {
+    expect(formatScore(null)).toBe("Score not yet available");
+    expect(formatScore(undefined)).toBe("Score not yet available");
+    expect(formatScore(NaN)).toBe("Score not yet available");
+    expect(formatScore(Infinity)).toBe("Score not yet available");
   });
 });
 
@@ -126,10 +126,10 @@ describe("formatFreshness", () => {
     expect(formatFreshness(oldDate)).toBe("2026-01-01");
   });
 
-  it("returns Pending for null/undefined", () => {
-    expect(formatFreshness(null)).toBe("Pending");
-    expect(formatFreshness(undefined)).toBe("Pending");
-    expect(formatFreshness("")).toBe("Pending");
+  it("returns Not yet available for null/undefined", () => {
+    expect(formatFreshness(null)).toBe("Not yet available");
+    expect(formatFreshness(undefined)).toBe("Not yet available");
+    expect(formatFreshness("")).toBe("Not yet available");
   });
 });
 

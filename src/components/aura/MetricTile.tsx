@@ -16,7 +16,7 @@ export default function MetricTile({ label, value, detail, status }: MetricTileP
   };
 
   return (
-    <div className="rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 p-4">
+    <div className="rounded-xl bg-[#0D1117]/60 backdrop-blur-sm border border-white/30 p-4">
       <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">{label}</div>
       <div className={`mt-1 text-lg font-bold tabular-nums ${status ? statusColors[status] : "text-ink"}`}>
         {value}

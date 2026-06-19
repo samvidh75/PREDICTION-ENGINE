@@ -22,17 +22,17 @@ export const BrokerRedirector: React.FC<BrokerRedirectorProps> = ({ ticker }) =>
   };
 
   return (
-    <div className="bg-white border border-[#E5E5E5] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-4 select-none">
+    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-4 select-none">
       
       {/* Title */}
       <div className="flex items-center space-x-2">
         <ShieldAlert className="w-4.5 h-4.5 text-[#D946EF]" />
-        <span className="text-[11px] font-mono font-medium tracking-wider text-[#525252] uppercase">
+        <span className="text-[11px] font-mono font-medium tracking-wider text-[#9AA7B5] uppercase">
           External Analytical Out-Routing
         </span>
       </div>
 
-      <p className="text-[12px] leading-relaxed text-[#525252]">
+      <p className="text-[12px] leading-relaxed text-[#9AA7B5]">
         StockStory India is a research platform. Brokerage execution is not connected in this app.
       </p>
 
@@ -53,7 +53,7 @@ export const BrokerRedirector: React.FC<BrokerRedirectorProps> = ({ ticker }) =>
       </div>
 
       {/* Safety Notice Segment */}
-      <div className="flex items-center justify-center space-x-1 font-mono text-[9px] text-neutral-400 uppercase tracking-widest pt-2 border-t border-neutral-100">
+      <div className="flex items-center justify-center space-x-1 font-mono text-[9px] text-[#9AA7B5] uppercase tracking-widest pt-2 border-t border-[rgba(148,163,184,0.16)]">
         <span>Research only. No order routing.</span>
       </div>
 

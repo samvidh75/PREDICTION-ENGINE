@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
               onClick={handleNav(item)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="rounded-md px-3 py-2 text-sm text-neutral-200 hover:text-white"
+              className="rounded-md px-3 py-2 text-sm text-[#9AA7B5] hover:text-white"
             >
               {item.label}
             </motion.button>

@@ -41,21 +41,21 @@ export const LandingHero: React.FC = () => {
         Includes sharp border transition on authError and staggered entry cascade.
       */}
       <div
-        className={`max-w-[440px] w-full bg-white border rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-8 flex flex-col space-y-6 transition-all duration-1000 ease-out transform ${
-          authError ? "border-[#D946EF]" : "border-[#E5E5E5]"
+         className={`max-w-[440px] w-full bg-[#0D1117] border rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-8 flex flex-col space-y-6 transition-all duration-1000 ease-out transform ${
+          authError ? "border-[#D946EF]" : "border-[rgba(148,163,184,0.16)]"
         } ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
         }`}
       >
         {/* Header Block */}
         <div>
-          <span className="text-[11px] font-mono font-medium uppercase tracking-widest text-[#525252] block mb-1">
+          <span className="text-[11px] font-mono font-medium uppercase tracking-widest text-[#9AA7B5] block mb-1">
             STOCKSTORY INDIA
           </span>
-          <h2 className="text-2xl font-semibold tracking-tight text-[#0A0A0A]">
+          <h2 className="text-2xl font-semibold tracking-tight text-[#E6EDF3]">
             Access Platform
           </h2>
-          <p className="mt-3 text-[13px] leading-relaxed text-[#525252]">
+          <p className="mt-3 text-[13px] leading-relaxed text-[#9AA7B5]">
             Explore structured financial analysis, ownership trends, 
             valuation context, and market structure.
           </p>
@@ -69,13 +69,13 @@ export const LandingHero: React.FC = () => {
             onClick={handleInitialize}
             className={`w-full h-11 rounded-none font-medium text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 select-none min-h-[48px] active:scale-[0.98] duration-100 ${
               isConnecting
-                ? "bg-[#FAFAFA] border border-[#E5E5E5] text-[#525252] cursor-not-allowed"
+                ? "bg-[#0D1117] border border-[rgba(148,163,184,0.16)] text-[#9AA7B5] cursor-not-allowed"
                 : "bg-[#0A0A0A] text-white hover:bg-[#1A1A1A]"
             }`}
           >
             {isConnecting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-[#525252]" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#9AA7B5]" />
                 <span className="font-mono text-[11px] tracking-wider font-semibold">
                   CONNECTING...
                 </span>
@@ -94,10 +94,10 @@ export const LandingHero: React.FC = () => {
         </div>
 
         {/* Security Sub-card */}
-        <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between">
-          <div className="text-[11px] font-mono tracking-wider text-[#525252] flex items-center space-x-1.5">
+        <div className="pt-4 border-t border-[rgba(148,163,184,0.16)] flex items-center justify-between">
+          <div className="text-[11px] font-mono tracking-wider text-[#9AA7B5] flex items-center space-x-1.5">
             <ShieldCheck className="w-4 h-4 text-cyan-500" />
-            <span className="font-semibold text-neutral-600 uppercase">
+            <span className="font-semibold text-[#9AA7B5] uppercase">
               SECURE CONNECTION
             </span>
           </div>
@@ -106,7 +106,7 @@ export const LandingHero: React.FC = () => {
 
       {/* Compliance / SEBI Watermark under absolute specifications */}
       <div
-        className={`mt-4 text-[9px] font-mono text-[#525252] tracking-widest uppercase transition-all duration-1000 delay-300 transform ${
+        className={`mt-4 text-[9px] font-mono text-[#9AA7B5] tracking-widest uppercase transition-all duration-1000 delay-300 transform ${
           mounted ? "opacity-100" : "opacity-0"
         }`}
       >

@@ -210,15 +210,15 @@ function Card({ signal }: { signal: IntelligenceSignal }) {
     <div className={`border-4 border-black p-4 ${tone}`} style={{ boxShadow: '4px 4px 0px #000' }}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="font-semibold uppercase tracking-wide">{signal.symbol}</span>
-        <span className="border-2 border-black bg-white px-2 py-0.5 text-[10px] font-bold uppercase">{badge}</span>
+        <span className="border-2 border-black bg-[#0D1117] px-2 py-0.5 text-[10px] font-bold uppercase">{badge}</span>
       </div>
       <div className="grid grid-cols-3 gap-2 text-xs">
-        <div><span className="block text-[9px] font-bold uppercase text-gray-500">Previous</span>{displayValue(signal.previousValue)}</div>
-        <div><span className="block text-[9px] font-bold uppercase text-gray-500">Current</span>{displayValue(signal.currentValue)}</div>
-        <div><span className="block text-[9px] font-bold uppercase text-gray-500">Delta</span>{displayDelta(signal.delta)}</div>
+        <div><span className="block text-[9px] font-bold uppercase text-[#64748B]">Previous</span>{displayValue(signal.previousValue)}</div>
+        <div><span className="block text-[9px] font-bold uppercase text-[#64748B]">Current</span>{displayValue(signal.currentValue)}</div>
+        <div><span className="block text-[9px] font-bold uppercase text-[#64748B]">Delta</span>{displayDelta(signal.delta)}</div>
       </div>
-      <div className="mt-3 text-xs leading-relaxed text-gray-700">{signal.explanation}</div>
-      <div className="mt-3 flex flex-wrap gap-2 text-[9px] font-bold uppercase tracking-wider text-gray-500">
+      <div className="mt-3 text-xs leading-relaxed text-[#9AA7B5]">{signal.explanation}</div>
+      <div className="mt-3 flex flex-wrap gap-2 text-[9px] font-bold uppercase tracking-wider text-[#64748B]">
         <span>{signal.type.replaceAll('_', ' ')}</span>
         <span>Severity: {signal.severity}</span>
       </div>
@@ -256,7 +256,7 @@ export default function DailyFeed() {
   }, []);
 
   if (state.loading) {
-    return <div className="p-8 text-center"><div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-black border-t-transparent" /><p className="mt-4 text-sm font-bold uppercase text-gray-600">Loading daily intelligence...</p></div>;
+    return <div className="p-8 text-center"><div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-black border-t-transparent" /><p className="mt-4 text-sm font-bold uppercase text-[#64748B]">Loading daily intelligence...</p></div>;
   }
 
   const improvers = state.signals.filter((signal) => direction(signal) === 'improver');
@@ -271,13 +271,13 @@ export default function DailyFeed() {
             <h2 className="text-2xl font-semibold uppercase tracking-wider">Daily Intelligence</h2>
             <p className="mt-1 text-sm font-bold">Prediction-registry snapshot differences</p>
           </div>
-          <span className="border-2 border-black bg-white px-3 py-1 text-xs font-bold uppercase">{state.status}</span>
+          <span className="border-2 border-black bg-[#0D1117] px-3 py-1 text-xs font-bold uppercase">{state.status}</span>
         </div>
-        <div className="mt-3 grid gap-1 text-[10px] font-medium text-gray-700 sm:grid-cols-2">
-          <span>As of: {state.asOf || 'Data unavailable'}</span>
-          <span>Freshness: {state.freshness}</span>
-          <span>Sources: {state.sourceTables.length > 0 ? state.sourceTables.join(', ') : 'Data unavailable'}</span>
-          <span>Symbols analyzed: {state.symbolsAnalyzed ?? 'Data unavailable'}</span>
+        <div className="mt-3 grid gap-1 text-[10px] font-medium text-[#9AA7B5] sm:grid-cols-2">
+          <span>As of: {state.asOf || 'Not enough information'}</span>
+          <span>Recency: {state.freshness}</span>
+          <span>Sources: {state.sourceTables.length > 0 ? state.sourceTables.join(', ') : 'Not enough information'}</span>
+          <span>Symbols analyzed: {state.symbolsAnalyzed ?? 'Not enough information'}</span>
         </div>
       </div>
 
@@ -290,7 +290,7 @@ export default function DailyFeed() {
       ) : (
         <div className="border-4 border-dashed border-black bg-gray-50 p-8 text-center">
           <p className="text-xl font-semibold">{state.status === 'empty' ? 'No significant changes' : 'Daily intelligence unavailable'}</p>
-          <p className="mt-1 text-sm text-gray-600">{state.message}</p>
+          <p className="mt-1 text-sm text-[#64748B]">{state.message}</p>
         </div>
       )}
     </div>

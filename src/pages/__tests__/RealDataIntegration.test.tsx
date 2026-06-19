@@ -120,11 +120,11 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText('Pending')).not.toBeInTheDocument();
+      expect(screen.queryByText(/Pending|Not enough information|not yet available/)).not.toBeInTheDocument();
     });
   });
 
-  it('SearchPage shows Pending for stocks without leaderboard entry', async () => {
+  it('SearchPage shows Not enough information for stocks without leaderboard entry', async () => {
     window.history.replaceState({}, '', '?page=search&q=TCS');
 
     vi.stubGlobal('fetch', makeMockFetch({
@@ -138,7 +138,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Pending')).toBeInTheDocument();
+      expect(screen.getByText(/Not enough information/)).toBeInTheDocument();
     });
   });
 
