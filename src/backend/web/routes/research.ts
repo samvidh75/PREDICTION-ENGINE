@@ -18,7 +18,6 @@ import { healthometerEngine } from "../../../stockstory/healthometer/Healthomete
 import { buildHealthometerInput } from "../../../stockstory/healthometer/inputBuilder";
 import { algorithmicAnalysisEngine } from "../../../stockstory/analysis/AlgorithmicAnalysisEngine";
 import { evaluatePredictionV2 } from "../../../stockstory/prediction/engine/PredictionEngineV2";
-import { buildFactorInputFromSnapshot } from "../../integrations/indianapi/IndianApiMapper";
 
 function normaliseSymbol(raw: string): string {
   return raw.toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
@@ -467,22 +466,22 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
 
       let predictionV2: Record<string, unknown> | null = null;
       try {
-        const v2Input = buildFactorInputFromSnapshot({
-          fundamentals: fundamentalsView ? {
-            peRatio: parseFinite(fsRow?.pe_ratio), pbRatio: parseFinite(fsRow?.pb_ratio),
-            roce: parseFinite(fsRow?.roce ?? fsRow?.return_on_capital_employed), roe: parseFinite(fsRow?.roe ?? fsRow?.return_on_equity),
-            debtToEquity: parseFinite(fsRow?.debt_to_equity), dividendYield: parseFinite(fsRow?.dividend_yield),
-            eps: parseFinite(fsRow?.eps), bookValue: parseFinite(fsRow?.book_value),
-            salesGrowth: parseFinite(fsRow?.revenue_growth), profitGrowth: parseFinite(fsRow?.profit_growth),
-            operatingMargin: parseFinite(fsRow?.operating_margin), netMargin: parseFinite(fsRow?.net_margin),
-            currentRatio: parseFinite(fsRow?.current_ratio), interestCoverage: null,
-          } : null,
-          price: quoteView ? {
-            price: parseFinite(quoteView.lastPrice), marketCap: parseFinite(quoteView.marketCap),
-            volume: null, week52High: null, week52Low: null,
-          } : null,
-          profile: null,
-        } as any);
+        const fund = fundamentalsView;
+        const v2Input: Record<string, number | null | undefined> = {
+          pe_ratio: fund?.peRatio ?? parseFinite(fsRow?.pe_ratio),
+          pb_ratio: fund?.pbRatio ?? parseFinite(fsRow?.pb_ratio),
+          return_on_equity: fund?.roe ?? parseFinite(fsRow?.roe),
+          roce: fund?.roic ?? parseFinite(fsRow?.roce),
+          debt_to_equity: fund?.debtToEquity ?? parseFinite(fsRow?.debt_to_equity),
+          revenue_growth: fund?.revenueGrowth ?? parseFinite(fsRow?.revenue_growth),
+          operating_margin: fund?.operatingMargin ?? parseFinite(fsRow?.operating_margin),
+          net_margin: fund?.netMargin ?? parseFinite(fsRow?.net_margin),
+          eps_growth: fund?.epsGrowth ?? parseFinite(fsRow?.eps_growth),
+          gross_margin: fund?.grossMargin ?? parseFinite(fsRow?.gross_margin),
+          price: parseFinite(quoteView?.lastPrice),
+          market_cap: parseFinite(quoteView?.marketCap) ?? parseFinite(fsRow?.market_cap),
+          volume: parseFinite(quoteView?.volume),
+        };
         const v2Result = await evaluatePredictionV2({
           symbol: sym, sector: profile?.sector ?? null,
           financials: v2Input, prices: {}, metrics: {}, fundamentals: {},
