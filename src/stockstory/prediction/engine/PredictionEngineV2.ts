@@ -15,17 +15,23 @@ function computeFactorScore(factor: FactorDefinition, input: FactorInput): Facto
     return { factorId: factor.id, value: null, score: null, status: factor.status, active: false, reason: "Factor inactive" };
   }
 
-  const hasAllInputs = factor.requiredRawInputs.every((r) => {
-    const val = (input.financials as any)[r] ?? (input.prices as any)[r] ?? (input.metrics as any)[r] ?? null;
-    return val !== null && val !== undefined;
-  });
+  // Check if pre-computed value is provided directly (factor ID matches input key)
+  const allInputs = { ...input.financials, ...input.prices, ...input.metrics, ...input.fundamentals };
+  const directVal = (allInputs as Record<string, unknown>)[factor.id];
+  const hasDirectValue = typeof directVal === "number" && Number.isFinite(directVal);
 
-  if (!hasAllInputs) {
-    if (factor.missingDataBehavior === "return_null") {
-      return { factorId: factor.id, value: null, score: null, status: factor.status, active: true, reason: "Missing required data" };
-    }
-    if (factor.missingDataBehavior === "reduce_confidence") {
-      return { factorId: factor.id, value: null, score: null, status: factor.status, active: true, reason: "Missing data, confidence reduced" };
+  if (!hasDirectValue) {
+    const hasAllInputs = factor.requiredRawInputs.every((r) => {
+      const val = (input.financials as any)[r] ?? (input.prices as any)[r] ?? (input.metrics as any)[r] ?? null;
+      return val !== null && val !== undefined;
+    });
+    if (!hasAllInputs) {
+      if (factor.missingDataBehavior === "return_null") {
+        return { factorId: factor.id, value: null, score: null, status: factor.status, active: true, reason: "Missing required data" };
+      }
+      if (factor.missingDataBehavior === "reduce_confidence") {
+        return { factorId: factor.id, value: null, score: null, status: factor.status, active: true, reason: "Missing data, confidence reduced" };
+      }
     }
   }
 
