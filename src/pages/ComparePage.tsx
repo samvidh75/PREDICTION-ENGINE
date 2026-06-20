@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeftRight, X, Search, BarChart3, Loader2, ExternalLink, Bookmark, Copy } from "lucide-react";
+import { ArrowLeftRight, X, Search, Loader2 } from "lucide-react";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
-import { CompareShareRecap } from "../components/share/CompareShareRecap";
 import { SpatialSheet } from "../components/intelligence/SpatialSheet";
-import { PRODUCT_EVENTS, trackEvent } from "../lib/analytics/productEvents";
 import { api, type SearchResult } from "../services/api/client";
-import ResearchContextLink from "../components/research/ResearchContextLink";
 import { buildCompareViewModel } from "../lib/product/viewModels/compareViewModel";
 
 interface CompareCompany {
@@ -31,7 +28,6 @@ export const ComparePage: React.FC = () => {
     missingDataCaveat: string | null;
   } | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
-
   const [shareRecapOpen, setShareRecapOpen] = useState(false);
 
   const companyViews = useMemo(() => {
@@ -55,9 +51,12 @@ export const ComparePage: React.FC = () => {
   }, [companyViews, routeData]);
 
   const fetchCompare = useCallback(async (syms: string[]) => {
+    // Exclude duplicates before sending
+    const uniqueSyms = Array.from(new Set(syms.map(s => s.toUpperCase())));
+    if (uniqueSyms.length < 2) return;
     setRouteLoading(true);
     try {
-      const res = await api.compareCompanies(syms);
+      const res = await api.compareCompanies(uniqueSyms);
       setRouteData(res.data);
     } catch {
       setRouteData(null);
@@ -72,8 +71,10 @@ export const ComparePage: React.FC = () => {
     const ids = idsParam ? idsParam.split(",").filter(Boolean) : (idParam ? [idParam] : []);
     if (ids.length > 0) {
       setLoading(true);
-      const resolved: CompareCompany[] = ids.map((sym) => ({
-        symbol: sym.toUpperCase(),
+      // Deduplicate symbols from URL parameters immediately
+      const uniqueIds = Array.from(new Set(ids.map(s => s.toUpperCase())));
+      const resolved: CompareCompany[] = uniqueIds.map((sym) => ({
+        symbol: sym,
         companyName: sym,
         score: null,
       }));
@@ -102,10 +103,11 @@ export const ComparePage: React.FC = () => {
   }, [searchQuery, companies.length]);
 
   const addCompany = async (symbol: string) => {
-    if (companies.find((c) => c.symbol === symbol.toUpperCase())) return;
+    const cleanSym = symbol.toUpperCase();
+    if (companies.find((c) => c.symbol === cleanSym)) return; // Duplicate check
     setSearchQuery("");
     setSearchResults([]);
-    const updated = [...companies, { symbol: symbol.toUpperCase(), companyName: symbol, score: null }];
+    const updated = [...companies, { symbol: cleanSym, companyName: symbol, score: null }];
     setCompanies(updated);
     const params = new URLSearchParams(window.location.search);
     params.set("ids", updated.map((c) => c.symbol).join(","));
@@ -129,24 +131,19 @@ export const ComparePage: React.FC = () => {
     }
   };
 
-  const fmt = (v: number | null | undefined): string => {
-    if (typeof v === "number" && Number.isFinite(v)) return String(Math.round(v));
-    return "—";
-  };
-
   return (
     <ProductShell>
       <ProductPage>
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="flex items-center gap-2">
-            <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-sm font-semibold text-[#E6EDF3]">Compare research</h1>
+            <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
+            <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Compare companies</h1>
           </div>
-          <p className="mt-1 text-xs text-[#9AA7B5]">Compare up to {MAX_COMPANIES} companies side by side to decide which deserves more research.</p>
+          <p className="mt-1.5 text-sm text-[#9AA7B5]">Compare up to {MAX_COMPANIES} companies side by side to evaluate key factors and determine which deserves further review.</p>
         </div>
 
         {companies.length < MAX_COMPANIES && (
-          <ProductPanel className="mb-5 p-0">
+          <ProductPanel className="mb-6 border border-white/[0.08]">
             <div className="flex items-center gap-3 px-4 py-3">
               <Search className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
               <input
@@ -160,7 +157,7 @@ export const ComparePage: React.FC = () => {
               {searching && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />}
             </div>
             {searchResults.length > 0 && (
-              <div className="border-t border-[rgba(148,163,184,0.08)] px-2 pb-2 pt-1">
+              <div className="border-t border-white/[0.06] px-2 pb-2 pt-1">
                 {searchResults.map((r) => (
                   <button
                     key={r.symbol}
@@ -179,25 +176,25 @@ export const ComparePage: React.FC = () => {
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-12 text-xs text-[#9AA7B5]">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
+          <div className="flex items-center justify-center gap-2 py-16 text-xs text-[#9AA7B5]">
+            <Loader2 className="h-4 w-4 animate-spin text-[#2962FF]" aria-hidden="true" />
             Loading research comparison...
           </div>
         ) : (
           <>
             {companies.length > 0 && (
-              <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {companies.map((company) => (
                   <div
                     key={company.symbol}
-                    className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2"
+                    className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-2.5"
                   >
                     <button
                       type="button"
                       onClick={() => productNavigate("stock", company.symbol)}
                       className="min-w-0 flex-1 text-left"
                     >
-                      <span className="block truncate font-mono text-xs font-semibold text-[#E6EDF3] hover:underline">{company.symbol}</span>
+                      <span className="block truncate font-mono text-sm font-semibold text-[#E6EDF3] hover:underline">{company.symbol}</span>
                     </button>
                     <button
                       type="button"
@@ -205,12 +202,12 @@ export const ComparePage: React.FC = () => {
                       className="rounded p-1 text-[#64748B] hover:text-[#E6EDF3] transition-colors"
                       aria-label={`Remove ${company.symbol}`}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 ))}
                 {companies.length < MAX_COMPANIES && (
-                  <div className="flex items-center gap-2 rounded-lg border border-dashed border-[rgba(148,163,184,0.12)] px-3 py-2 text-xs text-[#64748B]">
+                  <div className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.08] px-3 py-2.5 text-xs text-[#64748B]">
                     <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     <span>Add company</span>
                   </div>
@@ -219,21 +216,13 @@ export const ComparePage: React.FC = () => {
             )}
 
             {companies.length === 0 && (
-              <div className="flex flex-col items-center gap-5 py-6 text-center">
-                <ArrowLeftRight className="h-10 w-10 text-[#2D333B]" aria-hidden="true" />
+              <div className="flex flex-col items-center gap-5 py-12 text-center">
+                <ArrowLeftRight className="h-12 w-12 text-[#2D333B]" aria-hidden="true" />
                 <div>
                   <h2 className="text-sm font-semibold text-[#E6EDF3]">Search companies above to compare</h2>
                   <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[#9AA7B5]">
-                    Add up to {MAX_COMPANIES} companies to see a side-by-side breakdown. Use this to decide which company deserves deeper investigation.
+                    Add up to {MAX_COMPANIES} companies to see a side-by-side comparison matrix. Deciding what to review next is a research first step.
                   </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <ProductAction onClick={() => productNavigate("rankings")}>
-                    <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> Open rankings
-                  </ProductAction>
-                  <ProductAction variant="secondary" onClick={() => productNavigate("search")}>
-                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search companies
-                  </ProductAction>
                 </div>
               </div>
             )}
@@ -241,7 +230,7 @@ export const ComparePage: React.FC = () => {
         )}
 
         {routeLoading && (
-          <div className="flex items-center justify-center gap-2 py-6 text-xs text-[#9AA7B5]">
+          <div className="flex items-center justify-center gap-2 py-12 text-xs text-[#9AA7B5]">
             <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
             Loading comparison...
           </div>
@@ -249,107 +238,65 @@ export const ComparePage: React.FC = () => {
 
         {!loading && !routeLoading && companies.length >= 2 && routeData && (
           <div className="space-y-5">
-            {/* Factor Comparison from Research Engine */}
+            {/* Factor Comparison Matrix (clean rows, only real non-empty rows) */}
             {routeData.factorComparison && routeData.factorComparison.length > 0 && (
-              <ProductPanel className="overflow-hidden">
-                <div className="px-4 py-3.5">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Factor Comparison</div>
-                  <div className="-mx-2 overflow-x-auto">
-                    <div className="min-w-[400px] px-2 space-y-3">
-                      {routeData.factorComparison.map((fc) => (
-                        <div key={fc.factor} className="rounded-lg border border-[rgba(148,163,184,0.08)] bg-[rgba(255,255,255,0.02)] p-3">
-                          <span className="text-xs font-semibold text-[#E6EDF3]">{fc.factor}</span>
-                          <p className="mt-1 text-[11px] leading-4 text-[#9AA7B5]">{fc.explanation}</p>
+              <ProductPanel className="overflow-hidden border border-white/[0.08] p-4">
+                <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Decision matrix</div>
+                <div className="space-y-2">
+                  {routeData.factorComparison.filter(fc => fc.explanation).map((fc) => (
+                    <div key={fc.factor} className="rounded-lg border border-white/[0.04] bg-white/[0.01] p-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="min-w-0">
+                        <span className="text-xs font-semibold text-[#E6EDF3]">{fc.factor}</span>
+                        <p className="mt-1 text-[11px] leading-relaxed text-[#9AA7B5]">{fc.explanation}</p>
+                      </div>
+                      {fc.winner && (
+                        <div className="shrink-0 text-[10px] font-bold text-[#2962FF] uppercase tracking-wider bg-[#2962FF]/10 px-2 py-0.5 rounded self-start sm:self-center">
+                          {fc.winner}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
+                  ))}
                 </div>
               </ProductPanel>
             )}
 
-            {/* Recommendation */}
+            {/* Recommendation - Genuinely neutral */}
             {routeData.recommendation && (
-              <ProductPanel className="overflow-hidden">
-                <div className="px-4 py-3.5">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Research Cue</div>
-                  <p className="text-sm leading-5 text-[#E6EDF3]">{routeData.recommendation}</p>
-                </div>
+              <ProductPanel className="overflow-hidden border border-white/[0.08] p-4">
+                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Summary review prompt</div>
+                <p className="text-xs leading-relaxed text-[#E6EDF3]">
+                  {routeData.recommendation.toLowerCase().includes("buy")
+                    ? "Needs further review"
+                    : routeData.recommendation}
+                </p>
               </ProductPanel>
-            )}
-
-            {/* Missing data caveat */}
-            {routeData.missingDataCaveat && (
-              <div className="rounded-lg border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.06)] p-3 text-xs text-[#F59E0B]">
-                {routeData.missingDataCaveat}
-              </div>
             )}
 
             {/* Actions per company */}
-            <ProductPanel className="overflow-hidden">
-              <div className="px-4 py-3.5">
-                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Actions</div>
-                <div className="-mx-2 overflow-x-auto">
-                  <div className="min-w-[400px] px-2">
-                    <div className="grid" style={{ gridTemplateColumns: `120px repeat(${companies.length}, 1fr)` }}>
-                      <div className="text-[10px] font-medium text-[#64748B] py-1.5" />
-                      {companies.map((c) => (
-                        <div key={c.symbol} className="flex items-center justify-end gap-1.5 py-1.5">
-                          <ProductAction onClick={() => productNavigate("stock", c.symbol)}>
-                            <ExternalLink className="h-3 w-3" aria-hidden="true" /> Research
-                          </ProductAction>
-                          <ProductAction variant="secondary" onClick={() => productNavigate("stock", c.symbol)}>
-                            <Bookmark className="h-3 w-3" aria-hidden="true" /> Track
-                          </ProductAction>
-                          <ProductAction variant="secondary" onClick={() => { setShareRecapOpen(true); trackEvent(PRODUCT_EVENTS.COMPARE_SHARE_OPENED); }}>
-                            <Copy className="h-3 w-3" aria-hidden="true" /> Recap
-                          </ProductAction>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ProductPanel>
+            <div className="flex flex-wrap items-center gap-2">
+              {companies.map((c) => (
+                <button
+                  key={c.symbol}
+                  type="button"
+                  onClick={() => productNavigate("stock", c.symbol)}
+                  className="rounded-lg border border-[#2962FF] bg-[#2962FF]/10 px-4 py-2 text-xs font-semibold text-white hover:bg-[#2962FF]/20 transition-all"
+                >
+                  Research {c.symbol} &rarr;
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {!loading && !routeLoading && companies.length >= 2 && !routeData && (
-          <ProductPanel className="p-6 text-center">
-            <p className="text-sm text-[#9AA7B5]">Comparison is being prepared for these companies. Check back shortly.</p>
-            <div className="mt-4 flex justify-center gap-2">
-              <ProductAction variant="secondary" onClick={() => fetchCompare(companies.map((c) => c.symbol))}>Try again</ProductAction>
-            </div>
+          <ProductPanel className="p-6 text-center border border-white/[0.08]">
+            <p className="text-xs text-[#9AA7B5]">Not enough information to draw a direct decision matrix for these selections yet.</p>
           </ProductPanel>
         )}
-
-        {!loading && companies.length > 0 && (
-          <div className="mt-5 border-t border-[rgba(148,163,184,0.08)] pt-4">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] leading-relaxed text-[#64748B]">
-                Compare shows structured research output for the selected companies. Missing values are omitted. Research cues are reading aids based on available values, not investment advice.
-              </p>
-              <ResearchContextLink label="How scores work" />
-            </div>
-          </div>
-        )}
-
-        <SpatialSheet open={shareRecapOpen} onClose={() => setShareRecapOpen(false)} title="Comparison Summary">
-          {companies.length >= 2 && routeData ? (
-            <CompareShareRecap
-              companyA={{ symbol: companies[0].symbol, companyName: companies[0].companyName, score: null }}
-              companyB={{ symbol: companies[1].symbol, companyName: companies[1].companyName, score: null }}
-              decisionLabels={routeData.factorComparison?.map((fc) => fc.winner).filter((w): w is string => w !== null) ?? []}
-            />
-          ) : (
-            <div className="flex items-center justify-center py-8 text-xs text-[#9AA7B5]">
-              Add at least two companies to see a comparison recap.
-            </div>
-          )}
-        </SpatialSheet>
       </ProductPage>
     </ProductShell>
   );
 };
 
 export default ComparePage;
+

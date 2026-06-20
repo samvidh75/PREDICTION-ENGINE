@@ -41,13 +41,18 @@ describe('PublicRankingsPage states', () => {
     mockGetScanner.mockResolvedValue({ data: [], preset: "Quality compounders" });
     render(<PublicRankingsPage />);
     await waitFor(() => {
-      expect(screen.getByText('Rankings are being compiled')).toBeInTheDocument();
+      expect(screen.getByText('Shortlist is being compiled')).toBeInTheDocument();
     });
   });
 
-  it('shows signup teaser for unauthenticated users when empty', async () => {
+  it('shows signup teaser for unauthenticated users when data exists', async () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false });
-    mockGetScanner.mockResolvedValue({ data: [], preset: "Quality compounders" });
+    mockGetScanner.mockResolvedValue({
+      data: [
+        { symbol: 'ITC', companyName: 'ITC Limited', sector: 'Consumer Goods', rank: 1, conviction: 'high', score: 85, oneLineThesis: 'Steady cash flows', keyReason: 'High dividend yield', riskMarker: null }
+      ],
+      preset: "Quality compounders"
+    });
     render(<PublicRankingsPage />);
     await waitFor(() => {
       expect(screen.getByText('Create free account')).toBeInTheDocument();

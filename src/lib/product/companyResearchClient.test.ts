@@ -12,7 +12,7 @@ const research = {
     symbol: "RELIANCE", companyName: "Reliance Industries", sector: "Energy", industry: null,
     quote: null, fundamentals: null, candles: [], history: [], risk: null,
     factorScores: [{ name: "quality", score: 82, explanation: null }],
-    thesis: { status: "Healthy", thesis: "Durable operating strength", bullCase: null, bearCase: null, topStrengths: ["Business quality"], topRisks: ["Valuation context"] },
+    thesis: { status: "Healthy", thesis: "Durable operating strength", bullCase: null, bearCase: null, topStrengths: ["Business quality", "Business quality"], topRisks: ["Valuation context", "Risk context"] },
     investContext: { conviction: "High conviction", score: 73, thesis: "Durable operating strength", keyRisks: ["Valuation context"], keyStrengths: ["Business quality"], whatToWatch: ["Capital efficiency"] },
   },
 };
@@ -60,4 +60,38 @@ describe("companyResearchClient", () => {
     expect(result.message).toBe("Research context is based on available data.");
     expect(JSON.stringify(result)).not.toMatch(/SYMBOL_NOT_IN_UNIVERSE|PREDICTION_NOT_FOUND/);
   });
+
+  it("ensures duplicate driver chips are deduped and backend strengths/risks map uniquely", async () => {
+    vi.mocked(api.getCompanyResearch).mockResolvedValue(research);
+    vi.mocked(api.getStockStory).mockResolvedValue(story);
+    const result = await fetchUnifiedResearch("RELIANCE", "Reliance Industries", "Energy", null, false);
+    
+    // Strengths list has duplicate in research: "Business quality", "Business quality"
+    // Risks has: "Valuation context", "Risk context" vs keyRisks "Valuation context"
+    const strengths = result.prediction.topPositiveDrivers;
+    const risks = result.prediction.topRiskDrivers;
+
+    expect(strengths).toEqual(["Business quality"]);
+    expect(risks).toEqual(["Valuation context", "Risk context"]);
+  });
+
+  it("strictly emits no forbidden public copy like Buy, Sell, Hold, price target, etc.", async () => {
+    vi.mocked(api.getCompanyResearch).mockResolvedValue(research);
+    vi.mocked(api.getStockStory).mockResolvedValue(story);
+    const result = await fetchUnifiedResearch("RELIANCE", "Reliance Industries", "Energy", null, false);
+    const serialized = JSON.stringify(result);
+
+    const forbiddenPatterns = [
+      /\bBuy\b/i, /\bSell\b/i, /\bHold\b/i, /\bStrong Buy\b/i, /\bBuy now\b/i,
+      /target price/i, /price target/i, /stop-loss/i, /guaranteed return/i,
+      /data unavailable/i, /SYMBOL_NOT_IN_UNIVERSE/i, /PREDICTION_NOT_FOUND/i,
+      /RESEARCH_UNAVAILABLE/i, /calibration/i, /backtest/i, /debug/i,
+      /Unhealthy/i, /Very Unhealthy/i
+    ];
+
+    forbiddenPatterns.forEach((pattern) => {
+      expect(serialized).not.toMatch(pattern);
+    });
+  });
 });
+

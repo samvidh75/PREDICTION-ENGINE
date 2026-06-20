@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Briefcase, Search, ShieldCheck, TrendingUp, AlertCircle, ArrowLeftRight, BookOpen, Eye, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, Search, ShieldCheck, TrendingUp, AlertCircle, ArrowLeftRight, BookOpen, Eye, Sparkles } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { ProductAction, productNavigate } from "../components/product/ProductUI";
 import ScorePill from "../components/ui/ScorePill";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { formatNumber } from "../services/ui/dataFormatting";
 import { PremiumCommandButton } from "../components/intelligence/PremiumCommandButton";
 import { FirstRunGuide } from "../components/onboarding/FirstRunGuide";
 import { ResearchWorkflowRail } from "../components/intelligence/ResearchWorkflowRail";
@@ -55,11 +54,6 @@ export const DashboardHub: React.FC = () => {
     return [...unique].slice(0, 8);
   }, [watchlists]);
 
-  const handleSearchSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (searchQuery.trim()) navigate("search", searchQuery.trim());
-  };
-
   return (
     <div className="w-full overflow-x-hidden px-4 pb-20 pt-6 sm:px-6">
       <FirstRunGuide />
@@ -67,19 +61,19 @@ export const DashboardHub: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-base font-semibold text-[#E6EDF3]">Research Command Centre</h1>
+          <TrendingUp className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
+          <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research command center</h1>
         </div>
-        <p className="mt-1 text-xs text-[#9AA7B5]">Search, discover, compare, and track — understand the stock before you invest.</p>
+        <p className="mt-1 text-sm text-[#9AA7B5]">What should you research next? Screen Indian equities, review scored models, or build comparison matrixes.</p>
       </div>
 
       {/* Command search */}
       <div className="mb-6">
-        <PremiumCommandButton onClick={() => navigate("search")} placeholder="Search company to begin research..." />
+        <PremiumCommandButton onClick={() => navigate("search")} placeholder="Search symbol or sector to begin research..." />
       </div>
 
       {/* Start with research */}
-      <RoundedDepthPanel padding="md" className="mb-6">
+      <RoundedDepthPanel padding="md" className="mb-6 border border-white/[0.08]">
         <h2 className="text-xs font-semibold text-[#E6EDF3]">Start with research</h2>
         <p className="mt-1 text-[10px] text-[#9AA7B5]">Choose a strategy to discover companies worth researching.</p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -96,23 +90,23 @@ export const DashboardHub: React.FC = () => {
 
       {/* Quick actions cluster */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <button type="button" onClick={() => navigate("scanner")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-          <Search className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+        <button type="button" onClick={() => navigate("scanner")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+          <Search className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
           <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Open scanner</span>
           <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Discover research candidates</span>
         </button>
-        <button type="button" onClick={() => navigate("rankings")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-          <BarChart3 className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+        <button type="button" onClick={() => navigate("rankings")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+          <BarChart3 className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
           <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">View rankings</span>
           <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Browse scored companies</span>
         </button>
-        <button type="button" onClick={() => navigate("compare")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-          <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+        <button type="button" onClick={() => navigate("compare")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+          <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
           <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Compare companies</span>
           <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Side-by-side research</span>
         </button>
-        <button type="button" onClick={() => navigate("watchlist")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-          <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
+        <button type="button" onClick={() => navigate("watchlist")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+          <Eye className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
           <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Review watchlist</span>
           <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Track thesis changes</span>
         </button>
@@ -121,7 +115,7 @@ export const DashboardHub: React.FC = () => {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           {/* What changed preview */}
-          <RoundedDepthPanel padding="md">
+          <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-[#F59E0B]" aria-hidden="true" />
               <h2 className="text-xs font-semibold text-[#E6EDF3]">What changed</h2>
@@ -134,36 +128,8 @@ export const DashboardHub: React.FC = () => {
             </div>
           </RoundedDepthPanel>
 
-          {/* Rankings preview */}
-          <RoundedDepthPanel padding="md">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">Research rankings</h2>
-            </div>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Browse the full rankings to explore scored companies with factor context and explanation.</p>
-            <div className="mt-3">
-              <Button type="button" size="sm" onClick={() => navigate("rankings")}>
-                Open rankings <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Button>
-            </div>
-          </RoundedDepthPanel>
-
-          {/* Compare prompt */}
-          <RoundedDepthPanel padding="md">
-            <div className="flex items-center gap-2">
-              <ArrowLeftRight className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">Compare companies</h2>
-            </div>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Add up to 3 companies to see a side-by-side breakdown and decide which deserves deeper investigation.</p>
-            <div className="mt-3">
-              <Button type="button" size="sm" onClick={() => navigate("compare")}>
-                Open compare <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Button>
-            </div>
-          </RoundedDepthPanel>
-
           {/* Methodology note */}
-          <RoundedDepthPanel padding="md">
+          <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
             <div className="flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
               <h2 className="text-xs font-semibold text-[#E6EDF3]">How StockStory thinks</h2>
@@ -179,13 +145,13 @@ export const DashboardHub: React.FC = () => {
 
         {/* Right rail */}
         <div className="space-y-6">
-          <RoundedDepthPanel padding="sm">
+          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
             <h3 className="text-xs font-semibold text-[#E6EDF3]">Research workflow</h3>
             <ResearchWorkflowRail className="mt-3" />
           </RoundedDepthPanel>
 
           {/* Tracked companies */}
-          <RoundedDepthPanel padding="sm">
+          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
             <h3 className="text-xs font-semibold text-[#E6EDF3]">Tracked companies</h3>
             {followedTickers.length === 0 ? (
               <div>
@@ -222,7 +188,7 @@ export const DashboardHub: React.FC = () => {
           </RoundedDepthPanel>
 
           {/* Recently explored */}
-          <RoundedDepthPanel padding="sm">
+          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
             <h3 className="text-xs font-semibold text-[#E6EDF3]">Recently explored</h3>
             {recentResearch.slice(0, 6).length === 0 ? (
               <p className="mt-2 text-xs text-[#9AA7B5]">Search for a company to begin research.</p>

@@ -97,7 +97,7 @@ describe('DashboardHub states', () => {
 
   it('shows empty recent state', () => {
     renderDashboard();
-    expect(screen.getByText('Research Command Centre')).toBeInTheDocument();
+    expect(screen.getByText('Research command center')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {

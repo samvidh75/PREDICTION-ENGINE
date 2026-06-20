@@ -6,9 +6,6 @@ import { api, type ScannerResultItem } from "../services/api/client";
 import Table from "../components/ui/Table";
 import Input from "../components/ui/Input";
 import CustomSelect from "../components/ui/CustomSelect";
-import ScorePill from "../components/ui/ScorePill";
-import { formatRank } from "../services/ui/dataFormatting";
-import ResearchContextLink from "../components/research/ResearchContextLink";
 import { signalLabelFromScore } from "../lib/product/signalLabels";
 import { dedupeRankings } from "../lib/product/rankingsDedupe";
 
@@ -38,11 +35,15 @@ export const PublicRankingsPage: React.FC = () => {
       .then((res) => {
         if (ctrl.signal.aborted) return;
         const raw = res.data ?? [];
-        setRankings(dedupeRankings(raw.map((item) => ({
+        // Deduplicate immediately
+        const unique = dedupeRankings(raw);
+        // Recalculate rank numbers sequentially
+        const uniqueWithRanks = unique.map((item, idx) => ({
           ...item,
-          rank: item.rank ?? 0,
-          displayRank: 0,
-        }))));
+          rank: idx + 1,
+          displayRank: idx + 1,
+        }));
+        setRankings(uniqueWithRanks);
         setLoading(false);
       })
       .catch(() => {
@@ -53,7 +54,6 @@ export const PublicRankingsPage: React.FC = () => {
     return () => ctrl.abort();
   }, []);
 
-  // Derive sectors from real data only — ignore null/empty/bad
   const sectors = useMemo(() => {
     const set = new Set<string>();
     rankings.forEach((r) => {
@@ -62,7 +62,6 @@ export const PublicRankingsPage: React.FC = () => {
     return Array.from(set);
   }, [rankings]);
 
-  // Show sector filter only if 2+ useful sectors exist
   const showSectorFilter = sectors.length >= 2;
 
   const filteredRankings = useMemo(() => {
@@ -78,7 +77,6 @@ export const PublicRankingsPage: React.FC = () => {
     });
   }, [rankings, searchText, sectorFilter]);
 
-  // Guest users see 3 rows maximum; authenticated users see all matching rows
   const displayedRankings = useMemo(() => {
     if (!isAuthenticated) {
       return rankings.slice(0, 3);
@@ -97,11 +95,11 @@ export const PublicRankingsPage: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research Shortlist</h1>
-              <p className="mt-1 text-sm text-[#9AA7B5]">
+              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research shortlist</h1>
+              <p className="mt-1.5 text-sm text-[#9AA7B5]">
                 {isAuthenticated
-                  ? "Scored Indian equities — use the shortlist to identify companies worth researching."
-                  : "Institutional-grade research models applied to Indian equities."}
+                  ? "Screened Indian equities. Use this shortlist to prioritize your research queue."
+                  : "Institutional-grade research shortlists applied to Indian equities."}
               </p>
             </div>
             {!isAuthenticated && (
@@ -114,7 +112,7 @@ export const PublicRankingsPage: React.FC = () => {
 
           {/* Authenticated Controls Panel */}
           {isAuthenticated && rankings.length > 0 && (
-            <ProductPanel className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+            <ProductPanel className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between border border-white/[0.08]">
               <div className="relative w-full md:max-w-xs">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-[#64748B]" />
                 <Input
@@ -129,21 +127,19 @@ export const PublicRankingsPage: React.FC = () => {
               {showSectorFilter && (
                 <div className="flex items-center gap-3">
                   <span className="whitespace-nowrap text-xs font-medium text-[#9AA7B5]">Sector:</span>
-                  <div className="relative">
-                    <CustomSelect
-                      aria-label="Sector"
-                      value={sectorFilter}
-                      onChange={(e) => setSectorFilter(e.target.value)}
-                      className="appearance-none bg-[#0D1117] text-[#E6EDF3] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#2962FF]/60"
-                    >
-                      <option value="all">All Sectors</option>
-                      {sectors.map((sec) => (
-                        <option key={sec} value={sec}>
-                          {sec}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </div>
+                  <CustomSelect
+                    aria-label="Sector"
+                    value={sectorFilter}
+                    onChange={(e) => setSectorFilter(e.target.value)}
+                    className="appearance-none bg-[#0D1117] text-[#E6EDF3] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none"
+                  >
+                    <option value="all">All Sectors</option>
+                    {sectors.map((sec) => (
+                      <option key={sec} value={sec}>
+                        {sec}
+                      </option>
+                    ))}
+                  </CustomSelect>
                 </div>
               )}
             </ProductPanel>
@@ -151,19 +147,16 @@ export const PublicRankingsPage: React.FC = () => {
 
           {/* How to read rankings */}
           {isAuthenticated && rankings.length > 0 && (
-            <details className="group rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.015)]">
+            <details className="group rounded-lg border border-white/[0.08] bg-[rgba(255,255,255,0.015)]">
               <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
                 <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-                How to read rankings
+                How to use rankings
                 <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" aria-hidden="true" />
               </summary>
-              <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-3 text-xs leading-relaxed text-[#9AA7B5] space-y-2">
-                <p><strong className="text-[#E6EDF3]">Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
-                <p><strong className="text-[#E6EDF3]">Conviction</strong> — How confident the model is based on data sufficiency. High conviction means more dimensions were verified.</p>
+              <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[#9AA7B5] space-y-2">
+                <p><strong className="text-[#E6EDF3]">Research Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
+                <p><strong className="text-[#E6EDF3]">Conviction</strong> — How confident the model is based on data sufficiency.</p>
                 <p><strong className="text-[#E6EDF3]">No Buy/Sell calls</strong> — StockStory does not issue trading recommendations. Use scores to inform your own research process.</p>
-                <p className="pt-1">
-                  <ResearchContextLink label="Read full research standards" />
-                </p>
               </div>
             </details>
           )}
@@ -171,35 +164,33 @@ export const PublicRankingsPage: React.FC = () => {
           {/* Loading & Empty State */}
           {loading ? (
             <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">
-              Loading rankings...
+              Loading shortlist...
             </div>
           ) : rankings.length === 0 ? (
             <div className="py-12 text-center">
               <Info className="mx-auto h-8 w-8 text-[#64748B]" />
-              <h2 className="mt-3 text-base font-semibold text-[#E6EDF3]">Rankings are being compiled</h2>
+              <h2 className="mt-3 text-base font-semibold text-[#E6EDF3]">Shortlist is being compiled</h2>
               <p className="mt-2 text-xs text-[#9AA7B5]">
                 Rankings appear after verified multi-factor research runs have completed.
               </p>
-              {!isAuthenticated && (
-                <div className="mt-6 flex justify-center gap-3">
-                  <ProductAction onClick={() => productNavigate("signup")}>Create free account</ProductAction>
-                  <ProductAction variant="secondary" onClick={() => productNavigate("methodology")}>Read research standards</ProductAction>
-                </div>
-              )}
             </div>
           ) : (
-            <div className="space-y-6">
-              {/* Desktop Rankings Table */}
-              <div className="hidden md:block">
-                <Table headers={["Rank", "Symbol", "Company", "Sector", "Research Score", "Conviction", "Driver", "Actions"]}>
-                  {displayedRankings.map((r) => {
-                    const realSector = isRealSector(r.sector);
+            <div className="space-y-4">
+              {/* Institutional Grid / List of Cards (Responsive & Clean) */}
+              <div className="space-y-2">
+                {displayedRankings.map((r) => {
+                  const realSector = isRealSector(r.sector);
+                  const sig = rankingsSignalLabel(r.score);
+                  const signalColor = sig?.color ?? "#64748B";
 
-                    return (
-                      <tr
-                        key={r.symbol}
+                  return (
+                    <ProductPanel
+                      key={r.symbol}
+                      className="border border-white/[0.08] hover:border-white/[0.15] transition-all"
+                    >
+                      <div
                         onClick={isAuthenticated ? () => productNavigate("stock", r.symbol) : handleActionRedirect}
-                        className="table-row cursor-pointer"
+                        className="p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
                         tabIndex={0}
                         role="button"
                         onKeyDown={(e) => {
@@ -210,205 +201,71 @@ export const PublicRankingsPage: React.FC = () => {
                           }
                         }}
                       >
-                        {/* Rank */}
-                        <td className="px-6 py-4 font-mono text-sm font-semibold text-[#9AA7B5] tabular-nums">
-                          {formatRank(r.rank)}
-                        </td>
-
-                        {/* Symbol */}
-                        <td className="px-6 py-4 font-mono text-sm font-bold text-[#E6EDF3] hover:underline">
-                          {r.symbol}
-                        </td>
-
-                        {/* Company Name */}
-                        <td className="px-6 py-4 text-sm text-[#9AA7B5] truncate max-w-[220px]">
-                          {r.companyName}
-                        </td>
-
-                        {/* Sector — omit quietly if not available */}
-                        <td className="px-6 py-4 text-sm text-[#9AA7B5]">
-                          {realSector ? r.sector : "—"}
-                        </td>
-
-                        {/* Research Score */}
-                        <td className="px-6 py-4 font-mono">
-                          {isAuthenticated ? (
-                            r.score !== null && r.score !== undefined ? (
-                              <ScorePill score={Math.round(r.score)} />
-                            ) : (
-                              <span className="text-[10px] text-[#64748B]">—</span>
-                            )
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-xs text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
-                              <Lock className="h-3 w-3" /> Gated
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Signal label */}
-                        <td className="px-6 py-4 text-xs font-medium text-[#9AA7B5]">
-                          {isAuthenticated ? (
-                            (() => {
-                              const sig = rankingsSignalLabel(r.score);
-                              if (!sig) return <span className="text-[#64748B]">—</span>;
-                              return (
-                                <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${sig.color}33`, backgroundColor: `${sig.color}15`, color: sig.color }}>
-                                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sig.color }} aria-hidden="true" />
-                                  {sig.label}
-                                </span>
-                              );
-                            })()
-                          ) : (
-                            <span className="text-[#64748B] italic">Sign in to view</span>
-                          )}
-                        </td>
-
-                        {/* Driver column */}
-                        <td className="px-6 py-4 text-[11px] text-[#64748B] max-w-[180px] truncate">
-                          {isAuthenticated ? (r.keyReason || "—") : "—"}
-                        </td>
-
-                        {/* Action Buttons */}
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isAuthenticated) productNavigate("stock", r.symbol);
-                                else handleActionRedirect();
-                              }}
-                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
-                            >
-                              Research
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isAuthenticated) productNavigate("compare", r.symbol);
-                                else handleActionRedirect();
-                              }}
-                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
-                            >
-                              Compare
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isAuthenticated) productNavigate("stock", r.symbol);
-                                else handleActionRedirect();
-                              }}
-                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
-                            >
-                              Track
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isAuthenticated) productNavigate("invest", r.symbol);
-                                else handleActionRedirect();
-                              }}
-                              className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF] transition-colors"
-                            >
-                              Invest
-                            </button>
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Rank Badge */}
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-xs font-bold text-[#9AA7B5] border border-white/[0.08]">
+                            {r.rank}
                           </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </Table>
-              </div>
-
-              {/* Mobile View Cards */}
-              <div className="grid gap-3 md:hidden">
-                {displayedRankings.map((r) => {
-                  const realSector = isRealSector(r.sector);
-
-                  return (
-                    <ProductPanel key={r.symbol} className="p-4 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm font-semibold text-[#9AA7B5] tabular-nums">{formatRank(r.rank)}</span>
-                            <span className="font-mono text-base font-bold text-[#E6EDF3]">{r.symbol}</span>
-                          </div>
-                          <p className="text-xs text-[#9AA7B5] mt-0.5">{r.companyName}</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          {isAuthenticated ? (
-                            <>
-                              {r.score !== null ? <ScorePill score={Math.round(r.score)} /> : <span className="text-[10px] text-[#64748B]">—</span>}
-                              {(rankingsSignalLabel(r.score)) && (
-                                <span className="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[9px] font-medium" style={{ borderColor: `${rankingsSignalLabel(r.score)!.color}33`, backgroundColor: `${rankingsSignalLabel(r.score)!.color}15`, color: rankingsSignalLabel(r.score)!.color }}>
-                                  <span className="h-1 w-1 rounded-full" style={{ backgroundColor: rankingsSignalLabel(r.score)!.color }} aria-hidden="true" />
-                                  {rankingsSignalLabel(r.score)!.label}
-                                </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-sm font-bold text-[#E6EDF3]">{r.symbol}</span>
+                              {realSector && (
+                                <span className="text-[9px] uppercase tracking-wider text-[#64748B] font-semibold">{r.sector}</span>
                               )}
-                            </>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
-                              <Lock className="h-2.5 w-2.5" /> Gated
-                            </span>
-                          )}
+                            </div>
+                            <p className="truncate text-xs text-[#9AA7B5] mt-0.5">{r.companyName}</p>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 text-[10px] font-medium">
-                        {realSector && (
-                          <span className="rounded bg-[rgba(148,163,184,0.08)] border border-[rgba(148,163,184,0.12)] px-1.5 py-0.5 text-[#9AA7B5]">
-                            {r.sector}
+                      <div className="p-4 pt-0 sm:pt-4 flex flex-wrap items-center justify-between sm:justify-end gap-3">
+                        {/* Score & Conviction */}
+                        {isAuthenticated ? (
+                          <>
+                            {r.score !== null && (
+                              <div className="flex items-center gap-1.5 bg-[#2962FF]/10 border border-[#2962FF]/20 px-2 py-0.5 rounded">
+                                <span className="text-[10px] uppercase font-bold text-[#2962FF]">Score</span>
+                                <span className="text-xs font-bold text-[#2962FF] tabular-nums">{Math.round(r.score)}</span>
+                              </div>
+                            )}
+                            {sig && (
+                              <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[#E6EDF3]">
+                                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
+                                {sig.label}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
+                            <Lock className="h-3 w-3" /> Gated
                           </span>
                         )}
-                        <span className="rounded bg-[rgba(148,163,184,0.08)] border border-[rgba(148,163,184,0.12)] px-1.5 py-0.5 text-[#9AA7B5]">
-                          {isAuthenticated ? (r.conviction || "—") : "Sign in to view conviction"}
-                        </span>
-                      </div>
 
-                      <div className="flex flex-wrap gap-2 pt-2 border-t border-[rgba(148,163,184,0.06)]">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isAuthenticated) productNavigate("stock", r.symbol);
-                            else handleActionRedirect();
-                          }}
-                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#E6EDF3] hover:border-[#2962FF]"
-                        >
-                          Research
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isAuthenticated) productNavigate("compare", r.symbol);
-                            else handleActionRedirect();
-                          }}
-                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
-                        >
-                          Compare
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isAuthenticated) productNavigate("stock", r.symbol);
-                            else handleActionRedirect();
-                          }}
-                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
-                        >
-                          Track
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isAuthenticated) productNavigate("invest", r.symbol);
-                            else handleActionRedirect();
-                          }}
-                          className="flex-1 min-w-[80px] rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.02)] py-1.5 text-center text-xs font-semibold text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]"
-                        >
-                          Invest
-                        </button>
+                        {/* Actions cluster */}
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isAuthenticated) productNavigate("stock", r.symbol);
+                              else handleActionRedirect();
+                            }}
+                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[#2962FF] hover:underline"
+                          >
+                            Research
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isAuthenticated) productNavigate("compare", r.symbol);
+                              else handleActionRedirect();
+                            }}
+                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3]"
+                          >
+                            Compare
+                          </button>
+                        </div>
                       </div>
                     </ProductPanel>
                   );
@@ -424,7 +281,7 @@ export const PublicRankingsPage: React.FC = () => {
                   <div className="max-w-md space-y-2">
                     <h2 className="text-lg font-bold tracking-tight text-[#E6EDF3]">Unlock full research rankings</h2>
                     <p className="text-xs leading-5 text-[#9AA7B5]">
-                      Create a free account to unlock our complete universe of scored equities, detailed multi-factor parameters, custom filters, and direct broker handoffs.
+                      Create a free account to unlock our complete universe of scored equities, detailed multi-factor parameters, and direct broker handoffs.
                     </p>
                   </div>
                   <div className="flex flex-col gap-2.5 sm:flex-row pt-2">

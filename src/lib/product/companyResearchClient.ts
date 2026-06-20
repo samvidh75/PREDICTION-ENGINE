@@ -78,7 +78,6 @@ function buildHealthometerFromBackend(data: CompanyResearchData, story?: StockSt
       overallScore,
       overallStatus: dimScores.length >= 7 ? 'Complete' : dimScores.length > 0 ? 'Partial research context' : 'Not enough information for this view yet',
       dimensions: dims,
-      backendLabel,
     },
     label,
   };
@@ -121,6 +120,9 @@ export async function fetchUnifiedResearch(
 
     const { healthometer, label } = buildHealthometerFromBackend(researchData, story);
 
+    const rawDrivers = [...(ic?.keyStrengths ?? []), ...(thesis?.topStrengths ?? [])];
+    const rawRisks = [...(ic?.keyRisks ?? []), ...(thesis?.topRisks ?? [])];
+
     const analysis = {
       companyHealth: ic?.conviction ?? thesis?.status ?? story?.classification ?? null,
       convictionState: ic?.conviction ?? story?.classification ?? null,
@@ -128,11 +130,14 @@ export async function fetchUnifiedResearch(
       thesis: ic?.thesis ?? thesis?.thesis ?? null,
       bullCase: thesis?.bullCase ?? null,
       bearCase: thesis?.bearCase ?? null,
-      keyDrivers: ic?.keyStrengths ?? thesis?.topStrengths ?? [],
-      riskFlags: ic?.keyRisks ?? thesis?.topRisks ?? [],
+      keyDrivers: rawDrivers,
+      riskFlags: rawRisks,
       watchNext: ic?.whatToWatch ?? [],
       investmentChecklist: [],
     };
+
+    const dedupeChips = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
+    const filterForbidden = (arr: string[]) => arr.filter(c => !/\b(Unhealthy|Very Unhealthy|Buy|Sell|Hold|Strong Buy|Buy now|target price|price target|stop-loss|guaranteed return)\b/i.test(c));
 
     const old = buildCompanyResearch(symbol, companyName, sector, rawMetrics, isTracked);
 
@@ -143,8 +148,8 @@ export async function fetchUnifiedResearch(
       confidence: ic?.conviction || story?.confidenceScore ? 'high' : old.prediction.confidence,
       activeFactorCount: healthometer.dimensions.filter(d => d.score !== null).length || old.prediction.activeFactorCount,
       publicResearchStance: normalizeResearchStance(ic?.conviction ?? story?.classification ?? old.prediction.publicResearchStance),
-      topPositiveDrivers: analysis.keyDrivers.slice(0, 3).length > 0 ? analysis.keyDrivers.slice(0, 3) : old.prediction.topPositiveDrivers,
-      topRiskDrivers: analysis.riskFlags.slice(0, 3).length > 0 ? analysis.riskFlags.slice(0, 3) : old.prediction.topRiskDrivers,
+      topPositiveDrivers: dedupeChips(filterForbidden(analysis.keyDrivers.slice(0, 3).length > 0 ? analysis.keyDrivers.slice(0, 3) : old.prediction.topPositiveDrivers)),
+      topRiskDrivers: dedupeChips(filterForbidden(analysis.riskFlags.slice(0, 3).length > 0 ? analysis.riskFlags.slice(0, 3) : old.prediction.topRiskDrivers)),
     };
 
     return {
@@ -160,3 +165,4 @@ export async function fetchUnifiedResearch(
     return fallback();
   }
 }
+
