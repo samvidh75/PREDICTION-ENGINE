@@ -5,6 +5,9 @@ export type ResearchSignalLabel =
   | "Healthy"
   | "Unhealthy"
   | "Very Unhealthy"
+  | "Needs review"
+  | "Risk rising"
+  | "Fragile"
   | "Research signals pending";
 
 export type SignalTone = "constructive" | "neutral" | "caution" | "severe";
@@ -150,16 +153,14 @@ export function computeResearchSignal(
 
   const { label, tone, action } = computeLabel(avgScore, confidence, riskScore);
 
-  const summary =
-    label === "Very Healthy"
-      ? `Strong research case supported by multiple factors.`
-      : label === "Healthy"
-        ? `Moderate research case with identifiable strengths and risks.`
-        : label === "Unhealthy"
-          ? `Below-average metrics or elevated risk indicators detected — review before proceeding.`
-          : label === "Very Unhealthy"
-            ? `Significant risk concerns identified. Exercise caution.`
-            : "Research signals pending — not enough data inputs for a reliable research case.";
+  const summary = (() => {
+    if (label === 'Very Healthy') return 'Strong research case supported by multiple factors.';
+    if (label === 'Healthy') return 'Moderate research case with identifiable strengths and risks.';
+    const ls = label.toLowerCase();
+    if (ls === 'unhealthy' || ls === 'very unhealthy' || ls === 'needs review') return 'Below-average metrics or elevated risk indicators detected — review before proceeding.';
+    if (ls === 'risk rising' || ls === 'fragile') return 'Significant risk concerns identified. Exercise caution.';
+    return 'Research signals pending — not enough data inputs for a reliable research case.';
+  })();
 
   const missingInputs: string[] = [];
   if (factorScores.qualityScore === null) missingInputs.push("Quality score");

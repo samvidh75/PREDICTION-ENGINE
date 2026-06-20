@@ -30,18 +30,14 @@ import { buildPredictionViewModel } from "../lib/product/predictionEngine/predic
 
 
 const getClassificationStyle = (cls: string) => {
-  switch (cls) {
-    case "Very Healthy":
-      return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
-    case "Healthy":
-      return "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.2)] text-[#2962FF]";
-    case "Unhealthy":
-      return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.2)] text-[#F59E0B]";
-    case "Very Unhealthy":
-      return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.2)] text-[#EF4444]";
-    default:
-      return "bg-white/[0.04] border-white/[0.08] text-[#9AA7B5]";
-  }
+  const norm = cls.trim().toLowerCase();
+  if (norm === 'very healthy' || norm === 'very healthy' || cls === 'Very Healthy') return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
+  if (norm === 'healthy') return "bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.25)] text-[#22C55E]";
+  if (norm === 'stable') return "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.25)] text-[#2962FF]";
+  if (norm === 'needs review' || norm === 'unhealthy') return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)] text-[#F59E0B]";
+  if (norm === 'risk rising' || norm === 'very unhealthy') return "bg-[rgba(251,146,60,0.12)] border-[rgba(251,146,60,0.25)] text-[#FB923C]";
+  if (norm === 'fragile') return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.25)] text-[#EF4444]";
+  return "bg-white/[0.04] border-white/[0.08] text-[#9AA7B5]";
 };
 
 const getConfidenceStyle = (conf: string) => {
@@ -274,7 +270,8 @@ export const StockStoryPage: React.FC = () => {
 
   const snapshotLabel = useMemo(() => {
     if (!isInWatchlist) return null;
-    return getSnapshotChangeLabel(ticker, signal?.score ?? null, signal?.label === "Unhealthy" || signal?.label === "Very Unhealthy" ? 30 : null);
+    const labelLower = (signal?.label ?? '').toLowerCase();
+    return getSnapshotChangeLabel(ticker, signal?.score ?? null, labelLower === 'unhealthy' || labelLower === 'very unhealthy' || labelLower === 'risk rising' || labelLower === 'fragile' || labelLower === 'avoid for now' ? 30 : null);
   }, [isInWatchlist, ticker, signal]);
 
   const handleSaveNote = (value: string) => { setNoteText(value); NoteEngine.saveNote(ticker, value); };

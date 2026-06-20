@@ -275,8 +275,8 @@ export const DashboardHub: React.FC = () => {
                     const labelInfo = opp.score !== null && opp.score !== undefined
                       ? opp.score >= 75 ? { label: "Very Healthy", color: "#16A34A" }
                         : opp.score >= 55 ? { label: "Healthy", color: "#2962FF" }
-                          : opp.score >= 40 ? { label: "Unhealthy", color: "#F59E0B" }
-                            : { label: "Very Unhealthy", color: "#EF4444" }
+                          : opp.score >= 40 ? { label: "Needs review", color: "#F59E0B" }
+                            : { label: "Risk rising", color: "#EF4444" }
                       : null;
                     return (
                       <div

@@ -25,7 +25,7 @@ const sections = [
   {
     icon: BarChart3,
     title: "Prediction Engine",
-    body: "The Prediction Engine synthesises available factor data into a single research stance — Healthy, Unhealthy, or Very Unhealthy — along with a numerical score and confidence level. It reflects how much information is available and how consistently the dimensions align. The Prediction Engine does not predict future prices or returns."
+    body: "The Prediction Engine synthesises available factor data into a research stance — such as High conviction, Watch, Needs review, or Risk rising — along with a numerical score and confidence level. It reflects how much information is available and how consistently the dimensions align. The Prediction Engine does not predict future prices or returns."
   },
   {
     icon: Shield,
