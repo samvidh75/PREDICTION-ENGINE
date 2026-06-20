@@ -14,7 +14,7 @@ export function productNavigate(pageKey: string, id?: string): void {
 
 export function ProductShell({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
   return (
-    <div className={`min-h-screen bg-[#060A10] text-[#E8EDF2] antialiased ${className}`}>
+    <div className={`min-h-screen bg-[#070A0F] text-[#E6EDF3] antialiased ${className}`}>
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41,98,255,0.03) 0%, transparent 60%)' }} />
       <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14 z-10">
         {children}
@@ -25,7 +25,7 @@ export function ProductShell({ children, className = "" }: { children: React.Rea
 
 export function ProductPage({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" }): JSX.Element {
   const Component = as;
-  return <Component className={`mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 lg:px-8 ${className}`}>{children}</Component>;
+  return <Component className={`mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 lg:px-6 ${className}`}>{children}</Component>;
 }
 
 export function ProductPageHeader({
@@ -61,7 +61,7 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-200 ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-150 ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
@@ -119,7 +119,7 @@ export function ProductEmptyState({ icon: Icon = Info, title, body, action }: { 
   );
 }
 
-export function ProductLoadingState({ title = "Preparing research context…", body = "Preparing research context…" }: { title?: string; body?: string }): JSX.Element {
+export function ProductLoadingState({ title = "Loading research", body = "Bringing the latest company context into view." }: { title?: string; body?: string }): JSX.Element {
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
       <Loader2 className="h-5 w-5 animate-spin text-[#2962FF]" aria-hidden="true" />
@@ -195,7 +195,7 @@ export function ProductLoadingLine(): JSX.Element {
 export function ProductIntegrityRow(): JSX.Element {
   return (
     <div className="flex flex-wrap gap-2">
-      <ProductStatusPill tone="blue"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Research workspace</ProductStatusPill>
+      <ProductStatusPill tone="blue"><CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Research ready</ProductStatusPill>
     </div>
   );
 }

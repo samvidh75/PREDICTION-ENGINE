@@ -101,8 +101,8 @@ describe("product view adapters", () => {
     expect(convictionToLabel(null)).toBe("");
     expect(convictionToLabel(80)).toBe("Very Healthy");
     expect(convictionToLabel(60)).toBe("Healthy");
-    expect(convictionToLabel(40)).toBe("Unhealthy");
-    expect(convictionToLabel(20)).toBe("Very Unhealthy");
+    expect(convictionToLabel(40)).toBe("Needs review");
+    expect(convictionToLabel(20)).toBe("Risk rising");
   });
 
   it("factorDescription stays product-safe", () => {

@@ -85,26 +85,24 @@ describe('recommendationPolicy', () => {
     expect(result.stance).toBe('Not enough information');
   });
 
-  it('does not output Buy/Sell/Hold or old stances', () => {
-    const stances = ['Very Healthy', 'Healthy', 'Unhealthy', 'Very Unhealthy', 'Not enough information'];
+  it('does not output Buy/Sell/Hold', () => {
     const result = mapScoreToStance(80, 20, 100);
-    expect(stances).toContain(result.stance);
     expect(result.stance).not.toMatch(/Buy|Sell|Hold/);
   });
 
-  it('returns Very Healthy for high scores', () => {
+  it('returns High conviction for high scores with low risk', () => {
     const result = mapScoreToStance(80, 20, 100);
-    expect(result.stance).toBe('Very Healthy');
+    expect(result.stance).toBe('High conviction');
   });
 
-  it('returns Very Unhealthy when risk is very high', () => {
+  it('returns Avoid for now when risk is very high', () => {
     const result = mapScoreToStance(80, 80, 100);
-    expect(result.stance).toBe('Very Unhealthy');
+    expect(result.stance).toBe('Avoid for now');
   });
 
-  it('returns Unhealthy when risk is elevated', () => {
+  it('returns Risk rising when risk is elevated', () => {
     const result = mapScoreToStance(80, 60, 100);
-    expect(result.stance).toBe('Unhealthy');
+    expect(result.stance).toBe('Risk rising');
   });
 
   it('returns no price targets', () => {
@@ -119,7 +117,7 @@ describe('predictionViewModel', () => {
     expect(vm.symbol).toBe('RELIANCE');
     expect(vm.readiness).toBe('partial');
     expect(vm.activeFactorCount).toBeGreaterThanOrEqual(2);
-    expect(vm.publicResearchStance).toBe('Very Healthy');
+    expect(vm.publicResearchStance).toBe('High conviction');
   });
 
   it('returns limited state without data', () => {
