@@ -4,16 +4,15 @@ import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell
 import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
 import { HelpPopover } from "../ui/HelpPopover";
+import { signalLabelFromScore } from "../../lib/product/signalLabels";
 import { signalToneToStatusColor, toneToSeverityClass } from "../../lib/research/researchSignalModel";
 import CustomSelect from "../ui/CustomSelect";
 import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewModel";
 
 function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
-  if (score === null) return null;
-  if (score >= 75) return { label: "Very Healthy", color: "#16A34A", toneClass: "status-dot-active" };
-  if (score >= 55) return { label: "Healthy", color: "#2962FF", toneClass: "status-dot-active" };
-  if (score >= 40) return { label: "Unhealthy", color: "#F59E0B", toneClass: "status-dot-partial" };
-  return { label: "Very Unhealthy", color: "#EF4444", toneClass: "status-dot-blocked" };
+  const t = signalLabelFromScore(score);
+  if (!t) return null;
+  return { label: t.label, color: t.color, toneClass: t.toneClass === 'constructive' || t.toneClass === 'affirmative' ? 'status-dot-active' : t.toneClass === 'warning' ? 'status-dot-partial' : 'status-dot-blocked' };
 }
 
 const SCANNER_PRESETS = [
@@ -169,19 +168,16 @@ export default function ScannerPage() {
   }, [query, allEntries]);
 
   const convictionLabel = useCallback((entry: ScannerResultItem): string => {
-    const score = entry.score ?? null;
-    if (score === null) return "";
-    if (score >= 75) return "Very Healthy";
-    if (score >= 55) return "Healthy";
-    if (score >= 40) return "Unhealthy";
-    return "Very Unhealthy";
+    const labelInfo = signalLabelFromScore(entry.score ?? null);
+    return labelInfo?.label ?? "";
   }, []);
 
   const convictionTone = useCallback((_entry: ScannerResultItem): "verified" | "blue" | "warning" | "muted" => {
-    const label = convictionLabel(_entry);
-    if (label === "Very Healthy") return "verified";
-    if (label === "Healthy") return "blue";
-    if (label === "Unhealthy") return "warning";
+    const labelInfo = signalLabelFromScore(_entry.score ?? null);
+    if (!labelInfo) return "muted";
+    if (labelInfo.toneClass === 'constructive') return "verified";
+    if (labelInfo.toneClass === 'affirmative') return "blue";
+    if (labelInfo.toneClass === 'warning') return "warning";
     return "muted";
   }, [convictionLabel]);
 

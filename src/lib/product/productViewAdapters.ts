@@ -35,8 +35,8 @@ function convictionLabel(score: number | null, confidence: number | null): strin
   if (score === null) return "";
   if (score >= 75 && (confidence === null || confidence >= 60)) return "Very Healthy";
   if (score >= 55) return "Healthy";
-  if (score >= 40) return "Unhealthy";
-  return "Very Unhealthy";
+  if (score >= 40) return "Needs review";
+  return "Risk rising";
 }
 
 function leadingFactor(entry: LeaderboardEntry): string {
@@ -187,8 +187,8 @@ export function convictionToLabel(convictionScore: number | null): string {
   if (convictionScore === null) return "";
   if (convictionScore >= 75) return "Very Healthy";
   if (convictionScore >= 55) return "Healthy";
-  if (convictionScore >= 35) return "Unhealthy";
-  return "Very Unhealthy";
+  if (convictionScore >= 35) return "Needs review";
+  return "Risk rising";
 }
 
 export function factorDescription(factor: string, score: number | null): string {

@@ -36,8 +36,11 @@ export interface FactorDefinition {
 }
 
 export type PublicResearchStance =
-  | "Very Healthy"
-  | "Healthy"
-  | "Unhealthy"
-  | "Very Unhealthy"
+  | "High conviction"
+  | "Watch"
+  | "Needs review"
+  | "Risk rising"
+  | "Thesis improving"
+  | "Avoid for now"
+  | "Partial research context"
   | "Not enough information";

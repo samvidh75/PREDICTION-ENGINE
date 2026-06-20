@@ -9,14 +9,13 @@ import CustomSelect from "../components/ui/CustomSelect";
 import ScorePill from "../components/ui/ScorePill";
 import { formatRank } from "../services/ui/dataFormatting";
 import ResearchContextLink from "../components/research/ResearchContextLink";
+import { signalLabelFromScore } from "../lib/product/signalLabels";
 import { dedupeRankings } from "../lib/product/rankingsDedupe";
 
 function rankingsSignalLabel(score: number | null): { label: string; color: string } | null {
-  if (score === null) return null;
-  if (score >= 75) return { label: "Very Healthy", color: "#16A34A" };
-  if (score >= 55) return { label: "Healthy", color: "#2962FF" };
-  if (score >= 40) return { label: "Unhealthy", color: "#F59E0B" };
-  return { label: "Very Unhealthy", color: "#EF4444" };
+  const t = signalLabelFromScore(score);
+  if (!t) return null;
+  return { label: t.label, color: t.color };
 }
 
 function isRealSector(sector: string | null | undefined): boolean {
