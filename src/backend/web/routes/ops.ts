@@ -876,6 +876,66 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       checkedAt: new Date().toISOString(),
     });
   });
+
+  app.post("/api/ops/run-outcomes", async (request, reply) => {
+    try {
+      const { query: queryFn } = await import("../../../db/index.js");
+      const dryRun = (request.query as Record<string, string>)?.dry === "true";
+      const symbolFilter = (request.query as Record<string, string>)?.symbol || null;
+      const horizonFilter = (request.query as Record<string, string>)?.horizon || null;
+
+      const stats = { checked: 0, created: 0, skippedUnmatured: 0, skippedMissingPrice: 0, skippedMissingPredictionPrice: 0, failed: 0 };
+
+      let sql = `SELECT id, symbol, prediction_date, prediction_horizon,
+                        ranking_score, classification, confidence_score, price_at_prediction
+                 FROM prediction_registry
+                 WHERE ranking_score IS NOT NULL`;
+      const params: string[] = [];
+      if (symbolFilter) { params.push(symbolFilter.toUpperCase()); sql += ` AND UPPER(REPLACE(symbol, ' ', '')) = $${params.length}`; }
+      if (horizonFilter) { params.push(horizonFilter); sql += ` AND prediction_horizon = $${params.length}`; }
+      sql += ' ORDER BY prediction_date DESC LIMIT 500';
+
+      const result = await queryFn(sql, params);
+      const rows = result.rows || [];
+      const labels: string[] = [];
+
+      for (const row of rows) {
+        stats.checked++;
+        const horizon = row.prediction_horizon || 30;
+        const predDate = new Date(row.prediction_date);
+        const targetDate = new Date(predDate.getTime() + horizon * 24 * 60 * 60 * 1000);
+        if (targetDate > new Date()) { stats.skippedUnmatured++; continue; }
+        if (!row.price_at_prediction) { stats.skippedMissingPredictionPrice++; continue; }
+
+        const pr = await queryFn(
+          `SELECT date, close FROM daily_prices WHERE UPPER(REPLACE(symbol, ' ', '')) = $1 AND date <= $2 ORDER BY date DESC LIMIT 1`,
+          [String(row.symbol).toUpperCase().trim(), targetDate.toISOString().slice(0, 10)],
+        );
+        if (!pr.rows?.length) { stats.skippedMissingPrice++; continue; }
+        const priceRow = pr.rows[0];
+        if (!priceRow.close || Number(row.price_at_prediction) <= 0) { stats.skippedMissingPrice++; continue; }
+
+        const realisedReturn = ((Number(priceRow.close) - Number(row.price_at_prediction)) / Number(row.price_at_prediction)) * 100;
+        const dir = realisedReturn > 5 ? 'positive_return' : realisedReturn < -5 ? 'negative_return' : 'flat';
+        const sBucket = Number(row.ranking_score) >= 85 ? '85-100' : Number(row.ranking_score) >= 70 ? '70-84' : Number(row.ranking_score) >= 55 ? '55-69' : Number(row.ranking_score) >= 40 ? '40-54' : Number(row.ranking_score) >= 25 ? '25-39' : '0-24';
+        const cBucket = Number(row.confidence_score) >= 80 ? 'high' : Number(row.confidence_score) >= 60 ? 'medium' : Number(row.confidence_score) >= 40 ? 'low' : 'partial';
+
+        if (dryRun) { labels.push(`${row.symbol} ${horizon}D: score=${row.ranking_score} bucket=${sBucket} return=${realisedReturn.toFixed(2)}% dir=${dir}`); continue; }
+
+        await queryFn(
+          `INSERT INTO prediction_outcomes (prediction_id, symbol, horizon_days, prediction_date, price_at_prediction, realised_price, realised_return_pct, realised_at, direction_result, score_bucket, confidence_bucket, classification_at_prediction)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+           ON CONFLICT (prediction_id) DO UPDATE SET realised_price=EXCLUDED.realised_price, realised_return_pct=EXCLUDED.realised_return_pct, realised_at=EXCLUDED.realised_at, direction_result=EXCLUDED.direction_result, updated_at=NOW()`,
+          [row.id, row.symbol, horizon, row.prediction_date, row.price_at_prediction, priceRow.close, realisedReturn, priceRow.date, dir, sBucket, cBucket, row.classification],
+        );
+        stats.created++;
+      }
+
+      return { ok: true, mode: dryRun ? 'dry-run' : 'apply', stats, samples: labels.length > 0 ? labels.slice(0, 20) : [] };
+    } catch (err: any) {
+      return reply.status(500).send({ ok: false, error: String(err.message || err).slice(0, 500) });
+    }
+  });
 };
 
 export default opsRoutes;
