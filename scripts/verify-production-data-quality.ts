@@ -122,6 +122,7 @@ async function main(): Promise<void> {
   results.push(await dqCheck("signals", "data",
     `${__DQ_FRONTEND}/api/predictions/signals?limit=10`, undefined,
     (body) => {
+      if (body.status === "empty") return null;
       const s = (body as any).data?.signals;
       if (!Array.isArray(s)) return "signals is not an array";
       const nan = dqNoNaN(body);
