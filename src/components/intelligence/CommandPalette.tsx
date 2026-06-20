@@ -104,14 +104,16 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   }, [onClose, selectedIndex, allItems]);
 
   useEffect(() => {
+    let timerId: ReturnType<typeof setTimeout> | undefined;
     if (open) {
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
-      setTimeout(() => { inputRef.current?.focus(); setSelectedIndex(0); }, 80);
+      timerId = setTimeout(() => { inputRef.current?.focus(); setSelectedIndex(0); }, 80);
     }
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      if (timerId) clearTimeout(timerId);
     };
   }, [open, handleKeyDown]);
 

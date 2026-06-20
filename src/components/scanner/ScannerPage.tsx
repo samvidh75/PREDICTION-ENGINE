@@ -187,6 +187,16 @@ export default function ScannerPage() {
 
   const filteredResults = useMemo(() => {
     let filtered = [...results];
+    
+    // Deduplicate on symbol to satisfy uniqueness requirement
+    const seen = new Set<string>();
+    filtered = filtered.filter((r) => {
+      if (!r.symbol) return false;
+      if (seen.has(r.symbol)) return false;
+      seen.add(r.symbol);
+      return true;
+    });
+
     if (filters.scoreRange !== "All") {
       filtered = filtered.filter((e) => {
         if (e.score === null || e.score === undefined) return false;
@@ -405,11 +415,8 @@ export default function ScannerPage() {
               </div>
             </ProductPanel>
           ) : (
-            <div className="space-y-2">
-              <div className="hidden max-md:flex text-xs text-[#9AA7B5]">
-                {sortedResults.length} result{sortedResults.length === 1 ? "" : "s"} found
-              </div>
-              {sortedResults.slice(0, 50).map((entry) => {
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {sortedResults.slice(0, 100).map((entry) => {
                 const fullSymbol = entry.symbol;
                 const item = scannerResultToResearchListItem(entry);
                 const score = entry.score;
@@ -420,75 +427,75 @@ export default function ScannerPage() {
                 const signalInfo = scannerSignalLabel(score);
                 const signalColor = signalInfo?.color ?? "#64748B";
                 return (
-                  <ProductPanel key={fullSymbol} as="article" className="p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          <span className="font-mono text-base font-semibold text-[#E6EDF3]">{fullSymbol}</span>
-                          {entry.rank && (
-                            <span className="text-[10px] font-medium text-[#64748B]">#{entry.rank}</span>
-                          )}
+                  <ProductPanel key={fullSymbol} as="article" className="flex flex-col justify-between p-4 border border-white/[0.08] hover:border-white/[0.15] transition-all">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="font-mono text-sm font-bold text-[#E6EDF3] tracking-wide">{fullSymbol}</span>
+                          <h3 className="truncate text-xs text-[#9AA7B5] mt-0.5">{item.company}</h3>
                         </div>
-                        <p className="truncate text-sm text-[#9AA7B5]">{item.company}</p>
-                        {item.thesis && (
-                          <p className="mt-1.5 text-xs leading-5 text-[#E6EDF3]">{item.thesis}</p>
-                        )}
-                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                          {sector && (
-                            <span className="rounded-sm bg-[rgba(148,163,184,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">{sector}</span>
-                          )}
-                          {signalInfo && (
-                            <span className="inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: `${signalColor}33`, backgroundColor: `${signalColor}15`, color: signalColor }}>
-                              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
-                              {signalInfo.label}
-                            </span>
-                          )}
-                          {score !== null && (
-                            <ProductStatusPill tone="blue">{Math.round(score)}</ProductStatusPill>
-                          )}
-                          {risky && (
-                            <ProductStatusPill tone="warning">Risk rising</ProductStatusPill>
-                          )}
-                        </div>
-                        {item.keyReason && (
-                          <p className="mt-1 text-[11px] leading-4 text-[#64748B]">{item.keyReason}</p>
-                        )}
-                        {item.riskMarker && (
-                          <p className="mt-1 text-[11px] leading-4 text-[#EF4444]">{item.riskMarker}</p>
+                        {score !== null && (
+                          <div className="flex flex-col items-end shrink-0">
+                            <span className="text-xs font-bold text-[#2962FF] tabular-nums bg-[#2962FF]/10 px-2 py-0.5 rounded">{Math.round(score)}</span>
+                          </div>
                         )}
                       </div>
+
+                      {sector && (
+                        <div className="mt-2">
+                          <span className="inline-flex rounded bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#64748B]">{sector}</span>
+                        </div>
+                      )}
+
+                      {item.thesis && (
+                        <p className="mt-3 text-xs leading-relaxed text-[#E6EDF3] line-clamp-2">{item.thesis}</p>
+                      )}
+
+                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                        {signalInfo && (
+                          <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[#E6EDF3]">
+                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
+                            {signalInfo.label}
+                          </span>
+                        )}
+                        {risky && (
+                          <span className="inline-flex rounded bg-[#EF4444]/10 border border-[#EF4444]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#EF4444]">Risk rising</span>
+                        )}
+                      </div>
+
+                      {item.keyReason && (
+                        <p className="mt-2 text-[10px] leading-relaxed text-[#64748B]">{item.keyReason}</p>
+                      )}
+                      {item.riskMarker && (
+                        <p className="mt-1 text-[10px] leading-relaxed text-[#EF4444]">{item.riskMarker}</p>
+                      )}
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-[rgba(148,163,184,0.08)] pt-3">
+
+                    <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
                       <button
                         type="button"
                         onClick={() => handleResearch(fullSymbol)}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#2962FF] bg-[rgba(41,98,255,0.12)] px-3 text-[11px] font-semibold text-white hover:bg-[rgba(41,98,255,0.2)] transition-colors"
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2962FF] hover:text-[#3B71FF] transition-colors"
                       >
-                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                        Research
+                        Research &rarr;
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleCompare(fullSymbol)}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
-                      >
-                        Compare
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleTrack(fullSymbol)}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
-                      >
-                        <Bookmark className="h-3 w-3" aria-hidden="true" />
-                        Track
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleInvest(fullSymbol)}
-                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-transparent px-3 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
-                      >
-                        Invest
-                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCompare(fullSymbol)}
+                          className="text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                        >
+                          Compare
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleTrack(fullSymbol)}
+                          className="text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                        >
+                          Track
+                        </button>
+                      </div>
                     </div>
                   </ProductPanel>
                 );

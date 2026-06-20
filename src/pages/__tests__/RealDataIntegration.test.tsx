@@ -96,7 +96,7 @@ describe('Real Data Integration Pages', () => {
     render(<LayoutProvider><DashboardHub /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Research Command Centre')).toBeInTheDocument();
+      expect(screen.getByText('Research command center')).toBeInTheDocument();
     });
   });
 
@@ -185,7 +185,14 @@ describe('Real Data Integration Pages', () => {
 
   it('PublicRankingsPage shows public teaser when unauthenticated', async () => {
     window.history.replaceState({}, '', '?page=rankings');
-    vi.stubGlobal('fetch', makeMockFetch({}));
+    vi.stubGlobal('fetch', makeMockFetch({
+      '/api/research/scanner': {
+        ok: true,
+        data: [
+          { symbol: 'ITC', companyName: 'ITC Limited', sector: 'Consumer Goods', rank: 1, conviction: 'high', score: 85, oneLineThesis: 'Steady cash flows', keyReason: 'High dividend yield', riskMarker: null }
+        ]
+      }
+    }));
 
     render(
       <LayoutProvider>
@@ -194,7 +201,7 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Research Shortlist')).toBeInTheDocument();
+      expect(screen.getByText('Research shortlist')).toBeInTheDocument();
       expect(screen.getByText('Create free account')).toBeInTheDocument();
     });
   });

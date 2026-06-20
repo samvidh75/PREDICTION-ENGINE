@@ -138,7 +138,7 @@ export const DashboardHub: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
               <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
-              Research Command Centre
+              Research command center
             </div>
             <h1 className="mt-2 text-xl font-semibold tracking-tight text-[#E6EDF3]">Understand the stock before you invest</h1>
             <p className="mt-1 text-xs text-[#9AA7B5]">Search, discover, compare, and track — AI research for Indian equities.</p>

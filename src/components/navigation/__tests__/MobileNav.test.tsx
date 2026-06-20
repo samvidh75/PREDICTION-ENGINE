@@ -22,23 +22,23 @@ function mockCurrentPage(page: string) {
 }
 
 describe('MobileNav authenticated', () => {
-  it('renders Portfolio tab', () => {
+  it('renders Scanner tab', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.getByText('Portfolio')).toBeInTheDocument();
+    expect(screen.getByText('Scanner')).toBeInTheDocument();
   });
 
-  it('renders Compare tab', () => {
+  it('renders Menu tab', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.getByText('Compare')).toBeInTheDocument();
+    expect(screen.getByText('Menu')).toBeInTheDocument();
   });
 
-  it('renders Home, Rankings, Watchlist tabs', () => {
+  it('renders Home, Search, Watchlist tabs', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
     expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Rankings')).toBeInTheDocument();
+    expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Watchlist')).toBeInTheDocument();
   });
 

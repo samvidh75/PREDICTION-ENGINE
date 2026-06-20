@@ -1,30 +1,24 @@
-import React from "react";
-import { ArrowLeftRight, BookOpen, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp, Activity } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowLeftRight, BookOpen, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp, Activity, Menu, X, Settings, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 interface MobileNavItem {
-  page: "dashboard" | "search" | "rankings" | "watchlist" | "portfolio" | "compare" | "alerts" | "methodology";
-  label: string;
-  icon: React.ReactNode;
-}
-
-interface PublicMobileNavItem {
-  page: "landing" | "about" | "rankings" | "login" | "signup" | "scanner";
+  page: "dashboard" | "scanner" | "search" | "watchlist" | "menu";
   label: string;
   icon: React.ReactNode;
 }
 
 export const MobileNav: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const currentPage = (() => {
     if (typeof window === "undefined") return "landing";
     return new URLSearchParams(window.location.search).get("page") ?? "landing";
   })();
 
-  const isPublicMobile = !isAuthenticated || ["landing", "about", "rankings", "login", "signup"].includes(currentPage);
-
   const setPage = (pageKey: string) => {
+    setMenuOpen(false);
     const params = new URLSearchParams(window.location.search);
     params.set("page", pageKey);
     params.delete("id");
@@ -32,81 +26,98 @@ export const MobileNav: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
-  const handlePublicNav = (page: PublicMobileNavItem["page"]) => setPage(page);
-
+  // Modern bottom tabs structure
   const tabs: MobileNavItem[] = [
-    { page: "dashboard", label: "Home", icon: <Home className="icon-nav" /> },
-    { page: "search", label: "Search", icon: <Search className="icon-nav" /> },
-    { page: "rankings", label: "Rankings", icon: <Sparkles className="icon-nav" /> },
-    { page: "watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
-    { page: "portfolio", label: "Portfolio", icon: <TrendingUp className="icon-nav" /> },
+    { page: "dashboard", label: "Home", icon: <Home className="h-5 w-5" /> },
+    { page: "scanner", label: "Scanner", icon: <Search className="h-5 w-5" /> },
+    { page: "search", label: "Search", icon: <Search className="h-5 w-5" /> },
+    { page: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
   ];
 
-  const compareRoute = { page: "compare" as const, label: "Compare", icon: <ArrowLeftRight className="icon-nav" /> };
-  const alertsRoute = { page: "alerts" as const, label: "Alerts", icon: <Activity className="icon-nav" /> };
-
-  const publicTabs: PublicMobileNavItem[] = [
-    { page: "landing", label: "Home", icon: <Home className="icon-nav" /> },
-    { page: "scanner", label: "Scanner", icon: <Search className="icon-nav" /> },
-    { page: "about", label: "Product", icon: <Info className="icon-nav" /> },
-    { page: "login", label: "Sign in", icon: <LogIn className="icon-nav" /> },
+  const menuItems = [
+    { page: "rankings", label: "Rankings", icon: <Sparkles className="h-4 w-4" /> },
+    { page: "compare", label: "Compare", icon: <ArrowLeftRight className="h-4 w-4" /> },
+    { page: "portfolio", label: "Portfolio", icon: <TrendingUp className="h-4 w-4" /> },
+    { page: "alerts", label: "Alerts", icon: <Activity className="h-4 w-4" /> },
+    { page: "methodology", label: "Methodology", icon: <BookOpen className="h-4 w-4" /> },
+    { page: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
   ];
 
   return (
-    <nav className="bottom-nav md:hidden" aria-label="Mobile navigation">
-      {isPublicMobile
-        ? publicTabs.map((tab) => {
-            const isActive = currentPage === tab.page;
-            return (
+    <>
+      <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[90] h-16 border-t border-white/[0.08] bg-[#070A0F]/90 backdrop-blur-xl flex items-center justify-around" aria-label="Mobile navigation">
+        {tabs.map((tab) => {
+          const isActive = currentPage === tab.page;
+          return (
+            <button
+              key={tab.page}
+              type="button"
+              onClick={() => setPage(tab.page)}
+              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[#9AA7B5] hover:text-white transition-colors ${isActive ? "text-[#2962FF] font-semibold" : ""}`}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {tab.icon}
+              <span className="text-[10px] tracking-wide">{tab.label}</span>
+            </button>
+          );
+        })}
+        {/* Menu Toggle button */}
+        <button
+          type="button"
+          onClick={() => setMenuOpen(!menuOpen)}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[#9AA7B5] hover:text-white transition-colors ${menuOpen ? "text-[#2962FF]" : ""}`}
+          aria-label="Toggle menu"
+        >
+          <Menu className="h-5 w-5" />
+          <span className="text-[10px] tracking-wide">Menu</span>
+        </button>
+      </nav>
+
+      {/* Menu overlay drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[100] md:hidden flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="More navigation options">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
+          <div className="relative w-full rounded-t-2xl bg-[#0D1117] border-t border-white/[0.08] p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-10">
+            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+              <h2 className="text-sm font-bold text-[#E6EDF3] tracking-wide">Workspace Options</h2>
               <button
-                key={tab.page}
                 type="button"
-                onClick={() => handlePublicNav(tab.page)}
-                className={`bottom-tab ${isActive ? "bottom-tab-active" : ""}`}
-                aria-current={isActive ? "page" : undefined}
+                onClick={() => setMenuOpen(false)}
+                className="rounded p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                aria-label="Close menu"
               >
-                {tab.icon}
-                <span>{tab.label}</span>
+                <X className="h-5 w-5" />
               </button>
-            );
-          })
-        : (<>{tabs.map((tab) => {
-            const isActive = currentPage === tab.page;
-            return (
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 py-2">
+              {menuItems.map((item) => (
+                <button
+                  key={item.page}
+                  type="button"
+                  onClick={() => setPage(item.page)}
+                  className="flex items-center gap-2.5 rounded-lg border border-white/[0.04] bg-white/[0.01] p-3 text-left text-xs font-semibold text-[#E6EDF3] hover:bg-white/[0.03] transition-colors"
+                >
+                  {item.icon}
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {isAuthenticated && (
               <button
-                key={tab.page}
                 type="button"
-                onClick={() => setPage(tab.page)}
-                className={`bottom-tab ${isActive ? "bottom-tab-active" : ""}`}
-                aria-current={isActive ? "page" : undefined}
+                onClick={() => { setMenuOpen(false); logout(); }}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 py-3 text-xs font-bold text-red-500 hover:bg-red-500/20 transition-all mt-4"
               >
-                {tab.icon}
-                <span>{tab.label}</span>
+                <LogOut className="h-4 w-4" />
+                Sign out
               </button>
-            );
-          })}
-          <button
-            key="compare"
-            type="button"
-            onClick={() => setPage("compare")}
-            className={`bottom-tab ${currentPage === "compare" ? "bottom-tab-active" : ""}`}
-            aria-current={currentPage === "compare" ? "page" : undefined}
-          >
-            {compareRoute.icon}
-            <span>{compareRoute.label}</span>
-          </button>
-          <button
-            key="alerts"
-            type="button"
-            onClick={() => setPage("alerts")}
-            className={`bottom-tab ${currentPage === "alerts" ? "bottom-tab-active" : ""}`}
-            aria-current={currentPage === "alerts" ? "page" : undefined}
-          >
-            {alertsRoute.icon}
-            <span>{alertsRoute.label}</span>
-          </button>
-          </>)}
-    </nav>
+            )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
