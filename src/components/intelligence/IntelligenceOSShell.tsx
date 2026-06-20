@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight, Menu, X } from "lucide-react";
 import { CommandPalette } from "./CommandPalette";
 import ProfileButton from "../navigation/ProfileButton";
@@ -58,6 +58,8 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
   const [commandOpen, setCommandOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(() => getCurrentPageKey());
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handler = () => setCurrentPage(getCurrentPageKey());
@@ -78,7 +80,44 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleMenuKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMenuOpen(false);
+        menuTriggerRef.current?.focus();
+      }
+      if (e.key === "Tab" && menuRef.current) {
+        const focusable = menuRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleMenuKey);
+    const prev = document.activeElement as HTMLElement | null;
+    setTimeout(() => menuRef.current?.querySelector<HTMLElement>("button, [href]")?.focus(), 50);
+    return () => {
+      document.removeEventListener("keydown", handleMenuKey);
+      prev?.focus();
+    };
+  }, [menuOpen]);
+
   return (
+    <>
+      <a href="#ss-main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#2962FF]">
+        Skip to main content
+      </a>
     <div className="flex min-h-screen flex-col bg-[var(--color-canvas)] text-[var(--color-text-primary)] antialiased md:h-dvh">
       <header className="relative z-30 hidden h-14 shrink-0 items-center justify-between gap-4 border-b border-[var(--color-border-light)] bg-[var(--color-surface)]/95 px-5 shadow-[0_12px_40px_rgba(15,23,42,0.18)] backdrop-blur-xl md:flex">
         <span className="text-sm font-semibold tracking-tight text-[var(--color-text-primary)]">StockStory<span className="text-[#16A34A]">.</span>India</span>
@@ -100,7 +139,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
           })}
         </nav>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden pb-20 md:overflow-y-auto md:pb-0">
+        <main id="ss-main-content" className="min-w-0 flex-1 overflow-x-hidden pb-20 md:overflow-y-auto md:pb-0">
           <div className="w-full md:px-6 md:py-6 lg:px-10 xl:px-12">{children}</div>
         </main>
       </div>
@@ -132,20 +171,21 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             <Search className="h-5 w-5" aria-hidden="true" />
             <span className="text-[9px] font-medium uppercase tracking-wider">Search</span>
           </button>
-          <button type="button" onClick={() => setMenuOpen(true)} className="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 text-[var(--color-text-muted)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50" aria-label="Menu">
+          <button ref={menuTriggerRef} type="button" onClick={() => setMenuOpen(true)} className="flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 text-[var(--color-text-muted)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50" aria-label="Menu" aria-haspopup="dialog" aria-expanded={menuOpen}>
             <Menu className="h-5 w-5" aria-hidden="true" />
             <span className="text-[9px] font-medium uppercase tracking-wider">Menu</span>
           </button>
       </nav>
 
       {menuOpen && <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-sm md:hidden" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setMenuOpen(false); }}>
-        <section role="dialog" aria-modal="true" aria-label="Product menu" className="w-full rounded-t-3xl border border-b-0 border-[var(--color-border)] bg-[var(--color-surface)] px-4 pb-8 pt-4 shadow-2xl">
-          <div className="mb-4 flex items-center justify-between px-1"><h2 className="text-sm font-semibold text-[var(--color-text-primary)]">More research tools</h2><button type="button" onClick={() => setMenuOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-xl text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50" aria-label="Close menu"><X className="h-5 w-5" /></button></div>
+        <section ref={menuRef} role="dialog" aria-modal="true" aria-label="Product menu" className="w-full rounded-t-3xl border border-b-0 border-[var(--color-border)] bg-[var(--color-surface)] px-4 pb-8 pt-4 shadow-2xl">
+          <div className="mb-4 flex items-center justify-between px-1"><h2 className="text-sm font-semibold text-[var(--color-text-primary)]" id="ss-mobile-menu-title">More research tools</h2><button type="button" onClick={() => setMenuOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-xl text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50" aria-label="Close menu"><X className="h-5 w-5" /></button></div>
           <div className="grid grid-cols-2 gap-2">{MOBILE_MENU_ROUTES.map((route) => <button key={route.id} type="button" onClick={() => { setMenuOpen(false); navigatePage(route.pageKey); }} className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.025)] px-4 text-left text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"><route.icon className="h-4 w-4 text-[#7EA1FF]" />{route.label}</button>)}</div>
         </section>
       </div>}
 
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
     </div>
+    </>
   );
 }
