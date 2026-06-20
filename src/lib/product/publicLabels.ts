@@ -64,6 +64,15 @@ export function normalizeHealthometerLabel(raw: string | null | undefined): Heal
   return DEPRECATED_TO_HEALTHOMETER[trimmed] ?? 'Not enough information';
 }
 
+export function healthometerLabelFromScore(score: number | null | undefined): HealthometerLabel {
+  if (score === null || score === undefined || !Number.isFinite(score)) return 'Not enough information';
+  if (score >= 80) return 'Very healthy';
+  if (score >= 65) return 'Healthy';
+  if (score >= 45) return 'Stable';
+  if (score >= 30) return 'Needs review';
+  return 'Fragile';
+}
+
 // ── Normalize a label to Research stance canonical label ──
 export function normalizeResearchStance(raw: string | null | undefined): ResearchStanceLabel {
   if (!raw) return 'Not enough information';

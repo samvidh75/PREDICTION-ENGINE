@@ -24,7 +24,7 @@ describe('InvestHandoffSheet', () => {
   it('renders broker not ready state when opened without context', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker handoff is being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review the research first/i)).toBeInTheDocument();
     });
     expect(screen.getByText('Track instead')).toBeInTheDocument();
     expect(screen.getByText('Compare first')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('InvestHandoffSheet', () => {
   it('shows no broker handoff disclaimer in no-broker mode', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker integration is not yet available/i)).toBeInTheDocument();
+      expect(screen.getByText(/Track or compare this company before continuing/i)).toBeInTheDocument();
     });
   });
 
@@ -57,7 +57,7 @@ describe('InvestHandoffSheet', () => {
   it('contains no backend/provider vocabulary', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker handoff is being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review the research first/i)).toBeInTheDocument();
     });
     const body = document.body.textContent || '';
     const violation = hasBackendVocabulary(body);
@@ -67,7 +67,7 @@ describe('InvestHandoffSheet', () => {
   it('contains no forbidden trading language', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker handoff is being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review the research first/i)).toBeInTheDocument();
     });
     const body = document.body.textContent || '';
     const violation = hasForbiddenTradingLanguage(body);
@@ -77,7 +77,7 @@ describe('InvestHandoffSheet', () => {
   it('contains no product-forbidden terms', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker handoff is being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review the research first/i)).toBeInTheDocument();
     });
     const body = document.body.textContent || '';
     const violation = hasProductForbiddenTerms(body);
@@ -87,7 +87,7 @@ describe('InvestHandoffSheet', () => {
   it('contains no render garbage', async () => {
     render(<InvestHandoffSheet open={true} onClose={vi.fn()} symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText(/Broker handoff is being prepared/i)).toBeInTheDocument();
+      expect(screen.getByText(/Review the research first/i)).toBeInTheDocument();
     });
     const body = document.body.textContent || '';
     const violation = hasRenderGarbage(body);

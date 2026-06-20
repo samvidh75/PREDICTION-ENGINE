@@ -36,7 +36,7 @@ export const ProfileButton: React.FC = () => {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
+        <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
           <div className="border-b border-[rgba(148,163,184,0.08)] px-4 py-3">
             <div className="text-xs font-medium text-[#E6EDF3]">{user.displayName || "User"}</div>
             {user.email && <div className="mt-0.5 text-[10px] text-[#64748B]">{user.email}</div>}

@@ -2,6 +2,7 @@ import React from "react";
 import { Activity, Shield, AlertTriangle } from "lucide-react";
 import type { ResearchSignalView } from "../../lib/research/researchSignalModel";
 import { signalToneToStatusColor } from "../../lib/research/researchSignalModel";
+import { normalizeResearchStance } from "../../lib/product/publicLabels";
 
 interface ThesisHealthMeterProps {
   signal: ResearchSignalView | null;
@@ -68,16 +69,17 @@ export const ThesisHealthMeter: React.FC<ThesisHealthMeterProps> = ({ signal, si
 
   const color = signalToneToStatusColor(signal.tone);
   const cfg = SIZE_CONFIG[size];
+  const publicLabel = normalizeResearchStance(signal.label);
 
   return (
-    <div className={`flex ${size === "lg" ? "flex-col gap-4" : "items-center gap-4"} rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4`} role="region" aria-label={`Research signal: ${signal.label}`}>
+    <div className={`flex ${size === "lg" ? "flex-col gap-4" : "items-center gap-4"} rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4`} role="region" aria-label={`Research signal: ${publicLabel}`}>
       <div className="flex items-center gap-4">
         <ScoreRing score={signal.score} size={size} color={color} />
 
         <div className="min-w-0">
           <div className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-0.5 ${signal.tone === "constructive" ? "border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.12)]" : signal.tone === "caution" ? "border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.12)]" : signal.tone === "severe" ? "border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.12)]" : "border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)]"}`}>
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
-            <span className="text-[11px] font-semibold" style={{ color }}>{signal.label}</span>
+            <span className="text-[11px] font-semibold" style={{ color }}>{publicLabel}</span>
           </div>
 
           {showDetails && (

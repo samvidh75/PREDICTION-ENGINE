@@ -262,8 +262,15 @@ export interface StockStoryData {
   predictionHorizon: number;
   rankingScore: number | null;
   healthScore: number | null;
+  healthometer?: {
+    overallScore: number | null;
+    label: string | null;
+    dimensions: Array<{ id: string; label: string; score: number | null; status: string }>;
+  } | null;
   classification: string | null;
-  confidence: string | null;
+  confidence: string | { level: string | null; score: number | null } | null;
+  confidenceLevel?: string | null;
+  confidenceScore?: number | null;
   sector: string | null;
   growth: number | null;
   quality: number | null;

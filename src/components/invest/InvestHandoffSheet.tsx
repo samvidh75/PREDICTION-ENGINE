@@ -114,13 +114,13 @@ export function InvestHandoffSheet({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative z-10 flex max-h-[90vh] w-full flex-col overflow-y-auto rounded-t-2xl border border-b-0 border-[rgba(148,163,184,0.12)] bg-[#0D1117] shadow-2xl sm:max-h-[85vh] sm:w-[480px] sm:rounded-2xl sm:border-b">
+      <div role="dialog" aria-modal="true" aria-labelledby="invest-review-title" className="relative z-10 flex max-h-[90vh] w-full flex-col overflow-y-auto rounded-t-2xl border border-b-0 border-[rgba(148,163,184,0.12)] bg-[#0D1117] shadow-2xl sm:max-h-[85vh] sm:w-[480px] sm:rounded-2xl sm:border-b">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[rgba(148,163,184,0.08)] bg-[#0D1117] px-5 py-3">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#2962FF]/10">
               <FileText className="h-3.5 w-3.5 text-[#2962FF]" />
             </div>
-            <h2 className="text-xs font-semibold text-[#E6EDF3]">Invest review</h2>
+            <h2 id="invest-review-title" className="text-xs font-semibold text-[#E6EDF3]">Invest review</h2>
           </div>
           <button
             type="button"
@@ -144,9 +144,9 @@ export function InvestHandoffSheet({
                 <div className="space-y-5 py-4">
                   <div className="flex flex-col items-center gap-3 rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-6 text-center">
                     <Info className="h-6 w-6 text-[#2962FF]" />
-                    <h3 className="text-sm font-semibold text-[#E6EDF3]">Broker handoff is being prepared.</h3>
+                    <h3 className="text-sm font-semibold text-[#E6EDF3]">Review the research first.</h3>
                     <p className="max-w-xs text-xs leading-5 text-[#9AA7B5]">
-                      Broker integration is not yet available for this company. Track or compare first while you evaluate.
+                      Track or compare this company before continuing to your own broker.
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 pt-2">

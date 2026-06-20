@@ -2,8 +2,8 @@ import type { ProductIdentity, ProductActionResult } from "./productRuntime";
 import type { PredictionViewState } from "./predictionEngine/predictionViewModel";
 import type { HealthometerViewState, HealthometerDimension } from "./predictionEngine/healthometerViewModel";
 import { buildCompanyResearch, buildFinancialSnapshotView, type ResearchState } from "./companyResearchRuntime";
-import { api } from "../../services/api/client";
-import { normalizeHealthometerLabel } from "./publicLabels";
+import { api, type CompanyResearchData, type StockStoryData } from "../../services/api/client";
+import { healthometerLabelFromScore, normalizeHealthometerLabel, normalizeResearchStance } from "./publicLabels";
 
 export interface UnifiedResearchResult {
   identity: ProductIdentity;
@@ -31,13 +31,13 @@ export interface UnifiedResearchResult {
   methodologyNote: string;
 }
 
-function buildHealthometerFromBackend(data: any): { healthometer: HealthometerViewState; label: string | null } {
+function buildHealthometerFromBackend(data: CompanyResearchData, story?: StockStoryData | null): { healthometer: HealthometerViewState; label: string | null } {
   const ic = data?.investContext;
   const thesis = data?.thesis;
   const strengths = thesis?.topStrengths ?? ic?.keyStrengths ?? [];
   const risks = thesis?.topRisks ?? ic?.keyRisks ?? [];
   const conviction = ic?.conviction ?? thesis?.status ?? null;
-  const score = ic?.score ?? null;
+  const score = ic?.score ?? story?.healthometer?.overallScore ?? story?.healthScore ?? null;
 
   const dims: HealthometerDimension[] = [];
   const knownDims = [
@@ -59,11 +59,17 @@ function buildHealthometerFromBackend(data: any): { healthometer: HealthometerVi
   }
 
   knownDims.forEach((dim) => {
-    const s = scoreMap[dim.id] ?? null;
+    const storyDimension = story?.healthometer?.dimensions.find((candidate) => candidate.id === dim.id);
+    const storyScores: Record<string, number | null | undefined> = {
+      quality: story?.quality, valuation: story?.valuation, growth: story?.growth,
+      risk: story?.risk, momentum: story?.momentum,
+    };
+    const s = scoreMap[dim.id] ?? storyDimension?.score ?? storyScores[dim.id] ?? null;
     dims.push({ id: dim.id, label: dim.label, score: s, status: s !== null ? 'verified' : 'insufficient', color: '#64748B' });
   });
 
-  const label = normalizeHealthometerLabel(conviction);
+  const backendLabel = story?.healthometer?.label ?? conviction;
+  const label = backendLabel ? normalizeHealthometerLabel(backendLabel) : healthometerLabelFromScore(score);
   const dimScores = dims.map(d => d.score).filter((s): s is number => s !== null);
   const overallScore = score ?? (dimScores.length > 0 ? Math.round(dimScores.reduce((a, b) => a + b, 0) / dimScores.length) : null);
 
@@ -72,7 +78,7 @@ function buildHealthometerFromBackend(data: any): { healthometer: HealthometerVi
       overallScore,
       overallStatus: dimScores.length >= 7 ? 'Complete' : dimScores.length > 0 ? 'Partial research context' : 'Not enough information for this view yet',
       dimensions: dims,
-      backendLabel: conviction,
+      backendLabel,
     },
     label,
   };
@@ -93,24 +99,32 @@ export async function fetchUnifiedResearch(
 
   if (!symbol) return fallback();
 
+  const [researchResult, storyResult] = await Promise.allSettled([
+    api.getCompanyResearch(symbol, { signal }),
+    api.getStockStory(symbol, 30, { signal }),
+  ]);
+  const data = researchResult.status === "fulfilled" ? researchResult.value?.data : null;
+  const story = storyResult.status === "fulfilled" ? storyResult.value?.data : null;
+  if (!data && !story) return fallback();
+
   try {
-    const res = await api.getCompanyResearch(symbol, { signal });
-    const data = res?.data;
-
-    if (!data) return fallback();
-
-    const ic = data.investContext;
-    const thesis = data.thesis;
-    const hasBackendData = ic?.conviction || (thesis?.status && thesis.status !== 'Research signals pending');
+    const researchData: CompanyResearchData = data ?? {
+      symbol, companyName: companyName || symbol, sector: sector || null, industry: null,
+      quote: null, fundamentals: null, candles: [], factorScores: [], thesis: null,
+      risk: null, history: [], investContext: null,
+    };
+    const ic = researchData.investContext;
+    const thesis = researchData.thesis;
+    const hasBackendData = Boolean(ic?.conviction || (thesis?.status && thesis.status !== 'Research signals pending') || story?.rankingScore !== null);
 
     if (!hasBackendData) return fallback();
 
-    const { healthometer, label } = buildHealthometerFromBackend(data);
+    const { healthometer, label } = buildHealthometerFromBackend(researchData, story);
 
     const analysis = {
-      companyHealth: ic?.conviction ?? thesis?.status ?? null,
-      convictionState: ic?.conviction ?? null,
-      summary: ic?.thesis ?? null,
+      companyHealth: ic?.conviction ?? thesis?.status ?? story?.classification ?? null,
+      convictionState: ic?.conviction ?? story?.classification ?? null,
+      summary: ic?.thesis ?? story?.narrative ?? null,
       thesis: ic?.thesis ?? thesis?.thesis ?? null,
       bullCase: thesis?.bullCase ?? null,
       bearCase: thesis?.bearCase ?? null,
@@ -124,16 +138,18 @@ export async function fetchUnifiedResearch(
 
     const prediction: PredictionViewState = {
       ...old.prediction,
-      overallScore: ic?.score ?? old.prediction.overallScore,
+      readiness: 'ready',
+      overallScore: ic?.score ?? story?.rankingScore ?? old.prediction.overallScore,
+      confidence: ic?.conviction || story?.confidenceScore ? 'high' : old.prediction.confidence,
       activeFactorCount: healthometer.dimensions.filter(d => d.score !== null).length || old.prediction.activeFactorCount,
-      publicResearchStance: ic?.conviction ?? old.prediction.publicResearchStance,
+      publicResearchStance: normalizeResearchStance(ic?.conviction ?? story?.classification ?? old.prediction.publicResearchStance),
       topPositiveDrivers: analysis.keyDrivers.slice(0, 3).length > 0 ? analysis.keyDrivers.slice(0, 3) : old.prediction.topPositiveDrivers,
       topRiskDrivers: analysis.riskFlags.slice(0, 3).length > 0 ? analysis.riskFlags.slice(0, 3) : old.prediction.topRiskDrivers,
     };
 
     return {
       ...old,
-      state: 'ready',
+      state: data ? 'ready' : 'partial',
       message: '',
       prediction,
       healthometer,
