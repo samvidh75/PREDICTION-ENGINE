@@ -467,17 +467,18 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       let predictionV2: Record<string, unknown> | null = null;
       try {
         const fund = fundamentalsView;
+        const pct = (v: number | null | undefined) => v !== null && v !== undefined ? v * 100 : null;
         const v2Input: Record<string, number | null | undefined> = {
           pe_ratio: fund?.peRatio ?? parseFinite(fsRow?.pe_ratio),
           pb_ratio: fund?.pbRatio ?? parseFinite(fsRow?.pb_ratio),
-          return_on_equity: fund?.roe ?? parseFinite(fsRow?.roe),
-          return_on_assets: fund?.roa ?? null,
+          return_on_equity: pct(fund?.roe ?? parseFinite(fsRow?.roe)),
+          return_on_assets: pct(fund?.roa ?? null),
           debt_to_equity: fund?.debtToEquity ?? parseFinite(fsRow?.debt_to_equity),
-          revenue_growth_1y: fund?.revenueGrowth ?? parseFinite(fsRow?.revenue_growth),
-          eps_growth_1y: fund?.epsGrowth ?? parseFinite(fsRow?.eps_growth),
-          operating_margin: fund?.operatingMargin ?? parseFinite(fsRow?.operating_margin),
-          net_margin: fund?.netMargin ?? parseFinite(fsRow?.net_margin),
-          gross_margin: fund?.grossMargin ?? parseFinite(fsRow?.gross_margin),
+          revenue_growth_1y: pct(fund?.revenueGrowth ?? parseFinite(fsRow?.revenue_growth)),
+          eps_growth_1y: pct(fund?.epsGrowth ?? parseFinite(fsRow?.eps_growth)),
+          operating_margin: pct(fund?.operatingMargin ?? parseFinite(fsRow?.operating_margin)),
+          net_margin: pct(fund?.netMargin ?? parseFinite(fsRow?.net_margin)),
+          gross_margin: pct(fund?.grossMargin ?? parseFinite(fsRow?.gross_margin)),
           return_1d: null, return_5d: null, return_1m: null, return_3m: null, return_6m: null, return_1y: null,
           ma_20d_position: null, ma_50d_position: null, ma_200d_position: null,
           distance_from_52w_high: null, distance_from_52w_low: null,
