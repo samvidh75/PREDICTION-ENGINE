@@ -10,7 +10,7 @@ interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
 export const Table: React.FC<TableProps> = ({ headers, children, glass = false, compact = false, className = "", ...props }) => {
   const containerStyles = glass
     ? "w-full overflow-x-auto rounded-xl glass-panel"
-    : "w-full overflow-x-auto rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_18px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.035)]";
+    : "w-full overflow-x-auto rounded-xl border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] shadow-[0_18px_48px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.035)]";
   const cellPadding = compact ? "px-3 py-2.5" : "px-6 py-4";
   return (
     <div className={containerStyles}>
@@ -22,7 +22,7 @@ export const Table: React.FC<TableProps> = ({ headers, children, glass = false, 
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[rgba(148,163,184,0.06)] text-[#E6EDF3]">{children}</tbody>
+        <tbody className="divide-y divide-[rgba(148,163,184,0.06)] text-[var(--color-text-primary)]">{children}</tbody>
       </table>
     </div>
   );

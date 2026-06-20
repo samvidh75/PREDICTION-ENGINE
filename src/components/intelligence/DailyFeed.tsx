@@ -210,7 +210,7 @@ function Card({ signal }: { signal: IntelligenceSignal }) {
     <div className={`border-4 border-black p-4 ${tone}`} style={{ boxShadow: '4px 4px 0px #000' }}>
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="font-semibold uppercase tracking-wide">{signal.symbol}</span>
-        <span className="border-2 border-black bg-[#0D1117] px-2 py-0.5 text-[10px] font-bold uppercase">{badge}</span>
+        <span className="border-2 border-black bg-[var(--color-surface)] px-2 py-0.5 text-[10px] font-bold uppercase">{badge}</span>
       </div>
       <div className="grid grid-cols-3 gap-2 text-xs">
         <div><span className="block text-[9px] font-bold uppercase text-[#64748B]">Previous</span>{displayValue(signal.previousValue)}</div>
@@ -271,7 +271,7 @@ export default function DailyFeed() {
             <h2 className="text-2xl font-semibold uppercase tracking-wider">Daily Intelligence</h2>
             <p className="mt-1 text-sm font-bold">Prediction-registry snapshot differences</p>
           </div>
-          <span className="border-2 border-black bg-[#0D1117] px-3 py-1 text-xs font-bold uppercase">{state.status}</span>
+          <span className="border-2 border-black bg-[var(--color-surface)] px-3 py-1 text-xs font-bold uppercase">{state.status}</span>
         </div>
         <div className="mt-3 grid gap-1 text-[10px] font-medium text-[#9AA7B5] sm:grid-cols-2">
           <span>As of: {state.asOf || 'Not enough information'}</span>

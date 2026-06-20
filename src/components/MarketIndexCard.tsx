@@ -23,7 +23,7 @@ export const MarketIndexCard: React.FC<IndexCardProps> = ({
     <button
       type="button"
       onClick={onSelect}
-      className="group w-full text-left bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6 relative overflow-hidden transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.02)] active:scale-[0.98] select-none cursor-pointer"
+      className="group w-full text-left bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] rounded-none p-6 relative overflow-hidden transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.02)] active:scale-[0.98] select-none cursor-pointer"
     >
       {/* Micro Laser Underline Gradient Shift on Hover */}
       <div

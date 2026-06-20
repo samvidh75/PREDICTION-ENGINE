@@ -71,9 +71,9 @@ export const TrustCentrePage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-base font-semibold text-[#E6EDF3]">How StockStory Thinks</h1>
+            <h1 className="text-base font-semibold text-[var(--color-text-primary)]">How StockStory Thinks</h1>
           </div>
-          <p className="mt-1 text-xs text-[#9AA7B5]">Research methodology — how we evaluate businesses and how to use the product responsibly.</p>
+          <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Research methodology — how we evaluate businesses and how to use the product responsibly.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <ProductAction onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
             <ProductAction onClick={() => productNavigate("about")} variant="secondary">Read mission</ProductAction>
@@ -86,16 +86,16 @@ export const TrustCentrePage: React.FC = () => {
               <div className="flex items-start gap-3">
                 <section.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-[#E6EDF3]">{section.title}</h2>
+                  <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">{section.title}</h2>
                   {section.body && (
-                    <p className="mt-2 text-xs leading-relaxed text-[#9AA7B5]">{section.body}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">{section.body}</p>
                   )}
                   {section.subsections && (
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       {section.subsections.map((sub) => (
                         <div key={sub.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
-                          <h3 className="text-xs font-semibold text-[#E6EDF3]">{sub.label}</h3>
-                          <p className="mt-1 text-[11px] leading-relaxed text-[#9AA7B5]">{sub.detail}</p>
+                          <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">{sub.label}</h3>
+                          <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{sub.detail}</p>
                         </div>
                       ))}
                     </div>

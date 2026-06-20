@@ -95,8 +95,8 @@ export const PublicRankingsPage: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research shortlist</h1>
-              <p className="mt-1.5 text-sm text-[#9AA7B5]">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research shortlist</h1>
+              <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
                 {isAuthenticated
                   ? "Screened Indian equities. Use this shortlist to prioritize your research queue."
                   : "Institutional-grade research shortlists applied to Indian equities."}
@@ -105,7 +105,7 @@ export const PublicRankingsPage: React.FC = () => {
             {!isAuthenticated && (
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-2 w-2 rounded-full bg-[#F59E0B]" />
-                <span className="text-xs text-[#9AA7B5]">Teaser preview</span>
+                <span className="text-xs text-[var(--color-text-secondary)]">Teaser preview</span>
               </div>
             )}
           </div>
@@ -126,12 +126,12 @@ export const PublicRankingsPage: React.FC = () => {
 
               {showSectorFilter && (
                 <div className="flex items-center gap-3">
-                  <span className="whitespace-nowrap text-xs font-medium text-[#9AA7B5]">Sector:</span>
+                  <span className="whitespace-nowrap text-xs font-medium text-[var(--color-text-secondary)]">Sector:</span>
                   <CustomSelect
                     aria-label="Sector"
                     value={sectorFilter}
                     onChange={(e) => setSectorFilter(e.target.value)}
-                    className="appearance-none bg-[#0D1117] text-[#E6EDF3] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none"
+                    className="appearance-none bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none"
                   >
                     <option value="all">All Sectors</option>
                     {sectors.map((sec) => (
@@ -148,29 +148,29 @@ export const PublicRankingsPage: React.FC = () => {
           {/* How to read rankings */}
           {isAuthenticated && rankings.length > 0 && (
             <details className="group rounded-lg border border-white/[0.08] bg-[rgba(255,255,255,0.015)]">
-              <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
+              <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
                 <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
                 How to use rankings
                 <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" aria-hidden="true" />
               </summary>
-              <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[#9AA7B5] space-y-2">
-                <p><strong className="text-[#E6EDF3]">Research Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
-                <p><strong className="text-[#E6EDF3]">Conviction</strong> — How confident the model is based on data sufficiency.</p>
-                <p><strong className="text-[#E6EDF3]">No Buy/Sell calls</strong> — StockStory does not issue trading recommendations. Use scores to inform your own research process.</p>
+              <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[var(--color-text-secondary)] space-y-2">
+                <p><strong className="text-[var(--color-text-primary)]">Research Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
+                <p><strong className="text-[var(--color-text-primary)]">Conviction</strong> — How confident the model is based on data sufficiency.</p>
+                <p><strong className="text-[var(--color-text-primary)]">No Buy/Sell calls</strong> — StockStory does not issue trading recommendations. Use scores to inform your own research process.</p>
               </div>
             </details>
           )}
 
           {/* Loading & Empty State */}
           {loading ? (
-            <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">
+            <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">
               Loading shortlist...
             </div>
           ) : rankings.length === 0 ? (
             <div className="py-12 text-center">
               <Info className="mx-auto h-8 w-8 text-[#64748B]" />
-              <h2 className="mt-3 text-base font-semibold text-[#E6EDF3]">Shortlist is being compiled</h2>
-              <p className="mt-2 text-xs text-[#9AA7B5]">
+              <h2 className="mt-3 text-base font-semibold text-[var(--color-text-primary)]">Shortlist is being compiled</h2>
+              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
                 Rankings appear after verified multi-factor research runs have completed.
               </p>
             </div>
@@ -203,17 +203,17 @@ export const PublicRankingsPage: React.FC = () => {
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Rank Badge */}
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-xs font-bold text-[#9AA7B5] border border-white/[0.08]">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-xs font-bold text-[var(--color-text-secondary)] border border-white/[0.08]">
                             {r.rank}
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-sm font-bold text-[#E6EDF3]">{r.symbol}</span>
+                              <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{r.symbol}</span>
                               {realSector && (
                                 <span className="text-[9px] uppercase tracking-wider text-[#64748B] font-semibold">{r.sector}</span>
                               )}
                             </div>
-                            <p className="truncate text-xs text-[#9AA7B5] mt-0.5">{r.companyName}</p>
+                            <p className="truncate text-xs text-[var(--color-text-secondary)] mt-0.5">{r.companyName}</p>
                           </div>
                         </div>
                       </div>
@@ -229,7 +229,7 @@ export const PublicRankingsPage: React.FC = () => {
                               </div>
                             )}
                             {sig && (
-                              <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[#E6EDF3]">
+                              <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[var(--color-text-primary)]">
                                 <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
                                 {sig.label}
                               </span>
@@ -261,7 +261,7 @@ export const PublicRankingsPage: React.FC = () => {
                               if (isAuthenticated) productNavigate("compare", r.symbol);
                               else handleActionRedirect();
                             }}
-                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[#9AA7B5] hover:text-[#E6EDF3]"
+                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                           >
                             Compare
                           </button>
@@ -279,8 +279,8 @@ export const PublicRankingsPage: React.FC = () => {
                     <Lock className="h-6 w-6 text-[#F59E0B]" />
                   </div>
                   <div className="max-w-md space-y-2">
-                    <h2 className="text-lg font-bold tracking-tight text-[#E6EDF3]">Unlock full research rankings</h2>
-                    <p className="text-xs leading-5 text-[#9AA7B5]">
+                    <h2 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">Unlock full research rankings</h2>
+                    <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
                       Create a free account to unlock our complete universe of scored equities, detailed multi-factor parameters, and direct broker handoffs.
                     </p>
                   </div>

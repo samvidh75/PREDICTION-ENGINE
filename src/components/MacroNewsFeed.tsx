@@ -43,13 +43,13 @@ export const MacroNewsFeed: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6 flex flex-col space-y-5 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] rounded-none p-6 flex flex-col space-y-5 select-none">
       
       {/* Feed Header */}
       <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <Rss className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[var(--color-text-primary)]">
             Macro System Notices
           </span>
         </div>
@@ -61,7 +61,7 @@ export const MacroNewsFeed: React.FC = () => {
         {macroUpdates.map((item) => (
           <div
             key={item.id}
-            className="group flex flex-col space-y-1.5 p-3.5 border border-[rgba(148,163,184,0.16)] bg-[#0D1117] hover:bg-[#111827] hover:shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200"
+            className="group flex flex-col space-y-1.5 p-3.5 border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-raised)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all duration-200"
           >
             <div className="flex items-center justify-between font-mono text-[9px]">
               <span className="text-[#9AA7B5]">SYS.TIME // {item.time}</span>
@@ -70,7 +70,7 @@ export const MacroNewsFeed: React.FC = () => {
               </span>
             </div>
             
-            <h4 className="text-[13px] font-semibold text-[#E6EDF3] leading-tight">
+            <h4 className="text-[13px] font-semibold text-[var(--color-text-primary)] leading-tight">
               {item.title}
             </h4>
             

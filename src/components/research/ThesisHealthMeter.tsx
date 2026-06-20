@@ -40,7 +40,7 @@ function ScoreRing({ score, size, color }: { score: number | null; size: "sm" | 
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center text-center" aria-hidden="true">
-        <span className={`font-semibold tracking-tight tabular-nums text-[#E6EDF3] ${cfg.score}`}>
+        <span className={`font-semibold tracking-tight tabular-nums text-[var(--color-text-primary)] ${cfg.score}`}>
           {score !== null ? Math.round(score) : "—"}
         </span>
         <span className={`font-bold uppercase tracking-widest ${cfg.label}`} style={{ color }}>
@@ -84,7 +84,7 @@ export const ThesisHealthMeter: React.FC<ThesisHealthMeterProps> = ({ signal, si
 
           {showDetails && (
             <div className={`mt-2 flex flex-wrap items-center ${cfg.gap}`}>
-              <span className="inline-flex items-center gap-1 text-[10px] text-[#9AA7B5]">
+              <span className="inline-flex items-center gap-1 text-[10px] text-[var(--color-text-secondary)]">
                 <Shield className="h-3 w-3" aria-hidden="true" />
                 {signal.confidence}% confidence
               </span>
@@ -98,7 +98,7 @@ export const ThesisHealthMeter: React.FC<ThesisHealthMeterProps> = ({ signal, si
 
       {showDetails && signal.summary && (
         <div className="flex flex-col gap-2">
-          <p className="text-xs leading-5 text-[#9AA7B5]">{signal.summary}</p>
+          <p className="text-xs leading-5 text-[var(--color-text-secondary)]">{signal.summary}</p>
 
           {signal.topDrivers.length > 0 && (
             <div className="flex flex-wrap gap-2">

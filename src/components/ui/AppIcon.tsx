@@ -44,8 +44,8 @@ export function IconButton({
   const variantClasses = variant === "primary"
     ? "bg-[#2A6AFF] text-white hover:bg-[#1F52D0] shadow-[0_0_20px_rgba(42,106,255,0.1)]"
     : variant === "surface"
-      ? "border border-[rgba(148,163,184,0.14)] bg-[#0C1119] text-[#9AA7B5] hover:border-[rgba(42,106,255,0.3)] hover:bg-[rgba(42,106,255,0.08)] hover:text-[#E8EDF2]"
-      : "text-[#9AA7B5] hover:text-[#E8EDF2] hover:bg-[rgba(255,255,255,0.04)]";
+      ? "border border-[rgba(148,163,184,0.14)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[rgba(42,106,255,0.3)] hover:bg-[rgba(42,106,255,0.08)] hover:text-[var(--color-text-primary)]"
+      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(15,23,42,0.04)]";
 
   const sizeClasses = size === "xs" ? "h-7 w-7" : size === "sm" ? "h-8 w-8" : size === "md" ? "h-9 w-9" : size === "lg" ? "h-10 w-10" : "h-12 w-12";
   const iconSize: IconSize = size === "xl" ? "lg" : size === "lg" ? "md" : size === "md" ? "sm" : size === "sm" ? "xs" : "xs";

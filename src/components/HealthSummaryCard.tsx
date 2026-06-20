@@ -77,7 +77,7 @@ export const HealthSummaryCard: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] rounded-none p-6 flex flex-col space-y-4 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] rounded-none p-6 flex flex-col space-y-4 select-none">
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
@@ -87,7 +87,7 @@ export const HealthSummaryCard: React.FC = () => {
             Exchange Health Overview
           </span>
         </div>
-        <span className="font-mono text-[9px] text-[#9AA7B5] bg-[#0D1117] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
+        <span className="font-mono text-[9px] text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
           NON-ADVISORY METRIC LENS
         </span>
       </div>
@@ -96,7 +96,7 @@ export const HealthSummaryCard: React.FC = () => {
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left font-sans text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[rgba(148,163,184,0.16)] text-[#9AA7B5] font-mono text-[10px] uppercase tracking-wider">
+            <tr className="border-b border-[rgba(148,163,184,0.16)] text-[var(--color-text-secondary)] font-mono text-[10px] uppercase tracking-wider">
               <th className="pb-2 font-medium">Symbol // Entity</th>
               <th className="pb-2 font-medium">Exchange</th>
               <th className="pb-2 font-medium text-right">Market Cap (Cr)</th>
@@ -111,7 +111,7 @@ export const HealthSummaryCard: React.FC = () => {
               const isCyanAccent = validatedHealth === "VERY HEALTHY" || validatedHealth === "HEALTHY";
               const isMagentaAccent = validatedHealth === "WEAKENING" || validatedHealth === "UNHEALTHY";
 
-              let badgeStyle = "text-[#9AA7B5] bg-[#111827] border-[rgba(148,163,184,0.16)]";
+              let badgeStyle = "text-[var(--color-text-secondary)] bg-[var(--color-surface-raised)] border-[rgba(148,163,184,0.16)]";
               if (isCyanAccent) {
                 badgeStyle = "text-[#06B6D4] bg-[#06B6D4]/5 border-[#06B6D4]/10";
               } else if (isMagentaAccent) {
@@ -126,7 +126,7 @@ export const HealthSummaryCard: React.FC = () => {
                   {/* Symbol & Name */}
                   <td className="py-3">
                     <div className="font-bold text-[#E6EDF3] font-mono">{stock.ticker}</div>
-                    <div className="text-[10px] text-[#9AA7B5] truncate max-w-[150px]">
+                    <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[150px]">
                       {stock.companyName}
                     </div>
                   </td>
@@ -137,7 +137,7 @@ export const HealthSummaryCard: React.FC = () => {
                   </td>
 
                   {/* Market Cap */}
-                  <td className="py-3 font-mono text-right text-[#9AA7B5]">
+                  <td className="py-3 font-mono text-right text-[var(--color-text-secondary)]">
                     ₹{stock.marketCapCr.toLocaleString("en-IN")}
                   </td>
 
@@ -158,7 +158,7 @@ export const HealthSummaryCard: React.FC = () => {
         </table>
       </div>
 
-      <div className="text-[9px] leading-relaxed text-[#9AA7B5] text-center font-mono uppercase tracking-widest pt-2 border-t border-[rgba(148,163,184,0.16)]">
+      <div className="text-[9px] leading-relaxed text-[var(--color-text-secondary)] text-center font-mono uppercase tracking-widest pt-2 border-t border-[rgba(148,163,184,0.16)]">
         Strict Healthometer Matrix // Prohibits Buy Sell Commands
       </div>
     </div>

@@ -12,7 +12,7 @@ export const SignalExplanationPanel: React.FC<SignalExplanationPanelProps> = ({ 
   if (!signal) {
     return (
       <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-        <div className="flex items-center gap-2 text-xs text-[#9AA7B5]">
+        <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
           <Activity className="h-4 w-4 text-[#64748B]" aria-hidden="true" />
           Research signals pending — not enough data for a reliable case.
         </div>
@@ -29,14 +29,14 @@ export const SignalExplanationPanel: React.FC<SignalExplanationPanelProps> = ({ 
           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
           {signal.label}
         </span>
-        <span className="text-[11px] text-[#9AA7B5]">{signal.confidence}% confidence</span>
+        <span className="text-[11px] text-[var(--color-text-secondary)]">{signal.confidence}% confidence</span>
         {signal.dataSufficiency !== "Sufficient" && (
           <span className="text-[10px] text-[#64748B]">· Partial data</span>
         )}
       </div>
 
       {signal.summary && (
-        <p className="text-xs leading-5 text-[#9AA7B5]">{signal.summary}</p>
+        <p className="text-xs leading-5 text-[var(--color-text-secondary)]">{signal.summary}</p>
       )}
 
       {!compact && signal.topDrivers.length > 0 && (

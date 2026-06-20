@@ -7,7 +7,7 @@ export const CustomSelect = forwardRef<HTMLSelectElement, CustomSelectProps>((pr
     <select
       ref={ref}
       {...props}
-      className={`appearance-none bg-[#1e1e2f] text-[#E6EDF3] border border-[#2b2b3a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4c6ef5] ${props.className || ''}`}
+      className={`appearance-none bg-white text-[var(--color-text-primary)] border border-[rgba(148,163,184,0.16)] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2962FF] ${props.className || ''}`}
     >
       {props.children}
     </select>

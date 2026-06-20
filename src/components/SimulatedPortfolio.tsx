@@ -74,7 +74,7 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
   const isHealthyState = portfolioHealth === "VERY HEALTHY" || portfolioHealth === "HEALTHY" || portfolioHealth === "STABLE";
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none flex flex-col space-y-6 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] p-6 rounded-none flex flex-col space-y-6 select-none">
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
@@ -98,7 +98,7 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
 
       {/* Margin Account Balances */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+        <div className="p-3 bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)]">
           <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
             Virtual Cash Bal
           </span>
@@ -107,7 +107,7 @@ export const SimulatedPortfolio: React.FC<SimulatedPortfolioProps> = ({
           </span>
         </div>
 
-        <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+        <div className="p-3 bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)]">
           <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
             Net Equity Val
           </span>

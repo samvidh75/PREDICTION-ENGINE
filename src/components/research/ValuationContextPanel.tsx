@@ -10,7 +10,7 @@ export const ValuationContextPanel: React.FC<ValuationContextPanelProps> = ({ co
   if (!context) {
     return (
       <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-        <p className="text-xs text-[#9AA7B5]">Valuation context is limited for this company.</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">Valuation context is limited for this company.</p>
       </div>
     );
   }
@@ -19,7 +19,7 @@ export const ValuationContextPanel: React.FC<ValuationContextPanelProps> = ({ co
   if (metrics.length === 0) {
     return (
       <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-        <p className="text-xs text-[#9AA7B5]">Valuation context is limited for this company.</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">Valuation context is limited for this company.</p>
       </div>
     );
   }
@@ -31,12 +31,12 @@ export const ValuationContextPanel: React.FC<ValuationContextPanelProps> = ({ co
         {metrics.map((m) => m && (
           <div key={m.label} className="rounded-lg border border-[rgba(148,163,184,0.08)] bg-[rgba(255,255,255,0.015)] p-2.5">
             <div className="text-[9px] font-medium text-[#64748B]">{m.label}</div>
-            <div className="mt-0.5 font-mono text-sm font-bold tabular-nums text-[#E6EDF3]">{formatMetricValue(m)}</div>
+            <div className="mt-0.5 font-mono text-sm font-bold tabular-nums text-[var(--color-text-primary)]">{formatMetricValue(m)}</div>
           </div>
         ))}
       </div>
       {context.interpretation && (
-        <p className="text-[11px] leading-relaxed text-[#9AA7B5]">{context.interpretation}</p>
+        <p className="text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{context.interpretation}</p>
       )}
     </div>
   );

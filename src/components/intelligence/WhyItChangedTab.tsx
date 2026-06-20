@@ -47,7 +47,7 @@ function driverColor(index: number): string {
 }
 
 function driverTextColor(index: number): string {
-  return DRIVER_COLORS[index]?.replace("bg-", "text-") ?? "text-[#64748B]";
+  return DRIVER_COLORS[index]?.replace("bg-", "text-") ?? "text-[var(--color-text-muted)]";
 }
 
 interface WhyItChangedTabProps {
@@ -94,9 +94,9 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
     return (
       <div className="flex flex-col gap-4" aria-busy="true" aria-live="polite">
         {[1, 2, 3].map(i => (
-          <div key={i} className="animate-pulse rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.03)] p-4">
-            <div className="mb-2 h-3 w-2/5 rounded bg-[rgba(148,163,184,0.12)]" />
-            <div className="h-2 w-3/5 rounded bg-[rgba(148,163,184,0.08)]" />
+          <div key={i} className="animate-pulse rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.03)] p-4">
+            <div className="mb-2 h-3 w-2/5 rounded bg-[rgba(15,23,42,0.12)]" />
+            <div className="h-2 w-3/5 rounded bg-[rgba(15,23,42,0.08)]" />
           </div>
         ))}
       </div>
@@ -106,17 +106,17 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
   if (error || !data) {
     return (
       <div className="rounded-xl border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] p-5 text-center">
-        <p className="mb-1 text-sm font-bold text-[#E6EDF3]">Research signals pending</p>
-        <p className="text-xs text-[#9AA7B5]">{error || "Research signals are being prepared for this company."}</p>
+        <p className="mb-1 text-sm font-bold text-[var(--color-text-primary)]">Research signals pending</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">{error || "Research signals are being prepared for this company."}</p>
       </div>
     );
   }
 
   if (!data.classification.from) {
     return (
-      <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.03)] p-5 text-center">
-        <p className="mb-1 text-sm font-bold text-[#E6EDF3]">Research signals pending</p>
-        <p className="text-xs leading-relaxed text-[#9AA7B5]">
+      <div className="rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.03)] p-5 text-center">
+        <p className="mb-1 text-sm font-bold text-[var(--color-text-primary)]">Research signals pending</p>
+        <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
           This is the first prediction for {data.symbol}. Change tracking begins with the next prediction cycle.
         </p>
       </div>
@@ -130,24 +130,24 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
     <div className="flex flex-col gap-4">
       {/* Summary Banner */}
       <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4">
-        <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748B]">What Changed</p>
+        <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">What Changed</p>
         <p className="text-sm font-semibold leading-relaxed text-slate-800">{data.summary}</p>
       </div>
 
       {/* Health Score Delta */}
-      <div className="rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-4">
-        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748B]">Health Score</p>
+      <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">Health Score</p>
         <div className="flex flex-wrap items-center gap-6">
           <div className="text-center">
-            <p className="mb-1 text-[10px] uppercase text-[#64748B]">Yesterday</p>
-            <p className={`text-4xl font-semibold tabular-nums ${hs.delta !== null && hs.delta > 0 ? "text-emerald-600" : "text-[#64748B]"}`}>
+            <p className="mb-1 text-[10px] uppercase text-[var(--color-text-muted)]">Yesterday</p>
+            <p className={`text-4xl font-semibold tabular-nums ${hs.delta !== null && hs.delta > 0 ? "text-emerald-600" : "text-[var(--color-text-muted)]"}`}>
               {hs.from ?? "—"}
             </p>
           </div>
-          <p className="text-2xl font-bold text-[#64748B]">→</p>
+          <p className="text-2xl font-bold text-[var(--color-text-muted)]">→</p>
           <div className="text-center">
-            <p className="mb-1 text-[10px] uppercase text-[#64748B]">Today</p>
-            <p className="text-4xl font-semibold tabular-nums text-[#E6EDF3]">{hs.to}</p>
+            <p className="mb-1 text-[10px] uppercase text-[var(--color-text-muted)]">Today</p>
+            <p className="text-4xl font-semibold tabular-nums text-[var(--color-text-primary)]">{hs.to}</p>
           </div>
           {hs.delta !== null && (
             <div className={`rounded-lg border px-3 py-1 ${hs.delta > 0 ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"}`}>
@@ -159,8 +159,8 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
         </div>
 
         {classChange.changed && (
-          <div className="mt-3 rounded-lg bg-[#111827] px-3 py-2 text-xs">
-            <span className="text-[#64748B]">Classification: </span>
+          <div className="mt-3 rounded-lg bg-[var(--color-surface-raised)] px-3 py-2 text-xs">
+            <span className="text-[var(--color-text-muted)]">Classification: </span>
             <span className={`font-bold ${hs.delta && hs.delta > 0 ? "text-emerald-600" : "text-rose-500"}`}>
               {classChange.from} → {classChange.to}
             </span>
@@ -170,8 +170,8 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
 
       {/* Biggest Drivers */}
       {data.drivers.filter(d => Math.abs(d.delta) >= 3).length > 0 && (
-        <div className="rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-4">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748B]">Biggest Drivers</p>
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">Biggest Drivers</p>
           <div className="flex flex-col gap-2.5">
             {data.drivers.filter(d => Math.abs(d.delta) >= 3).slice(0, 6).map(d => {
               const barWidth = Math.min(Math.abs(d.delta * 2), 100);
@@ -185,20 +185,20 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
                       <span className={`flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-white ${driverColor(rankIdx)}`}>
                         {d.importanceRank}
                       </span>
-                      <span className="text-xs font-semibold text-[#9AA7B5]">{d.factor}</span>
+                      <span className="text-xs font-semibold text-[var(--color-text-secondary)]">{d.factor}</span>
                     </div>
                     <span className={`text-xs font-bold tabular-nums ${d.delta > 0 ? "text-emerald-600" : "text-rose-500"}`}>
                       {d.delta > 0 ? '+' : ''}{d.delta}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-[rgba(148,163,184,0.16)]">
+                    <div className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--color-border)]">
                       <div
                         className={`h-full rounded-full ${barColor} transition-all duration-500 ease-out`}
                         style={{ width: `${barWidth}%` }}
                       />
                     </div>
-                    <span className="min-w-[36px] text-right text-[10px] text-[#64748B]">
+                    <span className="min-w-[36px] text-right text-[10px] text-[var(--color-text-muted)]">
                       {d.percentContribution}%
                     </span>
                   </div>
@@ -211,27 +211,27 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
 
       {/* Factor Contribution Table */}
       {data.factorContributions.length > 1 && (
-        <div className="overflow-auto rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-4">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748B]">Factor Contributions</p>
+        <div className="overflow-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">Factor Contributions</p>
           <table className="w-full border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[rgba(148,163,184,0.16)]">
-                <th className="p-1.5 text-left text-[10px] uppercase text-[#64748B]">Rank</th>
-                <th className="p-1.5 text-left text-[10px] uppercase text-[#64748B]">Factor</th>
-                <th className="p-1.5 text-right text-[10px] uppercase text-[#64748B]">Delta</th>
-                <th className="p-1.5 text-right text-[10px] uppercase text-[#64748B]">Contribution</th>
-                <th className="p-1.5 text-center text-[10px] uppercase text-[#64748B]">Direction</th>
+              <tr className="border-b border-[var(--color-border)]">
+                <th className="p-1.5 text-left text-[10px] uppercase text-[var(--color-text-muted)]">Rank</th>
+                <th className="p-1.5 text-left text-[10px] uppercase text-[var(--color-text-muted)]">Factor</th>
+                <th className="p-1.5 text-right text-[10px] uppercase text-[var(--color-text-muted)]">Delta</th>
+                <th className="p-1.5 text-right text-[10px] uppercase text-[var(--color-text-muted)]">Contribution</th>
+                <th className="p-1.5 text-center text-[10px] uppercase text-[var(--color-text-muted)]">Direction</th>
               </tr>
             </thead>
             <tbody>
               {data.factorContributions.map(fc => (
-                <tr key={fc.factor} className="border-b border-[rgba(148,163,184,0.16)]">
-                  <td className="p-2 tabular-nums text-[#64748B]">#{fc.importanceRank}</td>
-                  <td className="p-2 font-semibold text-[#9AA7B5]">{fc.factor}</td>
+                <tr key={fc.factor} className="border-b border-[var(--color-border)]">
+                  <td className="p-2 tabular-nums text-[var(--color-text-muted)]">#{fc.importanceRank}</td>
+                  <td className="p-2 font-semibold text-[var(--color-text-secondary)]">{fc.factor}</td>
                   <td className={`p-2 text-right font-bold tabular-nums ${fc.delta >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
                     {fc.delta > 0 ? '+' : ''}{fc.delta}
                   </td>
-                  <td className="p-2 text-right tabular-nums text-[#64748B]">{fc.percentContribution}%</td>
+                  <td className="p-2 text-right tabular-nums text-[var(--color-text-muted)]">{fc.percentContribution}%</td>
                   <td className="p-2 text-center">
                     <span className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${fc.direction === 'positive' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-500"}`}>
                       {fc.direction === 'positive' ? '↑ UP' : '↓ DOWN'}
@@ -251,7 +251,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
             <p className="mb-2 text-[11px] font-bold uppercase text-emerald-700">Positives</p>
             <ul className="m-0 flex flex-col gap-1 pl-4">
               {data.positives.map((p, i) => (
-                <li key={i} className="text-xs leading-relaxed text-[#9AA7B5]">{p}</li>
+                <li key={i} className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{p}</li>
               ))}
             </ul>
           </div>
@@ -261,7 +261,7 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
             <p className="mb-2 text-[11px] font-bold uppercase text-rose-600">Negatives</p>
             <ul className="m-0 flex flex-col gap-1 pl-4">
               {data.negatives.map((n, i) => (
-                <li key={i} className="text-xs leading-relaxed text-[#9AA7B5]">{n}</li>
+                <li key={i} className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{n}</li>
               ))}
             </ul>
           </div>
@@ -270,42 +270,42 @@ export default function WhyItChangedTab({ symbol }: WhyItChangedTabProps): JSX.E
 
       {/* Historical Reliability */}
       {data.historicalReliability && (
-        <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
-          <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#64748B]">Historical Reliability</p>
+        <div className="rounded-xl border border-[var(--color-insight-border)] bg-[var(--color-insight-bg)] p-4">
+          <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">Historical Reliability</p>
           <div className="flex flex-wrap items-center gap-5">
             <div>
-              <p className="text-3xl font-semibold text-slate-800">{data.historicalReliability.successRate}%</p>
-              <p className="text-[10px] text-[#64748B]">Success Rate</p>
+              <p className="text-3xl font-semibold text-[var(--color-text-primary)]">{data.historicalReliability.successRate}%</p>
+              <p className="text-[10px] text-[var(--color-text-muted)]">Success Rate</p>
             </div>
-            <div className="h-10 w-px bg-violet-200" />
+            <div className="h-10 w-px bg-[var(--color-insight-border)]" />
             <div>
-              <p className="text-lg font-bold tabular-nums text-[#9AA7B5]">{data.historicalReliability.sampleSize}</p>
-              <p className="text-[10px] text-[#64748B]">Sample Size</p>
+              <p className="text-lg font-bold tabular-nums text-[var(--color-text-secondary)]">{data.historicalReliability.sampleSize}</p>
+              <p className="text-[10px] text-[var(--color-text-muted)]">Sample Size</p>
             </div>
-            <div className="h-10 w-px bg-violet-200" />
+            <div className="h-10 w-px bg-[var(--color-insight-border)]" />
             <div>
               <p className={`text-lg font-bold tabular-nums ${data.historicalReliability.avgAlphaPct >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
                 {data.historicalReliability.avgAlphaPct > 0 ? '+' : ''}{data.historicalReliability.avgAlphaPct}%
               </p>
-              <p className="text-[10px] text-[#64748B]">Avg Alpha</p>
+              <p className="text-[10px] text-[var(--color-text-muted)]">Avg Alpha</p>
             </div>
-            <div className="h-10 w-px bg-violet-200" />
+            <div className="h-10 w-px bg-[var(--color-insight-border)]" />
             <div>
-              <span className="rounded-md border border-violet-200 bg-[#0D1117] px-2.5 py-1 text-[11px] font-bold text-violet-700">
+              <span className="rounded-md border border-[var(--color-insight-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[11px] font-bold text-[var(--color-insight)]">
                 {data.historicalReliability.predictivePower}
               </span>
             </div>
           </div>
-          <p className="mt-2.5 text-[11px] leading-relaxed text-[#64748B]">
-            Signals like this ({data.historicalReliability.signalType}) historically succeeded <strong className="font-semibold text-[#9AA7B5]">{data.historicalReliability.successRate}%</strong> of the time
+          <p className="mt-2.5 text-[11px] leading-relaxed text-[var(--color-text-muted)]">
+            Signals like this ({data.historicalReliability.signalType}) historically succeeded <strong className="font-semibold text-[var(--color-text-secondary)]">{data.historicalReliability.successRate}%</strong> of the time
             with an average alpha of <strong className={`font-semibold ${data.historicalReliability.avgAlphaPct >= 0 ? "text-emerald-600" : "text-rose-500"}`}>{data.historicalReliability.avgAlphaPct > 0 ? '+' : ''}{data.historicalReliability.avgAlphaPct}%</strong>.
-            Based on <strong className="font-semibold text-[#9AA7B5]">{data.historicalReliability.sampleSize}</strong> validated outcomes.
+            Based on <strong className="font-semibold text-[var(--color-text-secondary)]">{data.historicalReliability.sampleSize}</strong> validated outcomes.
           </p>
         </div>
       )}
 
       {/* Generated at */}
-      <p className="text-right text-[9px] text-[#64748B]">
+      <p className="text-right text-[9px] text-[var(--color-text-muted)]">
         Explanation generated {new Date(data.generatedAt).toLocaleString()}
       </p>
     </div>

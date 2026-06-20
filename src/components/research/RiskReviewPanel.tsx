@@ -21,18 +21,18 @@ export const RiskReviewPanel: React.FC<RiskReviewPanelProps> = ({ riskFlags, ove
         ) : (
           <ShieldCheck className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
         )}
-        <span className={`text-[10px] font-bold uppercase tracking-wider ${elevated ? "text-[#EF4444]" : "text-[#9AA7B5]"}`}>
+        <span className={`text-[10px] font-bold uppercase tracking-wider ${elevated ? "text-[#EF4444]" : "text-[var(--color-text-secondary)]"}`}>
           Risk review
         </span>
         {overallRisk && (
-          <span className={`text-[10px] font-medium ${elevated ? "text-[#EF4444]" : "text-[#9AA7B5]"}`}>
+          <span className={`text-[10px] font-medium ${elevated ? "text-[#EF4444]" : "text-[var(--color-text-secondary)]"}`}>
             · {overallRisk}
           </span>
         )}
       </div>
 
       {elevated && (
-        <p className="text-xs leading-5 text-[#9AA7B5]">
+        <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
           Elevated risk indicators detected. Review risk factors and volatility before continuing with this company.
         </p>
       )}
@@ -40,7 +40,7 @@ export const RiskReviewPanel: React.FC<RiskReviewPanelProps> = ({ riskFlags, ove
       {hasFlags && (
         <ul className="space-y-1.5">
           {riskFlags.map((flag, i) => (
-            <li key={i} className="flex items-start gap-2 text-[11px] text-[#9AA7B5]">
+            <li key={i} className="flex items-start gap-2 text-[11px] text-[var(--color-text-secondary)]">
               <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#EF4444]/60" />
               {flag}
             </li>
@@ -49,7 +49,7 @@ export const RiskReviewPanel: React.FC<RiskReviewPanelProps> = ({ riskFlags, ove
       )}
 
       {!elevated && !hasFlags && (
-        <p className="text-xs text-[#9AA7B5]">
+        <p className="text-xs text-[var(--color-text-secondary)]">
           No elevated risk flags detected for this company. Review fundamentals for a complete assessment.
         </p>
       )}

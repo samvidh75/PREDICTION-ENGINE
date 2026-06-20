@@ -26,8 +26,8 @@ function FactorBar({ label, score, explanation }: FactorBarProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium text-[#9AA7B5]">{label}</span>
-        <span className="font-mono text-[11px] font-semibold tabular-nums text-[#E6EDF3]">{Math.round(score)}</span>
+        <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">{label}</span>
+        <span className="font-mono text-[11px] font-semibold tabular-nums text-[var(--color-text-primary)]">{Math.round(score)}</span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
         <div
@@ -53,7 +53,7 @@ export const FactorScorePanel: React.FC<FactorScorePanelProps> = ({ factors }) =
       <ProductPanel className="p-4">
         <div className="flex flex-col items-center gap-2 py-4 text-center">
           <BarChart3 className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
-          <h3 className="text-xs font-semibold text-[#9AA7B5]">Factor scores pending</h3>
+          <h3 className="text-xs font-semibold text-[var(--color-text-secondary)]">Factor scores pending</h3>
           <p className="text-[10px] leading-4 text-[#64748B]">Research signals pending — not enough data inputs for a reliable research case.</p>
         </div>
       </ProductPanel>
@@ -76,7 +76,7 @@ export const FactorScorePanel: React.FC<FactorScorePanelProps> = ({ factors }) =
       <ProductPanel className="p-4">
         <div className="flex flex-col items-center gap-2 py-4 text-center">
           <BarChart3 className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
-          <h3 className="text-xs font-semibold text-[#9AA7B5]">Factor scores pending</h3>
+          <h3 className="text-xs font-semibold text-[var(--color-text-secondary)]">Factor scores pending</h3>
           <p className="text-[10px] leading-4 text-[#64748B]">Research signals pending — not enough data inputs for a reliable research case.</p>
         </div>
       </ProductPanel>
@@ -85,7 +85,7 @@ export const FactorScorePanel: React.FC<FactorScorePanelProps> = ({ factors }) =
 
   return (
     <ProductPanel className="p-4">
-      <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9AA7B5]">Factor Scores</h3>
+      <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)]">Factor Scores</h3>
       <div className="space-y-3">
         {factorsConfig.map((f) => (
           <FactorBar key={f.label} label={f.label} score={f.score} explanation={f.explanation} />
