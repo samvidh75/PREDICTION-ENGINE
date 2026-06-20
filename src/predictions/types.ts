@@ -47,8 +47,8 @@ export interface PredictionRecord {
   sector_score: number;
 
   // Market context at prediction time
-  price_at_prediction: number;
-  benchmark_level: number;         // NIFTY 50 level
+  price_at_prediction: number | null;
+  benchmark_level: number | null;  // NIFTY 50 level
 
   // Forward validation
   prediction_horizon: number;      // days (7, 30, 90, 180, 365)
