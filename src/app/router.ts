@@ -23,7 +23,8 @@ export type PageKey =
   | "compare"
   | "alerts"
   | "invest"
-  | "terms";
+  | "terms"
+  | "ipo";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {
@@ -55,6 +56,7 @@ export function getPageKeyFromUrl(): PageKey {
       compare: "compare",
       alerts: "alerts",
       invest: "invest",
+      ipo: "ipo",
     };
 
     return mapping[raw] ?? "landing";
@@ -96,7 +98,7 @@ export const PROTECTED_PAGES: PageKey[] = [
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "methodology",
-  "rankings", "compare", "scanner",
+  "rankings", "compare", "scanner", "ipo",
 ];
 
 /**

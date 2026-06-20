@@ -26,6 +26,7 @@ import SettingsPage from "../pages/SettingsPage";
 import TrustCentrePage from "../pages/TrustCentrePage";
 import ComparePage from "../pages/ComparePage";
 import AlertsPage from "../pages/AlertsPage";
+import IPOCenterPage from "../pages/IPOCenterPage";
 import AppLayout from "../components/navigation/AppLayout";
 
 interface PageRendererProps {
@@ -68,6 +69,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <ComparePage />;
     case "terms":
       return <TermsPage />;
+    case "ipo":
+      return <IPOCenterPage />;
     default:
       return <PublicLandingPage />;
   }
@@ -99,6 +102,8 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
       return <ComparePage />;
     case "alerts":
       return <AlertsPage />;
+    case "ipo":
+      return <IPOCenterPage />;
     case "dashboard":
     default:
       return <DashboardHub />;
