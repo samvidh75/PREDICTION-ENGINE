@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Search, BarChart3, TrendingUp, Eye, ArrowLeftRight, BookOpen, Briefcase, History } from "lucide-react";
+import { trapFocus } from "../../services/ui/focusTrap";
 
 interface Action {
   id: string;
@@ -84,8 +85,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     action: () => { navigatePage("stock", { id: r.symbol }); onClose(); },
   }))];
 
+  const paletteRef = useRef<HTMLDivElement>(null);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") { onClose(); return; }
+    if (e.key === "Tab" && paletteRef.current) { e.preventDefault(); trapFocus(paletteRef.current, e); return; }
     if (e.key === "ArrowDown") { e.preventDefault(); setSelectedIndex((i) => Math.min(i + 1, allItems.length - 1)); }
     if (e.key === "ArrowUp") { e.preventDefault(); setSelectedIndex((i) => Math.max(i - 1, 0)); }
     if (e.key === "Enter" && allItems[selectedIndex]) {
@@ -136,6 +140,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   return (
     <div
+      ref={paletteRef}
       className="fixed inset-0 z-[60] flex items-start justify-center px-3 pt-[12vh] sm:pt-[18vh]"
       style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(18px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}

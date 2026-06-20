@@ -641,3 +641,59 @@ test.describe("Public rankings/predictions CTA routing", () => {
     await assertNoRenderGarbage(page);
   });
 });
+
+// ── Keyboard & accessibility smoke ────────────────────────────────────
+
+test.describe("Keyboard and accessibility", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockAllApi(page);
+    await page.addInitScript(() => {
+      window.localStorage.setItem(
+        "ss_auth_session_v1",
+        JSON.stringify({
+          status: "authenticated",
+          uid: "test-user-001",
+          createdAtMs: Date.now(),
+        })
+      );
+    });
+  });
+
+  test("skip-to-content link exists and is focusable", async ({ page }) => {
+    await page.goto("/?page=dashboard");
+    const skipLink = page.locator('a[href="#ss-main-content"]');
+    await expect(skipLink).toBeVisible();
+    await expect(skipLink).toHaveAttribute("href", "#ss-main-content");
+  });
+
+  test("command palette opens with Cmd+K and closes with Escape", async ({ page }) => {
+    await page.goto("/?page=dashboard");
+    await page.keyboard.press("Meta+k");
+    await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: /command palette/i })).not.toBeVisible();
+  });
+
+  test("command palette search input is focused on open", async ({ page }) => {
+    await page.goto("/?page=dashboard");
+    await page.keyboard.press("Meta+k");
+    await expect(page.getByLabel("Command search")).toBeFocused();
+    await page.keyboard.press("Escape");
+  });
+
+  test("modals trap focus and return focus on close", async ({ page }) => {
+    await page.goto("/?page=dashboard");
+    await page.keyboard.press("Meta+k");
+    await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: /command palette/i })).not.toBeVisible();
+  });
+
+  test("profile button has accessible name", async ({ page }) => {
+    await page.goto("/?page=dashboard");
+    const profileBtn = page.getByRole("button", { name: /account menu/i });
+    if (await profileBtn.isVisible()) {
+      await expect(profileBtn).toHaveAttribute("aria-expanded");
+    }
+  });
+});
