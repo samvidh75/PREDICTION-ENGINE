@@ -11,6 +11,7 @@ import {
   productNavigate,
 } from "../components/product/ProductUI";
 import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
+import FeatureWelcomeTour from "../components/onboarding/FeatureWelcomeTour";
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
@@ -39,6 +40,7 @@ export function MarketIntelligenceVisual(): JSX.Element {
 export const PublicLandingPage: React.FC = () => {
   return (
     <ProductShell>
+      <FeatureWelcomeTour />
       <ProductPage>
         <ProductHero
           eyebrow="AI research for Indian equities"
@@ -55,8 +57,9 @@ export const PublicLandingPage: React.FC = () => {
         />
 
         <ProductSection>
-          <div className="mb-5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(41,98,255,0.04)] p-4">
-            <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
+          <div className="relative mb-5 overflow-hidden rounded-[22px] border border-blue-100/80 bg-[linear-gradient(120deg,rgba(239,246,255,.9),rgba(255,255,255,.82))] p-5 shadow-[0_16px_38px_rgba(30,64,175,.07)]">
+            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-500 to-violet-500" />
+            <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
               <strong className="text-[var(--color-text-primary)]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
             </p>
           </div>
@@ -70,12 +73,12 @@ export const PublicLandingPage: React.FC = () => {
             </div>
             <ProductIntegrityRow />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 [perspective:1200px]">
             {steps.map(({ icon: Icon, title, body }, i) => (
-              <ProductPanel key={title} className="relative p-4">
-                <span className="absolute right-3 top-3 text-[10px] font-medium text-[#64748B]">{i + 1}</span>
-                <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-                <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
+              <ProductPanel key={title} className="group relative min-h-[190px] overflow-hidden rounded-[22px] p-5 shadow-[0_16px_36px_rgba(15,23,42,.07)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_50px_rgba(30,64,175,.13)]">
+                <span className="absolute right-4 top-4 font-mono text-[10px] font-semibold text-[#94A3B8]">0{i + 1}</span>
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-600 shadow-[inset_0_0_0_1px_rgba(41,98,255,.08)]"><Icon className="h-4 w-4" aria-hidden="true" /></span>
+                <h3 className="mt-5 text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
                 <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
               </ProductPanel>
             ))}
