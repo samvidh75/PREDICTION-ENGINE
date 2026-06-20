@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Compass, Search, X } from "lucide-react";
+import { ArrowRight, Compass, Search, X } from "lucide-react";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
 import { UserJourneyEngine } from "../../services/behavior/UserJourneyEngine";
 import { RegisteredStock } from "../../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../../services/stocks/StockSearchEngine";
-import { CompanyCard } from "../company/CompanyCard";
 
 interface Props {
   onClose: () => void;
@@ -86,9 +85,9 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-black/82 backdrop-blur-2xl flex justify-center items-start pt-14 md:pt-24 px-4 font-sans select-none" role="dialog" aria-modal="true" aria-label="Search companies">
-      <div className="w-full md:w-[760px] rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] border border-white/10 bg-[#161B22]">
-        <div className="flex items-center gap-3.5 px-4 h-[58px] bg-white/[0.045] border-b border-white/10">
+    <div className="fixed inset-0 z-[1000] flex justify-center items-start bg-slate-950/45 px-3 pt-4 backdrop-blur-xl sm:px-4 sm:pt-14 md:pt-24 font-sans select-none" role="dialog" aria-modal="true" aria-label="Search companies">
+      <div className="flex max-h-[88dvh] w-full flex-col overflow-hidden rounded-[24px] border border-white/70 bg-white/95 shadow-[0_28px_90px_rgba(15,23,42,.28)] md:w-[700px]">
+        <div className="flex h-[60px] items-center gap-3.5 border-b border-[var(--color-border)] bg-white/70 px-4">
           <Search className="w-4 h-4 text-[#b2b5be]" />
           <input
             ref={inputRef}
@@ -96,7 +95,7 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
             value={query}
             onChange={(event) => handleSearch(event.target.value)}
             placeholder="Search Indian companies, tickers, or sectors..."
-            className="flex-1 bg-transparent text-[#f0f3fa] border-none outline-none text-[14px] placeholder-[#787b86] font-medium"
+            className="flex-1 bg-transparent text-[var(--color-text-primary)] border-none outline-none text-[14px] placeholder:text-[var(--color-text-muted)] font-medium"
             aria-label="Search companies, tickers, or sectors"
           />
           <button
@@ -112,24 +111,18 @@ export const CommandCentreSearch: React.FC<Props> = ({ onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {results.length > 0 ? (
             results.map((stock, idx) => (
-              <div 
+              <button type="button" onClick={() => handleSelect(stock)}
                 key={stock.symbol} 
-                className={`transition-all duration-150 rounded-xl ${
+                className={`group flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-150 ${
                   idx === activeIndex 
-                    ? "ring-2 ring-[#2962ff] bg-[#2962ff]/10" 
-                    : ""
+                    ? "border-[#2962ff]/40 bg-[#2962ff]/[0.06] shadow-[inset_3px_0_0_#2962ff]"
+                    : "border-[var(--color-border)] bg-white/72 hover:border-[#2962ff]/30 hover:bg-white"
                 }`}
               >
-                <CompanyCard
-                  ticker={stock.symbol}
-                  name={stock.companyName}
-                  sector={stock.sector}
-                  marketCap={stock.marketCap.formatted}
-                  score={getScore(stock) ?? "—"}
-                  whyItMatters={getOneLineReason(stock)}
-                  onOpenBriefing={() => handleSelect(stock)}
-                />
-              </div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2962FF]/10 font-mono text-xs font-bold text-[#3159B7]">{stock.symbol.slice(0, 2)}</div>
+                <div className="min-w-0 flex-1"><div className="flex items-baseline gap-2"><span className="truncate text-sm font-semibold text-[var(--color-text-primary)]">{stock.companyName}</span><span className="font-mono text-[11px] font-semibold text-[var(--color-text-muted)]">{stock.symbol}</span></div><p className="mt-1 truncate text-xs text-[var(--color-text-muted)]">{stock.sector}</p></div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-[var(--color-text-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[#2962FF]" />
+              </button>
             ))
           ) : query.length >= 2 ? (
             <div className="py-12 text-center text-xs text-[#787b86] uppercase tracking-widest font-mono">No matching companies found</div>

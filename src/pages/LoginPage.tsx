@@ -36,8 +36,8 @@ export const LoginPage: React.FC = () => {
         <div className="space-y-5">
           <div className="space-y-2">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Research workspace</div>
-            <h2 className="text-2xl font-semibold tracking-tight text-[#E8EDF2] md:text-3xl">Return to your research.</h2>
-            <p className="max-w-lg text-sm leading-6 text-[#9AA7B5]">Company health, valuation context, risk signals — everything ready to review.</p>
+            <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-3xl">Return to your research.</h2>
+            <p className="max-w-lg text-sm leading-6 text-[var(--color-text-secondary)]">Company health, valuation context, risk signals — everything ready to review.</p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">

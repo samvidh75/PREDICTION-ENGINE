@@ -64,6 +64,8 @@ export default function StockStoryPageF0(): JSX.Element {
   const drivers = allDrivers.length ? allDrivers : ["Business quality", "Financial strength", "Capital efficiency"];
   const allRisks = [...new Set(research.prediction.topRiskDrivers)];
   const risks = allRisks.length ? allRisks : [research.riskContext.overall ?? "Review recent business momentum"];
+  const contextTone = quote.quote ? (quote.quote.changePercent > 0 ? "positive" : quote.quote.changePercent < 0 ? "risk" : "neutral") : score !== null && score >= 70 ? "positive" : score !== null && score < 45 ? "risk" : "neutral";
+  const contextShadow = contextTone === "positive" ? "shadow-[var(--shadow-green-context)]" : contextTone === "risk" ? "shadow-[var(--shadow-red-context)]" : "shadow-[var(--shadow-blue-context)]";
 
   const toggleTrack = () => {
     const list = watchlists[0];
@@ -85,7 +87,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
   return <ProductShell>
     <ProductPage className="max-w-[1320px] !py-5 md:!py-8">
-      <header className="overflow-hidden rounded-2xl border border-[rgba(148,163,184,0.18)] bg-[var(--color-surface)]">
+      <header data-context-tone={contextTone} className={`overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] backdrop-blur-[18px] ${contextShadow}`}>
         <div className="grid gap-6 p-5 md:grid-cols-[1fr_auto] md:p-7">
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -96,13 +98,13 @@ export default function StockStoryPageF0(): JSX.Element {
             <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[38px]">{identity.displayName}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">A decision-ready view of business quality, financial strength, valuation and risk — composed for review, not reaction.</p>
           </div>
-          <div className="flex min-w-[220px] flex-col justify-between gap-4 rounded-xl border border-[rgba(148,163,184,0.14)] bg-[#111827] p-4">
+          <div className="flex min-w-[220px] flex-col justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-white/80 p-4 shadow-[var(--shadow-sm)]">
             <div><div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Price context</div><div className="mt-2 font-mono text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">{price.price}</div>{price.change && <div className={`mt-1 font-mono text-xs tabular-nums ${price.positive ? "text-[#16A34A]" : "text-[#EF4444]"}`}>{price.change}</div>}</div>
             <div className="text-[11px] text-[#64748B]">Updated with the latest available market context</div>
           </div>
         </div>
         {research.message && <div className="border-t border-[rgba(148,163,184,0.12)] px-5 py-3 text-xs text-[var(--color-text-secondary)] md:px-7">{research.message}</div>}
-        <div data-testid="stock-action-cluster" className="flex flex-col gap-2 border-t border-[rgba(148,163,184,0.12)] bg-[#0A0F16] p-4 sm:flex-row sm:flex-wrap md:px-7">
+        <div data-testid="stock-action-cluster" className="flex flex-col gap-2 border-t border-[var(--color-border)] bg-slate-50/70 p-4 sm:flex-row sm:flex-wrap md:px-7">
           {actions.map((action) => <ProductAction key={action.id} variant={action.primary ? "primary" : "secondary"} onClick={() => runAction(action.id)} className="sm:min-w-[120px]">{actionLabel[action.id]}</ProductAction>)}
         </div>
       </header>
@@ -117,13 +119,13 @@ export default function StockStoryPageF0(): JSX.Element {
           <div className="flex items-center justify-between"><div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Prediction Engine</div><Sparkles className="h-4 w-4 text-[#2962FF]" /></div>
           <div className="mt-3 text-xl font-semibold text-[var(--color-text-primary)]">{research.prediction.publicResearchStance}</div>
           <div className="mt-1 text-xs text-[var(--color-text-secondary)]">{research.prediction.confidence} confidence · {research.prediction.activeFactorCount} active signals</div>
-          <div className="mt-5 flex flex-wrap gap-2">{drivers.slice(0, 3).map((driver) => <span key={driver} className="rounded-lg border border-[rgba(41,98,255,0.22)] bg-[rgba(41,98,255,0.08)] px-2.5 py-1.5 text-xs text-[#B8C8FF]">{driver}</span>)}</div>
+          <div className="mt-5 flex flex-wrap gap-2">{drivers.slice(0, 3).map((driver) => <span key={driver} className="rounded-lg border border-[rgba(41,98,255,0.22)] bg-[rgba(41,98,255,0.08)] px-2.5 py-1.5 text-xs text-[#3159B7]">{driver}</span>)}</div>
           <p className="mt-5 text-xs leading-5 text-[var(--color-text-secondary)]">Prediction Engine reflects research context, signal strength, and recent data. Review the thesis and risks before acting.</p>
         </ProductPanel>
         <ProductPanel className="p-5 lg:col-span-1">
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]"><ShieldAlert className="h-4 w-4 text-[#F59E0B]" /> Review first</div>
-          <div className="mt-4 space-y-3">{risks.slice(0, 3).map((risk) => <div key={risk} className="flex gap-2.5 text-sm leading-5 text-[#CDD5DF]"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F59E0B]" />{risk}</div>)}</div>
-          <button onClick={() => productNavigate("compare", ticker)} className="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-[#7EA1FF] hover:text-white">Compare before deciding <ArrowRight className="h-3.5 w-3.5" /></button>
+          <div className="mt-4 space-y-3">{risks.slice(0, 3).map((risk) => <div key={risk} className="flex gap-2.5 text-sm leading-5 text-[var(--color-text-secondary)]"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F59E0B]" />{risk}</div>)}</div>
+          <button onClick={() => productNavigate("compare", ticker)} className="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-[#3159B7] hover:text-[#1E40AF]">Compare before deciding <ArrowRight className="h-3.5 w-3.5" /></button>
         </ProductPanel>
       </section>
 

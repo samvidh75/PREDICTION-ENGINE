@@ -13,6 +13,7 @@ const VIEWPORTS = [
   { width: 430, height: 932 },
   { width: 768, height: 1024 },
   { width: 1024, height: 768 },
+  { width: 1366, height: 768 },
   { width: 1440, height: 900 },
   { width: 1920, height: 1080 },
 ] as const;
@@ -22,6 +23,9 @@ interface Route { name: string; path: string; auth?: boolean; state?: CaptureSta
 
 const ROUTES: Route[] = [
   { name: "home", path: "/?page=landing" },
+  { name: "login", path: "/?page=login" },
+  { name: "signup", path: "/?page=signup" },
+  { name: "about", path: "/?page=about" },
   { name: "stock-CHENNPETRO", path: "/?page=stock&id=CHENNPETRO", auth: true },
   { name: "stock-ITC", path: "/?page=stock&id=ITC", auth: true },
   { name: "stock-RELIANCE", path: "/?page=stock&id=RELIANCE", auth: true },

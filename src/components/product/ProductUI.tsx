@@ -61,7 +61,7 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_8px_24px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-150 ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] backdrop-blur-[18px] transition-all duration-200 hover:shadow-[var(--shadow-card-hover)] ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
@@ -112,8 +112,8 @@ export function ProductEmptyState({ icon: Icon = Info, title, body, action }: { 
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
       <Icon className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
-      <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
-      <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">{body}</p>
+      <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
+      <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
       {action && <div className="mt-4">{action}</div>}
     </ProductPanel>
   );
@@ -154,9 +154,9 @@ export function ProductFormPanel({ children, title, body }: { children: React.Re
   return (
     <ProductPanel className="w-full p-5 sm:p-6">
       <div className="mb-5">
-        <div className="text-sm font-semibold text-[#E6EDF3]">StockStory<span className="text-[#16A34A]">.</span>India</div>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-[#E6EDF3]">{title}</h1>
-        <p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{body}</p>
+        <div className="text-sm font-semibold text-[var(--color-text-primary)]">StockStory<span className="text-[#16A34A]">.</span>India</div>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-[var(--color-text-primary)]">{title}</h1>
+        <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{body}</p>
       </div>
       {children}
     </ProductPanel>
