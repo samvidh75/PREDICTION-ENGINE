@@ -124,7 +124,8 @@ function buildScannerResult(
     };
   }
 
-  const convictionLabel = conviction.overallScore >= 75 ? "Very Healthy" : conviction.overallScore >= 55 ? "Healthy" : conviction.overallScore >= 35 ? "Unhealthy" : "Very Unhealthy";
+  const rawScore = conviction.overallScore;
+  const convictionLabel = rawScore !== null && rawScore >= 75 ? "Very Healthy" : rawScore !== null && rawScore >= 55 ? "Healthy" : rawScore !== null && rawScore >= 35 ? "Needs review" : "Risk rising";
 
   return {
     symbol: input.symbol, companyName: input.companyName, sector: input.sector,

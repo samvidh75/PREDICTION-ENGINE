@@ -15,6 +15,8 @@
  * Skips with summary when env vars are missing.
  */
 
+export {};
+
 const RESET = '\x1b[0m';
 const RED = '\x1b[31m';
 const GREEN = '\x1b[32m';

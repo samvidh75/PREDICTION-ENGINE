@@ -13,6 +13,8 @@
  * Dry-run is the default. Pass --apply to write results.
  */
 
+export {};
+
 const DRY_RUN = !process.argv.includes('--apply');
 const symbolFilter = process.argv.find((a) => a.startsWith('--symbol='))?.split('=')[1] || null;
 const horizonFilter = process.argv.find((a) => a.startsWith('--horizon='))?.split('=')[1] || null;
