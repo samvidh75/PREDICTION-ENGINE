@@ -41,6 +41,13 @@ function computeFactorScore(factor: FactorDefinition, input: FactorInput): Facto
 
 function getFactorValue(factor: FactorDefinition, input: FactorInput): number | null {
   const allData = { ...input.financials, ...input.prices, ...input.metrics, ...input.fundamentals };
+
+  // Direct pre-computed value: if factor ID matches a key in input, use directly
+  const directValue = (allData as Record<string, unknown>)[factor.id];
+  if (typeof directValue === "number" && Number.isFinite(directValue)) {
+    return directValue;
+  }
+
   const vals = factor.requiredRawInputs.map((r) => {
     const v = (allData as any)[r];
     return typeof v === "number" && Number.isFinite(v) ? v : null;
