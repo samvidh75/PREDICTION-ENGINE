@@ -86,13 +86,13 @@ export function normalizeResearchStance(raw: string | null | undefined): Researc
 export function getHealthometerTone(label: HealthometerLabel | string | null | undefined): LabelTone {
   const h = normalizeHealthometerLabel(label);
   switch (h) {
-    case 'Very healthy': return { label: h, color: '#16A34A', bg: 'rgba(22,163,74,0.12)', border: 'rgba(22,163,74,0.3)' };
-    case 'Healthy': return { label: h, color: '#22C55E', bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.25)' };
-    case 'Stable': return { label: h, color: '#2962FF', bg: 'rgba(41,98,255,0.12)', border: 'rgba(41,98,255,0.25)' };
-    case 'Needs review': return { label: h, color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)' };
-    case 'Risk rising': return { label: h, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.25)' };
-    case 'Fragile': return { label: h, color: '#EF4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.25)' };
-    default: return { label: 'Not enough information', color: '#64748B', bg: 'rgba(100,116,139,0.12)', border: 'rgba(100,116,139,0.25)' };
+    case 'Very healthy': return { label: h, color: '#2DD4BF', bg: 'rgba(45,212,191,0.12)', border: 'rgba(45,212,191,0.2)' };
+    case 'Healthy': return { label: h, color: '#5B7CFA', bg: 'rgba(91,124,250,0.12)', border: 'rgba(91,124,250,0.2)' };
+    case 'Stable': return { label: h, color: '#94A3B8', bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.2)' };
+    case 'Needs review': return { label: h, color: '#F4B740', bg: 'rgba(244,183,64,0.12)', border: 'rgba(244,183,64,0.2)' };
+    case 'Risk rising': return { label: h, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.2)' };
+    case 'Fragile': return { label: h, color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.2)' };
+    default: return { label: 'Not enough information', color: '#718096', bg: 'rgba(113,128,150,0.12)', border: 'rgba(113,128,150,0.2)' };
   }
 }
 
@@ -100,13 +100,13 @@ export function getHealthometerTone(label: HealthometerLabel | string | null | u
 export function getResearchStanceTone(stance: ResearchStanceLabel | string | null | undefined): LabelTone {
   const s = normalizeResearchStance(stance);
   switch (s) {
-    case 'High conviction': return { label: s, color: '#16A34A', bg: 'rgba(22,163,74,0.12)', border: 'rgba(22,163,74,0.3)' };
-    case 'Watch': return { label: s, color: '#2962FF', bg: 'rgba(41,98,255,0.12)', border: 'rgba(41,98,255,0.25)' };
-    case 'Thesis improving': return { label: s, color: '#22C55E', bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.25)' };
-    case 'Needs review': return { label: s, color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)' };
-    case 'Risk rising': return { label: s, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.25)' };
-    case 'Avoid for now': return { label: s, color: '#EF4444', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.25)' };
-    default: return { label: 'Not enough information', color: '#64748B', bg: 'rgba(100,116,139,0.12)', border: 'rgba(100,116,139,0.25)' };
+    case 'High conviction': return { label: s, color: '#2DD4BF', bg: 'rgba(45,212,191,0.12)', border: 'rgba(45,212,191,0.2)' };
+    case 'Watch': return { label: s, color: '#5B7CFA', bg: 'rgba(91,124,250,0.12)', border: 'rgba(91,124,250,0.2)' };
+    case 'Thesis improving': return { label: s, color: '#8B5CF6', bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.2)' };
+    case 'Needs review': return { label: s, color: '#F4B740', bg: 'rgba(244,183,64,0.12)', border: 'rgba(244,183,64,0.2)' };
+    case 'Risk rising': return { label: s, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.2)' };
+    case 'Avoid for now': return { label: s, color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.2)' };
+    default: return { label: 'Not enough information', color: '#718096', bg: 'rgba(113,128,150,0.12)', border: 'rgba(113,128,150,0.2)' };
   }
 }
 

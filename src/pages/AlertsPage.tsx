@@ -1,17 +1,13 @@
 import React from "react";
-import { Activity } from "lucide-react";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
+import { Activity, AlertTriangle, TrendingUp, TrendingDown, BarChart3, Eye } from "lucide-react";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate, ProductEmptyState } from "../components/product/ProductUI";
 
-const ALLOWED_CATEGORIES = [
-  "thesis changed",
-  "score changed",
-  "risk changed",
-  "valuation changed",
-  "financial strength changed",
-  "Healthometer changed",
-  "watchlist review",
-  "price moved",
-  "peer became more attractive",
+const CATEGORIES = [
+  { icon: AlertTriangle, label: "Thesis changed", desc: "New information may affect your thesis." },
+  { icon: TrendingUp, label: "Score changed", desc: "Research score has moved." },
+  { icon: TrendingDown, label: "Risk changed", desc: "Risk factors have shifted." },
+  { icon: BarChart3, label: "Valuation changed", desc: "Valuation context has changed." },
+  { icon: Eye, label: "Watchlist review", desc: "Time to review a tracked company." },
 ];
 
 export const AlertsPage: React.FC = () => {
@@ -20,28 +16,35 @@ export const AlertsPage: React.FC = () => {
       <ProductPage>
         <div className="flex items-center gap-2 mb-5">
           <Activity className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-base font-semibold text-[#E6EDF3]">What Changed</h1>
+          <h1 className="text-base font-semibold text-[#E6EDF3]">What changed that matters?</h1>
         </div>
-        <ProductPanel className="p-6">
-          <div className="flex flex-col items-center text-center">
-            <Activity className="h-6 w-6 text-[#64748B]" />
-            <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">What Changed</h3>
-            <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">
-              Track a company to review important changes.
-            </p>
-            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
-              {ALLOWED_CATEGORIES.map((cat) => (
-                <span key={cat} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-2 py-0.5 text-[10px] text-[#9AA7B5]">
-                  {cat}
-                </span>
-              ))}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
+        <ProductEmptyState
+          icon={Activity}
+          title="Choose the changes you care about"
+          body="When one of these shifts for a tracked company, you will know to review your thesis."
+          action={
+            <div className="flex flex-wrap gap-2">
               <ProductAction onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
               <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
             </div>
-          </div>
-        </ProductPanel>
+          }
+        />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <ProductPanel key={cat.label} className="p-4">
+                <div className="flex items-start gap-3">
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
+                  <div>
+                    <h3 className="text-xs font-semibold text-[#E6EDF3]">{cat.label}</h3>
+                    <p className="mt-1 text-[11px] leading-relaxed text-[#9AA7B5]">{cat.desc}</p>
+                  </div>
+                </div>
+              </ProductPanel>
+            );
+          })}
+        </div>
       </ProductPage>
     </ProductShell>
   );

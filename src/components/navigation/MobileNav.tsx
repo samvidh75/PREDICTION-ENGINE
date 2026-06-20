@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeftRight, BookOpen, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp, Activity, Menu, X, Settings, LogOut } from "lucide-react";
+import { ArrowLeftRight, BookOpen, Eye, Home, Info, LogIn, Search, Sparkles, TrendingUp, Activity, Menu, X, Settings, LogOut, BarChart3 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 interface MobileNavItem {
@@ -29,7 +29,7 @@ export const MobileNav: React.FC = () => {
   // Modern bottom tabs structure
   const tabs: MobileNavItem[] = [
     { page: "dashboard", label: "Home", icon: <Home className="h-5 w-5" /> },
-    { page: "scanner", label: "Scanner", icon: <Search className="h-5 w-5" /> },
+    { page: "scanner", label: "Scanner", icon: <BarChart3 className="h-5 w-5" /> },
     { page: "search", label: "Search", icon: <Search className="h-5 w-5" /> },
     { page: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
   ];
