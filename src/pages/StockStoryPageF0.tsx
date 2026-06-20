@@ -4,11 +4,11 @@ import { ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPi
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { useToast } from "../components/feedback/useToast";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
+import { fetchUnifiedResearch, type UnifiedResearchResult } from "../lib/product/companyResearchClient";
 import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
 import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
 import { buildSingleActionCluster, buildSinglePriceContext } from "../lib/product/stockDisplay";
-import { getHealthometerTone, getResearchStanceTone, normalizeResearchStance, normalizeHealthometerLabel } from "../lib/product/publicLabels";
-import { api } from "../services/api/client";
+import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 
@@ -31,24 +31,28 @@ export default function StockStoryPageF0(): JSX.Element {
   const stock = StockRegistry.getStock(ticker);
   const identity = getCompanyIdentity(ticker, stock?.companyName, stock?.sector);
   const quote = useLiveQuote(ticker);
-  const [metrics, setMetrics] = useState<Record<string, unknown> | null>(stock ? { sector: stock.sector } : null);
-  const [investOpen, setInvestOpen] = useState(false);
+  const [investOpen, setInvestOpen] = useState(() => new URLSearchParams(window.location.search).get("page") === "invest");
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const toast = useToast();
   const tracked = watchlists.some((list) => list.tickers.some((item) => normalizeSymbol(item) === ticker));
 
-  useEffect(() => {
-    const controller = new AbortController();
-    api.getCompanyFinancials(ticker, { signal: controller.signal }).then((data) => setMetrics(data as unknown as Record<string, unknown>)).catch(() => undefined);
-    return () => controller.abort();
-  }, [ticker]);
+  const [research, setResearch] = useState<UnifiedResearchResult>(() => ({
+    ...buildCompanyResearch(ticker, identity.displayName, identity.sector, null, tracked),
+    healthometerLabel: null,
+    analysis: null,
+  }));
 
-  const research = useMemo(() => buildCompanyResearch(ticker, identity.displayName, identity.sector, metrics, tracked), [ticker, identity.displayName, identity.sector, metrics, tracked]);
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
+      if (!ctrl.signal.aborted) setResearch(result);
+    });
+    return () => ctrl.abort();
+  }, [ticker, identity.displayName, identity.sector, tracked]);
+
   const readiness = research.prediction.readiness;
   const score = research.healthometer.overallScore ?? research.prediction.overallScore;
-  const label = normalizeHealthometerLabel(research.healthometer.backendLabel) === 'Not enough information' && research.healthometer.overallScore !== null
-    ? research.healthometer.overallScore >= 80 ? 'Very healthy' : research.healthometer.overallScore >= 65 ? 'Healthy' : research.healthometer.overallScore >= 45 ? 'Stable' : research.healthometer.overallScore >= 30 ? 'Needs review' : 'Fragile'
-    : normalizeHealthometerLabel(research.healthometer.backendLabel);
+  const label = research.healthometerLabel ?? healthometerLabelFromScore(research.healthometer.overallScore);
   const price = buildSinglePriceContext(
     quote.quote ? formatINR(quote.quote.price) : "Price pending",
     quote.quote ? `${formatINR(quote.quote.change)} (${formatPercent(quote.quote.changePercent)})` : null,
