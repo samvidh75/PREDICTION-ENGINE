@@ -45,4 +45,4 @@ export const FinancialMetricGrid: React.FC<{ groups: FinancialMetricGroup[] }> =
   );
 };
 
-export default FinancialMetricGrid;
+export default React.memo(FinancialMetricGrid);

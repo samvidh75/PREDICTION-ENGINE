@@ -42,4 +42,4 @@ export const ValuationContextPanel: React.FC<ValuationContextPanelProps> = ({ co
   );
 };
 
-export default ValuationContextPanel;
+export default React.memo(ValuationContextPanel);

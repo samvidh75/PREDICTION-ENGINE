@@ -57,4 +57,4 @@ export const RiskReviewPanel: React.FC<RiskReviewPanelProps> = ({ riskFlags, ove
   );
 };
 
-export default RiskReviewPanel;
+export default React.memo(RiskReviewPanel);

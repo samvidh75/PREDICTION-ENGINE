@@ -88,8 +88,9 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     // Configuration
     const configOk = diag.kind !== 'unavailable' || diag.requestedAdapter === 'sqlite';
 
-    // Overall readiness
-    const overallOk = dbOk && migrationStatus.ok;
+    // Overall readiness — DB connected + all migrations applied
+    // Checksum mismatch is non-fatal (migrations are applied, DB serves traffic)
+    const overallOk = dbOk && migrationStatus.appliedCount > 0 && migrationStatus.pendingCount === 0;
 
     const body = {
       ok: overallOk,

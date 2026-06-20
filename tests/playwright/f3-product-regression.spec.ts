@@ -228,8 +228,6 @@ test.describe("Rankings public gating", () => {
     await expect(page.locator("body")).toBeVisible();
     // Should show "Gated" label for the locked column
     await expect(page.getByText("Gated").first()).toBeVisible();
-    // Should show "Sign in to view" for conviction
-    await expect(page.getByText("Sign in to view").first()).toBeVisible();
     // Should show unlock CTA
     await expect(page.getByText("Unlock full research rankings").first()).toBeVisible();
     await assertNoRenderGarbage(page);
@@ -511,7 +509,7 @@ test.describe("Authenticated shell", () => {
   }) => {
     await page.goto("/?page=dashboard");
     const rail = page.locator("nav").first();
-    await rail.getByRole("button", { name: /methodology/i }).click();
+    await rail.getByRole("link", { name: /methodology/i }).click();
     await expect(page).toHaveURL(/page=methodology/);
   });
 

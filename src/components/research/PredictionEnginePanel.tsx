@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Activity, ShieldAlert } from "lucide-react";
 import { buildPredictionViewModel } from "../../lib/product/predictionEngine/predictionViewModel";
 import { buildHealthometerViewModel } from "../../lib/product/predictionEngine/healthometerViewModel";
@@ -38,29 +38,41 @@ interface PredictionEnginePanelProps {
   healthometerLabel?: string | null;
 }
 
-export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
+export const PredictionEnginePanel: React.NamedExoticComponent<PredictionEnginePanelProps> = React.memo(({
   symbol, score, riskScore, qualityScore, valuationScore,
   growthScore, stabilityScore, momentumScore, financialStrengthScore,
   rawMetrics, healthometerLabel,
 }) => {
-  const model = buildPredictionViewModel(symbol, score, riskScore, rawMetrics);
-  const health = buildHealthometerViewModel(
-    qualityScore, valuationScore, growthScore,
-    stabilityScore, riskScore, momentumScore,
-    financialStrengthScore
+  const model = useMemo(
+    () => buildPredictionViewModel(symbol, score, riskScore, rawMetrics),
+    [symbol, score, riskScore, rawMetrics]
+  );
+  const health = useMemo(
+    () => buildHealthometerViewModel(
+      qualityScore, valuationScore, growthScore,
+      stabilityScore, riskScore, momentumScore,
+      financialStrengthScore
+    ),
+    [qualityScore, valuationScore, growthScore, stabilityScore, riskScore, momentumScore, financialStrengthScore]
   );
 
   const hasRealData = model.activeFactorCount >= 2 && model.overallScore !== null;
 
-  const realDrivers = Array.from(new Set(model.topPositiveDrivers.filter(
-    (d) => !d.includes("N/A") && !d.toLowerCase().includes("unavailable")
-  )));
-  const realRisks = Array.from(new Set(model.topRiskDrivers.filter(
-    (d) => !d.includes("N/A") && !d.toLowerCase().includes("unavailable")
-  )));
+  const realDrivers = useMemo(
+    () => Array.from(new Set(model.topPositiveDrivers.filter(
+      (d) => !d.includes("N/A") && !d.toLowerCase().includes("unavailable")
+    ))),
+    [model.topPositiveDrivers]
+  );
+  const realRisks = useMemo(
+    () => Array.from(new Set(model.topRiskDrivers.filter(
+      (d) => !d.includes("N/A") && !d.toLowerCase().includes("unavailable")
+    ))),
+    [model.topRiskDrivers]
+  );
 
-  const realDimensions = health.dimensions.filter((d) => d.score !== null);
-  const missingDimensions = health.dimensions.filter((d) => d.score === null);
+  const realDimensions = useMemo(() => health.dimensions.filter((d) => d.score !== null), [health.dimensions]);
+  const missingDimensions = useMemo(() => health.dimensions.filter((d) => d.score === null), [health.dimensions]);
   const labelClass = healthometerLabel && LABEL_STYLES[healthometerLabel] ? LABEL_STYLES[healthometerLabel] : LABEL_STYLES["Stable"];
   const displayLabel = healthometerLabel || "Stable";
 
@@ -193,6 +205,6 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
       </ProductPanel>
     </div>
   );
-};
+});
 
 export default PredictionEnginePanel;

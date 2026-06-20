@@ -75,4 +75,4 @@ export const FactorDriverList: React.FC<FactorDriverListProps> = ({ factors }) =
   );
 };
 
-export default FactorDriverList;
+export default React.memo(FactorDriverList);
