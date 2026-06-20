@@ -24,12 +24,7 @@ vi.mock('../../components/product/ProductUI', async () => {
         {children}
       </div>
     ),
-    ProductProofPanel: ({ title, rows }: { title: string; rows: any[] }) => (
-      <div>
-        <h3>{title}</h3>
-        {rows.map((r, i) => <div key={i}>{r.label}: {r.body}</div>)}
-      </div>
-    ),
+    ProductStatusPill: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
     productNavigate: vi.fn(),
   };
 });

@@ -18,8 +18,8 @@ function tickerFromUrl(): string {
 }
 
 const DIM_COLORS: Record<string, string> = {
-  quality: "#2962FF", financial_strength: "#16A34A", valuation: "#F59E0B",
-  growth: "#22C55E", stability: "#06B6D4", risk: "#EF4444", momentum: "#8B5CF6",
+  quality: "#3B82F6", financial_strength: "#22C55E", valuation: "#A78BFA",
+  growth: "#14B8A6", stability: "#64748B", risk: "#F59E0B", momentum: "#38BDF8",
 };
 
 function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
@@ -60,8 +60,10 @@ export default function StockStoryPageF0(): JSX.Element {
   );
   const actions = buildSingleActionCluster(readiness, tracked);
   const dimensions = research.healthometer.dimensions;
-  const drivers = research.prediction.topPositiveDrivers.length ? research.prediction.topPositiveDrivers : ["Business quality", "Financial strength", "Capital efficiency"];
-  const risks = research.prediction.topRiskDrivers.length ? research.prediction.topRiskDrivers : [research.riskContext.overall ?? "Review valuation and recent business momentum"];
+  const allDrivers = [...new Set(research.prediction.topPositiveDrivers)];
+  const drivers = allDrivers.length ? allDrivers : ["Business quality", "Financial strength", "Capital efficiency"];
+  const allRisks = [...new Set(research.prediction.topRiskDrivers)];
+  const risks = allRisks.length ? allRisks : [research.riskContext.overall ?? "Review recent business momentum"];
 
   const toggleTrack = () => {
     const list = watchlists[0];
