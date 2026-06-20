@@ -199,7 +199,7 @@ test.describe("Public route smoke", () => {
   test("methodology page renders", async ({ page }) => {
     await page.goto("/?page=methodology");
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.locator('h1').filter({ hasText: 'Research Standards' })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How StockStory Thinks" })).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
@@ -519,7 +519,7 @@ test.describe("Authenticated shell", () => {
     page,
   }) => {
     await page.goto("/?page=dashboard");
-    await page.locator('nav button[aria-label="Account menu"]').first().click();
+    await page.getByRole("button", { name: "Account menu" }).click();
     await page.locator('div.absolute button:has-text("Settings")').first().click();
     await expect(page).toHaveURL(/page=settings/);
     await expect(page.locator("body")).toBeVisible();
