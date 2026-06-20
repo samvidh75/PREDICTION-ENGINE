@@ -21,6 +21,8 @@ import {
   DataLineageEntry,
 } from '../../../shared/data/AnalyticalResponse';
 import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFreshness';
+import { healthometerEngine } from '../../../stockstory/healthometer/HealthometerEngine';
+import type { HealthometerScore } from '../../../stockstory/healthometer/types';
 
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
@@ -118,6 +120,89 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
       const riskScore = asFiniteNumber(pred.risk_score);
       const sectorScore = asFiniteNumber(pred.sector_score);
 
+      // ── Healthometer v2 (additive) ────────────────────────────────
+      let healthometerResult: HealthometerScore | null = null;
+      try {
+        const [fsRes, factorRes, featureRes] = await Promise.all([
+          pool.query(
+            `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
+                    debt_to_equity, current_ratio, operating_margin,
+                    net_margin, gross_margin, revenue_growth, profit_growth,
+                    eps_growth, fcf_yield, market_cap, beta
+             FROM financial_snapshots
+              WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+                AND pe_ratio IS NOT NULL
+              ORDER BY snapshot_date DESC LIMIT 1`,
+            [symbol]
+          ),
+          pool.query(
+            `SELECT quality_factor, value_factor, growth_factor,
+                    momentum_factor, risk_factor, sector_strength_factor
+             FROM factor_snapshots
+             WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+             ORDER BY trade_date DESC LIMIT 1`,
+            [symbol]
+          ),
+          pool.query(
+            `SELECT volatility, momentum, rsi, trend_strength
+             FROM feature_snapshots
+             WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+             ORDER BY trade_date DESC LIMIT 1`,
+            [symbol]
+          ),
+        ]);
+        const fsRow = (fsRes.rows?.[0] || null) as Record<string, unknown> | null;
+        const factorRow = (factorRes.rows?.[0] || null) as Record<string, unknown> | null;
+        const featureRow = (featureRes.rows?.[0] || null) as Record<string, unknown> | null;
+        if (fsRow || factorRow || featureRow) {
+          const input = {
+            symbol,
+            financials: {
+              peRatio: asFiniteNumber(fsRow?.pe_ratio),
+              pbRatio: asFiniteNumber(fsRow?.pb_ratio),
+              evEbitda: asFiniteNumber(fsRow?.ev_ebitda),
+              roe: asFiniteNumber(fsRow?.roe),
+              roce: asFiniteNumber(fsRow?.roce),
+              roa: asFiniteNumber(fsRow?.roa),
+              debtToEquity: asFiniteNumber(fsRow?.debt_to_equity),
+              currentRatio: asFiniteNumber(fsRow?.current_ratio),
+              operatingMargin: asFiniteNumber(fsRow?.operating_margin),
+              netMargin: asFiniteNumber(fsRow?.net_margin),
+              grossMargin: asFiniteNumber(fsRow?.gross_margin),
+              revenueGrowth: asFiniteNumber(fsRow?.revenue_growth),
+              profitGrowth: asFiniteNumber(fsRow?.profit_growth),
+              epsGrowth: asFiniteNumber(fsRow?.eps_growth),
+              fcfYield: asFiniteNumber(fsRow?.fcf_yield),
+              marketCap: asFiniteNumber(fsRow?.market_cap),
+              beta: asFiniteNumber(fsRow?.beta),
+            },
+            factors: {
+              qualityFactor: asFiniteNumber(factorRow?.quality_factor),
+              valueFactor: asFiniteNumber(factorRow?.value_factor),
+              growthFactor: asFiniteNumber(factorRow?.growth_factor),
+              momentumFactor: asFiniteNumber(factorRow?.momentum_factor),
+              riskFactor: asFiniteNumber(factorRow?.risk_factor),
+              sectorStrengthFactor: asFiniteNumber(factorRow?.sector_strength_factor),
+            },
+            features: {
+              volatility: asFiniteNumber(featureRow?.volatility),
+              momentum: asFiniteNumber(featureRow?.momentum),
+              rsi: asFiniteNumber(featureRow?.rsi),
+              trendStrength: asFiniteNumber(featureRow?.trend_strength),
+            },
+            predictionRegistry: {
+              rankingScore,
+              classification,
+              confidenceScore,
+              confidenceLevel,
+            },
+          };
+          healthometerResult = healthometerEngine.evaluate(input);
+        }
+      } catch {
+        // Healthometer is additive; failure does not block the response
+      }
+
       const factorSnapshot = (score: number | null, sourceField: string) => ({
         score,
         source: 'prediction_registry',
@@ -132,6 +217,16 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         predictionHorizon: asFiniteNumber(pred.prediction_horizon),
         rankingScore,
         healthScore: rankingScore,
+        healthometer: healthometerResult ? {
+          overallScore: healthometerResult.overallScore,
+          label: healthometerResult.label,
+          dimensions: healthometerResult.dimensions.map((d) => ({
+            id: d.id,
+            label: d.label,
+            score: d.score,
+            status: d.status,
+          })),
+        } : null,
         classification,
         confidence: {
           level: confidenceLevel,

@@ -10,6 +10,7 @@ export interface HealthometerViewState {
   overallScore: number | null;
   overallStatus: "Complete" | "Partial research context" | "Not enough information for this view yet";
   dimensions: HealthometerDimension[];
+  backendLabel?: string | null;
 }
 
 import { normalizeNumericValue } from "./factorNormalization";

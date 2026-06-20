@@ -3,33 +3,60 @@ import { computeResearchSignal, type ResearchSignalView } from "../research/rese
 import type { CompanyResearchData } from "../../services/api/client";
 
 export function companyResearchToFactorScores(data: CompanyResearchData | null): CompanyFactorScoresView | null {
-  if (!data?.factorScores || data.factorScores.length === 0) return null;
+  if (!data?.factorScores) return null;
 
-  const factorMap: Record<string, number | null> = {};
-  const explanationMap: Record<string, string | null> = {};
+  if (Array.isArray(data.factorScores)) {
+    if (data.factorScores.length === 0) return null;
+    const factorMap: Record<string, number | null> = {};
+    const explanationMap: Record<string, string | null> = {};
 
-  for (const fs of data.factorScores) {
-    const key = fs.name.toLowerCase();
-    factorMap[key] = fs.score;
-    explanationMap[key] = fs.explanation;
+    for (const fs of data.factorScores) {
+      const key = fs.name.toLowerCase();
+      factorMap[key] = fs.score;
+      explanationMap[key] = fs.explanation;
+    }
+
+    return {
+      symbol: data.symbol,
+      qualityScore: factorMap.quality ?? null,
+      valuationScore: factorMap.valuation ?? factorMap.value ?? null,
+      growthScore: factorMap.growth ?? null,
+      riskScore: factorMap.risk ?? null,
+      momentumScore: factorMap.momentum ?? null,
+      stabilityScore: factorMap.stability ?? null,
+      convictionScore: null,
+      qualityExplanation: explanationMap.quality ?? null,
+      valuationExplanation: explanationMap.valuation ?? explanationMap.value ?? null,
+      growthExplanation: explanationMap.growth ?? null,
+      riskExplanation: explanationMap.risk ?? null,
+      momentumExplanation: explanationMap.momentum ?? null,
+      stabilityExplanation: explanationMap.stability ?? null,
+    };
   }
 
-  return {
-    symbol: data.symbol,
-    qualityScore: factorMap.quality ?? null,
-    valuationScore: factorMap.valuation ?? factorMap.value ?? null,
-    growthScore: factorMap.growth ?? null,
-    riskScore: factorMap.risk ?? null,
-    momentumScore: factorMap.momentum ?? null,
-    stabilityScore: factorMap.stability ?? null,
-    convictionScore: null,
-    qualityExplanation: explanationMap.quality ?? null,
-    valuationExplanation: explanationMap.valuation ?? explanationMap.value ?? null,
-    growthExplanation: explanationMap.growth ?? null,
-    riskExplanation: explanationMap.risk ?? null,
-    momentumExplanation: explanationMap.momentum ?? null,
-    stabilityExplanation: explanationMap.stability ?? null,
-  };
+  if (typeof data.factorScores === 'object' && 'qualityScore' in data.factorScores) {
+    const fs = data.factorScores as Record<string, unknown>;
+    const hasScore = (fs.qualityScore ?? fs.valuationScore ?? fs.growthScore ?? fs.riskScore ?? fs.momentumScore ?? fs.stabilityScore) !== null;
+    if (!hasScore) return null;
+    return {
+      symbol: data.symbol,
+      qualityScore: (fs.qualityScore as number) ?? null,
+      valuationScore: (fs.valuationScore as number) ?? null,
+      growthScore: (fs.growthScore as number) ?? null,
+      riskScore: (fs.riskScore as number) ?? null,
+      momentumScore: (fs.momentumScore as number) ?? null,
+      stabilityScore: (fs.stabilityScore as number) ?? null,
+      convictionScore: (fs.convictionScore as number) ?? null,
+      qualityExplanation: (fs.qualityExplanation as string) ?? null,
+      valuationExplanation: (fs.valuationExplanation as string) ?? null,
+      growthExplanation: (fs.growthExplanation as string) ?? null,
+      riskExplanation: (fs.riskExplanation as string) ?? null,
+      momentumExplanation: (fs.momentumExplanation as string) ?? null,
+      stabilityExplanation: (fs.stabilityExplanation as string) ?? null,
+    };
+  }
+
+  return null;
 }
 
 export function computeSignalFromResearchData(data: CompanyResearchData | null): ResearchSignalView {

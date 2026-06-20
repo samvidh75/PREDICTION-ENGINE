@@ -119,7 +119,7 @@ function buildScannerResult(
       symbol: input.symbol, companyName: input.companyName, sector: input.sector,
       rank, conviction: "Research signals pending", score: null,
       oneLineThesis: "Research signals pending for this preset.",
-      keyReason: "Insufficient data for required features",
+      keyReason: "Not enough information for this preset.",
       riskMarker: null,
     };
   }

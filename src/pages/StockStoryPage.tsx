@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, FileText, ShieldAlert, Sparkles, Star, TrendingUp, Trophy } from "lucide-react";
+import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, Star } from "lucide-react";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { NoteEngine } from "../services/portfolio/NoteEngine";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
@@ -7,12 +7,10 @@ import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { api, ApiError } from "../services/api/client";
 import type { CompanyMetadata } from "../services/api/client";
-import WhyItChangedTab from "../components/intelligence/WhyItChangedTab";
 import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, formatScore } from "../services/ui/dataFormatting";
 import { useToast } from "../components/feedback/useToast";
 import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
-import ThesisHealthMeter from "../components/research/ThesisHealthMeter";
-import FactorScorePanel from "../components/research/FactorScorePanel";
+
 import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
 import { buildCompanyPageData, companyResearchToFactorScores } from "../lib/product/researchDataAdapter";
 import { ThesisSnapshotEngine } from "../services/portfolio/ThesisSnapshotEngine";
@@ -216,6 +214,8 @@ export const StockStoryPage: React.FC = () => {
     return adaptStockStoryResponse(story, financials);
   }, [story, financials]);
   const storyUnavailable = !story || storyData?.apiStatus === "unavailable";
+
+  const healthometerLabel: string | null = story?.healthometer?.label ?? null;
 
   const pageData = useMemo(() => buildCompanyPageData(researchData, storyData, financials), [researchData, storyData, financials]);
   const signal = useMemo(() => pageData.signal ?? computeSignalFromStoryData(storyData), [pageData.signal, storyData]);
@@ -421,129 +421,23 @@ export const StockStoryPage: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased text-[#E6EDF3]">
-      <div className="flex items-center justify-between gap-3 text-xs">
-        <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-semibold uppercase tracking-wider transition-colors hover:opacity-80 text-[#8B949E]">
-          <ArrowLeft className="h-3.5 w-3.5" /> Dashboard
-        </button>
-      </div>
 
-      <section className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-6">
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04]">
-              <svg className="h-full w-full -rotate-90">
-                <circle cx="56" cy="56" r={radius} className="stroke-white/[0.08]" strokeWidth="8" fill="transparent" />
-                <circle cx="56" cy="56" r={radius} stroke="#2962FF" strokeWidth="8" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.8s ease-out" }} />
-              </svg>
-              <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold tracking-tight tabular-nums text-[#E6EDF3]">{score !== null ? Math.round(score) : "Score not yet available"}</span>
-                <span className="text-[8px] font-bold uppercase tracking-widest text-[#2962FF]">Score</span>
-              </div>
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3] mb-1">{companyName}</h1>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getClassificationStyle(storyData.classification)}`}>
-                  {storyData.classification ?? "Not enough information"}
-                </span>
-                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getConfidenceStyle(storyData.confidence)}`}>
-                  {storyData.confidence} Confidence
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4 lg:items-end">
-            <div className="grid grid-cols-2 gap-6 rounded-xl border border-white/[0.06] bg-white/[0.04] p-3.5">
-              <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Price context</div>
-                <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{changeLabel}</div>
-              </div>
-              <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">Volume</div>
-                <div className="mt-1 font-mono text-xl font-bold tabular-nums text-[#E6EDF3]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "—"}
-                </div>
-                <div className="mt-0.5 font-mono text-[9px] text-[#64748B]">Updated {formatDateTime(quote?.updatedAt)}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 pt-4 border-t border-white/[0.06]">
-          <div className="mb-4">
-            <ThesisHealthMeter signal={signal} size="md" showDetails={true} />
-          </div>
-          <div className="text-[9px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-[#8B949E]">
-            <Activity className="h-3 w-3" /> Explanation
-          </div>
-          <p className="text-xs leading-relaxed max-w-5xl text-[#E6EDF3]">{storyData.narrative}</p>
-          <p className="mt-3 max-w-5xl rounded-lg border border-white/[0.06] bg-white/[0.03] p-3 text-[11px] leading-relaxed text-[#8B949E]">
-            Research signals are for informational purposes only. Not personalised investment advice.
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setExplanationModalOpen(true)}
-              className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[10px] font-semibold text-[#8B949E] hover:bg-white/[0.08] hover:text-[#E6EDF3] transition-colors"
-            >
-              <Activity className="mr-1.5 inline h-3 w-3" aria-hidden="true" />
-              Open full explanation
-            </button>
-            {signal && signal.action !== "Continue with broker" && (
-              <span className="rounded-lg border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.08)] px-3 py-1.5 text-[10px] font-semibold text-[#2962FF]">
-                Next: {signal.action}
-              </span>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="flex flex-wrap items-center gap-3">
-        <button onClick={handleToggleWatchlist} className={`rounded-xl border border-white/[0.08] px-4 py-2 text-[10px] font-semibold transition-colors ${isInWatchlist ? "text-[#EF4444] bg-white/[0.04] border-[rgba(239,68,68,0.2)]" : "text-[#8B949E] bg-white/[0.03] hover:bg-white/[0.06] hover:text-[#E6EDF3]"}`}>
-          <Star className={`mr-1.5 inline h-3 w-3 ${isInWatchlist ? "text-[#EF4444]" : ""}`} />
-          {isInWatchlist ? "Remove from watchlist" : "Track thesis"}
-        </button>
-        {isInWatchlist && snapshotLabel && (
-          <span className="rounded-lg border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.06)] px-2.5 py-1.5 text-[10px] font-medium text-[#2962FF]">
-            {snapshotLabel}
-          </span>
-        )}
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="h-3.5 w-3.5 text-[#2962FF]" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Prediction Engine</span>
-          </div>
-          {predictionModel.overallScore !== null ? (
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#E6EDF3]">{predictionModel.overallScore}</span>
-              <span className="text-[10px] text-[#9AA7B5]">/ 100 &middot; {predictionModel.publicResearchStance}</span>
-            </div>
-          ) : (
-            <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
-          )}
-          {predictionModel.activeFactorCount > 0 && (
-            <p className="mt-1 text-[10px] text-[#64748B]">{predictionModel.activeFactorCount} active parameters</p>
+      {healthometerLabel && (
+        <div className="flex items-center gap-3">
+          <span className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold ${
+            healthometerLabel === "Very healthy" || healthometerLabel === "Healthy"
+              ? "border-[rgba(22,163,74,0.3)] bg-[rgba(22,163,74,0.12)] text-[#16A34A]"
+              : healthometerLabel === "Stable"
+                ? "border-[rgba(41,98,255,0.25)] bg-[rgba(41,98,255,0.12)] text-[#2962FF]"
+                : healthometerLabel === "Needs review" || healthometerLabel === "Risk rising"
+                  ? "border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.12)] text-[#F59E0B]"
+                  : "border-[rgba(239,68,68,0.25)] bg-[rgba(239,68,68,0.12)] text-[#EF4444]"
+          }`}>{healthometerLabel}</span>
+          {score !== null && (
+            <span className="text-xs text-[#64748B]">{Math.round(score)} / 100 &middot; {predictionModel.activeFactorCount} active dimensions</span>
           )}
         </div>
-        <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <ShieldAlert className="h-3.5 w-3.5 text-[#16A34A]" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Healthometer</span>
-          </div>
-          {score !== null ? (
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#E6EDF3]">{Math.round(score)}</span>
-              <span className="text-[10px] text-[#9AA7B5]">/ 100 &middot; {storyData.classification ?? "Assessment"}</span>
-            </div>
-          ) : (
-            <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
-          )}
-        </div>
-      </section>
+      )}
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
         <div className="mb-2 flex items-center justify-between">
@@ -578,6 +472,7 @@ export const StockStoryPage: React.FC = () => {
                 stabilityScore={factorView?.stabilityScore}
                 momentumScore={factorView?.momentumScore}
                 rawMetrics={financials}
+                healthometerLabel={healthometerLabel}
               />
               <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] p-5">
                 <h2 className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E]">Research Thesis</h2>
