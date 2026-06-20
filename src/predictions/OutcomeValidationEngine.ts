@@ -62,8 +62,8 @@ export class OutcomeValidationEngine {
 
       // Calculate future_return as percentage change from prediction price
       const priceAtPrediction = prediction.price_at_prediction;
-      if (priceAtPrediction === 0) {
-        continue; // Cannot calculate return with zero price
+      if (!priceAtPrediction || priceAtPrediction === 0) {
+        continue; // Cannot calculate return without real price
       }
 
       const futureReturn =
@@ -73,7 +73,7 @@ export class OutcomeValidationEngine {
       const benchmarkAtPrediction = prediction.benchmark_level;
       let benchmarkReturn: number | null = null;
 
-      if (currentBenchmark !== null && benchmarkAtPrediction !== 0) {
+      if (currentBenchmark !== null && benchmarkAtPrediction && benchmarkAtPrediction !== 0) {
         benchmarkReturn =
           ((currentBenchmark - benchmarkAtPrediction) / benchmarkAtPrediction) * 100;
       }

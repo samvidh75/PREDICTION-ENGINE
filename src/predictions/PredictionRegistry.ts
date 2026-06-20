@@ -322,8 +322,8 @@ export class PredictionRegistry {
       momentum_score: Number(row.momentum_score),
       risk_score: Number(row.risk_score),
       sector_score: Number(row.sector_score),
-      price_at_prediction: row.price_at_prediction ? Number(row.price_at_prediction) : 0,
-      benchmark_level: row.benchmark_level ? Number(row.benchmark_level) : 0,
+      price_at_prediction: row.price_at_prediction != null ? Number(row.price_at_prediction) : null,
+      benchmark_level: row.benchmark_level != null ? Number(row.benchmark_level) : null,
       prediction_horizon: row.prediction_horizon,
       validation_status: row.validation_status,
       validated_at: row.validated_at instanceof Date

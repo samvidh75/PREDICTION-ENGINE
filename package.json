@@ -94,6 +94,7 @@
     "sync:nse-universe": "tsx scripts/sync-public-nse-universe.ts",
     "sync:index-constituents": "tsx scripts/sync-index-constituents.ts",
     "pipeline:predictions": "tsx scripts/run-prediction-pipeline.ts",
+    "data:hydrate": "tsx scripts/hydrate-production-data.ts",
     "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
     "backtest:unified-engine": "tsx scripts/backtest-unified-engine.ts",
     "validate:unified-ranking": "tsx scripts/validate-unified-ranking.ts",

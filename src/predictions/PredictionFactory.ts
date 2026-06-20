@@ -178,6 +178,7 @@ export class PredictionFactory {
             continue;
           }
 
+          const priceAtPrediction = await this.latestPrice(symbol);
           const input: ContractCreatePredictionInput = {
             symbol,
             predictionDate: today,
@@ -191,7 +192,7 @@ export class PredictionFactory {
             momentumScore: Math.round(momentumScore),
             riskScore: Math.round(criticalScores.risk),
             sectorScore: sectorScore !== null ? Math.round(sectorScore) : 0,
-            priceAtPrediction: null,
+            priceAtPrediction,
             benchmarkLevel: null,
             predictionHorizon: horizon as RegistryPredictionHorizon,
             createdBy: 'DailyPredictionCapture',
@@ -357,6 +358,21 @@ export class PredictionFactory {
       const result = await stockStoryEngine.evaluate(engineInputs as any);
       (result as any)._sectorStrengthFactor = fact?.sector_strength_factor ?? null;
       return result;
+    } catch {
+      return null;
+    }
+  }
+
+  private async latestPrice(symbol: string): Promise<number | null> {
+    try {
+      const result = await pool.query(
+        `SELECT close FROM daily_prices WHERE symbol = $1 ORDER BY trade_date DESC LIMIT 1`,
+        [symbol]
+      );
+      if (result.rows.length > 0 && result.rows[0].close != null) {
+        return Number(result.rows[0].close);
+      }
+      return null;
     } catch {
       return null;
     }
