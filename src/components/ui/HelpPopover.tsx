@@ -8,12 +8,7 @@ interface HelpPopoverProps {
 }
 
 export const HelpPopover: React.FC<HelpPopoverProps> = ({ title, children, storageKey }) => {
-  const [open, setOpen] = useState(() => {
-    if (storageKey && typeof window !== "undefined") {
-      return localStorage.getItem(storageKey) !== "dismissed";
-    }
-    return true;
-  });
+  const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const handleDismiss = useCallback(() => {

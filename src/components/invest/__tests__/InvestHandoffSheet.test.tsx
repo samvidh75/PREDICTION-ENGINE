@@ -29,7 +29,7 @@ describe('InvestHandoffSheet', () => {
     await renderReady();
     fireEvent.click(screen.getByRole('button', { name: /Continue review/i }));
     expect(screen.getByText(/Choose where to continue/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Zerodha Kite', exact: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Zerodha Kite' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Groww/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Quantity/i)).toHaveValue(1);
     expect(screen.getByText(/₹3,800/)).toBeInTheDocument();
