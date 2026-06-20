@@ -184,7 +184,7 @@ function convertUnifiedOutputToPredictionSnapshot(output: UnifiedPredictionOutpu
       factors[key] = {
         value: fs.value,
         availability: fs.availability >= 50 ? 'real' : fs.availability > 0 ? 'partial' : 'unavailable' as Availability,
-        confidence: fs.confidence,
+        confidence: fs.confidence ?? 0,
         reason: fs.reason,
         lineage: [],
       };

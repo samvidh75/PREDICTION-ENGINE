@@ -1,7 +1,6 @@
 import {
   UnifiedPredictionInput,
   UnifiedPredictionOutput,
-  UnifiedPredictionInput as EngineInput,
   UnifiedEngineConfig,
   UnifiedClassification,
   UnifiedFactorScore,
@@ -17,9 +16,9 @@ function clampScore(v: number): number {
 
 function weightedAverage(
   components: Array<{ score: number; weight: number }>
-): number {
+): number | null {
   const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
-  if (totalWeight === 0) return 50;
+  if (totalWeight === 0) return null;
   const avg = components.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight;
   return clampScore(avg);
 }
@@ -67,7 +66,6 @@ function computeMissingFields(input: UnifiedPredictionInput): string[] {
   if (input.revenueGrowth === null || input.revenueGrowth === undefined) missing.push('revenueGrowth');
   if (input.profitGrowth === null || input.profitGrowth === undefined) missing.push('profitGrowth');
   if (input.close === null || input.close === undefined) missing.push('close');
-  if (input.roa === null || input.roa === undefined && !missing.includes('roa')) missing.push('roa');
   return missing;
 }
 
@@ -80,11 +78,14 @@ function buildFactorScore(
   missing: string[],
   reason: string,
 ): UnifiedFactorScore {
+  const hasData = value !== null;
+  const ratio = featureCount > 0 ? availableCount / featureCount : 0;
+  const conf = hasData ? clampScore(Math.round(availability * ratio)) : null;
   return {
     group,
-    value: value !== null ? clampScore(value) : null,
+    value: hasData ? clampScore(value) : null,
     availability: clampScore(availability),
-    confidence: 50,
+    confidence: conf,
     featureCount,
     availableFeatureCount: availableCount,
     missingFeatures: missing,
@@ -233,7 +234,9 @@ function computeRiskScore(input: UnifiedPredictionInput): { score: number; missi
 
 function computeSectorScore(input: UnifiedPredictionInput): { score: number; missing: string[] } {
   if (!input.sector) return { score: 50, missing: ['sector'] };
-  return { score: 55, missing: [] };
+  const sf = safeFinite(input.sectorStrengthFactor);
+  if (sf !== null) return { score: clampScore(sf), missing: [] };
+  return { score: 50, missing: ['sector'] };
 }
 
 function computeLiquidityScore(input: UnifiedPredictionInput): { score: number; missing: string[] } {
@@ -323,8 +326,11 @@ function assessFreshness(input: UnifiedPredictionInput): UnifiedConfidenceLevel 
 function computeConfidenceScore(input: UnifiedPredictionInput): number {
   const base = input.fieldCompleteness ?? computeDataCompleteness(input);
   const stale = input.staleFieldCount ?? 0;
-  const penalty = stale * 10;
-  return clampScore(base - penalty);
+  const stalePenalty = stale * 8;
+  const hasPrice = input.close !== null && input.close !== undefined ? 0 : 20;
+  const partialCount = input.partialFactorCount ?? 0;
+  const coverageBonus = partialCount <= 1 ? 10 : partialCount <= 3 ? 5 : 0;
+  return clampScore(base - stalePenalty - hasPrice + coverageBonus);
 }
 
 function defaultConfig(): UnifiedEngineConfig {
@@ -426,9 +432,14 @@ export class UnifiedPredictionEngine {
         { score: dividendHealth.score, weight: 1 },
       ]);
 
-      const riskDampening = Math.max(0, (risk.score - 15) * 0.45);
-      rankingScore = clampScore(baseScore - riskDampening);
-      classification = classify(rankingScore);
+      if (baseScore === null) {
+        rankingScore = null;
+        classification = 'INSUFFICIENT_DATA';
+      } else {
+        const riskDampening = Math.max(0, (risk.score - 15) * 0.45);
+        rankingScore = clampScore(baseScore - riskDampening);
+        classification = classify(rankingScore);
+      }
     }
 
     const explanation = missingPrice
