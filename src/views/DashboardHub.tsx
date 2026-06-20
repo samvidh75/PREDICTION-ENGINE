@@ -1,216 +1,33 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Search, ShieldCheck, TrendingUp, AlertCircle, ArrowLeftRight, BookOpen, Eye, Sparkles } from "lucide-react";
-import { Button } from "../components/ui/Button";
-import { ProductAction, productNavigate } from "../components/product/ProductUI";
-import ScorePill from "../components/ui/ScorePill";
+import { ArrowRight, Bell, Eye, GitCompare, Search, Sparkles } from "lucide-react";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { StockRegistry } from "../services/stocks/StockRegistry";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { PremiumCommandButton } from "../components/intelligence/PremiumCommandButton";
-import { FirstRunGuide } from "../components/onboarding/FirstRunGuide";
-import { ResearchWorkflowRail } from "../components/intelligence/ResearchWorkflowRail";
-import { RoundedDepthPanel } from "../components/intelligence/RoundedDepthPanel";
 
-function navigate(pageKey: string, query?: string): void {
-  const params = new URLSearchParams(window.location.search);
-  params.set("page", pageKey);
-  params.delete("id");
-  if (query) params.set("q", query); else params.delete("q");
-  window.history.pushState({}, "", `?${params.toString()}`);
-  window.dispatchEvent(new Event("urlchange"));
-}
+function navigate(pageKey: string): void { const params = new URLSearchParams(window.location.search); params.set("page", pageKey); params.delete("id"); params.delete("q"); window.history.pushState({}, "", `?${params.toString()}`); window.dispatchEvent(new Event("urlchange")); }
+function openCompany(symbol: string): void { RecentSearchStore.addTicker(symbol); const params = new URLSearchParams(window.location.search); params.set("page", "stock"); params.set("id", symbol); window.history.pushState({}, "", `?${params.toString()}`); window.dispatchEvent(new Event("urlchange")); }
 
-function openCompany(symbol: string): void {
-  RecentSearchStore.addTicker(symbol);
-  const params = new URLSearchParams(window.location.search);
-  params.set("page", "stock");
-  params.set("id", symbol);
-  window.history.pushState({}, "", `?${params.toString()}`);
-  window.dispatchEvent(new Event("urlchange"));
-}
-
-const PRESET_ACTIONS = [
-  { label: "Quality compounders", icon: Sparkles, action: () => productNavigate("scanner") },
-  { label: "Undervalued quality", icon: BarChart3, action: () => productNavigate("scanner") },
-  { label: "Improving momentum", icon: TrendingUp, action: () => productNavigate("scanner") },
-  { label: "Low debt leaders", icon: ShieldCheck, action: () => productNavigate("scanner") },
-];
+const destinations = [
+  { title: "Discover", body: "Find companies worth a closer look.", icon: Sparkles, page: "scanner", tone: "bg-blue-50 text-blue-700" },
+  { title: "Compare", body: "Put two research cases side by side.", icon: GitCompare, page: "compare", tone: "bg-violet-50 text-violet-700" },
+  { title: "Track", body: "Return to the companies that matter.", icon: Eye, page: "watchlist", tone: "bg-emerald-50 text-emerald-700" },
+] as const;
 
 export const DashboardHub: React.FC = () => {
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
   const [recentResearch, setRecentResearch] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  useEffect(() => { setRecentResearch(RecentSearchStore.getRecent()); const handler = () => setWatchlists([...WatchlistEngine.getWatchlists()]); window.addEventListener("watchlistchange", handler); return () => window.removeEventListener("watchlistchange", handler); }, []);
+  const followedTickers = useMemo(() => { const unique = new Set<string>(); watchlists.forEach((watchlist) => watchlist.tickers.forEach((ticker) => unique.add(ticker))); return [...unique].slice(0, 5); }, [watchlists]);
 
-  useEffect(() => {
-    setRecentResearch(RecentSearchStore.getRecent());
-    const handler = () => setWatchlists([...WatchlistEngine.getWatchlists()]);
-    window.addEventListener("watchlistchange", handler);
-    return () => window.removeEventListener("watchlistchange", handler);
-  }, []);
-
-  const followedTickers = useMemo(() => {
-    const unique = new Set<string>();
-    watchlists.forEach((watchlist) => watchlist.tickers.forEach((ticker) => unique.add(ticker)));
-    return [...unique].slice(0, 8);
-  }, [watchlists]);
-
-  return (
-    <div className="w-full overflow-x-hidden px-4 pb-20 pt-6 sm:px-6">
-      <FirstRunGuide />
-
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research command center</h1>
-        </div>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">What should you research next? Screen Indian equities, review scored models, or build comparison matrixes.</p>
-      </div>
-
-      {/* Command search */}
-      <div className="mb-6">
-        <PremiumCommandButton onClick={() => navigate("search")} placeholder="Search symbol or sector to begin research..." />
-      </div>
-
-      {/* Start with research */}
-      <RoundedDepthPanel padding="md" className="mb-6 border border-white/[0.08]">
-        <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">Start with research</h2>
-        <p className="mt-1 text-[10px] text-[var(--color-text-secondary)]">Choose a strategy to discover companies worth researching.</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {PRESET_ACTIONS.map((preset) => (
-            <Button key={preset.label} type="button" size="sm" variant="secondary" onClick={preset.action}>
-              <preset.icon className="h-3.5 w-3.5" aria-hidden="true" /> {preset.label}
-            </Button>
-          ))}
-          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("scanner")}>
-            <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" /> All strategies
-          </Button>
-        </div>
-      </RoundedDepthPanel>
-
-      {/* Quick actions cluster */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <button type="button" onClick={() => navigate("scanner")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
-          <Search className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Open scanner</span>
-          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Discover research candidates</span>
-        </button>
-        <button type="button" onClick={() => navigate("rankings")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
-          <BarChart3 className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">View rankings</span>
-          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Browse scored companies</span>
-        </button>
-        <button type="button" onClick={() => navigate("compare")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
-          <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Compare companies</span>
-          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Side-by-side research</span>
-        </button>
-        <button type="button" onClick={() => navigate("watchlist")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
-          <Eye className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Review watchlist</span>
-          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Track thesis changes</span>
-        </button>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          {/* What changed preview */}
-          <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-[#F59E0B]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">What changed</h2>
-            </div>
-            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Track a company to review important changes — thesis shifts, score movements, and risk updates.</p>
-            <div className="mt-3">
-              <Button type="button" size="sm" onClick={() => navigate("alerts")}>
-                Open what changed <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Button>
-            </div>
-          </RoundedDepthPanel>
-
-          {/* Methodology note */}
-          <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">How StockStory thinks</h2>
-            </div>
-            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Research is not a guarantee. Understand our methodology — how we evaluate financial strength, valuation context, risk, and conviction.</p>
-            <div className="mt-3">
-              <Button type="button" size="sm" variant="secondary" onClick={() => navigate("methodology")}>
-                <BookOpen className="h-3.5 w-3.5" aria-hidden="true" /> Read methodology
-              </Button>
-            </div>
-          </RoundedDepthPanel>
-        </div>
-
-        {/* Right rail */}
-        <div className="space-y-6">
-          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Research workflow</h3>
-            <ResearchWorkflowRail className="mt-3" />
-          </RoundedDepthPanel>
-
-          {/* Tracked companies */}
-          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Tracked companies</h3>
-            {followedTickers.length === 0 ? (
-              <div>
-                <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Track companies to review important changes.</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <ProductAction variant="secondary" onClick={() => navigate("scanner")}>Open scanner</ProductAction>
-                  <ProductAction variant="ghost" onClick={() => navigate("search")}>Search company</ProductAction>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-2 space-y-1">
-                {followedTickers.map((ticker) => {
-                  const info = StockRegistry.getStock(ticker);
-                  const score = info?.telemetrySnapshot?.healthScore;
-                  return (
-                    <button
-                      key={ticker}
-                      type="button"
-                      onClick={() => openCompany(ticker)}
-                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.04]"
-                    >
-                      <div>
-                        <span className="font-mono text-xs font-semibold text-[var(--color-text-primary)]">{ticker}</span>
-                        {info?.companyName && <span className="ml-2 text-[10px] text-[var(--color-text-muted)]">{info.companyName}</span>}
-                      </div>
-                      {typeof score === "number" && Number.isFinite(score) ? (
-                        <ScorePill score={Math.round(score)} />
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </RoundedDepthPanel>
-
-          {/* Recently explored */}
-          <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Recently explored</h3>
-            {recentResearch.slice(0, 6).length === 0 ? (
-              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Search for a company to begin research.</p>
-            ) : (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {recentResearch.slice(0, 6).map((ticker) => (
-                  <button
-                    key={ticker}
-                    type="button"
-                    onClick={() => openCompany(ticker)}
-                    className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-1 font-mono text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-white/[0.06] transition-colors"
-                  >
-                    {ticker}
-                  </button>
-                ))}
-              </div>
-            )}
-          </RoundedDepthPanel>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="mx-auto w-full max-w-[1180px] overflow-x-hidden px-4 pb-24 pt-5 sm:px-6 sm:pt-8">
+    <section className="relative overflow-hidden rounded-[30px] border border-slate-200/80 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(241,246,255,.88))] p-5 shadow-[0_26px_80px_rgba(30,41,59,.11)] sm:p-8">
+      <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-300/20 blur-3xl" /><div className="pointer-events-none absolute -bottom-24 left-1/4 h-56 w-56 rounded-full bg-blue-300/20 blur-3xl" />
+      <div className="relative grid gap-7 lg:grid-cols-[1fr_360px] lg:items-center"><div><div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500"><Sparkles className="h-4 w-4 text-[#4F6EF7]" /> Your research workspace</div><h1 className="mt-3 max-w-2xl text-[30px] font-semibold leading-[1.08] tracking-[-0.035em] text-slate-950 sm:text-[42px]">What company are you thinking about?</h1><p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">Start with one company. We’ll organize the quality, valuation, risk, and thesis context for you.</p><button type="button" onClick={() => navigate("search")} className="mt-6 flex h-14 w-full max-w-xl items-center gap-3 rounded-2xl border border-slate-200 bg-white/95 px-4 text-left text-sm text-slate-500 shadow-[0_12px_32px_rgba(15,23,42,.09)] transition hover:border-[#4F6EF7]/40 hover:shadow-[0_16px_40px_rgba(79,110,247,.14)]"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[#4F6EF7]/10 text-[#4F6EF7]"><Search className="h-4 w-4" /></span><span className="flex-1">Search a company or symbol</span><ArrowRight className="h-4 w-4 text-slate-400" /></button></div>
+        <div className="relative rounded-[24px] border border-white bg-white/72 p-4 shadow-[0_18px_50px_rgba(15,23,42,.08)] backdrop-blur-xl"><div className="absolute inset-0 opacity-45 [background-image:radial-gradient(circle,rgba(79,110,247,.15)_1px,transparent_1px)] [background-size:18px_18px]" /><div className="relative"><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">A simple path</p><h2 className="mt-2 text-base font-semibold text-slate-900">Search → understand → revisit</h2><p className="mt-2 text-xs leading-5 text-slate-600">No wall of indicators. Just the clearest next step for your research.</p></div><div className="relative mt-5 flex items-center justify-between">{destinations.map(({ title, icon: Icon, tone }) => <div key={title} className="text-center"><div className={`mx-auto grid h-11 w-11 place-items-center rounded-2xl ${tone}`}><Icon className="h-4 w-4" /></div><span className="mt-2 block text-[10px] font-semibold text-slate-600">{title}</span></div>)}</div></div></div>
+    </section>
+    <section className="mt-5 grid gap-3 sm:grid-cols-3">{destinations.map(({ title, body, icon: Icon, page, tone }) => <button key={title} type="button" onClick={() => navigate(page)} className="group flex min-h-[116px] items-start gap-4 rounded-[22px] border border-slate-200/80 bg-white/85 p-4 text-left shadow-[0_10px_30px_rgba(15,23,42,.06)] transition hover:-translate-y-0.5 hover:border-[#4F6EF7]/25 hover:shadow-[0_16px_38px_rgba(15,23,42,.09)]"><span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${tone}`}><Icon className="h-4 w-4" /></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-slate-900">{title}</span><span className="mt-1 block text-xs leading-5 text-slate-600">{body}</span></span><ArrowRight className="mt-1 h-4 w-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#4F6EF7]" /></button>)}</section>
+    <section className="mt-5 grid gap-4 lg:grid-cols-[1fr_340px]"><div className="rounded-[24px] border border-slate-200/80 bg-white/86 p-5 shadow-[0_12px_34px_rgba(15,23,42,.07)]"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-50 text-amber-700"><Bell className="h-4 w-4" /></span><div><h2 className="text-sm font-semibold text-slate-900">What needs attention</h2><p className="mt-0.5 text-xs text-slate-600">Important changes from companies you track will appear here.</p></div></div><button type="button" onClick={() => navigate("alerts")} className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-[#3159B7]">Review changes <ArrowRight className="h-3.5 w-3.5" /></button></div>
+      <div className="rounded-[24px] border border-slate-200/80 bg-white/86 p-5 shadow-[0_12px_34px_rgba(15,23,42,.07)]"><h2 className="text-sm font-semibold text-slate-900">Continue researching</h2>{followedTickers.length === 0 && recentResearch.length === 0 ? <p className="mt-2 text-xs leading-5 text-slate-600">Your recent and tracked companies will collect here after your first search.</p> : <div className="mt-3 flex flex-wrap gap-2">{[...new Set([...followedTickers, ...recentResearch])].slice(0, 6).map((ticker) => { const stock = StockRegistry.getStock(ticker); return <button key={ticker} type="button" onClick={() => openCompany(ticker)} title={stock?.companyName || ticker} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-[11px] font-semibold text-slate-700 hover:border-[#4F6EF7]/30 hover:bg-white">{ticker}</button>; })}</div>}</div></section>
+  </div>;
 };
-
 export default DashboardHub;

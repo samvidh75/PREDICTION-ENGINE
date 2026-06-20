@@ -26,6 +26,7 @@ const ROUTES: Route[] = [
   { name: "login", path: "/?page=login" },
   { name: "signup", path: "/?page=signup" },
   { name: "about", path: "/?page=about" },
+  { name: "dashboard", path: "/?page=dashboard", auth: true },
   { name: "stock-CHENNPETRO", path: "/?page=stock&id=CHENNPETRO", auth: true },
   { name: "stock-ITC", path: "/?page=stock&id=ITC", auth: true },
   { name: "stock-RELIANCE", path: "/?page=stock&id=RELIANCE", auth: true },
