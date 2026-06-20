@@ -54,6 +54,8 @@ import { evaluateGovernancePenalty } from './risk/GovernancePenalty';
 import { applyPenalties, type Penalty } from './scoring/PenaltyScorer';
 import { SectorDistributionEngine } from './analytics/SectorDistributionEngine';
 
+import { PREDICTION_THRESHOLDS } from './prediction/PredictionThresholds';
+
 // ── Auto-initialise percentile distributions on module load ──────
 let _percentileReady = false;
 function ensurePercentileData(): void {
@@ -181,10 +183,10 @@ export class StockStoryEngine {
    * No second risk adjustment.
    */
   private classify(adjustedHealth: number): CompanyClassification {
-    if (adjustedHealth >= 80) return 'Excellent';
-    if (adjustedHealth >= 65) return 'Healthy';
-    if (adjustedHealth >= 45) return 'Stable';
-    if (adjustedHealth >= 30) return 'Weakening';
+    if (adjustedHealth >= PREDICTION_THRESHOLDS.EXCELLENT) return 'Excellent';
+    if (adjustedHealth >= PREDICTION_THRESHOLDS.HEALTHY) return 'Healthy';
+    if (adjustedHealth >= PREDICTION_THRESHOLDS.STABLE) return 'Stable';
+    if (adjustedHealth >= PREDICTION_THRESHOLDS.WEAKENING) return 'Weakening';
     return 'At Risk';
   }
 

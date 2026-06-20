@@ -10,6 +10,8 @@ import {
   UnifiedHorizon,
 } from './types';
 
+import { PREDICTION_THRESHOLDS } from '../stockstory/prediction/PredictionThresholds';
+
 function clampScore(v: number): number {
   return Math.max(0, Math.min(100, Math.round(v)));
 }
@@ -31,10 +33,10 @@ function safeFinite(value: number | null | undefined): number | null {
 
 function classify(s: number | null): UnifiedClassification {
   if (s === null) return 'INSUFFICIENT_DATA';
-  if (s >= 80) return 'EXCELLENT';
-  if (s >= 65) return 'HEALTHY';
-  if (s >= 50) return 'STABLE';
-  if (s >= 35) return 'WEAKENING';
+  if (s >= PREDICTION_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
+  if (s >= PREDICTION_THRESHOLDS.HEALTHY) return 'HEALTHY';
+  if (s >= PREDICTION_THRESHOLDS.STABLE) return 'STABLE';
+  if (s >= PREDICTION_THRESHOLDS.WEAKENING) return 'WEAKENING';
   return 'AT_RISK';
 }
 

@@ -122,10 +122,10 @@ async function run() {
 
       // Find realised price: use the close price closest to target date
       const priceResult = await dbAdapter.query(
-        `SELECT date, close FROM daily_prices
+        `SELECT trade_date, close FROM daily_prices
          WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
-           AND date <= $2
-         ORDER BY date DESC LIMIT 1`,
+           AND trade_date <= $2
+         ORDER BY trade_date DESC LIMIT 1`,
         [row.symbol.toUpperCase().trim(), targetDate.toISOString().slice(0, 10)],
       );
 
@@ -134,7 +134,7 @@ async function run() {
         continue;
       }
 
-      const priceRow = priceResult.rows[0] as PriceRow;
+      const priceRow = priceResult.rows[0] as any;
       const realisedPrice = priceRow.close;
       const priceAtPred = row.price_at_prediction;
 
@@ -170,7 +170,7 @@ async function run() {
         [
           row.id, row.symbol, horizon, row.prediction_date,
           priceAtPred, realisedPrice, realisedReturn,
-          priceRow.date, dir, sBucket, cBucket, row.classification,
+          priceRow.trade_date, dir, sBucket, cBucket, row.classification,
         ],
       );
 
