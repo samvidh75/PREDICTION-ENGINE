@@ -15,8 +15,10 @@
 
   /* Canvas & Surfaces — Light Research Theme */
   --color-canvas: #FFFFFF;
-  --color-surface: #FFFFFF;
-  --color-surface-raised: #F8FAFC;
+  --color-page: #F8FAFC;
+  --color-surface: rgba(255,255,255,0.86);
+  --color-surface-raised: rgba(255,255,255,0.94);
+  --color-surface-glass: rgba(255,255,255,0.72);
   --color-surface-modal: #FFFFFF;
   --color-surface-elevated: #F1F5F9;
   --color-surface-inset: #E2E8F0;
@@ -27,6 +29,7 @@
   /* Borders */
   --color-border: rgba(15, 23, 42, 0.10);
   --color-border-light: rgba(15, 23, 42, 0.06);
+  --color-border-strong: rgba(15,23,42,0.20);
   --color-border-accent: rgba(91, 124, 250, 0.25);
 
   /* Text */
@@ -69,6 +72,11 @@
   --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 8px 30px rgba(15, 23, 42, 0.12);
   --shadow-glow-blue: 0 0 20px rgba(91, 124, 250, 0.08);
+  --shadow-card: 0 12px 32px rgba(15,23,42,0.08);
+  --shadow-card-hover: 0 18px 44px rgba(15,23,42,0.12);
+  --shadow-green-context: 0 18px 44px rgba(22,163,74,0.14);
+  --shadow-red-context: 0 18px 44px rgba(220,38,38,0.13);
+  --shadow-blue-context: 0 18px 44px rgba(41,98,255,0.12);
 
   /* Spacing scale */
   --space-unit: 4px;

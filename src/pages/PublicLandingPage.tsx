@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, Scale, Search, ShieldCheck, Target, Users } from "lucide-react";
+import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, Scale, Search, ShieldCheck, Sparkles, Target, Users } from "lucide-react";
 import {
   ProductAction,
   ProductHero,
@@ -28,6 +28,14 @@ const differentiators = [
   { icon: Users, title: "Built for Indian equity investors", body: "Designed specifically for investors who research Indian stocks. From discovery to broker handoff." },
 ];
 
+export function MarketIntelligenceVisual(): JSX.Element {
+  return <div data-testid="market-intelligence-visual" className="relative min-h-[320px] overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,.94),rgba(238,244,255,.76))] p-5 shadow-[var(--shadow-blue-context)] backdrop-blur-[18px] md:min-h-[340px] md:p-6">
+    <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#8B5CF6]/10 blur-3xl" /><div className="absolute -bottom-14 -left-12 h-48 w-48 rounded-full bg-[#2962FF]/10 blur-3xl" /><div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(41,98,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(41,98,255,.06)_1px,transparent_1px)] [background-size:28px_28px]" />
+    <div className="relative flex items-center justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">Research intelligence</p><h2 className="mt-2 text-lg font-semibold text-[var(--color-text-primary)]">A clearer market picture</h2></div><span className="rounded-full border border-[#2962FF]/15 bg-white/80 px-3 py-1.5 text-[10px] font-semibold text-[#2962FF] shadow-sm">Structured context</span></div>
+    <div className="relative mx-auto mt-8 max-w-[390px]"><div className="absolute inset-x-7 top-4 h-[188px] rotate-3 rounded-[24px] border border-[#8B5CF6]/15 bg-white/55 shadow-lg" /><div className="absolute inset-x-3 top-2 h-[194px] -rotate-2 rounded-[24px] border border-[#2962FF]/15 bg-white/70 shadow-lg" /><div className="relative rounded-[24px] border border-white bg-white/90 p-5 shadow-[0_24px_60px_rgba(15,23,42,.14)]"><div className="flex items-start justify-between"><div><p className="font-mono text-xs font-semibold tracking-[0.12em] text-[var(--color-text-secondary)]">COMPANY LENS</p><p className="mt-1 text-xs text-[var(--color-text-muted)]">Quality · risk · valuation</p></div><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2962FF]/10"><Sparkles className="h-5 w-5 text-[#2962FF]" /></div></div><svg className="mt-5 h-16 w-full" viewBox="0 0 320 64" role="img" aria-label="Abstract research signal line"><defs><linearGradient id="signal" x1="0" x2="1"><stop stopColor="#2962FF"/><stop offset="1" stopColor="#8B5CF6"/></linearGradient></defs><path d="M2 49 C32 47 42 35 67 38 S105 50 130 29 S168 14 190 25 S230 45 254 25 S288 18 318 7" fill="none" stroke="url(#signal)" strokeWidth="3" strokeLinecap="round"/><path d="M2 49 C32 47 42 35 67 38 S105 50 130 29 S168 14 190 25 S230 45 254 25 S288 18 318 7 L318 64 L2 64Z" fill="url(#signal)" opacity=".08"/></svg><div className="mt-3 grid grid-cols-3 gap-2">{["Research", "Track", "Compare"].map((item) => <div key={item} className="rounded-xl border border-[var(--color-border)] bg-slate-50/75 px-2 py-2 text-center text-[10px] font-semibold text-[var(--color-text-secondary)]">{item}</div>)}</div></div><div className="absolute -bottom-5 -right-2 rounded-2xl border border-emerald-200/70 bg-white/95 px-3 py-2 shadow-[var(--shadow-green-context)]"><p className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">Thesis context</p><p className="mt-1 text-xs font-semibold text-[var(--color-text-primary)]">Evidence, organized</p></div></div>
+  </div>;
+}
+
 export const PublicLandingPage: React.FC = () => {
   return (
     <ProductShell>
@@ -43,32 +51,13 @@ export const PublicLandingPage: React.FC = () => {
               <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
             </>
           )}
-          aside={(
-            <ProductPanel className="flex min-h-[180px] flex-col justify-between p-5 md:p-6">
-              <div className="flex items-center justify-between gap-3 border-b border-[rgba(148,163,184,0.12)] pb-4">
-                <span className="text-sm font-semibold text-[#E6EDF3]">Research standards</span>
-              </div>
-              <div className="mt-4 grid gap-2">
-                {[
-                  { label: "Approach", value: "Research-driven" },
-                  { label: "Framework", value: "Multi-factor" },
-                  { label: "Universe", value: "Indian equities" },
-                  { label: "Status", value: "Structured research" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] px-3 py-2">
-                    <span className="text-[11px] font-medium text-[#64748B]">{item.label}</span>
-                    <span className="text-xs font-semibold text-[#E6EDF3]">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </ProductPanel>
-          )}
+          aside={<MarketIntelligenceVisual />}
         />
 
         <ProductSection>
           <div className="mb-5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(41,98,255,0.04)] p-4">
-            <p className="text-xs leading-relaxed text-[#9AA7B5]">
-              <strong className="text-[#E6EDF3]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
+            <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">
+              <strong className="text-[var(--color-text-primary)]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
             </p>
           </div>
         </ProductSection>
@@ -76,8 +65,8 @@ export const PublicLandingPage: React.FC = () => {
         <ProductSection>
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#E6EDF3]">How StockStory works</h2>
-              <p className="mt-1 text-sm text-[#9AA7B5]">Five steps from discovery to execution.</p>
+              <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">How StockStory works</h2>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">Five steps from discovery to execution.</p>
             </div>
             <ProductIntegrityRow />
           </div>
@@ -86,8 +75,8 @@ export const PublicLandingPage: React.FC = () => {
               <ProductPanel key={title} className="relative p-4">
                 <span className="absolute right-3 top-3 text-[10px] font-medium text-[#64748B]">{i + 1}</span>
                 <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-                <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
-                <p className="mt-2 text-xs leading-5 text-[#9AA7B5]">{body}</p>
+                <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
+                <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
               </ProductPanel>
             ))}
           </div>
@@ -95,8 +84,8 @@ export const PublicLandingPage: React.FC = () => {
 
         <ProductSection>
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-[#E6EDF3]">Key differentiators</h2>
-            <p className="mt-1 text-sm text-[#9AA7B5]">What makes StockStory different.</p>
+            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Key differentiators</h2>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">What makes StockStory different.</p>
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {differentiators.map(({ icon: Icon, title, body }) => (
@@ -106,8 +95,8 @@ export const PublicLandingPage: React.FC = () => {
                     <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-[#E6EDF3]">{title}</h3>
-                    <p className="mt-2 text-xs leading-5 text-[#9AA7B5]">{body}</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
+                    <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
                   </div>
                 </div>
               </ProductPanel>
