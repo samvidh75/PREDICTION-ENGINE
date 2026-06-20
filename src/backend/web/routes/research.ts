@@ -9,6 +9,14 @@ import { monitorPortfolio } from "../../../research/portfolio/portfolioEngine";
 import { generateAlerts } from "../../../research/alerts/alertsEngine";
 import type { NormalizedFundamentals, NormalizedCandle } from "../../../research/normalization/types";
 import type { ThesisStatus, RiskLevel } from "../../../research/contracts/productContracts";
+import type {
+  CompanyProfileView, CompanyQuoteView, CompanyFundamentalsView,
+  CompanyFactorScoresView, CompanyThesisView, CompanyRiskView,
+  CompanyHistoryView, InvestReviewContextView,
+} from "../../../research/contracts/productContracts";
+import { healthometerEngine } from "../../../stockstory/healthometer/HealthometerEngine";
+import { buildHealthometerInput } from "../../../stockstory/healthometer/inputBuilder";
+import { algorithmicAnalysisEngine } from "../../../stockstory/analysis/AlgorithmicAnalysisEngine";
 
 function normaliseSymbol(raw: string): string {
   return raw.toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
@@ -163,45 +171,69 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
-      const [metaRes, fsRes, dpRes, quote] = await Promise.all([
+      const [metaRes, fsRes, dpRes, quote, factorRes, featureRes, prRes] = await Promise.all([
         MarketDataGateway.getCompany(sym).catch(() => null),
         query(
-          `SELECT symbol, snapshot_date, pe_ratio, pb_ratio, roe, roa, roce AS roic,
-                  operating_margin, NULL AS net_margin, revenue_growth,
-                  eps_growth, debt_to_equity, current_ratio, beta,
-                  fcf_yield, ev_ebitda, market_cap, profit_growth,
-                  gross_margin, book_value, eps, dividend_yield,
-                  sales, net_profit, operating_profit, total_assets,
-                  total_debt, equity, cash_flow, free_cash_flow
+          `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
+                  debt_to_equity, current_ratio, operating_margin,
+                  net_margin, gross_margin, revenue_growth, profit_growth,
+                  eps_growth, fcf_yield, market_cap, beta
            FROM financial_snapshots
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+             AND pe_ratio IS NOT NULL
            ORDER BY snapshot_date DESC LIMIT 1`,
           [sym]
-        ),
+        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
         query(
           `SELECT trade_date, close, high, low, volume
            FROM daily_prices
            WHERE symbol = $1
            ORDER BY trade_date DESC LIMIT 252`,
           [sym]
-        ),
+        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
         MarketDataGateway.getQuote(sym).catch(() => null),
+        query(
+          `SELECT quality_factor, value_factor, growth_factor,
+                  momentum_factor, risk_factor, sector_strength_factor
+           FROM factor_snapshots
+           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+           ORDER BY trade_date DESC LIMIT 1`,
+          [sym]
+        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
+        query(
+          `SELECT volatility, momentum, rsi, trend_strength
+           FROM feature_snapshots
+           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+           ORDER BY trade_date DESC LIMIT 1`,
+          [sym]
+        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
+        query(
+          `SELECT ranking_score, classification, confidence_score, confidence_level
+           FROM prediction_registry
+           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+             AND ranking_score IS NOT NULL
+           ORDER BY prediction_date DESC LIMIT 1`,
+          [sym]
+        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
       ]);
 
       const fsRow = (fsRes.rows?.[0] || null) as Record<string, unknown> | null;
       const dpRows = (dpRes.rows || []) as Record<string, unknown>[];
+      const factorRow = (factorRes.rows?.[0] || null) as Record<string, unknown> | null;
+      const featureRow = (featureRes.rows?.[0] || null) as Record<string, unknown> | null;
+      const prRow = (prRes.rows?.[0] || null) as Record<string, unknown> | null;
 
       const fundamentals: NormalizedFundamentals | null = fsRow ? {
         symbol: sym,
         peRatio: parseFinite(fsRow.pe_ratio),
         pbRatio: parseFinite(fsRow.pb_ratio),
         evEbitda: parseFinite(fsRow.ev_ebitda),
-        dividendYield: parseFinite(fsRow.dividend_yield),
-        eps: parseFinite(fsRow.eps),
-        bookValue: parseFinite(fsRow.book_value),
+        dividendYield: null,
+        eps: null,
+        bookValue: null,
         roe: parseFinite(fsRow.roe),
         roa: parseFinite(fsRow.roa),
-        roic: parseFinite(fsRow.roic),
+        roic: parseFinite(fsRow.roce),
         debtToEquity: parseFinite(fsRow.debt_to_equity),
         currentRatio: parseFinite(fsRow.current_ratio),
         grossMargin: parseFinite(fsRow.gross_margin),
@@ -210,15 +242,15 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         revenueGrowth: parseFinite(fsRow.revenue_growth),
         profitGrowth: parseFinite(fsRow.profit_growth),
         epsGrowth: parseFinite(fsRow.eps_growth),
-        sales: parseFinite(fsRow.sales),
-        netProfit: parseFinite(fsRow.net_profit),
-        operatingProfit: parseFinite(fsRow.operating_profit),
-        totalAssets: parseFinite(fsRow.total_assets),
-        totalDebt: parseFinite(fsRow.total_debt),
-        equity: parseFinite(fsRow.equity),
-        cashFlow: parseFinite(fsRow.cash_flow),
-        freeCashFlow: parseFinite(fsRow.free_cash_flow),
-        timestamp: fsRow.snapshot_date ? String(fsRow.snapshot_date) : "",
+        sales: null,
+        netProfit: null,
+        operatingProfit: null,
+        totalAssets: null,
+        totalDebt: null,
+        equity: null,
+        cashFlow: null,
+        freeCashFlow: null,
+        timestamp: "",
         sourceSuccess: true,
       } : null;
 
@@ -254,12 +286,187 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         week52Low: null,
       } : null;
 
-      const result = buildCompanyResearch({
+      // ── Healthometer v2 Engine ─────────────────────────────────────
+      const healthInput = {
+        symbol: sym,
+        financials: {
+          peRatio: parseFinite(fsRow?.pe_ratio),
+          pbRatio: parseFinite(fsRow?.pb_ratio),
+          evEbitda: parseFinite(fsRow?.ev_ebitda),
+          roe: parseFinite(fsRow?.roe),
+          roce: parseFinite(fsRow?.roic),
+          roa: parseFinite(fsRow?.roa),
+          debtToEquity: parseFinite(fsRow?.debt_to_equity),
+          currentRatio: parseFinite(fsRow?.current_ratio),
+          operatingMargin: parseFinite(fsRow?.operating_margin),
+          netMargin: parseFinite(fsRow?.net_margin),
+          grossMargin: parseFinite(fsRow?.gross_margin),
+          revenueGrowth: parseFinite(fsRow?.revenue_growth),
+          profitGrowth: parseFinite(fsRow?.profit_growth),
+          epsGrowth: parseFinite(fsRow?.eps_growth),
+          fcfYield: parseFinite(fsRow?.fcf_yield),
+          marketCap: parseFinite(fsRow?.market_cap),
+          beta: parseFinite(fsRow?.beta),
+        },
+        factors: {
+          qualityFactor: parseFinite(factorRow?.quality_factor),
+          valueFactor: parseFinite(factorRow?.value_factor),
+          growthFactor: parseFinite(factorRow?.growth_factor),
+          momentumFactor: parseFinite(factorRow?.momentum_factor),
+          riskFactor: parseFinite(factorRow?.risk_factor),
+          sectorStrengthFactor: parseFinite(factorRow?.sector_strength_factor),
+        },
+        features: {
+          volatility: parseFinite(featureRow?.volatility),
+          momentum: parseFinite(featureRow?.momentum),
+          rsi: parseFinite(featureRow?.rsi),
+          trendStrength: parseFinite(featureRow?.trend_strength),
+        },
+        predictionRegistry: {
+          rankingScore: parseFinite(prRow?.ranking_score),
+          classification: prRow?.classification ? String(prRow.classification) : null,
+          confidenceScore: parseFinite(prRow?.confidence_score),
+          confidenceLevel: prRow?.confidence_level ? String(prRow.confidence_level) : null,
+        },
+      };
+
+      const healthScore = healthometerEngine.evaluate(healthInput);
+      const analysis = algorithmicAnalysisEngine.evaluate(healthScore);
+
+      // ── Build response (CompanyResearchOutput shape) ──────────────
+      const profile: CompanyProfileView = {
         symbol: sym, companyName, sector, industry,
-        fundamentals, quote: quoteData, candles,
-        relativeStrength: null, beta,
-        priorThesisStatus: null,
-      });
+        description: null, website: null, listingDate: null, faceValue: null, isin: null,
+      };
+
+      const quoteView: CompanyQuoteView = quoteData ? {
+        symbol: sym, ...quoteData, dayRange: null,
+      } : {
+        symbol: sym, lastPrice: null, change: null, changePercent: null,
+        open: null, high: null, low: null, close: null, volume: null,
+        marketCap: null, dayRange: null, week52High: null, week52Low: null,
+      };
+
+      const fundamentalsView: CompanyFundamentalsView = fundamentals ? {
+        symbol: sym, peRatio: fundamentals.peRatio, pbRatio: fundamentals.pbRatio,
+        evEbitda: fundamentals.evEbitda, dividendYield: fundamentals.dividendYield,
+        eps: fundamentals.eps, bookValue: fundamentals.bookValue,
+        roe: fundamentals.roe, roa: fundamentals.roa, roic: fundamentals.roic,
+        debtToEquity: fundamentals.debtToEquity, currentRatio: fundamentals.currentRatio,
+        grossMargin: fundamentals.grossMargin, operatingMargin: fundamentals.operatingMargin,
+        netMargin: fundamentals.netMargin, revenueGrowth: fundamentals.revenueGrowth,
+        profitGrowth: fundamentals.profitGrowth, epsGrowth: fundamentals.epsGrowth,
+        sales: fundamentals.sales, netProfit: fundamentals.netProfit,
+        operatingProfit: fundamentals.operatingProfit, totalAssets: fundamentals.totalAssets,
+        totalDebt: fundamentals.totalDebt, equity: fundamentals.equity,
+        cashFlow: fundamentals.cashFlow, freeCashFlow: fundamentals.freeCashFlow,
+      } : {
+        symbol: sym, peRatio: null, pbRatio: null, evEbitda: null, dividendYield: null,
+        eps: null, bookValue: null, roe: null, roa: null, roic: null, debtToEquity: null,
+        currentRatio: null, grossMargin: null, operatingMargin: null, netMargin: null,
+        revenueGrowth: null, profitGrowth: null, epsGrowth: null, sales: null,
+        netProfit: null, operatingProfit: null, totalAssets: null, totalDebt: null,
+        equity: null, cashFlow: null, freeCashFlow: null,
+      };
+
+      const getDimScore = (id: string): number | null =>
+        healthScore.dimensions.find((d) => d.id === id)?.score ?? null;
+
+      const getDimExplanation = (id: string, label: string): string | null => {
+        const s = getDimScore(id);
+        return s !== null ? `${label} score of ${s}` : null;
+      };
+
+      const qScore = getDimScore('quality');
+      const vScore = getDimScore('valuation');
+      const gScore = getDimScore('growth');
+      const rScore = getDimScore('risk');
+      const mScore = getDimScore('momentum');
+      const sScore = getDimScore('stability');
+
+      const factorScores: CompanyFactorScoresView = {
+        symbol: sym,
+        qualityScore: qScore,
+        valuationScore: vScore,
+        growthScore: gScore,
+        riskScore: rScore,
+        momentumScore: mScore,
+        stabilityScore: sScore,
+        convictionScore: healthScore.overallScore,
+        qualityExplanation: getDimExplanation('quality', 'Quality'),
+        valuationExplanation: getDimExplanation('valuation', 'Valuation'),
+        growthExplanation: getDimExplanation('growth', 'Growth'),
+        riskExplanation: getDimExplanation('risk', 'Risk'),
+        momentumExplanation: getDimExplanation('momentum', 'Momentum'),
+        stabilityExplanation: getDimExplanation('stability', 'Stability'),
+      };
+
+      const strengths = analysis.narrative.strengths;
+      const risks = analysis.narrative.risks;
+      const thesisStatus: ThesisStatus = healthScore.overallScore !== null
+        ? healthScore.overallScore >= 65 ? 'Strengthening'
+          : healthScore.overallScore >= 40 ? 'Stable'
+          : 'Weakening'
+        : 'Research signals pending';
+
+      const thesis: CompanyThesisView = {
+        symbol: sym, status: thesisStatus,
+        thesis: strengths.length > 0
+          ? `Research case centered on ${strengths[0].toLowerCase()}.`
+          : null,
+        bullCase: analysis.bullCase,
+        bearCase: analysis.bearCase,
+        topStrengths: strengths,
+        topRisks: risks,
+        whatWouldChange: risks.length > 0
+          ? ['Reduction in identified risk areas would improve the outlook.']
+          : ['Monitor quarterly results for sustained performance.'],
+        priorStatus: null,
+      };
+
+      const riskFlags: string[] = [];
+      if (parseFinite(fsRow?.debt_to_equity) !== null && (parseFinite(fsRow?.debt_to_equity) ?? 0) > 2) {
+        riskFlags.push('High leverage');
+      }
+      if (beta !== null && beta > 1.5) riskFlags.push('High volatility');
+      if (rScore !== null && rScore < 40) riskFlags.push('Elevated risk indicators');
+
+      const riskView: CompanyRiskView = {
+        symbol: sym,
+        overallRisk: riskFlags.length >= 2 ? 'High' : riskFlags.length === 1 ? 'Moderate' : healthScore.overallScore !== null ? 'Low' : 'Insufficient data',
+        leverageRisk: parseFinite(fsRow?.debt_to_equity) !== null ? `Debt/Equity: ${parseFinite(fsRow?.debt_to_equity)?.toFixed(2)}` : null,
+        volatilityRisk: beta !== null ? `Beta: ${beta.toFixed(2)}` : null,
+        liquidityRisk: parseFinite(fsRow?.current_ratio) !== null ? `Current ratio: ${parseFinite(fsRow?.current_ratio)?.toFixed(2)}` : null,
+        earningsRisk: parseFinite(fsRow?.net_profit) !== null ? (parseFinite(fsRow?.net_profit) ?? 0) > 0 ? 'Positive earnings' : 'Negative earnings' : null,
+        sectorRisk: null,
+        keyRiskFlags: riskFlags,
+      };
+
+      const history: CompanyHistoryView = candles.length > 0 ? {
+        symbol: sym,
+        priceHistory: candles.map((c) => ({ date: c.date, close: c.close, high: c.high, low: c.low, volume: c.volume })),
+        earliestDate: candles.reduce((e, c) => c.date < e ? c.date : e, candles[0]?.date ?? null),
+        latestDate: candles.reduce((l, c) => c.date > l ? c.date : l, candles[0]?.date ?? null),
+        dataPoints: candles.length,
+      } : { symbol: sym, priceHistory: [], earliestDate: null, latestDate: null, dataPoints: 0 };
+
+      const investContext: InvestReviewContextView = {
+        symbol: sym, companyName,
+        conviction: healthScore.label,
+        score: healthScore.overallScore,
+        thesis: analysis.narrative.overall,
+        keyRisks: risks,
+        keyStrengths: strengths,
+        whatToWatch: risks.length > 0
+          ? ['Monitor identified risk areas in upcoming results.']
+          : ['Monitor quarterly results for sustained performance.'],
+        missingCriticalData: healthScore.overallScore === null ? ['Insufficient data for full research case'] : [],
+      };
+
+      const result = {
+        profile, quote: quoteView, fundamentals: fundamentalsView,
+        factorScores, thesis, risk: riskView, history, investContext,
+      };
 
       const safe = productSafeParse<typeof result>(productSafeJson(result));
 
@@ -313,9 +520,10 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
               `SELECT pe_ratio, pb_ratio, roe, roa, roce AS roic,
                       debt_to_equity, current_ratio, gross_margin,
                       operating_margin, revenue_growth, profit_growth,
-                      eps_growth, beta, sales, net_profit
+                      eps_growth, beta
                FROM financial_snapshots
                WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+                 AND pe_ratio IS NOT NULL
                ORDER BY snapshot_date DESC LIMIT 1`,
               [sym]
             ),
@@ -564,11 +772,12 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         try {
           const [fsRes, prRes, metaRes] = await Promise.all([
             query(
-              `SELECT pe_ratio, pb_ratio, roe, debt_to_equity,
-                      gross_margin, revenue_growth, profit_growth
-               FROM financial_snapshots
-               WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
-               ORDER BY snapshot_date DESC LIMIT 1`, [sym]
+               `SELECT pe_ratio, pb_ratio, roe, debt_to_equity,
+                       gross_margin, revenue_growth, profit_growth
+                FROM financial_snapshots
+                WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+                  AND pe_ratio IS NOT NULL
+                ORDER BY snapshot_date DESC LIMIT 1`, [sym]
             ),
             query(
               `SELECT ranking_score FROM prediction_registry
@@ -701,13 +910,14 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       const [metaRes, fsRes, prRes] = await Promise.all([
         MarketDataGateway.getCompany(sym).catch(() => null),
         query(
-          `SELECT pe_ratio, pb_ratio, roe, roa, roce AS roic,
-                  debt_to_equity, current_ratio, gross_margin,
-                  operating_margin, revenue_growth, profit_growth,
-                  eps_growth, beta, sales, net_profit
-           FROM financial_snapshots
-           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
-           ORDER BY snapshot_date DESC LIMIT 1`, [sym]
+            `SELECT pe_ratio, pb_ratio, roe, roa, roce AS roic,
+                    debt_to_equity, current_ratio, gross_margin,
+                    operating_margin, revenue_growth, profit_growth,
+                    eps_growth, beta
+             FROM financial_snapshots
+             WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+               AND pe_ratio IS NOT NULL
+             ORDER BY snapshot_date DESC LIMIT 1`, [sym]
         ),
         query(
           `SELECT ranking_score FROM prediction_registry

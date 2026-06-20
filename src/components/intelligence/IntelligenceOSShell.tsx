@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight } from "lucide-react";
-import { GlobalCommandButton } from "./GlobalCommandButton";
 import { CommandPalette } from "./CommandPalette";
 import ProfileButton from "../navigation/ProfileButton";
 
@@ -91,7 +90,6 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
             <kbd className="ml-auto rounded border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#64748B]">⌘K</kbd>
           </button>
           <div className="flex items-center gap-3">
-            <GlobalCommandButton onClick={() => setCommandOpen(true)} />
             <ProfileButton />
           </div>
         </header>

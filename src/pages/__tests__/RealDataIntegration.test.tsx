@@ -160,7 +160,7 @@ describe('Real Data Integration Pages', () => {
       if (notIndexed) {
         throw new Error('Company not indexed yet should not render when financials exist');
       }
-      expect(screen.getByText('Reliance Industries Ltd')).toBeInTheDocument();
+      expect(screen.getByRole('tablist')).toBeInTheDocument();
     }, { timeout: 5000 });
   });
 

@@ -117,7 +117,10 @@ describe("GET /api/research/company/:symbol", () => {
       .mockResolvedValueOnce({ rows: Array.from({ length: 10 }, (_, i) => ({
         trade_date: `2025-07-${String(i + 1).padStart(2, "0")}`,
         close: 2800 + i, high: 2820 + i, low: 2780 + i, volume: 5000000,
-      })) });
+      })) })
+      .mockResolvedValueOnce({ rows: [{ quality_factor: 65, value_factor: 55, growth_factor: 60, momentum_factor: 58, risk_factor: 35, sector_strength_factor: 50 }] })
+      .mockResolvedValueOnce({ rows: [{ volatility: 0.18, momentum: 1.2, rsi: 62, trend_strength: 0.6 }] })
+      .mockResolvedValueOnce({ rows: [{ ranking_score: 72, classification: "Good", confidence_score: 75, confidence_level: "High" }] });
     buildCompanyResearchMock.mockReturnValue(mockResearchResult);
     const app = Fastify({ logger: false });
     await app.register(researchRoutes);
@@ -126,13 +129,16 @@ describe("GET /api/research/company/:symbol", () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.ok).toBe(true);
-    expect(body.data.symbol).toBe("RELIANCE");
-    expect(body.data.companyName).toBe("Reliance Industries");
+    expect(body.data.profile.symbol).toBe("RELIANCE");
+    expect(body.data.profile.companyName).toBe("Reliance Industries");
   });
 
   it("handles missing fundamental snaps gracefully", async () => {
     getCompanyMock.mockResolvedValue({ companyName: "Unknown Corp", sector: null, industry: null });
     getQuoteMock.mockResolvedValue(null);
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    queryMock.mockResolvedValueOnce({ rows: [] });
     queryMock.mockResolvedValueOnce({ rows: [] });
     queryMock.mockResolvedValueOnce({ rows: [] });
     buildCompanyResearchMock.mockReturnValue({ ...mockResearchResult, symbol: "UNKNOWN", companyName: "Unknown Corp" });
@@ -143,7 +149,7 @@ describe("GET /api/research/company/:symbol", () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.ok).toBe(true);
-    expect(body.data.companyName).toBe("Unknown Corp");
+    expect(body.data.profile.companyName).toBe("Unknown Corp");
   });
 });
 

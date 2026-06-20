@@ -71,3 +71,18 @@ export type { Distribution, PercentileScoreMap } from './scoring/PercentileEngin
 export { SectorPercentileEngine } from './scoring/SectorPercentileEngine';
 export type { PercentileMetric } from './scoring/SectorPercentileEngine';
 export { SectorDistributionEngine } from './analytics/SectorDistributionEngine';
+
+// Healthometer v2
+export { HealthometerEngine, healthometerEngine } from './healthometer/HealthometerEngine';
+export { buildHealthometerInput } from './healthometer/inputBuilder';
+export { classifyHealthometer } from './healthometer/labels';
+export type {
+  HealthometerLabel,
+  HealthometerDimension,
+  HealthometerScore,
+  HealthometerInput,
+} from './healthometer/types';
+
+// Algorithmic Analysis
+export { AlgorithmicAnalysisEngine, algorithmicAnalysisEngine } from './analysis/AlgorithmicAnalysisEngine';
+export type { AnalysisNarrative, AlgorithmicAnalysisResult } from './analysis/AlgorithmicAnalysisEngine';

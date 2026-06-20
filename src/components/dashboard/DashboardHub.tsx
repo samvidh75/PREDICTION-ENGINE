@@ -83,7 +83,14 @@ export const DashboardHub: React.FC = () => {
 
   useEffect(() => {
     api.getScanner("Quality compounders", 3)
-      .then((res) => setOpportunities(res.data ?? []))
+      .then((res) => {
+        const seen = new Set<string>();
+        setOpportunities((res.data ?? []).filter((item) => {
+          if (seen.has(item.symbol)) return false;
+          seen.add(item.symbol);
+          return true;
+        }));
+      })
       .catch(() => setOpportunities([]))
       .finally(() => setOppsLoading(false));
   }, []);

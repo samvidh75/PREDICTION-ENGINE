@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, ArrowLeft, Bookmark, ShieldAlert, TrendingUp, GitCompare } from "lucide-react";
+import { Bookmark, TrendingUp, GitCompare } from "lucide-react";
 import StockWorkspaceBar from "../components/company/StockWorkspaceBar";
 import StockStoryPage from "./StockStoryPage";
 import { ProductShell, ProductPage, productNavigate } from "../components/product/ProductUI";
@@ -85,14 +85,7 @@ export default function StockStoryPageF0(): JSX.Element {
   return (
     <ProductShell>
       <ProductPage>
-        <div className="mb-5 flex items-center justify-between">
-          <button
-            onClick={() => productNavigate("search")}
-            className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#9AA7B5] transition hover:text-[#E6EDF3]"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
-          </button>
-        </div>
+
 
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -159,40 +152,7 @@ export default function StockStoryPageF0(): JSX.Element {
           </div>
         </div>
 
-        <div className="mb-5 grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Activity className="h-3.5 w-3.5 text-[#2962FF]" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Prediction Engine</span>
-            </div>
-            {runtimeResult.prediction.overallScore !== null ? (
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold text-[#E6EDF3]">{runtimeResult.prediction.overallScore}</span>
-                <span className="text-[10px] text-[#9AA7B5]">/ 100</span>
-                <span className="rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2 py-0.5 text-[9px] font-semibold text-[#2962FF]">{runtimeResult.prediction.readiness}</span>
-              </div>
-            ) : (
-              <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
-            )}
-          </div>
-          <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldAlert className="h-3.5 w-3.5 text-[#16A34A]" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Healthometer</span>
-            </div>
-            {runtimeResult.healthometer.overallScore !== null ? (
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-bold text-[#E6EDF3]">{Math.round(runtimeResult.healthometer.overallScore)}</span>
-                <span className="text-[10px] text-[#9AA7B5]">/ 100</span>
-                {runtimeResult.healthometer.dimensions.length > 0 && (
-                  <span className="text-[9px] text-[#64748B]">{runtimeResult.healthometer.dimensions.filter((d: any) => d.score !== null).length} active</span>
-                )}
-              </div>
-            ) : (
-              <p className="text-xs text-[#64748B]">Not enough information for this view yet.</p>
-            )}
-          </div>
-        </div>
+
 
         <StockWorkspaceBar ticker={ticker} horizon={horizon} />
 
@@ -216,16 +176,7 @@ export default function StockStoryPageF0(): JSX.Element {
           symbol={ticker}
         />
 
-        {stockInfo && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => productNavigate("methodology")}
-              className="text-[9px] font-medium uppercase tracking-wider text-[#64748B] transition hover:text-[#9AA7B5]"
-            >
-              How research methodology works
-            </button>
-          </div>
-        )}
+
       </ProductPage>
     </ProductShell>
   );
