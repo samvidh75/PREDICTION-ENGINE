@@ -3,6 +3,7 @@ import { Search, Compass, BookOpen, User, Settings, Shield } from 'lucide-react'
 import { NAV_TOKENS } from './NavigationDesignTokens';
 import { NavigationCoordinator, AppRoute } from './NavigationCoordinator';
 import ProfileButton from './ProfileButton';
+import { NavLink } from './NavLink';
 
 interface DesktopShellProps {
   currentRoute: AppRoute;
@@ -54,10 +55,11 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
           <nav className="flex items-center gap-4">
             {menuItems.map(item => {
               const active = currentRoute === item.route;
+              const href = `/?page=${item.route}`;
               return (
-                <button
+                <NavLink
                   key={item.route}
-                  onClick={() => NavigationCoordinator.navigateTo(item.route)}
+                  href={href}
                   className={`px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 cursor-pointer transition-all duration-300 ${
                     active 
                       ? 'bg-[#2962ff]/15 text-[#7da0ff] border border-[#2962ff]/30' 
@@ -66,7 +68,7 @@ export const DesktopShell: React.FC<DesktopShellProps> = ({ currentRoute, onOpen
                 >
                   <item.icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
-                </button>
+                </NavLink>
               );
             })}
           </nav>

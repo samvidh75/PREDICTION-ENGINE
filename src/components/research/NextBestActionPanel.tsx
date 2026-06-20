@@ -43,4 +43,4 @@ export const NextBestActionPanel: React.FC<NextBestActionPanelProps> = ({ symbol
   );
 };
 
-export default NextBestActionPanel;
+export default React.memo(NextBestActionPanel);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight, Menu, X } from "lucide-react";
 import { CommandPalette } from "./CommandPalette";
 import ProfileButton from "../navigation/ProfileButton";
+import { NavLink } from "../navigation/NavLink";
 
 interface ShellRoute {
   id: string;
@@ -133,9 +134,9 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
         <nav className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-[var(--color-border-light)] bg-[var(--color-surface)]/95 pt-3 backdrop-blur-xl md:flex" aria-label="Main navigation">
           {ROUTES.map((route) => {
             const isActive = currentPage === route.pageKey;
-            return <button key={route.id} type="button" onClick={() => navigatePage(route.pageKey)} className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 ${isActive ? "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] shadow-[inset_3px_0_0_#2962FF]" : "text-[var(--color-text-muted)] hover:bg-[rgba(15,23,42,0.04)] hover:text-[var(--color-text-secondary)]"}`} aria-label={route.label} title={route.label}>
+            return <NavLink key={route.id} href={`/?page=${route.pageKey}`} className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 ${isActive ? "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] shadow-[inset_3px_0_0_#2962FF]" : "text-[var(--color-text-muted)] hover:bg-[rgba(15,23,42,0.04)] hover:text-[var(--color-text-secondary)]"}`} aria-label={route.label} title={route.label}>
               <route.icon className="h-4 w-4" aria-hidden="true" />
-            </button>;
+            </NavLink>;
           })}
         </nav>
 
@@ -148,10 +149,9 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
           {MOBILE_ROUTES.map((route) => {
             const isActive = currentPage === route.pageKey;
             return (
-              <button
+              <NavLink
                 key={route.id}
-                type="button"
-                onClick={() => navigatePage(route.pageKey)}
+                href={`/?page=${route.pageKey}`}
                 className={`flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50 ${
                   isActive ? "bg-[rgba(15,23,42,0.06)] text-[var(--color-text-primary)]" : "text-[var(--color-text-muted)]"
                 }`}
@@ -159,7 +159,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
               >
                 <route.icon className="h-5 w-5" aria-hidden="true" />
                 <span className="text-[9px] font-medium uppercase tracking-wider">{route.label}</span>
-              </button>
+              </NavLink>
             );
           })}
           <button
@@ -180,7 +180,7 @@ export function IntelligenceOSShell({ children }: IntelligenceOSShellProps) {
       {menuOpen && <div className="fixed inset-0 z-50 flex items-end bg-black/60 backdrop-blur-sm md:hidden" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setMenuOpen(false); }}>
         <section ref={menuRef} role="dialog" aria-modal="true" aria-label="Product menu" className="w-full rounded-t-3xl border border-b-0 border-[var(--color-border)] bg-[var(--color-surface)] px-4 pb-8 pt-4 shadow-2xl">
           <div className="mb-4 flex items-center justify-between px-1"><h2 className="text-sm font-semibold text-[var(--color-text-primary)]" id="ss-mobile-menu-title">More research tools</h2><button type="button" onClick={() => setMenuOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-xl text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50" aria-label="Close menu"><X className="h-5 w-5" /></button></div>
-          <div className="grid grid-cols-2 gap-2">{MOBILE_MENU_ROUTES.map((route) => <button key={route.id} type="button" onClick={() => { setMenuOpen(false); navigatePage(route.pageKey); }} className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.025)] px-4 text-left text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"><route.icon className="h-4 w-4 text-[#7EA1FF]" />{route.label}</button>)}</div>
+          <div className="grid grid-cols-2 gap-2">{MOBILE_MENU_ROUTES.map((route) => <NavLink key={route.id} href={`/?page=${route.pageKey}`} onClick={() => setTimeout(() => setMenuOpen(false), 0)} className="flex min-h-14 items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.025)] px-4 text-left text-sm font-medium text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/50"><route.icon className="h-4 w-4 text-[#7EA1FF]" />{route.label}</NavLink>)}</div>
         </section>
       </div>}
 
