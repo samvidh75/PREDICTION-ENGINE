@@ -5,22 +5,23 @@ import { buildHealthometerViewModel } from "../../lib/product/predictionEngine/h
 import { ProductPanel } from "../product/ProductUI";
 
 const LABEL_STYLES: Record<string, string> = {
-  "Very healthy": "bg-[rgba(22,163,74,0.15)] border-[rgba(22,163,74,0.3)] text-[#16A34A]",
-  "Healthy": "bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.25)] text-[#22C55E]",
-  "Stable": "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.25)] text-[#2962FF]",
-  "Needs review": "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)] text-[#F59E0B]",
-  "Risk rising": "bg-[rgba(251,146,60,0.12)] border-[rgba(251,146,60,0.25)] text-[#FB923C]",
-  "Fragile": "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.25)] text-[#EF4444]",
+  "Very healthy": "bg-[rgba(45,212,191,0.12)] border-[rgba(45,212,191,0.2)] text-[#2DD4BF]",
+  "Healthy": "bg-[rgba(91,124,250,0.12)] border-[rgba(91,124,250,0.2)] text-[#5B7CFA]",
+  "Stable": "bg-[rgba(148,163,184,0.12)] border-[rgba(148,163,184,0.2)] text-[#94A3B8]",
+  "Needs review": "bg-[rgba(244,183,64,0.12)] border-[rgba(244,183,64,0.2)] text-[#F4B740]",
+  "Risk rising": "bg-[rgba(251,146,60,0.12)] border-[rgba(251,146,60,0.2)] text-[#FB923C]",
+  "Fragile": "bg-[rgba(248,113,113,0.12)] border-[rgba(248,113,113,0.2)] text-[#F87171]",
 };
 
 const DIM_COLORS: Record<string, string> = {
-  quality: "#2962FF",
-  financial_strength: "#16A34A",
-  growth: "#22C55E",
-  valuation: "#F59E0B",
-  risk: "#EF4444",
-  momentum: "#8B5CF6",
-  stability: "#06B6D4",
+  quality: "#5B7CFA",
+  financial_strength: "#2DD4BF",
+  growth: "#8B5CF6",
+  valuation: "#F4B740",
+  risk: "#FB923C",
+  momentum: "#38BDF8",
+  stability: "#94A3B8",
+  capital_efficiency: "#A78BFA",
 };
 
 interface PredictionEnginePanelProps {
@@ -69,7 +70,7 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
           <div className="flex items-center justify-between border-b border-white/[0.06] pb-3 mb-4">
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-[#2962FF]" />
-              <h3 className="text-sm font-semibold text-[#E6EDF3]">Research context</h3>
+              <h3 className="text-sm font-semibold text-[#E6EDF3]">Prediction Engine</h3>
             </div>
             <span className="text-[10px] font-mono text-[#9AA7B5]">{model.activeFactorCount} active parameters</span>
           </div>
@@ -106,10 +107,10 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
 
             {realDrivers.length > 0 && (
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-1">Strongest signals</span>
+                <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Strongest signals</span>
                 <div className="flex flex-wrap gap-1.5">
                   {realDrivers.map((d) => (
-                    <span key={d} className="rounded border border-[rgba(22,163,74,0.2)] bg-[rgba(22,163,74,0.06)] px-2 py-0.5 text-[9px] font-medium text-[#16A34A]">{d}</span>
+                    <span key={d} className="rounded border border-[var(--color-active-border)] bg-[var(--color-active-bg)] px-2 py-0.5 text-[9px] font-medium text-[var(--color-active)]">{d}</span>
                   ))}
                 </div>
               </div>
@@ -117,10 +118,10 @@ export const PredictionEnginePanel: React.FC<PredictionEnginePanelProps> = ({
 
             {realRisks.length > 0 && (
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#64748B] block mb-1">Risk indicators</span>
+                <span className="text-[10px] uppercase tracking-wider text-[var(--color-text-muted)] block mb-1">Risk indicators</span>
                 <div className="flex flex-wrap gap-1.5">
                   {realRisks.map((d) => (
-                    <span key={d} className="rounded border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] px-2 py-0.5 text-[9px] font-medium text-[#EF4444]">{d}</span>
+                    <span key={d} className="rounded border border-[var(--color-danger-border)] bg-[var(--color-danger-bg)] px-2 py-0.5 text-[9px] font-medium text-[var(--color-danger)]">{d}</span>
                   ))}
                 </div>
               </div>

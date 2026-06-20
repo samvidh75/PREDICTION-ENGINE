@@ -26,6 +26,7 @@ import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter"
 import PredictionEnginePanel from "../components/research/PredictionEnginePanel";
 import { buildCompanyResearchViewModel } from "../lib/product/viewModels/companyResearchViewModel";
 import { buildPredictionViewModel } from "../lib/product/predictionEngine/predictionViewModel";
+import { getHealthometerTone } from "../lib/product/publicLabels";
 
 
 
@@ -419,22 +420,22 @@ export const StockStoryPage: React.FC = () => {
   return (
     <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased text-[#E6EDF3]">
 
-      {healthometerLabel && (
-        <div className="flex items-center gap-3">
-          <span className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold ${
-            healthometerLabel === "Very healthy" || healthometerLabel === "Healthy"
-              ? "border-[rgba(22,163,74,0.3)] bg-[rgba(22,163,74,0.12)] text-[#16A34A]"
-              : healthometerLabel === "Stable"
-                ? "border-[rgba(41,98,255,0.25)] bg-[rgba(41,98,255,0.12)] text-[#2962FF]"
-                : healthometerLabel === "Needs review" || healthometerLabel === "Risk rising"
-                  ? "border-[rgba(245,158,11,0.25)] bg-[rgba(245,158,11,0.12)] text-[#F59E0B]"
-                  : "border-[rgba(239,68,68,0.25)] bg-[rgba(239,68,68,0.12)] text-[#EF4444]"
-          }`}>{healthometerLabel}</span>
-          {score !== null && (
-            <span className="text-xs text-[#64748B]">{Math.round(score)} / 100 &middot; {predictionModel.activeFactorCount} active dimensions</span>
-          )}
-        </div>
-      )}
+      {healthometerLabel && (() => {
+        const tone = getHealthometerTone(healthometerLabel);
+        return (
+          <div className="flex items-center gap-3">
+            <span
+              className="rounded-md border px-2 py-0.5 text-[10px] font-semibold"
+              style={{ color: tone.color, backgroundColor: tone.bg, borderColor: tone.border }}
+            >
+              {healthometerLabel}
+            </span>
+            {score !== null && (
+              <span className="text-xs text-[#64748B]">{Math.round(score)} / 100 &middot; {predictionModel.activeFactorCount} active dimensions</span>
+            )}
+          </div>
+        );
+      })()}
 
       <div className="rounded-2xl border border-white/[0.08] bg-[#0D1117] p-5">
         <div className="mb-2 flex items-center justify-between">

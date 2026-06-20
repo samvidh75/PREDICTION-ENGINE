@@ -18,6 +18,17 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    preview: {
+      port: 4173,
+      strictPort: true,
+      proxy: {
+        "/api": {
+          target: apiTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
     build: {
       sourcemap: false,
       rollupOptions: {

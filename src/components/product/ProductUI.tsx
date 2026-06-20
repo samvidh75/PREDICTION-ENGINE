@@ -14,8 +14,8 @@ export function productNavigate(pageKey: string, id?: string): void {
 
 export function ProductShell({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
   return (
-    <div className={`min-h-screen bg-[#070A0F] text-[#E6EDF3] antialiased ${className}`}>
-      <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41,98,255,0.03) 0%, transparent 60%)' }} />
+    <div className={`min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] antialiased ${className}`}>
+      <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(91,124,250,0.03) 0%, transparent 60%)' }} />
       <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14 z-10">
         {children}
       </main>
@@ -61,16 +61,16 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-[0_8px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.03)] transition-all duration-150 ${className}`}>{children}</Component>;
+  return <Component className={`rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_8px_24px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-150 ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
   return (
     <section className="grid gap-6 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-12">
-      <div className="flex min-h-[360px] flex-col justify-center rounded-2xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.04)] md:p-8">
-        {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">{eyebrow}</div>}
-        <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[#E6EDF3] sm:text-4xl md:text-5xl">{title}</h1>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#9AA7B5] md:text-base">{body}</p>
+      <div className="flex min-h-[360px] flex-col justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.04)] md:p-8">
+        {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">{eyebrow}</div>}
+        <h1 className="max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-4xl md:text-5xl">{title}</h1>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)] md:text-base">{body}</p>
         {actions && <div className="mt-6 flex flex-col gap-2 sm:flex-row">{actions}</div>}
       </div>
       {aside}
@@ -80,10 +80,10 @@ export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?
 
 export function ProductAction({ children, onClick, href, variant = "primary", className = "", disabled = false, disabledReason, id }: { children: React.ReactNode; onClick?: () => void; href?: string; variant?: "primary" | "secondary" | "ghost"; className?: string; disabled?: boolean; disabledReason?: string; id?: string }): JSX.Element {
   const classes = variant === "primary"
-    ? "border-[#2962FF] bg-[#2962FF] text-white shadow-[0_10px_30px_rgba(41,98,255,0.18)] hover:bg-[#1F4FE0] hover:shadow-[0_14px_36px_rgba(41,98,255,0.22)]"
+    ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white shadow-[0_10px_30px_rgba(91,124,250,0.18)] hover:bg-[var(--color-accent-hover)] hover:shadow-[0_14px_36px_rgba(91,124,250,0.22)]"
     : variant === "secondary"
-      ? "border-[rgba(148,163,184,0.2)] bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60 hover:bg-[#161B22]"
-      : "border-transparent bg-transparent text-[#9AA7B5] hover:bg-white/[0.03] hover:text-[#E6EDF3]";
+      ? "border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:bg-white/[0.02]"
+      : "border-transparent bg-transparent text-[var(--color-text-secondary)] hover:bg-white/[0.03] hover:text-[var(--color-text-primary)]";
   const content = (
     <>
       <span>{children}</span>
