@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Bookmark, Check, ShieldAlert, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ShieldAlert, ShoppingBag, Sparkles, ChevronDown, ChevronRight } from "lucide-react";
 import { ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { useToast } from "../components/feedback/useToast";
@@ -11,6 +11,12 @@ import { buildSingleActionCluster, buildSinglePriceContext } from "../lib/produc
 import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../services/stocks/StockRegistry";
+import ResearchChecklistPanel from "../components/research/ResearchChecklistPanel";
+import TechnicalIntelligencePanel from "../components/research/TechnicalIntelligencePanel";
+import OwnershipIntelligencePanel from "../components/research/OwnershipIntelligencePanel";
+import CorporateEventsTimeline from "../components/research/CorporateEventsTimeline";
+import { TrendlyneWidget } from "../components/external/TrendlyneWidget";
+import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
 
 function tickerFromUrl(): string {
   const p = new URLSearchParams(window.location.search);
@@ -40,6 +46,7 @@ export default function StockStoryPageF0(): JSX.Element {
     ...buildCompanyResearch(ticker, identity.displayName, identity.sector, null, tracked),
     healthometerLabel: null,
     analysis: null,
+    priceHistory: [],
   }));
 
   useEffect(() => {
@@ -140,7 +147,74 @@ export default function StockStoryPageF0(): JSX.Element {
           <button onClick={() => productNavigate("methodology")} className="w-full px-2 py-2 text-left text-xs leading-5 text-[#64748B] hover:text-[var(--color-text-secondary)]">How to interpret Healthometer and Prediction Engine →</button>
         </aside>
       </div>
-      <button type="button" onClick={() => setInvestOpen(true)} className="fixed bottom-20 right-4 z-40 inline-flex h-14 items-center gap-2 rounded-full border border-white/50 bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,.32),inset_0_1px_0_rgba(255,255,255,.18)] transition hover:-translate-y-1 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20 md:bottom-5 md:right-5" aria-label={`Buy ${identity.displayName} through your broker`}><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10"><ShoppingBag className="h-4 w-4" /></span><span>Buy via broker</span></button>
+      <section className="mt-8">
+        <SectionTitle eyebrow="Market context" title="Price journey" body="Daily closing-price context from the available market history. Inspect a point to see its date and value." />
+        <HistoricalPriceChart symbol={ticker} points={research.priceHistory} />
+      </section>
+      <section className="mt-7 space-y-4">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]"><Sparkles className="h-4 w-4" /> Research Intelligence</div>
+
+        <ResearchChecklistPanel
+          input={{
+            healthometerScores: dimensions.map((d) => ({ id: d.id, label: d.label, score: d.score })),
+            momentumScore: dimensions.find((d) => d.id === "momentum")?.score ?? null,
+            riskScore: dimensions.find((d) => d.id === "risk")?.score ?? null,
+            peContext: research.valuationContext?.peContext ?? null,
+            pbContext: research.valuationContext?.pbContext ?? null,
+            debtWarning: research.riskContext?.debtWarning ?? null,
+            volatilityNote: research.riskContext?.volatilityNote ?? null,
+            revenueGrowth: null,
+            profitGrowth: null,
+            roce: null,
+            roe: null,
+            debtToEquity: null,
+            currentRatio: null,
+            promoterHolding: null,
+            fiiHolding: null,
+            hasPeerData: false,
+          }}
+        />
+
+        <TechnicalIntelligencePanel
+          input={{
+            priceHistory: research.priceHistory.map((point) => ({ close: point.close, volume: point.volume ?? undefined })),
+            momentumScore: dimensions.find((d) => d.id === "momentum")?.score ?? null,
+            volatilityScore: dimensions.find((d) => d.id === "risk")?.score ?? null,
+            priceChangePercent: quote.quote?.changePercent ?? null,
+            rsiValue: null,
+            macdValue: null,
+            distanceFrom52WeekHigh: null,
+          }}
+        />
+
+        <OwnershipIntelligencePanel input={{ snapshots: [] }} />
+
+        <CorporateEventsTimeline events={[]} />
+
+        <div className="space-y-4">
+          <details className="group rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
+            <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-semibold text-[var(--color-text-primary)]">
+              External technical snapshot
+              <ChevronDown className="h-4 w-4 text-[#64748B] transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="border-t border-[var(--color-border)] p-4">
+              <TrendlyneWidget kind="technicals" symbol={ticker} lazy />
+            </div>
+          </details>
+
+          <details className="group rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden">
+            <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-semibold text-[var(--color-text-primary)]">
+              External checklist view
+              <ChevronDown className="h-4 w-4 text-[#64748B] transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="border-t border-[var(--color-border)] p-4">
+              <TrendlyneWidget kind="checklist" symbol={ticker} lazy />
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <button type="button" onClick={() => setInvestOpen(true)} className="fixed bottom-20 right-4 z-40 inline-flex h-14 items-center gap-2 rounded-full border border-white/50 bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,.32),inset_0_1px_0_rgba(255,255,255,.18)] transition hover:-translate-y-1 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20 md:bottom-5 md:right-5" aria-label={`Research ${identity.displayName}`}><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10"><Sparkles className="h-4 w-4" /></span><span>Research</span></button>
       <InvestHandoffSheet open={investOpen} onClose={() => setInvestOpen(false)} symbol={ticker} companyName={identity.displayName} marketPrice={quote.quote?.price ?? null} />
     </ProductPage>
   </ProductShell>;

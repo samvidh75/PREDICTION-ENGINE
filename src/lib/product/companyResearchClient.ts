@@ -29,6 +29,7 @@ export interface UnifiedResearchResult {
   riskContext: { debtWarning: string | null; volatilityNote: string | null; overall: string | null };
   actions: ProductActionResult;
   methodologyNote: string;
+  priceHistory: Array<{ date: string; close: number; high: number | null; low: number | null; volume: number | null }>;
 }
 
 function buildHealthometerFromBackend(data: CompanyResearchData, story?: StockStoryData | null): { healthometer: HealthometerViewState; label: string | null } {
@@ -93,7 +94,7 @@ export async function fetchUnifiedResearch(
 ): Promise<UnifiedResearchResult> {
   const fallback = (): UnifiedResearchResult => {
     const r = buildCompanyResearch(symbol, companyName, sector, rawMetrics, isTracked);
-    return { ...r, healthometerLabel: null, analysis: null };
+    return { ...r, healthometerLabel: null, analysis: null, priceHistory: [] };
   };
 
   if (!symbol) return fallback();
@@ -160,9 +161,16 @@ export async function fetchUnifiedResearch(
       healthometer,
       healthometerLabel: label,
       analysis,
+      priceHistory: (() => {
+        const direct = Array.isArray(researchData.candles) ? researchData.candles : [];
+        const nested = (researchData as CompanyResearchData & { history?: { priceHistory?: CompanyResearchData["candles"] } }).history?.priceHistory;
+        const source = direct.length > 0 ? direct : Array.isArray(nested) ? nested : [];
+        return source
+          .filter((point) => typeof point.close === "number" && Number.isFinite(point.close) && point.close > 0)
+          .map((point) => ({ date: point.date, close: point.close, high: point.high ?? null, low: point.low ?? null, volume: point.volume ?? null }));
+      })(),
     };
   } catch {
     return fallback();
   }
 }
-

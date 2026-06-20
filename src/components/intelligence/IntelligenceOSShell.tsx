@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight, Menu, X } from "lucide-react";
+import { BarChart3, TrendingUp, ShieldCheck, Eye, Briefcase, Settings, Home, Search, ArrowLeftRight, Menu, X, Rocket } from "lucide-react";
 import { CommandPalette } from "./CommandPalette";
 import ProfileButton from "../navigation/ProfileButton";
 import { NavLink } from "../navigation/NavLink";
@@ -33,6 +33,7 @@ const MOBILE_MENU_ROUTES: ShellRoute[] = [
   { id: "compare", label: "Compare", icon: ArrowLeftRight, pageKey: "compare" },
   { id: "portfolio", label: "Portfolio", icon: Briefcase, pageKey: "portfolio" },
   { id: "alerts", label: "Alerts", icon: TrendingUp, pageKey: "alerts" },
+  { id: "ipo", label: "IPO Center", icon: Rocket, pageKey: "ipo" },
   { id: "methodology", label: "Methodology", icon: ShieldCheck, pageKey: "methodology" },
   { id: "settings", label: "Settings", icon: Settings, pageKey: "settings" },
 ];
