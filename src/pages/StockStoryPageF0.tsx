@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Bookmark, Check, ShieldAlert, Sparkles } from "lucide-react";
+import { ArrowRight, Bookmark, Check, ShieldAlert, ShoppingBag, Sparkles } from "lucide-react";
 import { ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { useToast } from "../components/feedback/useToast";
@@ -140,7 +140,8 @@ export default function StockStoryPageF0(): JSX.Element {
           <button onClick={() => productNavigate("methodology")} className="w-full px-2 py-2 text-left text-xs leading-5 text-[#64748B] hover:text-[var(--color-text-secondary)]">How to interpret Healthometer and Prediction Engine →</button>
         </aside>
       </div>
-      <InvestHandoffSheet open={investOpen} onClose={() => setInvestOpen(false)} symbol={ticker} />
+      <button type="button" onClick={() => setInvestOpen(true)} className="fixed bottom-20 right-4 z-40 inline-flex h-14 items-center gap-2 rounded-full border border-white/50 bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,.32),inset_0_1px_0_rgba(255,255,255,.18)] transition hover:-translate-y-1 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/20 md:bottom-5 md:right-5" aria-label={`Buy ${identity.displayName} through your broker`}><span className="grid h-8 w-8 place-items-center rounded-full bg-white/10"><ShoppingBag className="h-4 w-4" /></span><span>Buy via broker</span></button>
+      <InvestHandoffSheet open={investOpen} onClose={() => setInvestOpen(false)} symbol={ticker} companyName={identity.displayName} marketPrice={quote.quote?.price ?? null} />
     </ProductPage>
   </ProductShell>;
 }

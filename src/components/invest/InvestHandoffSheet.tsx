@@ -13,6 +13,9 @@ import {
   Shield,
   Info,
   Loader2,
+  Building2,
+  ShoppingBag,
+  WalletCards,
 } from "lucide-react";
 import { ProductPanel, productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
@@ -20,6 +23,7 @@ import type { InvestContextResponse } from "../../services/api/client";
 import ThesisHealthMeter from "../research/ThesisHealthMeter";
 import { computeResearchSignal, type ResearchSignalView } from "../../lib/research/researchSignalModel";
 import ResearchContextLink from "../research/ResearchContextLink";
+import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 
 interface InvestHandoffSheetProps {
   open: boolean;
@@ -27,7 +31,22 @@ interface InvestHandoffSheetProps {
   symbol: string;
   companyName?: string;
   thesisSummary?: string;
+  marketPrice?: number | null;
 }
+
+type BrokerChoice = { id: string; name: string; url: string };
+type HandoffDraft = { broker: BrokerChoice; quantity: number; price: number | null };
+
+const BROKERS: BrokerChoice[] = [
+  { id: "zerodha", name: "Zerodha Kite", url: "https://kite.zerodha.com/" },
+  { id: "groww", name: "Groww", url: "https://groww.in/stocks" },
+  { id: "angel", name: "Angel One", url: "https://trade.angelone.in/" },
+  { id: "upstox", name: "Upstox", url: "https://login.upstox.com/" },
+  { id: "dhan", name: "Dhan", url: "https://web.dhan.co/" },
+  { id: "icici", name: "ICICI Direct", url: "https://secure.icicidirect.com/" },
+  { id: "kotak", name: "Kotak Neo", url: "https://neo.kotaksecurities.com/" },
+  { id: "other", name: "Other broker", url: "" },
+];
 
 type Stage = 1 | 2 | 3;
 
@@ -44,16 +63,19 @@ export function InvestHandoffSheet({
   symbol,
   companyName,
   thesisSummary: propThesis,
+  marketPrice = null,
 }: InvestHandoffSheetProps) {
   const [stage, setStage] = useState<Stage>(1);
   const [loadingContext, setLoadingContext] = useState(false);
   const [context, setContext] = useState<InvestContextResponse["data"] | null>(null);
+  const [handoff, setHandoff] = useState<HandoffDraft | null>(null);
 
   useEffect(() => {
     if (open) {
       setStage(1);
       setLoadingContext(true);
       setContext(null);
+      setHandoff(null);
       api.getInvestContext(symbol)
         .then((res) => setContext(res.data))
         .catch(() => {})
@@ -79,9 +101,6 @@ export function InvestHandoffSheet({
     };
   }, [open, handleKeyDown]);
 
-  if (!open) return null;
-
-  const hasRealContext = context !== null;
   const displayName = companyName || context?.companyName || symbol.toUpperCase();
   const thesis = context?.thesis || propThesis || null;
   const risks = context?.keyRisks?.length ? context.keyRisks : null;
@@ -107,6 +126,8 @@ export function InvestHandoffSheet({
     };
     return computeResearchSignal(factorScores, null);
   }, [context, symbol]);
+
+  if (!open) return null;
 
   return (
     <div
@@ -148,46 +169,7 @@ export function InvestHandoffSheet({
             </div>
           ) : (
             <>
-              {!hasRealContext && (
-                <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-                  <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
-                    <div className="flex flex-col items-center gap-3 rounded-xl border border-[var(--color-border)] bg-white/[0.015] p-6 text-center">
-                      <Info className="h-6 w-6 text-[var(--color-accent)]" />
-                      <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Review the research first.</h3>
-                      <p className="max-w-xs text-xs leading-5 text-[var(--color-text-secondary)]">
-                        Track or compare this company before continuing to your own broker.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex-none border-t border-[var(--border-subtle)] bg-[var(--color-surface-raised)] px-5 py-4 flex flex-col gap-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); productNavigate("watchlist"); }}
-                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-semibold text-[var(--color-text-primary)] hover:border-[var(--color-accent)] transition-colors"
-                    >
-                      <TrendingUp className="h-3.5 w-3.5" />
-                      Track instead
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { onClose(); productNavigate("compare", symbol); }}
-                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs font-semibold text-[var(--color-text-primary)] hover:border-[var(--color-accent)] transition-colors"
-                    >
-                      <BarChart3 className="h-3.5 w-3.5" />
-                      Compare first
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-3 text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
-                    >
-                      <ArrowLeft className="h-3.5 w-3.5" />
-                      Back to research
-                    </button>
-                  </div>
-                </div>
-              )}
-              {hasRealContext && stage === 1 && (
+              {stage === 1 && (
                 <StageOne
                   symbol={symbol}
                   displayName={displayName}
@@ -203,16 +185,20 @@ export function InvestHandoffSheet({
                   onBack={onClose}
                 />
               )}
-              {hasRealContext && stage === 2 && (
+              {stage === 2 && (
                 <StageTwo
+                  symbol={symbol}
+                  displayName={displayName}
+                  marketPrice={marketPrice}
                   onBack={() => setStage(1)}
-                  onContinue={() => setStage(3)}
+                  onContinue={(draft) => { setHandoff(draft); setStage(3); }}
                 />
               )}
-              {hasRealContext && stage === 3 && (
+              {stage === 3 && handoff && (
                 <StageThree
                   symbol={symbol}
                   displayName={displayName}
+                  handoff={handoff}
                   onBack={() => setStage(2)}
                   onClose={onClose}
                 />
@@ -404,52 +390,73 @@ function StageOne({
 }
 
 function StageTwo({
+  symbol,
+  displayName,
+  marketPrice,
   onBack,
   onContinue,
 }: {
+  symbol: string;
+  displayName: string;
+  marketPrice: number | null;
   onBack: () => void;
-  onContinue: () => void;
+  onContinue: (draft: HandoffDraft) => void;
 }) {
+  const [selectedId, setSelectedId] = useState("zerodha");
+  const [quantity, setQuantity] = useState("1");
+  const [otherName, setOtherName] = useState("");
+  const parsedQuantity = Number(quantity);
+  const validQuantity = Number.isInteger(parsedQuantity) && parsedQuantity > 0;
+  const selected = BROKERS.find((broker) => broker.id === selectedId) ?? BROKERS[0];
+  const effectiveBroker = selected.id === "other" ? { ...selected, name: otherName.trim() || "Other broker" } : selected;
+  const canContinue = validQuantity && (selected.id !== "other" || otherName.trim().length > 1);
+  const estimate = marketPrice && validQuantity ? marketPrice * parsedQuantity : null;
+
+  const continueToBroker = () => {
+    if (!canContinue) return;
+    if (effectiveBroker.url) window.open(effectiveBroker.url, "_blank", "noopener,noreferrer");
+    onContinue({ broker: effectiveBroker, quantity: parsedQuantity, price: marketPrice });
+  };
+
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-        <ProductPanel className="flex flex-col items-center p-8 text-center bg-[var(--color-surface)]">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-light)]">
-            <ExternalLink className="h-5 w-5 text-[var(--color-accent)]" />
+        <div>
+          <div className="flex items-center justify-between gap-3"><div className="text-[11px] font-semibold uppercase tracking-[.18em] text-[var(--color-accent)]">Broker handoff</div><button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"><ArrowLeft className="h-3 w-3" /> Review</button></div>
+          <h3 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Choose where to continue</h3>
+          <p className="mt-2 text-sm leading-5 text-[var(--color-text-secondary)]">We will open the official broker portal. Sign in and approve the order there.</p>
+        </div>
+
+        <ProductPanel className="overflow-hidden p-0">
+          <div className="border-b border-[var(--color-border)] p-4">
+            <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--color-accent-light)] text-[var(--color-accent)]"><ShoppingBag className="h-4 w-4" /></span><div><div className="text-sm font-semibold text-[var(--color-text-primary)]">{displayName}</div><div className="font-mono text-[11px] text-[var(--color-text-muted)]">{symbol.toUpperCase()} · NSE equity</div></div></div>
           </div>
-          <h3 className="mt-4 text-base font-semibold text-[var(--color-text-primary)]">
-            Review your research before deciding
-          </h3>
-          <p className="mt-2 max-w-sm text-sm leading-5 text-[var(--color-text-secondary)]">
-            Research review is complete. Any execution decision happens outside StockStory after your own review. Track or compare first while you evaluate.
-          </p>
-          <div className="mt-6 flex flex-col items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2.5">
-              <Shield className="h-4 w-4 text-[var(--color-text-muted)]" />
-              <span className="text-xs text-[var(--color-text-muted)]">
-                No broker credentials are stored in StockStory.
-              </span>
-            </div>
+          <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
+            {BROKERS.map((broker) => <button key={broker.id} type="button" onClick={() => setSelectedId(broker.id)} className={`min-h-16 rounded-xl border px-2 py-3 text-center text-[11px] font-semibold transition ${selectedId === broker.id ? "border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)] shadow-sm" : "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent-border)]"}`}><Building2 className="mx-auto mb-1.5 h-4 w-4" />{broker.name}</button>)}
           </div>
         </ProductPanel>
+
+        {selectedId === "other" && <input aria-label="Broker name" value={otherName} onChange={(event) => setOtherName(event.target.value)} placeholder="Type your broker's name" className="h-11 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-accent)]" />}
+
+        <ProductPanel className="p-4">
+          <label className="text-[11px] font-semibold uppercase tracking-[.14em] text-[var(--color-text-muted)]" htmlFor="broker-quantity">Quantity</label>
+          <div className="mt-2 flex items-center gap-3"><button type="button" onClick={() => setQuantity(String(Math.max(1, (validQuantity ? parsedQuantity : 1) - 1)))} className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--color-border)] text-lg text-[var(--color-text-primary)]">−</button><input id="broker-quantity" inputMode="numeric" type="number" min="1" step="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} className="h-11 min-w-0 flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-center font-mono text-base font-semibold text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)]" /><button type="button" onClick={() => setQuantity(String((validQuantity ? parsedQuantity : 0) + 1))} className="grid h-11 w-11 place-items-center rounded-xl border border-[var(--color-border)] text-lg text-[var(--color-text-primary)]">+</button></div>
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-[var(--color-surface-raised)] px-3 py-2.5 text-xs"><span className="text-[var(--color-text-muted)]">Estimated value</span><span className="font-mono font-semibold text-[var(--color-text-primary)]">{estimate ? `₹${estimate.toLocaleString("en-IN", { maximumFractionDigits: 2 })}` : "Confirmed by broker"}</span></div>
+          {!validQuantity && <p className="mt-2 text-xs text-red-500">Enter a whole-number quantity of at least 1.</p>}
+        </ProductPanel>
+
+        <div className="flex items-start gap-3 rounded-2xl border border-emerald-200/80 bg-emerald-50/70 p-4"><Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /><p className="text-xs leading-5 text-emerald-900"><strong>Secure handoff:</strong> StockStory records this intent, but never asks for or stores your broker password, PIN or OTP.</p></div>
       </div>
 
       <div className="flex-none border-t border-[var(--border-subtle)] bg-[var(--color-surface-raised)] px-5 py-4 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <button
           type="button"
-          onClick={onContinue}
+          onClick={continueToBroker}
+          disabled={!canContinue}
           className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)] px-4 text-xs font-semibold text-white hover:bg-[var(--color-accent-hover)] transition-colors"
         >
-          Continue to summary
-          <ArrowRight className="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex w-full h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent px-4 text-xs font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to review
+          {effectiveBroker.url ? `Open ${effectiveBroker.name}` : "I opened my broker"}
+          <ExternalLink className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
@@ -459,21 +466,31 @@ function StageTwo({
 function StageThree({
   symbol,
   displayName,
+  handoff,
   onBack,
   onClose,
 }: {
   symbol: string;
   displayName: string;
+  handoff: HandoffDraft;
   onBack: () => void;
   onClose: () => void;
 }) {
+  const [fillPrice, setFillPrice] = useState(handoff.price ? String(handoff.price) : "");
+  const [saved, setSaved] = useState(false);
+  const validPrice = Number.isFinite(Number(fillPrice)) && Number(fillPrice) > 0;
+  const recordPurchase = () => {
+    if (!validPrice) return;
+    const ok = PortfolioEngine.addHolding({ symbol, shares: handoff.quantity, avgBuyPrice: Number(fillPrice), sector: "Sector unavailable" });
+    if (ok) setSaved(true);
+  };
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
         <ProductPanel className="p-4 bg-[var(--color-surface)]">
           <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
             <FileText className="h-3 w-3" />
-            Review summary
+            Handoff summary
           </div>
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between text-sm">
@@ -486,40 +503,34 @@ function StageThree({
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[var(--color-text-muted)]">Mode</span>
-              <span className="font-medium text-[var(--color-active)]">Research review</span>
+              <span className="text-[var(--color-text-muted)]">Broker</span>
+              <span className="font-medium text-[var(--color-text-primary)]">{handoff.broker.name}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[var(--color-text-muted)]">Next step</span>
-              <span className="font-medium text-[var(--color-text-primary)]">
-                Decide outside StockStory
-              </span>
+              <span className="text-[var(--color-text-muted)]">Quantity</span>
+              <span className="font-mono font-semibold text-[var(--color-text-primary)]">{handoff.quantity}</span>
             </div>
           </div>
         </ProductPanel>
 
-        <ProductPanel className="border border-[var(--color-active-border)] bg-[var(--color-active-bg)] p-4">
-          <div className="flex items-start gap-3">
-            <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-active)]" />
-            <div>
-              <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-                No order has been placed.
-              </p>
-              <p className="mt-1 text-sm leading-5 text-[var(--color-text-secondary)]">
-                StockStory India does not execute orders or send instructions on your behalf. This is not a confirmation of any external action.
-              </p>
-            </div>
-          </div>
-        </ProductPanel>
+        {!saved ? <ProductPanel className="p-4">
+          <div className="flex items-center gap-2"><WalletCards className="h-4 w-4 text-[var(--color-accent)]" /><h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Did the purchase complete?</h3></div>
+          <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">Only record a position after your broker shows a successful or filled order.</p>
+          <label htmlFor="fill-price" className="mt-4 block text-[11px] font-semibold uppercase tracking-[.14em] text-[var(--color-text-muted)]">Average fill price</label>
+          <div className="relative mt-2"><span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[var(--color-text-muted)]">₹</span><input id="fill-price" type="number" min="0.01" step="0.01" value={fillPrice} onChange={(event) => setFillPrice(event.target.value)} placeholder="Price shown by broker" className="h-11 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] pl-8 pr-3 font-mono text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)]" /></div>
+          <button type="button" disabled={!validPrice} onClick={recordPurchase} className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--color-accent-hover)] disabled:cursor-not-allowed disabled:opacity-40"><ShoppingBag className="h-4 w-4" />Confirm filled &amp; add to portfolio</button>
+        </ProductPanel> : <ProductPanel className="border border-emerald-200 bg-emerald-50/70 p-5 text-center"><CheckCircle2 className="mx-auto h-7 w-7 text-emerald-600" /><h3 className="mt-3 text-base font-semibold text-emerald-950">Position recorded</h3><p className="mt-1 text-xs leading-5 text-emerald-800">{handoff.quantity} {symbol.toUpperCase()} added to your StockStory portfolio for thesis tracking.</p></ProductPanel>}
+
+        <div className="flex items-start gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"><Shield className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-text-muted)]" /><p className="text-xs leading-5 text-[var(--color-text-secondary)]">StockStory cannot verify the broker fill automatically until that broker is connected with read-only portfolio permission.</p></div>
       </div>
 
       <div className="flex-none border-t border-[var(--border-subtle)] bg-[var(--color-surface-raised)] px-5 py-4 space-y-3 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => { if (saved) { onClose(); productNavigate("portfolio"); } else onClose(); }}
           className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-lg border border-[var(--color-accent)] bg-[var(--color-accent)] px-4 text-xs font-semibold text-white hover:bg-[var(--color-accent-hover)] transition-colors"
         >
-          Done
+          {saved ? "View portfolio" : "Done without recording"}
         </button>
         <button
           type="button"
