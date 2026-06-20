@@ -675,6 +675,7 @@ test.describe("Keyboard and accessibility", () => {
 
   test("command palette opens with Cmd+K and closes with Escape", async ({ page }) => {
     await page.goto("/?page=dashboard");
+    await expect(page.locator('a[href="#ss-main-content"]')).toBeVisible();
     await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
     await page.keyboard.press("Escape");
@@ -683,6 +684,7 @@ test.describe("Keyboard and accessibility", () => {
 
   test("command palette search input is focused on open", async ({ page }) => {
     await page.goto("/?page=dashboard");
+    await expect(page.locator('a[href="#ss-main-content"]')).toBeVisible();
     await page.keyboard.press("Control+k");
     await expect(page.getByLabel("Command search")).toBeFocused();
     await page.keyboard.press("Escape");
@@ -690,6 +692,7 @@ test.describe("Keyboard and accessibility", () => {
 
   test("modals trap focus and return focus on close", async ({ page }) => {
     await page.goto("/?page=dashboard");
+    await expect(page.locator('a[href="#ss-main-content"]')).toBeVisible();
     await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
     await page.keyboard.press("Escape");
