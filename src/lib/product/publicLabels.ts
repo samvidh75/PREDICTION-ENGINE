@@ -92,7 +92,7 @@ export function getHealthometerTone(label: HealthometerLabel | string | null | u
     case 'Needs review': return { label: h, color: '#F4B740', bg: 'rgba(244,183,64,0.12)', border: 'rgba(244,183,64,0.2)' };
     case 'Risk rising': return { label: h, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.2)' };
     case 'Fragile': return { label: h, color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.2)' };
-    default: return { label: 'Not enough information', color: '#718096', bg: 'rgba(113,128,150,0.12)', border: 'rgba(113,128,150,0.2)' };
+    default: return { label: 'Not enough information', color: '#64748B', bg: 'rgba(100,116,139,0.12)', border: 'rgba(100,116,139,0.2)' };
   }
 }
 
@@ -106,7 +106,7 @@ export function getResearchStanceTone(stance: ResearchStanceLabel | string | nul
     case 'Needs review': return { label: s, color: '#F4B740', bg: 'rgba(244,183,64,0.12)', border: 'rgba(244,183,64,0.2)' };
     case 'Risk rising': return { label: s, color: '#FB923C', bg: 'rgba(251,146,60,0.12)', border: 'rgba(251,146,60,0.2)' };
     case 'Avoid for now': return { label: s, color: '#F87171', bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.2)' };
-    default: return { label: 'Not enough information', color: '#718096', bg: 'rgba(113,128,150,0.12)', border: 'rgba(113,128,150,0.2)' };
+    default: return { label: 'Not enough information', color: '#64748B', bg: 'rgba(100,116,139,0.12)', border: 'rgba(100,116,139,0.2)' };
   }
 }
 

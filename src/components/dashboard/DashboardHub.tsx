@@ -134,21 +134,21 @@ export const DashboardHub: React.FC = () => {
   return (
     <ProductShell>
       <ProductPage>
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-1 sm:pt-0">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
-              <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)] leading-tight">
+              <TrendingUp className="h-[16px] w-[16px] text-[var(--color-accent)]" aria-hidden="true" />
               Research command center
             </div>
-            <h1 className="mt-2 text-xl font-semibold tracking-tight text-[#E6EDF3]">Understand the stock before you invest</h1>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Search, discover, compare, and track — AI research for Indian equities.</p>
+            <h1 className="mt-2 text-[26px] font-bold tracking-tight leading-tight text-[var(--color-text-primary)] sm:text-2xl sm:font-semibold">Understand the stock before you invest</h1>
+            <p className="mt-1.5 text-[14px] text-[var(--color-text-secondary)] sm:text-xs">Search, discover, compare, and track — AI research for Indian equities.</p>
           </div>
           <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" aria-hidden="true" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-muted)]" aria-hidden="true" />
             <input
               type="text"
               placeholder="Search company to begin research..."
-              className="h-10 w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] pl-10 pr-4 text-sm text-[#E6EDF3] placeholder:text-[#64748B] outline-none transition focus:border-[#2962FF]"
+              className="h-12 w-full rounded-lg border border-[var(--border-soft)] bg-[var(--color-surface-inset)] pl-10 pr-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[var(--color-accent)] sm:h-10"
               onFocus={() => productNavigate("search")}
               readOnly
             />
@@ -156,41 +156,41 @@ export const DashboardHub: React.FC = () => {
         </div>
 
         {/* Research actions cluster */}
-        <div className="mb-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <button type="button" onClick={() => productNavigate("scanner")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-            <Search className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Open scanner</span>
-            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Discover research candidates</span>
+        <div className="mb-5 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-4">
+          <button type="button" onClick={() => productNavigate("scanner")} className="rounded-xl border border-[var(--border-soft)] bg-[var(--color-surface)] p-4 text-left transition hover:border-[var(--color-accent)]/40 hover:bg-white/[0.01]">
+            <Search className="h-4.5 w-4.5 text-[var(--color-accent)]" aria-hidden="true" />
+            <span className="mt-2.5 block text-xs font-semibold text-[var(--color-text-primary)]">Open scanner</span>
+            <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Discover research candidates</span>
           </button>
-          <button type="button" onClick={() => productNavigate("rankings")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-            <BarChart3 className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">View rankings</span>
-            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Browse scored companies</span>
+          <button type="button" onClick={() => productNavigate("rankings")} className="rounded-xl border border-[var(--border-soft)] bg-[var(--color-surface)] p-4 text-left transition hover:border-[var(--color-accent)]/40 hover:bg-white/[0.01]">
+            <BarChart3 className="h-4.5 w-4.5 text-[var(--color-accent)]" aria-hidden="true" />
+            <span className="mt-2.5 block text-xs font-semibold text-[var(--color-text-primary)]">View rankings</span>
+            <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Browse scored companies</span>
           </button>
-          <button type="button" onClick={() => productNavigate("compare")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-            <GitCompare className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Compare companies</span>
-            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Side-by-side research</span>
+          <button type="button" onClick={() => productNavigate("compare")} className="rounded-xl border border-[var(--border-soft)] bg-[var(--color-surface)] p-4 text-left transition hover:border-[var(--color-accent)]/40 hover:bg-white/[0.01]">
+            <GitCompare className="h-4.5 w-4.5 text-[var(--color-accent)]" aria-hidden="true" />
+            <span className="mt-2.5 block text-xs font-semibold text-[var(--color-text-primary)]">Compare companies</span>
+            <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Side-by-side research</span>
           </button>
-          <button type="button" onClick={() => productNavigate("watchlist")} className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3 text-left transition hover:border-[#2962FF]/40">
-            <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Review watchlist</span>
-            <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Track thesis changes</span>
+          <button type="button" onClick={() => productNavigate("watchlist")} className="rounded-xl border border-[var(--border-soft)] bg-[var(--color-surface)] p-4 text-left transition hover:border-[var(--color-accent)]/40 hover:bg-white/[0.01]">
+            <Eye className="h-4.5 w-4.5 text-[var(--color-accent)]" aria-hidden="true" />
+            <span className="mt-2.5 block text-xs font-semibold text-[var(--color-text-primary)]">Review watchlist</span>
+            <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Track thesis changes</span>
           </button>
         </div>
 
         {/* Start with research - strategy chips */}
         <div className="mb-5">
-          <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
+          <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--color-surface)] p-4">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">Start with research</h2>
+              <Sparkles className="h-4 w-4 text-[var(--color-accent)]" aria-hidden="true" />
+              <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">Start with research</h2>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><Sparkles className="h-3.5 w-3.5" /> Quality compounders</ProductAction>
-              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><BarChart3 className="h-3.5 w-3.5" /> Undervalued quality</ProductAction>
-              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><TrendingUp className="h-3.5 w-3.5" /> Improving momentum</ProductAction>
-              <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}><Shield className="h-3.5 w-3.5" /> Low debt leaders</ProductAction>
+              <button type="button" onClick={() => productNavigate("scanner")} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--color-surface-raised)] px-3 text-[11px] font-medium text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:bg-white/[0.02] transition-colors"><Sparkles className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Quality compounders</button>
+              <button type="button" onClick={() => productNavigate("scanner")} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--color-surface-raised)] px-3 text-[11px] font-medium text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:bg-white/[0.02] transition-colors"><BarChart3 className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Undervalued quality</button>
+              <button type="button" onClick={() => productNavigate("scanner")} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--color-surface-raised)] px-3 text-[11px] font-medium text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:bg-white/[0.02] transition-colors"><TrendingUp className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Improving momentum</button>
+              <button type="button" onClick={() => productNavigate("scanner")} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--color-surface-raised)] px-3 text-[11px] font-medium text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:bg-white/[0.02] transition-colors"><Shield className="h-3.5 w-3.5 text-[var(--color-accent)]" /> Low debt leaders</button>
             </div>
           </div>
         </div>
