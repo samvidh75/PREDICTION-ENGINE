@@ -171,7 +171,7 @@ export const WatchlistPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h1 className="text-base font-semibold text-[#E6EDF3]">Daily thesis workflow</h1>
+              <h1 className="text-base font-semibold text-[var(--color-text-primary)]">Daily thesis workflow</h1>
             </div>
             <p className="mt-1 text-xs text-[#8B949E]">Review, track, and act on your investment theses.</p>
           </div>
@@ -179,7 +179,7 @@ export const WatchlistPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Sectors</span>
               {sectorBreakdown.map(([sector, count]) => (
-                <span key={sector} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[#E6EDF3]">
+                <span key={sector} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[var(--color-text-primary)]">
                   {sector} <span className="text-[#484F58]">({count})</span>
                 </span>
               ))}
@@ -246,7 +246,7 @@ export const WatchlistPage: React.FC = () => {
                       className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-colors ${
                         thesisTab === tab
                           ? "border-[#2962FF] bg-[#2962FF]/10 text-[#2962FF]"
-                          : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[#9AA7B5] hover:text-[#E6EDF3]"
+                          : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                       }`}
                     >
                       {TAB_ICONS[tab]}
@@ -278,7 +278,7 @@ export const WatchlistPage: React.FC = () => {
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2 min-w-0">
                               <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="flex items-center gap-2 text-left">
-                                <span className="font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{ticker}</span>
+                                <span className="font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{ticker}</span>
                                 {info && (
                                   <span className="truncate text-xs text-[#8B949E] max-w-[180px]">{info.companyName}</span>
                                 )}
@@ -312,7 +312,7 @@ export const WatchlistPage: React.FC = () => {
                               value={noteObj.note}
                               onChange={(e) => handleNoteChange(ticker, e.target.value)}
                               placeholder="Why am I watching? Thesis summary..."
-                              className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none"
+                              className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none"
                               aria-label="Thesis note"
                             />
                           </div>
@@ -320,7 +320,7 @@ export const WatchlistPage: React.FC = () => {
                           <div className="mt-3">
                             <button
                               onClick={() => productNavigate("alerts")}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[rgba(148,163,184,0.25)] transition-colors"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[rgba(148,163,184,0.25)] transition-colors"
                             >
                               <ChevronRight className="h-3 w-3" aria-hidden="true" />
                               What changed

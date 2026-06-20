@@ -144,37 +144,37 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       aria-label="Command palette"
     >
       <div
-        className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/[0.09] bg-[#0D1117] shadow-[0_28px_90px_rgba(0,0,0,0.58),0_8px_24px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.055)] transition-all duration-200 ease-out"
+        className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-[rgba(15,23,42,0.09)] bg-[var(--color-surface)] shadow-[0_28px_90px_rgba(15,23,42,0.58),0_8px_24px_rgba(15,23,42,0.32),inset_0_1px_0_rgba(15,23,42,0.055)] transition-all duration-200 ease-out"
         style={{ transform: "translateZ(0)" }}
       >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(15,23,42,0.06)] to-transparent" />
 
         {/* Search input */}
-        <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#111827]/55 px-5 py-4">
-          <Search className="h-5 w-5 shrink-0 text-[#484F58]" aria-hidden="true" />
+        <div className="flex items-center gap-3 border-b border-[var(--color-border-light)] bg-[var(--color-surface-raised)]/55 px-5 py-4">
+          <Search className="h-5 w-5 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
             placeholder="Search companies or type a command..."
-            className="h-8 w-full bg-transparent text-sm text-[#E6EDF3] placeholder:text-[#64748B] outline-none"
+            className="h-8 w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none"
             aria-label="Command search"
           />
-          <kbd className="hidden shrink-0 rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58] sm:inline-block">esc</kbd>
+          <kbd className="hidden shrink-0 rounded-md border border-[var(--color-border-light)] bg-[rgba(15,23,42,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-text-muted)] sm:inline-block">esc</kbd>
         </div>
 
         {/* Results */}
         <div className="max-h-[min(54vh,380px)] overflow-y-auto px-2 py-2">
           {searching && (
-            <div className="px-3 py-3 text-xs text-[#64748B]">Searching...</div>
+            <div className="px-3 py-3 text-xs text-[var(--color-text-muted)]">Searching...</div>
           )}
 
           {!searching && query.trim() && searchResults.length === 0 && filteredActions.length === 0 && (
             <div className="flex flex-col items-center px-3 py-6 text-center">
-              <Search className="h-6 w-6 text-[#64748B] mb-2" aria-hidden="true" />
-              <p className="text-xs text-[#9AA7B5]">No commands match &ldquo;{query}&rdquo;</p>
-              <p className="mt-1 max-w-[260px] text-[10px] leading-relaxed text-[#64748B]">Try searching for a company name or ticker instead</p>
+              <Search className="h-6 w-6 text-[var(--color-text-muted)] mb-2" aria-hidden="true" />
+              <p className="text-xs text-[var(--color-text-secondary)]">No commands match &ldquo;{query}&rdquo;</p>
+              <p className="mt-1 max-w-[260px] text-[10px] leading-relaxed text-[var(--color-text-muted)]">Try searching for a company name or ticker instead</p>
               <button
                 type="button"
                 onClick={() => { setQuery(""); }}
@@ -192,16 +192,16 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               type="button"
               onClick={() => { item.action(); onClose(); }}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs transition-all duration-150 ${
-                selectedIndex === i ? "bg-[#111827] text-[#E6EDF3] shadow-[inset_3px_0_0_#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
+                selectedIndex === i ? "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] shadow-[inset_3px_0_0_#2962FF]" : "text-[var(--color-text-secondary)] hover:bg-[rgba(15,23,42,0.04)]"
               }`}
             >
-              <item.icon className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
+              <item.icon className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <span className="font-medium">{item.label}</span>
-                {item.description && <span className="ml-2 text-[10px] text-[#64748B]">{item.description}</span>}
+                {item.description && <span className="ml-2 text-[10px] text-[var(--color-text-muted)]">{item.description}</span>}
               </div>
               {i < 9 && (
-                <kbd className="shrink-0 ml-auto rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-[#484F58]">⌘{i + 1}</kbd>
+                <kbd className="shrink-0 ml-auto rounded-md border border-[var(--color-border-light)] bg-[rgba(15,23,42,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-text-muted)]">⌘{i + 1}</kbd>
               )}
             </button>
           ))}
@@ -209,7 +209,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {/* Search results */}
           {searchResults.length > 0 && (
             <>
-              {filteredActions.length > 0 && <div className="border-t border-white/[0.04] my-1" />}
+              {filteredActions.length > 0 && <div className="border-t border-[rgba(15,23,42,0.04)] my-1" />}
               {searchResults.map((r, i) => {
                 const idx = filteredActions.length + i;
                 return (
@@ -218,13 +218,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     type="button"
                     onClick={() => { navigatePage("stock", { id: r.symbol }); onClose(); }}
                     className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs transition-all duration-150 ${
-                    selectedIndex === idx ? "bg-[#111827] text-[#E6EDF3] shadow-[inset_3px_0_0_#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
+                    selectedIndex === idx ? "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] shadow-[inset_3px_0_0_#2962FF]" : "text-[var(--color-text-secondary)] hover:bg-[rgba(15,23,42,0.04)]"
                   }`}
                 >
-                    <Search className="h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
+                    <Search className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
                     <div className="min-w-0 flex-1">
                       <span className="font-mono font-semibold">{r.symbol}</span>
-                      {r.name && <span className="ml-2 text-[10px] text-[#64748B]">{r.name}</span>}
+                      {r.name && <span className="ml-2 text-[10px] text-[var(--color-text-muted)]">{r.name}</span>}
                     </div>
                   </button>
                 );
@@ -234,7 +234,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         </div>
 
         {/* Footer hint */}
-        <div className="border-t border-white/[0.04] bg-[#080C10]/45 px-5 py-2.5 text-[10px] text-[#64748B]">
+        <div className="border-t border-[rgba(15,23,42,0.04)] bg-[var(--color-surface)]/45 px-5 py-2.5 text-[10px] text-[var(--color-text-muted)]">
           <span className="hidden sm:inline">↑↓ navigate · ↵ select · esc close · ⌘1-9 quick select</span>
           <span className="sm:hidden">Tap a result to navigate</span>
         </div>

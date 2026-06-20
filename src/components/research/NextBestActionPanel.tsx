@@ -20,8 +20,8 @@ export const NextBestActionPanel: React.FC<NextBestActionPanelProps> = ({ symbol
     : actions.filter((a) => a.key !== "research");
 
   return (
-    <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-      <div className="text-[10px] font-bold uppercase tracking-wider text-[#8B949E] mb-2.5">Next steps</div>
+    <div className="rounded-xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.025)] p-4">
+      <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)] mb-2.5">Next steps</div>
       <div className="flex flex-wrap gap-1.5">
         {visible.map((a) => {
           const Icon = a.icon;
@@ -30,7 +30,7 @@ export const NextBestActionPanel: React.FC<NextBestActionPanelProps> = ({ symbol
               key={a.key}
               type="button"
               onClick={() => a.action(symbol)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:border-[#2962FF]/40 hover:text-[#E6EDF3] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[rgba(15,23,42,0.03)] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-text-primary)] transition-colors"
             >
               <Icon className="h-3 w-3" aria-hidden="true" />
               {a.label}

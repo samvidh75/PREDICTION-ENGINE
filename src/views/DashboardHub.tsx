@@ -62,9 +62,9 @@ export const DashboardHub: React.FC = () => {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-2xl font-bold tracking-tight text-[#E6EDF3]">Research command center</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research command center</h1>
         </div>
-        <p className="mt-1 text-sm text-[#9AA7B5]">What should you research next? Screen Indian equities, review scored models, or build comparison matrixes.</p>
+        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">What should you research next? Screen Indian equities, review scored models, or build comparison matrixes.</p>
       </div>
 
       {/* Command search */}
@@ -74,8 +74,8 @@ export const DashboardHub: React.FC = () => {
 
       {/* Start with research */}
       <RoundedDepthPanel padding="md" className="mb-6 border border-white/[0.08]">
-        <h2 className="text-xs font-semibold text-[#E6EDF3]">Start with research</h2>
-        <p className="mt-1 text-[10px] text-[#9AA7B5]">Choose a strategy to discover companies worth researching.</p>
+        <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">Start with research</h2>
+        <p className="mt-1 text-[10px] text-[var(--color-text-secondary)]">Choose a strategy to discover companies worth researching.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {PRESET_ACTIONS.map((preset) => (
             <Button key={preset.label} type="button" size="sm" variant="secondary" onClick={preset.action}>
@@ -90,25 +90,25 @@ export const DashboardHub: React.FC = () => {
 
       {/* Quick actions cluster */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <button type="button" onClick={() => navigate("scanner")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+        <button type="button" onClick={() => navigate("scanner")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
           <Search className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Open scanner</span>
-          <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Discover research candidates</span>
+          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Open scanner</span>
+          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Discover research candidates</span>
         </button>
-        <button type="button" onClick={() => navigate("rankings")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+        <button type="button" onClick={() => navigate("rankings")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
           <BarChart3 className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">View rankings</span>
-          <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Browse scored companies</span>
+          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">View rankings</span>
+          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Browse scored companies</span>
         </button>
-        <button type="button" onClick={() => navigate("compare")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+        <button type="button" onClick={() => navigate("compare")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
           <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Compare companies</span>
-          <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Side-by-side research</span>
+          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Compare companies</span>
+          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Side-by-side research</span>
         </button>
-        <button type="button" onClick={() => navigate("watchlist")} className="rounded-xl border border-white/[0.08] bg-[#0D1117] p-4 text-left transition hover:border-[#2962FF]/40">
+        <button type="button" onClick={() => navigate("watchlist")} className="rounded-xl border border-white/[0.08] bg-[var(--color-surface)] p-4 text-left transition hover:border-[#2962FF]/40">
           <Eye className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-          <span className="mt-2 block text-xs font-semibold text-[#E6EDF3]">Review watchlist</span>
-          <span className="mt-0.5 block text-[10px] text-[#9AA7B5]">Track thesis changes</span>
+          <span className="mt-2 block text-xs font-semibold text-[var(--color-text-primary)]">Review watchlist</span>
+          <span className="mt-0.5 block text-[10px] text-[var(--color-text-secondary)]">Track thesis changes</span>
         </button>
       </div>
 
@@ -118,9 +118,9 @@ export const DashboardHub: React.FC = () => {
           <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-[#F59E0B]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">What changed</h2>
+              <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">What changed</h2>
             </div>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Track a company to review important changes — thesis shifts, score movements, and risk updates.</p>
+            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Track a company to review important changes — thesis shifts, score movements, and risk updates.</p>
             <div className="mt-3">
               <Button type="button" size="sm" onClick={() => navigate("alerts")}>
                 Open what changed <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -132,9 +132,9 @@ export const DashboardHub: React.FC = () => {
           <RoundedDepthPanel padding="md" className="border border-white/[0.08]">
             <div className="flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h2 className="text-xs font-semibold text-[#E6EDF3]">How StockStory thinks</h2>
+              <h2 className="text-xs font-semibold text-[var(--color-text-primary)]">How StockStory thinks</h2>
             </div>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Research is not a guarantee. Understand our methodology — how we evaluate financial strength, valuation context, risk, and conviction.</p>
+            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Research is not a guarantee. Understand our methodology — how we evaluate financial strength, valuation context, risk, and conviction.</p>
             <div className="mt-3">
               <Button type="button" size="sm" variant="secondary" onClick={() => navigate("methodology")}>
                 <BookOpen className="h-3.5 w-3.5" aria-hidden="true" /> Read methodology
@@ -146,16 +146,16 @@ export const DashboardHub: React.FC = () => {
         {/* Right rail */}
         <div className="space-y-6">
           <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[#E6EDF3]">Research workflow</h3>
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Research workflow</h3>
             <ResearchWorkflowRail className="mt-3" />
           </RoundedDepthPanel>
 
           {/* Tracked companies */}
           <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[#E6EDF3]">Tracked companies</h3>
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Tracked companies</h3>
             {followedTickers.length === 0 ? (
               <div>
-                <p className="mt-2 text-xs text-[#9AA7B5]">Track companies to review important changes.</p>
+                <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Track companies to review important changes.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <ProductAction variant="secondary" onClick={() => navigate("scanner")}>Open scanner</ProductAction>
                   <ProductAction variant="ghost" onClick={() => navigate("search")}>Search company</ProductAction>
@@ -174,8 +174,8 @@ export const DashboardHub: React.FC = () => {
                       className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.04]"
                     >
                       <div>
-                        <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{ticker}</span>
-                        {info?.companyName && <span className="ml-2 text-[10px] text-[#64748B]">{info.companyName}</span>}
+                        <span className="font-mono text-xs font-semibold text-[var(--color-text-primary)]">{ticker}</span>
+                        {info?.companyName && <span className="ml-2 text-[10px] text-[var(--color-text-muted)]">{info.companyName}</span>}
                       </div>
                       {typeof score === "number" && Number.isFinite(score) ? (
                         <ScorePill score={Math.round(score)} />
@@ -189,9 +189,9 @@ export const DashboardHub: React.FC = () => {
 
           {/* Recently explored */}
           <RoundedDepthPanel padding="sm" className="border border-white/[0.08]">
-            <h3 className="text-xs font-semibold text-[#E6EDF3]">Recently explored</h3>
+            <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">Recently explored</h3>
             {recentResearch.slice(0, 6).length === 0 ? (
-              <p className="mt-2 text-xs text-[#9AA7B5]">Search for a company to begin research.</p>
+              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Search for a company to begin research.</p>
             ) : (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {recentResearch.slice(0, 6).map((ticker) => (
@@ -199,7 +199,7 @@ export const DashboardHub: React.FC = () => {
                     key={ticker}
                     type="button"
                     onClick={() => openCompany(ticker)}
-                    className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-1 font-mono text-[10px] font-semibold text-[#9AA7B5] hover:bg-white/[0.06] transition-colors"
+                    className="rounded-lg border border-white/5 bg-white/[0.03] px-2 py-1 font-mono text-[10px] font-semibold text-[var(--color-text-secondary)] hover:bg-white/[0.06] transition-colors"
                   >
                     {ticker}
                   </button>

@@ -49,7 +49,7 @@ export const TelemetryMetrics: React.FC<TelemetryMetricsProps> = ({
   const isUnderValued = peVariance < 0;
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-6 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-6 select-none">
       
       {/* 1. Bilingual Market Capitalization Metadata Block */}
       <div className="space-y-3">
@@ -60,12 +60,12 @@ export const TelemetryMetrics: React.FC<TelemetryMetricsProps> = ({
           </span>
         </div>
 
-        <div className="p-4 bg-[#0D1117] border border-[rgba(148,163,184,0.16)] space-y-2">
+        <div className="p-4 bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] space-y-2">
           <div className="flex flex-col">
             <span className="text-[10px] font-mono text-[#9AA7B5] uppercase tracking-widest">
               Numeric Representation:
             </span>
-            <span className="text-xl font-bold text-[#E6EDF3] font-mono mt-0.5">
+            <span className="text-xl font-bold text-[var(--color-text-primary)] font-mono mt-0.5">
               {formattedCapNumeric}
             </span>
           </div>
@@ -93,20 +93,20 @@ export const TelemetryMetrics: React.FC<TelemetryMetricsProps> = ({
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+          <div className="p-3 bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)]">
             <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
               Asset P/E
             </span>
-            <span className="text-lg font-bold text-[#E6EDF3] font-mono block mt-1">
+            <span className="text-lg font-bold text-[var(--color-text-primary)] font-mono block mt-1">
               {peStock.toFixed(2)}
             </span>
           </div>
           
-          <div className="p-3 bg-[#0D1117] border border-[rgba(148,163,184,0.16)]">
+          <div className="p-3 bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)]">
             <span className="text-[9px] font-mono text-[#9AA7B5] uppercase tracking-wider block">
               Industry P/E
             </span>
-            <span className="text-lg font-bold text-[#E6EDF3] font-mono block mt-1">
+            <span className="text-lg font-bold text-[var(--color-text-primary)] font-mono block mt-1">
               {peIndustry.toFixed(2)}
             </span>
           </div>

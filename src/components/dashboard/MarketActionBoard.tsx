@@ -101,8 +101,8 @@ function SectorList({ items }: { items: SectorMover[] }) {
 
 function ScannerCard({ preset, onOpenCompany }: { preset: ScannerPreset; onOpenCompany: (symbol: string) => void }) {
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-[#0D1117]">
-      <div className="border-b border-white/[0.06] px-3 py-2">
+    <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)]">
+      <div className="border-b border-[var(--color-border-light)] px-3 py-2">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">{preset.label}</h3>
           <span className={`text-[9px] font-bold uppercase tracking-wider ${preset.availability === 'real' ? 'text-emerald-300' : 'text-white/30'}`}>
@@ -170,7 +170,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
   }, []);
 
   return (
-    <section aria-label="Market action board" className="space-y-4 rounded-xl border border-white/[0.06] bg-white/[0.012] p-4">
+    <section aria-label="Market action board" className="space-y-4 rounded-xl border border-[var(--color-border-light)] bg-white/[0.012] p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-2">
           <Activity className="mt-0.5 h-4 w-4 text-cyan-300" />
@@ -190,7 +190,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
       </div>
 
       {loading ? (
-        <div className="rounded-lg border border-white/[0.06] bg-[#0D1117] px-3 py-4 text-[11px] text-white/35">Loading market snapshots...</div>
+        <div className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] px-3 py-4 text-[11px] text-white/35">Loading market snapshots...</div>
       ) : error || !snapshot ? (
         <div className="flex items-start gap-2 rounded-lg border border-rose-400/20 bg-rose-400/5 px-3 py-4 text-[11px] text-rose-200/70">
           <AlertTriangle className="h-4 w-4 shrink-0" />
@@ -204,32 +204,32 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
       ) : (
         <>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-3 py-2">
+            <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] overflow-hidden">
+              <div className="flex items-center gap-2 border-b border-[var(--color-border-light)] px-3 py-2">
                 <TrendingUp className="h-3.5 w-3.5 text-emerald-300" />
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Gainers</h3>
               </div>
               <MoverList items={snapshot.data.gainers} emptyMessage="Gainers require at least two stored price dates." onOpenCompany={onOpenCompany} />
             </section>
 
-            <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-3 py-2">
+            <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] overflow-hidden">
+              <div className="flex items-center gap-2 border-b border-[var(--color-border-light)] px-3 py-2">
                 <TrendingDown className="h-3.5 w-3.5 text-rose-300" />
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Losers</h3>
               </div>
               <MoverList items={snapshot.data.losers} emptyMessage="Losers require at least two stored price dates." onOpenCompany={onOpenCompany} />
             </section>
 
-            <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-3 py-2">
+            <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] overflow-hidden">
+              <div className="flex items-center gap-2 border-b border-[var(--color-border-light)] px-3 py-2">
                 <BarChart3 className="h-3.5 w-3.5 text-cyan-300" />
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Active by volume</h3>
               </div>
               <MoverList items={snapshot.data.volumeLeaders} emptyMessage="Volume leaders require populated daily price volume." onOpenCompany={onOpenCompany} />
             </section>
 
-            <section className="rounded-lg border border-white/[0.06] bg-[#0D1117] overflow-hidden">
-              <div className="flex items-center gap-2 border-b border-white/[0.06] px-3 py-2">
+            <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] overflow-hidden">
+              <div className="flex items-center gap-2 border-b border-[var(--color-border-light)] px-3 py-2">
                 <Activity className="h-3.5 w-3.5 text-violet-300" />
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Sector movers</h3>
               </div>

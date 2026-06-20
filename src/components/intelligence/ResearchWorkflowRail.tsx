@@ -50,10 +50,10 @@ export function ResearchWorkflowRail({ items, className = "" }: ResearchWorkflow
           key={label}
           type="button"
           onClick={action}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-medium text-[#8B949E] hover:bg-white/[0.04] hover:text-[#E6EDF3] transition-colors"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[rgba(15,23,42,0.04)] hover:text-[var(--color-text-primary)] transition-colors"
           title={description}
         >
-          <Icon className="h-4 w-4 shrink-0 text-[#484F58]" aria-hidden="true" />
+          <Icon className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
           <span>{label}</span>
         </button>
       ))}

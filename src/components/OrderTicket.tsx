@@ -65,7 +65,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
   };
 
   return (
-    <div className={`bg-[#0D1117] border rounded-none p-6 relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.01)] transition-all duration-300 ${
+    <div className={`bg-[var(--color-surface)] border rounded-none p-6 relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.01)] transition-all duration-300 ${
       marginError ? "border-[#D946EF]" : "border-[rgba(148,163,184,0.16)]"
     } select-none`}>
       
@@ -77,7 +77,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
             Simulated Order Ticket // {ticker}
           </span>
         </div>
-        <span className="font-mono text-[9px] text-[#9AA7B5] bg-[#0D1117] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
+        <span className="font-mono text-[9px] text-[#9AA7B5] bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
           ZERO CAPITAL DEV NODE
         </span>
       </div>
@@ -85,7 +85,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
       {/* Form */}
       <form onSubmit={handleExecute} className="space-y-4">
         {/* Toggle Switch */}
-        <div className="grid grid-cols-2 h-11 border border-[rgba(148,163,184,0.16)] bg-[#0D1117]">
+        <div className="grid grid-cols-2 h-11 border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)]">
           <button
             type="button"
             onClick={() => { setOrderType("BUY"); setMarginError(null); }}
@@ -118,7 +118,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
                 setQuantity(Math.max(1, parseInt(e.target.value) || 0));
                 setMarginError(null);
               }}
-              className="font-mono text-sm tracking-tight text-[#E6EDF3] bg-[#0D1117] border border-[rgba(148,163,184,0.16)] h-11 px-4 focus:border-[#06B6D4] outline-none rounded-none"
+              className="font-mono text-sm tracking-tight text-[#E6EDF3] bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] h-11 px-4 focus:border-[#06B6D4] outline-none rounded-none"
             />
           </div>
 
@@ -132,13 +132,13 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
                 setPrice(Math.max(1, parseFloat(e.target.value) || 0));
                 setMarginError(null);
               }}
-              className="font-mono text-sm tracking-tight text-[#E6EDF3] bg-[#0D1117] border border-[rgba(148,163,184,0.16)] h-11 px-4 focus:border-[#06B6D4] outline-none rounded-none"
+              className="font-mono text-sm tracking-tight text-[#E6EDF3] bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] h-11 px-4 focus:border-[#06B6D4] outline-none rounded-none"
             />
           </div>
         </div>
 
         {/* Exposure math */}
-        <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-3 flex justify-between items-center font-mono text-xs text-[#64748B]">
+        <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] p-3 flex justify-between items-center font-mono text-xs text-[#64748B]">
           <span>ESTIMATED VALUE:</span>
           <span className="font-bold text-[#E6EDF3]">
             ₹{totalCost.toLocaleString("en-IN")}

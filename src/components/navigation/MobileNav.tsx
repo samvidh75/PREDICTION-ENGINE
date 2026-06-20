@@ -45,7 +45,7 @@ export const MobileNav: React.FC = () => {
 
   return (
     <>
-      <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[90] h-16 border-t border-white/[0.08] bg-[#070A0F]/90 backdrop-blur-xl flex items-center justify-around" aria-label="Mobile navigation">
+      <nav className="bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[90] h-16 border-t border-[var(--color-border)] bg-[var(--color-canvas)]/90 backdrop-blur-xl flex items-center justify-around" aria-label="Mobile navigation">
         {tabs.map((tab) => {
           const isActive = currentPage === tab.page;
           return (
@@ -53,7 +53,7 @@ export const MobileNav: React.FC = () => {
               key={tab.page}
               type="button"
               onClick={() => setPage(tab.page)}
-              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[#9AA7B5] hover:text-white transition-colors ${isActive ? "text-[#2962FF] font-semibold" : ""}`}
+              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[var(--color-text-secondary)] hover:text-white transition-colors ${isActive ? "text-[#2962FF] font-semibold" : ""}`}
               aria-current={isActive ? "page" : undefined}
             >
               {tab.icon}
@@ -65,7 +65,7 @@ export const MobileNav: React.FC = () => {
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[#9AA7B5] hover:text-white transition-colors ${menuOpen ? "text-[#2962FF]" : ""}`}
+          className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[var(--color-text-secondary)] hover:text-white transition-colors ${menuOpen ? "text-[#2962FF]" : ""}`}
           aria-label="Toggle menu"
         >
           <Menu className="h-5 w-5" />
@@ -77,13 +77,13 @@ export const MobileNav: React.FC = () => {
       {menuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="More navigation options">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMenuOpen(false)} />
-          <div className="relative w-full rounded-t-2xl bg-[#0D1117] border-t border-white/[0.08] p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-10">
+          <div className="relative w-full rounded-t-2xl bg-[var(--color-surface)] border-t border-[var(--color-border)] p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto pb-10">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <h2 className="text-sm font-bold text-[#E6EDF3] tracking-wide">Workspace Options</h2>
+              <h2 className="text-sm font-bold text-[var(--color-text-primary)] tracking-wide">Workspace Options</h2>
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="rounded p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                className="rounded p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                 aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
@@ -96,7 +96,7 @@ export const MobileNav: React.FC = () => {
                   key={item.page}
                   type="button"
                   onClick={() => setPage(item.page)}
-                  className="flex items-center gap-2.5 rounded-lg border border-white/[0.04] bg-white/[0.01] p-3 text-left text-xs font-semibold text-[#E6EDF3] hover:bg-white/[0.03] transition-colors"
+                  className="flex items-center gap-2.5 rounded-lg border border-[rgba(15,23,42,0.04)] bg-[rgba(15,23,42,0.01)] p-3 text-left text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(15,23,42,0.03)] transition-colors"
                 >
                   {item.icon}
                   {item.label}

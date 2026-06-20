@@ -25,7 +25,7 @@ export const FactorDriverList: React.FC<FactorDriverListProps> = ({ factors }) =
   if (!factors) {
     return (
       <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-        <p className="text-xs text-[#9AA7B5]">Factor scores are not yet available for this company.</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">Factor scores are not yet available for this company.</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export const FactorDriverList: React.FC<FactorDriverListProps> = ({ factors }) =
   if (items.length === 0) {
     return (
       <div className="rounded-xl border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-4">
-        <p className="text-xs text-[#9AA7B5]">Factor scores are not yet available for this company.</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">Factor scores are not yet available for this company.</p>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export const FactorDriverList: React.FC<FactorDriverListProps> = ({ factors }) =
       {items.map((item) => (
         <div key={item.key}>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-[#9AA7B5]">{item.key}</span>
+            <span className="text-xs text-[var(--color-text-secondary)]">{item.key}</span>
             {item.score !== null && (
               <span className={`font-mono text-xs font-semibold tabular-nums ${labelColor(item.score)}`}>
                 {Math.round(item.score)}

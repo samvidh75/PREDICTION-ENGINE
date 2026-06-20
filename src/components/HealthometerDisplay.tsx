@@ -25,7 +25,7 @@ export const HealthometerDisplay: React.FC<HealthometerDisplayProps> = ({ status
         return {
           color: "#525252",
           label: "STABLE CORE BOUNDARIES",
-          bg: "bg-[#111827]",
+          bg: "bg-[var(--color-surface-raised)]",
           border: "border-[rgba(148,163,184,0.16)]",
           icon: <ShieldCheck className="w-5 h-5 text-[#64748B]" />,
           description: "Enterprise operations track standard parameters with robust margin reserves."
@@ -53,13 +53,13 @@ export const HealthometerDisplay: React.FC<HealthometerDisplayProps> = ({ status
   }, [status]);
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-5 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] p-6 rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.01)] flex flex-col space-y-5 select-none">
       
       {/* Title */}
       <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <Cpu className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[var(--color-text-primary)]">
             Healthometer Deep-Scan Layer
           </span>
         </div>

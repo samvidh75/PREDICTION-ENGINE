@@ -40,7 +40,7 @@ export const HelpPopover: React.FC<HelpPopoverProps> = ({ title, children, stora
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1.5 text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(15,23,42,0.03)] px-2.5 py-1.5 text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
         aria-label="Show help"
       >
         <Info className="h-3 w-3" aria-hidden="true" />
@@ -52,22 +52,22 @@ export const HelpPopover: React.FC<HelpPopoverProps> = ({ title, children, stora
   return (
     <div
       ref={panelRef}
-      className="relative rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-4 shadow-[0_18px_48px_rgba(0,0,0,0.24)]"
+      className="relative rounded-xl border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] p-4 shadow-[0_18px_48px_rgba(0,0,0,0.24)]"
       role="region"
       aria-label={title}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-[#E6EDF3]">{title}</h3>
+        <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">{title}</h3>
         <button
           type="button"
           onClick={handleDismiss}
-          className="rounded p-0.5 text-[#64748B] hover:text-[#E6EDF3] transition-colors"
+          className="rounded p-0.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           aria-label="Dismiss"
         >
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
-      <div className="text-[11px] leading-5 text-[#9AA7B5]">
+      <div className="text-[11px] leading-5 text-[var(--color-text-secondary)]">
         {children}
       </div>
     </div>

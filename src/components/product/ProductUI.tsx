@@ -91,7 +91,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
     </>
   );
   if (href) {
-    return <a id={id} href={href} className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] ${classes} ${className}`}>{content}</a>;
+    return <a id={id} href={href} className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-white ${classes} ${className}`}>{content}</a>;
   }
   return (
     <button
@@ -101,7 +101,7 @@ export function ProductAction({ children, onClick, href, variant = "primary", cl
       disabled={disabled}
       title={disabled ? disabledReason : undefined}
       aria-disabled={disabled}
-      className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 active:translate-y-px focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-[#070A0F] disabled:translate-y-0 disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[#111827] disabled:text-[#64748B] ${classes} ${className}`}
+      className={`inline-flex h-11 items-center justify-center gap-2 rounded-xl border px-4 text-xs font-semibold transition-all duration-200 active:translate-y-px focus:outline-none focus:ring-2 focus:ring-[#2962FF]/70 focus:ring-offset-2 focus:ring-offset-white disabled:translate-y-0 disabled:cursor-not-allowed disabled:border-[rgba(148,163,184,0.12)] disabled:bg-[var(--color-surface-raised)] disabled:text-[var(--color-text-muted)] ${classes} ${className}`}
     >
       {disabled && disabledReason ? disabledReason : content}
     </button>

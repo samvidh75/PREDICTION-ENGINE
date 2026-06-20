@@ -43,12 +43,12 @@ const SORT_OPTIONS = [
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{label}</label>
+      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">{label}</label>
       <div className="relative">
         <CustomSelect
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-full cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-1.5 pr-8 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
+          className="h-9 w-full cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-3 py-1.5 pr-8 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
         >
           {options.map((o) => <option key={o} value={o}>{o}</option>)}
         </CustomSelect>
@@ -60,7 +60,7 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h4 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#64748B]">{title}</h4>
+      <h4 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">{title}</h4>
       {children}
     </div>
   );
@@ -279,8 +279,8 @@ export default function ScannerPage() {
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h1 className="text-xl font-semibold text-[#E6EDF3]">Research scanner</h1>
-              <p className="mt-1 text-sm text-[#9AA7B5]">Discover companies worth researching. Select a strategy, search by name, or filter by fundamentals.</p>
+              <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Research scanner</h1>
+              <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Discover companies worth researching. Select a strategy, search by name, or filter by fundamentals.</p>
             </div>
             <div className="hidden sm:block shrink-0">
               <HelpPopover title="How to use the scanner" storageKey="scanner-help-dismissed">
@@ -296,21 +296,21 @@ export default function ScannerPage() {
           </div>
 
           {/* Command-style search */}
-          <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
-            <Search className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
+          <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] px-4 py-2.5">
+            <Search className="h-4 w-4 shrink-0 text-[var(--color-text-secondary)]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search symbol, company, or sector..."
-              className="h-9 w-full min-w-0 bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
+              className="h-9 w-full min-w-0 bg-transparent text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-secondary)]"
               aria-label="Search symbol, company, or sector"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => { setQuery(""); setResults(allEntries); }}
-                className="mr-1 shrink-0 rounded p-0.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                className="mr-1 shrink-0 rounded p-0.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                 aria-label="Clear search"
               >
                 <X className="h-4 w-4" />
@@ -336,8 +336,8 @@ export default function ScannerPage() {
                   onClick={() => handlePresetClick(preset.label)}
                   className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
                     active
-                      ? "border-[#2962FF] bg-[rgba(41,98,255,0.12)] text-[#E6EDF3]"
-                      : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[#9AA7B5] hover:border-[rgba(148,163,184,0.3)] hover:text-[#E6EDF3]"
+                      ? "border-[#2962FF] bg-[rgba(41,98,255,0.12)] text-[var(--color-text-primary)]"
+                      : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[var(--color-text-secondary)] hover:border-[rgba(148,163,184,0.3)] hover:text-[var(--color-text-primary)]"
                   }`}
                 >
                   <preset.icon className="h-3 w-3" aria-hidden="true" />
@@ -352,20 +352,20 @@ export default function ScannerPage() {
             <button
               type="button"
               onClick={() => setAdvancedOpen(!advancedOpen)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors md:hidden"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors md:hidden"
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
               Filters
               {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
             <div className="hidden md:flex items-center gap-1.5">
-              <span className="text-[10px] text-[#64748B] font-semibold uppercase tracking-wider">Sort</span>
+              <span className="text-[10px] text-[var(--color-text-muted)] font-semibold uppercase tracking-wider">Sort</span>
               <div className="relative">
                 <CustomSelect
                   aria-label="Sort results"
                   value={sortValue}
                   onChange={(e) => setSortValue(e.target.value)}
-                  className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[#0D1117] px-2.5 py-1 text-xs text-[#E6EDF3] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
+                  className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-2.5 py-1 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -375,7 +375,7 @@ export default function ScannerPage() {
             </div>
             <div className="hidden md:block flex-1" />
             {!loading && (
-              <span className="text-[11px] text-[#64748B]">{sortedResults.length} result{sortedResults.length === 1 ? "" : "s"}</span>
+              <span className="text-[11px] text-[var(--color-text-muted)]">{sortedResults.length} result{sortedResults.length === 1 ? "" : "s"}</span>
             )}
           </div>
 
@@ -385,13 +385,13 @@ export default function ScannerPage() {
               <button
                 type="button"
                 onClick={() => setAdvancedOpen(!advancedOpen)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[#E6EDF3] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
               >
                 <span className="inline-flex items-center gap-2">
-                  <Filter className="h-3.5 w-3.5 text-[#9AA7B5]" aria-hidden="true" />
+                  <Filter className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
                   Advanced filters
                 </span>
-                {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#9AA7B5]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#9AA7B5]" />}
+                {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" /> : <ChevronDown className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" />}
               </button>
               {advancedOpen && (
                 <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-4">
@@ -403,12 +403,12 @@ export default function ScannerPage() {
 
           {/* Results */}
           {loading ? (
-            <div className="py-12 text-center text-sm text-[#9AA7B5]" role="status" aria-live="polite">Scanning companies...</div>
+            <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">Scanning companies...</div>
           ) : sortedResults.length === 0 ? (
             <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
-              <Search className="h-5 w-5 text-[#64748B]" aria-hidden="true" />
-              <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">No results found</h3>
-              <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">Adjust your filters or try a different search.</p>
+              <Search className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
+              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">No results found</h3>
+              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Adjust your filters or try a different search.</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
                 <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
@@ -431,8 +431,8 @@ export default function ScannerPage() {
                     <div>
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <span className="font-mono text-sm font-bold text-[#E6EDF3] tracking-wide">{fullSymbol}</span>
-                          <h3 className="truncate text-xs text-[#9AA7B5] mt-0.5">{item.company}</h3>
+                          <span className="font-mono text-sm font-bold text-[var(--color-text-primary)] tracking-wide">{fullSymbol}</span>
+                          <h3 className="truncate text-xs text-[var(--color-text-secondary)] mt-0.5">{item.company}</h3>
                         </div>
                         {score !== null && (
                           <div className="flex flex-col items-end shrink-0">
@@ -443,17 +443,17 @@ export default function ScannerPage() {
 
                       {sector && (
                         <div className="mt-2">
-                          <span className="inline-flex rounded bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#64748B]">{sector}</span>
+                          <span className="inline-flex rounded bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
                         </div>
                       )}
 
                       {item.thesis && (
-                        <p className="mt-3 text-xs leading-relaxed text-[#E6EDF3] line-clamp-2">{item.thesis}</p>
+                        <p className="mt-3 text-xs leading-relaxed text-[var(--color-text-primary)] line-clamp-2">{item.thesis}</p>
                       )}
 
                       <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {signalInfo && (
-                          <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[#E6EDF3]">
+                          <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[var(--color-text-primary)]">
                             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
                             {signalInfo.label}
                           </span>
@@ -464,7 +464,7 @@ export default function ScannerPage() {
                       </div>
 
                       {item.keyReason && (
-                        <p className="mt-2 text-[10px] leading-relaxed text-[#64748B]">{item.keyReason}</p>
+                        <p className="mt-2 text-[10px] leading-relaxed text-[var(--color-text-muted)]">{item.keyReason}</p>
                       )}
                       {item.riskMarker && (
                         <p className="mt-1 text-[10px] leading-relaxed text-[#EF4444]">{item.riskMarker}</p>
@@ -484,14 +484,14 @@ export default function ScannerPage() {
                         <button
                           type="button"
                           onClick={() => handleCompare(fullSymbol)}
-                          className="text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                          className="text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                         >
                           Compare
                         </button>
                         <button
                           type="button"
                           onClick={() => handleTrack(fullSymbol)}
-                          className="text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
+                          className="text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
                         >
                           Track
                         </button>
@@ -508,10 +508,10 @@ export default function ScannerPage() {
         {filterDrawerOpen && (
           <div className="fixed inset-0 z-[100] flex items-end md:hidden" role="dialog" aria-modal="true" aria-label="Filters">
             <div className="absolute inset-0 bg-black/60" onClick={() => setFilterDrawerOpen(false)} />
-            <div className="relative max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-[#0D1117] p-5 shadow-xl">
+            <div className="relative max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-[var(--color-surface)] p-5 shadow-xl">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-[#E6EDF3]">Filters</h2>
-                <button type="button" onClick={() => setFilterDrawerOpen(false)} className="rounded-md p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors" aria-label="Close filters">
+                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Filters</h2>
+                <button type="button" onClick={() => setFilterDrawerOpen(false)} className="rounded-md p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" aria-label="Close filters">
                   <X className="h-4 w-4" />
                 </button>
               </div>

@@ -21,10 +21,10 @@ export const Button: React.FC<ButtonProps> = ({
   const variants: Record<string, string> = {
     primary: "bg-[#2962FF] text-white hover:bg-[#3B71FF] border border-[#2962FF]",
     secondary: glass
-      ? "border border-[rgba(148,163,184,0.16)] bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60"
-      : "bg-[#111827] text-[#E6EDF3] hover:border-[#2962FF]/60 border border-[rgba(148,163,184,0.16)]",
-    outline: "bg-transparent border border-[rgba(148,163,184,0.16)] text-[#9AA7B5] hover:text-[#E6EDF3] hover:border-[#2962FF]/60",
-    ghost: "bg-transparent text-[#9AA7B5] hover:text-[#E6EDF3] hover:bg-white/[0.03] border border-transparent",
+      ? "border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:border-[#2962FF]/60"
+      : "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:border-[#2962FF]/60 border border-[rgba(148,163,184,0.16)]",
+    outline: "bg-transparent border border-[rgba(148,163,184,0.16)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[#2962FF]/60",
+    ghost: "bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(15,23,42,0.03)] border border-transparent",
     danger: "bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#FCA5A5] hover:bg-[#EF4444]/15",
   };
 

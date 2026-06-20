@@ -75,17 +75,17 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
   ];
 
   return (
-    <div className="bg-[#0D1117] border border-[rgba(148,163,184,0.16)] p-6 rounded-none flex flex-col space-y-4 select-none">
+    <div className="bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] p-6 rounded-none flex flex-col space-y-4 select-none">
       
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex items-center space-x-2">
           <Search className="w-4.5 h-4.5 text-[#06B6D4]" />
-          <span className="text-[13px] uppercase tracking-wider font-semibold text-[#E6EDF3]">
+          <span className="text-[13px] uppercase tracking-wider font-semibold text-[var(--color-text-primary)]">
             Watchlist Market Feed
           </span>
         </div>
-        <span className="font-mono text-[9px] text-[#9AA7B5] bg-[#0D1117] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
+        <span className="font-mono text-[9px] text-[var(--color-text-secondary)] bg-[var(--color-surface)] border border-[rgba(148,163,184,0.16)] px-2 py-0.5 rounded">
           NSE // BSE SECTOR INDEX
         </span>
       </div>
@@ -94,7 +94,7 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
       <div className="overflow-x-auto w-full">
         <table className="w-full text-left font-sans text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[rgba(148,163,184,0.16)] text-[#9AA7B5] font-mono text-[9px] uppercase tracking-wider">
+            <tr className="border-b border-[rgba(148,163,184,0.16)] text-[var(--color-text-secondary)] font-mono text-[9px] uppercase tracking-wider">
               <th className="pb-2 font-medium">Symbol // Name</th>
               <th className="pb-2 font-medium">Exchange</th>
               <th className="pb-2 font-medium text-right">Price</th>
@@ -109,17 +109,17 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
                 <tr
                   key={asset.id}
                   onClick={() => onSelectAsset(asset)}
-                  className={`hover:bg-white/[0.04] transition-all duration-200 cursor-pointer ${
-                    isSelected ? "bg-[#111827]" : ""
+                  className={`hover:bg-[rgba(15,23,42,0.04)] transition-all duration-200 cursor-pointer ${
+                    isSelected ? "bg-[var(--color-surface-raised)]" : ""
                   }`}
                 >
                   {/* Symbol */}
                   <td className="py-3">
                     <div className="flex items-center space-x-2">
-                      <div className="font-bold text-[#E6EDF3] font-mono">{asset.ticker}</div>
+                      <div className="font-bold text-[var(--color-text-primary)] font-mono">{asset.ticker}</div>
                       {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />}
                     </div>
-                    <div className="text-[10px] text-[#9AA7B5] truncate max-w-[130px]">
+                    <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[130px]">
                       {asset.name}
                     </div>
                   </td>
@@ -130,7 +130,7 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
                   </td>
 
                   {/* Price */}
-                  <td className="py-3 font-mono text-right text-[#E6EDF3] font-semibold">
+                  <td className="py-3 font-mono text-right text-[var(--color-text-primary)] font-semibold">
                     ₹{asset.price.toLocaleString("en-IN")}
                   </td>
 
@@ -148,7 +148,7 @@ export const WatchlistTelemetry: React.FC<WatchlistTelemetryProps> = ({
         </table>
       </div>
 
-      <div className="text-[9px] leading-relaxed text-[#9AA7B5] text-center font-mono uppercase tracking-widest pt-2 border-t border-[rgba(148,163,184,0.16)]">
+      <div className="text-[9px] leading-relaxed text-[var(--color-text-secondary)] text-center font-mono uppercase tracking-widest pt-2 border-t border-[rgba(148,163,184,0.16)]">
         Click Row to Load Order Ticket
       </div>
     </div>

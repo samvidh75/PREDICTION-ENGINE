@@ -16,7 +16,7 @@ export const AlertsPage: React.FC = () => {
       <ProductPage>
         <div className="flex items-center gap-2 mb-5">
           <Activity className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-          <h1 className="text-base font-semibold text-[#E6EDF3]">What changed that matters?</h1>
+          <h1 className="text-base font-semibold text-[var(--color-text-primary)]">What changed that matters?</h1>
         </div>
         <ProductEmptyState
           icon={Activity}
@@ -37,8 +37,8 @@ export const AlertsPage: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
                   <div>
-                    <h3 className="text-xs font-semibold text-[#E6EDF3]">{cat.label}</h3>
-                    <p className="mt-1 text-[11px] leading-relaxed text-[#9AA7B5]">{cat.desc}</p>
+                    <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">{cat.label}</h3>
+                    <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{cat.desc}</p>
                   </div>
                 </div>
               </ProductPanel>

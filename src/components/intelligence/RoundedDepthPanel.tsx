@@ -14,9 +14,9 @@ const PADDING = {
 };
 
 const VARIANT_STYLE = {
-  default: "border border-white/5 bg-[#0D1117] shadow-[0_1px_3px_rgba(0,0,0,0.3)]",
-  elevated: "border border-white/[0.06] bg-[#0D1117] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_1px_2px_rgba(0,0,0,0.3)]",
-  modal: "border border-white/10 bg-[#0D1117] shadow-[0_12px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]",
+  default: "border border-[var(--color-border-light)] bg-[var(--color-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.3)]",
+  elevated: "border border-[var(--color-border-light)] bg-[var(--color-surface)] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_1px_2px_rgba(0,0,0,0.3)]",
+  modal: "border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_12px_48px_rgba(0,0,0,0.5),0_4px_12px_rgba(0,0,0,0.3)]",
 };
 
 export function RoundedDepthPanel({ children, className = "", padding = "md", variant = "default" }: RoundedDepthPanelProps) {

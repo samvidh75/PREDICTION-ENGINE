@@ -100,9 +100,9 @@ export const PortfolioPage: React.FC = () => {
         <ProductPanel className="p-5 sm:p-6" as="section" aria-label="Portfolio overview">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Tracked thesis</div>
-              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#E6EDF3]">Manual thesis monitor</h1>
-              <p className="mt-1 max-w-3xl text-xs leading-5 text-[#9AA7B5]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">Tracked thesis</div>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Manual thesis monitor</h1>
+              <p className="mt-1 max-w-3xl text-xs leading-5 text-[var(--color-text-secondary)]">
                 Record positions locally, monitor thesis progress, and keep execution outside StockStory.
               </p>
             </div>
@@ -121,8 +121,8 @@ export const PortfolioPage: React.FC = () => {
               { label: "Largest thesis", value: largest ? largest.symbol : '—', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry` : undefined },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{item.label}</div>
-                <div className="mt-1 text-sm font-semibold tabular-nums text-[#E6EDF3]">{item.value}</div>
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">{item.label}</div>
+                <div className="mt-1 text-sm font-semibold tabular-nums text-[var(--color-text-primary)]">{item.value}</div>
                 {item.detail && <div className="mt-0.5 text-[10px] text-[#64748B]">{item.detail}</div>}
               </div>
             ))}
@@ -133,18 +133,18 @@ export const PortfolioPage: React.FC = () => {
           <ProductPanel className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <div className="text-sm font-semibold text-[#E6EDF3]">Add position</div>
-                <p className="text-xs text-[#9AA7B5]">Record a manual holding for research tracking.</p>
+                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Add position</div>
+                <p className="text-xs text-[var(--color-text-secondary)]">Record a manual holding for research tracking.</p>
               </div>
-              <button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><X className="h-4 w-4" /></button>
+              <button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <form onSubmit={handleAddHolding} className="space-y-3">
-              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
+              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
               <div className="grid grid-cols-2 gap-3">
-                <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-                <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
+                <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
+                <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
               </div>
-              <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
+              <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
               {formError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{formError}</div>}
               <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Save holding</button>
             </form>
@@ -155,14 +155,14 @@ export const PortfolioPage: React.FC = () => {
           <ProductPanel className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <div className="text-sm font-semibold text-[#E6EDF3]">Edit {editingHolding.symbol}</div>
-                <p className="text-xs text-[#9AA7B5]">Update shares or average buy price.</p>
+                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Edit {editingHolding.symbol}</div>
+                <p className="text-xs text-[var(--color-text-secondary)]">Update shares or average buy price.</p>
               </div>
-              <button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><X className="h-4 w-4" /></button>
+              <button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <form onSubmit={handleEditHolding} className="space-y-3">
-              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Shares" />
-              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Avg Buy Price" />
+              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Shares" />
+              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Avg Buy Price" />
               {formError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{formError}</div>}
               <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Save</button>
             </form>
@@ -173,13 +173,13 @@ export const PortfolioPage: React.FC = () => {
           <ProductPanel className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <div className="text-sm font-semibold text-[#E6EDF3]">Import CSV</div>
-                <p className="text-xs text-[#9AA7B5]">TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]</p>
+                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Import CSV</div>
+                <p className="text-xs text-[var(--color-text-secondary)]">TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]</p>
               </div>
-              <button type="button" onClick={() => { setIsImportOpen(false); setCsvText(''); }} className="text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><X className="h-4 w-4" /></button>
+              <button type="button" onClick={() => { setIsImportOpen(false); setCsvText(''); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
             </div>
             <form onSubmit={handleCSVImport} className="space-y-3">
-              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[#E6EDF3] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
+              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
               <p className="text-[10px] leading-relaxed text-[#64748B]">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Leave sector blank if unknown.</p>
               {importError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{importError}</div>}
               <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Parse and import</button>
@@ -192,7 +192,7 @@ export const PortfolioPage: React.FC = () => {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="h-4 w-4 text-[#F59E0B]" />
-                <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">What changed</h2>
+                <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-text-primary)]">What changed</h2>
               </div>
               <div className="flex gap-2">
                 {attentionCount > 0 && (
@@ -212,8 +212,8 @@ export const PortfolioPage: React.FC = () => {
             <div className="grid gap-3 md:grid-cols-2">
               {review.reviewQueue.map((item) => (
                 <button key={item.id} type="button" onClick={() => item.symbol && handleOpenStock(item.symbol)} className={`rounded-lg border p-3 text-left transition-colors hover:bg-[rgba(255,255,255,0.03)] ${reviewSeverityClass(item.severity)}`}>
-                  <div className="text-[11px] font-semibold text-[#E6EDF3]">{item.title}</div>
-                  <div className="mt-1 text-[10px] leading-relaxed opacity-75 text-[#9AA7B5]">{item.detail}</div>
+                  <div className="text-[11px] font-semibold text-[var(--color-text-primary)]">{item.title}</div>
+                  <div className="mt-1 text-[10px] leading-relaxed opacity-75 text-[var(--color-text-secondary)]">{item.detail}</div>
                 </button>
               ))}
             </div>
@@ -236,31 +236,31 @@ export const PortfolioPage: React.FC = () => {
         ) : (
           <ProductPanel className="overflow-hidden" as="section" aria-label="Monitored positions">
             <div className="hidden sm:block">
-              <div className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] gap-2 border-b border-[rgba(148,163,184,0.12)] p-3 text-[9px] font-bold uppercase tracking-wider text-[#9AA7B5]">
+              <div className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] gap-2 border-b border-[rgba(148,163,184,0.12)] p-3 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
                 <span className="pl-3">Ticker</span><span>Thesis</span><span>Sector</span><span>Shares</span><span>Entry price</span><span>Current value</span><span>Return</span><span className="text-right pr-3"></span>
               </div>
               {review.holdings.map((holding) => {
                 const thesis = thesisStatus(holding);
                 return (
                   <div key={holding.symbol} className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] items-center gap-2 border-b border-[rgba(148,163,184,0.06)] p-3 last:border-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-                    <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-[#9AA7B5]">
+                    <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{holding.symbol}</button>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] text-[var(--color-text-secondary)]">
                       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
                       {thesis.label}
                     </span>
-                    <span className="truncate text-[11px] text-[#9AA7B5]">{holding.sector}</span>
-                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.shares}</span>
-                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</span>
-                    <span className="font-mono text-xs tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</span>
+                    <span className="truncate text-[11px] text-[var(--color-text-secondary)]">{holding.sector}</span>
+                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{holding.shares}</span>
+                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{uiFormatINR(holding.costBasis)}</span>
+                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</span>
                     <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
                       {holding.gainLossPct === null ? '—' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                     </span>
                     <div className="flex items-center justify-end gap-1">
-                      <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors">
+                      <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
                         <ArrowLeftRight className="h-3 w-3" />
                       </button>
-                      <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3 w-3" /></button>
-                      <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3 w-3" /></button>
+                      <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><Edit2 className="h-3 w-3" /></button>
+                      <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3 w-3" /></button>
                     </div>
                   </div>
                 );
@@ -274,34 +274,34 @@ export const PortfolioPage: React.FC = () => {
                   <div key={holding.symbol} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[#E6EDF3] hover:underline">{holding.symbol}</button>
-                        <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[#9AA7B5]">
+                        <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{holding.symbol}</button>
+                        <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-text-secondary)]">
                           <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
                           {thesis.label}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><ArrowLeftRight className="h-3.5 w-3.5" /></button>
-                        <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
-                        <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[#9AA7B5] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><ArrowLeftRight className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
                       <div className="col-span-2">
-                        <span className="text-[#9AA7B5]">Thesis</span>
-                        <p className="font-medium text-[#E6EDF3]">
+                        <span className="text-[var(--color-text-secondary)]">Thesis</span>
+                        <p className="font-medium text-[var(--color-text-primary)]">
                           <span className="inline-flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
                             {thesis.label}
                           </span>
                         </p>
                       </div>
-                      <div><span className="text-[#9AA7B5]">Sector</span><p className="font-medium truncate text-[#E6EDF3]">{holding.sector}</p></div>
-                      <div><span className="text-[#9AA7B5]">Shares</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.shares}</p></div>
-                      <div><span className="text-[#9AA7B5]">Entry price</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{uiFormatINR(holding.costBasis)}</p></div>
-                      <div><span className="text-[#9AA7B5]">Current value</span><p className="font-mono font-medium tabular-nums text-[#E6EDF3]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</p></div>
+                      <div><span className="text-[var(--color-text-secondary)]">Sector</span><p className="font-medium truncate text-[var(--color-text-primary)]">{holding.sector}</p></div>
+                      <div><span className="text-[var(--color-text-secondary)]">Shares</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{holding.shares}</p></div>
+                      <div><span className="text-[var(--color-text-secondary)]">Entry price</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{uiFormatINR(holding.costBasis)}</p></div>
+                      <div><span className="text-[var(--color-text-secondary)]">Current value</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</p></div>
                       <div className="col-span-2">
-                        <span className="text-[#9AA7B5]">Return</span>
+                        <span className="text-[var(--color-text-secondary)]">Return</span>
                         <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
                           {holding.gainLossPct === null ? '—' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
                         </p>
@@ -316,15 +316,15 @@ export const PortfolioPage: React.FC = () => {
 
         {review.concentration.sectorExposure.length > 0 && (
           <ProductPanel className="p-5" as="section" aria-label="Cost basis sector exposure">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[#E6EDF3]">Sector exposure — entry price</h2>
+            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-text-primary)]">Sector exposure — entry price</h2>
             <div className="mt-3 space-y-2">
               {review.concentration.sectorExposure.map((item) => (
                 <div key={item.sector} className="flex items-center gap-3 text-[11px]">
-                  <span className="w-40 truncate text-[#9AA7B5]">{item.sector}</span>
+                  <span className="w-40 truncate text-[var(--color-text-secondary)]">{item.sector}</span>
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[rgba(148,163,184,0.12)]">
                     <div className="h-full rounded-full bg-[#16A34A]" style={{ width: `${Math.min(100, item.weightPct)}%` }} />
                   </div>
-                  <span className="w-16 text-right font-mono tabular-nums text-[#E6EDF3]">{item.weightPct.toFixed(2)}%</span>
+                  <span className="w-16 text-right font-mono tabular-nums text-[var(--color-text-primary)]">{item.weightPct.toFixed(2)}%</span>
                 </div>
               ))}
             </div>

@@ -103,7 +103,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
     return (
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="bg-[#0D1117] border border-white/[0.06] rounded-xl p-4 animate-pulse">
+          <div key={i} className="bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl p-4 animate-pulse">
             <div className="h-4 w-32 bg-white/[0.04] rounded mb-2" />
             <div className="h-3 w-64 bg-white/[0.04] rounded" />
           </div>
@@ -115,7 +115,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
   // Error state
   if (error) {
     return (
-      <div className="bg-[#0D1117] border border-red-500/10 rounded-xl p-6 text-center">
+      <div className="bg-[var(--color-surface)] border border-red-500/10 rounded-xl p-6 text-center">
         <div className="text-2xl mb-2">⚠️</div>
         <div className="text-[#E6EDF3] text-sm font-medium">Research signals pending</div>
         <div className="text-white/30 text-xs mt-1">Research signals pending.</div>
@@ -126,7 +126,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
   // Empty state
   if (items.length === 0) {
     return (
-      <div className="bg-[#0D1117] border border-white/[0.06] rounded-xl p-8 text-center">
+      <div className="bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl p-8 text-center">
         <div className="text-3xl mb-3">✅</div>
         <div className="text-[#E6EDF3] text-sm font-medium">Nothing needs attention</div>
         <div className="text-white/30 text-xs mt-1">No significant prediction changes detected today</div>
@@ -148,7 +148,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
               <a
                 key={item.id}
                 href={item.actionUrl}
-                className="block bg-[#0D1117] border border-red-500/20 hover:border-red-500/40 rounded-xl p-4 transition-colors group"
+                className="block bg-[var(--color-surface)] border border-red-500/20 hover:border-red-500/40 rounded-xl p-4 transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-[#E6EDF3]">{item.symbol}</span>
@@ -186,7 +186,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
               <a
                 key={item.id}
                 href={item.actionUrl}
-                className="block bg-[#0D1117] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 transition-colors group"
+                className="block bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:border-[var(--color-border-accent)] rounded-xl p-3 transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-[#E6EDF3]">{item.symbol}</span>
