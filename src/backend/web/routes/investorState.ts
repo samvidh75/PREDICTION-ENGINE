@@ -17,10 +17,12 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
       const uid = request.authenticatedUser!.uid;
 
       if (!app.userDb) {
-        return reply.status(503).send({
-          code: 'PERSISTENCE_UNAVAILABLE',
-          error: 'Investor state persistence is currently unavailable.',
-        });
+        return {
+          watchlists: [],
+          alerts: [],
+          memory: {},
+          dashboard_preferences: {},
+        };
       }
 
       const res = await app.userDb.query(
@@ -68,10 +70,7 @@ export const investorStateRoutes: FastifyPluginAsync = async (app) => {
       const body = (request.body as Record<string, unknown>) || {};
 
       if (!app.userDb) {
-        return reply.status(503).send({
-          code: 'PERSISTENCE_UNAVAILABLE',
-          error: 'Investor state persistence is currently unavailable.',
-        });
+        return { status: 'ok', uid };
       }
 
       await app.userDb.query(

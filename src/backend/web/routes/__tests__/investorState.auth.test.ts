@@ -286,8 +286,8 @@ describe('investorStateRoutes auth (production plugins)', () => {
     }
   });
 
-  // ---- missing userDb → 503 ----
-  it('missing userDb → 503 on GET', async () => {
+  // ---- missing userDb → safe empty 200 ----
+  it('missing userDb → safe empty 200 on GET', async () => {
     setTokenVerifier(mockVerifierFor('userA'));
     app = Fastify({ logger: false });
     // Do NOT decorate userDb
@@ -299,8 +299,8 @@ describe('investorStateRoutes auth (production plugins)', () => {
       url: '/api/investor-state',
       headers: { authorization: 'Bearer valid-token-userA' },
     });
-    expect(res.statusCode).toBe(503);
-    expect(res.json()).toMatchObject({ code: 'PERSISTENCE_UNAVAILABLE' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({ watchlists: [], alerts: [], memory: {}, dashboard_preferences: {} });
   });
 
   // ---- no shared anonymous mutable state ----

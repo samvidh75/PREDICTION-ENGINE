@@ -33,7 +33,7 @@ export interface UnifiedFactorScore {
   group: UnifiedFactorGroup;
   value: number | null;
   availability: number;
-  confidence: number;
+  confidence: number | null;
   featureCount: number;
   availableFeatureCount: number;
   missingFeatures: string[];
