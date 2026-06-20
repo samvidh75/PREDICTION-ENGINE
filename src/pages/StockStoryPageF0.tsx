@@ -7,6 +7,7 @@ import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
 import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
 import { buildSingleActionCluster, buildSinglePriceContext } from "../lib/product/stockDisplay";
+import { getHealthometerTone, getResearchStanceTone, normalizeResearchStance, normalizeHealthometerLabel } from "../lib/product/publicLabels";
 import { api } from "../services/api/client";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { StockRegistry } from "../services/stocks/StockRegistry";
@@ -16,8 +17,10 @@ function tickerFromUrl(): string {
   return normalizeSymbol(p.get("id") ?? p.get("symbol") ?? p.get("ticker") ?? "");
 }
 
-const scoreTone = (score: number | null) => score === null ? "muted" : score >= 70 ? "verified" : score >= 45 ? "blue" : "warning";
-const healthLabel = (score: number | null) => score === null ? "Not enough information" : score >= 80 ? "Very healthy" : score >= 65 ? "Healthy" : score >= 45 ? "Stable" : score >= 30 ? "Needs review" : "Fragile";
+const DIM_COLORS: Record<string, string> = {
+  quality: "#2962FF", financial_strength: "#16A34A", valuation: "#F59E0B",
+  growth: "#22C55E", stability: "#06B6D4", risk: "#EF4444", momentum: "#8B5CF6",
+};
 
 function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
   return <div className="mb-4"><div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748B]">{eyebrow}</div><h2 className="mt-1 text-[22px] font-semibold tracking-tight text-[#E6EDF3]">{title}</h2>{body && <p className="mt-1 max-w-2xl text-sm leading-6 text-[#9AA7B5]">{body}</p>}</div>;
@@ -43,7 +46,9 @@ export default function StockStoryPageF0(): JSX.Element {
   const research = useMemo(() => buildCompanyResearch(ticker, identity.displayName, identity.sector, metrics, tracked), [ticker, identity.displayName, identity.sector, metrics, tracked]);
   const readiness = research.prediction.readiness;
   const score = research.healthometer.overallScore ?? research.prediction.overallScore;
-  const label = healthLabel(score);
+  const label = normalizeHealthometerLabel(research.healthometer.backendLabel) === 'Not enough information' && research.healthometer.overallScore !== null
+    ? research.healthometer.overallScore >= 80 ? 'Very healthy' : research.healthometer.overallScore >= 65 ? 'Healthy' : research.healthometer.overallScore >= 45 ? 'Stable' : research.healthometer.overallScore >= 30 ? 'Needs review' : 'Fragile'
+    : normalizeHealthometerLabel(research.healthometer.backendLabel);
   const price = buildSinglePriceContext(
     quote.quote ? formatINR(quote.quote.price) : "Price pending",
     quote.quote ? `${formatINR(quote.quote.change)} (${formatPercent(quote.quote.changePercent)})` : null,
@@ -80,7 +85,7 @@ export default function StockStoryPageF0(): JSX.Element {
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <span className="font-mono text-xs font-semibold tracking-[0.12em] text-[#9AA7B5]">{identity.symbol}</span>
               {identity.sector && <span className="text-xs text-[#64748B]">· {identity.sector}</span>}
-              <ProductStatusPill tone={scoreTone(score)}>{label}</ProductStatusPill>
+              <ProductStatusPill tone={score !== null && score >= 70 ? "verified" : score !== null && score >= 45 ? "blue" : "muted"}>{label}</ProductStatusPill>
             </div>
             <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.03em] text-[#E6EDF3] md:text-[38px]">{identity.displayName}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[#9AA7B5]">A decision-ready view of business quality, financial strength, valuation and risk — composed for review, not reaction.</p>
@@ -99,8 +104,8 @@ export default function StockStoryPageF0(): JSX.Element {
       <section className="mt-5 grid gap-4 lg:grid-cols-3">
         <ProductPanel className="p-5 lg:col-span-1">
           <div className="flex items-start justify-between gap-4"><div><div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Healthometer</div><div className="mt-2 text-xl font-semibold text-[#E6EDF3]">{label}</div></div><div className="font-mono text-3xl font-semibold tabular-nums text-[#E6EDF3]">{score ?? "—"}</div></div>
-          <p className="mt-3 text-xs leading-5 text-[#9AA7B5]">A compact reading of the company’s present condition across active research dimensions.</p>
-          <div className="mt-5 space-y-3">{dimensions.slice(0, 5).map((dimension) => <div key={dimension.id}><div className="mb-1 flex justify-between text-xs"><span className="text-[#9AA7B5]">{dimension.label}</span><span className="font-mono tabular-nums text-[#E6EDF3]">{dimension.score ?? "—"}</span></div><div className="h-1.5 overflow-hidden rounded-full bg-[#161B22]"><div className="h-full rounded-full bg-[#2962FF]" style={{ width: `${Math.max(0, Math.min(100, dimension.score ?? 0))}%` }} /></div></div>)}</div>
+          <p className="mt-3 text-xs leading-5 text-[#9AA7B5]">A compact reading of the company's present condition across active research dimensions.</p>
+          <div className="mt-5 space-y-3">{dimensions.map((dimension) => <div key={dimension.id}><div className="mb-1 flex justify-between text-xs"><span className="text-[#9AA7B5]">{dimension.label}</span><span className="font-mono tabular-nums text-[#E6EDF3]">{dimension.score ?? "—"}</span></div><div className="h-1.5 overflow-hidden rounded-full bg-[#161B22]"><div className="h-full rounded-full" style={{ width: `${Math.max(0, Math.min(100, dimension.score ?? 0))}%`, backgroundColor: DIM_COLORS[dimension.id] || "#2962FF" }} /></div></div>)}</div>
         </ProductPanel>
         <ProductPanel className="p-5 lg:col-span-1">
           <div className="flex items-center justify-between"><div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Prediction Engine</div><Sparkles className="h-4 w-4 text-[#2962FF]" /></div>
@@ -118,7 +123,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
       <div className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         <main className="min-w-0 space-y-7">
-          <section><SectionTitle eyebrow="Research narrative" title="The thesis in one pass" body="What matters, what can improve, and what deserves skepticism." /><div className="grid gap-4 md:grid-cols-2"><ProductPanel className="p-5"><h3 className="text-base font-semibold text-[#E6EDF3]">Why it matters</h3><p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{drivers[0]} is the clearest active reason to study this company further. Test that strength against valuation and execution quality.</p></ProductPanel><ProductPanel className="p-5"><h3 className="text-base font-semibold text-[#E6EDF3]">Bear case</h3><p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{risks[0]}. A stronger thesis needs evidence that this risk is contained or improving.</p></ProductPanel></div></section>
+          <section><SectionTitle eyebrow="Research narrative" title="The thesis in one pass" body="What matters, what can improve, and what deserves skepticism." /><div className="grid gap-4 md:grid-cols-2"><ProductPanel className="p-5"><h3 className="text-base font-semibold text-[#E6EDF3]">Why it matters</h3><p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{drivers[0]} is the clearest signal supporting further research. Assess whether this strength is durable and reflected in the current valuation.</p></ProductPanel><ProductPanel className="p-5"><h3 className="text-base font-semibold text-[#E6EDF3]">What to challenge</h3><p className="mt-2 text-sm leading-6 text-[#9AA7B5]">{risks[0]}. A complete thesis requires evidence that this concern is either contained or actively improving.</p></ProductPanel></div></section>
           <section><SectionTitle eyebrow="Factor intelligence" title="Condition by dimension" /><div className="grid gap-3 sm:grid-cols-2">{dimensions.map((d) => <ProductPanel key={d.id} className="flex items-center justify-between p-4"><div><h3 className="text-sm font-semibold text-[#E6EDF3]">{d.label}</h3><p className="mt-1 text-xs text-[#64748B]">{d.score === null ? "Not enough information" : d.score >= 65 ? "Supporting the thesis" : d.score >= 45 ? "Balanced context" : "Needs review"}</p></div><div className="font-mono text-2xl font-semibold tabular-nums text-[#E6EDF3]">{d.score ?? "—"}</div></ProductPanel>)}</div></section>
         </main>
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
