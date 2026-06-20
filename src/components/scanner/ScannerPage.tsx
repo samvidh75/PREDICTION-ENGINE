@@ -275,12 +275,15 @@ export default function ScannerPage() {
   return (
     <ProductShell>
       <ProductPage>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
           {/* Header */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Research scanner</h1>
-              <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Discover companies worth researching. Select a strategy, search by name, or filter by fundamentals.</p>
+          <div className="relative overflow-hidden rounded-[28px] border border-blue-100/80 bg-[linear-gradient(125deg,rgba(255,255,255,.98),rgba(239,246,255,.88)_58%,rgba(245,243,255,.82))] px-5 py-7 shadow-[0_24px_65px_rgba(30,64,175,.10)] sm:px-7 sm:py-8">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-400/14 blur-3xl" />
+            <div className="relative flex items-start justify-between gap-3">
+            <div className="min-w-0 max-w-3xl">
+              <div className="text-[10px] font-bold uppercase tracking-[.2em] text-blue-600">Discover · step 1 of 3</div>
+              <h1 className="mt-3 text-[30px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[38px]">Find your next research question.</h1>
+              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Choose one lens. We’ll organise the companies; you decide which thesis deserves a closer look.</p>
             </div>
             <div className="hidden sm:block shrink-0">
               <HelpPopover title="How to use the scanner" storageKey="scanner-help-dismissed">
@@ -293,17 +296,18 @@ export default function ScannerPage() {
                 </ul>
               </HelpPopover>
             </div>
+            </div>
           </div>
 
           {/* Command-style search */}
-          <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] px-4 py-2.5">
-            <Search className="h-4 w-4 shrink-0 text-[var(--color-text-secondary)]" />
+          <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 shadow-[0_14px_34px_rgba(15,23,42,.07)] focus-within:border-blue-300 focus-within:shadow-[0_16px_38px_rgba(41,98,255,.12)]">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Search className="h-4 w-4" /></span>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search symbol, company, or sector..."
-              className="h-9 w-full min-w-0 bg-transparent text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-secondary)]"
+              className="h-10 w-full min-w-0 bg-transparent text-[15px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
               aria-label="Search symbol, company, or sector"
             />
             {query && (
@@ -319,14 +323,16 @@ export default function ScannerPage() {
             <button
               type="button"
               onClick={handleQuerySubmit}
-              className="shrink-0 rounded-md bg-[#2962FF] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#3B71FF] transition-colors"
+              className="shrink-0 rounded-xl bg-[#2962FF] px-5 py-3 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(41,98,255,.24)] hover:bg-[#3B71FF] transition"
             >
               Scan
             </button>
           </div>
 
-          {/* Strategy presets - dark styled horizontal chip rail with hidden scrollbar */}
-          <div className="scrollbar-none -mx-4 flex items-center gap-1.5 overflow-x-auto px-4">
+          {/* One guided lens grid — no competing horizontal rail. */}
+          <section aria-labelledby="research-lens-title">
+            <div className="mb-3 flex items-end justify-between gap-3"><div><div className="text-[10px] font-bold uppercase tracking-[.18em] text-[var(--color-text-muted)]">Step 2</div><h2 id="research-lens-title" className="mt-1 text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Choose a research lens</h2></div><span className="hidden text-xs text-[var(--color-text-muted)] sm:block">One lens at a time</span></div>
+          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-5">
             {SCANNER_PRESETS.map((preset) => {
               const active = activePreset === preset.label;
               return (
@@ -334,21 +340,21 @@ export default function ScannerPage() {
                   key={preset.label}
                   type="button"
                   onClick={() => handlePresetClick(preset.label)}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+                  className={`group flex min-h-[76px] items-start gap-3 rounded-2xl border p-3 text-left text-xs font-semibold transition duration-200 ${
                     active
-                      ? "border-[#2962FF] bg-[rgba(41,98,255,0.12)] text-[var(--color-text-primary)]"
-                      : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[var(--color-text-secondary)] hover:border-[rgba(148,163,184,0.3)] hover:text-[var(--color-text-primary)]"
+                      ? "-translate-y-0.5 border-[#2962FF] bg-[linear-gradient(145deg,#fff,#eef4ff)] text-[#1D4ED8] shadow-[0_12px_28px_rgba(41,98,255,.13)]"
+                      : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] shadow-sm hover:-translate-y-0.5 hover:border-blue-200 hover:text-[var(--color-text-primary)] hover:shadow-md"
                   }`}
                 >
-                  <preset.icon className="h-3 w-3" aria-hidden="true" />
-                  {preset.label}
+                  <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${active ? "bg-blue-100 text-blue-600" : "bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600"}`}><preset.icon className="h-3.5 w-3.5" aria-hidden="true" /></span>
+                  <span className="leading-4">{preset.label}</span>
                 </button>
               );
             })}
-          </div>
+          </div></section>
 
           {/* Toolbar */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border-light)] bg-slate-50/70 px-3 py-2">
             <button
               type="button"
               onClick={() => setAdvancedOpen(!advancedOpen)}
@@ -401,6 +407,8 @@ export default function ScannerPage() {
             </ProductPanel>
           </div>
 
+          <div className="flex items-end justify-between gap-3"><div><div className="text-[10px] font-bold uppercase tracking-[.18em] text-[var(--color-text-muted)]">Step 3</div><h2 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Review the shortlist</h2></div>{!loading && <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">{sortedResults.length} companies</span>}</div>
+
           {/* Results */}
           {loading ? (
             <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">Scanning companies...</div>
@@ -415,7 +423,7 @@ export default function ScannerPage() {
               </div>
             </ProductPanel>
           ) : (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {sortedResults.slice(0, 100).map((entry) => {
                 const fullSymbol = entry.symbol;
                 const item = scannerResultToResearchListItem(entry);
@@ -426,29 +434,35 @@ export default function ScannerPage() {
                 const sector = item.sector;
                 const signalInfo = scannerSignalLabel(score);
                 const signalColor = signalInfo?.color ?? "#64748B";
+                const performanceShadow = score !== null && score >= 65
+                  ? "shadow-[0_18px_44px_rgba(22,163,74,.11)] hover:shadow-[0_24px_54px_rgba(22,163,74,.17)]"
+                  : score !== null && score < 45
+                    ? "shadow-[0_18px_44px_rgba(220,38,38,.10)] hover:shadow-[0_24px_54px_rgba(220,38,38,.16)]"
+                    : "shadow-[0_16px_40px_rgba(30,64,175,.08)] hover:shadow-[0_22px_50px_rgba(30,64,175,.13)]";
                 return (
-                  <ProductPanel key={fullSymbol} as="article" className="flex flex-col justify-between p-4 border border-white/[0.08] hover:border-white/[0.15] transition-all">
+                  <ProductPanel key={fullSymbol} as="article" className={`group relative min-h-[250px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-white p-5 transition duration-300 hover:-translate-y-1 ${performanceShadow}`}>
+                    <div className="absolute inset-x-5 top-0 h-px opacity-70" style={{ background: `linear-gradient(90deg,transparent,${signalColor},transparent)` }} />
                     <div>
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <span className="font-mono text-sm font-bold text-[var(--color-text-primary)] tracking-wide">{fullSymbol}</span>
-                          <h3 className="truncate text-xs text-[var(--color-text-secondary)] mt-0.5">{item.company}</h3>
+                          <span className="font-mono text-[13px] font-semibold text-[var(--color-text-muted)] tracking-[.08em]">{fullSymbol}</span>
+                          <h3 className="mt-1 truncate text-[17px] font-semibold tracking-tight text-[var(--color-text-primary)]">{item.company}</h3>
                         </div>
                         {score !== null && (
                           <div className="flex flex-col items-end shrink-0">
-                            <span className="text-xs font-bold text-[#2962FF] tabular-nums bg-[#2962FF]/10 px-2 py-0.5 rounded">{Math.round(score)}</span>
+                            <span className="grid h-11 min-w-11 place-items-center rounded-2xl bg-slate-50 px-2 font-mono text-base font-semibold tabular-nums text-[var(--color-text-primary)] shadow-[inset_0_0_0_1px_var(--color-border)]">{Math.round(score)}</span>
                           </div>
                         )}
                       </div>
 
                       {sector && (
                         <div className="mt-2">
-                          <span className="inline-flex rounded bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
+                          <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
                         </div>
                       )}
 
                       {item.thesis && (
-                        <p className="mt-3 text-xs leading-relaxed text-[var(--color-text-primary)] line-clamp-2">{item.thesis}</p>
+                        <p className="mt-4 text-[13px] leading-5 text-[var(--color-text-secondary)] line-clamp-2">{item.thesis}</p>
                       )}
 
                       <div className="mt-3 flex flex-wrap items-center gap-1.5">
@@ -471,11 +485,11 @@ export default function ScannerPage() {
                       )}
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
+                    <div className="mt-5 flex items-center justify-between border-t border-[var(--color-border-light)] pt-4">
                       <button
                         type="button"
                         onClick={() => handleResearch(fullSymbol)}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2962FF] hover:text-[#3B71FF] transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#2962FF] hover:gap-2 hover:text-[#1D4ED8] transition-all"
                       >
                         Research &rarr;
                       </button>

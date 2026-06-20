@@ -13,7 +13,6 @@ import {
   Shield,
   Info,
   Loader2,
-  Building2,
   ShoppingBag,
   WalletCards,
 } from "lucide-react";
@@ -34,19 +33,30 @@ interface InvestHandoffSheetProps {
   marketPrice?: number | null;
 }
 
-type BrokerChoice = { id: string; name: string; url: string };
+type BrokerChoice = { id: string; name: string; short: string; url: string; color: string; soft: string };
 type HandoffDraft = { broker: BrokerChoice; quantity: number; price: number | null };
 
 const BROKERS: BrokerChoice[] = [
-  { id: "zerodha", name: "Zerodha Kite", url: "https://kite.zerodha.com/" },
-  { id: "groww", name: "Groww", url: "https://groww.in/stocks" },
-  { id: "angel", name: "Angel One", url: "https://trade.angelone.in/" },
-  { id: "upstox", name: "Upstox", url: "https://login.upstox.com/" },
-  { id: "dhan", name: "Dhan", url: "https://web.dhan.co/" },
-  { id: "icici", name: "ICICI Direct", url: "https://secure.icicidirect.com/" },
-  { id: "kotak", name: "Kotak Neo", url: "https://neo.kotaksecurities.com/" },
-  { id: "other", name: "Other broker", url: "" },
+  { id: "zerodha", name: "Zerodha Kite", short: "Z", url: "https://kite.zerodha.com/", color: "#387ED1", soft: "#EDF5FC" },
+  { id: "groww", name: "Groww", short: "G", url: "https://groww.in/stocks", color: "#00A67E", soft: "#E9FAF5" },
+  { id: "angel", name: "Angel One", short: "A", url: "https://trade.angelone.in/", color: "#5B36D9", soft: "#F1EEFF" },
+  { id: "upstox", name: "Upstox", short: "U", url: "https://login.upstox.com/", color: "#6C2BD9", soft: "#F4EDFF" },
+  { id: "dhan", name: "Dhan", short: "ध", url: "https://web.dhan.co/", color: "#16A34A", soft: "#EAF8EF" },
+  { id: "icici", name: "ICICI Direct", short: "i", url: "https://secure.icicidirect.com/", color: "#B02A30", soft: "#FFF1E8" },
+  { id: "kotak", name: "Kotak Neo", short: "K", url: "https://neo.kotaksecurities.com/", color: "#E31837", soft: "#FFF0F2" },
+  { id: "other", name: "Other broker", short: "+", url: "", color: "#475569", soft: "#F1F5F9" },
 ];
+
+function BrokerBrandMark({ broker }: { broker: BrokerChoice }): JSX.Element {
+  return (
+    <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-[13px] font-sans text-sm font-extrabold shadow-[inset_0_0_0_1px_rgba(255,255,255,.8),0_5px_14px_rgba(15,23,42,.08)]" style={{ color: broker.color, backgroundColor: broker.soft }} aria-hidden="true">
+      {broker.id === "groww" && <span className="absolute inset-x-0 bottom-0 h-2 bg-[#5367FF]/25" />}
+      {broker.id === "icici" && <span className="absolute -left-1 top-1 h-7 w-3 rotate-[24deg] rounded-full bg-[#F58220]/85" />}
+      {broker.id === "kotak" && <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full border-2 border-current opacity-35" />}
+      <span className="relative">{broker.short}</span>
+    </span>
+  );
+}
 
 type Stage = 1 | 2 | 3;
 
@@ -432,7 +442,7 @@ function StageTwo({
             <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-[var(--color-accent-light)] text-[var(--color-accent)]"><ShoppingBag className="h-4 w-4" /></span><div><div className="text-sm font-semibold text-[var(--color-text-primary)]">{displayName}</div><div className="font-mono text-[11px] text-[var(--color-text-muted)]">{symbol.toUpperCase()} · NSE equity</div></div></div>
           </div>
           <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4">
-            {BROKERS.map((broker) => <button key={broker.id} type="button" onClick={() => setSelectedId(broker.id)} className={`min-h-16 rounded-xl border px-2 py-3 text-center text-[11px] font-semibold transition ${selectedId === broker.id ? "border-[var(--color-accent)] bg-[var(--color-accent-light)] text-[var(--color-accent)] shadow-sm" : "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent-border)]"}`}><Building2 className="mx-auto mb-1.5 h-4 w-4" />{broker.name}</button>)}
+            {BROKERS.map((broker) => <button key={broker.id} type="button" onClick={() => setSelectedId(broker.id)} style={selectedId === broker.id ? { borderColor: broker.color, boxShadow: `0 10px 24px ${broker.color}20` } : undefined} className={`flex min-h-[82px] flex-col items-center justify-center rounded-2xl border px-2 py-3 text-center text-[11px] font-semibold transition duration-200 hover:-translate-y-0.5 ${selectedId === broker.id ? "bg-white text-[var(--color-text-primary)]" : "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)]"}`}><BrokerBrandMark broker={broker} /><span className="mt-2">{broker.name}</span></button>)}
           </div>
         </ProductPanel>
 
