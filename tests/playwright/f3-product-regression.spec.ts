@@ -160,6 +160,11 @@ async function assertNoRenderGarbage(page: import("@playwright/test").Page): Pro
   expect(bodyText).not.toContain("Infinity");
 }
 
+async function dismissWelcomeIfVisible(page: import("@playwright/test").Page): Promise<void> {
+  const close = page.getByRole("button", { name: /close feature introduction/i });
+  if (await close.isVisible().catch(() => false)) await close.click();
+}
+
 // ── Public Route Smoke ───────────────────────────────────────────────
 
 test.describe("Public route smoke", () => {
@@ -262,6 +267,7 @@ test.describe("Public navigation", () => {
 
   test("landing page has working CTA to signup", async ({ page }) => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
+    await dismissWelcomeIfVisible(page);
     await page.locator("#hero-cta-start").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-start").click();
     await expect(page).toHaveURL(/page=signup/);
@@ -269,6 +275,7 @@ test.describe("Public navigation", () => {
 
   test("landing page has working CTA to methodology", async ({ page }) => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
+    await dismissWelcomeIfVisible(page);
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#hero-cta-methodology").click();
     await expect(page).toHaveURL(/page=methodology/);
@@ -276,6 +283,7 @@ test.describe("Public navigation", () => {
 
   test("landing page has working CTA to about", async ({ page }) => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
+    await dismissWelcomeIfVisible(page);
     await page.locator("#onboarding-cta-about").waitFor({ state: "visible", timeout: 10000 });
     await page.locator("#onboarding-cta-about").click();
     await expect(page).toHaveURL(/page=about/);
@@ -375,9 +383,9 @@ test.describe("Scanner", () => {
   test("scanner shows no white scrollbar issue", async ({ page }) => {
     await page.goto("/?page=scanner");
     await expect(page.locator("body")).toBeVisible();
-    // Verify no default/light scrollbar (check for overflow)
-    const chipRail = page.locator(".scrollbar-none").first();
-    await expect(chipRail).toBeVisible();
+    // The guided lens grid must not create horizontal page overflow.
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
     await assertNoRenderGarbage(page);
   });
 
@@ -632,6 +640,7 @@ test.describe("Public rankings/predictions CTA routing", () => {
     await page.goto("/?page=predictions");
     await expect(page.locator("body")).toBeVisible();
     const cta = page.getByRole("button", { name: /create free account/i });
+    await dismissWelcomeIfVisible(page);
     if (await cta.isVisible()) {
       await cta.click();
       await expect(page).toHaveURL(/page=signup/);
@@ -666,7 +675,7 @@ test.describe("Keyboard and accessibility", () => {
 
   test("command palette opens with Cmd+K and closes with Escape", async ({ page }) => {
     await page.goto("/?page=dashboard");
-    await page.keyboard.press("Meta+k");
+    await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog", { name: /command palette/i })).not.toBeVisible();
@@ -674,14 +683,14 @@ test.describe("Keyboard and accessibility", () => {
 
   test("command palette search input is focused on open", async ({ page }) => {
     await page.goto("/?page=dashboard");
-    await page.keyboard.press("Meta+k");
+    await page.keyboard.press("Control+k");
     await expect(page.getByLabel("Command search")).toBeFocused();
     await page.keyboard.press("Escape");
   });
 
   test("modals trap focus and return focus on close", async ({ page }) => {
     await page.goto("/?page=dashboard");
-    await page.keyboard.press("Meta+k");
+    await page.keyboard.press("Control+k");
     await expect(page.getByRole("dialog", { name: /command palette/i })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog", { name: /command palette/i })).not.toBeVisible();
