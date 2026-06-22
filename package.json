@@ -113,7 +113,10 @@
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
     "probe:akshare": "python3 scripts/probe-akshare-provider.py",
-    "job:maintenance": "tsx scripts/run-production-maintenance-job.ts"
+    "job:maintenance": "tsx scripts/run-production-maintenance-job.ts",
+    "stockedge:smoke": "tsx scripts/stockedge-smoke.ts",
+    "stockedge:extract": "tsx scripts/stockedge-smoke.ts",
+    "market:enrichment:smoke": "tsx scripts/stockedge-smoke.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
@@ -134,7 +137,7 @@
     "lucide-react": "^0.300.0",
     "pg": "^8.21.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^18.3.0",
     "redis": "^5.12.1"
   },
   "devDependencies": {
