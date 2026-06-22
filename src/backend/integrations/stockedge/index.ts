@@ -2,6 +2,7 @@ export * from "./StockEdgeCache";
 export * from "./StockEdgeClient";
 export * from "./StockEdgeConfig";
 export * from "./StockEdgeErrors";
+export * from "./StockEdgeExtractor";
 export * from "./StockEdgeIngestionJob";
 export * from "./StockEdgeMapper";
 export * from "./StockEdgePredictionBridge";
