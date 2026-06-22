@@ -1,6 +1,6 @@
 import { StockEdgeClient } from "./StockEdgeClient";
 import { mapCanonicalSnapshot } from "./StockEdgeMapper";
-import type { StockEdgeCanonicalSnapshot, StockEdgeFetchResult } from "./StockEdgeTypes";
+import type { StockEdgeCanonicalSnapshot, StockEdgeFetchResult, StockEdgeLayer } from "./StockEdgeTypes";
 
 export interface StockEdgeWrapperOptions {
   client?: StockEdgeClient;
@@ -36,7 +36,7 @@ export class StockEdgeWrapper {
     };
   }
 
-  async fetchLayer(symbol: string, layer: Exclude<Parameters<StockEdgeClient["getJson"]>[0]["layer"], "full_snapshot">): Promise<StockEdgeFetchResult<unknown>> {
+  async fetchLayer(symbol: string, layer: Exclude<StockEdgeLayer, "full_snapshot">): Promise<StockEdgeFetchResult<unknown>> {
     const normalized = symbol.trim().toUpperCase();
     return this.client.getJson({
       layer,
