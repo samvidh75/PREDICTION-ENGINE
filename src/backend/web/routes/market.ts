@@ -1,11 +1,12 @@
 import type { FastifyPluginAsync } from "fastify";
 import { indianApiService } from "../../integrations/indianapi/IndianApiService";
+import { unifiedMarketDataService } from "../../integrations/market/UnifiedMarketDataService";
 
 const marketRoutes: FastifyPluginAsync = async (app) => {
   app.get("/api/market/stock/:symbol/summary", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
-    const result = await indianApiService.getFullSnapshot(sym);
+    const result = await unifiedMarketDataService.getFullSnapshot(sym);
     if (!result.ok && !result.data) {
       return reply.status(404).send({ ok: false, dataState: "partial", message: "Not enough information for this view yet." });
     }
@@ -32,25 +33,34 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
 
   app.get("/api/market/stock/:symbol/fundamentals", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
-    const result = await indianApiService.getFundamentals(symbol.toUpperCase().trim());
-    if (!result.ok && !result.data) {
+    const result = indianApiService.getFundamentals(symbol.toUpperCase().trim());
+    const enriched = unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
+    const [base, snapshot] = await Promise.all([result, enriched]);
+    const data = snapshot.data?.fundamentals ?? base.data;
+    if (!data) {
       return reply.status(404).send({ ok: false, dataState: "partial", message: "Fundamental data is not yet available." });
     }
-    return { ok: true, data: result.data, dataState: result.data?.dataState ?? "partial" };
+    return { ok: true, data, dataState: data.dataState ?? "partial" };
   });
 
   app.get("/api/market/stock/:symbol/shareholding", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
-    const result = await indianApiService.getShareholding(symbol.toUpperCase().trim());
-    if (!result.ok && !result.data) {
+    const enriched = await unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
+    const data = enriched.data?.shareholding;
+    if (!data) {
       return reply.status(404).send({ ok: false, dataState: "partial", message: "Shareholding is not yet available." });
     }
-    return { ok: true, data: result.data, dataState: result.data?.dataState ?? "partial" };
+    return { ok: true, data, dataState: data.dataState ?? "partial" };
   });
 
   app.get("/api/market/stock/:symbol/financials", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
     const { view } = request.query as { view?: string };
+    const enriched = await unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
+    const tables = enriched.data?.stockEdge?.financialTables ?? [];
+    if (tables.length > 0) {
+      return { ok: true, data: tables, dataState: "available", periodType: view || "quarterly" };
+    }
     const result = await indianApiService.getFinancials(symbol.toUpperCase().trim());
     if (!result.ok && !result.data) {
       return reply.status(404).send({ ok: false, dataState: "partial", message: "Financial statements are not yet available." });
@@ -60,13 +70,25 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
 
   app.get("/api/market/stock/:symbol/full", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
-    const { include } = request.query as { include?: string };
-    const layers = include ? include.split(",").map((l) => l.trim()) as any[] : undefined;
-    const result = await indianApiService.getFullSnapshot(symbol.toUpperCase().trim(), layers);
+    const result = await unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
     if (!result.ok && !result.data) {
       return reply.status(404).send({ ok: false, dataState: "partial", message: "Not enough information for this view yet." });
     }
     return { ok: true, data: result.data, dataState: result.data?.dataState ?? "partial" };
+  });
+
+  app.get("/api/market/stock/:symbol/enrichment", async (request, reply) => {
+    const { symbol } = request.params as { symbol: string };
+    const result = await unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
+    if (!result.data?.stockEdge) {
+      return reply.status(404).send({ ok: false, dataState: "partial", message: "Additional research context is not yet available." });
+    }
+    return {
+      ok: true,
+      dataState: result.data.dataState,
+      enrichment: result.data.enrichment,
+      data: result.data.stockEdge,
+    };
   });
 };
 
