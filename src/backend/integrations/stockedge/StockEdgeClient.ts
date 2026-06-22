@@ -116,7 +116,7 @@ export class StockEdgeClient {
     const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs);
     const url = new URL(path, this.config.baseUrl);
     try {
-      const headers: HeadersInit = { Accept: "application/json" };
+      const headers: Record<string, string> = { Accept: "application/json" };
       if (this.config.accessSecret) headers.Authorization = `Bearer ${this.config.accessSecret}`;
       const response = await this.fetchImpl(url, { headers, signal: controller.signal });
       if (!response.ok) {
