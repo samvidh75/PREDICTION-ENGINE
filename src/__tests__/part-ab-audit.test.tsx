@@ -84,9 +84,10 @@ describe('Part AB — No raw rendering defects', () => {
 describe('Part AB — Scanner', () => {
   it('ScannerPage renders strategy chips', () => {
     renderWithProviders(<ScannerPage />);
-    expect(screen.getByText('Quality compounders')).toBeInTheDocument();
-    expect(screen.getByText('Undervalued quality')).toBeInTheDocument();
-    expect(screen.getByText('Risk rising')).toBeInTheDocument();
+    expect(screen.getByText('Free scans (5)')).toBeInTheDocument();
+    expect(screen.getByText('Premium scans (15)')).toBeInTheDocument();
+    expect(screen.getByText('Low debt leaders')).toBeInTheDocument();
+    expect(screen.getByText('Watchlist-worthy movers')).toBeInTheDocument();
   });
 });
 

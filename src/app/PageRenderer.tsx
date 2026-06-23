@@ -27,6 +27,7 @@ import TrustCentrePage from "../pages/TrustCentrePage";
 import ComparePage from "../pages/ComparePage";
 import AlertsPage from "../pages/AlertsPage";
 import IPOCenterPage from "../pages/IPOCenterPage";
+import PricingPage from "../pages/PricingPage";
 import AppLayout from "../components/navigation/AppLayout";
 
 interface PageRendererProps {
@@ -46,6 +47,7 @@ const PUBLIC_PAGES: Record<string, boolean> = {
   rankings: true,
   scanner: true,
   compare: true,
+  pricing: true,
   terms: true,
 };
 
@@ -71,6 +73,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <TermsPage />;
     case "ipo":
       return <IPOCenterPage />;
+    case "pricing":
+      return <PricingPage />;
     default:
       return <PublicLandingPage />;
   }
