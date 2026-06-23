@@ -529,6 +529,32 @@ export interface NewsResponse {
   error?: string;
 }
 
+export interface FinancialSeriesPointResponse {
+  period: string;
+  fiscalYear: number;
+  quarter?: string;
+  value: number | null;
+  unit: string;
+  sourceState: string;
+}
+
+export interface FinancialSeriesResponseItem {
+  symbol: string;
+  metric: string;
+  label: string;
+  periodType: string;
+  points: FinancialSeriesPointResponse[];
+  updatedAt: string;
+}
+
+export interface FinancialSeriesResponse {
+  symbol: string;
+  series: FinancialSeriesResponseItem[];
+  source: string;
+  updatedAt: string;
+  cacheTtlHours: number;
+}
+
 // ── API Methods ──────────────────────────────────────────────────────
 
 export const api = {
@@ -636,6 +662,11 @@ export const api = {
   getNews: (symbol: string, options?: ApiRequestOptions) =>
     apiFetch<NewsResponse>(
       `/api/news/${encodeURIComponent(symbol)}`, options,
+    ),
+
+  getFinancialSeries: (symbol: string, options?: ApiRequestOptions) =>
+    apiFetch<FinancialSeriesResponse>(
+      `/api/financial-series/${encodeURIComponent(symbol)}`, options,
     ),
 
   // -- Watchlists (authenticated) --

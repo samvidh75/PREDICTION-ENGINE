@@ -21,6 +21,7 @@ import upstoxRoutes from "./upstox";
 import { researchRoutes } from "./research";
 import marketRoutes from "./market";
 import { newsRoutes } from "./news";
+import { financialSeriesRoutes } from "./financialSeries";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
@@ -44,6 +45,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(researchRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(marketRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(newsRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(financialSeriesRoutes as unknown as never, { encapsulate: false } as never);
 };
 
 export default routes;

@@ -42,6 +42,7 @@ export default function StockStoryPageF0(): JSX.Element {
   }));
   const [newsItems, setNewsItems] = useState<NewsItemResponse[]>([]);
   const [newsRefreshedAt, setNewsRefreshedAt] = useState<string>("");
+  const [financialSeries, setFinancialSeries] = useState<import("../components/research/FinancialHistogram").FinancialSeries[]>([]);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -54,6 +55,19 @@ export default function StockStoryPageF0(): JSX.Element {
         if (!ctrl.signal.aborted) {
           setNewsItems(res.items || []);
           setNewsRefreshedAt(res.cachedAt || new Date().toISOString());
+        }
+      }).catch(() => {});
+      api.getFinancialSeries(ticker, { signal: ctrl.signal }).then((res) => {
+        if (!ctrl.signal.aborted && res.series) {
+          setFinancialSeries(res.series.map((s) => ({
+            metric: s.metric as any,
+            label: s.label,
+            points: s.points.map((p) => ({
+              period: p.period,
+              value: p.value,
+              unit: p.unit as any,
+            })),
+          })));
         }
       }).catch(() => {});
     });
@@ -98,8 +112,6 @@ export default function StockStoryPageF0(): JSX.Element {
     }
     return meters;
   }, [research, dimensions]);
-
-  const financialSeries: import("../components/research/FinancialHistogram").FinancialSeries[] = useMemo(() => [], [research]);
 
   return <ProductShell>
     <ProductPage className="max-w-[1180px] !py-3 md:!py-4">
