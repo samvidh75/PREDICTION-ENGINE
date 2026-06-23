@@ -2,6 +2,7 @@ import { query } from "../../../db/index";
 import type { StockPageSnapshot, SnapshotFreshnessState } from "../../../shared/research/StockPageSnapshotTypes";
 import { getCachedSnapshot, setCachedSnapshot } from "./StockPageSnapshotCache";
 import { getSnapshotFromDb, upsertSnapshot } from "./StockPageSnapshotRepository";
+import { isIndianTradingSessionDate, latestIndianTradingSession } from "../../../shared/market/IndianTradingCalendar";
 
 function parseFinite(v: unknown): number | null {
   if (v === null || v === undefined) return null;
@@ -11,11 +12,25 @@ function parseFinite(v: unknown): number | null {
 
 async function fetchQuote(symbol: string): Promise<StockPageSnapshot["quote"]> {
   try {
-    const res = await query(
-      `SELECT close, open, trade_date FROM daily_prices WHERE UPPER(REPLACE(symbol, ' ', '')) = $1 AND close > 0 ORDER BY trade_date DESC LIMIT 2`,
-      [symbol],
-    );
-    const rows = (res.rows || []) as Record<string, unknown>[];
+    // Use canonical quote from MarketDataGateway + reconciliation for consistency with quote API
+    const { MarketDataGateway } = await import("../../../services/data/MarketDataGateway");
+    const { reconcileQuoteWithHistory } = await import("../../services/market/MarketQuoteReconciler");
+
+    const [providerQuote, historyRes] = await Promise.all([
+      MarketDataGateway.getQuote(symbol).catch(() => null),
+      query(
+        `SELECT trade_date, close, volume FROM daily_prices WHERE UPPER(REPLACE(symbol, ' ', '')) = $1 AND close > 0 ORDER BY trade_date DESC LIMIT 10`,
+        [symbol],
+      ),
+    ]);
+
+    const reconciled = reconcileQuoteWithHistory(symbol, providerQuote, historyRes.rows || []);
+    if (reconciled) {
+      return { price: reconciled.price, change: reconciled.change, changePercent: reconciled.changePercent, updatedAt: reconciled.updatedAt ?? null };
+    }
+
+    // Fallback: daily_prices only
+    const rows = ((historyRes.rows || []) as Record<string, unknown>[]).filter((row) => isIndianTradingSessionDate(String(row["trade_date"] ?? "")));
     if (rows.length === 0) return { price: null, change: null, changePercent: null, updatedAt: null };
     const latest = rows[0];
     const prev = rows[1];
@@ -38,7 +53,7 @@ async function fetchPriceHistory(symbol: string): Promise<StockPageSnapshot["pri
     high: parseFinite(r["high"]),
     low: parseFinite(r["low"]),
     volume: parseFinite(r["volume"]),
-  }));
+  })).filter((point) => point.close > 0 && isIndianTradingSessionDate(point.date)).sort((a, b) => a.date.localeCompare(b.date));
 }
 
 async function fetchHealthometer(symbol: string): Promise<StockPageSnapshot["healthometer"]> {
@@ -147,8 +162,11 @@ export async function buildSnapshot(symbol: string): Promise<StockPageSnapshot> 
     }
   }
 
+  const quoteDate = quote.updatedAt?.slice(0, 10) ?? null;
+  const latestExpected = latestIndianTradingSession();
+  const quoteIsCurrent = Boolean(quoteDate && quoteDate >= latestExpected);
   let freshnessState: SnapshotFreshnessState = "partial";
-  if (hasQuote && hasHistory && hasHealthometer) freshnessState = "fresh";
+  if (hasQuote && hasHistory && hasHealthometer && quoteIsCurrent) freshnessState = "fresh";
   else if (hasQuote || hasHistory || hasHealthometer) freshnessState = "stale";
 
   const snapshot: StockPageSnapshot = {
