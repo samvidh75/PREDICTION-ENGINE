@@ -155,7 +155,8 @@
     "audit:health-readiness": "tsx scripts/audit-health-readiness.ts",
     "audit:release-candidate": "tsx scripts/audit-release-candidate.ts",
     "audit:rc2": "tsx scripts/audit-rc2.ts",
-    "audit:rc3": "tsx scripts/audit-rc3.ts"
+    "audit:rc3": "tsx scripts/audit-rc3.ts",
+    "audit:final-release": "tsx scripts/audit-final-release.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
