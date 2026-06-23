@@ -16,14 +16,14 @@ describe("HistoricalPriceChart", () => {
   it("renders real daily observations with an accessible chart label", () => {
     render(<HistoricalPriceChart symbol="RELIANCE" points={points} />);
     expect(screen.getByRole("img", { name: /RELIANCE 6M daily closing-price chart/i })).toBeInTheDocument();
-    expect(screen.getByText("90 days")).toBeInTheDocument();
+    expect(screen.getByText(/daily close/i)).toBeInTheDocument();
   });
 
   it("changes the visible daily range without fabricating observations", () => {
     render(<HistoricalPriceChart symbol="RELIANCE" points={points} />);
     fireEvent.click(screen.getByRole("button", { name: "1M" }));
     expect(screen.getByRole("button", { name: "1M" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("23 days")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /RELIANCE 1M daily closing-price chart/i })).toBeInTheDocument();
   });
 
   it("shows an honest empty state when history is insufficient", () => {

@@ -147,16 +147,10 @@ export default function FinancialHistogram({ series, loading }: FinancialHistogr
   }
 
   return (
-    <ProductPanel className="p-5">
+    <ProductPanel className="p-4">
       <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Financial history</div>
-      <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
-        Track financial performance
-      </h2>
-      <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
-        Annual financial metrics. Tap a metric to view its trend.
-      </p>
 
-      <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1" role="tablist">
+      <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1" role="tablist">
         {METRICS.map((m) => {
           const s = series.find((s) => s.metric === m.key);
           const disabled = !s || !s.points.some((p) => p.value !== null);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiError, type StockQuote } from "../services/api/client";
 
 export type LiveQuoteState = {
@@ -13,8 +13,21 @@ const emptyQuoteState: LiveQuoteState = {
   error: null,
 };
 
+const quoteCache = new Map<string, { data: StockQuote; ts: number }>();
+const CACHE_TTL = 30_000;
+
 function normalizeSymbol(symbol: string): string {
   return symbol.trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
+}
+
+function getCached(symbol: string): StockQuote | null {
+  const entry = quoteCache.get(symbol);
+  if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data;
+  return null;
+}
+
+function setCached(symbol: string, quote: StockQuote): void {
+  quoteCache.set(symbol, { data: quote, ts: Date.now() });
 }
 
 export function useLiveQuote(symbol?: string): LiveQuoteState {
@@ -23,11 +36,21 @@ export function useLiveQuote(symbol?: string): LiveQuoteState {
 }
 
 export function useLiveQuotes(symbols: string[]): Record<string, LiveQuoteState> {
-  const normalizedSymbols = useMemo(() => {
-    return Array.from(new Set(symbols.map(normalizeSymbol).filter(Boolean))).sort();
-  }, [symbols.join("|")]);
+  const key = useMemo(() => symbols.map(normalizeSymbol).filter(Boolean).sort().join("|"), [symbols]);
+  const normalizedSymbols = useMemo(() => key ? key.split("|") : [], [key]);
 
-  const [states, setStates] = useState<Record<string, LiveQuoteState>>({});
+  const [states, setStates] = useState<Record<string, LiveQuoteState>>(() => {
+    const initial: Record<string, LiveQuoteState> = {};
+    for (const sym of normalizedSymbols) {
+      const cached = getCached(sym);
+      initial[sym] = cached
+        ? { quote: cached, loading: false, error: null }
+        : { quote: null, loading: true, error: null };
+    }
+    return initial;
+  });
+
+  const fetchedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (normalizedSymbols.length === 0) {
@@ -36,38 +59,40 @@ export function useLiveQuotes(symbols: string[]): Record<string, LiveQuoteState>
     }
 
     const controller = new AbortController();
+    const toFetch = normalizedSymbols.filter((sym) => {
+      if (fetchedRef.current.has(sym)) return false;
+      if (getCached(sym)) return false;
+      return true;
+    });
+
+    if (toFetch.length === 0) return;
+
     setStates((prev) => {
-      const next: Record<string, LiveQuoteState> = {};
-      normalizedSymbols.forEach((symbol) => {
-        next[symbol] = {
-          quote: prev[symbol]?.quote ?? null,
-          loading: true,
-          error: null,
-        };
-      });
+      const next = { ...prev };
+      for (const sym of toFetch) {
+        if (!next[sym]) next[sym] = { quote: null, loading: true, error: null };
+      }
       return next;
     });
 
-    normalizedSymbols.forEach((symbol) => {
+    toFetch.forEach((symbol) => {
       api.getQuote(symbol)
         .then((quote) => {
           if (controller.signal.aborted) return;
-          setStates((prev) => ({
-            ...prev,
-            [symbol]: { quote, loading: false, error: null },
-          }));
+          setCached(symbol, quote);
+          setStates((prev) => ({ ...prev, [symbol]: { quote, loading: false, error: null } }));
         })
-        .catch((err) => {
+        .catch(() => {
           if (controller.signal.aborted) return;
           setStates((prev) => ({
             ...prev,
-            [symbol]: { quote: null, loading: false, error: "Quote data is temporarily unavailable." },
+            [symbol]: { quote: prev[symbol]?.quote ?? null, loading: false, error: "Quote data is temporarily unavailable." },
           }));
         });
     });
 
     return () => controller.abort();
-  }, [normalizedSymbols.join("|")]);
+  }, [key]);
 
   return states;
 }
