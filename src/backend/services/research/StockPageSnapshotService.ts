@@ -3,6 +3,8 @@ import type { StockPageSnapshot, SnapshotFreshnessState } from "../../../shared/
 import { getCachedSnapshot, setCachedSnapshot } from "./StockPageSnapshotCache";
 import { getSnapshotFromDb, upsertSnapshot } from "./StockPageSnapshotRepository";
 import { isIndianTradingSessionDate, latestIndianTradingSession } from "../../../shared/market/IndianTradingCalendar";
+import { MarketDataGateway } from "../../../services/data/MarketDataGateway";
+import { reconcileQuoteWithHistory } from "../market/MarketQuoteReconciler";
 
 function parseFinite(v: unknown): number | null {
   if (v === null || v === undefined) return null;
@@ -13,9 +15,6 @@ function parseFinite(v: unknown): number | null {
 async function fetchQuote(symbol: string): Promise<StockPageSnapshot["quote"]> {
   try {
     // Use canonical quote from MarketDataGateway + reconciliation for consistency with quote API
-    const { MarketDataGateway } = await import("../../../services/data/MarketDataGateway");
-    const { reconcileQuoteWithHistory } = await import("../../services/market/MarketQuoteReconciler");
-
     const [providerQuote, historyRes] = await Promise.all([
       MarketDataGateway.getQuote(symbol).catch(() => null),
       query(
