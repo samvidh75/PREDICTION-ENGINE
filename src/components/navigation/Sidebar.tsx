@@ -2,6 +2,7 @@ import React from "react";
 import { LayoutDashboard, Search, Trophy, Eye, ShieldCheck, Settings, LogOut, Sparkles } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { NavLink } from "./NavLink";
+import StockStoryLogo from "../brand/StockStoryLogo";
 
 const NAV_ITEMS = [
   { href: "/?page=dashboard", label: "Home", icon: <LayoutDashboard className="icon-nav" /> },
@@ -20,8 +21,7 @@ export const Sidebar: React.FC = () => {
     <aside className="hidden md:flex md:flex-col md:w-56 md:shrink-0 md:h-screen md:sticky md:top-0 md:border-r md:border-[var(--color-border)] md:bg-[var(--color-surface)] md:p-4 md:justify-between">
       <div>
         <div className="flex items-center gap-2 px-3 pb-5 mb-2 border-b border-[var(--color-border-light)]">
-          <div className="w-7 h-7 rounded-md bg-[var(--color-accent)] flex items-center justify-center text-white text-xs font-bold">S</div>
-          <span className="text-sm font-semibold text-[var(--color-text-primary)]">StockStory</span>
+          <StockStoryLogo variant="lockup" size="sm" />
         </div>
         <nav className="flex flex-col gap-0.5 mt-4" aria-label="Main navigation">
           {NAV_ITEMS.map((link) => (

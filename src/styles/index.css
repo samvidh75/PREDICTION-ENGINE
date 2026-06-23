@@ -52,6 +52,15 @@
   --color-text-muted: #64748B;
   --color-text-faint: #94A3B8;
 
+  /* Brand — Premium Green/Graphite (StockStory identity) */
+  --brand-green: #10A37F;
+  --brand-green-deep: #087A61;
+  --brand-green-soft: #DDF7EF;
+  --brand-mint: #7CE0C3;
+  --brand-ink: #07120F;
+  --brand-graphite: #0D1117;
+  --brand-slate: #64748B;
+
   /* Accent — Premium Blue (preserved) */
   --color-accent: #5B7CFA;
   --color-accent-hover: #4A68E8;

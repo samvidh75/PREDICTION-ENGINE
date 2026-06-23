@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import StockStoryLogo from '../brand/StockStoryLogo';
 import { ProfileButton } from './ProfileButton';
 import { NavLink } from './NavLink';
 
@@ -29,9 +30,9 @@ export const TopNav: React.FC = () => {
       >
         <NavLink
           href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
-          className="max-w-[60%] shrink truncate border-none bg-transparent p-0 text-left text-[13px] font-semibold tracking-tight text-[var(--color-text-primary)]"
+          className="shrink-0 border-none bg-transparent p-0"
         >
-          StockStory<span className="text-[#16A34A]">.</span>India
+          <StockStoryLogo variant="mark" size="sm" />
         </NavLink>
 
         {isAuthenticated && user ? (
@@ -60,9 +61,9 @@ export const TopNav: React.FC = () => {
         <div className="flex w-[180px] shrink-0 items-center lg:w-[220px]">
           <NavLink
             href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
-            className="cursor-pointer border-none bg-transparent p-0 text-sm font-semibold tracking-tight text-[var(--color-text-primary)]"
+            className="cursor-pointer border-none bg-transparent p-0"
           >
-            StockStory<span className="text-[#16A34A]">.</span>India
+            <StockStoryLogo variant="lockup" size="sm" />
           </NavLink>
         </div>
 

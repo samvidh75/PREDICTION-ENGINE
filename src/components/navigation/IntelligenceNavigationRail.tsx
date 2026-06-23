@@ -7,6 +7,7 @@ import { getDiscoveryIndex } from "../../services/discovery/discoveryIndex";
 import type { DiscoveryEntityKind } from "../../services/discovery/discoveryTypes";
 import { navigate, navigateToExplore, navigateToStock, type PageKey } from "../../architecture/navigation/routeCoordinator";
 import { NavLabel } from "../../shared/ui/components/PremiumTypography";
+import StockStoryLogo from "../brand/StockStoryLogo";
 
 type NavItem = {
   id: string;
@@ -293,7 +294,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
             <div style={{ ["--ss-ty-nav-label-color" as never]: "rgba(255,255,255,0.55)" }}>
               <NavLabel>Quick nav</NavLabel>
             </div>
-            <div className="mt-1 text-[12px] text-white/85 font-medium truncate">StockStory India</div>
+            <div className="mt-1"><StockStoryLogo variant="wordmark" size="sm" tone="light" showIndia={false} /></div>
           </div>
           {!prefersReducedMotion && (
             <div className="h-2 w-2 rounded-full bg-[var(--color-surface)]/70" style={{ boxShadow: `0 0 22px ${glow.main}` }} />
