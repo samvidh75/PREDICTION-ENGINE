@@ -3,7 +3,6 @@
  *
  * Usage:
  *   npx tsx scripts/audit-public-copy.ts
- *   npx tsx scripts/audit-public-copy.ts --fix
  */
 
 import fs from 'node:fs';
@@ -19,6 +18,7 @@ const FRONTEND_DIRS = [
 
 const FORBIDDEN_TERMS: { pattern: RegExp; context?: string }[] = [
   { pattern: /\bprovider\b/i, context: 'public UI - use "source" or omit' },
+  { pattern: /\bcoverage\b/i, context: 'public UI - use "research available" or omit' },
   { pattern: /\bfreshness\b/i, context: 'public UI - data quality term' },
   { pattern: /\bsource pending\b/i, context: 'public UI - use "being prepared"' },
   { pattern: /\bsource verified\b/i, context: 'public UI' },
@@ -30,6 +30,8 @@ const FORBIDDEN_TERMS: { pattern: RegExp; context?: string }[] = [
   { pattern: /\bhistory unavailable\b/i, context: 'public UI' },
   { pattern: /\bIndianAPI\b/i, context: 'public UI - never expose provider name' },
   { pattern: /\bYahoo\b/i, context: 'public UI - never expose provider name' },
+  { pattern: /\bJugaad\b/i, context: 'public UI - never expose internal project name' },
+  { pattern: /\bNSEPython\b/i, context: 'public UI - never expose provider name' },
   { pattern: /\bStockEdge\b/i, context: 'public UI - never expose provider name' },
   { pattern: /\bbackend\b/i, context: 'public UI - never use "backend"' },
   { pattern: /\bTrendlyne disabled\b/i, context: 'public UI - never show disabled state' },
@@ -50,6 +52,9 @@ const FORBIDDEN_TERMS: { pattern: RegExp; context?: string }[] = [
   { pattern: /\binvest now\b/i, context: 'investment advice - use "review now"' },
   { pattern: /\byou should invest\b/i, context: 'investment advice - use "may want to research"' },
   { pattern: /\bpersonalized recommendation\b/i, context: 'investment advice - SEBI requires registration' },
+  { pattern: /\bBuy\b(?!.*[Ss]tory|[Rr]esearch|[Tt]he|[Cc]ompany|[Aa]ction)/, context: 'investment advice - do not use Buy/Sell/Hold' },
+  { pattern: /\bSell\b(?!.*[Ss]tory|[Rr]esearch|[Tt]he|[Cc]ompany|[Aa]ction)/, context: 'investment advice - do not use Buy/Sell/Hold' },
+  { pattern: /\bHold\b(?!.*[Ss]tory|[Rr]esearch|[Tt]he|[Cc]ompany|[Ss]take|[Aa]ction)/, context: 'investment advice - do not use Buy/Sell/Hold' },
 ];
 
 interface FoundIssue {
@@ -71,7 +76,9 @@ function scanFile(filePath: string): FoundIssue[] {
         const isTestFile = filePath.includes('__tests__') || filePath.includes('.test.');
         const isReport = filePath.includes('reports/');
         const isCompliancePolicy = filePath.includes('compliance/') || filePath.includes('companyResearchClient.ts');
-        if (isTestFile || isReport || isCompliancePolicy) continue;
+        const isDocs = filePath.includes('docs/');
+        const isInternalAdmin = filePath.includes('internal/') || filePath.includes('admin/');
+        if (isTestFile || isReport || isCompliancePolicy || isDocs || isInternalAdmin) continue;
         issues.push({
           file: path.relative(process.cwd(), filePath),
           line: i + 1,

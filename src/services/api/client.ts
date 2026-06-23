@@ -80,16 +80,27 @@ async function apiFetch<T>(
   }
 
   try {
-    const response = await fetch(`${BASE_URL}${path}`, {
-      method,
-      headers: {
-        Accept: "application/json",
-        ...headers,
-        ...(body ? { "Content-Type": "application/json" } : {}),
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
+    let response: Response | null = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      response = await fetch(`${BASE_URL}${path}`, {
+        method,
+        headers: {
+          Accept: "application/json",
+          ...headers,
+          ...(body ? { "Content-Type": "application/json" } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+      if (response.status !== 429 || method !== "GET" || attempt > 0) break;
+      const retrySeconds = Number(response.headers.get("Retry-After") ?? 1);
+      await new Promise<void>((resolve, reject) => {
+        const retryTimer = setTimeout(resolve, Math.min(Math.max(retrySeconds, 0.1) * 1_000, 2_000));
+        controller.signal.addEventListener("abort", () => { clearTimeout(retryTimer); reject(new DOMException("Aborted", "AbortError")); }, { once: true });
+      });
+    }
+
+    if (!response) throw new ApiError(0, "NETWORK_ERROR", "No response received.");
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({})) as Record<string, unknown>;
@@ -342,6 +353,10 @@ export interface StockQuote {
   volume?: number;
   updatedAt?: string;
   retrievedAt?: string;
+  asOf?: string | null;
+  source?: "provider" | "daily_prices";
+  freshness?: "current" | "delayed" | "unknown";
+  delayed?: boolean;
 }
 
 export interface CompanyMetadata {
@@ -445,6 +460,8 @@ export interface ScannerResponse {
   ok: true;
   data: ScannerResultItem[];
   preset: string;
+  coverage?: { requested: number; evaluated: number; returned: number; complete: boolean };
+  message?: string | null;
 }
 
 export interface CompareResponse {
@@ -672,9 +689,9 @@ export const api = {
       `/api/research/alerts/${encodeURIComponent(symbol)}`,
     ),
 
-  getInvestContext: (symbol: string) =>
+  getInvestContext: (symbol: string, options?: ApiRequestOptions) =>
     apiFetch<InvestContextResponse>(
-      `/api/research/invest/${encodeURIComponent(symbol)}`,
+      `/api/research/invest/${encodeURIComponent(symbol)}`, options,
     ),
 
   getNews: (symbol: string, options?: ApiRequestOptions) =>
@@ -728,6 +745,21 @@ export const api = {
       `/api/watchlists/${encodeURIComponent(id)}/tickers/${encodeURIComponent(ticker)}`,
       { method: "DELETE" },
     ),
+
+  getIntelligenceSnapshot: (symbol: string) =>
+    apiFetch<{ ok: boolean; data: unknown }>(`/api/research/snapshot/${encodeURIComponent(symbol)}`),
+
+  getIntelligenceDashboard: () =>
+    apiFetch<{ ok: boolean; data: unknown }>("/api/intelligence/dashboard"),
+
+  getSuperScans: () =>
+    apiFetch<{ ok: boolean; data: unknown[] }>("/api/scans/super"),
+
+  getSuperScan: (scanKey: string) =>
+    apiFetch<{ ok: boolean; data: unknown[] }>(`/api/scans/super/${encodeURIComponent(scanKey)}`),
+
+  getIntelligenceIngestionStatus: () =>
+    apiFetch<{ ok: boolean; data: unknown }>("/api/ops/ingestion-status"),
 };
 
 export default api;

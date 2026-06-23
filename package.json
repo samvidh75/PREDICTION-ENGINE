@@ -88,6 +88,11 @@
     "prediction:healthometer-smoke": "tsx scripts/healthometer-smoke.ts",
     "technicals:smoke": "tsx scripts/technical-indicators-smoke.ts",
     "audit:public-copy": "tsx scripts/audit-public-copy.ts",
+    "audit:production-trust": "tsx scripts/audit-production-trust.ts",
+    "audit:search-quality": "tsx scripts/audit-search-quality.ts",
+    "audit:scanner-quality": "tsx scripts/audit-scanner-quality.ts",
+    "audit:market-data-consistency": "tsx scripts/audit-market-data-consistency.ts",
+    "audit:news-sanitization": "tsx scripts/audit-news-sanitization.ts",
     "technicals:compute": "tsx -e 'const {computeAndCache} = require(\"./src/backend/services/technicals/TechnicalIndicatorService\"); const s = process.argv.find(a=>a.startsWith(\"--symbols=\"))?.split(\"=\")[1]; Promise.all((s||\"RELIANCE,ITC\").split(\",\").map(async(sym)=>{const r=await computeAndCache(sym);console.log(sym+\": \"+Object.keys(r.indicators).filter(k=>r.indicators[k]!==null).length+\" indicators computed\")})).then(()=>process.exit(0)).catch(e=>{console.error(e);process.exit(1)})'",
     "test:smoke": "vitest run scripts/__tests__/smoke-test-api.test.ts",
     "test:release-gate": "vitest run scripts/__tests__/release-gate.test.ts",
@@ -133,7 +138,6 @@
     "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
     "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
     "smoke:static-assets": "tsx scripts/smoke-static-assets.ts",
-    "audit:public-copy": "tsx scripts/audit-public-copy.ts",
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
     "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
@@ -147,7 +151,11 @@
     "stockedge:discover": "tsx scripts/stockedge-discover.ts",
     "stockedge:coverage": "tsx scripts/stockedge-coverage.ts",
     "stockedge:schedule-smoke": "tsx scripts/stockedge-schedule-smoke.ts",
-    "market:enrichment:smoke": "tsx scripts/stockedge-smoke.ts"
+    "market:enrichment:smoke": "tsx scripts/stockedge-smoke.ts",
+    "audit:search-quality": "tsx scripts/audit-search-quality.ts",
+    "audit:scanner-quality": "tsx scripts/audit-scanner-quality.ts",
+    "audit:news-sanitization": "tsx scripts/audit-news-sanitization.ts",
+    "audit:production-trust": "tsx scripts/audit-production-trust.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
