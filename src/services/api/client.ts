@@ -555,6 +555,24 @@ export interface FinancialSeriesResponse {
   cacheTtlHours: number;
 }
 
+export interface TrendlyneWidgetResponse {
+  available: boolean;
+  kind: "technicals" | "checklist" | "ipo";
+  symbol: string | null;
+  widgetMode: "iframe" | "script" | "disabled" | string;
+  widgetUrl: string | null;
+  reason: "available" | "not_configured" | "unavailable" | string;
+  updatedAt: string;
+}
+
+export interface TrendlyneStatusResponse {
+  available: boolean;
+  widgetMode: string;
+  reason: string;
+  widgets: Array<{ kind: "technicals" | "checklist" | "ipo"; needsSymbol: boolean }>;
+  updatedAt: string;
+}
+
 // ── API Methods ──────────────────────────────────────────────────────
 
 export const api = {
@@ -668,6 +686,12 @@ export const api = {
     apiFetch<FinancialSeriesResponse>(
       `/api/financial-series/${encodeURIComponent(symbol)}`, options,
     ),
+
+  getTrendlyneStatus: (options?: ApiRequestOptions) =>
+    apiFetch<TrendlyneStatusResponse>("/api/integrations/trendlyne/status", options),
+
+  getTrendlyneWidget: (kind: "technicals" | "checklist" | "ipo", symbol: string, options?: ApiRequestOptions) =>
+    apiFetch<TrendlyneWidgetResponse>(`/api/integrations/trendlyne/widget/${encodeURIComponent(kind)}/${encodeURIComponent(symbol)}`, options),
 
   // -- Watchlists (authenticated) --
   getWatchlists: () =>
