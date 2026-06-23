@@ -24,7 +24,8 @@ export type PageKey =
   | "alerts"
   | "invest"
   | "terms"
-  | "ipo";
+  | "ipo"
+  | "pricing";
 
 /** Maps query-param "page" values to canonical PageKey. */
 export function getPageKeyFromUrl(): PageKey {
@@ -57,6 +58,7 @@ export function getPageKeyFromUrl(): PageKey {
       alerts: "alerts",
       invest: "invest",
       ipo: "ipo",
+      pricing: "pricing",
     };
 
     return mapping[raw] ?? "landing";
