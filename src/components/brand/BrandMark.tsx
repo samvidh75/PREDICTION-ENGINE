@@ -3,46 +3,57 @@ import React from "react";
 interface BrandMarkProps {
   size?: number;
   tone?: "light" | "dark" | "auto";
+  animated?: boolean;
 }
 
-export default function BrandMark({ size = 28, tone = "auto" }: BrandMarkProps): JSX.Element {
-  const isAuto = tone === "auto";
+function colors(tone: "light" | "dark" | "auto", isDark: boolean) {
+  const d = tone === "dark" || (tone === "auto" && isDark);
+  return {
+    surface: d ? "#0D1117" : "#FFFFFF",
+    stroke: d ? "#7CE0C3" : "#10A37F",
+    accent: d ? "#10A37F" : "#087A61",
+    signal: d ? "#DDF7EF" : "#10A37F",
+    muted: d ? "#30363D" : "#E2E8F0",
+  };
+}
+
+export default function BrandMark({ size = 28, tone = "auto", animated = false }: BrandMarkProps): JSX.Element {
+  const isDark = tone === "dark" || (tone === "auto" && typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+  const c = colors(tone, isDark);
+
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 28 28"
       fill="none"
-      aria-label="StockStory India"
+      aria-hidden="true"
       role="img"
     >
-      <rect
-        x="1" y="1" width="26" height="26" rx="6"
-        className={isAuto ? "stroke-[#2962FF] dark:stroke-[#5B8DEF]" : tone === "dark" ? "stroke-[#5B8DEF]" : "stroke-[#2962FF]"}
-        strokeWidth="1.5"
+      <defs>
+        <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={c.surface} />
+          <stop offset="100%" stopColor={c.surface} stopOpacity="0.95" />
+        </linearGradient>
+      </defs>
+      <rect x="0.5" y="0.5" width="27" height="27" rx="7" fill="url(#bg-grad)" stroke={c.muted} strokeWidth="1" />
+      <path
+        d="M8 17 C8 13 12 11 14 15 C16 19 20 17 20 13"
+        stroke={c.stroke}
+        strokeWidth="2.2"
+        strokeLinecap="round"
         fill="none"
+        className={animated ? "animate-pulse" : ""}
       />
       <path
-        d="M7 20L7 14L11 14L11 10L14 10L14 6L17 6L17 10L20 10L20 14L21 14"
-        className={isAuto ? "stroke-[#2962FF] dark:stroke-[#5B8DEF]" : tone === "dark" ? "stroke-[#5B8DEF]" : "stroke-[#2962FF]"}
-        strokeWidth="1.8"
+        d="M8 11 C8 15 12 17 14 13 C16 9 20 11 20 15"
+        stroke={c.accent}
+        strokeWidth="1.6"
         strokeLinecap="round"
-        strokeLinejoin="round"
         fill="none"
+        opacity="0.6"
       />
-      <path
-        d="M17 20L17 16L14 16L14 14L11 14"
-        className={isAuto ? "stroke-[#2962FF] dark:stroke-[#5B8DEF]" : tone === "dark" ? "stroke-[#5B8DEF]" : "stroke-[#2962FF]"}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        opacity="0.5"
-      />
-      <circle
-        cx="21" cy="14" r="1.5"
-        className={isAuto ? "fill-emerald-500 dark:fill-emerald-400" : tone === "dark" ? "fill-emerald-400" : "fill-emerald-500"}
-      />
+      <circle cx="20" cy="13" r="1.8" fill={c.signal} />
     </svg>
   );
 }
