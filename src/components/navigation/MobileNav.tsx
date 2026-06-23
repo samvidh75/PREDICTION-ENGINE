@@ -29,7 +29,7 @@ export const MobileNav: React.FC = () => {
   // Modern bottom tabs structure
   const tabs: MobileNavItem[] = [
     { page: "dashboard", label: "Home", icon: <Home className="h-5 w-5" /> },
-    { page: "scanner", label: "Scanner", icon: <BarChart3 className="h-5 w-5" /> },
+    { page: "scanner", label: "AI Scanner", icon: <BarChart3 className="h-5 w-5" /> },
     { page: "search", label: "Search", icon: <Search className="h-5 w-5" /> },
     { page: "watchlist", label: "Watchlist", icon: <Eye className="h-5 w-5" /> },
   ];
@@ -37,8 +37,6 @@ export const MobileNav: React.FC = () => {
   const menuItems = [
     { page: "rankings", label: "Rankings", icon: <Sparkles className="h-4 w-4" /> },
     { page: "compare", label: "Compare", icon: <ArrowLeftRight className="h-4 w-4" /> },
-    { page: "portfolio", label: "Portfolio", icon: <TrendingUp className="h-4 w-4" /> },
-    { page: "alerts", label: "Alerts", icon: <Activity className="h-4 w-4" /> },
     { page: "methodology", label: "Methodology", icon: <BookOpen className="h-4 w-4" /> },
     { page: "settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
   ];

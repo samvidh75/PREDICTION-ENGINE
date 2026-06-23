@@ -1,38 +1,33 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Filter, Lock, Search, TrendingUp, Shield, AlertTriangle, Activity, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, ArrowUpDown, Info, ExternalLink, Bookmark, TrendingUp as InvestIcon } from "lucide-react";
-import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill } from "../product/ProductUI";
+import { ChevronDown, ChevronUp, Filter, Lock, Search, TrendingUp, Shield, AlertTriangle, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, Star } from "lucide-react";
+import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
-import { HelpPopover } from "../ui/HelpPopover";
 import { signalLabelFromScore } from "../../lib/product/signalLabels";
-import { signalToneToStatusColor, toneToSeverityClass } from "../../lib/research/researchSignalModel";
 import CustomSelect from "../ui/CustomSelect";
 import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewModel";
-import { FREE_SCANS, PREMIUM_SCANS, type ScanCatalogueEntry } from "../../lib/product/scanCatalogue";
+import { SCANNER_CATEGORIES, type ScannerCategory, CATEGORY_SECTIONS } from "../../lib/product/scannerCategories";
+import { getCurrentPlan, canViewPremiumScans, UPGRADE_URL } from "../../lib/product/planAccess";
+import { toResearchState, assertNoForbiddenScannerCopy } from "../../lib/compliance/scannerPolicy";
 
-function scannerSignalLabel(score: number | null): { label: string; color: string; toneClass: string } | null {
-  const t = signalLabelFromScore(score);
-  if (!t) return null;
-  return { label: t.label, color: t.color, toneClass: t.toneClass === 'constructive' || t.toneClass === 'affirmative' ? 'status-dot-active' : t.toneClass === 'warning' ? 'status-dot-partial' : 'status-dot-blocked' };
-}
+const categoryIcon = (id: ScannerCategory) => {
+  switch (id) {
+    case "large_cap_health": return Shield;
+    case "mid_cap_health": return Shield;
+    case "small_cap_health": return Shield;
+    case "quality_leaders": return Star;
+    case "low_debt_leaders": return Briefcase;
+    case "profitability_leaders": return TrendingUp;
+    case "financial_strength": return Shield;
+    case "valuation_comfort": return DollarSign;
+    case "momentum_improving": return TrendingUp;
+    case "dividend_stability": return Shield;
+    case "risk_rising": return AlertTriangle;
+    case "good_business_out_of_favour": return DollarSign;
+  }
+};
 
-const SCANNER_PRESETS = [
-  { label: "Quality compounders", icon: Shield, filters: { qualityMin: 70, growthMin: 60 } },
-  { label: "Undervalued quality", icon: DollarSign, filters: { valueMin: 65, qualityMin: 60 } },
-  { label: "Improving momentum", icon: TrendingUp, filters: { momentumMin: 70 } },
-  { label: "Low debt leaders", icon: Briefcase, filters: { riskMin: 60, qualityMin: 50 } },
-  { label: "Earnings acceleration", icon: BarChart3, filters: { growthMin: 70 } },
-  { label: "Dividend stability", icon: Shield, filters: { riskMin: 50, qualityMin: 50 } },
-  { label: "Risk rising", icon: AlertTriangle, filters: { riskMax: 35 } },
-  { label: "Turnaround watch", icon: Activity, filters: { qualityMin: 0, valueMin: 50, growthMin: 40 } },
-  { label: "Good businesses out of favour", icon: DollarSign, filters: { qualityMin: 60, valueMin: 65 } },
-  { label: "High quality, expensive", icon: BarChart3, filters: { qualityMin: 70, valueMax: 40 } },
-];
-
-const MARKET_CAP_OPTIONS = ["All", "Large", "Mid", "Small", "Micro"];
 const SCORE_RANGES = ["All", "80-100", "60-79", "40-59", "Below 40"];
-const FACTOR_LEVELS = ["Any", "High", "Medium", "Low"];
-const DIVIDEND_OPTIONS = ["Any", "High (>4%)", "Medium (2-4%)", "Low (<2%)"];
 
 const SORT_OPTIONS = [
   { value: "score-desc", label: "Score ↓" },
@@ -67,29 +62,46 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
+function scannerSignalLabel(score: number | null): { label: string; color: string } | null {
+  const t = signalLabelFromScore(score);
+  if (!t) return null;
+  return { label: toResearchState(t.label), color: t.color };
+}
+
+function complianceExplanation(entry: ScannerResultItem): string {
+  const score = entry.score ?? 50;
+  const riskMarker = (entry.riskMarker || "").toLowerCase();
+  if (riskMarker.includes("risk") || riskMarker.includes("weak")) {
+    return "Risk signals present — closer review recommended.";
+  }
+  if (score >= 75) {
+    return "Strong business quality and lower balance-sheet risk.";
+  }
+  if (score >= 60) {
+    return "Improving profitability with reasonable valuation context.";
+  }
+  if (score >= 45) {
+    return "Healthy financial strength, but valuation needs review.";
+  }
+  return "Momentum is improving, but risk should be reviewed.";
+}
+
 export default function ScannerPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ScannerResultItem[]>([]);
   const [allEntries, setAllEntries] = useState<ScannerResultItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [guideOpen, setGuideOpen] = useState(false);
-  const [scanMode, setScanMode] = useState<"free" | "premium">("free");
-  const [activePreset, setActivePreset] = useState<string>("");
   const [sortValue, setSortValue] = useState("score-desc");
 
   const [filters, setFilters] = useState({
-    marketCap: "All",
     scoreRange: "All",
-    valuation: "Any",
-    growth: "Any",
-    profitability: "Any",
-    balanceSheet: "Any",
-    momentum: "Any",
-    volatility: "Any",
-    dividendYield: "Any",
   });
+
+  const plan = getCurrentPlan();
+  const isPremium = canViewPremiumScans(plan);
 
   const viewModel = useMemo(() => {
     return buildScannerViewModel(
@@ -106,27 +118,9 @@ export default function ScannerPage() {
         hasRealData: true,
       })),
       loading,
-      activePreset
+      activeCategory
     );
-  }, [query, results, loading, activePreset]);
-
-  // Derive sectors from real data only, excluding pending/not available
-  const sectors = useMemo(() => {
-    const set = new Set<string>();
-    allEntries.forEach((r) => {
-      const sec = r.sector?.trim();
-      if (
-        sec &&
-        sec.toLowerCase() !== "not available" &&
-        sec.toLowerCase() !== "sector pending" &&
-        sec.toLowerCase() !== "unavailable" &&
-        sec.toLowerCase() !== "pending"
-      ) {
-        set.add(sec);
-      }
-    });
-    return Array.from(set);
-  }, [allEntries]);
+  }, [query, results, loading, activeCategory]);
 
   const fetchScanner = useCallback(async (preset: string) => {
     setLoading(true);
@@ -143,23 +137,31 @@ export default function ScannerPage() {
   }, []);
 
   useEffect(() => {
-    fetchScanner(activePreset);
-  }, [fetchScanner, activePreset]);
+    if (activeCategory) {
+      const cat = SCANNER_CATEGORIES.find((c) => c.id === activeCategory);
+      if (cat && cat.filterPreset) {
+        fetchScanner(cat.filterPreset);
+        return;
+      }
+    }
+    if (!activeCategory) {
+      setLoading(false);
+    }
+  }, [activeCategory, fetchScanner]);
 
-  const handleScanClick = useCallback((scan: ScanCatalogueEntry) => {
-    const label = scan.title;
-    if (activePreset === label) {
-      fetchScanner(label);
+  const handleCategoryClick = useCallback((catId: string, isFree: boolean) => {
+    if (!isFree && !isPremium) {
+      productNavigate("pricing");
       return;
     }
-    setActivePreset(label);
-    setFilters({ marketCap: "All", scoreRange: "All", valuation: "Any", growth: "Any", profitability: "Any", balanceSheet: "Any", momentum: "Any", volatility: "Any", dividendYield: "Any" });
-  }, [activePreset, fetchScanner]);
-
-  const handleTabChange = useCallback((mode: "free" | "premium") => {
-    setScanMode(mode);
-    setActivePreset("");
-  }, []);
+    if (activeCategory === catId) {
+      setActiveCategory("");
+      setAllEntries([]);
+      setResults([]);
+      return;
+    }
+    setActiveCategory(catId);
+  }, [activeCategory, isPremium]);
 
   const handleQuerySubmit = useCallback(() => {
     const trimmed = query.trim().toLowerCase();
@@ -175,28 +177,12 @@ export default function ScannerPage() {
     setResults(filtered);
   }, [query, allEntries]);
 
-  const convictionLabel = useCallback((entry: ScannerResultItem): string => {
-    const labelInfo = signalLabelFromScore(entry.score ?? null);
-    return labelInfo?.label ?? "";
-  }, []);
-
-  const convictionTone = useCallback((_entry: ScannerResultItem): "verified" | "blue" | "warning" | "muted" => {
-    const labelInfo = signalLabelFromScore(_entry.score ?? null);
-    if (!labelInfo) return "muted";
-    if (labelInfo.toneClass === 'constructive') return "verified";
-    if (labelInfo.toneClass === 'affirmative') return "blue";
-    if (labelInfo.toneClass === 'warning') return "warning";
-    return "muted";
-  }, [convictionLabel]);
-
   const hasRiskFlag = useCallback((entry: ScannerResultItem): boolean => {
     return entry.riskMarker !== null && entry.riskMarker !== "Risk review normal";
   }, []);
 
   const filteredResults = useMemo(() => {
-    let filtered = [...results];
-    
-    // Deduplicate on symbol to satisfy uniqueness requirement
+    let filtered = activeCategory ? results : [];
     const seen = new Set<string>();
     filtered = filtered.filter((r) => {
       if (!r.symbol) return false;
@@ -216,7 +202,7 @@ export default function ScannerPage() {
       });
     }
     return filtered;
-  }, [results, filters]);
+  }, [results, filters, activeCategory]);
 
   const sortedResults = useMemo(() => {
     const sorted = [...filteredResults];
@@ -236,87 +222,51 @@ export default function ScannerPage() {
     return sorted;
   }, [filteredResults, sortValue]);
 
-  const updateFilter = useCallback((key: string, value: string) => {
-    setActivePreset("");
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
   const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
   const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
   const handleTrack = useCallback(async (_symbol: string) => {}, []);
-  const handleInvest = useCallback((symbol: string) => productNavigate("invest", symbol), []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleQuerySubmit();
   }, [handleQuerySubmit]);
 
-  const filterContent = (
-    <div className="space-y-5">
-      <FilterSection title="Score">
-        <div className="grid gap-3 sm:max-w-xs">
-          <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => updateFilter("scoreRange", v)} />
-        </div>
-      </FilterSection>
-      {sectors.length > 1 && (
-        <FilterSection title="Sector">
-          <FilterSelect label="Sector" value={filters.marketCap} options={["All", ...sectors]} onChange={(v) => updateFilter("marketCap", v)} />
-        </FilterSection>
-      )}
-      <FilterSection title="Factors">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <FilterSelect label="Valuation" value={filters.valuation} options={FACTOR_LEVELS} onChange={(v) => updateFilter("valuation", v)} />
-          <FilterSelect label="Growth" value={filters.growth} options={FACTOR_LEVELS} onChange={(v) => updateFilter("growth", v)} />
-          <FilterSelect label="Profitability" value={filters.profitability} options={FACTOR_LEVELS} onChange={(v) => updateFilter("profitability", v)} />
-          <FilterSelect label="Balance sheet" value={filters.balanceSheet} options={FACTOR_LEVELS} onChange={(v) => updateFilter("balanceSheet", v)} />
-          <FilterSelect label="Momentum" value={filters.momentum} options={FACTOR_LEVELS} onChange={(v) => updateFilter("momentum", v)} />
-          <FilterSelect label="Volatility / Risk" value={filters.volatility} options={FACTOR_LEVELS} onChange={(v) => updateFilter("volatility", v)} />
-        </div>
-      </FilterSection>
-      <FilterSection title="Dividend">
-        <div className="grid gap-3 sm:max-w-xs">
-          <FilterSelect label="Dividend yield" value={filters.dividendYield} options={DIVIDEND_OPTIONS} onChange={(v) => updateFilter("dividendYield", v)} />
-        </div>
-      </FilterSection>
-    </div>
-  );
+  const sectionsByTitle: Record<string, { id: string; label: string }> = {};
+  for (const s of CATEGORY_SECTIONS) {
+    sectionsByTitle[s.id] = s;
+  }
+
+  const categoriesBySection = useMemo(() => {
+    const map: Record<string, typeof SCANNER_CATEGORIES> = {};
+    for (const cat of SCANNER_CATEGORIES) {
+      if (!map[cat.section]) map[cat.section] = [];
+      map[cat.section].push(cat);
+    }
+    return map;
+  }, []);
 
   return (
     <ProductShell>
       <ProductPage>
         <div className="flex flex-col gap-6">
-          {/* Header */}
+          {/* Hero */}
           <div className="relative overflow-hidden rounded-[28px] border border-blue-100/80 bg-[linear-gradient(125deg,rgba(255,255,255,.98),rgba(239,246,255,.88)_58%,rgba(245,243,255,.82))] px-5 py-7 shadow-[0_24px_65px_rgba(30,64,175,.10)] sm:px-7 sm:py-8">
             <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-400/14 blur-3xl" />
-            <div className="relative flex items-start justify-between gap-3">
-            <div className="min-w-0 max-w-3xl">
-              <div className="text-[10px] font-bold uppercase tracking-[.2em] text-blue-600">Discover · step 1 of 3</div>
-              <h1 className="mt-3 text-[30px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[38px]">Find your next research question.</h1>
-              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Choose one lens. We’ll organise the companies; you decide which thesis deserves a closer look.</p>
-            </div>
-            <div className="hidden sm:block shrink-0">
-              <HelpPopover title="How to use the scanner" storageKey="scanner-help-dismissed">
-                <ul className="list-inside space-y-1.5">
-                  <li>• Select a strategy preset to scan by research theme</li>
-                  <li>• Search by symbol, company name, or sector</li>
-                  <li>• Use filters to narrow by score, valuation, or growth</li>
-                  <li>• Click Research to open a company's full thesis</li>
-                  <li>• Use Compare to evaluate companies side by side</li>
-                </ul>
-              </HelpPopover>
-            </div>
+            <div className="relative">
+              <h1 className="text-[32px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[40px]">AI Scanner</h1>
+              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Find companies worth researching by quality, valuation, financial strength, risk, momentum, and market segment.</p>
             </div>
           </div>
 
-          {/* Command-style search */}
+          {/* Natural-language search */}
           <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 shadow-[0_14px_34px_rgba(15,23,42,.07)] focus-within:border-blue-300 focus-within:shadow-[0_16px_38px_rgba(41,98,255,.12)]">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Search className="h-4 w-4" /></span>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Search symbol, company, or sector..."
+              placeholder="Try: low-debt large caps with improving profitability"
               className="h-10 w-full min-w-0 bg-transparent text-[15px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
-              aria-label="Search symbol, company, or sector"
+              aria-label="Search companies by name, symbol, or sector"
             />
             {query && (
               <button
@@ -333,152 +283,181 @@ export default function ScannerPage() {
               onClick={handleQuerySubmit}
               className="shrink-0 rounded-xl bg-[#2962FF] px-5 py-3 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(41,98,255,.24)] hover:bg-[#3B71FF] transition"
             >
-              Scan
+              Run scanner
             </button>
           </div>
 
-          {/* Free / Premium tab bar */}
-          <div className="flex gap-0.5 rounded-2xl bg-slate-100 p-1">
-            <button
-              type="button"
-              onClick={() => handleTabChange("free")}
-              className={`flex-1 rounded-xl px-4 py-2.5 text-center text-xs font-semibold transition-all ${
-                scanMode === "free"
-                  ? "bg-white text-[var(--color-text-primary)] shadow-sm"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-              }`}
-            >
-              Free scans ({FREE_SCANS.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTabChange("premium")}
-              className={`flex-1 rounded-xl px-4 py-2.5 text-center text-xs font-semibold transition-all ${
-                scanMode === "premium"
-                  ? "bg-white text-[var(--color-text-primary)] shadow-sm"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-              }`}
-            >
-              <span className="inline-flex items-center gap-1.5">
-                <Lock className="h-3 w-3" aria-hidden="true" />
-                Premium scans ({PREMIUM_SCANS.length})
-              </span>
-            </button>
-          </div>
+          {/* Category sections */}
+          {CATEGORY_SECTIONS.map((section) => {
+            const cats = categoriesBySection[section.id] || [];
+            if (cats.length === 0) return null;
+            return (
+              <section key={section.id} aria-labelledby={`section-${section.id}`}>
+                <div className="mb-3">
+                  <h2 id={`section-${section.id}`} className="text-sm font-bold uppercase tracking-[.12em] text-[var(--color-text-muted)]">{section.label}</h2>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
+                  {cats.map((cat) => {
+                    const active = activeCategory === cat.id;
+                    const Icon = categoryIcon(cat.id);
+                    const isLocked = !cat.free && !isPremium;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => handleCategoryClick(cat.id, cat.free)}
+                        className={`group flex min-h-[80px] items-start gap-3 rounded-2xl border p-3 text-left text-xs font-semibold transition duration-200 ${
+                          active
+                            ? "-translate-y-0.5 border-[#2962FF] bg-[linear-gradient(145deg,#fff,#eef4ff)] text-[#1D4ED8] shadow-[0_12px_28px_rgba(41,98,255,.13)]"
+                            : isLocked
+                              ? "border-dashed border-[var(--color-border)] bg-white/60 text-[var(--color-text-muted)]"
+                              : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] shadow-sm hover:-translate-y-0.5 hover:border-blue-200 hover:text-[var(--color-text-primary)] hover:shadow-md"
+                        }`}
+                        title={cat.description}
+                      >
+                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${active ? "bg-blue-100 text-blue-600" : isLocked ? "bg-slate-50/60 text-slate-400" : "bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600"}`}>
+                          {isLocked ? (
+                            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                          ) : (
+                            <Icon className="h-4 w-4" />
+                          )}
+                        </span>
+                        <span className="leading-4">{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
 
-          {/* One guided lens grid — no competing horizontal rail. */}
-          <section aria-labelledby="research-lens-title">
-            <div className="mb-3 flex items-end justify-between gap-3"><div><div className="text-[10px] font-bold uppercase tracking-[.18em] text-[var(--color-text-muted)]">Step 2</div><h2 id="research-lens-title" className="mt-1 text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Choose a research lens</h2></div><span className="hidden text-xs text-[var(--color-text-muted)] sm:block">One lens at a time</span></div>
-          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-5">
-            {(scanMode === "free" ? FREE_SCANS : PREMIUM_SCANS).map((scan) => {
-              const active = activePreset === scan.title;
-              return (
+          {/* Upgrade prompt for non-premium users */}
+          {!isPremium && (
+            <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-gradient-to-br from-blue-50/50 to-white p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Unlock deeper scanner views with Investor</h3>
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Get mid-cap, small-cap, profitability, and financial strength categories.</p>
+                </div>
                 <button
-                  key={scan.id}
                   type="button"
-                  onClick={() => scan.free ? handleScanClick(scan) : productNavigate("pricing")}
-                  className={`group flex min-h-[76px] items-start gap-3 rounded-2xl border p-3 text-left text-xs font-semibold transition duration-200 ${
-                    active
-                      ? "-translate-y-0.5 border-[#2962FF] bg-[linear-gradient(145deg,#fff,#eef4ff)] text-[#1D4ED8] shadow-[0_12px_28px_rgba(41,98,255,.13)]"
-                      : scan.free
-                        ? "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] shadow-sm hover:-translate-y-0.5 hover:border-blue-200 hover:text-[var(--color-text-primary)] hover:shadow-md"
-                        : "border-dashed border-[var(--color-border)] bg-white/60 text-[var(--color-text-muted)]"
-                  }`}
+                  onClick={() => productNavigate("pricing")}
+                  className="shrink-0 rounded-xl bg-[#2962FF] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(41,98,255,.24)] hover:bg-[#3B71FF] transition"
                 >
-                  <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${active ? "bg-blue-100 text-blue-600" : scan.free ? "bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600" : "bg-slate-50/60 text-slate-400"}`}>
-                    {scan.free ? (
-                      <span className="text-xs font-bold">{scan.title.charAt(0)}</span>
-                    ) : (
-                      <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                    )}
-                  </span>
-                  <span className="leading-4">{scan.title}</span>
+                  View plans
                 </button>
-              );
-            })}
-          </div></section>
-
-          {/* Toolbar */}
-          <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border-light)] bg-slate-50/70 px-3 py-2">
-            <button
-              type="button"
-              onClick={() => setAdvancedOpen(!advancedOpen)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors md:hidden"
-            >
-              <SlidersHorizontal className="h-3.5 w-3.5" />
-              Filters
-              {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-            </button>
-            <div className="hidden md:flex items-center gap-1.5">
-              <span className="text-[10px] text-[var(--color-text-muted)] font-semibold uppercase tracking-wider">Sort</span>
-              <div className="relative">
-                <CustomSelect
-                  aria-label="Sort results"
-                  value={sortValue}
-                  onChange={(e) => setSortValue(e.target.value)}
-                  className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-2.5 py-1 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </CustomSelect>
               </div>
             </div>
-            <div className="hidden md:block flex-1" />
-            {!loading && (
-              <span className="text-[11px] text-[var(--color-text-muted)]">{sortedResults.length} result{sortedResults.length === 1 ? "" : "s"}</span>
-            )}
-          </div>
+          )}
 
-          {/* Advanced filters - desktop */}
-          <div className="hidden md:block">
-            <ProductPanel className="overflow-hidden">
+          {/* Results toolbar */}
+          {activeCategory && !loading && sortedResults.length > 0 && (
+            <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border-light)] bg-slate-50/70 px-3 py-2">
               <button
                 type="button"
                 onClick={() => setAdvancedOpen(!advancedOpen)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors md:hidden"
               >
-                <span className="inline-flex items-center gap-2">
-                  <Filter className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
-                  Advanced filters
-                </span>
-                {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" /> : <ChevronDown className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" />}
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                Filters
+                {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               </button>
-              {advancedOpen && (
-                <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-4">
-                  {filterContent}
+              <div className="hidden md:flex items-center gap-1.5">
+                <span className="text-[10px] text-[var(--color-text-muted)] font-semibold uppercase tracking-wider">Sort</span>
+                <div className="relative">
+                  <CustomSelect
+                    aria-label="Sort results"
+                    value={sortValue}
+                    onChange={(e) => setSortValue(e.target.value)}
+                    className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-2.5 py-1 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </CustomSelect>
                 </div>
-              )}
-            </ProductPanel>
-          </div>
+              </div>
+              <div className="md:hidden flex-1" />
+              <div className="hidden md:block flex-1" />
+              <span className="text-[11px] text-[var(--color-text-muted)]">{sortedResults.length} result{sortedResults.length === 1 ? "" : "s"}</span>
+            </div>
+          )}
 
-          <div className="flex items-end justify-between gap-3"><div><div className="text-[10px] font-bold uppercase tracking-[.18em] text-[var(--color-text-muted)]">Step 3</div><h2 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Review the shortlist</h2></div>{!loading && <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">{sortedResults.length} companies</span>}</div>
+          {/* Advanced filters - desktop */}
+          {activeCategory && !loading && sortedResults.length > 0 && (
+            <div className="hidden md:block">
+              <ProductPanel className="overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setAdvancedOpen(!advancedOpen)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <Filter className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
+                    Advanced filters
+                  </span>
+                  {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" /> : <ChevronDown className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" />}
+                </button>
+                {advancedOpen && (
+                  <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-4">
+                    <FilterSection title="Score">
+                      <div className="grid gap-3 sm:max-w-xs">
+                        <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => setFilters((p) => ({ ...p, scoreRange: v }))} />
+                      </div>
+                    </FilterSection>
+                  </div>
+                )}
+              </ProductPanel>
+            </div>
+          )}
+
+          {/* Results heading */}
+          {activeCategory && !loading && sortedResults.length > 0 && (
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Companies worth reviewing</h2>
+                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Healthy companies to research further based on your selected category.</p>
+              </div>
+              <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">{sortedResults.length} companies</span>
+            </div>
+          )}
 
           {/* Results */}
-          {loading ? (
+          {loading && (
             <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">Scanning companies...</div>
-          ) : sortedResults.length === 0 ? (
+          )}
+
+          {!loading && activeCategory && sortedResults.length === 0 && !loading && (
             <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
               <Search className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
-              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">No results found</h3>
-              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Adjust your filters or try a different search.</p>
+              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Not enough companies match this view yet.</h3>
+              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Try a different category or check back when more data is available.</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
+                <ProductAction variant="secondary" onClick={() => setActiveCategory("")}>Browse categories</ProductAction>
                 <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
               </div>
             </ProductPanel>
-          ) : (
+          )}
+
+          {!loading && !activeCategory && sortedResults.length === 0 && (
+            <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
+              <BarChart3 className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
+              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Select a category to begin</h3>
+              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Choose a research lens above to discover companies worth reviewing.</p>
+            </ProductPanel>
+          )}
+
+          {!loading && sortedResults.length > 0 && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {sortedResults.slice(0, 100).map((entry) => {
                 const fullSymbol = entry.symbol;
                 const item = scannerResultToResearchListItem(entry);
                 const score = entry.score;
-                const convLabel = convictionLabel(entry);
-                const convTone = convictionTone(entry);
                 const risky = hasRiskFlag(entry);
                 const sector = item.sector;
                 const signalInfo = scannerSignalLabel(score);
                 const signalColor = signalInfo?.color ?? "#64748B";
+                const explanation = complianceExplanation(entry);
                 const performanceShadow = score !== null && score >= 65
                   ? "shadow-[0_18px_44px_rgba(22,163,74,.11)] hover:shadow-[0_24px_54px_rgba(22,163,74,.17)]"
                   : score !== null && score < 45
@@ -522,9 +501,9 @@ export default function ScannerPage() {
                         )}
                       </div>
 
-                      {item.keyReason && (
-                        <p className="mt-2 text-[10px] leading-relaxed text-[var(--color-text-muted)]">{item.keyReason}</p>
-                      )}
+                      {/* Compliance-safe explanation */}
+                      <p className="mt-2 text-[10px] leading-relaxed text-[var(--color-text-muted)]">{explanation}</p>
+
                       {item.riskMarker && (
                         <p className="mt-1 text-[10px] leading-relaxed text-[#EF4444]">{item.riskMarker}</p>
                       )}
@@ -574,7 +553,11 @@ export default function ScannerPage() {
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              {filterContent}
+              <FilterSection title="Score">
+                <div className="grid gap-3 sm:max-w-xs">
+                  <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => setFilters((p) => ({ ...p, scoreRange: v }))} />
+                </div>
+              </FilterSection>
               <button
                 type="button"
                 onClick={() => setFilterDrawerOpen(false)}

@@ -80,7 +80,7 @@ export const TopNav: React.FC = () => {
                 href="/?page=scanner"
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
-                Scanner
+                AI Scanner
               </NavLink>
               <NavLink
                 href="/?page=rankings"
@@ -99,12 +99,6 @@ export const TopNav: React.FC = () => {
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
                 Watchlist
-              </NavLink>
-              <NavLink
-                href="/?page=portfolio"
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
-              >
-                Portfolio
               </NavLink>
               <NavLink
                 href="/?page=methodology"
