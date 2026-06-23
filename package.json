@@ -139,6 +139,7 @@
     "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
     "smoke:static-assets": "tsx scripts/smoke-static-assets.ts",
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
+    "audit:accessibility-smoke": "tsx scripts/audit-accessibility-smoke.ts",
     "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",

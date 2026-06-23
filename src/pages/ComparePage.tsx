@@ -221,8 +221,12 @@ export const ComparePage: React.FC = () => {
                 <div>
                   <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Search companies above to compare</h2>
                   <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[var(--color-text-secondary)]">
-                    Add up to {MAX_COMPANIES} companies to see a side-by-side comparison matrix. Deciding what to review next is a research first step.
+                    Add up to {MAX_COMPANIES} companies to see a side-by-side comparison matrix.
                   </p>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open AI Scanner</ProductAction>
+                  <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
                 </div>
               </div>
             )}
