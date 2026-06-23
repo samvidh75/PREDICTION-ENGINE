@@ -19,6 +19,7 @@ import ResearchChecklistPanel from "../components/research/ResearchChecklistPane
 import TechnicalIntelligencePanel from "../components/research/TechnicalIntelligencePanel";
 import OwnershipIntelligencePanel from "../components/research/OwnershipIntelligencePanel";
 import CorporateEventsTimeline from "../components/research/CorporateEventsTimeline";
+import { TrendlyneWidget } from "../components/external/TrendlyneWidget";
 
 function tickerFromUrl(): string {
   const p = new URLSearchParams(window.location.search);
@@ -43,10 +44,12 @@ export default function StockStoryPageF0(): JSX.Element {
   const [newsItems, setNewsItems] = useState<NewsItemResponse[]>([]);
   const [newsRefreshedAt, setNewsRefreshedAt] = useState<string>("");
   const [financialSeries, setFinancialSeries] = useState<import("../components/research/FinancialHistogram").FinancialSeries[]>([]);
+  const [trendlyneAvailable, setTrendlyneAvailable] = useState(false);
 
   useEffect(() => {
     const ctrl = new AbortController();
     researchFetched.current = false;
+    setTrendlyneAvailable(false);
     fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
       if (!ctrl.signal.aborted) { setResearch(result); researchFetched.current = true; }
     });
@@ -70,6 +73,9 @@ export default function StockStoryPageF0(): JSX.Element {
           })));
         }
       }).catch(() => {});
+      api.getTrendlyneWidget("technicals", ticker, { signal: ctrl.signal }).then((res) => {
+        if (!ctrl.signal.aborted) setTrendlyneAvailable(Boolean(res.available && res.widgetUrl));
+      }).catch(() => {});
     });
     return () => ctrl.abort();
   }, [ticker, identity.displayName, identity.sector, tracked]);
@@ -82,7 +88,6 @@ export default function StockStoryPageF0(): JSX.Element {
   const allRisks = [...new Set(research.prediction.topRiskDrivers)];
   const risks = allRisks.length ? allRisks : [research.riskContext.overall ?? "Review recent business momentum"];
 
-  const hasPositiveReturn = quote.quote ? quote.quote.changePercent >= 0 : null;
   const contextTone = quote.quote ? (quote.quote.changePercent > 0 ? "positive" : quote.quote.changePercent < 0 ? "risk" : "neutral") : score !== null && score >= 70 ? "positive" : score !== null && score < 45 ? "risk" : "neutral";
   const contextShadow = contextTone === "positive" ? "shadow-[var(--shadow-green-context)]" : contextTone === "risk" ? "shadow-[var(--shadow-red-context)]" : "shadow-[var(--shadow-blue-context)]";
 
@@ -153,6 +158,12 @@ export default function StockStoryPageF0(): JSX.Element {
       {analysisMeters.length > 0 && (
         <section className="mt-3">
           <AnalysisMeters meters={analysisMeters} />
+        </section>
+      )}
+
+      {trendlyneAvailable && (
+        <section className="mt-3">
+          <TrendlyneWidget kind="technicals" symbol={ticker} title="Technical checklist" description="" lazy />
         </section>
       )}
 
