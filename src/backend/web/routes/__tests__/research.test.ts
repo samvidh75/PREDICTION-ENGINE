@@ -156,6 +156,7 @@ describe("GET /api/research/company/:symbol", () => {
 describe("GET /api/research/scanner", () => {
   it("returns empty result when no symbols have scores", async () => {
     queryMock.mockResolvedValueOnce({ rows: [] });
+    queryMock.mockResolvedValueOnce({ rows: [] });
     runScannerMock.mockReturnValue([]);
     const app = Fastify({ logger: false });
     await app.register(researchRoutes);

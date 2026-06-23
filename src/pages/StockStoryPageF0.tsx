@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, Check, ShoppingBag, Sparkles } from "lucide-react";
-import { ProductAction, ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import { Check, ShoppingBag, Sparkles, ArrowUpRight } from "lucide-react";
+import { ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
 import { fetchUnifiedResearch, type UnifiedResearchResult } from "../lib/product/companyResearchClient";
@@ -8,7 +8,7 @@ import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
 import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
 import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import type { NewsItemResponse } from "../services/api/client";
+import { api, type NewsItemResponse } from "../services/api/client";
 import { getStaleSnapshot, setCachedSnapshot } from "../lib/product/stockPageSnapshotCache";
 import type { StockPageSnapshot } from "../shared/research/StockPageSnapshotTypes";
 import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
@@ -103,19 +103,17 @@ export default function StockStoryPageF0(): JSX.Element {
     fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
       if (!ctrl.signal.aborted) { setResearch(result); researchFetched.current = true; }
     });
-    import("../services/api/client").then(({ api }) => {
-      api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
-        if (!ctrl.signal.aborted) { setNewsItems(res.items || []); setNewsRefreshedAt(res.cachedAt || new Date().toISOString()); }
-      }).catch(() => {});
-      api.getFinancialSeries(ticker, { signal: ctrl.signal }).then((res) => {
-        if (!ctrl.signal.aborted && res.series) {
-          setFinancialSeries(res.series.map((s) => ({
-            metric: s.metric as any, label: s.label,
-            points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
-          })));
-        }
-      }).catch(() => {});
-    });
+    api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
+      if (!ctrl.signal.aborted) { setNewsItems(res.items || []); setNewsRefreshedAt(res.cachedAt || new Date().toISOString()); }
+    }).catch(() => {});
+    api.getFinancialSeries(ticker, { signal: ctrl.signal }).then((res) => {
+      if (!ctrl.signal.aborted && res.series) {
+        setFinancialSeries(res.series.map((s) => ({
+          metric: s.metric as any, label: s.label,
+          points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
+        })));
+      }
+    }).catch(() => {});
     return () => ctrl.abort();
   }, [ticker, identity.displayName, identity.sector, tracked]);
 
@@ -129,6 +127,11 @@ export default function StockStoryPageF0(): JSX.Element {
 
   const contextTone = quote.quote ? (quote.quote.changePercent > 0 ? "positive" : quote.quote.changePercent < 0 ? "risk" : "neutral") : score !== null && score >= 70 ? "positive" : score !== null && score < 45 ? "risk" : "neutral";
   const contextShadow = contextTone === "positive" ? "shadow-[var(--shadow-green-context)]" : contextTone === "risk" ? "shadow-[var(--shadow-red-context)]" : "shadow-[var(--shadow-blue-context)]";
+  const latestHistoryPoint = research.priceHistory.at(-1) ?? null;
+  const quoteUpdatedAt = quote.quote?.updatedAt ? new Date(quote.quote.updatedAt) : null;
+  const quoteAgeHours = quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? (Date.now() - quoteUpdatedAt.getTime()) / 3_600_000 : null;
+  const chartQuoteMismatch = Boolean(quote.quote && latestHistoryPoint && Math.abs(quote.quote.price - latestHistoryPoint.close) / quote.quote.price > 0.0025);
+  const marketDataNeedsReview = quote.quote?.delayed === true || quoteAgeHours === null || quoteAgeHours > 18 || chartQuoteMismatch;
 
   return <ProductShell>
     <ProductPage className="max-w-[1180px] !py-3 md:!py-4">
@@ -142,26 +145,37 @@ export default function StockStoryPageF0(): JSX.Element {
               <ProductStatusPill tone={score !== null && score >= 70 ? "verified" : score !== null && score >= 45 ? "blue" : "muted"}>{label}</ProductStatusPill>
             </div>
             <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[32px]">{identity.displayName}</h1>
-            <div className="mt-2 flex items-baseline gap-2.5">
-              <span className="font-mono text-[22px] font-semibold tabular-nums tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[26px]">{quote.quote ? formatINR(quote.quote.price) : "—"}</span>
-              {quote.quote && (
-                <span className={`inline-flex items-center gap-1 font-mono text-sm tabular-nums ${quote.quote.changePercent >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-                  {quote.quote.changePercent >= 0 ? "+" : ""}{formatINR(quote.quote.change)} ({quote.quote.changePercent >= 0 ? "+" : ""}{formatPercent(quote.quote.changePercent)})
-                </span>
-              )}
-            </div>
+            <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
+              {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? `Quote updated ${quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}` : "Quote timestamp unavailable"}
+              {latestHistoryPoint?.date ? ` · Chart through ${latestHistoryPoint.date}` : ""}
+              {quote.quote?.source ? ` · Source: ${quote.quote.source === "daily_prices" ? "verified daily close" : "market provider"}` : ""}
+            </p>
           </div>
-          <div className="flex items-start gap-2 self-start">
-            <ProductAction variant="secondary" onClick={() => productNavigate("compare", ticker)} className="h-9 text-xs">
-              <ArrowUpRight className="h-3.5 w-3.5" /> Compare
-            </ProductAction>
-          </div>
+
         </div>
         {research.message && <div className="border-t border-[rgba(148,163,184,0.12)] px-3 py-2.5 text-[11px] text-[var(--color-text-secondary)] md:px-4">{research.message}</div>}
+        {marketDataNeedsReview && <div role="status" className="border-t border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] leading-5 text-amber-900 md:px-4">Market data may be delayed or the chart and quote may refer to different sessions. Verify the timestamp with your exchange or broker before acting.</div>}
       </header>
 
-      {/* Price chart */}
-      <section className="mt-3">
+      <nav aria-label="Company research sections" className="sticky top-0 z-30 -mx-1 mt-2 flex gap-1 overflow-x-auto rounded-xl border border-[var(--color-border)] bg-white/95 p-1 shadow-sm backdrop-blur md:static md:mx-0 md:w-fit">
+        {[["overview", "Overview"], ["thesis", "Thesis"], ["technicals", "Technicals"], ["news", "News"]].map(([id, text]) => (
+          <a key={id} href={`#${id}`} className="shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)] hover:bg-slate-50 hover:text-[var(--color-text-primary)]">{text}</a>
+        ))}
+      </nav>
+
+      {/* Price + chart */}
+      <section id="overview" className="mt-3 scroll-mt-16">
+        <div className="mb-3 flex items-baseline gap-2.5">
+          <span className="font-mono text-[28px] font-semibold tabular-nums tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[32px]">{quote.quote ? formatINR(quote.quote.price) : "—"}</span>
+          {quote.quote && (
+            <span className={`inline-flex items-center gap-1 font-mono text-sm tabular-nums ${quote.quote.changePercent >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              {quote.quote.changePercent >= 0 ? "+" : ""}{formatINR(quote.quote.change)} ({quote.quote.changePercent >= 0 ? "+" : ""}{formatPercent(quote.quote.changePercent)})
+            </span>
+          )}
+          {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) && (
+            <span className="text-[11px] text-[var(--color-text-muted)]">as of {quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
+          )}
+        </div>
         <HistoricalPriceChart symbol={ticker} points={research.priceHistory} />
       </section>
 
@@ -182,10 +196,10 @@ export default function StockStoryPageF0(): JSX.Element {
         </section>
       )}
 
-      {/* News / What changed */}
-      <section className="mt-3">
+      {/* News / What changed — capped to 10 most relevant */}
+      <section id="news" className="mt-3 scroll-mt-16">
         <StockNewsPanel
-          items={newsItems.map((n) => ({
+          items={newsItems.slice(0, 10).map((n) => ({
             id: `${ticker}-${n.publishedAt}-${n.headline.slice(0, 40)}`,
             symbol: ticker, headline: n.headline, publisher: n.publisher,
             publishedAt: n.publishedAt, summary: n.summary, whyItMatters: n.whyItMatters,
@@ -199,23 +213,23 @@ export default function StockStoryPageF0(): JSX.Element {
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)]">
         <main className="min-w-0 space-y-5">
           {/* Thesis overview — compact */}
-          <section>
+          <section id="thesis" className="scroll-mt-16">
             <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">Research narrative</div>
             <h2 className="mt-1 text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Thesis overview</h2>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <ProductPanel className="p-4">
+              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                 <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Why it matters</h3>
                 <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{drivers[0]} is the clearest signal supporting further research.</p>
-              </ProductPanel>
-              <ProductPanel className="p-4">
+              </div>
+              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                 <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">What to challenge</h3>
                 <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{risks[0]}. A complete thesis requires evidence that this concern is either contained or actively improving.</p>
-              </ProductPanel>
+              </div>
             </div>
           </section>
 
           {/* Premium deep-dive CTA (replaces former factor intelligence grid) */}
-          <ProductPanel className="p-4 text-center">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-center">
             <Sparkles className="mx-auto h-5 w-5 text-[#2962FF]" />
             <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Go deeper with Investor plan</p>
             <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
@@ -224,10 +238,10 @@ export default function StockStoryPageF0(): JSX.Element {
             <a href="/?page=pricing" className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#2962FF] px-4 py-2 text-xs font-semibold text-white">
               Investor ₹99 <ArrowUpRight className="h-3 w-3" />
             </a>
-          </ProductPanel>
+          </div>
         </main>
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <ProductPanel className="p-4">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
             <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Review checklist</h2>
             <div className="mt-3 space-y-2.5">
               {["Check the current price", "Challenge the key risk", "Compare a close alternative", "Decide position size externally"].map((item) => (
@@ -236,7 +250,7 @@ export default function StockStoryPageF0(): JSX.Element {
                 </div>
               ))}
             </div>
-          </ProductPanel>
+          </div>
           <button onClick={() => productNavigate("methodology")} className="w-full px-2 py-2 text-left text-xs leading-5 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
             How to interpret scores →
           </button>
@@ -264,6 +278,7 @@ export default function StockStoryPageF0(): JSX.Element {
                 fiiHolding: null, hasPeerData: false,
               }}
             />
+            <div id="technicals" className="scroll-mt-16">
             <TechnicalIntelligencePanel
               input={{
                 priceHistory: research.priceHistory.map((point) => ({ close: point.close, volume: point.volume ?? undefined })),
@@ -272,7 +287,10 @@ export default function StockStoryPageF0(): JSX.Element {
                 priceChangePercent: quote.quote?.changePercent ?? null,
                 rsiValue: null, macdValue: null, distanceFrom52WeekHigh: null,
               }}
+              asOf={latestHistoryPoint?.date ?? null}
+              delayed={marketDataNeedsReview}
             />
+            </div>
           </>
         )}
       </section>
@@ -281,7 +299,7 @@ export default function StockStoryPageF0(): JSX.Element {
       <button
         type="button"
         onClick={() => setInvestOpen(true)}
-        className="fixed bottom-5 right-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-[#0B1220] px-5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,23,42,.28),inset_0_1px_0_rgba(255,255,255,.15)] transition hover:-translate-y-0.5 hover:bg-[#16A34A] focus:outline-none focus:ring-4 focus:ring-emerald-500/20 md:bottom-5 md:right-5"
+        className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-[#0B1220] px-5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,23,42,.28),inset_0_1px_0_rgba(255,255,255,.15)] transition hover:-translate-y-0.5 hover:bg-[#16A34A] focus:outline-none focus:ring-4 focus:ring-emerald-500/20 md:bottom-5 md:right-5"
         aria-label={`Invest in ${identity.displayName}`}
       >
         <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10"><ShoppingBag className="h-3.5 w-3.5" /></span>
