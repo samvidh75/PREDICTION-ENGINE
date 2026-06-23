@@ -35,6 +35,21 @@ const FORBIDDEN_TERMS: { pattern: RegExp; context?: string }[] = [
   { pattern: /\bTrendlyne disabled\b/i, context: 'public UI - never show disabled state' },
   { pattern: /\bdata pipeline\b/i, context: 'public UI' },
   { pattern: /\bupstox(?!.*broker)/i, context: 'public UI - only in broker handoff context' },
+
+  // Investment advice / SEBI compliance phrases
+  { pattern: /\bbest stock to buy\b/i, context: 'investment advice - use "companies worth reviewing"' },
+  { pattern: /\bbuy now\b/i, context: 'investment advice - use "research now"' },
+  { pattern: /\bstrong buy\b/i, context: 'investment advice - use "high conviction"' },
+  { pattern: /\bsell now\b/i, context: 'investment advice - use "review now"' },
+  { pattern: /\btarget price\b/i, context: 'investment advice - use "contextual benchmark"' },
+  { pattern: /\bguaranteed\b/i, context: 'investment advice - no guarantees' },
+  { pattern: /\bsure shot\b/i, context: 'investment advice - no certainties' },
+  { pattern: /\bmultibagger\b/i, context: 'investment advice - no return promises' },
+  { pattern: /\bprofit guaranteed\b/i, context: 'investment advice - no guarantees' },
+  { pattern: /\btop pick to buy\b/i, context: 'investment advice - use "notable company"' },
+  { pattern: /\binvest now\b/i, context: 'investment advice - use "review now"' },
+  { pattern: /\byou should invest\b/i, context: 'investment advice - use "may want to research"' },
+  { pattern: /\bpersonalized recommendation\b/i, context: 'investment advice - SEBI requires registration' },
 ];
 
 interface FoundIssue {
@@ -55,7 +70,8 @@ function scanFile(filePath: string): FoundIssue[] {
         const trimmed = lines[i].trim().substring(0, 120);
         const isTestFile = filePath.includes('__tests__') || filePath.includes('.test.');
         const isReport = filePath.includes('reports/');
-        if (isTestFile || isReport) continue;
+        const isCompliancePolicy = filePath.includes('compliance/') || filePath.includes('companyResearchClient.ts');
+        if (isTestFile || isReport || isCompliancePolicy) continue;
         issues.push({
           file: path.relative(process.cwd(), filePath),
           line: i + 1,

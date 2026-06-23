@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Search, Trophy, Eye, ShieldCheck, Settings, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, Search, Trophy, Eye, ShieldCheck, Settings, LogOut, Sparkles, BarChart3 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { NavLink } from "./NavLink";
 import StockStoryLogo from "../brand/StockStoryLogo";
@@ -7,8 +7,8 @@ import StockStoryLogo from "../brand/StockStoryLogo";
 const NAV_ITEMS = [
   { href: "/?page=dashboard", label: "Home", icon: <LayoutDashboard className="icon-nav" /> },
   { href: "/?page=search", label: "Search", icon: <Search className="icon-nav" /> },
+  { href: "/?page=scanner", label: "AI Scanner", icon: <BarChart3 className="icon-nav" /> },
   { href: "/?page=rankings", label: "Rankings", icon: <Trophy className="icon-nav" /> },
-  { href: "/?page=rankings", label: "Signals", icon: <Sparkles className="icon-nav" /> },
   { href: "/?page=watchlist", label: "Watchlist", icon: <Eye className="icon-nav" /> },
   { href: "/?page=trust", label: "Trust Centre", icon: <ShieldCheck className="icon-nav" /> },
   { href: "/?page=settings", label: "Settings", icon: <Settings className="icon-nav" /> },

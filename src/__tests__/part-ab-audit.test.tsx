@@ -82,12 +82,24 @@ describe('Part AB — No raw rendering defects', () => {
 });
 
 describe('Part AB — Scanner', () => {
-  it('ScannerPage renders strategy chips', () => {
+  it('ScannerPage renders category sections', () => {
     renderWithProviders(<ScannerPage />);
-    expect(screen.getByText('Free scans (5)')).toBeInTheDocument();
-    expect(screen.getByText('Premium scans (15)')).toBeInTheDocument();
-    expect(screen.getByText('Low debt leaders')).toBeInTheDocument();
-    expect(screen.getByText('Watchlist-worthy movers')).toBeInTheDocument();
+    expect(screen.getByText('AI Scanner')).toBeInTheDocument();
+    expect(screen.getByText('Market segment')).toBeInTheDocument();
+    expect(screen.getByText('Business quality')).toBeInTheDocument();
+    expect(screen.getByText('Low-debt leaders')).toBeInTheDocument();
+    expect(screen.queryByText(/Free scans|Premium scans/i)).not.toBeInTheDocument();
+  });
+
+  it('ScannerPage does not contain investment advice language', () => {
+    renderWithProviders(<ScannerPage />);
+    const text = document.body.textContent || '';
+    expect(text).not.toMatch(/buy|sell|hold|strong buy|target price|multibagger|best stock to buy|recommendation/i);
+  });
+
+  it('ScannerPage result actions are Research/Compare/Track only', () => {
+    renderWithProviders(<ScannerPage />);
+    expect(screen.queryByText('Invest')).not.toBeInTheDocument();
   });
 });
 

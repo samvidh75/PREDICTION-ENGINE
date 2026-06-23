@@ -103,7 +103,7 @@ export default function IntelligenceNavigationRail(): JSX.Element | null {
       },
       {
         id: "scanner",
-        label: "Market Scanner",
+        label: "AI Scanner",
         page: "explore",
         description: "Scan themes, sectors & institutional cues",
       },

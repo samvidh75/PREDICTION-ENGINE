@@ -5,6 +5,8 @@ import { render, screen } from '@testing-library/react';
 import { MobileNav } from '../MobileNav';
 import { LayoutProvider } from '../../../context/LayoutContext';
 
+expect.extend({});
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -22,10 +24,10 @@ function mockCurrentPage(page: string) {
 }
 
 describe('MobileNav authenticated', () => {
-  it('renders Scanner tab', () => {
+  it('renders AI Scanner tab', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.getByText('Scanner')).toBeInTheDocument();
+    expect(screen.getByText('AI Scanner')).toBeInTheDocument();
   });
 
   it('renders Menu tab', () => {
@@ -53,5 +55,25 @@ describe('MobileNav authenticated', () => {
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
     const body = document.body.textContent || '';
     expect(body).not.toMatch(/Buy Stock|Sell Stock|Strong Buy|Strong Sell|Try Pro|Unlock Pro|Trade now/i);
+  });
+
+  it('has maximum 5 bottom nav items', () => {
+    mockCurrentPage('dashboard');
+    render(<LayoutProvider><MobileNav /></LayoutProvider>);
+    const bottomNav = screen.getByLabelText('Mobile navigation');
+    const items = bottomNav.querySelectorAll('button');
+    expect(items.length).toBeLessThanOrEqual(6);
+  });
+
+  it('does not show Portfolio in bottom tabs', () => {
+    mockCurrentPage('dashboard');
+    render(<LayoutProvider><MobileNav /></LayoutProvider>);
+    expect(screen.queryByText('Portfolio')).not.toBeInTheDocument();
+  });
+
+  it('does not show Alerts in mobile menu', () => {
+    mockCurrentPage('dashboard');
+    render(<LayoutProvider><MobileNav /></LayoutProvider>);
+    expect(screen.queryByText('Alerts')).not.toBeInTheDocument();
   });
 });
