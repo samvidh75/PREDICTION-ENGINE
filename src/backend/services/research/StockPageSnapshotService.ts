@@ -193,6 +193,18 @@ export async function getSnapshot(symbol: string): Promise<{ snapshot: StockPage
   if (cached) return { snapshot: cached, state: cached.freshnessState === "partial" ? "partial" : "available" };
   const dbSnap = await getSnapshotFromDb(clean);
   if (dbSnap) {
+    // Check freshness: rebuild if snapshot is older than 24 hours
+    const snapAge = dbSnap.updatedAt ? (Date.now() - new Date(dbSnap.updatedAt).getTime()) : Infinity;
+    if (snapAge > 86_400_000) {
+      try {
+        const fresh = await buildSnapshot(clean);
+        await upsertSnapshot(clean, fresh);
+        setCachedSnapshot(clean, fresh);
+        return { snapshot: fresh, state: fresh.freshnessState === "partial" ? "partial" : "available" };
+      } catch {
+        // Fall through to serve stale snapshot
+      }
+    }
     setCachedSnapshot(clean, dbSnap);
     return { snapshot: dbSnap, state: dbSnap.freshnessState === "partial" ? "partial" : "available" };
   }
