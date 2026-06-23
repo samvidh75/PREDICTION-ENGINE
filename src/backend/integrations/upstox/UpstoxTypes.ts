@@ -9,9 +9,6 @@ export interface UpstoxConfigSummary {
   hasSandboxAccessToken: boolean;
   marketDataEnabled: boolean;
   orderSandboxEnabled: boolean;
-  tokenAutoRequestEnabled: boolean;
-  tokenRequestLeadMinutes: number;
-  tokenRequestCooldownMinutes: number;
 }
 
 export interface UpstoxUserProfile {
@@ -106,22 +103,4 @@ export interface TokenRecord {
   mode: UpstoxMode;
   receivedAt: string;
   userId?: string;
-}
-
-export interface UpstoxTokenRequestRecord {
-  status: 'requested' | 'skipped' | 'failed';
-  requestedAt: string;
-  authorizationExpiry: string | null;
-  notifierConfigured: boolean;
-  reason: string;
-}
-
-export interface UpstoxNotifierPayload {
-  client_id?: string;
-  user_id?: string;
-  access_token?: string;
-  token_type?: string;
-  expires_at?: string | number;
-  issued_at?: string | number;
-  message_type?: string;
 }
