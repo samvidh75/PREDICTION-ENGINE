@@ -482,7 +482,7 @@ export default function ScannerPage() {
                     ? "shadow-[0_18px_44px_rgba(220,38,38,.10)] hover:shadow-[0_24px_54px_rgba(220,38,38,.16)]"
                     : "shadow-[0_16px_40px_rgba(30,64,175,.08)] hover:shadow-[0_22px_50px_rgba(30,64,175,.13)]";
                 return (
-                  <ProductPanel key={fullSymbol} as="article" className={`group relative min-h-[250px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-white p-5 transition duration-300 hover:-translate-y-1 ${performanceShadow}`}>
+                  <ProductPanel key={fullSymbol} as="article" className={`group relative min-h-[250px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition duration-300 hover:-translate-y-1 ${performanceShadow}`}>
                     <div className="absolute inset-x-5 top-0 h-px opacity-70" style={{ background: `linear-gradient(90deg,transparent,${signalColor},transparent)` }} />
                     <div>
                       <div className="flex items-start justify-between gap-2">
@@ -492,14 +492,14 @@ export default function ScannerPage() {
                         </div>
                         {score !== null && (
                           <div className="flex flex-col items-end shrink-0">
-                            <span className="grid h-11 min-w-11 place-items-center rounded-2xl bg-slate-50 px-2 font-mono text-base font-semibold tabular-nums text-[var(--color-text-primary)] shadow-[inset_0_0_0_1px_var(--color-border)]">{Math.round(score)}</span>
+                            <span className="grid h-11 min-w-11 place-items-center rounded-2xl bg-[var(--color-surface-2)] px-2 font-mono text-base font-semibold tabular-nums text-[var(--color-text-primary)] shadow-[inset_0_0_0_1px_var(--color-border)]">{Math.round(score)}</span>
                           </div>
                         )}
                       </div>
 
                       {sector && (
                         <div className="mt-2">
-                          <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
+                          <span className="inline-flex rounded-full bg-[var(--color-surface-2)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
                         </div>
                       )}
 

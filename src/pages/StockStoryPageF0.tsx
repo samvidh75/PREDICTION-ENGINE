@@ -178,7 +178,7 @@ export default function StockStoryPageF0(): JSX.Element {
 
         </div>
         {research.message && <div className="border-t border-[rgba(148,163,184,0.12)] px-3 py-2.5 text-[11px] text-[var(--color-text-secondary)] md:px-4">{research.message}</div>}
-        {marketDataNeedsReview && <div role="status" className="border-t border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] leading-5 text-amber-900 md:px-4">Market data may be delayed or the chart and quote may refer to different sessions. Verify the timestamp with your exchange or broker before acting.</div>}
+        {marketDataNeedsReview && <div role="status" className="border-t border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-[11px] leading-5 text-[var(--color-text-secondary)] md:px-4">Market data context is being refreshed. Verify timestamps before acting.</div>}
         <div className="flex gap-2 border-t border-[var(--color-border)] px-3 py-2 md:px-4">
           <button
             type="button"
@@ -198,9 +198,9 @@ export default function StockStoryPageF0(): JSX.Element {
         </div>
       </header>
 
-      <nav aria-label="Company research sections" className="sticky top-0 z-30 -mx-1 mt-2 flex gap-1 overflow-x-auto rounded-xl border border-[var(--color-border)] bg-white/95 p-1 shadow-sm backdrop-blur md:static md:mx-0 md:w-fit">
+      <nav aria-label="Company research sections" className="sticky top-0 z-30 -mx-1 mt-2 flex gap-1 overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/95 p-1 shadow-sm backdrop-blur md:static md:mx-0 md:w-fit">
         {[["overview", "Overview"], ["thesis", "Thesis"], ["technicals", "Technicals"], ["news", "News"]].map(([id, text]) => (
-          <a key={id} href={`#${id}`} className="shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)] hover:bg-slate-50 hover:text-[var(--color-text-primary)]">{text}</a>
+          <a key={id} href={`#${id}`} className="shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]">{text}</a>
         ))}
       </nav>
 
