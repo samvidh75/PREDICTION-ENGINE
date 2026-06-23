@@ -23,7 +23,7 @@ export class UpstoxSandboxClient {
   }
 
   private getBaseUrl(): string {
-    return 'https://sandbox-api.upstox.com/v2';
+    return this.config.getApiBaseUrl();
   }
 
   private async sandboxFetch<T>(path: string, options?: RequestInit): Promise<T> {
