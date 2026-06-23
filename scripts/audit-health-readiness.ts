@@ -5,6 +5,7 @@
  *   npx tsx scripts/audit-health-readiness.ts
  */
 
+export {};
 async function main(): Promise<void> {
   const baseUrl = process.env.API_BASE || "https://www.stockstory-india.com";
   let passed = 0;

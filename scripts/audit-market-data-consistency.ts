@@ -5,6 +5,7 @@
  *   npx tsx scripts/audit-market-data-consistency.ts
  */
 
+export {};
 const SYMBOLS = ["RELIANCE", "TCS", "INFY", "ITC", "HDFCBANK"];
 
 interface QuoteResponse {

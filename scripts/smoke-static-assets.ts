@@ -1,3 +1,4 @@
+export {};
 const PROD_URL = 'https://www.stockstory-india.com';
 
 async function checkUrl(path: string, expectSvg = false): Promise<boolean> {

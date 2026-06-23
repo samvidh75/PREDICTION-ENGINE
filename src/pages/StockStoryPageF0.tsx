@@ -10,6 +10,8 @@ import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import { api, type NewsItemResponse } from "../services/api/client";
 import { getStaleSnapshot, setCachedSnapshot } from "../lib/product/stockPageSnapshotCache";
+import { resolveCanonicalResearchState } from "../backend/services/research/CanonicalResearchStateResolver";
+import type { EngineResearchSnapshot } from "../shared/research/CanonicalResearchStateTypes";
 import type { StockPageSnapshot } from "../shared/research/StockPageSnapshotTypes";
 import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
 import HealthometerPanel from "../components/research/HealthometerPanel";
@@ -117,8 +119,27 @@ export default function StockStoryPageF0(): JSX.Element {
     return () => ctrl.abort();
   }, [ticker, identity.displayName, identity.sector, tracked]);
 
-  const score = research.healthometer.overallScore ?? research.prediction.overallScore;
-  const label = research.healthometerLabel ?? healthometerLabelFromScore(research.healthometer.overallScore);
+  const engineSnapshots: EngineResearchSnapshot[] = [
+    {
+      engineName: "healthometer",
+      score: research.healthometer.overallScore,
+      label: research.healthometerLabel || "",
+      dataAsOf: null,
+      freshnessDays: null,
+    },
+    {
+      engineName: "prediction",
+      score: research.prediction.overallScore,
+      label: research.prediction.publicResearchStance || "",
+      dataAsOf: null,
+      freshnessDays: null,
+    },
+  ].filter(s => s.score !== null);
+
+  const canonical = useMemo(() => resolveCanonicalResearchState(ticker, engineSnapshots), [ticker, engineSnapshots]);
+
+  const score = canonical.score ?? research.healthometer.overallScore ?? research.prediction.overallScore;
+  const label = canonical.label || research.healthometerLabel || healthometerLabelFromScore(research.healthometer.overallScore) || "Not enough information";
   const dimensions = research.healthometer.dimensions;
   const allDrivers = [...new Set(research.prediction.topPositiveDrivers)];
   const drivers = allDrivers.length ? allDrivers : ["Business quality", "Financial strength", "Capital efficiency"];
