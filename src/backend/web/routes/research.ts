@@ -18,6 +18,8 @@ import { healthometerEngine } from "../../../stockstory/healthometer/Healthomete
 import { buildHealthometerInput } from "../../../stockstory/healthometer/inputBuilder";
 import { algorithmicAnalysisEngine } from "../../../stockstory/analysis/AlgorithmicAnalysisEngine";
 import { evaluatePredictionV2 } from "../../../stockstory/prediction/engine/PredictionEngineV2";
+import { reconcileQuoteWithHistory } from "../../services/market/MarketQuoteReconciler";
+import { isIndianTradingSessionDate } from "../../../shared/market/IndianTradingCalendar";
 
 function normaliseSymbol(raw: string): string {
   return raw.toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
@@ -262,7 +264,7 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         low: parseFinite(r.low),
         open: null,
         volume: parseFinite(r.volume),
-      })).filter((c) => c.close > 0).reverse();
+      })).filter((c) => c.close > 0 && isIndianTradingSessionDate(c.date)).reverse();
 
       const companyName = (metaRes && typeof metaRes === "object" && "companyName" in metaRes)
         ? String((metaRes as any).companyName) : sym;
@@ -272,15 +274,16 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         ? String((metaRes as any).industry) : null;
       const beta = parseFinite(fsRow?.beta) ?? null;
 
-      const quoteData = quote && typeof quote === "object" ? {
-        lastPrice: parseFinite((quote as any).price),
-        change: parseFinite((quote as any).change),
-        changePercent: parseFinite((quote as any).changePercent),
+      const canonicalQuote = reconcileQuoteWithHistory(sym, quote as any, dpRows);
+      const quoteData = canonicalQuote ? {
+        lastPrice: parseFinite(canonicalQuote.price),
+        change: parseFinite(canonicalQuote.change),
+        changePercent: parseFinite(canonicalQuote.changePercent),
         open: parseFinite((quote as any).open),
         high: parseFinite((quote as any).high),
         low: parseFinite((quote as any).low),
-        close: parseFinite((quote as any).close ?? (quote as any).price),
-        volume: parseFinite((quote as any).volume),
+        close: parseFinite(canonicalQuote.price),
+        volume: parseFinite(canonicalQuote.volume),
         marketCap: fundamentals?.peRatio !== null && fundamentals?.sales !== null
           ? parseFinite(fsRow?.market_cap) : null,
         week52High: null,
@@ -513,6 +516,13 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         profile, quote: quoteView, fundamentals: fundamentalsView,
         factorScores, thesis, risk: riskView, history, investContext,
         predictionV2,
+        dataState: {
+          quoteAsOf: canonicalQuote?.asOf ?? null,
+          historyAsOf: history.latestDate,
+          quoteSource: canonicalQuote?.source ?? null,
+          freshness: canonicalQuote?.freshness ?? "unknown",
+          delayed: canonicalQuote?.delayed ?? true,
+        },
       };
 
       const safe = productSafeParse<typeof result>(productSafeJson(result));
@@ -545,19 +555,31 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       let targetSymbols: string[] = [];
 
       if (symbolsParam) {
-        targetSymbols = symbolsParam.split(",").map((s: string) => normaliseSymbol(s)).filter(Boolean);
+        targetSymbols = [...new Set(symbolsParam.split(",").map((s: string) => normaliseSymbol(s)).filter(Boolean))];
       } else {
         const topRes = await query(
-          `SELECT symbol FROM prediction_registry
+          `SELECT symbol, MAX(ranking_score) AS ranking_score FROM prediction_registry
            WHERE ranking_score IS NOT NULL
+           GROUP BY symbol
            ORDER BY ranking_score DESC LIMIT $1`,
           [limit]
         );
-        targetSymbols = ((topRes.rows || []) as any[]).map((r: any) => r.symbol);
+        targetSymbols = [...new Set(((topRes.rows || []) as any[]).map((r: any) => normaliseSymbol(r.symbol)).filter(Boolean))];
+
+        // Fallback: if prediction_registry has no data, use financial_snapshots symbols
+        if (targetSymbols.length === 0) {
+          const fsRes = await query(
+            `SELECT DISTINCT UPPER(REPLACE(symbol, ' ', '')) AS sym FROM financial_snapshots
+             WHERE pe_ratio IS NOT NULL AND roe IS NOT NULL
+             LIMIT $1`,
+            [limit]
+          );
+          targetSymbols = ((fsRes.rows || []) as any[]).map((r: any) => r.sym).filter(Boolean);
+        }
       }
 
       if (targetSymbols.length === 0) {
-        return reply.send({ ok: true, data: [], preset, message: "No symbols available for scanning." });
+        return reply.send({ ok: true, data: [], preset, coverage: { requested: limit, evaluated: 0, returned: 0, complete: false }, message: "No companies currently have enough dated evidence for this scan." });
       }
 
       const companies = await Promise.all(targetSymbols.slice(0, limit).map(async (sym) => {
@@ -646,7 +668,20 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       const results = runScanner(preset, companies);
       const safe = productSafeParse<typeof results>(productSafeJson(results));
 
-      return reply.send({ ok: true, data: safe, preset });
+      return reply.send({
+        ok: true,
+        data: safe,
+        preset,
+        coverage: {
+          requested: limit,
+          evaluated: companies.length,
+          returned: safe.length,
+          complete: safe.length >= Math.min(limit, targetSymbols.length),
+        },
+        message: safe.length < Math.min(limit, targetSymbols.length)
+          ? `Showing ${safe.length} companies with enough evidence from ${companies.length} evaluated.`
+          : null,
+      });
     } catch (err: any) {
       req.log.error({ err, preset }, "scanner failed");
       return reply.status(502).send({
