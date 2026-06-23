@@ -1,5 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import { Lock, Sparkles } from "lucide-react";
 import { ProductPanel } from "../product/ProductUI";
+import { canViewHealthometerDetail, getCurrentPlan, UPGRADE_URL } from "../../lib/product/planAccess";
+import HealthometerDetailSheet from "./HealthometerDetailSheet";
+import HealthometerUpgradeSheet from "./HealthometerUpgradeSheet";
 
 export interface HealthometerDimension {
   id: string;
@@ -14,35 +18,17 @@ export interface HealthometerPanelProps {
   loading?: boolean;
 }
 
-const DIM_COLORS: Record<string, string> = {
-  quality: "#3B82F6",
-  financial_strength: "#22C55E",
-  valuation: "#A78BFA",
-  growth: "#14B8A6",
-  stability: "#64748B",
-  risk: "#F59E0B",
-  momentum: "#38BDF8",
-};
-
-function dimColor(id: string): string {
-  return DIM_COLORS[id] || "#2962FF";
-}
-
 export default function HealthometerPanel({ label, score, dimensions, loading }: HealthometerPanelProps): JSX.Element {
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
   if (loading) {
     return (
       <ProductPanel className="p-5">
         <div className="animate-pulse space-y-4">
           <div className="h-4 w-24 rounded bg-slate-200" />
           <div className="h-8 w-20 rounded bg-slate-200" />
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="space-y-1">
-                <div className="h-3 w-16 rounded bg-slate-200" />
-                <div className="h-2 rounded-full bg-slate-100" />
-              </div>
-            ))}
-          </div>
+          <div className="h-2 rounded-full bg-slate-100" />
         </div>
       </ProductPanel>
     );
@@ -51,7 +37,7 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
   if (!score && dimensions.length === 0) {
     return (
       <ProductPanel className="p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Healthometer</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">Healthometer</div>
         <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">Not enough information for full Healthometer yet.</p>
       </ProductPanel>
     );
@@ -61,46 +47,61 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
   const safeScore = (score !== null && !Number.isNaN(score)) ? score : null;
   const displayScore = safeScore ?? (validDims.length > 0 ? Math.round(validDims.reduce((s, d) => s + (d.score ?? 0), 0) / validDims.length) : null);
 
+  const topDrivers = validDims.filter((d) => (d.score ?? 0) >= 60).slice(0, 3);
+  const topRisks = validDims.filter((d) => (d.score ?? 0) < 45).slice(0, 3);
+  const hasDetail = canViewHealthometerDetail(getCurrentPlan());
+
   return (
-    <ProductPanel className="p-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Healthometer</div>
-          <div className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">{label ?? "In review"}</div>
-        </div>
-        {displayScore !== null && (
-          <div className="font-mono text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">
-            {displayScore}
-          </div>
-        )}
-      </div>
-      {validDims.length > 0 && (
-        <div className="mt-4 space-y-2.5">
-          {dimensions.map((dimension) => (
-            <div key={dimension.id}>
-              <div className="mb-1 flex justify-between text-xs">
-                <span className="text-[var(--color-text-secondary)]">{dimension.label}</span>
-                <span className="font-mono tabular-nums text-[var(--color-text-primary)]">
-                  {dimension.score ?? "—"}
-                </span>
-              </div>
-              {dimension.score !== null ? (
-                <div className="h-1.5 overflow-hidden rounded-full bg-[#161B22]">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${Math.max(0, Math.min(100, dimension.score))}%`,
-                      backgroundColor: dimColor(dimension.id),
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="h-1.5 overflow-hidden rounded-full bg-[#161B22] opacity-30" />
-              )}
+    <>
+      <ProductPanel className="p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">
+              Healthometer {!hasDetail && <Lock className="ml-1 inline h-3 w-3" />}
             </div>
-          ))}
+            <div className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">{label ?? "In review"}</div>
+            {topDrivers.length > 0 && (
+              <div className="mt-2 text-xs leading-5 text-emerald-600">
+                <span className="font-medium">Strengths: </span>
+                {topDrivers.map((d) => d.label).join(", ")}
+              </div>
+            )}
+            {topRisks.length > 0 && (
+              <div className="text-xs leading-5 text-amber-600">
+                <span className="font-medium">Watch: </span>
+                {topRisks.map((d) => d.label).join(", ")}
+              </div>
+            )}
+          </div>
+          {displayScore !== null && (
+            <div className="shrink-0 font-mono text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">
+              {displayScore}
+            </div>
+          )}
         </div>
-      )}
-    </ProductPanel>
+        <div className="mt-3 flex gap-2">
+          <button
+            onClick={() => hasDetail ? setDetailOpen(true) : setUpgradeOpen(true)}
+            className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:border-blue-200 hover:text-[var(--color-text-primary)]"
+          >
+            {hasDetail ? "See detailed breakdown" : "Unlock detailed breakdown"}
+          </button>
+        </div>
+      </ProductPanel>
+
+      <HealthometerDetailSheet
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        label={label}
+        score={displayScore}
+        dimensions={dimensions}
+      />
+      <HealthometerUpgradeSheet
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        score={displayScore}
+        label={label}
+      />
+    </>
   );
 }
