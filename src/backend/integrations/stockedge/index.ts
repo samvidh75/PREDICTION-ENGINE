@@ -11,3 +11,5 @@ export * from "./StockEdgeWrapper";
 export * from "./StockEdgeSessionStore";
 export * from "./StockEdgeAuth";
 export * from "./StockEdgeEndpointDiscovery";
+export * from "./StockEdgePlaywrightAuth";
+export * from "./StockEdgeExtractionRunStore";
