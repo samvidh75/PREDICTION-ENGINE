@@ -55,7 +55,7 @@ export function getPageKeyFromUrl(): PageKey {
       trust: "methodology",
       validation: "methodology",
       predictions: "landing",
-      rankings: "rankings",
+      rankings: "scanner",
       compare: "compare",
       alerts: "alerts",
       invest: "invest",

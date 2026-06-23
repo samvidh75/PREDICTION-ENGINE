@@ -95,6 +95,7 @@ export default function ScannerPage() {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [sortValue, setSortValue] = useState("score-desc");
+  const [scannerMessage, setScannerMessage] = useState<string | null>(null);
 
   const [filters, setFilters] = useState({
     scoreRange: "All",
@@ -124,14 +125,17 @@ export default function ScannerPage() {
 
   const fetchScanner = useCallback(async (preset: string) => {
     setLoading(true);
+    setScannerMessage(null);
     try {
       const res = await api.getScanner(preset, 200);
       const data = res.data ?? [];
       setAllEntries(data);
       setResults(data);
+      setScannerMessage(res.message ?? (res.coverage && !res.coverage.complete ? `Showing ${res.coverage.returned} companies with sufficient evidence from ${res.coverage.evaluated} evaluated.` : null));
     } catch {
       setAllEntries([]);
       setResults([]);
+      setScannerMessage("The scan could not be refreshed. Please retry in a moment.");
     }
     setLoading(false);
   }, []);
@@ -425,6 +429,10 @@ export default function ScannerPage() {
           {/* Results */}
           {loading && (
             <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">Scanning companies...</div>
+          )}
+
+          {scannerMessage && !loading && (
+            <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">{scannerMessage}</div>
           )}
 
           {!loading && activeCategory && sortedResults.length === 0 && !loading && (

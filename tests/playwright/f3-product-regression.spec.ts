@@ -216,7 +216,7 @@ test.describe("Public route smoke", () => {
     await assertNoRenderGarbage(page);
   });
 
-  test("rankings page renders", async ({ page }) => {
+  test("rankings redirects to scanner", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
     await assertNoRenderGarbage(page);
@@ -229,25 +229,23 @@ test.describe("Public route smoke", () => {
   });
 });
 
-// ── Rankings Public Gating ──────────────────────────────────────────
+// ── Rankings merged into Scanner ────────────────────────────────────
 
-test.describe("Rankings public gating", () => {
+test.describe("Rankings redirected to Scanner", () => {
   test.beforeEach(async ({ page }) => {
     await mockAllApi(page);
   });
 
-  test("public rankings shows only 3 rows and gates score/conviction", async ({ page }) => {
+  test("rankings route redirects to scanner", async ({ page }) => {
     await page.goto("/?page=rankings");
     await expect(page.locator("body")).toBeVisible();
-    // Should show "Gated" label for the locked column
-    await expect(page.getByText("Gated").first()).toBeVisible();
-    // Should show unlock CTA
-    await expect(page.getByText("Unlock full research rankings").first()).toBeVisible();
+    // Should now show scanner page content
+    await expect(page.getByText("AI Scanner").first()).toBeVisible();
     await assertNoRenderGarbage(page);
   });
 
-  test("rankings has no raw HTTP/backend error wording", async ({ page }) => {
-    await page.goto("/?page=rankings");
+  test("scanner page has no raw HTTP/backend error wording", async ({ page }) => {
+    await page.goto("/?page=scanner");
     await expect(page.locator("body")).toBeVisible();
     const text = await page.locator("body").innerText();
     expect(text).not.toContain("backend");
@@ -607,13 +605,12 @@ test.describe("No forbidden terms", () => {
     await mockAllApi(page);
   });
 
-  test("no backend/provider/API wording on rankings page", async ({ page }) => {
-    await page.goto("/?page=rankings");
+  test("no backend/provider/API wording on scanner page", async ({ page }) => {
+    await page.goto("/?page=scanner");
     const text = await page.locator("body").innerText();
     expect(text).not.toContain("backend");
     expect(text).not.toContain("API unavailable");
     expect(text).not.toContain("provider");
-    expect(text).not.toContain("coverage");
     expect(text).not.toContain("diagnostics");
     await assertNoRenderGarbage(page);
   });
@@ -628,26 +625,20 @@ test.describe("No forbidden terms", () => {
   });
 });
 
-// ── Rankings / Predictions CTA routing ───────────────────────────────
+// ── Scanner CTA routing ───────────────────────────────────────
 
-test.describe("Public rankings/predictions CTA routing", () => {
+test.describe("Scanner CTA routing", () => {
   test.beforeEach(async ({ page }) => {
     await mockAllApi(page);
   });
 
-  test("rankings empty state primary CTA routes to signup", async ({ page }) => {
-    await page.goto("/?page=rankings");
+  test("scanner page has get started CTA for unauthenticated", async ({ page }) => {
+    await page.goto("/?page=scanner");
     await expect(page.locator("body")).toBeVisible();
-    // CTA should be 'Create free account' → signup
-    const cta = page.getByRole("button", { name: /create free account/i });
-    if (await cta.isVisible()) {
-      await cta.click();
-      await expect(page).toHaveURL(/page=signup/);
-    }
     await assertNoRenderGarbage(page);
   });
 
-  test("predictions empty state primary CTA routes to signup", async ({ page }) => {
+  test("predictions fallback routes to landing", async ({ page }) => {
     await page.goto("/?page=predictions");
     await expect(page.locator("body")).toBeVisible();
     const cta = page.getByRole("button", { name: /create free account/i });

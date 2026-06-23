@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, Bookmark } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import StockStoryLogo from '../brand/StockStoryLogo';
 import { ProfileButton } from './ProfileButton';
@@ -83,34 +83,28 @@ export const TopNav: React.FC = () => {
                 AI Scanner
               </NavLink>
               <NavLink
-                href="/?page=rankings"
-                className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
-              >
-                Rankings
-              </NavLink>
-              <NavLink
                 href="/?page=compare"
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
                 Compare
               </NavLink>
               <NavLink
-                href="/?page=watchlist"
+                href="/?page=track"
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
-                Watchlist
+                Track
               </NavLink>
               <NavLink
-                href="/?page=methodology"
+                href="/?page=pricing"
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
-                Methodology
+                Pricing
               </NavLink>
               <NavLink
-                href="/?page=settings"
+                href="/?page=about"
                 className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
               >
-                Settings
+                More
               </NavLink>
             </div>
 

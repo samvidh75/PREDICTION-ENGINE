@@ -77,21 +77,60 @@ export function InvestHandoffSheet({
 }: InvestHandoffSheetProps) {
   const [stage, setStage] = useState<Stage>(1);
   const [loadingContext, setLoadingContext] = useState(false);
+  const [contextError, setContextError] = useState<string | null>(null);
   const [context, setContext] = useState<InvestContextResponse["data"] | null>(null);
   const [handoff, setHandoff] = useState<HandoffDraft | null>(null);
 
-  useEffect(() => {
-    if (open) {
-      setStage(1);
-      setLoadingContext(true);
-      setContext(null);
-      setHandoff(null);
-      api.getInvestContext(symbol)
-        .then((res) => setContext(res.data))
-        .catch(() => {})
-        .finally(() => setLoadingContext(false));
+  const loadContext = useCallback(() => {
+    const controller = new AbortController();
+    let disposed = false;
+    const timeout = window.setTimeout(() => controller.abort(), 2_000);
+    setLoadingContext(true);
+    setContextError(null);
+
+    const cachedSnapshot = (() => {
+      try {
+        const raw = sessionStorage.getItem(`stock_snapshot_${symbol}`);
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    })();
+
+    if (cachedSnapshot) {
+      setContext(cachedSnapshot);
+      setLoadingContext(false);
     }
-  }, [open, symbol]);
+
+    api.getInvestContext(symbol, { signal: controller.signal })
+      .then((res) => {
+        if (!disposed) {
+          setContext(res.data);
+          try { sessionStorage.setItem(`stock_snapshot_${symbol}`, JSON.stringify(res.data)); } catch {}
+        }
+      })
+      .catch(() => {
+        if (!disposed && !cachedSnapshot) {
+          setContextError("Research context loading took too long. Compare or track instead.");
+        }
+      })
+      .finally(() => {
+        window.clearTimeout(timeout);
+        if (!disposed) setLoadingContext(false);
+      });
+    return () => {
+      disposed = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [symbol]);
+
+  useEffect(() => {
+    if (!open) return;
+    setStage(1);
+    setContext(null);
+    setHandoff(null);
+    setContextError(null);
+    return loadContext();
+  }, [open, loadContext]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -179,6 +218,12 @@ export function InvestHandoffSheet({
             </div>
           ) : (
             <>
+              {contextError && (
+                <div role="alert" className="flex items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-5 py-3 text-[11px] leading-5 text-amber-900">
+                  <span>{contextError}</span>
+                  <button type="button" onClick={() => { loadContext(); }} className="shrink-0 rounded-md border border-amber-300 px-2.5 py-1 font-semibold">Retry</button>
+                </div>
+              )}
               {stage === 1 && (
                 <StageOne
                   symbol={symbol}
@@ -190,8 +235,8 @@ export function InvestHandoffSheet({
                   watchItems={context?.whatToWatch ?? []}
                   signal={investSignal}
                   onContinue={() => setStage(2)}
-                  onTrack={() => { onClose(); }}
-                  onCompare={() => { onClose(); }}
+                  onTrack={() => { onClose(); productNavigate("track"); }}
+                  onCompare={() => { onClose(); productNavigate("compare", symbol); }}
                   onBack={onClose}
                 />
               )}

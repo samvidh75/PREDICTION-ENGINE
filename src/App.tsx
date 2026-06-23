@@ -9,6 +9,7 @@ import {
   notifyUrlChange,
   sanitizeReturnTo,
   PROTECTED_PAGES,
+  PUBLIC_PAGES,
   type PageKey,
 } from "./app/router";
 import PageRenderer from "./app/PageRenderer";
@@ -113,10 +114,7 @@ function AppContent(): JSX.Element {
     };
   }, []);
 
-  const isPublicPage =
-    pageKey === "landing" || pageKey === "about" || pageKey === "login" || pageKey === "signup" ||
-    pageKey === "trust" || pageKey === "methodology" || pageKey === "validation" || pageKey === "scanner" ||
-    pageKey === "rankings";
+  const isPublicPage = PUBLIC_PAGES.includes(pageKey);
   const isAuthLoading = loading;
   const isAuthed = isAuthenticated && !!user;
   const activePageKey = !isPublicPage && !isAuthed ? "login" : pageKey;
