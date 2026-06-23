@@ -27,10 +27,12 @@ export function loadStockEdgeConfig(): StockEdgeConfig {
   return {
     enabled: boolFromEnv("STOCKEDGE_ENABLED"),
     accountId: process.env.STOCKEDGE_ACCOUNT_ID,
-    accessSecret: process.env.STOCKEDGE_ACCESS_TOKEN,
-    baseUrl: process.env.STOCKEDGE_BASE_URL,
+    password: process.env.STOCKEDGE_PASSWORD,
+    baseUrl: process.env.STOCKEDGE_BASE_URL || "https://web.stockedge.com",
+    loginUrl: process.env.STOCKEDGE_LOGIN_URL || process.env.STOCKEDGE_BASE_URL || "https://web.stockedge.com",
     timeoutMs: intFromEnv("STOCKEDGE_TIMEOUT_MS", 15_000),
     rateLimitPerMinute: intFromEnv("STOCKEDGE_RATE_LIMIT_PER_MINUTE", 20),
+    sessionTtlSeconds: intFromEnv("STOCKEDGE_SESSION_TTL_SECONDS", 3_600),
     cacheTtlSeconds: {
       ...DEFAULT_TTLS,
       price: intFromEnv("STOCKEDGE_PRICE_TTL_SECONDS", DEFAULT_TTLS.price),
@@ -47,9 +49,11 @@ export function summarizeStockEdgeConfig(config = loadStockEdgeConfig()): Record
   return {
     enabled: config.enabled,
     hasAccountId: Boolean(config.accountId),
-    hasAccessToken: Boolean(config.accessSecret),
+    hasPassword: Boolean(config.password),
     hasBaseUrl: Boolean(config.baseUrl),
+    hasLoginUrl: Boolean(config.loginUrl),
     timeoutMs: config.timeoutMs,
     rateLimitPerMinute: config.rateLimitPerMinute,
+    sessionTtlSeconds: config.sessionTtlSeconds,
   };
 }

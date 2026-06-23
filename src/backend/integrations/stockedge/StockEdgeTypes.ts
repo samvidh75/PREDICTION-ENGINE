@@ -20,10 +20,12 @@ export type StockEdgeStatus =
 export interface StockEdgeConfig {
   enabled: boolean;
   accountId?: string;
-  accessSecret?: string;
+  password?: string;
   baseUrl?: string;
+  loginUrl?: string;
   timeoutMs: number;
   rateLimitPerMinute: number;
+  sessionTtlSeconds: number;
   cacheTtlSeconds: Record<StockEdgeLayer, number>;
 }
 
