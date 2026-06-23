@@ -25,10 +25,15 @@ describe("runScanner", () => {
     expect(results[0].rank).toBe(1);
   });
 
-  it("returns Research signals pending for companies without required features", () => {
+  it("omits companies without the required ranking evidence", () => {
     const results = runScanner("Quality compounders", [noDataCompany]);
-    expect(results[0].conviction).toBe("Research signals pending");
-    expect(results[0].score).toBeNull();
+    expect(results).toEqual([]);
+  });
+
+  it("deduplicates canonical symbols before ranking", () => {
+    const results = runScanner("Quality compounders", [goodCompany, { ...goodCompany, companyName: "Duplicate" }]);
+    expect(results).toHaveLength(1);
+    expect(results[0].symbol).toBe("TCS");
   });
 
   it("all scanner presets have valid definitions", () => {

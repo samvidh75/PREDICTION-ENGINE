@@ -11,6 +11,10 @@ export interface StockQuote {
   updatedAt?: string;
   /** Local retrieval timestamp. Must not be presented as a market update time. */
   retrievedAt?: string;
+  asOf?: string | null;
+  source?: "provider" | "daily_prices";
+  freshness?: "current" | "delayed" | "unknown";
+  delayed?: boolean;
 }
 
 export interface CompanyMetadata {

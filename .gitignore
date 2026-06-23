@@ -77,8 +77,12 @@ src/components/src/
 # Stray artifacts
 dashboard.png
 opencode.json
-:memory:
+:memory*
 scripts/dump-keymetrics.ts
 scripts/test-indianapi-keys.ts
 reports/frontend-rebuild/*
 reports/track-8d/*
+:memory*
+artifacts/
+tmp-debug.html
+:memory:*

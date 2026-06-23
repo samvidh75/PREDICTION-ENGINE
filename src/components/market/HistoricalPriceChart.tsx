@@ -103,12 +103,11 @@ export function HistoricalPriceChart({ symbol, points, loading = false }: Histor
         }} onPointerLeave={() => setActiveIndex(null)}>
           <defs>
             <linearGradient id={`price-area-${symbol}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={accent} stopOpacity=".22" /><stop offset="100%" stopColor={accent} stopOpacity=".01" /></linearGradient>
-            <filter id={`line-glow-${symbol}`} x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
           </defs>
           {chart.yTicks.map((tick) => <g key={tick.price}><line x1={PAD.left} x2={WIDTH - PAD.right} y1={tick.y} y2={tick.y} stroke="rgba(100,116,139,.14)" strokeDasharray="3 5" /><text x={PAD.left - 10} y={tick.y + 4} textAnchor="end" fill="#64748B" fontSize="10" fontFamily="Geist Mono">{money(tick.price, true)}</text></g>)}
           {chart.xIndexes.map((index) => <text key={index} x={chart.coords[index].x} y={HEIGHT - 10} textAnchor={index === 0 ? "start" : index === series.length - 1 ? "end" : "middle"} fill="#64748B" fontSize="10" fontFamily="Geist">{dateLabel(series[index].date)}</text>)}
           <path d={chart.area} fill={`url(#price-area-${symbol})`} />
-          <path d={chart.line} fill="none" stroke={accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter={`url(#line-glow-${symbol})`} />
+          <path d={chart.line} fill="none" stroke={accent} strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
           {inspectedCoord && <g><line x1={inspectedCoord.x} x2={inspectedCoord.x} y1={PAD.top} y2={HEIGHT - PAD.bottom} stroke="#475569" strokeWidth="1" strokeDasharray="3 4" /><circle cx={inspectedCoord.x} cy={inspectedCoord.y} r="7" fill="white" stroke={accent} strokeWidth="2.5" /><circle cx={inspectedCoord.x} cy={inspectedCoord.y} r="2.5" fill={accent} /></g>}
         </svg>
         <div className="grid grid-cols-3 gap-2 px-3 pb-3 sm:px-5">

@@ -6,6 +6,8 @@ import { ProductPanel } from "../product/ProductUI";
 interface TechnicalIntelligencePanelProps {
   input?: Partial<TechnicalInput>;
   view?: TechnicalIntelligenceView;
+  asOf?: string | null;
+  delayed?: boolean;
 }
 
 const STATE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -22,7 +24,7 @@ const STATUS_ICONS: Record<string, React.ElementType> = {
   risk: TrendingDown,
 };
 
-export default function TechnicalIntelligencePanel({ input, view }: TechnicalIntelligencePanelProps) {
+export default function TechnicalIntelligencePanel({ input, view, asOf, delayed = false }: TechnicalIntelligencePanelProps) {
   const techView = view ?? buildTechnicalIntelligence({
     priceHistory: input?.priceHistory ?? [],
     momentumScore: input?.momentumScore ?? null,
@@ -61,6 +63,9 @@ export default function TechnicalIntelligencePanel({ input, view }: TechnicalInt
           {techView.state === "Risk rising" && <AlertTriangle className="h-3 w-3" />}
           {techView.state}
         </span>
+      </div>
+      <div className={`mt-2 text-[10px] ${delayed ? "text-amber-700" : "text-[var(--color-text-muted)]"}`}>
+        {asOf ? `Calculated from prices through ${asOf}` : "Source date unavailable"}{delayed ? " · delayed data" : ""}
       </div>
 
       {techView.score !== null && (

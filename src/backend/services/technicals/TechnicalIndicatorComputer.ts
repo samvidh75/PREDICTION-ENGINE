@@ -1,4 +1,5 @@
 import type { OhlcvPoint, TechnicalIndicatorKey, TechnicalIndicatorSnapshot } from "../../../shared/technicals/TechnicalIndicatorTypes";
+import { isIndianTradingSessionDate } from "../../../shared/market/IndianTradingCalendar";
 
 function sma(values: number[], period: number): (number | null)[] {
   const result: (number | null)[] = [];
@@ -241,7 +242,19 @@ export function computeTechnicalIndicators(symbol: string, candles: OhlcvPoint[]
     return { snapshot: { symbol, asOf: candles[0]?.date ?? "", indicators: {}, states: {}, computedAt: new Date().toISOString() }, insufficientHistory: true };
   }
 
-  const sorted = [...candles].sort((a, b) => a.date.localeCompare(b.date));
+  const nowDate = new Date().toISOString().slice(0, 10);
+  const byDate = new Map<string, OhlcvPoint>();
+  for (const candle of candles) {
+    const date = candle.date.slice(0, 10);
+    if (!isIndianTradingSessionDate(date) || date > nowDate) continue;
+    if (![candle.open, candle.high, candle.low, candle.close, candle.volume].every(Number.isFinite)) continue;
+    if (candle.close <= 0 || candle.high < candle.low || candle.close > candle.high || candle.close < candle.low) continue;
+    byDate.set(date, { ...candle, date });
+  }
+  const sorted = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+  if (sorted.length < 2) {
+    return { snapshot: { symbol, asOf: sorted[0]?.date ?? "", indicators: {}, states: {}, computedAt: new Date().toISOString() }, insufficientHistory: true };
+  }
   const closes = sorted.map((c) => c.close);
   const volumes = sorted.map((c) => c.volume);
   const last = sorted[sorted.length - 1];

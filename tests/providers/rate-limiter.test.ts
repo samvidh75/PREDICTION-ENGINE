@@ -10,6 +10,8 @@ async function buildApp() {
   });
   app.get('/api/market-data/quote', async () => ({ ok: true }));
   app.get('/api/admin/ingestion/run', async () => ({ ok: true }));
+  app.get('/api/search/universal', async () => ({ ok: true }));
+  app.get('/api/research/scanner', async () => ({ ok: true }));
   return app;
 }
 
@@ -42,6 +44,21 @@ describe('rate limiter route family contract', () => {
       expect(limited.statusCode).toBe(429);
       expect(JSON.parse(limited.body)).toMatchObject({ family: 'admin-ingestion' });
       expect(limited.headers['retry-after']).toBeDefined();
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('keeps search and research reads in separate higher-capacity families', async () => {
+    const app = await buildApp();
+    try {
+      for (let index = 0; index < 60; index++) {
+        expect((await app.inject(`/api/research/scanner?nonce=${index}`)).statusCode).toBe(200);
+      }
+      expect((await app.inject('/api/research/scanner')).statusCode).toBe(429);
+      const search = await app.inject('/api/search/universal?query=RELIANCE');
+      expect(search.statusCode).toBe(200);
+      expect(search.headers['x-ratelimit-limit']).toBe('90');
     } finally {
       await app.close();
     }

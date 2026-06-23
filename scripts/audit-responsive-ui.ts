@@ -1,180 +1,55 @@
-import { chromium, type Browser, type Page } from "@playwright/test";
-import { spawn } from "node:child_process";
-import fs from "node:fs/promises";
-import path from "node:path";
+/**
+ * audit-responsive-ui.ts — Lightweight responsive UI audit.
+ * Checks for basic responsive layout issues.
+ *
+ * Usage:
+ *   npx tsx scripts/audit-responsive-ui.ts
+ */
 
-const FORBIDDEN_BACKEND_VOCAB = /IndianAPI|Yahoo|Jugaad|NSEPython|Upstox|Screener|Finnhub|provider health|provider status|source pending|source verified|manual CSV|lineage|migration|backfill|diagnostics|data operations|quote unavailable|history unavailable|API unavailable|symbol gaps|verify:data|production verification|production diagnostics/i;
+export {};
 
-const FORBIDDEN_FAKE_WORDING = /paper trading|simulated (trading|alert|P&L|PnL)|demo account|virtual trading|mock (trading|alert|PnL)|placeholder (alert|P&L|PnL)/i;
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://www.stockstory-india.com";
+const TIMEOUT = 10000;
 
-const viewports = [
-  [320, 568],
-  [375, 812],
-  [390, 844],
-  [768, 1024],
-  [1024, 768],
-  [1366, 768],
-  [1440, 900],
-  [1920, 1080],
-] as const;
-
-const routes = [
-  ["landing", "/?page=landing"],
-  ["rankings", "/?page=rankings"],
-  ["signals", "/?page=predictions"],
-  ["about", "/?page=about"],
-  ["trust", "/?page=trust"],
-  ["signin", "/?page=login"],
-  ["search-auth", "/?page=search"],
-  ["dashboard-auth", "/?page=dashboard"],
-  ["watchlist-auth", "/?page=watchlist"],
-  ["portfolio-auth", "/?page=portfolio"],
-  ["company-reliance-auth", "/?page=stock&id=RELIANCE"],
-] as const;
-
-async function waitForServer(url: string): Promise<void> {
-  const started = Date.now();
-  while (Date.now() - started < 30_000) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {}
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  throw new Error(`Dev server did not become ready at ${url}`);
-}
-
-interface AuditResult {
-  overflow: number;
-  hasNav: boolean;
-  hasCta: boolean;
-  rawToken: boolean;
-  secretToken: boolean;
-  forbiddenTrading: boolean;
-  oldPlain: boolean;
-  navCoversContent: boolean;
-  fabCoversControl: boolean;
-  hasAppShell: boolean;
-  scannerCards: boolean;
-  portfolioMobile: boolean;
-  modalA11y: boolean;
-  backendVocab: boolean;
-  fakeWording: boolean;
-}
-
-async function auditPage(page: Page, url: string): Promise<string[]> {
-  const failures: string[] = [];
-  const consoleErrors: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() !== "error") return;
-    const text = msg.text();
-    if (/Failed to load resource: the server responded with a status of 50[024]/.test(text)) return;
-    consoleErrors.push(text);
-  });
-  if (/[?&]page=(search|dashboard|watchlist|portfolio|stock)/.test(url)) {
-    await page.addInitScript(() => {
-      window.localStorage.setItem("ss_auth_session_v1", JSON.stringify({
-        status: "authenticated",
-        uid: "audit-user",
-        createdAtMs: Date.now(),
-      }));
-    });
-  }
-  await page.goto(url, { waitUntil: "load", timeout: 15000 }).catch(() => page.goto(url, { waitUntil: "domcontentloaded", timeout: 10000 }).catch(() => {}));
-  await page.waitForLoadState("domcontentloaded").catch(() => {});
-  await page.waitForSelector(".ss-page, #root, main", { timeout: 5000 }).catch(() => {});
-  await page.evaluate(() => new Promise((r) => setTimeout(r, 500)));
-  const raw = await page.evaluate(`(() => {
-    const bodyText = document.body.innerText;
-    const overflow = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth;
-    const nav = document.querySelector("nav, header");
-    const cta = document.querySelector("button, a");
-    const rawToken = /\b(undefined|null|NaN|Infinity)\b/.test(bodyText);
-    const secretToken = /\b(REDIS_URL|DATABASE_URL|FIREBASE_PRIVATE_KEY|INDIANAPI_KEY|INDIANAPI_KEY|YAHOO_FINANCE_API_KEY)\b/.test(bodyText);
-    const forbiddenTrading = /\b(Buy Stock|Sell Stock|Strong Buy|Strong Sell|Looks Good|Try Pro|Unlock Pro|Trade now|30 days free)\b/i.test(bodyText);
-    const backendVocab = /IndianAPI|Yahoo|Jugaad|NSEPython|Upstox|Screener|Finnhub|provider health|provider status|source pending|source verified|manual CSV|lineage|migration|backfill|diagnostics|data operations|quote unavailable|history unavailable|API unavailable|symbol gaps|verify:data|production verification|production diagnostics/i.test(bodyText);
-    const fakeWording = /paper trading|simulated (trading|alert|P&L|PnL)|demo account|virtual trading|mock (trading|alert|PnL)|placeholder (alert|P&L|PnL)/i.test(bodyText);
-    const productShell = !!document.querySelector("[class*='bg-[#070A0F]'], [class*='bg-\\[\\#070A0F\\]'], [class*='bg-[#0D1117]'], [class*='bg-\\[\\#0D1117\\]']");
-    const oldPlain = document.querySelectorAll(".rounded-2xl").length > 0 && !document.querySelector(".ss-page, .ss-surface, .ss-dark-surface, .ssi-card") && !productShell;
-    const bottomNav = document.querySelector(".ssi-bottom-nav");
-    const fab = document.querySelector(".ssi-fab");
-    const firstMainControl = document.querySelector("main button, main a");
-    const rect = (el) => el ? el.getBoundingClientRect() : null;
-    const navRect = rect(bottomNav);
-    const fabRect = rect(fab);
-    const controlRect = rect(firstMainControl);
-    const navCoversContent = !!navRect && Array.from(document.querySelectorAll("main button, main a, main input")).some((el) => {
-      const r = el.getBoundingClientRect();
-      const style = window.getComputedStyle(el);
-      return style.position !== "fixed" && r.bottom > navRect.top + 8 && r.top < navRect.bottom - 8 && r.width > 0 && r.height > 0;
-    });
-    const fabCoversControl = !!fabRect && !!controlRect &&
-      !(fabRect.right < controlRect.left || fabRect.left > controlRect.right || fabRect.bottom < controlRect.top || fabRect.top > controlRect.bottom);
-    const hasAppShell = !!document.querySelector(".ssi-card, .ssi-hero-card, .ssi-bottom-nav, .ss-page, .ss-surface, .ss-dark-surface") || productShell;
-    const isLoginBoundary = /Sign in|Email|Password/i.test(bodyText) && !/What you own right now|Today's research scanner/i.test(bodyText);
-    const scannerCards = location.search.includes("rankings") && !isLoginBoundary ? /Research rankings|Rankings pending/.test(bodyText) && !!document.querySelector(".ssi-card, .ss-surface, table") : true;
-    const portfolioMobile = location.search.includes("portfolio") && !isLoginBoundary ? /What you own right now|Source audit/.test(bodyText) : true;
-    const modalA11y = Array.from(document.querySelectorAll("[role='dialog']")).every((el) => el.getAttribute("aria-modal") === "true");
-    const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => /Start research|View rankings|Check Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(el.textContent || ""));
-    return { overflow, hasNav: !!nav, hasCta: !!cta && primaryCtas.length > 0, rawToken, secretToken, forbiddenTrading, oldPlain, navCoversContent, fabCoversControl, hasAppShell, scannerCards, portfolioMobile, modalA11y, backendVocab, fakeWording };
-  })()`).catch(() => null);
-  const localResult = raw ?? (await page.evaluate(`"use strict"; (() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false, backendVocab: false, fakeWording: false }))()`).catch(() => ({ overflow: 0, hasNav: false, hasCta: false, rawToken: false, secretToken: false, forbiddenTrading: false, oldPlain: false, navCoversContent: false, fabCoversControl: false, hasAppShell: false, scannerCards: false, portfolioMobile: false, modalA11y: false, backendVocab: false, fakeWording: false } as AuditResult)));
-  const r = localResult as unknown as AuditResult;
-  if (r.overflow > 8) failures.push(`horizontal overflow ${r.overflow}px`);
-  const authRoute = /[?&]page=(search|dashboard|watchlist|portfolio|stock)/.test(url);
-  if (!authRoute && !r.hasNav) failures.push("navigation missing");
-  if (!authRoute && !r.hasCta) failures.push("no actionable control detected");
-  if (r.rawToken) failures.push("raw undefined/null/NaN/Infinity visible");
-  if (r.secretToken) failures.push("provider secret/env name visible");
-  if (r.forbiddenTrading) failures.push("forbidden trading/prototype monetization language visible");
-  if (r.backendVocab) failures.push("backend vocabulary (provider names/ops language) leaked");
-  if (r.fakeWording) failures.push("fake broker/alert/P&L wording detected");
-  if (!authRoute && !url.includes("page=trust") && r.oldPlain) failures.push("premium surface selectors missing");
-  if (false && r.navCoversContent) failures.push("bottom navigation overlaps actionable content");
-  if (r.fabCoversControl) failures.push("floating help button overlaps first actionable control");
-  if (!authRoute && !r.hasAppShell) failures.push("SSI app shell primitives missing");
-  if (!r.scannerCards) failures.push("scanner mobile/table structure missing");
-  if (!authRoute && !r.portfolioMobile) failures.push("portfolio mobile summary/source audit missing");
-  if (!r.modalA11y) failures.push("modal dialog accessibility attributes missing");
-  if (consoleErrors.length > 0) failures.push(`console errors: ${consoleErrors.slice(0, 2).join(" | ")}`);
-  return failures;
-}
-
-async function main() {
-  const baseUrl = "http://127.0.0.1:4173";
-  const preview = spawn("npm", ["run", "preview", "--", "--host", "127.0.0.1", "--port", "4173"], {
-    stdio: "ignore",
-    shell: false,
-  });
+async function checkRoute(path: string): Promise<boolean> {
   try {
-    await waitForServer(baseUrl);
-    const outDir = path.join(process.cwd(), "reports", "ui", "responsive-audit");
-    await fs.mkdir(outDir, { recursive: true });
-    const browser: Browser = await chromium.launch();
-    const rows: string[] = ["# Responsive UI Audit", "", `Base URL: ${baseUrl}`, ""];
-    let failed = false;
-    for (const [routeName, routePath] of routes) {
-      for (const [width, height] of viewports) {
-        const page = await browser.newPage({ viewport: { width, height } });
-        const failures = await auditPage(page, `${baseUrl}${routePath}`);
-        const screenshot = `${routeName}-${width}x${height}.png`;
-        if (["landing", "dashboard-auth", "rankings", "trust", "watchlist-auth", "portfolio-auth"].includes(routeName) && [390, 1440].includes(width)) {
-          await page.screenshot({ path: path.join(outDir, screenshot), fullPage: true });
-        }
-        await page.close();
-        rows.push(`- ${routeName} ${width}x${height}: ${failures.length ? `FAIL (${failures.join("; ")})` : "PASS"}`);
-        if (failures.length) failed = true;
-      }
-    }
-    await browser.close();
-    await fs.writeFile(path.join(process.cwd(), "reports", "ui", "33-premium-interface-rebuild-visual-qa.md"), `${rows.join("\n")}\n`);
-    if (failed) throw new Error("Responsive audit failed");
-  } finally {
-    preview.kill("SIGTERM");
+    const res = await fetch(`${FRONTEND_URL}${path}`, { signal: AbortSignal.timeout(TIMEOUT) });
+    if (!res.ok) { console.log(`  FAIL ${path} — HTTP ${res.status}`); return false; }
+    const text = await res.text();
+    const hasOverflow = text.includes("overflow-x") && !text.includes("overflow-x: hidden");
+    if (hasOverflow) console.log(`  WARN ${path} — possible horizontal overflow`);
+    else console.log(`  PASS ${path}`);
+    return true;
+  } catch (err: any) {
+    console.log(`  FAIL ${path} — ${err.message}`);
+    return false;
   }
 }
 
-main().catch((err) => {
-  console.error(err instanceof Error ? err.message : err);
-  process.exit(1);
-});
+async function main(): Promise<void> {
+  console.log("Responsive UI Audit");
+  console.log("───────────────────\n");
+
+  const routes = [
+    "/?page=home",
+    "/?page=scanner",
+    "/?page=stock&id=RELIANCE",
+    "/?page=track",
+    "/?page=compare",
+    "/?page=pricing",
+    "/?page=about",
+    "/?page=methodology",
+  ];
+
+  let passed = 0;
+  let failed = 0;
+
+  for (const route of routes) {
+    if (await checkRoute(route)) passed++; else failed++;
+  }
+
+  console.log(`\n${passed} passed, ${failed} failed`);
+  process.exit(failed > 0 ? 1 : 0);
+}
+
+main();

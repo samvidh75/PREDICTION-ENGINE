@@ -11,7 +11,6 @@ import {
   productNavigate,
 } from "../components/product/ProductUI";
 import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
-import FeatureWelcomeTour from "../components/onboarding/FeatureWelcomeTour";
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
@@ -40,7 +39,6 @@ export function MarketIntelligenceVisual(): JSX.Element {
 export const PublicLandingPage: React.FC = () => {
   return (
     <ProductShell>
-      <FeatureWelcomeTour />
       <ProductPage>
         <ProductHero
           eyebrow="AI research for Indian equities"

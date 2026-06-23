@@ -62,14 +62,12 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
             <div className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">{label ?? "In review"}</div>
             {topDrivers.length > 0 && (
               <div className="mt-2 text-xs leading-5 text-emerald-600">
-                <span className="font-medium">Strengths: </span>
-                {topDrivers.map((d) => d.label).join(", ")}
+                <span className="font-medium">Strengths: </span>{topDrivers.length} dimension{topDrivers.length === 1 ? "" : "s"} above the review threshold
               </div>
             )}
             {topRisks.length > 0 && (
               <div className="text-xs leading-5 text-amber-600">
-                <span className="font-medium">Watch: </span>
-                {topRisks.map((d) => d.label).join(", ")}
+                <span className="font-medium">Watch: </span>{topRisks.length} dimension{topRisks.length === 1 ? "" : "s"} need closer review
               </div>
             )}
           </div>
@@ -78,6 +76,14 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
               {displayScore}
             </div>
           )}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Healthometer dimension summary">
+          {dimensions.map((dimension) => (
+            <div key={dimension.id} className="rounded-lg border border-[var(--color-border)] bg-slate-50 px-3 py-2">
+              <div className="text-[10px] font-medium text-[var(--color-text-muted)]">{dimension.label}</div>
+              <div className="mt-0.5 font-mono text-sm font-semibold text-[var(--color-text-primary)]">{typeof dimension.score === "number" && Number.isFinite(dimension.score) ? dimension.score : "—"}</div>
+            </div>
+          ))}
         </div>
         <div className="mt-3 flex gap-2">
           <button
