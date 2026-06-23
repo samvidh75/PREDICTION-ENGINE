@@ -15,10 +15,9 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('authenticated rankings route renders an intentional screen', async ({ page }) => {
+test('rankings route redirects to scanner for authenticated users', async ({ page }) => {
   await page.goto('/?page=rankings');
-  await expect(page.getByRole('heading', { name: 'Stock Rankings' })).toBeVisible();
-  await expect(page.getByText('Rankings pending')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'AI Scanner' })).toBeVisible();
 });
 
 test('desktop sidebar exposes grouped product workflows', async ({ page }) => {

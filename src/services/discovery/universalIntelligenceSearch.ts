@@ -1,5 +1,6 @@
 import type { DiscoveryEntity, DiscoveryResult, DiscoverySearchInput } from "./discoveryTypes";
 import { getDiscoveryIndex } from "./discoveryIndex";
+import { MasterCompanyRegistry } from "../data/MasterCompanyRegistry";
 
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
@@ -23,7 +24,6 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
   const titleLower = entity.title.toLowerCase();
   const narrativeLower = entity.shortNarrative.toLowerCase();
 
-  // Base “understanding” score when query is empty.
   const keywordHits = qTokens.length
     ? qTokens.reduce((acc, t) => {
         if (entity.keywords.some((k) => k.toLowerCase() === t)) return acc + 1.2;
@@ -48,10 +48,6 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
       .slice(0, 5);
   }
 
-  // Discovery Memory bias (gentle, not overpowering):
-  // - exact sector/theme title match => strong bias
-  // - relatedSectors match => medium bias
-  // - token overlap in keywords/title/narrative => soft bias
   let memoryBoost = 0;
 
   const entityRelatedSectors = entity.details?.relatedSectors ?? [];
@@ -63,7 +59,6 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
     memoryBoost += 0.35;
   }
 
-  // Soft token overlap bias:
   if (preferredSectors.length || preferredThemes.length) {
     const tokens = [...preferredSectors, ...preferredThemes].flatMap(titleTokens);
     const keywordLower = entity.keywords.map((k) => k.toLowerCase());
@@ -79,9 +74,6 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
 
   memoryBoost = Math.min(memoryBoost, 1.6);
 
-  // Confidence-driven modulation:
-  // - in elevated risk, prefer behavioural_condition + cautious/guarded themes
-  // - in stable conviction, prefer market_environment + institutional clarity
   const conf = input.confidenceState;
 
   let confidenceBoost = 0;
@@ -97,8 +89,7 @@ function scoreEntity(entity: DiscoveryEntity, input: DiscoverySearchInput): numb
     if (entity.kind === "market_narrative") confidenceBoost = 0.45;
   }
 
-  // Narrative key helps stable ordering but doesn't look like randomness.
-  const narrativeStability = (input.narrativeKey % 17) / 100; // 0..0.16
+  const narrativeStability = (input.narrativeKey % 17) / 100;
 
   const raw = keywordHits + confidenceBoost + memoryBoost + narrativeStability;
   return raw;
@@ -134,7 +125,6 @@ function buildMarketContext(entity: DiscoveryEntity, input: DiscoverySearchInput
   const hint = entity.details?.marketContextHint;
   if (hint) return hint;
 
-  // fallback: derived from confidence label
   return `Market context is treated as structure adaptation rather than prediction. Current label: ${input.marketStateLabel}.`;
 }
 
@@ -148,13 +138,84 @@ function progressivePick<T>(arr: T[], limit: number): T[] {
   return arr.slice(0, clamp(limit, 1, 30));
 }
 
+function getExactSymbolMatch(query: string, companies: any[]): number {
+  const normalizedQuery = normalizeQuery(query).replace(/[^a-z0-9]/g, "");
+  return companies.findIndex(({ entry }) => {
+    const symbol = normalizeQuery(entry.symbol).replace(/[^a-z0-9]/g, "");
+    const company = normalizeQuery(entry.companyName).replace(/[^a-z0-9]/g, "");
+    return normalizedQuery === symbol || normalizedQuery === company;
+  });
+}
+
 export function universalIntelligenceSearch(input: DiscoverySearchInput): DiscoveryResult[] {
   const index = getDiscoveryIndex();
-
-  // If query is empty, we still surface understanding (curiosity-first).
   const queryIsEmpty = !input.query.trim();
+  const normalizedQuery = normalizeQuery(input.query).replace(/[^a-z0-9]/g, "");
 
-  // Score all entities (query empty still gets Discovery Memory bias + confidence modulation)
+  const allEntries = MasterCompanyRegistry.getInstance().getAllEntries();
+  const stockMatches: DiscoveryResult[] = queryIsEmpty ? [] : allEntries
+    .map((entry) => {
+      const symbol = normalizeQuery(entry.symbol).replace(/[^a-z0-9]/g, "");
+      const company = normalizeQuery(entry.companyName).replace(/[^a-z0-9]/g, "");
+      const exactSymbol = normalizedQuery === symbol;
+      const exactCompany = !exactSymbol && normalizedQuery === company;
+      const prefix = !exactSymbol && !exactCompany && (symbol.startsWith(normalizedQuery) || company.startsWith(normalizedQuery));
+      const contains = !exactSymbol && !exactCompany && !prefix && (symbol.includes(normalizedQuery) || company.includes(normalizedQuery));
+      const alias = !exactSymbol && !exactCompany && !prefix && !contains && entry.isin ? normalizeQuery(entry.isin).includes(normalizedQuery) : false;
+
+      let score = 0;
+      let matchType = "none";
+      if (exactSymbol) { score = 1000; matchType = "exact_symbol"; }
+      else if (exactCompany) { score = 900; matchType = "exact_company"; }
+      else if (prefix) { score = 80; matchType = "prefix"; }
+      else if (contains) { score = 60; matchType = "contains"; }
+      else if (alias) { score = 50; matchType = "alias"; }
+
+      return { entry, score, matchType };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score || (b.entry.marketCap ?? 0) - (a.entry.marketCap ?? 0))
+    .slice(0, 5)
+    .map(({ entry, matchType }) => ({
+      id: `stock_${entry.symbol}`,
+      kind: "stock" as const,
+      title: entry.companyName,
+      ticker: entry.symbol,
+      companyName: entry.companyName,
+      sector: entry.sector,
+      narrativeSummary: matchType === "exact_symbol" || matchType === "exact_company"
+        ? `${entry.symbol} · ${entry.exchange} · ${entry.industry}`
+        : `${entry.symbol} · ${entry.exchange} · ${entry.industry}`,
+      confidenceEnvironment: input.marketStateLabel,
+      marketContext: "Open the company research page for current, sourced evidence.",
+      relationshipIndicators: [entry.exchange, entry.sector, entry.industry],
+    }));
+
+  if (!queryIsEmpty && stockMatches.length > 0 && stockMatches[0].ticker) {
+    const topSymbol = stockMatches[0].ticker;
+    const exactIdx = allEntries.findIndex(e => normalizeQuery(e.symbol).replace(/[^a-z0-9]/g, "") === normalizedQuery);
+    if (exactIdx >= 0) {
+      const exactEntry = allEntries[exactIdx];
+      const exactResult: DiscoveryResult = {
+        id: `stock_${exactEntry.symbol}`,
+        kind: "stock" as const,
+        title: exactEntry.companyName,
+        ticker: exactEntry.symbol,
+        companyName: exactEntry.companyName,
+        sector: exactEntry.sector,
+        narrativeSummary: `${exactEntry.symbol} · ${exactEntry.exchange} · ${exactEntry.industry}`,
+        confidenceEnvironment: input.marketStateLabel,
+        marketContext: "Open the company research page for current, sourced evidence.",
+        relationshipIndicators: [exactEntry.exchange, exactEntry.sector, exactEntry.industry],
+      };
+      const existingIdx = stockMatches.findIndex(r => r.ticker === exactEntry.symbol);
+      if (existingIdx >= 0) {
+        stockMatches.splice(existingIdx, 1);
+      }
+      stockMatches.unshift(exactResult);
+    }
+  }
+
   const scored = index
     .map((e) => {
       const s = scoreEntity(e, input);
@@ -162,14 +223,13 @@ export function universalIntelligenceSearch(input: DiscoverySearchInput): Discov
     })
     .sort((a, b) => b.s - a.s);
 
-  // Adaptive output sizing: more when query exists, fewer when empty (reduce overload)
   const limit = queryIsEmpty ? 4 : 6;
 
   const picked = progressivePick(scored, limit).map((x) => x.e);
 
-  return picked.map((entity) => {
+  const narratives = picked.map((entity) => {
     const narrativeSummary = buildNarrativeSummary(entity, input);
-    const confidenceEnvironment = input.marketStateLabel; // educational label; we keep it consistent
+    const confidenceEnvironment = input.marketStateLabel;
     const marketContext = buildMarketContext(entity, input);
 
     return {
@@ -182,4 +242,8 @@ export function universalIntelligenceSearch(input: DiscoverySearchInput): Discov
       relationshipIndicators: buildRelationshipIndicators(entity),
     };
   });
+
+  const combined = [...stockMatches, ...narratives].slice(0, 8);
+
+  return combined;
 }

@@ -18,6 +18,71 @@ import { dbAdapter } from '../../../db/DatabaseAdapter';
 import { MigrationRunner } from '../../../db/MigrationRunner';
 import type { MigrationExecutionAdapter } from '../../../db/MigrationRunner';
 import { join } from 'path';
+import { query } from '../../../db/index';
+
+async function checkDataHealth(): Promise<{
+  ok: boolean;
+  state: "ok" | "degraded" | "not_ready";
+  coverageCount: number;
+  predictionCount: number;
+  pipelineFreshnessDays: number | null;
+  criticalTablesPresent: boolean;
+}> {
+  try {
+    const [covRes, predRes, pipeRes, tablesRes] = await Promise.all([
+      query(`SELECT COUNT(DISTINCT symbol) as cnt FROM financial_snapshots WHERE source_label IS NOT NULL`)
+        .catch(() => ({ rows: [{ cnt: 0 }] })),
+      query(`SELECT COUNT(*) as cnt FROM prediction_registry WHERE ranking_score IS NOT NULL`)
+        .catch(() => ({ rows: [{ cnt: 0 }] })),
+      query(`SELECT MAX(ingestion_timestamp) as latest FROM financial_snapshots`)
+        .catch(() => ({ rows: [{ latest: null }] })),
+      query(`SELECT COUNT(*) as cnt FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('symbols', 'financial_snapshots', 'daily_prices', 'prediction_registry')`)
+        .catch(() => ({ rows: [{ cnt: 0 }] })),
+    ]);
+
+    const coverageCount = Number(covRes.rows?.[0]?.cnt ?? 0);
+    const predictionCount = Number(predRes.rows?.[0]?.cnt ?? 0);
+    const latestIngestion = pipeRes.rows?.[0]?.latest;
+    const criticalTablesPresent = Number(tablesRes.rows?.[0]?.cnt ?? 0) >= 4;
+
+    let pipelineFreshnessDays: number | null = null;
+    if (latestIngestion) {
+      pipelineFreshnessDays = Math.round((Date.now() - new Date(latestIngestion).getTime()) / 86400000);
+    }
+
+    const hasCoverage = coverageCount > 0;
+    const hasPredictions = predictionCount > 0;
+    const pipelineFresh = pipelineFreshnessDays === null || pipelineFreshnessDays <= 7;
+    const tablesOk = criticalTablesPresent;
+
+    let state: "ok" | "degraded" | "not_ready";
+    if (hasCoverage && hasPredictions && pipelineFresh && tablesOk) {
+      state = "ok";
+    } else if (!hasCoverage && !hasPredictions && !tablesOk) {
+      state = "not_ready";
+    } else {
+      state = "degraded";
+    }
+
+    return {
+      ok: state === "ok",
+      state,
+      coverageCount,
+      predictionCount,
+      pipelineFreshnessDays,
+      criticalTablesPresent,
+    };
+  } catch {
+    return {
+      ok: false,
+      state: "not_ready",
+      coverageCount: 0,
+      predictionCount: 0,
+      pipelineFreshnessDays: null,
+      criticalTablesPresent: false,
+    };
+  }
+}
 
 const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   // ── /healthz — Liveness only ──────────────────────────────────
@@ -34,10 +99,8 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const policy = loadDatabasePolicy();
     const diag = dbAdapter.diagnostics();
 
-    // Database readiness
     const dbOk = diag.ready && diag.kind !== 'unavailable';
 
-    // Migration status
     let migrationStatus: {
       ok: boolean;
       latestAppliedId: string | null;
@@ -77,23 +140,21 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         appliedCount: 0,
         pendingCount: 0,
         checksumMismatch: false,
-        detail: `Migration status check failed: ${err instanceof Error ? err.message : String(err)}`,
-      };
+        detail: 'Migration status unavailable — db not initialized',
+      } as typeof migrationStatus;
     }
 
-    // Cache — explicitly optional
     const cacheOk = true;
     const cacheRequired = false;
-
-    // Configuration
     const configOk = diag.kind !== 'unavailable' || diag.requestedAdapter === 'sqlite';
 
-    // Overall readiness — DB connected + all migrations applied
-    // Checksum mismatch is non-fatal (migrations are applied, DB serves traffic)
-    const overallOk = dbOk && migrationStatus.appliedCount > 0 && migrationStatus.pendingCount === 0;
+    const dataHealth = await checkDataHealth();
+
+    const overallOk = dbOk && migrationStatus.appliedCount > 0 && migrationStatus.pendingCount === 0 && dataHealth.state !== "not_ready";
 
     const body = {
       ok: overallOk,
+      state: !dbOk ? "not_ready" : dataHealth.state,
       service: 'stockstory-backend',
       database: {
         kind: diag.kind,
@@ -112,15 +173,15 @@ const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         checksumMismatch: migrationStatus.checksumMismatch,
         detail: migrationStatus.detail,
       },
-      cache: {
-        required: cacheRequired,
-        ok: cacheOk,
-        detail: null,
+      data: {
+        coverageCount: dataHealth.coverageCount,
+        predictionCount: dataHealth.predictionCount,
+        pipelineFreshnessDays: dataHealth.pipelineFreshnessDays,
+        criticalTablesPresent: dataHealth.criticalTablesPresent,
+        state: dataHealth.state,
       },
-      configuration: {
-        ok: configOk,
-        detail: null,
-      },
+      cache: { required: cacheRequired, ok: cacheOk, detail: null },
+      configuration: { ok: configOk, detail: null },
       at: Date.now(),
     };
 
