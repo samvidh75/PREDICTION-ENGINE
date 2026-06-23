@@ -588,7 +588,7 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
               `SELECT pe_ratio, pb_ratio, roe, roa, roce AS roic,
                       debt_to_equity, current_ratio, gross_margin,
                       operating_margin, revenue_growth, profit_growth,
-                      eps_growth, beta
+                      eps_growth, beta, dividend_yield, eps
                FROM financial_snapshots
                WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
                  AND pe_ratio IS NOT NULL
@@ -620,11 +620,14 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
           const pe = parseFinite(fsRow.pe_ratio);
           const pb = parseFinite(fsRow.pb_ratio);
           const ev = parseFinite(fsRow.ev_ebitda);
+          const dv = parseFinite(fsRow.dividend_yield);
+          const eps = parseFinite(fsRow.eps);
 
           let qualityScore: number | null = null;
-          if (roe !== null || gm !== null || om !== null) {
+          if (roe !== null || roa !== null || gm !== null || om !== null) {
             let scores = 0; let count = 0;
             if (roe !== null) { scores += roe >= 15 ? 75 : roe >= 10 ? 55 : roe >= 0 ? 40 : 15; count++; }
+            if (roa !== null) { scores += roa >= 0.15 ? 75 : roa >= 0.10 ? 55 : roa >= 0.07 ? 45 : roa >= 0.04 ? 35 : 20; count++; }
             if (gm !== null) { scores += gm >= 40 ? 75 : gm >= 20 ? 55 : 30; count++; }
             if (om !== null) { scores += om >= 15 ? 75 : om >= 8 ? 55 : 30; count++; }
             if (cr !== null) { scores += cr >= 1.5 ? 70 : cr >= 1 ? 50 : 25; count++; }
@@ -633,10 +636,11 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
           }
 
           let valuationScore: number | null = null;
-          if (pe !== null || pb !== null || ev !== null) {
+          if (pe !== null || pb !== null || ev !== null || dv !== null) {
             let scores = 0; let count = 0;
             if (pe !== null && pe > 0) { scores += pe <= 20 ? 75 : pe <= 35 ? 55 : pe <= 50 ? 35 : 20; count++; }
             if (pb !== null && pb > 0) { scores += pb <= 2 ? 75 : pb <= 4 ? 55 : pb <= 7 ? 35 : 20; count++; }
+            if (dv !== null) { scores += dv >= 0.04 ? 75 : dv >= 0.02 ? 60 : dv >= 0.01 ? 45 : dv > 0 ? 30 : 0; count++; }
             valuationScore = count > 0 ? Math.round(scores / count) : null;
           }
 
