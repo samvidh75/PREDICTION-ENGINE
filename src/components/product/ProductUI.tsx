@@ -26,7 +26,7 @@ export function ProductShell({ children, className = "" }: { children: React.Rea
 
 export function ProductPage({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" }): JSX.Element {
   const Component = as;
-  return <Component className={`mx-auto w-full max-w-[1260px] px-4 py-6 sm:px-6 lg:px-8 ${className}`}>{children}</Component>;
+  return <Component className={`mx-auto w-full max-w-[1180px] px-4 py-6 sm:px-6 lg:px-8 ${className}`}>{children}</Component>;
 }
 
 export function ProductPageHeader({
@@ -62,13 +62,13 @@ export function ProductSection({ children, className = "" }: { children: React.R
 
 export function ProductPanel({ children, className = "", as = "div" }: { children: React.ReactNode; className?: string; as?: "div" | "section" | "article" }): JSX.Element {
   const Component = as;
-  return <Component className={`rounded-[20px] border border-[var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,.96),rgba(248,250,252,.88))] shadow-[0_12px_34px_rgba(15,23,42,.075),inset_0_1px_0_rgba(255,255,255,.95)] backdrop-blur-[18px] transition-all duration-300 hover:shadow-[0_20px_46px_rgba(15,23,42,.105),inset_0_1px_0_white] ${className}`}>{children}</Component>;
+  return <Component className={`rounded-[18px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_12px_34px_rgba(15,23,42,.075),inset_0_1px_0_rgba(255,255,255,.95)] ${className}`}>{children}</Component>;
 }
 
 export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?: string; title: string; body: string; actions?: React.ReactNode; aside?: React.ReactNode }): JSX.Element {
   return (
-    <section className="grid gap-6 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-12">
-      <div className="relative flex min-h-[360px] flex-col justify-center overflow-hidden rounded-[28px] border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,246,255,.9))] p-6 shadow-[0_28px_70px_rgba(30,64,175,.13),inset_0_1px_0_white] md:p-9">
+    <section className="grid gap-6 py-6 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-10">
+      <div className="relative flex min-h-[320px] flex-col justify-center overflow-hidden rounded-[24px] border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,246,255,.9))] p-6 shadow-[0_28px_70px_rgba(30,64,175,.13),inset_0_1px_0_white] md:p-8">
         <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-violet-400/10 blur-3xl" />
         {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">{eyebrow}</div>}
         <h1 className="relative max-w-3xl text-3xl font-semibold leading-[1.04] tracking-[-.045em] text-[var(--color-text-primary)] sm:text-4xl md:text-5xl">{title}</h1>
