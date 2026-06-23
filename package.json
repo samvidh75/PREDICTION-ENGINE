@@ -132,6 +132,8 @@
     "ingest:authorized:quotes": "tsx scripts/ingest-authorized-quotes.ts",
     "audit:authorized:lineage": "tsx scripts/audit-authorized-provider-field-lineage.ts",
     "audit:authorized:coverage": "tsx scripts/audit-authorized-provider-coverage.ts",
+    "smoke:static-assets": "tsx scripts/smoke-static-assets.ts",
+    "audit:public-copy": "tsx scripts/audit-public-copy.ts",
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
     "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",

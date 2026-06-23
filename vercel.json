@@ -3,6 +3,28 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
+  "headers": [
+    {
+      "source": "/stockstory-mark.svg",
+      "headers": [
+        { "key": "Content-Type", "value": "image/svg+xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/favicon.svg",
+      "headers": [
+        { "key": "Content-Type", "value": "image/svg+xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -17,7 +39,11 @@
       "destination": "https://prediction-engine-production-f7a8.up.railway.app/readyz"
     },
     {
-      "source": "/((?!api|healthz|readyz).*)",
+      "source": "/stockstory-mark.svg",
+      "destination": "/stockstory-mark.svg"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
