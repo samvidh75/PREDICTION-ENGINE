@@ -131,7 +131,7 @@ export default function ScannerPage() {
       const data = res.data ?? [];
       setAllEntries(data);
       setResults(data);
-      setScannerMessage(res.message ?? (res.coverage && !res.coverage.complete ? `Showing ${res.coverage.returned} companies with sufficient evidence from ${res.coverage.evaluated} evaluated.` : null));
+      setScannerMessage(res.message ?? null);
     } catch {
       setAllEntries([]);
       setResults([]);
