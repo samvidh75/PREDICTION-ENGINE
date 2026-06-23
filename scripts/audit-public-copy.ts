@@ -71,7 +71,10 @@ function scanFile(filePath: string): FoundIssue[] {
 
   for (const entry of FORBIDDEN_TERMS) {
     for (let i = 0; i < lines.length; i++) {
-      if (entry.pattern.test(lines[i])) {
+      const line = lines[i];
+      // Skip import paths — they are never rendered in public UI
+      if (/^\s*import\s/.test(line)) continue;
+      if (entry.pattern.test(line)) {
         const trimmed = lines[i].trim().substring(0, 120);
         const isTestFile = filePath.includes('__tests__') || filePath.includes('.test.');
         const isReport = filePath.includes('reports/');
