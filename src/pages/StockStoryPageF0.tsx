@@ -328,8 +328,6 @@ export default function StockStoryPageF0(): JSX.Element {
                 priceChangePercent: quote.quote?.changePercent ?? null,
                 rsiValue: null, macdValue: null, distanceFrom52WeekHigh: null,
               }}
-              asOf={latestHistoryPoint?.date ?? null}
-              delayed={marketDataNeedsReview}
             />
             </div>
           </>
