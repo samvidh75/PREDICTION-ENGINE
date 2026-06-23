@@ -34,13 +34,18 @@ describe('HealthometerEngine', () => {
       const result = healthometerEngine.evaluate(makeInput());
       expect(result.overallScore).toBeGreaterThanOrEqual(0);
       expect(result.overallScore).toBeLessThanOrEqual(100);
-      expect(result.validDimensionCount).toBe(7);
-      expect(result.totalDimensionCount).toBe(7);
-      expect(result.dimensions).toHaveLength(7);
-      result.dimensions.forEach((d) => {
+      expect(result.validDimensionCount).toBe(8);
+      expect(result.totalDimensionCount).toBe(9);
+      expect(result.dimensions).toHaveLength(9);
+      const verifiedDims = result.dimensions.filter((d) => d.score !== null);
+      verifiedDims.forEach((d) => {
         expect(d.status).toBe('verified');
         expect(d.score).toBeGreaterThanOrEqual(0);
         expect(d.score).toBeLessThanOrEqual(100);
+      });
+      const insufficientDims = result.dimensions.filter((d) => d.score === null);
+      insufficientDims.forEach((d) => {
+        expect(d.status).toBe('insufficient');
       });
     });
 
@@ -115,7 +120,7 @@ describe('HealthometerEngine', () => {
       });
       const result = healthometerEngine.evaluate(input);
       expect(result.validDimensionCount).toBeGreaterThan(0);
-      expect(result.validDimensionCount).toBeLessThan(7);
+      expect(result.validDimensionCount).toBeLessThan(9);
       expect(result.dimensions.some((d) => d.status === 'insufficient')).toBe(true);
     });
 
