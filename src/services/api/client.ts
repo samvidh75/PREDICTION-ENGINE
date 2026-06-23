@@ -511,6 +511,24 @@ export interface InvestContextResponse {
   };
 }
 
+export interface NewsItemResponse {
+  headline: string;
+  publisher: string;
+  publishedAt: string;
+  summary: string;
+  whyItMatters: string;
+  url: string;
+  category: string;
+}
+
+export interface NewsResponse {
+  symbol: string;
+  items: NewsItemResponse[];
+  cachedAt: string;
+  cacheTtlHours: number;
+  error?: string;
+}
+
 // ── API Methods ──────────────────────────────────────────────────────
 
 export const api = {
@@ -613,6 +631,11 @@ export const api = {
   getInvestContext: (symbol: string) =>
     apiFetch<InvestContextResponse>(
       `/api/research/invest/${encodeURIComponent(symbol)}`,
+    ),
+
+  getNews: (symbol: string, options?: ApiRequestOptions) =>
+    apiFetch<NewsResponse>(
+      `/api/news/${encodeURIComponent(symbol)}`, options,
     ),
 
   // -- Watchlists (authenticated) --

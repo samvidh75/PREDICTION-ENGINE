@@ -3,9 +3,8 @@ import { STOCKEDGE_CODES, StockEdgeIntegrationError } from "./StockEdgeErrors";
 import { stockEdgeSessionStore } from "./StockEdgeSessionStore";
 import type { StockEdgeSession } from "./StockEdgeSessionStore";
 import type { StockEdgeConfig } from "./StockEdgeTypes";
-import { StockEdgePlaywrightAuth } from "./StockEdgePlaywrightAuth";
 
-export type StockEdgeLoginStrategy = "http_form" | "playwright" | "none";
+export type StockEdgeLoginStrategy = "http_form" | "none";
 
 function now(): string {
   return new Date().toISOString();
@@ -25,15 +24,9 @@ export interface StockEdgeLoginResult {
 
 export class StockEdgeAuth {
   private readonly config: StockEdgeConfig;
-  private playwrightEnabled: boolean;
 
   constructor(config?: StockEdgeConfig) {
     this.config = config ?? loadStockEdgeConfig();
-    this.playwrightEnabled = ["1", "true", "yes", "on"].includes((process.env.STOCKEDGE_PLAYWRIGHT_ENABLED ?? "").toLowerCase());
-  }
-
-  setPlaywrightEnabled(enabled: boolean): void {
-    this.playwrightEnabled = enabled;
   }
 
   configSummary(): Record<string, boolean | number> {
@@ -43,6 +36,8 @@ export class StockEdgeAuth {
       hasPassword: Boolean(this.config.password),
       hasBaseUrl: Boolean(this.config.baseUrl),
       hasLoginUrl: Boolean(this.config.loginUrl),
+      loginUrlExplicit: this.config.loginUrlExplicit,
+      hasLoginFormAction: Boolean(this.config.loginFormAction),
       timeoutMs: this.config.timeoutMs,
       rateLimitPerMinute: this.config.rateLimitPerMinute,
       sessionTtlSeconds: this.config.sessionTtlSeconds,
@@ -85,52 +80,46 @@ export class StockEdgeAuth {
       const session = await this.attemptHttpFormLogin();
       stockEdgeSessionStore.setSession(session);
       return { ok: true, strategy: "http_form", sessionCreated: true, mfaRequired: false };
-    } catch (httpError) {
-      if (httpError instanceof StockEdgeIntegrationError && httpError.code === STOCKEDGE_CODES.loginFailed && this.playwrightEnabled) {
-        try {
-          const pwAuth = new StockEdgePlaywrightAuth(this.config);
-          const pwSession = await pwAuth.login();
-          stockEdgeSessionStore.setSession(pwSession);
-          return { ok: true, strategy: "playwright", sessionCreated: true, mfaRequired: false };
-        } catch (pwError) {
-          if (pwError instanceof StockEdgeIntegrationError) {
-            const isMfa = pwError.code === STOCKEDGE_CODES.mfaRequired;
-            return { ok: false, strategy: "playwright", sessionCreated: false, mfaRequired: isMfa, errorCode: pwError.code };
-          }
-          return { ok: false, strategy: "playwright", sessionCreated: false, mfaRequired: false, errorCode: STOCKEDGE_CODES.loginFailed };
-        }
-      }
-      if (httpError instanceof StockEdgeIntegrationError) {
-        const isMfa = httpError.code === STOCKEDGE_CODES.mfaRequired;
-        return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: isMfa, errorCode: httpError.code };
+    } catch (error) {
+      if (error instanceof StockEdgeIntegrationError) {
+        return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: error.code === STOCKEDGE_CODES.mfaRequired, errorCode: error.code };
       }
       return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: false, errorCode: STOCKEDGE_CODES.loginFailed };
     }
   }
 
   private async attemptHttpFormLogin(): Promise<StockEdgeSession> {
-    const loginUrl = this.config.loginUrl || this.config.baseUrl || "https://web.stockedge.com";
     const baseUrl = this.config.baseUrl || "https://web.stockedge.com";
+
+    if (!this.config.loginUrlExplicit && !this.config.loginFormAction) {
+      throw new StockEdgeIntegrationError(
+        STOCKEDGE_CODES.discoveryRequired,
+        "StockEdge login endpoint not configured. Set STOCKEDGE_LOGIN_URL or STOCKEDGE_LOGIN_FORM_ACTION, or run endpoint discovery first.",
+      );
+    }
+
+    const loginUrl = this.config.loginUrl || baseUrl;
+    const formAction = this.config.loginFormAction || `${loginUrl}/api/login`;
+    const verifyUrl = `${baseUrl}/api/user/profile`;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs);
 
     try {
       const fetchImpl = globalThis.fetch;
+
       const loginPageResponse = await fetchImpl(loginUrl, {
         signal: controller.signal,
         redirect: "follow",
       });
-
       const setCookie = loginPageResponse.headers.get("set-cookie");
       const initialCookies = setCookie || "";
 
-      const formEndpoint = `${baseUrl}/api/login`;
       const formBody = new URLSearchParams();
       formBody.set("email", this.config.accountId!);
       formBody.set("password", this.config.password!);
 
-      const loginResponse = await fetchImpl(formEndpoint, {
+      const loginResponse = await fetchImpl(formAction, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -142,17 +131,16 @@ export class StockEdgeAuth {
         redirect: "follow",
       });
 
-      const responseCookies = loginResponse.headers.get("set-cookie") || initialCookies;
       const finalCookies = loginResponse.headers.get("set-cookie") || initialCookies;
 
       if (!finalCookies || finalCookies.length < 10) {
         throw new StockEdgeIntegrationError(
           STOCKEDGE_CODES.loginFailed,
-          "No session cookies returned from login",
+          "No session cookies returned from login — endpoint may need discovery",
         );
       }
 
-      const verifyResponse = await fetchImpl(`${baseUrl}/api/user/profile`, {
+      const verifyResponse = await fetchImpl(verifyUrl, {
         headers: { Cookie: finalCookies, Accept: "application/json" },
         signal: controller.signal,
       });

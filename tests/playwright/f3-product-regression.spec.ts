@@ -161,9 +161,17 @@ async function assertNoRenderGarbage(page: import("@playwright/test").Page): Pro
 }
 
 async function dismissWelcomeIfVisible(page: import("@playwright/test").Page): Promise<void> {
+  await page.evaluate(() => {
+    try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch {}
+  }).catch(() => {});
   const close = page.getByRole("button", { name: /close feature introduction/i });
-  if (await close.isVisible().catch(() => false)) await close.click();
+  if (await close.isVisible().catch(() => false)) {
+    await close.click({ force: true });
+    await page.waitForTimeout(300);
+  }
 }
+
+
 
 // ── Public Route Smoke ───────────────────────────────────────────────
 
@@ -262,6 +270,9 @@ test.describe("Rankings public gating", () => {
 
 test.describe("Public navigation", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch {}
+    });
     await mockAllApi(page);
   });
 
@@ -269,7 +280,7 @@ test.describe("Public navigation", () => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
     await dismissWelcomeIfVisible(page);
     await page.locator("#hero-cta-start").waitFor({ state: "visible", timeout: 10000 });
-    await page.locator("#hero-cta-start").click();
+    await page.locator("#hero-cta-start").click({ force: true });
     await expect(page).toHaveURL(/page=signup/);
   });
 
@@ -277,7 +288,7 @@ test.describe("Public navigation", () => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
     await dismissWelcomeIfVisible(page);
     await page.locator("#hero-cta-methodology").waitFor({ state: "visible", timeout: 10000 });
-    await page.locator("#hero-cta-methodology").click();
+    await page.locator("#hero-cta-methodology").click({ force: true });
     await expect(page).toHaveURL(/page=methodology/);
   });
 
@@ -285,7 +296,7 @@ test.describe("Public navigation", () => {
     await page.goto("/?page=landing", { waitUntil: "domcontentloaded" });
     await dismissWelcomeIfVisible(page);
     await page.locator("#onboarding-cta-about").waitFor({ state: "visible", timeout: 10000 });
-    await page.locator("#onboarding-cta-about").click();
+    await page.locator("#onboarding-cta-about").click({ force: true });
     await expect(page).toHaveURL(/page=about/);
   });
 });

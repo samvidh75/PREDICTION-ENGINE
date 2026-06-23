@@ -23,6 +23,8 @@ export interface StockEdgeConfig {
   password?: string;
   baseUrl?: string;
   loginUrl?: string;
+  loginFormAction?: string;
+  loginUrlExplicit: boolean;
   timeoutMs: number;
   rateLimitPerMinute: number;
   sessionTtlSeconds: number;
