@@ -1,68 +1,78 @@
 import React from "react";
-import { Bookmark, Eye, TrendingUp, Search, ArrowLeftRight } from "lucide-react";
-import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell, ProductPageHeader } from "../components/product/ProductUI";
+import { Bookmark, TrendingUp, Search, BarChart3 } from "lucide-react";
+import { productNavigate, ProductPage, ProductShell } from "../components/product/ProductUI";
+import { SectionHeader } from "../components/ui/SectionHeader";
 
 export default function TrackPage(): JSX.Element {
-  const sections = [
+  const actions = [
     {
-      id: "saved",
-      label: "Saved companies",
-      icon: <Bookmark className="h-4 w-4" />,
-      description: "Companies you've saved for review. Return to them when you're ready to go deeper.",
-      action: { label: "Search companies", page: "search" as const },
+      label: "Open AI Scanner",
+      icon: <BarChart3 className="h-4 w-4" />,
+      page: "scanner",
     },
     {
-      id: "changed",
-      label: "What changed",
-      icon: <TrendingUp className="h-4 w-4" />,
-      description: "Recent developments in companies you track. Stay informed without checking every day.",
-      action: { label: "Browse scanner", page: "scanner" as const },
-    },
-    {
-      id: "review",
-      label: "Review queue",
-      icon: <Eye className="h-4 w-4" />,
-      description: "Companies flagged for closer review based on recent signals or risk markers.",
-      action: { label: "View risk rising", page: "scanner" as const },
-    },
-    {
-      id: "compare",
-      label: "Compare companies",
-      icon: <ArrowLeftRight className="h-4 w-4" />,
-      description: "Evaluate companies side by side to find which thesis is stronger.",
-      action: { label: "Open compare", page: "compare" as const },
+      label: "Search company",
+      icon: <Search className="h-4 w-4" />,
+      page: "search",
     },
   ];
 
   return (
     <ProductShell>
-      <ProductPage>
-        <ProductPageHeader
-          title="Track your thesis"
-          subtitle="Save companies, revisit what changed, and decide what deserves another look."
-        />
+      <ProductPage className="max-w-[1180px]">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Track your thesis</h1>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            Save companies, revisit what changed, and decide what deserves another look.
+          </p>
+        </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {sections.map((section) => (
-            <ProductPanel key={section.id} className="p-5">
-              <div className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-600">
-                  {section.icon}
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{section.label}</h3>
-                  <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">{section.description}</p>
-                </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              id: "saved",
+              label: "Saved companies",
+              icon: <Bookmark className="h-5 w-5" />,
+              description: "Companies you return to for deeper research.",
+              action: "Search companies",
+              page: "search",
+            },
+            {
+              id: "changed",
+              label: "What changed",
+              icon: <TrendingUp className="h-5 w-5" />,
+              description: "Recent developments in companies you track.",
+              action: "Browse scanner",
+              page: "scanner",
+            },
+          ].map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => productNavigate(section.page)}
+              className="flex flex-col items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 text-left transition-colors hover:bg-[var(--color-surface-raised)]"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-blue-600">
+                {section.icon}
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{section.label}</h3>
+                <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">{section.description}</p>
               </div>
-              <div className="mt-4">
-                <ProductAction
-                  variant="secondary"
-                  onClick={() => productNavigate(section.action.page)}
-                >
-                  {section.action.label}
-                </ProductAction>
-              </div>
-            </ProductPanel>
+              <span className="mt-1 text-xs font-medium text-blue-600">{section.action} →</span>
+            </button>
+          ))}
+
+          {actions.map((a) => (
+            <button
+              key={a.page}
+              type="button"
+              onClick={() => productNavigate(a.page)}
+              className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--color-border)] bg-transparent p-5 text-left text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:border-blue-200 hover:text-[var(--color-text-primary)]"
+            >
+              {a.icon}
+              {a.label}
+            </button>
           ))}
         </div>
       </ProductPage>

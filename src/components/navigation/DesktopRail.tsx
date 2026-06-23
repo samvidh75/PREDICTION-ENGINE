@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Home, BarChart3, Search, Eye, ArrowLeftRight, DollarSign, BookOpen, Settings } from "lucide-react";
+import { Home, BarChart3, Search, Bookmark, ArrowLeftRight, DollarSign, BookOpen, Settings } from "lucide-react";
 import { NavLink } from "./NavLink";
 import StockStoryLogo from "../brand/StockStoryLogo";
 
@@ -14,7 +14,7 @@ const RAIL_ITEMS: RailItem[] = [
   { page: "dashboard", label: "Home", icon: <Home className="h-[18px] w-[18px]" />, primary: true },
   { page: "scanner", label: "AI Scanner", icon: <BarChart3 className="h-[18px] w-[18px]" />, primary: true },
   { page: "search", label: "Search", icon: <Search className="h-[18px] w-[18px]" />, primary: true },
-  { page: "track", label: "Track", icon: <Eye className="h-[18px] w-[18px]" />, primary: true },
+  { page: "track", label: "Track", icon: <Bookmark className="h-[18px] w-[18px]" />, primary: true },
   { page: "compare", label: "Compare", icon: <ArrowLeftRight className="h-[18px] w-[18px]" />, primary: false },
   { page: "pricing", label: "Pricing", icon: <DollarSign className="h-[18px] w-[18px]" />, primary: false },
   { page: "methodology", label: "Research standards", icon: <BookOpen className="h-[18px] w-[18px]" />, primary: false },
