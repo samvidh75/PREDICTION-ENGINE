@@ -170,9 +170,9 @@ export default function StockStoryPageF0(): JSX.Element {
             </div>
             <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[32px]">{identity.displayName}</h1>
             <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? `Quote updated ${quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}` : "Quote timestamp unavailable"}
+              {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? `Quote updated ${quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}` : "Price context being refreshed"}
               {latestHistoryPoint?.date ? ` · Chart through ${latestHistoryPoint.date}` : ""}
-              {quote.quote?.source ? ` · Source: ${quote.quote.source === "daily_prices" ? "verified daily close" : "live market feed"}` : ""}
+
             </p>
           </div>
 
