@@ -1,93 +1,75 @@
-/**
- * Upstox provider routes — token management and status.
- *
- * Routes:
- *   GET  /api/providers/upstox/status          — token presence, expiry, health (no secrets)
- *   POST /api/providers/upstox/token/request    — request token approval (7AM IST)
- *   GET/POST /api/providers/upstox/token/callback — OAuth callback handler (masks token)
- *
- * Security:
- *   - Never returns the raw access token.
- *   - Never logs the raw access token or client secret.
- *   - Sanitizes all provider errors before returning/logging.
- *   - Optional UPSTOX_NOTIFIER_SECRET validates callback origin.
- */
-
 import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 import crypto from "node:crypto";
+import { UpstoxConfig } from "../../integrations/upstox/UpstoxConfig";
+import { UpstoxTokenStore } from "../../integrations/upstox/UpstoxTokenStore";
+import { UpstoxOAuthService } from "../../integrations/upstox/UpstoxOAuthService";
+import { UpstoxSandboxClient } from "../../integrations/upstox/UpstoxSandboxClient";
+import { UpstoxClient } from "../../integrations/upstox/UpstoxClient";
+import { sanitizeErrorMessage } from "../../integrations/upstox/UpstoxErrors";
 
-interface TokenStatusResponse {
-  configured: boolean;
-  tokenPresent: boolean;
-  tokenExpiry: string | null;
-  tokenState: string;
-  lastVerified: string | null;
-  apiKeyConfigured: boolean;
-  clientSecretConfigured: boolean;
-  redirectUriConfigured: boolean;
-  healthStatus: string;
-}
-
-interface TokenRequestResponse {
-  status: string;
-  message: string;
-  authUrl: string | null;
-  requestedAt: string;
-}
-
-interface TokenCallbackResponse {
-  status: string;
-  message: string;
-  receivedAt: string;
-}
-
-/** In-memory token holder for the current process. Does NOT persist across restarts. */
-let currentAccessToken: string | null = null;
-let tokenReceivedAt: string | null = null;
-
-function trimmedEnv(name: string): string | undefined {
-  const value = process.env[name];
-  return value ? value.trim() : undefined;
-}
-
-function sanitizeError(message: string): string {
-  return message
-    .replace(/(token|access_token|refresh_token|code|client_secret|api_key|apikey)=([^&\s]+)/gi, "$1=[REDACTED]")
-    .replace(/bearer\s+[a-z0-9._~+/=-]+/gi, "Bearer [REDACTED]")
-    .replace(/authorization:\s*[^\s]+/gi, "authorization:[REDACTED]");
-}
+const STATE_TTL = 10 * 60 * 1000;
+const pendingStates = new Map<string, number>();
 
 function generateState(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
+function storeState(state: string): void {
+  pendingStates.set(state, Date.now());
+}
+
+function validateState(state: string | undefined): boolean {
+  if (!state) return false;
+  const ts = pendingStates.get(state);
+  if (!ts) return false;
+  if (Date.now() - ts > STATE_TTL) {
+    pendingStates.delete(state);
+    return false;
+  }
+  pendingStates.delete(state);
+  return true;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [state, ts] of pendingStates) {
+    if (now - ts > STATE_TTL) pendingStates.delete(state);
+  }
+}, 60_000);
+
 const upstoxRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
+  const config = UpstoxConfig.getInstance();
+  const tokenStore = UpstoxTokenStore.getInstance();
+  tokenStore.loadFromEnv();
+  const oauthService = new UpstoxOAuthService(config, tokenStore);
 
   app.get("/api/providers/upstox/status", async (_request, reply) => {
-    const accessToken = currentAccessToken ?? trimmedEnv("UPSTOX_ACCESS_TOKEN");
-    const apiKey = trimmedEnv("UPSTOX_API_KEY");
-    const clientSecret = trimmedEnv("UPSTOX_CLIENT_SECRET");
-    const redirectUri = trimmedEnv("UPSTOX_REDIRECT_URI");
+    const summary = config.getSummary();
+    const tokenStatus = tokenStore.getTokenStatus();
+    const maskedInfo = tokenStore.getMaskedInfo();
 
-    const response: TokenStatusResponse = {
-      configured: !!(apiKey && clientSecret),
-      tokenPresent: !!accessToken,
-      tokenExpiry: null,
-      tokenState: accessToken ? "present" : "missing",
-      lastVerified: tokenReceivedAt,
-      apiKeyConfigured: !!apiKey,
-      clientSecretConfigured: !!clientSecret,
-      redirectUriConfigured: !!redirectUri,
-      healthStatus: accessToken ? "token_available" : "token_missing",
-    };
-
-    return reply.send(response);
+    return reply.send({
+      configured: summary.hasApiKey && summary.hasClientSecret,
+      redirectConfigured: summary.hasRedirectUri,
+      tokenPresent: tokenStatus.live.present,
+      tokenState: tokenStatus.live.present ? "present" : "missing",
+      tokenExpiry: tokenStatus.live.expiresAt ? new Date(tokenStatus.live.expiresAt).toISOString() : null,
+      tokenMasked: maskedInfo.live,
+      sandboxEnabled: summary.sandboxEnabled,
+      sandboxTokenPresent: tokenStatus.sandbox.present,
+      sandboxTokenMasked: maskedInfo.sandbox,
+      marketDataEnabled: summary.marketDataEnabled,
+      orderSandboxEnabled: summary.orderSandboxEnabled,
+      apiKeyConfigured: summary.hasApiKey,
+      clientSecretConfigured: summary.hasClientSecret,
+      redirectUriConfigured: summary.hasRedirectUri,
+    });
   });
 
   app.post("/api/providers/upstox/token/request", async (request, reply) => {
-    const clientId = trimmedEnv("UPSTOX_API_KEY");
-    const redirectUri = trimmedEnv("UPSTOX_REDIRECT_URI")
-      || `${request.protocol}://${request.hostname}/api/providers/upstox/token/callback`;
+    const fallbackRedirect = `${request.protocol}://${request.hostname}/api/providers/upstox/token/callback`;
+    const clientId = config.apiKey;
+    const redirectUri = config.getRedirectUri() || fallbackRedirect;
 
     if (!clientId) {
       return reply.status(400).send({
@@ -98,117 +80,91 @@ const upstoxRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       });
     }
 
-    const state = generateState();
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: "code",
-      scope: "read_portfolio read_user_profile",
-      state,
-    });
-
-    const authUrl = `https://api.upstox.com/v2/login/authorization/dialog?${params.toString()}`;
-
-    return reply.send({
-      status: "requested",
-      message: "Authorization URL generated. User must approve via Upstox login.",
-      authUrl,
-      requestedAt: new Date().toISOString(),
-    } as TokenRequestResponse);
+    try {
+      const state = generateState();
+      storeState(state);
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        state,
+      });
+      const authUrl = `https://api.upstox.com/v2/login/authorization/dialog?${params.toString()}`;
+      return reply.send({
+        status: "requested",
+        message: "Authorization URL generated",
+        authUrl,
+        requestedAt: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      return reply.status(400).send({
+        status: "error",
+        message: sanitizeErrorMessage(err.message || "Cannot generate authorization URL"),
+        authUrl: null,
+        requestedAt: new Date().toISOString(),
+      });
+    }
   });
 
-  async function handleCallback(
-    request: any,
-    reply: any,
-  ): Promise<any> {
+  async function handleCallback(request: any, reply: any): Promise<any> {
     const query = (request.query || {}) as Record<string, string | undefined>;
     const body = (request.body || {}) as Record<string, string | undefined>;
     const code = query.code || body.code;
-    const state = query.state || body.state;
     const error = query.error || body.error;
-    const notifierSecret = trimmedEnv("UPSTOX_NOTIFIER_SECRET");
+    const notifierSecret = config.notifierSecret;
 
-    // Validate notifier signature if configured
-    const providedSecret = query.secret || body.secret || request.headers["x-upstox-notifier-secret"];
+    const providedSecret = query.secret || body.secret || request.headers?.["x-upstox-notifier-secret"];
+
+    if (!validateState(query.state)) {
+      return reply.status(401).send({
+        status: "rejected",
+        message: "OAuth state validation failed. Authorization request may have been tampered with.",
+        receivedAt: new Date().toISOString(),
+      });
+    }
+
     if (notifierSecret && providedSecret !== notifierSecret) {
-      request.log?.warn?.("Upstox callback rejected: notifier secret mismatch");
       return reply.status(401).send({
         status: "rejected",
         message: "Notifier secret validation failed.",
         receivedAt: new Date().toISOString(),
-      } as TokenCallbackResponse);
+      });
     }
 
     if (error) {
       return reply.status(400).send({
         status: "rejected",
-        message: `Upstox authorization rejected: ${sanitizeError(error)}`,
+        message: `Authorization rejected: ${sanitizeErrorMessage(error)}`,
         receivedAt: new Date().toISOString(),
-      } as TokenCallbackResponse);
+      });
     }
 
     if (!code) {
+      if (!config.configured) {
+        return reply.status(200).send({
+          status: "received",
+          message: "Authorization code received. Token exchange not possible — Upstox not configured.",
+          receivedAt: new Date().toISOString(),
+        });
+      }
       return reply.status(400).send({
         status: "error",
-        message: "Missing authorization code in callback.",
+        message: "Missing authorization code in callback",
         receivedAt: new Date().toISOString(),
-      } as TokenCallbackResponse);
+      });
     }
 
-    // Optional: exchange code for access token
-    const clientId = trimmedEnv("UPSTOX_API_KEY");
-    const clientSecret = trimmedEnv("UPSTOX_CLIENT_SECRET");
-    const redirectUri = trimmedEnv("UPSTOX_REDIRECT_URI")
-      || `${request.protocol}://${request.hostname}/api/providers/upstox/token/callback`;
-
-    let exchangeStatus = "received";
-    let exchangeMessage = "Authorization code received. Token exchange not attempted (client credentials unavailable).";
-
-    if (clientId && clientSecret) {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15_000);
-        const response = await fetch("https://api.upstox.com/v2/login/authorization/token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json",
-          },
-          body: new URLSearchParams({
-            code,
-            client_id: clientId,
-            client_secret: clientSecret,
-            redirect_uri: redirectUri,
-            grant_type: "authorization_code",
-          }).toString(),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-
-        const data = await response.json().catch(() => ({}));
-        if (response.ok && data.access_token) {
-          currentAccessToken = data.access_token;
-          tokenReceivedAt = new Date().toISOString();
-          exchangeStatus = "accepted";
-          exchangeMessage = "Access token received and accepted. Token value is not exposed.";
-        } else {
-          exchangeStatus = "rejected";
-          exchangeMessage = `Token exchange failed: ${sanitizeError(data.message || data.error || `HTTP ${response.status}`)}`;
-          request.log?.warn?.({ status: response.status, error: data.error }, "Upstox token exchange failed");
-        }
-      } catch (err: any) {
-        exchangeStatus = "rejected";
-        exchangeMessage = `Token exchange error: ${sanitizeError(err.message || String(err))}`;
-        request.log?.error?.(err, "Upstox token exchange exception");
-      }
+    if (!config.configured) {
+      return reply.status(200).send({
+        status: "received",
+        message: "Authorization code received. Token exchange not possible — Upstox not configured.",
+        receivedAt: new Date().toISOString(),
+      });
     }
 
-    return reply.send({
-      status: exchangeStatus,
-      message: exchangeMessage,
-      receivedAt: new Date().toISOString(),
-    } as TokenCallbackResponse);
+    const result = await oauthService.exchangeCodeForToken(code);
+    const httpStatus = result.status === "accepted" ? 200 : 400;
+    return reply.status(httpStatus).send(result);
   }
 
   app.get("/api/providers/upstox/token/callback", async (request, reply) => {
@@ -217,6 +173,108 @@ const upstoxRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
 
   app.post("/api/providers/upstox/token/callback", async (request, reply) => {
     return handleCallback(request, reply);
+  });
+
+  app.post("/api/providers/upstox/token/clear", async (request, reply) => {
+    const body = (request.body || {}) as Record<string, string | undefined>;
+    const mode = body.mode as 'live' | 'sandbox' | undefined;
+
+    if (mode && mode !== 'live' && mode !== 'sandbox') {
+      return reply.status(400).send({
+        status: "error",
+        message: "Invalid mode. Use 'live' or 'sandbox'.",
+      });
+    }
+
+    tokenStore.clearToken(mode);
+    return reply.send({
+      status: "cleared",
+      message: mode ? `Upstox ${mode} token cleared` : "Upstox tokens cleared",
+      clearedAt: new Date().toISOString(),
+    });
+  });
+
+  app.get("/api/providers/upstox/sandbox/status", async (_request, reply) => {
+    const sandboxToken = tokenStore.getSandboxToken();
+    const sandboxEnabled = config.getSandboxEnabled();
+
+    let sandboxReachable = false;
+    if (sandboxEnabled && sandboxToken) {
+      try {
+        const sandboxClient = new UpstoxSandboxClient(config, tokenStore);
+        const health = await sandboxClient.checkHealth();
+        sandboxReachable = health.status === 'healthy';
+      } catch {
+        sandboxReachable = false;
+      }
+    }
+
+    return reply.send({
+      sandboxEnabled,
+      sandboxTokenPresent: !!sandboxToken,
+      sandboxReachable,
+      orderSandboxEnabled: config.orderSandboxEnabled,
+      checkedAt: new Date().toISOString(),
+    });
+  });
+
+  app.get("/api/providers/upstox/profile", async (_request, reply) => {
+    try {
+      const client = new UpstoxClient(config, tokenStore);
+      const profile = await client.getUserProfile();
+      return reply.send({
+        status: "success",
+        data: {
+          userId: profile.userId,
+          userName: profile.userName,
+          broker: profile.broker,
+        },
+      });
+    } catch (err: any) {
+      return reply.status(401).send({
+        status: "error",
+        message: sanitizeErrorMessage(err.message || "Profile fetch failed"),
+      });
+    }
+  });
+
+  app.get("/api/providers/upstox/holdings", async (_request, reply) => {
+    try {
+      const client = new UpstoxClient(config, tokenStore);
+      const holdings = await client.getHoldings();
+      return reply.send({ status: "success", data: holdings });
+    } catch (err: any) {
+      return reply.status(401).send({
+        status: "error",
+        message: sanitizeErrorMessage(err.message || "Holdings fetch failed"),
+      });
+    }
+  });
+
+  app.get("/api/providers/upstox/positions", async (_request, reply) => {
+    try {
+      const client = new UpstoxClient(config, tokenStore);
+      const positions = await client.getPositions();
+      return reply.send({ status: "success", data: positions });
+    } catch (err: any) {
+      return reply.status(401).send({
+        status: "error",
+        message: sanitizeErrorMessage(err.message || "Positions fetch failed"),
+      });
+    }
+  });
+
+  app.get("/api/providers/upstox/funds", async (_request, reply) => {
+    try {
+      const client = new UpstoxClient(config, tokenStore);
+      const funds = await client.getFunds();
+      return reply.send({ status: "success", data: funds });
+    } catch (err: any) {
+      return reply.status(401).send({
+        status: "error",
+        message: sanitizeErrorMessage(err.message || "Funds fetch failed"),
+      });
+    }
   });
 };
 
