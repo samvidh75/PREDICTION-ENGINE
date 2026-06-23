@@ -152,10 +152,8 @@
     "stockedge:coverage": "tsx scripts/stockedge-coverage.ts",
     "stockedge:schedule-smoke": "tsx scripts/stockedge-schedule-smoke.ts",
     "market:enrichment:smoke": "tsx scripts/stockedge-smoke.ts",
-    "audit:search-quality": "tsx scripts/audit-search-quality.ts",
-    "audit:scanner-quality": "tsx scripts/audit-scanner-quality.ts",
-    "audit:news-sanitization": "tsx scripts/audit-news-sanitization.ts",
-    "audit:production-trust": "tsx scripts/audit-production-trust.ts"
+    "audit:health-readiness": "tsx scripts/audit-health-readiness.ts",
+    "audit:release-candidate": "tsx scripts/audit-release-candidate.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
