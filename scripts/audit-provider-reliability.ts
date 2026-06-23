@@ -14,7 +14,8 @@ interface Check {
 }
 
 const USE_PRODUCTION = process.argv.includes("--production");
-const API_BASE = USE_PRODUCTION ? "https://www.stockstory-india.com" : "http://localhost:4001";
+const ENV_BASE = process.env.API_BASE_URL || process.env.API_BASE;
+const API_BASE = USE_PRODUCTION ? "https://www.stockstory-india.com" : (ENV_BASE || "http://localhost:3000");
 
 const CHECKS: Check[] = [
   { name: "public_copy_no_provider_wording", command: "npx tsx scripts/audit-public-copy.ts", critical: true },
