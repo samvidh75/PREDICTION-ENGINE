@@ -9,6 +9,8 @@ import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
 import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
 import type { NewsItemResponse } from "../services/api/client";
+import { getStaleSnapshot, setCachedSnapshot } from "../lib/product/stockPageSnapshotCache";
+import type { StockPageSnapshot } from "../shared/research/StockPageSnapshotTypes";
 import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
 import HealthometerPanel from "../components/research/HealthometerPanel";
 import FinancialHistogram from "../components/research/FinancialHistogram";
@@ -33,42 +35,85 @@ export default function StockStoryPageF0(): JSX.Element {
   const tracked = watchlists.some((list) => list.tickers.some((item) => normalizeSymbol(item) === ticker));
   const researchFetched = useRef(false);
 
-  const [research, setResearch] = useState<UnifiedResearchResult>(() => ({
-    ...buildCompanyResearch(ticker, identity.displayName, identity.sector, null, tracked),
-    healthometerLabel: null,
-    analysis: null,
-    priceHistory: [],
-  }));
-  const [newsItems, setNewsItems] = useState<NewsItemResponse[]>([]);
+  const cachedSnap = useMemo(() => getStaleSnapshot(ticker), [ticker]);
+
+  const [research, setResearch] = useState<UnifiedResearchResult>(() => {
+    const s = cachedSnap;
+    return {
+      ...buildCompanyResearch(ticker, identity.displayName, identity.sector, null, tracked),
+      healthometerLabel: s?.healthometer?.label ?? null,
+      analysis: s?.healthometer?.overallScore !== null ? {
+        companyHealth: s?.healthometer?.label ?? null,
+        convictionState: s?.healthometer?.label ?? null,
+        summary: s?.investContext?.thesis ?? null,
+        thesis: s?.investContext?.thesis ?? null,
+        bullCase: null, bearCase: null,
+        keyDrivers: s?.investContext?.keyStrengths ?? [],
+        riskFlags: s?.investContext?.keyRisks ?? [],
+        watchNext: s?.investContext?.whatToWatch ?? [],
+        investmentChecklist: [],
+      } : null,
+      healthometer: s?.healthometer ? {
+        overallScore: s.healthometer.overallScore,
+        overallStatus: (s.healthometer.dimensions?.filter(d => d.score !== null).length ?? 0) >= 7 ? "Complete" : "Partial research context",
+        dimensions: s.healthometer.dimensions.map(d => ({ id: d.id, label: d.label, score: d.score, status: d.status as any, color: "#64748B" })),
+      } : { overallScore: null, overallStatus: "Not enough information for this view yet", dimensions: [] },
+      priceHistory: s?.priceHistory ?? [],
+    };
+  });
+  const [newsItems, setNewsItems] = useState<NewsItemResponse[]>(() =>
+    (cachedSnap?.news ?? []).map((n) => ({
+      headline: n.headline, publisher: n.publisher, publishedAt: n.publishedAt,
+      summary: n.summary, whyItMatters: n.whyItMatters, url: n.url, category: n.category,
+    }))
+  );
   const [newsRefreshedAt, setNewsRefreshedAt] = useState<string>("");
-  const [financialSeries, setFinancialSeries] = useState<import("../components/research/FinancialHistogram").FinancialSeries[]>([]);
-  const [trendlyneAvailable, setTrendlyneAvailable] = useState(false);
+  const [financialSeries, setFinancialSeries] = useState<import("../components/research/FinancialHistogram").FinancialSeries[]>(() =>
+    (cachedSnap?.financialSeries ?? []).map((s) => ({
+      metric: s.metric as any, label: s.label,
+      points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
+    }))
+  );
+  const [trendlyneAvailable, setTrendlyneAvailable] = useState(() => cachedSnap?.trendlyne?.available ?? false);
 
   useEffect(() => {
     const ctrl = new AbortController();
     researchFetched.current = false;
     setTrendlyneAvailable(false);
+
+    fetch(`${window.location.origin}/api/research/snapshot/${ticker}`, { signal: ctrl.signal })
+      .then(r => r.json()).then((data) => {
+        if (ctrl.signal.aborted || !data?.data) return;
+        const snap = data.data as StockPageSnapshot;
+        setCachedSnapshot(ticker, snap);
+        if (snap.priceHistory?.length) setResearch((prev) => ({ ...prev, priceHistory: snap.priceHistory }));
+        if (snap.healthometer?.overallScore !== null) {
+          setResearch((prev) => ({
+            ...prev,
+            healthometer: { overallScore: snap.healthometer.overallScore, overallStatus: "Partial research context", dimensions: snap.healthometer.dimensions.map(d => ({ id: d.id, label: d.label, score: d.score, status: d.status as any, color: "#64748B" })) },
+            healthometerLabel: snap.healthometer.label,
+          }));
+        }
+        if (snap.news?.length) setNewsItems(snap.news.map((n: any) => ({ headline: n.headline, publisher: n.publisher, publishedAt: n.publishedAt, summary: n.summary, whyItMatters: n.whyItMatters, url: n.url, category: n.category })));
+        if (snap.financialSeries?.length) setFinancialSeries(snap.financialSeries.map((s: any) => ({ metric: s.metric, label: s.label, points: s.points.map((p: any) => ({ period: p.period, value: p.value, unit: p.unit })) })));
+        if (snap.trendlyne?.available) setTrendlyneAvailable(true);
+        researchFetched.current = true;
+      }).catch(() => {});
+
     fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
       if (!ctrl.signal.aborted) { setResearch(result); researchFetched.current = true; }
     });
     import("../services/api/client").then(({ api }) => {
       api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
-        if (!ctrl.signal.aborted) {
-          setNewsItems(res.items || []);
-          setNewsRefreshedAt(res.cachedAt || new Date().toISOString());
-        }
+        if (!ctrl.signal.aborted) { setNewsItems(res.items || []); setNewsRefreshedAt(res.cachedAt || new Date().toISOString()); }
       }).catch(() => {});
       api.getFinancialSeries(ticker, { signal: ctrl.signal }).then((res) => {
         if (!ctrl.signal.aborted && res.series) {
           setFinancialSeries(res.series.map((s) => ({
-            metric: s.metric as any,
-            label: s.label,
+            metric: s.metric as any, label: s.label,
             points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
           })));
         }
-      }).catch(() => {});
-      api.getTrendlyneWidget("technicals", ticker, { signal: ctrl.signal }).then((res) => {
-        if (!ctrl.signal.aborted) setTrendlyneAvailable(Boolean(res.available && res.widgetUrl));
       }).catch(() => {});
     });
     return () => ctrl.abort();

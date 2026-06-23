@@ -76,6 +76,8 @@
     "import:fundamentals": "tsx scripts/import-fundamentals-export.ts",
     "validate:fundamentals": "tsx scripts/validate-fundamentals-template.ts",
     "smoke:api": "tsx scripts/smoke-test-api.ts",
+    "stockpage:snapshots": "tsx scripts/materialize-stock-page-snapshots.ts",
+    "stockpage:snapshots:smoke": "tsx scripts/materialize-stock-page-snapshots.ts --dry-run --symbols=RELIANCE,ITC,TCS,INFY,HDFCBANK",
     "validate:api-states": "tsx scripts/smoke-test-api.ts",
     "validate:hygiene": "tsx scripts/validate-repository-hygiene.ts",
     "release:gate": "tsx scripts/release-gate.ts",
