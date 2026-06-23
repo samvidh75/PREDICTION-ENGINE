@@ -1,10 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Fastify from "fastify";
+import { UpstoxConfig } from "../../../integrations/upstox/UpstoxConfig";
+import { UpstoxTokenStore } from "../../../integrations/upstox/UpstoxTokenStore";
 
-const envSnapshot = { ...process.env };
+const UPSTOX_ENV_KEYS = [
+  'UPSTOX_API_KEY', 'UPSTOX_CLIENT_SECRET', 'UPSTOX_REDIRECT_URI',
+  'UPSTOX_ACCESS_TOKEN', 'UPSTOX_SANDBOX_ENABLED', 'UPSTOX_SANDBOX_ACCESS_TOKEN',
+  'UPSTOX_SANDBOX_MODE', 'UPSTOX_NOTIFIER_SECRET', 'UPSTOX_MARKET_DATA_ENABLED',
+  'UPSTOX_ORDER_SANDBOX_ENABLED', 'UPSTOX_TOKEN_STORAGE', 'UPSTOX_REDIRECT_URI',
+];
 
 async function buildApp() {
-  // Dynamic import so env is set before module evaluates
   const { default: upstoxRoutes } = await import("../upstox");
   const app = Fastify({ logger: false });
   await app.register(upstoxRoutes);
@@ -12,9 +18,20 @@ async function buildApp() {
   return app;
 }
 
+beforeEach(() => {
+  for (const key of UPSTOX_ENV_KEYS) {
+    delete process.env[key];
+  }
+  UpstoxConfig.reset();
+  UpstoxTokenStore.reset();
+});
+
 afterEach(() => {
-  process.env = { ...envSnapshot };
-  vi.unstubAllEnvs();
+  for (const key of UPSTOX_ENV_KEYS) {
+    delete process.env[key];
+  }
+  UpstoxConfig.reset();
+  UpstoxTokenStore.reset();
 });
 
 describe("Upstox provider routes — security", () => {

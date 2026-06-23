@@ -16,10 +16,17 @@ import type {
   MarketDataProvider,
 } from './types';
 
-const UPSTOX_BASE = 'https://api.upstox.com/v2';
+function isSandbox(): boolean {
+  return process.env.UPSTOX_SANDBOX_ENABLED === 'true' || process.env.UPSTOX_SANDBOX_MODE === 'true';
+}
+
+const UPSTOX_BASE = isSandbox() ? 'https://sandbox-api.upstox.com/v2' : 'https://api.upstox.com/v2';
 const FETCH_TIMEOUT = 10_000;
 
 function getAccessToken(): string | null {
+  if (isSandbox()) {
+    return process.env.UPSTOX_SANDBOX_ACCESS_TOKEN?.trim() || null;
+  }
   return process.env.UPSTOX_ACCESS_TOKEN?.trim() || null;
 }
 

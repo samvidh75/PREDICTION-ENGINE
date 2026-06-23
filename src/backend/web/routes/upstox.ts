@@ -111,14 +111,13 @@ const upstoxRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
     const body = (request.body || {}) as Record<string, string | undefined>;
     const code = query.code || body.code;
     const error = query.error || body.error;
-    const notifierSecret = config.notifierSecret;
+    const notifierSecret = process.env.UPSTOX_NOTIFIER_SECRET?.trim();
 
     const providedSecret = query.secret || body.secret || request.headers?.["x-upstox-notifier-secret"];
-
-    if (!validateState(query.state)) {
+    if (notifierSecret && providedSecret !== notifierSecret) {
       return reply.status(401).send({
         status: "rejected",
-        message: "OAuth state validation failed. Authorization request may have been tampered with.",
+        message: "Notifier secret validation failed.",
         receivedAt: new Date().toISOString(),
       });
     }
