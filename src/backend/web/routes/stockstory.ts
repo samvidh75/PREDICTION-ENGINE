@@ -128,7 +128,8 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
             `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
                     debt_to_equity, current_ratio, operating_margin,
                     net_margin, gross_margin, revenue_growth, profit_growth,
-                    eps_growth, fcf_yield, market_cap, beta
+                    eps_growth, fcf_yield, market_cap, beta,
+                    dividend_yield, eps
              FROM financial_snapshots
               WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
                 AND pe_ratio IS NOT NULL
@@ -175,6 +176,8 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
               fcfYield: asFiniteNumber(fsRow?.fcf_yield),
               marketCap: asFiniteNumber(fsRow?.market_cap),
               beta: asFiniteNumber(fsRow?.beta),
+              dividendYield: asFiniteNumber(fsRow?.dividend_yield),
+              eps: asFiniteNumber(fsRow?.eps),
             },
             factors: {
               qualityFactor: asFiniteNumber(factorRow?.quality_factor),
