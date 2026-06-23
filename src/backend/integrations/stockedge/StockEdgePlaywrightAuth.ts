@@ -1,9 +1,20 @@
-import { chromium } from "playwright";
 import { loadStockEdgeConfig } from "./StockEdgeConfig";
 import { STOCKEDGE_CODES, StockEdgeIntegrationError } from "./StockEdgeErrors";
 import { stockEdgeSessionStore } from "./StockEdgeSessionStore";
 import type { StockEdgeSession } from "./StockEdgeSessionStore";
 import type { StockEdgeConfig } from "./StockEdgeTypes";
+
+async function getPlaywrightChromium(): Promise<typeof import("playwright").chromium> {
+  try {
+    const pw = await import("playwright");
+    return pw.chromium;
+  } catch {
+    throw new StockEdgeIntegrationError(
+      STOCKEDGE_CODES.loginFailed,
+      "Playwright is not installed. Install with: npm install playwright && npx playwright install chromium",
+    );
+  }
+}
 
 const ACCOUNT_SELECTORS = [
   "input[type=email]",
@@ -62,6 +73,7 @@ export class StockEdgePlaywrightAuth {
     const accountId = this.config.accountId;
     const password = this.config.password;
 
+    const chromium = await getPlaywrightChromium();
     const browser = await chromium.launch({ headless: true });
     try {
       const context = await browser.newContext({
@@ -152,6 +164,7 @@ export class StockEdgePlaywrightAuth {
     const accountId = this.config.accountId;
     const password = this.config.password;
 
+    const chromium = await getPlaywrightChromium();
     const browser = await chromium.launch({ headless: true });
     try {
       const context = await browser.newContext();
