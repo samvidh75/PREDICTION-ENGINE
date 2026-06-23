@@ -7,3 +7,12 @@ node_modules
 .env.*
 artifacts
 .tmp.*
+reports/
+dist/
+.coverage/
+playwright-report/
+test-results/
+docs/
+data/
+tmp/
+coverage/
