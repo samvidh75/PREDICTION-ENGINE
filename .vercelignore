@@ -1,0 +1,9 @@
+.tmp
+/tmp
+coverage
+playwright-report
+test-results
+.playwright-mcp
+/data
+:memory:
+:memory: (1)

@@ -10,7 +10,7 @@ import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
 import { buildSingleActionCluster, buildSinglePriceContext } from "../lib/product/stockDisplay";
 import { healthometerLabelFromScore } from "../lib/product/publicLabels";
 import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { StockRegistry } from "../services/stocks/StockRegistry";
+import type { NewsItemResponse } from "../services/api/client";
 import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
 import HealthometerPanel from "../components/research/HealthometerPanel";
 import AnalysisMeters from "../components/research/AnalysisMeters";
@@ -33,8 +33,7 @@ function SectionTitle({ eyebrow, title, body }: { eyebrow: string; title: string
 
 export default function StockStoryPageF0(): JSX.Element {
   const ticker = tickerFromUrl();
-  const stock = StockRegistry.getStock(ticker);
-  const identity = getCompanyIdentity(ticker, stock?.companyName, stock?.sector);
+  const identity = getCompanyIdentity(ticker, null, null);
   const quote = useLiveQuote(ticker);
   const [investOpen, setInvestOpen] = useState(() => new URLSearchParams(window.location.search).get("page") === "invest");
   const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
@@ -47,11 +46,21 @@ export default function StockStoryPageF0(): JSX.Element {
     analysis: null,
     priceHistory: [],
   }));
+  const [newsItems, setNewsItems] = useState<NewsItemResponse[]>([]);
+  const [newsRefreshedAt, setNewsRefreshedAt] = useState<string>("");
 
   useEffect(() => {
     const ctrl = new AbortController();
     fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
       if (!ctrl.signal.aborted) setResearch(result);
+    });
+    import("../services/api/client").then(({ api }) => {
+      api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
+        if (!ctrl.signal.aborted) {
+          setNewsItems(res.items || []);
+          setNewsRefreshedAt(res.cachedAt || new Date().toISOString());
+        }
+      }).catch(() => {});
     });
     return () => ctrl.abort();
   }, [ticker, identity.displayName, identity.sector, tracked]);
@@ -215,8 +224,18 @@ export default function StockStoryPageF0(): JSX.Element {
       {/* 7. News intelligence */}
       <section className="mt-5">
         <StockNewsPanel
-          items={[]}
-          refreshedAt={new Date().toISOString()}
+          items={newsItems.map((n) => ({
+            id: `${ticker}-${n.publishedAt}-${n.headline.slice(0, 40)}`,
+            symbol: ticker,
+            headline: n.headline,
+            publisher: n.publisher,
+            publishedAt: n.publishedAt,
+            summary: n.summary,
+            whyItMatters: n.whyItMatters,
+            url: n.url,
+            category: n.category as "company" | "results" | "brokerage" | "sector" | "corporate_action" | "market",
+          }))}
+          refreshedAt={newsRefreshedAt}
         />
       </section>
 

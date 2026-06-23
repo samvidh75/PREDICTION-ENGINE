@@ -23,13 +23,22 @@ function boolFromEnv(name: string): boolean {
   return ["1", "true", "yes", "on"].includes((process.env[name] ?? "").toLowerCase());
 }
 
+const DEFAULT_BASE_URL = "https://web.stockedge.com";
+
 export function loadStockEdgeConfig(): StockEdgeConfig {
+  const rawBaseUrl = process.env.STOCKEDGE_BASE_URL;
+  const rawLoginUrl = process.env.STOCKEDGE_LOGIN_URL;
+  const rawLoginFormAction = process.env.STOCKEDGE_LOGIN_FORM_ACTION;
+  const baseUrl = rawBaseUrl || DEFAULT_BASE_URL;
+  const loginUrl = rawLoginUrl || baseUrl;
   return {
     enabled: boolFromEnv("STOCKEDGE_ENABLED"),
     accountId: process.env.STOCKEDGE_ACCOUNT_ID,
     password: process.env.STOCKEDGE_PASSWORD,
-    baseUrl: process.env.STOCKEDGE_BASE_URL || "https://web.stockedge.com",
-    loginUrl: process.env.STOCKEDGE_LOGIN_URL || process.env.STOCKEDGE_BASE_URL || "https://web.stockedge.com",
+    baseUrl,
+    loginUrl,
+    loginFormAction: rawLoginFormAction || undefined,
+    loginUrlExplicit: Boolean(rawLoginUrl),
     timeoutMs: intFromEnv("STOCKEDGE_TIMEOUT_MS", 15_000),
     rateLimitPerMinute: intFromEnv("STOCKEDGE_RATE_LIMIT_PER_MINUTE", 20),
     sessionTtlSeconds: intFromEnv("STOCKEDGE_SESSION_TTL_SECONDS", 3_600),

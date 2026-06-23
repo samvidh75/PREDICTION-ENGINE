@@ -20,6 +20,7 @@ function makeConfig(overrides: Partial<StockEdgeConfig> = {}): StockEdgeConfig {
     password: "test-password",
     baseUrl: "https://web.stockedge.com",
     loginUrl: "https://web.stockedge.com",
+    loginUrlExplicit: true,
     timeoutMs: 5000,
     rateLimitPerMinute: 20,
     sessionTtlSeconds: 3600,
