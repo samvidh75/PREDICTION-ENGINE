@@ -653,10 +653,28 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
             riskScore = de <= 0.5 ? 75 : de <= 1 ? 55 : de <= 2 ? 35 : 15;
           }
 
+          // Compute stability from available data (low debt + healthy current ratio)
+          let stabilityScore: number | null = null;
+          if (de !== null || cr !== null) {
+            let s = 0; let c = 0;
+            if (de !== null) { s += de <= 0.3 ? 80 : de <= 0.5 ? 65 : de <= 1 ? 50 : de <= 2 ? 35 : 15; c++; }
+            if (cr !== null) { s += cr >= 2 ? 75 : cr >= 1.5 ? 60 : cr >= 1 ? 45 : 25; c++; }
+            stabilityScore = c > 0 ? Math.round(s / c) : null;
+          }
+
+          // Momentum proxy from growth data
+          let momentumScore: number | null = null;
+          if (rg !== null || pg !== null) {
+            let s = 0; let c = 0;
+            if (rg !== null) { s += rg >= 20 ? 75 : rg >= 10 ? 55 : rg >= 5 ? 40 : rg >= 0 ? 25 : 10; c++; }
+            if (pg !== null) { s += pg >= 20 ? 75 : pg >= 10 ? 55 : pg >= 5 ? 40 : pg >= 0 ? 25 : 10; c++; }
+            momentumScore = c > 0 ? Math.round(s / c) : null;
+          }
+
           return {
             symbol: sym, companyName, sector: sector || null,
             scores: { quality: qualityScore, valuation: valuationScore, growth: growthScore,
-              risk: riskScore, momentum: null, stability: null },
+              risk: riskScore, momentum: momentumScore, stability: stabilityScore },
           };
         } catch {
           return { symbol: sym, companyName: sym, sector: null,
@@ -736,6 +754,7 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
 
           const roe = parseFinite(fsRow.roe);
           const de = parseFinite(fsRow.debt_to_equity);
+          const cr = parseFinite(fsRow.current_ratio);
           const gm = parseFinite(fsRow.gross_margin);
           const om = parseFinite(fsRow.operating_margin);
           const rg = parseFinite(fsRow.revenue_growth);
@@ -769,9 +788,25 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
             riskScore = de <= 0.5 ? 75 : de <= 1 ? 55 : de <= 2 ? 35 : 15;
           }
 
+          let stabilityScore: number | null = null;
+          if (de !== null || cr !== null) {
+            let s = 0; let c = 0;
+            if (de !== null) { s += de <= 0.3 ? 80 : de <= 0.5 ? 65 : de <= 1 ? 50 : de <= 2 ? 35 : 15; c++; }
+            if (cr !== null) { s += cr >= 2 ? 75 : cr >= 1.5 ? 60 : cr >= 1 ? 45 : 25; c++; }
+            stabilityScore = c > 0 ? Math.round(s / c) : null;
+          }
+
+          let momentumScore: number | null = null;
+          if (rg !== null || pg !== null) {
+            let s = 0; let c = 0;
+            if (rg !== null) { s += rg >= 20 ? 75 : rg >= 10 ? 55 : rg >= 5 ? 40 : rg >= 0 ? 25 : 10; c++; }
+            if (pg !== null) { s += pg >= 20 ? 75 : pg >= 10 ? 55 : pg >= 5 ? 40 : pg >= 0 ? 25 : 10; c++; }
+            momentumScore = c > 0 ? Math.round(s / c) : null;
+          }
+
           return { symbol: sym, companyName,
             scores: { quality: qualityScore, valuation: valuationScore, growth: growthScore,
-              risk: riskScore, momentum: null, stability: null } };
+              risk: riskScore, momentum: momentumScore, stability: stabilityScore } };
         } catch {
           return { symbol: sym, companyName: sym,
             scores: { quality: null, valuation: null, growth: null, risk: null, momentum: null, stability: null } };
