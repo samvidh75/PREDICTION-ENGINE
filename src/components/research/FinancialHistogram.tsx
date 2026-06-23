@@ -46,8 +46,11 @@ function formatCompactValue(value: number | null, unit?: string): string {
   if (unit === "%") return `${value.toFixed(1)}%`;
   if (unit === "absolute") return value.toLocaleString("en-IN");
   if (abs >= 10000) return `₹${(value / 100).toFixed(0)}Cr`;
-  if (abs >= 100) return `₹${(value / 100).toFixed(1)}Cr`;
-  if (abs >= 1) return `₹${value.toFixed(1)}Cr`;
+  if (abs >= 100) {
+    const crore = value / 100;
+    return `₹${Number.isInteger(crore) ? crore.toFixed(0) : crore.toFixed(1)}Cr`;
+  }
+  if (abs >= 1) return `₹${Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1)}Cr`;
   return `₹${value.toFixed(2)}Cr`;
 }
 
@@ -191,6 +194,7 @@ export default function FinancialHistogram({ series, loading }: FinancialHistogr
   const activePoint = activeSeries && activeIndex !== null
     ? activeSeries.points[activeIndex]
     : null;
+  const displayPoint = activePoint ?? activeSeries?.points.filter((point) => point.value !== null).at(-1) ?? null;
 
   const isMargin = activeMetric === "operatingMargin" || activeMetric === "netMargin";
   const unit = activeSeries?.points[0]?.unit ?? (isMargin ? "%" : "crore");
@@ -237,11 +241,11 @@ export default function FinancialHistogram({ series, loading }: FinancialHistogr
         })}
       </div>
 
-      {activePoint && (
+      {displayPoint && (
         <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
-          <span className="text-[var(--color-text-secondary)]">{activePoint.period}</span>
+          <span className="text-[var(--color-text-secondary)]">{displayPoint.period}</span>
           <span className="text-[#2962FF]">·</span>
-          <span>{formatCompactValue(activePoint.value, unit)}</span>
+          <span>{formatCompactValue(displayPoint.value, unit)}</span>
         </div>
       )}
 

@@ -2,54 +2,54 @@
 
 Base URL: http://127.0.0.1:4173
 
-- landing 320x568: PASS
-- landing 375x812: PASS
-- landing 390x844: PASS
-- landing 768x1024: PASS
-- landing 1024x768: PASS
-- landing 1366x768: PASS
-- landing 1440x900: PASS
-- landing 1920x1080: PASS
-- rankings 320x568: PASS
-- rankings 375x812: PASS
-- rankings 390x844: PASS
-- rankings 768x1024: PASS
-- rankings 1024x768: PASS
-- rankings 1366x768: PASS
-- rankings 1440x900: PASS
-- rankings 1920x1080: PASS
-- signals 320x568: PASS
-- signals 375x812: PASS
-- signals 390x844: PASS
-- signals 768x1024: PASS
-- signals 1024x768: PASS
-- signals 1366x768: PASS
-- signals 1440x900: PASS
-- signals 1920x1080: PASS
-- about 320x568: PASS
-- about 375x812: PASS
-- about 390x844: PASS
-- about 768x1024: PASS
-- about 1024x768: PASS
-- about 1366x768: PASS
-- about 1440x900: PASS
-- about 1920x1080: PASS
-- trust 320x568: PASS
-- trust 375x812: PASS
-- trust 390x844: PASS
-- trust 768x1024: PASS
-- trust 1024x768: PASS
-- trust 1366x768: PASS
-- trust 1440x900: PASS
-- trust 1920x1080: PASS
-- signin 320x568: PASS
-- signin 375x812: PASS
-- signin 390x844: PASS
-- signin 768x1024: PASS
-- signin 1024x768: PASS
-- signin 1366x768: PASS
-- signin 1440x900: PASS
-- signin 1920x1080: PASS
+- landing 320x568: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 375x812: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 390x844: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 768x1024: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1024x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1366x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1440x900: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1920x1080: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- rankings 320x568: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 375x812: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 390x844: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 768x1024: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1024x768: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1366x768: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1440x900: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1920x1080: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- signals 320x568: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 375x812: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 390x844: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 768x1024: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1024x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1366x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1440x900: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1920x1080: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- about 320x568: FAIL (navigation missing; SSI app shell primitives missing)
+- about 375x812: FAIL (navigation missing; SSI app shell primitives missing)
+- about 390x844: FAIL (navigation missing; SSI app shell primitives missing)
+- about 768x1024: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1024x768: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1366x768: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1440x900: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1920x1080: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 320x568: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 375x812: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 390x844: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 768x1024: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1024x768: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1366x768: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1440x900: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1920x1080: FAIL (navigation missing; SSI app shell primitives missing)
+- signin 320x568: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 375x812: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 390x844: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 768x1024: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1024x768: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1366x768: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1440x900: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1920x1080: FAIL (premium surface selectors missing; SSI app shell primitives missing)
 - search-auth 320x568: PASS
 - search-auth 375x812: PASS
 - search-auth 390x844: PASS

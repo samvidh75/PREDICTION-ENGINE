@@ -16,6 +16,7 @@ interface FreshnessRow extends Record<string, unknown> {
 
 const PROVIDER_STATUS_CACHE_MS = 60_000;
 let providerStatusCache: { expiresAt: number; data: ProviderStatusMatrix } | null = null;
+let providerStatusRefresh: Promise<ProviderStatusMatrix> | null = null;
 
 async function getLiveProviderStatuses(): Promise<ProviderStatusMatrix> {
   const now = Date.now();
@@ -24,6 +25,16 @@ async function getLiveProviderStatuses(): Promise<ProviderStatusMatrix> {
   const data = await broker.getProviderStatusMatrix();
   providerStatusCache = { expiresAt: now + PROVIDER_STATUS_CACHE_MS, data };
   return data;
+}
+
+function getProviderStatusesNonBlocking(): { data: ProviderStatusMatrix; state: "cached" | "warming" } {
+  const now = Date.now();
+  if (providerStatusCache && providerStatusCache.expiresAt > now) return { data: providerStatusCache.data, state: "cached" };
+  if (!providerStatusRefresh) {
+    providerStatusRefresh = getLiveProviderStatuses().finally(() => { providerStatusRefresh = null; });
+    void providerStatusRefresh.catch(() => undefined);
+  }
+  return { data: providerStatusCache?.data ?? {}, state: "warming" };
 }
 
 const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
@@ -118,13 +129,27 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
       metrics.python_version = 'not_found';
     }
 
-    const providers = await getLiveProviderStatuses();
+    const providerSnapshot = getProviderStatusesNonBlocking();
+    const providers = providerSnapshot.data;
+
+    const providerDegraded = Object.values(providers).some((provider) =>
+      provider.required && provider.status !== "healthy"
+    );
+    const pipelineAge = Number.parseInt(String(metrics.pipeline_freshness), 10);
+    const dataDegraded = metrics.db_health !== "connected"
+      || metrics.symbols_covered <= 0
+      || metrics.predictions_today <= 0
+      || !Number.isFinite(pipelineAge)
+      || pipelineAge > 1
+      || String(metrics.scheduler_health).includes(":partial")
+      || String(metrics.scheduler_health).includes(":error");
 
     return reply.send({
-      status: "ok",
+      status: dataDegraded || providerDegraded ? "degraded" : "ok",
       timestamp: new Date().toISOString(),
       metrics,
       providers,
+      providerStatus: providerSnapshot.state,
     });
   });
 

@@ -43,6 +43,10 @@ const ROUTE_FAMILIES: Record<string, string[]> = {
   intelligence: ['/api/intelligence'],
   stockstory: ['/api/stockstory'],
   predictions: ['/api/predictions'],
+  search: ['/api/search'],
+  research: ['/api/research'],
+  technicals: ['/api/technicals'],
+  operations: ['/api/ops'],
   'admin-ingestion': ['/api/admin/ingestion'],
 };
 
@@ -51,6 +55,10 @@ const FAMILY_RULES: Record<string, RateLimitRule> = {
   intelligence: { windowMs: 60_000, maxRequests: 20 },
   stockstory: { windowMs: 60_000, maxRequests: 20 },
   predictions: { windowMs: 60_000, maxRequests: 30 },
+  search: { windowMs: 60_000, maxRequests: 90 },
+  research: { windowMs: 60_000, maxRequests: 60 },
+  technicals: { windowMs: 60_000, maxRequests: 60 },
+  operations: { windowMs: 60_000, maxRequests: 30 },
   'admin-ingestion': { windowMs: 60_000, maxRequests: 10 },
 };
 

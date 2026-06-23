@@ -57,7 +57,7 @@ export default function HealthometerDetailSheet({ open, onClose, label, score, d
         </div>
 
         <div className="mt-5 space-y-2 border-t border-[var(--color-border)] pt-4 text-xs text-[var(--color-text-secondary)]">
-          <p>The Healthometer aggregates multiple research dimensions into a single score. Higher scores indicate stronger overall business quality and investment context.</p>
+          <p>The Healthometer summarises the available research dimensions; it is not a recommendation. Review each dated input and any missing dimension before relying on the combined score.</p>
         </div>
       </div>
     </div>
