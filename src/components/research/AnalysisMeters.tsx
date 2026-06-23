@@ -54,18 +54,12 @@ export default function AnalysisMeters({ meters, technicalNote, fundamentalNote 
   }
 
   return (
-    <ProductPanel className="p-5">
+    <ProductPanel className="p-4">
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">
-        <Activity className="h-4 w-4" /> Analysis meters
+        <Activity className="h-3.5 w-3.5" /> Analysis meters
       </div>
-      <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
-        Technical & fundamental context
-      </h2>
-      <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
-        Key metrics that inform the research view.
-      </p>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {meters.map((meter) => {
           const style = STATUS_STYLES[meter.status] || STATUS_STYLES.not_enough_information;
           return (

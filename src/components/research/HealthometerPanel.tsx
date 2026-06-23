@@ -50,9 +50,9 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
 
   if (!score && dimensions.length === 0) {
     return (
-      <ProductPanel className="p-5">
+      <ProductPanel className="p-4">
         <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Healthometer</div>
-        <p className="mt-3 text-sm leading-6 text-[var(--color-text-secondary)]">Not enough information for full Healthometer yet. Check back when more research data is available.</p>
+        <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">Not enough information for full Healthometer yet.</p>
       </ProductPanel>
     );
   }
@@ -62,23 +62,20 @@ export default function HealthometerPanel({ label, score, dimensions, loading }:
   const displayScore = safeScore ?? (validDims.length > 0 ? Math.round(validDims.reduce((s, d) => s + (d.score ?? 0), 0) / validDims.length) : null);
 
   return (
-    <ProductPanel className="p-5">
+    <ProductPanel className="p-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]">Healthometer</div>
-          <div className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">{label ?? "In review"}</div>
+          <div className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">{label ?? "In review"}</div>
         </div>
         {displayScore !== null && (
-          <div className="font-mono text-3xl font-semibold tabular-nums text-[var(--color-text-primary)]">
+          <div className="font-mono text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">
             {displayScore}
           </div>
         )}
       </div>
-      <p className="mt-3 text-xs leading-5 text-[var(--color-text-secondary)]">
-        A compact reading of the company's present condition across active research dimensions.
-      </p>
       {validDims.length > 0 && (
-        <div className="mt-5 space-y-3">
+        <div className="mt-4 space-y-2.5">
           {dimensions.map((dimension) => (
             <div key={dimension.id}>
               <div className="mb-1 flex justify-between text-xs">
