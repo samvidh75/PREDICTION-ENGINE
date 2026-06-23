@@ -6,13 +6,15 @@ export interface UpstoxHealthResult {
   apiKeyPresent: boolean;
   clientSecretPresent: boolean;
   redirectUriPresent: boolean;
+  sandboxMode: boolean;
   status: 'ok' | 'degraded' | 'unconfigured';
   detail: string;
 }
 
 export class UpstoxHealthEngine {
   checkHealth(): UpstoxHealthResult {
-    const token = process.env.UPSTOX_ACCESS_TOKEN;
+    const sandboxMode = process.env.UPSTOX_SANDBOX_ENABLED === 'true' || process.env.UPSTOX_SANDBOX_MODE === 'true';
+    const token = sandboxMode ? process.env.UPSTOX_SANDBOX_ACCESS_TOKEN : process.env.UPSTOX_ACCESS_TOKEN;
     const apiKey = process.env.UPSTOX_API_KEY;
     const clientSecret = process.env.UPSTOX_CLIENT_SECRET;
     const redirectUri = process.env.UPSTOX_REDIRECT_URI;
@@ -24,14 +26,16 @@ export class UpstoxHealthEngine {
     let tokenStatus: UpstoxTokenStatus = 'missing';
     let detail = '';
 
+    const modeLabel = sandboxMode ? 'sandbox' : 'production';
+
     if (token && token.length > 10) {
       tokenStatus = 'accepted';
-      detail = 'Upstox access token is present and accepted';
+      detail = `Upstox ${modeLabel} access token is present and accepted`;
     } else if (token) {
       tokenStatus = 'rejected';
-      detail = 'Upstox access token present but appears invalid (too short)';
+      detail = `Upstox ${modeLabel} access token present but appears invalid (too short)`;
     } else {
-      detail = 'No Upstox access token set';
+      detail = `No Upstox ${modeLabel} access token set`;
     }
 
     if (!apiKeyPresent) {
@@ -57,6 +61,7 @@ export class UpstoxHealthEngine {
       apiKeyPresent,
       clientSecretPresent,
       redirectUriPresent,
+      sandboxMode,
       status,
       detail,
     };

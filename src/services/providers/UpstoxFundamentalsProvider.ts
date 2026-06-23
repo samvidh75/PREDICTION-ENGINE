@@ -22,7 +22,8 @@ import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
 import { getSharedProviderRequestBroker } from './broker/createProviderRequestBroker';
 import { getCurrentIngestionRunId } from '../acquisition/IngestionRunContext';
 
-const API_BASE = 'https://api.upstox.com/v2/fundamentals';
+const IS_SANDBOX = process.env.UPSTOX_SANDBOX_ENABLED === 'true' || process.env.UPSTOX_SANDBOX_MODE === 'true';
+const API_BASE = IS_SANDBOX ? 'https://sandbox-api.upstox.com/v2/fundamentals' : 'https://api.upstox.com/v2/fundamentals';
 const REQUEST_TIMEOUT_MS = 10_000;
 const FUNDAMENTALS_CACHE_POLICY = { ttlMs: 3_600_000, staleWindowMs: 3_600_000, negativeTtlMs: 120_000 } as const;
 
@@ -174,7 +175,7 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
 
   private async fetchKeyRatios(symbol: string, isin: string, token: string): Promise<any> {
     const url = `${API_BASE}/${isin}/key-ratios`;
-    const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'key_ratios', symbol, { isin }, async () => {
+      const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'key_ratios', symbol, { isin, sandbox: IS_SANDBOX }, async () => {
       const resp = await this.fetchWithTimeout(url, token);
       return {
         data: await this.readJsonSafely(resp),
@@ -195,7 +196,7 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
 
   private async fetchBalanceSheet(symbol: string, isin: string, token: string): Promise<any> {
     const url = `${API_BASE}/${isin}/balance-sheet?type=consolidated`;
-    const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'balance_sheet', symbol, { isin, type: 'consolidated' }, async () => {
+      const result = await (await getSharedProviderRequestBroker()).execute('upstox', 'balance_sheet', symbol, { isin, type: 'consolidated', sandbox: IS_SANDBOX }, async () => {
       const resp = await this.fetchWithTimeout(url, token);
       const data = await this.readJsonSafely(resp);
       return {

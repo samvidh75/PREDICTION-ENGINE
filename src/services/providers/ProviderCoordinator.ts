@@ -63,6 +63,10 @@ export class ProviderCoordinator {
         return window.localStorage.getItem('upstox_access_token') ?? null;
       }
       if (typeof process !== 'undefined') {
+        const isSandbox = process.env.UPSTOX_SANDBOX_ENABLED === 'true' || process.env.UPSTOX_SANDBOX_MODE === 'true';
+        if (isSandbox) {
+          return process.env.UPSTOX_SANDBOX_ACCESS_TOKEN ?? null;
+        }
         return process.env.UPSTOX_ACCESS_TOKEN ?? process.env.VITE_UPSTOX_ACCESS_TOKEN ?? null;
       }
       return null;
