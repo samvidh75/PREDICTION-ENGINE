@@ -3,8 +3,9 @@ import { STOCKEDGE_CODES, StockEdgeIntegrationError } from "./StockEdgeErrors";
 import { stockEdgeSessionStore } from "./StockEdgeSessionStore";
 import type { StockEdgeSession } from "./StockEdgeSessionStore";
 import type { StockEdgeConfig } from "./StockEdgeTypes";
+import { StockEdgePlaywrightAuth } from "./StockEdgePlaywrightAuth";
 
-export type StockEdgeLoginStrategy = "http_form" | "headless_browser" | "none";
+export type StockEdgeLoginStrategy = "http_form" | "playwright" | "none";
 
 function now(): string {
   return new Date().toISOString();
@@ -24,9 +25,15 @@ export interface StockEdgeLoginResult {
 
 export class StockEdgeAuth {
   private readonly config: StockEdgeConfig;
+  private playwrightEnabled: boolean;
 
   constructor(config?: StockEdgeConfig) {
     this.config = config ?? loadStockEdgeConfig();
+    this.playwrightEnabled = ["1", "true", "yes", "on"].includes((process.env.STOCKEDGE_PLAYWRIGHT_ENABLED ?? "").toLowerCase());
+  }
+
+  setPlaywrightEnabled(enabled: boolean): void {
+    this.playwrightEnabled = enabled;
   }
 
   configSummary(): Record<string, boolean | number> {
@@ -78,10 +85,24 @@ export class StockEdgeAuth {
       const session = await this.attemptHttpFormLogin();
       stockEdgeSessionStore.setSession(session);
       return { ok: true, strategy: "http_form", sessionCreated: true, mfaRequired: false };
-    } catch (error) {
-      if (error instanceof StockEdgeIntegrationError) {
-        const isMfa = error.code === STOCKEDGE_CODES.mfaRequired;
-        return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: isMfa, errorCode: error.code };
+    } catch (httpError) {
+      if (httpError instanceof StockEdgeIntegrationError && httpError.code === STOCKEDGE_CODES.loginFailed && this.playwrightEnabled) {
+        try {
+          const pwAuth = new StockEdgePlaywrightAuth(this.config);
+          const pwSession = await pwAuth.login();
+          stockEdgeSessionStore.setSession(pwSession);
+          return { ok: true, strategy: "playwright", sessionCreated: true, mfaRequired: false };
+        } catch (pwError) {
+          if (pwError instanceof StockEdgeIntegrationError) {
+            const isMfa = pwError.code === STOCKEDGE_CODES.mfaRequired;
+            return { ok: false, strategy: "playwright", sessionCreated: false, mfaRequired: isMfa, errorCode: pwError.code };
+          }
+          return { ok: false, strategy: "playwright", sessionCreated: false, mfaRequired: false, errorCode: STOCKEDGE_CODES.loginFailed };
+        }
+      }
+      if (httpError instanceof StockEdgeIntegrationError) {
+        const isMfa = httpError.code === STOCKEDGE_CODES.mfaRequired;
+        return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: isMfa, errorCode: httpError.code };
       }
       return { ok: false, strategy: "http_form", sessionCreated: false, mfaRequired: false, errorCode: STOCKEDGE_CODES.loginFailed };
     }

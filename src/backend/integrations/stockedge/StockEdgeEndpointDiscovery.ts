@@ -2,6 +2,7 @@ import { loadStockEdgeConfig } from "./StockEdgeConfig";
 import { STOCKEDGE_CODES, StockEdgeIntegrationError } from "./StockEdgeErrors";
 import { stockEdgeSessionStore } from "./StockEdgeSessionStore";
 import type { StockEdgeConfig, StockEdgeLayer } from "./StockEdgeTypes";
+import { StockEdgePlaywrightAuth } from "./StockEdgePlaywrightAuth";
 
 export type SymbolParamStrategy = "path" | "query" | "body" | "unknown";
 
@@ -175,6 +176,51 @@ export class StockEdgeEndpointDiscovery {
       return null;
     } finally {
       clearTimeout(timeout);
+    }
+  }
+
+  async discoverWithPlaywright(symbol: string): Promise<StockEdgeDiscoveryResult> {
+    const start = Date.now();
+    if (!this.config.enabled) {
+      return { ok: false, endpoints: [], layerCounts: {}, errorCode: STOCKEDGE_CODES.disabled, elapsedMs: Date.now() - start };
+    }
+    if (!this.config.accountId || !this.config.password) {
+      return { ok: false, endpoints: [], layerCounts: {}, errorCode: STOCKEDGE_CODES.authNotConfigured, elapsedMs: Date.now() - start };
+    }
+
+    try {
+      const pwAuth = new StockEdgePlaywrightAuth(this.config);
+      const result = await pwAuth.discoverEndpoints(symbol);
+
+      const endpoints: StockEdgeDiscoveredEndpoint[] = result.endpoints.map((ep, i) => ({
+        id: `se-pw-${ep.layer}-${Date.now()}-${i}`,
+        layer: ep.layer as StockEdgeLayer,
+        method: "GET" as const,
+        urlTemplate: ep.url,
+        host: ep.host,
+        requiredHeaders: ["Cookie"],
+        symbolParamStrategy: "unknown" as SymbolParamStrategy,
+        confidence: ep.sampleKeys.length > 0 ? 0.8 : 0.3,
+        sampleKeys: ep.sampleKeys,
+        discoveredAt: new Date().toISOString(),
+      }));
+
+      const layerCounts: Record<string, number> = {};
+      for (const ep of endpoints) {
+        const layer = ep.layer;
+        layerCounts[layer] = (layerCounts[layer] || 0) + 1;
+      }
+
+      return {
+        ok: endpoints.length > 0,
+        endpoints,
+        layerCounts,
+        elapsedMs: Date.now() - start,
+        errorCode: endpoints.length === 0 ? STOCKEDGE_CODES.endpointNotDiscovered : undefined,
+      };
+    } catch (error) {
+      const code = error instanceof StockEdgeIntegrationError ? error.code : STOCKEDGE_CODES.endpointNotDiscovered;
+      return { ok: false, endpoints: [], layerCounts: {}, errorCode: code, elapsedMs: Date.now() - start };
     }
   }
 }

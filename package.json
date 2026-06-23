@@ -115,12 +115,12 @@
     "probe:akshare": "python3 scripts/probe-akshare-provider.py",
     "job:maintenance": "tsx scripts/run-production-maintenance-job.ts",
     "stockedge:smoke": "tsx scripts/stockedge-smoke.ts",
-    "stockedge:extract": "tsx scripts/stockedge-smoke.ts",
+    "stockedge:extract": "tsx scripts/stockedge-extract.ts",
     "stockedge:config": "tsx scripts/stockedge-config.ts",
     "stockedge:login-smoke": "tsx scripts/stockedge-login-smoke.ts",
     "stockedge:discover": "tsx scripts/stockedge-discover.ts",
-    "stockedge:extract-v2": "tsx scripts/stockedge-extract.ts",
     "stockedge:coverage": "tsx scripts/stockedge-coverage.ts",
+    "stockedge:schedule-smoke": "tsx scripts/stockedge-schedule-smoke.ts",
     "market:enrichment:smoke": "tsx scripts/stockedge-smoke.ts"
   },
   "dependencies": {

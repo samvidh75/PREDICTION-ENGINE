@@ -1,6 +1,7 @@
 import type { StockEdgeCanonicalSnapshot, StockEdgeLayer } from "./StockEdgeTypes";
 import { StockEdgeWrapper } from "./StockEdgeWrapper";
 import { buildStockEdgePredictionInput } from "./StockEdgePredictionBridge";
+import { stockEdgeExtractionRunStore } from "./StockEdgeExtractionRunStore";
 
 export interface StockEdgeExtractionPlan {
   symbol: string;
@@ -43,7 +44,7 @@ export class StockEdgeExtractor {
     const result = await this.wrapper.fetchFullSnapshot(plan.symbol);
 
     if (!result.ok || !result.data) {
-      return {
+      const failed: StockEdgeExtractionResult = {
         symbol: plan.symbol,
         ok: false,
         layersAttempted: plan.layers,
@@ -56,6 +57,8 @@ export class StockEdgeExtractor {
         errors: result.internalErrorCode ? [result.internalErrorCode] : ["extraction_failed"],
         discoveryEndpoints: 0,
       };
+      stockEdgeExtractionRunStore.recordRun({ id: `extract-${plan.symbol}-${Date.now()}`, symbol: plan.symbol, startedAt: new Date(start).toISOString(), completedAt: new Date().toISOString(), ok: false, layersAttempted: plan.layers, layersAvailable: [], mappedFieldCount: 0, activeFactorInputCount: 0, errors: failed.errors, elapsedMs: failed.elapsedMs });
+      return failed;
     }
 
     const snapshot = result.data;
@@ -72,7 +75,7 @@ export class StockEdgeExtractor {
     const missingSections = plan.layers.filter((l) => !layersAvailable.includes(l));
     const predictionInput = buildStockEdgePredictionInput(snapshot);
 
-    return {
+    const success: StockEdgeExtractionResult = {
       symbol: plan.symbol,
       ok: true,
       layersAttempted: plan.layers,
@@ -84,5 +87,13 @@ export class StockEdgeExtractor {
       elapsedMs: Date.now() - start,
       errors: result.internalErrorCode ? [result.internalErrorCode] : [],
     };
+
+    stockEdgeExtractionRunStore.recordRun({ id: `extract-${plan.symbol}-${Date.now()}`, symbol: plan.symbol, startedAt: new Date(start).toISOString(), completedAt: new Date().toISOString(), ok: true, layersAttempted: plan.layers, layersAvailable, mappedFieldCount: success.mappedFieldCount, activeFactorInputCount: success.activeFactorInputCount, errors: success.errors, elapsedMs: success.elapsedMs });
+
+    if (!plan.dryRun) {
+      stockEdgeExtractionRunStore.recordSnapshot({ symbol: plan.symbol, capturedAt: new Date().toISOString(), layersAvailable, mappedFieldCount: success.mappedFieldCount, ttlSeconds: 3600 });
+    }
+
+    return success;
   }
 }
