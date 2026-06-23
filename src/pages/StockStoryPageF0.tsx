@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ShoppingBag, Sparkles, ArrowUpRight } from "lucide-react";
+import { Bookmark, Check, ShoppingBag, Sparkles, ArrowUpRight } from "lucide-react";
+import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
+import { addRecentResearch } from "../lib/recent/recentResearchStore";
 import { ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
 import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
 import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
@@ -105,6 +107,7 @@ export default function StockStoryPageF0(): JSX.Element {
     fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
       if (!ctrl.signal.aborted) { setResearch(result); researchFetched.current = true; }
     });
+    addRecentResearch({ symbol: ticker, companyName: identity.displayName });
     api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
       if (!ctrl.signal.aborted) { setNewsItems(res.items || []); setNewsRefreshedAt(res.cachedAt || new Date().toISOString()); }
     }).catch(() => {});
@@ -176,6 +179,23 @@ export default function StockStoryPageF0(): JSX.Element {
         </div>
         {research.message && <div className="border-t border-[rgba(148,163,184,0.12)] px-3 py-2.5 text-[11px] text-[var(--color-text-secondary)] md:px-4">{research.message}</div>}
         {marketDataNeedsReview && <div role="status" className="border-t border-amber-200 bg-amber-50 px-3 py-2.5 text-[11px] leading-5 text-amber-900 md:px-4">Market data may be delayed or the chart and quote may refer to different sessions. Verify the timestamp with your exchange or broker before acting.</div>}
+        <div className="flex gap-2 border-t border-[var(--color-border)] px-3 py-2 md:px-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (isTracked(ticker)) { removeTrackedCompany(ticker); } else { addTrackedCompany({ symbol: ticker, companyName: identity.displayName, addedAt: new Date().toISOString(), source: "stock_page" }); }
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+              isTracked(ticker) ? "border-blue-200 bg-blue-50 text-blue-700" : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-blue-200 hover:text-[var(--color-text-primary)]"
+            }`}
+          >
+            <Bookmark className={`h-3.5 w-3.5 ${isTracked(ticker) ? "fill-blue-600 text-blue-600" : ""}`} />
+            {isTracked(ticker) ? "Tracked" : "Track"}
+          </button>
+          <button type="button" onClick={() => productNavigate("compare", ticker)} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:border-blue-200 hover:text-[var(--color-text-primary)] transition-colors">
+            <ArrowUpRight className="h-3.5 w-3.5" /> Compare
+          </button>
+        </div>
       </header>
 
       <nav aria-label="Company research sections" className="sticky top-0 z-30 -mx-1 mt-2 flex gap-1 overflow-x-auto rounded-xl border border-[var(--color-border)] bg-white/95 p-1 shadow-sm backdrop-blur md:static md:mx-0 md:w-fit">

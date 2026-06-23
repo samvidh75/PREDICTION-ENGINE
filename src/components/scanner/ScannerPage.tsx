@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, Filter, Lock, Search, TrendingUp, Shield, AlertTriangle, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, Star } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
+import { addTrackedCompany, removeTrackedCompany, isTracked } from "../../lib/track/trackStore";
 import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
 import { signalLabelFromScore } from "../../lib/product/signalLabels";
 import CustomSelect from "../ui/CustomSelect";
@@ -228,7 +229,16 @@ export default function ScannerPage() {
 
   const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
   const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
-  const handleTrack = useCallback(async (_symbol: string) => {}, []);
+  const handleTrack = useCallback((symbol: string) => {
+    const entry = results.find((r) => r.symbol === symbol);
+    if (!entry) return;
+    if (isTracked(symbol)) {
+      removeTrackedCompany(symbol);
+    } else {
+      addTrackedCompany({ symbol, companyName: entry.companyName || symbol, addedAt: new Date().toISOString(), source: "scanner" });
+    }
+    setResults((prev) => [...prev]);
+  }, [results]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleQuerySubmit();
