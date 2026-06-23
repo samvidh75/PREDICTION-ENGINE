@@ -5,8 +5,6 @@ import { render, screen } from '@testing-library/react';
 import { MobileNav } from '../MobileNav';
 import { LayoutProvider } from '../../../context/LayoutContext';
 
-expect.extend({});
-
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -27,21 +25,21 @@ describe('MobileNav authenticated', () => {
   it('renders AI Scanner tab', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.getByText('AI Scanner')).toBeInTheDocument();
+    expect(screen.getAllByText('AI Scanner').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders Menu tab', () => {
+  it('renders menu toggle button', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.getByText('Menu')).toBeInTheDocument();
+    expect(screen.getByLabelText('Toggle menu')).toBeInTheDocument();
   });
 
-  it('renders Home, Search, Watchlist tabs', () => {
+  it('renders Home, Search, Track tabs', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Search')).toBeInTheDocument();
-    expect(screen.getByText('Watchlist')).toBeInTheDocument();
+    expect(screen.getByText('Track')).toBeInTheDocument();
   });
 
   it('has accessible label on nav element', () => {
@@ -65,10 +63,10 @@ describe('MobileNav authenticated', () => {
     expect(items.length).toBeLessThanOrEqual(6);
   });
 
-  it('does not show Portfolio in bottom tabs', () => {
+  it('does not show Watchlist in bottom tabs', () => {
     mockCurrentPage('dashboard');
     render(<LayoutProvider><MobileNav /></LayoutProvider>);
-    expect(screen.queryByText('Portfolio')).not.toBeInTheDocument();
+    expect(screen.queryByText('Watchlist')).not.toBeInTheDocument();
   });
 
   it('does not show Alerts in mobile menu', () => {

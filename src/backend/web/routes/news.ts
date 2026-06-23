@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 import { GoogleNewsRssProvider } from "../../../services/providers/GoogleNewsRssProvider";
+import { sanitizeTitle, sanitizeSummary, sanitizeNewsItems } from "../../services/news/NewsSanitizer";
 
 const NEWS_CACHE_TTL = 12 * 60 * 60 * 1000;
 
@@ -37,15 +38,30 @@ export const newsRoutes: FastifyPluginAsync = async (app) => {
       const provider = new GoogleNewsRssProvider();
       const rawItems = await provider.getNews(clean);
 
-      const items: NewsItemResponse[] = rawItems.map((item) => ({
-        headline: item.title,
-        publisher: item.source || "Google News",
-        publishedAt: item.datetime,
-        summary: item.summary || "",
-        whyItMatters: "",
-        url: item.url,
-        category: "company",
-      }));
+      const seenHeadlines = new Set<string>();
+      const items: NewsItemResponse[] = [];
+
+      for (const item of rawItems) {
+        const headline = sanitizeTitle(item.title || "");
+        const publisher = sanitizeTitle(item.source || "News");
+        const summary = sanitizeSummary(item.summary || "");
+
+        const dedupKey = headline.toLowerCase().trim();
+        if (!headline || seenHeadlines.has(dedupKey)) continue;
+        seenHeadlines.add(dedupKey);
+
+        items.push({
+          headline,
+          publisher: publisher || "News",
+          publishedAt: item.datetime || "",
+          summary: summary || "",
+          whyItMatters: "",
+          url: item.url || "",
+          category: "company",
+        });
+
+        if (items.length >= 20) break;
+      }
 
       cache.set(clean, { data: items, fetchedAt: Date.now() });
 

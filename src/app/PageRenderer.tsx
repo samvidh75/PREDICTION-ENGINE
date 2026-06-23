@@ -5,12 +5,11 @@
  * the default (DashboardHub or PublicLandingPage).
  */
 import React from "react";
-import type { PageKey } from "./router";
+import { PUBLIC_PAGES, type PageKey } from "./router";
 
 // Public pages
 import PublicLandingPage from "../pages/PublicLandingPage";
 import PublicAboutPage from "../pages/PublicAboutPage";
-import PublicRankingsPage from "../pages/PublicRankingsPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 import TermsPage from "../pages/TermsPage";
@@ -20,14 +19,13 @@ import DashboardHub from "../views/DashboardHub";
 import SearchPage from "../pages/SearchPage";
 import ScannerPage from "../components/scanner/ScannerPage";
 import StockStoryPage from "../pages/StockStoryPageF0";
-import PortfolioPage from "../pages/PortfolioPage";
-import WatchlistPage from "../pages/WatchlistPage";
+import TrackPage from "../pages/TrackPage";
 import SettingsPage from "../pages/SettingsPage";
 import TrustCentrePage from "../pages/TrustCentrePage";
 import ComparePage from "../pages/ComparePage";
-import AlertsPage from "../pages/AlertsPage";
 import IPOCenterPage from "../pages/IPOCenterPage";
 import PricingPage from "../pages/PricingPage";
+import MorePage from "../pages/MorePage";
 import AppLayout from "../components/navigation/AppLayout";
 
 interface PageRendererProps {
@@ -35,21 +33,6 @@ interface PageRendererProps {
   isAuthenticated: boolean;
   hasStockId: boolean;
 }
-
-const PUBLIC_PAGES: Record<string, boolean> = {
-  landing: true,
-  about: true,
-  login: true,
-  signup: true,
-  trust: true,
-  methodology: true,
-  validation: true,
-  rankings: true,
-  scanner: true,
-  compare: true,
-  pricing: true,
-  terms: true,
-};
 
 function renderPublicPage(pageKey: PageKey): JSX.Element {
   switch (pageKey) {
@@ -64,7 +47,7 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
     case "validation":
       return <TrustCentrePage />;
     case "rankings":
-      return <PublicRankingsPage />;
+      return <ScannerPage />;
     case "scanner":
       return <ScannerPage />;
     case "compare":
@@ -75,6 +58,10 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <IPOCenterPage />;
     case "pricing":
       return <PricingPage />;
+    case "track":
+      return <TrackPage />;
+    case "more":
+      return <MorePage />;
     default:
       return <PublicLandingPage />;
   }
@@ -83,9 +70,9 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
 function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
   switch (pageKey) {
     case "portfolio":
-      return <PortfolioPage />;
     case "watchlist":
-      return <WatchlistPage />;
+    case "alerts":
+      return <TrackPage />;
     case "settings":
       return <SettingsPage />;
     case "search":
@@ -101,11 +88,13 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
     case "validation":
       return <TrustCentrePage />;
     case "rankings":
-      return <PublicRankingsPage />;
+      return <ScannerPage />;
     case "compare":
       return <ComparePage />;
-    case "alerts":
-      return <AlertsPage />;
+    case "track":
+      return <TrackPage />;
+    case "more":
+      return <MorePage />;
     case "ipo":
       return <IPOCenterPage />;
     case "dashboard":
@@ -116,7 +105,7 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
 
 export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
   if (!isAuthenticated) {
-    return PUBLIC_PAGES[pageKey] ? renderPublicPage(pageKey) : <PublicLandingPage />;
+    return PUBLIC_PAGES.includes(pageKey) ? renderPublicPage(pageKey) : <PublicLandingPage />;
   }
 
   // About keeps its public presentation even for authenticated users.

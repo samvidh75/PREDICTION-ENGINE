@@ -92,18 +92,49 @@ export const SCANNER_PRESETS: Record<ScannerPreset, ScannerPresetDefinition> = {
   },
 };
 
+function toResearchState(convictionLabel: string): string {
+  switch (convictionLabel) {
+    case "Very Healthy": return "High conviction";
+    case "Healthy": return "Watch";
+    case "Needs review": return "Needs review";
+    case "Risk rising": return "Risk rising";
+    default: return "Not enough information";
+  }
+}
+
+function getDataQuality(scores: Record<string, number | null>): "complete" | "partial" {
+  const nonNull = Object.values(scores).filter(s => s !== null).length;
+  const total = Object.keys(scores).length;
+  if (total === 0) return "partial";
+  return nonNull / total >= 0.5 ? "complete" : "partial";
+}
+
 export function runScanner(
   preset: ScannerPreset,
   companies: ScannerCompanyInput[],
 ): ScannerResultView[] {
   const definition = SCANNER_PRESETS[preset];
 
-  const scored = companies.map((c, idx) => {
-    const conviction = computeResearchConviction(c.scores, definition.weightAdjustment);
-    return buildScannerResult(c, conviction, idx + 1, definition);
-  });
+  const unique = [...new Map(companies.map((company) => [company.symbol.trim().toUpperCase(), {
+    ...company,
+    symbol: company.symbol.trim().toUpperCase(),
+  }])).values()];
 
-  return scored.sort((a, b) => (b.score ?? -1) - (a.score ?? -1)).map((r, idx) => ({ ...r, rank: idx + 1 }));
+  const scored = unique
+    .map((c, idx) => {
+      const conviction = computeResearchConviction(c.scores, definition.weightAdjustment);
+      return buildScannerResult(c, conviction, idx + 1, definition);
+    })
+    .filter((result) => {
+      if (result.score === null) return false;
+      if (result.conviction === "Research signals pending" || result.conviction === "") return false;
+      if (!result.keyReason || result.keyReason === "Research signals pending for this preset.") return false;
+      return true;
+    });
+
+  const ranked = scored.sort((a, b) => (b.score ?? -1) - (a.score ?? -1)).map((r, idx) => ({ ...r, rank: idx + 1 }));
+
+  return ranked.slice(0, 50);
 }
 
 function buildScannerResult(
