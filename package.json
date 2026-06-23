@@ -158,7 +158,10 @@
     "audit:rc2": "tsx scripts/audit-rc2.ts",
     "audit:rc3": "tsx scripts/audit-rc3.ts",
     "audit:final-release": "tsx scripts/audit-final-release.ts",
-    "scanner:materialize": "tsx scripts/materialize-scanner-results.ts"
+    "scanner:materialize": "tsx scripts/materialize-scanner-results.ts",
+    "audit:provider-reliability": "tsx scripts/audit-provider-reliability.ts",
+    "smoke:trendlyne": "tsx scripts/trendlyne-smoke.ts",
+    "smoke:stockedge": "tsx scripts/stockedge-smoke.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
