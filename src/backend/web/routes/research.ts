@@ -566,16 +566,15 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         );
         targetSymbols = [...new Set(((topRes.rows || []) as any[]).map((r: any) => normaliseSymbol(r.symbol)).filter(Boolean))];
 
-        // Fallback: if prediction_registry has no data, use financial_snapshots symbols
-        if (targetSymbols.length === 0) {
-          const fsRes = await query(
-            `SELECT DISTINCT UPPER(REPLACE(symbol, ' ', '')) AS sym FROM financial_snapshots
-             WHERE pe_ratio IS NOT NULL AND roe IS NOT NULL
-             LIMIT $1`,
-            [limit]
-          );
-          targetSymbols = ((fsRes.rows || []) as any[]).map((r: any) => r.sym).filter(Boolean);
-        }
+        // Merge with financial_snapshots symbols to maximize coverage
+        const fsRes = await query(
+          `SELECT DISTINCT UPPER(REPLACE(symbol, ' ', '')) AS sym FROM financial_snapshots
+           WHERE pe_ratio IS NOT NULL AND roe IS NOT NULL
+           LIMIT $1`,
+          [limit * 2]
+        );
+        const fsSymbols = ((fsRes.rows || []) as any[]).map((r: any) => r.sym).filter(Boolean);
+        targetSymbols = [...new Set([...targetSymbols, ...fsSymbols])].slice(0, limit);
       }
 
       if (targetSymbols.length === 0) {
