@@ -151,8 +151,8 @@ export default function StockStoryPageF0(): JSX.Element {
   const latestHistoryPoint = research.priceHistory.at(-1) ?? null;
   const quoteUpdatedAt = quote.quote?.updatedAt ? new Date(quote.quote.updatedAt) : null;
   const quoteAgeHours = quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? (Date.now() - quoteUpdatedAt.getTime()) / 3_600_000 : null;
-  const chartQuoteMismatch = Boolean(quote.quote && latestHistoryPoint && Math.abs(quote.quote.price - latestHistoryPoint.close) / quote.quote.price > 0.0025);
-  const marketDataNeedsReview = quote.quote?.delayed === true || quoteAgeHours === null || quoteAgeHours > 18 || chartQuoteMismatch;
+  const chartQuoteMismatch = Boolean(quote.quote && latestHistoryPoint && Math.abs(quote.quote.price - latestHistoryPoint.close) / quote.quote.price > 0.005);
+  const marketDataNeedsReview = quote.quote?.delayed === true || quoteAgeHours === null || quoteAgeHours > 30 || chartQuoteMismatch;
 
   return <ProductShell>
     <ProductPage className="max-w-[1180px] !py-3 md:!py-4">
