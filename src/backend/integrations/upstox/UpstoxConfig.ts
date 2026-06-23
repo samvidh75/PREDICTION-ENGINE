@@ -82,6 +82,7 @@ export class UpstoxConfig {
   }
 
   getApiBaseUrl(): string {
+    if (this.getSandboxEnabled()) return 'https://sandbox-api.upstox.com/v2';
     return 'https://api.upstox.com/v2';
   }
 
