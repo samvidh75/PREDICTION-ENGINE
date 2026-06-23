@@ -11,7 +11,7 @@
     "build": "npm run build:frontend",
     "redis:health": "npx tsx scripts/redis-health.ts",
     "build:frontend": "npm run typecheck:frontend && vite build",
-    "build:vercel": "vite build",
+    "build:vercel": "npm run typecheck:vercel && vite build",
     "build:backend": "npm run typecheck:backend && npm run compile:backend",
     "build:render": "npm run compile:backend",
     "build:docker": "npm run compile:backend && npm run build:frontend",
