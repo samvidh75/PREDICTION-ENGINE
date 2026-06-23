@@ -33,7 +33,7 @@ async function main() {
         { signal: AbortSignal.timeout(10000) }
       );
       const data = await res.json();
-      const results = data.results || data;
+      const results = data.data?.results || data.results || data;
       const top = Array.isArray(results) && results.length > 0 ? results[0] : null;
 
       const topTicker = top?.ticker || "";

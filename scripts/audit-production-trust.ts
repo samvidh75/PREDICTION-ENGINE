@@ -60,7 +60,7 @@ async function main() {
     await checkJson(`${BASE_URL}/api/search/universal?query=RELIANCE`,
       "RELIANCE search top result is Reliance Industries",
       (d) => {
-        const results = d.results || d;
+        const results = d.data?.results || d.results || d;
         if (Array.isArray(results) && results.length > 0) {
           return results[0].ticker === "RELIANCE" || (results[0].title || "").includes("Reliance Industries");
         }
@@ -69,7 +69,7 @@ async function main() {
     ),
     await checkJson(`${BASE_URL}/api/market-data/quote/RELIANCE`,
       "RELIANCE quote available",
-      (d) => d && d.lastPrice !== undefined
+      (d) => d && (d.price !== undefined || d.lastPrice !== undefined)
     ),
     await checkJson(`${BASE_URL}/api/news/RELIANCE`,
       "News has no HTML leakage",
