@@ -20,12 +20,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-/* ============================================
-   SSI Institutional Research OS — Design System
-   ============================================ */
-
-/* Base Reset */
 *,
 *::before,
 *::after {
@@ -39,13 +33,13 @@ html {
 html,
 body {
   height: 100%;
-  background-color: var(--color-canvas) !important;
+  background: var(--ss-bg) !important;
 }
 
 body {
   margin: 0;
   background: var(--ss-bg) !important;
-  color: var(--ss-text);
+  color: var(--ss-ink);
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.5;
@@ -65,39 +59,24 @@ button, input, select, textarea {
   font: inherit;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(91, 124, 250, 0.03) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 #root {
   min-height: 100dvh;
   position: relative;
   z-index: 1;
-  background-color: var(--color-canvas) !important;
+  background: var(--ss-bg) !important;
 }
 
 ::selection {
-  background: var(--color-accent);
+  background: var(--ss-ink);
   color: white;
 }
 
-/* ============================================
-   Typography Scale
-   ============================================ */
 .page-heading {
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: var(--color-text-primary);
+  color: var(--ss-ink);
 }
 
 @media (min-width: 768px) {
@@ -111,62 +90,51 @@ body::before {
   font-weight: 600;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--color-text-primary);
+  color: var(--ss-ink);
 }
 
 .body-text {
   font-size: 0.875rem;
   line-height: 1.7;
-  color: var(--color-text-secondary);
+  color: var(--ss-ink-2);
 }
 
 .caption {
   font-size: 0.75rem;
   line-height: 1.5;
-  color: var(--color-text-muted);
+  color: var(--ss-ink-3);
 }
 
 .label {
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1;
-  color: var(--color-text-secondary);
+  color: var(--ss-ink-2);
 }
 
-/* Card & Data Display */
 .data-value {
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-primary);
+  color: var(--ss-ink);
 }
 
 .data-label {
   font-size: 0.6875rem;
   font-weight: 500;
   line-height: 1;
-  color: var(--color-text-muted);
+  color: var(--ss-ink-3);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .metric-value {
-  font-family: var(--font-mono);
   font-size: 1.125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-primary);
-}
-
-.micro-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--color-text-muted);
+  color: var(--ss-ink);
 }
 
 .mono {
@@ -175,32 +143,47 @@ body::before {
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
-/* ============================================
-   Surface System (3 levels)
-   ============================================ */
 .surface {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius-sm);
 }
 
 .surface-raised {
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
+  background: var(--ss-surface-warm);
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius-sm);
 }
 
 .surface-modal {
-  background: var(--color-surface-modal);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-border);
+  border-radius: var(--ss-radius-md);
+  box-shadow: var(--ss-shadow-floating);
 }
 
-/* ============================================
-   Status Indicators
-   ============================================ */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--ss-radius-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ss-ink-3);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.nav-link:hover {
+  background: var(--ss-bg-soft);
+  color: var(--ss-ink);
+}
+
+.nav-link-active {
+  color: var(--ss-ink);
+  font-weight: 600;
+}
+
 .status-dot {
   display: inline-block;
   width: 6px;
@@ -209,144 +192,9 @@ body::before {
   flex-shrink: 0;
 }
 
-.status-dot-active { background: var(--color-active); }
-.status-dot-partial { background: var(--color-warning); }
-.status-dot-blocked { background: var(--color-danger); }
-.status-dot-muted { background: var(--color-text-muted); }
+.status-dot-active { background: var(--ss-positive); }
+.status-dot-muted { background: var(--ss-ink-4); }
 
-.status-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.status-label-active {
-  background: var(--color-active-bg);
-  color: var(--color-active);
-}
-
-.status-label-partial {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-
-.status-label-blocked {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-}
-
-.status-label-muted {
-  background: var(--color-muted-bg);
-  color: var(--color-text-muted);
-}
-
-/* ============================================
-   Icon sizes
-   ============================================ */
-.icon-nav { width: 20px; height: 20px; }
-.icon-action { width: 18px; height: 18px; }
-.icon-card { width: 20px; height: 20px; }
-.icon-inline { width: 14px; height: 14px; }
-
-/* ============================================
-   Tables
-   ============================================ */
-.table-header {
-  padding: 10px 16px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-align: left;
-  border-bottom: 1px solid var(--color-border-light);
-  white-space: nowrap;
-}
-
-.table-cell {
-  padding: 12px 16px;
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-border-light);
-  vertical-align: middle;
-}
-
-.table-row {
-  transition: background 120ms ease;
-}
-
-.table-row:hover {
-  background: rgba(15, 23, 42, 0.03);
-}
-
-.table-row:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
-}
-
-/* ============================================
-   Navigation
-   ============================================ */
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  transition: background 120ms ease, color 120ms ease;
-}
-
-.nav-link:hover {
-  background: var(--color-accent-light);
-  color: var(--color-accent);
-}
-
-.nav-link-active {
-  color: var(--c-ink);
-  font-weight: 600;
-}
-
-.bottom-nav {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 90;
-  display: flex;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-}
-
-.bottom-tab {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  min-height: 48px;
-  border-radius: 8px;
-  font-size: 0.625rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  transition: background 120ms ease, color 120ms ease;
-}
-
-.bottom-tab-active {
-  color: var(--c-brand);
-}
-
-/* ============================================
-   Buttons
-   ============================================ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -355,52 +203,44 @@ body::before {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1;
-  border-radius: 8px;
+  border-radius: var(--ss-radius-sm);
   transition: background 120ms ease, border-color 120ms ease;
   cursor: pointer;
 }
 
 .btn-primary {
-  background: var(--color-accent);
+  background: var(--ss-action);
   color: white;
   padding: 8px 16px;
 }
 
 .btn-primary:hover {
-  background: #3B71FF;
+  background: var(--ss-action-hover);
 }
 
 .btn-secondary {
   background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  color: var(--ss-ink-2);
+  border: 1px solid var(--ss-border);
   padding: 7px 15px;
 }
 
 .btn-secondary:hover {
-  border-color: var(--color-accent-border);
-  color: var(--color-accent);
+  border-color: var(--ss-ink);
+  color: var(--ss-ink);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--ss-ink-3);
   padding: 8px 12px;
 }
 
 .btn-ghost:hover {
-  background: var(--color-accent-light);
-  color: var(--color-accent);
+  background: var(--ss-bg-soft);
+  color: var(--ss-ink);
 }
 
-.btn-sm {
-  padding: 5px 10px;
-  font-size: 0.8125rem;
-}
-
-/* ============================================
-   Utility
-   ============================================ */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -418,7 +258,6 @@ body::before {
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
 
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -430,17 +269,18 @@ body::before {
   }
 }
 
-/* Focus — Soft Glow */
 :focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-accent), 0 0 16px rgba(91, 124, 250, 0.15);
+  outline: 2px solid var(--ss-ink);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 button:focus-visible,
 a:focus-visible,
 [tabindex]:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-accent), 0 0 16px rgba(91, 124, 250, 0.15);
+  outline: 2px solid var(--ss-ink);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 button,
@@ -448,9 +288,6 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ============================================
-   Custom Scrollbar — Dark Premium Theme
-   ============================================ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -461,21 +298,19 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(0, 0, 0, 0.14);
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
 }
 
-/* Hide scrollbar but keep scrollable — for horizontal chip rails */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -485,30 +320,24 @@ a {
   display: none;
 }
 
-/* Ensure all interactive elements meet 44x44px minimum touch target */
 @media (pointer: coarse) {
   button, a, input, select, textarea { min-height: 44px; }
 }
 
-/* Select / dropdown dark styling */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239AA7B5' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239A9A9A' d='M1 1l4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 10px 6px;
   padding-right: 24px;
 }
 
-/* Option styling for light select */
 select option {
   background: #FFFFFF;
-  color: #0F172A;
+  color: #111111;
 }
 
-/* ============================================
-   Mobile responsive overrides
-   ============================================ */
 @media (max-width: 639px) {
   .hide-mobile { display: none !important; }
 }
@@ -516,70 +345,9 @@ select option {
   .show-mobile { display: none !important; }
 }
 
-/* ============================================
-   Legacy alias — remove after full migration
-   ============================================ */
 .ss-page { min-height: 100vh; }
 .ss-metric { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1; letter-spacing: 0; }
 .ssi-number { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1; font-weight: 600; letter-spacing: 0; }
-@keyframes brand-rise {
-  from { opacity: 0; transform: translateY(5px) scaleY(.75); }
-  to { opacity: 1; transform: translateY(0) scaleY(1); }
-}
-
-@keyframes brand-draw {
-  from { stroke-dasharray: 1; stroke-dashoffset: 1; }
-  to { stroke-dasharray: 1; stroke-dashoffset: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [class*="brand-rise"], [class*="brand-draw"] { animation: none !important; }
-}
-
-/* Institutional visual baseline */
-html,
-body,
-#root {
-  background: var(--c-bg) !important;
-}
-
-body {
-  color: var(--c-ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-}
-
-body::before {
-  display: none;
-}
-
-*:not(svg):not(svg *) {
-  box-shadow: none !important;
-}
-
-[class*="gradient"]:not(svg):not(svg *) {
-  background-image: none !important;
-}
-
-*:not(svg):not(svg *):not(select) {
-  background-image: none !important;
-}
-
-:focus-visible,
-button:focus-visible,
-a:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--c-brand);
-  outline-offset: 2px;
-  box-shadow: none !important;
-}
-
-button,
-input,
-select,
-textarea {
-  border-radius: var(--r-md);
-}
 
 .price,
 .score,

@@ -222,9 +222,9 @@ export const SettingsPage: React.FC = () => {
                 <span className="text-[#E6EDF3] font-medium">Unified v2.0.0</span>
               </div>
               <div className="flex justify-between">
-                <span>Data providers</span>
+                <span>Research basis</span>
                 <span className="text-[#E6EDF3] font-medium text-right">
-                  IndianAPI, Yahoo Finance, Screener.in
+                  Multi-source financial data
                 </span>
               </div>
             </div>

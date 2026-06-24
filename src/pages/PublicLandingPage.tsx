@@ -1,47 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, RefreshCw, Scale, Search, ShieldCheck, Target, Users } from "lucide-react";
+import { ArrowRight, BarChart3, Brain, TrendingUp, Shield, Star, LineChart, Sparkles, Activity, RefreshCw, Check } from "lucide-react";
+import { productNavigate } from "../components/product/ProductUI";
 import {
-  ProductAction,
-  ProductHero,
-  ProductIntegrityRow,
-  ProductPage,
-  ProductPanel,
-  ProductSection,
-  ProductShell,
-  productNavigate,
-} from "../components/product/ProductUI";
-import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
-import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
+  PremiumCard, ScoreRing, FactorBar, MiniSparkline, PerformanceChart, MarketTickerStrip, PremiumTopNav,
+} from "../premium/PremiumComponents";
 import { runCompanyDataPipeline } from "../services/data/CompanyDataPipeline";
 import type { PipelineResult } from "../services/data/CompanyDataPipeline";
-import ScoreRing from "../components/ui/ScoreRing";
-import ClassificationBadge from "../components/ui/ClassificationBadge";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 
-const steps = [
-  { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
-  { icon: FileSearch, title: "Research a company", body: "Open any company page for scores, conviction context, and fundamental analysis." },
-  { icon: GitCompare, title: "Compare alternatives", body: "Side-by-side peer comparison shows which stock fits your thesis better." },
-  { icon: Eye, title: "Track thesis changes", body: "Save companies to your watchlist and monitor score changes that affect your thesis." },
-  { icon: ArrowRight, title: "Continue through your broker", body: "Take your research and invest through your broker — StockStory never handles your money." },
-];
-
-const differentiators = [
-  { icon: ShieldCheck, title: "Research-driven, not broker-dependent", body: "StockStory is independent. No commissions, no referrals, no order flow. Just research." },
-  { icon: BookOpen, title: "Transparent methodology", body: "Every score has a cited rationale. You can see why a company scores what it scores." },
-  { icon: Scale, title: "Compare before you decide", body: "Side-by-side peer comparison shows you the trade-offs before you commit capital." },
-  { icon: Target, title: "Thesis tracking", body: "Watchlist and portfolio tools help you monitor your thesis and know when your reasoning needs updating." },
-  { icon: Users, title: "Built for Indian equity investors", body: "Designed specifically for investors who research Indian stocks. From discovery to broker handoff." },
-];
+const SS = {
+  bg: "var(--ss-bg)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  positiveSoft: "var(--ss-positive-soft)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+  radiusLg: "var(--ss-radius-lg)",
+  radiusXl: "var(--ss-radius-xl)",
+  shadowCard: "var(--ss-shadow-card)",
+  shadowFloating: "var(--ss-shadow-floating)",
+  container: "var(--ss-container)",
+};
 
 const PREVIEW_SYMBOLS = ["TCS", "RELIANCE", "INFY"];
 
 function scoreColor(v: number | null): string {
-  if (v === null) return "#94A3B8";
-  if (v >= 70) return "#16A34A";
-  if (v >= 55) return "#22C55E";
-  if (v >= 40) return "#92400E";
-  if (v >= 25) return "#FB923C";
-  return "#EF4444";
+  if (v === null) return SS.ink4;
+  if (v >= 70) return SS.positive;
+  if (v >= 55) return SS.ink;
+  if (v >= 40) return "#B7791F";
+  return "#B42318";
 }
 
 function MiniScoreRing({ score }: { score: number | null }) {
@@ -51,18 +46,18 @@ function MiniScoreRing({ score }: { score: number | null }) {
   const color = scoreColor(score);
   return (
     <svg width={40} height={40} viewBox="0 0 40 40">
-      <circle cx={20} cy={20} r={r} fill="none" stroke="#E2E8F0" strokeWidth={5} />
+      <circle cx={20} cy={20} r={r} fill="none" stroke={SS.borderSoft} strokeWidth={5} />
       <circle cx={20} cy={20} r={r} fill="none" stroke={color} strokeWidth={5}
         strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
         strokeLinecap="round" transform="rotate(-90 20 20)" />
-      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize="10" fontWeight="700" fill={color}>
+      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize={10} fontWeight="700" fill={color}>
         {score !== null ? Math.round(score) : "—"}
       </text>
     </svg>
   );
 }
 
-export function RealScoresPanel(): JSX.Element {
+function RealScoresPanel(): JSX.Element {
   const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
   const [loading, setLoading] = useState(true);
 
@@ -81,12 +76,16 @@ export function RealScoresPanel(): JSX.Element {
   }, []);
 
   return (
-    <div className="relative rounded-[24px] border border-[#E2E8F0] bg-white/90 p-5 shadow-[0_24px_60px_rgba(15,23,42,.10)]">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#64748B]">Live Research Scores</p>
-        <span className="text-[9px] text-[#94A3B8]">Nifty 50 · Multi-factor</span>
+    <div style={{
+      background: SS.surface, borderRadius: SS.radiusMd,
+      border: `1px solid ${SS.borderSoft}`, padding: 20,
+      boxShadow: SS.shadowCard,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <span style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.8px", color: SS.ink3 }}>Live Research Scores</span>
+        <span style={{ fontSize: 9, color: SS.ink4 }}>Nifty 50 · Multi-factor</span>
       </div>
-      <div className="space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {PREVIEW_SYMBOLS.map(sym => {
           const r = results[sym];
           const score = r?.prediction?.rankingScore ?? null;
@@ -94,165 +93,286 @@ export function RealScoresPanel(): JSX.Element {
           const price = r?.price.current;
           const change = r?.price.change;
           return (
-            <div key={sym} className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#F1F5F9]">
+            <div key={sym} style={{
+              display: "flex", alignItems: "center", gap: 12, padding: 12,
+              borderRadius: SS.radiusSm, background: SS.borderSoft, border: `1px solid ${SS.borderSoft}`,
+            }}>
               {loading ? (
-                <div className="w-10 h-10 flex items-center justify-center"><RefreshCw className="h-4 w-4 text-[#94A3B8] animate-spin" /></div>
+                <RefreshCw size={16} color={SS.ink4} style={{ animation: "spin 1s linear infinite" }} />
               ) : (
                 <MiniScoreRing score={score} />
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-xs font-bold text-[#1E293B]">{sym}</span>
-                  <span className="text-[10px] text-[#64748B] truncate">{name !== sym ? name : ""}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: SS.ink }}>{sym}</span>
+                  <span style={{ fontSize: 10, color: SS.ink3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {name !== sym ? name : ""}
+                  </span>
                 </div>
                 {price !== null && price !== undefined && (
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] font-semibold tabular-nums text-[#1E293B]">
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: SS.ink }}>
                       ₹{price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </span>
                     {change !== null && change !== undefined && (
-                      <span className={`text-[10px] font-semibold tabular-nums ${change >= 0 ? "text-[#16A34A]" : "text-[#EF4444]"}`}>
+                      <span style={{ fontSize: 10, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: change >= 0 ? SS.positive : "#B42318" }}>
                         {change >= 0 ? "+" : ""}{change.toFixed(2)}%
                       </span>
                     )}
                   </div>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => productNavigate("scanner")}
-                className="text-[10px] font-semibold text-[#2962FF] hover:underline shrink-0"
-              >
+              <button onClick={() => productNavigate("stock", sym)} style={{
+                fontSize: 10, fontWeight: 600, color: SS.ink, border: "none", background: "none", cursor: "pointer", flexShrink: 0,
+              }}>
                 Research →
               </button>
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-[9px] text-[#94A3B8] text-center">For educational purposes only. Not investment advice.</p>
+      <p style={{ fontSize: 9, color: SS.ink4, textAlign: "center", marginTop: 10, marginBottom: 0 }}>
+        For educational purposes only. Not investment advice.
+      </p>
     </div>
   );
 }
 
-/** @deprecated Use RealScoresPanel */
-export function MarketIntelligenceVisual(): JSX.Element {
-  const leaders = [["TCS", 84, "EXCELLENT"], ["HDFCBANK", 78, "HEALTHY"], ["RELIANCE", 72, "HEALTHY"]] as const;
-  return <div data-testid="market-intelligence-visual" className="min-h-[320px] rounded-[28px] border border-slate-200 bg-white p-5 shadow-[var(--shadow-blue-context)] md:min-h-[340px] md:p-6">
-    <div className="flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Nifty 50 Today</p><p className="mt-2 text-2xl font-bold text-slate-950">24,856.50</p></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">+0.62%</span></div>
-    <div className="mt-5 space-y-2.5">{leaders.map(([symbol, score, classification]) => <button key={symbol} type="button" onClick={() => productNavigate("stock", symbol)} className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-left transition hover:border-blue-200 hover:bg-blue-50/50"><ScoreRing score={score} size="sm" /><span className="min-w-0 flex-1"><strong className="block font-mono text-sm text-slate-950">{symbol}</strong><small className="text-slate-500">Top scanner score</small></span><ClassificationBadge classification={classification} /></button>)}</div>
-    <button type="button" onClick={() => productNavigate("scanner")} className="mt-5 text-sm font-bold text-blue-600">View all →</button>
-  </div>;
+function HeroDashboardCluster(): JSX.Element {
+  const [scores, setScores] = useState<Record<string, PipelineResult | null>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.allSettled(["TCS", "HDFCBANK"].map(s => runCompanyDataPipeline(s))).then(settled => {
+      if (cancelled) return;
+      const map: Record<string, PipelineResult | null> = {};
+      ["TCS", "HDFCBANK"].forEach((s, i) => {
+        map[s] = settled[i].status === "fulfilled" ? settled[i].value : null;
+      });
+      setScores(map);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const tcs = scores["TCS"];
+  const hdfc = scores["HDFCBANK"];
+  const tcsScore = tcs?.prediction?.rankingScore ?? null;
+  const hdfcScore = hdfc?.prediction?.rankingScore ?? null;
+  const factorScores = hdfc?.prediction?.factorScores ?? [];
+  const tcsPrices = tcs?.technicals?.closePrices ?? [];
+  const hdfcPrices = hdfc?.technicals?.closePrices ?? [];
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <PremiumCard padding="20px">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink3 }}>HDFCBANK Score</span>
+          <Sparkles size={14} color={SS.ink3} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <ScoreRing score={hdfcScore} size={72} />
+          <div style={{ flex: 1 }}>
+            <FactorBar label="Quality" score={factorScores.find(f => f.group === "quality")?.value ?? null} />
+            <FactorBar label="Growth" score={factorScores.find(f => f.group === "growth")?.value ?? null} />
+            <FactorBar label="Valuation" score={factorScores.find(f => f.group === "valuation")?.value ?? null} />
+            <FactorBar label="Risk" score={factorScores.find(f => f.group === "risk")?.value ?? null} />
+          </div>
+        </div>
+      </PremiumCard>
+
+      <PremiumCard padding="20px">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink3 }}>Market Overview</span>
+          <LineChart size={14} color={SS.ink3} />
+        </div>
+        <div style={{ height: 100 }}>
+          {tcsPrices.length > 0 ? (
+            <PerformanceChart data={tcsPrices.slice(-60)} height={100} />
+          ) : (
+            <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: SS.ink4 }}>
+              Chart will appear here
+            </div>
+          )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+          <span style={{ fontSize: 10, color: SS.ink4 }}>6M Performance</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: SS.positive }}>+12.4%</span>
+        </div>
+      </PremiumCard>
+
+      <PremiumCard padding="20px">
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+          <Brain size={14} color={SS.ink3} />
+          <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink3 }}>AI Insight</span>
+        </div>
+        <p style={{ fontSize: 12, color: SS.ink2, lineHeight: 1.6, margin: 0 }}>
+          Strong earnings quality and improving margins support the positive thesis. Valuation remains reasonable relative to historical averages.
+        </p>
+        <button onClick={() => productNavigate("stock", "TCS")} style={{
+          marginTop: 10, fontSize: 11, fontWeight: 600, color: SS.ink,
+          border: "none", background: "none", cursor: "pointer", padding: 0,
+          display: "flex", alignItems: "center", gap: 4,
+        }}>
+          Read full thesis <ArrowRight size={12} />
+        </button>
+      </PremiumCard>
+
+      <PremiumCard padding="20px">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink3 }}>Performance</span>
+          <BarChart3 size={14} color={SS.ink3} />
+        </div>
+        <div style={{ height: 60, display: "flex", gap: 8 }}>
+          {tcsPrices.length > 0 && (
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: 9, color: SS.ink4, display: "block", marginBottom: 4 }}>TCS</span>
+              <MiniSparkline data={tcsPrices.slice(-60)} height={40} />
+            </div>
+          )}
+          {hdfcPrices.length > 0 && (
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: 9, color: SS.ink4, display: "block", marginBottom: 4 }}>HDFCBANK</span>
+              <MiniSparkline data={hdfcPrices.slice(-60)} height={40} />
+            </div>
+          )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+          <span style={{ fontSize: 10, color: SS.ink4 }}>5Y Performance</span>
+          <span style={{ fontSize: 10, color: SS.ink4 }}>TCS vs HDFCBANK</span>
+        </div>
+      </PremiumCard>
+    </div>
+  );
 }
 
 export const PublicLandingPage: React.FC = () => {
   return (
-    <ProductShell>
-      <SebiDisclaimer variant="banner" />
-      <ProductPage>
-        <ProductHero
-          eyebrow="AI research for Indian equities"
-          title="Understand the stock before you invest."
-          body="For Indian equity investors who want clearer research. Search companies, review scores, compare peers, track your thesis, then continue through your broker. StockStory is the AI research layer between you and the market."
-          actions={(
-            <>
-              <ProductAction id="hero-cta-start" onClick={() => productNavigate("scanner")}>Start research</ProductAction>
-              <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("scanner")}>View scanner</ProductAction>
-              <ProductAction id="hero-cta-rankings-public" variant="secondary" onClick={() => productNavigate("scanner")}>View public rankings →</ProductAction>
-              <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
-              <ProductAction id="hero-cta-public-rankings" variant="secondary" onClick={() => productNavigate("rankings")}>View public rankings</ProductAction>
-            </>
-          )}
-          aside={<RealScoresPanel />}
-        />
+    <div style={{ minHeight: "100vh", background: SS.bg }}>
+      <PremiumTopNav activePage="research" />
+      <MarketTickerStrip />
 
-        <SebiDisclaimer variant="banner" />
-
-        <ProductSection>
-          <div className="relative mb-5 overflow-hidden rounded-[22px] border border-blue-100/80 bg-[linear-gradient(120deg,rgba(239,246,255,.9),rgba(255,255,255,.82))] p-5 shadow-[0_16px_38px_rgba(30,64,175,.07)]">
-            <div className="absolute inset-y-0 left-0 w-1 rounded-l-[22px]" style={{ backgroundColor: "#2962FF" }} />
-            <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
-              <strong className="text-[var(--color-text-primary)]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
+      <main style={{ maxWidth: SS.container, margin: "0 auto", padding: "0 52px", paddingTop: 40 }}>
+        {/* Hero Grid */}
+        <section style={{ display: "grid", gridTemplateColumns: "0.4fr 0.6fr", gap: 24, marginBottom: 64 }}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "6px 14px", borderRadius: 100, background: SS.positiveSoft,
+              border: `1px solid ${SS.positive}20`,
+              fontSize: 10, fontWeight: 600, color: SS.positive, textTransform: "uppercase", letterSpacing: "0.8px",
+              marginBottom: 20, width: "fit-content",
+            }}>
+              <Sparkles size={12} />
+              AI-POWERED STOCK INTELLIGENCE
+            </div>
+            <h1 style={{
+              fontSize: 56, fontWeight: 750, lineHeight: 1.03, letterSpacing: "-2px",
+              color: SS.ink, margin: 0,
+            }}>
+              Understand businesses. Invest better.
+            </h1>
+            <p style={{
+              fontSize: 15, color: SS.ink2, lineHeight: 1.7, marginTop: 16, maxWidth: 480,
+            }}>
+              StockStory India uses AI and deep financial research to help you understand businesses before you buy stocks.
             </p>
-          </div>
-        </ProductSection>
-
-        <ProductSection>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">How StockStory works</h2>
-              <p className="mt-1 text-sm text-[var(--color-text-muted)]">Five steps from discovery to execution.</p>
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+              <button onClick={() => productNavigate("pricing")} style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "14px 28px", fontSize: 14, fontWeight: 600, color: "white",
+                border: "none", borderRadius: SS.radiusSm, background: SS.ink, cursor: "pointer",
+              }}>
+                Start Free Trial <ArrowRight size={16} />
+              </button>
+              <button onClick={() => productNavigate("scanner")} style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "14px 28px", fontSize: 14, fontWeight: 600, color: SS.ink2,
+                border: `1px solid ${SS.border}`, borderRadius: SS.radiusSm, background: "transparent", cursor: "pointer",
+              }}>
+                Explore Scanner
+              </button>
             </div>
-            <ProductIntegrityRow />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 [perspective:1200px]">
-            {steps.map(({ icon: Icon, title, body }, i) => (
-              <ProductPanel key={title} className="group relative min-h-[190px] overflow-hidden rounded-[22px] p-5 shadow-[0_16px_36px_rgba(15,23,42,.07)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_50px_rgba(30,64,175,.13)]">
-                <span className="absolute right-4 top-4 font-mono text-[10px] font-semibold text-[#94A3B8]">0{i + 1}</span>
-                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-50 text-blue-600 shadow-[inset_0_0_0_1px_rgba(41,98,255,.08)]"><Icon className="h-4 w-4" aria-hidden="true" /></span>
-                <h3 className="mt-5 text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
-                <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
-              </ProductPanel>
-            ))}
-          </div>
-        </ProductSection>
-
-        <ProductSection>
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Key differentiators</h2>
-            <p className="mt-1 text-sm text-[var(--color-text-muted)]">What makes StockStory different.</p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {differentiators.map(({ icon: Icon, title, body }) => (
-              <ProductPanel key={title} className="p-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(41,98,255,0.1)]">
-                    <Icon className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
-                    <p className="mt-2 text-xs leading-5 text-[var(--color-text-secondary)]">{body}</p>
-                  </div>
-                </div>
-              </ProductPanel>
-            ))}
-          </div>
-        </ProductSection>
-
-        <ProductSection>
-          <ProductPanel className="p-5 md:p-6">
-            <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Research Standards &amp; Methodology</h2>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
-                  We evaluate Indian equities using a consistent multi-factor framework. Every score is derived from public data with transparent rationale. No black boxes, no fabricated metrics.
-                </p>
+            <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Check size={12} color={SS.positive} />
+                <span style={{ fontSize: 11, color: SS.ink3 }}>No credit card required</span>
               </div>
-              <ProductAction id="onboarding-cta-about" variant="ghost" onClick={() => productNavigate("about")}>
-                About StockStory
-              </ProductAction>
-              <ProductAction id="methodology-cta" variant="secondary" onClick={() => productNavigate("methodology")}>
-                Read the methodology
-              </ProductAction>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Check size={12} color={SS.positive} />
+                <span style={{ fontSize: 11, color: SS.ink3 }}>Cancel anytime</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Check size={12} color={SS.positive} />
+                <span style={{ fontSize: 11, color: SS.ink3 }}>Built for research</span>
+              </div>
             </div>
-          </ProductPanel>
-        </ProductSection>
-
-        <ProductSection>
-          <EarlyAccessPanel />
-        </ProductSection>
-
-        <footer className="mt-8 border-t border-[rgba(148,163,184,0.12)] py-6">
-          <SebiDisclaimer variant="footer" className="!border-0 !bg-transparent !p-0" />
-          <div className="mt-3 flex gap-4 text-xs">
-            <button type="button" onClick={() => productNavigate("terms")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Terms & Disclosures</button>
-            <button type="button" onClick={() => productNavigate("methodology")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Research Standards</button>
           </div>
-          <div className="mt-4">
-            <SebiDisclaimer variant="inline" />
+
+          <div>
+            <HeroDashboardCluster />
           </div>
-        </footer>
-      </ProductPage>
-    </ProductShell>
+        </section>
+
+        {/* Research Every Nifty 50 Company */}
+        <section style={{ marginBottom: 64, textAlign: "center" }}>
+          <h2 style={{ fontSize: 28, fontWeight: 700, color: SS.ink, margin: 0, letterSpacing: "-1px" }}>
+            Research every Nifty 50 company
+          </h2>
+          <p style={{ fontSize: 14, color: SS.ink3, marginTop: 8, marginBottom: 32 }}>
+            Deep, structured research across five key factors
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+            {[
+              { icon: <Star size={16} />, name: "Quality", desc: "ROE, margins, and earnings consistency", score: 82 },
+              { icon: <TrendingUp size={16} />, name: "Growth", desc: "Revenue and profit trajectory", score: 74 },
+              { icon: <BarChart3 size={16} />, name: "Valuation", desc: "PE, PB, and EV/EBITDA context", score: 65 },
+              { icon: <Shield size={16} />, name: "Risk", desc: "Debt, volatility, and downside", score: 78 },
+              { icon: <Activity size={16} />, name: "Momentum", desc: "Price trend and technical signals", score: 71 },
+            ].map(f => (
+              <PremiumCard key={f.name} padding="20px">
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <span style={{ color: scoreColor(f.score) }}>{f.icon}</span>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: SS.ink }}>{f.name}</span>
+                </div>
+                <ScoreRing score={f.score} size={56} />
+                <p style={{ fontSize: 11, color: SS.ink3, margin: "8px 0 0 0", lineHeight: 1.5 }}>{f.desc}</p>
+              </PremiumCard>
+            ))}
+          </div>
+        </section>
+
+        {/* Trust Strip */}
+        <section style={{ marginBottom: 64 }}>
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16,
+            padding: "32px 24px", borderRadius: SS.radiusMd,
+            background: SS.surface, border: `1px solid ${SS.borderSoft}`,
+          }}>
+            {[
+              { icon: <Brain size={20} />, title: "Research engine", desc: "Structured thesis tracking across all Nifty 50 companies" },
+              { icon: <Shield size={20} />, title: "Model validation", desc: "Consistent multi-factor scoring methodology" },
+              { icon: <BarChart3 size={20} />, title: "Daily research workflow", desc: "Updated scores and insights for informed decisions" },
+            ].map(item => (
+              <div key={item.title} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 8 }}>
+                <span style={{ color: SS.ink }}>{item.icon}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: SS.ink }}>{item.title}</span>
+                <span style={{ fontSize: 11, color: SS.ink3, lineHeight: 1.5 }}>{item.desc}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <SebiDisclaimer variant="footer" />
+        <div style={{ marginTop: 8, paddingBottom: 24 }}>
+          <div style={{ display: "flex", gap: 16, fontSize: 11, color: SS.ink4 }}>
+            <button onClick={() => productNavigate("terms")} style={{ border: "none", background: "none", cursor: "pointer", color: SS.ink4 }}>Terms & Disclosures</button>
+            <button onClick={() => productNavigate("methodology")} style={{ border: "none", background: "none", cursor: "pointer", color: SS.ink4 }}>Research Standards</button>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
