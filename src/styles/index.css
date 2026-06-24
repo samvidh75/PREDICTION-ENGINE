@@ -563,6 +563,10 @@ body::before {
   background-image: none !important;
 }
 
+*:not(svg):not(svg *):not(select) {
+  background-image: none !important;
+}
+
 :focus-visible,
 button:focus-visible,
 a:focus-visible,
