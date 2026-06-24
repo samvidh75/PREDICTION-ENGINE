@@ -34,8 +34,12 @@ export function getPageKeyFromUrl(): PageKey {
   if (typeof window === "undefined") return "landing";
   try {
     const params = new URLSearchParams(window.location.search);
-    const pathKey = window.location.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
-    const raw = (params.get("page") ?? pathKey ?? "landing").toLowerCase().trim() || "landing";
+    const pathKey = window.location.pathname
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")[0];
+    const raw =
+      (params.get("page") ?? pathKey ?? "landing").toLowerCase().trim() ||
+      "landing";
 
     const mapping: Record<string, PageKey> = {
       landing: "landing",
@@ -62,6 +66,7 @@ export function getPageKeyFromUrl(): PageKey {
       invest: "invest",
       ipo: "ipo",
       pricing: "pricing",
+      terms: "terms",
       track: "track",
       more: "more",
     };
@@ -98,14 +103,36 @@ export function notifyUrlChange(): void {
 
 /** Protected pages that require authentication. */
 export const PROTECTED_PAGES: PageKey[] = [
-  "dashboard", "watchlist", "portfolio", "settings", "alerts", "invest",
+  "dashboard",
+  "watchlist",
+  "portfolio",
+  "settings",
+  "alerts",
+  "invest",
 ];
 
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
-  "landing", "about", "login", "signup", "methodology",
-  "rankings", "compare", "scanner", "search", "stock", "company",
-  "watchlist", "portfolio", "alerts", "ipo", "track", "more", "pricing", "terms", "settings",
+  "landing",
+  "about",
+  "login",
+  "signup",
+  "methodology",
+  "rankings",
+  "compare",
+  "scanner",
+  "search",
+  "stock",
+  "company",
+  "watchlist",
+  "portfolio",
+  "alerts",
+  "ipo",
+  "track",
+  "more",
+  "pricing",
+  "terms",
+  "settings",
 ];
 
 /**
@@ -118,7 +145,11 @@ export function sanitizeReturnTo(returnTo: string | null): string | null {
   if (!returnTo || typeof returnTo !== "string") return null;
   const trimmed = returnTo.trim();
   if (!trimmed.startsWith("?")) return null;
-  if (trimmed.toLowerCase().includes("http:") || trimmed.toLowerCase().includes("https:")) return null;
+  if (
+    trimmed.toLowerCase().includes("http:") ||
+    trimmed.toLowerCase().includes("https:")
+  )
+    return null;
   if (trimmed.startsWith("//")) return null;
   if (/[\s<>"'()@]/.test(trimmed)) return null;
   // Ensure only valid query param characters
@@ -130,7 +161,10 @@ export function sanitizeReturnTo(returnTo: string | null): string | null {
 /**
  * Get a human-readable context message for the auth page based on the returnTo URL.
  */
-export function getReturnToContext(returnTo: string | null, isSignup = false): string | null {
+export function getReturnToContext(
+  returnTo: string | null,
+  isSignup = false,
+): string | null {
   if (!returnTo) return null;
   try {
     const params = new URLSearchParams(returnTo.replace(/^\?/, ""));
@@ -138,11 +172,15 @@ export function getReturnToContext(returnTo: string | null, isSignup = false): s
     const symbol = params.get("id") || params.get("symbol");
     const action = isSignup ? "Create an account" : "Sign in";
     if (targetPage === "company" || targetPage === "stock") {
-      return symbol ? `${action} to continue researching ${symbol.toUpperCase()}.` : `${action} to continue your research.`;
+      return symbol
+        ? `${action} to continue researching ${symbol.toUpperCase()}.`
+        : `${action} to continue your research.`;
     }
     if (targetPage === "portfolio") return `${action} to view your portfolio.`;
-    if (targetPage === "watchlist") return `${action} to manage your watchlist.`;
-    if (targetPage === "dashboard") return `${action} to access your dashboard.`;
+    if (targetPage === "watchlist")
+      return `${action} to manage your watchlist.`;
+    if (targetPage === "dashboard")
+      return `${action} to access your dashboard.`;
     return `${action} to continue your research.`;
   } catch {
     return null;
@@ -156,29 +194,52 @@ export function getReturnToContext(returnTo: string | null, isSignup = false): s
 export function hasStockId(): boolean {
   if (typeof window === "undefined") return false;
   const params = new URLSearchParams(window.location.search);
-  return params.has("id") || params.has("symbol") || params.has("ticker") || params.has("companyId");
+  return (
+    params.has("id") ||
+    params.has("symbol") ||
+    params.has("ticker") ||
+    params.has("companyId")
+  );
 }
 
 /** Get the stock/company identifier from URL, normalizing across param aliases. */
 export function getStockTicker(): string {
   if (typeof window === "undefined") return "";
   const params = new URLSearchParams(window.location.search);
-  return (params.get("id") ?? params.get("symbol") ?? params.get("ticker") ?? params.get("companyId") ?? "").toUpperCase().trim();
+  return (
+    params.get("id") ??
+    params.get("symbol") ??
+    params.get("ticker") ??
+    params.get("companyId") ??
+    ""
+  )
+    .toUpperCase()
+    .trim();
 }
 
 /** Map a PageKey to a subsystem identifier for error boundaries. */
 export function getRouteSubsystem(pageKey: PageKey): string {
   switch (pageKey) {
-    case "landing": return "public_landing";
-    case "about": return "public_about";
-    case "login": return "public_login";
-    case "signup": return "public_signup";
+    case "landing":
+      return "public_landing";
+    case "about":
+      return "public_about";
+    case "login":
+      return "public_login";
+    case "signup":
+      return "public_signup";
     case "stock":
-    case "company": return "stock_story";
-    case "dashboard": return "market_intelligence_dashboard";
-    case "search": return "search_page";
-    case "portfolio": return "portfolio_page";
-    case "watchlist": return "watchlist_page";
-    default: return `route_${pageKey}`;
+    case "company":
+      return "stock_story";
+    case "dashboard":
+      return "market_intelligence_dashboard";
+    case "search":
+      return "search_page";
+    case "portfolio":
+      return "portfolio_page";
+    case "watchlist":
+      return "watchlist_page";
+    default:
+      return `route_${pageKey}`;
   }
 }

@@ -7,19 +7,25 @@
 import React, { Suspense } from "react";
 import { PUBLIC_PAGES, type PageKey } from "./router";
 import AppLayout from "../components/navigation/AppLayout";
-import TopNav from "../components/navigation/TopNav";
 import PageErrorBoundary from "../components/diagnostics/PageErrorBoundary";
 import SebiDisclaimer from "../components/compliance/SebiDisclaimer";
+import AppShell from "../components/layout/AppShell";
 
-const PublicLandingPage = React.lazy(() => import("../pages/PublicLandingPage"));
-const PublicRankingsPage = React.lazy(() => import("../pages/PublicRankingsPage"));
+const PublicLandingPage = React.lazy(
+  () => import("../pages/PublicLandingPage"),
+);
+const PublicRankingsPage = React.lazy(
+  () => import("../pages/PublicRankingsPage"),
+);
 const PublicAboutPage = React.lazy(() => import("../pages/PublicAboutPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage"));
 const SignupPage = React.lazy(() => import("../pages/SignupPage"));
 const TermsPage = React.lazy(() => import("../pages/TermsPage"));
 const DashboardHub = React.lazy(() => import("../views/DashboardHub"));
 const SearchPage = React.lazy(() => import("../pages/SearchPage"));
-const ScannerPage = React.lazy(() => import("../components/scanner/ScannerPage"));
+const ScannerPage = React.lazy(
+  () => import("../components/scanner/ScannerPage"),
+);
 const StockStoryPage = React.lazy(() => import("../pages/StockStoryPageF0"));
 const TrackPage = React.lazy(() => import("../pages/TrackPage"));
 const WatchlistPage = React.lazy(() => import("../pages/WatchlistPage"));
@@ -83,7 +89,10 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
   }
 }
 
-function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
+function renderAuthenticatedPage(
+  pageKey: PageKey,
+  hasStockId: boolean,
+): JSX.Element {
   switch (pageKey) {
     case "portfolio":
       return <PortfolioPage />;
@@ -123,14 +132,50 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
 
 const SELF_NAV_PAGES: PageKey[] = ["landing", "scanner", "stock", "company"];
 
-export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
-  const publicView = PUBLIC_PAGES.includes(pageKey) ? renderPublicPage(pageKey) : <PublicLandingPage />;
-  const page = !isAuthenticated
-    ? <>{pageKey !== "login" && pageKey !== "signup" && !SELF_NAV_PAGES.includes(pageKey) && <TopNav />}{publicView}{!SELF_NAV_PAGES.includes(pageKey) && <SebiDisclaimer variant="footer" />}</>
-    : pageKey === "about"
-      ? <PublicAboutPage />
-      : SELF_NAV_PAGES.includes(pageKey)
-        ? renderAuthenticatedPage(pageKey, hasStockId)
-        : <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}<SebiDisclaimer variant="footer" /></AppLayout>;
-  return <PageErrorBoundary><Suspense fallback={<div className="min-h-screen bg-[var(--ss-bg)] pt-28"><div className="mx-auto h-48 max-w-5xl animate-pulse rounded-2xl bg-white shadow-sm" /></div>}>{page}</Suspense></PageErrorBoundary>;
+export default function PageRenderer({
+  pageKey,
+  isAuthenticated,
+  hasStockId,
+}: PageRendererProps): JSX.Element {
+  const publicView = PUBLIC_PAGES.includes(pageKey) ? (
+    renderPublicPage(pageKey)
+  ) : (
+    <PublicLandingPage />
+  );
+  const page = !isAuthenticated ? (
+    <>
+      {pageKey !== "login" &&
+      pageKey !== "signup" &&
+      !SELF_NAV_PAGES.includes(pageKey) ? (
+        <AppShell>
+          {publicView}
+          <SebiDisclaimer variant="footer" />
+        </AppShell>
+      ) : (
+        publicView
+      )}
+    </>
+  ) : pageKey === "about" ? (
+    <PublicAboutPage />
+  ) : SELF_NAV_PAGES.includes(pageKey) ? (
+    renderAuthenticatedPage(pageKey, hasStockId)
+  ) : (
+    <AppLayout>
+      {renderAuthenticatedPage(pageKey, hasStockId)}
+      <SebiDisclaimer variant="footer" />
+    </AppLayout>
+  );
+  return (
+    <PageErrorBoundary>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[var(--ss-bg)] pt-28">
+            <div className="mx-auto h-48 max-w-5xl animate-pulse rounded-2xl bg-white shadow-sm" />
+          </div>
+        }
+      >
+        {page}
+      </Suspense>
+    </PageErrorBoundary>
+  );
 }
