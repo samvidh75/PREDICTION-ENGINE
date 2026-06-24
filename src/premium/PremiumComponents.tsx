@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Search, Sparkles, TrendingUp, TrendingDown, BarChart3, ArrowUpRight, Bookmark, GitCompare, X, ChevronRight, Star, Shield, Activity, AlertTriangle, LineChart, RefreshCw, Clock, Check, ChevronDown, SlidersHorizontal, Info } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Search, Sparkles, TrendingUp, TrendingDown, BarChart3, ArrowUpRight, Bookmark, GitCompare, X, ChevronRight, Star, Shield, Activity, AlertTriangle, LineChart, RefreshCw, Clock, Check, ChevronDown, SlidersHorizontal, Info, Menu } from "lucide-react";
 import { productNavigate } from "../components/product/ProductUI";
 import { api } from "../services/api/client";
 
@@ -85,15 +85,38 @@ function isMarketOpen(): boolean {
 /* ─────────────────────────────────────────────
    PremiumTopNav
    ───────────────────────────────────────────── */
+function useMobile(): boolean {
+  const [mobile, setMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return mobile;
+}
+
+const NAV_ITEMS = [
+  { key: "research", label: "Research", page: "landing" },
+  { key: "scanner", label: "Scanner", page: "scanner" },
+  { key: "compare", label: "Compare", page: "compare" },
+  { key: "watchlist", label: "Watchlist", page: "watchlist" },
+  { key: "pricing", label: "Pricing", page: "pricing" },
+  { key: "learn", label: "Learn", page: "about" },
+];
+
+// Map route pages to nav keys for active state
+const PAGE_TO_KEY: Record<string, string> = {
+  landing: "research", scanner: "scanner", compare: "compare",
+  watchlist: "watchlist", pricing: "pricing", about: "learn",
+  stock: "research", search: "research", rankings: "research",
+  portfolio: "watchlist", alerts: "watchlist", track: "watchlist",
+};
+
 export function PremiumTopNav({ activePage = "research" }: { activePage?: string }) {
-  const navItems = [
-    { key: "research", label: "Research", page: "landing" },
-    { key: "scanner", label: "Scanner", page: "scanner" },
-    { key: "compare", label: "Compare", page: "compare" },
-    { key: "watchlist", label: "Watchlist", page: "watchlist" },
-    { key: "pricing", label: "Pricing", page: "pricing" },
-    { key: "learn", label: "Learn", page: "about" },
-  ];
+  const mobile = useMobile();
+  const activeKey = PAGE_TO_KEY[activePage] ?? activePage;
+
+  if (mobile) return null; // MobileProductNav handles mobile
 
   return (
     <header style={{
@@ -107,7 +130,10 @@ export function PremiumTopNav({ activePage = "research" }: { activePage?: string
         padding: "0 52px", height: "100%",
         display: "flex", alignItems: "center", gap: 40,
       }}>
-        <button onClick={() => productNavigate("landing")} style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "none", cursor: "pointer", padding: 0 }}>
+        <button onClick={() => productNavigate("landing")} style={{
+          display: "flex", alignItems: "center", gap: 10,
+          border: "none", background: "none", cursor: "pointer", padding: 0, flexShrink: 0,
+        }}>
           <div style={{
             width: 32, height: 32, borderRadius: 8,
             background: S.ink, display: "flex", alignItems: "center", justifyContent: "center",
@@ -121,19 +147,19 @@ export function PremiumTopNav({ activePage = "research" }: { activePage?: string
         </button>
 
         <nav style={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
-          {navItems.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <button key={item.key} onClick={() => productNavigate(item.page)}
               style={{
-                padding: "8px 16px", fontSize: 13, fontWeight: activePage === item.key ? 600 : 500,
-                color: activePage === item.key ? S.ink : S.ink3,
+                padding: "8px 16px", fontSize: 13, fontWeight: activeKey === item.key ? 600 : 500,
+                color: activeKey === item.key ? S.ink : S.ink3,
                 background: "none", border: "none", cursor: "pointer", borderRadius: S.radiusXs,
-                position: "relative", transition: "color 0.15s",
+                position: "relative", transition: "color 0.15s", whiteSpace: "nowrap",
               }}
-              onMouseEnter={e => { if (activePage !== item.key) e.currentTarget.style.color = S.ink; }}
-              onMouseLeave={e => { if (activePage !== item.key) e.currentTarget.style.color = S.ink3; }}
+              onMouseEnter={e => { if (activeKey !== item.key) e.currentTarget.style.color = S.ink; }}
+              onMouseLeave={e => { if (activeKey !== item.key) e.currentTarget.style.color = S.ink3; }}
             >
               {item.label}
-              {activePage === item.key && (
+              {activeKey === item.key && (
                 <span style={{
                   position: "absolute", bottom: -1, left: "50%", transform: "translateX(-50%)",
                   width: "70%", height: 2, background: S.ink, borderRadius: 1,
@@ -143,7 +169,7 @@ export function PremiumTopNav({ activePage = "research" }: { activePage?: string
           ))}
         </nav>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button onClick={() => productNavigate("search")} style={{
             width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center",
             border: `1px solid ${S.border}`, borderRadius: S.radiusXs, background: "none", cursor: "pointer",
@@ -166,11 +192,8 @@ export function PremiumTopNav({ activePage = "research" }: { activePage?: string
           <button onClick={() => productNavigate("pricing")} style={{
             padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "white",
             border: "none", background: S.action, cursor: "pointer", borderRadius: S.radiusSm,
-            display: "flex", alignItems: "center", gap: 6,
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = S.action}
-            onMouseLeave={e => e.currentTarget.style.background = S.action}
-          >
+            display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
+          }}>
             Start Free Trial <ArrowUpRight size={14} />
           </button>
         </div>
@@ -182,9 +205,10 @@ export function PremiumTopNav({ activePage = "research" }: { activePage?: string
 /* ─────────────────────────────────────────────
    MarketTickerStrip
    ───────────────────────────────────────────── */
-export function MarketTickerStrip() {
+export function MarketTickerStrip({ compact }: { compact?: boolean }) {
   const [quotes, setQuotes] = useState<IndexQuote[]>(INDICES.map(i => ({ ...i, price: null, change: null })));
   const marketOpen = isMarketOpen();
+  const mobile = useMobile();
 
   useEffect(() => {
     let cancelled = false;
@@ -200,39 +224,43 @@ export function MarketTickerStrip() {
     return () => { cancelled = true; };
   }, []);
 
+  const h = compact ? 48 : 66;
+  const px = mobile ? "0 16px" : "0 52px";
+  const innerPx = mobile ? "0 16px" : "0 24px";
+
   return (
-    <div style={{
-      maxWidth: S.container, margin: "0 auto", padding: "0 52px",
-      width: "100%",
-    }}>
+    <div style={{ maxWidth: S.container, margin: "0 auto", padding: px, width: "100%" }}>
       <div style={{
-        display: "flex", alignItems: "center", gap: 28,
-        height: 66, background: S.surface, borderRadius: S.radiusMd,
+        display: "flex", alignItems: "center", gap: mobile ? 16 : 28,
+        height: h, background: S.surface, borderRadius: compact ? S.radiusSm : S.radiusMd,
         border: `1px solid ${S.borderSoft}`,
-        padding: "0 24px",
+        padding: innerPx,
         boxShadow: S.shadowCard,
+        overflowX: "auto", overflowY: "hidden",
+        scrollbarWidth: "none", msOverflowStyle: "none",
+        WebkitOverflowScrolling: "touch",
       }}>
         {quotes.map(q => (
-          <div key={q.symbol} style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: S.ink3, letterSpacing: "0.2px" }}>{q.label}</span>
+          <div key={q.symbol} style={{ display: "flex", alignItems: "baseline", gap: 6, flexShrink: 0 }}>
+            <span style={{ fontSize: compact ? 11 : 12, fontWeight: 600, color: S.ink3, letterSpacing: "0.2px" }}>{q.label}</span>
             {q.price !== null ? (
               <>
-                <span style={{ fontSize: 13, fontWeight: 700, color: S.ink, fontVariantNumeric: "tabular-nums" }}>
+                <span style={{ fontSize: compact ? 12 : 13, fontWeight: 700, color: S.ink, fontVariantNumeric: "tabular-nums" }}>
                   {q.price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: changeColor(q.change), fontVariantNumeric: "tabular-nums" }}>
+                <span style={{ fontSize: compact ? 11 : 12, fontWeight: 600, color: changeColor(q.change), fontVariantNumeric: "tabular-nums" }}>
                   {q.change !== null ? `${q.change >= 0 ? "+" : ""}${q.change.toFixed(2)}%` : ""}
                 </span>
               </>
             ) : (
-              <span style={{ fontSize: 12, color: S.ink4 }}>—</span>
+              <span style={{ fontSize: compact ? 11 : 12, color: S.ink4 }}>—</span>
             )}
           </div>
         ))}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: S.positive }} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: S.ink3 }}>Market is Open</span>
-          <span style={{ fontSize: 11, color: S.ink4 }}>Closes 3:30 PM</span>
+          <span style={{ fontSize: compact ? 10 : 11, fontWeight: 600, color: S.ink3 }}>Market is Open</span>
+          <span style={{ fontSize: compact ? 10 : 11, color: S.ink4 }}>Closes 3:30 PM</span>
         </div>
       </div>
     </div>
@@ -705,6 +733,250 @@ export function EmptyProductState({ icon, title, body }: { icon?: React.ReactNod
       {icon || <Info size={24} color={S.ink4} />}
       <h3 style={{ fontSize: 15, fontWeight: 600, color: S.ink, margin: "12px 0 4px 0" }}>{title}</h3>
       <p style={{ fontSize: 12, color: S.ink3, margin: 0, maxWidth: 320 }}>{body}</p>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   ScorePill
+   ───────────────────────────────────────────── */
+export function ScorePill({ score, size = "sm" }: { score: number | null; size?: "sm" | "md" }) {
+  const fs = size === "md" ? 14 : 12;
+  const px = size === "md" ? "8px 14px" : "4px 10px";
+  const c = scoreColor(score);
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 4,
+      padding: px, fontSize: fs, fontWeight: 700, lineHeight: 1,
+      borderRadius: S.radiusXs, color: c,
+      background: score !== null && score >= 75 ? S.positiveSoft : score !== null && score >= 55 ? S.bgSoft : "transparent",
+      border: `1px solid ${score !== null ? c : S.border}`,
+      fontVariantNumeric: "tabular-nums",
+    }}>
+      {score !== null ? Math.round(score) : "—"}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   FactorChip
+   ───────────────────────────────────────────── */
+const FACTOR_CHIP_LABELS: Record<string, string> = {
+  quality: "Q", valuation: "V", growth: "G",
+  stability: "S", momentum: "M", risk: "R",
+  liquidity: "L", ownership: "O", events: "E",
+};
+export function FactorChip({ group, value }: { group: string; value: number | null }) {
+  const label = FACTOR_CHIP_LABELS[group] ?? group.slice(0, 1).toUpperCase();
+  const c = value !== null ? scoreColor(value) : S.ink4;
+  return (
+    <span style={{
+      fontSize: 9, fontWeight: 600, padding: "2px 5px", lineHeight: 1,
+      borderRadius: 3, color: c,
+      background: value !== null && value >= 70 ? S.positiveSoft : value !== null && value < 40 ? S.negativeSoft : S.bgSoft,
+      border: `1px solid ${c}20`,
+    }}>
+      {label}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   ProductPageHeader
+   ───────────────────────────────────────────── */
+export function ProductPageHeader({ title, description, badge, actions }: {
+  title: string; description?: string; badge?: string; actions?: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24, gap: 16 }}>
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.3px" }}>{title}</h1>
+          {badge && (
+            <span style={{
+              fontSize: 9, padding: "3px 8px", borderRadius: S.radiusXs,
+              background: S.bgSoft, color: S.ink3, fontWeight: 600,
+              textTransform: "uppercase", letterSpacing: "0.3px",
+            }}>{badge}</span>
+          )}
+        </div>
+        {description && (
+          <p style={{ fontSize: 13, color: S.ink3, margin: "4px 0 0 0", lineHeight: 1.5, maxWidth: 560 }}>
+            {description}
+          </p>
+        )}
+      </div>
+      {actions && <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>{actions}</div>}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   CommandSearch
+   ───────────────────────────────────────────── */
+export function CommandSearch({ placeholder = "Search a company or ask for a stock screen...", onSearch }: {
+  placeholder?: string; onSearch?: (q: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 12,
+      background: S.surface, borderRadius: S.radiusMd,
+      border: `1px solid ${S.borderSoft}`, padding: "0 16px",
+      height: 48, boxShadow: S.shadowCard,
+      cursor: "pointer",
+    }} onClick={() => inputRef.current?.focus()}>
+      <Search size={16} color={S.ink4} style={{ flexShrink: 0 }} />
+      <input ref={inputRef} type="text" value={query} onChange={e => setQuery(e.target.value)}
+        placeholder={placeholder}
+        onKeyDown={e => { if (e.key === "Enter" && onSearch) onSearch(query); }}
+        style={{
+          flex: 1, border: "none", outline: "none", background: "none",
+          fontSize: 13, color: S.ink, fontFamily: "Inter, sans-serif",
+        }}
+      />
+      {query.length > 0 && (
+        <button onClick={() => setQuery("")} style={{
+          border: "none", background: "none", cursor: "pointer", color: S.ink4, padding: 4,
+        }}>
+          <X size={14} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   MobileProductNav (bottom nav bar)
+   ───────────────────────────────────────────── */
+const BOTTOM_NAV_ITEMS = [
+  { key: "research", label: "Research", page: "landing", icon: Search },
+  { key: "scanner", label: "Scanner", page: "scanner", icon: BarChart3 },
+  { key: "compare", label: "Compare", page: "compare", icon: GitCompare },
+  { key: "watchlist", label: "Watchlist", page: "watchlist", icon: Bookmark },
+  { key: "more", label: "More", page: "more", icon: Menu },
+];
+export function MobileProductNav({ activePage = "research" }: { activePage?: string }) {
+  return (
+    <nav style={{
+      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
+      height: 64, background: "rgba(255,255,255,0.96)",
+      borderTop: `1px solid ${S.borderSoft}`,
+      backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+      display: "flex", alignItems: "center", justifyContent: "space-around",
+      paddingBottom: "env(safe-area-inset-bottom, 0px)",
+    }}>
+      {BOTTOM_NAV_ITEMS.map(item => {
+        const Icon = item.icon;
+        const active = activePage === item.key;
+        return (
+          <button key={item.key} onClick={() => productNavigate(item.page)} style={{
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+            padding: "8px 16px", border: "none", background: "none", cursor: "pointer",
+          }}>
+            <Icon size={20} color={active ? S.ink : S.ink4} />
+            <span style={{ fontSize: 10, fontWeight: active ? 600 : 500, color: active ? S.ink : S.ink4 }}>
+              {item.label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   HealthometerRing
+   ───────────────────────────────────────────── */
+const HEALTH_LABELS: Record<string, { label: string; color: string }> = {
+  EXCELLENT: { label: "Strong", color: "var(--ss-positive)" },
+  HEALTHY: { label: "Favorable", color: "var(--ss-positive)" },
+  STABLE: { label: "Fair", color: "var(--ss-ink)" },
+  WEAKENING: { label: "Needs Review", color: "var(--ss-caution)" },
+  AT_RISK: { label: "Risk Rising", color: "var(--ss-negative)" },
+  INSUFFICIENT_DATA: { label: "Pending", color: "var(--ss-ink-4)" },
+};
+
+export function HealthometerRing({ score, classification, size = 72 }: {
+  score: number | null; classification?: string; size?: number;
+}) {
+  const sw = Math.max(4, size * 0.09);
+  const r = (size - sw) / 2;
+  const circ = 2 * Math.PI * r;
+  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
+  const color = scoreColor(score);
+  const hl = classification ? HEALTH_LABELS[classification] : null;
+  const fs = size * 0.3;
+  const labelColor = hl?.color ?? S.ink4;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={S.borderSoft} strokeWidth={sw} />
+        {fill > 0 && (
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={sw}
+            strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
+            strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            style={{ transition: "stroke-dashoffset 0.6s ease" }}
+          />
+        )}
+        <text x="50%" y="46%" textAnchor="middle" dy="0" fontSize={fs} fontWeight="700" fill={color} fontFamily="Inter, sans-serif">
+          {score !== null ? Math.round(score) : "—"}
+        </text>
+        <text x="50%" y="62%" textAnchor="middle" dy="0" fontSize={fs * 0.42} fontWeight="500" fill={S.ink3} fontFamily="Inter, sans-serif">
+          Health
+        </text>
+      </svg>
+      {hl && (
+        <span style={{ fontSize: 10, fontWeight: 600, color: labelColor, textTransform: "uppercase", letterSpacing: "0.3px" }}>
+          {hl.label}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   FactorBreakdownBars
+   ───────────────────────────────────────────── */
+const FACTOR_LABELS: Record<string, string> = {
+  quality: "Quality", valuation: "Valuation", growth: "Growth",
+  stability: "Stability", momentum: "Momentum", risk: "Safety",
+  sector: "Sector", liquidity: "Liquidity", ownership: "Ownership",
+  events: "Events", dataQuality: "Data Quality",
+};
+
+export function FactorBreakdownBars({ factors }: {
+  factors: Array<{ group: string; value: number | null; reason?: string }>;
+}) {
+  if (!factors.length) return null;
+  const core = ["quality", "valuation", "growth", "stability", "momentum", "risk"];
+  const ordered = [...core, ...factors.filter(f => !core.includes(f.group)).map(f => f.group)];
+  const sorted = [...factors].sort((a, b) => {
+    const ai = ordered.indexOf(a.group);
+    const bi = ordered.indexOf(b.group);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {sorted.map(f => (
+        <div key={f.group}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: S.ink }}>
+              {FACTOR_LABELS[f.group] ?? f.group}
+            </span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: scoreColor(f.value), fontVariantNumeric: "tabular-nums" }}>
+              {f.value !== null ? Math.round(f.value) : "—"}
+            </span>
+          </div>
+          <FactorBar label="" score={f.value} maxScore={100} />
+          {f.reason && (
+            <p style={{ fontSize: 11, color: S.ink3, margin: "4px 0 0 0", lineHeight: 1.5 }}>
+              {f.reason}
+            </p>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

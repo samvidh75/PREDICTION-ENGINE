@@ -1,7 +1,7 @@
 // src/components/dashboard/DashboardLayout.tsx
 import React from 'react';
 import IntelligenceNavigationRail from '../navigation/IntelligenceNavigationRail';
-import { DashboardHub } from './DashboardHub';
+import DashboardHub from './DashboardHub';
 
 export const DashboardLayout: React.FC = () => {
   return (

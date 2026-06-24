@@ -1,418 +1,353 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { Lock, Search, Info, BookOpen, ArrowRight, AlertCircle, RefreshCw } from "lucide-react";
-import {
-  ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate,
-} from "../components/product/ProductUI";
-import { useAuth } from "../context/AuthContext";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { Search, Sparkles, ArrowUpRight, TrendingUp, TrendingDown, Star, Lock, ChevronRight, Bookmark, GitCompare, RefreshCw, AlertCircle, Shield, Check } from "lucide-react";
+import { PremiumCard, ScoreRing, ScorePill, FactorChip, MiniSparkline, FactorBar, EmptyProductState, ProductPageHeader, PremiumAppShell, MobileProductNav, CommandSearch } from "../premium/PremiumComponents";
+import { productNavigate } from "../components/product/ProductUI";
 import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
 import { globalPipelineQueue } from "../services/data/PipelineQueue";
-import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
-import Input from "../components/ui/Input";
+import { fPrice, fChange } from "../lib/format";
+import { getTrackedCompanies, addTrackedCompany, removeTrackedCompany, isTracked } from "../lib/track/trackStore";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+const S = {
+  bg: "var(--ss-bg)", bgSoft: "var(--ss-bg-soft)", surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)", ink2: "var(--ss-ink-2)", ink3: "var(--ss-ink-3)", ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)", borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)", positiveSoft: "var(--ss-positive-soft)",
+  negative: "var(--ss-negative)", negativeSoft: "var(--ss-negative-soft)",
+  caution: "var(--ss-caution)", cautionSoft: "var(--ss-caution-soft)",
+  action: "var(--ss-action)",
+  radiusXs: "var(--ss-radius-xs)", radiusSm: "var(--ss-radius-sm)", radiusMd: "var(--ss-radius-md)",
+  radiusLg: "var(--ss-radius-lg)", radiusXl: "var(--ss-radius-xl)",
+  shadowCard: "var(--ss-shadow-card)", shadowFloating: "var(--ss-shadow-floating)",
+  container: "var(--ss-container)",
+};
 
 function scoreColor(v: number | null): string {
-  if (v === null) return "#94A3B8";
-  if (v >= 70) return "#16A34A";
-  if (v >= 55) return "#22C55E";
-  if (v >= 40) return "#92400E";
-  if (v >= 25) return "#FB923C";
-  return "#EF4444";
+  if (v === null) return S.ink4;
+  if (v >= 75) return S.positive;
+  if (v >= 55) return S.ink;
+  if (v >= 35) return S.caution;
+  return S.negative;
 }
 
-function classLabel(cls: string): string {
+const NIFTY30_SYMBOLS = [
+  "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK",
+  "HINDUNILVR", "ITC", "SBIN", "BHARTIARTL", "LT",
+  "KOTAKBANK", "BAJFINANCE", "AXISBANK", "WIPRO", "MARUTI",
+  "TITAN", "ASIANPAINT", "SUNPHARMA", "NTPC", "ONGC",
+  "POWERGRID", "ULTRACEMCO", "HCLTECH", "M&M", "TATAMOTORS",
+  "NESTLE", "HDFCLIFE", "SBILIFE", "TATASTEEL",
+];
+
+const TABS = [
+  { key: "all", label: "All" },
+  { key: "quality", label: "Quality compounders" },
+  { key: "undervalued", label: "Undervalued quality" },
+  { key: "momentum", label: "Improving momentum" },
+  { key: "lowrisk", label: "Low risk" },
+  { key: "review", label: "Needs review" },
+];
+
+function matchesTab(pred: PipelineResult["prediction"] | null, tab: string): boolean {
+  if (tab === "all") return true;
+  if (!pred) return false;
+  const cls = pred.classification;
+  const factor = (g: string) => pred.factorScores.find(f => f.group === g)?.value ?? 0;
+  switch (tab) {
+    case "quality": return cls === "EXCELLENT" || factor("quality") >= 70;
+    case "undervalued": return cls === "HEALTHY" && factor("valuation") >= 55;
+    case "momentum": return factor("momentum") >= 55;
+    case "lowrisk": return factor("risk") >= 55;
+    case "review": return cls === "WEAKENING" || cls === "AT_RISK" || cls === "INSUFFICIENT_DATA";
+    default: return true;
+  }
+}
+
+function clsBadge(cls: string | null): { label: string; color: string; bg: string } {
   switch (cls) {
-    case "EXCELLENT": return "Excellent";
-    case "HEALTHY": return "Healthy";
-    case "STABLE": return "Stable";
-    case "WEAKENING": return "Weakening";
-    case "AT_RISK": return "At Risk";
-    default: return "—";
+    case "EXCELLENT": return { label: "High Conviction", color: S.positive, bg: S.positiveSoft };
+    case "HEALTHY": return { label: "Research", color: S.ink, bg: S.bgSoft };
+    case "STABLE": return { label: "Watch", color: S.ink3, bg: S.bgSoft };
+    case "WEAKENING": return { label: "Needs Review", color: S.caution, bg: S.cautionSoft };
+    case "AT_RISK": return { label: "Risk Rising", color: S.negative, bg: S.negativeSoft };
+    default: return { label: "—", color: S.ink4, bg: S.bgSoft };
   }
 }
 
-function confidenceBadge(level: string): { label: string; cls: string } {
-  switch (level) {
-    case "HIGH": return { label: "High conf.", cls: "bg-green-50 text-green-700 border-green-200" };
-    case "MEDIUM": return { label: "Med conf.", cls: "bg-slate-50 text-slate-700 border-slate-200" };
-    case "LOW": return { label: "Low conf.", cls: "bg-red-50 text-red-700 border-red-200" };
-    case "CRITICAL": return { label: "Critical", cls: "bg-red-50 text-red-700 border-red-200" };
-    default: return { label: "—", cls: "bg-gray-50 text-gray-500 border-gray-200" };
-  }
+function useMobile(): boolean {
+  const [mobile, setMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return mobile;
 }
 
-// ── Mini Score Ring ───────────────────────────────────────────────────────────
-
-function MiniRing({ score }: { score: number | null }) {
-  const r = 16;
-  const circ = 2 * Math.PI * r;
-  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
-  const color = scoreColor(score);
-  return (
-    <svg width={40} height={40} viewBox="0 0 40 40" role="img" aria-label={score !== null ? `Score ${Math.round(score)}` : "Score unavailable"}>
-      <circle cx={20} cy={20} r={r} fill="none" stroke="#E2E8F0" strokeWidth={5} />
-      <circle
-        cx={20} cy={20} r={r} fill="none" stroke={color} strokeWidth={5}
-        strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
-        strokeLinecap="round" transform="rotate(-90 20 20)"
-      />
-      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize="10" fontWeight="700" fill={color}>
-        {score !== null ? Math.round(score) : "—"}
-      </text>
-    </svg>
-  );
-}
-
-// ── Mini Bar ──────────────────────────────────────────────────────────────────
-
-function MiniBar({ label, score }: { label: string; score: number | null }) {
-  const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
-  const color = scoreColor(score);
-  return (
-    <div className="flex flex-col gap-0.5 w-16">
-      <span className="text-[9px] text-[#94A3B8] uppercase tracking-wider truncate">{label}</span>
-      <div className="h-1 bg-[#E2E8F0] rounded-full overflow-hidden w-full">
-        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
-      </div>
-      <span className="text-[10px] font-semibold tabular-nums" style={{ color }}>
-        {score !== null ? Math.round(score) : "—"}
-      </span>
-    </div>
-  );
-}
-
-// ── Stock Row ─────────────────────────────────────────────────────────────────
-
-function StockRow({
-  symbol,
-  rank,
-  result,
-  isAuthenticated,
-  onNavigate,
+function RankingRow({
+  symbol, rank, result, tracked,
+  onTrack, onNavigate, onCompare,
 }: {
-  symbol: string;
-  rank: number;
+  symbol: string; rank: number;
   result: PipelineResult | null;
-  isAuthenticated: boolean;
+  tracked: boolean;
+  onTrack: () => void;
   onNavigate: () => void;
+  onCompare: () => void;
 }) {
   const pred = result?.prediction ?? null;
   const score = pred?.rankingScore ?? null;
-  const cls = pred?.classification ?? "INSUFFICIENT_DATA";
-  const confLevel = pred?.confidenceLevel ?? "LOW";
-  const exchange = result?.price.exchange;
+  const cls = pred?.classification ?? null;
   const companyName = result?.companyName;
   const sector = result?.sector;
+  const price = result?.price.current ?? null;
+  const change = result?.price.change ?? null;
+  const closePrices = result?.technicals?.closePrices ?? [];
+  const badge = clsBadge(cls);
 
-  const priceDisplay = result?.price.current !== null && result?.price.current !== undefined
-    ? `₹${result.price.current.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
-    : null;
-  const changeDisplay = result?.price.change !== null && result?.price.change !== undefined
-    ? result.price.change
-    : null;
-
-  const qualityScore = pred?.factorScores.find(f => f.group === "quality")?.value ?? null;
-  const growthScore = pred?.factorScores.find(f => f.group === "growth")?.value ?? null;
-  const momentumScore = pred?.factorScores.find(f => f.group === "momentum")?.value ?? null;
-
-  const conf = confidenceBadge(confLevel);
-  const clsColor = scoreColor(score);
+  if (!result) {
+    return (
+      <PremiumCard padding="12px 20px">
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 24, textAlign: "right", flexShrink: 0 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: S.ink4, fontVariantNumeric: "tabular-nums" }}>—</span>
+          </div>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: S.bgSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <RefreshCw size={14} color={S.ink4} className="animate-spin" />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: S.ink, fontFamily: "monospace" }}>{symbol}</div>
+            <div style={{ fontSize: 10, color: S.ink4 }}>Loading data…</div>
+          </div>
+        </div>
+      </PremiumCard>
+    );
+  }
 
   return (
-    <ProductPanel
-      className="border border-white/[0.08] hover:border-white/[0.18] transition-all cursor-pointer"
-      as="article"
-    >
-      <div
-        className="p-4 flex items-center gap-4 flex-wrap sm:flex-nowrap"
-        onClick={isAuthenticated ? onNavigate : undefined}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && isAuthenticated) { e.preventDefault(); onNavigate(); } }}
-        aria-label={`View research for ${symbol}`}
-      >
-        {/* Rank + Ring */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="w-6 text-right text-xs text-[#64748B] font-semibold tabular-nums">{rank}</div>
-          {result === null ? (
-            <div className="w-10 h-10 rounded-full bg-[#F1F5F9] flex items-center justify-center">
-              <RefreshCw className="h-3 w-3 text-[#94A3B8] animate-spin" />
-            </div>
-          ) : (
-            isAuthenticated ? <MiniRing score={score} /> : (
-              <div className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center">
-                <Lock className="h-3.5 w-3.5 text-[#94A3B8]" />
-              </div>
-            )
-          )}
+    <PremiumCard padding="12px 20px">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, width: "100%" }}>
+        <div style={{ width: 24, textAlign: "right", flexShrink: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: S.ink4, fontVariantNumeric: "tabular-nums" }}>{rank}</span>
         </div>
 
-        {/* Symbol + Name */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{symbol}</span>
+        <div style={{ flexShrink: 0 }}>
+          <ScoreRing score={score} size={40} showLabel={false} />
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: S.ink, fontFamily: "monospace" }}>{symbol}</span>
             {companyName && (
-              <span className="text-xs text-[#64748B] truncate max-w-[180px]">{companyName}</span>
-            )}
-            {exchange && (
-              <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-[#94A3B8]">{exchange}</span>
+              <span style={{ fontSize: 11, color: S.ink3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 160 }}>{companyName}</span>
             )}
             {sector && (
-              <span className="text-[9px] text-[#64748B] uppercase tracking-wider hidden md:inline">{sector}</span>
+              <span style={{ fontSize: 9, fontWeight: 600, color: S.ink4, textTransform: "uppercase", letterSpacing: "0.3px" }}>{sector}</span>
             )}
           </div>
-          {isAuthenticated && pred && (
-            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              <span
-                className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                style={{ color: clsColor, background: `${clsColor}15` }}
-              >
-                {classLabel(cls)}
-              </span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${conf.cls}`}>{conf.label}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
+            <ScorePill score={score} size="sm" />
+            <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 6px", borderRadius: S.radiusXs, color: badge.color, background: badge.bg, lineHeight: 1 }}>
+              {badge.label}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ textAlign: "right", flexShrink: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: S.ink, fontVariantNumeric: "tabular-nums" }}>
+            {price !== null ? fPrice(price) : "—"}
+          </div>
+          {change !== null && (
+            <div style={{ fontSize: 11, fontWeight: 600, fontVariantNumeric: "tabular-nums", color: change >= 0 ? S.positive : S.negative }}>
+              {fChange(change)}
             </div>
           )}
         </div>
 
-        {/* Price */}
-        {isAuthenticated && priceDisplay && (
-          <div className="text-right hidden sm:block shrink-0">
-            <div className="text-sm font-bold tabular-nums text-[var(--color-text-primary)]">{priceDisplay}</div>
-            {changeDisplay !== null && (
-              <div className={`text-[11px] tabular-nums font-semibold ${changeDisplay >= 0 ? "text-green-500" : "text-red-500"}`}>
-                {changeDisplay >= 0 ? "+" : ""}{changeDisplay.toFixed(2)}%
-              </div>
-            )}
-          </div>
-        )}
+        <div style={{ flexShrink: 0 }}>
+          <MiniSparkline data={closePrices} width={56} height={18} />
+        </div>
 
-        {/* Mini bars */}
-        {isAuthenticated && pred && (
-          <div className="flex items-end gap-3 hidden lg:flex shrink-0">
-            <MiniBar label="Quality" score={qualityScore} />
-            <MiniBar label="Growth" score={growthScore} />
-            <MiniBar label="Momentum" score={momentumScore} />
-          </div>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+          {["quality", "valuation", "growth", "momentum", "risk"].map(g => {
+            const v = pred?.factorScores.find(f => f.group === g)?.value ?? null;
+            return <FactorChip key={g} group={g} value={v} />;
+          })}
+        </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0">
-          {isAuthenticated ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onNavigate(); }}
-              className="px-2.5 py-1 text-[10px] font-semibold text-[#2962FF] hover:underline"
-            >
-              Research →
-            </button>
-          ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#92400E] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
-              <Lock className="h-3 w-3" /> Gated
-            </span>
-          )}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <button onClick={(e) => { e.stopPropagation(); onNavigate(); }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 12px", fontSize: 11, fontWeight: 600, border: "none", borderRadius: S.radiusXs, background: S.action, color: "white", cursor: "pointer", whiteSpace: "nowrap" }}>
+            Research <ArrowUpRight size={12} />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); onCompare(); }}
+            style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, padding: 0, border: `1px solid ${S.border}`, borderRadius: S.radiusXs, background: "none", color: S.ink3, cursor: "pointer" }}
+            title="Compare">
+            <GitCompare size={13} />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); onTrack(); }}
+            style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 30, height: 30, padding: 0, border: `1px solid ${tracked ? S.positive : S.border}`, borderRadius: S.radiusXs, background: tracked ? S.positiveSoft : "none", color: tracked ? S.positive : S.ink3, cursor: "pointer" }}
+            title={tracked ? "Unwatch" : "Watch"}>
+            {tracked ? <Check size={13} /> : <Bookmark size={13} />}
+          </button>
         </div>
       </div>
-
-      {/* Price-null warning */}
-      {result !== null && result.price.current === null && isAuthenticated && (
-        <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-[#92400E]">
-          <AlertCircle className="h-3 w-3" />
-          <span>Price data unavailable — score based on fundamentals only</span>
-        </div>
-      )}
-    </ProductPanel>
+    </PremiumCard>
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
-
-const INITIAL_BATCH = 10;
-const BATCH_SIZE = 3;
-
 export const PublicRankingsPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const mobile = useMobile();
   const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
-  const [loaded, setLoaded] = useState<number>(INITIAL_BATCH);
+  const [activeTab, setActiveTab] = useState("all");
   const [searchText, setSearchText] = useState("");
+  const [trackedSet, setTrackedSet] = useState<Set<string>>(() => new Set(getTrackedCompanies().map(c => c.symbol)));
   const loadingRef = useRef(false);
 
-  // Load initial batch on mount
   useEffect(() => {
-    const symbols = NIFTY50_SYMBOLS.slice(0, INITIAL_BATCH);
-    loadBatch(symbols);
-  }, []);
-
-  const loadBatch = useCallback(async (symbols: string[]) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
-
-    // Process in sub-batches of 3, enqueuing via globalPipelineQueue to respect rate limits
-    for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
-      const batch = symbols.slice(i, i + BATCH_SIZE);
-      await Promise.allSettled(
-        batch.map(sym =>
+    const loadAll = async () => {
+      if (loadingRef.current) return;
+      loadingRef.current = true;
+      for (let i = 0; i < NIFTY30_SYMBOLS.length; i += 5) {
+        const batch = NIFTY30_SYMBOLS.slice(i, i + 5);
+        await Promise.allSettled(batch.map(sym =>
           globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
-            (r) => setResults(prev => ({ ...prev, [sym]: r })),
+            r => setResults(prev => ({ ...prev, [sym]: r })),
             () => setResults(prev => ({ ...prev, [sym]: null })),
           )
-        ),
-      );
-    }
-    loadingRef.current = false;
+        ));
+      }
+      loadingRef.current = false;
+    };
+    loadAll();
   }, []);
 
-  // Infinite scroll: load more when scrolled near bottom
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (loaded >= NIFTY50_SYMBOLS.length) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loadingRef.current) {
-          const nextBatch = NIFTY50_SYMBOLS.slice(loaded, loaded + BATCH_SIZE * 3);
-          if (nextBatch.length > 0) {
-            setLoaded(prev => prev + nextBatch.length);
-            loadBatch(nextBatch);
-          }
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    if (sentinelRef.current) observerRef.current.observe(sentinelRef.current);
-    return () => observerRef.current?.disconnect();
-  }, [loaded, loadBatch]);
-
-  const displayedSymbols = useMemo(() => {
-    const universe = isAuthenticated ? NIFTY50_SYMBOLS.slice(0, loaded) : NIFTY50_SYMBOLS.slice(0, 3);
-    if (!searchText.trim()) return universe;
-    const q = searchText.toLowerCase();
-    return universe.filter(sym => {
-      const r = results[sym];
-      return (
-        sym.toLowerCase().includes(q) ||
-        r?.companyName?.toLowerCase().includes(q) ||
-        r?.sector?.toLowerCase().includes(q)
-      );
+  const filteredSymbols = useMemo(() => {
+    let list = NIFTY30_SYMBOLS;
+    if (activeTab !== "all") {
+      list = list.filter(s => {
+        const r = results[s];
+        return r?.prediction ? matchesTab(r.prediction, activeTab) : false;
+      });
+    }
+    if (searchText.trim()) {
+      const q = searchText.toLowerCase();
+      list = list.filter(s => {
+        const r = results[s];
+        return s.toLowerCase().includes(q) ||
+          r?.companyName?.toLowerCase().includes(q) ||
+          r?.sector?.toLowerCase().includes(q);
+      });
+    }
+    return [...list].sort((a, b) => {
+      const sa = results[a]?.prediction?.rankingScore ?? -1;
+      const sb = results[b]?.prediction?.rankingScore ?? -1;
+      return sb - sa;
     });
-  }, [isAuthenticated, loaded, results, searchText]);
+  }, [results, activeTab, searchText]);
 
-  const allLoading = displayedSymbols.every(s => results[s] === undefined);
+  const handleTrack = useCallback((symbol: string, name: string | null) => {
+    if (isTracked(symbol)) {
+      removeTrackedCompany(symbol);
+      setTrackedSet(prev => { const n = new Set(prev); n.delete(symbol); return n; });
+    } else {
+      addTrackedCompany({ symbol, companyName: name ?? symbol, addedAt: new Date().toISOString(), source: "stock_page" });
+      setTrackedSet(prev => { const n = new Set(prev); n.add(symbol); return n; });
+    }
+  }, []);
 
-  return (
-    <ProductShell>
-      <ProductPage>
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research Shortlist</h1>
-              <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
-                {isAuthenticated
-                  ? `Nifty 50 universe · ${Object.keys(results).length} stocks scored in this session`
-                  : "Institutional-grade multi-factor research applied to Indian equities."}
-              </p>
-            </div>
-            {!isAuthenticated && (
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[#92400E]" />
-                <span className="text-xs text-[var(--color-text-secondary)]">Teaser — 3 stocks shown</span>
-              </div>
-            )}
+  const allLoading = NIFTY30_SYMBOLS.every(s => results[s] === undefined);
+
+  const content = (
+    <div style={{ maxWidth: 1360, margin: "0 auto", padding: mobile ? "0 16px" : "0 52px", width: "100%" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 20, paddingTop: 28, paddingBottom: 40 }}>
+        <ProductPageHeader
+          title="Rankings"
+          description="AI-ranked Indian equities by conviction, quality, valuation, risk, and momentum."
+        />
+
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {TABS.map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: "6px 14px", fontSize: 12, fontWeight: activeTab === tab.key ? 600 : 500,
+                borderRadius: S.radiusXs, border: "none",
+                background: activeTab === tab.key ? S.ink : S.bgSoft,
+                color: activeTab === tab.key ? "white" : S.ink3,
+                cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap",
+              }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12,
+          background: S.surface, borderRadius: S.radiusMd,
+          border: `1px solid ${S.borderSoft}`, padding: "0 16px",
+          height: 48, boxShadow: S.shadowCard,
+        }}>
+          <Search size={16} color={S.ink4} style={{ flexShrink: 0 }} />
+          <input type="text" value={searchText} onChange={e => setSearchText(e.target.value)}
+            placeholder="Filter by symbol or company name…"
+            style={{
+              flex: 1, border: "none", outline: "none", background: "none",
+              fontSize: 13, color: S.ink, fontFamily: "Inter, sans-serif",
+            }}
+          />
+          {searchText && (
+            <button onClick={() => setSearchText("")}
+              style={{ border: "none", background: "none", cursor: "pointer", color: S.ink4, padding: 4 }}>
+              <AlertCircle size={14} />
+            </button>
+          )}
+        </div>
+
+        {allLoading && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "60px 0" }}>
+            <RefreshCw size={24} color={S.ink4} className="animate-spin" />
+            <span style={{ fontSize: 13, color: S.ink3 }}>Computing research scores…</span>
           </div>
+        )}
 
-          {/* Controls */}
-          {isAuthenticated && (
-            <ProductPanel className="flex items-center gap-3 p-3 border border-white/[0.08]">
-              <Search className="h-4 w-4 text-[#64748B] shrink-0 ml-1" />
-              <Input
-                className="flex-1 bg-transparent border-0 text-sm placeholder:text-[#94A3B8] focus:ring-0"
-                placeholder="Search symbol, company, or sector…"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                aria-label="Search stocks"
-              />
-            </ProductPanel>
-          )}
+        {!allLoading && filteredSymbols.length === 0 && (
+          <EmptyProductState
+            icon={<Search size={24} color={S.ink4} />}
+            title="No results found"
+            body="Try adjusting your filter or search query."
+          />
+        )}
 
-          {/* How to use */}
-          {isAuthenticated && (
-            <details className="group rounded-lg border border-white/[0.08] bg-[rgba(255,255,255,0.015)]">
-              <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
-                <BookOpen className="h-3.5 w-3.5" />
-                How to use this shortlist
-                <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" />
-              </summary>
-              <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[var(--color-text-secondary)] space-y-2">
-                <p><strong className="text-[var(--color-text-primary)]">Research Score (0–100)</strong> — Multi-factor engine combining quality, valuation, growth, momentum, stability, and risk. Higher is stronger fundamentals.</p>
-                <p><strong className="text-[var(--color-text-primary)]">Scores are live</strong> — Each session computes real-time scores from available data. No cached or fabricated scores.</p>
-                <p><strong className="text-[var(--color-text-primary)]">No buy/sell calls</strong> — StockStory does not issue trading recommendations. Use scores to prioritize your own research.</p>
-              </div>
-            </details>
-          )}
-
-          {/* Loading state */}
-          {allLoading && (
-            <div className="py-8 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">
-              <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-[#94A3B8]" />
-              Computing research scores…
-            </div>
-          )}
-
-          {/* Stock list */}
-          <div className="space-y-2">
-            {displayedSymbols.map((sym, idx) => (
-              <StockRow
+        {filteredSymbols.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {filteredSymbols.map((sym, idx) => (
+              <RankingRow
                 key={sym}
                 symbol={sym}
                 rank={idx + 1}
                 result={results[sym] ?? null}
-                isAuthenticated={isAuthenticated}
+                tracked={trackedSet.has(sym)}
+                onTrack={() => handleTrack(sym, results[sym]?.companyName ?? null)}
                 onNavigate={() => productNavigate("stock", sym)}
+                onCompare={() => productNavigate("compare", sym)}
               />
             ))}
-
-            {/* Infinite scroll sentinel */}
-            {isAuthenticated && loaded < NIFTY50_SYMBOLS.length && (
-              <div ref={sentinelRef} className="py-4 text-center text-xs text-[#94A3B8]">
-                Loading more stocks…
-              </div>
-            )}
           </div>
+        )}
 
-          {/* Unauthenticated lock panel */}
-          {!isAuthenticated && (
-            <ProductPanel className="p-6 md:p-8 border border-[rgba(245,158,11,0.2)] bg-gradient-to-br from-[#0D1117] via-[#0F141F] to-[#0D1117] rounded-xl flex flex-col items-center text-center space-y-4 shadow-xl">
-              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(245,158,11,0.1)]">
-                <Lock className="h-6 w-6 text-[#92400E]" />
-              </div>
-              <div className="max-w-md space-y-2">
-                <h2 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">Unlock full research shortlist</h2>
-                <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
-                  Create a free account to unlock live-computed scores for 50+ Nifty stocks, multi-factor parameters, and direct broker handoffs.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2.5 sm:flex-row pt-2">
-                <ProductAction onClick={() => productNavigate("signup")} className="font-semibold text-xs">
-                  Create free account
-                </ProductAction>
-                <ProductAction variant="secondary" onClick={() => productNavigate("methodology")} className="font-semibold text-xs">
-                  Read research standards
-                </ProductAction>
-              </div>
-            </ProductPanel>
-          )}
-
-          {/* SEBI disclaimer */}
-          <p className="text-[10px] text-[#94A3B8] leading-relaxed">
-            Research scores are for educational purposes only and are not buy/sell recommendations. StockStory India is not a SEBI-registered investment adviser. All investments are subject to market risk.
-          </p>
+        <div style={{ paddingTop: 8 }}>
+          <SebiDisclaimer variant="footer" />
         </div>
-      </ProductPage>
-    </ProductShell>
+      </div>
+    </div>
   );
-};
+
+  return (
+    <div style={{ minHeight: "100vh", background: S.bg }}>
+      {content}
+      {mobile && <MobileProductNav activePage="research" />}
+    </div>
+  );
+}
 
 export default PublicRankingsPage;
