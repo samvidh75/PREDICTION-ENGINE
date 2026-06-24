@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Logo from "../brand/Logo";
-import { MiniSparkline } from "../../premium/PremiumComponents";
+import { MiniSparkline } from "../ui/ScoreRing";
 import { productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
 import { useAuth } from "../../context/AuthContext";
@@ -18,7 +18,6 @@ const indices = [
 interface IndexState {
   price: number | null;
   change: number | null;
-  history?: number[];
 }
 
 const navRoutes: Record<string, string> = {
@@ -43,61 +42,51 @@ function isMarketOpen() {
 
 export function TopNav({ active = "" }: { active?: string }) {
   const { isAuthenticated, user } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="h-[56px] bg-white border-b border-[#e8e8e8] flex items-center px-7 gap-0 sticky top-0 z-50">
-      <button onClick={() => productNavigate("landing")} className="flex-shrink-0">
-        <Logo />
-      </button>
-      <div className="hidden md:flex items-center gap-1 ml-8">
-        {Object.entries(navRoutes).map(([label, route]) => (
-          <button
-            key={label}
-            onClick={() => productNavigate(route)}
-            className={`text-[14px] font-[500] px-3 py-1.5 rounded-md transition-colors relative ${
-              active === label.toLowerCase()
-                ? "text-[#0a0a0a] font-[600]"
-                : "text-[#555] hover:text-[#0a0a0a] hover:bg-[#f5f5f5]"
-            }`}
-          >
-            {label}
-            {(label === "Research" || label === "Learn") && (
-              <span className="ml-0.5 text-[10px]">▾</span>
-            )}
-            {active === "scanner" && label === "Scanner" && (
-              <span className="absolute bottom-[-14px] left-1/2 -translate-x-1/2 w-[60%] h-[2px] bg-[#1a7f4b] rounded-full" />
-            )}
-          </button>
-        ))}
-      </div>
-      <div className="ml-auto flex items-center gap-3">
-        <button
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-[#f5f5f5] border border-[#e8e8e8] text-[#888] hover:text-[#0a0a0a] transition-colors"
-          onClick={() => productNavigate("search")}
-          aria-label="Search"
-        >
-          <Search size={14} />
+    <nav className="h-[44px] bg-[#000000] flex items-center px-5 sticky top-0 z-50">
+      <div className="max-w-[1280px] w-full mx-auto flex items-center">
+        <button onClick={() => productNavigate("landing")}>
+          <Logo />
         </button>
-        {isAuthenticated && user ? (
-          <ProfileButton />
-        ) : (
-          <>
+        <div className="hidden md:flex items-center gap-[24px] ml-auto mr-auto">
+          {Object.entries(navRoutes).map(([label, route]) => (
             <button
-              className="h-[34px] px-4 text-[13px] font-[500] text-[#2d2d2d] bg-white border border-[#e8e8e8] rounded-[8px] hover:border-[#ccc] transition-colors"
-              onClick={() => productNavigate("login")}
+              key={label}
+              onClick={() => productNavigate(route)}
+              className="text-[12px] font-[400] text-white/80 hover:text-white tracking-[-0.12px] transition-colors"
             >
-              Sign in
+              {label}
             </button>
-            <button
-              className="h-[34px] px-4 text-[13px] font-[600] text-white bg-[#0a0a0a] rounded-[8px] flex items-center gap-2 hover:bg-[#222] transition-colors"
-              onClick={() => productNavigate("signup")}
-            >
-              Start Free Trial
-              <ArrowUpRight size={14} />
-            </button>
-          </>
-        )}
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            className="w-[28px] h-[28px] flex items-center justify-center text-white/60 hover:text-white transition-colors"
+            onClick={() => productNavigate("search")}
+            aria-label="Search"
+          >
+            <Search size={14} />
+          </button>
+          {isAuthenticated && user ? (
+            <ProfileButton />
+          ) : (
+            <>
+              <button
+                className="bg-[#1d1d1f] text-white text-[12px] font-[400] tracking-[-0.12px] px-[14px] py-[6px] rounded-[8px] hover:bg-[#333] transition-colors"
+                onClick={() => productNavigate("login")}
+              >
+                Sign in
+              </button>
+              <button
+                className="bg-[#0066cc] text-white text-[12px] font-[400] tracking-[-0.12px] px-[14px] py-[6px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95]"
+                onClick={() => productNavigate("signup")}
+              >
+                Start Free Trial
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
@@ -117,10 +106,7 @@ export function MarketTicker() {
           const result = settled[position];
           next[index.symbol] =
             result.status === "fulfilled" && result.value != null
-              ? {
-                  price: result.value.price ?? null,
-                  change: result.value.changePercent ?? null,
-                }
+              ? { price: result.value.price ?? null, change: result.value.changePercent ?? null }
               : { price: null, change: null };
         });
         setQuotes(next);
@@ -130,40 +116,32 @@ export function MarketTicker() {
   }, []);
 
   return (
-    <div className="h-[48px] bg-white border-b border-[#e8e8e8] flex">
-      {indices.map((index) => {
-        const quote = quotes[index.symbol];
-        const change = quote?.change ?? null;
-        const price = quote?.price ?? null;
-        const isPositive = change !== null && change >= 0;
-        return (
-          <div key={index.name} className="flex-1 flex items-center gap-3 px-5 border-r border-[#e8e8e8] last:border-r-0">
-            <div>
-              <div className="text-[11px] font-[600] text-[#888] tracking-[0.04em]">{index.name}</div>
-              <div className="text-[14px] font-[700] text-[#0a0a0a] tabular">
-                {price !== null
-                  ? price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                  : "—"}
-              </div>
-            </div>
-            {change !== null && (
-              <span className={`text-[12px] font-[600] ${isPositive ? 'text-[#1a7f4b]' : 'text-red-500'}`}>
-                {isPositive ? '+' : ''}{change.toFixed(2)}%
+    <div className="h-[40px] bg-white border-b border-[#f0f0f0] flex items-center px-5">
+      <div className="max-w-[1280px] w-full mx-auto flex items-center gap-6">
+        {indices.map((index) => {
+          const quote = quotes[index.symbol];
+          const change = quote?.change ?? null;
+          const price = quote?.price ?? null;
+          const isPositive = change !== null && change >= 0;
+          return (
+            <div key={index.name} className="flex items-center gap-2">
+              <span className="text-[10px] font-[600] text-[#7a7a7a] tracking-[0.03em]">{index.name}</span>
+              <span className="text-[12px] font-[600] text-[#1d1d1f] tabular">
+                {price !== null ? price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
               </span>
-            )}
-            <MiniSparkline data={[]} color="#1a7f4b" width={60} height={24} />
-          </div>
-        );
-      })}
-      <div className="flex items-center gap-2 px-5 border-l border-[#e8e8e8] flex-shrink-0">
-        <div className={`w-[7px] h-[7px] rounded-full ${open ? 'bg-[#22c55e]' : 'bg-[#ccc]'}`} />
-        <div>
-          <div className={`text-[12px] font-[600] ${open ? 'text-[#1a7f4b]' : 'text-[#888]'}`}>
-            {open ? 'Market is Open' : 'Market Closed'}
-          </div>
-          <div className="text-[11px] text-[#888]">
-            {open ? 'Closes 3:30 PM ▾' : 'Opens 9:15 AM ▾'}
-          </div>
+              {change !== null && (
+                <span className={`text-[11px] font-[500] ${isPositive ? 'text-[#1a7f4b]' : 'text-[#c0392b]'}`}>
+                  {isPositive ? '+' : ''}{change.toFixed(2)}%
+                </span>
+              )}
+            </div>
+          );
+        })}
+        <div className="ml-auto flex items-center gap-1.5">
+          <div className={`w-[5px] h-[5px] rounded-full ${open ? 'bg-[#22c55e]' : 'bg-[#ccc]'}`} />
+          <span className={`text-[10px] font-[500] ${open ? 'text-[#1a7f4b]' : 'text-[#7a7a7a]'}`}>
+            {open ? 'Open' : 'Closed'}
+          </span>
         </div>
       </div>
     </div>
@@ -191,7 +169,7 @@ export default function AppShell({
   }, []);
 
   return (
-    <div className="bg-[#f7f7f5] min-h-screen">
+    <div className="bg-[#f5f5f7] min-h-screen">
       <a href="#ss-main-content" className="sr-only focus:not-sr-only focus:absolute focus:p-2 focus:bg-white focus:z-[100]">
         Skip to main content
       </a>
