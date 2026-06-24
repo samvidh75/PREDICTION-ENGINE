@@ -48,10 +48,10 @@ function driverValues(group: string, p: PipelineResult): { label: string; value:
   const f = p.fundamentals;
   const t = p.technicals;
   const drivers: Record<string, { label: string; value: string }[]> = {
-    quality: [{ label: "ROE", value: f.roe !== null ? `${f.roe.toFixed(1)}%` : "—" }, { label: "ROA", value: f.roa !== null ? `${f.roa.toFixed(1)}%` : "—" }, { label: "ROIC", value: f.roic !== null ? `${f.roic.toFixed(1)}%` : "—" }],
+    quality: [{ label: "ROE", value: f.roe !== null ? `${(f.roe * 100).toFixed(1)}%` : "—" }, { label: "ROA", value: f.roa !== null ? `${(f.roa * 100).toFixed(1)}%` : "—" }, { label: "ROIC", value: f.roic !== null ? `${(f.roic * 100).toFixed(1)}%` : "—" }],
     valuation: [{ label: "P/E", value: f.peRatio !== null ? f.peRatio.toFixed(1) : "—" }, { label: "P/B", value: f.pbRatio !== null ? f.pbRatio.toFixed(1) : "—" }, { label: "EV/EBITDA", value: f.evEbitda !== null ? `${f.evEbitda.toFixed(1)}x` : "—" }],
-    growth: [{ label: "Rev Growth", value: f.revenueGrowth !== null ? `${f.revenueGrowth.toFixed(1)}%` : "—" }, { label: "EPS Growth", value: f.epsGrowth !== null ? `${f.epsGrowth.toFixed(1)}%` : "—" }, { label: "Profit Growth", value: f.profitGrowth !== null ? `${f.profitGrowth.toFixed(1)}%` : "—" }],
-    stability: [{ label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "Current Ratio", value: f.currentRatio !== null ? f.currentRatio.toFixed(2) : "—" }, { label: "Op. Margin", value: f.operatingMargin !== null ? `${f.operatingMargin.toFixed(1)}%` : "—" }],
+    growth: [{ label: "Rev Growth", value: f.revenueGrowth !== null ? `${(f.revenueGrowth * 100).toFixed(1)}%` : "—" }, { label: "EPS Growth", value: f.epsGrowth !== null ? `${(f.epsGrowth * 100).toFixed(1)}%` : "—" }, { label: "Profit Growth", value: f.profitGrowth !== null ? `${(f.profitGrowth * 100).toFixed(1)}%` : "—" }],
+    stability: [{ label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "Current Ratio", value: f.currentRatio !== null ? f.currentRatio.toFixed(2) : "—" }, { label: "Op. Margin", value: f.operatingMargin !== null ? `${(f.operatingMargin * 100).toFixed(1)}%` : "—" }],
     momentum: [{ label: "RSI (14)", value: t.rsi14 !== null ? t.rsi14.toFixed(1) : "—" }, { label: "MACD", value: t.macd !== null ? t.macd.toFixed(2) : "—" }, { label: "SMA50", value: t.movingAverageDistance50 !== null ? `${(t.movingAverageDistance50 * 100).toFixed(1)}%` : "—" }],
     risk: [{ label: "Beta", value: f.beta !== null ? f.beta.toFixed(2) : "—" }, { label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "ATR", value: t.atr14 !== null ? t.atr14.toFixed(2) : "—" }],
   };
