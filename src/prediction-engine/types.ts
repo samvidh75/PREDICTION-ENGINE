@@ -8,6 +8,38 @@ export type UnifiedClassification =
   | 'AT_RISK'
   | 'INSUFFICIENT_DATA';
 
+export interface EngineInput {
+  peRatio: number | null;
+  pbRatio: number | null;
+  roe: number | null;
+  roce: number | null;
+  debtToEquity: number | null;
+  currentRatio: number | null;
+  revenueGrowth: number | null;
+  profitGrowth: number | null;
+  dividendYield: number | null;
+  closes: number[];
+}
+
+export interface EngineFactorScore {
+  score: number | null;
+  reason: string;
+}
+
+export interface EngineOutput {
+  composite: number | null;
+  classification: UnifiedClassification;
+  factorScores: {
+    quality: EngineFactorScore;
+    valuation: EngineFactorScore;
+    growth: EngineFactorScore;
+    stability: EngineFactorScore;
+    momentum: EngineFactorScore;
+  };
+  dataCompleteness: number;
+  availableWeight: number;
+}
+
 export type UnifiedConfidenceLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'CRITICAL';
 
 export type UnifiedFactorGroup =
