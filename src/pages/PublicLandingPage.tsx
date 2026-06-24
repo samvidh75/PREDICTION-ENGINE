@@ -1,25 +1,31 @@
-import { ArrowUpRight, ArrowRight, Check, Search, Sparkles, Users, BarChart3, Shield } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, ArrowRight, Check, Search, ShoppingCart, Share2, Sparkles, Users, BarChart3, Shield } from "lucide-react";
 import AppShell from "../components/layout/AppShell";
 import ScoreRing, { getScoreColor, getScoreLabel, MiniSparkline } from "../components/ui/ScoreRing";
+import TradePanel from "../components/trade/TradePanel";
 import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
+import { shareStock } from "../lib/referral";
 import { LineChart, Line, ResponsiveContainer, Area, AreaChart, XAxis, YAxis } from "recharts";
 
 function generateChartData(points = 20) {
   const data: { t: string; v: number }[] = [];
+  const deltas = [3,18,-5,12,-8,22,-3,15,6,-4,19,-7,11,-2,16,4,-9,23,-1,14];
   let v = 24500;
   for (let i = 0; i < points; i++) {
-    v += (Math.random() - 0.45) * 100;
+    v += deltas[i % deltas.length];
     data.push({ t: `${9 + Math.floor(i / 4)}:${((i % 4) * 15).toString().padStart(2, '0')}`, v: Math.round(v) });
   }
   return data;
 }
 function generate5YData() {
   const d: { name: string; stock: number; index: number }[] = [];
+  const drifts = [[0.015,0.008],[0.022,0.012],[0.018,0.006],[0.025,0.016],[0.012,0.010],[0.020,0.014],[0.016,0.009],[0.028,0.018],[0.014,0.011],[0.024,0.015],[0.019,0.007],[0.026,0.017],[0.013,0.010],[0.021,0.013],[0.017,0.008],[0.027,0.019],[0.015,0.012],[0.023,0.014],[0.018,0.009],[0.029,0.020],[0.016,0.013],[0.024,0.015],[0.020,0.010],[0.030,0.021],[0.017,0.014],[0.025,0.016],[0.021,0.011],[0.031,0.022],[0.018,0.015],[0.026,0.017],[0.022,0.012],[0.028,0.018],[0.019,0.016],[0.027,0.018],[0.023,0.013],[0.029,0.019],[0.020,0.017],[0.028,0.019],[0.024,0.014],[0.030,0.020],[0.021,0.018],[0.029,0.020],[0.025,0.015],[0.031,0.021],[0.022,0.019],[0.030,0.021],[0.026,0.016],[0.032,0.022],[0.023,0.020],[0.031,0.022],[0.027,0.017],[0.033,0.023],[0.024,0.021],[0.032,0.023],[0.028,0.018],[0.034,0.024],[0.025,0.022],[0.033,0.024],[0.029,0.019],[0.035,0.025]];
   let s = 100, idx = 100;
   for (let i = 0; i < 60; i++) {
-    s *= 1 + (Math.random() - 0.48) * 0.03;
-    idx *= 1 + (Math.random() - 0.48) * 0.02;
+    const d2 = drifts[i % drifts.length];
+    s *= 1 + d2[0];
+    idx *= 1 + d2[1];
     d.push({ name: `M${i + 1}`, stock: Math.round(s * 100) / 100, index: Math.round(idx * 100) / 100 });
   }
   return d;
@@ -52,6 +58,16 @@ export default function PublicLandingPage() {
       risk: f?.debtToEquity ? Math.max(20, 90 - Math.round(f.debtToEquity * 5)) : 75,
     };
     return vals[key] ?? 65;
+  };
+
+  const [tradeOpen, setTradeOpen] = useState(false);
+  const [tradeSymbol, setTradeSymbol] = useState("");
+  const [tradePrice, setTradePrice] = useState<number | null>(null);
+
+  const openTrade = (symbol: string, price: number | null) => {
+    setTradeSymbol(symbol);
+    setTradePrice(price);
+    setTradeOpen(true);
   };
 
   return (
@@ -94,10 +110,20 @@ export default function PublicLandingPage() {
               <p className="text-[17px] font-[400] text-[#cccccc] leading-[1.47] tracking-[-0.374px] mb-4">
                 Every stock gets a proprietary AI score across 5 dimensions. Updated daily.
               </p>
-              <button onClick={() => productNavigate("stock", "HDFCBANK")}
-                className="bg-[#0066cc] text-white text-[14px] font-[400] tracking-[-0.224px] px-[15px] py-[8px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95]">
-                View Full Research <ArrowRight size={13} className="inline ml-1" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => productNavigate("stock", "HDFCBANK")}
+                  className="bg-[#0066cc] text-white text-[14px] font-[400] tracking-[-0.224px] px-[15px] py-[8px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95]">
+                  View Full Research <ArrowRight size={13} className="inline ml-1" />
+                </button>
+                <button onClick={() => openTrade("HDFCBANK", data?.price?.current ?? null)}
+                  className="bg-[#1a7f4b] text-white text-[12px] font-[500] tracking-[-0.12px] px-[12px] py-[8px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95] flex items-center gap-1.5">
+                  <ShoppingCart size={12} /> Buy
+                </button>
+                <button onClick={() => shareStock("HDFCBANK", data?.price?.companyName ?? "HDFC Bank Ltd.")}
+                  className="bg-transparent text-[#2997ff] border border-[#2997ff] text-[12px] font-[400] px-[12px] py-[8px] rounded-[9999px] hover:opacity-80 transition-opacity active:scale-[0.95] flex items-center gap-1.5">
+                  <Share2 size={12} /> Share
+                </button>
+              </div>
             </div>
             <div className="bg-[#2a2a2c] rounded-[18px] p-6 border border-[#333]">
               <div className="flex items-center gap-3 mb-4">
@@ -290,6 +316,15 @@ export default function PublicLandingPage() {
           </div>
         </div>
       </div>
+
+      <TradePanel
+        open={tradeOpen}
+        onClose={() => setTradeOpen(false)}
+        symbol={tradeSymbol || "HDFCBANK"}
+        companyName={data?.price?.companyName ?? "HDFC Bank Ltd."}
+        price={tradePrice}
+        score={78}
+      />
     </AppShell>
   );
 }

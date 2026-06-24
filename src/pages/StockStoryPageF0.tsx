@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { ArrowUpRight, Check, ChevronRight, Sparkles, Star, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Check, ChevronRight, Share2, ShoppingCart, Sparkles, Star, X } from "lucide-react";
 import AppShell from "../components/layout/AppShell";
 import ScoreRing, { getScoreColor, getScoreLabel } from "../components/ui/ScoreRing";
+import TradePanel from "../components/trade/TradePanel";
 import { useStockData } from "../hooks/useStockData";
 import { getStockTicker } from "../app/router";
 import { fMarketCap, fPrice, fRatio, fChange } from "../lib/format";
 import { productNavigate } from "../components/product/ProductUI";
 import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
+import { shareStock } from "../lib/referral";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const fallbackTicker = "TCS";
@@ -15,10 +17,12 @@ const factorKeys = ["quality", "growth", "valuation", "momentum", "risk"];
 function perf() {
   const d: { n: string; s: number; nf: number; ni: number }[] = [];
   let s = 100, nf = 100, ni = 100;
+  const drifts = [[0.015,0.008,0.012],[0.022,0.012,0.018],[0.018,0.006,0.014],[0.025,0.016,0.020],[0.012,0.010,0.008],[0.020,0.014,0.016],[0.016,0.009,0.013],[0.028,0.018,0.022],[0.014,0.011,0.010],[0.024,0.015,0.019],[0.019,0.007,0.015],[0.026,0.017,0.021],[0.013,0.010,0.009],[0.021,0.013,0.017],[0.017,0.008,0.014],[0.027,0.019,0.023],[0.015,0.012,0.011],[0.023,0.014,0.018],[0.018,0.009,0.015],[0.029,0.020,0.024],[0.016,0.013,0.012],[0.024,0.015,0.019],[0.020,0.010,0.016],[0.030,0.021,0.025],[0.017,0.014,0.013],[0.025,0.016,0.020],[0.021,0.011,0.017],[0.031,0.022,0.026],[0.018,0.015,0.014],[0.026,0.017,0.021],[0.022,0.012,0.018],[0.028,0.018,0.022],[0.019,0.016,0.015],[0.027,0.018,0.022],[0.023,0.013,0.019],[0.029,0.019,0.023],[0.020,0.017,0.016],[0.028,0.019,0.023],[0.024,0.014,0.020],[0.030,0.020,0.024],[0.021,0.018,0.017],[0.029,0.020,0.024],[0.025,0.015,0.021],[0.031,0.021,0.025],[0.022,0.019,0.018],[0.030,0.021,0.025],[0.026,0.016,0.022],[0.032,0.022,0.026],[0.023,0.020,0.019],[0.031,0.022,0.026],[0.027,0.017,0.023],[0.033,0.023,0.027],[0.024,0.021,0.020],[0.032,0.023,0.027],[0.028,0.018,0.024],[0.034,0.024,0.028],[0.025,0.022,0.021],[0.033,0.024,0.028],[0.029,0.019,0.025],[0.035,0.025,0.029]];
   for (let i = 0; i < 60; i++) {
-    s *= 1 + (Math.random() - 0.47) * 0.025;
-    nf *= 1 + (Math.random() - 0.48) * 0.018;
-    ni *= 1 + (Math.random() - 0.47) * 0.022;
+    const d2 = drifts[i % drifts.length];
+    s *= 1 + d2[0];
+    nf *= 1 + d2[1];
+    ni *= 1 + d2[2];
     d.push({ n: `M${i + 1}`, s: Math.round(s * 100) / 100, nf: Math.round(nf * 100) / 100, ni: Math.round(ni * 100) / 100 });
   }
   return d;
@@ -35,11 +39,54 @@ export default function StockStoryPageF0() {
   const { data, loading } = useStockData(ticker);
   const [tab, setTab] = useState("Thesis");
   const [tracked, setTracked] = useState(() => isTracked(ticker));
+  const [tradeOpen, setTradeOpen] = useState(false);
 
   const f = data?.fundamentals;
   const p = data?.price;
   const prices = data?.historical?.closes ?? [];
   const score = 78;
+  const companyName = p?.companyName ?? ticker;
+
+  // Dynamic page meta for SEO
+  useEffect(() => {
+    const title = `${ticker} Stock Research & AI Analysis — StockStory India`;
+    const desc = `AI-powered research on ${companyName} (${ticker}). Get StockStory Score, fair value estimates, fundamentals, and analyst consensus.`;
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute("content", desc);
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute("content", `${ticker} (${companyName}) — AI Stock Research`);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute("content", desc);
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute("content", `https://stockstory-india.com/?page=stock&id=${ticker}`);
+    const twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute("content", desc);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute("href", `https://stockstory-india.com/?page=stock&id=${ticker}`);
+  }, [ticker, companyName]);
+
+  // JSON-LD for this stock page
+  useEffect(() => {
+    const existing = document.getElementById("ss-jsonld-stock");
+    if (existing) existing.remove();
+    const script = document.createElement("script");
+    script.id = "ss-jsonld-stock";
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": `${ticker} — ${companyName}`,
+      "description": `AI-powered equity research on ${companyName} listed on NSE. StockStory Score: ${score}/100.`,
+      "provider": { "@type": "Organization", "name": "StockStory India", "url": "https://stockstory-india.com" },
+      "category": "Equity Research",
+      "offers": { "@type": "AggregateOffer", "offerCount": "1", "priceCurrency": "INR" },
+      "image": `https://stockstory-india.com/og-image.png`,
+      "url": `https://stockstory-india.com/?page=stock&id=${ticker}`,
+    });
+    document.head.appendChild(script);
+    return () => { const el = document.getElementById("ss-jsonld-stock"); if (el) el.remove(); };
+  }, [ticker, companyName, score]);
 
   const gfs = (key: string) => {
     const v: Record<string, number> = {
@@ -69,7 +116,7 @@ export default function StockStoryPageF0() {
             <div className="flex items-center gap-3 mb-3">
               <div className="w-[52px] h-[52px] rounded-[12px] bg-[#0066cc] flex items-center justify-center text-white text-[16px] font-[600]">{ticker.slice(0, 3)}</div>
               <div>
-                <h1 className="text-[28px] font-[600] text-[#1d1d1f] leading-[1.14] tracking-[-0.28px] mb-0.5">{p?.companyName ?? ticker}</h1>
+                <h1 className="text-[28px] font-[600] text-[#1d1d1f] leading-[1.14] tracking-[-0.28px] mb-0.5">{companyName}</h1>
                 <div className="flex items-center gap-2 text-[12px] text-[#7a7a7a]">
                   <span className="font-[600] text-[#1d1d1f]">{ticker}</span>
                   <span className="text-[9px] font-[600] text-[#7a7a7a] bg-[#f0f0f0] px-1.5 py-0.5 rounded">NSE</span>
@@ -89,11 +136,15 @@ export default function StockStoryPageF0() {
               <span>Sector <span className="font-[600] text-[#1d1d1f] ml-1">{p?.sector ?? '—'}</span></span>
               <span>Industry <span className="font-[600] text-[#1d1d1f] ml-1">IT - Services</span></span>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => { if (tracked) removeTrackedCompany(ticker); else addTrackedCompany({ symbol: ticker, companyName: p?.companyName ?? ticker, addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }}
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={() => { if (tracked) removeTrackedCompany(ticker); else addTrackedCompany({ symbol: ticker, companyName, addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }}
                 className="h-[32px] px-3 border border-[#e0e0e0] rounded-[8px] text-[11px] text-[#7a7a7a] active:scale-[0.95] hover:border-[#ccc] transition-colors flex items-center gap-1.5"><Star size={12} /> {tracked ? 'Following' : 'Follow'}</button>
               <button onClick={() => productNavigate("compare", ticker)}
                 className="h-[32px] px-3 border border-[#e0e0e0] rounded-[8px] text-[11px] text-[#7a7a7a] active:scale-[0.95] hover:border-[#ccc] transition-colors">⇄ Compare</button>
+              <button onClick={() => setTradeOpen(true)}
+                className="h-[32px] px-4 bg-[#1a7f4b] text-white text-[11px] font-[500] rounded-[9999px] active:scale-[0.95] hover:opacity-90 transition-opacity flex items-center gap-1.5"><ShoppingCart size={12} /> Buy</button>
+              <button onClick={() => { shareStock(ticker, companyName); }}
+                className="h-[32px] px-3 border border-[#e0e0e0] rounded-[9999px] text-[11px] text-[#7a7a7a] active:scale-[0.95] hover:border-[#ccc] transition-colors flex items-center gap-1.5"><Share2 size={12} /> Share</button>
               <button onClick={() => setTab('Thesis')}
                 className="h-[32px] px-4 bg-[#0066cc] text-white text-[11px] font-[400] rounded-[9999px] active:scale-[0.95] hover:opacity-90 transition-opacity flex items-center gap-1.5">View Thesis <ArrowUpRight size={12} /></button>
             </div>
@@ -134,7 +185,6 @@ export default function StockStoryPageF0() {
         {loading ? <div className="py-12 text-center text-[#7a7a7a]">Loading…</div> : (
           <div className="grid grid-cols-[1fr_280px] gap-6 py-5">
             <div>
-              {/* Thesis + DCF */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px]">
                   <div className="flex items-center justify-between mb-3">
@@ -150,7 +200,6 @@ export default function StockStoryPageF0() {
                   ))}
                   <button onClick={() => setTab('Thesis')} className="text-[11px] font-[600] text-[#0066cc] mt-2 flex items-center gap-1 active:scale-[0.95]">Read Full Thesis <ArrowUpRight size={11} /></button>
                 </div>
-
                 <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px]">
                   <div className="flex items-center gap-1 mb-3"><span className="text-[14px] font-[600] text-[#1d1d1f]">Fair Value (DCF)</span><span className="text-[10px] text-[#7a7a7a]">ⓘ</span></div>
                   <div className="mb-3"><span className="text-[26px] font-[600] text-[#1d1d1f]">₹ 4,620</span><span className="ml-2 text-[11px] text-[#0066cc] bg-[#f5f5f7] px-2 py-0.5 rounded-[9999px]">+11.5% Upside</span></div>
@@ -164,8 +213,6 @@ export default function StockStoryPageF0() {
                   <div className="flex justify-between text-[10px] text-[#7a7a7a] mt-1"><span>₹ 3,900</span><span>₹ 4,620</span><span>₹ 5,200</span></div>
                 </div>
               </div>
-
-              {/* Perf + Fundamentals */}
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px]">
                   <div className="flex items-center justify-between mb-3">
@@ -203,8 +250,6 @@ export default function StockStoryPageF0() {
                   </div>
                 </div>
               </div>
-
-              {/* Strengths + Consensus */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px]">
                   <div className="text-[14px] font-[600] text-[#1d1d1f] mb-3">Strengths vs Risks</div>
@@ -238,8 +283,6 @@ export default function StockStoryPageF0() {
                 </div>
               </div>
             </div>
-
-            {/* Sidebar */}
             <div>
               <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px] mb-3">
                 <div className="text-[10px] font-[600] text-[#7a7a7a] uppercase tracking-[.05em] mb-2.5">Key Metrics</div>
@@ -257,6 +300,21 @@ export default function StockStoryPageF0() {
                   ))}
                 </div>
                 <button className="text-[10px] text-[#0066cc] mt-2 font-[500] active:scale-[0.95]">View More Metrics ›</button>
+              </div>
+
+              {/* Quick Trade Card */}
+              <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px] mb-3">
+                <div className="text-[10px] font-[600] text-[#7a7a7a] uppercase tracking-[.05em] mb-2.5">Quick Trade</div>
+                <p className="text-[11px] text-[#7a7a7a] mb-3 leading-[1.4]">Research completed? Take the next step — invest in {ticker} through our partner brokers.</p>
+                <button onClick={() => setTradeOpen(true)}
+                  className="w-full h-[36px] bg-[#1a7f4b] text-white text-[12px] font-[500] rounded-[9999px] flex items-center justify-center gap-2 active:scale-[0.95] hover:opacity-90 transition-opacity">
+                  <ShoppingCart size={13} /> Buy {ticker} Now
+                </button>
+                <div className="flex items-center justify-center gap-2 mt-2 text-[9px] text-[#bbb]">
+                  <span>via partner brokers</span>
+                  <span>·</span>
+                  <span>Free account opening</span>
+                </div>
               </div>
 
               <div className="bg-white border border-[#e0e0e0] rounded-[18px] p-[24px] mb-3">
@@ -286,12 +344,31 @@ export default function StockStoryPageF0() {
               </div>
 
               <div className="text-[10px] text-[#bbb] leading-[1.5] pt-3 border-t border-[#e0e0e0] mt-1">
-                Research scores are for educational purposes only. Not investment advice. StockStory India is not a SEBI-registered adviser.
+                Research scores are for educational purposes only. Not investment advice. StockStory India is not a SEBI-registered adviser. <strong className="text-[#7a7a7a]">When you buy through partner brokers, we earn a commission at no extra cost to you.</strong>
               </div>
             </div>
           </div>
         )}
+
+        {/* Partner broker disclaimer */}
+        <div className="border-t border-[#e0e0e0] py-4 mt-2 mb-4">
+          <p className="text-[9px] text-[#bbb] leading-[1.5]">
+            <strong>Disclosure:</strong> StockStory India is an equity research platform and <strong>is not a stock broker</strong>.
+            We do not execute trades or handle funds. When you open a broker account or place a trade through our partner links,
+            we may earn a referral commission. Partner brokers include Zerodha, Groww, Angel One, Upstox, Dhan, and ICICI Direct.
+            All trading and investing involves risk. Consult a SEBI-registered adviser before investing.
+          </p>
+        </div>
       </div>
+
+      <TradePanel
+        open={tradeOpen}
+        onClose={() => setTradeOpen(false)}
+        symbol={ticker}
+        companyName={companyName}
+        price={p?.current ?? null}
+        score={score}
+      />
     </AppShell>
   );
 }
