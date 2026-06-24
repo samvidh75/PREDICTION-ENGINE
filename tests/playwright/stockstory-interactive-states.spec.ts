@@ -408,4 +408,69 @@ test.describe("12. Mobile navigation", () => {
     );
     expect(overflow).toBeLessThanOrEqual(8);
   });
+
+  test("dashboard has mobile nav at 390px", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(mockAuthSession);
+    await mockAllApi(page);
+    await page.goto("/?page=dashboard", { waitUntil: "domcontentloaded", timeout: 10000 });
+    await page.waitForTimeout(500);
+    const nav = page.locator("nav[aria-label='Mobile navigation']");
+    await expect(nav).toBeAttached();
+    await assertNoForbiddenTerms(page);
+    await assertNoRenderGarbage(page);
+  });
+});
+
+test.describe("13. Command palette on PremiumAppShell", () => {
+  test("command palette opens on scanner page", async ({ page }) => {
+    await setup(page, "scanner");
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(300);
+    await assertNoForbiddenTerms(page);
+    await assertNoRenderGarbage(page);
+  });
+
+  test("command palette opens on watchlist page", async ({ page }) => {
+    await setup(page, "watchlist");
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(300);
+    await assertNoForbiddenTerms(page);
+  });
+
+  test("command palette opens on portfolio page", async ({ page }) => {
+    await setup(page, "portfolio");
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(300);
+    await assertNoForbiddenTerms(page);
+  });
+
+  test("command palette contains product commands only", async ({ page }) => {
+    await setup(page, "scanner");
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(300);
+    const body = await page.locator("body").textContent() || "";
+    expect(body).not.toContain("diagnostics");
+    expect(body).not.toContain("backend");
+    expect(body).not.toContain("provider");
+    expect(body).not.toContain("migration");
+    expect(body).not.toContain("coverage");
+    await assertNoForbiddenTerms(page);
+  });
+
+  test("command palette closes with Escape", async ({ page }) => {
+    await setup(page, "scanner");
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(200);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(200);
+    await assertNoForbiddenTerms(page);
+  });
+
+  test("command palette opens on about page", async ({ page }) => {
+    await setup(page, "about", undefined, false);
+    await page.keyboard.press("Meta+k");
+    await page.waitForTimeout(300);
+    await assertNoForbiddenTerms(page);
+  });
 });

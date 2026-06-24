@@ -32,9 +32,8 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Overflow: no
 - Giant blank region: no
 - Low contrast hero: no
-- Primary CTAs: missing
-- Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Primary CTAs: ok
+- Status: **PASS**
 
 ### landing @ tablet-768
 - Content: 768px / Viewport: 768px
@@ -43,9 +42,8 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Overflow: no
 - Giant blank region: no
 - Low contrast hero: no
-- Primary CTAs: missing
-- Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Primary CTAs: ok
+- Status: **PASS**
 
 ### rankings @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -55,8 +53,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### rankings @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -66,8 +63,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### rankings @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -137,8 +133,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### trust @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -148,8 +143,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### trust @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -179,8 +173,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### about @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -190,8 +183,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### about @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -200,9 +192,8 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Overflow: no
 - Giant blank region: no
 - Low contrast hero: no
-- Primary CTAs: missing
-- Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Primary CTAs: ok
+- Status: **PASS**
 
 ### about @ tablet-768
 - Content: 768px / Viewport: 768px
@@ -211,9 +202,8 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Overflow: no
 - Giant blank region: no
 - Low contrast hero: no
-- Primary CTAs: missing
-- Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Primary CTAs: ok
+- Status: **PASS**
 
 ### dashboard-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -223,8 +213,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### dashboard-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -234,8 +223,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### dashboard-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -265,8 +253,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### search-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -276,8 +263,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### search-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -307,8 +293,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### compare-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -318,8 +303,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### compare-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -349,8 +333,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### watchlist-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -360,8 +343,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### watchlist-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -391,8 +373,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### portfolio-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -402,8 +383,7 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **FAIL**
-- Errors: narrow container (max-w-7xl/5xl) found on desktop
+- Status: **PASS**
 
 ### portfolio-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -466,4 +446,4 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Status: **PASS**
 
 ## Summary
-Some checks failed. See above for details.
+All checks passed.

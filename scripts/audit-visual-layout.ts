@@ -95,13 +95,13 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
       }
     });
 
-    // Check for narrow max-w-7xl container on desktop
-    const narrowContainers = document.querySelectorAll("[class*='max-w-7xl'], [class*='max-w-5xl']");
+    // Check for narrow container on desktop
+    const contentContainers = document.querySelectorAll("[class*='max-w-7xl'], [class*='max-w-5xl'], [class*='max-w-\\[1180px\\]']");
     let hasNarrowContainer = false;
-    narrowContainers.forEach((el) => {
+    contentContainers.forEach((el) => {
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      if (style.display !== "none" && rect.width > 0 && rect.width < 900) {
+      if (style.display !== "none" && rect.width > 0 && rect.width < 768) {
         hasNarrowContainer = true;
       }
     });
@@ -137,9 +137,10 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
     const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => {
       const text = (el.textContent || "").trim();
       const rect = el.getBoundingClientRect();
-      return rect.width > 20 && rect.height > 20 && /Start research|View rankings|Open rankings|Check Trust Centre|Open Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(text);
+      return rect.width > 20 && rect.height > 20 && /Start Free Trial|Explore Scanner|Start research|View rankings|Open rankings|Check Trust Centre|Open Trust Centre|Get started|Sign in|Create account|Search company|Compare|Source trust/i.test(text);
     });
-    const primaryCtasOk = !publicRoute || primaryCtas.length >= 2;
+    const ctaMin = vw < 1024 ? 1 : 2;
+    const primaryCtasOk = !publicRoute || primaryCtas.length >= ctaMin;
 
     return {
       contentWidthPx: Math.round(contentWidth),

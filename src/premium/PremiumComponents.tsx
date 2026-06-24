@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { productNavigate } from "../components/product/ProductUI";
 import { api } from "../services/api/client";
+import { CommandPalette } from "../components/intelligence/CommandPalette";
 
 /* ─── Design token references ─── */
 const S = {
@@ -2586,6 +2587,17 @@ export function PremiumAppShell({
   children: React.ReactNode;
   activePage?: string;
 }) {
+  const [commandOpen, setCommandOpen] = useState(false);
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", onShortcut);
+    return () => document.removeEventListener("keydown", onShortcut);
+  }, []);
   return (
     <div style={{ minHeight: "100vh", background: S.bg }}>
       <a
@@ -2622,6 +2634,10 @@ export function PremiumAppShell({
           {children}
         </main>
       </div>
+      <CommandPalette
+        open={commandOpen}
+        onClose={() => setCommandOpen(false)}
+      />
     </div>
   );
 }
