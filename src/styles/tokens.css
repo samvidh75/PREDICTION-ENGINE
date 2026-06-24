@@ -1,0 +1,10 @@
+:root {
+  --white:#fff; --bg:#f7f7f5; --ink:#0a0a0a; --ink2:#2d2d2d; --ink3:#555; --ink4:#888; --ink5:#bbb;
+  --line:#e8e8e8; --line-light:#f2f2f2; --green:#1a7f4b; --green-mid:#22c55e; --green-bg:#ebf7f1;
+  --green-dark:#0d5c34; --red:#c0392b; --red-bg:#fef0ee; --amber:#b45309; --amber-bg:#fef9ec;
+  --blue:#1a56db; --blue-bg:#eef4ff; --s-excellent:#0d5c34; --s-excellent-bg:#e8f7ef;
+  --s-good:#1a7f4b; --s-good-bg:#ebf7f1; --s-fair:#1a56db; --s-fair-bg:#eef4ff;
+  --s-weak:#b45309; --s-weak-bg:#fef9ec; --s-poor:#c0392b; --s-poor-bg:#fef0ee;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; --nav-h:56px; --ticker-h:48px;
+  --r:10px; --r-sm:7px; --r-xs:5px;
+}
