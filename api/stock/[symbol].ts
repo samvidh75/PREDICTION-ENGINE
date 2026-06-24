@@ -8,14 +8,17 @@ const providerTimeout = (ms: number): Promise<never> =>
 async function safeProvider(
   label: string,
   operation: () => Promise<ProviderPayload>,
+  timeoutMs = 7_000,
 ): Promise<ProviderPayload> {
   try {
-    return await Promise.race([operation(), providerTimeout(7_000)]);
+    return await Promise.race([operation(), providerTimeout(timeoutMs)]);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "unknown error";
     return { _error: `${label}: ${message}` };
   }
 }
+
+export const config = { maxDuration: 30 };
 
 function asNumber(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -34,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!symbol) return res.status(400).json({ error: "symbol required" });
 
   const indianApiKey = process.env.INDIANAPI_KEY || "";
-  const [priceData, fundamentalData, historicalData, researchData] = await Promise.all([
+  const [priceData, fundamentalData, historicalData, researchData, backendQuoteData] = await Promise.all([
     safeProvider("price", async () => {
       if (!indianApiKey) return { _error: "price: INDIANAPI_KEY not configured" };
       const response = await fetch(
@@ -81,6 +84,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!response.ok) return { _error: `research HTTP ${response.status}` };
       const payload = (await response.json()) as { data?: Record<string, unknown> };
       return payload.data ?? { _error: "research: empty response" };
+    }, 15_000),
+    safeProvider("backend quote", async () => {
+      const baseUrl = process.env.BACKEND_BASE_URL || "https://prediction-engine-production-f7a8.up.railway.app";
+      const response = await fetch(`${baseUrl}/api/market-data/quote/${encodeURIComponent(symbol)}`);
+      if (!response.ok) return { _error: `backend quote HTTP ${response.status}` };
+      return (await response.json()) as ProviderPayload;
     }),
   ]);
 
@@ -95,13 +104,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     : {};
 
   const price = {
-    current: asNumber(priceData.currentPrice ?? priceData.price ?? researchQuote.lastPrice),
-    change: asNumber(priceData.percentChange ?? priceData.pChange ?? researchQuote.changePercent),
-    changeAbs: asNumber(priceData.change ?? researchQuote.change),
-    open: asNumber(priceData.open ?? researchQuote.open),
-    high: asNumber(priceData.dayHigh ?? priceData.high ?? researchQuote.high),
-    low: asNumber(priceData.dayLow ?? priceData.low ?? researchQuote.low),
-    volume: asNumber(priceData.volume ?? researchQuote.volume),
+    current: asNumber(priceData.currentPrice ?? priceData.price ?? backendQuoteData.price ?? researchQuote.lastPrice),
+    change: asNumber(priceData.percentChange ?? priceData.pChange ?? backendQuoteData.changePercent ?? researchQuote.changePercent),
+    changeAbs: asNumber(priceData.change ?? backendQuoteData.change ?? researchQuote.change),
+    open: asNumber(priceData.open ?? backendQuoteData.open ?? researchQuote.open),
+    high: asNumber(priceData.dayHigh ?? priceData.high ?? backendQuoteData.high ?? researchQuote.high),
+    low: asNumber(priceData.dayLow ?? priceData.low ?? backendQuoteData.low ?? researchQuote.low),
+    volume: asNumber(priceData.volume ?? backendQuoteData.volume ?? researchQuote.volume),
     weekHigh52: asNumber(priceData["52WeekHigh"] ?? priceData.yearHigh ?? researchQuote.week52High),
     weekLow52: asNumber(priceData["52WeekLow"] ?? priceData.yearLow ?? researchQuote.week52Low),
     marketCap: asNumber(priceData.marketCap ?? researchQuote.marketCap),
@@ -111,8 +120,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? String(priceData.companyName ?? priceData.name)
         : typeof researchProfile.companyName === "string" ? researchProfile.companyName : symbol,
     sector: typeof priceData.sector === "string" ? priceData.sector : typeof researchProfile.sector === "string" ? researchProfile.sector : null,
-    source: priceData._error ? (asNumber(researchQuote.lastPrice) === null ? "unavailable" : "research-cache") : "indianapi",
-    priceError: priceData._error && asNumber(researchQuote.lastPrice) === null ? priceData._error : null,
+    source: priceData._error ? (asNumber(backendQuoteData.price ?? researchQuote.lastPrice) === null ? "unavailable" : "research-cache") : "indianapi",
+    priceError: priceData._error && asNumber(backendQuoteData.price ?? researchQuote.lastPrice) === null ? priceData._error : null,
   };
 
   const ratios =
