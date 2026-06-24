@@ -1,92 +1,306 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { Trophy, Lock, ArrowRight, Search, Info, ExternalLink, Shield, BookOpen } from "lucide-react";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductHero, ProductSection, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { Lock, Search, Info, BookOpen, ArrowRight, AlertCircle, RefreshCw } from "lucide-react";
+import {
+  ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate,
+} from "../components/product/ProductUI";
 import { useAuth } from "../context/AuthContext";
-import { api, type ScannerResultItem } from "../services/api/client";
-import Table from "../components/ui/Table";
+import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
+import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
 import Input from "../components/ui/Input";
-import CustomSelect from "../components/ui/CustomSelect";
-import { signalLabelFromScore } from "../lib/product/signalLabels";
-import { dedupeRankings } from "../lib/product/rankingsDedupe";
 
-function rankingsSignalLabel(score: number | null): { label: string; color: string } | null {
-  const t = signalLabelFromScore(score);
-  if (!t) return null;
-  return { label: t.label, color: t.color };
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function scoreColor(v: number | null): string {
+  if (v === null) return "#94A3B8";
+  if (v >= 70) return "#16A34A";
+  if (v >= 55) return "#22C55E";
+  if (v >= 40) return "#F59E0B";
+  if (v >= 25) return "#FB923C";
+  return "#EF4444";
 }
 
-function isRealSector(sector: string | null | undefined): boolean {
-  if (!sector) return false;
-  const s = sector.trim().toLowerCase();
-  return !["not available", "sector pending", "unavailable", "pending", "", "unknown", "n/a"].includes(s);
+function classLabel(cls: string): string {
+  switch (cls) {
+    case "EXCELLENT": return "Excellent";
+    case "HEALTHY": return "Healthy";
+    case "STABLE": return "Stable";
+    case "WEAKENING": return "Weakening";
+    case "AT_RISK": return "At Risk";
+    default: return "—";
+  }
 }
+
+function confidenceBadge(level: string): { label: string; cls: string } {
+  switch (level) {
+    case "HIGH": return { label: "High conf.", cls: "bg-green-50 text-green-700 border-green-200" };
+    case "MEDIUM": return { label: "Med conf.", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "LOW": return { label: "Low conf.", cls: "bg-red-50 text-red-700 border-red-200" };
+    case "CRITICAL": return { label: "Critical", cls: "bg-red-50 text-red-700 border-red-200" };
+    default: return { label: "—", cls: "bg-gray-50 text-gray-500 border-gray-200" };
+  }
+}
+
+// ── Mini Score Ring ───────────────────────────────────────────────────────────
+
+function MiniRing({ score }: { score: number | null }) {
+  const r = 16;
+  const circ = 2 * Math.PI * r;
+  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
+  const color = scoreColor(score);
+  return (
+    <svg width={40} height={40} viewBox="0 0 40 40" role="img" aria-label={score !== null ? `Score ${Math.round(score)}` : "Score unavailable"}>
+      <circle cx={20} cy={20} r={r} fill="none" stroke="#E2E8F0" strokeWidth={5} />
+      <circle
+        cx={20} cy={20} r={r} fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
+        strokeLinecap="round" transform="rotate(-90 20 20)"
+      />
+      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize="10" fontWeight="700" fill={color}>
+        {score !== null ? Math.round(score) : "—"}
+      </text>
+    </svg>
+  );
+}
+
+// ── Mini Bar ──────────────────────────────────────────────────────────────────
+
+function MiniBar({ label, score }: { label: string; score: number | null }) {
+  const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
+  const color = scoreColor(score);
+  return (
+    <div className="flex flex-col gap-0.5 w-16">
+      <span className="text-[9px] text-[#94A3B8] uppercase tracking-wider truncate">{label}</span>
+      <div className="h-1 bg-[#E2E8F0] rounded-full overflow-hidden w-full">
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+      </div>
+      <span className="text-[10px] font-semibold tabular-nums" style={{ color }}>
+        {score !== null ? Math.round(score) : "—"}
+      </span>
+    </div>
+  );
+}
+
+// ── Stock Row ─────────────────────────────────────────────────────────────────
+
+function StockRow({
+  symbol,
+  rank,
+  result,
+  isAuthenticated,
+  onNavigate,
+}: {
+  symbol: string;
+  rank: number;
+  result: PipelineResult | null;
+  isAuthenticated: boolean;
+  onNavigate: () => void;
+}) {
+  const pred = result?.prediction ?? null;
+  const score = pred?.rankingScore ?? null;
+  const cls = pred?.classification ?? "INSUFFICIENT_DATA";
+  const confLevel = pred?.confidenceLevel ?? "LOW";
+  const exchange = result?.price.exchange;
+  const companyName = result?.companyName;
+  const sector = result?.sector;
+
+  const priceDisplay = result?.price.current !== null && result?.price.current !== undefined
+    ? `₹${result.price.current.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`
+    : null;
+  const changeDisplay = result?.price.change !== null && result?.price.change !== undefined
+    ? result.price.change
+    : null;
+
+  const qualityScore = pred?.factorScores.find(f => f.group === "quality")?.value ?? null;
+  const growthScore = pred?.factorScores.find(f => f.group === "growth")?.value ?? null;
+  const momentumScore = pred?.factorScores.find(f => f.group === "momentum")?.value ?? null;
+
+  const conf = confidenceBadge(confLevel);
+  const clsColor = scoreColor(score);
+
+  return (
+    <ProductPanel
+      className="border border-white/[0.08] hover:border-white/[0.18] transition-all cursor-pointer"
+      as="article"
+    >
+      <div
+        className="p-4 flex items-center gap-4 flex-wrap sm:flex-nowrap"
+        onClick={isAuthenticated ? onNavigate : undefined}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && isAuthenticated) { e.preventDefault(); onNavigate(); } }}
+        aria-label={`View research for ${symbol}`}
+      >
+        {/* Rank + Ring */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="w-6 text-right text-xs text-[#64748B] font-semibold tabular-nums">{rank}</div>
+          {result === null ? (
+            <div className="w-10 h-10 rounded-full bg-[#F1F5F9] flex items-center justify-center">
+              <RefreshCw className="h-3 w-3 text-[#94A3B8] animate-spin" />
+            </div>
+          ) : (
+            isAuthenticated ? <MiniRing score={score} /> : (
+              <div className="w-10 h-10 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-center">
+                <Lock className="h-3.5 w-3.5 text-[#94A3B8]" />
+              </div>
+            )
+          )}
+        </div>
+
+        {/* Symbol + Name */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{symbol}</span>
+            {companyName && (
+              <span className="text-xs text-[#64748B] truncate max-w-[180px]">{companyName}</span>
+            )}
+            {exchange && (
+              <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-[#94A3B8]">{exchange}</span>
+            )}
+            {sector && (
+              <span className="text-[9px] text-[#64748B] uppercase tracking-wider hidden md:inline">{sector}</span>
+            )}
+          </div>
+          {isAuthenticated && pred && (
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <span
+                className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+                style={{ color: clsColor, background: `${clsColor}15` }}
+              >
+                {classLabel(cls)}
+              </span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${conf.cls}`}>{conf.label}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Price */}
+        {isAuthenticated && priceDisplay && (
+          <div className="text-right hidden sm:block shrink-0">
+            <div className="text-sm font-bold tabular-nums text-[var(--color-text-primary)]">{priceDisplay}</div>
+            {changeDisplay !== null && (
+              <div className={`text-[11px] tabular-nums font-semibold ${changeDisplay >= 0 ? "text-green-500" : "text-red-500"}`}>
+                {changeDisplay >= 0 ? "+" : ""}{changeDisplay.toFixed(2)}%
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Mini bars */}
+        {isAuthenticated && pred && (
+          <div className="flex items-end gap-3 hidden lg:flex shrink-0">
+            <MiniBar label="Quality" score={qualityScore} />
+            <MiniBar label="Growth" score={growthScore} />
+            <MiniBar label="Momentum" score={momentumScore} />
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onNavigate(); }}
+              className="px-2.5 py-1 text-[10px] font-semibold text-[#2962FF] hover:underline"
+            >
+              Research →
+            </button>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
+              <Lock className="h-3 w-3" /> Gated
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Price-null warning */}
+      {result !== null && result.price.current === null && isAuthenticated && (
+        <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-[#F59E0B]">
+          <AlertCircle className="h-3 w-3" />
+          <span>Price data unavailable — score based on fundamentals only</span>
+        </div>
+      )}
+    </ProductPanel>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+
+const INITIAL_BATCH = 10;
+const BATCH_SIZE = 3;
 
 export const PublicRankingsPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [rankings, setRankings] = useState<ScannerResultItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
+  const [loaded, setLoaded] = useState<number>(INITIAL_BATCH);
   const [searchText, setSearchText] = useState("");
-  const [sectorFilter, setSectorFilter] = useState("all");
+  const loadingRef = useRef(false);
+
+  // Load initial batch on mount
+  useEffect(() => {
+    const symbols = NIFTY50_SYMBOLS.slice(0, INITIAL_BATCH);
+    loadBatch(symbols);
+  }, []);
+
+  const loadBatch = useCallback(async (symbols: string[]) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+
+    // Process in sub-batches of 3 to respect provider rate limits
+    for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
+      const batch = symbols.slice(i, i + BATCH_SIZE);
+      await Promise.allSettled(
+        batch.map(async (sym) => {
+          try {
+            const r = await runCompanyDataPipeline(sym);
+            setResults(prev => ({ ...prev, [sym]: r }));
+          } catch {
+            setResults(prev => ({ ...prev, [sym]: null }));
+          }
+        }),
+      );
+    }
+    loadingRef.current = false;
+  }, []);
+
+  // Infinite scroll: load more when scrolled near bottom
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    setLoading(true);
-    api.getScanner("Quality compounders", 50)
-      .then((res) => {
-        if (ctrl.signal.aborted) return;
-        const raw = res.data ?? [];
-        // Deduplicate immediately
-        const unique = dedupeRankings(raw);
-        // Recalculate rank numbers sequentially
-        const uniqueWithRanks = unique.map((item, idx) => ({
-          ...item,
-          rank: idx + 1,
-          displayRank: idx + 1,
-        }));
-        setRankings(uniqueWithRanks);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (ctrl.signal.aborted) return;
-        setRankings([]);
-        setLoading(false);
-      });
-    return () => ctrl.abort();
-  }, []);
+    if (loaded >= NIFTY50_SYMBOLS.length) return;
 
-  const sectors = useMemo(() => {
-    const set = new Set<string>();
-    rankings.forEach((r) => {
-      if (isRealSector(r.sector)) set.add(r.sector!.trim());
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loadingRef.current) {
+          const nextBatch = NIFTY50_SYMBOLS.slice(loaded, loaded + BATCH_SIZE * 3);
+          if (nextBatch.length > 0) {
+            setLoaded(prev => prev + nextBatch.length);
+            loadBatch(nextBatch);
+          }
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    if (sentinelRef.current) observerRef.current.observe(sentinelRef.current);
+    return () => observerRef.current?.disconnect();
+  }, [loaded, loadBatch]);
+
+  const displayedSymbols = useMemo(() => {
+    const universe = isAuthenticated ? NIFTY50_SYMBOLS.slice(0, loaded) : NIFTY50_SYMBOLS.slice(0, 3);
+    if (!searchText.trim()) return universe;
+    const q = searchText.toLowerCase();
+    return universe.filter(sym => {
+      const r = results[sym];
+      return (
+        sym.toLowerCase().includes(q) ||
+        r?.companyName?.toLowerCase().includes(q) ||
+        r?.sector?.toLowerCase().includes(q)
+      );
     });
-    return Array.from(set);
-  }, [rankings]);
+  }, [isAuthenticated, loaded, results, searchText]);
 
-  const showSectorFilter = sectors.length >= 2;
-
-  const filteredRankings = useMemo(() => {
-    return rankings.filter((r) => {
-      const matchesSearch =
-        r.symbol.toLowerCase().includes(searchText.toLowerCase()) ||
-        r.companyName.toLowerCase().includes(searchText.toLowerCase()) ||
-        (r.sector && r.sector.toLowerCase().includes(searchText.toLowerCase()));
-
-      const matchesSector = sectorFilter === "all" || r.sector === sectorFilter;
-
-      return matchesSearch && matchesSector;
-    });
-  }, [rankings, searchText, sectorFilter]);
-
-  const displayedRankings = useMemo(() => {
-    if (!isAuthenticated) {
-      return rankings.slice(0, 3);
-    }
-    return filteredRankings;
-  }, [rankings, filteredRankings, isAuthenticated]);
-
-  const handleActionRedirect = useCallback(() => {
-    productNavigate("signup");
-  }, []);
+  const allLoading = displayedSymbols.every(s => results[s] === undefined);
 
   return (
     <ProductShell>
@@ -95,207 +309,107 @@ export const PublicRankingsPage: React.FC = () => {
           {/* Header */}
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research shortlist</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Research Shortlist</h1>
               <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
                 {isAuthenticated
-                  ? "Screened Indian equities. Use this shortlist to prioritize your research queue."
-                  : "Institutional-grade research shortlists applied to Indian equities."}
+                  ? `Nifty 50 universe · ${Object.keys(results).length} stocks scored in this session`
+                  : "Institutional-grade multi-factor research applied to Indian equities."}
               </p>
             </div>
             {!isAuthenticated && (
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-2 w-2 rounded-full bg-[#F59E0B]" />
-                <span className="text-xs text-[var(--color-text-secondary)]">Teaser preview</span>
+                <span className="text-xs text-[var(--color-text-secondary)]">Teaser — 3 stocks shown</span>
               </div>
             )}
           </div>
 
-          {/* Authenticated Controls Panel */}
-          {isAuthenticated && rankings.length > 0 && (
-            <ProductPanel className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between border border-white/[0.08]">
-              <div className="relative w-full md:max-w-xs">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-[#64748B]" />
-                <Input
-                  className="pl-9 h-10 w-full"
-                  aria-label="Search rankings by symbol or sector"
-                  placeholder="Search symbol or sector..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                />
-              </div>
-
-              {showSectorFilter && (
-                <div className="flex items-center gap-3">
-                  <span className="whitespace-nowrap text-xs font-medium text-[var(--color-text-secondary)]">Sector:</span>
-                  <CustomSelect
-                    aria-label="Sector"
-                    value={sectorFilter}
-                    onChange={(e) => setSectorFilter(e.target.value)}
-                    className="appearance-none bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[rgba(148,163,184,0.16)] rounded-xl px-3 py-2 text-xs focus:outline-none"
-                  >
-                    <option value="all">All Sectors</option>
-                    {sectors.map((sec) => (
-                      <option key={sec} value={sec}>
-                        {sec}
-                      </option>
-                    ))}
-                  </CustomSelect>
-                </div>
-              )}
+          {/* Controls */}
+          {isAuthenticated && (
+            <ProductPanel className="flex items-center gap-3 p-3 border border-white/[0.08]">
+              <Search className="h-4 w-4 text-[#64748B] shrink-0 ml-1" />
+              <Input
+                className="flex-1 bg-transparent border-0 text-sm placeholder:text-[#94A3B8] focus:ring-0"
+                placeholder="Search symbol, company, or sector…"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                aria-label="Search stocks"
+              />
             </ProductPanel>
           )}
 
-          {/* How to read rankings */}
-          {isAuthenticated && rankings.length > 0 && (
+          {/* How to use */}
+          {isAuthenticated && (
             <details className="group rounded-lg border border-white/[0.08] bg-[rgba(255,255,255,0.015)]">
               <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
-                <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
-                How to use rankings
-                <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" aria-hidden="true" />
+                <BookOpen className="h-3.5 w-3.5" />
+                How to use this shortlist
+                <ArrowRight className="ml-auto h-3 w-3 transition-transform group-open:rotate-90" />
               </summary>
               <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[var(--color-text-secondary)] space-y-2">
-                <p><strong className="text-[var(--color-text-primary)]">Research Score</strong> — 0-100 rating based on multi-factor research assessment. Higher scores indicate stronger fundamentals.</p>
-                <p><strong className="text-[var(--color-text-primary)]">Conviction</strong> — How confident the model is based on data sufficiency.</p>
-                <p><strong className="text-[var(--color-text-primary)]">No Buy/Sell calls</strong> — StockStory does not issue trading recommendations. Use scores to inform your own research process.</p>
+                <p><strong className="text-[var(--color-text-primary)]">Research Score (0–100)</strong> — Multi-factor engine combining quality, valuation, growth, momentum, stability, and risk. Higher is stronger fundamentals.</p>
+                <p><strong className="text-[var(--color-text-primary)]">Scores are live</strong> — Each session computes real-time scores from live providers. No cached or fabricated scores.</p>
+                <p><strong className="text-[var(--color-text-primary)]">No buy/sell calls</strong> — StockStory does not issue trading recommendations. Use scores to prioritize your own research.</p>
               </div>
             </details>
           )}
 
-          {/* Loading & Empty State */}
-          {loading ? (
-            <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">
-              Loading shortlist...
-            </div>
-          ) : rankings.length === 0 ? (
-            <div className="py-12 text-center">
-              <Info className="mx-auto h-8 w-8 text-[#64748B]" />
-              <h2 className="mt-3 text-base font-semibold text-[var(--color-text-primary)]">Shortlist is being compiled</h2>
-              <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-                Rankings appear after verified multi-factor research runs have completed.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Institutional Grid / List of Cards (Responsive & Clean) */}
-              <div className="space-y-2">
-                {displayedRankings.map((r) => {
-                  const realSector = isRealSector(r.sector);
-                  const sig = rankingsSignalLabel(r.score);
-                  const signalColor = sig?.color ?? "#64748B";
-
-                  return (
-                    <ProductPanel
-                      key={r.symbol}
-                      className="border border-white/[0.08] hover:border-white/[0.15] transition-all"
-                    >
-                      <div
-                        onClick={isAuthenticated ? () => productNavigate("stock", r.symbol) : handleActionRedirect}
-                        className="p-4 cursor-pointer flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-                        tabIndex={0}
-                        role="button"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            if (isAuthenticated) productNavigate("stock", r.symbol);
-                            else handleActionRedirect();
-                          }
-                        }}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          {/* Rank Badge */}
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.04] text-xs font-bold text-[var(--color-text-secondary)] border border-white/[0.08]">
-                            {r.rank}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{r.symbol}</span>
-                              {realSector && (
-                                <span className="text-[9px] uppercase tracking-wider text-[#64748B] font-semibold">{r.sector}</span>
-                              )}
-                            </div>
-                            <p className="truncate text-xs text-[var(--color-text-secondary)] mt-0.5">{r.companyName}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4 pt-0 sm:pt-4 flex flex-wrap items-center justify-between sm:justify-end gap-3">
-                        {/* Score & Conviction */}
-                        {isAuthenticated ? (
-                          <>
-                            {r.score !== null && (
-                              <div className="flex items-center gap-1.5 bg-[#2962FF]/10 border border-[#2962FF]/20 px-2 py-0.5 rounded">
-                                <span className="text-[10px] uppercase font-bold text-[#2962FF]">Score</span>
-                                <span className="text-xs font-bold text-[#2962FF] tabular-nums">{Math.round(r.score)}</span>
-                              </div>
-                            )}
-                            {sig && (
-                              <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[var(--color-text-primary)]">
-                                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
-                                {sig.label}
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
-                            <Lock className="h-3 w-3" /> Gated
-                          </span>
-                        )}
-
-                        {/* Actions cluster */}
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (isAuthenticated) productNavigate("stock", r.symbol);
-                              else handleActionRedirect();
-                            }}
-                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[#2962FF] hover:underline"
-                          >
-                            Research
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (isAuthenticated) productNavigate("compare", r.symbol);
-                              else handleActionRedirect();
-                            }}
-                            className="rounded px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                          >
-                            Compare
-                          </button>
-                        </div>
-                      </div>
-                    </ProductPanel>
-                  );
-                })}
-              </div>
-
-              {/* Public/Teaser Lock Panel */}
-              {!isAuthenticated && (
-                <ProductPanel className="p-6 md:p-8 border border-[rgba(245,158,11,0.2)] bg-gradient-to-br from-[#0D1117] via-[#0F141F] to-[#0D1117] rounded-xl flex flex-col items-center text-center space-y-4 shadow-xl">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(245,158,11,0.1)]">
-                    <Lock className="h-6 w-6 text-[#F59E0B]" />
-                  </div>
-                  <div className="max-w-md space-y-2">
-                    <h2 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">Unlock full research rankings</h2>
-                    <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
-                      Create a free account to unlock our complete universe of scored equities, detailed multi-factor parameters, and direct broker handoffs.
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2.5 sm:flex-row pt-2">
-                    <ProductAction onClick={() => productNavigate("signup")} className="font-semibold text-xs">
-                      Create free account
-                    </ProductAction>
-                    <ProductAction variant="secondary" onClick={() => productNavigate("methodology")} className="font-semibold text-xs">
-                      Read research standards
-                    </ProductAction>
-                  </div>
-                </ProductPanel>
-              )}
+          {/* Loading state */}
+          {allLoading && (
+            <div className="py-8 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">
+              <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-[#94A3B8]" />
+              Computing research scores…
             </div>
           )}
+
+          {/* Stock list */}
+          <div className="space-y-2">
+            {displayedSymbols.map((sym, idx) => (
+              <StockRow
+                key={sym}
+                symbol={sym}
+                rank={idx + 1}
+                result={results[sym] ?? null}
+                isAuthenticated={isAuthenticated}
+                onNavigate={() => productNavigate("stock", sym)}
+              />
+            ))}
+
+            {/* Infinite scroll sentinel */}
+            {isAuthenticated && loaded < NIFTY50_SYMBOLS.length && (
+              <div ref={sentinelRef} className="py-4 text-center text-xs text-[#94A3B8]">
+                Loading more stocks…
+              </div>
+            )}
+          </div>
+
+          {/* Unauthenticated lock panel */}
+          {!isAuthenticated && (
+            <ProductPanel className="p-6 md:p-8 border border-[rgba(245,158,11,0.2)] bg-gradient-to-br from-[#0D1117] via-[#0F141F] to-[#0D1117] rounded-xl flex flex-col items-center text-center space-y-4 shadow-xl">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(245,158,11,0.1)]">
+                <Lock className="h-6 w-6 text-[#F59E0B]" />
+              </div>
+              <div className="max-w-md space-y-2">
+                <h2 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">Unlock full research shortlist</h2>
+                <p className="text-xs leading-5 text-[var(--color-text-secondary)]">
+                  Create a free account to unlock live-computed scores for 50+ Nifty stocks, multi-factor parameters, and direct broker handoffs.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2.5 sm:flex-row pt-2">
+                <ProductAction onClick={() => productNavigate("signup")} className="font-semibold text-xs">
+                  Create free account
+                </ProductAction>
+                <ProductAction variant="secondary" onClick={() => productNavigate("methodology")} className="font-semibold text-xs">
+                  Read research standards
+                </ProductAction>
+              </div>
+            </ProductPanel>
+          )}
+
+          {/* SEBI disclaimer */}
+          <p className="text-[10px] text-[#94A3B8] leading-relaxed">
+            Research scores are for educational purposes only and are not buy/sell recommendations. StockStory India is not a SEBI-registered investment adviser. All investments are subject to market risk.
+          </p>
         </div>
       </ProductPage>
     </ProductShell>
