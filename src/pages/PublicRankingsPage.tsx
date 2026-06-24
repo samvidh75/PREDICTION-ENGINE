@@ -30,7 +30,7 @@ const symbols = [
   "SBIN",
 ];
 const filters = [
-  ["Universe", "India – NSE & BSE", "1,258 companies"],
+  ["Universe", "India – NSE & BSE", "Covered companies"],
   ["Score Range", "50 ━━━━━━━━━ 100", ""],
   ["Sector", "All Sectors ›", ""],
   ["Quality", "ROE > 15%, D/E < … ›", ""],
@@ -120,6 +120,7 @@ export default function PublicRankingsPage() {
   const [query, setQuery] = useState("");
   const [showChips, setShowChips] = useState(true);
   const [notice, setNotice] = useState("");
+  const [sortOrder, setSortOrder] = useState("score");
   useEffect(() => {
     let active = true;
     Promise.all(
@@ -133,6 +134,9 @@ export default function PublicRankingsPage() {
       active = false;
     };
   }, []);
+  const loadedResults = Object.values(rows).filter(
+    (result): result is PipelineResult => result !== null,
+  );
   const visibleSymbols = symbols
     .filter((symbol) => {
       const result = rows[symbol];
@@ -140,7 +144,76 @@ export default function PublicRankingsPage() {
         `${symbol} ${result?.companyName ?? ""} ${result?.sector ?? ""}`.toLowerCase();
       return haystack.includes(query.trim().toLowerCase());
     })
+    .sort((left, right) => {
+      if (sortOrder === "change")
+        return (
+          (rows[right]?.price.change ?? -Infinity) -
+          (rows[left]?.price.change ?? -Infinity)
+        );
+      return (
+        (rows[right]?.prediction?.rankingScore ?? -Infinity) -
+        (rows[left]?.prediction?.rankingScore ?? -Infinity)
+      );
+    })
     .slice(0, 6);
+  const highConviction = loadedResults.filter(
+    (result) => (result.prediction?.rankingScore ?? 0) >= 80,
+  ).length;
+  const advances = loadedResults.filter(
+    (result) => (result.price.change ?? 0) > 0,
+  ).length;
+  const declines = loadedResults.filter(
+    (result) => (result.price.change ?? 0) < 0,
+  ).length;
+  const factorAverages = [
+    "quality",
+    "growth",
+    "valuation",
+    "momentum",
+    "risk",
+  ].map((group) => {
+    const values = loadedResults
+      .map(
+        (result) =>
+          result.prediction?.factorScores.find(
+            (factor) => factor.group === group,
+          )?.value,
+      )
+      .filter(
+        (value): value is number => value !== null && value !== undefined,
+      );
+    return values.length
+      ? Math.round(
+          values.reduce((sum, value) => sum + value, 0) / values.length,
+        )
+      : null;
+  });
+  const sectorAverages = Array.from(
+    new Set(
+      loadedResults
+        .map((result) => result.sector)
+        .filter((sector): sector is string => Boolean(sector)),
+    ),
+  )
+    .map((sector) => {
+      const values = loadedResults
+        .filter((result) => result.sector === sector)
+        .map((result) => result.prediction?.rankingScore)
+        .filter(
+          (value): value is number => value !== null && value !== undefined,
+        );
+      return [
+        sector,
+        values.length
+          ? Math.round(
+              values.reduce((sum, value) => sum + value, 0) / values.length,
+            )
+          : null,
+      ] as const;
+    })
+    .filter((entry) => entry[1] !== null)
+    .sort((a, b) => (b[1] ?? 0) - (a[1] ?? 0))
+    .slice(0, 5);
   const refreshScan = () => {
     setNotice("Refreshing live research…");
     Promise.all(
@@ -247,10 +320,10 @@ export default function PublicRankingsPage() {
         <main className="scan-main">
           <div className="stats-bar">
             {[
-              ["Total Companies", "1,258"],
-              ["High Conviction", "128"],
-              ["Watchlist Matches", "24"],
-              ["Live Updates", "Just now"],
+              ["Companies Reviewed", String(loadedResults.length)],
+              ["High Conviction", String(highConviction)],
+              ["Visible Results", String(visibleSymbols.length)],
+              ["Research Status", loadedResults.length ? "Ready" : "Loading"],
             ].map(([a, b], i) => (
               <div key={a}>
                 <small>{a}</small>
@@ -260,10 +333,10 @@ export default function PublicRankingsPage() {
                 <span>
                   {
                     [
-                      "Searched universe",
+                      "Current research set",
                       "Score ≥ 80",
-                      "In your watchlist",
-                      "Real-time data",
+                      "Matching current filters",
+                      "Latest available research",
                     ][i]
                   }
                 </span>
@@ -279,8 +352,13 @@ export default function PublicRankingsPage() {
                 placeholder="Search for a company e.g. TCS, HDFCBANK"
               />
             </label>
-            <select>
-              <option>AI Score (High to Low)</option>
+            <select
+              value={sortOrder}
+              onChange={(event) => setSortOrder(event.target.value)}
+              aria-label="Sort scanner results"
+            >
+              <option value="score">AI Score (High to Low)</option>
+              <option value="change">1D Change (High to Low)</option>
             </select>
             <button onClick={exportRows}>
               <Download size={14} /> Export
@@ -319,7 +397,7 @@ export default function PublicRankingsPage() {
                     "Price (₹)",
                     "1D Change",
                     "Factors",
-                    "AI Signal",
+                    "Research Signal",
                     "Confidence",
                   ].map((x) => (
                     <th key={x}>{x}</th>
@@ -332,12 +410,7 @@ export default function PublicRankingsPage() {
                 ))}
               </tbody>
             </table>
-            <footer>
-              Showing 1 to 6 of 1,258 results{" "}
-              <span>
-                ‹　 <b>1</b>　2　3　…　210　 ›
-              </span>
-            </footer>
+            <footer>Showing {visibleSymbols.length} current results</footer>
           </div>
           <div className="analytics">
             <section>
@@ -347,9 +420,9 @@ export default function PublicRankingsPage() {
                   <div key={x}>
                     <span>{x}</span>
                     <i>
-                      <b style={{ width: `${[86, 84, 77, 82, 76][i]}%` }} />
+                      <b style={{ width: `${factorAverages[i] ?? 0}%` }} />
                     </i>
-                    <strong>{[86, 84, 77, 82, 76][i]}</strong>
+                    <strong>{factorAverages[i] ?? "—"}</strong>
                   </div>
                 ),
               )}
@@ -357,20 +430,29 @@ export default function PublicRankingsPage() {
             <section>
               <b>Score Heatmap</b>
               <div className="heatmap">
-                {Array.from({ length: 40 }, (_, i) => (
-                  <i key={i} style={{ opacity: 0.2 + (i % 9) / 11 }} />
-                ))}
+                {loadedResults
+                  .flatMap((result) => result.prediction?.factorScores ?? [])
+                  .map((factor, index) => (
+                    <i
+                      key={`${factor.group}-${index}`}
+                      style={{
+                        opacity: Math.max(0.15, (factor.value ?? 0) / 100),
+                      }}
+                    />
+                  ))}
               </div>
             </section>
             <section className="breadth">
               <b>Market Breadth</b>
               <div>
                 <strong className="green">
-                  1,856<small>Advances</small>
+                  {advances}
+                  <small>Advances</small>
                 </strong>
                 <i />
                 <strong className="red">
-                  1,089<small>Declines</small>
+                  {declines}
+                  <small>Declines</small>
                 </strong>
               </div>
             </section>
@@ -392,25 +474,22 @@ export default function PublicRankingsPage() {
               <div>
                 <b>{t}</b>
                 <p>
-                  Strong company signals and healthy operating leverage across
-                  top-ranked stocks.
+                  {loadedResults.some(
+                    (result) => result.prediction?.rankingScore != null,
+                  )
+                    ? "Research dimensions supporting the current ordering."
+                    : "Insights appear as company research signals become ready."}
                 </p>
               </div>
             </article>
           ))}
           <section>
             <h3>Top Sectors in Scan</h3>
-            {[
-              ["IT Services", 86],
-              ["Banks", 84],
-              ["Pharma", 80],
-              ["Auto", 78],
-              ["FMCG", 76],
-            ].map(([s, n]) => (
+            {sectorAverages.map(([s, n]) => (
               <div className="sector" key={s}>
                 <span>{s}</span>
                 <i>
-                  <b style={{ width: `${n}%` }} />
+                  <b style={{ width: `${n ?? 0}%` }} />
                 </i>
                 <strong>{n}</strong>
               </div>
@@ -420,7 +499,7 @@ export default function PublicRankingsPage() {
             <Bell />
             <h3>Make it Yours</h3>
             <p>Save this scan and get alerts on matching stocks.</p>
-            <button>▣　Save This Scan</button>
+            <button onClick={saveScreen}>▣　Save This Scan</button>
           </section>
         </aside>
       </div>

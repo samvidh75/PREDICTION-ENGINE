@@ -2,7 +2,6 @@ import {
   ArrowUpRight,
   BarChart3,
   Check,
-  Database,
   Search,
   Shield,
   Sparkles,
@@ -15,10 +14,6 @@ import { productNavigate } from "../components/product/ProductUI";
 import type { UnifiedFactorScore } from "../prediction-engine/types";
 
 const factorNames = ["quality", "growth", "valuation", "risk", "momentum"];
-const chart = [
-  22, 26, 24, 29, 27, 35, 39, 34, 42, 46, 51, 48, 57, 60, 55, 63, 67, 65, 74,
-  78, 73, 80,
-];
 function FactorRows({ factors }: { factors: UnifiedFactorScore[] }) {
   return (
     <div className="factor-rows">
@@ -42,6 +37,8 @@ export default function PublicLandingPage() {
   const { pipeline, loading } = useStockData("HDFCBANK");
   const pred = pipeline?.prediction;
   const score = pred?.rankingScore ?? null;
+  const prices = pipeline?.technicals.closePrices ?? [];
+  const confidence = pipeline?.dataCompleteness ?? 0;
   return (
     <AppShell active="research">
       <div className="home page-wrap">
@@ -79,7 +76,7 @@ export default function PublicLandingPage() {
               {[
                 "No credit card required",
                 "Cancel anytime, no lock-ins",
-                "Trusted by 2M+ investors",
+                "Built for serious investors",
               ].map((x) => (
                 <span key={x}>
                   <Check size={13} />
@@ -113,7 +110,6 @@ export default function PublicLandingPage() {
                 <Card className="ai-insight">
                   <header>
                     <b>✦ AI Insight</b>
-                    <small>Generated today</small>
                   </header>
                   <h3>HDFCBANK: Research signals at a glance</h3>
                   <p>
@@ -121,7 +117,14 @@ export default function PublicLandingPage() {
                       "AI thesis is being generated for this company. Check back shortly."}
                   </p>
                   <footer>
-                    <span>AI Confidence: High</span>
+                    <span>
+                      Research confidence:{" "}
+                      {confidence >= 75
+                        ? "High"
+                        : confidence >= 50
+                          ? "Moderate"
+                          : "Building"}
+                    </span>
                     <button
                       onClick={() => productNavigate("stock", "HDFCBANK")}
                     >
@@ -136,28 +139,31 @@ export default function PublicLandingPage() {
             <Card>
               <header className="card-title">
                 <b>Market Overview</b>
-                <span>• Live</span>
+                <span>Research view</span>
                 <small>1D　1W　1M　YTD</small>
               </header>
               <div className="large-chart">
-                <MiniSparkline data={chart} width={350} height={120} />
+                <div className="product-safe-state">
+                  Market breadth will appear when the current session summary is
+                  ready.
+                </div>
               </div>
               <div className="market-grid">
                 <div>
                   <small>Advances</small>
-                  <b className="green">1,856</b>
+                  <b>—</b>
                 </div>
                 <div>
                   <small>Declines</small>
-                  <b className="red">1,089</b>
+                  <b>—</b>
                 </div>
                 <div>
                   <small>Unchanged</small>
-                  <b>136</b>
+                  <b>—</b>
                 </div>
                 <div>
                   <small>Market Breadth</small>
-                  <b className="green">+767</b>
+                  <b>—</b>
                 </div>
               </div>
             </Card>
@@ -167,14 +173,11 @@ export default function PublicLandingPage() {
                 <small>vs NIFTY 50</small>
               </header>
               <div className="chart-legend">
-                <span>
-                  ━ HDFCBANK <b>+221.4%</b>
-                </span>
-                <span>━ NIFTY 50 +98.7%</span>
+                <span>━ HDFCBANK market history</span>
               </div>
               <div className="large-chart">
                 <MiniSparkline
-                  data={chart.map((x, i) => x + i * 3)}
+                  data={prices.slice(-80)}
                   width={350}
                   height={115}
                 />
@@ -185,7 +188,8 @@ export default function PublicLandingPage() {
         <section className="research-band">
           <h2>Research every Nifty 50 company</h2>
           <p>
-            5 proprietary scores. 1000+ data points. Updated every single day.
+            Five research dimensions. Structured analysis. Built for disciplined
+            investing.
           </p>
           <div className="research-cards">
             {factorNames.map((name, i) => (
@@ -196,7 +200,14 @@ export default function PublicLandingPage() {
                 <section>
                   <b>{name[0].toUpperCase() + name.slice(1)}</b>
                   <strong>
-                    {[92, 85, 78, 82, 87][i]}
+                    {pred?.factorScores.find((factor) => factor.group === name)
+                      ?.value == null
+                      ? "—"
+                      : Math.round(
+                          pred?.factorScores.find(
+                            (factor) => factor.group === name,
+                          )?.value ?? 0,
+                        )}
                     <small>/100</small>
                   </strong>
                   <p>
@@ -212,7 +223,7 @@ export default function PublicLandingPage() {
                   </p>
                 </section>
                 <MiniSparkline
-                  data={chart.slice(i, i + 12)}
+                  data={prices.slice(-(16 + i), prices.length - i || undefined)}
                   width={55}
                   height={28}
                 />
@@ -223,42 +234,41 @@ export default function PublicLandingPage() {
         <section className="proof">
           <div>
             <Users />
-            <p>Trusted by millions of investors across India</p>
+            <p>Built for research clarity</p>
             <strong>
-              2M+ <small>Active Investors</small>
+              Clear <small>Thesis workflow</small>
             </strong>
             <strong>
-              10M+ <small>Research Reports</small>
+              Factor-led <small>Decision support</small>
             </strong>
             <strong>
-              250M+ <small>Data Points Daily</small>
+              Calm <small>Research experience</small>
             </strong>
           </div>
           <blockquote>
-            “ StockStory has changed the way I research companies. The insights
-            are deeper, faster, and incredibly reliable.”
-            <small>— Verified User ✓</small>
+            Research the business, understand the risks, and revisit your thesis
+            as facts change.<small>Methodology-led investing</small>
           </blockquote>
           <div className="award">
-            India's Highest Rated
+            Built for disciplined
             <br />
-            Stock Research Platform<strong>★★★★★</strong>
-            <small>4.8/5 from 50K+ reviews</small>
+            equity research<strong>Research first</strong>
+            <small>Scores are research aids, not guarantees.</small>
           </div>
         </section>
         <section className="infra">
           <h3>Built on best-in-class data and AI infrastructure</h3>
           {[
-            [Database, "1000+ Data Sources"],
-            [Sparkles, "AI Research Engine"],
+            [BarChart3, "Research engine"],
+            [Sparkles, "Factor models"],
             [Users, "Human + AI Quality"],
             [Shield, "Enterprise Grade Security"],
-            [BarChart3, "99.9% Uptime"],
+            [BarChart3, "Reliable experience"],
           ].map(([Icon, label]) => (
             <div key={String(label)}>
               {typeof Icon !== "string" && <Icon size={18} />}
               <b>{String(label)}</b>
-              <small>Reliable, verified and always on.</small>
+              <small>Built for calm, structured research.</small>
             </div>
           ))}
         </section>

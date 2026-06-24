@@ -143,11 +143,11 @@ export function FactorDots({
 }
 export function AISignalBadge({ classification }: { classification: string }) {
   const map: Record<string, [string, string]> = {
-    EXCELLENT: ["Strong Buy ↗", "var(--green)"],
-    HEALTHY: ["Buy ↗", "var(--green)"],
-    STABLE: ["Accumulate →", "var(--blue)"],
-    WEAKENING: ["Watch ⚠", "var(--amber)"],
-    AT_RISK: ["Avoid ↘", "var(--red)"],
+    EXCELLENT: ["High Conviction", "var(--green)"],
+    HEALTHY: ["Research", "var(--green)"],
+    STABLE: ["Watch", "var(--blue)"],
+    WEAKENING: ["Needs Review", "var(--amber)"],
+    AT_RISK: ["Risk Rising", "var(--red)"],
   };
   const [label, color] = map[classification] ?? ["Research", "var(--ink4)"];
   return (
