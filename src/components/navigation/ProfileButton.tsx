@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { LogOut, User, Settings, FileText, BookOpen } from "lucide-react";
+import { LogOut, Settings, FileText, BookOpen } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { productNavigate } from "../product/ProductUI";
 import { trapFocus } from "../../services/ui/focusTrap";
@@ -29,21 +29,24 @@ export const ProfileButton: React.FC = () => {
   }, [open]);
 
   if (!user) return null;
+  const initials = (user.displayName || user.email || "SM")
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "SM";
 
   return (
     <div className="relative" ref={ref}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface)] px-2.5 py-1.5 text-[var(--color-text-secondary)] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[var(--color-text-primary)]"
+        className="flex items-center gap-2 rounded-[var(--r-md)] border border-[var(--c-border)] bg-white px-1.5 py-1 text-[var(--c-ink-secondary)] transition-colors hover:border-[var(--c-border-strong)] hover:text-[var(--c-ink)]"
         aria-expanded={open}
         aria-label="Account menu"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[rgba(41,98,255,0.12)]">
-          <User className="h-3.5 w-3.5 text-[#2962FF]" />
-        </span>
-        <span className="hidden max-w-[120px] truncate text-xs font-medium lg:block">
-          {user.displayName || user.email || "Account"}
+        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--c-border)] bg-[var(--c-surface-sunken)] text-[12px] font-medium text-[var(--c-ink-secondary)]">
+          {initials}
         </span>
       </button>
 

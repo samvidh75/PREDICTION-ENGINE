@@ -37,7 +37,7 @@ export const TopNav: React.FC = () => {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50 flex h-14 min-h-14 items-center justify-between gap-2 px-3 safe-area-top md:hidden bg-[var(--color-surface)] border-b border-[var(--color-border)]"
+        className="fixed top-0 left-0 right-0 z-50 flex h-14 min-h-14 items-center justify-between gap-2 border-b border-[var(--c-border)] bg-white px-3 safe-area-top md:hidden"
       >
         <NavLink
           href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
@@ -50,7 +50,7 @@ export const TopNav: React.FC = () => {
           <button
             type="button"
             onClick={triggerSearch}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[var(--color-text-primary)]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--r-md)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] text-[var(--c-ink-muted)] transition-colors hover:border-[var(--c-border-strong)] hover:text-[var(--c-ink)]"
             aria-label="Open search"
           >
             <Search className="h-4 w-4" />
@@ -59,7 +59,7 @@ export const TopNav: React.FC = () => {
           <button
             type="button"
             onClick={() => setPage("scanner")}
-            className="h-9 shrink-0 rounded-lg px-3 text-xs font-medium text-white bg-[#2962FF] hover:bg-[#3B71FF] transition-colors"
+            className="h-9 shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-3 text-xs font-medium text-white transition-colors"
           >
             Continue as guest
           </button>
@@ -67,7 +67,7 @@ export const TopNav: React.FC = () => {
       </header>
 
       <nav
-        className="fixed top-0 left-0 z-50 hidden h-15 w-full items-center px-4 md:flex lg:px-8 bg-[var(--color-surface)] border-b border-[var(--color-border)]"
+        className="fixed top-0 left-0 z-50 hidden h-15 w-full items-center border-b border-[var(--c-border)] bg-white px-4 md:flex lg:px-8"
       >
         <div className="flex w-[180px] shrink-0 items-center lg:w-[220px]">
           <NavLink
@@ -78,9 +78,9 @@ export const TopNav: React.FC = () => {
           </NavLink>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-md items-center rounded-xl border border-slate-200 bg-slate-50 px-3 lg:flex">
-          <Search className="h-4 w-4 text-slate-400" />
-          <input value={searchQuery} onChange={(event) => handleLiveSearch(event.target.value)} placeholder="Search NSE/BSE companies…" className="h-9 w-full bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400" aria-label="Search NSE or BSE companies" />
+        <div className="mx-auto hidden w-full max-w-md items-center rounded-[var(--r-md)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-3 lg:flex">
+          <Search className="h-4 w-4 text-[var(--c-ink-disabled)]" />
+          <input value={searchQuery} onChange={(event) => handleLiveSearch(event.target.value)} placeholder="Search NSE/BSE companies…" className="h-9 w-full bg-transparent px-2 text-[13px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-ink-disabled)]" aria-label="Search NSE or BSE companies" />
         </div>
 
         {isAuthenticated && user ? (
@@ -127,7 +127,7 @@ export const TopNav: React.FC = () => {
             <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
               <button
                 onClick={triggerSearch}
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] transition-all hover:border-[rgba(41,98,255,0.3)] hover:bg-[rgba(41,98,255,0.08)] hover:text-[var(--color-text-primary)]"
+                className="flex h-9 w-9 items-center justify-center rounded-[var(--r-md)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] text-[var(--c-ink-muted)] transition-colors hover:border-[var(--c-border-strong)] hover:text-[var(--c-ink)]"
                 aria-label="Open search"
               >
                 <Search className="h-4 w-4" />
@@ -164,7 +164,7 @@ export const TopNav: React.FC = () => {
           </div>
         )}
       </nav>
-      <div className="fixed left-0 right-0 top-14 z-40 flex h-9 items-center overflow-hidden border-b border-slate-200 bg-white px-3 text-[10px] shadow-sm md:top-[60px] lg:px-8">
+      <div className="fixed left-0 right-0 top-14 z-40 flex h-9 items-center overflow-hidden border-b border-[var(--c-border)] bg-white px-3 text-[10px] md:top-[60px] lg:px-8">
         <span className="mr-5 flex shrink-0 items-center gap-1.5 font-bold text-slate-600"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />NSE · Live</span>
         <div className="flex min-w-max flex-1 items-center justify-around gap-8">
           {([["Nifty 50", "+0.62%"], ["Sensex", "+0.58%"], ["Nifty Bank", "+0.41%"], ["Nifty IT", "−0.18%"]] as const).map(([name, change], i) => (
