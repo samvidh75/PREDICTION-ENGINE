@@ -12,11 +12,11 @@ const FACTOR_LABELS: Record<string, string> = { quality: "Quality", valuation: "
 const FACTOR_ICONS: Record<string, React.ReactNode> = { quality: <Star className="h-4 w-4" />, valuation: <BarChart3 className="h-4 w-4" />, growth: <TrendingUp className="h-4 w-4" />, stability: <Shield className="h-4 w-4" />, momentum: <Activity className="h-4 w-4" />, risk: <AlertCircle className="h-4 w-4" /> };
 
 function scoreColor(v: number | null): string {
-  if (v === null) return "#9CA3AF";
-  if (v >= 75) return "#057A55";
-  if (v >= 55) return "#1A56DB";
-  if (v >= 35) return "#92400E";
-  return "#C81E1E";
+  if (v === null) return "var(--c-ink-disabled)";
+  if (v >= 75) return "var(--c-score-high)";
+  if (v >= 55) return "var(--c-score-mid)";
+  if (v >= 35) return "var(--c-score-low)";
+  return "var(--c-score-poor)";
 }
 
 function classificationLabel(cls: string): string {
@@ -24,9 +24,15 @@ function classificationLabel(cls: string): string {
   return map[cls] ?? cls;
 }
 
-function classificationColor(cls: string): string {
-  const map: Record<string, string> = { EXCELLENT: "#057A55", HEALTHY: "#057A55", STABLE: "#1A56DB", WEAKENING: "#92400E", AT_RISK: "#C81E1E" };
-  return map[cls] ?? "#9CA3AF";
+function classificationStyle(cls: string): React.CSSProperties {
+  const map: Record<string, React.CSSProperties> = {
+    EXCELLENT: { background: "#F0FDF4", color: "#065F46", borderColor: "#A7F3D0" },
+    HEALTHY: { background: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" },
+    STABLE: { background: "#F8FAFC", color: "#374151", borderColor: "#E5E7EB" },
+    WEAKENING: { background: "#FFFBEB", color: "#78350F", borderColor: "#FDE68A" },
+    AT_RISK: { background: "#FEF2F2", color: "#7F1D1D", borderColor: "#FECACA" },
+  };
+  return map[cls] ?? { background: "#F8FAFC", color: "#6B7280", borderColor: "#E5E7EB" };
 }
 
 function getFactorSummary(group: string, score: number | null, missingFeatures: string[]): string {
@@ -66,12 +72,12 @@ function ScoreRing({ score, size = 80 }: { score: number | null; size?: number }
   const grade = score !== null ? (score >= 80 ? "A" : score >= 65 ? "B" : score >= 50 ? "C" : score >= 35 ? "D" : "F") : "—";
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={score !== null ? `Score: ${Math.round(score)}` : "Score unavailable"}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F3F4F6" strokeWidth={8} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--c-border)" strokeWidth={8} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8} strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)} strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset 0.6s ease" }} />
-      <text x="50%" y="48%" textAnchor="middle" dy="0" fontSize={size < 56 ? 14 : 24} fontWeight="600" fill="#111827" fontFamily="system-ui">
+      <text x="50%" y="48%" textAnchor="middle" dy="0" fontSize={size < 56 ? 18 : 28} fontWeight="700" fill={color} fontFamily="Inter, sans-serif">
         {score !== null ? Math.round(score) : "—"}
       </text>
-      <text x="50%" y={size / 2 + (size < 56 ? 10 : 16)} textAnchor="middle" fontSize={size < 56 ? 8 : 12} fontWeight="500" fill="#9CA3AF" fontFamily="system-ui">
+      <text x="50%" y={size / 2 + (size < 56 ? 10 : 16)} textAnchor="middle" fontSize={size < 56 ? 8 : 12} fontWeight="500" fill="var(--c-ink-muted)" fontFamily="Inter, sans-serif">
         {grade}
       </text>
     </svg>
@@ -114,16 +120,16 @@ export default function StockStoryPageF0(): JSX.Element {
 
   if (!ticker) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center text-[#9CA3AF]">
+      <div className="min-h-screen bg-[var(--c-bg)] flex items-center justify-center text-[var(--c-ink-muted)]">
         No stock selected. Go back and search for a symbol.
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[var(--c-bg)]">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-[#E5E7EB] shadow-sm">
+      <header className="sticky top-0 z-40 border-b border-[var(--c-border)] bg-white">
         <div className="mx-auto max-w-[1180px] px-4 py-3">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
             <div className="flex items-center gap-2 min-w-0">
@@ -131,16 +137,16 @@ export default function StockStoryPageF0(): JSX.Element {
                 <ArrowLeft className="h-4 w-4" />
                 <span className="text-xs">Back</span>
               </button>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[#EFF6FF] text-[#1D4ED8]">{pipeline?.price?.exchange ?? "NSE"}</span>
-              <span className="font-semibold text-[20px] text-[#111827] tracking-tight">{ticker}</span>
+              <span className="rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-[7px] py-0.5 text-[11px] font-medium text-[var(--c-ink-muted)]">{pipeline?.price?.exchange ?? "NSE"}</span>
+              <span className="text-[18px] font-bold tracking-[-0.3px] text-[var(--c-ink)]">{ticker}</span>
             </div>
             {pipeline?.companyName && <span className="text-[13px] text-[#6B7280] -mt-1 md:mt-0">{pipeline.companyName}</span>}
             <div className="flex items-center gap-3 ml-auto">
               <div className="text-right">
                 {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
                   <>
-                    <span className="text-[28px] font-semibold tabular-nums text-[#111827] leading-none">{fPrice(pipeline.price.current)}</span>
-                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium ml-2 ${pricePos ? "bg-[#DEF7EC] text-[#057A55]" : "bg-[#FDE8E8] text-[#C81E1E]"}`}>
+                    <span className="price text-[24px] font-semibold tabular-nums text-[var(--c-ink)] leading-none">{fPrice(pipeline.price.current)}</span>
+                    <div className={`ml-2 inline-flex items-center gap-1 rounded-[var(--r-sm)] border px-2 py-[3px] text-[12px] font-medium ${pricePos ? "border-[#BBF7D0] bg-[var(--c-positive-bg)] text-[var(--c-positive)]" : "border-[#FECACA] bg-[var(--c-negative-bg)] text-[var(--c-negative)]"}`}>
                       <span>{pricePos ? "+" : ""}{pipeline.price.change?.toFixed(2) ?? "—"}%</span>
                       {pipeline.price.changeAbs !== null && <span>({fChange(pipeline.price.changeAbs)})</span>}
                     </div>
@@ -152,11 +158,14 @@ export default function StockStoryPageF0(): JSX.Element {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button type="button" onClick={() => { isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: pipeline?.companyName ?? "", addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] transition-colors">
+                <button type="button" onClick={() => { isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: pipeline?.companyName ?? "", addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }} className="h-8 rounded-[var(--r-md)] border border-[var(--c-border-strong)] bg-white px-[14px] text-[13px] font-medium text-[var(--c-ink-secondary)] transition-colors hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]">
                   <Bookmark className="inline h-3 w-3 mr-1" />{tracked ? "Tracked" : "Track"}
                 </button>
-                <button type="button" onClick={() => productNavigate("compare", ticker)} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] transition-colors">
+                <button type="button" onClick={() => productNavigate("compare", ticker)} className="h-8 rounded-[var(--r-md)] border border-[var(--c-border-strong)] bg-white px-[14px] text-[13px] font-medium text-[var(--c-ink-secondary)] transition-colors hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]">
                   Compare
+                </button>
+                <button type="button" onClick={() => productNavigate("invest", ticker)} className="h-8 rounded-[var(--r-md)] bg-[var(--c-positive)] px-[14px] text-[13px] font-semibold text-white">
+                  Continue to broker →
                 </button>
                 <button type="button" onClick={refetch} disabled={loading} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-40 transition-colors">
                   <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -179,14 +188,14 @@ export default function StockStoryPageF0(): JSX.Element {
         {pipeline && (
           <>
             {/* Engine Score Card */}
-            <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
+            <section className="rounded-[var(--r-xl)] border border-[var(--c-border)] bg-white px-6 py-6 sm:px-7">
               <div className="flex flex-col lg:flex-row gap-6">
                 <div className="lg:w-3/5 space-y-4">
                   <div className="flex items-center gap-4">
                     <ScoreRing score={pred?.rankingScore ?? weightedScore} size={80} />
                     <div>
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border" style={{ color: classificationColor(classification), borderColor: `${classificationColor(classification)}30`, background: `${classificationColor(classification)}15` }}>{classificationLabel(classification)}</span>
-                      <div className="mt-1 text-[13px] text-[#4B5563]">Confidence: <strong>{pred?.confidenceLevel ?? "—"}</strong></div>
+                      <span className="rounded-[var(--r-sm)] border px-2 py-0.5 text-xs font-medium" style={classificationStyle(classification)}>{classificationLabel(classification)}</span>
+                      <div className="mt-1 text-[13px] font-normal text-[var(--c-ink-muted)]">Confidence: <strong className="font-semibold text-[var(--c-ink)]">{pred?.confidenceLevel ?? "—"}</strong></div>
                     </div>
                   </div>
                   <div className="space-y-[10px]">
@@ -196,19 +205,19 @@ export default function StockStoryPageF0(): JSX.Element {
                       const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
                       return (
                         <div key={group} className="flex items-center gap-3">
-                          <span className="w-20 text-xs font-medium text-[#6B7280] capitalize">{FACTOR_LABELS[group] ?? group}</span>
-                          <div className="flex-1 h-[6px] bg-[#F3F4F6] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
+                          <span className="w-20 text-xs font-medium text-[var(--c-ink-secondary)] capitalize">{FACTOR_LABELS[group] ?? group}</span>
+                          <div className="h-[5px] flex-1 overflow-hidden rounded-[3px] bg-[var(--c-border)]">
+                            <div className="h-full rounded-[3px] transition-all" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
                           </div>
                           <span className="w-8 text-right text-xs font-semibold tabular-nums" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
                         </div>
                       );
                     })}
                   </div>
-                  <div className="flex items-center gap-3 text-[11px] text-[#9CA3AF]">
-                    <span className="rounded bg-[#F3F4F6] px-2 py-1 font-mono">Unified Engine v2.0.0</span>
-                    <span><strong className="text-[#6B7280]">{pipeline.dataCompleteness}%</strong> data available</span>
-                    <span>· <strong className="text-[#6B7280]">{pred?.confidenceLevel ?? "—"}</strong> confidence</span>
+                  <div className="flex items-center gap-3 text-[12px] text-[var(--c-ink-muted)]">
+                    <span className="rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-2 py-[3px] font-mono text-[11px]">Unified Engine v2.0.0</span>
+                    <span><strong className="font-medium">{pipeline.dataCompleteness}%</strong> data available</span>
+                    <span>· <strong className="font-medium">{pred?.confidenceLevel ?? "—"}</strong> confidence</span>
                   </div>
                 </div>
                 <div className="lg:w-2/5 lg:pl-6 lg:border-l lg:border-[#E5E7EB]">
@@ -231,6 +240,12 @@ export default function StockStoryPageF0(): JSX.Element {
               </div>
             </section>
 
+            <nav className="flex overflow-x-auto border-b border-[var(--c-border)]" aria-label="Stock research sections">
+              {["Thesis", "Fundamentals", "Risk", "Technicals", "Peers", "History"].map((tab, index) => (
+                <button key={tab} type="button" disabled={index !== 0} className={`border-b-2 px-4 py-2.5 text-[13px] ${index === 0 ? "border-[var(--c-brand)] font-semibold text-[var(--c-ink)]" : "border-transparent font-medium text-[var(--c-ink-muted)] hover:text-[var(--c-ink-secondary)]"}`}>{tab}</button>
+              ))}
+            </nav>
+
             {/* Factor Cards (Thesis) */}
             <section className="grid gap-3 md:grid-cols-2">
               {FACTOR_GROUPS.map((group) => {
@@ -238,21 +253,21 @@ export default function StockStoryPageF0(): JSX.Element {
                 const score = fs?.value ?? null;
                 const drivers = driverValues(group, pipeline);
                 return (
-                  <article key={group} className="bg-white border border-[#E5E7EB] rounded-xl p-5 space-y-4">
+                  <article key={group} className="space-y-4 rounded-[var(--r-lg)] border border-[var(--c-border)] bg-white px-[22px] py-5">
                     <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-sm font-semibold text-[#111827]">
-                        <span style={{ color: "#1A56DB" }}>{FACTOR_ICONS[group]}</span>
+                      <span className="flex items-center gap-2 text-[13px] font-semibold text-[var(--c-ink)]">
+                        <span className="text-[var(--c-ink-muted)]">{FACTOR_ICONS[group]}</span>
                         {FACTOR_LABELS[group]}
                       </span>
-                      <span className="text-[32px] font-semibold tabular-nums leading-none" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
+                      <span className="score text-[28px] font-bold tabular-nums leading-none" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
                     </div>
-                    <div className="h-[6px] bg-[#F3F4F6] rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${score !== null ? Math.max(0, Math.min(100, score)) : 0}%`, backgroundColor: scoreColor(score) }} />
+                    <div className="h-[5px] overflow-hidden rounded-[3px] bg-[var(--c-border)]">
+                      <div className="h-full rounded-[3px] transition-all" style={{ width: `${score !== null ? Math.max(0, Math.min(100, score)) : 0}%`, backgroundColor: scoreColor(score) }} />
                     </div>
-                    <p className="text-[13px] text-[#4B5563] leading-relaxed">{getFactorSummary(group, score, fs?.missingFeatures ?? [])}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#9CA3AF] font-mono">
+                    <p className="text-[13px] leading-[1.6] text-[var(--c-ink-secondary)]">{getFactorSummary(group, score, fs?.missingFeatures ?? [])}</p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-[var(--c-ink-muted)]">
                       {drivers.map((d, i) => (
-                        <span key={i}>{d.label}: <strong className="text-[#6B7280]">{d.value}</strong>{i < drivers.length - 1 ? " ·" : ""}</span>
+                        <span key={i} className="font-medium">{d.label}: <strong className="font-normal">{d.value}</strong>{i < drivers.length - 1 ? <span className="text-[var(--c-ink-disabled)]"> ·</span> : ""}</span>
                       ))}
                     </div>
                     {score === null && (
