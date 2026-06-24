@@ -9,7 +9,7 @@ function generateChartData(points = 20) {
   const data: { t: string; v: number }[] = [];
   let v = 24500;
   for (let i = 0; i < points; i++) {
-    v += (Math.random() - 0.45) * 100;
+    v += (Math.sin(i * 1.7) + 0.1) * 50;
     data.push({ t: `${9 + Math.floor(i / 4)}:${((i % 4) * 15).toString().padStart(2, '0')}`, v: Math.round(v) });
   }
   return data;
@@ -19,8 +19,8 @@ function generate5YData() {
   const d: { name: string; stock: number; index: number }[] = [];
   let s = 100, idx = 100;
   for (let i = 0; i < 60; i++) {
-    s *= 1 + (Math.random() - 0.48) * 0.03;
-    idx *= 1 + (Math.random() - 0.48) * 0.02;
+    s *= 1 + (Math.sin(i * 1.13) + 0.08) * 0.015;
+    idx *= 1 + (Math.sin(i * 0.87) + 0.06) * 0.01;
     d.push({ name: `M${i + 1}`, stock: Math.round(s * 100) / 100, index: Math.round(idx * 100) / 100 });
   }
   return d;

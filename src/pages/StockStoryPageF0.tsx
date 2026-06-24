@@ -16,9 +16,9 @@ function generatePerfData() {
   const d: { name: string; stock: number; nifty: number; niftyIT: number }[] = [];
   let stock = 100, nifty = 100, it = 100;
   for (let i = 0; i < 60; i++) {
-    stock *= 1 + (Math.random() - 0.47) * 0.025;
-    nifty *= 1 + (Math.random() - 0.48) * 0.018;
-    it *= 1 + (Math.random() - 0.47) * 0.022;
+    stock *= 1 + (Math.sin(i * 1.21) + 0.06) * 0.0125;
+    nifty *= 1 + (Math.sin(i * 0.91) + 0.04) * 0.009;
+    it *= 1 + (Math.sin(i * 1.07) + 0.06) * 0.011;
     d.push({ name: `M${i + 1}`, stock: Math.round(stock * 100) / 100, nifty: Math.round(nifty * 100) / 100, niftyIT: Math.round(it * 100) / 100 });
   }
   return d;
