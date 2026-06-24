@@ -35,25 +35,21 @@ export default function DesktopRail(): JSX.Element {
 
   function itemClass(page: string): string {
     const isActive = currentPage === page;
-    const isScanner = page === "scanner";
-    const base = "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150 hover:bg-[var(--color-surface-raised)]";
-    if (isActive && isScanner) return `${base} bg-violet-50 text-violet-700 font-bold`;
-    if (isActive) return `${base} bg-blue-50 text-blue-600 font-bold`;
-    return `${base} text-[var(--color-text-secondary)] font-medium`;
+    const base = "flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-md)] transition-colors duration-150 hover:text-[var(--c-ink-secondary)]";
+    if (isActive) return `${base} text-[var(--c-ink)] font-semibold`;
+    return `${base} text-[var(--c-ink-disabled)] font-medium`;
   }
 
   function iconClass(page: string): string {
     const isActive = currentPage === page;
-    const isScanner = page === "scanner";
-    if (isActive && isScanner) return "text-violet-600";
-    if (isActive) return "text-blue-600";
-    return "text-[var(--color-text-muted)]";
+    if (isActive) return "text-[var(--c-ink)]";
+    return "text-[var(--c-ink-disabled)] group-hover:text-[var(--c-ink-secondary)]";
   }
 
   return (
     <aside
       aria-label="Primary navigation"
-      className="hidden md:flex group fixed left-0 top-0 bottom-0 z-40 flex-col overflow-hidden transition-[width] duration-200 ease-out w-16 hover:w-[220px] bg-[var(--color-surface)] border-r border-[var(--color-border)] shadow-[1px_0_3px_rgba(15,23,42,0.04)]"
+      className="hidden md:flex group fixed left-0 top-0 bottom-0 z-40 flex-col overflow-hidden transition-[width] duration-200 ease-out w-16 hover:w-[220px] bg-white border-r border-[var(--c-border)]"
     >
       {/* Brand */}
       <div className="flex items-center h-16 px-3 shrink-0 overflow-hidden border-b border-[var(--color-border)]">
@@ -75,7 +71,7 @@ export default function DesktopRail(): JSX.Element {
               className={itemClass(page)}
               aria-current={currentPage === page ? "page" : undefined}
             >
-              <span className={`grid place-items-center h-7 w-7 rounded-md shrink-0 ${iconClass(page)}`}>
+              <span className={`grid place-items-center h-7 w-7 shrink-0 ${iconClass(page)}`}>
                 {icon}
               </span>
               <span className="text-[13px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -99,7 +95,7 @@ export default function DesktopRail(): JSX.Element {
                 className={itemClass(page) + " text-[13px]"}
                 aria-current={currentPage === page ? "page" : undefined}
               >
-                <span className={`grid place-items-center h-7 w-7 rounded-md shrink-0 ${iconClass(page)}`}>
+                <span className={`grid place-items-center h-7 w-7 shrink-0 ${iconClass(page)}`}>
                   {icon}
                 </span>
                 <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
