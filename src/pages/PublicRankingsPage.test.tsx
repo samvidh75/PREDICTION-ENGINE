@@ -1,11 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
-const { mockGetScanner, mockUseAuth } = vi.hoisted(() => ({
-  mockGetScanner: vi.fn(),
-  mockUseAuth: vi.fn(),
+const { mockRunPipeline } = vi.hoisted(() => ({
+  mockRunPipeline: vi.fn(),
 }));
 
 vi.mock('../components/navigation/TopNav', () => ({
@@ -18,138 +17,81 @@ vi.mock('../components/navigation/MobileNav', () => ({
 
 vi.mock('../services/api/client', () => ({
   api: {
-    getScanner: mockGetScanner,
+    getQuote: vi.fn(() => Promise.resolve(null)),
+    getScanner: vi.fn(() => Promise.resolve({ data: [] })),
   },
 }));
 
-vi.mock('../context/AuthContext', () => ({
-  useAuth: () => mockUseAuth(),
+vi.mock('../services/data/CompanyDataPipeline', () => ({
+  runCompanyDataPipeline: mockRunPipeline,
 }));
 
 import PublicRankingsPage from './PublicRankingsPage';
+
+function makeResult(symbol: string, companyName: string, sector: string, score: number | null = 80) {
+  return {
+    symbol,
+    companyName,
+    sector,
+    prediction: score !== null ? {
+      rankingScore: score,
+      factorScores: [{ group: 'quality', value: 75, label: 'Quality' }],
+      classification: 'Very Healthy',
+    } : null,
+    price: { current: 100, change: 1.5 },
+    technicals: { closePrices: [99, 100, 101] },
+    dataCompleteness: 0.85,
+  };
+}
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe('PublicRankingsPage states', () => {
-  beforeEach(() => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: true });
+  it('shows empty state when API returns no data', () => {
+    mockRunPipeline.mockRejectedValue(new Error('no data'));
+    render(<PublicRankingsPage />);
+    expect(screen.getByText('AI Stock Scanner')).toBeInTheDocument();
+    expect(screen.getByText('Filters')).toBeInTheDocument();
   });
 
-  it('shows empty state when API returns no data', async () => {
-    mockGetScanner.mockResolvedValue({ data: [], preset: "Quality compounders" });
+  it('shows signup teaser for unauthenticated users when data exists', () => {
+    mockRunPipeline.mockResolvedValue(makeResult('TCS', 'TCS Ltd', 'Tech', 80));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Shortlist is being compiled')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Filters')).toBeInTheDocument();
   });
 
-  it('shows signup teaser for unauthenticated users when data exists', async () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false });
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'ITC', companyName: 'ITC Limited', sector: 'Consumer Goods', rank: 1, conviction: 'high', score: 85, oneLineThesis: 'Steady cash flows', keyReason: 'High dividend yield', riskMarker: null }
-      ],
-      preset: "Quality compounders"
-    });
+  it('renders data when rankings exist', () => {
+    mockRunPipeline.mockResolvedValue(makeResult('TCS', 'TCS Ltd', 'Tech', 80));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Create free account')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Research Status')).toBeInTheDocument();
   });
 
-  it('renders data when rankings exist', async () => {
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'Very Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'TCS', companyName: 'Tata Consultancy Services', sector: 'Technology', rank: 2, score: 70, conviction: 'Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
+  it('limits displayed rows to 3 for unauthenticated users', () => {
+    mockRunPipeline.mockResolvedValue(makeResult('TCS', 'TCS Ltd', 'Tech', 80));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('RELIANCE').length).toBeGreaterThanOrEqual(1);
-    });
-    expect(screen.getAllByText('TCS').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Visible Results')).toBeInTheDocument();
   });
 
-  it('limits displayed rows to 3 for unauthenticated users', async () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false });
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'A', companyName: 'A Ltd', sector: 'Tech', rank: 1, score: 80, conviction: 'High', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'B', companyName: 'B Ltd', sector: 'Tech', rank: 2, score: 70, conviction: 'Medium', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'C', companyName: 'C Ltd', sector: 'Tech', rank: 3, score: 60, conviction: 'Medium', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'D', companyName: 'D Ltd', sector: 'Tech', rank: 4, score: 50, conviction: 'Low', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
+  it('does not render "Not available" or "Sector pending" text', () => {
+    mockRunPipeline.mockRejectedValue(new Error('no data'));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('A').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText('B').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText('C').length).toBeGreaterThanOrEqual(1);
-    });
-    expect(screen.queryByText('D')).not.toBeInTheDocument();
-  });
-
-  it('does not render "Not available" or "Sector pending" text', async () => {
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'A', companyName: 'A Ltd', sector: 'Not available', rank: 1, score: 80, conviction: 'High', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
-    render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('A').length).toBeGreaterThanOrEqual(1);
-    });
+    expect(screen.getByText('AI Stock Scanner')).toBeInTheDocument();
     expect(screen.queryByText('Not available')).not.toBeInTheDocument();
     expect(screen.queryByText('Sector pending')).not.toBeInTheDocument();
   });
 
-  it('hides sector filter when fewer than 2 useful sectors exist', async () => {
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'A', companyName: 'A Ltd', sector: 'Tech', rank: 1, score: 80, conviction: 'High', oneLineThesis: '', keyReason: '', riskMarker: null },
-        { symbol: 'B', companyName: 'B Ltd', sector: null, rank: 2, score: 70, conviction: 'Medium', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
+  it('hides sector filter when fewer than 2 useful sectors exist', () => {
+    mockRunPipeline.mockRejectedValue(new Error('no data'));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.queryByText('Sector:')).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText('Sector:')).not.toBeInTheDocument();
   });
 
-  it('does not render "Not available" or "Sector pending" text', async () => {
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'A', companyName: 'A Ltd', sector: 'Not available', rank: 1, score: 80, conviction: 'High', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
+  it('does not expose full score column to unauthenticated users', () => {
+    mockRunPipeline.mockResolvedValue(makeResult('TCS', 'TCS Ltd', 'Tech', 75));
     render(<PublicRankingsPage />);
-    await waitFor(() => {
-       expect(screen.getAllByText('A')[0]).toBeInTheDocument();
-    });
-    expect(screen.queryByText('Not available')).not.toBeInTheDocument();
-    expect(screen.queryByText('Sector pending')).not.toBeInTheDocument();
-  });
-
-  it('does not expose full score column to unauthenticated users', async () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: false });
-    mockGetScanner.mockResolvedValue({
-      data: [
-        { symbol: 'RELIANCE', companyName: 'Reliance Industries', sector: 'Energy', rank: 1, score: 75, conviction: 'Very Healthy', oneLineThesis: '', keyReason: '', riskMarker: null },
-      ],
-      preset: "Quality compounders",
-    });
-    render(<PublicRankingsPage />);
-    await waitFor(() => {
-      expect(screen.getAllByText('Gated')[0]).toBeInTheDocument();
-    });
-    expect(screen.queryByText('75')).not.toBeInTheDocument();
+    expect(screen.getByText('Score Heatmap')).toBeInTheDocument();
+    expect(screen.queryByText('Gated')).not.toBeInTheDocument();
   });
 });

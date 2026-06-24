@@ -37,6 +37,15 @@ vi.mock('../../services/portfolio/PortfolioSnapshotFactory', () => ({
   },
 }));
 
+vi.mock('../../lib/track/trackStore', () => ({
+  getTrackedCompanies: vi.fn(() => [
+    { symbol: 'TCS', companyName: 'Tata Consultancy Services', addedAt: new Date().toISOString(), source: 'test' },
+  ]),
+  isTracked: vi.fn(() => true),
+  removeTrackedCompany: vi.fn(),
+  addTrackedCompany: vi.fn(),
+}));
+
 vi.mock('../../components/product/ProductUI', async () => {
   const React = await import('react');
   return {
@@ -86,8 +95,8 @@ describe('PortfolioPage product copy', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Manual thesis monitor')).toBeInTheDocument();
-      expect(screen.getByText(/with current pricing/)).toBeInTheDocument();
+      expect(screen.getByText('Portfolio thesis monitor')).toBeInTheDocument();
+      expect(screen.getByText('Tata Consultancy Services')).toBeInTheDocument();
       expect(screen.getAllByText('TCS').length).toBeGreaterThan(0);
     });
   });

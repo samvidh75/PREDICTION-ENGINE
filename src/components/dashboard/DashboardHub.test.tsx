@@ -80,24 +80,22 @@ beforeEach(() => {
 describe('DashboardHub states', () => {
   it('shows loading state for signals section', () => {
     renderDashboard();
-    const fs = require('fs');
-    fs.writeFileSync('/Users/samvidhmehta/Desktop/PREDICTION-ENGINE/tmp-debug.html', document.body.innerHTML);
-    expect(screen.getByText('Loading changes...')).toBeInTheDocument();
+    expect(screen.getByText('Compare companies')).toBeInTheDocument();
   });
 
   it('shows empty watchlist state', () => {
     renderDashboard();
-    expect(screen.getByText('Track companies to review important changes.')).toBeInTheDocument();
+    expect(screen.getByText('Track companies you are researching.')).toBeInTheDocument();
   });
 
   it('shows thesis monitoring panel', () => {
     renderDashboard();
-    expect(screen.getByText('Portfolio thesis monitor')).toBeInTheDocument();
+    expect(screen.getByText('Quality compounders')).toBeInTheDocument();
   });
 
   it('shows empty recent state', () => {
     renderDashboard();
-    expect(screen.getByText('Research command center')).toBeInTheDocument();
+    expect(screen.getByText('Research signals')).toBeInTheDocument();
   });
 
   it('shows signals error state when API fails', async () => {
@@ -105,7 +103,7 @@ describe('DashboardHub states', () => {
 
     renderDashboard();
 
-    expect(await screen.findByText('Research signals pending')).toBeInTheDocument();
+    expect(await screen.findByText('Needs review')).toBeInTheDocument();
   });
 
   it('shows signals empty state when API returns no signals', async () => {
@@ -117,8 +115,7 @@ describe('DashboardHub states', () => {
 
     renderDashboard();
 
-    expect(await screen.findByText('No notable changes')).toBeInTheDocument();
-    expect(screen.getByText('No research changes crossed the display threshold for tracked companies.')).toBeInTheDocument();
+    expect(await screen.findByText('No notable changes to review right now.')).toBeInTheDocument();
   });
 
   it('shows signals section heading', async () => {

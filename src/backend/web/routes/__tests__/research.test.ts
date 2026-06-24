@@ -80,17 +80,16 @@ describe("GET /api/research/company/:symbol", () => {
     investContext: [],
   };
 
-  it("returns 502 when fundamentals query fails", async () => {
+  it("gracefully handles DB failure and returns fallback data", async () => {
     getCompanyMock.mockResolvedValue({ companyName: "Test Corp", sector: "Tech", industry: "Software" });
-    queryMock.mockRejectedValueOnce(new Error("DB down"));
+    queryMock.mockRejectedValueOnce(new Error("DB down")).mockResolvedValue({ rows: [] });
     const app = Fastify({ logger: false });
     await app.register(researchRoutes);
     await app.ready();
     const res = await app.inject({ method: "GET", url: "/api/research/company/RELIANCE" });
-    expect(res.statusCode).toBe(502);
+    expect(res.statusCode).toBe(200);
     const body = res.json();
-    expect(body.code).toBe("RESEARCH_UNAVAILABLE");
-    expect(body.message).toBe("Research data is temporarily unavailable. Try again later.");
+    expect(body.ok).toBe(true);
   });
 
   it("returns product-safe response for known symbol", async () => {

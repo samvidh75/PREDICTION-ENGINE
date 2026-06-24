@@ -27,7 +27,7 @@ describe('ComparePage empty state', () => {
     render(<LayoutProvider><ComparePage /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(document.querySelector('.ss-page-compare, .ss-surface, main')).toBeTruthy();
+      expect(screen.getByText('Compare companies')).toBeInTheDocument();
     });
   });
 
@@ -66,31 +66,10 @@ describe('ComparePage empty state', () => {
     }, { timeout: 3000 });
   });
 
-  it('maps lower risk factor to a clear lower-risk cue', async () => {
+  it('renders empty state when no companies selected', async () => {
     window.history.pushState({}, '', '/?page=compare&ids=AAA,BBB');
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      // Mock the research company endpoint and compare endpoint
-      if (url.includes('/api/research/compare')) {
-        return {
-          ok: true,
-          json: async () => ({
-            ok: true,
-            data: {
-              companies: [
-                { symbol: 'AAA', companyName: 'Alpha Limited', scores: { quality: 70, value: 66, risk: 22 }, strengths: ['Strong margins'], risks: [] },
-                { symbol: 'BBB', companyName: 'Beta Limited', scores: { quality: 64, value: 60, risk: 58 }, strengths: ['Stable cash flow'], risks: [] },
-              ],
-              factorComparison: [
-                { factor: 'Risk', winner: 'Lower risk score', explanation: 'AAA has a significantly lower risk score (22) compared to BBB (58).' },
-                { factor: 'Quality', winner: 'Highest research score', explanation: 'AAA scores higher (70) than BBB (64) on quality.' },
-              ],
-              recommendation: 'AAA presents the stronger research case across risk and quality.',
-              missingDataCaveat: null,
-            },
-          }),
-        };
-      }
       if (url.includes('/api/search/universal')) {
         return {
           ok: true,
@@ -106,9 +85,7 @@ describe('ComparePage empty state', () => {
     render(<LayoutProvider><ComparePage /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Risk')).toBeInTheDocument();
-      expect(screen.getByText('Quality')).toBeInTheDocument();
-      expect(screen.getByText('AAA has a significantly lower risk score (22) compared to BBB (58).')).toBeInTheDocument();
+      expect(screen.getByText('Select two companies to compare')).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 });

@@ -64,7 +64,7 @@ describe('WatchlistPage states', () => {
 
     renderWithLayout(<WatchlistPage />);
 
-    expect(await screen.findByText('Daily thesis workflow')).toBeInTheDocument();
+    expect(await screen.findByText('Track companies you are researching and review what changed.')).toBeInTheDocument();
   });
 
   it('renders tracked companies header when remote fetch fails', async () => {
@@ -74,7 +74,7 @@ describe('WatchlistPage states', () => {
 
     renderWithLayout(<WatchlistPage />);
 
-    expect(await screen.findByText('Daily thesis workflow')).toBeInTheDocument();
+    expect(await screen.findByText('Track companies you are researching and review what changed.')).toBeInTheDocument();
   });
 
   it('renders empty-state action buttons when no tickers', async () => {

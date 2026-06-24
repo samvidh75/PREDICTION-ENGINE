@@ -17,7 +17,7 @@ function renderWithProviders(ui: React.ReactElement) {
 describe('AlertsPage', () => {
   it('renders What Changed heading', () => {
     renderWithProviders(<AlertsPage />);
-    const headings = screen.getAllByText('What changed that matters?');
+    const headings = screen.getAllByText('Alerts');
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -28,7 +28,7 @@ describe('AlertsPage', () => {
     }));
     renderWithProviders(<AlertsPage />);
     await waitFor(() => {
-      expect(screen.getByText(/When one of these shifts for a tracked company/)).toBeInTheDocument();
+      expect(screen.getByText('Review important changes in companies you track.')).toBeInTheDocument();
     });
   });
 
