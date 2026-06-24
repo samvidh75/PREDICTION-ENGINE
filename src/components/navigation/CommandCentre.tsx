@@ -3,7 +3,8 @@ import { StockSearchEngine } from "../../services/stocks/StockSearchIndex";
 import { SearchRankingEngine } from "../../services/search/SearchRankingEngine";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
-import { formatINR, formatPercent, useLiveQuotes } from "../../hooks/useLiveQuotes";
+import { fPrice, fChange } from "../../lib/format";
+import { useUnifiedQuotes } from "../../hooks/useUnifiedQuotes";
 
 type Props = {
   isOpen: boolean;
@@ -40,7 +41,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
     const raw = StockSearchEngine.search(query, 12);
     return SearchRankingEngine.rank(raw, query).slice(0, 8);
   }, [query]);
-  const liveQuotes = useLiveQuotes(searchResults.map((stock) => stock.ticker));
+  const liveQuotes = useUnifiedQuotes(searchResults.map((stock) => stock.ticker));
 
   if (!isOpen) return null;
 
@@ -110,10 +111,10 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
                       <div className="text-right shrink-0">
                         <div className="text-[10px] uppercase text-white/40 tracking-wider font-mono">Live Price</div>
                         <div className="text-[13px] font-bold text-white font-mono mt-0.5">
-                          {quoteState?.loading ? "Loading..." : quote ? formatINR(quote.price) : "Unavailable"}
+                          {quoteState?.loading ? "Loading..." : quote ? fPrice(quote.price) : "Unavailable"}
                         </div>
                         <div className={`text-[10px] font-mono mt-0.5 ${quote && quote.changePercent >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                          {quote ? formatPercent(quote.changePercent) : ""}
+                          {quote ? fChange(quote.changePercent) : ""}
                         </div>
                       </div>
                     </button>

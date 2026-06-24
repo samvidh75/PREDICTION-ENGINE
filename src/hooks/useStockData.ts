@@ -1,74 +1,78 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { runCompanyDataPipeline, PipelineResult } from '../services/data/CompanyDataPipeline';
+import { useCallback, useEffect, useState } from "react";
 
-export interface UseStockDataResult {
-  pipeline: PipelineResult | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
+export interface StockData {
+  symbol: string;
+  price: {
+    current: number | null;
+    change: number | null;
+    changeAbs: number | null;
+    open: number | null;
+    high: number | null;
+    low: number | null;
+    volume: number | null;
+    weekHigh52: number | null;
+    weekLow52: number | null;
+    marketCap: number | null;
+    exchange: string;
+    companyName: string;
+    sector: string | null;
+    source: string;
+    priceError: string | null;
+  };
+  fundamentals: {
+    peRatio: number | null;
+    pbRatio: number | null;
+    roe: number | null;
+    roce: number | null;
+    debtToEquity: number | null;
+    currentRatio: number | null;
+    dividendYield: number | null;
+    eps: number | null;
+    revenueGrowth: number | null;
+    profitGrowth: number | null;
+    netMargin: number | null;
+    operatingMargin: number | null;
+    marketCap: number | null;
+    fundamentalSource: string;
+    fundamentalError: string | null;
+  };
+  historical: {
+    closes: number[];
+    timestamps: number[];
+    source: string;
+    error: string | null;
+  };
+  dataCompleteness: number;
+  fetchedAt: string;
+  errors: string[];
 }
 
-export function useStockData(symbol: string | null): UseStockDataResult {
-  const [pipeline, setPipeline] = useState<PipelineResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+export function useStockData(symbol: string | null) {
+  const [data, setData] = useState<StockData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const isMountedRef = useRef(true);
-  const fetchingRef = useRef(false);
 
-  const fetchData = useCallback(async (sym: string, isFirstFetch: boolean) => {
-    if (fetchingRef.current) return;
-    fetchingRef.current = true;
-
-    // On first fetch show loading state; on refresh keep stale data visible
-    if (isFirstFetch) setLoading(true);
-
-    try {
-      const result = await runCompanyDataPipeline(sym);
-      if (!isMountedRef.current) return;
-
-      setPipeline(result);
-
-      // Only set error when ALL providers failed and price is unavailable
-      const allFailed = result.price.current === null && result.pipelineErrors.length > 0;
-      setError(allFailed ? result.pipelineErrors[0] : null);
-    } catch (err: unknown) {
-      if (!isMountedRef.current) return;
-      setError(err instanceof Error ? err.message : 'Failed to load stock data');
-    } finally {
-      if (isMountedRef.current) setLoading(false);
-      fetchingRef.current = false;
-    }
-  }, []);
-
-  const isFirstFetchRef = useRef(true);
-
-  const refetch = useCallback(() => {
+  const fetchStock = useCallback(async () => {
     if (!symbol) return;
-    fetchData(symbol, false);
-  }, [symbol, fetchData]);
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const nextData = (await response.json()) as StockData;
+      setData(nextData);
+      setError(null);
+    } catch (nextError: unknown) {
+      setError(nextError instanceof Error ? nextError.message : "Failed to load stock data");
+    } finally {
+      setLoading(false);
+    }
+  }, [symbol]);
 
   useEffect(() => {
-    isMountedRef.current = true;
-    isFirstFetchRef.current = true;
+    void fetchStock();
+  }, [fetchStock]);
 
-    if (!symbol) {
-      setPipeline(null);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    // Reset state when symbol changes
-    setPipeline(null);
-    setError(null);
-    fetchData(symbol, true);
-
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, [symbol, fetchData]);
-
-  return { pipeline, loading, error, refetch };
+  return { data, loading, error, refetch: fetchStock };
 }
 
 export default useStockData;

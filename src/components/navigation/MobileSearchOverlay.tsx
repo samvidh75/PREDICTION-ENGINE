@@ -3,7 +3,8 @@ import { StockSearchEngine } from "../../services/stocks/StockSearchIndex";
 import { SearchRankingEngine } from "../../services/search/SearchRankingEngine";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
-import { formatINR, formatPercent, useLiveQuotes } from "../../hooks/useLiveQuotes";
+import { fPrice, fChange } from "../../lib/format";
+import { useUnifiedQuotes } from "../../hooks/useUnifiedQuotes";
 
 type Props = {
   isOpen: boolean;
@@ -18,7 +19,7 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
     const raw = StockSearchEngine.search(query, 12);
     return SearchRankingEngine.rank(raw, query).slice(0, 8);
   }, [query]);
-  const liveQuotes = useLiveQuotes(searchResults.map((stock) => stock.ticker));
+  const liveQuotes = useUnifiedQuotes(searchResults.map((stock) => stock.ticker));
 
   if (!isOpen) return null;
 
@@ -64,13 +65,13 @@ export default function MobileSearchOverlay({ isOpen, onClose }: Props): JSX.Ele
               </div>
               <div className="text-right">
                 <div className="text-[15px] font-semibold text-[#f0f3fa]">
-                  {quoteState?.loading ? "Loading..." : quote ? formatINR(quote.price) : "Unavailable"}
+                  {quoteState?.loading ? "Loading..." : quote ? fPrice(quote.price) : "Unavailable"}
                 </div>
                 <div
                   className="text-[11px] font-medium mt-1"
                   style={{ color: quote && quote.changePercent >= 0 ? "#22ab94" : "#f23645" }}
                 >
-                  {quote ? formatPercent(quote.changePercent) : ""}
+                  {quote ? fChange(quote.changePercent) : ""}
                 </div>
               </div>
             </button>
