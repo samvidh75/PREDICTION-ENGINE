@@ -73,6 +73,21 @@ export const marketDataRoutes: FastifyPluginAsync = async (app) => {
       );
     }
   });
+
+  // Proxy Yahoo historical price data server-side to avoid browser CORS blocks.
+  app.get("/api/historical/:symbol", async (request, reply) => {
+    const { symbol } = request.params as { symbol: string };
+    const { range = "3mo" } = request.query as { range?: string };
+    const sym = symbol.toUpperCase().trim();
+
+    try {
+      const points = await MarketDataGateway.getHistory(sym);
+      return { symbol: sym, range, points };
+    } catch (err: any) {
+      request.log.error({ err, symbol: sym }, "historical data request failed");
+      reply.status(502).send({ error: "Historical data is temporarily unavailable.", code: "HISTORICAL_UNAVAILABLE" });
+    }
+  });
 };
 
 export default marketDataRoutes;

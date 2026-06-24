@@ -69,7 +69,10 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   private apiKey: string;
 
   constructor(apiKey?: string) {
-    const key = apiKey || (typeof process !== 'undefined' && process.env?.INDIANAPI_KEY) || '';
+    const key = apiKey
+      || (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_INDIANAPI_KEY)
+      || (typeof process !== 'undefined' && process.env?.INDIANAPI_KEY)
+      || '';
     this.apiKey = key;
   }
 
