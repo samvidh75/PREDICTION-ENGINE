@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import DashboardHub from '../../components/dashboard/DashboardHub';
 import { SearchPage } from '../SearchPage';
-import { PublicRankingsPage } from '../PublicRankingsPage';
+import PublicRankingsPage from '../PublicRankingsPage';
 import StockStoryPage from '../StockStoryPageF0';
 import { LayoutProvider } from '../../context/LayoutContext';
 
