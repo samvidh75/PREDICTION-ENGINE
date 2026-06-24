@@ -470,6 +470,9 @@ export class UnifiedPredictionEngine {
       keyRisks: [],
       sourceEngine: 'UnifiedPredictionEngine',
       createdBy: 'system',
+      availableWeight: featureVector.filter(f => f.raw !== null).length / Math.max(featureVector.length, 1),
+      isFabricated: false,
+      fabricationReason: null,
     };
   }
 

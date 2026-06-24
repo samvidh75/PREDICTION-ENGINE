@@ -164,6 +164,12 @@ export interface UnifiedPredictionOutput {
 
   sourceEngine: string;
   createdBy: string;
+
+  // Fraction of composite weight that had real data (0–1)
+  availableWeight: number;
+  // True only if fabricated data was substituted — always false in production
+  isFabricated: boolean;
+  fabricationReason: string | null;
 }
 
 export interface UnifiedEngineResult {
