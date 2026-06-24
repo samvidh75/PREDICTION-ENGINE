@@ -251,7 +251,7 @@ export function PremiumTopNav({
           </div>
         </button>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
+        <nav aria-label="Primary navigation" style={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
           {NAV_ITEMS.map((item) => (
             <button
               key={item.key}
@@ -299,6 +299,7 @@ export function PremiumTopNav({
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={() => productNavigate("search")}
+            aria-label="Search companies"
             style={{
               width: 36,
               height: 36,
@@ -1901,6 +1902,7 @@ export function MobileProductNav({
 }) {
   return (
     <nav
+      aria-label="Mobile navigation"
       style={{
         position: "fixed",
         bottom: 0,
@@ -1925,6 +1927,7 @@ export function MobileProductNav({
           <button
             key={item.key}
             onClick={() => productNavigate(item.page)}
+            aria-label={item.label}
             style={{
               display: "flex",
               flexDirection: "column",

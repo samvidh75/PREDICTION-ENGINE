@@ -120,11 +120,18 @@ async function auditPageLayout(page: Page, url: string, viewportW: number): Prom
     const heroText = document.querySelector("h1, h2");
     let lowContrastHero = false;
     if (heroText) {
-      const style = window.getComputedStyle(heroText);
-      const color = style.color.match(/\d+/g)?.map(Number) || [];
-      if (color.length >= 3) {
-        const luminance = (0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]) / 255;
-        lowContrastHero = luminance < 0.45;
+      const cs = window.getComputedStyle(heroText);
+      const fg = cs.color.match(/\d+/g)?.map(Number) || [];
+      let bgMatch = cs.backgroundColor.match(/\d+/g)?.map(Number) || [];
+      if (bgMatch.length >= 4 && bgMatch[3] === 0) bgMatch = [250, 249, 246];
+      const bg = bgMatch;
+      if (fg.length >= 3) {
+        const sr = fg[0] / 255, sg = fg[1] / 255, sb = fg[2] / 255;
+        const Lfg = 0.2126 * (sr <= 0.03928 ? sr / 12.92 : Math.pow((sr + 0.055) / 1.055, 2.4)) + 0.7152 * (sg <= 0.03928 ? sg / 12.92 : Math.pow((sg + 0.055) / 1.055, 2.4)) + 0.0722 * (sb <= 0.03928 ? sb / 12.92 : Math.pow((sb + 0.055) / 1.055, 2.4));
+        const br = bg[0] / 255, bgv = bg[1] / 255, bb = bg[2] / 255;
+        const Lbg = 0.2126 * (br <= 0.03928 ? br / 12.92 : Math.pow((br + 0.055) / 1.055, 2.4)) + 0.7152 * (bgv <= 0.03928 ? bgv / 12.92 : Math.pow((bgv + 0.055) / 1.055, 2.4)) + 0.0722 * (bb <= 0.03928 ? bb / 12.92 : Math.pow((bb + 0.055) / 1.055, 2.4));
+        const lo = Math.max(Lfg, Lbg), hi = Math.min(Lfg, Lbg);
+        lowContrastHero = (lo + 0.05) / (hi + 0.05) < 3.0;
       }
     }
     const primaryCtas = Array.from(document.querySelectorAll("button, a")).filter((el) => {
