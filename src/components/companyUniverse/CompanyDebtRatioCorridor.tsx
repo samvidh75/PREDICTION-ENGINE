@@ -15,7 +15,7 @@ function glowForHealth(healthState: CompanyHealthState, theme: HealthTheme): str
       return theme.glowCyan;
     case "LIQUIDITY_FRAGILE":
     case "STRUCTURALLY_WEAKENING":
-      return theme.glowslate;
+      return theme.glowAmber;
     case "VOLATILITY_SENSITIVE":
     default:
       return theme.glowWarning;

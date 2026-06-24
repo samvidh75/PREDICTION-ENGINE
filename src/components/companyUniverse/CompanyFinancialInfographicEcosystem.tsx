@@ -18,7 +18,7 @@ function colorForHealth(healthState: CompanyHealthState, healthTheme: HealthThem
     case "CONFIDENCE_IMPROVING":
       return { bar: healthTheme.glowCyan, glow: healthTheme.glowCyan };
     case "STABLE_EXPANSION":
-      return { bar: healthTheme.glowslate, glow: healthTheme.glowslate };
+      return { bar: healthTheme.glowAmber, glow: healthTheme.glowAmber };
     case "VOLATILITY_SENSITIVE":
       return { bar: healthTheme.glowWarning, glow: healthTheme.glowWarning };
     case "LIQUIDITY_FRAGILE":

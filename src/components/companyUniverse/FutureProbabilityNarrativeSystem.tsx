@@ -34,7 +34,7 @@ export default function FutureProbabilityNarrativeSystem(props: {
       case "CONFIDENCE_IMPROVING":
         return healthTheme.glowCyan;
       case "STABLE_EXPANSION":
-        return healthTheme.glowslate;
+        return healthTheme.glowAmber;
       case "LIQUIDITY_FRAGILE":
         return healthTheme.glowDeep;
       case "VOLATILITY_SENSITIVE":
