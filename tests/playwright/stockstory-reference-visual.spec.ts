@@ -131,5 +131,27 @@ VIEWPORTS.forEach((vp) => {
       await assertNoRenderGarbage(page);
       await captureScreenshot(page, "broker-handoff-gated", vp);
     });
+
+    test("command palette on stock detail", async ({ page }) => {
+      await setupPage(page, "stock&id=TCS", vp, true);
+      await assertAppShell(page);
+      await page.keyboard.press("Meta+k");
+      await page.waitForTimeout(300);
+      await assertNoForbiddenTerms(page);
+      await assertNoRenderGarbage(page);
+      await captureScreenshot(page, "command-palette", vp);
+    });
+
+    if (vp.width <= 430) {
+      test("dashboard mobile nav", async ({ page }) => {
+        await setupPage(page, "dashboard", vp, true);
+        await assertAppShell(page);
+        const nav = page.locator("nav[aria-label='Mobile navigation']");
+        await expect(nav).toBeAttached();
+        await assertNoForbiddenTerms(page);
+        await assertNoRenderGarbage(page);
+        await captureScreenshot(page, "dashboard-mobile-nav", vp);
+      });
+    }
   });
 });
