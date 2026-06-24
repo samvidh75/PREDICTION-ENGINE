@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Settings } from "lucide-react";
+import { Crown, Search, Settings } from "lucide-react";
 import Logo from "../brand/Logo";
 import { productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
@@ -9,6 +9,8 @@ import { CommandPalette } from "../intelligence/CommandPalette";
 import GradientMesh from "../ui/GradientMesh";
 import { trackPageView } from "../../lib/analytics";
 import { getPreferences, setPreferences, type UserPreferences } from "../../lib/preferences";
+import { isPremium } from "../../lib/subscription";
+import { PricingModal } from "../premium/PremiumGate";
 
 const indices = [
   { name: "NIFTY 50", symbol: "^NSEI" },
@@ -32,6 +34,8 @@ function isMarketOpen() {
 
 export function TopNav({ active = "" }: { active?: string }) {
   const { isAuthenticated, user } = useAuth();
+  const [pricingOpen, setPricingOpen] = useState(false);
+  const premium = isPremium();
   return (
     <nav className="h-[64px] bg-white/90 backdrop-blur-md flex items-center px-6 sticky top-0 z-50 border-b border-[#e3e8ee]">
       <div className="max-w-[1200px] w-full mx-auto flex items-center">
@@ -44,7 +48,11 @@ export function TopNav({ active = "" }: { active?: string }) {
             </button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2">
+          <button onClick={() => setPricingOpen(true)}
+            className={`text-[12px] font-[400] rounded-[9999px] px-[12px] py-[6px] transition-all active:scale-[0.97] flex items-center gap-1.5 ${premium ? 'bg-[#f6f9fc] text-[#533afd] border border-[#533afd]' : 'bg-[#533afd]/10 text-[#533afd] hover:bg-[#533afd]/20'}`}>
+            <Crown size={12} /> {premium ? 'Premium' : 'Upgrade'}
+          </button>
           <button onClick={() => productNavigate("search")} aria-label="Search"
             className="w-[34px] h-[34px] flex items-center justify-center text-[#64748d] hover:text-[#0d253d] transition-colors">
             <Search size={15} />
@@ -63,6 +71,7 @@ export function TopNav({ active = "" }: { active?: string }) {
           )}
         </div>
       </div>
+      {pricingOpen && <PricingModal onClose={() => setPricingOpen(false)} />}
     </nav>
   );
 }
