@@ -1,31 +1,30 @@
 @import "./design-tokens.css";
 @import "./tokens.css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body { font-family: 'Inter', sans-serif; background: #f7f7f5; color: #0a0a0a; -webkit-font-smoothing: antialiased; }
-.tabular { font-variant-numeric: tabular-nums; }
-
 @layer base {
   :root {
-    --green: #1a7f4b;
-    --green-light: #22c55e;
-    --green-bg: #ebf7f1;
-    --green-dark: #0d5c34;
+    --apple-blue: #0066cc;
+    --apple-blue-dark: #2997ff;
+    --apple-ink: #1d1d1f;
+    --apple-parchment: #f5f5f7;
   }
   * { box-sizing: border-box; }
-  html { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  html { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; }
   body {
-    background: #f7f7f5;
-    color: #0a0a0a;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  ::selection { background: #0066cc; color: white; }
 }
 
 @layer utilities {
