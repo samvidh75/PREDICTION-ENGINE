@@ -24,28 +24,28 @@ function ensureReportsDir() {
 function writeReport(name: string, data: any) {
   const path = join(REPORTS_DIR, name);
   writeFileSync(path, JSON.stringify(data, null, 2), 'utf-8');
-  console.log(`  ✓ Report written: ${path}`);
+  console.info(`  ✓ Report written: ${path}`);
 }
 
 async function verify() {
-  console.log('╔═══════════════════════════════════════════════════╗');
-  console.log('║  RC3 Phase 2 — Real Warehouse Verification Test  ║');
-  console.log('╚═══════════════════════════════════════════════════╝');
-  console.log(`  Time: ${new Date().toISOString()}`);
+  console.info('╔═══════════════════════════════════════════════════╗');
+  console.info('║  RC3 Phase 2 — Real Warehouse Verification Test  ║');
+  console.info('╚═══════════════════════════════════════════════════╝');
+  console.info(`  Time: ${new Date().toISOString()}`);
 
   ensureReportsDir();
 
   // ═══════════════════════════════════════════════════════════════
   // PHASE 3: Connection Test
   // ═══════════════════════════════════════════════════════════════
-  console.log('\n═══ PHASE 3: Real Connection Test ═══');
+  console.info('\n═══ PHASE 3: Real Connection Test ═══');
   const connStart = Date.now();
   try {
     const connRes = await pool.query('SELECT 1');
     const latency = Date.now() - connStart;
     
     if (connRes.rowCount !== null) {
-      console.log('  ✓ PostgreSQL Connection established successfully.');
+      console.info('  ✓ PostgreSQL Connection established successfully.');
       writeReport('POSTGRES_CONNECTION_REPORT.json', {
         connected: true,
         authentication: 'OK',
@@ -67,7 +67,7 @@ async function verify() {
   // ═══════════════════════════════════════════════════════════════
   // PHASE 4: Migration Verification
   // ═══════════════════════════════════════════════════════════════
-  console.log('\n═══ PHASE 4: Migration Verification ═══');
+  console.info('\n═══ PHASE 4: Migration Verification ═══');
   const tables = ['symbols', 'daily_prices', 'financial_snapshots', 'news_articles', 'provider_logs'];
   const statusReport: any = { migrated: true, tables: {}, timestamp: new Date().toISOString() };
   
@@ -83,7 +83,7 @@ async function verify() {
       const exists = checkRes.rows[0].exists;
       statusReport.tables[table] = exists ? 'OK' : 'MISSING';
       if (exists) {
-        console.log(`  ✓ Table "${table}" exists.`);
+        console.info(`  ✓ Table "${table}" exists.`);
       } else {
         console.error(`  ❌ Table "${table}" is missing!`);
         statusReport.migrated = false;
@@ -98,13 +98,13 @@ async function verify() {
   // ═══════════════════════════════════════════════════════════════
   // PHASE 5: Data Insert Test
   // ═══════════════════════════════════════════════════════════════
-  console.log('\n═══ PHASE 5: Data Insert Test ═══');
+  console.info('\n═══ PHASE 5: Data Insert Test ═══');
   const coordinator = new ProviderCoordinator();
   const insertReport: any[] = [];
   const targetSymbols = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK'];
 
   for (const sym of targetSymbols) {
-    console.log(`  Acquiring and storing data for ${sym}...`);
+    console.info(`  Acquiring and storing data for ${sym}...`);
     
     // 1. Metadata
     try {
@@ -157,14 +157,14 @@ async function verify() {
   // ═══════════════════════════════════════════════════════════════
   // PHASE 6: Query Test
   // ═══════════════════════════════════════════════════════════════
-  console.log('\n═══ PHASE 6: Query Test ═══');
+  console.info('\n═══ PHASE 6: Query Test ═══');
   const queryReport: any = { timestamp: new Date().toISOString(), counts: {} };
   for (const table of tables) {
     try {
       const countRes = await pool.query(`SELECT COUNT(*) FROM ${table}`);
       const count = parseInt(countRes.rows[0].count, 10);
       queryReport.counts[table] = count;
-      console.log(`  ✓ Table "${table}" record count: ${count}`);
+      console.info(`  ✓ Table "${table}" record count: ${count}`);
     } catch (err: any) {
       queryReport.counts[table] = `ERROR: ${err.message}`;
     }
@@ -172,9 +172,9 @@ async function verify() {
   writeReport('DATABASE_QUERY_REPORT.json', queryReport);
 
   await pool.end();
-  console.log('\n╔═══════════════════════════════════════════════════╗');
-  console.log('║  RC3 Phase 2 — Real Warehouse Verification Done   ║');
-  console.log('╚═══════════════════════════════════════════════════╝');
+  console.info('\n╔═══════════════════════════════════════════════════╗');
+  console.info('║  RC3 Phase 2 — Real Warehouse Verification Done   ║');
+  console.info('╚═══════════════════════════════════════════════════╝');
 }
 
 verify().catch((err) => {

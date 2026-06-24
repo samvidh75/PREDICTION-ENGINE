@@ -537,3 +537,51 @@ select option {
 @media (prefers-reduced-motion: reduce) {
   [class*="brand-rise"], [class*="brand-draw"] { animation: none !important; }
 }
+
+/* Institutional visual baseline */
+html,
+body,
+#root {
+  background: var(--c-bg) !important;
+}
+
+body {
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  display: none;
+}
+
+*:not(svg):not(svg *) {
+  box-shadow: none !important;
+}
+
+[class*="gradient"]:not(svg):not(svg *) {
+  background-image: none !important;
+}
+
+:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: var(--r-md);
+}
+
+.price,
+.score,
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}

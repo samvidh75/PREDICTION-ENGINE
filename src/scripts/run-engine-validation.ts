@@ -32,7 +32,7 @@ function ensureReportsDir() {
 function writeReport(name: string, data: any) {
   const path = join(REPORTS_DIR, name);
   writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
-  console.log(`  ✓ Report written: ${path}`);
+  console.info(`  ✓ Report written: ${path}`);
 }
 
 import pool from "../db/index";
@@ -43,9 +43,9 @@ import { factorEngine } from "../services/FactorEngine";
 const VALIDATION_SYMBOLS = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "HAL"];
 
 async function main() {
-  console.log("=================================================");
-  console.log("  StockStory Feature & Factor Engine Validation  ");
-  console.log("=================================================");
+  console.info("=================================================");
+  console.info("  StockStory Feature & Factor Engine Validation  ");
+  console.info("=================================================");
 
   ensureReportsDir();
 
@@ -56,7 +56,7 @@ async function main() {
   };
 
   for (const sym of VALIDATION_SYMBOLS) {
-    console.log(`\nProcessing symbol: ${sym}`);
+    console.info(`\nProcessing symbol: ${sym}`);
     const runResult: any = {
       symbol: sym,
       steps: {
@@ -68,7 +68,7 @@ async function main() {
 
     try {
       // 1. Ingest metadata, historical daily prices, and financials
-      console.log(`  - Ingesting metadata...`);
+      console.info(`  - Ingesting metadata...`);
       const meta = await coordinator.getMetadata(sym);
       await pool.query(
         `INSERT INTO symbols (symbol, exchange, company_name, sector, industry, listing_status)
@@ -77,7 +77,7 @@ async function main() {
         [sym, meta.exchange || "NSE", meta.companyName || sym, meta.sector || "", meta.industry || "", "ACTIVE"]
       );
 
-      console.log(`  - Ingesting 1 Year of daily historical prices...`);
+      console.info(`  - Ingesting 1 Year of daily historical prices...`);
       const history = await coordinator.getHistory(sym, "1Y");
       let priceCount = 0;
       for (const p of history) {
@@ -89,9 +89,9 @@ async function main() {
         );
         priceCount++;
       }
-      console.log(`    ✓ Stored ${priceCount} daily candles.`);
+      console.info(`    ✓ Stored ${priceCount} daily candles.`);
 
-      console.log(`  - Ingesting financial snapshots...`);
+      console.info(`  - Ingesting financial snapshots...`);
       try {
         const financials = await coordinator.getFinancials(sym);
         await pool.query(
@@ -114,12 +114,12 @@ async function main() {
       runResult.steps.ingestion = `SUCCESS (Prices: ${priceCount})`;
 
       // 2. Run Feature Engine
-      console.log(`  - Calculating technical features...`);
+      console.info(`  - Calculating technical features...`);
       const features = await featureEngine.calculateAndStoreFeatures(sym);
       runResult.steps.features = `SUCCESS (Features calculated: ${features.length})`;
 
       // 3. Run Factor Engine
-      console.log(`  - Generating factor scores and explanations...`);
+      console.info(`  - Generating factor scores and explanations...`);
       const factors = await factorEngine.calculateAndStoreFactors(sym);
       runResult.steps.factors = `SUCCESS (Factors calculated: ${factors.length})`;
 
@@ -148,14 +148,14 @@ async function main() {
   }
 
   // Print summary to console
-  console.log("\n=================================================");
-  console.log("               Validation Summary                ");
-  console.log("=================================================");
+  console.info("\n=================================================");
+  console.info("               Validation Summary                ");
+  console.info("=================================================");
   for (const r of validationReport.runs) {
-    console.log(`${r.symbol}: Ingestion: ${r.steps.ingestion} | Features: ${r.steps.features} | Factors: ${r.steps.factors}`);
+    console.info(`${r.symbol}: Ingestion: ${r.steps.ingestion} | Features: ${r.steps.features} | Factors: ${r.steps.factors}`);
     if (r.latestFactorOutput) {
-      console.log(`  Latest Score: ${r.latestFactorOutput.compositeFactorScore} on ${r.latestFactorOutput.tradeDate}`);
-      console.log(`  Positive Drivers: ${r.latestFactorOutput.explanations.topPositiveDrivers.join(", ")}`);
+      console.info(`  Latest Score: ${r.latestFactorOutput.compositeFactorScore} on ${r.latestFactorOutput.tradeDate}`);
+      console.info(`  Positive Drivers: ${r.latestFactorOutput.explanations.topPositiveDrivers.join(", ")}`);
     }
   }
 

@@ -17,7 +17,7 @@ export class ConfidenceV2Activator {
   private readonly engine = new ConfidenceEngineV2();
 
   async activateAndStore(referenceDate: string): Promise<{ activated: number; stored: number }> {
-    console.log(`[ConfidenceV2Activator] Activating for ${referenceDate}...`);
+    console.info(`[ConfidenceV2Activator] Activating for ${referenceDate}...`);
 
     const snapshotsResult = await pool.query(
       `SELECT symbol, trade_date, quality_factor, growth_factor, value_factor,
@@ -33,7 +33,7 @@ export class ConfidenceV2Activator {
     const activated = snapshots.length;
 
     if (activated === 0) {
-      console.log(`[ConfidenceV2Activator] No factor_snapshots found for ${referenceDate}`);
+      console.info(`[ConfidenceV2Activator] No factor_snapshots found for ${referenceDate}`);
       return { activated: 0, stored: 0 };
     }
 
@@ -97,7 +97,7 @@ export class ConfidenceV2Activator {
       client.release();
     }
 
-    console.log(`[ConfidenceV2Activator] Complete. Activated: ${activated}, Stored: ${stored}`);
+    console.info(`[ConfidenceV2Activator] Complete. Activated: ${activated}, Stored: ${stored}`);
     return { activated, stored };
   }
 }

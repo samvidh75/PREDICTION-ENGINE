@@ -38,7 +38,7 @@ export class DailyPipelineScheduler {
   async execute(): Promise<PipelineRunResult> {
     // Lock file to prevent concurrent runs
     if (this.hasLock()) {
-      console.log('[SCHEDULER] Pipeline already running — skipping');
+      console.info('[SCHEDULER] Pipeline already running — skipping');
       return {
         runId: 'skipped',
         startedAt: new Date().toISOString(),
@@ -54,7 +54,7 @@ export class DailyPipelineScheduler {
     const phases: PipelinePhaseResult[] = [];
     let overallSuccess = true;
 
-    console.log(`[SCHEDULER] Starting pipeline run ${runId}`);
+    console.info(`[SCHEDULER] Starting pipeline run ${runId}`);
 
     try {
       // Phase 1: Data Refresh (05:00 IST)
@@ -66,7 +66,7 @@ export class DailyPipelineScheduler {
           `SELECT MAX(trade_date) as latest FROM daily_prices`
         );
         const latestDate = latestPrices.rows[0]?.latest;
-        console.log(`  Latest price data: ${latestDate}`);
+        console.info(`  Latest price data: ${latestDate}`);
         await this.logPipelineComplete(runId, 'data_refresh', 'success');
       }));
 
@@ -78,7 +78,7 @@ export class DailyPipelineScheduler {
         const latestFactors = await pool.query(
           `SELECT MAX(trade_date) as latest FROM factor_snapshots`
         );
-        console.log(`  Latest factor data: ${latestFactors.rows[0]?.latest}`);
+        console.info(`  Latest factor data: ${latestFactors.rows[0]?.latest}`);
         await this.logPipelineComplete(runId, 'factor_refresh', 'success');
       }));
 
@@ -86,7 +86,7 @@ export class DailyPipelineScheduler {
       phases.push(await this.executePhase('prediction_generation', async () => {
         await this.logPipelineStart(runId, 'prediction_generation');
         const result = await predictionFactory.generateDaily([30, 90, 365]);
-        console.log(`  Created: ${result.created}, Skipped: ${result.skipped}, Errors: ${result.errors.length}`);
+        console.info(`  Created: ${result.created}, Skipped: ${result.skipped}, Errors: ${result.errors.length}`);
         if (result.errors.length > 0) {
           console.error(`  Errors: ${result.errors.slice(0, 3).join('; ')}`);
         }
@@ -100,7 +100,7 @@ export class DailyPipelineScheduler {
         await this.logPipelineStart(runId, 'outcome_validation');
         const result = await outcomeValidator.validateAll([30, 90, 180, 365]);
         await outcomeValidator.logRun(result);
-        result.forEach(r => console.log(`  ${r.horizonDays}d: ${r.validated} validated, ${r.skipped} skipped, ${r.errors} errors`));
+        result.forEach(r => console.info(`  ${r.horizonDays}d: ${r.validated} validated, ${r.skipped} skipped, ${r.errors} errors`));
         await this.logPipelineComplete(runId, 'outcome_validation',
           result.every(r => r.errors === 0) ? 'success' : 'partial');
         return result;
@@ -114,7 +114,7 @@ export class DailyPipelineScheduler {
         const validatedCount = await pool.query(
           `SELECT COUNT(*) as cnt FROM prediction_registry WHERE validation_status = 'validated'`
         );
-        console.log(`  Validated predictions: ${validatedCount.rows[0]?.cnt || 0}`);
+        console.info(`  Validated predictions: ${validatedCount.rows[0]?.cnt || 0}`);
         await this.logPipelineComplete(runId, 'trust_metrics', 'success');
       }));
 
@@ -126,7 +126,7 @@ export class DailyPipelineScheduler {
           `SELECT COUNT(*) as cnt FROM prediction_registry WHERE prediction_date = $1`,
           [new Date().toISOString().split('T')[0]]
         );
-        console.log(`  Today's predictions: ${todayPredictions.rows[0]?.cnt || 0}`);
+        console.info(`  Today's predictions: ${todayPredictions.rows[0]?.cnt || 0}`);
         await this.logPipelineComplete(runId, 'daily_feed', 'success');
       }));
 
@@ -138,7 +138,7 @@ export class DailyPipelineScheduler {
     }
 
     const completedAt = new Date().toISOString();
-    console.log(`[SCHEDULER] Pipeline ${runId} complete — ${overallSuccess ? 'SUCCESS' : 'PARTIAL'}`);
+    console.info(`[SCHEDULER] Pipeline ${runId} complete — ${overallSuccess ? 'SUCCESS' : 'PARTIAL'}`);
 
     // Dispatch alerts for any failed phases
     const failedPhases = phases.filter(p => p.status === 'failed');

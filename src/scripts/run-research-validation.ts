@@ -30,7 +30,7 @@ function ensureReportsDir() {
 function writeReport(name: string, data: any) {
   const path = join(REPORTS_DIR, name);
   writeFileSync(path, JSON.stringify(data, null, 2), "utf-8");
-  console.log(`  ✓ Report written: ${path}`);
+  console.info(`  ✓ Report written: ${path}`);
 }
 
 import pool from "../db/index";
@@ -47,18 +47,18 @@ import { predictionExplanationEngine } from "../services/PredictionExplanationEn
 const RESEARCH_SYMBOLS = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "HAL", "BEL", "IRFC"];
 
 async function main() {
-  console.log("=================================================");
-  console.log("  StockStory Factor & Prediction Research Suite  ");
-  console.log("=================================================");
+  console.info("=================================================");
+  console.info("  StockStory Factor & Prediction Research Suite  ");
+  console.info("=================================================");
 
   ensureReportsDir();
 
   const coordinator = new ProviderCoordinator();
 
   // ── STEP 1: INGEST 5 YEARS OF DATA FOR ALL 7 SYMBOLS ──────────
-  console.log("\n>>> STEP 1: Ingesting 5 Years of Data...");
+  console.info("\n>>> STEP 1: Ingesting 5 Years of Data...");
   for (const sym of RESEARCH_SYMBOLS) {
-    console.log(`  Processing Ingestion for ${sym}...`);
+    console.info(`  Processing Ingestion for ${sym}...`);
     try {
       // Ingest Metadata
       const meta = await coordinator.getMetadata(sym);
@@ -81,7 +81,7 @@ async function main() {
         );
         count++;
       }
-      console.log(`    ✓ Successfully stored ${count} prices for ${sym}`);
+      console.info(`    ✓ Successfully stored ${count} prices for ${sym}`);
 
       // Seed default/fallback financials if missing
       await pool.query(
@@ -102,10 +102,10 @@ async function main() {
   }
 
   // ── STEP 2: RUN HISTORICAL FACTOR BACKTESTS (PHASE 1) ──────────
-  console.log("\n>>> STEP 2: Running Factor Backtests...");
+  console.info("\n>>> STEP 2: Running Factor Backtests...");
   const backtestReports: any = {};
   for (const sym of RESEARCH_SYMBOLS) {
-    console.log(`  Backtesting factors for ${sym}...`);
+    console.info(`  Backtesting factors for ${sym}...`);
     try {
       const results = await factorBacktestEngine.runBacktest(sym);
       backtestReports[sym] = results;
@@ -116,10 +116,10 @@ async function main() {
   writeReport("FACTOR_BACKTEST_REPORT.json", backtestReports);
 
   // ── STEP 3: RUN FEATURE IMPORTANCE ANALYSIS (PHASE 2) ─────────
-  console.log("\n>>> STEP 3: Running Feature Importance Engine...");
+  console.info("\n>>> STEP 3: Running Feature Importance Engine...");
   const importanceReports: any = {};
   for (const sym of RESEARCH_SYMBOLS) {
-    console.log(`  Analyzing feature importance for ${sym}...`);
+    console.info(`  Analyzing feature importance for ${sym}...`);
     try {
       const results = await featureImportanceEngine.analyzeFeatureImportance(sym);
       importanceReports[sym] = results;
@@ -130,7 +130,7 @@ async function main() {
   writeReport("FEATURE_IMPORTANCE_REPORT.json", importanceReports);
 
   // ── STEP 4: PREPARE ML DATASET FOR BENCHMARKS ─────────────────
-  console.log("\n>>> STEP 4: Preparing Machine Learning Datasets...");
+  console.info("\n>>> STEP 4: Preparing Machine Learning Datasets...");
   // Aggregate all symbols' 5-year data into a single master training/test set
   const featuresRes = await pool.query(
     `SELECT fs.*, dp.close
@@ -140,7 +140,7 @@ async function main() {
   );
 
   const rows = featuresRes.rows;
-  console.log(`  Aggregated ${rows.length} total feature-price rows.`);
+  console.info(`  Aggregated ${rows.length} total feature-price rows.`);
 
   // Group by symbol to compute targets cleanly without cross-over boundaries
   const symbolGroups: Record<string, typeof rows> = {};
@@ -208,7 +208,7 @@ async function main() {
   }
 
   // ── STEP 5: RUN LIGHTGBM BENCHMARKS (PHASE 4) ─────────────────
-  console.log("\n>>> STEP 5: Running LightGBM Benchmarks...");
+  console.info("\n>>> STEP 5: Running LightGBM Benchmarks...");
   const lgb7D = await lightGBMBenchmark.runBenchmark(X, y_7D);
   const lgb30D = await lightGBMBenchmark.runBenchmark(X, y_30D);
   const lgb90D = await lightGBMBenchmark.runBenchmark(X, y_90D);
@@ -221,7 +221,7 @@ async function main() {
   writeReport("LIGHTGBM_RESULTS.json", lgbResults);
 
   // ── STEP 6: RUN XGBOOST BENCHMARKS (PHASE 5) ──────────────────
-  console.log("\n>>> STEP 6: Running XGBoost Benchmarks...");
+  console.info("\n>>> STEP 6: Running XGBoost Benchmarks...");
   const xgb7D = await xGBoostBenchmark.runBenchmark(X, y_7D);
   const xgb30D = await xGBoostBenchmark.runBenchmark(X, y_30D);
   const xgb90D = await xGBoostBenchmark.runBenchmark(X, y_90D);
@@ -234,7 +234,7 @@ async function main() {
   writeReport("XGBOOST_RESULTS.json", xgbResults);
 
   // ── STEP 7: EXPLAINABILITY EXAMPLES VALIDATION (PHASE 7) ───────
-  console.log("\n>>> STEP 7: Generating Explainability Reports...");
+  console.info("\n>>> STEP 7: Generating Explainability Reports...");
   const explainabilityReports: any[] = [];
   
   // Pick some sample dates/symbols to generate validation explanation traces
@@ -285,14 +285,14 @@ async function main() {
   writeReport("EXPLAINABILITY_REPORT.json", explainabilityReports);
 
   // ── STEP 8: GENERATE MARKDOWN COMPARISONS AND DECISIONS ───────
-  console.log("\n>>> STEP 8: Creating Markdown Analysis Reports...");
+  console.info("\n>>> STEP 8: Creating Markdown Analysis Reports...");
   generateComparisonReport(lgbResults, xgbResults);
   generateReadinessReport(backtestReports, lgbResults, xgbResults);
 
   await pool.end();
-  console.log("\n=================================================");
-  console.log("    Research and Validation Phase Completed      ");
-  console.log("=================================================");
+  console.info("\n=================================================");
+  console.info("    Research and Validation Phase Completed      ");
+  console.info("=================================================");
 }
 
 function generateComparisonReport(lgb: any[], xgb: any[]) {
@@ -320,7 +320,7 @@ This report compares performance metrics between **Factor-Only Baselines**, **Li
 `;
 
   writeFileSync(join(REPORTS_DIR, "..", "MODEL_COMPARISON_REPORT.md"), content, "utf-8");
-  console.log("  ✓ Written MODEL_COMPARISON_REPORT.md to workspace root.");
+  console.info("  ✓ Written MODEL_COMPARISON_REPORT.md to workspace root.");
 }
 
 function generateReadinessReport(backtest: any, lgb: any[], xgb: any[]) {
@@ -353,7 +353,7 @@ This report reviews factor predictive value and provides recommendations regardi
 `;
 
   writeFileSync(join(REPORTS_DIR, "..", "PREDICTION_ENGINE_READINESS.md"), content, "utf-8");
-  console.log("  ✓ Written PREDICTION_ENGINE_READINESS.md to workspace root.");
+  console.info("  ✓ Written PREDICTION_ENGINE_READINESS.md to workspace root.");
 }
 
 main().catch(err => {

@@ -95,7 +95,7 @@ export function logAuthState(entry: Omit<AuthLogEntry, 'timestamp' | 'userAgent'
       entry.phase === 'loading_timeout' ? '🚨' :
       entry.phase === 'persistence_error' ? '💥' :
       '⚠️';
-    console.log(
+    console.info(
       `[AuthState] ${emoji} ${entry.phase}` +
         (entry.uid ? ` uid=${entry.uid.slice(0, 8)}` : '') +
         (entry.sessionAgeMs != null ? ` age=${Math.round(entry.sessionAgeMs / 1000)}s` : '') +

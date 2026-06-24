@@ -169,12 +169,12 @@ export class DatabaseAdapter {
     this._diagnostics = buildDiagnostics(policy, resolved.kind, resolved.fallbackUsed, resolved.detail);
 
     if (this._kind === "postgres") {
-      console.log("[db] Canonical adapter: PostgreSQL connected");
+      console.info("[db] Canonical adapter: PostgreSQL connected");
     } else if (this._kind === "sqlite") {
       if (resolved.fallbackUsed) {
         console.warn(`[db] Canonical adapter: SQLite fallback (${resolved.detail ?? "PostgreSQL unavailable"})`);
       } else {
-        console.log("[db] Canonical adapter: SQLite configured");
+        console.info("[db] Canonical adapter: SQLite configured");
       }
     } else {
       console.error(`[db] Canonical adapter: unavailable (${resolved.detail ?? "No database available"})`);

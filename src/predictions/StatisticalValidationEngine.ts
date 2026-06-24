@@ -101,7 +101,7 @@ export class StatisticalValidationEngine {
         sample_size: n,
       };
       await this.storeResult(result, today);
-      console.log(`[StatisticalValidationEngine] validateAlpha: insufficient data (n=${n})`);
+      console.info(`[StatisticalValidationEngine] validateAlpha: insufficient data (n=${n})`);
       return result;
     }
 
@@ -124,7 +124,7 @@ export class StatisticalValidationEngine {
         sample_size: n,
       };
       await this.storeResult(result, today);
-      console.log(`[StatisticalValidationEngine] validateAlpha: zero variance, meanAlpha=${meanAlpha}`);
+      console.info(`[StatisticalValidationEngine] validateAlpha: zero variance, meanAlpha=${meanAlpha}`);
       return result;
     }
 
@@ -162,7 +162,7 @@ export class StatisticalValidationEngine {
 
     await this.storeResult(result, today);
 
-    console.log(
+    console.info(
       `[StatisticalValidationEngine] validateAlpha: n=${n}, meanAlpha=${meanAlpha.toFixed(4)}, ` +
       `t=${tStat.toFixed(4)}, p=${pValue.toFixed(6)}, IR=${informationRatio.toFixed(4)}, ` +
       `significant=${isSignificant}`,
@@ -202,7 +202,7 @@ export class StatisticalValidationEngine {
         sample_size: withReturns.length,
       };
       await this.storeResult(result, today);
-      console.log(`[StatisticalValidationEngine] validateTopVsBottom: insufficient data (n=${withReturns.length})`);
+      console.info(`[StatisticalValidationEngine] validateTopVsBottom: insufficient data (n=${withReturns.length})`);
       return result;
     }
 
@@ -248,7 +248,7 @@ export class StatisticalValidationEngine {
         sample_size: n,
       };
       await this.storeResult(result, today);
-      console.log(`[StatisticalValidationEngine] validateTopVsBottom: zero variance in both groups`);
+      console.info(`[StatisticalValidationEngine] validateTopVsBottom: zero variance in both groups`);
       return result;
     }
 
@@ -289,7 +289,7 @@ export class StatisticalValidationEngine {
 
     await this.storeResult(result, today);
 
-    console.log(
+    console.info(
       `[StatisticalValidationEngine] validateTopVsBottom: n=${n}, topMean=${mean1.toFixed(4)}, ` +
       `bottomMean=${mean2.toFixed(4)}, t=${tStat.toFixed(4)}, p=${pValue.toFixed(6)}, ` +
       `IR=${informationRatio.toFixed(4)}, significant=${isSignificant}`,

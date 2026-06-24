@@ -16,7 +16,7 @@ export class PerformanceObservability {
       timestamp: Date.now(),
     };
     this.metrics.push(metric);
-    console.log(`[PerformanceObservability] Logged ${metricName}: ${valueMs}ms`);
+    console.info(`[PerformanceObservability] Logged ${metricName}: ${valueMs}ms`);
   }
 
   public static getAverageLatency(metricName: string): number {

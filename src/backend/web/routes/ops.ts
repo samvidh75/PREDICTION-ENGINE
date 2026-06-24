@@ -451,7 +451,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
                 histRows++;
               }
             }
-            console.log(`Historical backfill for ${symbol}: ${result.data.length} rows via ${result.provider}` + (applyMode ? ' written' : ' would write'));
+            console.info(`Historical backfill for ${symbol}: ${result.data.length} rows via ${result.provider}` + (applyMode ? ' written' : ' would write'));
           } catch (err: any) {
             console.error(`Historical backfill failed for ${symbol}: ${err.message}`);
             failures.push(symbol);
@@ -642,7 +642,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           for (const symbol of symbols) {
             const snapshots = await featureEngine.calculateAndStoreFeatures(symbol);
             featureRows += snapshots.filter(s => s.rsi !== null && s.macd !== null).length;
-            console.log(`  ${symbol}: ${snapshots.length} feature snapshots`);
+            console.info(`  ${symbol}: ${snapshots.length} feature snapshots`);
           }
           rowsWritten["feature_snapshots"] = (rowsWritten["feature_snapshots"] ?? 0) + featureRows;
           results.features = { status: "success", rowsWritten: featureRows };
@@ -660,7 +660,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
           for (const symbol of symbols) {
             const snapshots = await factorEngine.calculateAndStoreFactors(symbol);
             factorRows += snapshots.length;
-            console.log(`  ${symbol}: ${snapshots.length} factor snapshots`);
+            console.info(`  ${symbol}: ${snapshots.length} factor snapshots`);
           }
           rowsWritten["factor_snapshots"] = (rowsWritten["factor_snapshots"] ?? 0) + factorRows;
           results.factors = { status: "success", rowsWritten: factorRows };

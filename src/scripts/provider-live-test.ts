@@ -31,7 +31,7 @@ function ensureReportsDir() {
 function writeReport(name: string, data: any) {
   const path = join(REPORTS_DIR, name);
   writeFileSync(path, JSON.stringify(data, null, 2), 'utf-8');
-  console.log(`Report written: ${path}`);
+  console.info(`Report written: ${path}`);
 }
 
 interface TestResult {

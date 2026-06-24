@@ -14,70 +14,70 @@ const DATA_DIR = process.env.PG_DATA_DIR ?? join(BASE_DIR, 'postgres-data');
 const PGSQL_DIR = process.env.PG_HOME ?? join(BIN_DIR, 'pgsql');
 
 async function setup() {
-  console.log('=== Setting up Portable PostgreSQL (Real Warehouse) ===');
+  console.info('=== Setting up Portable PostgreSQL (Real Warehouse) ===');
 
   // Step 1: Download binaries zip if not present
   if (!existsSync(ZIP_PATH) && !existsSync(PGSQL_DIR)) {
-    console.log(`Downloading PostgreSQL binaries from ${DOWNLOAD_URL}...`);
+    console.info(`Downloading PostgreSQL binaries from ${DOWNLOAD_URL}...`);
     const resp = await fetch(DOWNLOAD_URL);
     if (!resp.ok) {
       throw new Error(`Failed to download: ${resp.statusText}`);
     }
     const buffer = await resp.arrayBuffer();
     writeFileSync(ZIP_PATH, Buffer.from(buffer));
-    console.log('Download complete.');
+    console.info('Download complete.');
   } else {
-    console.log('PostgreSQL binaries zip already exists.');
+    console.info('PostgreSQL binaries zip already exists.');
   }
 
   // Step 2: Extract zip
   if (!existsSync(PGSQL_DIR)) {
-    console.log(`Extracting to ${BIN_DIR}...`);
+    console.info(`Extracting to ${BIN_DIR}...`);
     mkdirSync(BIN_DIR, { recursive: true });
     execSync(`tar -xf "${ZIP_PATH}" -C "${BIN_DIR}"`);
-    console.log('Extraction complete.');
+    console.info('Extraction complete.');
   } else {
-    console.log('PostgreSQL binaries already extracted.');
+    console.info('PostgreSQL binaries already extracted.');
   }
 
   // Step 3: Initialize data directory
   if (!existsSync(DATA_DIR)) {
-    console.log(`Initializing database in ${DATA_DIR}...`);
+    console.info(`Initializing database in ${DATA_DIR}...`);
     const initdbCmd = `"${join(PGSQL_DIR, 'bin', `initdb${PG_EXE_SUFFIX}`)}" -U postgres -A trust -D "${DATA_DIR}"`;
     execSync(initdbCmd, { stdio: 'inherit' });
-    console.log('Database initialization complete.');
+    console.info('Database initialization complete.');
   } else {
-    console.log('Database data directory already exists.');
+    console.info('Database data directory already exists.');
   }
 
   // Step 4: Start PostgreSQL
-  console.log('Starting PostgreSQL server on port 5432...');
+  console.info('Starting PostgreSQL server on port 5432...');
   try {
     const pgctlCmd = `"${join(PGSQL_DIR, 'bin', `pg_ctl${PG_EXE_SUFFIX}`)}" -D "${DATA_DIR}" -o "-p 5432" start`;
     execSync(pgctlCmd, { stdio: 'inherit' });
-    console.log('PostgreSQL started.');
+    console.info('PostgreSQL started.');
   } catch (err: any) {
-    console.log('Server startup command output:', err.message);
+    console.info('Server startup command output:', err.message);
   }
 
   // Wait for server to bind
   await new Promise((r) => setTimeout(r, 3000));
 
   // Step 5: Create database stockstory
-  console.log('Creating database "stockstory"...');
+  console.info('Creating database "stockstory"...');
   try {
     const createdbCmd = `"${join(PGSQL_DIR, 'bin', `createdb${PG_EXE_SUFFIX}`)}" -U postgres -p 5432 stockstory`;
     execSync(createdbCmd, { stdio: 'inherit' });
-    console.log('Database created.');
+    console.info('Database created.');
   } catch (err: any) {
     if (err.message.includes('already exists')) {
-      console.log('Database "stockstory" already exists.');
+      console.info('Database "stockstory" already exists.');
     } else {
       console.warn('createdb warning/error:', err.message);
     }
   }
 
-  console.log('=== Portable PostgreSQL Setup Complete! ===');
+  console.info('=== Portable PostgreSQL Setup Complete! ===');
 }
 
 setup().catch((err) => {

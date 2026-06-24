@@ -19,7 +19,7 @@ export async function runMigrations(force?: boolean): Promise<MigrationStatus> {
   const runner = new MigrationRunner(dbAdapter, migrationsDir);
 
   const status = await runner.status();
-  console.log(`[migrate] Applied: ${status.appliedCount}, Pending: ${status.pendingCount}`);
+  console.info(`[migrate] Applied: ${status.appliedCount}, Pending: ${status.pendingCount}`);
 
   if (status.checksumMismatch) {
     if (force) {
@@ -30,11 +30,11 @@ export async function runMigrations(force?: boolean): Promise<MigrationStatus> {
   }
 
   if (status.pendingCount === 0) {
-    console.log("[migrate] No pending migrations. Up to date.");
+    console.info("[migrate] No pending migrations. Up to date.");
     return status;
   }
 
-  console.log("[migrate] Running pending migrations...");
+  console.info("[migrate] Running pending migrations...");
   return runner.runPending(force);
 }
 
@@ -46,8 +46,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     try {
       const force = process.argv.includes("--force");
       const result = await runMigrations(force);
-      console.log("[migrate] Complete.");
-      console.log(`  Latest: ${result.latestAppliedId}, Applied: ${result.appliedCount}`);
+      console.info("[migrate] Complete.");
+      console.info(`  Latest: ${result.latestAppliedId}, Applied: ${result.appliedCount}`);
     } catch (err: unknown) {
       exitCode = 1;
       const msg = err instanceof Error ? err.message : String(err);

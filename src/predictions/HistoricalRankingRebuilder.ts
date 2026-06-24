@@ -35,7 +35,7 @@ export class HistoricalRankingRebuilder {
 
     // Generate month-end dates
     const monthEndDates = this.generateMonthEndDates(startDate, referenceDate);
-    console.log(`[HistoricalRankingRebuilder] Processing ${monthEndDates.length} month-end dates from ${startDate} to ${referenceDate}`);
+    console.info(`[HistoricalRankingRebuilder] Processing ${monthEndDates.length} month-end dates from ${startDate} to ${referenceDate}`);
 
     let totalPredictions = 0;
     const symbolsPerDate: number[] = [];
@@ -46,7 +46,7 @@ export class HistoricalRankingRebuilder {
       symbolsPerDate.push(rankings.length);
 
       if (rankings.length === 0) {
-        console.log(`  [${dateStr}] No ranking data available, skipping`);
+        console.info(`  [${dateStr}] No ranking data available, skipping`);
         continue;
       }
 
@@ -78,7 +78,7 @@ export class HistoricalRankingRebuilder {
       // Batch insert into prediction_registry via registry
       await predictionRegistry.createPredictionsBatch(inputs);
       totalPredictions += inputs.length;
-      console.log(`  [${dateStr}] Inserted ${inputs.length} predictions from ${rankings.length} symbols`);
+      console.info(`  [${dateStr}] Inserted ${inputs.length} predictions from ${rankings.length} symbols`);
     }
 
     return {

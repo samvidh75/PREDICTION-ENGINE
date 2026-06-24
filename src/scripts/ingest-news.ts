@@ -11,9 +11,9 @@
 import pool from "../db/index";
 
 async function main() {
-  console.log("=== News Ingestion (DEPRECATED — using runtime pipeline instead) ===");
-  console.log("Runtime news pipeline: DataAcquisitionCoordinator.fetchNews()");
-  console.log("No direct DB insertion needed — news is fetched at request time.");
+  console.info("=== News Ingestion (DEPRECATED — using runtime pipeline instead) ===");
+  console.info("Runtime news pipeline: DataAcquisitionCoordinator.fetchNews()");
+  console.info("No direct DB insertion needed — news is fetched at request time.");
   await pool.end();
 }
 

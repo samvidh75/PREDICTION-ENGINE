@@ -17,12 +17,12 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
     await dbAdapter.initialize();
     const runner = new MigrationRunner(dbAdapter, migrationsDir);
     const status = await runner.status();
-    console.log(`[migrate] Applied: ${status.appliedCount}, Pending: ${status.pendingCount}`);
+    console.info(`[migrate] Applied: ${status.appliedCount}, Pending: ${status.pendingCount}`);
     if (status.checksumMismatch) {
       if (forceMigrations) {
         const runnerForApply = new MigrationRunner(dbAdapter, migrationsDir);
         const result = await runnerForApply.runPending(true);
-        console.log(`[migrate] Complete. Pending applied: ${result.appliedCount - status.appliedCount}`);
+        console.info(`[migrate] Complete. Pending applied: ${result.appliedCount - status.appliedCount}`);
         return result;
       } else {
         console.warn("[migrate] Checksum mismatch detected. Set FORCE_MIGRATIONS=true to bypass.");
@@ -30,10 +30,10 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
     } else if (status.pendingCount > 0) {
       const runnerForApply = new MigrationRunner(dbAdapter, migrationsDir);
       const result = await runnerForApply.runPending();
-      console.log(`[migrate] Complete. Pending applied: ${result.appliedCount - status.appliedCount}`);
+      console.info(`[migrate] Complete. Pending applied: ${result.appliedCount - status.appliedCount}`);
       return result;
     } else {
-      console.log("[migrate] No pending migrations. Up to date.");
+      console.info("[migrate] No pending migrations. Up to date.");
       return status;
     }
   } catch (migrateErr: unknown) {
@@ -45,7 +45,7 @@ async function runStartupMigrations(): Promise<MigrationStatus | null> {
 }
 
 async function runLineageBackfill(isApply: boolean, limitNum: number, symbolList: string[] | null): Promise<void> {
-  console.log(`[maintenance] Running lineage backfill (${isApply ? "APPLY" : "DRY RUN"}) limit=${limitNum}`);
+  console.info(`[maintenance] Running lineage backfill (${isApply ? "APPLY" : "DRY RUN"}) limit=${limitNum}`);
   for (const table of ["feature_snapshots", "factor_snapshots"]) {
     let sql = `SELECT fs.symbol, fs.trade_date FROM ${table} fs WHERE fs.source_provider IS NULL`;
     const params: any[] = [];
@@ -56,7 +56,7 @@ async function runLineageBackfill(isApply: boolean, limitNum: number, symbolList
     sql += ` ORDER BY fs.trade_date DESC LIMIT $${params.length + 1}`;
     params.push(limitNum);
     const res = await query(sql, params); const rows = res.rows || [];
-    console.log(`[maintenance] ${table}: scanned ${rows.length} rows`);
+    console.info(`[maintenance] ${table}: scanned ${rows.length} rows`);
 
     let matched = 0, applied = 0, skipped = 0;
     for (const row of rows) {
@@ -84,14 +84,14 @@ async function runLineageBackfill(isApply: boolean, limitNum: number, symbolList
         }
       }
     }
-    console.log(`[maintenance] ${table}: matched=${matched} applied=${applied} skipped=${skipped}`);
+    console.info(`[maintenance] ${table}: matched=${matched} applied=${applied} skipped=${skipped}`);
   }
 }
 
 async function runFundamentalsMetadata(isApply: boolean, limitNum: number, srcLabel: string): Promise<void> {
   const countRes = await query(`SELECT COUNT(*) as cnt FROM financial_snapshots WHERE source_label IS NULL OR source_label=''`);
   const totalMissing = Number(countRes.rows?.[0]?.cnt || 0);
-  console.log(`[maintenance] Fundamentals metadata: ${totalMissing} rows missing source_label (${isApply ? "APPLY" : "DRY RUN"})`);
+  console.info(`[maintenance] Fundamentals metadata: ${totalMissing} rows missing source_label (${isApply ? "APPLY" : "DRY RUN"})`);
 
   if (isApply) {
     if (!srcLabel) { console.error("[maintenance] FUNDAMENTALS-METADATA APPLY REQUIRES --source-label"); return; }
@@ -100,14 +100,14 @@ async function runFundamentalsMetadata(isApply: boolean, limitNum: number, srcLa
        WHERE symbol IN (SELECT symbol FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $2)`,
       [srcLabel, limitNum]
     );
-    console.log(`[maintenance] Updated ${upRes.rowCount || 0} rows with source_label='${srcLabel}'`);
+    console.info(`[maintenance] Updated ${upRes.rowCount || 0} rows with source_label='${srcLabel}'`);
   } else {
     if (totalMissing > 0) {
       const symRes = await query(
         `SELECT DISTINCT symbol FROM financial_snapshots WHERE (source_label IS NULL OR source_label='') LIMIT $1`, [limitNum]
       );
       const symbols = (symRes.rows || []).map((r: any) => r.symbol);
-      console.log(`[maintenance] Sample symbols missing source: ${symbols.join(", ")}`);
+      console.info(`[maintenance] Sample symbols missing source: ${symbols.join(", ")}`);
     }
   }
 }
@@ -123,14 +123,14 @@ async function runCoverageDiagnostics(): Promise<void> {
   const predRes = await query(`SELECT COUNT(*) as cnt FROM prediction_input_lineage`);
   const predRows = Number(predRes.rows?.[0]?.cnt || 0);
 
-  console.log(`\n[maintenance] === Coverage Diagnostics ===`);
-  console.log(`  Total symbols: ${total}`);
-  console.log(`  Fundamentals symbols: ${fsSymbols}`);
-  console.log(`  Fundamentals rows: ${fsRows}`);
-  console.log(`  Fundamentals with source_label: ${withSource}`);
-  console.log(`  Prediction input lineage rows: ${predRows}`);
-  console.log(`  Feature/factor lineage: pending backfill`);
-  console.log(`  Known gaps: 3 no-quote, 3 no-history, 1 not-on-leaderboard`);
+  console.info(`\n[maintenance] === Coverage Diagnostics ===`);
+  console.info(`  Total symbols: ${total}`);
+  console.info(`  Fundamentals symbols: ${fsSymbols}`);
+  console.info(`  Fundamentals rows: ${fsRows}`);
+  console.info(`  Fundamentals with source_label: ${withSource}`);
+  console.info(`  Prediction input lineage rows: ${predRows}`);
+  console.info(`  Feature/factor lineage: pending backfill`);
+  console.info(`  Known gaps: 3 no-quote, 3 no-history, 1 not-on-leaderboard`);
 }
 
 async function runStartupMaintenanceJob(): Promise<void> {
@@ -143,10 +143,10 @@ async function runStartupMaintenanceJob(): Promise<void> {
   const srcLabel = process.env.RUN_MAINTENANCE_SOURCE_LABEL || "";
   const exitAfterRun = process.env.MAINTENANCE_EXIT_AFTER_RUN === "true";
 
-  console.log("[maintenance] ═══════════════════════════════════════════");
-  console.log(`[maintenance] Running production maintenance job: ${jobName}`);
-  console.log(`[maintenance] REMOVE ENV VAR RUN_MAINTENANCE_JOB AFTER SUCCESS`);
-  console.log("[maintenance] ═══════════════════════════════════════════");
+  console.info("[maintenance] ═══════════════════════════════════════════");
+  console.info(`[maintenance] Running production maintenance job: ${jobName}`);
+  console.info(`[maintenance] REMOVE ENV VAR RUN_MAINTENANCE_JOB AFTER SUCCESS`);
+  console.info("[maintenance] ═══════════════════════════════════════════");
 
   try {
     await dbAdapter.initialize();
@@ -178,7 +178,7 @@ async function runStartupMaintenanceJob(): Promise<void> {
   }
 
   if (exitAfterRun) {
-    console.log("[maintenance] MAINTENANCE_EXIT_AFTER_RUN=true — exiting.");
+    console.info("[maintenance] MAINTENANCE_EXIT_AFTER_RUN=true — exiting.");
     process.exit(0);
   }
 }
@@ -198,19 +198,19 @@ async function main(): Promise<void> {
   const watchdog = new AppHealthWatchdog({
     checkIntervalMs: 30_000,
     onStatusChange: (prev, curr) => {
-      console.log(`[watchdog] status: ${prev} → ${curr}`);
+      console.info(`[watchdog] status: ${prev} → ${curr}`);
     },
   });
   app.decorate("watchdog", watchdog);
 
   await app.listen({ port, host });
-  console.log(`[backend] fastify listening on http://${host}:${port}`);
+  console.info(`[backend] fastify listening on http://${host}:${port}`);
 
   const fbStatus = getFirebaseAdminStatus();
   if (fbStatus !== 'initialized') {
     console.warn(`[backend] Firebase Admin status: ${fbStatus}`);
   } else {
-    console.log('[backend] Firebase Admin initialized');
+    console.info('[backend] Firebase Admin initialized');
   }
 
   watchdog.start();

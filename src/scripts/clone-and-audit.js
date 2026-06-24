@@ -33,7 +33,7 @@ const auditResults = {};
 
 for (const repo of REPOS) {
   const name = repo.split('/').pop().replace('.git', '');
-  console.log(`Cloning and Auditing: ${name}...`);
+  console.info(`Cloning and Auditing: ${name}...`);
   const targetPath = join(TEMP_DIR, name);
 
   try {
@@ -44,7 +44,7 @@ for (const repo of REPOS) {
 
     // Attempt shallow clone
     execSync(`git clone --depth 1 "${repo}" "${targetPath}"`, { stdio: 'ignore' });
-    console.log(`  ✓ Cloned successfully.`);
+    console.info(`  ✓ Cloned successfully.`);
 
     // Find LICENSE or LICENSE.txt
     let license = 'Unknown';
@@ -114,4 +114,4 @@ for (const repo of REPOS) {
 // Write findings to a JSON file
 const reportPath = join(process.cwd(), 'reports', 'TEMP_AUDIT_DATA.json');
 writeFileSync(reportPath, JSON.stringify(auditResults, null, 2), 'utf8');
-console.log(`\nAudit finished! Data written to: ${reportPath}`);
+console.info(`\nAudit finished! Data written to: ${reportPath}`);
