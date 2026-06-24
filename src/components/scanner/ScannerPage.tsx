@@ -350,28 +350,25 @@ export default function ScannerPage() {
       <ProductPage>
         <div className="flex flex-col gap-6">
           {/* Hero */}
-          <div className="relative overflow-hidden rounded-[28px] border border-blue-100/80 bg-[linear-gradient(125deg,rgba(255,255,255,.98),rgba(239,246,255,.88)_58%,rgba(245,243,255,.82))] px-5 py-7 shadow-[0_24px_65px_rgba(30,64,175,.10)] sm:px-7 sm:py-8">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-400/14 blur-3xl" />
-            <div className="relative">
-              <h1 className="text-[32px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[40px]">Stock Scanner — Indian Equities</h1>
-              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Ranked by StockStory engine score · Updated daily</p>
-            </div>
+          <div className="px-0 pb-2 pt-8">
+            <h1 className="text-[26px] font-bold leading-tight tracking-[-0.5px] text-[var(--c-ink)]">Stock Scanner — Indian Equities</h1>
+            <p className="mt-1 max-w-2xl text-[14px] text-[var(--c-ink-muted)]">Ranked by StockStory engine score · Updated daily</p>
           </div>
 
           <SebiDisclaimer variant="banner" />
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Classification filter">
-            {["All", "Excellent", "Healthy", "Stable", "Weakening"].map((item) => <button key={item} type="button" role="tab" aria-selected={classificationFilter === item} onClick={() => setClassificationFilter(item)} className={`rounded-full px-4 py-2 text-xs font-bold ${classificationFilter === item ? "bg-slate-950 text-white" : "border border-slate-200 bg-white text-slate-600"}`}>{item}</button>)}
+          <div className="flex flex-wrap border-b border-[var(--c-border)]" role="tablist" aria-label="Classification filter">
+            {["All", "Excellent", "Healthy", "Stable", "Weakening"].map((item) => <button key={item} type="button" role="tab" aria-selected={classificationFilter === item} onClick={() => setClassificationFilter(item)} className={`border-b-2 px-4 py-2.5 text-[13px] ${classificationFilter === item ? "border-[var(--c-brand)] font-semibold text-[var(--c-ink)]" : "border-transparent font-medium text-[var(--c-ink-muted)] hover:text-[var(--c-ink-secondary)]"}`}>{item}</button>)}
           </div>
 
           {/* Natural-language search */}
-          <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 shadow-[0_14px_34px_rgba(15,23,42,.07)] focus-within:border-blue-300 focus-within:shadow-[0_16px_38px_rgba(41,98,255,.12)]">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600"><Search className="h-4 w-4" /></span>
+          <div className="flex h-11 items-center gap-3 rounded-[var(--r-lg)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-3 focus-within:border-[var(--c-border-strong)]">
+            <Search className="h-4 w-4 shrink-0 text-[var(--c-ink-muted)]" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Try: low-debt large caps with improving profitability"
-              className="h-10 w-full min-w-0 bg-transparent text-[15px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+              className="h-full w-full min-w-0 bg-transparent text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-ink-disabled)]"
               aria-label="Search companies by name, symbol, or sector"
             />
             {query && (
@@ -387,7 +384,7 @@ export default function ScannerPage() {
             <button
               type="button"
               onClick={handleQuerySubmit}
-              className="shrink-0 rounded-xl bg-[#2962FF] px-5 py-3 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(41,98,255,.24)] hover:bg-[#3B71FF] transition"
+              className="h-9 shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-[18px] text-[13px] font-semibold text-white"
             >
               Run scanner
             </button>
@@ -400,7 +397,7 @@ export default function ScannerPage() {
             return (
               <section key={section.id} aria-labelledby={`section-${section.id}`}>
                 <div className="mb-3">
-                  <h2 id={`section-${section.id}`} className="text-sm font-bold uppercase tracking-[.12em] text-[var(--color-text-muted)]">{section.label}</h2>
+                  <h2 id={`section-${section.id}`} className="text-[10px] font-semibold uppercase tracking-[.08em] text-[var(--c-ink-muted)]">{section.label}</h2>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
                   {cats.map((cat) => {
@@ -412,16 +409,16 @@ export default function ScannerPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => handleCategoryClick(cat.id, cat.free)}
-                        className={`group flex min-h-[80px] items-start gap-3 rounded-2xl border p-3 text-left text-xs font-semibold transition duration-200 ${
+                        className={`group flex min-h-[72px] items-start gap-3 rounded-[var(--r-lg)] border bg-white px-[18px] py-[14px] text-left text-[13px] font-semibold text-[var(--c-ink)] transition-colors ${
                           active
-                            ? "-translate-y-0.5 border-[#2962FF] bg-[linear-gradient(145deg,#fff,#eef4ff)] text-[#1D4ED8] shadow-[0_12px_28px_rgba(41,98,255,.13)]"
+                            ? "border-[var(--c-border-strong)]"
                             : isLocked
-                              ? "border-dashed border-[var(--color-border)] bg-white/60 text-[var(--color-text-muted)]"
-                              : "border-[var(--color-border)] bg-white text-[var(--color-text-secondary)] shadow-sm hover:-translate-y-0.5 hover:border-blue-200 hover:text-[var(--color-text-primary)] hover:shadow-md"
+                              ? "border-dashed border-[var(--c-border)] text-[var(--c-ink-muted)]"
+                              : "border-[var(--c-border)] hover:border-[var(--c-border-strong)]"
                         }`}
                         title={cat.description}
                       >
-                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${active ? "bg-blue-100 text-blue-600" : isLocked ? "bg-slate-50/60 text-slate-400" : "bg-slate-50 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600"}`}>
+                        <span className="grid h-5 w-5 shrink-0 place-items-center text-[var(--c-ink-muted)]">
                           {isLocked ? (
                             <Lock className="h-3.5 w-3.5" aria-hidden="true" />
                           ) : (
@@ -439,7 +436,7 @@ export default function ScannerPage() {
 
           {/* Upgrade prompt for non-premium users */}
           {!isPremium && (
-            <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-gradient-to-br from-blue-50/50 to-white p-5">
+            <div className="rounded-[var(--r-lg)] border border-dashed border-[var(--c-border)] bg-white p-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Unlock deeper scanner views with Investor</h3>
@@ -448,7 +445,7 @@ export default function ScannerPage() {
                 <button
                   type="button"
                   onClick={() => productNavigate("pricing")}
-                  className="shrink-0 rounded-xl bg-[#2962FF] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_8px_20px_rgba(41,98,255,.24)] hover:bg-[#3B71FF] transition"
+                  className="shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-5 py-2.5 text-xs font-semibold text-white"
                 >
                   View plans
                 </button>

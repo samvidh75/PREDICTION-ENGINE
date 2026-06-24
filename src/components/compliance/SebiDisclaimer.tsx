@@ -44,14 +44,14 @@ export function SebiDisclaimer({ variant = "footer", className = "" }: SebiDiscl
   if (variant === "banner") {
     if (!visible) return null;
     return (
-      <div className="w-full bg-[#FFFBEB] border-b border-[#FDE68A] px-4 py-2.5 flex items-start gap-3">
-        <p className="flex-1 text-[11px] leading-5 text-[#78350F]">
+      <div className="flex w-full items-start gap-3 border-l-[3px] border-[#D97706] bg-[#FFFBEB] px-4 py-3">
+        <p className="flex-1 text-[12px] leading-[1.6] text-[var(--c-ink-secondary)]">
           <strong className="font-semibold">SEBI Disclaimer:</strong>{" "}
           {DISCLAIMER_TEXT}
         </p>
         <button
           onClick={() => { dismissBanner(); setVisible(false); }}
-          className="mt-0.5 shrink-0 text-[#92400E] hover:text-[#78350F] transition-colors"
+          className="mt-0.5 shrink-0 text-[var(--c-ink-muted)] transition-colors hover:text-[var(--c-ink)]"
           aria-label="Dismiss disclaimer"
         >
           <X className="h-4 w-4" />
