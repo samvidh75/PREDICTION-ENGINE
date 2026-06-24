@@ -14,31 +14,31 @@
   </url>
 
   <url>
-    <loc>https://stockstory-india.com/?page=stock&id=TCS</loc>
+    <loc>https://stockstory-india.com/?page=stock&amp;id=TCS</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-india.com/?page=stock&id=HDFCBANK</loc>
+    <loc>https://stockstory-india.com/?page=stock&amp;id=HDFCBANK</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-india.com/?page=stock&id=RELIANCE</loc>
+    <loc>https://stockstory-india.com/?page=stock&amp;id=RELIANCE</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-india.com/?page=stock&id=INFY</loc>
+    <loc>https://stockstory-india.com/?page=stock&amp;id=INFY</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-india.com/?page=stock&id=ICICIBANK</loc>
+    <loc>https://stockstory-india.com/?page=stock&amp;id=ICICIBANK</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
