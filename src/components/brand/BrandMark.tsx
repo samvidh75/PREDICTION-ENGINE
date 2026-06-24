@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 interface BrandMarkProps {
   size?: number;
@@ -6,54 +6,40 @@ interface BrandMarkProps {
   animated?: boolean;
 }
 
-function colors(tone: "light" | "dark" | "auto", isDark: boolean) {
-  const d = tone === "dark" || (tone === "auto" && isDark);
-  return {
-    surface: d ? "#0D1117" : "#FFFFFF",
-    stroke: d ? "#7CE0C3" : "#10A37F",
-    accent: d ? "#10A37F" : "#087A61",
-    signal: d ? "#DDF7EF" : "#10A37F",
-    muted: d ? "#30363D" : "#E2E8F0",
-  };
-}
-
 export default function BrandMark({ size = 28, tone = "auto", animated = false }: BrandMarkProps): JSX.Element {
-  const isDark = tone === "dark" || (tone === "auto" && typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
-  const c = colors(tone, isDark);
+  const gradientId = useId().replace(/:/g, "");
+  const darkSurface = tone === "dark";
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 28 28"
+      viewBox="0 0 64 64"
       fill="none"
       aria-hidden="true"
-      role="img"
+      focusable="false"
+      className="overflow-visible"
     >
       <defs>
-        <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={c.surface} />
-          <stop offset="100%" stopColor={c.surface} stopOpacity="0.95" />
+        <linearGradient id={gradientId} x1="12" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+          <stop stopColor={darkSurface ? "#234B7A" : "#F2F8FF"} />
+          <stop offset="1" stopColor={darkSurface ? "#18365E" : "#E4F0FF"} />
         </linearGradient>
       </defs>
-      <rect x="0.5" y="0.5" width="27" height="27" rx="7" fill="url(#bg-grad)" stroke={c.muted} strokeWidth="1" />
+      <circle cx="32" cy="32" r="30" fill={`url(#${gradientId})`} />
+      <g className={animated ? "origin-bottom animate-[brand-rise_.7s_ease-out_both]" : undefined}>
+        <rect x="14" y="41" width="9" height="12" rx="2.5" fill="#8FB2F3" />
+        <rect x="27.5" y="33" width="9" height="20" rx="2.5" fill="#5E8DE6" />
+        <rect x="41" y="23" width="9" height="30" rx="2.5" fill="#2459D9" />
+      </g>
       <path
-        d="M8 17 C8 13 12 11 14 15 C16 19 20 17 20 13"
-        stroke={c.stroke}
-        strokeWidth="2.2"
+        d="M43.5 11.5C50.8 16.2 55.5 23.3 57.6 31.9"
+        stroke="#19C89A"
+        strokeWidth="4.6"
         strokeLinecap="round"
-        fill="none"
-        className={animated ? "animate-pulse" : ""}
+        className={animated ? "animate-[brand-draw_.9s_.2s_ease-out_both]" : undefined}
+        pathLength="1"
       />
-      <path
-        d="M8 11 C8 15 12 17 14 13 C16 9 20 11 20 15"
-        stroke={c.accent}
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.6"
-      />
-      <circle cx="20" cy="13" r="1.8" fill={c.signal} />
     </svg>
   );
 }

@@ -4,8 +4,7 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_INDIANAPI_KEY": "@indianapi-key",
-    "VITE_UPSTOX_TOKEN": "@upstox-token"
+    "VITE_SCREENER_ENABLED": "true"
   },
   "headers": [
     {

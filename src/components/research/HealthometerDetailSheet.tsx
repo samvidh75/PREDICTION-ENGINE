@@ -1,6 +1,11 @@
 import React from "react";
 import { X } from "lucide-react";
-import type { HealthometerDimension } from "./HealthometerPanel";
+
+export interface HealthometerDimension {
+  id: string;
+  label: string;
+  score: number | null;
+}
 
 interface HealthometerDetailSheetProps {
   open: boolean;

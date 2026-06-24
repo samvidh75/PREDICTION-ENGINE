@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Activity, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ProfileButton } from './ProfileButton';
 import { NavLink } from './NavLink';
+import StockStoryLogo from '../brand/StockStoryLogo';
 
 export const TopNav: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedIndices, setExpandedIndices] = useState(false);
 
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -41,7 +43,7 @@ export const TopNav: React.FC = () => {
           href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
           className="shrink-0 border-none bg-transparent p-0"
         >
-          <span className="flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong>StockStory</strong><small className="rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-700">INDIA</small></span>
+          <StockStoryLogo variant="lockup" size="sm" animated />
         </NavLink>
 
         {isAuthenticated && user ? (
@@ -72,7 +74,7 @@ export const TopNav: React.FC = () => {
             href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
             className="cursor-pointer border-none bg-transparent p-0"
           >
-            <span className="flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong className="text-base text-slate-950">StockStory</strong><small className="rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-700">INDIA</small></span>
+            <StockStoryLogo variant="lockup" size="sm" animated />
           </NavLink>
         </div>
 
@@ -164,7 +166,20 @@ export const TopNav: React.FC = () => {
       </nav>
       <div className="fixed left-0 right-0 top-14 z-40 flex h-9 items-center overflow-hidden border-b border-slate-200 bg-white px-3 text-[10px] shadow-sm md:top-[60px] lg:px-8">
         <span className="mr-5 flex shrink-0 items-center gap-1.5 font-bold text-slate-600"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />NSE · Live</span>
-        <div className="flex min-w-max flex-1 items-center justify-around gap-8">{[["Nifty 50", "+0.62%"], ["Sensex", "+0.58%"], ["Nifty Bank", "+0.41%"], ["Nifty IT", "−0.18%"]].map(([name, change]) => <span key={name} className="font-semibold text-slate-600">{name} <b className={change.startsWith("+") ? "text-emerald-600" : "text-red-600"}>{change}</b></span>)}</div>
+        <div className="flex min-w-max flex-1 items-center justify-around gap-8">
+          {([["Nifty 50", "+0.62%"], ["Sensex", "+0.58%"], ["Nifty Bank", "+0.41%"], ["Nifty IT", "−0.18%"]] as const).map(([name, change], i) => (
+            <span key={name} className={`font-semibold text-slate-600 ${i >= 2 && !expandedIndices ? "max-[479px]:hidden" : ""}`}>
+              {name} <b className={change.startsWith("+") ? "text-emerald-600" : "text-red-600"}>{change}</b>
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={() => setExpandedIndices(true)}
+            className={`hidden max-[479px]:block text-xs text-blue-600 font-semibold whitespace-nowrap ${expandedIndices ? "hidden" : ""}`}
+          >
+            +{2} more
+          </button>
+        </div>
       </div>
     </>
   );

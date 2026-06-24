@@ -15,7 +15,7 @@ interface StockStoryLogoProps {
   className?: string;
 }
 
-export const MARK_SIZES: Record<LogoSize, number> = { sm: 20, md: 28, lg: 36, hero: 52 };
+export const MARK_SIZES: Record<LogoSize, number> = { sm: 24, md: 32, lg: 42, hero: 64 };
 export const WORDMARK_SIZES: Record<LogoSize, "sm" | "md" | "lg"> = { sm: "sm", md: "md", lg: "lg", hero: "lg" };
 
 export default function StockStoryLogo({
@@ -39,7 +39,7 @@ export default function StockStoryLogo({
   }
 
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
+      <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <BrandMark size={MARK_SIZES[size]} tone={tone} animated={animated} />
       <BrandWordmark tone={tone} size={WORDMARK_SIZES[size]} showIndia={showIndia} />
     </span>

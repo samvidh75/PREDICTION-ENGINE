@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigationMotion } from "../../hooks/useNavigationMotion";
+import logo from "../../assets/logo.svg";
 
 const NAV_ITEMS = [
   { label: "Dashboard", page: "dashboard" },
@@ -34,9 +35,20 @@ export const Navbar: React.FC = () => {
         <button
           type="button"
           onClick={() => setPage("dashboard")}
-          className="border-none bg-transparent p-0 text-left text-lg font-semibold tracking-wide text-white"
+          className="border-none bg-transparent p-0 text-left"
+          aria-label="StockStory India home"
         >
-          StockStory India
+          <img src={logo} alt="" width={32} height={32} aria-hidden="true" />
+          <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.3px' }}>
+            StockStory
+          </span>
+          <span style={{
+            fontSize: 9, fontWeight: 600, color: '#1A56DB',
+            background: '#EBF5FF', padding: '2px 5px', borderRadius: 4,
+            letterSpacing: '1.5px', marginLeft: 4
+          }}>
+            INDIA
+          </span>
         </button>
 
         <nav className="hidden items-center space-x-2 md:flex">

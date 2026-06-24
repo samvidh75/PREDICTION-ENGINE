@@ -1,262 +1,284 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, Check, ShoppingBag, Sparkles, ArrowUpRight, ShieldCheck, TrendingUp, BarChart3, Scale, Activity, History } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { ArrowLeft, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Star, BarChart3, Shield, Activity, Bookmark } from "lucide-react";
+import { useStockData } from "../hooks/useStockData";
+import { productNavigate } from "../components/product/ProductUI";
+import { fPrice, fChange, fScore } from "../lib/format";
 import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
-import { addRecentResearch } from "../lib/recent/recentResearchStore";
-import { ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
-import { InvestHandoffSheet } from "../components/invest/InvestHandoffSheet";
-import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
-import { fetchUnifiedResearch, type UnifiedResearchResult } from "../lib/product/companyResearchClient";
-import { buildCompanyResearch } from "../lib/product/companyResearchRuntime";
-import { getCompanyIdentity, normalizeSymbol } from "../lib/product/identity";
-import { healthometerLabelFromScore } from "../lib/product/publicLabels";
-import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { api, type NewsItemResponse } from "../services/api/client";
-import { getStaleSnapshot, setCachedSnapshot } from "../lib/product/stockPageSnapshotCache";
-import { resolveCanonicalResearchState } from "../backend/services/research/CanonicalResearchStateResolver";
-import type { EngineResearchSnapshot } from "../shared/research/CanonicalResearchStateTypes";
-import type { StockPageSnapshot } from "../shared/research/StockPageSnapshotTypes";
-import HistoricalPriceChart from "../components/market/HistoricalPriceChart";
-import HealthometerPanel from "../components/research/HealthometerPanel";
-import FinancialHistogram from "../components/research/FinancialHistogram";
-import StockNewsPanel from "../components/research/StockNewsPanel";
-import ResearchChecklistPanel from "../components/research/ResearchChecklistPanel";
-import TechnicalIntelligencePanel from "../components/research/TechnicalIntelligencePanel";
-import OwnershipIntelligencePanel from "../components/research/OwnershipIntelligencePanel";
-import CorporateEventsTimeline from "../components/research/CorporateEventsTimeline";
-import { TrendlyneWidget } from "../components/external/TrendlyneWidget";
-import ScoreRing, { scoreColor } from "../components/ui/ScoreRing";
-import ClassificationBadge from "../components/ui/ClassificationBadge";
-import SebiDisclaimer from "../components/compliance/SebiDisclaimer";
-import type { UnifiedClassification } from "../prediction-engine/types";
+import type { PipelineResult } from "../services/data/CompanyDataPipeline";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 
-function tickerFromUrl(): string {
-  const p = new URLSearchParams(window.location.search);
-  return normalizeSymbol(p.get("id") ?? p.get("symbol") ?? p.get("ticker") ?? "");
+const FACTOR_GROUPS = ["quality", "valuation", "growth", "stability", "momentum", "risk"] as const;
+const FACTOR_LABELS: Record<string, string> = { quality: "Quality", valuation: "Valuation", growth: "Growth", stability: "Stability", momentum: "Momentum", risk: "Safety" };
+const FACTOR_ICONS: Record<string, React.ReactNode> = { quality: <Star className="h-4 w-4" />, valuation: <BarChart3 className="h-4 w-4" />, growth: <TrendingUp className="h-4 w-4" />, stability: <Shield className="h-4 w-4" />, momentum: <Activity className="h-4 w-4" />, risk: <AlertCircle className="h-4 w-4" /> };
+
+function scoreColor(v: number | null): string {
+  if (v === null) return "#9CA3AF";
+  if (v >= 75) return "#057A55";
+  if (v >= 55) return "#1A56DB";
+  if (v >= 35) return "#92400E";
+  return "#C81E1E";
 }
 
-const FactorBar = React.memo(function FactorBar({ label, score }: { label: string; score: number | null }): JSX.Element {
-  return <div className="min-w-[120px] flex-1"><div className="mb-1.5 flex justify-between text-[11px] font-semibold text-slate-600"><span>{label}</span><span>{score === null ? "—" : Math.round(score)}</span></div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full transition-all duration-700" style={{ width: `${score ?? 0}%`, backgroundColor: scoreColor(score) }} /></div></div>;
-});
+function classificationLabel(cls: string): string {
+  const map: Record<string, string> = { EXCELLENT: "Excellent", HEALTHY: "Healthy", STABLE: "Stable", WEAKENING: "Weakening", AT_RISK: "At Risk", INSUFFICIENT_DATA: "Insufficient Data" };
+  return map[cls] ?? cls;
+}
+
+function classificationColor(cls: string): string {
+  const map: Record<string, string> = { EXCELLENT: "#057A55", HEALTHY: "#057A55", STABLE: "#1A56DB", WEAKENING: "#92400E", AT_RISK: "#C81E1E" };
+  return map[cls] ?? "#9CA3AF";
+}
+
+function getFactorSummary(group: string, score: number | null, missingFeatures: string[]): string {
+  if (score === null) return "Insufficient data to score this factor.";
+  if (missingFeatures.length > 0) return `Partial data: ${missingFeatures.join(", ")} unavailable.`;
+  const level = score >= 75 ? "strong" : score >= 55 ? "moderate" : score >= 35 ? "weak" : "very weak";
+  const map: Record<string, string> = {
+    quality: `Business quality is ${level}. Higher ROE, ROA, and ROIC indicate more efficient capital use.`,
+    valuation: `Valuation appears ${level} relative to earnings and assets. Lower PE and PB are more attractive.`,
+    growth: `Revenue and earnings growth is ${level}. Consistent growth above 15% YoY is the target benchmark.`,
+    stability: `Financial stability is ${level}. Low debt, strong liquidity, and healthy margins contribute positively.`,
+    momentum: `Technical momentum is ${level}. RSI, MACD, and price trend relative to moving averages drive this score.`,
+    risk: `Safety profile is ${level} (higher = safer). Low beta and conservative leverage reduce risk.`,
+  };
+  return map[group] ?? `Score: ${score}/100`;
+}
+
+function driverValues(group: string, p: PipelineResult): { label: string; value: string }[] {
+  const f = p.fundamentals;
+  const t = p.technicals;
+  const drivers: Record<string, { label: string; value: string }[]> = {
+    quality: [{ label: "ROE", value: f.roe !== null ? `${f.roe.toFixed(1)}%` : "—" }, { label: "ROA", value: f.roa !== null ? `${f.roa.toFixed(1)}%` : "—" }, { label: "ROIC", value: f.roic !== null ? `${f.roic.toFixed(1)}%` : "—" }],
+    valuation: [{ label: "P/E", value: f.peRatio !== null ? f.peRatio.toFixed(1) : "—" }, { label: "P/B", value: f.pbRatio !== null ? f.pbRatio.toFixed(1) : "—" }, { label: "EV/EBITDA", value: f.evEbitda !== null ? `${f.evEbitda.toFixed(1)}x` : "—" }],
+    growth: [{ label: "Rev Growth", value: f.revenueGrowth !== null ? `${f.revenueGrowth.toFixed(1)}%` : "—" }, { label: "EPS Growth", value: f.epsGrowth !== null ? `${f.epsGrowth.toFixed(1)}%` : "—" }, { label: "Profit Growth", value: f.profitGrowth !== null ? `${f.profitGrowth.toFixed(1)}%` : "—" }],
+    stability: [{ label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "Current Ratio", value: f.currentRatio !== null ? f.currentRatio.toFixed(2) : "—" }, { label: "Op. Margin", value: f.operatingMargin !== null ? `${f.operatingMargin.toFixed(1)}%` : "—" }],
+    momentum: [{ label: "RSI (14)", value: t.rsi14 !== null ? t.rsi14.toFixed(1) : "—" }, { label: "MACD", value: t.macd !== null ? t.macd.toFixed(2) : "—" }, { label: "SMA50", value: t.movingAverageDistance50 !== null ? `${(t.movingAverageDistance50 * 100).toFixed(1)}%` : "—" }],
+    risk: [{ label: "Beta", value: f.beta !== null ? f.beta.toFixed(2) : "—" }, { label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "ATR", value: t.atr14 !== null ? t.atr14.toFixed(2) : "—" }],
+  };
+  return drivers[group] ?? [];
+}
+
+function ScoreRing({ score, size = 80 }: { score: number | null; size?: number }) {
+  const r = (size - 12) / 2;
+  const circ = 2 * Math.PI * r;
+  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
+  const color = scoreColor(score);
+  const grade = score !== null ? (score >= 80 ? "A" : score >= 65 ? "B" : score >= 50 ? "C" : score >= 35 ? "D" : "F") : "—";
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={score !== null ? `Score: ${Math.round(score)}` : "Score unavailable"}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F3F4F6" strokeWidth={8} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8} strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)} strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset 0.6s ease" }} />
+      <text x="50%" y="48%" textAnchor="middle" dy="0" fontSize={size < 56 ? 14 : 24} fontWeight="600" fill="#111827" fontFamily="system-ui">
+        {score !== null ? Math.round(score) : "—"}
+      </text>
+      <text x="50%" y={size / 2 + (size < 56 ? 10 : 16)} textAnchor="middle" fontSize={size < 56 ? 8 : 12} fontWeight="500" fill="#9CA3AF" fontFamily="system-ui">
+        {grade}
+      </text>
+    </svg>
+  );
+}
 
 export default function StockStoryPageF0(): JSX.Element {
-  const ticker = tickerFromUrl();
-  const identity = getCompanyIdentity(ticker, null, null);
-  const quote = useLiveQuote(ticker);
-  const [investOpen, setInvestOpen] = useState(() => new URLSearchParams(window.location.search).get("page") === "invest");
-  const [watchlists] = useState(() => WatchlistEngine.getWatchlists());
-  const tracked = watchlists.some((list) => list.tickers.some((item) => normalizeSymbol(item) === ticker));
-  const researchFetched = useRef(false);
-
-  const cachedSnap = useMemo(() => getStaleSnapshot(ticker), [ticker]);
-
-  const [research, setResearch] = useState<UnifiedResearchResult>(() => {
-    const s = cachedSnap;
-    return {
-      ...buildCompanyResearch(ticker, identity.displayName, identity.sector, null, tracked),
-      healthometerLabel: s?.healthometer?.label ?? null,
-      analysis: s?.healthometer?.overallScore !== null ? {
-        companyHealth: s?.healthometer?.label ?? null,
-        convictionState: s?.healthometer?.label ?? null,
-        summary: s?.investContext?.thesis ?? null,
-        thesis: s?.investContext?.thesis ?? null,
-        bullCase: null, bearCase: null,
-        keyDrivers: s?.investContext?.keyStrengths ?? [],
-        riskFlags: s?.investContext?.keyRisks ?? [],
-        watchNext: s?.investContext?.whatToWatch ?? [],
-        investmentChecklist: [],
-      } : null,
-      healthometer: s?.healthometer ? {
-        overallScore: s.healthometer.overallScore,
-        overallStatus: (s.healthometer.dimensions?.filter(d => d.score !== null).length ?? 0) >= 7 ? "Complete" : "Partial research context",
-        dimensions: s.healthometer.dimensions.map(d => ({ id: d.id, label: d.label, score: d.score, status: d.status as any, color: "#64748B" })),
-      } : { overallScore: null, overallStatus: "Not enough information for this view yet", dimensions: [] },
-      priceHistory: s?.priceHistory ?? [],
-    };
+  const [ticker, setTicker] = useState<string>(() => {
+    const p = new URLSearchParams(window.location.search);
+    return (p.get("id") ?? p.get("ticker") ?? "").toUpperCase().trim();
   });
-  const [newsItems, setNewsItems] = useState<NewsItemResponse[]>(() =>
-    (cachedSnap?.news ?? []).map((n) => ({
-      headline: n.headline, publisher: n.publisher, publishedAt: n.publishedAt,
-      summary: n.summary, whyItMatters: n.whyItMatters, url: n.url, category: n.category,
-    }))
-  );
-  const [newsRefreshedAt, setNewsRefreshedAt] = useState<string>("");
-  const [financialSeries, setFinancialSeries] = useState<import("../components/research/FinancialHistogram").FinancialSeries[]>(() =>
-    (cachedSnap?.financialSeries ?? []).map((s) => ({
-      metric: s.metric as any, label: s.label,
-      points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
-    }))
-  );
-  const [trendlyneAvailable, setTrendlyneAvailable] = useState(() => cachedSnap?.trendlyne?.available ?? false);
-  const [activeTab, setActiveTab] = useState<"thesis" | "fundamentals" | "risk" | "technicals" | "peers" | "history">("thesis");
+  const { pipeline, loading, error, refetch } = useStockData(ticker || null);
+  const [tracked, setTracked] = useState(() => isTracked(ticker));
 
   useEffect(() => {
-    const ctrl = new AbortController();
-    researchFetched.current = false;
-    setTrendlyneAvailable(false);
+    const onUrl = () => {
+      const p = new URLSearchParams(window.location.search);
+      const sym = (p.get("id") ?? p.get("ticker") ?? "").toUpperCase().trim();
+      if (sym && sym !== ticker) setTicker(sym);
+    };
+    window.addEventListener("urlchange", onUrl);
+    window.addEventListener("popstate", onUrl);
+    return () => { window.removeEventListener("urlchange", onUrl); window.removeEventListener("popstate", onUrl); };
+  }, [ticker]);
 
-    fetch(`${window.location.origin}/api/research/snapshot/${ticker}`, { signal: ctrl.signal })
-      .then(r => r.json()).then((data) => {
-        if (ctrl.signal.aborted || !data?.data) return;
-        const snap = data.data as StockPageSnapshot;
-        setCachedSnapshot(ticker, snap);
-        if (snap.priceHistory?.length) setResearch((prev) => ({ ...prev, priceHistory: snap.priceHistory }));
-        if (snap.healthometer?.overallScore !== null) {
-          setResearch((prev) => ({
-            ...prev,
-            healthometer: { overallScore: snap.healthometer.overallScore, overallStatus: "Partial research context", dimensions: snap.healthometer.dimensions.map(d => ({ id: d.id, label: d.label, score: d.score, status: d.status as any, color: "#64748B" })) },
-            healthometerLabel: snap.healthometer.label,
-          }));
-        }
-        if (snap.news?.length) setNewsItems(snap.news.map((n: any) => ({ headline: n.headline, publisher: n.publisher, publishedAt: n.publishedAt, summary: n.summary, whyItMatters: n.whyItMatters, url: n.url, category: n.category })));
-        if (snap.financialSeries?.length) setFinancialSeries(snap.financialSeries.map((s: any) => ({ metric: s.metric, label: s.label, points: s.points.map((p: any) => ({ period: p.period, value: p.value, unit: p.unit })) })));
-        if (snap.trendlyne?.available) setTrendlyneAvailable(true);
-        researchFetched.current = true;
-      }).catch(() => {});
+  const pred = pipeline?.prediction ?? null;
+  const factorScores = pred?.factorScores ?? [];
+  const pricePos = pipeline ? (pipeline.price.change ?? 0) >= 0 : true;
+  const classification = pred?.classification ?? "INSUFFICIENT_DATA";
 
-    fetchUnifiedResearch(ticker, identity.displayName, identity.sector, null, tracked, ctrl.signal).then((result) => {
-      if (!ctrl.signal.aborted) { setResearch(result); researchFetched.current = true; }
-    });
-    addRecentResearch({ symbol: ticker, companyName: identity.displayName });
-    api.getNews(ticker, { signal: ctrl.signal }).then((res) => {
-      if (!ctrl.signal.aborted) { setNewsItems(res.items || []); setNewsRefreshedAt(res.cachedAt || new Date().toISOString()); }
-    }).catch(() => {});
-    api.getFinancialSeries(ticker, { signal: ctrl.signal }).then((res) => {
-      if (!ctrl.signal.aborted && res.series) {
-        setFinancialSeries(res.series.map((s) => ({
-          metric: s.metric as any, label: s.label,
-          points: s.points.map((p) => ({ period: p.period, value: p.value, unit: p.unit as any })),
-        })));
-      }
-    }).catch(() => {});
-    return () => ctrl.abort();
-  }, [ticker, identity.displayName, identity.sector, tracked]);
+  const weightedScore = useMemo(() => {
+    if (!pred?.factorScores?.length) return pred?.rankingScore ?? null;
+    const weights: Record<string, number> = { quality: 0.22, valuation: 0.18, growth: 0.20, stability: 0.12, momentum: 0.13, risk: 0.15 };
+    let total = 0;
+    for (const fs of pred.factorScores) {
+      if (fs.value !== null) total += fs.value * (weights[fs.group] ?? 0);
+    }
+    return Math.round(total);
+  }, [pred]);
 
-  const engineSnapshots: EngineResearchSnapshot[] = [
-    {
-      engineName: "healthometer",
-      score: research.healthometer.overallScore,
-      label: research.healthometerLabel || "",
-      dataAsOf: null,
-      freshnessDays: null,
-    },
-    {
-      engineName: "prediction",
-      score: research.prediction.overallScore,
-      label: research.prediction.publicResearchStance || "",
-      dataAsOf: null,
-      freshnessDays: null,
-    },
-  ].filter(s => s.score !== null);
+  if (!ticker) {
+    return (
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center text-[#9CA3AF]">
+        No stock selected. Go back and search for a symbol.
+      </div>
+    );
+  }
 
-  const canonical = useMemo(() => resolveCanonicalResearchState(ticker, engineSnapshots), [ticker, engineSnapshots]);
-
-  const score = canonical.score ?? research.healthometer.overallScore ?? research.prediction.overallScore;
-  const label = canonical.label || research.healthometerLabel || healthometerLabelFromScore(research.healthometer.overallScore) || "Not enough information";
-  const dimensions = research.healthometer.dimensions;
-  const allDrivers = [...new Set(research.prediction.topPositiveDrivers)];
-  const drivers = allDrivers.length ? allDrivers : ["Business quality", "Financial strength", "Capital efficiency"];
-  const allRisks = [...new Set(research.prediction.topRiskDrivers)];
-  const risks = allRisks.length ? allRisks : [research.riskContext.overall ?? "Review recent business momentum"];
-
-  const contextTone = quote.quote ? (quote.quote.changePercent > 0 ? "positive" : quote.quote.changePercent < 0 ? "risk" : "neutral") : score !== null && score >= 70 ? "positive" : score !== null && score < 45 ? "risk" : "neutral";
-  const contextShadow = contextTone === "positive" ? "shadow-[var(--shadow-green-context)]" : contextTone === "risk" ? "shadow-[var(--shadow-red-context)]" : "shadow-[var(--shadow-blue-context)]";
-  const latestHistoryPoint = research.priceHistory.at(-1) ?? null;
-  const quoteUpdatedAt = quote.quote?.updatedAt ? new Date(quote.quote.updatedAt) : null;
-  const quoteAgeHours = quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? (Date.now() - quoteUpdatedAt.getTime()) / 3_600_000 : null;
-  const chartQuoteMismatch = Boolean(quote.quote && latestHistoryPoint && Math.abs(quote.quote.price - latestHistoryPoint.close) / quote.quote.price > 0.005);
-  const marketDataNeedsReview = quote.quote?.delayed === true || quoteAgeHours === null || quoteAgeHours > 30 || chartQuoteMismatch;
-
-  const factorNames = ["Quality", "Valuation", "Growth", "Stability", "Momentum", "Safety"];
-  const factorScores = factorNames.map((name) => {
-    const aliases = name === "Safety" ? ["risk", "safety"] : [name.toLowerCase()];
-    const match = dimensions.find((dimension) => aliases.includes(dimension.id.toLowerCase()) || aliases.includes(dimension.label.toLowerCase()));
-    return { name, score: match?.score ?? null, detail: match?.status ?? "Awaiting enough verified inputs to explain this factor." };
-  });
-  const classification: UnifiedClassification = score === null ? "INSUFFICIENT_DATA" : score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK";
-  const availableFactors = factorScores.filter((factor) => factor.score !== null).length;
-  const dataCompleteness = Math.round((availableFactors / factorScores.length) * 100);
-  const confidence = dataCompleteness >= 80 ? "HIGH" : dataCompleteness >= 50 ? "MEDIUM" : "LOW";
-  const latestMetrics = financialSeries.slice(0, 9).map((series) => ({ label: series.label, value: series.points.at(-1)?.value ?? null, unit: series.points.at(-1)?.unit ?? "" }));
-
-  return <ProductShell>
-    <ProductPage className="max-w-[1280px] !py-5">
-      <header className="sticky top-24 z-20 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur md:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-          <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-xs font-bold text-blue-600">NSE · {identity.symbol}</span><ClassificationBadge classification={classification} /><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${confidence === "HIGH" ? "bg-emerald-50 text-emerald-700" : confidence === "MEDIUM" ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-600"}`}>{confidence} CONFIDENCE</span></div><h1 className="mt-2 truncate text-2xl font-black tracking-tight text-slate-950 md:text-3xl">{identity.displayName}</h1></div>
-          <div><div className="font-mono text-2xl font-bold text-slate-950">{quote.quote ? formatINR(quote.quote.price) : "—"}</div>{quote.quote && <div className={`mt-1 text-sm font-bold ${quote.quote.changePercent >= 0 ? "text-emerald-600" : "text-red-600"}`}>{quote.quote.changePercent >= 0 ? "+" : ""}{formatPercent(quote.quote.changePercent)}</div>}</div>
-          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: identity.displayName, addedAt: new Date().toISOString(), source: "stock_page" })} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700"><Bookmark className="mr-1 inline h-3.5 w-3.5" />Track</button><button type="button" onClick={() => productNavigate("compare", ticker)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700">Compare</button><button type="button" onClick={() => setInvestOpen(true)} title="Research only — consult a SEBI-registered adviser before investing" className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white">Continue to broker →</button></div>
+  return (
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-[#E5E7EB] shadow-sm">
+        <div className="mx-auto max-w-[1180px] px-4 py-3">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <button type="button" onClick={() => productNavigate("search")} className="flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#111827] transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+                <span className="text-xs">Back</span>
+              </button>
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-[#EFF6FF] text-[#1D4ED8]">{pipeline?.price?.exchange ?? "NSE"}</span>
+              <span className="font-semibold text-[20px] text-[#111827] tracking-tight">{ticker}</span>
+            </div>
+            {pipeline?.companyName && <span className="text-[13px] text-[#6B7280] -mt-1 md:mt-0">{pipeline.companyName}</span>}
+            <div className="flex items-center gap-3 ml-auto">
+              <div className="text-right">
+                {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
+                  <>
+                    <span className="text-[28px] font-semibold tabular-nums text-[#111827] leading-none">{fPrice(pipeline.price.current)}</span>
+                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[12px] font-medium ml-2 ${pricePos ? "bg-[#DEF7EC] text-[#057A55]" : "bg-[#FDE8E8] text-[#C81E1E]"}`}>
+                      <span>{pricePos ? "+" : ""}{pipeline.price.change?.toFixed(2) ?? "—"}%</span>
+                      {pipeline.price.changeAbs !== null && <span>({fChange(pipeline.price.changeAbs)})</span>}
+                    </div>
+                  </>
+                ) : loading ? (
+                  <span className="text-sm text-[#9CA3AF]">Loading...</span>
+                ) : (
+                  <span className="text-sm text-[#9CA3AF]">Price unavailable</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={() => { isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: pipeline?.companyName ?? "", addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] transition-colors">
+                  <Bookmark className="inline h-3 w-3 mr-1" />{tracked ? "Tracked" : "Track"}
+                </button>
+                <button type="button" onClick={() => productNavigate("compare", ticker)} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] transition-colors">
+                  Compare
+                </button>
+                <button type="button" onClick={refetch} disabled={loading} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-40 transition-colors">
+                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center"><ScoreRing score={score} size="xl" /><div className="min-w-0 flex-1"><div className="flex flex-wrap gap-4">{factorScores.map((factor) => <FactorBar key={factor.name} label={factor.name} score={factor.score} />)}</div><div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-slate-500"><span><strong className="text-slate-900">{dataCompleteness}%</strong> data available — {confidence} confidence</span><span className="rounded bg-slate-100 px-2 py-1 font-mono">Unified Engine v2.0.0</span></div></div></div>
-      </section>
+      <main className="mx-auto max-w-[1180px] px-4 py-6 space-y-5">
+        {error && !pipeline && (
+          <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"><AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />{error}</div>
+        )}
 
-      <nav className="mt-5 flex overflow-x-auto border-b border-slate-200" aria-label="Stock research tabs">{(["thesis", "fundamentals", "risk", "technicals", "peers", "history"] as const).map((tab) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`shrink-0 border-b-2 px-4 py-3 text-xs font-bold capitalize ${activeTab === tab ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500"}`}>{tab}</button>)}</nav>
+        {loading && !pipeline && (
+          <div className="p-8 bg-white border border-[#E5E7EB] rounded-2xl text-center text-[#9CA3AF]"><RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />Loading {ticker}...</div>
+        )}
 
-      <div className="mt-5 min-h-[360px]">
-        {activeTab === "thesis" && <div className="grid gap-4 md:grid-cols-2">{factorScores.map((factor, index) => { const Icon = [ShieldCheck, Scale, TrendingUp, BarChart3, Activity, ShieldCheck][index]; return <article key={factor.name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><span className="flex items-center gap-2 font-bold text-slate-950"><Icon className="h-4 w-4 text-blue-600" />{factor.name}</span><strong className="text-2xl" style={{ color: scoreColor(factor.score) }}>{factor.score === null ? "—" : Math.round(factor.score)}</strong></div><FactorBar label="Factor score" score={factor.score} /><p className="mt-4 text-sm leading-6 text-slate-600">{factor.score === null ? "This factor is waiting for enough verified source data." : `${factor.name} currently provides ${factor.score >= 65 ? "supportive" : factor.score >= 50 ? "mixed" : "cautious"} evidence for the research thesis. ${factor.detail}`}</p>{factor.score === null && <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">Missing inputs · awaiting data</p>}</article>; })}</div>}
-
-        {activeTab === "fundamentals" && <section><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 9 }, (_, index) => latestMetrics[index] ?? ({ label: ["Revenue Growth", "EPS Growth", "Profit Growth", "Gross Margin", "Operating Margin", "Net Margin", "Current Ratio", "D/E Ratio", "FCF Yield"][index], value: null, unit: "" })).map((metric) => <div key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="text-xs font-semibold text-slate-500">{metric.label}</div><div className="mt-2 text-2xl font-bold text-slate-950">{metric.value === null ? "—" : `${metric.value}${metric.unit}`}</div>{metric.value === null && <div className="mt-1 text-[10px] text-slate-400">Awaiting data</div>}</div>)}</div><p className="mt-4 text-xs text-slate-500">Last updated: {quoteUpdatedAt?.toLocaleString("en-IN") ?? "Awaiting source refresh"} · Public company filings and licensed market data</p></section>}
-
-        {activeTab === "risk" && <section><div className="mb-5 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5"><ShieldCheck className="h-8 w-8 text-emerald-600" /><div><div className="text-xs font-bold uppercase text-slate-400">Safety score · higher is safer</div><div className="text-3xl font-black" style={{ color: scoreColor(factorScores[5].score) }}>{factorScores[5].score ?? "—"}</div></div></div><div className="grid gap-4 md:grid-cols-2">{[["Market Risk", "Beta"], ["Financial Leverage", "D/E"], ["Liquidity", "Current ratio"], ["Earnings Quality", "FCF vs earnings"]].map(([name, metric], index) => { const value = latestMetrics.find((item) => item.label.toLowerCase().includes(metric.toLowerCase().split(" ")[0]))?.value ?? null; const level = value === null ? "AWAITING DATA" : index === 0 && value > 2 ? "CRITICAL" : value > 1 ? "HIGH" : "LOW"; return <div key={name} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex justify-between"><strong>{name}</strong><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${level === "CRITICAL" ? "bg-red-50 text-red-700" : level === "HIGH" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>{level}</span></div><div className="mt-4 text-xl font-bold">{value ?? "—"}</div><p className="mt-2 text-xs text-slate-500">{metric} · {value === null ? "Verified input not yet available." : "Review this metric in the context of sector norms."}</p></div>; })}</div></section>}
-
-        {activeTab === "technicals" && (trendlyneAvailable || research.priceHistory.length > 1 ? <section><div className="mb-4 flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong>Overall technical signal: <span className="text-blue-600">NEUTRAL</span></strong></div><TechnicalIntelligencePanel input={{ priceHistory: research.priceHistory.map((point) => ({ close: point.close, volume: point.volume ?? undefined })), momentumScore: factorScores[4].score, volatilityScore: factorScores[5].score, priceChangePercent: quote.quote?.changePercent ?? null, rsiValue: null, macdValue: null, distanceFrom52WeekHigh: null }} /></section> : <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center"><Activity className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Technical data not yet available for this stock</h2><p className="mt-2 text-sm text-slate-500">RSI, MACD and ADX cards will appear after the next indicator refresh.</p></div>)}
-
-        {activeTab === "peers" && <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><Scale className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Peer comparison is being prepared</h2><p className="mt-2 text-sm text-slate-500">Add this company to Compare to review verified peers side by side.</p><button onClick={() => productNavigate("compare", ticker)} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">Add to compare</button></div>}
-        {activeTab === "history" && <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><History className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Thesis snapshots will appear here once you start tracking this company.</h2></div>}
-      </div>
-
-      {/* Research intelligence sections — only when populated, otherwise omitted */}
-      <section className="mt-5 space-y-4">
-        {(research.healthometer.dimensions.length > 0 || research.priceHistory.length > 1) && (
+        {pipeline && (
           <>
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">
-              <Sparkles className="h-3.5 w-3.5" /> Research Intelligence
-            </div>
-            <ResearchChecklistPanel
-              input={{
-                healthometerScores: dimensions.map((d) => ({ id: d.id, label: d.label, score: d.score })),
-                momentumScore: dimensions.find((d) => d.id === "momentum")?.score ?? null,
-                riskScore: dimensions.find((d) => d.id === "risk")?.score ?? null,
-                peContext: research.valuationContext?.peContext ?? null,
-                pbContext: research.valuationContext?.pbContext ?? null,
-                debtWarning: research.riskContext?.debtWarning ?? null,
-                volatilityNote: research.riskContext?.volatilityNote ?? null,
-                revenueGrowth: null, profitGrowth: null, roce: null, roe: null,
-                debtToEquity: null, currentRatio: null, promoterHolding: null,
-                fiiHolding: null, hasPeerData: false,
-              }}
-            />
-            <div id="technicals" className="scroll-mt-16">
-            <TechnicalIntelligencePanel
-              input={{
-                priceHistory: research.priceHistory.map((point) => ({ close: point.close, volume: point.volume ?? undefined })),
-                momentumScore: dimensions.find((d) => d.id === "momentum")?.score ?? null,
-                volatilityScore: dimensions.find((d) => d.id === "risk")?.score ?? null,
-                priceChangePercent: quote.quote?.changePercent ?? null,
-                rsiValue: null, macdValue: null, distanceFrom52WeekHigh: null,
-              }}
-            />
-            </div>
+            {/* Engine Score Card */}
+            <section className="bg-white border border-[#E5E7EB] rounded-2xl p-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                <div className="lg:w-3/5 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <ScoreRing score={pred?.rankingScore ?? weightedScore} size={80} />
+                    <div>
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border" style={{ color: classificationColor(classification), borderColor: `${classificationColor(classification)}30`, background: `${classificationColor(classification)}15` }}>{classificationLabel(classification)}</span>
+                      <div className="mt-1 text-[13px] text-[#4B5563]">Confidence: <strong>{pred?.confidenceLevel ?? "—"}</strong></div>
+                    </div>
+                  </div>
+                  <div className="space-y-[10px]">
+                    {FACTOR_GROUPS.map((group) => {
+                      const fs = factorScores.find(f => f.group === group);
+                      const score = fs?.value ?? null;
+                      const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
+                      return (
+                        <div key={group} className="flex items-center gap-3">
+                          <span className="w-20 text-xs font-medium text-[#6B7280] capitalize">{FACTOR_LABELS[group] ?? group}</span>
+                          <div className="flex-1 h-[6px] bg-[#F3F4F6] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
+                          </div>
+                          <span className="w-8 text-right text-xs font-semibold tabular-nums" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px] text-[#9CA3AF]">
+                    <span className="rounded bg-[#F3F4F6] px-2 py-1 font-mono">Unified Engine v2.0.0</span>
+                    <span><strong className="text-[#6B7280]">{pipeline.dataCompleteness}%</strong> data available</span>
+                    <span>· <strong className="text-[#6B7280]">{pred?.confidenceLevel ?? "—"}</strong> confidence</span>
+                  </div>
+                </div>
+                <div className="lg:w-2/5 lg:pl-6 lg:border-l lg:border-[#E5E7EB]">
+                  <div className="text-[11px] font-medium text-[#6B7280] uppercase tracking-wider mb-3">Pipeline Health</div>
+                  <div className="space-y-2">
+                    {[
+                      { name: "IndianAPI", ok: pipeline.price.current !== null && pipeline.price.source === "indianapi", status: "Live price" },
+                      { name: "Yahoo", ok: pipeline.technicals.closePrices.length > 0, status: "Historical" },
+                      { name: "Screener", ok: pipeline.fundamentals.fundamentalSource !== null, status: pipeline.fundamentals.fundamentalSource ?? "Pending" },
+                      { name: "Upstox", ok: false, status: "Not configured" },
+                    ].map(({ name, ok, status }) => (
+                      <div key={name} className="flex items-center gap-2 text-xs">
+                        <span className={`h-2 w-2 rounded-full ${ok ? "bg-[#057A55]" : status === "Pending" ? "bg-[#92400E]" : "bg-[#D1D5DB]"}`} />
+                        <span className="text-[#4B5563]">{name}</span>
+                        <span className="ml-auto text-[#9CA3AF]">{status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Factor Cards (Thesis) */}
+            <section className="grid gap-3 md:grid-cols-2">
+              {FACTOR_GROUPS.map((group) => {
+                const fs = factorScores.find(f => f.group === group);
+                const score = fs?.value ?? null;
+                const drivers = driverValues(group, pipeline);
+                return (
+                  <article key={group} className="bg-white border border-[#E5E7EB] rounded-xl p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-[#111827]">
+                        <span style={{ color: "#1A56DB" }}>{FACTOR_ICONS[group]}</span>
+                        {FACTOR_LABELS[group]}
+                      </span>
+                      <span className="text-[32px] font-semibold tabular-nums leading-none" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
+                    </div>
+                    <div className="h-[6px] bg-[#F3F4F6] rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${score !== null ? Math.max(0, Math.min(100, score)) : 0}%`, backgroundColor: scoreColor(score) }} />
+                    </div>
+                    <p className="text-[13px] text-[#4B5563] leading-relaxed">{getFactorSummary(group, score, fs?.missingFeatures ?? [])}</p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#9CA3AF] font-mono">
+                      {drivers.map((d, i) => (
+                        <span key={i}>{d.label}: <strong className="text-[#6B7280]">{d.value}</strong>{i < drivers.length - 1 ? " ·" : ""}</span>
+                      ))}
+                    </div>
+                    {score === null && (
+                      <div className="rounded-lg bg-[#FEF3C7] p-2 text-xs text-[#92400E]">Missing inputs — awaiting data</div>
+                    )}
+                  </article>
+                );
+              })}
+            </section>
+
+            {/* Pipeline Errors */}
+            {pipeline.pipelineErrors.length > 0 && (
+              <div className="space-y-1">
+                {pipeline.pipelineErrors.slice(0, 3).map((err, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-[11px] text-[#92400E] bg-[#FEF3C7] rounded-lg px-3 py-2">
+                    <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+                    <span>{err.slice(0, 120)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
-      </section>
+      </main>
 
-      {/* Invest CTA */}
-      <button
-        type="button"
-        onClick={() => setInvestOpen(true)}
-        className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-[#0B1220] px-5 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(15,23,42,.28),inset_0_1px_0_rgba(255,255,255,.15)] transition hover:-translate-y-0.5 hover:bg-[#16A34A] focus:outline-none focus:ring-4 focus:ring-emerald-500/20 md:bottom-5 md:right-5"
-        aria-label={`Invest in ${identity.displayName}`}
-      >
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10"><ShoppingBag className="h-3.5 w-3.5" /></span>
-        <span>Invest</span>
-      </button>
-
-      <SebiDisclaimer variant="footer" className="mt-8 rounded-xl" />
-      <InvestHandoffSheet open={investOpen} onClose={() => setInvestOpen(false)} symbol={ticker} companyName={identity.displayName} marketPrice={quote.quote?.price ?? null} />
-    </ProductPage>
-  </ProductShell>;
-
+      <SebiDisclaimer variant="footer" />
+    </div>
+  );
 }

@@ -19,8 +19,8 @@ import {
 import { ProductPanel, productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
 import type { InvestContextResponse } from "../../services/api/client";
-import ThesisHealthMeter from "../research/ThesisHealthMeter";
-import { computeResearchSignal, type ResearchSignalView } from "../../lib/research/researchSignalModel";
+import type { UnifiedPredictionOutput } from "../../prediction-engine/types";
+
 import ResearchContextLink from "../research/ResearchContextLink";
 import { PortfolioEngine } from "../../services/portfolio/PortfolioEngine";
 
@@ -31,6 +31,7 @@ interface InvestHandoffSheetProps {
   companyName?: string;
   thesisSummary?: string;
   marketPrice?: number | null;
+  prediction?: UnifiedPredictionOutput | null;
 }
 
 type BrokerChoice = { id: string; name: string; short: string; url: string; color: string; soft: string };
@@ -74,6 +75,7 @@ export function InvestHandoffSheet({
   companyName,
   thesisSummary: propThesis,
   marketPrice = null,
+  prediction = null,
 }: InvestHandoffSheetProps) {
   const [stage, setStage] = useState<Stage>(1);
   const [loadingContext, setLoadingContext] = useState(false);
@@ -155,27 +157,6 @@ export function InvestHandoffSheet({
   const risks = context?.keyRisks?.length ? context.keyRisks : null;
   const conviction = context?.conviction || null;
 
-  const investSignal = useMemo(() => {
-    if (!context) return null;
-    const factorScores = {
-      symbol,
-      qualityScore: null,
-      growthScore: null,
-      stabilityScore: null,
-      momentumScore: null,
-      valuationScore: null,
-      riskScore: null,
-      convictionScore: context.score ?? null,
-      qualityExplanation: null,
-      valuationExplanation: null,
-      growthExplanation: null,
-      riskExplanation: null,
-      momentumExplanation: null,
-      stabilityExplanation: null,
-    };
-    return computeResearchSignal(factorScores, null);
-  }, [context, symbol]);
-
   if (!open) return null;
 
   return (
@@ -233,7 +214,7 @@ export function InvestHandoffSheet({
                   risks={risks}
                   strengths={context?.keyStrengths ?? []}
                   watchItems={context?.whatToWatch ?? []}
-                  signal={investSignal}
+                  prediction={prediction}
                   onContinue={() => setStage(2)}
                   onTrack={() => { onClose(); productNavigate("track"); }}
                   onCompare={() => { onClose(); productNavigate("compare", symbol); }}
@@ -274,7 +255,7 @@ function StageOne({
   risks,
   strengths,
   watchItems,
-  signal,
+  prediction,
   onContinue,
   onTrack,
   onCompare,
@@ -287,7 +268,7 @@ function StageOne({
   risks: string[] | null;
   strengths: string[];
   watchItems: string[];
-  signal: ResearchSignalView | null;
+  prediction: UnifiedPredictionOutput | null;
   onContinue: () => void;
   onTrack: () => void;
   onCompare: () => void;
@@ -313,9 +294,64 @@ function StageOne({
               {conviction}
             </span>
           )}
-          {signal && (
-            <div className="mt-3">
-              <ThesisHealthMeter signal={signal} size="sm" showDetails={true} />
+          {prediction && (
+            <div style={{
+              background: '#F9FAFB', border: '1px solid #E5E7EB',
+              borderRadius: 10, padding: '16px 20px', marginTop: 12
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF',
+                letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                Research summary
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <div style={{ fontSize: 32, fontWeight: 600,
+                  color: (prediction.rankingScore ?? 0) >= 75 ? '#057A55' :
+                         (prediction.rankingScore ?? 0) >= 55 ? '#1A56DB' :
+                         (prediction.rankingScore ?? 0) >= 35 ? '#D97706' : '#C81E1E' }}>
+                  {prediction.rankingScore ?? '—'}
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                    {prediction.classification?.replace('_', ' ') ?? 'Unknown'}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6B7280' }}>
+                    {prediction.confidenceLevel ?? '—'} confidence ·{' '}
+                    {Math.round((prediction.dataCompleteness ?? 0))}% data available
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                gap: 8 }}>
+                {(prediction.factorScores ?? [])
+                  .filter((f: any) => f.group !== 'sector' && f.group !== 'dataQuality')
+                  .map((f: any) => (
+                    <div key={f.group} style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 11, color: '#9CA3AF',
+                        textTransform: 'capitalize', marginBottom: 2 }}>
+                        {f.group}
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 600,
+                        color: (f.value ?? 0) >= 65 ? '#057A55' :
+                               (f.value ?? 0) >= 45 ? '#D97706' : '#C81E1E' }}>
+                        {f.value ?? '—'}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+          {!prediction && (
+            <div style={{
+              background: '#F9FAFB', border: '1px solid #E5E7EB',
+              borderRadius: 10, padding: '16px 20px', marginTop: 12
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF',
+                letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                Research summary
+              </div>
+              <div style={{ fontSize: 13, color: '#9CA3AF' }}>
+                Research data not yet available for this stock.
+              </div>
             </div>
           )}
           {thesisSummary && (

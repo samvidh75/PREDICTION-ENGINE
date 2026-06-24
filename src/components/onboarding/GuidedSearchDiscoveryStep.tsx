@@ -61,9 +61,6 @@ export default function GuidedSearchDiscoveryStep({
 
     const r = selected;
     const t = window.setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.log("[onboarding-guided-search] auto-advance fired", { selectedId: r.id, kind: r.kind, title: r.title });
-
       const index = getDiscoveryIndex();
       const entity = index.find((e) => e.id === r.id && e.kind === r.kind);
       if (entity) {
@@ -83,13 +80,6 @@ export default function GuidedSearchDiscoveryStep({
     if (continuing) return;
 
     setContinuing(true);
-
-    // eslint-disable-next-line no-console
-    console.log("[onboarding-guided-search] Continue clicked", {
-      selectedId: selected.id,
-      selectedKind: selected.kind,
-      selectedTitle: selected.title,
-    });
 
     const index = getDiscoveryIndex();
     const entity = index.find((e) => e.id === selected.id && e.kind === selected.kind);

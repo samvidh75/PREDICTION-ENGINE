@@ -105,7 +105,7 @@ export const PROTECTED_PAGES: PageKey[] = [
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "methodology",
   "rankings", "compare", "scanner", "search", "stock", "company",
-  "watchlist", "portfolio", "alerts", "ipo", "track", "more", "pricing", "terms",
+  "watchlist", "portfolio", "alerts", "ipo", "track", "more", "pricing", "terms", "settings",
 ];
 
 /**

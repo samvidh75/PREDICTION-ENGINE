@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   ArrowLeft, ExternalLink, RefreshCw, AlertCircle, CheckCircle2,
   TrendingUp, TrendingDown, Minus, Star, BarChart3, Shield, Activity,
   Users, Info, ChevronDown, Building2,
 } from "lucide-react";
 import { useStockData } from "../hooks/useStockData";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { productNavigate } from "../components/product/ProductUI";
 import { formatINR, formatPercent } from "../hooks/useLiveQuotes";
 import { fPrice, fChange, fRelativeTime } from "../lib/format";
@@ -720,6 +721,9 @@ export const StockStoryPage: React.FC = () => {
   const [symbol, setSymbol] = useState<string>(() => readSymbolFromUrl());
   const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
   const { pipeline, loading, error, refetch } = useStockData(symbol || null);
+  useDocumentTitle(symbol ? `${symbol} Research — ${pipeline?.companyName ?? ""} | StockStory India` : "Stock Detail | StockStory India");
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
 
   // Sync symbol from URL changes (browser nav)
   useEffect(() => {
@@ -738,6 +742,21 @@ export const StockStoryPage: React.FC = () => {
     };
   }, [symbol]);
 
+  useEffect(() => {
+    if (loading && !pipeline) {
+      retryTimeoutRef.current = setTimeout(() => setTimedOut(true), 10000);
+    } else {
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+    };
+  }, [loading, pipeline]);
+
   const pred = pipeline?.prediction ?? null;
   const pricePos = pipeline ? (pipeline.price.change ?? 0) >= 0 : true;
 
@@ -753,21 +772,21 @@ export const StockStoryPage: React.FC = () => {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* ── Sticky Header ───────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-[#E2E8F0] shadow-sm">
-        <div className="mx-auto max-w-[1180px] px-4 py-3 flex items-center gap-3 flex-wrap">
-          {/* Back + Symbol */}
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="mx-auto max-w-[1180px] px-4 py-3 flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
+          {/* Line 1: Back + Symbol + CompanyName + Exchange */}
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <button
               type="button"
               onClick={() => productNavigate("search")}
               className="flex items-center gap-1 text-sm text-[#64748B] hover:text-[#1E293B] transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Back</span>
+              <span>Back</span>
             </button>
             <span className="text-[#E2E8F0]">·</span>
             <span className="font-mono text-lg font-bold text-[#1E293B]">{symbol}</span>
             {pipeline?.companyName && (
-              <span className="text-sm text-[#94A3B8] truncate hidden sm:block max-w-[200px]">{pipeline.companyName}</span>
+              <span className="text-sm text-[#94A3B8] truncate max-w-[200px]">{pipeline.companyName}</span>
             )}
             {pipeline?.price.exchange && (
               <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]">
@@ -776,8 +795,8 @@ export const StockStoryPage: React.FC = () => {
             )}
           </div>
 
-          {/* Price */}
-          <div className="flex items-center gap-2 ml-auto">
+          {/* Line 2: Price + Change% + ChangeAbs */}
+          <div className="flex items-center gap-2 md:ml-auto">
             {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
               <>
                 <span className="text-xl font-bold tabular-nums text-[#1E293B]">
@@ -789,7 +808,7 @@ export const StockStoryPage: React.FC = () => {
                   </span>
                 )}
                 {pipeline.price.changeAbs !== null && (
-                  <span className={`text-sm tabular-nums hidden sm:inline ${pricePos ? "text-green-600" : "text-red-500"}`}>
+                  <span className={`text-sm tabular-nums ${pricePos ? "text-green-600" : "text-red-500"}`}>
                     ({fChange(pipeline.price.changeAbs)})
                   </span>
                 )}
@@ -806,28 +825,28 @@ export const StockStoryPage: React.FC = () => {
             )}
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Line 3: Action buttons - full width on mobile */}
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <button
               type="button"
               onClick={refetch}
               disabled={loading}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] disabled:opacity-40 transition-colors"
+              className="flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] disabled:opacity-40 transition-colors flex-1 md:flex-none"
             >
               <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Refresh</span>
+              <span>Refresh</span>
             </button>
             <button
               type="button"
               onClick={() => productNavigate("compare", symbol)}
-              className="px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] transition-colors hidden sm:flex"
+              className="flex items-center justify-center gap-1 px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] transition-colors flex-1 md:flex-none"
             >
               Compare
             </button>
             <button
               type="button"
               onClick={() => productNavigate("broker", symbol)}
-              className="px-3 py-1.5 text-xs font-semibold text-white bg-[#16A34A] rounded-lg hover:bg-[#15803D] transition-colors"
+              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-[#16A34A] rounded-lg hover:bg-[#15803D] transition-colors flex-1 md:flex-none"
             >
               Continue to broker →
             </button>
@@ -846,17 +865,56 @@ export const StockStoryPage: React.FC = () => {
 
       <main className="mx-auto max-w-[1180px] px-4 py-6 sm:px-6 space-y-5">
         {/* ── Error / Loading ───────────────────────────────────────────── */}
-        {error && !pipeline && (
-          <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
-            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-            <span>{error}</span>
-          </div>
+        {error && !pipeline && !loading && (
+          error.toLowerCase().includes("not found") || error.toLowerCase().includes("no data") ? (
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+              <p className="font-medium">Stock not found: {symbol}. Search for a valid NSE/BSE symbol.</p>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search symbol..."
+                  defaultValue={symbol}
+                  className="flex-1 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-sm text-amber-900 outline-none focus:border-amber-500"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
+                      productNavigate("search", (e.target as HTMLInputElement).value.trim());
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => productNavigate("search")}
+                  className="shrink-0 px-3 py-1.5 text-xs font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )
         )}
 
-        {loading && !pipeline && (
+        {loading && !pipeline && !timedOut && (
           <div className="p-8 bg-white border border-[#E2E8F0] rounded-2xl text-center text-[#94A3B8] text-sm">
             <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
             Loading {symbol} research data…
+          </div>
+        )}
+
+        {timedOut && !pipeline && (
+          <div className="flex items-center justify-between gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+            <span>Could not load stock data. Check your connection and try again.</span>
+            <button
+              type="button"
+              onClick={() => { setTimedOut(false); refetch(); }}
+              className="shrink-0 px-3 py-1.5 text-xs font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 transition-colors"
+            >
+              Retry
+            </button>
           </div>
         )}
 
@@ -920,35 +978,42 @@ export const StockStoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* ── Tab Navigation ─────────────────────────────────────── */}
-            <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
-              {/* Tab bar */}
-              <div className="flex border-b border-[#E2E8F0] overflow-x-auto">
-                {TABS.map(tab => (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
-                      activeTab === tab
-                        ? "border-[#2962FF] text-[#2962FF]"
-                        : "border-transparent text-[#64748B] hover:text-[#1E293B] hover:border-[#E2E8F0]"
-                    }`}
-                  >
-                    {TAB_LABELS[tab]}
-                  </button>
-                ))}
-              </div>
+            {pred ? (
+              <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+                {/* Tab bar */}
+                <div className="flex border-b border-[#E2E8F0] overflow-x-auto scrollbar-none">
+                  {TABS.map(tab => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                        activeTab === tab
+                          ? "border-[#2962FF] text-[#2962FF]"
+                          : "border-transparent text-[#64748B] hover:text-[#1E293B] hover:border-[#E2E8F0]"
+                      }`}
+                    >
+                      {TAB_LABELS[tab]}
+                    </button>
+                  ))}
+                </div>
 
-              {/* Tab content */}
-              <div className="p-5">
-                {activeTab === "thesis" && <ThesisTab pipeline={pipeline} />}
-                {activeTab === "fundamentals" && <FundamentalsTab pipeline={pipeline} />}
-                {activeTab === "risk" && <RiskTab pipeline={pipeline} />}
-                {activeTab === "technicals" && <TechnicalsTab pipeline={pipeline} />}
-                {activeTab === "peers" && <PeersTab pipeline={pipeline} />}
+                {/* Tab content */}
+                <div className="p-5">
+                  {activeTab === "thesis" && <ThesisTab pipeline={pipeline} />}
+                  {activeTab === "fundamentals" && <FundamentalsTab pipeline={pipeline} />}
+                  {activeTab === "risk" && <RiskTab pipeline={pipeline} />}
+                  {activeTab === "technicals" && <TechnicalsTab pipeline={pipeline} />}
+                  {activeTab === "peers" && <PeersTab pipeline={pipeline} />}
+                </div>
               </div>
-            </div>
+            ) : pipeline.price.current !== null && pipeline.price.current !== undefined ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                <p className="text-sm text-amber-800 font-medium">
+                  Research scoring not yet available for this stock. Check back soon.
+                </p>
+              </div>
+            ) : null}
           </>
         )}
       </main>

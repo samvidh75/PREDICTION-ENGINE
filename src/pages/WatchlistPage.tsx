@@ -1,168 +1,138 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { WatchlistEngine, CustomWatchlist } from "../services/portfolio/WatchlistEngine";
-import { SmartWatchlistEngine, SmartWatchlist } from "../services/portfolio/SmartWatchlistEngine";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Trash2, RefreshCw, Clock, Plus, Search, Eye } from "lucide-react";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
+import { globalPipelineQueue } from "../services/data/PipelineQueue";
+import { fPrice, fChange, fRelativeTime } from "../lib/format";
+import { ScoreRing } from "../components/ui/ScoreRing";
+import { ClassificationBadge } from "../components/ui/ClassificationBadge";
+import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../components/product/ProductUI";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
-import { StockRegistry } from "../services/stocks/StockRegistry";
-import { NoteEngine } from "../services/portfolio/NoteEngine";
-import { loadAuthSession } from "../services/auth/sessionStore";
-import { api, WatchlistRow } from "../services/api/client";
-import { ChevronRight, Eye, TrendingUp, TrendingDown, AlertTriangle, Minus } from "lucide-react";
 import { useToast } from "../components/feedback/useToast";
-import { ProductPanel, ProductEmptyState, ProductAction, ProductPage, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
-import { buildWatchlistViewModel } from "../lib/product/viewModels/watchlistViewModel";
+import Input from "../components/ui/Input";
 
-interface DisplayList {
-  id: string;
-  name: string;
-  tickers: string[];
-  source: "remote" | "local" | "smart";
+const WATCHLIST_KEY = "ss_watchlist";
+const MAX_WATCHLIST = 20;
+
+function getWatchlistSymbols(): string[] {
+  try {
+    const raw = localStorage.getItem(WATCHLIST_KEY) ?? "";
+    return raw ? raw.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : [];
+  } catch { return []; }
 }
 
-const REMOTE_PREFIX = "remote-";
-const SMART_PREFIX = "smart-";
-
-const THESIS_TABS = ["Needs review", "Thesis improving", "Risk rising", "Unchanged", "Tracked companies"] as const;
-type ThesisTab = typeof THESIS_TABS[number];
-
-const REVIEW_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
-
-function categorizeTicker(ticker: string): ThesisTab {
-  const info = StockRegistry.getStock(ticker);
-  const score = info?.telemetrySnapshot?.healthScore ?? null;
-  const noteObj = NoteEngine.getNote(ticker);
-  const hasScore = typeof score === "number" && Number.isFinite(score);
-  const hasNoteText = noteObj.note && noteObj.note.trim().length > 0;
-  const hasRecentNote = !!noteObj.timestamp && (Date.now() - noteObj.timestamp) < REVIEW_DAYS_MS;
-
-  if (!hasScore || !hasNoteText || !hasRecentNote) return "Needs review";
-  if (score >= 60) return "Thesis improving";
-  if (score <= 40) return "Risk rising";
-  return "Unchanged";
+function setWatchlistSymbols(symbols: string[]): void {
+  localStorage.setItem(WATCHLIST_KEY, symbols.join(","));
+  window.dispatchEvent(new Event("watchlistchange"));
 }
 
-const TAB_ICONS: Record<ThesisTab, React.ReactNode> = {
-  "Needs review": <AlertTriangle className="h-3 w-3" />,
-  "Thesis improving": <TrendingUp className="h-3 w-3" />,
-  "Risk rising": <TrendingDown className="h-3 w-3" />,
-  "Unchanged": <Minus className="h-3 w-3" />,
-  "Tracked companies": <Eye className="h-3 w-3" />,
-};
+function changeColor(change: number | null): string {
+  if (change === null || change === undefined) return "text-[#8B949E]";
+  return change >= 0 ? "text-green-400" : "text-red-400";
+}
 
 export const WatchlistPage: React.FC = () => {
-  const [authState, setAuthState] = useState<"loading" | "authenticated" | "anonymous">("loading");
-  const [remoteLists, setRemoteLists] = useState<WatchlistRow[] | null>(null);
-  const [localLists, setLocalLists] = useState<CustomWatchlist[]>(() => WatchlistEngine.getWatchlists());
-  const [smartWatchlists] = useState<SmartWatchlist[]>(() => SmartWatchlistEngine.getSmartWatchlists());
-  const [selectedList, setSelectedList] = useState<string>("");
-  const [thesisTab, setThesisTab] = useState<ThesisTab>("Tracked companies");
+  useDocumentTitle("My Watchlist | StockStory India");
   const toast = useToast();
-  const [noteRefresh, setNoteRefresh] = useState(0);
+  const [symbols, setSymbols] = useState<string[]>(() => getWatchlistSymbols());
+  const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
+  const [loadingSymbols, setLoadingSymbols] = useState<Set<string>>(new Set());
+  const [addInput, setAddInput] = useState("");
+  const [refreshProgress, setRefreshProgress] = useState<{ done: number; total: number } | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    const session = loadAuthSession();
-    if (session.uid) { api.getWatchlists().then(lists => { setRemoteLists(lists); setAuthState("authenticated"); }).catch(() => { setRemoteLists(null); setAuthState("authenticated"); }); }
-    else { setRemoteLists(null); setAuthState("anonymous"); }
+    return () => { mountedRef.current = false; };
   }, []);
 
   useEffect(() => {
-    const handler = () => setLocalLists([...WatchlistEngine.getWatchlists()]);
+    const handler = () => {
+      const updated = getWatchlistSymbols();
+      setSymbols(updated);
+    };
     window.addEventListener("watchlistchange", handler);
     return () => window.removeEventListener("watchlistchange", handler);
   }, []);
 
+  const loadSymbols = useCallback(async (syms: string[]) => {
+    if (syms.length === 0) return;
+    setLoadingSymbols(prev => {
+      const next = new Set(prev);
+      syms.forEach(s => next.add(s));
+      return next;
+    });
+    await Promise.allSettled(
+      syms.map(sym =>
+        globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
+          r => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: r })); },
+          () => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: null })); },
+        )
+      ),
+    );
+    if (mountedRef.current) {
+      setLoadingSymbols(prev => {
+        const next = new Set(prev);
+        syms.forEach(s => next.delete(s));
+        return next;
+      });
+    }
+  }, []);
+
   useEffect(() => {
-    if (selectedList) return;
-    if (remoteLists && remoteLists.length > 0) setSelectedList(`${REMOTE_PREFIX}${remoteLists[0].id}`);
-    else if (localLists.length > 0) setSelectedList(localLists[0].id);
-    else if (smartWatchlists.length > 0) setSelectedList(`${SMART_PREFIX}0`);
-  }, [remoteLists, localLists, smartWatchlists, selectedList]);
+    loadSymbols(symbols);
+  }, [symbols, loadSymbols]);
 
-  const isBackendActive = remoteLists !== null;
-  const isAuthenticated = authState !== "loading";
-
-  const displayLists: DisplayList[] = useMemo(() => {
-    const lists: DisplayList[] = [];
-    if (remoteLists) { for (const wl of remoteLists) lists.push({ id: `${REMOTE_PREFIX}${wl.id}`, name: wl.name, tickers: wl.tickers, source: "remote" }); }
-    else { for (const wl of localLists) lists.push({ id: wl.id, name: wl.name, tickers: wl.tickers, source: "local" }); }
-    return lists;
-  }, [remoteLists, localLists]);
-
-  const allTrackedTickers = useMemo(() => {
-    const list = displayLists.find(l => l.id === selectedList);
-    return list?.tickers ?? [];
-  }, [displayLists, selectedList]);
-
-  const categories = useMemo(() => {
-    const map: Record<string, string[]> = {};
-    for (const tab of THESIS_TABS) {
-      if (tab === "Tracked companies") {
-        map[tab] = allTrackedTickers;
-      } else {
-        map[tab] = allTrackedTickers.filter((t) => categorizeTicker(t) === tab);
-      }
+  const handleAdd = () => {
+    const sym = addInput.toUpperCase().trim();
+    if (!sym) return;
+    if (symbols.length >= MAX_WATCHLIST) {
+      toast.warning(`Watchlist limited to ${MAX_WATCHLIST} stocks. Remove some to add more.`);
+      setAddInput("");
+      return;
     }
-    return map;
-  }, [allTrackedTickers]);
-
-  const viewModel = useMemo(() => {
-    return buildWatchlistViewModel(allTrackedTickers, categories);
-  }, [allTrackedTickers, categories]);
-
-  const handleRemoveTicker = (ticker: string) => {
-    if (selectedList.startsWith(SMART_PREFIX)) return;
-    const list = displayLists.find(l => l.id === selectedList);
-    if (!list) return;
-    if (list.source === "remote") {
-      const remoteId = selectedList.replace(REMOTE_PREFIX, "");
-      api.removeWatchlistTicker(remoteId, ticker).then(updated => { setRemoteLists(prev => prev ? prev.map(wl => wl.id === remoteId ? updated : wl) : prev); toast.success(`${ticker} removed`); }).catch(() => { toast.error(`Could not remove ${ticker}.`); api.getWatchlists().then(lists => setRemoteLists(lists)).catch(() => {}); });
-    } else {
-      WatchlistEngine.removeTicker(selectedList, ticker);
-      setLocalLists([...WatchlistEngine.getWatchlists()]);
-      toast.success(`${ticker} removed`);
+    if (symbols.includes(sym)) {
+      toast.info(`${sym} is already in your watchlist`);
+      setAddInput("");
+      return;
     }
+    const updated = [...symbols, sym];
+    setWatchlistSymbols(updated);
+    setSymbols(updated);
+    setAddInput("");
+    toast.success(`${sym} added to watchlist`);
   };
 
-  const rawActiveTickers = useMemo(() => {
-    if (selectedList.startsWith(SMART_PREFIX)) { const idx = parseInt(selectedList.replace(SMART_PREFIX, ""), 10); return smartWatchlists[idx]?.tickers || []; }
-    const list = displayLists.find(l => l.id === selectedList);
-    return list?.tickers || [];
-  }, [selectedList, displayLists, smartWatchlists]);
-
-  const activeTickers = useMemo(() => {
-    return [...rawActiveTickers].sort((a, b) => { const timeA = NoteEngine.getNote(a).timestamp || 0; const timeB = NoteEngine.getNote(b).timestamp || 0; return timeB - timeA; });
-  }, [rawActiveTickers, noteRefresh]);
-
-  const filteredTickers = useMemo(() => {
-    if (thesisTab === "Tracked companies") return activeTickers;
-    return activeTickers.filter(t => categorizeTicker(t) === thesisTab);
-  }, [activeTickers, thesisTab]);
-
-  const needsReviewCount = useMemo(() => {
-    return activeTickers.filter(t => categorizeTicker(t) === "Needs review").length;
-  }, [activeTickers]);
-
-  const handleNoteChange = (ticker: string, text: string) => { NoteEngine.saveNote(ticker, text); setNoteRefresh(prev => prev + 1); };
-
-  const sectorBreakdown = useMemo(() => {
-    const counts: Record<string, number> = {};
-    filteredTickers.forEach((t) => {
-      const sec = StockRegistry.getStock(t)?.sector || "Unknown";
-      counts[sec] = (counts[sec] || 0) + 1;
+  const handleRemove = (sym: string) => {
+    const updated = symbols.filter(s => s !== sym);
+    setWatchlistSymbols(updated);
+    setSymbols(updated);
+    setResults(prev => {
+      const next = { ...prev };
+      delete next[sym];
+      return next;
     });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [filteredTickers]);
+    toast.success(`${sym} removed`);
+  };
 
-  if (authState === "loading") {
-    return (
-      <ProductShell>
-        <ProductPage>
-          <div className="flex items-center justify-center min-h-[200px]">
-            <span className="text-xs text-[#8B949E]">Loading watchlists...</span>
-          </div>
-        </ProductPage>
-      </ProductShell>
-    );
-  }
+  const handleRefreshAll = async () => {
+    if (symbols.length === 0) return;
+    setRefreshProgress({ done: 0, total: symbols.length });
+    for (let i = 0; i < symbols.length; i++) {
+      const sym = symbols[i];
+      await globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
+        r => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: r })); },
+        () => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: null })); },
+      );
+      if (mountedRef.current) {
+        setRefreshProgress(prev => prev ? { ...prev, done: prev.done + 1 } : null);
+      }
+    }
+    if (mountedRef.current) setRefreshProgress(null);
+    toast.success("Watchlist refreshed");
+  };
+
+  const isLoading = loadingSymbols.size > 0;
+  const activeProgress = refreshProgress || (isLoading ? { done: symbols.filter(s => s in results).length, total: symbols.length } : null);
 
   return (
     <ProductShell>
@@ -170,171 +140,154 @@ export const WatchlistPage: React.FC = () => {
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-              <h1 className="text-base font-semibold text-[var(--color-text-primary)]">Daily thesis workflow</h1>
+              <Eye className="h-4 w-4 text-[#2962FF]" />
+              <h1 className="text-base font-semibold text-[#E6EDF3]">Watchlist</h1>
             </div>
-            <p className="mt-1 text-xs text-[#8B949E]">Review, track, and act on your investment theses.</p>
+            <p className="mt-1 text-xs text-[#8B949E]">
+              {symbols.length > 0
+                ? `${symbols.length} stock${symbols.length !== 1 ? "s" : ""} tracked`
+                : "Track stocks you care about"}
+            </p>
           </div>
-          {sectorBreakdown.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-[#8B949E]">Sectors</span>
-              {sectorBreakdown.map(([sector, count]) => (
-                <span key={sector} className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] text-[var(--color-text-primary)]">
-                  {sector} <span className="text-[#484F58]">({count})</span>
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            {activeProgress && (
+              <span className="text-[11px] text-[#8B949E]">
+                Refreshing {activeProgress.done} of {activeProgress.total}...
+              </span>
+            )}
+            {symbols.length > 0 && (
+              <button
+                onClick={handleRefreshAll}
+                disabled={!!refreshProgress}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${refreshProgress ? "animate-spin" : ""}`} />
+                Refresh all
+              </button>
+            )}
+            <button
+              onClick={() => productNavigate("scanner")}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+            >
+              <Search className="h-3.5 w-3.5" />
+              Scanner
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-          <div className="flex flex-col space-y-3 lg:col-span-1">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">My Lists</span>
-            {displayLists.length === 0 ? (
-              <p className="text-xs text-[#8B949E]">No lists yet. Search a company to create one.</p>
-            ) : (
-              displayLists.map((wl) => (
-                <button
-                  key={wl.id}
-                  onClick={() => setSelectedList(wl.id)}
-                  className={`w-full text-left rounded-xl px-3 py-2.5 text-xs transition-colors flex items-center justify-between ${
-                    selectedList === wl.id ? "bg-[#2962FF]/10 text-[#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
-                  }`}
-                >
-                  <span>{wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span></span>
-                </button>
-              ))
-            )}
-            {smartWatchlists.length > 0 && (
-              <>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-[#484F58]">Auto Lists</span>
-                {smartWatchlists.map((wl, idx) => (
-                  <button
-                    key={wl.name}
-                    onClick={() => setSelectedList(`${SMART_PREFIX}${idx}`)}
-                    className={`w-full text-left rounded-xl px-3 py-2.5 text-xs transition-colors ${
-                      selectedList === `${SMART_PREFIX}${idx}` ? "bg-[#2962FF]/10 text-[#2962FF]" : "text-[#8B949E] hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    {wl.name} <span className="opacity-60 ml-1">({wl.tickers.length})</span>
-                  </button>
-                ))}
-              </>
-            )}
-          </div>
-
-          <div className="lg:col-span-3">
-            {activeTickers.length === 0 ? (
-              <ProductEmptyState
-                icon={Eye}
-                title="Track companies you are researching."
-                body="Open the scanner or search for a company to start tracking."
-                action={
-                  <div className="flex flex-wrap gap-2">
-                    <ProductAction onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
-                    <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
-                  </div>
-                }
+        {symbols.length === 0 ? (
+          <ProductEmptyState
+            icon={Eye}
+            title="Your watchlist is empty"
+            body="Find stocks to track in the Scanner."
+            action={
+              <ProductAction onClick={() => productNavigate("scanner")}>
+                Go to Scanner →
+              </ProductAction>
+            }
+          />
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 pb-2">
+              <Input
+                placeholder="Add stock symbol..."
+                value={addInput}
+                onChange={(e) => setAddInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
+                className="h-9 text-xs max-w-[200px]"
+                glass
               />
-            ) : (
-              <>
-                <div className="mb-4 flex flex-wrap gap-2">
-                  {THESIS_TABS.map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setThesisTab(tab)}
-                      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-medium transition-colors ${
-                        thesisTab === tab
-                          ? "border-[#2962FF] bg-[#2962FF]/10 text-[#2962FF]"
-                          : "border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                      }`}
-                    >
-                      {TAB_ICONS[tab]}
-                      {tab}
-                      {tab === "Needs review" && needsReviewCount > 0 && (
-                        <span className="ml-0.5 rounded-full bg-[#F59E0B]/20 px-1.5 py-0.5 text-[10px] text-[#F59E0B]">{needsReviewCount}</span>
+              <button
+                onClick={handleAdd}
+                disabled={!addInput.trim() || symbols.length >= MAX_WATCHLIST}
+                className="inline-flex items-center gap-1 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors disabled:opacity-40"
+              >
+                <Plus className="h-3 w-3" />
+                Add
+              </button>
+              {symbols.length >= MAX_WATCHLIST && (
+                <span className="text-[10px] text-[#F59E0B]">Max {MAX_WATCHLIST} stocks</span>
+              )}
+            </div>
+
+            {symbols.map((sym) => {
+              const r = results[sym];
+              const pending = loadingSymbols.has(sym);
+              const ready = r !== undefined;
+
+              const price = ready && r ? r.price.current : null;
+              const change = ready && r ? r.price.change : null;
+              const healthScore = ready && r ? (r.prediction?.healthScore ?? null) : null;
+              const classification = ready && r ? (r.prediction?.classification ?? "INSUFFICIENT_DATA") : "INSUFFICIENT_DATA";
+              const companyName = ready && r ? r.companyName : null;
+              const fetchedAt = ready && r ? r.fetchedAt : null;
+
+              return (
+                <ProductPanel key={sym} className="p-3 md:p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="shrink-0">
+                      {pending && !r ? (
+                        <div className="flex h-10 w-10 items-center justify-center">
+                          <RefreshCw className="h-4 w-4 animate-spin text-[#2962FF]" />
+                        </div>
+                      ) : (
+                        <ScoreRing score={healthScore} size="sm" />
                       )}
-                    </button>
-                  ))}
-                </div>
-                {filteredTickers.length === 0 && thesisTab !== "Tracked companies" ? (
-                  <div className="flex flex-col items-center justify-center min-h-[160px] rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] p-6 text-center">
-                    <p className="text-xs text-[#8B949E]">No companies match this filter.</p>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm font-bold text-[#E6EDF3]">{sym}</span>
+                        {companyName && (
+                          <span className="hidden truncate text-xs text-[#8B949E] max-w-[160px] sm:inline">{companyName}</span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        {ready && r ? (
+                          <>
+                            <span className="font-mono text-xs font-medium text-[#E6EDF3]">{fPrice(price)}</span>
+                            {change !== null && (
+                              <span className={`font-mono text-xs font-medium ${changeColor(change)}`}>
+                                {change >= 0 ? "+" : ""}{fChange(change)}
+                              </span>
+                            )}
+                            <ClassificationBadge classification={classification} size="sm" />
+                            {fetchedAt && (
+                              <span className="flex items-center gap-1 text-[10px] text-[#484F58]">
+                                <Clock className="h-3 w-3" />
+                                Last researched {fRelativeTime(fetchedAt)}
+                              </span>
+                            )}
+                          </>
+                        ) : pending ? (
+                          <span className="text-[11px] text-[#8B949E]">Loading data...</span>
+                        ) : (
+                          <span className="text-[11px] text-[#F59E0B]">Could not load data</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => navigateToStock({ ticker: sym, mode: "push" })}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
+                      >
+                        Research →
+                      </button>
+                      <button
+                        onClick={() => handleRemove(sym)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#484F58] hover:bg-white/[0.04] hover:text-[#EF4444] transition-colors"
+                        title="Remove from watchlist"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {filteredTickers.map((ticker) => {
-                      const info = StockRegistry.getStock(ticker);
-                      const score = info?.telemetrySnapshot?.healthScore ?? null;
-                      const noteObj = NoteEngine.getNote(ticker);
-                      const hasScore = typeof score === "number" && Number.isFinite(score);
-                      const category = categorizeTicker(ticker);
-
-                      const convTone = hasScore ? (score >= 60 ? "verified" : score <= 40 ? "danger" : "warning") : "muted";
-                      const catTone = category === "Needs review" ? "warning" : category === "Thesis improving" ? "verified" : category === "Risk rising" ? "danger" : "muted";
-
-                      return (
-                        <ProductPanel key={ticker} className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <button onClick={() => navigateToStock({ ticker, mode: "push" })} className="flex items-center gap-2 text-left">
-                                <span className="font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{ticker}</span>
-                                {info && (
-                                  <span className="truncate text-xs text-[#8B949E] max-w-[180px]">{info.companyName}</span>
-                                )}
-                                <ChevronRight className="h-3.5 w-3.5 text-[#484F58] shrink-0" aria-hidden="true" />
-                              </button>
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                              <ProductAction variant="ghost" onClick={() => navigateToStock({ ticker, mode: "push" })}>Research</ProductAction>
-                              <ProductAction variant="ghost" onClick={() => productNavigate("compare", ticker)}>Compare</ProductAction>
-                              <ProductAction variant="ghost" disabled disabledReason="Connect broker">Invest</ProductAction>
-                              <button onClick={() => handleRemoveTicker(ticker)} className="text-[10px] text-[#484F58] hover:text-[#EF4444] transition-colors ml-1" disabled={selectedList.startsWith(SMART_PREFIX)}>Remove</button>
-                            </div>
-                          </div>
-
-                          <div className="mt-2 flex items-center gap-2">
-                            <ProductStatusPill tone={convTone}>{hasScore ? Math.round(score) : "--"}</ProductStatusPill>
-                            <ProductStatusPill tone={catTone}>
-                              {category === "Needs review" ? "Needs review" :
-                               category === "Thesis improving" ? "Improving" :
-                               category === "Risk rising" ? "Risk rising" :
-                               "Unchanged"}
-                            </ProductStatusPill>
-                            {noteObj.timestamp ? (
-                              <span className="text-[10px] text-[#484F58]">Note saved</span>
-                            ) : null}
-                          </div>
-
-                          <div className="mt-3">
-                            <input
-                              type="text"
-                              value={noteObj.note}
-                              onChange={(e) => handleNoteChange(ticker, e.target.value)}
-                              placeholder="Why am I watching? Thesis summary..."
-                              className="w-full rounded-xl border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none"
-                              aria-label="Thesis note"
-                            />
-                          </div>
-
-                          <div className="mt-3">
-                            <button
-                              onClick={() => productNavigate("alerts")}
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.12)] bg-white/[0.02] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[rgba(148,163,184,0.25)] transition-colors"
-                            >
-                              <ChevronRight className="h-3 w-3" aria-hidden="true" />
-                              What changed
-                            </button>
-                          </div>
-                        </ProductPanel>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
-            )}
+                </ProductPanel>
+              );
+            })}
           </div>
-        </div>
+        )}
       </ProductPage>
     </ProductShell>
   );

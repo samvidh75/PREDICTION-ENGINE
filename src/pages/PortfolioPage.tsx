@@ -1,346 +1,326 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { PortfolioSnapshotFactory } from '../services/portfolio/PortfolioSnapshotFactory';
-import { PortfolioEngine, SECTOR_UNAVAILABLE, normalizeUserHolding, type UserHolding } from '../services/portfolio/PortfolioEngine';
-import { buildPortfolioReview } from '../services/portfolio/PortfolioReviewEngine';
-import type { PortfolioHoldingReview } from '../services/portfolio/PortfolioReviewEngine';
-import { navigateToStock } from '../architecture/navigation/routeCoordinator';
-import { loadAuthSession } from '../services/auth/sessionStore';
-import { AlertCircle, ArrowLeftRight, Edit2, Plus, ShieldAlert, Trash2, Upload, X } from 'lucide-react';
-import { useLiveQuotes } from '../hooks/useLiveQuotes';
-import { formatINR as uiFormatINR } from '../services/ui/dataFormatting';
-import ConfirmDialog from '../components/ui/ConfirmDialog';
-import { useToast } from '../components/feedback/useToast';
+import React, { useEffect, useMemo, useState } from 'react';
+import { runCompanyDataPipeline, type PipelineResult } from '../services/data/CompanyDataPipeline';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { fPrice, fChange } from '../lib/format';
+import { ScoreRing } from '../components/ui/ScoreRing';
+import { ClassificationBadge } from '../components/ui/ClassificationBadge';
 import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from '../components/product/ProductUI';
+import { TrendingUp, TrendingDown, Minus, AlertTriangle, Eye, Clock, BarChart3 } from 'lucide-react';
 
-function reviewSeverityClass(severity: 'info' | 'review' | 'attention'): string {
-  if (severity === 'attention') return 'border-[#EF4444]/30 bg-[rgba(239,68,68,0.06)] text-[#EF4444]';
-  if (severity === 'review') return 'border-[#F59E0B]/30 bg-[rgba(245,158,11,0.06)] text-[#F59E0B]';
-  return 'border-[#16A34A]/30 bg-[rgba(22,163,74,0.06)] text-[#16A34A]';
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface ThesisSnapshot {
+  symbol: string;
+  addedAt: string;
+  scoreAtAdd: number | null;
+  classificationAtAdd: string | null;
+  factorScoresAtAdd: Record<string, number | null>;
+  priceAtAdd: number | null;
 }
 
-function thesisStatus(holding: PortfolioHoldingReview): { label: string; dot: string } {
-  if (holding.gainLossPct === null) return { label: 'Awaiting outcome', dot: '#64748B' };
-  if (holding.gainLossPct >= 30) return { label: 'Matured', dot: '#16A34A' };
-  if (holding.gainLossPct >= 10) return { label: 'Progressing', dot: '#16A34A' };
-  if (holding.gainLossPct >= 0) return { label: 'Early', dot: '#2962FF' };
-  if (holding.gainLossPct >= -10) return { label: 'Pulling back', dot: '#F59E0B' };
-  return { label: 'Needs review', dot: '#EF4444' };
+interface ThesisCardData {
+  snapshot: ThesisSnapshot;
+  name: string | null;
+  currentPrice: number | null;
+  currentScore: number | null;
+  currentClassification: string | null;
+  currentFactors: Record<string, number | null>;
 }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'ss_thesis_snapshots';
+
+function loadSnapshots(): ThesisSnapshot[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed;
+  } catch {
+    return [];
+  }
+}
+
+function saveSnapshots(snapshots: ThesisSnapshot[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshots));
+}
+
+const CLASS_LEVEL: Record<string, number> = {
+  EXCELLENT: 0, HEALTHY: 1, STABLE: 2, WEAKENING: 3, AT_RISK: 4, INSUFFICIENT_DATA: 5,
+};
+
+function daysSince(iso: string): number {
+  return Math.round((Date.now() - new Date(iso).getTime()) / 86400000);
+}
+
+function statusBadge(snapshot: ThesisSnapshot, currentScore: number | null): { label: string; cls: string } {
+  if (currentScore === null || snapshot.scoreAtAdd === null) {
+    return { label: 'THESIS HOLDING', cls: 'border-[#16A34A]/30 text-[#16A34A] bg-[rgba(22,163,74,0.06)]' };
+  }
+  const delta = currentScore - snapshot.scoreAtAdd;
+  if (delta > 5) return { label: 'IMPROVING', cls: 'border-[#16A34A]/30 text-[#16A34A] bg-[rgba(22,163,74,0.06)]' };
+  if (delta >= -5) return { label: 'THESIS HOLDING', cls: 'border-[#16A34A]/30 text-[#16A34A] bg-[rgba(22,163,74,0.06)]' };
+  if (delta > -15) return { label: 'WEAKENING', cls: 'border-[#F59E0B]/30 text-[#F59E0B] bg-[rgba(245,158,11,0.06)]' };
+  return { label: 'REVIEW NEEDED', cls: 'border-[#EF4444]/30 text-[#EF4444] bg-[rgba(239,68,68,0.06)]' };
+}
+
+function classificationDroppedTwoOrMore(snapshot: ThesisSnapshot, current: string | null): boolean {
+  if (!snapshot.classificationAtAdd || !current) return false;
+  const from = CLASS_LEVEL[snapshot.classificationAtAdd];
+  const to = CLASS_LEVEL[current];
+  if (from === undefined || to === undefined) return false;
+  return to - from >= 2;
+}
+
+function computeDeltaScore(snapshot: ThesisSnapshot, currentScore: number | null): string | null {
+  if (snapshot.scoreAtAdd === null || currentScore === null) return null;
+  const delta = currentScore - snapshot.scoreAtAdd;
+  if (delta > 0) return `+${Math.round(delta)}`;
+  if (delta < 0) return `${Math.round(delta)}`;
+  return '0';
+}
+
+function factorDeltas(snapshot: ThesisSnapshot, current: Record<string, number | null>): Array<{ group: string; was: number | null; now: number | null; delta: number | null }> {
+  const groups = new Set([...Object.keys(snapshot.factorScoresAtAdd), ...Object.keys(current)]);
+  return Array.from(groups).map((group) => {
+    const was = snapshot.factorScoresAtAdd[group] ?? null;
+    const now = current[group] ?? null;
+    const delta = was !== null && now !== null ? now - was : null;
+    return { group, was, now, delta };
+  });
+}
+
+function whatChangedText(snapshot: ThesisSnapshot, currentScore: number | null, currentClassification: string | null, currentFactors: Record<string, number | null>): string {
+  const parts: string[] = [];
+
+  if (snapshot.scoreAtAdd !== null && currentScore !== null) {
+    const delta = currentScore - snapshot.scoreAtAdd;
+    if (delta > 0) parts.push(`Score improved by ${Math.round(delta)} points`);
+    else if (delta < 0) parts.push(`Score declined by ${Math.abs(Math.round(delta))} points`);
+  }
+
+  if (snapshot.classificationAtAdd && currentClassification && snapshot.classificationAtAdd !== currentClassification) {
+    const fromLevel = CLASS_LEVEL[snapshot.classificationAtAdd];
+    const toLevel = CLASS_LEVEL[currentClassification];
+    if (fromLevel !== undefined && toLevel !== undefined) {
+      if (toLevel < fromLevel) parts.push(`Classification upgraded from ${snapshot.classificationAtAdd} to ${currentClassification}`);
+      else parts.push(`Classification downgraded from ${snapshot.classificationAtAdd} to ${currentClassification}`);
+    }
+  }
+
+  const deltas = factorDeltas(snapshot, currentFactors).filter((d) => d.delta !== null && Math.abs(d.delta) >= 3);
+  const improved = deltas.filter((d) => d.delta! > 0);
+  const declined = deltas.filter((d) => d.delta! < 0);
+  if (improved.length > 0) parts.push(`${improved.map((d) => d.group).join(', ')} improved`);
+  if (declined.length > 0) parts.push(`${declined.map((d) => d.group).join(', ')} declined`);
+
+  if (parts.length === 0) return 'No significant changes detected.';
+  return parts.join('. ') + '.';
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export const PortfolioPage: React.FC = () => {
-  const [snapshot, setSnapshot] = useState(() => PortfolioSnapshotFactory.createSnapshot());
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isImportOpen, setIsImportOpen] = useState(false);
-  const [editingHolding, setEditingHolding] = useState<UserHolding | null>(null);
-  const [symbol, setSymbol] = useState('');
-  const [shares, setShares] = useState('');
-  const [price, setPrice] = useState('');
-  const [sector, setSector] = useState('');
-  const [csvText, setCsvText] = useState('');
-  const [formError, setFormError] = useState('');
-  const [importError, setImportError] = useState('');
-  const liveQuotes = useLiveQuotes(snapshot.holdings.map((holding) => holding.symbol));
-  const authSession = loadAuthSession();
-  const isLocalOnly = !authSession.uid;
-  const [deleteConfirmSymbol, setDeleteConfirmSymbol] = useState<string | null>(null);
-  const toast = useToast();
+  useDocumentTitle("Thesis Monitor | StockStory India");
+  const [snapshots, setSnapshots] = useState<ThesisSnapshot[]>(() => loadSnapshots());
+  const [pipelineResults, setPipelineResults] = useState<Record<string, PipelineResult>>({});
+  const [loading, setLoading] = useState(true);
 
-  const refreshSnapshot = useCallback(() => setSnapshot(PortfolioSnapshotFactory.createSnapshot()), []);
-  useEffect(() => { window.addEventListener('portfoliochange', refreshSnapshot); return () => window.removeEventListener('portfoliochange', refreshSnapshot); }, [refreshSnapshot]);
+  const symbols = useMemo(() => snapshots.map((s) => s.symbol), [snapshots]);
 
-  const currentPrices = useMemo(() => {
-    const prices: Record<string, number> = {};
-    for (const holding of snapshot.holdings) {
-      const value = liveQuotes[holding.symbol]?.quote?.price;
-      if (typeof value === 'number' && Number.isFinite(value) && value > 0) prices[holding.symbol] = value;
-    }
-    return prices;
-  }, [liveQuotes, snapshot.holdings]);
+  useEffect(() => {
+    setLoading(true);
+    Promise.allSettled(symbols.map((sym) => runCompanyDataPipeline(sym))).then((settled) => {
+      const map: Record<string, PipelineResult> = {};
+      settled.forEach((r, i) => {
+        if (r.status === 'fulfilled') map[symbols[i]] = r.value;
+      });
+      setPipelineResults((prev) => ({ ...prev, ...map }));
+      setLoading(false);
+    });
+  }, [symbols.join(',')]);
 
-  const review = useMemo(() => buildPortfolioReview(snapshot.holdings, currentPrices), [currentPrices, snapshot.holdings]);
+  const cardData: ThesisCardData[] = useMemo(() => {
+    return snapshots.map((snap) => {
+      const pipe = pipelineResults[snap.symbol];
+      const pred = pipe?.prediction;
+      const currentFactors: Record<string, number | null> = {};
+      if (pred) {
+        for (const fs of pred.factorScores) {
+          currentFactors[fs.group] = fs.value;
+        }
+      }
+      return {
+        snapshot: snap,
+        name: pipe?.companyName ?? null,
+        currentPrice: pipe?.price.current ?? null,
+        currentScore: pred?.rankingScore ?? null,
+        currentClassification: pred?.classification ?? null,
+        currentFactors,
+      };
+    });
+  }, [snapshots, pipelineResults]);
 
-  const resetHoldingForm = () => { setSymbol(''); setShares(''); setPrice(''); setSector(''); setFormError(''); };
-
-  const handleAddHolding = (event: React.FormEvent) => {
-    event.preventDefault(); setFormError('');
-    const added = PortfolioEngine.addHolding({ symbol: symbol.toUpperCase().trim(), shares: Number(shares), avgBuyPrice: Number(price), sector });
-    if (!added) { setFormError('Ticker, shares and average buy price must be valid positive values.'); return; }
-    resetHoldingForm(); setIsAddOpen(false);
+  const handleRemove = (symbol: string) => {
+    const updated = snapshots.filter((s) => s.symbol !== symbol);
+    setSnapshots(updated);
+    saveSnapshots(updated);
+    setPipelineResults((prev) => {
+      const next = { ...prev };
+      delete next[symbol];
+      return next;
+    });
   };
-
-  const handleEditHolding = (event: React.FormEvent) => {
-    event.preventDefault(); if (!editingHolding) return; setFormError('');
-    const updated = PortfolioEngine.updateHolding(editingHolding.symbol, Number(shares), Number(price));
-    if (!updated) { setFormError('Shares and average buy price must be valid positive values.'); return; }
-    setEditingHolding(null); setShares(''); setPrice('');
-  };
-
-  const handleCSVImport = (event: React.FormEvent) => {
-    event.preventDefault(); setImportError(''); const lines = csvText.split('\n'); const parsed: UserHolding[] = [];
-    for (let index = 0; index < lines.length; index++) {
-      const raw = lines[index].trim(); if (!raw) continue; const parts = raw.split(',');
-      if (parts.length < 3) { setImportError(`Row ${index + 1}: expected TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]`); return; }
-      const normalized = normalizeUserHolding({ symbol: parts[0].trim().toUpperCase(), shares: Number(parts[1].trim()), avgBuyPrice: Number(parts[2].trim()), sector: parts[3]?.trim() || SECTOR_UNAVAILABLE });
-      if (!normalized) { setImportError(`Row ${index + 1}: ticker, shares and average buy price must be valid positive values`); return; }
-      parsed.push(normalized);
-    }
-    if (parsed.length === 0) { setImportError('No valid rows found.'); return; }
-    parsed.forEach((holding) => PortfolioEngine.addHolding(holding)); setIsImportOpen(false); setCsvText('');
-  };
-
-  const handleOpenStock = (ticker: string) => navigateToStock({ ticker, mode: "push" });
-  const largest = review.concentration.largestPosition;
-
-  const attentionCount = review.reviewQueue.filter((item) => item.severity === 'attention').length;
-  const reviewCount = review.reviewQueue.filter((item) => item.severity === 'review').length;
 
   return (
     <ProductShell>
       <ProductPage>
-        <ProductPanel className="p-5 sm:p-6" as="section" aria-label="Portfolio overview">
+        <ProductPanel className="p-5 sm:p-6" as="section" aria-label="Thesis monitor">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">Tracked thesis</div>
-              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Manual thesis monitor</h1>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">Thesis monitor</div>
+              <h1 className="mt-1 text-xl font-semibold tracking-tight text-[var(--color-text-primary)]">Research thesis tracker</h1>
               <p className="mt-1 max-w-3xl text-xs leading-5 text-[var(--color-text-secondary)]">
-                Record positions locally, monitor thesis progress, and keep execution outside StockStory.
+                Track how your research theses evolve over time. Monitor score and factor changes for stocks you're watching.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <ProductAction variant="primary" onClick={() => setIsAddOpen(true)}><Plus className="h-3.5 w-3.5" /> Add position</ProductAction>
-              <ProductAction variant="secondary" onClick={() => setIsImportOpen(true)}><Upload className="h-3.5 w-3.5" /> Import CSV</ProductAction>
-              <ProductAction variant="ghost" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {[
-              { label: "Total entry", value: review.totalCostBasis > 0 ? uiFormatINR(review.totalCostBasis) : '—' },
-              { label: "Market value", value: review.livePortfolioValue !== null ? uiFormatINR(review.livePortfolioValue) : '—' },
-              { label: "Monitored", value: `${review.holdings.length} thesis${review.holdings.length !== 1 ? 'es' : ''}`, detail: review.quoteCoverage.coveredPositions > 0 ? `${review.quoteCoverage.coveredPositions}/${review.quoteCoverage.totalPositions} with current pricing` : 'Track companies to begin monitoring' },
-              { label: "Largest thesis", value: largest ? largest.symbol : '—', detail: largest ? `${largest.weightPct.toFixed(2)}% of entry` : undefined },
-            ].map((item) => (
-              <div key={item.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">{item.label}</div>
-                <div className="mt-1 text-sm font-semibold tabular-nums text-[var(--color-text-primary)]">{item.value}</div>
-                {item.detail && <div className="mt-0.5 text-[10px] text-[#64748B]">{item.detail}</div>}
-              </div>
-            ))}
           </div>
         </ProductPanel>
 
-        {isAddOpen && (
-          <ProductPanel className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Add position</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">Record a manual holding for research tracking.</p>
-              </div>
-              <button type="button" onClick={() => { setIsAddOpen(false); resetHoldingForm(); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
-            </div>
-            <form onSubmit={handleAddHolding} className="space-y-3">
-              <input aria-label="Ticker" type="text" required placeholder="Ticker" value={symbol} onChange={(event) => setSymbol(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-              <div className="grid grid-cols-2 gap-3">
-                <input aria-label="Shares" type="number" min="0.000001" step="any" required placeholder="Shares" value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-                <input aria-label="Average buy price" type="number" min="0.000001" step="any" required placeholder="Avg Buy Price" value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-              </div>
-              <input aria-label="Sector optional" type="text" placeholder="Sector (optional)" value={sector} onChange={(event) => setSector(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-              {formError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{formError}</div>}
-              <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Save holding</button>
-            </form>
-          </ProductPanel>
-        )}
-
-        {editingHolding !== null && (
-          <ProductPanel className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Edit {editingHolding.symbol}</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">Update shares or average buy price.</p>
-              </div>
-              <button type="button" onClick={() => { setEditingHolding(null); setFormError(''); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
-            </div>
-            <form onSubmit={handleEditHolding} className="space-y-3">
-              <input aria-label="Edit shares" type="number" min="0.000001" step="any" required value={shares} onChange={(event) => setShares(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Shares" />
-              <input aria-label="Edit average buy price" type="number" min="0.000001" step="any" required value={price} onChange={(event) => setPrice(event.target.value)} className="w-full rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" placeholder="Avg Buy Price" />
-              {formError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{formError}</div>}
-              <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Save</button>
-            </form>
-          </ProductPanel>
-        )}
-
-        {isImportOpen && (
-          <ProductPanel className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="text-sm font-semibold text-[var(--color-text-primary)]">Import CSV</div>
-                <p className="text-xs text-[var(--color-text-secondary)]">TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]</p>
-              </div>
-              <button type="button" onClick={() => { setIsImportOpen(false); setCsvText(''); }} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><X className="h-4 w-4" /></button>
-            </div>
-            <form onSubmit={handleCSVImport} className="space-y-3">
-              <textarea aria-label="Portfolio CSV" required rows={6} placeholder="TCS,10,3600,IT" value={csvText} onChange={(event) => setCsvText(event.target.value)} className="w-full resize-none rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-3 py-2.5 font-mono text-xs text-[var(--color-text-primary)] placeholder:text-[#484F58] outline-none focus:border-[#2962FF]/60 transition-colors" />
-              <p className="text-[10px] leading-relaxed text-[#64748B]">Format: TICKER,SHARES,AVG_BUY_PRICE[,SECTOR]. Leave sector blank if unknown.</p>
-              {importError && <div className="rounded-lg border border-[#EF4444]/20 bg-[rgba(239,68,68,0.06)] p-2.5 text-[10px] text-[#EF4444]">{importError}</div>}
-              <button type="submit" className="w-full rounded-lg border border-[#2962FF] bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">Parse and import</button>
-            </form>
-          </ProductPanel>
-        )}
-
-        {review.reviewQueue.length > 0 && (
-          <section aria-label="Thesis changes" className="space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="h-4 w-4 text-[#F59E0B]" />
-                <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-text-primary)]">What changed</h2>
-              </div>
-              <div className="flex gap-2">
-                {attentionCount > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-[#EF4444]/30 bg-[rgba(239,68,68,0.06)] px-2 py-0.5 text-[10px] font-medium text-[#EF4444]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#EF4444]" />
-                    {attentionCount} risk{attentionCount !== 1 ? 's' : ''}
-                  </span>
-                )}
-                {reviewCount > 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-[#F59E0B]/30 bg-[rgba(245,158,11,0.06)] px-2 py-0.5 text-[10px] font-medium text-[#F59E0B]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
-                    {reviewCount} to review
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              {review.reviewQueue.map((item) => (
-                <button key={item.id} type="button" onClick={() => item.symbol && handleOpenStock(item.symbol)} className={`rounded-lg border p-3 text-left transition-colors hover:bg-[rgba(255,255,255,0.03)] ${reviewSeverityClass(item.severity)}`}>
-                  <div className="text-[11px] font-semibold text-[var(--color-text-primary)]">{item.title}</div>
-                  <div className="mt-1 text-[10px] leading-relaxed opacity-75 text-[var(--color-text-secondary)]">{item.detail}</div>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {review.holdings.length === 0 ? (
+        {snapshots.length === 0 ? (
           <ProductEmptyState
-            icon={AlertCircle}
-            title="No thesis tracked yet"
-            body="Track companies to monitor whether the thesis still holds."
+            icon={Eye}
+            title="No tracked theses"
+            body="You haven't tracked any stocks yet. Research a stock and click 'Track thesis' to monitor it here."
             action={
-              <div className="flex gap-2">
-                <ProductAction variant="primary" onClick={() => productNavigate("scanner")}>Open scanner</ProductAction>
-                <ProductAction variant="secondary" onClick={() => productNavigate("search")}>Search company</ProductAction>
-                <ProductAction variant="ghost" onClick={() => productNavigate("watchlist")}>Open watchlist</ProductAction>
-              </div>
+              <ProductAction variant="primary" onClick={() => productNavigate('scanner')}>
+                <BarChart3 className="h-3.5 w-3.5" /> Start researching
+              </ProductAction>
             }
           />
         ) : (
-          <ProductPanel className="overflow-hidden" as="section" aria-label="Monitored positions">
-            <div className="hidden sm:block">
-              <div className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] gap-2 border-b border-[rgba(148,163,184,0.12)] p-3 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
-                <span className="pl-3">Ticker</span><span>Thesis</span><span>Sector</span><span>Shares</span><span>Entry price</span><span>Current value</span><span>Return</span><span className="text-right pr-3"></span>
+          <div className="space-y-3">
+            {loading && snapshots.length > 0 && Object.keys(pipelineResults).length === 0 && (
+              <div className="flex items-center justify-center py-8 text-xs text-[var(--color-text-secondary)]">
+                <Clock className="mr-2 h-3.5 w-3.5 animate-spin" />
+                Loading thesis data...
               </div>
-              {review.holdings.map((holding) => {
-                const thesis = thesisStatus(holding);
-                return (
-                  <div key={holding.symbol} className="grid grid-cols-[1fr_78px_78px_65px_90px_90px_70px_110px] items-center gap-2 border-b border-[rgba(148,163,184,0.06)] p-3 last:border-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-                    <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent pl-3 text-left font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{holding.symbol}</button>
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-[var(--color-text-secondary)]">
-                      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
-                      {thesis.label}
-                    </span>
-                    <span className="truncate text-[11px] text-[var(--color-text-secondary)]">{holding.sector}</span>
-                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{holding.shares}</span>
-                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{uiFormatINR(holding.costBasis)}</span>
-                    <span className="font-mono text-xs tabular-nums text-[var(--color-text-primary)]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</span>
-                    <span className={`font-mono text-xs tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                      {holding.gainLossPct === null ? '—' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
-                    </span>
-                    <div className="flex items-center justify-end gap-1">
-                      <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
-                        <ArrowLeftRight className="h-3 w-3" />
-                      </button>
-                      <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><Edit2 className="h-3 w-3" /></button>
-                      <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1.5 text-[var(--color-text-secondary)] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3 w-3" /></button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            )}
+            {cardData.map((card) => {
+              const snap = card.snapshot;
+              const badge = statusBadge(snap, card.currentScore);
+              const isReview = classificationDroppedTwoOrMore(snap, card.currentClassification);
+              const actualBadge = isReview ? { label: 'REVIEW NEEDED', cls: 'border-[#EF4444]/30 text-[#EF4444] bg-[rgba(239,68,68,0.06)]' } : badge;
+              const deltaScore = computeDeltaScore(snap, card.currentScore);
+              const fDeltas = factorDeltas(snap, card.currentFactors);
+              const changed = whatChangedText(snap, card.currentScore, card.currentClassification, card.currentFactors);
 
-            <div className="space-y-3 sm:hidden p-4">
-              {review.holdings.map((holding) => {
-                const thesis = thesisStatus(holding);
-                return (
-                  <div key={holding.symbol} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] p-4">
-                    <div className="flex items-center justify-between mb-3">
+              return (
+                <ProductPanel key={snap.symbol} className="overflow-hidden p-0" as="section" aria-label={`${snap.symbol} thesis`}>
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 border-b border-[rgba(148,163,184,0.08)] p-4">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <button type="button" onClick={() => handleOpenStock(holding.symbol)} className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline">{holding.symbol}</button>
-                        <span className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-text-secondary)]">
-                          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
-                          {thesis.label}
+                        <button
+                          type="button"
+                          onClick={() => productNavigate('stock', snap.symbol)}
+                          className="cursor-pointer border-none bg-transparent font-mono text-sm font-bold text-[var(--color-text-primary)] hover:underline"
+                        >
+                          {snap.symbol}
+                        </button>
+                        <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${actualBadge.cls}`}>
+                          {actualBadge.label}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button type="button" aria-label={`Compare ${holding.symbol}`} onClick={() => productNavigate("compare", holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><ArrowLeftRight className="h-3.5 w-3.5" /></button>
-                        <button type="button" aria-label={`Edit ${holding.symbol}`} onClick={() => { setEditingHolding(holding); setShares(String(holding.shares)); setPrice(String(holding.avgBuyPrice)); setFormError(''); }} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><Edit2 className="h-3.5 w-3.5" /></button>
-                        <button type="button" aria-label={`Delete ${holding.symbol}`} onClick={() => setDeleteConfirmSymbol(holding.symbol)} className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-text-secondary)] hover:text-[#EF4444] transition-colors"><Trash2 className="h-3.5 w-3.5" /></button>
+                      {card.name && (
+                        <div className="mt-0.5 text-[11px] text-[var(--color-text-secondary)]">{card.name}</div>
+                      )}
+                      <div className="mt-1.5 flex items-center gap-1 text-[10px] text-[#64748B]">
+                        <Clock className="h-3 w-3" />
+                        Added {daysSince(snap.addedAt)} days ago at {fPrice(snap.priceAtAdd)}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
-                      <div className="col-span-2">
-                        <span className="text-[var(--color-text-secondary)]">Thesis</span>
-                        <p className="font-medium text-[var(--color-text-primary)]">
-                          <span className="inline-flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: thesis.dot }} />
-                            {thesis.label}
-                          </span>
-                        </p>
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(snap.symbol)}
+                      className="cursor-pointer border-none bg-transparent p-1 text-[#64748B] hover:text-[#EF4444] transition-colors"
+                      aria-label={`Remove ${snap.symbol}`}
+                    >
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Body */}
+                  <div className="grid gap-4 p-4 sm:grid-cols-[1fr_1fr_1.5fr]">
+                    {/* Left: Score change */}
+                    <div className="flex flex-col items-center gap-2 sm:items-start">
+                      <ScoreRing score={card.currentScore} size="md" showGrade />
+                      <div className="text-center sm:text-left">
+                        {deltaScore !== null && (
+                          <div className={`text-xs font-bold tabular-nums ${card.currentScore !== null && snap.scoreAtAdd !== null && card.currentScore >= snap.scoreAtAdd ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
+                            Delta {deltaScore}
+                          </div>
+                        )}
+                        {snap.scoreAtAdd !== null && (
+                          <div className="text-[10px] text-[#64748B]">Was {Math.round(snap.scoreAtAdd)}</div>
+                        )}
                       </div>
-                      <div><span className="text-[var(--color-text-secondary)]">Sector</span><p className="font-medium truncate text-[var(--color-text-primary)]">{holding.sector}</p></div>
-                      <div><span className="text-[var(--color-text-secondary)]">Shares</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{holding.shares}</p></div>
-                      <div><span className="text-[var(--color-text-secondary)]">Entry price</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{uiFormatINR(holding.costBasis)}</p></div>
-                      <div><span className="text-[var(--color-text-secondary)]">Current value</span><p className="font-mono font-medium tabular-nums text-[var(--color-text-primary)]">{holding.liveValue === null ? <span className="text-[#64748B]">—</span> : uiFormatINR(holding.liveValue)}</p></div>
-                      <div className="col-span-2">
-                        <span className="text-[var(--color-text-secondary)]">Return</span>
-                        <p className={`font-mono font-medium tabular-nums ${holding.gainLossPct === null ? 'text-[#64748B]' : holding.gainLossPct >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>
-                          {holding.gainLossPct === null ? '—' : `${holding.gainLossPct >= 0 ? '+' : ''}${holding.gainLossPct.toFixed(2)}%`}
-                        </p>
+                    </div>
+
+                    {/* Center: Classification change */}
+                    <div className="flex flex-col items-center gap-1.5 sm:items-start">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">Classification</div>
+                      {card.currentClassification ? (
+                        <ClassificationBadge classification={card.currentClassification} size="sm" />
+                      ) : (
+                        <span className="text-[10px] text-[#64748B]">—</span>
+                      )}
+                      {snap.classificationAtAdd && (
+                        <div className="flex items-center gap-1.5 text-[10px] text-[#64748B]">
+                          Was <ClassificationBadge classification={snap.classificationAtAdd} size="sm" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Factor changes */}
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] mb-1.5">Factor changes</div>
+                      <div className="space-y-1">
+                        {fDeltas.map((fd) => (
+                          <div key={fd.group} className="flex items-center justify-between gap-3 text-[11px]">
+                            <span className="capitalize text-[var(--color-text-secondary)] w-20 truncate">{fd.group}</span>
+                            <span className="font-mono tabular-nums text-[var(--color-text-primary)]">
+                              {fd.was !== null ? Math.round(fd.was) : '—'} → {fd.now !== null ? Math.round(fd.now) : '—'}
+                            </span>
+                            <span className={`flex items-center gap-0.5 font-mono tabular-nums ${
+                              fd.delta === null ? 'text-[#64748B]' : fd.delta > 0 ? 'text-[#16A34A]' : fd.delta < 0 ? 'text-[#EF4444]' : 'text-[#64748B]'
+                            }`}>
+                              {fd.delta === null ? '—' : fd.delta > 0 ? <TrendingUp className="h-3 w-3" /> : fd.delta < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                              {fd.delta !== null && `${fd.delta > 0 ? '+' : ''}${Math.round(fd.delta)}`}
+                            </span>
+                          </div>
+                        ))}
+                        {fDeltas.length === 0 && (
+                          <div className="text-[10px] text-[#64748B]">No factor data available</div>
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </ProductPanel>
-        )}
 
-        {review.concentration.sectorExposure.length > 0 && (
-          <ProductPanel className="p-5" as="section" aria-label="Cost basis sector exposure">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--color-text-primary)]">Sector exposure — entry price</h2>
-            <div className="mt-3 space-y-2">
-              {review.concentration.sectorExposure.map((item) => (
-                <div key={item.sector} className="flex items-center gap-3 text-[11px]">
-                  <span className="w-40 truncate text-[var(--color-text-secondary)]">{item.sector}</span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[rgba(148,163,184,0.12)]">
-                    <div className="h-full rounded-full bg-[#16A34A]" style={{ width: `${Math.min(100, item.weightPct)}%` }} />
+                  {/* What changed */}
+                  <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-3">
+                    <div className="flex items-start gap-2">
+                      <BarChart3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-text-secondary)]" />
+                      <p className="text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{changed}</p>
+                    </div>
                   </div>
-                  <span className="w-16 text-right font-mono tabular-nums text-[var(--color-text-primary)]">{item.weightPct.toFixed(2)}%</span>
-                </div>
-              ))}
-            </div>
-          </ProductPanel>
+                </ProductPanel>
+              );
+            })}
+          </div>
         )}
-
-        <ConfirmDialog
-          open={deleteConfirmSymbol !== null}
-          title="Remove holding"
-          message={`Remove ${deleteConfirmSymbol} from your portfolio? This cannot be undone.`}
-          confirmLabel="Remove"
-          cancelLabel="Cancel"
-          destructive={true}
-          onConfirm={() => { if (deleteConfirmSymbol) { PortfolioEngine.removeHolding(deleteConfirmSymbol); toast.success(`${deleteConfirmSymbol} removed from portfolio`); setDeleteConfirmSymbol(null); } }}
-          onCancel={() => setDeleteConfirmSymbol(null)}
-        />
       </ProductPage>
     </ProductShell>
   );

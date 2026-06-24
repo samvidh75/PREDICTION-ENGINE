@@ -21,6 +21,9 @@ const SearchPage = React.lazy(() => import("../pages/SearchPage"));
 const ScannerPage = React.lazy(() => import("../components/scanner/ScannerPage"));
 const StockStoryPage = React.lazy(() => import("../pages/StockStoryPageF0"));
 const TrackPage = React.lazy(() => import("../pages/TrackPage"));
+const WatchlistPage = React.lazy(() => import("../pages/WatchlistPage"));
+const PortfolioPage = React.lazy(() => import("../pages/PortfolioPage"));
+const AlertsPage = React.lazy(() => import("../pages/AlertsPage"));
 const SettingsPage = React.lazy(() => import("../pages/SettingsPage"));
 const TrustCentrePage = React.lazy(() => import("../pages/TrustCentrePage"));
 const ComparePage = React.lazy(() => import("../pages/ComparePage"));
@@ -56,9 +59,13 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
     case "company":
       return <StockStoryPage />;
     case "portfolio":
+      return <PortfolioPage />;
     case "watchlist":
+      return <WatchlistPage />;
     case "alerts":
-      return <TrackPage />;
+      return <AlertsPage />;
+    case "settings":
+      return <SettingsPage />;
     case "compare":
       return <ComparePage />;
     case "terms":
@@ -79,9 +86,11 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
 function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Element {
   switch (pageKey) {
     case "portfolio":
+      return <PortfolioPage />;
     case "watchlist":
+      return <WatchlistPage />;
     case "alerts":
-      return <TrackPage />;
+      return <AlertsPage />;
     case "settings":
       return <SettingsPage />;
     case "search":
