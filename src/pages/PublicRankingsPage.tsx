@@ -5,6 +5,7 @@ import {
 } from "../components/product/ProductUI";
 import { useAuth } from "../context/AuthContext";
 import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
+import { globalPipelineQueue } from "../services/data/PipelineQueue";
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
 import Input from "../components/ui/Input";
 
@@ -245,18 +246,16 @@ export const PublicRankingsPage: React.FC = () => {
     if (loadingRef.current) return;
     loadingRef.current = true;
 
-    // Process in sub-batches of 3 to respect provider rate limits
+    // Process in sub-batches of 3, enqueuing via globalPipelineQueue to respect rate limits
     for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
       const batch = symbols.slice(i, i + BATCH_SIZE);
       await Promise.allSettled(
-        batch.map(async (sym) => {
-          try {
-            const r = await runCompanyDataPipeline(sym);
-            setResults(prev => ({ ...prev, [sym]: r }));
-          } catch {
-            setResults(prev => ({ ...prev, [sym]: null }));
-          }
-        }),
+        batch.map(sym =>
+          globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
+            (r) => setResults(prev => ({ ...prev, [sym]: r })),
+            () => setResults(prev => ({ ...prev, [sym]: null })),
+          )
+        ),
       );
     }
     loadingRef.current = false;
