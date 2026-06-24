@@ -308,8 +308,7 @@ body::before {
 }
 
 .nav-link-active {
-  background: var(--color-accent-light);
-  color: var(--color-accent);
+  color: var(--c-ink);
   font-weight: 600;
 }
 
@@ -342,8 +341,7 @@ body::before {
 }
 
 .bottom-tab-active {
-  background: var(--color-accent-light);
-  color: var(--color-accent);
+  color: var(--c-brand);
 }
 
 /* ============================================
