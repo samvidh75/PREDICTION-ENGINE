@@ -37,8 +37,9 @@ export const LoginPage: React.FC = () => {
         </div>
         <ProductFormPanel title="Sign in" body={contextMessage || "Sign in to continue your research."}>
           <CinematicAuthGateway onAuthed={onAuthed} initialStage="login" restoreOnMount={false} contextMessage={contextMessage} />
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex flex-col items-center gap-2">
             <ProductAction variant="ghost" onClick={() => productNavigate("signup")}>Need an account? Create one</ProductAction>
+            <ProductAction variant="ghost" onClick={() => productNavigate("scanner")}>Continue as guest →</ProductAction>
           </div>
         </ProductFormPanel>
       </ProductPage>

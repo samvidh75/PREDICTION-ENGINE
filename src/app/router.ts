@@ -97,14 +97,14 @@ export function notifyUrlChange(): void {
 
 /** Protected pages that require authentication. */
 export const PROTECTED_PAGES: PageKey[] = [
-  "dashboard", "search", "stock", "company",
-  "watchlist", "portfolio", "settings", "alerts", "invest",
+  "dashboard", "watchlist", "portfolio", "settings", "alerts", "invest",
 ];
 
 /** Public pages that don't require authentication. */
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "methodology",
-  "rankings", "compare", "scanner", "ipo", "track", "more", "pricing", "terms",
+  "rankings", "compare", "scanner", "search", "stock", "company",
+  "ipo", "track", "more", "pricing", "terms",
 ];
 
 /**

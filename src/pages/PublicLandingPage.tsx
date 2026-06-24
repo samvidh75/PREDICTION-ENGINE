@@ -1,5 +1,5 @@
-import React from "react";
-import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, Scale, Search, ShieldCheck, Sparkles, Target, Users } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ArrowRight, BookOpen, Eye, FileSearch, GitCompare, RefreshCw, Scale, Search, ShieldCheck, Target, Users } from "lucide-react";
 import {
   ProductAction,
   ProductHero,
@@ -11,6 +11,9 @@ import {
   productNavigate,
 } from "../components/product/ProductUI";
 import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
+import { runCompanyDataPipeline } from "../services/data/CompanyDataPipeline";
+import type { PipelineResult } from "../services/data/CompanyDataPipeline";
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
@@ -28,17 +31,116 @@ const differentiators = [
   { icon: Users, title: "Built for Indian equity investors", body: "Designed specifically for investors who research Indian stocks. From discovery to broker handoff." },
 ];
 
+const PREVIEW_SYMBOLS = ["TCS", "RELIANCE", "INFY"];
+
+function scoreColor(v: number | null): string {
+  if (v === null) return "#94A3B8";
+  if (v >= 70) return "#16A34A";
+  if (v >= 55) return "#22C55E";
+  if (v >= 40) return "#F59E0B";
+  if (v >= 25) return "#FB923C";
+  return "#EF4444";
+}
+
+function MiniScoreRing({ score }: { score: number | null }) {
+  const r = 16;
+  const circ = 2 * Math.PI * r;
+  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
+  const color = scoreColor(score);
+  return (
+    <svg width={40} height={40} viewBox="0 0 40 40">
+      <circle cx={20} cy={20} r={r} fill="none" stroke="#E2E8F0" strokeWidth={5} />
+      <circle cx={20} cy={20} r={r} fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
+        strokeLinecap="round" transform="rotate(-90 20 20)" />
+      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize="10" fontWeight="700" fill={color}>
+        {score !== null ? Math.round(score) : "—"}
+      </text>
+    </svg>
+  );
+}
+
+export function RealScoresPanel(): JSX.Element {
+  const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.allSettled(PREVIEW_SYMBOLS.map(s => runCompanyDataPipeline(s))).then(settled => {
+      if (cancelled) return;
+      const map: Record<string, PipelineResult | null> = {};
+      PREVIEW_SYMBOLS.forEach((s, i) => {
+        map[s] = settled[i].status === "fulfilled" ? settled[i].value : null;
+      });
+      setResults(map);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div className="relative rounded-[24px] border border-[#E2E8F0] bg-white/90 p-5 shadow-[0_24px_60px_rgba(15,23,42,.10)]">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#64748B]">Live Research Scores</p>
+        <span className="text-[9px] text-[#94A3B8]">Nifty 50 · Multi-factor</span>
+      </div>
+      <div className="space-y-3">
+        {PREVIEW_SYMBOLS.map(sym => {
+          const r = results[sym];
+          const score = r?.prediction?.rankingScore ?? null;
+          const name = r?.companyName ?? sym;
+          const price = r?.price.current;
+          const change = r?.price.change;
+          return (
+            <div key={sym} className="flex items-center gap-3 p-3 rounded-xl bg-[#F8FAFC] border border-[#F1F5F9]">
+              {loading ? (
+                <div className="w-10 h-10 flex items-center justify-center"><RefreshCw className="h-4 w-4 text-[#94A3B8] animate-spin" /></div>
+              ) : (
+                <MiniScoreRing score={score} />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-xs font-bold text-[#1E293B]">{sym}</span>
+                  <span className="text-[10px] text-[#64748B] truncate">{name !== sym ? name : ""}</span>
+                </div>
+                {price !== null && price !== undefined && (
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[11px] font-semibold tabular-nums text-[#1E293B]">
+                      ₹{price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                    </span>
+                    {change !== null && change !== undefined && (
+                      <span className={`text-[10px] font-semibold tabular-nums ${change >= 0 ? "text-[#16A34A]" : "text-[#EF4444]"}`}>
+                        {change >= 0 ? "+" : ""}{change.toFixed(2)}%
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => productNavigate("scanner")}
+                className="text-[10px] font-semibold text-[#2962FF] hover:underline shrink-0"
+              >
+                Research →
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[9px] text-[#94A3B8] text-center">For educational purposes only. Not investment advice.</p>
+    </div>
+  );
+}
+
+/** @deprecated Use RealScoresPanel */
 export function MarketIntelligenceVisual(): JSX.Element {
-  return <div data-testid="market-intelligence-visual" className="relative min-h-[320px] overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[linear-gradient(145deg,rgba(255,255,255,.94),rgba(238,244,255,.76))] p-5 shadow-[var(--shadow-blue-context)] backdrop-blur-[18px] md:min-h-[340px] md:p-6">
-    <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#8B5CF6]/10 blur-3xl" /><div className="absolute -bottom-14 -left-12 h-48 w-48 rounded-full bg-[#2962FF]/10 blur-3xl" /><div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(41,98,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(41,98,255,.06)_1px,transparent_1px)] [background-size:28px_28px]" />
-    <div className="relative flex items-center justify-between"><div><p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">Research intelligence</p><h2 className="mt-2 text-lg font-semibold text-[var(--color-text-primary)]">A clearer market picture</h2></div><span className="rounded-full border border-[#2962FF]/15 bg-white/80 px-3 py-1.5 text-[10px] font-semibold text-[#2962FF] shadow-sm">Structured context</span></div>
-    <div className="relative mx-auto mt-8 max-w-[390px]"><div className="absolute inset-x-7 top-4 h-[188px] rotate-3 rounded-[24px] border border-[#8B5CF6]/15 bg-white/55 shadow-lg" /><div className="absolute inset-x-3 top-2 h-[194px] -rotate-2 rounded-[24px] border border-[#2962FF]/15 bg-white/70 shadow-lg" /><div className="relative rounded-[24px] border border-white bg-white/90 p-5 shadow-[0_24px_60px_rgba(15,23,42,.14)]"><div className="flex items-start justify-between"><div><p className="font-mono text-xs font-semibold tracking-[0.12em] text-[var(--color-text-secondary)]">COMPANY LENS</p><p className="mt-1 text-xs text-[var(--color-text-muted)]">Quality · risk · valuation</p></div><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2962FF]/10"><Sparkles className="h-5 w-5 text-[#2962FF]" /></div></div><svg className="mt-5 h-16 w-full" viewBox="0 0 320 64" role="img" aria-label="Abstract research signal line"><defs><linearGradient id="signal" x1="0" x2="1"><stop stopColor="#2962FF"/><stop offset="1" stopColor="#8B5CF6"/></linearGradient></defs><path d="M2 49 C32 47 42 35 67 38 S105 50 130 29 S168 14 190 25 S230 45 254 25 S288 18 318 7" fill="none" stroke="url(#signal)" strokeWidth="3" strokeLinecap="round"/><path d="M2 49 C32 47 42 35 67 38 S105 50 130 29 S168 14 190 25 S230 45 254 25 S288 18 318 7 L318 64 L2 64Z" fill="url(#signal)" opacity=".08"/></svg><div className="mt-3 grid grid-cols-3 gap-2">{["Research", "Track", "Compare"].map((item) => <div key={item} className="rounded-xl border border-[var(--color-border)] bg-slate-50/75 px-2 py-2 text-center text-[10px] font-semibold text-[var(--color-text-secondary)]">{item}</div>)}</div></div><div className="absolute -bottom-5 -right-2 rounded-2xl border border-emerald-200/70 bg-white/95 px-3 py-2 shadow-[var(--shadow-green-context)]"><p className="text-[9px] font-semibold uppercase tracking-wider text-emerald-700">Thesis context</p><p className="mt-1 text-xs font-semibold text-[var(--color-text-primary)]">Evidence, organized</p></div></div>
-  </div>;
+  return <RealScoresPanel />;
 }
 
 export const PublicLandingPage: React.FC = () => {
   return (
     <ProductShell>
+      <SebiDisclaimer variant="banner" />
       <ProductPage>
         <ProductHero
           eyebrow="AI research for Indian equities"
@@ -46,17 +148,18 @@ export const PublicLandingPage: React.FC = () => {
           body="For Indian equity investors who want clearer research. Search companies, review scores, compare peers, track your thesis, then continue through your broker. StockStory is the AI research layer between you and the market."
           actions={(
             <>
-              <ProductAction id="hero-cta-start" onClick={() => productNavigate("signup")}>Start research</ProductAction>
+              <ProductAction id="hero-cta-start" onClick={() => productNavigate("scanner")}>Start research</ProductAction>
               <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("scanner")}>View scanner</ProductAction>
+              <ProductAction id="hero-cta-rankings-public" variant="secondary" onClick={() => productNavigate("scanner")}>View public rankings →</ProductAction>
               <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
             </>
           )}
-          aside={<MarketIntelligenceVisual />}
+          aside={<RealScoresPanel />}
         />
 
         <ProductSection>
           <div className="relative mb-5 overflow-hidden rounded-[22px] border border-blue-100/80 bg-[linear-gradient(120deg,rgba(239,246,255,.9),rgba(255,255,255,.82))] p-5 shadow-[0_16px_38px_rgba(30,64,175,.07)]">
-            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-500 to-violet-500" />
+            <div className="absolute inset-y-0 left-0 w-1 rounded-l-[22px]" style={{ backgroundColor: "#2962FF" }} />
             <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
               <strong className="text-[var(--color-text-primary)]">Who it is for:</strong> Indian equity investors who want structured, transparent research before making a decision. Not a broker, not a trading terminal, not a portfolio manager — a research tool.
             </p>
@@ -135,6 +238,9 @@ export const PublicLandingPage: React.FC = () => {
           <div className="mt-3 flex gap-4 text-xs">
             <button type="button" onClick={() => productNavigate("terms")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Terms & Disclosures</button>
             <button type="button" onClick={() => productNavigate("methodology")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Research Standards</button>
+          </div>
+          <div className="mt-4">
+            <SebiDisclaimer variant="inline" />
           </div>
         </footer>
       </ProductPage>
