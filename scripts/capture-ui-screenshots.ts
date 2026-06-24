@@ -4,7 +4,7 @@ import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const BASE_URL = process.env.BASE_URL || "http://127.0.0.1:4173";
-const OUT_DIR = resolve(process.env.SCREENSHOT_DIR || ".tmp/part-ba-after");
+const OUT_DIR = resolve(process.env.SCREENSHOT_DIR || ".tmp/part-bf-after");
 const NAVIGATION_TIMEOUT_MS = 15_000;
 const READY_TIMEOUT_MS = 8_000;
 
@@ -38,9 +38,9 @@ const ROUTES: Route[] = [
   { name: "portfolio", path: "/?page=portfolio", auth: true },
   { name: "alerts", path: "/?page=alerts", auth: true },
   { name: "methodology", path: "/?page=methodology" },
-  { name: "invest-sheet", path: "/?page=invest&id=RELIANCE", auth: true, state: "invest" },
-  { name: "command-palette", path: "/?page=dashboard", auth: true, state: "palette" },
-  { name: "mobile-nav", path: "/?page=dashboard", auth: true, state: "mobile-nav", mobileOnly: true },
+  { name: "invest-sheet", path: "/?page=stock&id=RELIANCE", auth: true, state: "invest" },
+  { name: "command-palette", path: "/?page=stock&id=TCS", auth: true, state: "palette" },
+  { name: "mobile-nav", path: "/?page=scanner", auth: true, state: "mobile-nav", mobileOnly: true },
 ];
 const ROUTE_FILTER = new Set((process.env.SCREENSHOT_ROUTES || "").split(",").map((value) => value.trim()).filter(Boolean));
 
@@ -62,7 +62,7 @@ async function settle(page: Page): Promise<void> {
 async function openState(page: Page, state?: CaptureState): Promise<void> {
   if (!state) return;
   if (state === "invest") {
-    const button = page.getByRole("button", { name: "Invest", exact: true });
+    const button = page.getByRole("button", { name: /invest review/i });
     if (await button.count()) await button.click();
   } else if (state === "palette") {
     await page.keyboard.press(process.platform === "darwin" ? "Meta+K" : "Control+K");
@@ -73,7 +73,7 @@ async function openState(page: Page, state?: CaptureState): Promise<void> {
   await page.waitForTimeout(200);
   if (state === "invest" && !(await page.getByRole("dialog").count())) throw new Error("Invest sheet did not open");
   if (state === "palette" && !(await page.getByRole("dialog").count())) throw new Error("Command palette did not open");
-  if (state === "mobile-nav" && !(await page.locator(".ssi-bottom-nav").count())) throw new Error("Mobile navigation is not visible");
+  if (state === "mobile-nav" && !(await page.locator("nav[aria-label='Mobile navigation']").count())) throw new Error("Mobile navigation is not visible");
 }
 
 /** Test-only visual fixture for stock detail screenshots. Not used in production. */
@@ -148,7 +148,7 @@ async function captureOne(browser: Browser, route: Route, viewport: typeof VIEWP
   });
   try {
     if (route.auth) await seedAuthenticatedSession(page);
-    if (route.name.startsWith("stock-")) await mockApi(page);
+    if (route.name.startsWith("stock-") || route.name === "invest-sheet" || route.name === "command-palette") await mockApi(page);
     await page.goto(`${BASE_URL}${route.path}`, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
     await settle(page);
     await openState(page, route.state);

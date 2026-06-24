@@ -2195,6 +2195,9 @@ export function InvestmentReviewSheet({
   if (!open) return null;
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Investment Review"
       style={{
         position: "fixed",
         inset: 0,
@@ -2464,6 +2467,9 @@ export function BrokerHandoffSheet({
   if (!open) return null;
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Broker handoff"
       style={{
         position: "fixed",
         inset: 0,
