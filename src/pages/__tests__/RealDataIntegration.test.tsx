@@ -5,7 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import DashboardHub from '../../components/dashboard/DashboardHub';
 import { SearchPage } from '../SearchPage';
 import { PublicRankingsPage } from '../PublicRankingsPage';
-import StockStoryPage from '../StockStoryPage';
+import StockStoryPage from '../StockStoryPageF0';
 import { LayoutProvider } from '../../context/LayoutContext';
 
 vi.mock('../../architecture/navigation/routeCoordinator', () => ({

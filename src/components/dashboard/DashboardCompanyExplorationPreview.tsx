@@ -89,7 +89,7 @@ export default function DashboardCompanyExplorationPreview({
     model.healthState === "STRUCTURALLY_HEALTHY" || model.healthState === "STABLE_EXPANSION" || model.healthState === "CONFIDENCE_IMPROVING"
       ? model.healthTheme.glowCyan
       : model.healthState === "LIQUIDITY_FRAGILE" || model.healthState === "STRUCTURALLY_WEAKENING"
-        ? model.healthTheme.glowslate
+        ? model.healthTheme.glowAmber
         : model.healthTheme.glowWarning;
 
   const narrativePreview = beginner
