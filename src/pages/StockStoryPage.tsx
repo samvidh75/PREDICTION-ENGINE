@@ -1,856 +1,950 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Activity, AlertCircle, ArrowLeft, ArrowRight, Building2, Star } from "lucide-react";
-import { formatINR, formatPercent, useLiveQuote } from "../hooks/useLiveQuotes";
-import { NoteEngine } from "../services/portfolio/NoteEngine";
-import { WatchlistEngine } from "../services/portfolio/WatchlistEngine";
-import { RecentSearchStore } from "../services/search/RecentSearchStore";
-import { StockRegistry } from "../services/stocks/StockRegistry";
-import { api, ApiError } from "../services/api/client";
-import type { CompanyMetadata } from "../services/api/client";
-import { formatNumber, formatPercentage as localFormatPercent, formatINR as uiFormatINR, formatScore } from "../services/ui/dataFormatting";
-import { useToast } from "../components/feedback/useToast";
-import { IntelligenceModal } from "../components/intelligence/IntelligenceModal";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  ArrowLeft, ExternalLink, RefreshCw, AlertCircle, CheckCircle2,
+  TrendingUp, TrendingDown, Minus, Star, BarChart3, Shield, Activity,
+  Users, Info, ChevronDown, Building2,
+} from "lucide-react";
+import { useStockData } from "../hooks/useStockData";
+import { productNavigate } from "../components/product/ProductUI";
+import { formatINR, formatPercent } from "../hooks/useLiveQuotes";
+import type { UnifiedFactorScore, UnifiedFactorGroup } from "../prediction-engine/types";
+import type { PipelineResult } from "../services/data/CompanyDataPipeline";
+import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
 
-import { computeSignalFromStoryData, storyDataToFactorScoresView } from "../lib/product/productSignalAdapter";
-import { buildCompanyPageData, companyResearchToFactorScores } from "../lib/product/researchDataAdapter";
-import { ThesisSnapshotEngine } from "../services/portfolio/ThesisSnapshotEngine";
-import { getSnapshotChangeLabel } from "../services/ui/freshnessLabels";
-import SignalExplanationPanel from "../components/research/SignalExplanationPanel";
-import FactorDriverList from "../components/research/FactorDriverList";
-import RiskReviewPanel from "../components/research/RiskReviewPanel";
-import NextBestActionPanel from "../components/research/NextBestActionPanel";
-import ResearchContextLink from "../components/research/ResearchContextLink";
-import { FinancialMetricGrid } from "../components/research/FinancialMetricGrid";
-import ValuationContextPanel from "../components/research/ValuationContextPanel";
-import { buildFinancialSnapshot } from "../lib/product/financialSnapshotAdapter";
-import PredictionEnginePanel from "../components/research/PredictionEnginePanel";
-import { buildCompanyResearchViewModel } from "../lib/product/viewModels/companyResearchViewModel";
-import { buildPredictionViewModel } from "../lib/product/predictionEngine/predictionViewModel";
-import { getHealthometerTone } from "../lib/product/publicLabels";
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-
-
-const getClassificationStyle = (cls: string) => {
-  const norm = cls.trim().toLowerCase();
-  if (norm === 'very healthy' || norm === 'very healthy' || cls === 'Very Healthy') return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
-  if (norm === 'healthy') return "bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.25)] text-[#22C55E]";
-  if (norm === 'stable') return "bg-[rgba(41,98,255,0.12)] border-[rgba(41,98,255,0.25)] text-[#2962FF]";
-  if (norm === 'needs review' || norm === 'unhealthy') return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.25)] text-[#F59E0B]";
-  if (norm === 'risk rising' || norm === 'very unhealthy') return "bg-[rgba(251,146,60,0.12)] border-[rgba(251,146,60,0.25)] text-[#FB923C]";
-  if (norm === 'fragile') return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.25)] text-[#EF4444]";
-  return "bg-[var(--color-surface-raised)] border-[var(--color-border)] text-[var(--color-text-secondary)]";
-};
-
-const getConfidenceStyle = (conf: string) => {
-  const norm = String(conf).toLowerCase();
-  switch (norm) {
-    case "very high":
-    case "high":
-      return "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.2)] text-[#16A34A]";
-    case "medium":
-      return "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.2)] text-[#F59E0B]";
-    case "low":
-      return "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.2)] text-[#EF4444]";
-    default:
-      return "bg-[var(--color-surface-raised)] border-[var(--color-border)] text-[var(--color-text-secondary)]";
-  }
-};
-
-type TabKey = "thesis" | "fundamentals" | "risk" | "peers" | "history";
-
-type MetadataState = { data: CompanyMetadata | null; loading: boolean; error: string | null; };
-
-const tabs: TabKey[] = ["thesis", "fundamentals", "risk", "peers", "history"];
-const TAB_LABELS: Record<TabKey, string> = { thesis: "Thesis", fundamentals: "Fundamentals", risk: "Risk", peers: "Peers", history: "History" };
-const TAB_ICONS: Record<TabKey, string> = { thesis: "Activity", fundamentals: "BarChart3", risk: "AlertCircle", peers: "Building2", history: "FileText" };
-
-function readTickerFromUrl(): string {
+function readSymbolFromUrl(): string {
   if (typeof window === "undefined") return "";
-  const params = new URLSearchParams(window.location.search);
-  return (params.get("id") ?? params.get("ticker") ?? "").toUpperCase().trim();
+  const p = new URLSearchParams(window.location.search);
+  return (p.get("id") ?? p.get("ticker") ?? "").toUpperCase().trim();
 }
 
 function readTabFromUrl(): TabKey {
   if (typeof window === "undefined") return "thesis";
-  const tab = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
-  return tab && tabs.includes(tab) ? tab : "thesis";
+  const t = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
+  return t && TABS.includes(t) ? t : "thesis";
 }
 
-function formatLargeINR(value?: number | null): string {
-  return uiFormatINR(value, true);
+function fmt(v: number | null | undefined, decimals = 1, suffix = ""): string {
+  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  return `${v.toFixed(decimals)}${suffix}`;
 }
 
-function formatDateTime(value?: string): string {
-  if (!value) return "Awaiting updated information";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Awaiting updated information";
-  return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+function fmtPct(v: number | null | undefined): string {
+  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  const pct = Math.abs(v) <= 2 ? v * 100 : v;
+  return `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
 }
 
-function extractScore(factor: any): number | null {
-  if (!factor || typeof factor.score !== "number" || !Number.isFinite(factor.score)) return null;
-  return factor.score;
+function fmtRatio(v: number | null | undefined, suffix = "x"): string {
+  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  return `${v.toFixed(1)}${suffix}`;
 }
 
-function adaptStockStoryResponse(data: any, financialsObj: any = null) {
-  if (!data) throw new Error("STOCKSTORY_SNAPSHOT_UNAVAILABLE");
-  const payload = data.data ?? data;
+function fmtScore(v: number | null | undefined): string {
+  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  return Math.round(v).toString();
+}
 
-  if (data.status === "unavailable" || !payload) {
-    return {
-      apiStatus: "unavailable",
-      unavailableReason: null,
-      unavailableMessage: "Not enough information for a reliable research case yet.",
-      dataState: data.dataState ?? null,
-      confidence: "Unavailable", healthScore: null, rankingScore: null, classification: null,
-      growth: null, quality: null, stability: null, valuation: null, momentum: null, risk: null,
-      narrative: "Not enough information for a reliable research case yet.",
-      factors: {}, financials: financialsObj || {},
-      engineDetails: {
-        growth: { score: null, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Factor scoring details are not yet available." },
-        quality: { score: null, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: null, commentary: "Factor scoring details are not yet available." },
-        stability: { score: null, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: null, commentary: "Factor scoring details are not yet available." },
-        momentum: { score: null, momentumScore: null, trendScore: null, volatilityScore: null, commentary: "Factor scoring details are not yet available." },
-        valuation: { score: null, peScore: null, pbScore: null, evEbitdaScore: null, fcfYieldScore: null, commentary: "Factor scoring details are not yet available." },
-        risk: { score: null, accountingAnomalyScore: null, debtStressScore: null, cashFlowStressScore: null, volatilityRiskScore: null, redFlagCount: 0, commentary: "Factor scoring details are not yet available." },
-        confidence: { level: "Unavailable", score: null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Not enough information for this view yet." },
-      },
-    };
+function relativeTime(iso: string | null): string {
+  if (!iso) return "";
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.round(diff / 60)} min ago`;
+  if (diff < 86400) return `${Math.round(diff / 3600)} hr ago`;
+  return `${Math.round(diff / 86400)} days ago`;
+}
+
+function scoreColor(v: number | null): string {
+  if (v === null) return "#94A3B8";
+  if (v >= 70) return "#16A34A";
+  if (v >= 55) return "#22C55E";
+  if (v >= 40) return "#F59E0B";
+  if (v >= 25) return "#FB923C";
+  return "#EF4444";
+}
+
+function classificationColor(cls: string): string {
+  switch (cls) {
+    case "EXCELLENT": return "#16A34A";
+    case "HEALTHY": return "#22C55E";
+    case "STABLE": return "#2962FF";
+    case "WEAKENING": return "#F59E0B";
+    case "AT_RISK": return "#EF4444";
+    default: return "#94A3B8";
   }
+}
 
-  const factors = payload.factors;
-  if (!factors) throw new Error("STOCKSTORY_FACTORS_MISSING");
+function classificationLabel(cls: string): string {
+  switch (cls) {
+    case "EXCELLENT": return "Excellent";
+    case "HEALTHY": return "Healthy";
+    case "STABLE": return "Stable";
+    case "WEAKENING": return "Weakening";
+    case "AT_RISK": return "At Risk";
+    case "INSUFFICIENT_DATA": return "Insufficient Data";
+    default: return cls;
+  }
+}
 
-  const growth = extractScore(factors.growth);
-  const quality = extractScore(factors.quality);
-  const stability = extractScore(factors.stability);
-  const momentum = extractScore(factors.momentum);
-  const valuation = extractScore(factors.value);
-  const risk = extractScore(factors.risk);
-  const confidenceScore = payload.confidence?.score ?? payload.confidenceScore ?? null;
+function confidenceColor(level: string): string {
+  switch (level) {
+    case "HIGH": return "#16A34A";
+    case "MEDIUM": return "#F59E0B";
+    case "LOW": case "CRITICAL": return "#EF4444";
+    default: return "#94A3B8";
+  }
+}
 
-  return {
-    ...payload,
-    apiStatus: data.status ?? "ok",
-    dataState: data.dataState ?? null,
-    confidence: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable",
-    growth, quality, stability, valuation, momentum, risk,
-    financials: financialsObj || {},
-    engineDetails: {
-      growth: { score: growth, revenueGrowth: financialsObj?.revenue_growth ?? null, epsGrowth: financialsObj?.earnings_growth ?? null, fcfGrowth: null, profitGrowth: financialsObj?.profit_growth ?? null, commentary: "Growth metrics reflect revenue and earnings trends." },
-      quality: { score: quality, roe: financialsObj?.roe ?? null, roic: financialsObj?.roic ?? null, grossMargin: null, operatingMargin: financialsObj?.operating_margin ?? null, efficiencyScore: quality, commentary: "Quality metrics assess profitability and capital efficiency." },
-      stability: { score: stability, debtScore: null, cashScore: null, volatilityScore: null, coverageScore: stability, commentary: "Stability measures balance sheet strength and earnings consistency." },
-      momentum: { score: momentum, momentumScore: momentum, trendScore: null, volatilityScore: null, commentary: "Momentum tracks recent price trends and market sentiment." },
-      valuation: { score: valuation, peScore: valuation, pbScore: valuation, evEbitdaScore: valuation, fcfYieldScore: valuation, commentary: "Valuation compares market price to fundamental business value." },
-      risk: { score: risk, accountingAnomalyScore: risk, debtStressScore: risk, cashFlowStressScore: risk, volatilityRiskScore: risk, redFlagCount: typeof risk === "number" && risk >= 65 ? 1 : 0, commentary: "Risk metrics flag potential accounting, leverage, and volatility concerns." },
-      confidence: { level: payload.confidence?.level ?? payload.confidenceLevel ?? "Unavailable", score: typeof confidenceScore === "number" ? confidenceScore : null, dataCompleteness: typeof data.dataState?.completenessScore === "number" ? data.dataState.completenessScore : null, signalAgreement: null, riskConsistency: null, historicalStability: null, commentary: "Confidence reflects the overall reliability of the current score assessment." },
+type TabKey = "thesis" | "fundamentals" | "risk" | "technicals" | "peers";
+const TABS: TabKey[] = ["thesis", "fundamentals", "risk", "technicals", "peers"];
+const TAB_LABELS: Record<TabKey, string> = {
+  thesis: "Thesis",
+  fundamentals: "Fundamentals",
+  risk: "Risk",
+  technicals: "Technicals",
+  peers: "Peers",
+};
+
+// ── Score Ring ────────────────────────────────────────────────────────────────
+
+function ScoreRing({ score, size = 96 }: { score: number | null; size?: number }) {
+  const r = (size - 12) / 2;
+  const circ = 2 * Math.PI * r;
+  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
+  const color = scoreColor(score);
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={score !== null ? `Score: ${Math.round(score)}` : "Score unavailable"}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#E2E8F0" strokeWidth={8} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8}
+        strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
+        strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        style={{ transition: "stroke-dashoffset 0.6s ease" }}
+      />
+      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize={size < 56 ? 11 : 18} fontWeight="700" fill={color}>
+        {score !== null ? Math.round(score) : "—"}
+      </text>
+    </svg>
+  );
+}
+
+// ── Factor Bar ────────────────────────────────────────────────────────────────
+
+function FactorBar({ label, score }: { label: string; score: number | null }) {
+  const color = scoreColor(score);
+  const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-20 shrink-0 text-xs text-[#64748B] truncate">{label}</span>
+      <div className="flex-1 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+      </div>
+      <span className="w-8 text-right text-xs font-semibold tabular-nums" style={{ color }}>{fmtScore(score)}</span>
+    </div>
+  );
+}
+
+// ── Metric Cell ───────────────────────────────────────────────────────────────
+
+function MetricCell({
+  label, value, source, note,
+}: {
+  label: string; value: string; source?: string; note?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5 p-3 bg-white border border-[#E2E8F0] rounded-xl hover:border-[#CBD5E1] transition-colors group">
+      <span className="text-[10px] uppercase tracking-wider text-[#94A3B8] font-semibold">{label}</span>
+      <span className="text-lg font-bold text-[#1E293B] tabular-nums leading-snug">
+        {value === "—" ? <span className="text-[#CBD5E1]">—</span> : value}
+      </span>
+      {note && <span className="text-[10px] text-[#94A3B8]">{note}</span>}
+      {source && (
+        <span className="text-[9px] text-[#CBD5E1] group-hover:text-[#94A3B8] transition-colors">Source: {source}</span>
+      )}
+    </div>
+  );
+}
+
+// ── SEBI Disclaimer ───────────────────────────────────────────────────────────
+
+function SebiDisclaimer() {
+  return (
+    <footer className="mt-8 px-4 py-4 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+      <p className="text-[11px] leading-5 text-[#94A3B8] max-w-5xl mx-auto">
+        <strong className="font-semibold text-[#64748B]">Disclaimer:</strong>{" "}
+        Research scores, factor analysis, and signals on this platform are for educational and research purposes only. They are not recommendations to buy, sell, or hold any securities. Past research scores are not indicative of future returns. StockStory India is not a SEBI-registered investment adviser. Always consult a SEBI-registered investment adviser before making investment decisions. All investments are subject to market risk; read all scheme-related documents carefully. SEBI registration is not an endorsement or guarantee of returns.
+      </p>
+    </footer>
+  );
+}
+
+// ── Thesis Tab ────────────────────────────────────────────────────────────────
+
+const FACTOR_META: Record<string, { icon: React.ReactNode; color: string; drivers: (p: PipelineResult) => string }> = {
+  quality: {
+    icon: <Star className="h-4 w-4" />,
+    color: "#2962FF",
+    drivers: (p) => `ROE ${fmtPct(p.fundamentals.roe)} · ROA ${fmtPct(p.fundamentals.roa)} · ROIC ${fmtPct(p.fundamentals.roic)}`,
+  },
+  valuation: {
+    icon: <BarChart3 className="h-4 w-4" />,
+    color: "#7C3AED",
+    drivers: (p) => `PE ${fmt(p.fundamentals.peRatio, 1)} · PB ${fmt(p.fundamentals.pbRatio, 1)} · EV/EBITDA ${fmt(p.fundamentals.evEbitda, 1)}x`,
+  },
+  growth: {
+    icon: <TrendingUp className="h-4 w-4" />,
+    color: "#059669",
+    drivers: (p) => `Revenue ${fmtPct(p.fundamentals.revenueGrowth)} · EPS ${fmtPct(p.fundamentals.epsGrowth)} · Profit ${fmtPct(p.fundamentals.profitGrowth)}`,
+  },
+  stability: {
+    icon: <Shield className="h-4 w-4" />,
+    color: "#0EA5E9",
+    drivers: (p) => `D/E ${fmtRatio(p.fundamentals.debtToEquity)} · Current Ratio ${fmtRatio(p.fundamentals.currentRatio)} · Op. Margin ${fmtPct(p.fundamentals.operatingMargin)}`,
+  },
+  momentum: {
+    icon: <Activity className="h-4 w-4" />,
+    color: "#F59E0B",
+    drivers: (p) => {
+      const macdDir = p.technicals.macd !== null ? (p.technicals.macd > 0 ? "Bullish" : "Bearish") : "—";
+      const maDist = p.technicals.movingAverageDistance50 !== null
+        ? `${(p.technicals.movingAverageDistance50 * 100).toFixed(1)}% above SMA50`
+        : "MA dist —";
+      return `RSI ${fmt(p.technicals.rsi14, 1)} · MACD ${macdDir} · ${maDist}`;
     },
-  };
-}
+  },
+  risk: {
+    icon: <AlertCircle className="h-4 w-4" />,
+    color: "#EF4444",
+    drivers: (p) => `Beta ${fmt(p.fundamentals.beta, 2)} · D/E ${fmtRatio(p.fundamentals.debtToEquity)} · ATR ${fmt(p.technicals.atr14, 2)}`,
+  },
+};
 
-export const StockStoryPage: React.FC = () => {
-  const ticker = useMemo(() => readTickerFromUrl(), []);
-  const registryStock = useMemo(() => StockRegistry.getStock(ticker), [ticker]);
-  const liveQuote = useLiveQuote(ticker);
-  const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
-  const [watchlists, setWatchlists] = useState(() => WatchlistEngine.getWatchlists());
-  const [noteText, setNoteText] = useState(() => NoteEngine.getNote(ticker).note);
-  const [metadata, setMetadata] = useState<MetadataState>({ data: null, loading: true, error: null });
-  const toast = useToast();
-  const [story, setStory] = useState<any | null>(null);
-  const [storyLoading, setStoryLoading] = useState<boolean>(true);
-  const [storyError, setStoryError] = useState<string | null>(null);
-  const [ownership, setOwnership] = useState<any | null>(null);
-  const [timeline, setTimeline] = useState<any[]>([]);
-  const [explanationModalOpen, setExplanationModalOpen] = useState(false);
+function ThesisTab({ pipeline }: { pipeline: PipelineResult }) {
+  const { prediction, fundamentals, technicals } = pipeline;
+  const factorScores: UnifiedFactorScore[] = prediction?.factorScores ?? [];
 
-  useEffect(() => { RecentSearchStore.addTicker(ticker); }, [ticker]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setMetadata({ data: null, loading: true, error: null });
-    api.getMetadata(ticker, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setMetadata({ data, loading: false, error: null }); }).catch(() => { if (controller.signal.aborted) return; setMetadata({ data: null, loading: false, error: "Company metadata needs research." }); });
-    return () => controller.abort();
-  }, [ticker]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    setStoryLoading(true); setStoryError(null);
-    const horizon = Number.parseInt(new URLSearchParams(window.location.search).get("horizon") ?? "30", 10);
-    api.getStockStory(ticker, horizon, { signal: controller.signal }).then((data) => { if (controller.signal.aborted) return; setStory(data); setStoryLoading(false); }).catch(() => { if (controller.signal.aborted) return; setStoryError("Company research needs review."); setStoryLoading(false); });
-    return () => controller.abort();
-  }, [ticker]);
-
-  const [financials, setFinancials] = useState<any>(null);
-  useEffect(() => { api.getCompanyFinancials(ticker).then(data => setFinancials(data)).catch(() => setFinancials(null)); }, [ticker]);
-
-  const [researchData, setResearchData] = useState<any>(null);
-  const [researchDataLoading, setResearchDataLoading] = useState(false);
-  useEffect(() => {
-    const ctrl = new AbortController();
-    setResearchDataLoading(true);
-    api.getCompanyResearch(ticker, { signal: ctrl.signal })
-      .then((res) => { if (!ctrl.signal.aborted) setResearchData(res.data); })
-      .catch(() => { if (!ctrl.signal.aborted) setResearchData(null); })
-      .finally(() => { if (!ctrl.signal.aborted) setResearchDataLoading(false); });
-    return () => ctrl.abort();
-  }, [ticker]);
-
-  const companyName = metadata.data?.companyName && metadata.data.companyName !== ticker ? metadata.data.companyName : registryStock?.companyName || ticker;
-  const sector = metadata.data?.sector || registryStock?.sector || "Awaiting classification";
-  const industry = metadata.data?.industry || "Awaiting classification";
-  const exchange = metadata.data?.exchange || liveQuote.quote?.exchange || registryStock?.exchange || "Awaiting classification";
-  const marketCap = formatLargeINR(metadata.data?.marketCap);
-  const currency = metadata.data?.currency || "INR";
-  const quote = liveQuote.quote;
-  const priceLabel = liveQuote.loading ? "Loading..." : quote ? formatINR(quote.price) : "Awaiting market data";
-  const changeLabel = quote ? `${formatINR(quote.change)} (${formatPercent(quote.changePercent)})` : "Awaiting market data";
-
-  const storyData = useMemo(() => {
-    if (!story) { if (financials && financials.snapshot_date) return adaptStockStoryResponse({ status: "unavailable" }, financials); return null; }
-    return adaptStockStoryResponse(story, financials);
-  }, [story, financials]);
-  const storyUnavailable = !story || storyData?.apiStatus === "unavailable";
-
-  const healthometerLabel: string | null = story?.healthometer?.label ?? null;
-
-  const pageData = useMemo(() => buildCompanyPageData(researchData, storyData, financials), [researchData, storyData, financials]);
-  const signal = useMemo(() => pageData.signal ?? computeSignalFromStoryData(storyData), [pageData.signal, storyData]);
-  const factorView = useMemo(() => pageData.factors ?? storyDataToFactorScoresView(storyData), [pageData.factors, storyData]);
-  const financialSnapshot = useMemo(() => buildFinancialSnapshot(financials), [financials]);
-  const isInWatchlist = useMemo(() => watchlists.some((w) => w.tickers.includes(ticker)), [watchlists, ticker]);
-
-  const researchViewModel = useMemo(() => {
-    const score = researchData?.score ?? storyData?.healthScore ?? null;
-    const financialGroups = financials ? buildFinancialSnapshot(financials).groups : [];
-    return buildCompanyResearchViewModel(
-      ticker,
-      companyName,
-      sector,
-      { score, financialGroups },
-      isInWatchlist
-    );
-  }, [ticker, companyName, sector, researchData, storyData, financials, isInWatchlist]);
-
-  const predictionModel = useMemo(() => {
-    return buildPredictionViewModel(
-      ticker,
-      researchViewModel.research?.score,
-      researchData?.riskScore ?? factorView?.riskScore,
-      financials
-    );
-  }, [ticker, researchViewModel.research?.score, researchData?.riskScore, factorView?.riskScore, financials]);
-
-  const relatedCompanies = useMemo(() => {
-    if (!registryStock?.sector) return [];
-    return StockRegistry.getAllStocks().filter((stock) => stock.symbol !== ticker && stock.sector === registryStock.sector).slice(0, 6);
-  }, [registryStock?.sector, ticker]);
-
-  const handleToggleWatchlist = () => {
-    const defaultList = watchlists[0];
-    if (!defaultList) return;
-    if (isInWatchlist) {
-      WatchlistEngine.removeTicker(defaultList.id, ticker);
-      toast.success(`${ticker} removed from watchlist`);
-    } else {
-      WatchlistEngine.addTicker(defaultList.id, ticker);
-      toast.success(`${ticker} saved to watchlist`);
-      if (signal && signal !== null) {
-        ThesisSnapshotEngine.saveSnapshot({
-          symbol: ticker,
-          score: signal.score,
-          label: signal.label,
-          confidence: signal.confidence,
-          timestamp: new Date().toISOString(),
-          factors: {},
-        });
-      }
-    }
-    setWatchlists([...WatchlistEngine.getWatchlists()]);
-  };
-
-  const snapshotLabel = useMemo(() => {
-    if (!isInWatchlist) return null;
-    const labelLower = (signal?.label ?? '').toLowerCase();
-    return getSnapshotChangeLabel(ticker, signal?.score ?? null, labelLower === 'unhealthy' || labelLower === 'very unhealthy' || labelLower === 'risk rising' || labelLower === 'fragile' || labelLower === 'avoid for now' ? 30 : null);
-  }, [isInWatchlist, ticker, signal]);
-
-  const handleSaveNote = (value: string) => { setNoteText(value); NoteEngine.saveNote(ticker, value); };
-
-  const navigateToPage = (pageKey: string) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", pageKey); params.delete("id"); params.delete("tab");
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
-  };
-
-  const navigateToTicker = (symbol: string) => {
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock"); params.set("id", symbol); params.delete("tab");
-    window.history.pushState({}, "", `?${params.toString()}`);
-    window.dispatchEvent(new Event("urlchange"));
-  };
-
-  const selectTab = (tab: TabKey) => {
-    setActiveTab(tab);
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", "stock"); params.set("id", ticker); params.set("tab", tab);
-    window.history.replaceState({}, "", `?${params.toString()}`);
-  };
-
-  if (storyLoading) {
-    return (
-      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased bg-[var(--color-canvas)] text-[var(--color-text-primary)] min-h-screen">
-        <div className="flex items-center justify-between gap-3 text-xs">
-          <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider hover:opacity-80 text-[var(--color-text-primary)]">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-          </button>
-        </div>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[var(--color-border)] border-t-[#2962FF]" />
-            <span className="text-sm font-semibold tracking-wider text-[var(--color-text-secondary)]">Loading company research...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!researchViewModel.hasEnoughData) {
-    return (
-      <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased bg-[var(--color-canvas)] text-[var(--color-text-primary)] min-h-screen">
-        <div className="flex items-center justify-between gap-3 text-xs">
-          <button onClick={() => navigateToPage("dashboard")} className="flex items-center gap-1.5 border-none bg-transparent font-bold uppercase tracking-wider text-[var(--color-text-primary)] hover:opacity-80">
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-          </button>
-        </div>
-
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
-          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] mb-1">{companyName}</h1>
-              <div className="inline-flex rounded-full border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.12)] px-2.5 py-1 text-[10px] font-medium text-[#2962FF]">
-                Not enough information for this view yet.
-              </div>
-            </div>
-            <div className="grid min-w-[260px] grid-cols-2 gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3.5">
-              <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Price context</div>
-                <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[var(--color-text-primary)]">{priceLabel}</div>
-                <div className={`mt-0.5 font-mono text-[10px] font-bold ${quote && quote.changePercent >= 0 ? 'text-[#16A34A]' : 'text-[#EF4444]'}`}>{changeLabel}</div>
-              </div>
-              <div>
-                <div className="text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Volume</div>
-                <div className="mt-1 font-mono text-lg font-bold tabular-nums text-[var(--color-text-primary)]">
-                  {typeof quote?.volume === "number" && Number.isFinite(quote.volume) ? quote.volume.toLocaleString("en-IN") : "—"}
-                </div>
-                <div className="mt-0.5 font-mono text-[9px] text-[var(--color-text-muted)]">Updated {formatDateTime(quote?.updatedAt)}</div>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-4 max-w-3xl text-xs leading-5 text-[var(--color-text-secondary)]">
-            Research context is based on available data. Track this company to review changes over time.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button onClick={handleToggleWatchlist} className={`h-10 rounded-xl px-4 text-xs font-semibold transition ${isInWatchlist ? "border border-red-500/30 bg-red-500/10 text-red-400" : "border border-[var(--color-border)] bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] hover:bg-[rgba(15,23,42,0.06)]"}`}>
-              <Star className={`mr-1.5 inline-block h-4 w-4 ${isInWatchlist ? "text-red-400" : ""}`} />
-              {isInWatchlist ? "Remove from watchlist" : "Track via watchlist"}
-            </button>
-            <button type="button" onClick={() => navigateToPage("search")} className="h-10 rounded-xl bg-[#2962FF] px-4 text-xs font-semibold text-white transition hover:bg-[#3B71FF]">
-              Search Another Company
-            </button>
-            <button type="button" onClick={() => navigateToPage("methodology")} className="h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 text-xs font-semibold text-[var(--color-text-secondary)] transition hover:bg-[rgba(15,23,42,0.06)]">
-              View Scoring Methodology
-            </button>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Your Notes</span>
-            {noteText && noteText.trim().length > 0 && (
-              <span className="text-[9px] text-[var(--color-text-muted)]">Saved on this device</span>
-            )}
-          </div>
-          <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-xs text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[#2962FF]" aria-label="Research notes" />
-        </div>
-        <div className="mt-4 text-center">
-          <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="text-[9px] font-medium tracking-wider text-[var(--color-text-muted)] uppercase hover:text-[var(--color-text-secondary)] transition-colors">
-            Informational research tool — Read Terms & Disclosures
-          </button>
-        </div>
-
-      </div>
-    );
-  }
-
-  const radius = 42;
-  const circumference = 2 * Math.PI * radius;
-  const score = typeof storyData.healthScore === "number" && Number.isFinite(storyData.healthScore) ? storyData.healthScore : null;
-  const strokeDashoffset = circumference - ((score ?? 0) / 100) * circumference;
-
-  const renderProgressBar = (label: string, scoreValue: number | null, colorClass: string) => {
-    const hasScore = typeof scoreValue === "number" && Number.isFinite(scoreValue);
-    const barColors: Record<string, string> = {
-      "text-primary": "bg-[var(--color-accent)]", "text-secondary": "bg-[var(--color-text-muted)]",
-      "text-warning": "bg-[var(--color-warning)]", "text-danger": "bg-[var(--color-danger)]",
-    };
-    const barColor = barColors[colorClass] || "bg-slate-400";
-    return (
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs font-semibold">
-          <span className="text-[var(--color-text-muted)]">{label}</span>
-          <span className={colorClass}>{hasScore ? formatScore(scoreValue) : "Awaiting data"}</span>
-        </div>
-        <div className="h-1.5 w-full rounded-full overflow-hidden bg-[rgba(255,255,255,0.06)]">
-          <div className={`h-full rounded-full transition-all duration-1000 ${barColor}`} style={{ width: hasScore ? `${scoreValue}%` : "0%" }} />
-        </div>
-      </div>
-    );
-  };
-
-  const formatGrowthValue = (val: number | null) => {
-    if (val === null || val === undefined) return <span className="text-[var(--color-text-muted)]">Awaiting data</span>;
-    const isPos = val >= 0;
-    return <span className={`font-mono font-bold ${isPos ? "text-[var(--color-active)]" : "text-[var(--color-danger)]"}`}>{isPos ? "+" : ""}{(val * 100).toFixed(2)}%</span>;
-  };
+  const primaryGroups: UnifiedFactorGroup[] = ["quality", "valuation", "growth", "stability", "momentum", "risk"];
+  const displayedFactors = primaryGroups.map(g => factorScores.find(f => f.group === g)).filter(Boolean) as UnifiedFactorScore[];
 
   return (
-    <div className="flex w-full flex-col gap-6 px-6 pb-16 antialiased text-[var(--color-text-primary)]">
-
-      {healthometerLabel && (() => {
-        const tone = getHealthometerTone(healthometerLabel);
-        return (
-          <div className="flex items-center gap-3">
-            <span
-              className="rounded-md border px-2 py-0.5 text-[10px] font-semibold"
-              style={{ color: tone.color, backgroundColor: tone.bg, borderColor: tone.border }}
-            >
-              {healthometerLabel}
-            </span>
-            {score !== null && (
-              <span className="text-xs text-[var(--color-text-muted)]">{Math.round(score)} / 100 &middot; {predictionModel.activeFactorCount} active dimensions</span>
-            )}
-          </div>
-        );
-      })()}
-
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Your Notes</span>
-          {noteText && noteText.trim().length > 0 && (
-            <span className="text-[9px] text-[var(--color-text-muted)]">Saved on this device</span>
-          )}
+    <div className="space-y-4">
+      {displayedFactors.length === 0 && (
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+          Factor scores unavailable — prediction engine requires more data.
         </div>
-        <textarea value={noteText} onChange={(event) => handleSaveNote(event.target.value)} placeholder="Add your own research notes for this company..." className="h-20 w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 text-xs text-[var(--color-text-primary)] outline-none transition placeholder:text-[var(--color-text-muted)]" aria-label="Research notes" />
-      </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {primaryGroups.map((group) => {
+          const fs = factorScores.find(f => f.group === group);
+          const meta = FACTOR_META[group];
+          const score = fs?.value ?? null;
+          const color = meta?.color ?? "#64748B";
+          const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
 
-      <div className="flex gap-2 overflow-x-auto border-b border-[var(--color-border)]" role="tablist">
-        {tabs.map((tab) => (
-          <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => selectTab(tab)} className={`h-10 shrink-0 border-b-2 bg-transparent px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${activeTab === tab ? "text-[#2962FF] border-[#2962FF] font-semibold" : "text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-muted)]"}`}>
-            {TAB_LABELS[tab]}
-          </button>
-        ))}
-      </div>
+          return (
+            <div key={group} className="p-4 bg-white border border-[#E2E8F0] rounded-2xl flex flex-col gap-3 hover:border-[#CBD5E1] transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2" style={{ color }}>
+                  {meta?.icon}
+                  <span className="text-sm font-semibold capitalize">{group}</span>
+                </div>
+                <span className="text-2xl font-bold tabular-nums" style={{ color: scoreColor(score) }}>
+                  {fmtScore(score)}
+                </span>
+              </div>
 
-      <div className="min-h-[300px] rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6">
+              {/* Fill bar */}
+              <div className="h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
+              </div>
 
-        {activeTab === "thesis" && (
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="space-y-5 lg:col-span-2">
-              <PredictionEnginePanel
-                symbol={ticker}
-                score={score}
-                riskScore={factorView?.riskScore}
-                qualityScore={factorView?.qualityScore}
-                valuationScore={factorView?.valuationScore}
-                growthScore={factorView?.growthScore}
-                stabilityScore={factorView?.stabilityScore}
-                momentumScore={factorView?.momentumScore}
-                rawMetrics={financials}
-                healthometerLabel={healthometerLabel}
-              />
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-                <h2 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Research Thesis</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--color-text-primary)]">
-                  {pageData?.narrative || storyData?.narrative || "Thesis details are being prepared."}
+              {/* Reason text */}
+              {fs?.reason && (
+                <p className="text-xs text-[#64748B] leading-relaxed">{fs.reason}</p>
+              )}
+
+              {/* Driver values */}
+              {meta && (
+                <p className="text-[11px] text-[#94A3B8] font-mono leading-relaxed">
+                  {meta.drivers(pipeline)}
                 </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#16A34A]">Bull Case</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-primary)]">
-                    {pageData?.bullCase
-                      ? pageData.bullCase
-                      : storyData?.growth !== null && storyData?.growth >= 60
-                        ? "Strong growth metrics and quality indicators suggest the company has favourable fundamentals."
-                        : storyData?.valuation !== null && storyData?.valuation >= 60
-                          ? "Attractive valuation relative to fundamentals may present a reasonable entry point for further research."
-                          : "Review fundamentals and risk tabs for a complete picture before forming a thesis."}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#EF4444]">Bear Case</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-primary)]">
-                    {pageData?.bearCase
-                      ? pageData.bearCase
-                      : storyData?.risk !== null && storyData?.risk < 40
-                        ? "Elevated risk indicators warrant closer review of leverage, volatility, and cash flow stability."
-                        : storyData?.momentum !== null && storyData?.momentum < 40
-                          ? "Weak price momentum may reflect broader sector or market concerns."
-                          : "Research the risk tab to identify potential concerns before making any decision."}
-                  </p>
-                </div>
-              </div>
-              {pageData?.topStrengths && pageData.topStrengths.length > 0 && (
-                <div className="rounded-2xl border border-[rgba(22,163,74,0.15)] bg-[rgba(22,163,74,0.04)] p-4">
-                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#16A34A]">Key Strengths</h3>
-                  <ul className="mt-2 space-y-1.5">
-                    {pageData.topStrengths.map((s: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[var(--color-text-secondary)]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#16A34A]/60" />
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               )}
-              {pageData?.topRisks && pageData.topRisks.length > 0 && (
-                <div className="rounded-2xl border border-[rgba(239,68,68,0.15)] bg-[rgba(239,68,68,0.04)] p-4">
-                  <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#EF4444]">Key Risks</h3>
-                  <ul className="mt-2 space-y-1.5">
-                    {pageData.topRisks.map((r: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[var(--color-text-secondary)]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#EF4444]/60" />
-                        {r}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <RiskReviewPanel
-                riskFlags={pageData?.keyRiskFlags ?? []}
-                overallRisk={pageData?.overallRisk ?? null}
-                riskScore={factorView?.riskScore ?? null}
-              />
-              <NextBestActionPanel symbol={ticker} hasSignal={signal !== null && signal.label !== "Research signals pending"} hasSector={sector !== "Awaiting classification"} />
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-                <h2 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-                  Before You Invest
-                  <ResearchContextLink label="How scores work" />
-                </h2>
-                <ul className="mt-3 space-y-2">
-                  {[
-                    "Understand the business model and how it makes money.",
-                    "Compare this company with its peers in the same sector.",
-                    "Review the risk factors, leverage, and volatility metrics.",
-                    "Decide your position size and risk tolerance with your broker or adviser.",
-                    "Research is not advice — always verify independently.",
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs leading-5 text-[var(--color-text-secondary)]">
-                      <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-[rgba(41,98,255,0.15)] text-center text-[9px] font-bold text-[#2962FF] flex items-center justify-center">{i + 1}</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <FactorDriverList factors={factorView} />
-              {financialSnapshot.groups.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Financial Strength</h3>
-                  <FinancialMetricGrid groups={financialSnapshot.groups} />
-                </div>
-              )}
-              {financialSnapshot.valuation && (
-                <ValuationContextPanel context={financialSnapshot.valuation} />
-              )}
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-                  <Building2 className="h-3.5 w-3.5" /> Profile
-                </div>
-                <dl className="mt-3 space-y-2 text-xs">
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-[var(--color-text-muted)]">Sector</dt><dd className="text-right font-semibold text-[var(--color-text-primary)]">{sector}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-[var(--color-text-muted)]">Industry</dt><dd className="text-right font-semibold truncate max-w-[160px] text-[var(--color-text-primary)]">{industry}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-[var(--color-text-muted)]">Market Cap</dt><dd className="text-right font-mono font-semibold tabular-nums text-[var(--color-text-primary)]">{marketCap}</dd>
-                  </div>
-                </dl>
-              </div>
-              <div className="flex justify-center">
-                <ResearchContextLink />
-              </div>
-            </div>
-          </div>
-        )}
 
-        {activeTab === "fundamentals" && (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Growth</h3>
-              <dl className="mt-3 space-y-3 text-xs">
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">Revenue Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.revenueGrowth)}</dd>
+              {/* Missing features warning */}
+              {fs && fs.missingFeatures.length > 0 && (
+                <div className="flex items-start gap-1 text-[10px] text-[#F59E0B]">
+                  <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+                  <span>Missing: {fs.missingFeatures.join(", ")}</span>
                 </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">EPS Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.epsGrowth)}</dd>
-                </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">Profit Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.profitGrowth)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-[var(--color-text-muted)]">FCF Growth</dt><dd>{formatGrowthValue(storyData.engineDetails.growth.fcfGrowth)}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-[11px] leading-relaxed text-[var(--color-text-muted)]">{storyData.engineDetails.growth.commentary}</p>
+              )}
+
+              {!fs && (
+                <div className="text-[11px] text-[#CBD5E1]">Insufficient data for this factor</div>
+              )}
             </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Quality</h3>
-              <dl className="mt-3 space-y-3 text-xs">
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">ROE</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roe)}</dd>
-                </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">ROIC</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.roic)}</dd>
-                </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">Operating Margin</dt><dd>{formatGrowthValue(storyData.engineDetails.quality.operatingMargin)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-[var(--color-text-muted)]">Efficiency Score</dt><dd className="font-mono font-bold tabular-nums text-[var(--color-text-primary)]">{formatScore(storyData.engineDetails.quality.efficiencyScore)}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-[11px] leading-relaxed text-[var(--color-text-muted)]">{storyData.engineDetails.quality.commentary}</p>
-            </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Valuation</h3>
-              <dl className="mt-3 space-y-3 text-xs">
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">P/E Ratio</dt><dd className="font-mono font-bold tabular-nums text-[var(--color-text-primary)]">{formatNumber(storyData.financials.peRatio)}</dd>
-                </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">P/B Ratio</dt><dd className="font-mono font-bold tabular-nums text-[var(--color-text-primary)]">{formatNumber(storyData.financials.pbRatio)}</dd>
-                </div>
-                <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                  <dt className="text-[var(--color-text-muted)]">EV/EBITDA</dt><dd className="font-mono font-bold tabular-nums text-[var(--color-text-primary)]">{formatNumber(storyData.financials.evEbitda)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-[var(--color-text-muted)]">FCF Yield</dt><dd className="font-mono font-bold tabular-nums text-[var(--color-text-primary)]">{localFormatPercent(storyData.financials.fcfYield)}</dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-[11px] leading-relaxed text-[var(--color-text-muted)]">{storyData.engineDetails.valuation.commentary}</p>
-            </div>
-            {ownership && (
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-                <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Shareholding</h3>
-                <div className="mt-3 space-y-3">
-                  {ownership.categories?.map((c: any) => (
-                    <div key={c.category} className="space-y-1">
-                      <div className="flex justify-between text-[11px]">
-                        <span className="text-[var(--color-text-secondary)]">{c.category}</span>
-                        <span className="text-[var(--color-text-primary)]">{c.share}</span>
-                      </div>
-                      <div className="h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
-                        <div className="h-full rounded-full bg-[#2962FF]" style={{ width: `${parseFloat(c.share) || 0}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Fundamentals Tab ──────────────────────────────────────────────────────────
+
+function FundamentalsTab({ pipeline }: { pipeline: PipelineResult }) {
+  const f = pipeline.fundamentals;
+  const freshDays = f.fundamentalFreshnessDays;
+  const freshLabel = freshDays !== null ? `Updated ${freshDays === 0 ? "today" : `${freshDays}d ago`}` : undefined;
+  const src = f.fundamentalSource === "screener" ? "Screener.in"
+    : f.fundamentalSource === "indianapi" ? "IndianAPI"
+    : f.fundamentalSource === "partial" ? "Multiple sources"
+    : "—";
+
+  return (
+    <div className="space-y-6">
+      {freshLabel && (
+        <p className="text-xs text-[#94A3B8]">Last updated: {freshLabel} · Source: {src}</p>
+      )}
+
+      {/* Growth */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Growth</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="Revenue Growth (3Y)" value={fmtPct(f.revenueGrowth)} source="Screener.in" />
+          <MetricCell label="EPS Growth" value={fmtPct(f.epsGrowth)} source="Screener.in" />
+          <MetricCell label="Profit Growth (3Y)" value={fmtPct(f.profitGrowth)} source="Screener.in" />
+        </div>
+      </div>
+
+      {/* Profitability */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Profitability</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="Gross Margin" value={fmtPct(f.grossMargin)} source="Screener.in" />
+          <MetricCell label="Operating Margin" value={fmtPct(f.operatingMargin)} source="Screener.in" />
+          <MetricCell label="Net Margin" value={fmtPct(f.netMargin)} source="Screener.in" />
+        </div>
+      </div>
+
+      {/* Returns */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Returns</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="ROE" value={fmtPct(f.roe)} source="Screener.in" />
+          <MetricCell label="ROA" value={fmtPct(f.roa)} source="Screener.in" />
+          <MetricCell label="ROIC" value={fmtPct(f.roic)} source="Screener.in" />
+        </div>
+      </div>
+
+      {/* Leverage & Liquidity */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Leverage & Liquidity</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="D/E Ratio" value={fmtRatio(f.debtToEquity)} source="Screener.in" />
+          <MetricCell label="Current Ratio" value={fmtRatio(f.currentRatio)} source="Screener.in" />
+          <MetricCell label="Interest Coverage" value={fmtRatio(f.interestCoverage)} source="Screener.in" />
+        </div>
+      </div>
+
+      {/* Valuation */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Valuation</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="P/E Ratio" value={fmt(f.peRatio, 1)} source="IndianAPI" />
+          <MetricCell label="P/B Ratio" value={fmt(f.pbRatio, 1)} source="IndianAPI" />
+          <MetricCell label="EV/EBITDA" value={fmt(f.evEbitda, 1, "x")} source="IndianAPI" />
+        </div>
+      </div>
+
+      {/* Per Share */}
+      <div>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-3">Per Share</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <MetricCell label="EPS" value={fmt(f.eps, 2, " ₹")} source="IndianAPI" />
+          <MetricCell label="Dividend Yield" value={fmtPct(f.dividendYield)} source="IndianAPI" />
+          <MetricCell label="FCF Yield" value={fmtPct(f.fcfYield)} source="Screener.in" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Risk Tab ──────────────────────────────────────────────────────────────────
+
+function RiskLevel({ level }: { level: "LOW" | "MODERATE" | "HIGH" | "UNKNOWN" }) {
+  const styles = {
+    LOW: "bg-green-50 text-green-700 border-green-200",
+    MODERATE: "bg-amber-50 text-amber-700 border-amber-200",
+    HIGH: "bg-red-50 text-red-700 border-red-200",
+    UNKNOWN: "bg-gray-50 text-gray-500 border-gray-200",
+  };
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${styles[level]}`}>{level}</span>
+  );
+}
+
+function RiskTab({ pipeline }: { pipeline: PipelineResult }) {
+  const { fundamentals: f, technicals: t, prediction } = pipeline;
+
+  const safetyScore = prediction?.factorScores.find(s => s.group === "risk")?.value ?? null;
+
+  const betaLevel = f.beta === null ? "UNKNOWN" : f.beta > 1.5 ? "HIGH" : f.beta > 1.0 ? "MODERATE" : "LOW";
+  const debtLevel = f.debtToEquity === null ? "UNKNOWN" : f.debtToEquity > 1.5 ? "HIGH" : f.debtToEquity > 0.75 ? "MODERATE" : "LOW";
+  const liquidityLevel = f.currentRatio === null ? "UNKNOWN" : f.currentRatio < 1 ? "HIGH" : f.currentRatio < 1.5 ? "MODERATE" : "LOW";
+  const fcfVsNet = f.netMargin !== null && f.fcfYield !== null
+    ? (f.fcfYield > f.netMargin ? "LOW" : "MODERATE") as "LOW" | "MODERATE" | "HIGH" | "UNKNOWN"
+    : "UNKNOWN";
+
+  return (
+    <div className="space-y-5">
+      {/* Safety score summary */}
+      <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl flex items-center gap-4">
+        <ScoreRing score={safetyScore} size={56} />
+        <div>
+          <div className="text-sm font-semibold text-[#1E293B]">Engine Safety Score</div>
+          <div className="text-xs text-[#64748B] mt-0.5">
+            {safetyScore !== null
+              ? safetyScore >= 70 ? "Low risk profile"
+                : safetyScore >= 45 ? "Moderate risk"
+                : "Elevated risk — review before investing"
+              : "Score unavailable — insufficient data"}
+          </div>
+        </div>
+      </div>
+
+      {/* Beta unavailable banner */}
+      {f.beta === null && (
+        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>Beta unavailable — market risk cannot be assessed from available data.</span>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Market Risk */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-semibold text-[#1E293B]">Market Risk</div>
+            <RiskLevel level={betaLevel} />
+          </div>
+          <div className="text-2xl font-bold tabular-nums text-[#1E293B]">{fmt(f.beta, 2)}</div>
+          <div className="text-xs text-[#94A3B8] mt-1">Beta · Sensitivity to Nifty 50 moves</div>
+          <div className="text-[10px] text-[#CBD5E1] mt-1">Source: Yahoo Finance 2Y price history</div>
+        </div>
+
+        {/* Leverage Risk */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-semibold text-[#1E293B]">Leverage Risk</div>
+            <RiskLevel level={debtLevel} />
+          </div>
+          <div className="text-2xl font-bold tabular-nums text-[#1E293B]">{fmtRatio(f.debtToEquity)}</div>
+          <div className="text-xs text-[#94A3B8] mt-1">Debt/Equity Ratio</div>
+          <div className="text-[10px] text-[#CBD5E1] mt-1">Source: Screener.in</div>
+        </div>
+
+        {/* Liquidity Risk */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-semibold text-[#1E293B]">Liquidity Risk</div>
+            <RiskLevel level={liquidityLevel} />
+          </div>
+          <div className="text-2xl font-bold tabular-nums text-[#1E293B]">{fmtRatio(f.currentRatio)}</div>
+          <div className="text-xs text-[#94A3B8] mt-1">Current Ratio · {f.currentRatio !== null && f.currentRatio < 1 ? "Below 1 — potential short-term stress" : f.currentRatio !== null && f.currentRatio >= 2 ? "Comfortable coverage" : f.currentRatio !== null ? "Adequate" : "Data not available"}</div>
+          <div className="text-[10px] text-[#CBD5E1] mt-1">Source: Screener.in</div>
+        </div>
+
+        {/* Earnings Quality */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-semibold text-[#1E293B]">Earnings Quality</div>
+            <RiskLevel level={fcfVsNet} />
+          </div>
+          <div className="text-sm tabular-nums text-[#1E293B] mt-1">
+            FCF Yield {fmtPct(f.fcfYield)} vs Net Margin {fmtPct(f.netMargin)}
+          </div>
+          <div className="text-xs text-[#94A3B8] mt-1">
+            {f.fcfYield !== null && f.netMargin !== null
+              ? f.fcfYield > f.netMargin
+                ? "FCF exceeds net margin — quality earnings"
+                : "FCF below net margin — earnings quality review needed"
+              : "Insufficient data for earnings quality assessment"}
+          </div>
+          <div className="text-[10px] text-[#CBD5E1] mt-1">Source: Screener.in</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Technicals Tab ────────────────────────────────────────────────────────────
+
+function TechnicalsTab({ pipeline }: { pipeline: PipelineResult }) {
+  const { technicals: t, price } = pipeline;
+  const dataLen = t.closePrices.length;
+
+  if (dataLen < 15) {
+    return (
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+        Insufficient historical data for technical analysis (need 15+ days, have {dataLen}).
+      </div>
+    );
+  }
+
+  // Overall technical signal
+  const rsi = t.rsi14;
+  const macdH = t.macdHistogram;
+  const maDist = t.movingAverageDistance50;
+
+  const isBullish = rsi !== null && rsi > 55 && macdH !== null && macdH > 0 && maDist !== null && maDist > 0;
+  const isBearish = rsi !== null && rsi < 45 && macdH !== null && macdH < 0 && maDist !== null && maDist < 0;
+  const signal = isBullish ? "BULLISH" : isBearish ? "BEARISH" : "NEUTRAL";
+  const signalStyle = isBullish
+    ? "bg-green-50 text-green-700 border-green-200"
+    : isBearish
+    ? "bg-red-50 text-red-700 border-red-200"
+    : "bg-blue-50 text-blue-700 border-blue-200";
+
+  const rsiZone = rsi === null ? "—" : rsi > 70 ? "Overbought" : rsi < 40 ? "Oversold" : "Normal";
+  const adxStrength = t.adx14 === null ? "—"
+    : t.adx14 < 20 ? "No trend"
+    : t.adx14 < 25 ? "Weak trend"
+    : t.adx14 < 40 ? "Trending"
+    : "Strong trend";
+  const bwLabel = t.bollingerWidth === null ? "—"
+    : t.bollingerWidth < 0.08 ? "Tight (low volatility)"
+    : t.bollingerWidth > 0.2 ? "Wide (high volatility)"
+    : "Normal";
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-[#64748B]">
+          Computed from {dataLen} trading days of Yahoo Finance data
+        </span>
+        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${signalStyle}`}>{signal}</span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* RSI */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1">RSI (14)</div>
+          <div className="text-3xl font-bold tabular-nums text-[#1E293B]">{fmt(t.rsi14, 1)}</div>
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+              rsiZone === "Overbought" ? "bg-red-50 text-red-700 border-red-200"
+              : rsiZone === "Oversold" ? "bg-green-50 text-green-700 border-green-200"
+              : "bg-blue-50 text-blue-600 border-blue-200"
+            }`}>{rsiZone}</span>
+          </div>
+          <div className="text-[10px] text-[#CBD5E1] mt-2">Overbought &gt;70 · Normal 40–70 · Oversold &lt;40</div>
+        </div>
+
+        {/* MACD */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1">MACD</div>
+          <div className="text-3xl font-bold tabular-nums text-[#1E293B]">{fmt(t.macd, 2)}</div>
+          <div className="text-xs text-[#64748B] mt-1.5 space-y-0.5">
+            <div>Signal: {fmt(t.macdSignal, 2)}</div>
+            <div>Histogram: <span className={t.macdHistogram !== null && t.macdHistogram > 0 ? "text-green-600" : "text-red-500"}>{fmt(t.macdHistogram, 2)}</span></div>
+          </div>
+          <div className="text-[10px] text-[#CBD5E1] mt-1">
+            {t.macdHistogram !== null ? (t.macdHistogram > 0 ? "Bullish momentum" : "Bearish momentum") : "—"}
+          </div>
+        </div>
+
+        {/* ADX */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1">ADX (14)</div>
+          <div className="text-3xl font-bold tabular-nums text-[#1E293B]">{fmt(t.adx14, 1)}</div>
+          <div className="mt-1.5">
+            <span className="px-2 py-0.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full text-[10px] text-[#64748B]">{adxStrength}</span>
+          </div>
+          <div className="text-[10px] text-[#CBD5E1] mt-2">No trend &lt;20 · Weak 20–25 · Trending 25–40 · Strong &gt;40</div>
+        </div>
+
+        {/* Bollinger Width */}
+        <div className="p-4 bg-white border border-[#E2E8F0] rounded-2xl">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8] mb-1">Bollinger Width</div>
+          <div className="text-3xl font-bold tabular-nums text-[#1E293B]">{fmt(t.bollingerWidth, 3)}</div>
+          <div className="mt-1.5">
+            <span className="px-2 py-0.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-full text-[10px] text-[#64748B]">{bwLabel}</span>
+          </div>
+          <div className="text-[10px] text-[#CBD5E1] mt-2">SMA50 distance: {t.movingAverageDistance50 !== null ? `${(t.movingAverageDistance50 * 100).toFixed(1)}% ${t.movingAverageDistance50 >= 0 ? "above" : "below"}` : "—"}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Peers Tab ─────────────────────────────────────────────────────────────────
+
+function PeersTab({ pipeline }: { pipeline: PipelineResult }) {
+  const { sector, prediction: pred, fundamentals: f, price: p } = pipeline;
+
+  // Derive peer symbols from same sector (using NIFTY50 as universe)
+  // Since we don't have sector-level filtering, show top 5 NIFTY50 stocks excluding current
+  const peerSymbols = useMemo(() => {
+    return NIFTY50_SYMBOLS.filter(s => s !== pipeline.symbol).slice(0, 5);
+  }, [pipeline.symbol]);
+
+  const myScore = pred?.rankingScore ?? null;
+  const myPE = f.peRatio;
+  const myROE = f.roe;
+  const myRevGrowth = f.revenueGrowth;
+
+  return (
+    <div className="space-y-4">
+      <div className="text-sm text-[#64748B]">
+        Comparing against Nifty 50 universe
+        {sector ? ` · Sector: ${sector}` : ""}
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-[#E2E8F0]">
+              <th className="text-left py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Symbol</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Score</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Class</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider hidden sm:table-cell">PE</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider hidden sm:table-cell">ROE</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-[#64748B] uppercase tracking-wider hidden md:table-cell">Rev Growth</th>
+              <th className="py-2 px-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* Current stock */}
+            <tr className="border-b border-[#F1F5F9] bg-blue-50/50">
+              <td className="py-2.5 px-3 font-bold text-[#2962FF]">{pipeline.symbol} <span className="text-[10px] text-[#94A3B8] font-normal">(this)</span></td>
+              <td className="py-2.5 px-3 text-right font-bold tabular-nums" style={{ color: scoreColor(myScore) }}>{fmtScore(myScore)}</td>
+              <td className="py-2.5 px-3 text-right">
+                {pred && (
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ color: classificationColor(pred.classification), background: `${classificationColor(pred.classification)}15` }}>
+                    {classificationLabel(pred.classification)}
+                  </span>
+                )}
+              </td>
+              <td className="py-2.5 px-3 text-right tabular-nums text-[#1E293B] hidden sm:table-cell">{fmt(myPE, 1)}</td>
+              <td className="py-2.5 px-3 text-right tabular-nums text-[#1E293B] hidden sm:table-cell">{fmtPct(myROE)}</td>
+              <td className="py-2.5 px-3 text-right tabular-nums text-[#1E293B] hidden md:table-cell">{fmtPct(myRevGrowth)}</td>
+              <td className="py-2.5 px-3"></td>
+            </tr>
+            {/* Peer rows — navigate on click */}
+            {peerSymbols.map((sym) => (
+              <tr
+                key={sym}
+                className="border-b border-[#F1F5F9] hover:bg-[#F8FAFC] cursor-pointer transition-colors"
+                onClick={() => productNavigate("stock", sym)}
+              >
+                <td className="py-2.5 px-3 font-semibold text-[#1E293B]">{sym}</td>
+                <td className="py-2.5 px-3 text-right text-[#94A3B8] text-xs">—</td>
+                <td className="py-2.5 px-3 text-right text-[#94A3B8] text-xs">—</td>
+                <td className="py-2.5 px-3 text-right text-[#94A3B8] text-xs hidden sm:table-cell">—</td>
+                <td className="py-2.5 px-3 text-right text-[#94A3B8] text-xs hidden sm:table-cell">—</td>
+                <td className="py-2.5 px-3 text-right text-[#94A3B8] text-xs hidden md:table-cell">—</td>
+                <td className="py-2.5 px-3">
+                  <button
+                    type="button"
+                    className="text-[10px] text-[#2962FF] hover:underline font-semibold"
+                    onClick={(e) => { e.stopPropagation(); productNavigate("stock", sym); }}
+                  >
+                    Research →
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-[10px] text-[#CBD5E1]">
+        Click any peer row to load their full research report. Scores load on-demand to avoid rate limits.
+      </p>
+    </div>
+  );
+}
+
+// ── Pipeline Health Panel ─────────────────────────────────────────────────────
+
+function PipelineHealth({ pipeline }: { pipeline: PipelineResult }) {
+  const { price, fundamentals, technicals, pipelineErrors } = pipeline;
+
+  const providers = [
+    { name: "IndianAPI (price)", ok: price.current !== null && price.source === "indianapi" },
+    { name: "Yahoo (historical)", ok: technicals.closePrices.length > 0 },
+    { name: "Screener (fundamentals)", ok: fundamentals.fundamentalSource !== null },
+    { name: "Upstox (supplemental)", ok: false, unavailable: true },
+  ];
+
+  return (
+    <div className="space-y-2">
+      <div className="text-xs font-semibold text-[#64748B] mb-2 uppercase tracking-wider">Pipeline Health</div>
+      {providers.map(({ name, ok, unavailable }) => (
+        <div key={name} className="flex items-center gap-2 text-xs">
+          {unavailable ? (
+            <Minus className="h-3 w-3 text-[#CBD5E1]" />
+          ) : ok ? (
+            <CheckCircle2 className="h-3 w-3 text-green-500" />
+          ) : (
+            <AlertCircle className="h-3 w-3 text-red-400" />
+          )}
+          <span className={unavailable ? "text-[#CBD5E1]" : ok ? "text-[#64748B]" : "text-red-500"}>{name}</span>
+          <span className={`ml-auto text-[10px] ${unavailable ? "text-[#CBD5E1]" : ok ? "text-green-500" : "text-red-400"}`}>
+            {unavailable ? "Not configured" : ok ? "Live" : "Failed"}
+          </span>
+        </div>
+      ))}
+      {pipelineErrors.map((err, i) => (
+        <div key={i} className="flex items-start gap-1.5 text-[10px] text-amber-600 bg-amber-50 rounded px-2 py-1 mt-1">
+          <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+          <span className="break-words">{err.slice(0, 120)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
+
+export const StockStoryPage: React.FC = () => {
+  const [symbol, setSymbol] = useState<string>(() => readSymbolFromUrl());
+  const [activeTab, setActiveTab] = useState<TabKey>(() => readTabFromUrl());
+  const { pipeline, loading, error, refetch } = useStockData(symbol || null);
+
+  // Sync symbol from URL changes (browser nav)
+  useEffect(() => {
+    const onUrl = () => {
+      const sym = readSymbolFromUrl();
+      if (sym && sym !== symbol) {
+        setSymbol(sym);
+        setActiveTab(readTabFromUrl());
+      }
+    };
+    window.addEventListener("urlchange", onUrl);
+    window.addEventListener("popstate", onUrl);
+    return () => {
+      window.removeEventListener("urlchange", onUrl);
+      window.removeEventListener("popstate", onUrl);
+    };
+  }, [symbol]);
+
+  const pred = pipeline?.prediction ?? null;
+  const pricePos = pipeline ? (pipeline.price.change ?? 0) >= 0 : true;
+
+  if (!symbol) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center text-[#94A3B8]">
+        No stock selected. Go back and search for a symbol.
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC]">
+      {/* ── Sticky Header ───────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-[#E2E8F0] shadow-sm">
+        <div className="mx-auto max-w-[1180px] px-4 py-3 flex items-center gap-3 flex-wrap">
+          {/* Back + Symbol */}
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              type="button"
+              onClick={() => productNavigate("search")}
+              className="flex items-center gap-1 text-sm text-[#64748B] hover:text-[#1E293B] transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+            <span className="text-[#E2E8F0]">·</span>
+            <span className="font-mono text-lg font-bold text-[#1E293B]">{symbol}</span>
+            {pipeline?.companyName && (
+              <span className="text-sm text-[#94A3B8] truncate hidden sm:block max-w-[200px]">{pipeline.companyName}</span>
+            )}
+            {pipeline?.price.exchange && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]">
+                {pipeline.price.exchange}
+              </span>
             )}
           </div>
-        )}
 
-        {activeTab === "risk" && (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#EF4444]">
-                <AlertCircle className="h-3 w-3" /> Risk Factors
-              </h3>
-              <div className="mt-4 space-y-4">
-                {[
-                  { label: "Accounting", value: storyData.engineDetails.risk.accountingAnomalyScore },
-                  { label: "Leverage", value: storyData.engineDetails.risk.debtStressScore },
-                  { label: "Cash Flow", value: storyData.engineDetails.risk.cashFlowStressScore },
-                  { label: "Volatility", value: storyData.engineDetails.risk.volatilityRiskScore },
-                ].map((r) => (
-                  <div key={r.label}>
-                    <div className="flex justify-between text-[11px]">
-                      <span className="text-[var(--color-text-secondary)]">{r.label}</span>
-                      <span className="font-mono font-semibold tabular-nums text-[var(--color-text-primary)]">{r.value != null ? `${Math.round(r.value)}` : "—"}</span>
-                    </div>
-                    <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
-                      <div className={`h-full rounded-full transition-all ${r.value != null && r.value >= 60 ? 'bg-[#EF4444]' : 'bg-[#2962FF]'}`} style={{ width: r.value != null ? `${r.value}%` : "0%" }} />
-                    </div>
-                  </div>
-                ))}
+          {/* Price */}
+          <div className="flex items-center gap-2 ml-auto">
+            {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
+              <>
+                <span className="text-xl font-bold tabular-nums text-[#1E293B]">
+                  ₹{pipeline.price.current.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                {pipeline.price.change !== null && (
+                  <span className={`text-sm font-semibold tabular-nums ${pricePos ? "text-green-600" : "text-red-500"}`}>
+                    {pricePos ? "+" : ""}{pipeline.price.change.toFixed(2)}%
+                  </span>
+                )}
+                {pipeline.price.changeAbs !== null && (
+                  <span className={`text-sm tabular-nums hidden sm:inline ${pricePos ? "text-green-600" : "text-red-500"}`}>
+                    ({pricePos ? "+" : ""}₹{pipeline.price.changeAbs.toFixed(2)})
+                  </span>
+                )}
+                {pipeline.price.lastTradeTime && (
+                  <span className="text-[10px] text-[#94A3B8] hidden md:inline">
+                    {relativeTime(pipeline.price.lastTradeTime)}
+                  </span>
+                )}
+              </>
+            ) : loading ? (
+              <span className="text-sm text-[#94A3B8]">Loading…</span>
+            ) : (
+              <span className="text-sm text-[#CBD5E1]">Price unavailable</span>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={refetch}
+              disabled={loading}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] disabled:opacity-40 transition-colors"
+            >
+              <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => productNavigate("compare", symbol)}
+              className="px-2.5 py-1.5 text-xs text-[#64748B] border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] transition-colors hidden sm:flex"
+            >
+              Compare
+            </button>
+            <button
+              type="button"
+              onClick={() => productNavigate("broker", symbol)}
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-[#16A34A] rounded-lg hover:bg-[#15803D] transition-colors"
+            >
+              Continue to broker →
+            </button>
+            {/* SEBI Disclaimer tooltip */}
+            <div className="relative group">
+              <button type="button" className="flex items-center text-[#94A3B8] hover:text-[#64748B]" aria-label="SEBI disclaimer">
+                <Info className="h-4 w-4" />
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-72 bg-white border border-[#E2E8F0] rounded-xl shadow-lg p-3 text-[10px] text-[#64748B] leading-relaxed opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                Research scores are for educational purposes only. Not a SEBI-registered investment adviser. Not a buy/sell recommendation.
               </div>
-              <p className="mt-4 text-[11px] leading-relaxed text-[var(--color-text-muted)]">{storyData.engineDetails.risk.commentary}</p>
             </div>
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
-                <Activity className="h-3 w-3" /> Confidence
-              </h3>
-              <dl className="mt-4 space-y-3 text-xs">
-                {[
-                  { label: "Data completeness", value: storyData.engineDetails.confidence.dataCompleteness },
-                  { label: "Signal agreement", value: storyData.engineDetails.confidence.signalAgreement },
-                  { label: "Risk consistency", value: storyData.engineDetails.confidence.riskConsistency },
-                  { label: "Historical stability", value: storyData.engineDetails.confidence.historicalStability },
-                ].map((c) => (
-                  <div key={c.label} className="flex justify-between border-b border-[var(--color-border)] pb-2">
-                    <dt className="text-[var(--color-text-muted)]">{c.label}</dt>
-                    <dd className="font-mono font-semibold tabular-nums text-[var(--color-text-primary)]">{c.value != null ? `${Math.round(c.value)}%` : "—"}</dd>
-                  </div>
-                ))}
-              </dl>
-              <p className="mt-3 text-[11px] leading-relaxed text-[var(--color-text-muted)]">{storyData.engineDetails.confidence.commentary}</p>
-            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1180px] px-4 py-6 sm:px-6 space-y-5">
+        {/* ── Error / Loading ───────────────────────────────────────────── */}
+        {error && !pipeline && (
+          <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        {activeTab === "peers" && (
-          <div className="space-y-4">
-            {relatedCompanies.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {relatedCompanies.map((company) => (
-                  <button
-                    key={company.symbol}
-                    type="button"
-                    onClick={() => navigateToTicker(company.symbol)}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-left transition hover:bg-[var(--color-surface-elevated)]"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-bold text-[var(--color-text-primary)]">{company.symbol}</span>
-                        <span className="text-[10px] text-[var(--color-text-muted)]">{company.sector}</span>
+        {loading && !pipeline && (
+          <div className="p-8 bg-white border border-[#E2E8F0] rounded-2xl text-center text-[#94A3B8] text-sm">
+            <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
+            Loading {symbol} research data…
+          </div>
+        )}
+
+        {pipeline && (
+          <>
+            {/* ── Engine Score Card ──────────────────────────────────── */}
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm p-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Left — Score ring */}
+                <div className="flex flex-col items-center gap-3 md:border-r md:border-[#E2E8F0] md:pr-6">
+                  <ScoreRing score={pred?.rankingScore ?? null} size={96} />
+                  {pred && (
+                    <>
+                      <div className="flex items-center gap-2 flex-wrap justify-center">
+                        <span
+                          className="px-2.5 py-0.5 rounded-full text-xs font-bold border"
+                          style={{ color: classificationColor(pred.classification), background: `${classificationColor(pred.classification)}15`, borderColor: `${classificationColor(pred.classification)}30` }}
+                        >
+                          {classificationLabel(pred.classification)}
+                        </span>
+                        <span
+                          className="px-2.5 py-0.5 rounded-full text-xs font-semibold border"
+                          style={{ color: confidenceColor(pred.confidenceLevel), background: `${confidenceColor(pred.confidenceLevel)}15`, borderColor: `${confidenceColor(pred.confidenceLevel)}30` }}
+                        >
+                          {pred.confidenceLevel} confidence
+                        </span>
                       </div>
-                      <p className="mt-0.5 truncate text-xs text-[var(--color-text-secondary)]">{company.companyName}</p>
+                      <div className="text-[10px] text-[#CBD5E1] text-center">Unified Engine v2.0.0</div>
+                    </>
+                  )}
+
+                  {/* Completeness bar */}
+                  <div className="w-full mt-1">
+                    <div className="flex justify-between text-[10px] text-[#94A3B8] mb-1">
+                      <span>Data completeness</span>
+                      <span>{pipeline.dataCompleteness} / 100</span>
                     </div>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-[#2962FF]" />
+                    <div className="h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#2962FF] rounded-full" style={{ width: `${pipeline.dataCompleteness}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Middle — Factor bars */}
+                <div className="flex flex-col gap-3 md:border-r md:border-[#E2E8F0] md:pr-6">
+                  <div className="text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-1">Factor Scores</div>
+                  {pred ? (
+                    (["quality", "valuation", "growth", "stability", "momentum", "risk"] as const).map(group => {
+                      const fs = pred.factorScores.find(f => f.group === group);
+                      return <FactorBar key={group} label={group.charAt(0).toUpperCase() + group.slice(1)} score={fs?.value ?? null} />;
+                    })
+                  ) : (
+                    <span className="text-sm text-[#CBD5E1]">Awaiting engine output</span>
+                  )}
+                </div>
+
+                {/* Right — Pipeline health */}
+                <div>
+                  <PipelineHealth pipeline={pipeline} />
+                </div>
+              </div>
+            </div>
+
+            {/* ── Tab Navigation ─────────────────────────────────────── */}
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+              {/* Tab bar */}
+              <div className="flex border-b border-[#E2E8F0] overflow-x-auto">
+                {TABS.map(tab => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                      activeTab === tab
+                        ? "border-[#2962FF] text-[#2962FF]"
+                        : "border-transparent text-[#64748B] hover:text-[#1E293B] hover:border-[#E2E8F0]"
+                    }`}
+                  >
+                    {TAB_LABELS[tab]}
                   </button>
                 ))}
               </div>
-            ) : (
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 text-sm text-[var(--color-text-muted)]">
-                Peer companies in the same sector are not available for comparison.
+
+              {/* Tab content */}
+              <div className="p-5">
+                {activeTab === "thesis" && <ThesisTab pipeline={pipeline} />}
+                {activeTab === "fundamentals" && <FundamentalsTab pipeline={pipeline} />}
+                {activeTab === "risk" && <RiskTab pipeline={pipeline} />}
+                {activeTab === "technicals" && <TechnicalsTab pipeline={pipeline} />}
+                {activeTab === "peers" && <PeersTab pipeline={pipeline} />}
               </div>
-            )}
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Compare with Peers</h3>
-              <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">
-                Use the compare tool to evaluate this company against others in the same sector side by side.
-              </p>
-              <button
-                type="button"
-                onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "compare"); p.set("id", ticker); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#2962FF] px-4 py-2 text-xs font-semibold text-white hover:bg-[#3B71FF] transition-colors"
-              >
-                Compare companies
-              </button>
             </div>
-          </div>
+          </>
         )}
+      </main>
 
-        {activeTab === "history" && (
-          <div className="space-y-6">
-            {timeline.length > 0 ? (
-              <div className="relative ml-3 space-y-6 border-l border-[var(--color-border)] pl-6 text-xs">
-                {timeline.map((evt, idx) => (
-                  <div key={idx} className="relative">
-                    <span className="absolute -left-[25px] top-1 flex h-3 w-3 items-center justify-center rounded-full bg-[#2962FF] ring-4 ring-[var(--color-surface)]" />
-                    <div className="mb-1 font-mono text-[10px] font-semibold text-[#2962FF]">{evt.date}</div>
-                    <div className="mb-1 text-sm font-semibold text-[var(--color-text-primary)]">{evt.event}</div>
-                    <p className="leading-relaxed text-[var(--color-text-secondary)]">{evt.detail}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 text-sm text-[var(--color-text-muted)]">
-                Corporate actions timeline is not currently available.
-              </div>
-            )}
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">Research Basis</h3>
-              <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">
-                Research is based on company fundamentals, market data, and sector analysis. All scores are computed through documented methodology.
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-4 text-center">
-        <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="text-[9px] font-medium tracking-wider text-[var(--color-text-muted)] uppercase hover:text-[var(--color-text-secondary)] transition-colors">
-          Informational research tool — Read Terms & Disclosures
-        </button>
-      </div>
-
-      <IntelligenceModal
-        open={explanationModalOpen}
-        onClose={() => setExplanationModalOpen(false)}
-        title={ticker ? `${ticker} — score explanation` : ""}
-        subtitle="Factor context and score details for this company."
-      >
-        <div className="space-y-5">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Score</span>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-bold tabular-nums text-[var(--color-text-primary)]">
-                  {score !== null ? Math.round(score) : "—"}
-                </span>
-                <span className="text-xs text-[var(--color-text-muted)]">/ 100</span>
-              </div>
-              {storyData?.classification && (
-                <span className="mt-1 inline-flex items-center rounded-full border border-white/5 bg-[var(--color-surface-raised)] px-2.5 py-0.5 text-[10px] font-medium text-[var(--color-text-muted)]">
-                  {storyData.classification}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Factor context</span>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-muted)]">
-              {storyData?.narrative || "Factor scoring details are not yet available."}
-            </p>
-          </div>
-
-          {signal && <SignalExplanationPanel signal={signal} />}
-          <FactorDriverList factors={factorView} />
-          <RiskReviewPanel
-            riskFlags={pageData?.keyRiskFlags ?? []}
-            overallRisk={pageData?.overallRisk ?? null}
-            riskScore={factorView?.riskScore ?? null}
-          />
-
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4">
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Research basis</span>
-            <div className="mt-2 space-y-1.5">
-              {[
-                { label: "Assessment date", value: storyData?.predictionDate ? formatDateTime(storyData.predictionDate) : "Assessment not yet available" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--color-text-muted)]">{item.label}</span>
-                  <span className="text-xs font-medium text-[var(--color-text-primary)]">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-[10px] leading-relaxed text-[var(--color-text-muted)]">
-            This score explanation shows model inputs and outputs for reference. <button type="button" onClick={() => { const p = new URLSearchParams(window.location.search); p.set("page", "terms"); window.history.pushState({}, "", `?${p.toString()}`); window.dispatchEvent(new Event("urlchange")); }} className="underline hover:text-[var(--color-text-secondary)] transition-colors">Read Terms & Disclosures</button>
-          </p>
-        </div>
-      </IntelligenceModal>
+      <SebiDisclaimer />
     </div>
   );
 };

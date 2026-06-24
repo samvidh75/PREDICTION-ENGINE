@@ -590,6 +590,65 @@ export interface TrendlyneStatusResponse {
   updatedAt: string;
 }
 
+// ── Data Source Tags ─────────────────────────────────────────────────
+
+export type DataSourceTag =
+  | 'indianapi_price'
+  | 'yahoo_price'
+  | 'indianapi_financials'
+  | 'screener'
+  | 'upstox'
+  | 'computed'
+  | 'unavailable';
+
+// ── Priority rules (documented) ──────────────────────────────────────
+// PRICE fields:           Provider A (indianapi) > Provider B (yahoo)
+// VALUATION ratios:       Provider C (indianapi_financials) > Provider D (screener) > null
+// QUALITY/GROWTH/STABLE:  Provider D (screener) > Provider E (upstox) > null
+// TECHNICALS:             always computed from Yahoo historical, never from providers
+
+// ── Historical Point (for price.getHistory) ──────────────────────────
+
+export interface HistoricalPoint {
+  date: string;
+  close: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  volume?: number;
+}
+
+// ── Financial Snapshot (for fundamentals.get) ────────────────────────
+
+export interface FinancialSnapshot {
+  symbol: string;
+  peRatio: number | null;
+  pbRatio: number | null;
+  eps: number | null;
+  dividendYield: number | null;
+  roe: number | null;
+  roa: number | null;
+  roic: number | null;
+  debtToEquity: number | null;
+  currentRatio: number | null;
+  revenueGrowth: number | null;
+  profitGrowth: number | null;
+  epsGrowth: number | null;
+  grossMargin: number | null;
+  operatingMargin: number | null;
+  netMargin: number | null;
+  evEbitda: number | null;
+  fcfYield: number | null;
+  beta: number | null;
+  marketCap: number | null;
+  source: DataSourceTag;
+  fetchedAt: string;
+  // Source tags for individual fields
+  peRatio_source?: DataSourceTag;
+  roe_source?: DataSourceTag;
+  debtToEquity_source?: DataSourceTag;
+}
+
 // ── API Methods ──────────────────────────────────────────────────────
 
 export const api = {
@@ -760,6 +819,50 @@ export const api = {
 
   getIntelligenceIngestionStatus: () =>
     apiFetch<{ ok: boolean; data: unknown }>("/api/ops/ingestion-status"),
+
+  // ── Namespaced method groups (clean API surface) ──────────────────────────
+
+  price: {
+    /** Live quote. Uses Provider A (IndianAPI) with Provider B (Yahoo) fallback on backend. */
+    getQuote: (symbol: string) =>
+      apiFetch<StockQuote>(`/api/market-data/quote/${encodeURIComponent(symbol)}`),
+
+    /** Historical OHLCV. Uses Provider B (Yahoo) on backend. range: 1D|5D|1M|3M|6M|1Y|2Y|3Y|5Y */
+    getHistory: (symbol: string, range = '3M') =>
+      apiFetch<HistoricalPoint[]>(`/api/market-data/history/${encodeURIComponent(symbol)}?range=${encodeURIComponent(range)}`),
+
+    /** Company metadata (name, sector, exchange). */
+    getMeta: (symbol: string) =>
+      apiFetch<CompanyMetadata>(`/api/market-data/metadata/${encodeURIComponent(symbol)}`),
+  },
+
+  fundamentals: {
+    /**
+     * Merged fundamentals for a symbol.
+     * Valuation (PE/PB/EPS): Provider C (IndianAPI financials) wins.
+     * Quality/Growth/Stability (ROE/D-E/margins): Provider D (Screener) wins.
+     */
+    get: (symbol: string) =>
+      apiFetch<FinancialSnapshot>(`/api/company/${encodeURIComponent(symbol)}/financials`),
+  },
+
+  research: {
+    /** Full company research bundle: quote + fundamentals + candles + factor scores. */
+    getStory: (symbol: string) =>
+      apiFetch<CompanyResearchResponse>(`/api/research/company/${encodeURIComponent(symbol)}`),
+
+    /** Scanner with a named preset. */
+    scan: (preset = 'Quality compounders', limit = 50, symbols?: string) =>
+      apiFetch<ScannerResponse>(
+        `/api/research/scanner?preset=${encodeURIComponent(preset)}&limit=${limit}${symbols ? `&symbols=${encodeURIComponent(symbols)}` : ''}`,
+      ),
+  },
+
+  search: {
+    /** Universal symbol search. */
+    query: (q: string) =>
+      apiFetch<SearchResponse>(`/api/search/universal?query=${encodeURIComponent(q)}`),
+  },
 };
 
 export default api;
