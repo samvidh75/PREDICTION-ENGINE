@@ -13,7 +13,7 @@ import { resetForTest } from '../../db/SQLiteAdapter';
 import { loadMarketActionSnapshot } from '../../services/market/MarketActionService';
 
 function tempDbPath(): string {
-  return path.join(os.tmpdir(), `market-action-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.db`);
+  return path.join(os.tmpdir(), `market-action-${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2, 8)}.db`);
 }
 
 function cleanupDb(dbPath: string): void {

@@ -59,7 +59,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
 
   const addToast = useCallback(
     (type: ToastType, message: string) => {
-      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const id = `${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2, 8)}`;
 
       setToasts((prev) => {
         const isDuplicate = prev.some(

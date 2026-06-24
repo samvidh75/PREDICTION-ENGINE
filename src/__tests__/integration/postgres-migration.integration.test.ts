@@ -25,7 +25,7 @@ const skipIfNoPg = hasPostgres() ? it : it.skip;
 
 /** Create a temporary directory with migration files */
 function createTempMigDir(migrations: { id: string; sql: string }[]): string {
-  const dir = path.join(os.tmpdir(), `pg-mig-test-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`);
+  const dir = path.join(os.tmpdir(), `pg-mig-test-${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2, 6)}`);
   fs.mkdirSync(dir, { recursive: true });
   for (const m of migrations) {
     fs.writeFileSync(path.join(dir, m.id), m.sql, 'utf-8');

@@ -320,7 +320,7 @@ export class ProviderRequestBroker {
 
   private async backoff(attempt: number): Promise<void> {
     const delay = Math.min(BACKOFF_CONFIG.baseDelayMs * Math.pow(2, attempt - 1), BACKOFF_CONFIG.maxDelayMs);
-    const jitter = delay * (0.5 + Math.random() * 0.5); // 50-100% of delay
+    const jitter = delay * (0.5 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.5); // 50-100% of delay
     await new Promise(resolve => setTimeout(resolve, jitter));
   }
 

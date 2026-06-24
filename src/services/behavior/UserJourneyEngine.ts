@@ -15,7 +15,7 @@ export class UserJourneyEngine {
     metadata: Record<string, any> = {}
   ): void {
     const event: UserEvent = {
-      id: Math.random().toString(36).substring(2, 11),
+      id: (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substring(2, 11),
       timestamp: Date.now(),
       type,
       metadata,

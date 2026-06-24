@@ -110,7 +110,7 @@ export function saveWatchlists(lists: CustomWatchlist[], uid?: string): void {
 export function createWatchlist(name: string, uid?: string): CustomWatchlist {
   const lists = getWatchlists(uid);
   const next: CustomWatchlist = {
-    id: Math.random().toString(36).substring(2, 9),
+    id: (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substring(2, 9),
     name,
     tickers: [],
     isArchived: false,

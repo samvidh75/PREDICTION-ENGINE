@@ -20,7 +20,7 @@ export class MockHistoricalProvider implements HistoricalProvider {
         high: basePrice + Math.sin(i) * 10 + 5,
         low: basePrice + Math.sin(i) * 10 - 5,
         close: basePrice + Math.sin(i) * 10 + Math.cos(i) * 3,
-        volume: 50000 + Math.floor(Math.random() * 20000),
+        volume: 50000 + Math.floor((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 20000),
       });
     }
 

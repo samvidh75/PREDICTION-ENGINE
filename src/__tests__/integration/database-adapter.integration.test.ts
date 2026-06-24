@@ -17,7 +17,7 @@ import { dbAdapter } from '../../db/DatabaseAdapter';
 
 function tempDbPath(testName: string): string {
   const ts = Date.now();
-  const rand = Math.random().toString(36).slice(2, 8);
+  const rand = (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2, 8);
   return path.join(os.tmpdir(), `integration-${ts}-${rand}-${testName}.db`);
 }
 

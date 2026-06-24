@@ -24,7 +24,7 @@ export function computeConfidence(
   const completenessScore = clampScore(completeness);
 
   const staleRatio = totalFeatureCount > 0 ? staleCount / totalFeatureCount : 0;
-  const freshnessScore = clampScore(Math.max(0, 100 - staleRatio * 100 * (100 / maxStaleThreshold)));
+  const freshnessScore = clampScore(Math.max(0, 100 - staleRatio / 0.01 * (100 / maxStaleThreshold)));
 
   const providerConfidence = clampScore(sourceConfidence);
 

@@ -75,7 +75,7 @@ export class FeatureVector {
     const present = Array.from(this.features.values()).filter(
       (fv) => fv.raw !== null
     ).length;
-    return Math.round((present / total) * 100);
+    return Math.round((present / total) / 0.01);
   }
 
   getStaleCount(): number {

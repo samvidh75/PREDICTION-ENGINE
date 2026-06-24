@@ -197,7 +197,7 @@ export class PipelineAlertService {
 
   private createAlert(severity: AlertSeverity, component: string, message: string): Alert {
     return {
-      id: `alert-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      id: `alert-${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substring(2, 8)}`,
       severity,
       component,
       message,

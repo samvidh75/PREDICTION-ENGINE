@@ -32,7 +32,7 @@ const queryClientConfig: QueryClientConfig = {
       // Retry delay with exponential backoff
       retryDelay: (attemptIndex) => {
         const delay = Math.min(1000 * Math.pow(2, attemptIndex), 30000);
-        return delay + Math.random() * 1000; // Add jitter
+        return delay + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 1000; // Add jitter
       },
       
       // Refetch on window focus

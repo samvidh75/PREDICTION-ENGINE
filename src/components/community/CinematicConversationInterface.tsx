@@ -44,7 +44,7 @@ function createId(): string {
   if (c && typeof (c as { randomUUID?: () => string }).randomUUID === "function") {
     return (c as { randomUUID: () => string }).randomUUID();
   }
-  return `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  return `${Date.now()}_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(16).slice(2)}`;
 }
 
 function glowForState(

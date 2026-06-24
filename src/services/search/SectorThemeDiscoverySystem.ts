@@ -212,23 +212,23 @@ class SectorThemeDiscoverySystem {
       // Create neural nodes for each company
       for (let i = 0; i < theme.companies.length; i++) {
         const angle = (i / theme.companies.length) * Math.PI * 2;
-        const radius = 50 + Math.random() * 30;
+        const radius = 50 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 30;
         
         neuralNodes.push({
           x: Math.cos(angle) * radius,
           y: Math.sin(angle) * radius,
-          intensity: 0.5 + Math.random() * 0.5
+          intensity: 0.5 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.5
         });
       }
 
       // Create connections between related companies
       for (let i = 0; i < neuralNodes.length; i++) {
         for (let j = i + 1; j < neuralNodes.length; j++) {
-          if (Math.random() > 0.5) {
+          if ((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) > 0.5) {
             neuralConnections.push({
               from: i,
               to: j,
-              strength: 0.3 + Math.random() * 0.7
+              strength: 0.3 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.7
             });
           }
         }

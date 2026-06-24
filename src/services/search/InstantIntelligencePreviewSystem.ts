@@ -121,7 +121,7 @@ class InstantIntelligencePreviewSystem {
     percentile: number;
   } {
     // In production, this would come from actual sector data
-    const rank = Math.floor(Math.random() * 50) + 1;
+    const rank = Math.floor((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 50) + 1;
     const total = 100;
     const percentile = ((total - rank) / total) * 100;
 

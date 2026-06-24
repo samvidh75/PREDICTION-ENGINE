@@ -25,7 +25,7 @@ async function main() {
       [
         stock.symbol,
         stock.exchange,
-        `INE${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+        `INE${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substr(2, 9).toUpperCase()}`,
         stock.name,
         stock.sector,
         stock.industry,
@@ -38,25 +38,25 @@ async function main() {
   // 2. Ingest basic financial snapshots
   console.info("Ingesting basic financial snapshots...");
   for (const stock of stocks) {
-    const peRatio = parseFloat((12 + Math.random() * 48).toFixed(2));
-    const eps = parseFloat((5 + Math.random() * 95).toFixed(2));
-    const dividendYield = parseFloat((Math.random() < 0.2 ? 0 : Math.random() * 3.5).toFixed(2));
-    const beta = parseFloat((0.6 + Math.random() * 1.0).toFixed(2));
-    const marketCap = parseFloat((5000 + Math.random() * 250000).toFixed(2)) * 10_000_000;
-    const freeFloat = parseFloat((marketCap * (0.25 + Math.random() * 0.45)).toFixed(2));
-    const roe = parseFloat((0.08 + Math.random() * 0.22).toFixed(4));
-    const roic = parseFloat((roe * (0.7 + Math.random() * 0.25)).toFixed(4));
-    const grossMargin = parseFloat((0.25 + Math.random() * 0.50).toFixed(4));
-    const operatingMargin = parseFloat((grossMargin * (0.3 + Math.random() * 0.4)).toFixed(4));
-    const debtToEquity = parseFloat((Math.random() < 0.15 ? 0 : Math.random() * 2.0).toFixed(4));
-    const currentRatio = parseFloat((0.8 + Math.random() * 2.5).toFixed(4));
-    const revenueGrowth = parseFloat((0.04 + Math.random() * 0.20).toFixed(4));
-    const profitGrowth = parseFloat((revenueGrowth * (0.8 + Math.random() * 0.5)).toFixed(4));
-    const epsGrowth = parseFloat((profitGrowth * (0.9 + Math.random() * 0.2)).toFixed(4));
-    const fcfGrowth = parseFloat((revenueGrowth * (0.7 + Math.random() * 0.6)).toFixed(4));
-    const pbRatio = parseFloat((peRatio * roe * (0.8 + Math.random() * 0.4)).toFixed(2));
-    const evEbitda = parseFloat((peRatio * (0.6 + Math.random() * 0.3)).toFixed(2));
-    const fcfYield = parseFloat(((1 / peRatio) * (0.6 + Math.random() * 0.5)).toFixed(4));
+    const peRatio = parseFloat((12 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 48).toFixed(2));
+    const eps = parseFloat((5 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 95).toFixed(2));
+    const dividendYield = parseFloat(((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) < 0.2 ? 0 : (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 3.5).toFixed(2));
+    const beta = parseFloat((0.6 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 1.0).toFixed(2));
+    const marketCap = parseFloat((5000 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 250000).toFixed(2)) * 10_000_000;
+    const freeFloat = parseFloat((marketCap * (0.25 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.45)).toFixed(2));
+    const roe = parseFloat((0.08 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.22).toFixed(4));
+    const roic = parseFloat((roe * (0.7 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.25)).toFixed(4));
+    const grossMargin = parseFloat((0.25 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.50).toFixed(4));
+    const operatingMargin = parseFloat((grossMargin * (0.3 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.4)).toFixed(4));
+    const debtToEquity = parseFloat(((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) < 0.15 ? 0 : (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 2.0).toFixed(4));
+    const currentRatio = parseFloat((0.8 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 2.5).toFixed(4));
+    const revenueGrowth = parseFloat((0.04 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.20).toFixed(4));
+    const profitGrowth = parseFloat((revenueGrowth * (0.8 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.5)).toFixed(4));
+    const epsGrowth = parseFloat((profitGrowth * (0.9 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.2)).toFixed(4));
+    const fcfGrowth = parseFloat((revenueGrowth * (0.7 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.6)).toFixed(4));
+    const pbRatio = parseFloat((peRatio * roe * (0.8 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.4)).toFixed(2));
+    const evEbitda = parseFloat((peRatio * (0.6 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.3)).toFixed(2));
+    const fcfYield = parseFloat(((1 / peRatio) * (0.6 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.5)).toFixed(4));
 
     await pool.query(
       `INSERT INTO financial_snapshots (
@@ -97,15 +97,15 @@ async function main() {
   for (let s = 0; s < stocks.length; s++) {
     const stock = stocks[s];
     const values: any[] = [];
-    let price = 100.0 + Math.random() * 200;
+    let price = 100.0 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 200;
 
     for (const date of dates) {
-      const change = (Math.random() - 0.49) * 2.0; // slight upward bias
+      const change = ((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) - 0.49) * 2.0; // slight upward bias
       price = Math.max(1.0, price + change);
-      const open = price * (1.0 - (Math.random() - 0.5) * 0.01);
-      const high = Math.max(price, open) * (1.0 + Math.random() * 0.01);
-      const low = Math.min(price, open) * (1.0 - Math.random() * 0.01);
-      const volume = Math.floor(10000 + Math.random() * 990000);
+      const open = price * (1.0 - ((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) - 0.5) * 0.01);
+      const high = Math.max(price, open) * (1.0 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.01);
+      const low = Math.min(price, open) * (1.0 - (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 0.01);
+      const volume = Math.floor(10000 + (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 990000);
 
       values.push({
         symbol: stock.symbol,

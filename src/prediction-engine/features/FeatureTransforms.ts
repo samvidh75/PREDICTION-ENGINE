@@ -52,7 +52,7 @@ export function percentileRank(value: number, sortedArray: number[]): number | n
   const cleaned = sortedArray.filter((x) => Number.isFinite(x));
   if (cleaned.length === 0) return null;
   const countBelow = cleaned.filter((x) => x <= v).length;
-  return (countBelow / cleaned.length) * 100;
+  return (countBelow / cleaned.length) / 0.01;
 }
 
 export function ratio(numerator: number, denominator: number): number | null {

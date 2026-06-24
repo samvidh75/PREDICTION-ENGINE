@@ -67,7 +67,7 @@ export default function usePracticeReplayEngine(
 
   const captureFrame = useCallback(
     (args: Omit<PracticeReplayFrame, "id" | "holdings"> & { holdings: PortfolioHolding[] }) => {
-      const id = `pr_${args.at}_${Math.random().toString(16).slice(2)}`;
+      const id = `pr_${args.at}_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(16).slice(2)}`;
 
       setFrames((prev) => {
         const next: PracticeReplayFrame[] = [

@@ -45,7 +45,7 @@ export class LiveTelemetryStream {
         total: Number(data.total ?? (data.metrics.reduce((acc: number, m: any) => acc + (m.value * (m.weight || 0.33)), 0))),
         status: data.status || this.calculateStatus(data.metrics),
         metrics: data.metrics.map((m: any) => ({
-          id: m.id || `metric_${Math.random().toString(36).substr(2, 6)}`,
+          id: m.id || `metric_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substr(2, 6)}`,
           label: m.label || 'Unknown',
           value: Number(m.value) || 50,
           weight: Number(m.weight) || 0.33,

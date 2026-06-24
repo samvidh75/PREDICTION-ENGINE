@@ -172,7 +172,7 @@ describe('GROUP B — Feature Engine Write Test', () => {
       date.setDate(date.getDate() + i);
       if (date.getDay() === 0 || date.getDay() === 6) continue;
       const dateStr = date.toISOString().split('T')[0];
-      price = Math.max(price + (Math.random() - 0.48) * 50, 100);
+      price = Math.max(price + ((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) - 0.48) * 50, 100);
       insert.bind(['RELIANCE', dateStr, price - 5, price + 10, price - 8, price, price, 1000000]);
       insert.step();
       insert.reset();

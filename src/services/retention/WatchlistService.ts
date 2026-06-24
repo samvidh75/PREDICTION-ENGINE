@@ -44,7 +44,7 @@ export class WatchlistService {
   }
 
   async createWatchlist(userId: string, name: string): Promise<WatchlistRow> {
-    const id = `wl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const id = `wl_${Date.now()}_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substring(2, 7)}`;
     const now = new Date().toISOString();
     const tickers = '[]';
     await dbAdapter.query(
