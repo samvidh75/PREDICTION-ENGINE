@@ -44,7 +44,7 @@ export function SebiDisclaimer({ variant = "footer", className = "" }: SebiDiscl
   if (variant === "banner") {
     if (!visible) return null;
     return (
-      <div className="flex w-full items-start gap-3 border-l-[3px] border-[#D97706] bg-[#FFFBEB] px-4 py-3">
+      <div className="flex w-full items-start gap-3 border-l-[3px] border-[#92400E] bg-[#FFFBEB] px-4 py-3">
         <p className="flex-1 text-[12px] leading-[1.6] text-[var(--c-ink-secondary)]">
           <strong className="font-semibold">SEBI Disclaimer:</strong>{" "}
           {DISCLAIMER_TEXT}

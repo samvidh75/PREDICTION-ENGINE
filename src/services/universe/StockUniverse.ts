@@ -13,6 +13,23 @@ export const NIFTY50_SYMBOLS: string[] = [
   'UPL', 'VEDL', 'BRITANNIA', 'PIDILITIND',
 ];
 
+/** Symbol display names (API symbol → human-readable name) */
+export const SYMBOL_DISPLAY_MAP: Record<string, string> = {
+  'LT': 'L&T',
+  'MM': 'M&M',
+  'LTIM': 'LTIMindtree',
+};
+
+/** Symbol API aliases (display symbol → API-safe symbol) */
+export const SYMBOL_API_MAP: Record<string, string> = {
+  'LT': 'LT',
+  'MM': 'MM',
+  'M&M': 'MM',
+  'L&T': 'LT',
+};
+
+export const NIFTY50_FIRST_BATCH = NIFTY50_SYMBOLS.slice(0, 10);
+
 /** Return the first N symbols from the universe. */
 export function getUniverseSlice(count: number): string[] {
   return NIFTY50_SYMBOLS.slice(0, count);

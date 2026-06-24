@@ -98,7 +98,7 @@ export const SectorExplorer: React.FC = () => {
                     ? "text-[#020304]/60" 
                     : currentHealth === "Very Healthy" || currentHealth === "Healthy"
                       ? "text-[#00d17a]"
-                      : "text-amber-400"
+                      : "text-slate-400"
                 }`}>
                   {currentHealth}
                 </div>

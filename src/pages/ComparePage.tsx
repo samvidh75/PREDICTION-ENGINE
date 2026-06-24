@@ -77,14 +77,14 @@ function textColor(score: number | null): string {
   if (score === null) return "";
   if (score >= 70) return "#16A34A";
   if (score >= 55) return "#22C55E";
-  if (score >= 40) return "#F59E0B";
+  if (score >= 40) return "#92400E";
   return "#EF4444";
 }
 
 function barColor(score: number): string {
   if (score >= 70) return "#16A34A";
   if (score >= 55) return "#22C55E";
-  if (score >= 40) return "#F59E0B";
+  if (score >= 40) return "#92400E";
   return "#EF4444";
 }
 

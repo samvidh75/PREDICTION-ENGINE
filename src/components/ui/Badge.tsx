@@ -13,8 +13,8 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = "neutral", gla
       ? "bg-emerald-50/60 backdrop-blur-sm border border-emerald-200/50 text-emerald-700"
       : "bg-emerald-50 border border-emerald-200/70 text-emerald-700",
     warning: glass
-      ? "bg-amber-50/60 backdrop-blur-sm border border-amber-200/50 text-amber-700"
-      : "bg-amber-50 border border-amber-200/70 text-amber-700",
+      ? "bg-slate-50/60 backdrop-blur-sm border border-slate-200/50 text-slate-700"
+      : "bg-slate-50 border border-slate-200/70 text-slate-700",
     danger: glass
       ? "bg-red-50/60 backdrop-blur-sm border border-red-200/50 text-red-600"
       : "bg-red-50 border border-red-200/70 text-red-600",

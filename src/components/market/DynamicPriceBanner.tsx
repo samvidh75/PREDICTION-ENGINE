@@ -70,7 +70,7 @@ export const DynamicPriceBanner: React.FC<DynamicPriceBannerProps> = ({ symbol, 
           <h2 className="text-base font-bold text-[var(--color-text-primary)]">{symbol}</h2>
           {companyName && <p className="text-xs text-[var(--color-text-secondary)]">{companyName}</p>}
         </div>
-        {priceData.halted && <span className="rounded-md bg-[rgba(245,158,11,0.12)] px-2 py-0.5 text-[10px] font-semibold text-[#F59E0B]">Halted</span>}
+        {priceData.halted && <span className="rounded-md bg-[rgba(245,158,11,0.12)] px-2 py-0.5 text-[10px] font-semibold text-[#92400E]">Halted</span>}
       </div>
 
       <div className="flex items-baseline gap-3">

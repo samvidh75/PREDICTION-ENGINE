@@ -44,7 +44,7 @@ function toneForHealth(healthState: CompanyHealthState, healthTheme: HealthTheme
     case "STRUCTURALLY_HEALTHY":
       return { toneGlow: healthTheme.glowCyan, toneEdgeGlow: healthTheme.glowCyan };
     case "STABLE_EXPANSION":
-      return { toneGlow: healthTheme.glowAmber, toneEdgeGlow: healthTheme.glowAmber };
+      return { toneGlow: healthTheme.glowslate, toneEdgeGlow: healthTheme.glowslate };
     case "CONFIDENCE_IMPROVING":
       return { toneGlow: healthTheme.glowCyan, toneEdgeGlow: healthTheme.glowCyan };
     case "LIQUIDITY_FRAGILE":

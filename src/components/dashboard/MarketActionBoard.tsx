@@ -50,7 +50,7 @@ function percentClass(value: number | null): string {
 
 function stateClass(status: MarketActionResponse['status']): string {
   if (status === 'real') return 'text-emerald-300';
-  if (status === 'partial') return 'text-amber-300';
+  if (status === 'partial') return 'text-slate-300';
   return 'text-rose-300';
 }
 
@@ -197,7 +197,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
           Market analysis pending.
         </div>
       ) : snapshot.status === 'unavailable' ? (
-        <div className="flex items-start gap-2 rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-4 text-[11px] text-amber-100/70">
+        <div className="flex items-start gap-2 rounded-lg border border-slate-400/20 bg-slate-400/5 px-3 py-4 text-[11px] text-slate-100/70">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           {snapshot.message}
         </div>
@@ -230,7 +230,7 @@ export default function MarketActionBoard({ onOpenCompany }: { onOpenCompany: (s
 
             <section className="rounded-lg border border-[var(--color-border-light)] bg-[var(--color-surface)] overflow-hidden">
               <div className="flex items-center gap-2 border-b border-[var(--color-border-light)] px-3 py-2">
-                <Activity className="h-3.5 w-3.5 text-violet-300" />
+                <Activity className="h-3.5 w-3.5 text-slate-300" />
                 <h3 className="text-[10px] font-semibold uppercase tracking-wider text-[#8B949E]">Sector movers</h3>
               </div>
               <SectorList items={snapshot.data.sectorMovers} />

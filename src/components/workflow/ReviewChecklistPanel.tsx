@@ -15,7 +15,7 @@ interface ReviewChecklistPanelProps {
 
 const STATUS_CONFIG = {
   passed: { icon: CheckCircle2, color: "#16A34A", bg: "rgba(22,163,74,0.06)" },
-  warning: { icon: AlertTriangle, color: "#F59E0B", bg: "rgba(245,158,11,0.06)" },
+  warning: { icon: AlertTriangle, color: "#92400E", bg: "rgba(245,158,11,0.06)" },
   info: { icon: Info, color: "#2962FF", bg: "rgba(41,98,255,0.06)" },
   pending: { icon: Info, color: "#64748B", bg: "rgba(100,116,139,0.04)" },
 };

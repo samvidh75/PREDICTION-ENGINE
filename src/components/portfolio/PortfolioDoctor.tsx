@@ -168,7 +168,7 @@ function Bar({ label, value, color = 'bg-blue-500' }: { label: string; value: nu
 }
 
 function StatePanel({ title, message, tone }: { title: string; message: string; tone: 'empty' | 'error' | 'unavailable' }) {
-  const background = tone === 'error' ? 'bg-red-100' : tone === 'unavailable' ? 'bg-amber-100' : 'bg-gray-50';
+  const background = tone === 'error' ? 'bg-red-100' : tone === 'unavailable' ? 'bg-slate-100' : 'bg-gray-50';
   const border = tone === 'empty' ? 'border-dashed' : '';
 
   return (
@@ -278,7 +278,7 @@ export default function PortfolioDoctor() {
       <div className="rounded-2xl border border-[rgba(148,163,184,0.14)] bg-[#0C1119] p-5">
         <h3 className="font-semibold text-lg uppercase mb-4 text-[#E6EDF3]">Factor Exposure</h3>
         {factorEntries.length > 0 ? factorEntries.map(([key, value]) => (
-          <Bar key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={value} color={toPercent(value) >= 60 ? 'bg-green-500' : toPercent(value) >= 40 ? 'bg-amber-400' : 'bg-red-400'} />
+          <Bar key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={value} color={toPercent(value) >= 60 ? 'bg-green-500' : toPercent(value) >= 40 ? 'bg-slate-400' : 'bg-red-400'} />
         )) : <p className="text-sm text-gray-500">No factor exposure data available.</p>}
       </div>
 
@@ -290,7 +290,7 @@ export default function PortfolioDoctor() {
       </div>
 
       {data.neutralizedFields.length > 0 && (
-        <div className="border-4 border-black bg-amber-100 p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
+        <div className="border-4 border-black bg-slate-100 p-5" style={{ boxShadow: '6px 6px 0px #000' }}>
           <h3 className="font-semibold text-lg uppercase mb-2">Data Caveats</h3>
           <p className="text-sm mb-3">Some factor inputs were unavailable and were neutralized by the portfolio engine. Review these holdings before acting on the analysis.</p>
           <ul className="space-y-1 text-sm">

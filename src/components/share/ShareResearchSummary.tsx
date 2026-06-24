@@ -143,7 +143,7 @@ export function ShareResearchSummary({ data, onClose, onOpenMethodology }: Share
           <ul className="mt-2 space-y-1">
             {data.risksToReview.map((risk, i) => (
               <li key={i} className="flex items-start gap-2 text-xs text-[#9AA7B5]">
-                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-[#F59E0B]" aria-hidden="true" />
+                <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-[#92400E]" aria-hidden="true" />
                 <span>{risk}</span>
               </li>
             ))}

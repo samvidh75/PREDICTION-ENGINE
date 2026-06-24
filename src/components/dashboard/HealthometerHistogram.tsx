@@ -12,7 +12,7 @@ export const HealthometerHistogram: React.FC<Props> = ({ metrics }) => {
   const getStatusColor = (value: number) => {
     if (value > 80) return "#22d3ee"; // Cyan - Very Healthy
     if (value > 60) return "#38bdf8"; // Sky Blue - Healthy
-    if (value > 40) return "#a78bfa"; // Soft Violet - Stable
+    if (value > 40) return "#6B7280"; // Soft slate - Stable
     return "#e879f9";                 // Magenta - Weakening
   };
 

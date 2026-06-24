@@ -19,7 +19,7 @@ interface AnalysisMetersProps {
 const STATUS_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
   strong: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700", dot: "bg-emerald-500" },
   neutral: { bg: "bg-slate-50 border-slate-200", text: "text-slate-600", dot: "bg-slate-400" },
-  caution: { bg: "bg-amber-50 border-amber-200", text: "text-amber-700", dot: "bg-amber-500" },
+  caution: { bg: "bg-slate-50 border-slate-200", text: "text-slate-700", dot: "bg-slate-500" },
   not_enough_information: { bg: "bg-gray-50 border-gray-100", text: "text-gray-400", dot: "bg-gray-300" },
 };
 

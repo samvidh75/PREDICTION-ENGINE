@@ -39,7 +39,7 @@ function scoreColor(v: number | null): string {
   if (v === null) return "#94A3B8";
   if (v >= 70) return "#16A34A";
   if (v >= 55) return "#22C55E";
-  if (v >= 40) return "#F59E0B";
+  if (v >= 40) return "#92400E";
   if (v >= 25) return "#FB923C";
   return "#EF4444";
 }

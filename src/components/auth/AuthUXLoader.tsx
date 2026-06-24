@@ -240,12 +240,12 @@ export const AuthUXLoader: React.FC<AuthUXLoaderProps> = ({
   if (phase === 'slow') {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-[#020304]">
-        <div className="rounded-[28px] border border-amber-500/20 bg-amber-950/10 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(180,120,0,0.15)] max-w-[560px] w-[calc(100%-32px)]">
-          <div className="text-[11px] uppercase tracking-[0.2em] text-amber-400/80">Taking longer than usual</div>
+        <div className="rounded-[28px] border border-slate-500/20 bg-slate-950/10 backdrop-blur-2xl p-6 shadow-[0_0_60px_rgba(180,120,0,0.15)] max-w-[560px] w-[calc(100%-32px)]">
+          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400/80">Taking longer than usual</div>
           <div className="mt-3 text-[18px] font-semibold text-white/92">Still connecting to {pageLabel}...</div>
           <div className="mt-2 text-[13px] leading-[1.7] text-white/70">
             This usually takes a few seconds. Session restoration has been running for{' '}
-            <span className="text-amber-400 font-medium">{Math.round(elapsed / 1000)}s</span>.
+            <span className="text-slate-400 font-medium">{Math.round(elapsed / 1000)}s</span>.
           </div>
           <div className="mt-4 text-[12px] text-white/50 leading-relaxed">
             This could be due to a slow network or Firebase initialization delay. The page will appear automatically when ready.

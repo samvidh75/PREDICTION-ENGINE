@@ -63,7 +63,7 @@ export default function SectorRotationEcosystem(props: {
             // Signal colors
             const signalColors = {
               ACCUMULATE: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5",
-              HOLD: "text-amber-400 border-amber-500/20 bg-amber-500/5",
+              HOLD: "text-slate-400 border-slate-500/20 bg-slate-500/5",
               REDUCE: "text-rose-400 border-rose-500/20 bg-rose-500/5",
             };
             const signalColor = signalColors[intel.sectorRotationSignal as "ACCUMULATE" | "HOLD" | "REDUCE"] || signalColors.HOLD;

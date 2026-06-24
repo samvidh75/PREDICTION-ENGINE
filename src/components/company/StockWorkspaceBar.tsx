@@ -12,7 +12,7 @@ function formatDateTime(value?: string): string {
 
 function stateClass(value: string): string {
   if (value === "VERIFIED" || value === "Recent") return "text-[#16A34A]";
-  if (value === "PARTIAL" || value === "Delayed") return "text-[#D97706]";
+  if (value === "PARTIAL" || value === "Delayed") return "text-[#92400E]";
   if (value === "INVALID" || value === "Stale") return "text-[#DC2626]";
   return "text-[var(--color-text-muted)]";
 }

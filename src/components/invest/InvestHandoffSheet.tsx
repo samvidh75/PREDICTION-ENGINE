@@ -200,9 +200,9 @@ export function InvestHandoffSheet({
           ) : (
             <>
               {contextError && (
-                <div role="alert" className="flex items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-5 py-3 text-[11px] leading-5 text-amber-900">
+                <div role="alert" className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3 text-[11px] leading-5 text-slate-900">
                   <span>{contextError}</span>
-                  <button type="button" onClick={() => { loadContext(); }} className="shrink-0 rounded-md border border-amber-300 px-2.5 py-1 font-semibold">Retry</button>
+                  <button type="button" onClick={() => { loadContext(); }} className="shrink-0 rounded-md border border-slate-300 px-2.5 py-1 font-semibold">Retry</button>
                 </div>
               )}
               {stage === 1 && (
@@ -307,7 +307,7 @@ function StageOne({
                 <div style={{ fontSize: 32, fontWeight: 600,
                   color: (prediction.rankingScore ?? 0) >= 75 ? '#057A55' :
                          (prediction.rankingScore ?? 0) >= 55 ? '#1A56DB' :
-                         (prediction.rankingScore ?? 0) >= 35 ? '#D97706' : '#C81E1E' }}>
+                         (prediction.rankingScore ?? 0) >= 35 ? '#92400E' : '#C81E1E' }}>
                   {prediction.rankingScore ?? '—'}
                 </div>
                 <div>
@@ -332,7 +332,7 @@ function StageOne({
                       </div>
                       <div style={{ fontSize: 16, fontWeight: 600,
                         color: (f.value ?? 0) >= 65 ? '#057A55' :
-                               (f.value ?? 0) >= 45 ? '#D97706' : '#C81E1E' }}>
+                               (f.value ?? 0) >= 45 ? '#92400E' : '#C81E1E' }}>
                         {f.value ?? '—'}
                       </div>
                     </div>

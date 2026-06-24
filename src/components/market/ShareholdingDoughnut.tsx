@@ -14,7 +14,7 @@ interface ShareholdingDoughnutProps {
   loading?: boolean;
 }
 
-const COLORS = ["#2962FF", "#16A34A", "#F59E0B", "#64748B", "#A78BFA"];
+const COLORS = ["#2962FF", "#16A34A", "#92400E", "#64748B", "#6B7280"];
 const LABELS = ["Promoters", "FII", "DII", "Public", "Others"];
 const KEYS: (keyof ShareholdingData)[] = ["promoter", "fii", "dii", "public_", "others"];
 

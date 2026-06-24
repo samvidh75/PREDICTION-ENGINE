@@ -9,7 +9,7 @@ function barColor(score: number | null): string {
   if (score === null) return "bg-[rgba(148,163,184,0.12)]";
   if (score >= 70) return "bg-[#16A34A]";
   if (score >= 50) return "bg-[#2962FF]";
-  if (score >= 35) return "bg-[#F59E0B]";
+  if (score >= 35) return "bg-[#92400E]";
   return "bg-[#EF4444]";
 }
 
@@ -17,7 +17,7 @@ function labelColor(score: number | null): string {
   if (score === null) return "text-[#64748B]";
   if (score >= 70) return "text-[#16A34A]";
   if (score >= 50) return "text-[#2962FF]";
-  if (score >= 35) return "text-[#F59E0B]";
+  if (score >= 35) return "text-[#92400E]";
   return "text-[#EF4444]";
 }
 

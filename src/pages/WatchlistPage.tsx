@@ -206,7 +206,7 @@ export const WatchlistPage: React.FC = () => {
                 Add
               </button>
               {symbols.length >= MAX_WATCHLIST && (
-                <span className="text-[10px] text-[#F59E0B]">Max {MAX_WATCHLIST} stocks</span>
+                <span className="text-[10px] text-[#92400E]">Max {MAX_WATCHLIST} stocks</span>
               )}
             </div>
 
@@ -262,7 +262,7 @@ export const WatchlistPage: React.FC = () => {
                         ) : pending ? (
                           <span className="text-[11px] text-[#8B949E]">Loading data...</span>
                         ) : (
-                          <span className="text-[11px] text-[#F59E0B]">Could not load data</span>
+                          <span className="text-[11px] text-[#92400E]">Could not load data</span>
                         )}
                       </div>
                     </div>

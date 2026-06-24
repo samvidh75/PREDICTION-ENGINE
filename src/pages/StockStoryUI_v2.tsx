@@ -52,7 +52,7 @@ const factorLabels: Record<FactorKey, string> = {
 function ScoreRing({ score, size = 84 }: { score: number; size?: number }) {
   const radius = 38;
   const circumference = 2 * Math.PI * radius;
-  const color = score >= 80 ? "#0f9f6e" : score >= 70 ? "#2563eb" : "#d97706";
+  const color = score >= 80 ? "#0f9f6e" : score >= 70 ? "#2563eb" : "#92400E";
   return (
     <div className="relative grid shrink-0 place-items-center" style={{ width: size, height: size }} aria-label={`Score ${score} out of 100`}>
       <svg className="-rotate-90" width={size} height={size} viewBox="0 0 88 88" aria-hidden="true">
@@ -138,7 +138,7 @@ export default function StockStoryUIV2() {
               <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-slate-950"><BarChart3 size={15} /> Open full factor audit</button>
             </section>
 
-            <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4"><div className="flex gap-3"><AlertCircle className="mt-0.5 shrink-0 text-amber-600" size={18} /><p className="text-xs leading-5 text-amber-900"><strong>Preview data:</strong> values on this standalone design page are illustrative and must be connected to the live research API before release.</p></div></section>
+            <section className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div className="flex gap-3"><AlertCircle className="mt-0.5 shrink-0 text-slate-600" size={18} /><p className="text-xs leading-5 text-slate-900"><strong>Preview data:</strong> values on this standalone design page are illustrative and must be connected to the live research API before release.</p></div></section>
           </aside>
         </div>
       </main>

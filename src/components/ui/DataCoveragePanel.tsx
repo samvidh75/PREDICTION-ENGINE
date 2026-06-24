@@ -166,7 +166,7 @@ export const DataCoveragePanel: React.FC = () => {
               {val.domains && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {Object.entries(val.domains).map(([domain, entry]) => (
-                    <span key={domain} className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${entry.healthy ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"}`} title={entry.detail}>
+                    <span key={domain} className={`rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${entry.healthy ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-700"}`} title={entry.detail}>
                       {domain}: {entry.healthy ? "ok" : "labelled"}
                     </span>
                   ))}

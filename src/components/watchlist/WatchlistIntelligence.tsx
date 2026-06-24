@@ -61,7 +61,7 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
   return (
     <div className={`rounded-xl border p-4 backdrop-blur-sm transition-colors ${
       hasSignificantChange
-        ? 'border-amber-500/30 bg-amber-500/[0.02] hover:border-amber-500/50'
+        ? 'border-slate-500/30 bg-slate-500/[0.02] hover:border-slate-500/50'
         : 'border-white/5 bg-white/[0.01] hover:border-white/20'
     }`}>
       <div className="flex items-start justify-between mb-3">
@@ -71,7 +71,7 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
             <div className={`h-1.5 w-1.5 rounded-full ${
               healthTrend === 'improving' ? 'bg-emerald-400' :
               healthTrend === 'declining' ? 'bg-rose-400' :
-              'bg-amber-400'
+              'bg-slate-400'
             }`} />
             <span className="text-[9px] text-white/40 uppercase">{healthTrend} since yesterday</span>
           </div>
@@ -96,8 +96,8 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
       {change.narrativeChange && (
         <div className="mt-3 rounded-lg bg-white/[0.02] border border-white/5 px-2.5 py-1.5">
           <div className="flex items-center gap-1.5 mb-1">
-            <Brain className="h-3 w-3 text-violet-400" />
-            <span className="text-[9px] font-bold uppercase text-violet-400">Narrative Change</span>
+            <Brain className="h-3 w-3 text-slate-400" />
+            <span className="text-[9px] font-bold uppercase text-slate-400">Narrative Change</span>
           </div>
           <p className="text-[10px] text-white/60 leading-relaxed">{change.narrativeChange}</p>
         </div>
@@ -106,8 +106,8 @@ function WatchlistIntelligenceCard({ change }: { change: WatchlistChange }) {
       {change.alerts.length > 0 && (
         <div className="mt-3 space-y-1">
           {change.alerts.map((alert, i) => (
-            <div key={i} className="flex items-start gap-1.5 text-[10px] text-amber-300/80">
-              <AlertTriangle className="h-3 w-3 text-amber-400 shrink-0 mt-0.5" />
+            <div key={i} className="flex items-start gap-1.5 text-[10px] text-slate-300/80">
+              <AlertTriangle className="h-3 w-3 text-slate-400 shrink-0 mt-0.5" />
               {alert}
             </div>
           ))}

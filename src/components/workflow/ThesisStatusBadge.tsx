@@ -10,7 +10,7 @@ interface ThesisStatusBadgeProps {
 
 const CONFIG: Record<ThesisStatus, { label: string; color: string; bg: string }> = {
   improving: { label: "Improving", color: "#16A34A", bg: "rgba(22,163,74,0.1)" },
-  "needs-review": { label: "Needs review", color: "#F59E0B", bg: "rgba(245,158,11,0.1)" },
+  "needs-review": { label: "Needs review", color: "#92400E", bg: "rgba(245,158,11,0.1)" },
   "risk-rising": { label: "Risk rising", color: "#EF4444", bg: "rgba(239,68,68,0.1)" },
   unchanged: { label: "Unchanged", color: "#64748B", bg: "rgba(100,116,139,0.1)" },
   pending: { label: "Pending", color: "#64748B", bg: "rgba(100,116,139,0.06)" },

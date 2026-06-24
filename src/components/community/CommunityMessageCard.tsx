@@ -48,7 +48,7 @@ export default function CommunityMessageCard({
             className={[
               'shrink-0 rounded-full border px-3 py-1 text-xs font-medium',
               isHigh
-                ? 'border-amber-300/30 bg-amber-300/10 text-amber-200'
+                ? 'border-slate-300/30 bg-slate-300/10 text-slate-200'
                 : message.riskLevel === 'MEDIUM'
                   ? 'border-sky-300/30 bg-sky-300/10 text-sky-200'
                   : 'border-emerald-300/30 bg-emerald-300/10 text-emerald-200',
@@ -79,7 +79,7 @@ export default function CommunityMessageCard({
               {/* Muted educational overlay + safe reframe */}
               <div className="rounded-[18px] border border-white/10 bg-black/35 p-4">
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 text-amber-200">⚑</div>
+                  <div className="mt-0.5 text-slate-200">⚑</div>
                   <div>
                     <div className="text-sm font-semibold text-white/90">
                       {isBeginner ? 'Let’s make it safer' : 'Safe reframe suggestion'}
@@ -96,7 +96,7 @@ export default function CommunityMessageCard({
 
                     {message.moderationRationale && (
                       <div className="mt-3 rounded-[14px] border border-white/10 bg-black/30 p-3">
-                        <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-slate-200/80">
                           System moderation rationale
                         </div>
                         <p className="mt-2 text-[13px] leading-relaxed text-white/75">{message.moderationRationale}</p>
@@ -106,7 +106,7 @@ export default function CommunityMessageCard({
                             {message.moderationFlags.slice(0, 6).map((f) => (
                               <span
                                 key={f}
-                                className="rounded-full border border-amber-200/20 bg-amber-200/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-amber-100/90"
+                                className="rounded-full border border-slate-200/20 bg-slate-200/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-100/90"
                                 title={f}
                               >
                                 {f}

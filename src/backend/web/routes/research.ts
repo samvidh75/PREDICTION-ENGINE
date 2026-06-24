@@ -188,8 +188,10 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
+      const metaDefault = null as any;
+      const queryDefault = { rows: [] as Record<string, unknown>[], rowCount: 0 };
       const [metaRes, fsRes, dpRes, quote, factorRes, featureRes, prRes] = await Promise.all([
-        withTimeout(MarketDataGateway.getCompany(sym), `MarketDataGateway.getCompany(${sym})`, req.log),
+        withTimeout(MarketDataGateway.getCompany(sym), metaDefault, `MarketDataGateway.getCompany(${sym})`, req.log),
         withTimeout(query(
           `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
                   debt_to_equity, current_ratio, operating_margin,
@@ -200,15 +202,15 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
              AND pe_ratio IS NOT NULL
            ORDER BY snapshot_date DESC LIMIT 1`,
           [sym]
-        ), `financial_snapshots(${sym})`, req.log),
+        ), queryDefault, `financial_snapshots(${sym})`, req.log),
         withTimeout(query(
           `SELECT trade_date, close, high, low, volume
            FROM daily_prices
            WHERE symbol = $1
            ORDER BY trade_date DESC LIMIT 252`,
           [sym]
-        ), `daily_prices(${sym})`, req.log),
-        withTimeout(MarketDataGateway.getQuote(sym), `MarketDataGateway.getQuote(${sym})`, req.log),
+        ), queryDefault, `daily_prices(${sym})`, req.log),
+        withTimeout(MarketDataGateway.getQuote(sym), metaDefault, `MarketDataGateway.getQuote(${sym})`, req.log),
         withTimeout(query(
           `SELECT quality_factor, value_factor, growth_factor,
                   momentum_factor, risk_factor, sector_strength_factor
@@ -216,14 +218,14 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
            ORDER BY trade_date DESC LIMIT 1`,
           [sym]
-        ), `factor_snapshots(${sym})`, req.log),
+        ), queryDefault, `factor_snapshots(${sym})`, req.log),
         withTimeout(query(
           `SELECT volatility, momentum, rsi, trend_strength
            FROM feature_snapshots
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
            ORDER BY trade_date DESC LIMIT 1`,
           [sym]
-        ), `feature_snapshots(${sym})`, req.log),
+        ), queryDefault, `feature_snapshots(${sym})`, req.log),
         withTimeout(query(
           `SELECT ranking_score, classification, confidence_score, confidence_level
            FROM prediction_registry
@@ -231,7 +233,7 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
              AND ranking_score IS NOT NULL
            ORDER BY prediction_date DESC LIMIT 1`,
           [sym]
-        ), `prediction_registry(${sym})`, req.log),
+        ), queryDefault, `prediction_registry(${sym})`, req.log),
       ]);
 
       const fsRow = (fsRes.rows?.[0] || null) as Record<string, unknown> | null;
@@ -348,8 +350,15 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
         },
       };
 
-      const healthScore = healthometerEngine.evaluate(healthInput);
-      const analysis = algorithmicAnalysisEngine.evaluate(healthScore);
+      let healthScore: any;
+      let analysis: any;
+      try {
+        healthScore = healthometerEngine.evaluate(healthInput);
+        analysis = algorithmicAnalysisEngine.evaluate(healthScore);
+      } catch {
+        healthScore = { overallScore: null, dimensions: [], label: "Research signals pending" };
+        analysis = { narrative: { strengths: [], risks: [], overall: null }, bullCase: null, bearCase: null };
+      }
 
       // ── Build response (CompanyResearchOutput shape) ──────────────
       const profile: CompanyProfileView = {
@@ -544,9 +553,21 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       return reply.send({ ok: true, data: safe });
     } catch (err: any) {
       req.log.error({ err, symbol: sym }, "company research failed");
-      return reply.status(502).send({
-        code: "RESEARCH_UNAVAILABLE",
-        message: "Research data is temporarily unavailable. Try again later.",
+      return reply.status(200).send({
+        ok: true,
+        data: {
+          profile: { symbol: sym, companyName: sym, sector: null, industry: null, description: null, website: null, listingDate: null, faceValue: null, isin: null },
+          quote: { symbol: sym, lastPrice: null, change: null, changePercent: null, open: null, high: null, low: null, close: null, volume: null, marketCap: null, dayRange: null, week52High: null, week52Low: null },
+          fundamentals: null,
+          factorScores: null,
+          thesis: null,
+          risk: null,
+          history: null,
+          investContext: null,
+          predictionV2: null,
+        },
+        error: `Research data temporarily unavailable for ${sym}`,
+        pipelineErrors: [err?.message ?? "Unknown error"],
       });
     }
   });

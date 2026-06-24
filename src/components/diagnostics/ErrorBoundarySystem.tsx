@@ -26,8 +26,8 @@ export class ErrorBoundarySystem extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="p-6 rounded-[18px] border border-amber-500/20 bg-amber-500/5 text-center font-vos-interface text-xs">
-          <span className="text-amber-400 font-bold block mb-1">
+        <div className="p-6 rounded-[18px] border border-slate-500/20 bg-slate-500/5 text-center font-vos-interface text-xs">
+          <span className="text-slate-400 font-bold block mb-1">
             ⚠️ Live market data is currently refreshing
           </span>
           <span className="text-gray-400 block mb-1">

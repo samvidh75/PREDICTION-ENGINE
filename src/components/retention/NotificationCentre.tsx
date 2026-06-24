@@ -62,8 +62,8 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
     switch (type) {
       case 'prediction_upgrade': return <TrendingUp className="h-4 w-4 text-emerald-400" />;
       case 'prediction_downgrade': return <TrendingDown className="h-4 w-4 text-rose-400" />;
-      case 'health_change': return <Activity className="h-4 w-4 text-amber-400" />;
-      case 'confidence_change': return <Zap className="h-4 w-4 text-indigo-400" />;
+      case 'health_change': return <Activity className="h-4 w-4 text-slate-400" />;
+      case 'confidence_change': return <Zap className="h-4 w-4 text-slate-400" />;
       case 'new_opportunity': return <Sparkles className="h-4 w-4 text-cyan-400" />;
       default: return <AlertTriangle className="h-4 w-4 text-white/40" />;
     }

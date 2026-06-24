@@ -62,7 +62,7 @@ function statusBadge(snapshot: ThesisSnapshot, currentScore: number | null): { l
   const delta = currentScore - snapshot.scoreAtAdd;
   if (delta > 5) return { label: 'IMPROVING', cls: 'border-[#16A34A]/30 text-[#16A34A] bg-[rgba(22,163,74,0.06)]' };
   if (delta >= -5) return { label: 'THESIS HOLDING', cls: 'border-[#16A34A]/30 text-[#16A34A] bg-[rgba(22,163,74,0.06)]' };
-  if (delta > -15) return { label: 'WEAKENING', cls: 'border-[#F59E0B]/30 text-[#F59E0B] bg-[rgba(245,158,11,0.06)]' };
+  if (delta > -15) return { label: 'WEAKENING', cls: 'border-[#92400E]/30 text-[#92400E] bg-[rgba(245,158,11,0.06)]' };
   return { label: 'REVIEW NEEDED', cls: 'border-[#EF4444]/30 text-[#EF4444] bg-[rgba(239,68,68,0.06)]' };
 }
 

@@ -114,7 +114,7 @@ export default function PersonalDashboard({
             </p>
           </div>
           <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl">
-            <span className="text-gray-400 font-bold block uppercase text-[9px] font-mono mb-1 text-amber-300">
+            <span className="text-gray-400 font-bold block uppercase text-[9px] font-mono mb-1 text-slate-300">
               What should I watch?
             </span>
             <p>

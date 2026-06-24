@@ -170,7 +170,7 @@ export default function FactorTransparencyPanel({
             <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-3">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
-                  f.score >= 60 ? "bg-emerald-400" : f.score <= 40 ? "bg-rose-400" : "bg-amber-400"
+                  f.score >= 60 ? "bg-emerald-400" : f.score <= 40 ? "bg-rose-400" : "bg-slate-400"
                 }`}
                 style={{ width: `${f.score}%` }}
               />

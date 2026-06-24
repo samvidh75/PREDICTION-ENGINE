@@ -20,7 +20,7 @@ export const TodayIntelligenceBrief: React.FC = () => {
   };
 
   const riskColors = {
-    Aggressive: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    Aggressive: "text-slate-400 border-slate-500/30 bg-slate-500/10",
     "Risk-On": "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
     "Risk-Off": "text-rose-400 border-rose-500/30 bg-rose-500/10",
   };
@@ -77,7 +77,7 @@ export const TodayIntelligenceBrief: React.FC = () => {
 
       {/* Leading Factors */}
       <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-2">
-        <span className="text-[9px] uppercase tracking-widest text-amber-400 font-bold block font-mono">Leading Sectors & Factors</span>
+        <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold block font-mono">Leading Sectors & Factors</span>
         <div className="flex flex-wrap gap-2">
           {market.leadershipTrends && market.leadershipTrends.map((trend: string, i: number) => (
             <span key={i} className="bg-white/5 border border-white/10 px-3 py-1 rounded-lg text-xs text-gray-300 font-vos-reading">
