@@ -195,7 +195,7 @@ export default function StockStoryPageF0(): JSX.Element {
                     <ScoreRing score={pred?.rankingScore ?? weightedScore} size={80} />
                     <div>
                       <span className="rounded-[var(--r-sm)] border px-2 py-0.5 text-xs font-medium" style={classificationStyle(classification)}>{classificationLabel(classification)}</span>
-                      <div className="mt-1 text-[13px] font-normal text-[var(--c-ink-muted)]">Confidence: <strong className="font-semibold text-[var(--c-ink)]">{pred?.confidenceLevel ?? "—"}</strong></div>
+                      <div className="mt-1 text-[13px] text-[var(--c-ink-muted)]">{pipeline.dataCompleteness ?? "—"}% data · <strong className="font-semibold text-[var(--c-ink)]">{pred?.confidenceLevel ?? "—"}</strong> confidence</div>
                     </div>
                   </div>
                   <div className="space-y-[10px]">
@@ -220,17 +220,17 @@ export default function StockStoryPageF0(): JSX.Element {
                     <span>· <strong className="font-medium">{pred?.confidenceLevel ?? "—"}</strong> confidence</span>
                   </div>
                 </div>
-                <div className="lg:w-2/5 lg:pl-6 lg:border-l lg:border-[#E5E7EB]">
+                <div className="lg:w-2/5 lg:pl-6 lg:border-l lg:border-[var(--c-border)]">
                   <div className="text-[11px] font-medium text-[#6B7280] uppercase tracking-wider mb-3">Pipeline Health</div>
                   <div className="space-y-2">
                     {[
                       { name: "IndianAPI", ok: pipeline.price.current !== null && pipeline.price.source === "indianapi", status: "Live price" },
-                      { name: "Yahoo", ok: pipeline.technicals.closePrices.length > 0, status: "Historical" },
-                      { name: "Screener", ok: pipeline.fundamentals.fundamentalSource !== null, status: pipeline.fundamentals.fundamentalSource ?? "Pending" },
+                      { name: "Yahoo", ok: pipeline.technicals.closePrices.length > 0, status: pipeline.technicals.closePrices.length > 0 ? "Historical" : "No data" },
+                      { name: "Screener", ok: pipeline.fundamentals.fundamentalSource !== null, status: pipeline.fundamentals.fundamentalSource === "partial" ? "Partial data" : pipeline.fundamentals.fundamentalSource ? pipeline.fundamentals.fundamentalSource.charAt(0).toUpperCase() + pipeline.fundamentals.fundamentalSource.slice(1) : "Pending" },
                       { name: "Upstox", ok: false, status: "Not configured" },
                     ].map(({ name, ok, status }) => (
                       <div key={name} className="flex items-center gap-2 text-xs">
-                        <span className={`h-2 w-2 rounded-full ${ok ? "bg-[#057A55]" : status === "Pending" ? "bg-[#92400E]" : "bg-[#D1D5DB]"}`} />
+                        <span className={`h-2 w-2 rounded-full ${ok ? "bg-[#057A55]" : status === "Pending" || status === "No data" ? "bg-[#D1D5DB]" : "bg-[#92400E]"}`} />
                         <span className="text-[#4B5563]">{name}</span>
                         <span className="ml-auto text-[#9CA3AF]">{status}</span>
                       </div>
@@ -240,7 +240,7 @@ export default function StockStoryPageF0(): JSX.Element {
               </div>
             </section>
 
-            <nav className="flex overflow-x-auto border-b border-[var(--c-border)]" aria-label="Stock research sections">
+            <nav className="sticky top-14 z-10 flex overflow-x-auto border-b border-[var(--c-border)] bg-white" aria-label="Stock research sections">
               {["Thesis", "Fundamentals", "Risk", "Technicals", "Peers", "History"].map((tab, index) => (
                 <button key={tab} type="button" disabled={index !== 0} className={`border-b-2 px-4 py-2.5 text-[13px] ${index === 0 ? "border-[var(--c-brand)] font-semibold text-[var(--c-ink)]" : "border-transparent font-medium text-[var(--c-ink-muted)] hover:text-[var(--c-ink-secondary)]"}`}>{tab}</button>
               ))}
