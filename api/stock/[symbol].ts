@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!symbol) return res.status(400).json({ error: "symbol required" });
 
   const indianApiKey = process.env.INDIANAPI_KEY || "";
-  const [priceData, fundamentalData, historicalData] = await Promise.all([
+  const [priceData, fundamentalData, historicalData, researchData] = await Promise.all([
     safeProvider("price", async () => {
       if (!indianApiKey) return { _error: "price: INDIANAPI_KEY not configured" };
       const response = await fetch(
@@ -75,27 +75,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         timestamps: result?.timestamp ?? [],
       };
     }),
+    safeProvider("research", async () => {
+      const baseUrl = process.env.BACKEND_BASE_URL || "https://prediction-engine-production-f7a8.up.railway.app";
+      const response = await fetch(`${baseUrl}/api/research/company/${encodeURIComponent(symbol)}`);
+      if (!response.ok) return { _error: `research HTTP ${response.status}` };
+      const payload = (await response.json()) as { data?: Record<string, unknown> };
+      return payload.data ?? { _error: "research: empty response" };
+    }),
   ]);
 
+  const researchQuote = researchData.quote && typeof researchData.quote === "object"
+    ? researchData.quote as Record<string, unknown>
+    : {};
+  const researchFundamentals = researchData.fundamentals && typeof researchData.fundamentals === "object"
+    ? researchData.fundamentals as Record<string, unknown>
+    : {};
+  const researchProfile = researchData.profile && typeof researchData.profile === "object"
+    ? researchData.profile as Record<string, unknown>
+    : {};
+
   const price = {
-    current: asNumber(priceData.currentPrice ?? priceData.price),
-    change: asNumber(priceData.percentChange ?? priceData.pChange),
-    changeAbs: asNumber(priceData.change),
-    open: asNumber(priceData.open),
-    high: asNumber(priceData.dayHigh ?? priceData.high),
-    low: asNumber(priceData.dayLow ?? priceData.low),
-    volume: asNumber(priceData.volume),
-    weekHigh52: asNumber(priceData["52WeekHigh"] ?? priceData.yearHigh),
-    weekLow52: asNumber(priceData["52WeekLow"] ?? priceData.yearLow),
-    marketCap: asNumber(priceData.marketCap),
+    current: asNumber(priceData.currentPrice ?? priceData.price ?? researchQuote.lastPrice),
+    change: asNumber(priceData.percentChange ?? priceData.pChange ?? researchQuote.changePercent),
+    changeAbs: asNumber(priceData.change ?? researchQuote.change),
+    open: asNumber(priceData.open ?? researchQuote.open),
+    high: asNumber(priceData.dayHigh ?? priceData.high ?? researchQuote.high),
+    low: asNumber(priceData.dayLow ?? priceData.low ?? researchQuote.low),
+    volume: asNumber(priceData.volume ?? researchQuote.volume),
+    weekHigh52: asNumber(priceData["52WeekHigh"] ?? priceData.yearHigh ?? researchQuote.week52High),
+    weekLow52: asNumber(priceData["52WeekLow"] ?? priceData.yearLow ?? researchQuote.week52Low),
+    marketCap: asNumber(priceData.marketCap ?? researchQuote.marketCap),
     exchange: typeof priceData.exchange === "string" ? priceData.exchange : "NSE",
     companyName:
       typeof (priceData.companyName ?? priceData.name) === "string"
         ? String(priceData.companyName ?? priceData.name)
-        : symbol,
-    sector: typeof priceData.sector === "string" ? priceData.sector : null,
-    source: priceData._error ? "unavailable" : "indianapi",
-    priceError: priceData._error ?? null,
+        : typeof researchProfile.companyName === "string" ? researchProfile.companyName : symbol,
+    sector: typeof priceData.sector === "string" ? priceData.sector : typeof researchProfile.sector === "string" ? researchProfile.sector : null,
+    source: priceData._error ? (asNumber(researchQuote.lastPrice) === null ? "unavailable" : "research-cache") : "indianapi",
+    priceError: priceData._error && asNumber(researchQuote.lastPrice) === null ? priceData._error : null,
   };
 
   const ratios =
@@ -104,22 +121,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       : {};
   const salesGrowth = fundamentalData.compoundedSalesGrowth as Record<string, unknown> | undefined;
   const profitGrowth = fundamentalData.compoundedProfitGrowth as Record<string, unknown> | undefined;
+  const percentFallback = (value: unknown) => {
+    const parsed = asNumber(value);
+    return parsed === null ? null : Math.abs(parsed) <= 2 ? parsed * 100 : parsed;
+  };
   const fundamentals = {
-    peRatio: asNumber(ratios["Stock P/E"]),
-    pbRatio: asNumber(ratios["Price to Book"]),
-    roe: asNumber(ratios["Return on equity"]),
-    roce: asNumber(ratios.ROCE),
-    debtToEquity: asNumber(ratios["Debt to equity"]),
-    currentRatio: asNumber(ratios["Current ratio"]),
-    dividendYield: asNumber(ratios["Dividend Yield"]),
-    eps: asNumber(ratios["EPS in Rs"]),
-    revenueGrowth: asNumber(salesGrowth?.["3 Years"]),
-    profitGrowth: asNumber(profitGrowth?.["3 Years"]),
-    netMargin: null as number | null,
-    operatingMargin: null as number | null,
+    peRatio: asNumber(ratios["Stock P/E"]) ?? asNumber(researchFundamentals.peRatio),
+    pbRatio: asNumber(ratios["Price to Book"]) ?? asNumber(researchFundamentals.pbRatio),
+    roe: asNumber(ratios["Return on equity"]) ?? percentFallback(researchFundamentals.roe),
+    roce: asNumber(ratios.ROCE) ?? percentFallback(researchFundamentals.roic),
+    debtToEquity: asNumber(ratios["Debt to equity"]) ?? asNumber(researchFundamentals.debtToEquity),
+    currentRatio: asNumber(ratios["Current ratio"]) ?? asNumber(researchFundamentals.currentRatio),
+    dividendYield: asNumber(ratios["Dividend Yield"]) ?? percentFallback(researchFundamentals.dividendYield),
+    eps: asNumber(ratios["EPS in Rs"]) ?? asNumber(researchFundamentals.eps),
+    revenueGrowth: asNumber(salesGrowth?.["3 Years"]) ?? percentFallback(researchFundamentals.revenueGrowth),
+    profitGrowth: asNumber(profitGrowth?.["3 Years"]) ?? percentFallback(researchFundamentals.profitGrowth),
+    netMargin: percentFallback(researchFundamentals.netMargin),
+    operatingMargin: percentFallback(researchFundamentals.operatingMargin),
     marketCap: asNumber(ratios["Market Cap"]) ?? price.marketCap,
-    fundamentalSource: fundamentalData._error ? "unavailable" : "screener",
-    fundamentalError: fundamentalData._error ?? null,
+    fundamentalSource: fundamentalData._error ? (asNumber(researchFundamentals.peRatio) === null ? "unavailable" : "research-cache") : "screener",
+    fundamentalError: fundamentalData._error && asNumber(researchFundamentals.peRatio) === null ? fundamentalData._error : null,
   };
 
   const closes = Array.isArray(historicalData.closes)
