@@ -16,8 +16,8 @@ interface HealthometerDetailSheetProps {
 }
 
 const DIM_COLORS: Record<string, string> = {
-  quality: "#3B82F6", financial_strength: "#22C55E", valuation: "#A78BFA",
-  growth: "#14B8A6", stability: "#64748B", risk: "#F59E0B", momentum: "#38BDF8",
+  quality: "#3B82F6", financial_strength: "#22C55E", valuation: "#6B7280",
+  growth: "#14B8A6", stability: "#64748B", risk: "#92400E", momentum: "#38BDF8",
 };
 
 export default function HealthometerDetailSheet({ open, onClose, label, score, dimensions }: HealthometerDetailSheetProps): JSX.Element | null {

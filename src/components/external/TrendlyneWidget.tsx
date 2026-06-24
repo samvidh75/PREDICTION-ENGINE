@@ -103,7 +103,7 @@ export function TrendlyneWidget({
 
   const fallbackContent = fallback ?? (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-      <AlertTriangle className="h-6 w-6 text-[#F59E0B]" />
+      <AlertTriangle className="h-6 w-6 text-[#92400E]" />
       <p className="text-sm text-[var(--color-text-secondary)]">
         External research panel unavailable.
       </p>

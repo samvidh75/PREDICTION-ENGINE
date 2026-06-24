@@ -16,12 +16,12 @@ const LABEL_STYLES: Record<string, string> = {
 const DIM_COLORS: Record<string, string> = {
   quality: "#5B7CFA",
   financial_strength: "#2DD4BF",
-  growth: "#8B5CF6",
+  growth: "#1746A2",
   valuation: "#F4B740",
   risk: "#FB923C",
   momentum: "#38BDF8",
   stability: "#94A3B8",
-  capital_efficiency: "#A78BFA",
+  capital_efficiency: "#6B7280",
 };
 
 interface PredictionEnginePanelProps {

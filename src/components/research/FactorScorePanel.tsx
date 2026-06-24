@@ -16,7 +16,7 @@ interface FactorBarProps {
 function barColor(score: number): string {
   if (score >= 70) return "bg-[#16A34A]";
   if (score >= 50) return "bg-[#2962FF]";
-  if (score >= 35) return "bg-[#F59E0B]";
+  if (score >= 35) return "bg-[#92400E]";
   return "bg-[#EF4444]";
 }
 

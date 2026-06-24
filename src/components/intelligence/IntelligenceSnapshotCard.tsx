@@ -67,7 +67,7 @@ export const IntelligenceSnapshotCard: React.FC<IntelligenceSnapshotCardProps> =
         {/* Sector Outlook Section */}
         {sector && (
           <div className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col space-y-3">
-            <span className="text-[9px] uppercase tracking-widest text-amber-400 font-mono font-bold">Sector Outlook // {sector.sectorName}</span>
+            <span className="text-[9px] uppercase tracking-widest text-slate-400 font-mono font-bold">Sector Outlook // {sector.sectorName}</span>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div><span className="text-gray-500">Strength:</span> <span className="text-white font-semibold">{sector.strength}/100</span></div>
               <div><span className="text-gray-500">Momentum:</span> <span className="text-white font-semibold">{sector.momentum}</span></div>

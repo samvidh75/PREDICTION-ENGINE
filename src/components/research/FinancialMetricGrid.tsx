@@ -7,7 +7,7 @@ const GROUP_ICONS: Record<string, React.ReactNode> = {
   "Profitability & efficiency": <TrendingUp className="h-3.5 w-3.5 text-[#16A34A]" aria-hidden="true" />,
   "Valuation": <DollarSign className="h-3.5 w-3.5 text-[#2962FF]" aria-hidden="true" />,
   "Growth": <BarChart3 className="h-3.5 w-3.5 text-[#16A34A]" aria-hidden="true" />,
-  "Financial health": <Shield className="h-3.5 w-3.5 text-[#F59E0B]" aria-hidden="true" />,
+  "Financial health": <Shield className="h-3.5 w-3.5 text-[#92400E]" aria-hidden="true" />,
 };
 
 export const FinancialMetricGrid: React.FC<{ groups: FinancialMetricGroup[] }> = ({ groups }) => {

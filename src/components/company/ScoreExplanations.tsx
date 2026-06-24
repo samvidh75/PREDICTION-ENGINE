@@ -107,7 +107,7 @@ export default function ScoreExplanations({
           </p>
         </div>
         <div>
-          <span className="font-bold text-amber-300 font-mono block">What should investors watch?</span>
+          <span className="font-bold text-slate-300 font-mono block">What should investors watch?</span>
           <p className="mt-1 text-white/80 leading-relaxed font-vos-reading">{watchText}</p>
         </div>
       </div>

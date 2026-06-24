@@ -125,7 +125,7 @@ export function ThesisStatusBadge({
   const getStatusStyles = () => {
     switch (status) {
       case "needs-review":
-        return "border-[#F59E0B]/30 bg-[#F59E0B]/10 text-[#F59E0B]";
+        return "border-[#92400E]/30 bg-[#92400E]/10 text-[#92400E]";
       case "improving":
         return "border-[#16A34A]/30 bg-[#16A34A]/10 text-[#16A34A]";
       case "risk-rising":
@@ -289,8 +289,8 @@ export function WhatChangedPanel({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-semibold text-[#E6EDF3]">{change.symbol}</span>
-                  <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#F59E0B" : "#64748B", backgroundColor: change.severity === "critical" ? "#EF4444/15" : change.severity === "important" ? "#F59E0B/15" : "#64748B/15", color: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#F59E0B" : "#64748B" }}>
-                    <span className="h-1 w-1 rounded-full" style={{ backgroundColor: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#F59E0B" : "#64748B" }} />
+                  <span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[10px] font-medium" style={{ borderColor: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#92400E" : "#64748B", backgroundColor: change.severity === "critical" ? "#EF4444/15" : change.severity === "important" ? "#92400E/15" : "#64748B/15", color: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#92400E" : "#64748B" }}>
+                    <span className="h-1 w-1 rounded-full" style={{ backgroundColor: change.severity === "critical" ? "#EF4444" : change.severity === "important" ? "#92400E" : "#64748B" }} />
                     {change.type}
                   </span>
                 </div>

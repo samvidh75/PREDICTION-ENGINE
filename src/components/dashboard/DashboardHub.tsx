@@ -14,7 +14,7 @@ function trackedSignalDot(_ticker: string): { color: string; label: string } {
 }
 
 function severityColor(severity: string): string {
-  return severity === "critical" ? "#EF4444" : severity === "important" ? "#F59E0B" : "#64748B";
+  return severity === "critical" ? "#EF4444" : severity === "important" ? "#92400E" : "#64748B";
 }
 
 interface SignalItem {
@@ -216,7 +216,7 @@ export const DashboardHub: React.FC = () => {
                 </div>
               ) : signalsError ? (
                 <div className="flex flex-col items-center p-6 text-center">
-                  <AlertTriangle className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />
+                  <AlertTriangle className="h-5 w-5 text-[#92400E]" aria-hidden="true" />
                   <h3 className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Research signals pending</h3>
                   <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Track companies to review important changes.</p>
                 </div>
@@ -275,7 +275,7 @@ export const DashboardHub: React.FC = () => {
                     const labelInfo = opp.score !== null && opp.score !== undefined
                       ? opp.score >= 75 ? { label: "Very Healthy", color: "#16A34A" }
                         : opp.score >= 55 ? { label: "Healthy", color: "#2962FF" }
-                          : opp.score >= 40 ? { label: "Needs review", color: "#F59E0B" }
+                          : opp.score >= 40 ? { label: "Needs review", color: "#92400E" }
                             : { label: "Risk rising", color: "#EF4444" }
                       : null;
                     return (

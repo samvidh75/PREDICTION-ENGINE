@@ -565,7 +565,7 @@ export default function ScannerPage() {
                     <div className="mt-4 space-y-2">
                       <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Quality</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.qualityValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pr.qualityValue}%` }} /></div></div>
                       <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Growth</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.growthValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${pr.growthValue}%` }} /></div></div>
-                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Momentum</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.momentumValue ?? '—'}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-violet-500 transition-all" style={{ width: `${pr.momentumValue ?? 0}%` }} /></div></div>
+                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Momentum</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.momentumValue ?? '—'}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-slate-500 transition-all" style={{ width: `${pr.momentumValue ?? 0}%` }} /></div></div>
                     </div>
                   )}
                   <div className="mt-4 text-right"><span className="text-xs font-semibold text-[#2962FF]">Research →</span></div>
@@ -578,7 +578,7 @@ export default function ScannerPage() {
           {!pipeLoading && pipelineResults.size === 0 && loading && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading scanner results">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5"><div className="h-10 w-10 rounded-full bg-slate-100" /><div className="mt-5 h-4 w-1/2 rounded bg-slate-100" /><div className="mt-3 h-3 w-full rounded bg-slate-100" /></div>)}</div>}
 
           {scannerMessage && !loading && (
-            <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">{scannerMessage}</div>
+            <div role="status" className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-900">{scannerMessage}</div>
           )}
 
           {!loading && activeCategory && sortedResults.length === 0 && !loading && pipelineResults.size === 0 && !pipeLoading && (

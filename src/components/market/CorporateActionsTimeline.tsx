@@ -25,8 +25,8 @@ const ACTION_ICONS: Record<string, string> = {
 const ACTION_COLORS: Record<string, string> = {
   dividend: "#16A34A",
   split: "#2962FF",
-  bonus: "#A78BFA",
-  rights: "#F59E0B",
+  bonus: "#6B7280",
+  rights: "#92400E",
   other: "#64748B",
 };
 

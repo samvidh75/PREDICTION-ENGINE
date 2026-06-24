@@ -13,7 +13,7 @@ export const PortfolioHealthometer: React.FC<PortfolioHealthometerProps> = ({ sc
     Strong: "text-emerald-400 border-emerald-400 bg-emerald-400/10",
     Healthy: "text-green-400 border-green-400 bg-green-400/10",
     Stable: "text-blue-400 border-blue-400 bg-blue-400/10",
-    Weakening: "text-amber-400 border-amber-400 bg-amber-400/10",
+    Weakening: "text-slate-400 border-slate-400 bg-slate-400/10",
     "At Risk": "text-rose-500 border-rose-500 bg-rose-500/10",
   };
 

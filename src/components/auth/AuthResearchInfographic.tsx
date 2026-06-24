@@ -24,7 +24,7 @@ export function AuthResearchInfographic({ mode }: { mode: "login" | "signup" }):
   const isSignup = mode === "signup";
   return (
     <div data-testid="auth-research-infographic" className="relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-[linear-gradient(145deg,rgba(255,255,255,.96),rgba(243,247,255,.82))] p-4 shadow-[0_24px_70px_rgba(30,41,59,.10)] backdrop-blur-xl sm:p-5">
-      <div className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-violet-300/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-slate-300/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 -left-14 h-48 w-48 rounded-full bg-blue-300/20 blur-3xl" />
 
       <div className="relative flex items-start justify-between gap-4">
@@ -48,7 +48,7 @@ export function AuthResearchInfographic({ mode }: { mode: "login" | "signup" }):
           <div className="relative mt-5 grid grid-cols-3 items-center gap-1 text-center">
             {[
               { label: "Evidence", icon: ShieldCheck, tone: "bg-blue-50 text-blue-700" },
-              { label: "Compare", icon: GitCompare, tone: "bg-violet-50 text-violet-700" },
+              { label: "Compare", icon: GitCompare, tone: "bg-slate-50 text-slate-700" },
               { label: "Track", icon: Bookmark, tone: "bg-emerald-50 text-emerald-700" },
             ].map(({ label, icon: Icon, tone }, index) => <div key={label} className="relative"><div className={`mx-auto grid h-10 w-10 place-items-center rounded-2xl ${tone}`}><Icon className="h-4 w-4" /></div><p className="mt-2 text-[9px] font-semibold text-slate-600">{label}</p>{index < 2 && <ArrowUpRight className="absolute -right-1 top-3 h-3 w-3 text-slate-300" />}</div>)}
           </div>

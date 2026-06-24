@@ -27,14 +27,14 @@ const ICONS: Record<ToastType, React.ReactNode> = {
   success: <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />,
   error: <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />,
   info: <Info className="h-4 w-4 text-blue-600 shrink-0" />,
-  warning: <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />,
+  warning: <AlertTriangle className="h-4 w-4 text-slate-600 shrink-0" />,
 };
 
 const BORDER_COLORS: Record<ToastType, string> = {
   success: "border-l-emerald-500",
   error: "border-l-red-500",
   info: "border-l-blue-500",
-  warning: "border-l-amber-500",
+  warning: "border-l-slate-500",
 };
 
 const AUTO_DISMISS_MS: Record<ToastType, number> = {

@@ -140,9 +140,9 @@ function providerPillStyle(status: string): { bg: string; text: string; border: 
     case "missing_optional":
       return { bg: "bg-[var(--color-surface-raised)]/60", text: "text-[var(--color-text-secondary)]", border: "border-[rgba(148,163,184,0.16)]", label: "Optional" };
     case "missing_required":
-      return { bg: "bg-amber-50/60", text: "text-amber-700", border: "border-amber-200/50", label: "Required" };
+      return { bg: "bg-slate-50/60", text: "text-slate-700", border: "border-slate-200/50", label: "Required" };
     default:
-      return { bg: "bg-amber-50/60", text: "text-amber-700", border: "border-amber-200/50", label: status };
+      return { bg: "bg-slate-50/60", text: "text-slate-700", border: "border-slate-200/50", label: status };
   }
 }
 

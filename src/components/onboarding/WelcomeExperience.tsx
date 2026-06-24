@@ -30,13 +30,13 @@ const STEPS = [
     detail: 'We scan for accounting anomalies and structural risks that traditional screeners miss.',
   },
   {
-    icon: <Brain className="h-8 w-8 text-violet-400" />,
+    icon: <Brain className="h-8 w-8 text-slate-400" />,
     title: 'Narrative',
     description: 'Numbers alone are hard to interpret. We tell you what improved, what deteriorated, and what matters most.',
     detail: 'You get the story behind the scores — in plain English.',
   },
   {
-    icon: <History className="h-8 w-8 text-amber-400" />,
+    icon: <History className="h-8 w-8 text-slate-400" />,
     title: 'Prediction History',
     description: 'Every health assessment we make is recorded before outcomes. You can verify our accuracy yourself.',
     detail: 'No cherry-picking. No survivorship bias. Full transparency.',
@@ -87,7 +87,7 @@ export const WelcomeExperience: React.FC<WelcomeExperienceProps> = ({ onComplete
         {/* Progress bar */}
         <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-white/5 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-all duration-700"
+            className="h-full bg-gradient-to-r from-cyan-500 to-slate-500 transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>

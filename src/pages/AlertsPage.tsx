@@ -199,7 +199,7 @@ export const AlertsPage: React.FC = () => {
         )}
 
         {alerts.length >= MAX_ALERTS && (
-          <ProductPanel className="mb-4 border-amber-500/20 bg-amber-500/5 p-4 text-center">
+          <ProductPanel className="mb-4 border-slate-500/20 bg-slate-500/5 p-4 text-center">
             <p className="text-xs text-[var(--color-text-secondary)]">Upgrade to premium for unlimited alerts.</p>
           </ProductPanel>
         )}

@@ -69,7 +69,7 @@ export function ProductHero({ eyebrow, title, body, actions, aside }: { eyebrow?
   return (
     <section className="grid gap-6 py-6 md:grid-cols-[1.1fr_0.9fr] md:items-stretch md:py-10">
       <div className="relative flex min-h-[320px] flex-col justify-center overflow-hidden rounded-[24px] border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,246,255,.9))] p-6 shadow-[0_28px_70px_rgba(30,64,175,.13),inset_0_1px_0_white] md:p-8">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-violet-400/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-slate-400/10 blur-3xl" />
         {eyebrow && <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">{eyebrow}</div>}
         <h1 className="relative max-w-3xl text-3xl font-semibold leading-[1.04] tracking-[-.045em] text-[var(--color-text-primary)] sm:text-4xl md:text-5xl">{title}</h1>
         <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)] md:text-base">{body}</p>
@@ -134,7 +134,7 @@ export function ProductLoadingState({ title = "Loading research", body = "Bringi
 export function ProductErrorState({ title = "This view could not be prepared right now.", body = "This view could not be prepared right now.", action }: { title?: string; body?: string; action?: React.ReactNode }): JSX.Element {
   return (
     <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
-      <AlertCircle className="h-5 w-5 text-[#F59E0B]" aria-hidden="true" />
+      <AlertCircle className="h-5 w-5 text-[#92400E]" aria-hidden="true" />
       <h3 className="mt-3 text-sm font-semibold text-[#E6EDF3]">{title}</h3>
       <p className="mt-2 max-w-md text-xs leading-5 text-[#9AA7B5]">{body}</p>
       {action && <div className="mt-4">{action}</div>}
@@ -143,7 +143,7 @@ export function ProductErrorState({ title = "This view could not be prepared rig
 }
 
 export function ProductStatusPill({ children, tone = "muted" }: { children: React.ReactNode; tone?: "verified" | "warning" | "danger" | "blue" | "muted" }): JSX.Element {
-  const color = tone === "verified" ? "#16A34A" : tone === "warning" ? "#F59E0B" : tone === "danger" ? "#EF4444" : tone === "blue" ? "#2962FF" : "#64748B";
+  const color = tone === "verified" ? "#16A34A" : tone === "warning" ? "#92400E" : tone === "danger" ? "#EF4444" : tone === "blue" ? "#2962FF" : "#64748B";
   return (
     <span className="inline-flex min-h-6 items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.035)] px-2 py-1 text-[11px] font-medium text-[#9AA7B5] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]">
       <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
@@ -173,7 +173,7 @@ export function ProductProofPanel({ title, rows }: { title: string; rows: Array<
       <div className="mt-5 space-y-3">
         {rows.map(({ icon: Icon, label, body, tone = "blue" }) => (
           <div key={label} className="flex gap-3 rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
-            <Icon className={`mt-0.5 h-4 w-4 ${tone === "verified" ? "text-[#16A34A]" : tone === "warning" ? "text-[#F59E0B]" : "text-[#2962FF]"}`} aria-hidden="true" />
+            <Icon className={`mt-0.5 h-4 w-4 ${tone === "verified" ? "text-[#16A34A]" : tone === "warning" ? "text-[#92400E]" : "text-[#2962FF]"}`} aria-hidden="true" />
             <div>
               <div className="text-xs font-semibold text-[#E6EDF3]">{label}</div>
               <p className="mt-1 text-xs leading-5 text-[#9AA7B5]">{body}</p>
@@ -276,10 +276,10 @@ export function ProductRail({ children, className = "" }: { children: React.Reac
   );
 }
 
-export function ProductInsightCard({ icon: Icon, title, body, tone = "blue" }: { icon: LucideIcon; title: string; body: string; tone?: "blue" | "green" | "amber" | "red" | "muted" }): JSX.Element {
-  const borderColor = tone === "green" ? "rgba(22,163,74,0.2)" : tone === "amber" ? "rgba(245,158,11,0.2)" : tone === "red" ? "rgba(239,68,68,0.2)" : "rgba(41,98,255,0.2)";
-  const bgColor = tone === "green" ? "rgba(22,163,74,0.06)" : tone === "amber" ? "rgba(245,158,11,0.06)" : tone === "red" ? "rgba(239,68,68,0.06)" : "rgba(41,98,255,0.06)";
-  const iconColor = tone === "green" ? "#16A34A" : tone === "amber" ? "#F59E0B" : tone === "red" ? "#EF4444" : "#2962FF";
+export function ProductInsightCard({ icon: Icon, title, body, tone = "blue" }: { icon: LucideIcon; title: string; body: string; tone?: "blue" | "green" | "slate" | "red" | "muted" }): JSX.Element {
+  const borderColor = tone === "green" ? "rgba(22,163,74,0.2)" : tone === "slate" ? "rgba(245,158,11,0.2)" : tone === "red" ? "rgba(239,68,68,0.2)" : "rgba(41,98,255,0.2)";
+  const bgColor = tone === "green" ? "rgba(22,163,74,0.06)" : tone === "slate" ? "rgba(245,158,11,0.06)" : tone === "red" ? "rgba(239,68,68,0.06)" : "rgba(41,98,255,0.06)";
+  const iconColor = tone === "green" ? "#16A34A" : tone === "slate" ? "#92400E" : tone === "red" ? "#EF4444" : "#2962FF";
   return (
     <ProductCard className={`border-[${borderColor}] bg-[${bgColor}]`}>
       <div className="flex items-start gap-3">

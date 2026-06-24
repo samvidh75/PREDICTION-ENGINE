@@ -103,7 +103,7 @@ export const ResearchWorkspace: React.FC = () => {
           <div className="vos-card p-6 flex flex-col justify-between h-full min-h-[300px]">
             <div className="space-y-4">
               <div>
-                <span className="text-[10px] text-purple-400 uppercase tracking-widest font-bold block mb-1">Corporate Space</span>
+                <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold block mb-1">Corporate Space</span>
                 <h4 className="text-lg font-bold text-white font-vos-display">Team Space</h4>
               </div>
 
@@ -112,7 +112,7 @@ export const ResearchWorkspace: React.FC = () => {
                 {members.map((m) => (
                   <div key={m.id} className="bg-white/5 border border-white/5 p-2.5 rounded-[12px] flex items-center justify-between text-xs">
                     <span className="font-semibold text-white">{m.name}</span>
-                    <span className="px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold uppercase text-[9px]">
+                    <span className="px-2 py-0.5 rounded bg-slate-500/10 border border-slate-500/20 text-slate-400 font-bold uppercase text-[9px]">
                       {m.role}
                     </span>
                   </div>
@@ -127,7 +127,7 @@ export const ResearchWorkspace: React.FC = () => {
                 placeholder="Team member name..."
                 value={newMemberName}
                 onChange={(e) => setNewMemberName(e.target.value)}
-                className="w-full h-[40px] bg-white/5 border border-white/10 rounded-[12px] px-3 text-xs outline-none focus:border-purple-400 text-white"
+                className="w-full h-[40px] bg-white/5 border border-white/10 rounded-[12px] px-3 text-xs outline-none focus:border-slate-400 text-white"
               />
               <div className="flex gap-2">
                 <CustomSelect
@@ -142,7 +142,7 @@ export const ResearchWorkspace: React.FC = () => {
                 </CustomSelect>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-500 hover:bg-purple-400 text-white rounded-full text-xs font-bold transition-all cursor-pointer"
+                  className="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-full text-xs font-bold transition-all cursor-pointer"
                 >
                   Invite
                 </button>

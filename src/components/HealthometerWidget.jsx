@@ -66,8 +66,8 @@ const HealthometerWidget: React.FC<HealthometerWidgetProps> = ({
 
   if (!prediction) {
     return (
-      <div className="bg-[#0c0d0f] border border-amber-500/20 rounded-none p-4 font-mono">
-        <span className="text-[11px] font-bold text-amber-500 uppercase block mb-1">
+      <div className="bg-[#0c0d0f] border border-slate-500/20 rounded-none p-4 font-mono">
+        <span className="text-[11px] font-bold text-slate-500 uppercase block mb-1">
           Live market data is currently refreshing
         </span>
         <span className="text-[10px] text-gray-400 block">

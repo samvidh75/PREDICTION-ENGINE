@@ -10,7 +10,7 @@ interface ScorePillProps {
 export const ScorePill: React.FC<ScorePillProps> = ({ score, label, className = "", pillStyle = "dark" }) => {
   let colorClass = "bg-red-50 border-red-200 text-red-700";
   if (score > 40 && score <= 70) {
-    colorClass = "bg-amber-50 border-amber-200 text-amber-700";
+    colorClass = "bg-slate-50 border-slate-200 text-slate-700";
   } else if (score > 70) {
     colorClass = "bg-emerald-50 border-emerald-200 text-emerald-700";
   }
@@ -19,7 +19,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, label, className = 
     if (score <= 40) {
       colorClass = "bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.3)] text-[#EF4444]";
     } else if (score <= 70) {
-      colorClass = "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.3)] text-[#F59E0B]";
+      colorClass = "bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.3)] text-[#92400E]";
     } else {
       colorClass = "bg-[rgba(22,163,74,0.12)] border-[rgba(22,163,74,0.3)] text-[#16A34A]";
     }

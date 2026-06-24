@@ -15,7 +15,7 @@ function scoreColor(v: number | null): string {
   if (v === null) return "#94A3B8";
   if (v >= 70) return "#16A34A";
   if (v >= 55) return "#22C55E";
-  if (v >= 40) return "#F59E0B";
+  if (v >= 40) return "#92400E";
   if (v >= 25) return "#FB923C";
   return "#EF4444";
 }
@@ -34,7 +34,7 @@ function classLabel(cls: string): string {
 function confidenceBadge(level: string): { label: string; cls: string } {
   switch (level) {
     case "HIGH": return { label: "High conf.", cls: "bg-green-50 text-green-700 border-green-200" };
-    case "MEDIUM": return { label: "Med conf.", cls: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "MEDIUM": return { label: "Med conf.", cls: "bg-slate-50 text-slate-700 border-slate-200" };
     case "LOW": return { label: "Low conf.", cls: "bg-red-50 text-red-700 border-red-200" };
     case "CRITICAL": return { label: "Critical", cls: "bg-red-50 text-red-700 border-red-200" };
     default: return { label: "—", cls: "bg-gray-50 text-gray-500 border-gray-200" };
@@ -206,7 +206,7 @@ function StockRow({
               Research →
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#F59E0B] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-[#92400E] bg-[rgba(245,158,11,0.1)] px-2 py-0.5 rounded">
               <Lock className="h-3 w-3" /> Gated
             </span>
           )}
@@ -215,7 +215,7 @@ function StockRow({
 
       {/* Price-null warning */}
       {result !== null && result.price.current === null && isAuthenticated && (
-        <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-[#F59E0B]">
+        <div className="px-4 pb-3 flex items-center gap-1.5 text-[10px] text-[#92400E]">
           <AlertCircle className="h-3 w-3" />
           <span>Price data unavailable — score based on fundamentals only</span>
         </div>
@@ -317,7 +317,7 @@ export const PublicRankingsPage: React.FC = () => {
             </div>
             {!isAuthenticated && (
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-2 w-2 rounded-full bg-[#F59E0B]" />
+                <span className="inline-flex h-2 w-2 rounded-full bg-[#92400E]" />
                 <span className="text-xs text-[var(--color-text-secondary)]">Teaser — 3 stocks shown</span>
               </div>
             )}
@@ -386,7 +386,7 @@ export const PublicRankingsPage: React.FC = () => {
           {!isAuthenticated && (
             <ProductPanel className="p-6 md:p-8 border border-[rgba(245,158,11,0.2)] bg-gradient-to-br from-[#0D1117] via-[#0F141F] to-[#0D1117] rounded-xl flex flex-col items-center text-center space-y-4 shadow-xl">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(245,158,11,0.1)]">
-                <Lock className="h-6 w-6 text-[#F59E0B]" />
+                <Lock className="h-6 w-6 text-[#92400E]" />
               </div>
               <div className="max-w-md space-y-2">
                 <h2 className="text-lg font-bold tracking-tight text-[var(--color-text-primary)]">Unlock full research shortlist</h2>

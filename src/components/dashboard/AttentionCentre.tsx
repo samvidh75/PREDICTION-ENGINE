@@ -178,7 +178,7 @@ export default function AttentionCentre({ watchlistSymbols = [], limit = MAX_CRI
       {important.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-amber-500" />
+            <div className="w-2 h-2 rounded-full bg-slate-500" />
             <span className="text-xs text-white/40 uppercase tracking-wider">Important</span>
           </div>
           <div className="space-y-2">

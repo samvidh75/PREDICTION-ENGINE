@@ -38,8 +38,8 @@ interface ExplanationData {
 
 const DRIVER_COLORS: Record<number, string> = {
   1: "bg-cyan-500",
-  2: "bg-violet-500",
-  3: "bg-amber-500",
+  2: "bg-slate-500",
+  3: "bg-slate-500",
 };
 
 function driverColor(index: number): string {

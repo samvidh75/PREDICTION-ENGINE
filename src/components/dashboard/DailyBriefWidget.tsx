@@ -15,11 +15,11 @@ export const DailyBriefWidget: React.FC = () => {
 
   const moodIcon = market.marketMood === "Bullish" ? <Sun className="w-5 h-5 text-emerald-400" /> 
     : market.marketMood === "Bearish" ? <CloudRain className="w-5 h-5 text-rose-400" /> 
-    : <Cloud className="w-5 h-5 text-amber-400" />;
+    : <Cloud className="w-5 h-5 text-slate-400" />;
   
   const moodColor = market.marketMood === "Bullish" ? "text-emerald-400" 
     : market.marketMood === "Bearish" ? "text-rose-400" 
-    : "text-amber-400";
+    : "text-slate-400";
 
   return (
     <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 space-y-4">
