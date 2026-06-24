@@ -4,29 +4,29 @@
  * and public routes are rendered. Stale routes fall through to
  * the default (DashboardHub or PublicLandingPage).
  */
-import React from "react";
+import React, { Suspense } from "react";
 import { PUBLIC_PAGES, type PageKey } from "./router";
-
-// Public pages
-import PublicLandingPage from "../pages/PublicLandingPage";
-import PublicAboutPage from "../pages/PublicAboutPage";
-import LoginPage from "../pages/LoginPage";
-import SignupPage from "../pages/SignupPage";
-import TermsPage from "../pages/TermsPage";
-
-// Authenticated pages (intentional nav targets)
-import DashboardHub from "../views/DashboardHub";
-import SearchPage from "../pages/SearchPage";
-import ScannerPage from "../components/scanner/ScannerPage";
-import StockStoryPage from "../pages/StockStoryPageF0";
-import TrackPage from "../pages/TrackPage";
-import SettingsPage from "../pages/SettingsPage";
-import TrustCentrePage from "../pages/TrustCentrePage";
-import ComparePage from "../pages/ComparePage";
-import IPOCenterPage from "../pages/IPOCenterPage";
-import PricingPage from "../pages/PricingPage";
-import MorePage from "../pages/MorePage";
 import AppLayout from "../components/navigation/AppLayout";
+import TopNav from "../components/navigation/TopNav";
+import PageErrorBoundary from "../components/diagnostics/PageErrorBoundary";
+import SebiDisclaimer from "../components/compliance/SebiDisclaimer";
+
+const PublicLandingPage = React.lazy(() => import("../pages/PublicLandingPage"));
+const PublicAboutPage = React.lazy(() => import("../pages/PublicAboutPage"));
+const LoginPage = React.lazy(() => import("../pages/LoginPage"));
+const SignupPage = React.lazy(() => import("../pages/SignupPage"));
+const TermsPage = React.lazy(() => import("../pages/TermsPage"));
+const DashboardHub = React.lazy(() => import("../views/DashboardHub"));
+const SearchPage = React.lazy(() => import("../pages/SearchPage"));
+const ScannerPage = React.lazy(() => import("../components/scanner/ScannerPage"));
+const StockStoryPage = React.lazy(() => import("../pages/StockStoryPageF0"));
+const TrackPage = React.lazy(() => import("../pages/TrackPage"));
+const SettingsPage = React.lazy(() => import("../pages/SettingsPage"));
+const TrustCentrePage = React.lazy(() => import("../pages/TrustCentrePage"));
+const ComparePage = React.lazy(() => import("../pages/ComparePage"));
+const IPOCenterPage = React.lazy(() => import("../pages/IPOCenterPage"));
+const PricingPage = React.lazy(() => import("../pages/PricingPage"));
+const MorePage = React.lazy(() => import("../pages/MorePage"));
 
 interface PageRendererProps {
   pageKey: PageKey;
@@ -50,6 +50,15 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
       return <ScannerPage />;
     case "scanner":
       return <ScannerPage />;
+    case "search":
+      return <SearchPage />;
+    case "stock":
+    case "company":
+      return <StockStoryPage />;
+    case "portfolio":
+    case "watchlist":
+    case "alerts":
+      return <TrackPage />;
     case "compare":
       return <ComparePage />;
     case "terms":
@@ -104,12 +113,11 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
 }
 
 export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
-  if (!isAuthenticated) {
-    return PUBLIC_PAGES.includes(pageKey) ? renderPublicPage(pageKey) : <PublicLandingPage />;
-  }
-
-  // About keeps its public presentation even for authenticated users.
-  if (pageKey === "about") return <PublicAboutPage />;
-
-  return <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}</AppLayout>;
+  const publicView = PUBLIC_PAGES.includes(pageKey) ? renderPublicPage(pageKey) : <PublicLandingPage />;
+  const page = !isAuthenticated
+    ? <>{pageKey !== "login" && pageKey !== "signup" && <TopNav />}{publicView}<SebiDisclaimer variant="footer" /></>
+    : pageKey === "about"
+      ? <PublicAboutPage />
+      : <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}<SebiDisclaimer variant="footer" /></AppLayout>;
+  return <PageErrorBoundary><Suspense fallback={<div className="min-h-screen bg-[#F6F8FB] pt-28"><div className="mx-auto h-48 max-w-5xl animate-pulse rounded-2xl bg-white shadow-sm" /></div>}>{page}</Suspense></PageErrorBoundary>;
 }

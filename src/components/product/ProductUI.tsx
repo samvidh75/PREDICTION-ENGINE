@@ -17,7 +17,7 @@ export function ProductShell({ children, className = "" }: { children: React.Rea
     <div className={`min-h-screen bg-[var(--color-canvas)] text-[var(--color-text-primary)] antialiased ${className}`}>
       <div className="fixed inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 75% 45% at 50% 0%, rgba(91,124,250,0.075) 0%, transparent 62%), radial-gradient(circle at 92% 34%, rgba(139,92,246,.035), transparent 25%), linear-gradient(180deg,#fbfdff 0%,#ffffff 42%,#f8fafc 100%)' }} />
       <div className="fixed inset-0 pointer-events-none opacity-[.24] [background-image:linear-gradient(rgba(41,98,255,.025)_1px,transparent_1px),linear-gradient(90deg,rgba(41,98,255,.025)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:linear-gradient(to_bottom,black,transparent_58%)]" />
-      <main className="relative mx-auto w-full pb-24 pt-16 md:pb-10 md:pt-14 z-10">
+      <main className="relative mx-auto w-full pb-24 pt-24 md:pb-10 md:pt-24 z-10">
         {children}
       </main>
     </div>

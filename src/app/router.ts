@@ -34,7 +34,8 @@ export function getPageKeyFromUrl(): PageKey {
   if (typeof window === "undefined") return "landing";
   try {
     const params = new URLSearchParams(window.location.search);
-    const raw = (params.get("page") ?? "landing").toLowerCase().trim();
+    const pathKey = window.location.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
+    const raw = (params.get("page") ?? pathKey ?? "landing").toLowerCase().trim() || "landing";
 
     const mapping: Record<string, PageKey> = {
       landing: "landing",
@@ -42,7 +43,7 @@ export function getPageKeyFromUrl(): PageKey {
       login: "login",
       signup: "signup",
       company: "company",
-      stock: "company",
+      stock: "stock",
       dashboard: "dashboard",
       market: "dashboard",
       search: "search",
@@ -55,7 +56,7 @@ export function getPageKeyFromUrl(): PageKey {
       trust: "methodology",
       validation: "methodology",
       predictions: "landing",
-      rankings: "scanner",
+      rankings: "rankings",
       compare: "compare",
       alerts: "alerts",
       invest: "invest",
@@ -104,7 +105,7 @@ export const PROTECTED_PAGES: PageKey[] = [
 export const PUBLIC_PAGES: PageKey[] = [
   "landing", "about", "login", "signup", "methodology",
   "rankings", "compare", "scanner", "search", "stock", "company",
-  "ipo", "track", "more", "pricing", "terms",
+  "watchlist", "portfolio", "alerts", "ipo", "track", "more", "pricing", "terms",
 ];
 
 /**
