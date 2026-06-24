@@ -4,7 +4,7 @@
 
 | Item | Before | After |
 |---|---|---|---|
-| Baseline commit | `15b9a3b85` | `b13b9d549` |
+| Baseline commit | `15b9a3b85` | `c2f19a081` |
 | Branch | `main` | `main` |
 | Frontend build | Pass | Pass (1.28s) |
 | Typecheck (all) | Pass | Pass |
