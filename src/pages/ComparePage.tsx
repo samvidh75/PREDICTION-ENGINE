@@ -1,388 +1,448 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { X, Plus, ArrowLeftRight } from "lucide-react";
-import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Search, ArrowUpRight, GitCompare, Sparkles, Shield, TrendingUp, TrendingDown, Check, X, ChevronRight, AlertTriangle, BarChart3, RefreshCw } from "lucide-react";
+import { PremiumAppShell, PremiumTopNav, MarketTickerStrip, PremiumCard, ScoreRing, ScorePill, FactorChip, FactorBar, MiniSparkline, FactorBreakdownBars, ProductPageHeader, EmptyProductState, InvestmentReviewSheet, BrokerHandoffSheet, MobileProductNav } from "../premium/PremiumComponents";
+import { productNavigate } from "../components/product/ProductUI";
 import { runCompanyDataPipeline, type PipelineResult } from "../services/data/CompanyDataPipeline";
-import { fPrice, fPercent, fScore, fMarketCap, fRatio } from "../lib/format";
-import { ScoreRing } from "../components/ui/ScoreRing";
-import { ClassificationBadge } from "../components/ui/ClassificationBadge";
+import { fPrice } from "../lib/format";
+import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 
-const MAX_SYMBOLS = 4;
-const FACTOR_GROUPS = ["quality", "valuation", "growth", "stability", "momentum", "risk"] as const;
-const FACTOR_LABEL: Record<string, string> = { quality: "Quality", valuation: "Valuation", growth: "Growth", stability: "Stability", momentum: "Momentum", risk: "Safety" };
+const S = {
+  bg: "var(--ss-bg)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  negative: "var(--ss-negative)",
+  caution: "var(--ss-caution)",
+  action: "var(--ss-action)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+  radiusLg: "var(--ss-radius-lg)",
+  container: "var(--ss-container)",
+};
 
-function parseSymbolsFromUrl(): string[] {
-  const p = new URLSearchParams(window.location.search);
-  return (p.get("symbols") ?? p.get("ids") ?? p.get("id") ?? "").split(",").map(s => s.trim().toUpperCase()).filter(Boolean);
-}
+const FACTOR_GROUPS: Array<{ key: string; label: string; icon: React.ReactNode }> = [
+  { key: "quality", label: "Quality", icon: <Shield size={14} /> },
+  { key: "growth", label: "Growth", icon: <TrendingUp size={14} /> },
+  { key: "valuation", label: "Valuation", icon: <BarChart3 size={14} /> },
+  { key: "risk", label: "Risk", icon: <AlertTriangle size={14} /> },
+  { key: "momentum", label: "Momentum", icon: <TrendingDown size={14} /> },
+];
 
-function updateUrlSymbols(symbols: string[]) {
-  const p = new URLSearchParams(window.location.search);
-  symbols.length ? p.set("symbols", symbols.join(",")) : p.delete("symbols");
-  window.history.replaceState({}, "", `?${p.toString()}`);
-}
-
-function factorScore(r: PipelineResult | null, group: string): number | null {
+function getFactorScore(r: PipelineResult | null, group: string): number | null {
   const fs = r?.prediction?.factorScores?.find(f => f.group === group);
   if (fs?.value === null || fs?.value === undefined) return null;
   return group === "risk" ? Math.round(100 - fs.value) : Math.round(fs.value);
 }
 
-function fSMA50(r: PipelineResult | null): string {
-  const d = r?.technicals?.movingAverageDistance50;
-  if (d === null || d === undefined) return "—";
-  return d > 0.005 ? "Above SMA50" : d < -0.005 ? "Below SMA50" : "At SMA50";
+function scoreColor(v: number | null): string {
+  if (v === null) return S.ink4;
+  if (v >= 75) return S.positive;
+  if (v >= 55) return S.ink;
+  if (v >= 35) return S.caution;
+  return S.negative;
 }
 
-function isAboveSMA50(r: PipelineResult | null): boolean | null {
-  const d = r?.technicals?.movingAverageDistance50;
-  return d === null || d === undefined ? null : d > 0.005;
+function useMobile(): boolean {
+  const [mobile, setMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return mobile;
 }
 
+export default function ComparePage() {
+  const mobile = useMobile();
+  const [leftSym, setLeftSym] = useState("");
+  const [rightSym, setRightSym] = useState("");
+  const [leftResult, setLeftResult] = useState<PipelineResult | null>(null);
+  const [rightResult, setRightResult] = useState<PipelineResult | null>(null);
+  const [leftLoading, setLeftLoading] = useState(false);
+  const [rightLoading, setRightLoading] = useState(false);
+  const [leftError, setLeftError] = useState("");
+  const [rightError, setRightError] = useState("");
+  const [leftInput, setLeftInput] = useState("");
+  const [rightInput, setRightInput] = useState("");
+  const [investSym, setInvestSym] = useState("");
+  const [investName, setInvestName] = useState("");
+  const [showInvest, setShowInvest] = useState(false);
+  const [showBroker, setShowBroker] = useState(false);
 
-
-// ── Row definition helpers ────────────────────────────────────────────────────
-
-interface RowConf {
-  label: string;
-  lowerIsBetter: boolean;
-  raw: (r: PipelineResult) => number | null;
-  display: (r: PipelineResult) => string;
-}
-
-function makeRows(): RowConf[] {
-  return [
-    { label: "Current price",  lowerIsBetter: false, raw: r => r.price.current, display: r => fPrice(r.price.current) },
-    { label: "% Change",       lowerIsBetter: false, raw: r => r.price.change, display: r => fPercent(r.price.change, true) },
-    { label: "52-week range",  lowerIsBetter: false, raw: r => r.price.weekHigh52 && r.price.weekLow52 ? (r.price.weekHigh52 - r.price.weekLow52) : null, display: r => r.price.weekLow52 && r.price.weekHigh52 ? `${fPrice(r.price.weekLow52)} – ${fPrice(r.price.weekHigh52)}` : "—" },
-    { label: "Market cap",     lowerIsBetter: false, raw: r => r.price.marketCap, display: r => fMarketCap(r.price.marketCap) },
-    { label: "P/E ratio",      lowerIsBetter: true,  raw: r => r.fundamentals.peRatio, display: r => fRatio(r.fundamentals.peRatio, "x") },
-    { label: "P/B ratio",      lowerIsBetter: false, raw: r => r.fundamentals.pbRatio, display: r => fRatio(r.fundamentals.pbRatio, "x") },
-    { label: "EV/EBITDA",      lowerIsBetter: false, raw: r => r.fundamentals.evEbitda, display: r => fRatio(r.fundamentals.evEbitda, "x") },
-    { label: "ROE",            lowerIsBetter: false, raw: r => r.fundamentals.roe, display: r => fPercent(r.fundamentals.roe) },
-    { label: "ROA",            lowerIsBetter: false, raw: r => r.fundamentals.roa, display: r => fPercent(r.fundamentals.roa) },
-    { label: "D/E ratio",      lowerIsBetter: true,  raw: r => r.fundamentals.debtToEquity, display: r => fRatio(r.fundamentals.debtToEquity, "x") },
-    { label: "Revenue growth", lowerIsBetter: false, raw: r => r.fundamentals.revenueGrowth, display: r => fPercent(r.fundamentals.revenueGrowth) },
-    { label: "EPS growth",     lowerIsBetter: false, raw: r => r.fundamentals.epsGrowth, display: r => fPercent(r.fundamentals.epsGrowth) },
-    { label: "Operating margin", lowerIsBetter: false, raw: r => r.fundamentals.operatingMargin, display: r => fPercent(r.fundamentals.operatingMargin) },
-    { label: "FCF yield",     lowerIsBetter: false, raw: r => r.fundamentals.fcfYield, display: r => fPercent(r.fundamentals.fcfYield) },
-    { label: "RSI (14)",       lowerIsBetter: false, raw: r => r.technicals.rsi14, display: r => fScore(r.technicals.rsi14) },
-    { label: "MACD signal",    lowerIsBetter: false, raw: r => r.technicals.macdSignal, display: r => r.technicals.macdSignal !== null ? r.technicals.macdSignal.toFixed(2) : "—" },
-    { label: "ADX (14)",       lowerIsBetter: false, raw: r => r.technicals.adx14, display: r => fScore(r.technicals.adx14) },
-    { label: "SMA50 position", lowerIsBetter: false, raw: r => isAboveSMA50(r) !== null ? (isAboveSMA50(r) ? 1 : 0) : null, display: r => fSMA50(r) },
-  ];
-}
-
-function textColor(score: number | null): string {
-  if (score === null) return "";
-  if (score >= 70) return "#16A34A";
-  if (score >= 55) return "#22C55E";
-  if (score >= 40) return "#92400E";
-  return "#EF4444";
-}
-
-function barColor(score: number): string {
-  if (score >= 70) return "#16A34A";
-  if (score >= 55) return "#22C55E";
-  if (score >= 40) return "#92400E";
-  return "#EF4444";
-}
-
-function bestWorstIndex(values: (number | null)[], lowerIsBetter: boolean): [best: number | null, worst: number | null] {
-  const valid = values.map((v, i) => [v, i] as const).filter(([v]) => v !== null && Number.isFinite(v)) as [number, number][];
-  if (valid.length < 2) return [null, null];
-  if (lowerIsBetter) {
-    valid.sort((a, b) => a[0] - b[0]);
-  } else {
-    valid.sort((a, b) => b[0] - a[0]);
-  }
-  return [valid[0][1], valid[valid.length - 1][1]];
-}
-
-// ── Main Component ────────────────────────────────────────────────────────────
-
-export const ComparePage: React.FC = () => {
-  useDocumentTitle("Compare Stocks | StockStory India");
-  const [symbols, setSymbols] = useState<string[]>(() => parseSymbolsFromUrl());
-  const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
-  const [loading, setLoading] = useState<Record<string, boolean>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [addInput, setAddInput] = useState("");
-
-  const fetchAll = useCallback(async (syms: string[]) => {
-    if (syms.length === 0) return;
-    const loadMap: Record<string, boolean> = {};
-    const errMap: Record<string, string> = {};
-    syms.forEach(s => { loadMap[s] = true; errMap[s] = ""; });
-    setLoading(prev => ({ ...prev, ...loadMap }));
-    setErrors(prev => ({ ...prev, ...errMap }));
-
-    const settled = await Promise.allSettled(syms.map(s => runCompanyDataPipeline(s)));
-    const newResults: Record<string, PipelineResult | null> = {};
-    const newErrors: Record<string, string> = {};
-    const newLoading: Record<string, boolean> = {};
-
-    syms.forEach((s, i) => {
-      newLoading[s] = false;
-      if (settled[i].status === "fulfilled") {
-        newResults[s] = settled[i].value;
-        newErrors[s] = "";
-      } else {
-        newResults[s] = null;
-        newErrors[s] = (settled[i] as PromiseRejectedResult).reason?.message ?? "Failed";
-      }
-    });
-
-    setResults(prev => ({ ...prev, ...newResults }));
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    setLoading(prev => ({ ...prev, ...newLoading }));
+  const loadCompany = useCallback(async (symbol: string, side: "left" | "right") => {
+    const setLoad = side === "left" ? setLeftLoading : setRightLoading;
+    const setResult = side === "left" ? setLeftResult : setRightResult;
+    const setError = side === "left" ? setLeftError : setRightError;
+    setLoad(true);
+    setError("");
+    try {
+      const r = await runCompanyDataPipeline(symbol);
+      setResult(r);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load");
+      setResult(null);
+    } finally {
+      setLoad(false);
+    }
   }, []);
 
-  useEffect(() => { fetchAll(symbols); }, [symbols, fetchAll]);
+  const handleLeftSubmit = useCallback(() => {
+    const sym = leftInput.trim().toUpperCase();
+    if (!sym) return;
+    setLeftSym(sym);
+    setLeftInput("");
+    loadCompany(sym, "left");
+  }, [leftInput, loadCompany]);
 
-  const addSymbol = useCallback((sym: string) => {
-    const clean = sym.trim().toUpperCase();
-    if (!clean || symbols.includes(clean) || symbols.length >= MAX_SYMBOLS) return;
-    const next = [...symbols, clean];
-    setSymbols(next);
-    updateUrlSymbols(next);
-    setAddInput("");
-  }, [symbols]);
+  const handleRightSubmit = useCallback(() => {
+    const sym = rightInput.trim().toUpperCase();
+    if (!sym) return;
+    setRightSym(sym);
+    setRightInput("");
+    loadCompany(sym, "right");
+  }, [rightInput, loadCompany]);
 
-  const removeSymbol = useCallback((sym: string) => {
-    const next = symbols.filter(s => s !== sym);
-    setSymbols(next);
-    updateUrlSymbols(next);
-  }, [symbols]);
+  const removeLeft = useCallback(() => {
+    setLeftSym("");
+    setLeftResult(null);
+    setLeftError("");
+  }, []);
 
-  const handleAddKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") addSymbol(addInput);
-  }, [addInput, addSymbol]);
+  const removeRight = useCallback(() => {
+    setRightSym("");
+    setRightResult(null);
+    setRightError("");
+  }, []);
 
-  const rows = useMemo(() => makeRows(), []);
+  const isLeftTracked = leftSym ? isTracked(leftSym) : false;
+  const isRightTracked = rightSym ? isTracked(rightSym) : false;
+
+  const handleTrack = useCallback((sym: string, name: string | null) => {
+    if (isTracked(sym)) { removeTrackedCompany(sym); return; }
+    addTrackedCompany({ symbol: sym, companyName: name ?? sym, addedAt: new Date().toISOString(), source: "compare" });
+  }, []);
+
+  const handleInvest = useCallback((sym: string, name: string | null) => {
+    setInvestSym(sym);
+    setInvestName(name ?? sym);
+    setShowInvest(true);
+  }, []);
+
+  const bothLoaded = leftResult && rightResult;
 
   const summaryText = useMemo(() => {
-    const parts: string[] = [];
-    const leaders: Record<string, string[]> = {};
-    for (const g of FACTOR_GROUPS) {
-      const scored = symbols.map(s => ({ sym: s, score: factorScore(results[s] ?? null, g) })).filter(x => x.score !== null);
-      if (scored.length < 2) continue;
-      const best = scored.reduce((a, b) => (a.score ?? 0) >= (b.score ?? 0) ? a : b);
-      const label = FACTOR_LABEL[g] ?? g;
-      if (!leaders[best.sym]) leaders[best.sym] = [];
-      leaders[best.sym].push(label);
+    if (!bothLoaded) return null;
+    const winners: string[] = [];
+    const factorMap: Record<string, string> = {
+      quality: "quality", growth: "growth", valuation: "valuation", risk: "risk", momentum: "momentum",
+    };
+    const labels: Record<string, string> = {
+      quality: "quality", growth: "growth", valuation: "valuation", risk: "risk", momentum: "momentum",
+    };
+    for (const g of ["quality", "growth", "valuation", "risk", "momentum"]) {
+      const l = getFactorScore(leftResult, g);
+      const r = getFactorScore(rightResult, g);
+      if (l === null || r === null || l === r) continue;
+      const winner = l > r ? leftResult.companyName ?? leftSym : rightResult.companyName ?? rightSym;
+      winners.push(`${winner} scores higher on ${g}`);
     }
-    for (const [sym, factors] of Object.entries(leaders)) {
-      const sc = fScore(results[sym]?.prediction?.rankingScore ?? null);
-      parts.push(`${sym} (${sc}) leads on ${factors.join(" and ")}`);
+    if (!winners.length) return `${leftResult.companyName ?? leftSym} and ${rightResult.companyName ?? rightSym} have broadly similar profiles.`;
+    return winners.join(". ") + ".";
+  }, [bothLoaded, leftResult, rightResult, leftSym, rightSym]);
+
+  function CompanyCard({ result, symbol, loading, error, onRemove, side }: {
+    result: PipelineResult | null; symbol: string; loading: boolean; error: string; onRemove: () => void; side: "left" | "right";
+  }) {
+    const tracked = symbol ? isTracked(symbol) : false;
+    if (loading) {
+      return (
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, color: S.ink4, fontSize: 13, gap: 8 }}>
+          <RefreshCw size={16} style={{ animation: "spin 1s linear infinite" }} /> Loading {symbol}...
+        </div>
+      );
     }
-    if (parts.length === 0) return null;
-    return `Based on engine scores: ${parts.join(". ")}.`;
-  }, [symbols, results]);
+    if (error) {
+      return (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, gap: 12 }}>
+          <AlertTriangle size={24} color={S.caution} />
+          <span style={{ fontSize: 13, color: S.caution }}>{error}</span>
+          <button onClick={() => loadCompany(symbol, side)} style={{ fontSize: 12, color: S.action, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Retry</button>
+        </div>
+      );
+    }
+    if (!result) return null;
+    const score = result.prediction?.rankingScore ?? null;
+    return (
+      <PremiumCard padding="20px" style={{ flex: 1 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <ScoreRing score={score} size={52} showLabel />
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: S.ink, letterSpacing: "-0.3px" }}>{result.companyName ?? symbol}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: S.ink2 }}>{symbol}</span>
+                {result.sector && <span style={{ fontSize: 11, color: S.ink3 }}>{result.sector}</span>}
+              </div>
+            </div>
+          </div>
+          <button onClick={onRemove} style={{ border: "none", background: "none", cursor: "pointer", color: S.ink4, padding: 4 }}>
+            <X size={16} />
+          </button>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {result.prediction?.keyStrengths?.slice(0, 2).map((s, i) => (
+            <span key={i} style={{ fontSize: 10, padding: "3px 8px", borderRadius: S.radiusXs, background: "var(--ss-positive-soft)", color: S.positive, fontWeight: 600 }}>{s}</span>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+          <button onClick={() => handleInvest(symbol, result.companyName)} style={{ flex: 1, padding: "10px", fontSize: 13, fontWeight: 600, color: "white", border: "none", borderRadius: S.radiusSm, background: S.action, cursor: "pointer" }}>
+            Invest
+          </button>
+          <button onClick={() => handleTrack(symbol, result.companyName)} style={{ flex: 1, padding: "10px", fontSize: 13, fontWeight: 600, color: S.ink2, border: `1px solid ${S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer" }}>
+            {tracked ? "Tracked" : "Track"}
+          </button>
+          <button onClick={() => productNavigate("stock", symbol)} style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: S.ink2, border: `1px solid ${S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+            Research <ArrowUpRight size={14} />
+          </button>
+        </div>
+      </PremiumCard>
+    );
+  }
+
+  function FactorRow({ label, leftScore, rightScore }: { label: string; leftScore: number | null; rightScore: number | null }) {
+    const winner = leftScore !== null && rightScore !== null && leftScore !== rightScore
+      ? (leftScore > rightScore ? "left" : "right")
+      : null;
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: `1px solid ${S.borderSoft}` }}>
+        <div style={{ width: mobile ? 60 : 80, fontSize: 12, fontWeight: 600, color: S.ink, flexShrink: 0 }}>{label}</div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <FactorBar label="" score={leftScore} />
+          </div>
+          {winner === "left" && <Check size={14} color={S.positive} style={{ flexShrink: 0 }} />}
+          {!winner && <span style={{ width: 14, flexShrink: 0 }} />}
+        </div>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <FactorBar label="" score={rightScore} />
+          </div>
+          {winner === "right" && <Check size={14} color={S.positive} style={{ flexShrink: 0 }} />}
+          {!winner && <span style={{ width: 14, flexShrink: 0 }} />}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <ProductShell>
-      <ProductPage>
-        <div className="mb-5 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" />
-              <h1 className="text-xl font-bold text-[#E6EDF3]">Compare stocks</h1>
-            </div>
-            <p className="mt-1 text-xs text-[#9AA7B5]">Compare 2–4 stocks side by side using real pipeline data</p>
-          </div>
-        </div>
+    <div style={{ minHeight: "100vh", background: S.bg }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <PremiumTopNav activePage="compare" />
+      <div style={{ paddingTop: 16, paddingBottom: 40 }}>
+        <MarketTickerStrip />
+        <div style={{ maxWidth: S.container, margin: "0 auto", padding: mobile ? "0 16px" : "0 52px", paddingTop: 28 }}>
+          <ProductPageHeader
+            title="Compare companies"
+            description="See which business deserves deeper research."
+            badge="Research tool"
+            actions={
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => { removeLeft(); removeRight(); }} style={{ padding: "10px 16px", fontSize: 13, fontWeight: 600, color: S.ink3, border: `1px solid ${S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                  <RefreshCw size={14} /> Reset
+                </button>
+              </div>
+            }
+          />
 
-        {symbols.length < MAX_SYMBOLS && (
-          <div className="mb-5 flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0D1117] px-4 py-2.5">
-            <Plus className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
-            <input
-              type="text"
-              value={addInput}
-              onChange={e => setAddInput(e.target.value.toUpperCase())}
-              onKeyDown={handleAddKeyDown}
-              placeholder="Add stock (e.g. TCS) and press Enter..."
-              className="w-full bg-transparent text-xs text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
+          {/* Company selectors */}
+          <div style={{ display: "flex", gap: mobile ? 12 : 24, marginBottom: 24 }}>
+            {/* Left slot */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {!leftSym ? (
+                <div style={{ background: S.surface, borderRadius: S.radiusMd, border: `1px solid ${S.borderSoft}`, padding: "0 14px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
+                  <Search size={14} color={S.ink4} />
+                  <input
+                    type="text"
+                    value={leftInput}
+                    onChange={e => setLeftInput(e.target.value.toUpperCase())}
+                    onKeyDown={e => e.key === "Enter" && handleLeftSubmit()}
+                    placeholder="Search symbol (e.g. TCS)"
+                    style={{ flex: 1, border: "none", outline: "none", background: "none", fontSize: 13, color: S.ink, fontFamily: "Inter, sans-serif" }}
+                  />
+                  {leftInput && (
+                    <button onClick={handleLeftSubmit} style={{ border: "none", background: "none", cursor: "pointer", color: S.action, padding: 4 }}>
+                      <ChevronRight size={16} />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <CompanyCard result={leftResult} symbol={leftSym} loading={leftLoading} error={leftError} onRemove={removeLeft} side="left" />
+              )}
+            </div>
+
+            {/* Right slot */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {!rightSym ? (
+                <div style={{ background: S.surface, borderRadius: S.radiusMd, border: `1px solid ${S.borderSoft}`, padding: "0 14px", height: 48, display: "flex", alignItems: "center", gap: 10 }}>
+                  <Search size={14} color={S.ink4} />
+                  <input
+                    type="text"
+                    value={rightInput}
+                    onChange={e => setRightInput(e.target.value.toUpperCase())}
+                    onKeyDown={e => e.key === "Enter" && handleRightSubmit()}
+                    placeholder="Search symbol (e.g. RELIANCE)"
+                    style={{ flex: 1, border: "none", outline: "none", background: "none", fontSize: 13, color: S.ink, fontFamily: "Inter, sans-serif" }}
+                  />
+                  {rightInput && (
+                    <button onClick={handleRightSubmit} style={{ border: "none", background: "none", cursor: "pointer", color: S.action, padding: 4 }}>
+                      <ChevronRight size={16} />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <CompanyCard result={rightResult} symbol={rightSym} loading={rightLoading} error={rightError} onRemove={removeRight} side="right" />
+              )}
+            </div>
+          </div>
+
+          {/* Empty state */}
+          {!bothLoaded && (
+            <EmptyProductState
+              icon={<GitCompare size={32} />}
+              title="Select two companies to compare"
+              body="Choose two companies above to compare their thesis, valuation, quality, and risk side by side."
             />
-          </div>
-        )}
+          )}
 
-        {symbols.length === 0 && (
-          <ProductPanel className="flex flex-col items-center gap-4 py-14 text-center border-white/[0.08]">
-            <ArrowLeftRight className="h-10 w-10 text-[#2D333B]" />
-            <div>
-              <h2 className="text-sm font-semibold text-[#E6EDF3]">Add stocks to compare</h2>
-              <p className="mt-1 text-xs text-[#9AA7B5]">Type a symbol above or use ?symbols=TCS,RELIANCE in the URL</p>
-            </div>
-            <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open AI Scanner</ProductAction>
-          </ProductPanel>
-        )}
+          {/* Loaded state — decision page */}
+          {bothLoaded && (
+            <>
+              {/* Decision summary card */}
+              <PremiumCard style={{ marginBottom: 24 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <Sparkles size={16} color={S.caution} />
+                  <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, letterSpacing: "-0.2px" }}>Comparison summary</span>
+                </div>
+                <p style={{ fontSize: 13, color: S.ink2, lineHeight: 1.6, margin: 0 }}>{summaryText}</p>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }}>
+                  {FACTOR_GROUPS.map(g => {
+                    const l = getFactorScore(leftResult, g.key);
+                    const r = getFactorScore(rightResult, g.key);
+                    if (l === null && r === null) return null;
+                    const winner = l !== null && r !== null && l !== r
+                      ? (l > r ? (leftResult.companyName ?? leftSym) : (rightResult.companyName ?? rightSym))
+                      : null;
+                    return (
+                      <div key={g.key} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: S.radiusXs, background: "var(--ss-bg-soft)", fontSize: 11, fontWeight: 500, color: S.ink2 }}>
+                        {g.icon}
+                        <span>{g.label}</span>
+                        {winner && <span style={{ color: S.positive, fontWeight: 600, marginLeft: 2 }}>→ {winner}</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </PremiumCard>
 
-        {symbols.length > 0 && (
-          <>
-            <div className="mb-4 grid gap-3" style={{ gridTemplateColumns: `180px repeat(${symbols.length}, 1fr)` }}>
-              {symbols.map(sym => (
-                <div key={sym} className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-2.5">
-                  <button type="button" onClick={() => productNavigate("stock", sym)} className="min-w-0 text-left">
-                    <span className="block truncate font-mono text-sm font-semibold text-[#E6EDF3] hover:underline">{sym}</span>
-                    <span className="block truncate text-[10px] text-[#9AA7B5]">{results[sym]?.companyName ?? ""}</span>
+              {/* Factor matrix */}
+              <PremiumCard style={{ marginBottom: 24 }} padding="20px">
+                <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, display: "block", marginBottom: 16, letterSpacing: "-0.2px" }}>Factor comparison</span>
+                {/* Header row */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 8, borderBottom: `1px solid ${S.border}` }}>
+                  <div style={{ width: mobile ? 60 : 80, fontSize: 10, fontWeight: 600, color: S.ink4, textTransform: "uppercase", letterSpacing: "0.5px", flexShrink: 0 }}>Factor</div>
+                  <div style={{ flex: 1, textAlign: "center", fontSize: 12, fontWeight: 700, color: S.ink }}>{leftResult.companyName ?? leftSym}</div>
+                  <div style={{ flex: 1, textAlign: "center", fontSize: 12, fontWeight: 700, color: S.ink }}>{rightResult.companyName ?? rightSym}</div>
+                </div>
+                {FACTOR_GROUPS.map(g => (
+                  <FactorRow key={g.key} label={g.label} leftScore={getFactorScore(leftResult, g.key)} rightScore={getFactorScore(rightResult, g.key)} />
+                ))}
+              </PremiumCard>
+
+              {/* Thesis comparison */}
+              <div style={{ display: "flex", gap: mobile ? 12 : 24, marginBottom: 24 }}>
+                {[leftResult, rightResult].map((r, i) => (
+                  <PremiumCard key={i} style={{ flex: 1 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, display: "block", marginBottom: 12, letterSpacing: "-0.2px" }}>
+                      Thesis — {r.companyName ?? (i === 0 ? leftSym : rightSym)}
+                    </span>
+                    <p style={{ fontSize: 12, color: S.ink2, lineHeight: 1.7, margin: 0 }}>
+                      {r.prediction?.explanation || "Analysis in progress."}
+                    </p>
+                  </PremiumCard>
+                ))}
+              </div>
+
+              {/* Risk comparison */}
+              <PremiumCard style={{ marginBottom: 24 }} padding="20px">
+                <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, display: "block", marginBottom: 16, letterSpacing: "-0.2px" }}>
+                  <Shield size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />Risk comparison
+                </span>
+                <div style={{ display: "flex", gap: mobile ? 12 : 24 }}>
+                  {[leftResult, rightResult].map((r, i) => {
+                    const risks = r.prediction?.keyRisks ?? [];
+                    return (
+                      <div key={i} style={{ flex: 1 }}>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: S.ink3, display: "block", marginBottom: 8 }}>
+                          {r.companyName ?? (i === 0 ? leftSym : rightSym)}
+                        </span>
+                        {risks.length > 0 ? risks.slice(0, 4).map((risk, j) => (
+                          <div key={j} style={{ display: "flex", gap: 8, alignItems: "flex-start", padding: "6px 0", borderBottom: j < risks.slice(0, 4).length - 1 ? `1px solid ${S.borderSoft}` : "none" }}>
+                            <span style={{ fontSize: 8, color: S.negative, marginTop: 3 }}>●</span>
+                            <span style={{ fontSize: 12, color: S.ink2, lineHeight: 1.4 }}>{risk}</span>
+                          </div>
+                        )) : (
+                          <span style={{ fontSize: 12, color: S.ink4 }}>No risk factors identified</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </PremiumCard>
+
+              {/* Decision helper */}
+              <PremiumCard padding="20px">
+                <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, display: "block", marginBottom: 12, letterSpacing: "-0.2px" }}>Next steps</span>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button onClick={() => productNavigate("stock", leftSym)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: S.ink2, border: `1px solid ${S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                    <ArrowUpRight size={14} /> Research {leftResult.companyName ?? leftSym}
                   </button>
-                  <button type="button" onClick={() => removeSymbol(sym)} className="rounded p-1 text-[#9AA7B5] hover:text-[#E6EDF3]">
-                    <X className="h-3.5 w-3.5" />
+                  <button onClick={() => productNavigate("stock", rightSym)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: S.ink2, border: `1px solid ${S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                    <ArrowUpRight size={14} /> Research {rightResult.companyName ?? rightSym}
+                  </button>
+                  {[leftSym, rightSym].map((sym, i) => {
+                    const tracked = isTracked(sym);
+                    return (
+                      <button key={sym} onClick={() => handleTrack(sym, i === 0 ? leftResult.companyName : rightResult.companyName)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: tracked ? S.positive : S.ink2, border: `1px solid ${tracked ? "var(--ss-positive)" : S.border}`, borderRadius: S.radiusSm, background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                        {tracked ? <Check size={14} /> : <Sparkles size={14} />} {tracked ? "Tracked" : "Track"} {sym}
+                      </button>
+                    );
+                  })}
+                  <button onClick={() => { setInvestSym(leftSym); setInvestName(leftResult.companyName ?? leftSym); setShowInvest(true); }} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "white", border: "none", borderRadius: S.radiusSm, background: S.action, cursor: "pointer" }}>
+                    Invest in {leftResult.companyName ?? leftSym}
+                  </button>
+                  <button onClick={() => { setInvestSym(rightSym); setInvestName(rightResult.companyName ?? rightSym); setShowInvest(true); }} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "white", border: "none", borderRadius: S.radiusSm, background: S.action, cursor: "pointer" }}>
+                    Invest in {rightResult.companyName ?? rightSym}
                   </button>
                 </div>
-              ))}
-            </div>
+              </PremiumCard>
 
-            <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#0D1117]">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-white/[0.06]">
-                    <th className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Metric</th>
-                    {symbols.map(sym => (
-                      <th key={sym} className="px-3 py-2.5 text-left font-mono text-xs font-bold text-[#E6EDF3]">{sym}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* ── PRICE section ── */}
-                  {[
-                    { label: "Current price", render: r => fPrice(r?.price.current ?? null) },
-                    { label: "% Change", render: r => <span className={r?.price.change && r.price.change > 0 ? "text-[#16A34A]" : r?.price.change && r.price.change < 0 ? "text-[#EF4444]" : ""}>{fPercent(r?.price.change ?? null, true)}</span> },
-                    { label: "52-week range", render: r => r?.price.weekLow52 && r?.price.weekHigh52 ? `${fPrice(r.price.weekLow52)} – ${fPrice(r.price.weekHigh52)}` : "—" },
-                    { label: "Market cap", render: r => fMarketCap(r?.price.marketCap ?? null) },
-                    { label: "Exchange", render: r => r?.price.exchange ?? "—" },
-                  ].map(({ label, render }) => (
-                    <tr key={label} className="border-b border-white/[0.04]">
-                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{label}</td>
-                      {symbols.map(sym => (
-                        <td key={sym} className="px-3 py-2 font-mono text-xs text-[#E6EDF3]">{render(results[sym] ?? null)}</td>
-                      ))}
-                    </tr>
-                  ))}
+              <div style={{ marginTop: 32 }}>
+                <SebiDisclaimer variant="footer" />
+              </div>
+            </>
+          )}
 
-                  {/* ── ENGINE SCORE section ── */}
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Engine score</td>
-                  </tr>
-                  <tr className="border-b border-white/[0.04]">
-                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Overall score</td>
-                    {symbols.map(sym => {
-                      const sc = results[sym]?.prediction?.rankingScore ?? null;
-                      return (
-                        <td key={sym} className="px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            <ScoreRing score={sc} size="sm" showGrade />
-                            <span className="font-mono text-sm font-bold" style={{ color: textColor(sc) }}>{fScore(sc)}</span>
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                  <tr className="border-b border-white/[0.04]">
-                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Classification</td>
-                    {symbols.map(sym => (
-                      <td key={sym} className="px-3 py-2">
-                        <ClassificationBadge classification={(results[sym]?.prediction?.classification ?? "INSUFFICIENT_DATA") as any} size="sm" />
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border-b border-white/[0.04]">
-                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Confidence</td>
-                    {symbols.map(sym => (
-                      <td key={sym} className="px-3 py-2 font-mono text-xs" style={{ color: textColor(results[sym]?.prediction?.confidenceScore ?? null) }}>{fScore(results[sym]?.prediction?.confidenceScore ?? null)}%</td>
-                    ))}
-                  </tr>
-                  <tr className="border-b border-white/[0.04]">
-                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Data completeness</td>
-                    {symbols.map(sym => (
-                      <td key={sym} className="px-3 py-2 font-mono text-xs text-[#E6EDF3]">{fScore(results[sym]?.dataCompleteness ?? null)}%</td>
-                    ))}
-                  </tr>
-
-                  {/* ── FACTOR SCORES section ── */}
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Factor scores</td>
-                  </tr>
-                  {FACTOR_GROUPS.map(g => (
-                    <tr key={g} className="border-b border-white/[0.04]">
-                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{FACTOR_LABEL[g]}</td>
-                      {(() => {
-                        const vals = symbols.map(sym => factorScore(results[sym] ?? null, g));
-                        const [best, worst] = bestWorstIndex(vals, false);
-                        return symbols.map((sym, ci) => {
-                          const v = vals[ci];
-                          return (
-                            <td key={sym} className={`px-3 py-2.5 ${ci === best ? "bg-[rgba(22,163,74,0.08)]" : ci === worst ? "bg-[rgba(239,68,68,0.08)]" : ""}`}>
-                              {v !== null ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="w-6 text-right font-mono text-xs font-bold" style={{ color: barColor(v) }}>{v}</span>
-                                  <div className="h-1.5 w-full max-w-[60px] overflow-hidden rounded-full bg-[#1E242C]">
-                                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, v)}%`, backgroundColor: barColor(v) }} />
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-[#9AA7B5]">—</span>
-                              )}
-                            </td>
-                          );
-                        });
-                      })()}
-                    </tr>
-                  ))}
-
-                  {/* ── FUNDAMENTALS section ── */}
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Fundamentals</td>
-                  </tr>
-                  {rows.slice(4, 14).map(row => (
-                    <tr key={row.label} className="border-b border-white/[0.04]">
-                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{row.label}</td>
-                      {(() => {
-                        const vals = symbols.map(sym => results[sym] ? row.raw(results[sym] as PipelineResult) : null);
-                        const [best, worst] = bestWorstIndex(vals, row.lowerIsBetter);
-                        return symbols.map((sym, ci) => (
-                          <td key={sym} className={`px-3 py-2 font-mono text-xs transition-colors ${ci === best ? "bg-[rgba(22,163,74,0.08)] text-[#16A34A]" : ci === worst ? "bg-[rgba(239,68,68,0.08)] text-[#EF4444]" : "text-[#E6EDF3]"}`}>
-                            {results[sym] ? row.display(results[sym] as PipelineResult) : <span className="text-[#9AA7B5]">—</span>}
-                          </td>
-                        ));
-                      })()}
-                    </tr>
-                  ))}
-
-                  {/* ── TECHNICALS section ── */}
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Technicals</td>
-                  </tr>
-                  {rows.slice(14).map(row => (
-                    <tr key={row.label} className="border-b border-white/[0.04]">
-                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{row.label}</td>
-                      {(() => {
-                        const vals = symbols.map(sym => results[sym] ? row.raw(results[sym] as PipelineResult) : null);
-                        const [best, worst] = bestWorstIndex(vals, row.lowerIsBetter);
-                        return symbols.map((sym, ci) => (
-                          <td key={sym} className={`px-3 py-2 font-mono text-xs transition-colors ${ci === best ? "bg-[rgba(22,163,74,0.08)] text-[#16A34A]" : ci === worst ? "bg-[rgba(239,68,68,0.08)] text-[#EF4444]" : "text-[#E6EDF3]"}`}>
-                            {results[sym] ? row.display(results[sym] as PipelineResult) : <span className="text-[#9AA7B5]">—</span>}
-                          </td>
-                        ));
-                      })()}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {summaryText && symbols.length >= 2 && (
-              <ProductPanel className="mt-5 border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.04)] p-4">
-                <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Summary verdict</div>
-                <p className="text-xs leading-relaxed text-[#E6EDF3]">{summaryText}</p>
-              </ProductPanel>
-            )}
-          </>
-        )}
-      </ProductPage>
-    </ProductShell>
+          <InvestmentReviewSheet open={showInvest} onClose={() => setShowInvest(false)} symbol={investSym} companyName={investName} />
+          <BrokerHandoffSheet open={showBroker} onClose={() => setShowBroker(false)} symbol={investSym} />
+        </div>
+      </div>
+      <MobileProductNav activePage="compare" />
+    </div>
   );
-};
-
-export default ComparePage;
+}

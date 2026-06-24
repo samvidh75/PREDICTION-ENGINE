@@ -1,296 +1,357 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Trash2, RefreshCw, Clock, Plus, Search, Eye } from "lucide-react";
-import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import React, { useState, useEffect, useCallback } from "react";
+import { Bookmark, Search, ArrowUpRight, TrendingUp, TrendingDown, ChevronRight, RefreshCw, AlertTriangle, Check, X, Clock, GitCompare, Star, Sparkles, Eye } from "lucide-react";
+import {
+  PremiumAppShell, PremiumCard, ScorePill, FactorChip, MiniSparkline,
+  EmptyProductState, ProductPageHeader, InvestmentReviewSheet,
+  BrokerHandoffSheet, MobileProductNav,
+} from "../premium/PremiumComponents";
+import { productNavigate } from "../components/product/ProductUI";
 import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
-import { globalPipelineQueue } from "../services/data/PipelineQueue";
-import { fPrice, fChange, fRelativeTime } from "../lib/format";
-import { ScoreRing } from "../components/ui/ScoreRing";
+import { fPrice } from "../lib/format";
+import { getTrackedCompanies, addTrackedCompany, removeTrackedCompany, isTracked } from "../lib/track/trackStore";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 import { ClassificationBadge } from "../components/ui/ClassificationBadge";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductEmptyState, productNavigate } from "../components/product/ProductUI";
-import { navigateToStock } from "../architecture/navigation/routeCoordinator";
-import { useToast } from "../components/feedback/useToast";
-import Input from "../components/ui/Input";
 
-const WATCHLIST_KEY = "ss_watchlist";
-const MAX_WATCHLIST = 20;
+const S = {
+  bg: "var(--ss-bg)",
+  bgSoft: "var(--ss-bg-soft)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  positiveSoft: "var(--ss-positive-soft)",
+  negative: "var(--ss-negative)",
+  negativeSoft: "var(--ss-negative-soft)",
+  caution: "var(--ss-caution)",
+  cautionSoft: "var(--ss-caution-soft)",
+  action: "var(--ss-action)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+  radiusLg: "var(--ss-radius-lg)",
+  shadowCard: "var(--ss-shadow-card)",
+  shadowFloating: "var(--ss-shadow-floating)",
+  container: "var(--ss-container)",
+};
 
-function getWatchlistSymbols(): string[] {
-  try {
-    const raw = localStorage.getItem(WATCHLIST_KEY) ?? "";
-    return raw ? raw.split(",").map(s => s.trim().toUpperCase()).filter(Boolean) : [];
-  } catch { return []; }
-}
+const iconBtn: React.CSSProperties = {
+  display: "inline-flex", alignItems: "center", justifyContent: "center",
+  width: 30, height: 30, borderRadius: S.radiusXs,
+  border: `1px solid ${S.borderSoft}`, background: "none", cursor: "pointer",
+  color: S.ink3, transition: "color 0.15s, background 0.15s", flexShrink: 0,
+};
 
-function setWatchlistSymbols(symbols: string[]): void {
-  localStorage.setItem(WATCHLIST_KEY, symbols.join(","));
-  window.dispatchEvent(new Event("watchlistchange"));
-}
+const secondaryBtn: React.CSSProperties = {
+  display: "inline-flex", alignItems: "center", gap: 6,
+  padding: "8px 16px", fontSize: 12, fontWeight: 600,
+  border: `1px solid ${S.border}`, borderRadius: S.radiusXs,
+  background: "none", cursor: "pointer", color: S.ink2,
+};
 
-function changeColor(change: number | null): string {
-  if (change === null || change === undefined) return "text-[#8B949E]";
-  return change >= 0 ? "text-green-400" : "text-red-400";
-}
+const primaryBtn: React.CSSProperties = {
+  display: "inline-flex", alignItems: "center", gap: 6,
+  padding: "8px 16px", fontSize: 12, fontWeight: 600, color: "white",
+  border: "none", borderRadius: S.radiusXs,
+  background: S.action, cursor: "pointer",
+};
 
-export const WatchlistPage: React.FC = () => {
-  useDocumentTitle("My Watchlist | StockStory India");
-  const toast = useToast();
-  const [symbols, setSymbols] = useState<string[]>(() => getWatchlistSymbols());
+export default function WatchlistPage() {
+  const [tracked, setTracked] = useState(() => getTrackedCompanies());
   const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
-  const [loadingSymbols, setLoadingSymbols] = useState<Set<string>>(new Set());
-  const [addInput, setAddInput] = useState("");
-  const [refreshProgress, setRefreshProgress] = useState<{ done: number; total: number } | null>(null);
-  const mountedRef = useRef(true);
+  const [loading, setLoading] = useState<Set<string>>(new Set());
+  const [investSheet, setInvestSheet] = useState<{ symbol: string; companyName?: string } | null>(null);
+  const [brokerSheet, setBrokerSheet] = useState<{ symbol: string } | null>(null);
+
+  const refresh = useCallback(() => setTracked(getTrackedCompanies()), []);
 
   useEffect(() => {
-    return () => { mountedRef.current = false; };
-  }, []);
-
-  useEffect(() => {
-    const handler = () => {
-      const updated = getWatchlistSymbols();
-      setSymbols(updated);
+    window.addEventListener("trackchange", refresh);
+    const handler = (e: StorageEvent) => { if (e.key === "ss_tracked_companies") refresh(); };
+    window.addEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("trackchange", refresh);
+      window.removeEventListener("storage", handler);
     };
-    window.addEventListener("watchlistchange", handler);
-    return () => window.removeEventListener("watchlistchange", handler);
-  }, []);
+  }, [refresh]);
 
-  const loadSymbols = useCallback(async (syms: string[]) => {
+  const loadData = useCallback(async (syms: string[]) => {
     if (syms.length === 0) return;
-    setLoadingSymbols(prev => {
-      const next = new Set(prev);
-      syms.forEach(s => next.add(s));
-      return next;
-    });
+    setLoading(prev => { const n = new Set(prev); syms.forEach(s => n.add(s)); return n; });
     await Promise.allSettled(
       syms.map(sym =>
-        globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
-          r => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: r })); },
-          () => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: null })); },
+        runCompanyDataPipeline(sym).then(
+          r => { setResults(p => ({ ...p, [sym]: r })); },
+          () => { setResults(p => ({ ...p, [sym]: null })); },
         )
       ),
     );
-    if (mountedRef.current) {
-      setLoadingSymbols(prev => {
-        const next = new Set(prev);
-        syms.forEach(s => next.delete(s));
-        return next;
-      });
-    }
+    setLoading(prev => { const n = new Set(prev); syms.forEach(s => n.delete(s)); return n; });
   }, []);
 
-  useEffect(() => {
-    loadSymbols(symbols);
-  }, [symbols, loadSymbols]);
+  useEffect(() => { loadData(tracked.map(t => t.symbol)); }, [tracked, loadData]);
 
-  const handleAdd = () => {
-    const sym = addInput.toUpperCase().trim();
-    if (!sym) return;
-    if (symbols.length >= MAX_WATCHLIST) {
-      toast.warning(`Watchlist limited to ${MAX_WATCHLIST} stocks. Remove some to add more.`);
-      setAddInput("");
-      return;
-    }
-    if (symbols.includes(sym)) {
-      toast.info(`${sym} is already in your watchlist`);
-      setAddInput("");
-      return;
-    }
-    const updated = [...symbols, sym];
-    setWatchlistSymbols(updated);
-    setSymbols(updated);
-    setAddInput("");
-    toast.success(`${sym} added to watchlist`);
-  };
-
-  const handleRemove = (sym: string) => {
-    const updated = symbols.filter(s => s !== sym);
-    setWatchlistSymbols(updated);
-    setSymbols(updated);
-    setResults(prev => {
-      const next = { ...prev };
-      delete next[sym];
-      return next;
-    });
-    toast.success(`${sym} removed`);
-  };
-
-  const handleRefreshAll = async () => {
-    if (symbols.length === 0) return;
-    setRefreshProgress({ done: 0, total: symbols.length });
-    for (let i = 0; i < symbols.length; i++) {
-      const sym = symbols[i];
-      await globalPipelineQueue.enqueue(() => runCompanyDataPipeline(sym)).then(
-        r => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: r })); },
-        () => { if (mountedRef.current) setResults(prev => ({ ...prev, [sym]: null })); },
+  const handleRefreshAll = useCallback(async () => {
+    const syms = tracked.map(t => t.symbol);
+    setLoading(prev => { const n = new Set(prev); syms.forEach(s => n.add(s)); return n; });
+    for (const sym of syms) {
+      await runCompanyDataPipeline(sym).then(
+        r => { setResults(p => ({ ...p, [sym]: r })); },
+        () => { setResults(p => ({ ...p, [sym]: null })); },
       );
-      if (mountedRef.current) {
-        setRefreshProgress(prev => prev ? { ...prev, done: prev.done + 1 } : null);
-      }
     }
-    if (mountedRef.current) setRefreshProgress(null);
-    toast.success("Watchlist refreshed");
-  };
+    setLoading(prev => { const n = new Set(prev); syms.forEach(s => n.delete(s)); return n; });
+  }, [tracked]);
 
-  const isLoading = loadingSymbols.size > 0;
-  const activeProgress = refreshProgress || (isLoading ? { done: symbols.filter(s => s in results).length, total: symbols.length } : null);
+  const toggleTrack = useCallback((sym: string, name: string) => {
+    if (isTracked(sym)) {
+      removeTrackedCompany(sym);
+    } else {
+      addTrackedCompany({ symbol: sym, companyName: name, addedAt: new Date().toISOString(), source: "stock_page" });
+    }
+    window.dispatchEvent(new Event("trackchange"));
+  }, []);
 
-  return (
-    <ProductShell>
-      <ProductPage>
-        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4 text-[#2962FF]" />
-              <h1 className="text-base font-semibold text-[#E6EDF3]">Watchlist</h1>
-            </div>
-            <p className="mt-1 text-xs text-[#8B949E]">
-              {symbols.length > 0
-                ? `${symbols.length} stock${symbols.length !== 1 ? "s" : ""} tracked`
-                : "Track stocks you care about"}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {activeProgress && (
-              <span className="text-[11px] text-[#8B949E]">
-                Refreshing {activeProgress.done} of {activeProgress.total}...
+  const improving = tracked.filter(t => {
+    const r = results[t.symbol];
+    return r?.prediction?.healthScore != null && r.prediction.healthScore >= 75;
+  });
+
+  const needsReview = tracked.filter(t => {
+    const r = results[t.symbol];
+    if (r?.prediction?.healthScore == null) return false;
+    return r.prediction.healthScore < 55
+      || r.prediction.classification === "WEAKENING"
+      || r.prediction.classification === "AT_RISK";
+  });
+
+  const renderItem = (t: { symbol: string; companyName: string }) => {
+    const r = results[t.symbol];
+    const isPending = loading.has(t.symbol);
+    const closePrices = r?.technicals?.closePrices ?? [];
+    const score = r?.prediction?.healthScore ?? null;
+    const classification = r?.prediction?.classification ?? "INSUFFICIENT_DATA";
+    const sector = r?.sector ?? null;
+    const price = r?.price?.current ?? null;
+    const change = r?.price?.change ?? null;
+
+    return (
+      <div key={t.symbol} style={{
+        display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+        padding: "14px 0",
+        borderBottom: `1px solid ${S.borderSoft}`,
+      }}>
+        <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: S.ink, letterSpacing: "-0.2px", fontVariantNumeric: "tabular-nums" }}>
+              {t.symbol}
+            </span>
+            {(t.companyName || r?.companyName) && (
+              <span style={{
+                fontSize: 12, color: S.ink3, whiteSpace: "nowrap",
+                overflow: "hidden", textOverflow: "ellipsis",
+              }}>
+                {t.companyName || r?.companyName}
               </span>
             )}
-            {symbols.length > 0 && (
-              <button
-                onClick={handleRefreshAll}
-                disabled={!!refreshProgress}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${refreshProgress ? "animate-spin" : ""}`} />
-                Refresh all
-              </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+            {sector && <span style={{ fontSize: 10, fontWeight: 500, color: S.ink4 }}>{sector}</span>}
+            {!isPending && price != null && (
+              <>
+                <span style={{ fontSize: 10, color: S.ink4 }}>·</span>
+                <span style={{ fontSize: 10, fontWeight: 600, color: S.ink2, fontVariantNumeric: "tabular-nums" }}>
+                  {fPrice(price)}
+                </span>
+              </>
             )}
-            <button
-              onClick={() => productNavigate("scanner")}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
-            >
-              <Search className="h-3.5 w-3.5" />
-              Scanner
-            </button>
+            {!isPending && change != null && (
+              <span style={{
+                fontSize: 10, fontWeight: 600,
+                color: change >= 0 ? S.positive : S.negative,
+                fontVariantNumeric: "tabular-nums",
+              }}>
+                {change >= 0 ? "+" : ""}{change.toFixed(2)}%
+              </span>
+            )}
+            {isPending && <span style={{ fontSize: 10, color: S.ink4 }}>Loading data...</span>}
           </div>
         </div>
 
-        {symbols.length === 0 ? (
-          <ProductEmptyState
-            icon={Eye}
-            title="Your watchlist is empty"
-            body="Find stocks to track in the Scanner."
-            action={
-              <ProductAction onClick={() => productNavigate("scanner")}>
-                Go to Scanner →
-              </ProductAction>
-            }
-          />
-        ) : (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 pb-2">
-              <Input
-                placeholder="Add stock symbol..."
-                value={addInput}
-                onChange={(e) => setAddInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
-                className="h-9 text-xs max-w-[200px]"
-                glass
-              />
-              <button
-                onClick={handleAdd}
-                disabled={!addInput.trim() || symbols.length >= MAX_WATCHLIST}
-                className="inline-flex items-center gap-1 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors disabled:opacity-40"
-              >
-                <Plus className="h-3 w-3" />
-                Add
-              </button>
-              {symbols.length >= MAX_WATCHLIST && (
-                <span className="text-[10px] text-[#92400E]">Max {MAX_WATCHLIST} stocks</span>
-              )}
-            </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {!isPending && score !== null && <ScorePill score={score} size="sm" />}
+          {closePrices.length >= 2 && <MiniSparkline data={closePrices} width={44} height={16} />}
+          {!isPending && r?.prediction && (
+            <ClassificationBadge classification={classification} size="sm" />
+          )}
+        </div>
 
-            {symbols.map((sym) => {
-              const r = results[sym];
-              const pending = loadingSymbols.has(sym);
-              const ready = r !== undefined;
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button
+            onClick={() => productNavigate("stock", t.symbol)}
+            title="Research"
+            style={iconBtn}
+            onMouseEnter={e => { e.currentTarget.style.background = S.bgSoft; e.currentTarget.style.color = S.ink; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = S.ink3; }}
+          >
+            <Search size={13} />
+          </button>
+          <button
+            onClick={() => productNavigate("compare", t.symbol)}
+            title="Compare"
+            style={iconBtn}
+            onMouseEnter={e => { e.currentTarget.style.background = S.bgSoft; e.currentTarget.style.color = S.ink; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = S.ink3; }}
+          >
+            <GitCompare size={13} />
+          </button>
+          <button
+            onClick={() => toggleTrack(t.symbol, t.companyName)}
+            title={isTracked(t.symbol) ? "Remove from watchlist" : "Add to watchlist"}
+            style={{
+              ...iconBtn,
+              color: isTracked(t.symbol) ? S.action : S.ink4,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = S.bgSoft; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
+          >
+            <Bookmark size={13} fill={isTracked(t.symbol) ? S.action : "none"} />
+          </button>
+          <button
+            onClick={() => setInvestSheet({ symbol: t.symbol, companyName: t.companyName || r?.companyName || undefined })}
+            title="Investment review"
+            style={iconBtn}
+            onMouseEnter={e => { e.currentTarget.style.background = S.positiveSoft; e.currentTarget.style.color = S.positive; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = S.ink3; }}
+          >
+            <TrendingUp size={13} />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
-              const price = ready && r ? r.price.current : null;
-              const change = ready && r ? r.price.change : null;
-              const healthScore = ready && r ? (r.prediction?.healthScore ?? null) : null;
-              const classification = ready && r ? (r.prediction?.classification ?? "INSUFFICIENT_DATA") : "INSUFFICIENT_DATA";
-              const companyName = ready && r ? r.companyName : null;
-              const fetchedAt = ready && r ? r.fetchedAt : null;
-
-              return (
-                <ProductPanel key={sym} className="p-3 md:p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="shrink-0">
-                      {pending && !r ? (
-                        <div className="flex h-10 w-10 items-center justify-center">
-                          <RefreshCw className="h-4 w-4 animate-spin text-[#2962FF]" />
-                        </div>
-                      ) : (
-                        <ScoreRing score={healthScore} size="sm" />
-                      )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-bold text-[#E6EDF3]">{sym}</span>
-                        {companyName && (
-                          <span className="hidden truncate text-xs text-[#8B949E] max-w-[160px] sm:inline">{companyName}</span>
-                        )}
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 flex-wrap">
-                        {ready && r ? (
-                          <>
-                            <span className="font-mono text-xs font-medium text-[#E6EDF3]">{fPrice(price)}</span>
-                            {change !== null && (
-                              <span className={`font-mono text-xs font-medium ${changeColor(change)}`}>
-                                {change >= 0 ? "+" : ""}{fChange(change)}
-                              </span>
-                            )}
-                            <ClassificationBadge classification={classification} size="sm" />
-                            {fetchedAt && (
-                              <span className="flex items-center gap-1 text-[10px] text-[#484F58]">
-                                <Clock className="h-3 w-3" />
-                                Last researched {fRelativeTime(fetchedAt)}
-                              </span>
-                            )}
-                          </>
-                        ) : pending ? (
-                          <span className="text-[11px] text-[#8B949E]">Loading data...</span>
-                        ) : (
-                          <span className="text-[11px] text-[#92400E]">Could not load data</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={() => navigateToStock({ ticker: sym, mode: "push" })}
-                        className="inline-flex items-center gap-1 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[#8B949E] hover:text-[#E6EDF3] transition-colors"
-                      >
-                        Research →
-                      </button>
-                      <button
-                        onClick={() => handleRemove(sym)}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#484F58] hover:bg-white/[0.04] hover:text-[#EF4444] transition-colors"
-                        title="Remove from watchlist"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </ProductPanel>
-              );
-            })}
+  const sectionCard = (title: string, icon: React.ReactNode, items: typeof tracked, emptyMsg?: string) => {
+    if (items.length === 0 && !emptyMsg) return null;
+    return (
+      <div style={{ marginBottom: 16 }}>
+        <PremiumCard padding="14px 20px">
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: items.length > 0 ? 0 : 0 }}>
+            <span style={{ color: S.ink3, display: "flex" }}>{icon}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: S.ink }}>{title}</span>
+            {items.length > 0 && (
+              <span style={{ fontSize: 11, color: S.ink4, marginLeft: "auto", fontWeight: 600 }}>
+                {items.length}
+              </span>
+            )}
           </div>
-        )}
-      </ProductPage>
-    </ProductShell>
-  );
-};
+          {items.length === 0 && emptyMsg && (
+            <p style={{ fontSize: 12, color: S.ink3, margin: "6px 0 0 0", lineHeight: 1.6 }}>
+              {emptyMsg}
+            </p>
+          )}
+          {items.length > 0 && (
+            <div style={{ marginTop: 4 }}>
+              {items.map(renderItem)}
+            </div>
+          )}
+        </PremiumCard>
+      </div>
+    );
+  };
 
-export default WatchlistPage;
+  if (tracked.length === 0) {
+    return (
+      <PremiumAppShell activePage="watchlist">
+        <ProductPageHeader
+          title="Watchlist"
+          description="Track companies you are researching and review what changed."
+        />
+        <EmptyProductState
+          icon={<Bookmark size={24} color={S.ink4} />}
+          title="Track companies you are researching."
+          body="Add a company from Scanner or Research to follow thesis changes and risks."
+        />
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 16 }}>
+          <button onClick={() => productNavigate("scanner")} style={primaryBtn}>
+            Open scanner
+          </button>
+          <button onClick={() => productNavigate("search")} style={secondaryBtn}>
+            Search company
+          </button>
+        </div>
+        <MobileProductNav activePage="watchlist" />
+        <SebiDisclaimer />
+      </PremiumAppShell>
+    );
+  }
+
+  const allTracked = tracked;
+
+  return (
+    <PremiumAppShell activePage="watchlist">
+      <ProductPageHeader
+        title="Watchlist"
+        description="Track companies you are researching and review what changed."
+        badge={`${tracked.length} tracked`}
+        actions={
+          <button
+            onClick={handleRefreshAll}
+            disabled={loading.size > 0}
+            style={{
+              ...secondaryBtn,
+              opacity: loading.size > 0 ? 0.5 : 1,
+              pointerEvents: loading.size > 0 ? "none" : "auto",
+            }}
+          >
+            <RefreshCw size={13} />
+            {loading.size > 0 ? `Loading ${loading.size}` : "Refresh"}
+          </button>
+        }
+      />
+
+      {sectionCard(
+        "What changed",
+        <Sparkles size={15} />,
+        [],
+        "Review your tracked companies on their stock pages to detect thesis changes over time. Scores and classifications update with each research session.",
+      )}
+
+      {needsReview.length > 0 && sectionCard(
+        "Needs review",
+        <AlertTriangle size={15} color={S.caution} />,
+        needsReview,
+      )}
+
+      {improving.length > 0 && sectionCard(
+        "Thesis improving",
+        <TrendingUp size={15} color={S.positive} />,
+        improving,
+      )}
+
+      {sectionCard(
+        "All tracked companies",
+        <Eye size={15} />,
+        allTracked,
+      )}
+
+      <InvestmentReviewSheet
+        open={investSheet !== null}
+        onClose={() => setInvestSheet(null)}
+        symbol={investSheet?.symbol ?? ""}
+        companyName={investSheet?.companyName}
+      />
+      <BrokerHandoffSheet
+        open={brokerSheet !== null}
+        onClose={() => setBrokerSheet(null)}
+        symbol={brokerSheet?.symbol}
+      />
+
+      <MobileProductNav activePage="watchlist" />
+      <SebiDisclaimer />
+    </PremiumAppShell>
+  );
+}

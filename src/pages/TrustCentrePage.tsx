@@ -1,131 +1,256 @@
 import React from "react";
-import { Search, BarChart3, BookOpen, Shield, ArrowRightLeft, Scale } from "lucide-react";
-import { ProductShell, ProductPage, ProductPanel, ProductAction, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
-import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
+import { Search, BarChart3, Shield, BookOpen, ArrowRightLeft, Scale, Check, AlertTriangle, Sparkles, TrendingUp, TrendingDown, Brain, Eye } from "lucide-react";
+import { PremiumAppShell, PremiumCard, FactorBar, ScoreRing, EmptyProductState, ProductPageHeader, MethodologyNote, MobileProductNav } from "../premium/PremiumComponents";
+import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
+import { productNavigate } from "../components/product/ProductUI";
 
-const sections = [
+const S = {
+  bg: "var(--ss-bg)",
+  bgSoft: "var(--ss-bg-soft)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  positiveSoft: "var(--ss-positive-soft)",
+  negative: "var(--ss-negative)",
+  negativeSoft: "var(--ss-negative-soft)",
+  caution: "var(--ss-caution)",
+  cautionSoft: "var(--ss-caution-soft)",
+  action: "var(--ss-action)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+};
+
+const convictionLevels = [
   {
-    icon: Search,
-    title: "Research workflow",
-    body: "StockStory applies a structured, multi-factor research framework to evaluate publicly traded companies. Each company is assessed across five core dimensions — Financial strength, Growth, Valuation context, Momentum, and Risk — using a consistent methodology. The goal is to surface a balanced, repeatable view of a company's fundamentals and market position."
+    label: "High Conviction",
+    desc: "Strong scores across most factors with consistent alignment. Represents the highest level of research support.",
+    color: S.positive,
+    bg: S.positiveSoft,
+    icon: Sparkles,
   },
   {
-    icon: BarChart3,
-    title: "Conviction and research dimensions",
-    body: "Each company is assigned an overall Research Score from 0 to 100 based on factors across our core dimensions:",
-    subsections: [
-      { label: "Financial strength", detail: "How efficiently the company generates returns on capital. Considers profitability, margins, and asset efficiency." },
-      { label: "Growth", detail: "Revenue, earnings, and cash flow trajectory over time. Captures both historical trends and forward signals." },
-      { label: "Valuation context", detail: "Pricing relative to earnings, book value, and cash yields. Contextualised against industry peers." },
-      { label: "Momentum", detail: "Price trend strength and relative market performance." },
-      { label: "Risk context", detail: "Leverage, cash buffers, accounting consistency, and price volatility that may affect the thesis." },
-      { label: "Conviction", detail: "Reflects the breadth and consistency of information behind the overall thesis. Higher conviction means more dimensions were evaluated." },
-    ]
+    label: "Research",
+    desc: "Good overall scores with room for monitoring. Most factors are favourable but some dimensions need observation.",
+    color: S.ink,
+    bg: S.bgSoft,
+    icon: Brain,
   },
   {
-    icon: BarChart3,
-    title: "Prediction Engine",
-    body: "The Prediction Engine synthesises available factor data into a research stance — such as High conviction, Watch, Needs review, or Risk rising — along with a numerical score and confidence level. It reflects how much information is available and how consistently the dimensions align. The Prediction Engine does not predict future prices or returns."
+    label: "Watch",
+    desc: "Mixed signals across factors. Some dimensions show strength while others raise questions. Needs attention.",
+    color: S.caution,
+    bg: S.cautionSoft,
+    icon: Eye,
   },
   {
-    icon: Shield,
-    title: "Healthometer",
-    body: "The Healthometer breaks the research stance into individual factor scores so you can see which dimensions are driving the view. Each factor — quality, growth, valuation, momentum, stability, risk — is scored independently. The Healthometer makes it easy to spot where a company excels and where it carries elevated risk."
+    label: "Needs Review",
+    desc: "Deteriorating factor scores or elevated risk signals warrant a closer look before proceeding.",
+    color: S.caution,
+    bg: S.cautionSoft,
+    icon: AlertTriangle,
   },
   {
-    icon: Shield,
-    title: "Research is not a recommendation",
-    body: "StockStory is a research-only workspace. We do not provide Buy, Sell, or Hold recommendations, nor do we suggest target prices or specific outcomes. Investment decisions require personal context, risk tolerance, and individual financial goals. Our mission is to equip you with objective, multi-factor analysis and clear risk tracking, so that you can make your own informed decisions."
+    label: "Risk Rising",
+    desc: "Multiple risk flags — high leverage, weak cash buffers, or persistent negative momentum. Significant caution advised.",
+    color: S.negative,
+    bg: S.negativeSoft,
+    icon: TrendingDown,
   },
-  {
-    icon: BookOpen,
-    title: "What thesis tracking means",
-    body: "Tracking a thesis means saving a company to your watchlist so you can monitor changes over time. StockStory helps you identify when scores move, risk factors change, or valuation context shifts — so you know when it is time to review your reasoning. Thesis tracking is a research aid, not a portfolio management system."
-  },
-  {
-    icon: ArrowRightLeft,
-    title: "Why compare matters",
-    body: "Compare allows you to look at peer companies side-by-side on the exact same multi-factor dimensions, helping you see where one business excels or poses a higher relative risk. This neutral, standardised comparison helps remove emotional bias from your research and focuses your attention on verified metrics."
-  },
-  {
-    icon: Shield,
-    title: "Handling of partial information",
-    body: "When certain financial fields are not available or not applicable, StockStory omits them quietly to present a clean, un-fabricated view rather than using generic filler text. The overall score adjusts automatically to represent the information available."
-  },
-  {
-    icon: ArrowRightLeft,
-    title: "Broker handoff philosophy",
-    body: "StockStory is a research platform, not a brokerage. All order placement and execution occur through your registered broker. StockStory never stores, processes, or accesses your broker credentials. The Invest handoff prepares your research summary, but the final decision and action remain yours. This separation keeps research objective and free from execution conflicts."
-  },
-  {
-    icon: Scale,
-    title: "Compliance statement",
-    body: "StockStory provides research, analysis, and educational content. Nothing on this platform constitutes investment advice, a recommendation, or solicitation to buy or sell securities. All investment decisions should be made with the advice of a qualified financial professional."
-  }
 ];
 
-export const TrustCentrePage: React.FC = () => {
-  return (
-    <ProductShell>
-      <ProductPage>
-        <div>
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-base font-semibold text-[var(--color-text-primary)]">How StockStory Thinks</h1>
-          </div>
-          <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Research methodology — how we evaluate businesses and how to use the product responsibly.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <ProductAction onClick={() => productNavigate("rankings")}>View rankings</ProductAction>
-            <ProductAction onClick={() => productNavigate("about")} variant="secondary">Read mission</ProductAction>
-          </div>
-        </div>
+const checklistItems = [
+  "Read the full company thesis and understand the narrative",
+  "Compare with peer companies in the same sector",
+  "Review key risk factors and their trajectory",
+  "Understand the valuation context relative to history and peers",
+  "Use broker flow only after your own review is complete",
+];
 
-        <div className="mt-6 space-y-4">
-          {sections.map((section) => (
-            <ProductPanel key={section.title} className="p-5 md:p-6" as="section">
-              <div className="flex items-start gap-3">
-                <section.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" aria-hidden="true" />
-                <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">{section.title}</h2>
-                  {section.body && (
-                    <p className="mt-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">{section.body}</p>
-                  )}
-                  {section.subsections && (
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      {section.subsections.map((sub) => (
-                        <div key={sub.label} className="rounded-lg border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.025)] p-3">
-                          <h3 className="text-xs font-semibold text-[var(--color-text-primary)]">{sub.label}</h3>
-                          <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{sub.detail}</p>
-                        </div>
-                      ))}
+const responsibleUseItems = [
+  "StockStory is not a guarantee of future returns",
+  "Research scores are not personalised financial advice",
+  "Consult a qualified adviser where appropriate",
+  "All investments carry market risk",
+  "Always do your own research before investing",
+];
+
+const TrustCentrePage: React.FC = () => {
+  return (
+    <>
+      <PremiumAppShell activePage="research">
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <ProductPageHeader
+            title="How StockStory thinks"
+            description="Research methodology and responsible use guide."
+          />
+
+          {/* ─── Research, Not Guarantees ─── */}
+          <PremiumCard padding="28px" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <Shield size={20} color={S.ink} style={{ marginTop: 2, flexShrink: 0 }} />
+              <div>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.2px" }}>Research, not guarantees</h2>
+                <p style={{ fontSize: 13, color: S.ink3, lineHeight: 1.7, margin: "10px 0 0 0" }}>
+                  StockStory helps you understand businesses before investing. Our scores and signals are research aids designed to surface a structured view of a company's fundamentals — not guarantees of future performance. Every final decision requires your own review, risk assessment, and personal context. Execution happens with your broker, not on this platform. Nothing here constitutes personalised financial advice.
+                </p>
+              </div>
+            </div>
+          </PremiumCard>
+
+          {/* ─── Five Core Factors ─── */}
+          <PremiumCard padding="28px" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 18 }}>
+              <BarChart3 size={20} color={S.ink} style={{ marginTop: 2, flexShrink: 0 }} />
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.2px" }}>The five core factors</h2>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{
+                padding: 16, borderRadius: S.radiusSm, border: `1px solid ${S.borderSoft}`,
+                background: S.bgSoft,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <TrendingUp size={14} color={S.positive} />
+                  <h3 style={{ fontSize: 13, fontWeight: 700, color: S.ink, margin: 0 }}>Quality</h3>
+                </div>
+                <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "4px 0 0 0" }}>How efficiently the company generates returns — profitability, margins, and asset efficiency.</p>
+              </div>
+              <div style={{
+                padding: 16, borderRadius: S.radiusSm, border: `1px solid ${S.borderSoft}`,
+                background: S.bgSoft,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <TrendingUp size={14} color={S.positive} />
+                  <h3 style={{ fontSize: 13, fontWeight: 700, color: S.ink, margin: 0 }}>Growth</h3>
+                </div>
+                <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "4px 0 0 0" }}>Revenue, earnings, and cash flow trajectory over time.</p>
+              </div>
+              <div style={{
+                padding: 16, borderRadius: S.radiusSm, border: `1px solid ${S.borderSoft}`,
+                background: S.bgSoft,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <Scale size={14} color={S.ink} />
+                  <h3 style={{ fontSize: 13, fontWeight: 700, color: S.ink, margin: 0 }}>Valuation</h3>
+                </div>
+                <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "4px 0 0 0" }}>Pricing relative to earnings, book value, and cash yields — contextualised against peers.</p>
+              </div>
+              <div style={{
+                padding: 16, borderRadius: S.radiusSm, border: `1px solid ${S.borderSoft}`,
+                background: S.bgSoft,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <Shield size={14} color={S.caution} />
+                  <h3 style={{ fontSize: 13, fontWeight: 700, color: S.ink, margin: 0 }}>Risk</h3>
+                </div>
+                <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "4px 0 0 0" }}>Leverage levels, cash buffers, accounting consistency, and price volatility.</p>
+              </div>
+              <div style={{
+                padding: 16, borderRadius: S.radiusSm, border: `1px solid ${S.borderSoft}`,
+                background: S.bgSoft,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <TrendingDown size={14} color={S.ink} />
+                  <h3 style={{ fontSize: 13, fontWeight: 700, color: S.ink, margin: 0 }}>Momentum</h3>
+                </div>
+                <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "4px 0 0 0" }}>Price trend strength and relative market performance.</p>
+              </div>
+            </div>
+          </PremiumCard>
+
+          {/* ─── How to Read Conviction ─── */}
+          <PremiumCard padding="28px" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 18 }}>
+              <Brain size={20} color={S.ink} style={{ marginTop: 2, flexShrink: 0 }} />
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.2px" }}>How to read conviction</h2>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {convictionLevels.map((c) => {
+                const Icon = c.icon;
+                return (
+                  <div key={c.label} style={{
+                    display: "flex", gap: 12, padding: "12px 14px", borderRadius: S.radiusSm,
+                    border: `1px solid ${S.borderSoft}`, background: c.bg,
+                  }}>
+                    <Icon size={16} color={c.color} style={{ marginTop: 1, flexShrink: 0 }} />
+                    <div>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: c.color }}>{c.label}</span>
+                      <p style={{ fontSize: 12, color: S.ink3, lineHeight: 1.6, margin: "3px 0 0 0" }}>{c.desc}</p>
                     </div>
-                  )}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <MethodologyNote>
+                StockStory does not use Buy, Hold, or Sell language. Conviction levels reflect the consistency and breadth of available research signals, not price predictions.
+              </MethodologyNote>
+            </div>
+          </PremiumCard>
+
+          {/* ─── Before You Invest ─── */}
+          <PremiumCard padding="28px" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <Check size={20} color={S.positive} style={{ marginTop: 2, flexShrink: 0 }} />
+              <div>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.2px" }}>Before you invest</h2>
+                <p style={{ fontSize: 12, color: S.ink3, margin: "6px 0 12px 0" }}>
+                  Use this checklist to ground every decision:
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {checklistItems.map((item) => (
+                    <div key={item} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <Check size={12} color={S.positive} style={{ marginTop: 3, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12, color: S.ink2, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </ProductPanel>
-          ))}
-        </div>
+            </div>
+          </PremiumCard>
 
-        <ProductPanel className="mt-4 p-5 md:p-6" as="section">
-          <div className="flex flex-wrap gap-2">
-            <ProductStatusPill tone="blue">Research workspace</ProductStatusPill>
-            <ProductStatusPill tone="verified">Transparent methodology</ProductStatusPill>
-            <ProductStatusPill tone="blue">Structured factor view</ProductStatusPill>
-            <ProductStatusPill tone="blue">Compare systematically</ProductStatusPill>
+          {/* ─── Responsible Use ─── */}
+          <PremiumCard padding="28px" style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+              <AlertTriangle size={20} color={S.caution} style={{ marginTop: 2, flexShrink: 0 }} />
+              <div>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: S.ink, margin: 0, letterSpacing: "-0.2px" }}>Responsible use</h2>
+                <p style={{ fontSize: 12, color: S.ink3, margin: "6px 0 14px 0" }}>
+                  StockStory is a research tool. Please use it responsibly:
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {responsibleUseItems.map((item) => (
+                    <div key={item} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <div style={{
+                        width: 4, height: 4, borderRadius: "50%", background: S.ink4,
+                        marginTop: 6, flexShrink: 0,
+                      }} />
+                      <span style={{ fontSize: 12, color: S.ink2, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </PremiumCard>
+
+          {/* ─── Footer Methodology Note ─── */}
+          <MethodologyNote>
+            StockStory provides research, analysis, and educational content. Nothing on this platform constitutes investment advice, a recommendation, or solicitation to buy or sell securities. All investment decisions should be made with the advice of a qualified financial professional. Past research scores are not indicative of future results.
+          </MethodologyNote>
+
+          <div style={{ marginTop: 32 }}>
+            <SebiDisclaimer variant="inline" />
           </div>
-        </ProductPanel>
-
-        <div className="mt-8 space-y-4">
-          <EarlyAccessPanel />
         </div>
+      </PremiumAppShell>
 
-        <div className="mt-8 border-t border-[rgba(148,163,184,0.16)] pt-6">
-          <p className="text-[10px] leading-relaxed text-[#64748B]">
-            StockStory provides research, analysis, and educational content. This is not investment advice.
-          </p>
-        </div>
-      </ProductPage>
-    </ProductShell>
+      <MobileProductNav activePage="research" />
+    </>
   );
 };
 
