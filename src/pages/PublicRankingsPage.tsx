@@ -6,6 +6,8 @@ import { runCompanyDataPipeline,type PipelineResult } from "../services/data/Com
 import { fChange,fPrice } from "../lib/format";
 import { productNavigate } from "../components/product/ProductUI";
 
+export { PublicRankingsPage };
+
 const symbols=["TCS","HDFCBANK","RELIANCE","INFY","ICICIBANK","SUNPHARMA","BHARTIARTL","ITC","LT","SBIN"];
 const filters=[["Universe","India – NSE & BSE","1,258 companies"],["Score Range","50 ━━━━━━━━━ 100",""] ,["Sector","All Sectors ›",""] ,["Quality","ROE > 15%, D/E < … ›",""] ,["Growth","Revenue CAGR > 10% ›",""] ,["Valuation","PE < 25, PEG < 1.5 ›",""] ,["Momentum","Price > 20DMA ›",""] ,["Market Cap","Large & Mid Cap ›",""] ,["Risk","Max Drawdown < 25% ›",""]];
 function ScannerRow({result,rank}:{result:PipelineResult|null;rank:number}){if(!result)return <tr className="loading-row"><td>{rank}</td><td colSpan={8}>Loading company data…</td></tr>;const p=result.prediction,score=p?.rankingScore??null;return <tr onClick={()=>productNavigate("stock",result.symbol)}><td>{rank}</td><td><div className={`avatar a${rank}`}>{result.symbol.slice(0,2)}</div><b>{result.symbol}</b><small>{result.companyName??"—"}</small></td><td>{result.sector??"—"}</td><td><ScoreBadge score={score} label={score===null?"Unavailable":score>=85?"Excellent":"Very Good"}/><MiniSparkline data={result.technicals.closePrices.slice(-20)} width={48} height={20}/></td><td className="num">{fPrice(result.price.current)}</td><td className={result.price.change!==null&&result.price.change>=0?"green":"red"}>{fChange(result.price.change)}%</td><td><FactorDots factorScores={p?.factorScores??[]}/></td><td><AISignalBadge classification={p?.classification??""}/></td><td><ConfidenceRing confidence={result.dataCompleteness}/></td></tr>}
