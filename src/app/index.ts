@@ -1,7 +1,6 @@
 /**
  * App shell barrel.
  */
-export { default as PageRenderer } from "./PageRenderer";
 export {
   getPageKeyFromUrl,
   getRouteSignatureFromUrl,

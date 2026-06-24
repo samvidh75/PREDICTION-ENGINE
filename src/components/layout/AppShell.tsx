@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Search } from "lucide-react";
 import Logo from "../brand/Logo";
-import { MiniSparkline } from "../ui/ScoreRing";
+import { MiniSparkline } from "../../premium/PremiumComponents";
 import { productNavigate } from "../product/ProductUI";
 import { api } from "../../services/api/client";
 import { useAuth } from "../../context/AuthContext";
