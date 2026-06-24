@@ -10,6 +10,11 @@ import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewM
 import { SCANNER_CATEGORIES, type ScannerCategory, CATEGORY_SECTIONS } from "../../lib/product/scannerCategories";
 import { getCurrentPlan, canViewPremiumScans, UPGRADE_URL } from "../../lib/product/planAccess";
 import { toResearchState, assertNoForbiddenScannerCopy } from "../../lib/compliance/scannerPolicy";
+import SebiDisclaimer from "../compliance/SebiDisclaimer";
+import ScoreRing from "../ui/ScoreRing";
+import ClassificationBadge from "../ui/ClassificationBadge";
+import type { UnifiedClassification } from "../../prediction-engine/types";
+import { StockRegistry } from "../../services/stocks/StockRegistry";
 
 const categoryIcon = (id: ScannerCategory) => {
   switch (id) {
@@ -92,7 +97,8 @@ export default function ScannerPage() {
   const [results, setResults] = useState<ScannerResultItem[]>([]);
   const [allEntries, setAllEntries] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("");
+  const [activeCategory, setActiveCategory] = useState<string>("large_cap_health");
+  const [classificationFilter, setClassificationFilter] = useState("All");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [sortValue, setSortValue] = useState("score-desc");
@@ -124,22 +130,35 @@ export default function ScannerPage() {
     );
   }, [query, results, loading, activeCategory]);
 
+  const registryFallback = useCallback((): ScannerResultItem[] => StockRegistry.getAllStocks().slice(0, 24).map((stock, index) => ({
+    symbol: stock.symbol,
+    companyName: stock.companyName,
+    sector: stock.sector,
+    rank: index + 1,
+    conviction: "Awaiting engine score",
+    score: null,
+    oneLineThesis: "Company profile is available; the latest engine score is still loading.",
+    keyReason: "Registry-backed company profile",
+    riskMarker: null,
+  })), []);
+
   const fetchScanner = useCallback(async (preset: string) => {
     setLoading(true);
     setScannerMessage(null);
     try {
       const res = await api.getScanner(preset, 200);
-      const data = res.data ?? [];
+      const data = res.data?.length ? res.data : registryFallback();
       setAllEntries(data);
       setResults(data);
       setScannerMessage(res.message ?? null);
     } catch {
-      setAllEntries([]);
-      setResults([]);
-      setScannerMessage("The scan could not be refreshed. Please retry in a moment.");
+      const fallback = registryFallback();
+      setAllEntries(fallback);
+      setResults(fallback);
+      setScannerMessage("Live rankings are temporarily unavailable. Showing the NSE/BSE company directory without fabricated scores.");
     }
     setLoading(false);
-  }, []);
+  }, [registryFallback]);
 
   useEffect(() => {
     if (activeCategory) {
@@ -206,8 +225,17 @@ export default function ScannerPage() {
         return true;
       });
     }
+    if (classificationFilter !== "All") {
+      filtered = filtered.filter((entry) => {
+        const score = entry.score ?? -1;
+        if (classificationFilter === "Excellent") return score >= 80;
+        if (classificationFilter === "Healthy") return score >= 65 && score < 80;
+        if (classificationFilter === "Stable") return score >= 50 && score < 65;
+        return score >= 0 && score < 50;
+      });
+    }
     return filtered;
-  }, [results, filters, activeCategory]);
+  }, [results, filters, activeCategory, classificationFilter]);
 
   const sortedResults = useMemo(() => {
     const sorted = [...filteredResults];
@@ -266,9 +294,14 @@ export default function ScannerPage() {
           <div className="relative overflow-hidden rounded-[28px] border border-blue-100/80 bg-[linear-gradient(125deg,rgba(255,255,255,.98),rgba(239,246,255,.88)_58%,rgba(245,243,255,.82))] px-5 py-7 shadow-[0_24px_65px_rgba(30,64,175,.10)] sm:px-7 sm:py-8">
             <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-violet-400/14 blur-3xl" />
             <div className="relative">
-              <h1 className="text-[32px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[40px]">AI Scanner</h1>
-              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Find companies worth researching by quality, valuation, financial strength, risk, momentum, and market segment.</p>
+              <h1 className="text-[32px] font-semibold leading-none tracking-[-.045em] text-[var(--color-text-primary)] sm:text-[40px]">Stock Scanner — Indian Equities</h1>
+              <p className="mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">Ranked by StockStory engine score · Updated daily</p>
             </div>
+          </div>
+
+          <SebiDisclaimer variant="banner" />
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Classification filter">
+            {["All", "Excellent", "Healthy", "Stable", "Weakening"].map((item) => <button key={item} type="button" role="tab" aria-selected={classificationFilter === item} onClick={() => setClassificationFilter(item)} className={`rounded-full px-4 py-2 text-xs font-bold ${classificationFilter === item ? "bg-slate-950 text-white" : "border border-slate-200 bg-white text-slate-600"}`}>{item}</button>)}
           </div>
 
           {/* Natural-language search */}
@@ -437,9 +470,7 @@ export default function ScannerPage() {
           )}
 
           {/* Results */}
-          {loading && (
-            <div className="py-12 text-center text-sm text-[var(--color-text-secondary)]" role="status" aria-live="polite">Scanning companies...</div>
-          )}
+          {loading && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading scanner results">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5"><div className="h-10 w-10 rounded-full bg-slate-100" /><div className="mt-5 h-4 w-1/2 rounded bg-slate-100" /><div className="mt-3 h-3 w-full rounded bg-slate-100" /></div>)}</div>}
 
           {scannerMessage && !loading && (
             <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">{scannerMessage}</div>
@@ -490,11 +521,7 @@ export default function ScannerPage() {
                           <span className="font-mono text-[13px] font-semibold text-[var(--color-text-muted)] tracking-[.08em]">{fullSymbol}</span>
                           <h3 className="mt-1 truncate text-[17px] font-semibold tracking-tight text-[var(--color-text-primary)]">{item.company}</h3>
                         </div>
-                        {score !== null && (
-                          <div className="flex flex-col items-end shrink-0">
-                            <span className="grid h-11 min-w-11 place-items-center rounded-2xl bg-[var(--color-surface-2)] px-2 font-mono text-base font-semibold tabular-nums text-[var(--color-text-primary)] shadow-[inset_0_0_0_1px_var(--color-border)]">{Math.round(score)}</span>
-                          </div>
-                        )}
+                        <ScoreRing score={score} size="sm" />
                       </div>
 
                       {sector && (
@@ -514,6 +541,7 @@ export default function ScannerPage() {
                             {signalInfo.label}
                           </span>
                         )}
+                        <ClassificationBadge classification={(score === null ? "INSUFFICIENT_DATA" : score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK") as UnifiedClassification} />
                         {risky && (
                           <span className="inline-flex rounded bg-[#EF4444]/10 border border-[#EF4444]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#EF4444]">Risk rising</span>
                         )}

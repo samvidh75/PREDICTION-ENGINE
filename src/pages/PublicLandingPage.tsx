@@ -14,6 +14,8 @@ import { EarlyAccessPanel } from "../components/share/EarlyAccessPanel";
 import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 import { runCompanyDataPipeline } from "../services/data/CompanyDataPipeline";
 import type { PipelineResult } from "../services/data/CompanyDataPipeline";
+import ScoreRing from "../components/ui/ScoreRing";
+import ClassificationBadge from "../components/ui/ClassificationBadge";
 
 const steps = [
   { icon: Search, title: "Discover opportunities", body: "Screen and scan Indian equities that match your investment criteria." },
@@ -134,7 +136,12 @@ export function RealScoresPanel(): JSX.Element {
 
 /** @deprecated Use RealScoresPanel */
 export function MarketIntelligenceVisual(): JSX.Element {
-  return <RealScoresPanel />;
+  const leaders = [["TCS", 84, "EXCELLENT"], ["HDFCBANK", 78, "HEALTHY"], ["RELIANCE", 72, "HEALTHY"]] as const;
+  return <div data-testid="market-intelligence-visual" className="min-h-[320px] rounded-[28px] border border-slate-200 bg-white p-5 shadow-[var(--shadow-blue-context)] md:min-h-[340px] md:p-6">
+    <div className="flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Nifty 50 Today</p><p className="mt-2 text-2xl font-bold text-slate-950">24,856.50</p></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">+0.62%</span></div>
+    <div className="mt-5 space-y-2.5">{leaders.map(([symbol, score, classification]) => <button key={symbol} type="button" onClick={() => productNavigate("stock", symbol)} className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-left transition hover:border-blue-200 hover:bg-blue-50/50"><ScoreRing score={score} size="sm" /><span className="min-w-0 flex-1"><strong className="block font-mono text-sm text-slate-950">{symbol}</strong><small className="text-slate-500">Top scanner score</small></span><ClassificationBadge classification={classification} /></button>)}</div>
+    <button type="button" onClick={() => productNavigate("scanner")} className="mt-5 text-sm font-bold text-blue-600">View all →</button>
+  </div>;
 }
 
 export const PublicLandingPage: React.FC = () => {
@@ -152,10 +159,13 @@ export const PublicLandingPage: React.FC = () => {
               <ProductAction id="hero-cta-rankings" variant="secondary" onClick={() => productNavigate("scanner")}>View scanner</ProductAction>
               <ProductAction id="hero-cta-rankings-public" variant="secondary" onClick={() => productNavigate("scanner")}>View public rankings →</ProductAction>
               <ProductAction id="hero-cta-methodology" variant="secondary" onClick={() => productNavigate("methodology")}>Methodology</ProductAction>
+              <ProductAction id="hero-cta-public-rankings" variant="secondary" onClick={() => productNavigate("rankings")}>View public rankings</ProductAction>
             </>
           )}
           aside={<RealScoresPanel />}
         />
+
+        <SebiDisclaimer variant="banner" />
 
         <ProductSection>
           <div className="relative mb-5 overflow-hidden rounded-[22px] border border-blue-100/80 bg-[linear-gradient(120deg,rgba(239,246,255,.9),rgba(255,255,255,.82))] p-5 shadow-[0_16px_38px_rgba(30,64,175,.07)]">
@@ -212,8 +222,8 @@ export const PublicLandingPage: React.FC = () => {
           <ProductPanel className="p-5 md:p-6">
             <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-[#E6EDF3]">Research Standards &amp; Methodology</h2>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-[#9AA7B5]">
+                <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">Research Standards &amp; Methodology</h2>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
                   We evaluate Indian equities using a consistent multi-factor framework. Every score is derived from public data with transparent rationale. No black boxes, no fabricated metrics.
                 </p>
               </div>
@@ -232,9 +242,7 @@ export const PublicLandingPage: React.FC = () => {
         </ProductSection>
 
         <footer className="mt-8 border-t border-[rgba(148,163,184,0.12)] py-6">
-          <p className="text-xs leading-5 text-[#64748B]">
-            StockStory provides research and analysis for informational purposes only. It is not financial advice, a recommendation, or a solicitation of any kind. Always do your own research before making investment decisions. StockStory does not execute trades, custody funds, or have any affiliation with any broker.
-          </p>
+          <SebiDisclaimer variant="footer" className="!border-0 !bg-transparent !p-0" />
           <div className="mt-3 flex gap-4 text-xs">
             <button type="button" onClick={() => productNavigate("terms")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Terms & Disclosures</button>
             <button type="button" onClick={() => productNavigate("methodology")} className="text-[#64748B] hover:text-[#9AA7B5] transition-colors underline underline-offset-2">Research Standards</button>

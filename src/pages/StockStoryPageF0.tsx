@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, Check, ShoppingBag, Sparkles, ArrowUpRight } from "lucide-react";
+import { Bookmark, Check, ShoppingBag, Sparkles, ArrowUpRight, ShieldCheck, TrendingUp, BarChart3, Scale, Activity, History } from "lucide-react";
 import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
 import { addRecentResearch } from "../lib/recent/recentResearchStore";
 import { ProductPage, ProductPanel, ProductShell, ProductStatusPill, productNavigate } from "../components/product/ProductUI";
@@ -24,11 +24,19 @@ import TechnicalIntelligencePanel from "../components/research/TechnicalIntellig
 import OwnershipIntelligencePanel from "../components/research/OwnershipIntelligencePanel";
 import CorporateEventsTimeline from "../components/research/CorporateEventsTimeline";
 import { TrendlyneWidget } from "../components/external/TrendlyneWidget";
+import ScoreRing, { scoreColor } from "../components/ui/ScoreRing";
+import ClassificationBadge from "../components/ui/ClassificationBadge";
+import SebiDisclaimer from "../components/compliance/SebiDisclaimer";
+import type { UnifiedClassification } from "../prediction-engine/types";
 
 function tickerFromUrl(): string {
   const p = new URLSearchParams(window.location.search);
   return normalizeSymbol(p.get("id") ?? p.get("symbol") ?? p.get("ticker") ?? "");
 }
+
+const FactorBar = React.memo(function FactorBar({ label, score }: { label: string; score: number | null }): JSX.Element {
+  return <div className="min-w-[120px] flex-1"><div className="mb-1.5 flex justify-between text-[11px] font-semibold text-slate-600"><span>{label}</span><span>{score === null ? "—" : Math.round(score)}</span></div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full transition-all duration-700" style={{ width: `${score ?? 0}%`, backgroundColor: scoreColor(score) }} /></div></div>;
+});
 
 export default function StockStoryPageF0(): JSX.Element {
   const ticker = tickerFromUrl();
@@ -79,6 +87,7 @@ export default function StockStoryPageF0(): JSX.Element {
     }))
   );
   const [trendlyneAvailable, setTrendlyneAvailable] = useState(() => cachedSnap?.trendlyne?.available ?? false);
+  const [activeTab, setActiveTab] = useState<"thesis" | "fundamentals" | "risk" | "technicals" | "peers" | "history">("thesis");
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -157,145 +166,45 @@ export default function StockStoryPageF0(): JSX.Element {
   const chartQuoteMismatch = Boolean(quote.quote && latestHistoryPoint && Math.abs(quote.quote.price - latestHistoryPoint.close) / quote.quote.price > 0.005);
   const marketDataNeedsReview = quote.quote?.delayed === true || quoteAgeHours === null || quoteAgeHours > 30 || chartQuoteMismatch;
 
+  const factorNames = ["Quality", "Valuation", "Growth", "Stability", "Momentum", "Safety"];
+  const factorScores = factorNames.map((name) => {
+    const aliases = name === "Safety" ? ["risk", "safety"] : [name.toLowerCase()];
+    const match = dimensions.find((dimension) => aliases.includes(dimension.id.toLowerCase()) || aliases.includes(dimension.label.toLowerCase()));
+    return { name, score: match?.score ?? null, detail: match?.status ?? "Awaiting enough verified inputs to explain this factor." };
+  });
+  const classification: UnifiedClassification = score === null ? "INSUFFICIENT_DATA" : score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK";
+  const availableFactors = factorScores.filter((factor) => factor.score !== null).length;
+  const dataCompleteness = Math.round((availableFactors / factorScores.length) * 100);
+  const confidence = dataCompleteness >= 80 ? "HIGH" : dataCompleteness >= 50 ? "MEDIUM" : "LOW";
+  const latestMetrics = financialSeries.slice(0, 9).map((series) => ({ label: series.label, value: series.points.at(-1)?.value ?? null, unit: series.points.at(-1)?.unit ?? "" }));
+
   return <ProductShell>
-    <ProductPage className="max-w-[1180px] !py-3 md:!py-4">
-      {/* Compact stock header */}
-      <header data-context-tone={contextTone} className={`overflow-hidden rounded-[18px] border border-[var(--color-border)] bg-[var(--color-surface-raised)] ${contextShadow}`}>
-        <div className="grid gap-3 p-3 md:grid-cols-[1fr_auto] md:p-4">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)]">{identity.symbol}</span>
-              {identity.sector && <span className="text-[11px] text-[var(--color-text-muted)]">· {identity.sector}</span>}
-              <ProductStatusPill tone={score !== null && score >= 70 ? "verified" : score !== null && score >= 45 ? "blue" : "muted"}>{label}</ProductStatusPill>
-            </div>
-            <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[32px]">{identity.displayName}</h1>
-            <p className="mt-1 text-[10px] text-[var(--color-text-muted)]">
-              {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) ? `Quote updated ${quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}` : "Price context being refreshed"}
-              {latestHistoryPoint?.date ? ` · Chart through ${latestHistoryPoint.date}` : ""}
-
-            </p>
-          </div>
-
-        </div>
-        {research.message && <div className="border-t border-[rgba(148,163,184,0.12)] px-3 py-2.5 text-[11px] text-[var(--color-text-secondary)] md:px-4">{research.message}</div>}
-        {marketDataNeedsReview && <div role="status" className="border-t border-[var(--color-border)] bg-[var(--color-surface-2)] px-3 py-2.5 text-[11px] leading-5 text-[var(--color-text-secondary)] md:px-4">Market data context is being refreshed. Verify timestamps before acting.</div>}
-        <div className="flex gap-2 border-t border-[var(--color-border)] px-3 py-2 md:px-4">
-          <button
-            type="button"
-            onClick={() => {
-              if (isTracked(ticker)) { removeTrackedCompany(ticker); } else { addTrackedCompany({ symbol: ticker, companyName: identity.displayName, addedAt: new Date().toISOString(), source: "stock_page" }); }
-            }}
-            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-              isTracked(ticker) ? "border-blue-200 bg-blue-50 text-blue-700" : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-blue-200 hover:text-[var(--color-text-primary)]"
-            }`}
-          >
-            <Bookmark className={`h-3.5 w-3.5 ${isTracked(ticker) ? "fill-blue-600 text-blue-600" : ""}`} />
-            {isTracked(ticker) ? "Tracked" : "Track"}
-          </button>
-          <button type="button" onClick={() => productNavigate("compare", ticker)} className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] hover:border-blue-200 hover:text-[var(--color-text-primary)] transition-colors">
-            <ArrowUpRight className="h-3.5 w-3.5" /> Compare
-          </button>
+    <ProductPage className="max-w-[1280px] !py-5">
+      <header className="sticky top-24 z-20 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur md:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+          <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-xs font-bold text-blue-600">NSE · {identity.symbol}</span><ClassificationBadge classification={classification} /><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${confidence === "HIGH" ? "bg-emerald-50 text-emerald-700" : confidence === "MEDIUM" ? "bg-amber-50 text-amber-700" : "bg-slate-100 text-slate-600"}`}>{confidence} CONFIDENCE</span></div><h1 className="mt-2 truncate text-2xl font-black tracking-tight text-slate-950 md:text-3xl">{identity.displayName}</h1></div>
+          <div><div className="font-mono text-2xl font-bold text-slate-950">{quote.quote ? formatINR(quote.quote.price) : "—"}</div>{quote.quote && <div className={`mt-1 text-sm font-bold ${quote.quote.changePercent >= 0 ? "text-emerald-600" : "text-red-600"}`}>{quote.quote.changePercent >= 0 ? "+" : ""}{formatPercent(quote.quote.changePercent)}</div>}</div>
+          <div className="flex flex-wrap gap-2"><button type="button" onClick={() => isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: identity.displayName, addedAt: new Date().toISOString(), source: "stock_page" })} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700"><Bookmark className="mr-1 inline h-3.5 w-3.5" />Track</button><button type="button" onClick={() => productNavigate("compare", ticker)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700">Compare</button><button type="button" onClick={() => setInvestOpen(true)} title="Research only — consult a SEBI-registered adviser before investing" className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white">Continue to broker →</button></div>
         </div>
       </header>
 
-      <nav aria-label="Company research sections" className="sticky top-0 z-30 -mx-1 mt-2 flex gap-1 overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/95 p-1 shadow-sm backdrop-blur md:static md:mx-0 md:w-fit">
-        {[["overview", "Overview"], ["thesis", "Thesis"], ["technicals", "Technicals"], ["news", "News"]].map(([id, text]) => (
-          <a key={id} href={`#${id}`} className="shrink-0 rounded-lg px-3 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]">{text}</a>
-        ))}
-      </nav>
-
-      {/* Price + chart */}
-      <section id="overview" className="mt-3 scroll-mt-16">
-        <div className="mb-3 flex items-baseline gap-2.5">
-          <span className="font-mono text-[28px] font-semibold tabular-nums tracking-[-0.03em] text-[var(--color-text-primary)] md:text-[32px]">{quote.quote ? formatINR(quote.quote.price) : "—"}</span>
-          {quote.quote && (
-            <span className={`inline-flex items-center gap-1 font-mono text-sm tabular-nums ${quote.quote.changePercent >= 0 ? "text-emerald-600" : "text-red-600"}`}>
-              {quote.quote.changePercent >= 0 ? "+" : ""}{formatINR(quote.quote.change)} ({quote.quote.changePercent >= 0 ? "+" : ""}{formatPercent(quote.quote.changePercent)})
-            </span>
-          )}
-          {quoteUpdatedAt && !Number.isNaN(quoteUpdatedAt.getTime()) && (
-            <span className="text-[11px] text-[var(--color-text-muted)]">as of {quoteUpdatedAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
-          )}
-        </div>
-        <HistoricalPriceChart symbol={ticker} points={research.priceHistory} />
+      <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center"><ScoreRing score={score} size="xl" /><div className="min-w-0 flex-1"><div className="flex flex-wrap gap-4">{factorScores.map((factor) => <FactorBar key={factor.name} label={factor.name} score={factor.score} />)}</div><div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-slate-500"><span><strong className="text-slate-900">{dataCompleteness}%</strong> data available — {confidence} confidence</span><span className="rounded bg-slate-100 px-2 py-1 font-mono">Unified Engine v2.0.0</span></div></div></div>
       </section>
 
-      {/* Healthometer summary — compact, gated detail */}
-      <section className="mt-3">
-        <HealthometerPanel label={label} score={score} dimensions={dimensions} />
-      </section>
+      <nav className="mt-5 flex overflow-x-auto border-b border-slate-200" aria-label="Stock research tabs">{(["thesis", "fundamentals", "risk", "technicals", "peers", "history"] as const).map((tab) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`shrink-0 border-b-2 px-4 py-3 text-xs font-bold capitalize ${activeTab === tab ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500"}`}>{tab}</button>)}</nav>
 
-      {/* Financial trend histogram — interactive */}
-      <section className="mt-3">
-        <FinancialHistogram series={financialSeries} />
-      </section>
+      <div className="mt-5 min-h-[360px]">
+        {activeTab === "thesis" && <div className="grid gap-4 md:grid-cols-2">{factorScores.map((factor, index) => { const Icon = [ShieldCheck, Scale, TrendingUp, BarChart3, Activity, ShieldCheck][index]; return <article key={factor.name} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><span className="flex items-center gap-2 font-bold text-slate-950"><Icon className="h-4 w-4 text-blue-600" />{factor.name}</span><strong className="text-2xl" style={{ color: scoreColor(factor.score) }}>{factor.score === null ? "—" : Math.round(factor.score)}</strong></div><FactorBar label="Factor score" score={factor.score} /><p className="mt-4 text-sm leading-6 text-slate-600">{factor.score === null ? "This factor is waiting for enough verified source data." : `${factor.name} currently provides ${factor.score >= 65 ? "supportive" : factor.score >= 50 ? "mixed" : "cautious"} evidence for the research thesis. ${factor.detail}`}</p>{factor.score === null && <p className="mt-3 rounded-lg bg-amber-50 p-2 text-xs text-amber-800">Missing inputs · awaiting data</p>}</article>; })}</div>}
 
-      {/* Trendlyne technical context — only when available */}
-      {trendlyneAvailable && (
-        <section className="mt-3">
-          <TrendlyneWidget kind="technicals" symbol={ticker} title="Technical checklist" description="" lazy />
-        </section>
-      )}
+        {activeTab === "fundamentals" && <section><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 9 }, (_, index) => latestMetrics[index] ?? ({ label: ["Revenue Growth", "EPS Growth", "Profit Growth", "Gross Margin", "Operating Margin", "Net Margin", "Current Ratio", "D/E Ratio", "FCF Yield"][index], value: null, unit: "" })).map((metric) => <div key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="text-xs font-semibold text-slate-500">{metric.label}</div><div className="mt-2 text-2xl font-bold text-slate-950">{metric.value === null ? "—" : `${metric.value}${metric.unit}`}</div>{metric.value === null && <div className="mt-1 text-[10px] text-slate-400">Awaiting data</div>}</div>)}</div><p className="mt-4 text-xs text-slate-500">Last updated: {quoteUpdatedAt?.toLocaleString("en-IN") ?? "Awaiting source refresh"} · Public company filings and licensed market data</p></section>}
 
-      {/* News / What changed — capped to 10 most relevant */}
-      <section id="news" className="mt-3 scroll-mt-16">
-        <StockNewsPanel
-          items={newsItems.slice(0, 10).map((n) => ({
-            id: `${ticker}-${n.publishedAt}-${n.headline.slice(0, 40)}`,
-            symbol: ticker, headline: n.headline, publisher: n.publisher,
-            publishedAt: n.publishedAt, summary: n.summary, whyItMatters: n.whyItMatters,
-            url: n.url, category: n.category as "company" | "results" | "brokerage" | "sector" | "corporate_action" | "market",
-          }))}
-          refreshedAt={newsRefreshedAt}
-        />
-      </section>
+        {activeTab === "risk" && <section><div className="mb-5 flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5"><ShieldCheck className="h-8 w-8 text-emerald-600" /><div><div className="text-xs font-bold uppercase text-slate-400">Safety score · higher is safer</div><div className="text-3xl font-black" style={{ color: scoreColor(factorScores[5].score) }}>{factorScores[5].score ?? "—"}</div></div></div><div className="grid gap-4 md:grid-cols-2">{[["Market Risk", "Beta"], ["Financial Leverage", "D/E"], ["Liquidity", "Current ratio"], ["Earnings Quality", "FCF vs earnings"]].map(([name, metric], index) => { const value = latestMetrics.find((item) => item.label.toLowerCase().includes(metric.toLowerCase().split(" ")[0]))?.value ?? null; const level = value === null ? "AWAITING DATA" : index === 0 && value > 2 ? "CRITICAL" : value > 1 ? "HIGH" : "LOW"; return <div key={name} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex justify-between"><strong>{name}</strong><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${level === "CRITICAL" ? "bg-red-50 text-red-700" : level === "HIGH" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>{level}</span></div><div className="mt-4 text-xl font-bold">{value ?? "—"}</div><p className="mt-2 text-xs text-slate-500">{metric} · {value === null ? "Verified input not yet available." : "Review this metric in the context of sector norms."}</p></div>; })}</div></section>}
 
-      {/* Thesis + review + premium CTA */}
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(240px,1fr)]">
-        <main className="min-w-0 space-y-5">
-          {/* Thesis overview — compact */}
-          <section id="thesis" className="scroll-mt-16">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">Research narrative</div>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Thesis overview</h2>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Why it matters</h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{drivers[0]} is the clearest signal supporting further research.</p>
-              </div>
-              <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">What to challenge</h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{risks[0]}. A complete thesis requires evidence that this concern is either contained or actively improving.</p>
-              </div>
-            </div>
-          </section>
+        {activeTab === "technicals" && (trendlyneAvailable || research.priceHistory.length > 1 ? <section><div className="mb-4 flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong>Overall technical signal: <span className="text-blue-600">NEUTRAL</span></strong></div><TechnicalIntelligencePanel input={{ priceHistory: research.priceHistory.map((point) => ({ close: point.close, volume: point.volume ?? undefined })), momentumScore: factorScores[4].score, volatilityScore: factorScores[5].score, priceChangePercent: quote.quote?.changePercent ?? null, rsiValue: null, macdValue: null, distanceFrom52WeekHigh: null }} /></section> : <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center"><Activity className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Technical data not yet available for this stock</h2><p className="mt-2 text-sm text-slate-500">RSI, MACD and ADX cards will appear after the next indicator refresh.</p></div>)}
 
-          {/* Premium deep-dive CTA (replaces former factor intelligence grid) */}
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-center">
-            <Sparkles className="mx-auto h-5 w-5 text-[#2962FF]" />
-            <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">Go deeper with Investor plan</p>
-            <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
-              Unlock score breakdown, detailed factor analysis, trend changes, and advanced comparison.
-            </p>
-            <a href="/?page=pricing" className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#2962FF] px-4 py-2 text-xs font-semibold text-white">
-              Investor ₹99 <ArrowUpRight className="h-3 w-3" />
-            </a>
-          </div>
-        </main>
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Review checklist</h2>
-            <div className="mt-3 space-y-2.5">
-              {["Check the current price", "Challenge the key risk", "Compare a close alternative", "Decide position size externally"].map((item) => (
-                <div key={item} className="flex gap-2 text-sm text-[var(--color-text-secondary)]">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2962FF]" />{item}
-                </div>
-              ))}
-            </div>
-          </div>
-          <button onClick={() => productNavigate("methodology")} className="w-full px-2 py-2 text-left text-xs leading-5 text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]">
-            How to interpret scores →
-          </button>
-        </aside>
+        {activeTab === "peers" && <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><Scale className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Peer comparison is being prepared</h2><p className="mt-2 text-sm text-slate-500">Add this company to Compare to review verified peers side by side.</p><button onClick={() => productNavigate("compare", ticker)} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">Add to compare</button></div>}
+        {activeTab === "history" && <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center"><History className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-4 font-bold">Thesis snapshots will appear here once you start tracking this company.</h2></div>}
       </div>
 
       {/* Research intelligence sections — only when populated, otherwise omitted */}
@@ -344,7 +253,10 @@ export default function StockStoryPageF0(): JSX.Element {
         <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10"><ShoppingBag className="h-3.5 w-3.5" /></span>
         <span>Invest</span>
       </button>
+
+      <SebiDisclaimer variant="footer" className="mt-8 rounded-xl" />
       <InvestHandoffSheet open={investOpen} onClose={() => setInvestOpen(false)} symbol={ticker} companyName={identity.displayName} marketPrice={quote.quote?.price ?? null} />
     </ProductPage>
   </ProductShell>;
+
 }

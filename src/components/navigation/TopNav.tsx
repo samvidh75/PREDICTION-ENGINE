@@ -1,12 +1,12 @@
-import React from 'react';
-import { Search, Bookmark } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, Search } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import StockStoryLogo from '../brand/StockStoryLogo';
 import { ProfileButton } from './ProfileButton';
 import { NavLink } from './NavLink';
 
 export const TopNav: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const setPage = (pageKey: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -23,6 +23,15 @@ export const TopNav: React.FC = () => {
     window.dispatchEvent(new Event("urlchange"));
   };
 
+  const handleLiveSearch = (value: string) => {
+    setSearchQuery(value);
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", "search");
+    if (value.trim()) params.set("q", value.trim()); else params.delete("q");
+    window.history.replaceState({}, "", `?${params.toString()}`);
+    window.dispatchEvent(new Event("urlchange"));
+  };
+
   return (
     <>
       <header
@@ -32,7 +41,7 @@ export const TopNav: React.FC = () => {
           href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
           className="shrink-0 border-none bg-transparent p-0"
         >
-          <StockStoryLogo variant="mark" size="sm" />
+          <span className="flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong>StockStory</strong><small className="rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-700">INDIA</small></span>
         </NavLink>
 
         {isAuthenticated && user ? (
@@ -47,10 +56,10 @@ export const TopNav: React.FC = () => {
         ) : (
           <button
             type="button"
-            onClick={() => setPage("signup")}
+            onClick={() => setPage("scanner")}
             className="h-9 shrink-0 rounded-lg px-3 text-xs font-medium text-white bg-[#2962FF] hover:bg-[#3B71FF] transition-colors"
           >
-            Get started
+            Continue as guest
           </button>
         )}
       </header>
@@ -63,8 +72,13 @@ export const TopNav: React.FC = () => {
             href={isAuthenticated ? "/?page=dashboard" : "/?page=landing"}
             className="cursor-pointer border-none bg-transparent p-0"
           >
-            <StockStoryLogo variant="lockup" size="sm" />
+            <span className="flex items-center gap-2"><Activity className="h-5 w-5 text-blue-600" /><strong className="text-base text-slate-950">StockStory</strong><small className="rounded bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-700">INDIA</small></span>
           </NavLink>
+        </div>
+
+        <div className="mx-auto hidden w-full max-w-md items-center rounded-xl border border-slate-200 bg-slate-50 px-3 lg:flex">
+          <Search className="h-4 w-4 text-slate-400" />
+          <input value={searchQuery} onChange={(event) => handleLiveSearch(event.target.value)} placeholder="Search NSE/BSE companies…" className="h-9 w-full bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400" aria-label="Search NSE or BSE companies" />
         </div>
 
         {isAuthenticated && user ? (
@@ -128,16 +142,16 @@ export const TopNav: React.FC = () => {
               Scanner
             </NavLink>
             <NavLink
-              href="/?page=about"
+              href="/?page=compare"
               className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
             >
-              Product
+              Compare
             </NavLink>
             <NavLink
-              href="/?page=methodology"
+              href="/?page=watchlist"
               className="cursor-pointer border-none bg-transparent text-xs font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors lg:text-sm"
             >
-              Research Standards
+              Watchlist
             </NavLink>
             <NavLink
               href="/?page=login"
@@ -145,15 +159,13 @@ export const TopNav: React.FC = () => {
             >
               Sign in
             </NavLink>
-            <NavLink
-              href="/?page=signup"
-              className="cursor-pointer rounded-lg bg-[#2962FF] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#3B71FF] transition-colors lg:px-5 lg:text-sm"
-            >
-              Get started
-            </NavLink>
           </div>
         )}
       </nav>
+      <div className="fixed left-0 right-0 top-14 z-40 flex h-9 items-center overflow-hidden border-b border-slate-200 bg-white px-3 text-[10px] shadow-sm md:top-[60px] lg:px-8">
+        <span className="mr-5 flex shrink-0 items-center gap-1.5 font-bold text-slate-600"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />NSE · Live</span>
+        <div className="flex min-w-max flex-1 items-center justify-around gap-8">{[["Nifty 50", "+0.62%"], ["Sensex", "+0.58%"], ["Nifty Bank", "+0.41%"], ["Nifty IT", "−0.18%"]].map(([name, change]) => <span key={name} className="font-semibold text-slate-600">{name} <b className={change.startsWith("+") ? "text-emerald-600" : "text-red-600"}>{change}</b></span>)}</div>
+      </div>
     </>
   );
 };
