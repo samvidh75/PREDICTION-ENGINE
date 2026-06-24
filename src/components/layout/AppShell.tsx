@@ -113,7 +113,7 @@ export function MarketTicker() {
         indices.forEach((index, position) => {
           const result = settled[position];
           next[index.symbol] =
-            result.status === "fulfilled"
+            result.status === "fulfilled" && result.value != null
               ? {
                   price: result.value.price ?? null,
                   change: result.value.changePercent ?? null,

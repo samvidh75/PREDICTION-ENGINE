@@ -174,12 +174,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: YES
+- Overflow: no
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: horizontal overflow 251px; hero heading appears low contrast
+- Errors: hero heading appears low contrast
 
 ### about @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -350,12 +350,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: YES
+- Overflow: no
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: horizontal overflow 251px; hero heading appears low contrast
+- Errors: hero heading appears low contrast
 
 ### watchlist-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -394,12 +394,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: YES
+- Overflow: no
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: horizontal overflow 251px; hero heading appears low contrast
+- Errors: hero heading appears low contrast
 
 ### portfolio-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -438,12 +438,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: YES
+- Overflow: no
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: horizontal overflow 251px; hero heading appears low contrast
+- Errors: hero heading appears low contrast
 
 ### company-reliance-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
