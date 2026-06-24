@@ -1,5 +1,4 @@
-@import "./design-tokens.css";
-@import "./tokens.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,24 +6,30 @@
 
 @layer base {
   :root {
-    --apple-blue: #0066cc;
-    --apple-blue-dark: #2997ff;
-    --apple-ink: #1d1d1f;
-    --apple-parchment: #f5f5f7;
+    --stripe-primary: #533afd;
+    --stripe-ink: #0d253d;
+    --stripe-canvas-soft: #f6f9fc;
   }
   * { box-sizing: border-box; }
-  html { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; }
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01" on;
+  }
   body {
-    background: #f5f5f7;
-    color: #1d1d1f;
-    font-size: 17px;
-    line-height: 1.47;
-    letter-spacing: -0.374px;
+    background: #ffffff;
+    color: #0d253d;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.4;
+    letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
-  ::selection { background: #0066cc; color: white; }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" !important;
+  }
+  ::selection { background: #533afd; color: white; }
 }
 
 @layer utilities {
