@@ -1,0 +1,11 @@
+import { Menu, Search } from "lucide-react";
+import Logo from "../brand/Logo";
+import { MiniSparkline } from "../ui/ResearchUI";
+import { productNavigate } from "../product/ProductUI";
+
+const indices=[{name:"NIFTY 50",value:"22,502.35",change:"+1.15%"},{name:"SENSEX",value:"74,115.17",change:"+1.10%"},{name:"BANK NIFTY",value:"48,753.30",change:"+1.35%"},{name:"NIFTY IT",value:"35,392.20",change:"+1.80%"}];
+const spark=[12,14,13,16,12,11,15,17,16,20,18,22,21,24,23,30];
+export function TopNav({active=""}:{active?:string}){return <header className="topnav"><button className="logo-button" onClick={()=>productNavigate("landing")}><Logo/></button><nav>{["Research","Scanner","Compare","Watchlist","Pricing","Learn"].map(x=><button className={active===x.toLowerCase()?"active":""} key={x} onClick={()=>productNavigate(x==="Research"?"landing":x.toLowerCase())}>{x}{(x==="Research"||x==="Learn")&&<small>⌄</small>}</button>)}</nav><div className="nav-actions"><button className="icon-btn" aria-label="Search"><Search size={16}/></button><button className="sign">Sign in</button><button className="primary">Start Free Trial ↗</button><button className="hamb"><Menu size={20}/></button></div></header>}
+function marketOpen(){const parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Kolkata",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());const day=parts.find(x=>x.type==="weekday")?.value??"";const h=Number(parts.find(x=>x.type==="hour")?.value??0),m=Number(parts.find(x=>x.type==="minute")?.value??0),t=h*60+m;return !["Sat","Sun"].includes(day)&&t>=555&&t<=930}
+export function MarketTicker(){const open=marketOpen();return <div className="ticker"><div className="ticker-scroll">{indices.map(i=><div className="ticker-cell" key={i.name}><div><small>{i.name}</small><strong className="num">{i.value}</strong></div><em>{i.change}</em><MiniSparkline data={spark}/></div>)}<div className="market-status"><div><i className={open?"pulse":""}/><b>{open?"Market is Open":"Market Closed"}</b></div><small>{open?"Closes 3:30 PM":"Opens 9:15 AM"}</small></div></div></div>}
+export default function AppShell({children,active}:{children:React.ReactNode;active?:string}){return <div className="app-shell"><TopNav active={active}/><MarketTicker/><main>{children}</main></div>}
