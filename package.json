@@ -35,6 +35,8 @@
     "test:unit:ci": "node scripts/run-vitest-ci.mjs",
     "test:integration:sqlite": "cross-env NODE_ENV=test DB_ADAPTER=sqlite ALLOW_SQLITE_FALLBACK=true SQLITE_DB_PATH=tmp/integration-sqlite.db vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test tests/playwright/f3-product-regression.spec.ts",
+    "test:visual:stockstory": "playwright test tests/playwright/stockstory-reference-visual.spec.ts",
+    "test:interactive:stockstory": "playwright test tests/playwright/stockstory-interactive-states.spec.ts",
     "test:e2e:uiux": "vitest run tests/e2e/uiux",
     "qa:screenshots": "npx tsx scripts/capture-ui-screenshots.ts",
     "test:integration:postgres": "cross-env NODE_ENV=test DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run --config vitest.integration.config.ts",

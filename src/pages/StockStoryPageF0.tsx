@@ -11,7 +11,7 @@ import {
   isTracked,
   removeTrackedCompany,
 } from "../lib/track/trackStore";
-import { InvestmentReviewSheet } from "../premium/PremiumComponents";
+import { InvestmentReviewSheet, MobileProductNav } from "../premium/PremiumComponents";
 
 const fallbackTicker = "TCS",
   factorNames = ["quality", "growth", "valuation", "risk", "momentum"];
@@ -395,6 +395,7 @@ export default function StockStoryPageF0() {
         thesis={pred?.explanation}
         risks={pred?.keyRisks ?? []}
       />
+      <MobileProductNav activePage="research" />
     </AppShell>
   );
 }
