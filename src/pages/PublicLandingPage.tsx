@@ -8,6 +8,7 @@ import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
 import { shareStock } from "../lib/referral";
 import { trackUserAction } from "../lib/analytics";
+import { PricingModal } from "../components/premium/PremiumGate";
 import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const deltas = [3,18,-5,12,-8,22,-3,15,6,-4,19,-7,11,-2,16,4,-9,23,-1,14];
@@ -44,6 +45,7 @@ export default function PublicLandingPage() {
   const [tradeOpen, setTradeOpen] = useState(false);
   const [tradeSymbol, setTradeSymbol] = useState("");
   const [tradePrice, setTradePrice] = useState<number | null>(null);
+  const [pricingOpen, setPricingOpen] = useState(false);
   const openTrade = (sym: string, pr: number | null) => { setTradeSymbol(sym); setTradePrice(pr); setTradeOpen(true); };
 
   const prices = data?.historical?.closes ?? [];
@@ -283,6 +285,44 @@ export default function PublicLandingPage() {
         </div>
       </div>
 
+      {/* Premium Band */}
+      <div className="bg-white border-b border-[#e3e8ee]">
+        <div className="max-w-[1200px] mx-auto px-6 py-[64px] text-center">
+          <div className="inline-flex items-center gap-1.5 bg-[#b9b9f9] text-[#4434d4] text-[10px] font-[400] tracking-[0.1px] px-3 py-1 rounded-[9999px] mb-4 uppercase">
+            <Sparkles size={12} /> Premium
+          </div>
+          <h2 className="text-[32px] font-[300] text-[#0d253d] leading-[1.1] tracking-[-0.64px] mb-3">
+            Supercharge your research
+          </h2>
+          <p className="text-[15px] font-[300] text-[#64748d] mb-8 max-w-[500px] mx-auto">
+            Unlock unlimited research, AI theses, PDF reports, portfolio tracking, and more.
+          </p>
+          <div className="grid grid-cols-3 gap-4 max-w-[800px] mx-auto mb-8">
+            {[
+              ['Unlimited Research', 'No daily limits on stock research views', 'Brain'],
+              ['AI Theses', 'Full AI investment thesis for every stock', 'Sparkles'],
+              ['PDF Reports', 'Downloadable one-page research reports', 'Download'],
+              ['Portfolio Tracking', 'Track your holdings with analytics', 'TrendingUp'],
+              ['Email Alerts', 'Get notified on score changes', 'Bell'],
+              ['Priority Data', '5-min refresh frequency', 'Clock'],
+            ].map(([title, desc, icon]) => (
+              <div key={title} className="text-left p-3">
+                <div className="text-[20px] mb-1">{icon === 'Brain' ? '🧠' : icon === 'Sparkles' ? '✨' : icon === 'Download' ? '📥' : icon === 'TrendingUp' ? '📈' : icon === 'Bell' ? '🔔' : '⏱'}</div>
+                <div className="text-[13px] font-[400] text-[#0d253d] mb-0.5">{title}</div>
+                <div className="text-[10px] text-[#64748d]">{desc}</div>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <button onClick={() => setPricingOpen(true)}
+              className="bg-[#533afd] text-white text-[16px] font-[400] rounded-[9999px] px-[20px] py-[10px] hover:bg-[#4434d4] transition-colors active:scale-[0.97]">
+              Upgrade to Premium — ₹199/mo
+            </button>
+            <span className="text-[11px] text-[#64748d]">or ₹9,999/year (save 58%)</span>
+          </div>
+        </div>
+      </div>
+
       {/* Canvas Band — Infrastructure */}
       <div className="bg-white">
         <div className="max-w-[1200px] mx-auto px-6 py-[64px]">
@@ -320,6 +360,7 @@ export default function PublicLandingPage() {
 
       <TradePanel open={tradeOpen} onClose={() => setTradeOpen(false)} symbol={tradeSymbol||"HDFCBANK"}
         companyName={data?.price?.companyName ?? "HDFC Bank Ltd."} price={tradePrice} score={78} />
+      {pricingOpen && <PricingModal onClose={() => setPricingOpen(false)} />}
     </AppShell>
   );
 }

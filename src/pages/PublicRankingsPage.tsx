@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Bell, ChevronUp, Search, Sparkles } from "lucide-react";
+import { Bell, ChevronUp, Crown, Search, Sparkles } from "lucide-react";
 import AppShell from "../components/layout/AppShell";
 import { getScoreColor, getSignalFromScore, MiniSparkline, ConfidenceRing } from "../components/ui/ScoreRing";
 import { runCompanyDataPipeline, PipelineResult } from "../services/data/CompanyDataPipeline";
 import { fChange, fPrice } from "../lib/format";
 import { productNavigate } from "../components/product/ProductUI";
+import { enqueuePrefetch } from "../lib/cache";
+import { isPremium } from "../lib/subscription";
+import PremiumGate from "../components/premium/PremiumGate";
 
 const symbols = ["TCS","HDFCBANK","RELIANCE","INFY","ICICIBANK","SUNPHARMA","BHARTIARTL","ITC","LT","SBIN"];
 
@@ -69,6 +72,8 @@ export default function PublicRankingsPage() {
   const [query, setQuery] = useState("");
   useEffect(() => {
     let active = true;
+    // Prefetch top stocks for instant loading
+    enqueuePrefetch(symbols);
     Promise.all(symbols.map(async s => [s, await runCompanyDataPipeline(s)] as const))
       .then(items => { if (active) setRows(Object.fromEntries(items)); }).catch(() => undefined);
     return () => { active = false; };
@@ -175,6 +180,11 @@ export default function PublicRankingsPage() {
             <div className="flex items-center justify-between mb-1"><span className="text-[11px] font-[400] text-[#0d253d]">Make it Yours</span><Bell size={12} className="text-[#64748d]" /></div>
             <p className="text-[9px] text-[#64748d] mb-2">Save scan & get alerts.</p>
             <button className="w-full h-[28px] border border-[#e3e8ee] rounded-[8px] text-[10px] text-[#64748d] active:scale-[0.97]">🗂 Save This Scan</button>
+          </div>
+          <div className="mt-3 p-3 bg-[#f6f9fc] rounded-[8px] border border-[#e3e8ee]">
+            <div className="flex items-center gap-1.5 mb-1"><Crown size={12} className="text-[#533afd]" /><span className="text-[10px] font-[400] text-[#0d253d]">Premium</span></div>
+            <p className="text-[9px] text-[#64748d] mb-2">Unlock full scanner with all Nifty 50 + sector stocks.</p>
+            <button onClick={() => productNavigate("pricing")} className="text-[9px] text-[#533afd] font-[400]">Learn more →</button>
           </div>
         </div>
       </div>

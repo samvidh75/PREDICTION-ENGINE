@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { getCache, setCache } from "../lib/cache";
 
 export interface StockData {
   symbol: string;
@@ -49,28 +50,40 @@ export interface StockData {
 
 export function useStockData(symbol: string | null) {
   const [data, setData] = useState<StockData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStock = useCallback(async () => {
     if (!symbol) return;
-    setLoading(true);
+
+    // Cache-first: try to load from cache immediately
+    const cacheKey = `stock_${symbol}`;
+    const cached = getCache<StockData>(cacheKey);
+    if (cached.data) {
+      setData(cached.data);
+      setLoading(false);
+      // If stale, refresh in background
+      if (!cached.isStale) return;
+    }
+
+    setLoading(!cached.data); // Only show loading if no cached data
     try {
       const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const nextData = (await response.json()) as StockData;
       setData(nextData);
+      setCache(cacheKey, nextData);
       setError(null);
-    } catch (nextError: unknown) {
-      setError(nextError instanceof Error ? nextError.message : "Failed to load stock data");
-    } finally {
       setLoading(false);
+    } catch (nextError: unknown) {
+      if (!cached.data) {
+        setError(nextError instanceof Error ? nextError.message : "Failed to load stock data");
+        setLoading(false);
+      }
     }
   }, [symbol]);
 
-  useEffect(() => {
-    void fetchStock();
-  }, [fetchStock]);
+  useEffect(() => { void fetchStock(); }, [fetchStock]);
 
   return { data, loading, error, refetch: fetchStock };
 }
