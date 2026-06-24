@@ -100,7 +100,7 @@ export default function ScannerPage() {
   const [results, setResults] = useState<ScannerResultItem[]>([]);
   const [allEntries, setAllEntries] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("large_cap_health");
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const [classificationFilter, setClassificationFilter] = useState("All");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
@@ -169,7 +169,7 @@ export default function ScannerPage() {
   }, [registryFallback]);
 
   useEffect(() => {
-    if (activeCategory) {
+    if (activeCategory && pipelineResults.size === 0 && !pipeLoading) {
       const cat = SCANNER_CATEGORIES.find((c) => c.id === activeCategory);
       if (cat && cat.filterPreset) {
         fetchScanner(cat.filterPreset);
@@ -179,7 +179,7 @@ export default function ScannerPage() {
     if (!activeCategory) {
       setLoading(false);
     }
-  }, [activeCategory, fetchScanner]);
+  }, [activeCategory, fetchScanner, pipelineResults.size, pipeLoading]);
 
   const runBatchPipeline = useCallback(async (catId: string) => {
     if (pipelineRef.current) return;
