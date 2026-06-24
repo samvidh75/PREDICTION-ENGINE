@@ -4,7 +4,7 @@
 
 | Item | Before | After |
 |---|---|---|
-| Baseline commit | `6fea3bc1f` | `(set on commit)` |
+| Baseline commit | `6fea3bc1f` | `ef124f9f0` |
 | Branch | `main` | `main` |
 | Frontend build | Pass | Pass (1.16s) |
 | Typecheck (all) | Pass | Pass |
