@@ -19,6 +19,30 @@ import { runCompanyDataPipeline } from "../../services/data/CompanyDataPipeline"
 import { NIFTY50_SYMBOLS } from "../../services/universe/StockUniverse";
 import { fPrice, fChange } from "../../lib/format";
 
+type PipelineRow = {
+  symbol: string; companyName: string; sector: string | null;
+  score: number | null; classification: UnifiedClassification;
+  price: string | null; change: string | null;
+  qualityValue: number | null; growthValue: number | null; momentumValue: number | null;
+};
+
+const DEFAULT_SYMBOLS = NIFTY50_SYMBOLS.slice(0, 10);
+
+function ScoreColorDot({ score }: { score: number | null }) {
+  if (score === null) return <span className="h-2 w-2 rounded-full bg-[var(--c-ink-disabled)]" />;
+  const c = score >= 75 ? "var(--c-score-high)" : score >= 55 ? "var(--c-score-mid)" : score >= 35 ? "var(--c-score-low)" : "var(--c-score-poor)";
+  return <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c }} />;
+}
+
+function rowClassification(score: number | null): UnifiedClassification {
+  if (score === null) return "INSUFFICIENT_DATA";
+  if (score >= 80) return "EXCELLENT";
+  if (score >= 65) return "HEALTHY";
+  if (score >= 50) return "STABLE";
+  if (score >= 35) return "WEAKENING";
+  return "AT_RISK";
+}
+
 const categoryIcon = (id: ScannerCategory) => {
   switch (id) {
     case "large_cap_health": return Shield;
@@ -107,10 +131,11 @@ export default function ScannerPage() {
   const [sortValue, setSortValue] = useState("score-desc");
   const [scannerMessage, setScannerMessage] = useState<string | null>(null);
 
-  const [pipelineResults, setPipelineResults] = useState<Map<string, { symbol: string; companyName: string; score: number; classification: UnifiedClassification; price: string; change: string; qualityValue: number | null; growthValue: number | null; momentumValue: number | null }>>(new Map());
+  const [pipelineResults, setPipelineResults] = useState<Map<string, PipelineRow>>(new Map());
   const [skeletonCount, setSkeletonCount] = useState(0);
   const [pipeLoading, setPipeLoading] = useState(false);
   const pipelineRef = useRef(false);
+  const defaultLoadedRef = useRef(false);
 
   const [filters, setFilters] = useState({
     scoreRange: "All",
@@ -191,7 +216,7 @@ export default function ScannerPage() {
 
     const symbols = NIFTY50_SYMBOLS.slice(0, 15);
     const isLargeCap = catId === "large_cap_health";
-    const resultsMap = new Map<string, { symbol: string; companyName: string; score: number; classification: UnifiedClassification; price: string; change: string; qualityValue: number | null; growthValue: number | null; momentumValue: number | null }>();
+    const resultsMap = new Map<string, PipelineRow>();
 
     for (const sym of symbols) {
       try {
@@ -209,6 +234,7 @@ export default function ScannerPage() {
         resultsMap.set(sym, {
           symbol: sym,
           companyName: p.companyName ?? sym,
+          sector: null,
           score,
           classification: cls,
           price: fPrice(p.price.current),
@@ -246,19 +272,72 @@ export default function ScannerPage() {
     runBatchPipeline(catId);
   }, [activeCategory, isPremium, runBatchPipeline]);
 
+  const loadDefaultTen = useCallback(async () => {
+    if (defaultLoadedRef.current) return;
+    defaultLoadedRef.current = true;
+    setPipeLoading(true);
+    setSkeletonCount(10);
+    setPipelineResults(new Map());
+
+    const resultsMap = new Map<string, PipelineRow>();
+    for (const sym of DEFAULT_SYMBOLS) {
+      try {
+        const p = await runCompanyDataPipeline(sym);
+        const score = p.prediction?.rankingScore ?? p.prediction?.healthScore ?? null;
+        const cls = rowClassification(score);
+        const qv = p.prediction?.factorScores?.find(f => f.group === 'quality')?.value ?? null;
+        const gv = p.prediction?.factorScores?.find(f => f.group === 'growth')?.value ?? null;
+        const mv = p.prediction?.factorScores?.find(f => f.group === 'momentum')?.value ?? null;
+        resultsMap.set(sym, {
+          symbol: sym,
+          companyName: p.companyName ?? sym,
+          sector: null,
+          score,
+          classification: cls,
+          price: p.price.current !== null ? fPrice(p.price.current) : null,
+          change: p.price.change !== null ? fChange(p.price.change) : null,
+          qualityValue: qv,
+          growthValue: gv,
+          momentumValue: mv,
+        });
+      } catch {
+        // skip failing symbols
+      }
+      setPipelineResults(new Map(resultsMap));
+      setSkeletonCount(Math.max(0, 10 - resultsMap.size));
+    }
+    setSkeletonCount(0);
+    setPipeLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (!activeCategory && !defaultLoadedRef.current && pipelineResults.size === 0 && !pipeLoading && allEntries.length === 0) {
+      loadDefaultTen();
+    }
+  }, [activeCategory, loadDefaultTen, pipelineResults.size, pipeLoading, allEntries.length]);
+
   const handleQuerySubmit = useCallback(() => {
     const trimmed = query.trim().toLowerCase();
+    if (!trimmed && !activeCategory) {
+      // Refresh: reload default 10
+      defaultLoadedRef.current = false;
+      setPipelineResults(new Map());
+      loadDefaultTen();
+      return;
+    }
     if (!trimmed) {
       setResults(allEntries);
       return;
     }
-    const filtered = allEntries.filter((e) =>
-      e.companyName?.toLowerCase().includes(trimmed) ||
-      e.symbol?.toLowerCase().includes(trimmed) ||
-      e.sector?.toLowerCase().includes(trimmed)
-    );
-    setResults(filtered);
-  }, [query, allEntries]);
+    if (activeCategory) {
+      const filtered = allEntries.filter((e) =>
+        e.companyName?.toLowerCase().includes(trimmed) ||
+        e.symbol?.toLowerCase().includes(trimmed) ||
+        e.sector?.toLowerCase().includes(trimmed)
+      );
+      setResults(filtered);
+    }
+  }, [query, allEntries, activeCategory, loadDefaultTen]);
 
   const hasRiskFlag = useCallback((entry: ScannerResultItem): boolean => {
     return entry.riskMarker !== null && entry.riskMarker !== "Risk review normal";
@@ -313,6 +392,18 @@ export default function ScannerPage() {
     });
     return sorted;
   }, [filteredResults, sortValue]);
+
+  const filteredRows = useMemo(() => {
+    const arr = Array.from(pipelineResults.values());
+    if (classificationFilter === "All") return arr;
+    return arr.filter((r) => {
+      const s = r.score ?? -1;
+      if (classificationFilter === "Excellent") return s >= 80;
+      if (classificationFilter === "Healthy") return s >= 65 && s < 80;
+      if (classificationFilter === "Stable") return s >= 50 && s < 65;
+      return s >= 0 && s < 50;
+    });
+  }, [pipelineResults, classificationFilter]);
 
   const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
   const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
@@ -386,7 +477,7 @@ export default function ScannerPage() {
               onClick={handleQuerySubmit}
               className="h-9 shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-[18px] text-[13px] font-semibold text-white"
             >
-              Run scanner
+              {query ? "Run scanner" : "Refresh"}
             </button>
           </div>
 
@@ -527,48 +618,62 @@ export default function ScannerPage() {
 
           {/* Pipeline skeleton loading */}
           {pipeLoading && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading pipeline results">
+            <div className="space-y-0 rounded-[var(--r-lg)] border border-[var(--c-border)] overflow-hidden" role="status" aria-label="Loading pipeline results">
               {Array.from({ length: Math.max(1, skeletonCount) }, (_, index) => (
-                <div key={`skel-${index}`} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5">
-                  <div className="flex items-start justify-between">
-                    <div><div className="h-4 w-16 rounded bg-slate-100" /><div className="mt-2 h-5 w-32 rounded bg-slate-100" /></div>
-                    <div className="h-10 w-10 rounded-full bg-slate-100" />
+                <div key={`skel-${index}`} className="flex items-center gap-4 px-5 py-4 border-b border-[var(--c-border)] animate-pulse bg-white">
+                  <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="h-3 w-20 rounded bg-slate-100" />
+                    <div className="h-3 w-32 rounded bg-slate-100" />
+                    <div className="flex gap-2"><div className="h-1.5 w-12 rounded bg-slate-100" /><div className="h-1.5 w-12 rounded bg-slate-100" /><div className="h-1.5 w-12 rounded bg-slate-100" /></div>
                   </div>
-                  <div className="mt-4 h-3 w-20 rounded bg-slate-100" />
-                  <div className="mt-3 flex gap-2"><div className="h-2 flex-1 rounded bg-slate-100" /><div className="h-2 flex-1 rounded bg-slate-100" /><div className="h-2 flex-1 rounded bg-slate-100" /></div>
-                  <div className="mt-4 h-10 w-full rounded bg-slate-100" />
+                  <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0" />
                 </div>
               ))}
             </div>
           )}
 
-          {/* Pipeline results */}
+          {/* Pipeline results — full-width row layout */}
           {!pipeLoading && pipelineResults.size > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {Array.from(pipelineResults.values()).map((pr) => (
-                <div key={pr.symbol} className="group relative min-h-[200px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition duration-300 hover:-translate-y-1 cursor-pointer" onClick={() => productNavigate("stock", pr.symbol)}>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="font-mono text-[13px] font-semibold text-[var(--color-text-muted)] tracking-[.08em]">{pr.symbol}</span>
-                      <h3 className="mt-1 truncate text-[17px] font-semibold tracking-tight text-[var(--color-text-primary)]">{pr.companyName}</h3>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-sm font-semibold text-[var(--color-text-primary)]">{pr.price}</span>
-                        <span className="text-xs text-[var(--color-text-secondary)]">{pr.change}</span>
-                      </div>
+            <div className="rounded-[var(--r-lg)] border border-[var(--c-border)] bg-white overflow-hidden">
+              {filteredRows.length === 0 && pipelineResults.size > 0 && (
+                <div className="px-5 py-6 text-center text-[13px] text-[var(--c-ink-muted)]">No results match the current filter.</div>
+              )}
+              {filteredRows.map((pr, idx) => (
+                <div
+                  key={pr.symbol}
+                  onClick={() => productNavigate("stock", pr.symbol)}
+                  className={`flex items-center gap-3 px-5 py-4 cursor-pointer transition-colors hover:bg-[var(--c-surface-raised)] ${idx < filteredRows.length - 1 ? "border-b border-[var(--c-border)]" : ""}`}
+                >
+                  <ScoreRing score={pr.score} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[14px] font-bold text-[var(--c-ink)]">{pr.symbol}</span>
+                      <span className="truncate text-[13px] text-[var(--c-ink-secondary)]">{pr.companyName}</span>
+                      <span className="ml-auto shrink-0 rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-[7px] py-[2px] text-[11px] text-[var(--c-ink-muted)]">Nifty 50</span>
                     </div>
-                    <ScoreRing score={pr.score} size="sm" />
-                  </div>
-                  <div className="mt-3">
-                    <ClassificationBadge classification={pr.classification} />
-                  </div>
-                  {pr.qualityValue !== null && pr.growthValue !== null && (
-                    <div className="mt-4 space-y-2">
-                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Quality</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.qualityValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pr.qualityValue}%` }} /></div></div>
-                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Growth</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.growthValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${pr.growthValue}%` }} /></div></div>
-                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Momentum</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.momentumValue ?? '—'}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-slate-500 transition-all" style={{ width: `${pr.momentumValue ?? 0}%` }} /></div></div>
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-[14px] font-semibold tabular-nums text-[var(--c-ink)]">{pr.price ?? <span className="text-[var(--c-ink-disabled)]">—</span>}</span>
+                      <span className={`text-[12px] font-medium ${pr.change?.startsWith("+") ? "text-[var(--c-positive)]" : pr.change?.startsWith("−") ? "text-[var(--c-negative)]" : "text-[var(--c-ink-muted)]"}`}>{pr.change ?? "—"}</span>
+                      <ClassificationBadge classification={pr.classification} size="sm" />
                     </div>
-                  )}
-                  <div className="mt-4 text-right"><span className="text-xs font-semibold text-[#2962FF]">Research →</span></div>
+                    <div className="mt-2 flex items-center gap-4">
+                      {["Quality", "Growth", "Momentum"].map((label) => {
+                        const val = label === "Quality" ? pr.qualityValue : label === "Growth" ? pr.growthValue : pr.momentumValue;
+                        const pct = val !== null ? Math.max(0, Math.min(100, val)) : 0;
+                        const c = val !== null ? (val >= 75 ? "var(--c-score-high)" : val >= 55 ? "var(--c-score-mid)" : val >= 35 ? "var(--c-score-low)" : "var(--c-score-poor)") : "var(--c-ink-disabled)";
+                        return (
+                          <div key={label} className="flex items-center gap-1.5">
+                            <span className="text-[10px] text-[var(--c-ink-muted)]">{label}</span>
+                            <div className="h-1 w-[60px] rounded-full bg-[var(--c-border)] overflow-hidden">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: c }} />
+                            </div>
+                            <span className="text-[11px] font-semibold tabular-nums" style={{ color: c }}>{val !== null ? Math.round(val) : "—"}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -593,7 +698,7 @@ export default function ScannerPage() {
             </ProductPanel>
           )}
 
-          {!loading && !activeCategory && sortedResults.length === 0 && (
+          {!loading && !pipeLoading && !activeCategory && pipelineResults.size === 0 && sortedResults.length === 0 && (
             <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
               <BarChart3 className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
               <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Select a category to begin</h3>
