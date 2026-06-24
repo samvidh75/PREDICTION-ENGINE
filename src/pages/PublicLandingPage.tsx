@@ -1,11 +1,268 @@
-import { ArrowUpRight, BarChart3, Check, Database, Search, Shield, Sparkles, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  BarChart3,
+  Check,
+  Database,
+  Search,
+  Shield,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import AppShell from "../components/layout/AppShell";
 import { Card, MiniSparkline, ScoreRing } from "../components/ui/ResearchUI";
 import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
 import type { UnifiedFactorScore } from "../prediction-engine/types";
 
-const factorNames=["quality","growth","valuation","risk","momentum"];
-const chart=[22,26,24,29,27,35,39,34,42,46,51,48,57,60,55,63,67,65,74,78,73,80];
-function FactorRows({factors}:{factors:UnifiedFactorScore[]}){return <div className="factor-rows">{factorNames.map(name=>{const f=factors.find(x=>x.group===name);const v=f?.value??null;return <div key={name}><span>{name[0].toUpperCase()+name.slice(1)}</span><i><b style={{width:`${v??0}%`}}/></i><strong>{v===null?"—":Math.round(v)}</strong></div>})}</div>}
-export default function PublicLandingPage(){const {pipeline,loading}=useStockData("HDFCBANK");const pred=pipeline?.prediction;const score=pred?.rankingScore??null;return <AppShell active="research"><div className="home page-wrap"><section className="hero-grid"><div className="hero-copy"><span className="ai-pill"><Sparkles size={13}/> AI-POWERED STOCK INTELLIGENCE</span><h1>Understand<br/>businesses.<br/>Invest better.</h1><p>StockStory India uses AI and deep financial research to help you understand businesses before you buy stocks.</p><div className="hero-actions"><button className="primary big">Start Free Trial <ArrowUpRight size={16}/></button><button className="secondary big" onClick={()=>productNavigate("scanner")}>Explore Scanner <Search size={16}/></button></div><div className="trust-row">{["No credit card required","Cancel anytime, no lock-ins","Trusted by 2M+ investors"].map(x=><span key={x}><Check size={13}/>{x}</span>)}</div></div><div className="hero-middle">{loading?<Card className="skeleton"/>:<><Card className="stock-preview"><header><div className="avatar hdfc">H</div><div><b>HDFCBANK</b><small>{pipeline?.companyName??"HDFC Bank Ltd."}</small></div><span>♡</span></header><div className="score-cluster"><ScoreRing score={score} size={106}/><FactorRows factors={pred?.factorScores??[]}/></div><button onClick={()=>productNavigate("stock","HDFCBANK")}>View Full Research →</button></Card><Card className="ai-insight"><header><b>✦ AI Insight</b><small>Generated today</small></header><h3>HDFCBANK: Research signals at a glance</h3><p>{pred?.explanation??"AI thesis is being generated for this company. Check back shortly."}</p><footer><span>AI Confidence: High</span><button>Read Full Thesis →</button></footer></Card></>}</div><div className="hero-right"><Card><header className="card-title"><b>Market Overview</b><span>• Live</span><small>1D　1W　1M　YTD</small></header><div className="large-chart"><MiniSparkline data={chart} width={350} height={120}/></div><div className="market-grid"><div><small>Advances</small><b className="green">1,856</b></div><div><small>Declines</small><b className="red">1,089</b></div><div><small>Unchanged</small><b>136</b></div><div><small>Market Breadth</small><b className="green">+767</b></div></div></Card><Card><header className="card-title"><b>5Y Performance</b><small>vs NIFTY 50</small></header><div className="chart-legend"><span>━ HDFCBANK <b>+221.4%</b></span><span>━ NIFTY 50 +98.7%</span></div><div className="large-chart"><MiniSparkline data={chart.map((x,i)=>x+i*3)} width={350} height={115}/></div></Card></div></section><section className="research-band"><h2>Research every Nifty 50 company</h2><p>5 proprietary scores. 1000+ data points. Updated every single day.</p><div className="research-cards">{factorNames.map((name,i)=><div key={name}><span className="factor-icon">{["◇","↗","◎","⬡","ϟ"][i]}</span><section><b>{name[0].toUpperCase()+name.slice(1)}</b><strong>{[92,85,78,82,87][i]}<small>/100</small></strong><p>{["High returns, strong balance sheet","Sustainable earnings growth","Attractive valuation vs value","Low financial risk, stable model","Strong price momentum"][i]}</p></section><MiniSparkline data={chart.slice(i,i+12)} width={55} height={28}/></div>)}</div></section><section className="proof"><div><Users/><p>Trusted by millions of investors across India</p><strong>2M+ <small>Active Investors</small></strong><strong>10M+ <small>Research Reports</small></strong><strong>250M+ <small>Data Points Daily</small></strong></div><blockquote>“ StockStory has changed the way I research companies. The insights are deeper, faster, and incredibly reliable.”<small>— Verified User ✓</small></blockquote><div className="award">India's Highest Rated<br/>Stock Research Platform<strong>★★★★★</strong><small>4.8/5 from 50K+ reviews</small></div></section><section className="infra"><h3>Built on best-in-class data and AI infrastructure</h3>{[[Database,"1000+ Data Sources"],[Sparkles,"AI Research Engine"],[Users,"Human + AI Quality"],[Shield,"Enterprise Grade Security"],[BarChart3,"99.9% Uptime"]].map(([Icon,label])=><div key={String(label)}>{typeof Icon!=="string"&&<Icon size={18}/>}<b>{String(label)}</b><small>Reliable, verified and always on.</small></div>)}</section></div></AppShell>}
+const factorNames = ["quality", "growth", "valuation", "risk", "momentum"];
+const chart = [
+  22, 26, 24, 29, 27, 35, 39, 34, 42, 46, 51, 48, 57, 60, 55, 63, 67, 65, 74,
+  78, 73, 80,
+];
+function FactorRows({ factors }: { factors: UnifiedFactorScore[] }) {
+  return (
+    <div className="factor-rows">
+      {factorNames.map((name) => {
+        const f = factors.find((x) => x.group === name);
+        const v = f?.value ?? null;
+        return (
+          <div key={name}>
+            <span>{name[0].toUpperCase() + name.slice(1)}</span>
+            <i>
+              <b style={{ width: `${v ?? 0}%` }} />
+            </i>
+            <strong>{v === null ? "—" : Math.round(v)}</strong>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+export default function PublicLandingPage() {
+  const { pipeline, loading } = useStockData("HDFCBANK");
+  const pred = pipeline?.prediction;
+  const score = pred?.rankingScore ?? null;
+  return (
+    <AppShell active="research">
+      <div className="home page-wrap">
+        <section className="hero-grid">
+          <div className="hero-copy">
+            <span className="ai-pill">
+              <Sparkles size={13} /> AI-POWERED STOCK INTELLIGENCE
+            </span>
+            <h1>
+              Understand
+              <br />
+              businesses.
+              <br />
+              Invest better.
+            </h1>
+            <p>
+              StockStory India uses AI and deep financial research to help you
+              understand businesses before you buy stocks.
+            </p>
+            <div className="hero-actions">
+              <button
+                className="primary big"
+                onClick={() => productNavigate("signup")}
+              >
+                Start Free Trial <ArrowUpRight size={16} />
+              </button>
+              <button
+                className="secondary big"
+                onClick={() => productNavigate("scanner")}
+              >
+                Explore Scanner <Search size={16} />
+              </button>
+            </div>
+            <div className="trust-row">
+              {[
+                "No credit card required",
+                "Cancel anytime, no lock-ins",
+                "Trusted by 2M+ investors",
+              ].map((x) => (
+                <span key={x}>
+                  <Check size={13} />
+                  {x}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="hero-middle">
+            {loading ? (
+              <Card className="skeleton" />
+            ) : (
+              <>
+                <Card className="stock-preview">
+                  <header>
+                    <div className="avatar hdfc">H</div>
+                    <div>
+                      <b>HDFCBANK</b>
+                      <small>{pipeline?.companyName ?? "HDFC Bank Ltd."}</small>
+                    </div>
+                    <span>♡</span>
+                  </header>
+                  <div className="score-cluster">
+                    <ScoreRing score={score} size={106} />
+                    <FactorRows factors={pred?.factorScores ?? []} />
+                  </div>
+                  <button onClick={() => productNavigate("stock", "HDFCBANK")}>
+                    View Full Research →
+                  </button>
+                </Card>
+                <Card className="ai-insight">
+                  <header>
+                    <b>✦ AI Insight</b>
+                    <small>Generated today</small>
+                  </header>
+                  <h3>HDFCBANK: Research signals at a glance</h3>
+                  <p>
+                    {pred?.explanation ??
+                      "AI thesis is being generated for this company. Check back shortly."}
+                  </p>
+                  <footer>
+                    <span>AI Confidence: High</span>
+                    <button
+                      onClick={() => productNavigate("stock", "HDFCBANK")}
+                    >
+                      Read Full Thesis →
+                    </button>
+                  </footer>
+                </Card>
+              </>
+            )}
+          </div>
+          <div className="hero-right">
+            <Card>
+              <header className="card-title">
+                <b>Market Overview</b>
+                <span>• Live</span>
+                <small>1D　1W　1M　YTD</small>
+              </header>
+              <div className="large-chart">
+                <MiniSparkline data={chart} width={350} height={120} />
+              </div>
+              <div className="market-grid">
+                <div>
+                  <small>Advances</small>
+                  <b className="green">1,856</b>
+                </div>
+                <div>
+                  <small>Declines</small>
+                  <b className="red">1,089</b>
+                </div>
+                <div>
+                  <small>Unchanged</small>
+                  <b>136</b>
+                </div>
+                <div>
+                  <small>Market Breadth</small>
+                  <b className="green">+767</b>
+                </div>
+              </div>
+            </Card>
+            <Card>
+              <header className="card-title">
+                <b>5Y Performance</b>
+                <small>vs NIFTY 50</small>
+              </header>
+              <div className="chart-legend">
+                <span>
+                  ━ HDFCBANK <b>+221.4%</b>
+                </span>
+                <span>━ NIFTY 50 +98.7%</span>
+              </div>
+              <div className="large-chart">
+                <MiniSparkline
+                  data={chart.map((x, i) => x + i * 3)}
+                  width={350}
+                  height={115}
+                />
+              </div>
+            </Card>
+          </div>
+        </section>
+        <section className="research-band">
+          <h2>Research every Nifty 50 company</h2>
+          <p>
+            5 proprietary scores. 1000+ data points. Updated every single day.
+          </p>
+          <div className="research-cards">
+            {factorNames.map((name, i) => (
+              <div key={name}>
+                <span className="factor-icon">
+                  {["◇", "↗", "◎", "⬡", "ϟ"][i]}
+                </span>
+                <section>
+                  <b>{name[0].toUpperCase() + name.slice(1)}</b>
+                  <strong>
+                    {[92, 85, 78, 82, 87][i]}
+                    <small>/100</small>
+                  </strong>
+                  <p>
+                    {
+                      [
+                        "High returns, strong balance sheet",
+                        "Sustainable earnings growth",
+                        "Attractive valuation vs value",
+                        "Low financial risk, stable model",
+                        "Strong price momentum",
+                      ][i]
+                    }
+                  </p>
+                </section>
+                <MiniSparkline
+                  data={chart.slice(i, i + 12)}
+                  width={55}
+                  height={28}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="proof">
+          <div>
+            <Users />
+            <p>Trusted by millions of investors across India</p>
+            <strong>
+              2M+ <small>Active Investors</small>
+            </strong>
+            <strong>
+              10M+ <small>Research Reports</small>
+            </strong>
+            <strong>
+              250M+ <small>Data Points Daily</small>
+            </strong>
+          </div>
+          <blockquote>
+            “ StockStory has changed the way I research companies. The insights
+            are deeper, faster, and incredibly reliable.”
+            <small>— Verified User ✓</small>
+          </blockquote>
+          <div className="award">
+            India's Highest Rated
+            <br />
+            Stock Research Platform<strong>★★★★★</strong>
+            <small>4.8/5 from 50K+ reviews</small>
+          </div>
+        </section>
+        <section className="infra">
+          <h3>Built on best-in-class data and AI infrastructure</h3>
+          {[
+            [Database, "1000+ Data Sources"],
+            [Sparkles, "AI Research Engine"],
+            [Users, "Human + AI Quality"],
+            [Shield, "Enterprise Grade Security"],
+            [BarChart3, "99.9% Uptime"],
+          ].map(([Icon, label]) => (
+            <div key={String(label)}>
+              {typeof Icon !== "string" && <Icon size={18} />}
+              <b>{String(label)}</b>
+              <small>Reliable, verified and always on.</small>
+            </div>
+          ))}
+        </section>
+      </div>
+    </AppShell>
+  );
+}

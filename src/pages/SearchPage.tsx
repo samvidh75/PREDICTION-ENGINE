@@ -2,12 +2,24 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, Search, X } from "lucide-react";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
-import { productNavigate, ProductAction, ProductEmptyState, ProductPanel, ProductPage, ProductShell, ProductStatusPill } from "../components/product/ProductUI";
+import {
+  productNavigate,
+  ProductAction,
+  ProductEmptyState,
+  ProductPanel,
+  ProductPage,
+  ProductShell,
+  ProductStatusPill,
+} from "../components/product/ProductUI";
 import { UserJourneyEngine } from "../services/behavior/UserJourneyEngine";
 import { RecentSearchStore } from "../services/search/RecentSearchStore";
 import { RegisteredStock } from "../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../services/stocks/StockSearchEngine";
-import { api, type LeaderboardEntry, type WatchlistRow } from "../services/api/client";
+import {
+  api,
+  type LeaderboardEntry,
+  type WatchlistRow,
+} from "../services/api/client";
 import { formatRank } from "../services/ui/dataFormatting";
 
 const RECENT_KEY = "ss_recent_searches";
@@ -17,7 +29,9 @@ function getRecentSearches(): string[] {
   try {
     const raw = localStorage.getItem(RECENT_KEY);
     return raw ? raw.split(",").filter(Boolean) : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function addRecentSearch(value: string): void {
@@ -31,7 +45,9 @@ function addRecentSearch(value: string): void {
 }
 
 function removeRecentSearch(value: string): void {
-  const list = getRecentSearches().filter(s => s !== value.toUpperCase().trim());
+  const list = getRecentSearches().filter(
+    (s) => s !== value.toUpperCase().trim(),
+  );
   localStorage.setItem(RECENT_KEY, list.join(","));
 }
 
@@ -62,9 +78,13 @@ export const SearchPage: React.FC = () => {
   const [query, setQuery] = useState(() => readQueryFromUrl());
   const [results, setResults] = useState<RegisteredStock[]>(() => {
     const initialQuery = readQueryFromUrl();
-    return initialQuery.length >= 2 ? StockSearchEngine.search(initialQuery) : [];
+    return initialQuery.length >= 2
+      ? StockSearchEngine.search(initialQuery)
+      : [];
   });
-  const [predictionsMap, setPredictionsMap] = useState<Record<string, LeaderboardEntry>>({});
+  const [predictionsMap, setPredictionsMap] = useState<
+    Record<string, LeaderboardEntry>
+  >({});
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [leaderboardError, setLeaderboardError] = useState(false);
   const [watchlists, setWatchlists] = useState<WatchlistRow[]>([]);
@@ -72,13 +92,17 @@ export const SearchPage: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const syncFromUrl = () => {
       const nextQuery = readQueryFromUrl();
       setQuery(nextQuery);
-      setResults(nextQuery.length >= 2 ? StockSearchEngine.search(nextQuery) : []);
+      setResults(
+        nextQuery.length >= 2 ? StockSearchEngine.search(nextQuery) : [],
+      );
     };
     window.addEventListener("urlchange", syncFromUrl);
     window.addEventListener("popstate", syncFromUrl);
@@ -92,10 +116,14 @@ export const SearchPage: React.FC = () => {
     let cancelled = false;
     setLeaderboardLoading(true);
     setLeaderboardError(false);
-    api.getLeaderboard(200)
+    api
+      .getLeaderboard(200)
       .then((res) => {
         if (cancelled) return;
-        if (!res.data) { setLeaderboardLoading(false); return; }
+        if (!res.data) {
+          setLeaderboardLoading(false);
+          return;
+        }
         const map: Record<string, LeaderboardEntry> = {};
         res.data.forEach((item) => {
           if (item.symbol) {
@@ -112,11 +140,14 @@ export const SearchPage: React.FC = () => {
           setLeaderboardLoading(false);
         }
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    api.getWatchlists()
+    api
+      .getWatchlists()
       .then((data) => setWatchlists(data))
       .catch(() => {});
   }, []);
@@ -143,8 +174,10 @@ export const SearchPage: React.FC = () => {
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (
-        dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
-        inputRef.current && !inputRef.current.contains(e.target as Node)
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
       ) {
         setShowDropdown(false);
       }
@@ -153,25 +186,35 @@ export const SearchPage: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const recentSearches = useMemo(() => getRecentSearches().slice(0, 5), [query]);
-
-  const topRanked = useMemo(() =>
-    Object.values(predictionsMap)
-      .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999))
-      .slice(0, 8),
-    [predictionsMap]
+  const recentSearches = useMemo(
+    () => getRecentSearches().slice(0, 5),
+    [query],
   );
 
-  const isSaved = (symbol: string) => watchlists.some((wl) => wl.tickers.includes(symbol));
+  const topRanked = useMemo(
+    () =>
+      Object.values(predictionsMap)
+        .sort((a, b) => (a.rank ?? 9999) - (b.rank ?? 9999))
+        .slice(0, 8),
+    [predictionsMap],
+  );
+
+  const isSaved = (symbol: string) =>
+    watchlists.some((wl) => wl.tickers.includes(symbol));
 
   const handleSearchChange = (value: string) => {
     setQuery(value);
     const trimmed = value.trim();
-    const nextResults = trimmed.length >= 2 ? StockSearchEngine.search(trimmed) : [];
+    const nextResults =
+      trimmed.length >= 2 ? StockSearchEngine.search(trimmed) : [];
     setResults(nextResults);
     updateSearchUrl(value, "replace");
     if (trimmed.length >= 2) {
-      UserJourneyEngine.trackEvent("search", { query: trimmed, resultCount: nextResults.length, source: "search_page" });
+      UserJourneyEngine.trackEvent("search", {
+        query: trimmed,
+        resultCount: nextResults.length,
+        source: "search_page",
+      });
     }
   };
 
@@ -185,19 +228,31 @@ export const SearchPage: React.FC = () => {
   const handleOpenStock = (stock: RegisteredStock) => {
     const trimmed = query.trim();
     if (trimmed) addRecentSearch(trimmed);
-    UserJourneyEngine.trackEvent("stock_explore", { symbol: stock.symbol, sector: stock.sector, source: "search_page" });
+    UserJourneyEngine.trackEvent("stock_explore", {
+      symbol: stock.symbol,
+      sector: stock.sector,
+      source: "search_page",
+    });
     navigateToStock({ ticker: stock.symbol, mode: "push" });
   };
 
   const handleDropdownSelect = (stock: RegisteredStock) => {
     addRecentSearch(stock.symbol);
     setShowDropdown(false);
-    UserJourneyEngine.trackEvent("stock_explore", { symbol: stock.symbol, sector: stock.sector, source: "search_typeahead" });
+    UserJourneyEngine.trackEvent("stock_explore", {
+      symbol: stock.symbol,
+      sector: stock.sector,
+      source: "search_typeahead",
+    });
     navigateToStock({ ticker: stock.symbol, mode: "push" });
   };
 
   const handleCompare = (symbol: string) => {
-    UserJourneyEngine.trackEvent("feature_discover", { action: "compare", symbol, source: "search_page" });
+    UserJourneyEngine.trackEvent("feature_discover", {
+      action: "compare",
+      symbol,
+      source: "search_page",
+    });
     productNavigate("compare", symbol);
   };
 
@@ -206,7 +261,11 @@ export const SearchPage: React.FC = () => {
     if (!wl) return;
     try {
       await api.addWatchlistTicker(wl.id, symbol);
-      UserJourneyEngine.trackEvent("watchlist_create", { symbol, watchlistId: wl.id, source: "search_page" });
+      UserJourneyEngine.trackEvent("watchlist_create", {
+        symbol,
+        watchlistId: wl.id,
+        source: "search_page",
+      });
       const updated = await api.getWatchlists();
       setWatchlists(updated);
     } catch {}
@@ -223,9 +282,13 @@ export const SearchPage: React.FC = () => {
   const handleRetryLeaderboard = () => {
     setLeaderboardLoading(true);
     setLeaderboardError(false);
-    api.getLeaderboard(200)
+    api
+      .getLeaderboard(200)
       .then((res) => {
-        if (!res.data) { setLeaderboardLoading(false); return; }
+        if (!res.data) {
+          setLeaderboardLoading(false);
+          return;
+        }
         const map: Record<string, LeaderboardEntry> = {};
         res.data.forEach((item) => {
           if (item.symbol) {
@@ -250,11 +313,13 @@ export const SearchPage: React.FC = () => {
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(prev => Math.min(prev + 1, dropdownResults.length - 1));
+        setSelectedIndex((prev) =>
+          Math.min(prev + 1, dropdownResults.length - 1),
+        );
         break;
       case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
+        setSelectedIndex((prev) => Math.max(prev - 1, 0));
         break;
       case "Enter":
         e.preventDefault();
@@ -276,6 +341,16 @@ export const SearchPage: React.FC = () => {
   return (
     <ProductShell>
       <ProductPage>
+        <div className="mb-5">
+          <span className="ai-pill">AI-POWERED DISCOVERY</span>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-[-.04em] text-[var(--ink)]">
+            Find your next research idea.
+          </h1>
+          <p className="mt-2 text-sm text-[var(--ink3)]">
+            Search every covered NSE and BSE company, then open its complete
+            research workspace.
+          </p>
+        </div>
         <div className="relative flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
           <Search className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
           <input
@@ -283,7 +358,9 @@ export const SearchPage: React.FC = () => {
             value={query}
             onChange={(e) => handleSearchChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => { if (dropdownResults.length > 0) setShowDropdown(true); }}
+            onFocus={() => {
+              if (dropdownResults.length > 0) setShowDropdown(true);
+            }}
             placeholder="Search by ticker, company name, or sector..."
             className="h-9 w-full min-w-0 bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
             aria-label="Search companies"
@@ -291,13 +368,22 @@ export const SearchPage: React.FC = () => {
           {query && (
             <button
               type="button"
-              onClick={() => { setQuery(""); setResults([]); setDropdownResults([]); setShowDropdown(false); updateSearchUrl("", "replace"); inputRef.current?.focus(); }}
+              onClick={() => {
+                setQuery("");
+                setResults([]);
+                setDropdownResults([]);
+                setShowDropdown(false);
+                updateSearchUrl("", "replace");
+                inputRef.current?.focus();
+              }}
               className="shrink-0 rounded p-0.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           )}
-          <kbd className="hidden md:inline-flex h-5 shrink-0 items-center rounded border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 font-mono text-[10px] text-[#9AA7B5]">⌘K</kbd>
+          <kbd className="hidden md:inline-flex h-5 shrink-0 items-center rounded border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 font-mono text-[10px] text-[#9AA7B5]">
+            ⌘K
+          </kbd>
 
           {showDropdown && (
             <div
@@ -305,7 +391,9 @@ export const SearchPage: React.FC = () => {
               className="absolute left-0 right-0 top-full mt-1 z-50 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-xl overflow-hidden"
             >
               {dropdownResults.map((stock, idx) => {
-                const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
+                const cleanedSym = stock.symbol
+                  .replace(/\.NS$/, "")
+                  .toUpperCase();
                 const prediction = predictionsMap[cleanedSym];
                 const score = prediction?.rankingScore ?? null;
                 return (
@@ -315,13 +403,21 @@ export const SearchPage: React.FC = () => {
                     onClick={() => handleDropdownSelect(stock)}
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                      idx === selectedIndex ? "bg-[rgba(255,255,255,0.06)]" : "hover:bg-[rgba(255,255,255,0.04)]"
+                      idx === selectedIndex
+                        ? "bg-[rgba(255,255,255,0.06)]"
+                        : "hover:bg-[rgba(255,255,255,0.04)]"
                     }`}
                   >
-                    <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{stock.symbol}</span>
-                    <span className="truncate text-xs text-[#9AA7B5]">{stock.companyName}</span>
+                    <span className="font-mono text-sm font-semibold text-[#E6EDF3]">
+                      {stock.symbol}
+                    </span>
+                    <span className="truncate text-xs text-[#9AA7B5]">
+                      {stock.companyName}
+                    </span>
                     {score !== null && (
-                      <span className="ml-auto text-[10px] font-medium text-[#9AA7B5]">{Math.round(score)}</span>
+                      <span className="ml-auto text-[10px] font-medium text-[#9AA7B5]">
+                        {Math.round(score)}
+                      </span>
                     )}
                   </button>
                 );
@@ -334,13 +430,18 @@ export const SearchPage: React.FC = () => {
           {query.trim().length >= 2 ? (
             <>
               <div className="text-xs text-[#9AA7B5]">
-                {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-mono text-[#E6EDF3]">"{query.trim()}"</span>
+                {results.length} result{results.length === 1 ? "" : "s"} for{" "}
+                <span className="font-mono text-[#E6EDF3]">
+                  "{query.trim()}"
+                </span>
               </div>
 
               {results.length > 0 ? (
                 <div className="grid gap-3 md:grid-cols-2">
                   {results.map((stock) => {
-                    const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
+                    const cleanedSym = stock.symbol
+                      .replace(/\.NS$/, "")
+                      .toUpperCase();
                     const prediction = predictionsMap[cleanedSym];
                     const score = prediction?.rankingScore ?? null;
                     const rank = prediction?.rank ?? null;
@@ -349,46 +450,80 @@ export const SearchPage: React.FC = () => {
                     const saved = isSaved(stock.symbol);
 
                     return (
-                      <ProductPanel key={stock.symbol} as="article" className="flex flex-col gap-3 p-4">
+                      <ProductPanel
+                        key={stock.symbol}
+                        as="article"
+                        className="flex flex-col gap-3 p-4"
+                      >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{stock.symbol}</span>
+                              <span className="font-mono text-sm font-semibold text-[#E6EDF3]">
+                                {stock.symbol}
+                              </span>
                               {rank !== null && (
-                                <span className="text-[10px] font-medium text-[#9AA7B5]">{formatRank(rank)}</span>
+                                <span className="text-[10px] font-medium text-[#9AA7B5]">
+                                  {formatRank(rank)}
+                                </span>
                               )}
                               {score !== null ? (
-                                <ProductStatusPill tone="verified">{Math.round(score)}</ProductStatusPill>
+                                <ProductStatusPill tone="verified">
+                                  {Math.round(score)}
+                                </ProductStatusPill>
                               ) : (
-                                <ProductStatusPill tone="muted">Not enough information</ProductStatusPill>
+                                <ProductStatusPill tone="muted">
+                                  Not enough information
+                                </ProductStatusPill>
                               )}
                             </div>
-                            <p className="mt-0.5 truncate text-xs text-[#9AA7B5]">{stock.companyName}</p>
+                            <p className="mt-0.5 truncate text-xs text-[#9AA7B5]">
+                              {stock.companyName}
+                            </p>
                             <div className="mt-1.5 flex flex-wrap items-center gap-2">
                               {stock.sector && (
-                                <span className="truncate text-[10px] font-medium text-[#64748B]">{stock.sector}</span>
+                                <span className="truncate text-[10px] font-medium text-[#64748B]">
+                                  {stock.sector}
+                                </span>
                               )}
-                              <ProductStatusPill tone={predictionDate ? "blue" : "muted"}>
-                                {predictionDate ? "Updated" : "Research signals not yet available"}
+                              <ProductStatusPill
+                                tone={predictionDate ? "blue" : "muted"}
+                              >
+                                {predictionDate
+                                  ? "Updated"
+                                  : "Research signals not yet available"}
                               </ProductStatusPill>
                               {confidenceScore !== null && (
-                                <ProductStatusPill tone="blue">{Math.round(confidenceScore)}% confidence</ProductStatusPill>
+                                <ProductStatusPill tone="blue">
+                                  {Math.round(confidenceScore)}% confidence
+                                </ProductStatusPill>
                               )}
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 border-t border-[rgba(148,163,184,0.08)] pt-3">
-                          <ProductAction variant="primary" onClick={() => handleOpenStock(stock)}>
+                          <ProductAction
+                            variant="primary"
+                            onClick={() => handleOpenStock(stock)}
+                          >
                             Open
                           </ProductAction>
-                          <ProductAction variant="secondary" onClick={() => handleCompare(stock.symbol)}>
+                          <ProductAction
+                            variant="secondary"
+                            onClick={() => handleCompare(stock.symbol)}
+                          >
                             Compare
                           </ProductAction>
                           <ProductAction
                             variant="ghost"
                             onClick={() => handleSave(stock.symbol)}
                             disabled={saved || watchlists.length === 0}
-                            disabledReason={saved ? "Saved" : watchlists.length === 0 ? "Sign in" : undefined}
+                            disabledReason={
+                              saved
+                                ? "Saved"
+                                : watchlists.length === 0
+                                  ? "Sign in"
+                                  : undefined
+                            }
                           >
                             Save
                           </ProductAction>
@@ -403,7 +538,10 @@ export const SearchPage: React.FC = () => {
                   title="No matching company found"
                   body={`No results for "${query.trim()}". Try a different ticker, company name, or sector. Browse the top ranked companies instead.`}
                   action={
-                    <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>
+                    <ProductAction
+                      variant="secondary"
+                      onClick={() => productNavigate("rankings")}
+                    >
                       View Top Rankings
                     </ProductAction>
                   }
@@ -417,7 +555,10 @@ export const SearchPage: React.FC = () => {
                 title="Search the company universe"
                 body="Type at least 2 characters to begin. Search by ticker, company name, or sector to find investment opportunities."
                 action={
-                  <ProductAction variant="secondary" onClick={() => productNavigate("rankings")}>
+                  <ProductAction
+                    variant="secondary"
+                    onClick={() => productNavigate("rankings")}
+                  >
                     Browse Top Rankings
                   </ProductAction>
                 }
@@ -426,7 +567,9 @@ export const SearchPage: React.FC = () => {
               {recentSearches.length > 0 && (
                 <ProductPanel className="p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Recent searches</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
+                      Recent searches
+                    </span>
                     <button
                       type="button"
                       onClick={handleClearRecent}
@@ -437,12 +580,18 @@ export const SearchPage: React.FC = () => {
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {recentSearches.map((item) => (
-                      <span key={item} className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] pl-2.5 pr-1 py-1">
+                      <span
+                        key={item}
+                        className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] pl-2.5 pr-1 py-1"
+                      >
                         <button
                           type="button"
                           onClick={() => {
                             addRecentSearch(item);
-                            UserJourneyEngine.trackEvent("stock_explore", { symbol: item, source: "search_recent" });
+                            UserJourneyEngine.trackEvent("stock_explore", {
+                              symbol: item,
+                              source: "search_recent",
+                            });
                             navigateToStock({ ticker: item, mode: "push" });
                           }}
                           className="font-mono text-[11px] font-medium text-[#E6EDF3] hover:text-white transition-colors"
@@ -473,7 +622,9 @@ export const SearchPage: React.FC = () => {
 
               {leaderboardError && (
                 <ProductPanel className="flex items-center justify-between gap-3 p-4">
-                  <span className="text-xs text-[#9AA7B5]">Could not load top rankings</span>
+                  <span className="text-xs text-[#9AA7B5]">
+                    Could not load top rankings
+                  </span>
                   <button
                     type="button"
                     onClick={handleRetryLeaderboard}
@@ -484,35 +635,49 @@ export const SearchPage: React.FC = () => {
                 </ProductPanel>
               )}
 
-              {!leaderboardLoading && !leaderboardError && topRanked.length > 0 && (
-                <ProductPanel className="p-4">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">Top ranked today</span>
-                  <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                    {topRanked.map((p) => (
-                      <button
-                        key={p.symbol}
-                        type="button"
-                        onClick={() => {
-                          RecentSearchStore.addTicker(p.symbol.replace(/\.NS$/, ""));
-                          UserJourneyEngine.trackEvent("stock_explore", { symbol: p.symbol, sector: p.sector, source: "search_top_ranked" });
-                          navigateToStock({ ticker: p.symbol, mode: "push" });
-                        }}
-                        className="flex items-center gap-2 rounded-md border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] px-3 py-2 text-left hover:bg-[rgba(255,255,255,0.04)] transition-colors"
-                      >
-                        <span className="text-[10px] font-medium text-[#9AA7B5]">#{p.rank}</span>
-                        <div className="min-w-0 flex-1">
-                          <span className="block truncate font-mono text-[11px] font-semibold text-[#E6EDF3]">
-                            {p.symbol.replace(/\.NS$/, "")}
+              {!leaderboardLoading &&
+                !leaderboardError &&
+                topRanked.length > 0 && (
+                  <ProductPanel className="p-4">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9AA7B5]">
+                      Top ranked today
+                    </span>
+                    <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                      {topRanked.map((p) => (
+                        <button
+                          key={p.symbol}
+                          type="button"
+                          onClick={() => {
+                            RecentSearchStore.addTicker(
+                              p.symbol.replace(/\.NS$/, ""),
+                            );
+                            UserJourneyEngine.trackEvent("stock_explore", {
+                              symbol: p.symbol,
+                              sector: p.sector,
+                              source: "search_top_ranked",
+                            });
+                            navigateToStock({ ticker: p.symbol, mode: "push" });
+                          }}
+                          className="flex items-center gap-2 rounded-md border border-[rgba(148,163,184,0.12)] bg-[rgba(255,255,255,0.02)] px-3 py-2 text-left hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                        >
+                          <span className="text-[10px] font-medium text-[#9AA7B5]">
+                            #{p.rank}
                           </span>
-                          {p.companyName && (
-                            <span className="block truncate text-[10px] text-[#64748B]">{p.companyName}</span>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </ProductPanel>
-              )}
+                          <div className="min-w-0 flex-1">
+                            <span className="block truncate font-mono text-[11px] font-semibold text-[#E6EDF3]">
+                              {p.symbol.replace(/\.NS$/, "")}
+                            </span>
+                            {p.companyName && (
+                              <span className="block truncate text-[10px] text-[#64748B]">
+                                {p.companyName}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </ProductPanel>
+                )}
             </>
           )}
         </section>
