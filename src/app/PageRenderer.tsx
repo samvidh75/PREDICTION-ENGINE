@@ -12,6 +12,7 @@ import PageErrorBoundary from "../components/diagnostics/PageErrorBoundary";
 import SebiDisclaimer from "../components/compliance/SebiDisclaimer";
 
 const PublicLandingPage = React.lazy(() => import("../pages/PublicLandingPage"));
+const PublicRankingsPage = React.lazy(() => import("../pages/PublicRankingsPage"));
 const PublicAboutPage = React.lazy(() => import("../pages/PublicAboutPage"));
 const LoginPage = React.lazy(() => import("../pages/LoginPage"));
 const SignupPage = React.lazy(() => import("../pages/SignupPage"));
@@ -50,9 +51,8 @@ function renderPublicPage(pageKey: PageKey): JSX.Element {
     case "validation":
       return <TrustCentrePage />;
     case "rankings":
-      return <ScannerPage />;
     case "scanner":
-      return <ScannerPage />;
+      return <PublicRankingsPage />;
     case "search":
       return <SearchPage />;
     case "stock":
