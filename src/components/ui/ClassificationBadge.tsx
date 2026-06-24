@@ -9,12 +9,12 @@ interface ClassificationBadgeProps {
 }
 
 const COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
-  EXCELLENT:         { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0" },
-  HEALTHY:           { bg: "#F0FDF4", text: "#22C55E", border: "#BBF7D0" },
-  STABLE:            { bg: "#EFF6FF", text: "#2962FF", border: "#BFDBFE" },
-  WEAKENING:         { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A" },
-  AT_RISK:           { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA" },
-  INSUFFICIENT_DATA: { bg: "#F8FAFC", text: "#94A3B8", border: "#E2E8F0" },
+  EXCELLENT:         { bg: "#F0FDF4", text: "#065F46", border: "#A7F3D0" },
+  HEALTHY:           { bg: "#EFF6FF", text: "#1E40AF", border: "#BFDBFE" },
+  STABLE:            { bg: "#F8FAFC", text: "#374151", border: "#E5E7EB" },
+  WEAKENING:         { bg: "#FFFBEB", text: "#78350F", border: "#FDE68A" },
+  AT_RISK:           { bg: "#FEF2F2", text: "#7F1D1D", border: "#FECACA" },
+  INSUFFICIENT_DATA: { bg: "#F8FAFC", text: "#6B7280", border: "#E5E7EB" },
 };
 
 const LABEL_MAP: Record<string, string> = {
@@ -38,7 +38,7 @@ export function ClassificationBadge({ classification, size = "md" }: Classificat
 
   return (
     <span
-      className={`inline-flex items-center rounded-full font-semibold border ${SIZE_CLS[size]}`}
+      className={`inline-flex items-center rounded-[var(--r-sm)] font-semibold border ${SIZE_CLS[size]}`}
       style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
     >
       {label}
