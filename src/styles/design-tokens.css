@@ -1,44 +1,96 @@
 :root {
-  --ss-bg: #070A0F;
-  --ss-bg-soft: #0B1117;
-  --ss-surface: #0F1720;
-  --ss-surface-raised: #141D29;
-  --ss-surface-glass: rgba(15, 23, 32, 0.82);
-  --ss-border: rgba(148, 163, 184, 0.16);
-  --ss-border-strong: rgba(148, 163, 184, 0.28);
-  --ss-text: #E6EDF3;
-  --ss-text-secondary: #9AA7B5;
-  --ss-text-muted: #64748B;
-  --ss-brand: #10A37F;
-  --ss-brand-deep: #087A61;
-  --ss-brand-soft: #DDF7EF;
-  --ss-mint: #7CE0C3;
-  --ss-blue: #2962FF;
-  --ss-positive: #16A34A;
-  --ss-warning: #F59E0B;
-  --ss-risk: #EF4444;
-  --ss-radius-sm: 10px;
-  --ss-radius-md: 14px;
-  --ss-radius-lg: 18px;
-  --ss-radius-xl: 24px;
-  --ss-shadow-card: 0 18px 60px rgba(2, 6, 23, 0.18);
-  --ss-shadow-soft: 0 10px 34px rgba(15, 23, 42, 0.10);
-}
+  /* Brand — single accent, used sparingly */
+  --c-brand:         #1746A2;
+  --c-brand-subtle:  #EEF2FF;
+  --c-brand-border:  #C7D2FE;
 
-.light {
-  --ss-bg: #F6F8FB;
-  --ss-bg-soft: #F0F2F5;
-  --ss-surface: #FFFFFF;
-  --ss-surface-raised: #FBFCFE;
-  --ss-surface-glass: rgba(255, 255, 255, 0.82);
-  --ss-border: rgba(15, 23, 42, 0.09);
-  --ss-border-strong: rgba(15, 23, 42, 0.16);
-  --ss-text: #0F172A;
-  --ss-text-secondary: #475569;
-  --ss-text-muted: #94A3B8;
-  --ss-brand: #10A37F;
-  --ss-brand-deep: #087A61;
-  --ss-brand-soft: #DDF7EF;
-  --ss-shadow-card: 0 18px 60px rgba(2, 6, 23, 0.08);
-  --ss-shadow-soft: 0 10px 34px rgba(15, 23, 42, 0.06);
+  /* Semantic — market direction only */
+  --c-positive:      #0F7B55;
+  --c-positive-bg:   #F0FDF4;
+  --c-negative:      #B91C1C;
+  --c-negative-bg:   #FEF2F2;
+
+  /* Neutral scale */
+  --c-ink:           #0D1117;
+  --c-ink-secondary: #3D4552;
+  --c-ink-muted:     #6B7280;
+  --c-ink-disabled:  #9CA3AF;
+
+  --c-surface:        #FFFFFF;
+  --c-surface-raised: #FAFAFA;
+  --c-surface-sunken: #F4F6F8;
+  --c-bg:             #F1F3F5;
+
+  --c-border:        #E5E7EB;
+  --c-border-strong: #D1D5DB;
+
+  /* Score colours — score rings and factor bars only */
+  --c-score-high: #0F7B55;
+  --c-score-mid:  #1746A2;
+  --c-score-low:  #92400E;
+  --c-score-poor: #B91C1C;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* Compatibility aliases for the existing component API */
+  --color-canvas: var(--c-bg);
+  --color-page: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-raised: var(--c-surface-raised);
+  --color-surface-elevated: var(--c-surface-sunken);
+  --color-surface-inset: var(--c-surface-sunken);
+  --color-surface-modal: var(--c-surface);
+  --color-surface-glass: var(--c-surface);
+  --color-surface-active: var(--c-surface-sunken);
+  --color-border: var(--c-border);
+  --color-border-light: var(--c-border);
+  --color-border-strong: var(--c-border-strong);
+  --color-border-accent: var(--c-brand-border);
+  --color-text-primary: var(--c-ink);
+  --color-text-secondary: var(--c-ink-secondary);
+  --color-text-muted: var(--c-ink-muted);
+  --color-text-faint: var(--c-ink-disabled);
+  --color-accent: var(--c-brand);
+  --color-accent-hover: var(--c-brand);
+  --color-accent-light: var(--c-brand-subtle);
+  --color-accent-border: var(--c-brand-border);
+  --color-active: var(--c-positive);
+  --color-active-bg: var(--c-positive-bg);
+  --color-active-border: #BBF7D0;
+  --color-danger: var(--c-negative);
+  --color-danger-bg: var(--c-negative-bg);
+  --color-danger-border: #FECACA;
+  --color-warning: var(--c-score-low);
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #FDE68A;
+  --color-insight: var(--c-brand);
+  --color-insight-bg: var(--c-brand-subtle);
+  --color-insight-border: var(--c-brand-border);
+  --color-muted-bg: var(--c-surface-sunken);
+  --ss-bg: var(--c-bg);
+  --ss-surface: var(--c-surface);
+  --ss-surface-raised: var(--c-surface-raised);
+  --ss-border: var(--c-border);
+  --ss-border-strong: var(--c-border-strong);
+  --ss-text: var(--c-ink);
+  --ss-text-secondary: var(--c-ink-secondary);
+  --ss-text-muted: var(--c-ink-muted);
+  --ss-brand: var(--c-brand);
+  --ss-positive: var(--c-positive);
+  --ss-risk: var(--c-negative);
+  --brand-green: var(--c-brand);
+  --brand-green-deep: var(--c-brand);
+  --brand-green-soft: var(--c-brand-subtle);
+  --brand-mint: var(--c-brand-border);
+  --brand-ink: var(--c-ink);
+  --brand-graphite: var(--c-ink);
+  --brand-slate: var(--c-ink-muted);
 }

@@ -14,12 +14,11 @@ const FONT: Record<Size, number> = { sm: 10, md: 13, lg: 18, xl: 24 };
 const GRADE_FONT: Record<Size, number> = { sm: 6, md: 8, lg: 11, xl: 14 };
 
 export function scoreColor(v: number | null): string {
-  if (v === null) return "#94A3B8";
-  if (v >= 70) return "#16A34A";
-  if (v >= 55) return "#22C55E";
-  if (v >= 40) return "#F59E0B";
-  if (v >= 25) return "#FB923C";
-  return "#EF4444";
+  if (v === null) return "var(--c-ink-disabled)";
+  if (v >= 75) return "var(--c-score-high)";
+  if (v >= 55) return "var(--c-score-mid)";
+  if (v >= 35) return "var(--c-score-low)";
+  return "var(--c-score-poor)";
 }
 
 function scoreGrade(v: number | null): string {
@@ -51,7 +50,7 @@ export function ScoreRing({ score, size = "md", showGrade = false }: ScoreRingPr
       role="img"
       aria-label={score !== null ? `Score: ${Math.round(score)} (${grade})` : "Score unavailable"}
     >
-      <circle cx={px / 2} cy={px / 2} r={r} fill="none" stroke="#E2E8F0" strokeWidth={sw} />
+      <circle cx={px / 2} cy={px / 2} r={r} fill="none" stroke="var(--c-border)" strokeWidth={sw} />
       <circle
         cx={px / 2} cy={px / 2} r={r} fill="none" stroke={color} strokeWidth={sw}
         strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)}
