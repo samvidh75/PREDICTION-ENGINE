@@ -1,5 +1,11 @@
 // Single authoritative pipeline that assembles all data for one stock
 // from all providers and feeds UnifiedPredictionEngine.
+//
+// DEPLOYMENT NOTE — required env vars:
+//   Vercel (frontend):  VITE_INDIANAPI_KEY (maps to @indianapi-key Vercel secret)
+//   Railway (backend):  INDIANAPI_KEY, UPSTOX_ACCESS_TOKEN
+// Historical price data is fetched via /api/historical/:symbol (backend proxy)
+// to avoid browser CORS blocks on direct Yahoo Finance requests.
 
 import { api } from '../api/client';
 import { computeTechnicals, TechnicalSnapshot } from '../marketData/TechnicalIndicators';
@@ -133,11 +139,18 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   const pipelineErrors: string[] = [];
   const fetchedAt = new Date().toISOString();
 
-  // Fetch all data in parallel
-  const [quoteSettled, researchSettled, financialsSettled] = await Promise.allSettled([
+  // Fetch all data in parallel; historical via backend proxy (/api/historical/:symbol) to avoid CORS
+  async function fetchHistorical(): Promise<{ points: Array<{ date: string; close: number; open?: number; high?: number; low?: number; volume?: number }> }> {
+    const resp = await fetch(`/api/historical/${encodeURIComponent(sym)}?range=3mo`);
+    if (!resp.ok) throw new Error(`Historical proxy ${resp.status}`);
+    return resp.json();
+  }
+
+  const [quoteSettled, researchSettled, financialsSettled, historicalSettled] = await Promise.allSettled([
     api.getQuote(sym),
     api.getCompanyResearch(sym),
     api.getCompanyFinancials(sym),
+    fetchHistorical(),
   ]);
 
   // ── Price layer ─────────────────────────────────────────────────────────────
@@ -174,11 +187,24 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   let sector: string | null = null;
   let researchFundamentals: Record<string, unknown> | null = null;
 
+  // Prefer backend-proxied historical data (no CORS); fall back to research candles
+  if (historicalSettled.status === 'fulfilled') {
+    candles = (historicalSettled.value.points ?? []).map(p => ({
+      date: p.date,
+      close: p.close,
+      high: finiteOrNull(p.high),
+      low: finiteOrNull(p.low),
+      volume: finiteOrNull(p.volume),
+    }));
+  } else {
+    pipelineErrors.push(`Historical fetch failed: ${(historicalSettled as PromiseRejectedResult).reason?.message ?? 'unknown'}`);
+  }
   if (researchSettled.status === 'fulfilled') {
     const rd = researchSettled.value.data;
     companyName = rd.companyName ?? null;
     sector = rd.sector ?? null;
-    candles = rd.candles ?? [];
+    // Only use research candles if backend historical unavailable
+    if (candles.length === 0) candles = rd.candles ?? [];
     researchFundamentals = rd.fundamentals as Record<string, unknown> | null;
 
     if (rd.quote) {
@@ -385,7 +411,7 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
       cashFlowFromOperations: null,
       fundamentalFreshnessDays: result.fundamentals.fundamentalFreshnessDays,
 
-      providerCount: [quoteSettled, researchSettled, financialsSettled].filter(s => s.status === 'fulfilled').length,
+      providerCount: [quoteSettled, researchSettled, financialsSettled, historicalSettled].filter(s => s.status === 'fulfilled').length,
       lineageCount: 1,
       fieldCompleteness: result.dataCompleteness,
       staleFieldCount: result.missingCriticalFields.length,

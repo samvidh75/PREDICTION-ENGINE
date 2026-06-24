@@ -3,6 +3,10 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
+  "env": {
+    "VITE_INDIANAPI_KEY": "@indianapi-key",
+    "VITE_UPSTOX_TOKEN": "@upstox-token"
+  },
   "headers": [
     {
       "source": "/stockstory-mark.svg",

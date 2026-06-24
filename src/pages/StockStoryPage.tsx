@@ -7,6 +7,7 @@ import {
 import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
 import { formatINR, formatPercent } from "../hooks/useLiveQuotes";
+import { fPrice, fChange, fRelativeTime } from "../lib/format";
 import type { UnifiedFactorScore, UnifiedFactorGroup } from "../prediction-engine/types";
 import type { PipelineResult } from "../services/data/CompanyDataPipeline";
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
@@ -589,6 +590,14 @@ function PeersTab({ pipeline }: { pipeline: PipelineResult }) {
     return NIFTY50_SYMBOLS.filter(s => s !== pipeline.symbol).slice(0, 5);
   }, [pipeline.symbol]);
 
+  if (!pred) {
+    return (
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+        Peer comparison requires a prediction engine output. Ensure price and fundamental data are available and retry.
+      </div>
+    );
+  }
+
   const myScore = pred?.rankingScore ?? null;
   const myPE = f.peRatio;
   const myROE = f.roe;
@@ -772,7 +781,7 @@ export const StockStoryPage: React.FC = () => {
             {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
               <>
                 <span className="text-xl font-bold tabular-nums text-[#1E293B]">
-                  ₹{pipeline.price.current.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {fPrice(pipeline.price.current)}
                 </span>
                 {pipeline.price.change !== null && (
                   <span className={`text-sm font-semibold tabular-nums ${pricePos ? "text-green-600" : "text-red-500"}`}>
@@ -781,12 +790,12 @@ export const StockStoryPage: React.FC = () => {
                 )}
                 {pipeline.price.changeAbs !== null && (
                   <span className={`text-sm tabular-nums hidden sm:inline ${pricePos ? "text-green-600" : "text-red-500"}`}>
-                    ({pricePos ? "+" : ""}₹{pipeline.price.changeAbs.toFixed(2)})
+                    ({fChange(pipeline.price.changeAbs)})
                   </span>
                 )}
                 {pipeline.price.lastTradeTime && (
                   <span className="text-[10px] text-[#94A3B8] hidden md:inline">
-                    {relativeTime(pipeline.price.lastTradeTime)}
+                    {fRelativeTime(pipeline.price.lastTradeTime)}
                   </span>
                 )}
               </>
