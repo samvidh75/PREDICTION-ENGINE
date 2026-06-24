@@ -128,7 +128,7 @@ export function MarketTicker() {
     };
   }, []);
   return (
-    <div className="ticker">
+    <div className="ticker" aria-label="Market overview" role="region">
       <div className="ticker-scroll">
         {indices.map((index) => {
           const quote = quotes[index.symbol];

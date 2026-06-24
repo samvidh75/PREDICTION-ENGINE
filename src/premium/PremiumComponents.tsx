@@ -401,6 +401,8 @@ export function MarketTickerStrip({ compact }: { compact?: boolean }) {
 
   return (
     <div
+      aria-label="Market overview"
+      role="region"
       style={{
         maxWidth: S.container,
         margin: "0 auto",
@@ -2577,8 +2579,30 @@ export function PremiumAppShell({
 }) {
   return (
     <div style={{ minHeight: "100vh", background: S.bg }}>
+      <a
+        href="#premium-main-content"
+        style={{
+          position: "fixed",
+          left: 12,
+          top: 8,
+          zIndex: 1000,
+          transform: "translateY(-150%)",
+          background: "#fff",
+          color: "#111",
+          border: "1px solid #12823B",
+          borderRadius: 8,
+          padding: "8px 12px",
+          fontSize: 12,
+          fontWeight: 700,
+        }}
+        onFocus={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+        onBlur={(e) => { e.currentTarget.style.transform = "translateY(-150%)"; }}
+      >
+        Skip to main content
+      </a>
       <div style={{ paddingTop: 16, paddingBottom: 40 }}>
-        <div
+        <main
+          id="premium-main-content"
           style={{
             maxWidth: S.container,
             margin: "0 auto",
@@ -2587,7 +2611,7 @@ export function PremiumAppShell({
           }}
         >
           {children}
-        </div>
+        </main>
       </div>
     </div>
   );
