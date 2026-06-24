@@ -1,301 +1,384 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeftRight, X, Search, Loader2 } from "lucide-react";
+import { X, Plus, ArrowLeftRight } from "lucide-react";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { ProductShell, ProductPage, ProductPanel, ProductAction, productNavigate } from "../components/product/ProductUI";
-import { SpatialSheet } from "../components/intelligence/SpatialSheet";
-import { api, type SearchResult } from "../services/api/client";
-import { buildCompareViewModel } from "../lib/product/viewModels/compareViewModel";
+import { runCompanyDataPipeline, type PipelineResult } from "../services/data/CompanyDataPipeline";
+import { fPrice, fPercent, fScore, fMarketCap, fRatio } from "../lib/format";
+import { ScoreRing } from "../components/ui/ScoreRing";
+import { ClassificationBadge } from "../components/ui/ClassificationBadge";
 
-interface CompareCompany {
-  symbol: string;
-  companyName?: string;
-  score?: number | null;
-  classification?: string | null;
+const MAX_SYMBOLS = 4;
+const FACTOR_GROUPS = ["quality", "valuation", "growth", "stability", "momentum", "risk"] as const;
+const FACTOR_LABEL: Record<string, string> = { quality: "Quality", valuation: "Valuation", growth: "Growth", stability: "Stability", momentum: "Momentum", risk: "Safety" };
+
+function parseSymbolsFromUrl(): string[] {
+  const p = new URLSearchParams(window.location.search);
+  return (p.get("symbols") ?? p.get("ids") ?? p.get("id") ?? "").split(",").map(s => s.trim().toUpperCase()).filter(Boolean);
 }
 
-const MAX_COMPANIES = 3;
+function updateUrlSymbols(symbols: string[]) {
+  const p = new URLSearchParams(window.location.search);
+  symbols.length ? p.set("symbols", symbols.join(",")) : p.delete("symbols");
+  window.history.replaceState({}, "", `?${p.toString()}`);
+}
+
+function factorScore(r: PipelineResult | null, group: string): number | null {
+  const fs = r?.prediction?.factorScores?.find(f => f.group === group);
+  if (fs?.value === null || fs?.value === undefined) return null;
+  return group === "risk" ? Math.round(100 - fs.value) : Math.round(fs.value);
+}
+
+function fSMA50(r: PipelineResult | null): string {
+  const d = r?.technicals?.movingAverageDistance50;
+  if (d === null || d === undefined) return "—";
+  return d > 0.005 ? "Above SMA50" : d < -0.005 ? "Below SMA50" : "At SMA50";
+}
+
+function isAboveSMA50(r: PipelineResult | null): boolean | null {
+  const d = r?.technicals?.movingAverageDistance50;
+  return d === null || d === undefined ? null : d > 0.005;
+}
+
+
+
+// ── Row definition helpers ────────────────────────────────────────────────────
+
+interface RowConf {
+  label: string;
+  lowerIsBetter: boolean;
+  raw: (r: PipelineResult) => number | null;
+  display: (r: PipelineResult) => string;
+}
+
+function makeRows(): RowConf[] {
+  return [
+    { label: "Current price",  lowerIsBetter: false, raw: r => r.price.current, display: r => fPrice(r.price.current) },
+    { label: "% Change",       lowerIsBetter: false, raw: r => r.price.change, display: r => fPercent(r.price.change, true) },
+    { label: "52-week range",  lowerIsBetter: false, raw: r => r.price.weekHigh52 && r.price.weekLow52 ? (r.price.weekHigh52 - r.price.weekLow52) : null, display: r => r.price.weekLow52 && r.price.weekHigh52 ? `${fPrice(r.price.weekLow52)} – ${fPrice(r.price.weekHigh52)}` : "—" },
+    { label: "Market cap",     lowerIsBetter: false, raw: r => r.price.marketCap, display: r => fMarketCap(r.price.marketCap) },
+    { label: "P/E ratio",      lowerIsBetter: true,  raw: r => r.fundamentals.peRatio, display: r => fRatio(r.fundamentals.peRatio, "x") },
+    { label: "P/B ratio",      lowerIsBetter: false, raw: r => r.fundamentals.pbRatio, display: r => fRatio(r.fundamentals.pbRatio, "x") },
+    { label: "EV/EBITDA",      lowerIsBetter: false, raw: r => r.fundamentals.evEbitda, display: r => fRatio(r.fundamentals.evEbitda, "x") },
+    { label: "ROE",            lowerIsBetter: false, raw: r => r.fundamentals.roe, display: r => fPercent(r.fundamentals.roe) },
+    { label: "ROA",            lowerIsBetter: false, raw: r => r.fundamentals.roa, display: r => fPercent(r.fundamentals.roa) },
+    { label: "D/E ratio",      lowerIsBetter: true,  raw: r => r.fundamentals.debtToEquity, display: r => fRatio(r.fundamentals.debtToEquity, "x") },
+    { label: "Revenue growth", lowerIsBetter: false, raw: r => r.fundamentals.revenueGrowth, display: r => fPercent(r.fundamentals.revenueGrowth) },
+    { label: "EPS growth",     lowerIsBetter: false, raw: r => r.fundamentals.epsGrowth, display: r => fPercent(r.fundamentals.epsGrowth) },
+    { label: "Operating margin", lowerIsBetter: false, raw: r => r.fundamentals.operatingMargin, display: r => fPercent(r.fundamentals.operatingMargin) },
+    { label: "FCF yield",     lowerIsBetter: false, raw: r => r.fundamentals.fcfYield, display: r => fPercent(r.fundamentals.fcfYield) },
+    { label: "RSI (14)",       lowerIsBetter: false, raw: r => r.technicals.rsi14, display: r => fScore(r.technicals.rsi14) },
+    { label: "MACD signal",    lowerIsBetter: false, raw: r => r.technicals.macdSignal, display: r => r.technicals.macdSignal !== null ? r.technicals.macdSignal.toFixed(2) : "—" },
+    { label: "ADX (14)",       lowerIsBetter: false, raw: r => r.technicals.adx14, display: r => fScore(r.technicals.adx14) },
+    { label: "SMA50 position", lowerIsBetter: false, raw: r => isAboveSMA50(r) !== null ? (isAboveSMA50(r) ? 1 : 0) : null, display: r => fSMA50(r) },
+  ];
+}
+
+function textColor(score: number | null): string {
+  if (score === null) return "";
+  if (score >= 70) return "#16A34A";
+  if (score >= 55) return "#22C55E";
+  if (score >= 40) return "#F59E0B";
+  return "#EF4444";
+}
+
+function barColor(score: number): string {
+  if (score >= 70) return "#16A34A";
+  if (score >= 55) return "#22C55E";
+  if (score >= 40) return "#F59E0B";
+  return "#EF4444";
+}
+
+function bestWorstIndex(values: (number | null)[], lowerIsBetter: boolean): [best: number | null, worst: number | null] {
+  const valid = values.map((v, i) => [v, i] as const).filter(([v]) => v !== null && Number.isFinite(v)) as [number, number][];
+  if (valid.length < 2) return [null, null];
+  if (lowerIsBetter) {
+    valid.sort((a, b) => a[0] - b[0]);
+  } else {
+    valid.sort((a, b) => b[0] - a[0]);
+  }
+  return [valid[0][1], valid[valid.length - 1][1]];
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 
 export const ComparePage: React.FC = () => {
-  const [companies, setCompanies] = useState<CompareCompany[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [loading, setLoading] = useState(false);
+  useDocumentTitle("Compare Stocks | StockStory India");
+  const [symbols, setSymbols] = useState<string[]>(() => parseSymbolsFromUrl());
+  const [results, setResults] = useState<Record<string, PipelineResult | null>>({});
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [addInput, setAddInput] = useState("");
 
-  // Compare route response state
-  const [routeData, setRouteData] = useState<{
-    factorComparison: Array<{ factor: string; winner: string | null; explanation: string }>;
-    recommendation: string | null;
-    missingDataCaveat: string | null;
-  } | null>(null);
-  const [routeLoading, setRouteLoading] = useState(false);
-  const [shareRecapOpen, setShareRecapOpen] = useState(false);
+  const fetchAll = useCallback(async (syms: string[]) => {
+    if (syms.length === 0) return;
+    const loadMap: Record<string, boolean> = {};
+    const errMap: Record<string, string> = {};
+    syms.forEach(s => { loadMap[s] = true; errMap[s] = ""; });
+    setLoading(prev => ({ ...prev, ...loadMap }));
+    setErrors(prev => ({ ...prev, ...errMap }));
 
-  const companyViews = useMemo(() => {
-    return companies.map((c) => ({
-      symbol: c.symbol,
-      companyName: c.companyName || "",
-      score: c.score !== null && c.score !== undefined ? c.score : null,
-      classification: c.classification || null,
-    }));
-  }, [companies]);
+    const settled = await Promise.allSettled(syms.map(s => runCompanyDataPipeline(s)));
+    const newResults: Record<string, PipelineResult | null> = {};
+    const newErrors: Record<string, string> = {};
+    const newLoading: Record<string, boolean> = {};
 
-  const viewModel = useMemo(() => {
-    return buildCompareViewModel(
-      companyViews,
-      routeData?.factorComparison?.map((c: any) => ({
-        factor: c.factor,
-        values: c.values ?? [],
-        winner: typeof c.winner === "number" ? c.winner : null,
-      })) ?? []
-    );
-  }, [companyViews, routeData]);
+    syms.forEach((s, i) => {
+      newLoading[s] = false;
+      if (settled[i].status === "fulfilled") {
+        newResults[s] = settled[i].value;
+        newErrors[s] = "";
+      } else {
+        newResults[s] = null;
+        newErrors[s] = (settled[i] as PromiseRejectedResult).reason?.message ?? "Failed";
+      }
+    });
 
-  const fetchCompare = useCallback(async (syms: string[]) => {
-    // Exclude duplicates before sending
-    const uniqueSyms = Array.from(new Set(syms.map(s => s.toUpperCase())));
-    if (uniqueSyms.length < 2) return;
-    setRouteLoading(true);
-    try {
-      const res = await api.compareCompanies(uniqueSyms);
-      setRouteData(res.data);
-    } catch {
-      setRouteData(null);
-    }
-    setRouteLoading(false);
+    setResults(prev => ({ ...prev, ...newResults }));
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    setLoading(prev => ({ ...prev, ...newLoading }));
   }, []);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const idsParam = params.get("ids") || "";
-    const idParam = params.get("id") || "";
-    const ids = idsParam ? idsParam.split(",").filter(Boolean) : (idParam ? [idParam] : []);
-    if (ids.length > 0) {
-      setLoading(true);
-      // Deduplicate symbols from URL parameters immediately
-      const uniqueIds = Array.from(new Set(ids.map(s => s.toUpperCase())));
-      const resolved: CompareCompany[] = uniqueIds.map((sym) => ({
-        symbol: sym,
-        companyName: sym,
-        score: null,
-      }));
-      setCompanies(resolved);
-      setLoading(false);
-      if (resolved.length >= 2) {
-        fetchCompare(resolved.map((c) => c.symbol));
-      }
-    }
-  }, [fetchCompare]);
+  useEffect(() => { fetchAll(symbols); }, [symbols, fetchAll]);
 
-  useEffect(() => {
-    if (!searchQuery.trim() || companies.length >= MAX_COMPANIES) { setSearchResults([]); return; }
-    setSearching(true);
-    const timer = setTimeout(async () => {
-      try {
-        const res = await api.searchUniversal(searchQuery.trim());
-        const results = res?.data?.results ?? [];
-        setSearchResults(results.slice(0, 5));
-      } catch {
-        setSearchResults([]);
-      }
-      setSearching(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery, companies.length]);
+  const addSymbol = useCallback((sym: string) => {
+    const clean = sym.trim().toUpperCase();
+    if (!clean || symbols.includes(clean) || symbols.length >= MAX_SYMBOLS) return;
+    const next = [...symbols, clean];
+    setSymbols(next);
+    updateUrlSymbols(next);
+    setAddInput("");
+  }, [symbols]);
 
-  const addCompany = async (symbol: string) => {
-    const cleanSym = symbol.toUpperCase();
-    if (companies.find((c) => c.symbol === cleanSym)) return; // Duplicate check
-    setSearchQuery("");
-    setSearchResults([]);
-    const updated = [...companies, { symbol: cleanSym, companyName: symbol, score: null }];
-    setCompanies(updated);
-    const params = new URLSearchParams(window.location.search);
-    params.set("ids", updated.map((c) => c.symbol).join(","));
-    window.history.replaceState({}, "", `?${params.toString()}`);
-    if (updated.length >= 2) {
-      fetchCompare(updated.map((c) => c.symbol));
-    }
-  };
+  const removeSymbol = useCallback((sym: string) => {
+    const next = symbols.filter(s => s !== sym);
+    setSymbols(next);
+    updateUrlSymbols(next);
+  }, [symbols]);
 
-  const removeCompany = (symbol: string) => {
-    const updated = companies.filter((c) => c.symbol !== symbol);
-    setCompanies(updated);
-    const params = new URLSearchParams(window.location.search);
-    if (updated.length > 0) params.set("ids", updated.map((c) => c.symbol).join(","));
-    else params.delete("ids");
-    window.history.replaceState({}, "", `?${params.toString()}`);
-    if (updated.length >= 2) {
-      fetchCompare(updated.map((c) => c.symbol));
-    } else {
-      setRouteData(null);
+  const handleAddKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") addSymbol(addInput);
+  }, [addInput, addSymbol]);
+
+  const rows = useMemo(() => makeRows(), []);
+
+  const summaryText = useMemo(() => {
+    const parts: string[] = [];
+    const leaders: Record<string, string[]> = {};
+    for (const g of FACTOR_GROUPS) {
+      const scored = symbols.map(s => ({ sym: s, score: factorScore(results[s] ?? null, g) })).filter(x => x.score !== null);
+      if (scored.length < 2) continue;
+      const best = scored.reduce((a, b) => (a.score ?? 0) >= (b.score ?? 0) ? a : b);
+      const label = FACTOR_LABEL[g] ?? g;
+      if (!leaders[best.sym]) leaders[best.sym] = [];
+      leaders[best.sym].push(label);
     }
-  };
+    for (const [sym, factors] of Object.entries(leaders)) {
+      const sc = fScore(results[sym]?.prediction?.rankingScore ?? null);
+      parts.push(`${sym} (${sc}) leads on ${factors.join(" and ")}`);
+    }
+    if (parts.length === 0) return null;
+    return `Based on engine scores: ${parts.join(". ")}.`;
+  }, [symbols, results]);
 
   return (
     <ProductShell>
       <ProductPage>
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" aria-hidden="true" />
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">Compare companies</h1>
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <ArrowLeftRight className="h-5 w-5 text-[#2962FF]" />
+              <h1 className="text-xl font-bold text-[#E6EDF3]">Compare stocks</h1>
+            </div>
+            <p className="mt-1 text-xs text-[#9AA7B5]">Compare 2–4 stocks side by side using real pipeline data</p>
           </div>
-          <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">Compare up to {MAX_COMPANIES} companies side by side to evaluate key factors and determine which deserves further review.</p>
         </div>
 
-        {companies.length < MAX_COMPANIES && (
-          <ProductPanel className="mb-6 border border-white/[0.08]">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <Search className="h-4 w-4 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search a company to add..."
-                className="w-full bg-transparent text-xs text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
-                aria-label="Search company to compare"
-              />
-              {searching && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />}
+        {symbols.length < MAX_SYMBOLS && (
+          <div className="mb-5 flex items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0D1117] px-4 py-2.5">
+            <Plus className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
+            <input
+              type="text"
+              value={addInput}
+              onChange={e => setAddInput(e.target.value.toUpperCase())}
+              onKeyDown={handleAddKeyDown}
+              placeholder="Add stock (e.g. TCS) and press Enter..."
+              className="w-full bg-transparent text-xs text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
+            />
+          </div>
+        )}
+
+        {symbols.length === 0 && (
+          <ProductPanel className="flex flex-col items-center gap-4 py-14 text-center border-white/[0.08]">
+            <ArrowLeftRight className="h-10 w-10 text-[#2D333B]" />
+            <div>
+              <h2 className="text-sm font-semibold text-[#E6EDF3]">Add stocks to compare</h2>
+              <p className="mt-1 text-xs text-[#9AA7B5]">Type a symbol above or use ?symbols=TCS,RELIANCE in the URL</p>
             </div>
-            {searchResults.length > 0 && (
-              <div className="border-t border-white/[0.06] px-2 pb-2 pt-1">
-                {searchResults.map((r) => (
-                  <button
-                    key={r.symbol}
-                    type="button"
-                    onClick={() => addCompany(r.symbol)}
-                    className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-xs text-[var(--color-text-secondary)] hover:bg-[rgba(255,255,255,0.04)] hover:text-[var(--color-text-primary)] transition-colors"
-                  >
-                    <Search className="h-3.5 w-3.5 shrink-0 text-[var(--color-text-muted)]" aria-hidden="true" />
-                    <span className="font-mono font-semibold">{r.symbol}</span>
-                    {r.companyName && <span className="text-[10px] text-[var(--color-text-muted)]">{r.companyName}</span>}
-                  </button>
-                ))}
-              </div>
-            )}
+            <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open AI Scanner</ProductAction>
           </ProductPanel>
         )}
 
-        {loading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-xs text-[var(--color-text-secondary)]">
-            <Loader2 className="h-4 w-4 animate-spin text-[#2962FF]" aria-hidden="true" />
-            Loading research comparison...
-          </div>
-        ) : (
+        {symbols.length > 0 && (
           <>
-            {companies.length > 0 && (
-              <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {companies.map((company) => (
-                  <div
-                    key={company.symbol}
-                    className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-3 py-2.5"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => productNavigate("stock", company.symbol)}
-                      className="min-w-0 flex-1 text-left"
-                    >
-                      <span className="block truncate font-mono text-sm font-semibold text-[var(--color-text-primary)] hover:underline">{company.symbol}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeCompany(company.symbol)}
-                      className="rounded p-1 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
-                      aria-label={`Remove ${company.symbol}`}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-                {companies.length < MAX_COMPANIES && (
-                  <div className="flex items-center gap-2 rounded-lg border border-dashed border-white/[0.08] px-3 py-2.5 text-xs text-[var(--color-text-muted)]">
-                    <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                    <span>Add company</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {companies.length === 0 && (
-              <div className="flex flex-col items-center gap-5 py-12 text-center">
-                <ArrowLeftRight className="h-12 w-12 text-[#2D333B]" aria-hidden="true" />
-                <div>
-                  <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Search companies above to compare</h2>
-                  <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-[var(--color-text-secondary)]">
-                    Add up to {MAX_COMPANIES} companies to see a side-by-side comparison matrix.
-                  </p>
+            <div className="mb-4 grid gap-3" style={{ gridTemplateColumns: `180px repeat(${symbols.length}, 1fr)` }}>
+              {symbols.map(sym => (
+                <div key={sym} className="flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#0D1117] px-3 py-2.5">
+                  <button type="button" onClick={() => productNavigate("stock", sym)} className="min-w-0 text-left">
+                    <span className="block truncate font-mono text-sm font-semibold text-[#E6EDF3] hover:underline">{sym}</span>
+                    <span className="block truncate text-[10px] text-[#9AA7B5]">{results[sym]?.companyName ?? ""}</span>
+                  </button>
+                  <button type="button" onClick={() => removeSymbol(sym)} className="rounded p-1 text-[#9AA7B5] hover:text-[#E6EDF3]">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <ProductAction variant="secondary" onClick={() => productNavigate("scanner")}>Open AI Scanner</ProductAction>
-                  <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {routeLoading && (
-          <div className="flex items-center justify-center gap-2 py-12 text-xs text-[var(--color-text-secondary)]">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2962FF]" aria-hidden="true" />
-            Loading comparison...
-          </div>
-        )}
-
-        {!loading && !routeLoading && companies.length >= 2 && routeData && (
-          <div className="space-y-5">
-            {/* Factor Comparison Matrix (clean rows, only real non-empty rows) */}
-            {routeData.factorComparison && routeData.factorComparison.length > 0 && (
-              <ProductPanel className="overflow-hidden border border-white/[0.08] p-4">
-                <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">Decision matrix</div>
-                <div className="space-y-2">
-                  {routeData.factorComparison.filter(fc => fc.explanation).map((fc) => (
-                    <div key={fc.factor} className="rounded-lg border border-white/[0.04] bg-white/[0.01] p-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                      <div className="min-w-0">
-                        <span className="text-xs font-semibold text-[var(--color-text-primary)]">{fc.factor}</span>
-                        <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">{fc.explanation}</p>
-                      </div>
-                      {fc.winner && (
-                        <div className="shrink-0 text-[10px] font-bold text-[#2962FF] uppercase tracking-wider bg-[#2962FF]/10 px-2 py-0.5 rounded self-start sm:self-center">
-                          {fc.winner}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </ProductPanel>
-            )}
-
-            {/* Recommendation - Genuinely neutral */}
-            {routeData.recommendation && (
-              <ProductPanel className="overflow-hidden border border-white/[0.08] p-4">
-                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">Summary review prompt</div>
-                <p className="text-xs leading-relaxed text-[var(--color-text-primary)]">
-                  {routeData.recommendation.toLowerCase().includes("buy")
-                    ? "Needs further review"
-                    : routeData.recommendation}
-                </p>
-              </ProductPanel>
-            )}
-
-            {/* Actions per company */}
-            <div className="flex flex-wrap items-center gap-2">
-              {companies.map((c) => (
-                <button
-                  key={c.symbol}
-                  type="button"
-                  onClick={() => productNavigate("stock", c.symbol)}
-                  className="rounded-lg border border-[#2962FF] bg-[#2962FF]/10 px-4 py-2 text-xs font-semibold text-white hover:bg-[#2962FF]/20 transition-all"
-                >
-                  Research {c.symbol} &rarr;
-                </button>
               ))}
             </div>
-          </div>
-        )}
 
-        {!loading && !routeLoading && companies.length >= 2 && !routeData && (
-          <ProductPanel className="p-6 text-center border border-white/[0.08]">
-            <p className="text-xs text-[var(--color-text-secondary)]">Not enough information to draw a direct decision matrix for these selections yet.</p>
-          </ProductPanel>
+            <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#0D1117]">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-[#9AA7B5]">Metric</th>
+                    {symbols.map(sym => (
+                      <th key={sym} className="px-3 py-2.5 text-left font-mono text-xs font-bold text-[#E6EDF3]">{sym}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* ── PRICE section ── */}
+                  {[
+                    { label: "Current price", render: r => fPrice(r?.price.current ?? null) },
+                    { label: "% Change", render: r => <span className={r?.price.change && r.price.change > 0 ? "text-[#16A34A]" : r?.price.change && r.price.change < 0 ? "text-[#EF4444]" : ""}>{fPercent(r?.price.change ?? null, true)}</span> },
+                    { label: "52-week range", render: r => r?.price.weekLow52 && r?.price.weekHigh52 ? `${fPrice(r.price.weekLow52)} – ${fPrice(r.price.weekHigh52)}` : "—" },
+                    { label: "Market cap", render: r => fMarketCap(r?.price.marketCap ?? null) },
+                    { label: "Exchange", render: r => r?.price.exchange ?? "—" },
+                  ].map(({ label, render }) => (
+                    <tr key={label} className="border-b border-white/[0.04]">
+                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{label}</td>
+                      {symbols.map(sym => (
+                        <td key={sym} className="px-3 py-2 font-mono text-xs text-[#E6EDF3]">{render(results[sym] ?? null)}</td>
+                      ))}
+                    </tr>
+                  ))}
+
+                  {/* ── ENGINE SCORE section ── */}
+                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Engine score</td>
+                  </tr>
+                  <tr className="border-b border-white/[0.04]">
+                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Overall score</td>
+                    {symbols.map(sym => {
+                      const sc = results[sym]?.prediction?.rankingScore ?? null;
+                      return (
+                        <td key={sym} className="px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <ScoreRing score={sc} size="sm" showGrade />
+                            <span className="font-mono text-sm font-bold" style={{ color: textColor(sc) }}>{fScore(sc)}</span>
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  <tr className="border-b border-white/[0.04]">
+                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Classification</td>
+                    {symbols.map(sym => (
+                      <td key={sym} className="px-3 py-2">
+                        <ClassificationBadge classification={(results[sym]?.prediction?.classification ?? "INSUFFICIENT_DATA") as any} size="sm" />
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="border-b border-white/[0.04]">
+                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Confidence</td>
+                    {symbols.map(sym => (
+                      <td key={sym} className="px-3 py-2 font-mono text-xs" style={{ color: textColor(results[sym]?.prediction?.confidenceScore ?? null) }}>{fScore(results[sym]?.prediction?.confidenceScore ?? null)}%</td>
+                    ))}
+                  </tr>
+                  <tr className="border-b border-white/[0.04]">
+                    <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">Data completeness</td>
+                    {symbols.map(sym => (
+                      <td key={sym} className="px-3 py-2 font-mono text-xs text-[#E6EDF3]">{fScore(results[sym]?.dataCompleteness ?? null)}%</td>
+                    ))}
+                  </tr>
+
+                  {/* ── FACTOR SCORES section ── */}
+                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Factor scores</td>
+                  </tr>
+                  {FACTOR_GROUPS.map(g => (
+                    <tr key={g} className="border-b border-white/[0.04]">
+                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{FACTOR_LABEL[g]}</td>
+                      {(() => {
+                        const vals = symbols.map(sym => factorScore(results[sym] ?? null, g));
+                        const [best, worst] = bestWorstIndex(vals, false);
+                        return symbols.map((sym, ci) => {
+                          const v = vals[ci];
+                          return (
+                            <td key={sym} className={`px-3 py-2.5 ${ci === best ? "bg-[rgba(22,163,74,0.08)]" : ci === worst ? "bg-[rgba(239,68,68,0.08)]" : ""}`}>
+                              {v !== null ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="w-6 text-right font-mono text-xs font-bold" style={{ color: barColor(v) }}>{v}</span>
+                                  <div className="h-1.5 w-full max-w-[60px] overflow-hidden rounded-full bg-[#1E242C]">
+                                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, v)}%`, backgroundColor: barColor(v) }} />
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-[#9AA7B5]">—</span>
+                              )}
+                            </td>
+                          );
+                        });
+                      })()}
+                    </tr>
+                  ))}
+
+                  {/* ── FUNDAMENTALS section ── */}
+                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Fundamentals</td>
+                  </tr>
+                  {rows.slice(4, 14).map(row => (
+                    <tr key={row.label} className="border-b border-white/[0.04]">
+                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{row.label}</td>
+                      {(() => {
+                        const vals = symbols.map(sym => results[sym] ? row.raw(results[sym] as PipelineResult) : null);
+                        const [best, worst] = bestWorstIndex(vals, row.lowerIsBetter);
+                        return symbols.map((sym, ci) => (
+                          <td key={sym} className={`px-3 py-2 font-mono text-xs transition-colors ${ci === best ? "bg-[rgba(22,163,74,0.08)] text-[#16A34A]" : ci === worst ? "bg-[rgba(239,68,68,0.08)] text-[#EF4444]" : "text-[#E6EDF3]"}`}>
+                            {results[sym] ? row.display(results[sym] as PipelineResult) : <span className="text-[#9AA7B5]">—</span>}
+                          </td>
+                        ));
+                      })()}
+                    </tr>
+                  ))}
+
+                  {/* ── TECHNICALS section ── */}
+                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <td colSpan={1 + symbols.length} className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Technicals</td>
+                  </tr>
+                  {rows.slice(14).map(row => (
+                    <tr key={row.label} className="border-b border-white/[0.04]">
+                      <td className="sticky left-0 z-10 bg-[#0D1117] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#9AA7B5]">{row.label}</td>
+                      {(() => {
+                        const vals = symbols.map(sym => results[sym] ? row.raw(results[sym] as PipelineResult) : null);
+                        const [best, worst] = bestWorstIndex(vals, row.lowerIsBetter);
+                        return symbols.map((sym, ci) => (
+                          <td key={sym} className={`px-3 py-2 font-mono text-xs transition-colors ${ci === best ? "bg-[rgba(22,163,74,0.08)] text-[#16A34A]" : ci === worst ? "bg-[rgba(239,68,68,0.08)] text-[#EF4444]" : "text-[#E6EDF3]"}`}>
+                            {results[sym] ? row.display(results[sym] as PipelineResult) : <span className="text-[#9AA7B5]">—</span>}
+                          </td>
+                        ));
+                      })()}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {summaryText && symbols.length >= 2 && (
+              <ProductPanel className="mt-5 border border-[rgba(41,98,255,0.2)] bg-[rgba(41,98,255,0.04)] p-4">
+                <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#2962FF]">Summary verdict</div>
+                <p className="text-xs leading-relaxed text-[#E6EDF3]">{summaryText}</p>
+              </ProductPanel>
+            )}
+          </>
         )}
       </ProductPage>
     </ProductShell>
@@ -303,4 +386,3 @@ export const ComparePage: React.FC = () => {
 };
 
 export default ComparePage;
-

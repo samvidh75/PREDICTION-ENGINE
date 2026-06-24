@@ -72,7 +72,6 @@ function logAuthState(phase: LoaderPhase, targetPage: string, elapsedMs: number,
       phase === 'timeout' ? '🚨' :
       phase === 'redirecting' ? '↪️' :
       '❌';
-    console.log(`[AuthUX] ${emoji} ${phase} → ${targetPage} (${elapsedMs}ms)`, entry);
   }
 
   // Also emit as a custom event so monitoring can pick it up

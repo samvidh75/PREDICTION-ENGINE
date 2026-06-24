@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RotateCcw, Search, X } from "lucide-react";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { navigateToStock } from "../architecture/navigation/routeCoordinator";
 import { productNavigate, ProductAction, ProductEmptyState, ProductPanel, ProductPage, ProductShell, ProductStatusPill } from "../components/product/ProductUI";
 import { UserJourneyEngine } from "../services/behavior/UserJourneyEngine";
@@ -8,6 +9,35 @@ import { RegisteredStock } from "../services/stocks/StockRegistry";
 import { StockSearchEngine } from "../services/stocks/StockSearchEngine";
 import { api, type LeaderboardEntry, type WatchlistRow } from "../services/api/client";
 import { formatRank } from "../services/ui/dataFormatting";
+
+const RECENT_KEY = "ss_recent_searches";
+
+function getRecentSearches(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    return raw ? raw.split(",").filter(Boolean) : [];
+  } catch { return []; }
+}
+
+function addRecentSearch(value: string): void {
+  const t = value.toUpperCase().trim();
+  if (!t) return;
+  const list = getRecentSearches();
+  const idx = list.indexOf(t);
+  if (idx !== -1) list.splice(idx, 1);
+  list.unshift(t);
+  localStorage.setItem(RECENT_KEY, list.slice(0, 5).join(","));
+}
+
+function removeRecentSearch(value: string): void {
+  const list = getRecentSearches().filter(s => s !== value.toUpperCase().trim());
+  localStorage.setItem(RECENT_KEY, list.join(","));
+}
+
+function clearRecentSearches(): void {
+  localStorage.removeItem(RECENT_KEY);
+}
 
 function readQueryFromUrl(): string {
   if (typeof window === "undefined") return "";
@@ -25,7 +55,10 @@ function updateSearchUrl(query: string, mode: "push" | "replace"): void {
 }
 
 export const SearchPage: React.FC = () => {
+  useDocumentTitle("Search — NSE/BSE | StockStory India");
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [query, setQuery] = useState(() => readQueryFromUrl());
   const [results, setResults] = useState<RegisteredStock[]>(() => {
     const initialQuery = readQueryFromUrl();
@@ -35,6 +68,9 @@ export const SearchPage: React.FC = () => {
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [leaderboardError, setLeaderboardError] = useState(false);
   const [watchlists, setWatchlists] = useState<WatchlistRow[]>([]);
+  const [dropdownResults, setDropdownResults] = useState<RegisteredStock[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   useEffect(() => { inputRef.current?.focus(); }, []);
 
@@ -85,7 +121,39 @@ export const SearchPage: React.FC = () => {
       .catch(() => {});
   }, []);
 
-  const recentSearches = useMemo(() => RecentSearchStore.getRecent().slice(0, 6), [query]);
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setDropdownResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceTimer.current = setTimeout(() => {
+      const res = StockSearchEngine.search(trimmed).slice(0, 8);
+      setDropdownResults(res);
+      setShowDropdown(res.length > 0);
+      setSelectedIndex(-1);
+    }, 300);
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, [query]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current && !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const recentSearches = useMemo(() => getRecentSearches().slice(0, 5), [query]);
 
   const topRanked = useMemo(() =>
     Object.values(predictionsMap)
@@ -111,12 +179,20 @@ export const SearchPage: React.FC = () => {
     const trimmed = query.trim();
     updateSearchUrl(trimmed, "push");
     if (trimmed.length >= 2) setResults(StockSearchEngine.search(trimmed));
+    setShowDropdown(false);
   };
 
   const handleOpenStock = (stock: RegisteredStock) => {
     const trimmed = query.trim();
-    if (trimmed) RecentSearchStore.addTicker(trimmed);
+    if (trimmed) addRecentSearch(trimmed);
     UserJourneyEngine.trackEvent("stock_explore", { symbol: stock.symbol, sector: stock.sector, source: "search_page" });
+    navigateToStock({ ticker: stock.symbol, mode: "push" });
+  };
+
+  const handleDropdownSelect = (stock: RegisteredStock) => {
+    addRecentSearch(stock.symbol);
+    setShowDropdown(false);
+    UserJourneyEngine.trackEvent("stock_explore", { symbol: stock.symbol, sector: stock.sector, source: "search_typeahead" });
     navigateToStock({ ticker: stock.symbol, mode: "push" });
   };
 
@@ -142,7 +218,7 @@ export const SearchPage: React.FC = () => {
     updateSearchUrl(value, "push");
   };
 
-  const handleClearRecent = () => RecentSearchStore.clear();
+  const handleClearRecent = () => clearRecentSearches();
 
   const handleRetryLeaderboard = () => {
     setLeaderboardLoading(true);
@@ -166,16 +242,48 @@ export const SearchPage: React.FC = () => {
       });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown || dropdownResults.length === 0) {
+      if (e.key === "Enter") handleSubmit();
+      return;
+    }
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex(prev => Math.min(prev + 1, dropdownResults.length - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < dropdownResults.length) {
+          handleDropdownSelect(dropdownResults[selectedIndex]);
+        } else {
+          handleSubmit();
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        inputRef.current?.blur();
+        break;
+    }
+  };
+
   return (
     <ProductShell>
       <ProductPage>
-        <div className="flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
+        <div className="relative flex items-center gap-3 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] px-4 py-2.5">
           <Search className="h-4 w-4 shrink-0 text-[#9AA7B5]" />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => handleSearchChange(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+            onKeyDown={handleKeyDown}
+            onFocus={() => { if (dropdownResults.length > 0) setShowDropdown(true); }}
             placeholder="Search by ticker, company name, or sector..."
             className="h-9 w-full min-w-0 bg-transparent text-sm text-[#E6EDF3] outline-none placeholder:text-[#9AA7B5]"
             aria-label="Search companies"
@@ -183,13 +291,43 @@ export const SearchPage: React.FC = () => {
           {query && (
             <button
               type="button"
-              onClick={() => { setQuery(""); setResults([]); updateSearchUrl("", "replace"); }}
+              onClick={() => { setQuery(""); setResults([]); setDropdownResults([]); setShowDropdown(false); updateSearchUrl("", "replace"); inputRef.current?.focus(); }}
               className="shrink-0 rounded p-0.5 text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
           )}
           <kbd className="hidden md:inline-flex h-5 shrink-0 items-center rounded border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-1.5 font-mono text-[10px] text-[#9AA7B5]">⌘K</kbd>
+
+          {showDropdown && (
+            <div
+              ref={dropdownRef}
+              className="absolute left-0 right-0 top-full mt-1 z-50 rounded-lg border border-[rgba(148,163,184,0.16)] bg-[#0D1117] shadow-xl overflow-hidden"
+            >
+              {dropdownResults.map((stock, idx) => {
+                const cleanedSym = stock.symbol.replace(/\.NS$/, "").toUpperCase();
+                const prediction = predictionsMap[cleanedSym];
+                const score = prediction?.rankingScore ?? null;
+                return (
+                  <button
+                    key={stock.symbol}
+                    type="button"
+                    onClick={() => handleDropdownSelect(stock)}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                      idx === selectedIndex ? "bg-[rgba(255,255,255,0.06)]" : "hover:bg-[rgba(255,255,255,0.04)]"
+                    }`}
+                  >
+                    <span className="font-mono text-sm font-semibold text-[#E6EDF3]">{stock.symbol}</span>
+                    <span className="truncate text-xs text-[#9AA7B5]">{stock.companyName}</span>
+                    {score !== null && (
+                      <span className="ml-auto text-[10px] font-medium text-[#9AA7B5]">{Math.round(score)}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <section className="space-y-4">
@@ -299,14 +437,27 @@ export const SearchPage: React.FC = () => {
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {recentSearches.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => handleRecentSearch(item)}
-                        className="rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-2.5 py-1 font-mono text-[11px] font-medium text-[#E6EDF3] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
-                      >
-                        {item}
-                      </button>
+                      <span key={item} className="inline-flex items-center gap-1 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] pl-2.5 pr-1 py-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addRecentSearch(item);
+                            UserJourneyEngine.trackEvent("stock_explore", { symbol: item, source: "search_recent" });
+                            navigateToStock({ ticker: item, mode: "push" });
+                          }}
+                          className="font-mono text-[11px] font-medium text-[#E6EDF3] hover:text-white transition-colors"
+                        >
+                          {item}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeRecentSearch(item)}
+                          className="ml-0.5 rounded p-0.5 text-[#9AA7B5] hover:text-[#E6EDF3] hover:bg-[rgba(255,255,255,0.06)] transition-colors"
+                          aria-label={`Remove ${item}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
                     ))}
                   </div>
                 </ProductPanel>

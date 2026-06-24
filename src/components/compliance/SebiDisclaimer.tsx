@@ -5,6 +5,7 @@ type DisclaimerVariant = "banner" | "footer" | "inline" | "tooltip";
 
 interface SebiDisclaimerProps {
   variant?: DisclaimerVariant;
+  className?: string;
 }
 
 const DISCLAIMER_TEXT =
@@ -31,7 +32,7 @@ function dismissBanner(): void {
   }
 }
 
-export function SebiDisclaimer({ variant = "footer" }: SebiDisclaimerProps) {
+export function SebiDisclaimer({ variant = "footer", className = "" }: SebiDisclaimerProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export function SebiDisclaimer({ variant = "footer" }: SebiDisclaimerProps) {
 
   if (variant === "footer") {
     return (
-      <footer className="mt-8 px-4 py-4 border-t border-[#E2E8F0] bg-[#F8FAFC]">
+      <footer className={`mt-8 px-4 py-4 border-t border-[#E2E8F0] bg-[#F8FAFC] ${className}`.trim()}>
         <p className="text-[11px] leading-5 text-[#94A3B8] max-w-5xl mx-auto">
           <strong className="font-semibold text-[#64748B]">Disclaimer:</strong>{" "}
           {DISCLAIMER_TEXT}

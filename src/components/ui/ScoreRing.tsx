@@ -13,7 +13,7 @@ const STROKE: Record<Size, number> = { sm: 4, md: 6, lg: 8, xl: 10 };
 const FONT: Record<Size, number> = { sm: 10, md: 13, lg: 18, xl: 24 };
 const GRADE_FONT: Record<Size, number> = { sm: 6, md: 8, lg: 11, xl: 14 };
 
-function scoreColor(v: number | null): string {
+export function scoreColor(v: number | null): string {
   if (v === null) return "#94A3B8";
   if (v >= 70) return "#16A34A";
   if (v >= 55) return "#22C55E";

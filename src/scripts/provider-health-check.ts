@@ -29,7 +29,7 @@ function pass(value: boolean): 'PASS' | 'FAIL' {
 
 function formatMarketCap(value: number | null | undefined): string {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 'N/A';
-  return `Rs ${(value / 10_000_000).toFixed(0)} Cr`;
+  return `₹${(value / 10_000_000).toFixed(0)} Cr`;
 }
 
 async function runHealthCheck(): Promise<void> {
@@ -93,7 +93,7 @@ async function runHealthCheck(): Promise<void> {
 
   for (const row of results) {
     const rowPassed = Object.values(row.checks).every(Boolean);
-    const price = typeof row.price === 'number' ? `Rs ${row.price.toFixed(2)}` : 'N/A';
+    const price = typeof row.price === 'number' ? `₹${row.price.toFixed(2)}` : 'N/A';
     const volume = typeof row.volume === 'number' ? row.volume.toLocaleString('en-IN') : 'N/A';
     md += `| ${row.symbol} | ${row.companyName} | ${row.sector} | ${row.industry} | ${formatMarketCap(row.marketCap)} | ${price} | ${volume} | ${row.updatedAt} | ${row.integrityStatus} | ${pass(rowPassed)} |\n`;
   }

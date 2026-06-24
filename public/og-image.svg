@@ -1,21 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f8f7f4"/>
-      <stop offset="100%" stop-color="#efeeeb"/>
-    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0D172D"/><stop offset="1" stop-color="#111F3A"/></linearGradient>
+    <linearGradient id="mark" x1="112" y1="161" x2="363" y2="430"><stop stop-color="#2C588A"/><stop offset="1" stop-color="#1C3C68"/></linearGradient>
   </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect x="60" y="60" width="1080" height="510" rx="28" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
-  <rect x="80" y="80" width="72" height="72" rx="16" fill="#1a4a3a"/>
-  <text x="116" y="126" font-family="system-ui,sans-serif" font-weight="700" font-size="28" fill="#f8f7f4" text-anchor="middle">S</text>
-  <text x="170" y="122" font-family="system-ui,sans-serif" font-weight="700" font-size="32" fill="#0f1419" letter-spacing="-0.02">StockStory</text>
-  <text x="336" y="122" font-family="system-ui,sans-serif" font-weight="700" font-size="32" fill="#1a4a3a">.India</text>
-  <text x="170" y="190" font-family="system-ui,sans-serif" font-weight="500" font-size="56" fill="#0f1419" letter-spacing="-0.02">Indian Equity Research</text>
-  <text x="170" y="260" font-family="system-ui,sans-serif" font-weight="400" font-size="24" fill="#536471">Source-backed signals, fundamentals, and ranking data</text>
-  <text x="170" y="295" font-family="system-ui,sans-serif" font-weight="400" font-size="24" fill="#536471">with clear availability labels.</text>
-  <line x1="170" y1="325" x2="300" y2="325" stroke="#1a4a3a" stroke-width="3" stroke-linecap="round"/>
-  <text x="170" y="380" font-family="system-ui,sans-serif" font-weight="500" font-size="14" fill="#8b98a5">Research signals only. Not investment advice.</text>
-  <rect x="900" y="440" width="160" height="40" rx="8" fill="#1a4a3a"/>
-  <text x="980" y="467" font-family="system-ui,sans-serif" font-weight="500" font-size="14" fill="#f8f7f4" text-anchor="middle">Research workspace</text>
+  <rect width="1200" height="630" rx="32" fill="url(#bg)"/>
+  <circle cx="242" cy="315" r="142" fill="url(#mark)"/>
+  <rect x="153" y="350" width="39" height="54" rx="9" fill="#356CB8"/>
+  <rect x="212" y="313" width="39" height="91" rx="9" fill="#4080D8"/>
+  <rect x="271" y="262" width="39" height="142" rx="9" fill="#58A0F4"/>
+  <path d="M286 211C324 235 348 271 359 315" fill="none" stroke="#27D3A3" stroke-width="20" stroke-linecap="round"/>
+  <text x="440" y="295" font-family="Geist,Inter,system-ui,sans-serif" font-size="74" font-weight="650" letter-spacing="-4" fill="#F8FAFC">StockStory</text>
+  <text x="445" y="352" font-family="Geist,Inter,system-ui,sans-serif" font-size="30" font-weight="650" letter-spacing="9" fill="#6EA4F8">INDIA</text>
+  <text x="445" y="414" font-family="Geist,Inter,system-ui,sans-serif" font-size="25" fill="#A9B8D0">AI equity research for Indian investors</text>
 </svg>

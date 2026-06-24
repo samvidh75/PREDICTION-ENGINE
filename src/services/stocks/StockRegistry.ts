@@ -40,9 +40,9 @@ function formatIndianMarketCap(value: number): string {
   const crore = 10_000_000;
   const lakhCrore = 100_000 * crore;
   if (value >= lakhCrore) {
-    return `Rs ${(value / lakhCrore).toFixed(2)} L Cr`;
+    return `₹${(value / lakhCrore).toFixed(2)} L Cr`;
   }
-  return `Rs ${(value / crore).toFixed(0)} Cr`;
+  return `₹${(value / crore).toFixed(0)} Cr`;
 }
 
 export class StockRegistry {

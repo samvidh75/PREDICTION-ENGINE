@@ -99,7 +99,7 @@ export function useLiveQuotes(symbols: string[]): Record<string, LiveQuoteState>
 
 export function formatINR(value?: number | null): string {
   if (typeof value !== "number" || !Number.isFinite(value)) return "Unavailable";
-  return `Rs ${value.toLocaleString("en-IN", {
+  return `₹${value.toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
