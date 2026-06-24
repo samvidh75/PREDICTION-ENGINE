@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Filter, Lock, Search, TrendingUp, Shield, AlertTriangle, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, Star } from "lucide-react";
 import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
@@ -15,6 +15,9 @@ import ScoreRing from "../ui/ScoreRing";
 import ClassificationBadge from "../ui/ClassificationBadge";
 import type { UnifiedClassification } from "../../prediction-engine/types";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
+import { runCompanyDataPipeline } from "../../services/data/CompanyDataPipeline";
+import { NIFTY50_SYMBOLS } from "../../services/universe/StockUniverse";
+import { fPrice, fChange } from "../../lib/format";
 
 const categoryIcon = (id: ScannerCategory) => {
   switch (id) {
@@ -104,6 +107,11 @@ export default function ScannerPage() {
   const [sortValue, setSortValue] = useState("score-desc");
   const [scannerMessage, setScannerMessage] = useState<string | null>(null);
 
+  const [pipelineResults, setPipelineResults] = useState<Map<string, { symbol: string; companyName: string; score: number; classification: UnifiedClassification; price: string; change: string; qualityValue: number | null; growthValue: number | null; momentumValue: number | null }>>(new Map());
+  const [skeletonCount, setSkeletonCount] = useState(0);
+  const [pipeLoading, setPipeLoading] = useState(false);
+  const pipelineRef = useRef(false);
+
   const [filters, setFilters] = useState({
     scoreRange: "All",
   });
@@ -173,6 +181,54 @@ export default function ScannerPage() {
     }
   }, [activeCategory, fetchScanner]);
 
+  const runBatchPipeline = useCallback(async (catId: string) => {
+    if (pipelineRef.current) return;
+    pipelineRef.current = true;
+    setPipeLoading(true);
+    setSkeletonCount(10);
+    setPipelineResults(new Map());
+    setScannerMessage(null);
+
+    const symbols = NIFTY50_SYMBOLS.slice(0, 15);
+    const isLargeCap = catId === "large_cap_health";
+    const resultsMap = new Map<string, { symbol: string; companyName: string; score: number; classification: UnifiedClassification; price: string; change: string; qualityValue: number | null; growthValue: number | null; momentumValue: number | null }>();
+
+    for (const sym of symbols) {
+      try {
+        const p = await runCompanyDataPipeline(sym);
+        if (isLargeCap) {
+          const mc = p.price.marketCap;
+          if (mc !== null && mc < 5e11) continue;
+        }
+        const score = p.prediction?.rankingScore ?? p.prediction?.healthScore ?? 50;
+        if (isLargeCap && score < 65) continue;
+        const cls: UnifiedClassification = score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK";
+        const qv = p.prediction?.factorScores?.find(f => f.group === 'quality')?.value ?? null;
+        const gv = p.prediction?.factorScores?.find(f => f.group === 'growth')?.value ?? null;
+        const mv = p.prediction?.factorScores?.find(f => f.group === 'momentum')?.value ?? null;
+        resultsMap.set(sym, {
+          symbol: sym,
+          companyName: p.companyName ?? sym,
+          score,
+          classification: cls,
+          price: fPrice(p.price.current),
+          change: fChange(p.price.change),
+          qualityValue: qv,
+          growthValue: gv,
+          momentumValue: mv,
+        });
+      } catch {
+        // skip failing symbols
+      }
+      setPipelineResults(new Map(resultsMap));
+      setSkeletonCount(Math.max(0, 10 - resultsMap.size));
+    }
+
+    setSkeletonCount(0);
+    setPipeLoading(false);
+    pipelineRef.current = false;
+  }, []);
+
   const handleCategoryClick = useCallback((catId: string, isFree: boolean) => {
     if (!isFree && !isPremium) {
       productNavigate("pricing");
@@ -182,10 +238,13 @@ export default function ScannerPage() {
       setActiveCategory("");
       setAllEntries([]);
       setResults([]);
+      setPipelineResults(new Map());
+      setSkeletonCount(0);
       return;
     }
     setActiveCategory(catId);
-  }, [activeCategory, isPremium]);
+    runBatchPipeline(catId);
+  }, [activeCategory, isPremium, runBatchPipeline]);
 
   const handleQuerySubmit = useCallback(() => {
     const trimmed = query.trim().toLowerCase();
@@ -469,14 +528,63 @@ export default function ScannerPage() {
             </div>
           )}
 
-          {/* Results */}
-          {loading && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading scanner results">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5"><div className="h-10 w-10 rounded-full bg-slate-100" /><div className="mt-5 h-4 w-1/2 rounded bg-slate-100" /><div className="mt-3 h-3 w-full rounded bg-slate-100" /></div>)}</div>}
+          {/* Pipeline skeleton loading */}
+          {pipeLoading && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading pipeline results">
+              {Array.from({ length: Math.max(1, skeletonCount) }, (_, index) => (
+                <div key={`skel-${index}`} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5">
+                  <div className="flex items-start justify-between">
+                    <div><div className="h-4 w-16 rounded bg-slate-100" /><div className="mt-2 h-5 w-32 rounded bg-slate-100" /></div>
+                    <div className="h-10 w-10 rounded-full bg-slate-100" />
+                  </div>
+                  <div className="mt-4 h-3 w-20 rounded bg-slate-100" />
+                  <div className="mt-3 flex gap-2"><div className="h-2 flex-1 rounded bg-slate-100" /><div className="h-2 flex-1 rounded bg-slate-100" /><div className="h-2 flex-1 rounded bg-slate-100" /></div>
+                  <div className="mt-4 h-10 w-full rounded bg-slate-100" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pipeline results */}
+          {!pipeLoading && pipelineResults.size > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from(pipelineResults.values()).map((pr) => (
+                <div key={pr.symbol} className="group relative min-h-[200px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition duration-300 hover:-translate-y-1 cursor-pointer" onClick={() => productNavigate("stock", pr.symbol)}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-[13px] font-semibold text-[var(--color-text-muted)] tracking-[.08em]">{pr.symbol}</span>
+                      <h3 className="mt-1 truncate text-[17px] font-semibold tracking-tight text-[var(--color-text-primary)]">{pr.companyName}</h3>
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <span className="text-sm font-semibold text-[var(--color-text-primary)]">{pr.price}</span>
+                        <span className="text-xs text-[var(--color-text-secondary)]">{pr.change}</span>
+                      </div>
+                    </div>
+                    <ScoreRing score={pr.score} size="sm" />
+                  </div>
+                  <div className="mt-3">
+                    <ClassificationBadge classification={pr.classification} />
+                  </div>
+                  {pr.qualityValue !== null && pr.growthValue !== null && (
+                    <div className="mt-4 space-y-2">
+                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Quality</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.qualityValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pr.qualityValue}%` }} /></div></div>
+                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Growth</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.growthValue}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${pr.growthValue}%` }} /></div></div>
+                      <div><div className="flex items-center justify-between text-[10px]"><span className="text-[var(--color-text-muted)]">Momentum</span><span className="font-semibold text-[var(--color-text-primary)]">{pr.momentumValue ?? '—'}</span></div><div className="mt-0.5 h-1.5 w-full rounded-full bg-slate-100"><div className="h-full rounded-full bg-violet-500 transition-all" style={{ width: `${pr.momentumValue ?? 0}%` }} /></div></div>
+                    </div>
+                  )}
+                  <div className="mt-4 text-right"><span className="text-xs font-semibold text-[#2962FF]">Research →</span></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Fallback: legacy scanner loading (only if not using pipeline) */}
+          {!pipeLoading && pipelineResults.size === 0 && loading && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading scanner results">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5"><div className="h-10 w-10 rounded-full bg-slate-100" /><div className="mt-5 h-4 w-1/2 rounded bg-slate-100" /><div className="mt-3 h-3 w-full rounded bg-slate-100" /></div>)}</div>}
 
           {scannerMessage && !loading && (
             <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">{scannerMessage}</div>
           )}
 
-          {!loading && activeCategory && sortedResults.length === 0 && !loading && (
+          {!loading && activeCategory && sortedResults.length === 0 && !loading && pipelineResults.size === 0 && !pipeLoading && (
             <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
               <Search className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
               <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Not enough companies match this view yet.</h3>
@@ -496,7 +604,7 @@ export default function ScannerPage() {
             </ProductPanel>
           )}
 
-          {!loading && sortedResults.length > 0 && (
+          {!loading && !pipeLoading && pipelineResults.size === 0 && sortedResults.length > 0 && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {sortedResults.slice(0, 100).map((entry) => {
                 const fullSymbol = entry.symbol;
