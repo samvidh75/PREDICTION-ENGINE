@@ -47,7 +47,7 @@ export function trackEvent(category: string, action: string, label?: string, val
           event_category: category,
           event_label: label,
           value: value,
-          send_to: "G-XXXXXXXXXX",
+          send_to: "G-ZX8Y4BFK6Z",
         });
       } catch { /* ga not loaded */ }
     }
