@@ -67,7 +67,7 @@ export class RankingStabilityValidator {
       warnings.push(`Max score change of ${maxScoreChange.toFixed(1)} exceeds 30-point threshold.`);
     }
     if (classificationFlipRate > 0.3) {
-      warnings.push(`Classification flip rate of ${(classificationFlipRate * 100).toFixed(1)}% suggests unstable classifications.`);
+      warnings.push(`Classification flip rate of ${(classificationFlipRate / 0.01).toFixed(1)}% suggests unstable classifications.`);
     }
     if (averageScoreChange > 15) {
       warnings.push(`Average score change of ${averageScoreChange.toFixed(1)} indicates high score volatility.`);
@@ -76,7 +76,7 @@ export class RankingStabilityValidator {
     const stabilityComponents = [
       Math.max(0, 100 - averageScoreChange * 2),
       Math.max(0, 100 - maxScoreChange * 1.5),
-      Math.max(0, 100 - classificationFlipRate * 100),
+      Math.max(0, 100 - classificationFlipRate / 0.01),
     ];
     const overallStabilityScore = Math.round(
       stabilityComponents.reduce((s, v) => s + v, 0) / stabilityComponents.length

@@ -20,7 +20,7 @@ import type { MigrationExecutionAdapter } from '../MigrationRunner';
 function makeTempDir(): string {
   const dir = path.join(
     os.tmpdir(),
-    `migration-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    `migration-test-${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2)}`,
   );
   fs.mkdirSync(dir, { recursive: true });
   return dir;

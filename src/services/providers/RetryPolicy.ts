@@ -37,7 +37,7 @@ export class RetryPolicy {
         const exponential = minDelayMs * Math.pow(2, attempt - 1);
         const delay = Math.min(exponential, maxDelayMs);
         // Add full jitter: random value between 0 and delay
-        const jitter = Math.random() * delay;
+        const jitter = (globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * delay;
         await new Promise(res => setTimeout(res, jitter));
       }
     }

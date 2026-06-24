@@ -191,7 +191,7 @@ export class UpstoxOAuthService {
   private static generateRandom(length: number): string {
     const arr = new Uint8Array(length);
     if (typeof crypto !== 'undefined') crypto.getRandomValues(arr);
-    else { for (let i = 0; i < length; i++) arr[i] = Math.floor(Math.random() * 255); }
+    else { for (let i = 0; i < length; i++) arr[i] = Math.floor((globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) * 255); }
     return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
   }
 

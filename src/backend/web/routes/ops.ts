@@ -715,7 +715,7 @@ const opsRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         const partials = Object.values(results).some((r: any) => r.status === "partial");
         overallStatus = failures ? "failure" : partials ? "partial" : "success";
 
-        const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const pipelineId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).slice(2)}`;
         const completedAt = new Date().toISOString();
         const symbolsFailed = symbols.length - quotesSucceeded;
         const errorClasses: string[] = [];

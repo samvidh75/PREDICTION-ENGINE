@@ -65,7 +65,7 @@ function momentumScore(input: EngineInput): EngineFactorScore {
   const sample = closes.slice(-20);
   const sma20 = sample.reduce((sum, value) => sum + value, 0) / sample.length;
   const current = closes[closes.length - 1];
-  const pctChange = ((current - closes[0]) / closes[0]) * 100;
+  const pctChange = ((current - closes[0]) / closes[0]) / 0.01;
   let score = current > sma20 ? 50 : 0;
   score += pctChange > 10 ? 30 : pctChange > 5 ? 20 : pctChange > 0 ? 10 : 0;
   if (closes.length >= 20) score += 10;
@@ -135,7 +135,7 @@ export class UnifiedPredictionEngine {
       input.closes.length > 0 ? 1 : null,
     ];
     const dataCompleteness = Math.round(
-      (completenessValues.filter(present).length / completenessValues.length) * 100,
+      (completenessValues.filter(present).length / completenessValues.length) / 0.01,
     );
     return {
       composite,

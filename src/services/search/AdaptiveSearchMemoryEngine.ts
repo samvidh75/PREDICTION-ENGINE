@@ -285,7 +285,7 @@ class AdaptiveSearchMemoryEngine {
    * Generate unique ID
    */
   private generateId(): string {
-    return `memory_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `memory_${Date.now()}_${(globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296).toString(36).substr(2, 9)}`;
   }
 
   /**

@@ -11,7 +11,7 @@
  *   4. Compute factor scores via FactorEngine
  *   5. Run validation checks
  * 
- * ZERO synthetic data. ZERO Math.random().
+ * ZERO synthetic data. ZERO pseudo-random values.
  * All data comes from real provider APIs.
  */
 
@@ -459,7 +459,7 @@ async function main(): Promise<void> {
     verdictMd += `- Real price history (Yahoo)\n`;
     verdictMd += `- Real technical indicators (computed from real prices)\n`;
     verdictMd += `- Real factor scores (computed from real financials + features)\n\n`;
-    verdictMd += `**Zero synthetic data. Zero Math.random().**\n`;
+    verdictMd += `**Zero synthetic data. Zero pseudo-random values.**\n`;
     verdictMd += `\n## Next Steps\n\n`;
     verdictMd += `1. Run \`calibrate.ts\` to generate real-data EngineCalibrationReport\n`;
     verdictMd += `2. Run TRACK-13 to audit real-world score distributions\n`;

@@ -66,9 +66,9 @@ function buildGroupScore(
 
   const featureCount = featureIds.length;
   const availableFeatureCount = featureCount - missing.length;
-  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) * 100 : 0;
+  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) / 0.01 : 0;
   const confidence = confidences.length > 0
-    ? clampScore(confidences.reduce((a, b) => a * b, 1) * 100)
+    ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
     ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
@@ -203,9 +203,9 @@ export function scoreMomentumGroup(features: Map<string, UnifiedFeatureValue>): 
 
   const featureCount = featureIds.length;
   const availableFeatureCount = featureCount - missing.length;
-  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) * 100 : 0;
+  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) / 0.01 : 0;
   const confidence = confidences.length > 0
-    ? clampScore(confidences.reduce((a, b) => a * b, 1) * 100)
+    ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
     ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
@@ -259,9 +259,9 @@ export function scoreRiskGroup(features: Map<string, UnifiedFeatureValue>): Unif
 
   const featureCount = featureIds.length;
   const availableFeatureCount = featureCount - missing.length;
-  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) * 100 : 0;
+  const availability = featureCount > 0 ? (availableFeatureCount / featureCount) / 0.01 : 0;
   const confidence = confidences.length > 0
-    ? clampScore(confidences.reduce((a, b) => a * b, 1) * 100)
+    ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
     ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
