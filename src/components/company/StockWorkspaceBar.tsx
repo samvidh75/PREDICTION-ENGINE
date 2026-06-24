@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
-import { useLiveQuote } from "../../hooks/useLiveQuotes";
+import { useUnifiedQuote } from "../../hooks/useUnifiedQuotes";
 import { api, type CompanyMetadata } from "../../services/api/client";
 
 function formatDateTime(value?: string): string {
@@ -33,7 +33,7 @@ function TrustItem({ label, value, detail, valueClass = "text-[var(--color-text-
 }
 
 export default function StockWorkspaceBar({ ticker, horizon }: { ticker: string; horizon: number }) {
-  const quoteState = useLiveQuote(ticker);
+  const quoteState = useUnifiedQuote(ticker);
   const [metadata, setMetadata] = useState<CompanyMetadata | null>(null);
   const [metadataLoading, setMetadataLoading] = useState(true);
 
