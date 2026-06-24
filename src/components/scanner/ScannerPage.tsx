@@ -1,40 +1,48 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Filter, Lock, Search, TrendingUp, Shield, AlertTriangle, BarChart3, Briefcase, DollarSign, X, SlidersHorizontal, Star } from "lucide-react";
-import { productNavigate, ProductAction, ProductPage, ProductPanel, ProductShell } from "../product/ProductUI";
+import { Search, TrendingUp, BarChart3, RefreshCw, Sparkles, SlidersHorizontal, ChevronDown, X } from "lucide-react";
+import { productNavigate } from "../product/ProductUI";
 import { api, type ScannerResultItem } from "../../services/api/client";
-import { addTrackedCompany, removeTrackedCompany, isTracked } from "../../lib/track/trackStore";
-import { scannerResultToResearchListItem } from "../../lib/product/productViewAdapters";
-import { signalLabelFromScore } from "../../lib/product/signalLabels";
-import CustomSelect from "../ui/CustomSelect";
-import { buildScannerViewModel } from "../../lib/product/viewModels/scannerViewModel";
-import { SCANNER_CATEGORIES, type ScannerCategory, CATEGORY_SECTIONS } from "../../lib/product/scannerCategories";
-import { getCurrentPlan, canViewPremiumScans, UPGRADE_URL } from "../../lib/product/planAccess";
-import { toResearchState, assertNoForbiddenScannerCopy } from "../../lib/compliance/scannerPolicy";
-import SebiDisclaimer from "../compliance/SebiDisclaimer";
-import ScoreRing from "../ui/ScoreRing";
-import ClassificationBadge from "../ui/ClassificationBadge";
-import type { UnifiedClassification } from "../../prediction-engine/types";
 import { StockRegistry } from "../../services/stocks/StockRegistry";
-import { runCompanyDataPipeline } from "../../services/data/CompanyDataPipeline";
 import { NIFTY50_SYMBOLS } from "../../services/universe/StockUniverse";
 import { fPrice, fChange } from "../../lib/format";
+import { getCurrentPlan, canViewPremiumScans } from "../../lib/product/planAccess";
+import { runCompanyDataPipeline } from "../../services/data/CompanyDataPipeline";
+import SebiDisclaimer from "../compliance/SebiDisclaimer";
 
-type PipelineRow = {
-  symbol: string; companyName: string; sector: string | null;
-  score: number | null; classification: UnifiedClassification;
-  price: string | null; change: string | null;
-  qualityValue: number | null; growthValue: number | null; momentumValue: number | null;
+import {
+  PremiumAppShell, PremiumTopNav, MarketTickerStrip, PremiumCard, ScoreRing,
+  ScannerFilterRail, ScannerResultsTable, RightInsightRail, FactorBar,
+  EmptyProductState, MethodologyNote,
+} from "../../premium/PremiumComponents";
+
+const SS = {
+  bg: "var(--ss-bg)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  positiveSoft: "var(--ss-positive-soft)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+  shadowCard: "var(--ss-shadow-card)",
+  container: "var(--ss-container)",
 };
 
-const DEFAULT_SYMBOLS = NIFTY50_SYMBOLS.slice(0, 10);
-
-function ScoreColorDot({ score }: { score: number | null }) {
-  if (score === null) return <span className="h-2 w-2 rounded-full bg-[var(--c-ink-disabled)]" />;
-  const c = score >= 75 ? "var(--c-score-high)" : score >= 55 ? "var(--c-score-mid)" : score >= 35 ? "var(--c-score-low)" : "var(--c-score-poor)";
-  return <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c }} />;
+interface PipelineRow {
+  symbol: string; companyName: string; sector: string | null;
+  score: number | null; price: string | null; change: string | null; changePositive: boolean | null;
+  qualityValue: number | null; growthValue: number | null;
+  momentumValue: number | null; valuationValue: number | null; riskValue: number | null;
 }
 
-function rowClassification(score: number | null): UnifiedClassification {
+const DEFAULT_SYMBOLS = NIFTY50_SYMBOLS.slice(0, 20);
+
+function rowClassification(score: number | null): string {
   if (score === null) return "INSUFFICIENT_DATA";
   if (score >= 80) return "EXCELLENT";
   if (score >= 65) return "HEALTHY";
@@ -43,340 +51,100 @@ function rowClassification(score: number | null): UnifiedClassification {
   return "AT_RISK";
 }
 
-const categoryIcon = (id: ScannerCategory) => {
-  switch (id) {
-    case "large_cap_health": return Shield;
-    case "mid_cap_health": return Shield;
-    case "small_cap_health": return Shield;
-    case "quality_leaders": return Star;
-    case "low_debt_leaders": return Briefcase;
-    case "profitability_leaders": return TrendingUp;
-    case "financial_strength": return Shield;
-    case "valuation_comfort": return DollarSign;
-    case "momentum_improving": return TrendingUp;
-    case "dividend_stability": return Shield;
-    case "risk_rising": return AlertTriangle;
-    case "good_business_out_of_favour": return DollarSign;
-  }
-};
-
-const SCORE_RANGES = ["All", "80-100", "60-79", "40-59", "Below 40"];
-
-const SORT_OPTIONS = [
-  { value: "score-desc", label: "Score ↓" },
-  { value: "score-asc", label: "Score ↑" },
-  { value: "name-asc", label: "Name A-Z" },
-  { value: "name-desc", label: "Name Z-A" },
-] as const;
-
-function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">{label}</label>
-      <div className="relative">
-        <CustomSelect
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-full cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-3 py-1.5 pr-8 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF] focus:outline-none focus:ring-1 focus:ring-[#2962FF]"
-        >
-          {options.map((o) => <option key={o} value={o}>{o}</option>)}
-        </CustomSelect>
-      </div>
-    </div>
-  );
-}
-
-function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h4 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-text-muted)]">{title}</h4>
-      {children}
-    </div>
-  );
-}
-
-function scannerSignalLabel(score: number | null): { label: string; color: string } | null {
-  const t = signalLabelFromScore(score);
-  if (!t) return null;
-  return { label: toResearchState(t.label), color: t.color };
-}
-
-function complianceExplanation(entry: ScannerResultItem): string {
-  const score = entry.score ?? 50;
-  const riskMarker = (entry.riskMarker || "").toLowerCase();
-  if (riskMarker.includes("risk") || riskMarker.includes("weak")) {
-    return "Risk signals present — closer review recommended.";
-  }
-  if (score >= 75) {
-    return "Strong business quality and lower balance-sheet risk.";
-  }
-  if (score >= 60) {
-    return "Improving profitability with reasonable valuation context.";
-  }
-  if (score >= 45) {
-    return "Healthy financial strength, but valuation needs review.";
-  }
-  return "Momentum is improving, but risk should be reviewed.";
-}
-
 export default function ScannerPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ScannerResultItem[]>([]);
   const [allEntries, setAllEntries] = useState<ScannerResultItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("");
-  const [classificationFilter, setClassificationFilter] = useState("All");
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [sortValue, setSortValue] = useState("score-desc");
-  const [scannerMessage, setScannerMessage] = useState<string | null>(null);
-
   const [pipelineResults, setPipelineResults] = useState<Map<string, PipelineRow>>(new Map());
-  const [skeletonCount, setSkeletonCount] = useState(0);
   const [pipeLoading, setPipeLoading] = useState(false);
-  const pipelineRef = useRef(false);
-  const defaultLoadedRef = useRef(false);
-
-  const [filters, setFilters] = useState({
-    scoreRange: "All",
+  const [skeletonCount, setSkeletonCount] = useState(0);
+  const [sortValue, setSortValue] = useState("score-desc");
+  const [filters, setFilters] = useState<Record<string, string>>({
+    universe: "All", scoreRange: "All", sector: "All", quality: "All",
+    growth: "All", valuation: "All", momentum: "All", marketCap: "All", risk: "All",
   });
 
   const plan = getCurrentPlan();
   const isPremium = canViewPremiumScans(plan);
+  const pipelineRef = useRef(false);
+  const defaultLoadedRef = useRef(false);
 
-  const viewModel = useMemo(() => {
-    return buildScannerViewModel(
-      query,
-      results.map((r) => ({
-        symbol: r.symbol,
-        companyName: r.companyName || "",
-        sector: r.sector || "",
-        score: typeof r.score === "number" ? r.score : null,
-        rank: r.rank ?? 0,
-        conviction: r.conviction || "",
-        keyReason: r.keyReason || "",
-        riskMarker: r.riskMarker || "",
-        hasRealData: true,
-      })),
-      loading,
-      activeCategory
-    );
-  }, [query, results, loading, activeCategory]);
-
-  const registryFallback = useCallback((): ScannerResultItem[] => StockRegistry.getAllStocks().slice(0, 24).map((stock, index) => ({
-    symbol: stock.symbol,
-    companyName: stock.companyName,
-    sector: stock.sector,
-    rank: index + 1,
-    conviction: "Awaiting engine score",
-    score: null,
-    oneLineThesis: "Company profile is available; the latest engine score is still loading.",
-    keyReason: "Registry-backed company profile",
-    riskMarker: null,
-  })), []);
-
-  const fetchScanner = useCallback(async (preset: string) => {
-    setLoading(true);
-    setScannerMessage(null);
-    try {
-      const res = await api.getScanner(preset, 200);
-      const data = res.data?.length ? res.data : registryFallback();
-      setAllEntries(data);
-      setResults(data);
-      setScannerMessage(res.message ?? null);
-    } catch {
-      const fallback = registryFallback();
-      setAllEntries(fallback);
-      setResults(fallback);
-      setScannerMessage("Live rankings are temporarily unavailable. Showing the NSE/BSE company directory without fabricated scores.");
-    }
-    setLoading(false);
-  }, [registryFallback]);
-
-  useEffect(() => {
-    if (activeCategory && pipelineResults.size === 0 && !pipeLoading) {
-      const cat = SCANNER_CATEGORIES.find((c) => c.id === activeCategory);
-      if (cat && cat.filterPreset) {
-        fetchScanner(cat.filterPreset);
-        return;
-      }
-    }
-    if (!activeCategory) {
-      setLoading(false);
-    }
-  }, [activeCategory, fetchScanner, pipelineResults.size, pipeLoading]);
-
-  const runBatchPipeline = useCallback(async (catId: string) => {
+  const runPipeline = useCallback(async () => {
     if (pipelineRef.current) return;
     pipelineRef.current = true;
     setPipeLoading(true);
     setSkeletonCount(10);
     setPipelineResults(new Map());
-    setScannerMessage(null);
 
-    const symbols = NIFTY50_SYMBOLS.slice(0, 15);
-    const isLargeCap = catId === "large_cap_health";
+    const symbols = DEFAULT_SYMBOLS;
     const resultsMap = new Map<string, PipelineRow>();
 
     for (const sym of symbols) {
       try {
         const p = await runCompanyDataPipeline(sym);
-        if (isLargeCap) {
-          const mc = p.price.marketCap;
-          if (mc !== null && mc < 5e11) continue;
-        }
         const score = p.prediction?.rankingScore ?? p.prediction?.healthScore ?? 50;
-        if (isLargeCap && score < 65) continue;
-        const cls: UnifiedClassification = score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK";
-        const qv = p.prediction?.factorScores?.find(f => f.group === 'quality')?.value ?? null;
-        const gv = p.prediction?.factorScores?.find(f => f.group === 'growth')?.value ?? null;
-        const mv = p.prediction?.factorScores?.find(f => f.group === 'momentum')?.value ?? null;
+        const qv = p.prediction?.factorScores?.find(f => f.group === "quality")?.value ?? null;
+        const gv = p.prediction?.factorScores?.find(f => f.group === "growth")?.value ?? null;
+        const mv = p.prediction?.factorScores?.find(f => f.group === "momentum")?.value ?? null;
+        const vv = p.prediction?.factorScores?.find(f => f.group === "valuation")?.value ?? null;
+        const rv = p.prediction?.factorScores?.find(f => f.group === "risk")?.value ?? null;
+        const changeVal = p.price.change;
         resultsMap.set(sym, {
-          symbol: sym,
-          companyName: p.companyName ?? sym,
-          sector: null,
-          score,
-          classification: cls,
-          price: fPrice(p.price.current),
-          change: fChange(p.price.change),
-          qualityValue: qv,
-          growthValue: gv,
-          momentumValue: mv,
+          symbol: sym, companyName: p.companyName ?? sym, sector: null,
+          score, price: p.price.current !== null ? fPrice(p.price.current) : null,
+          change: changeVal !== null ? fChange(changeVal) : null,
+          changePositive: changeVal !== null ? changeVal >= 0 : null,
+          qualityValue: qv, growthValue: gv, momentumValue: mv,
+          valuationValue: vv, riskValue: rv,
         });
-      } catch {
-        // skip failing symbols
-      }
+      } catch { /* skip */ }
       setPipelineResults(new Map(resultsMap));
       setSkeletonCount(Math.max(0, 10 - resultsMap.size));
     }
-
     setSkeletonCount(0);
     setPipeLoading(false);
     pipelineRef.current = false;
   }, []);
 
-  const handleCategoryClick = useCallback((catId: string, isFree: boolean) => {
-    if (!isFree && !isPremium) {
-      productNavigate("pricing");
-      return;
-    }
-    if (activeCategory === catId) {
-      setActiveCategory("");
-      setAllEntries([]);
-      setResults([]);
-      setPipelineResults(new Map());
-      setSkeletonCount(0);
-      return;
-    }
-    setActiveCategory(catId);
-    runBatchPipeline(catId);
-  }, [activeCategory, isPremium, runBatchPipeline]);
-
-  const loadDefaultTen = useCallback(async () => {
-    if (defaultLoadedRef.current) return;
-    defaultLoadedRef.current = true;
-    setPipeLoading(true);
-    setSkeletonCount(10);
-    setPipelineResults(new Map());
-
-    const resultsMap = new Map<string, PipelineRow>();
-    for (const sym of DEFAULT_SYMBOLS) {
-      try {
-        const p = await runCompanyDataPipeline(sym);
-        const score = p.prediction?.rankingScore ?? p.prediction?.healthScore ?? null;
-        const cls = rowClassification(score);
-        const qv = p.prediction?.factorScores?.find(f => f.group === 'quality')?.value ?? null;
-        const gv = p.prediction?.factorScores?.find(f => f.group === 'growth')?.value ?? null;
-        const mv = p.prediction?.factorScores?.find(f => f.group === 'momentum')?.value ?? null;
-        resultsMap.set(sym, {
-          symbol: sym,
-          companyName: p.companyName ?? sym,
-          sector: null,
-          score,
-          classification: cls,
-          price: p.price.current !== null ? fPrice(p.price.current) : null,
-          change: p.price.change !== null ? fChange(p.price.change) : null,
-          qualityValue: qv,
-          growthValue: gv,
-          momentumValue: mv,
-        });
-      } catch {
-        // skip failing symbols
-      }
-      setPipelineResults(new Map(resultsMap));
-      setSkeletonCount(Math.max(0, 10 - resultsMap.size));
-    }
-    setSkeletonCount(0);
-    setPipeLoading(false);
-  }, []);
-
   useEffect(() => {
-    if (!activeCategory && !defaultLoadedRef.current && pipelineResults.size === 0 && !pipeLoading && allEntries.length === 0) {
-      loadDefaultTen();
+    if (!defaultLoadedRef.current && pipelineResults.size === 0 && !pipeLoading) {
+      defaultLoadedRef.current = true;
+      runPipeline();
     }
-  }, [activeCategory, loadDefaultTen, pipelineResults.size, pipeLoading, allEntries.length]);
+  }, [runPipeline, pipelineResults.size, pipeLoading]);
 
-  const handleQuerySubmit = useCallback(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (!trimmed && !activeCategory) {
-      // Refresh: reload default 10
-      defaultLoadedRef.current = false;
-      setPipelineResults(new Map());
-      loadDefaultTen();
-      return;
-    }
-    if (!trimmed) {
-      setResults(allEntries);
-      return;
-    }
-    if (activeCategory) {
-      const filtered = allEntries.filter((e) =>
-        e.companyName?.toLowerCase().includes(trimmed) ||
-        e.symbol?.toLowerCase().includes(trimmed) ||
-        e.sector?.toLowerCase().includes(trimmed)
-      );
-      setResults(filtered);
-    }
-  }, [query, allEntries, activeCategory, loadDefaultTen]);
+  const handleRunScan = useCallback(() => {
+    defaultLoadedRef.current = false;
+    setPipelineResults(new Map());
+    runPipeline();
+  }, [runPipeline]);
 
-  const hasRiskFlag = useCallback((entry: ScannerResultItem): boolean => {
-    return entry.riskMarker !== null && entry.riskMarker !== "Risk review normal";
+  const handleFilterChange = useCallback((key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  const filteredResults = useMemo(() => {
-    let filtered = activeCategory ? results : [];
-    const seen = new Set<string>();
-    filtered = filtered.filter((r) => {
-      if (!r.symbol) return false;
-      if (seen.has(r.symbol)) return false;
-      seen.add(r.symbol);
-      return true;
-    });
-
+  const filteredRows = useMemo(() => {
+    const arr = Array.from(pipelineResults.values());
+    let filtered = [...arr];
     if (filters.scoreRange !== "All") {
-      filtered = filtered.filter((e) => {
-        if (e.score === null || e.score === undefined) return false;
-        if (filters.scoreRange === "80-100") return e.score >= 80;
-        if (filters.scoreRange === "60-79") return e.score >= 60 && e.score < 80;
-        if (filters.scoreRange === "40-59") return e.score >= 40 && e.score < 60;
-        if (filters.scoreRange === "Below 40") return e.score < 40;
+      filtered = filtered.filter(r => {
+        const s = r.score ?? -1;
+        if (filters.scoreRange === "80-100") return s >= 80;
+        if (filters.scoreRange === "60-79") return s >= 60 && s < 80;
+        if (filters.scoreRange === "40-59") return s >= 40 && s < 60;
+        if (filters.scoreRange === "Below 40") return s < 40;
         return true;
       });
     }
-    if (classificationFilter !== "All") {
-      filtered = filtered.filter((entry) => {
-        const score = entry.score ?? -1;
-        if (classificationFilter === "Excellent") return score >= 80;
-        if (classificationFilter === "Healthy") return score >= 65 && score < 80;
-        if (classificationFilter === "Stable") return score >= 50 && score < 65;
-        return score >= 0 && score < 50;
-      });
+    if (filters.sector !== "All") {
+      filtered = filtered.filter(r => r.sector === filters.sector);
     }
     return filtered;
-  }, [results, filters, activeCategory, classificationFilter]);
+  }, [pipelineResults, filters]);
 
-  const sortedResults = useMemo(() => {
-    const sorted = [...filteredResults];
+  const sortedRows = useMemo(() => {
+    const sorted = [...filteredRows];
     const [field, dir] = sortValue.split("-") as [string, string];
     sorted.sort((a, b) => {
       if (field === "score") {
@@ -384,447 +152,268 @@ export default function ScannerPage() {
         const sb = b.score ?? 0;
         return dir === "desc" ? sb - sa : sa - sb;
       }
-      const na = (a.companyName ?? a.symbol ?? "").toLowerCase();
-      const nb = (b.companyName ?? b.symbol ?? "").toLowerCase();
+      const na = (a.companyName || a.symbol).toLowerCase();
+      const nb = (b.companyName || b.symbol).toLowerCase();
       if (na < nb) return dir === "asc" ? -1 : 1;
       if (na > nb) return dir === "asc" ? 1 : -1;
       return 0;
     });
     return sorted;
-  }, [filteredResults, sortValue]);
+  }, [filteredRows, sortValue]);
 
-  const filteredRows = useMemo(() => {
-    const arr = Array.from(pipelineResults.values());
-    if (classificationFilter === "All") return arr;
-    return arr.filter((r) => {
-      const s = r.score ?? -1;
-      if (classificationFilter === "Excellent") return s >= 80;
-      if (classificationFilter === "Healthy") return s >= 65 && s < 80;
-      if (classificationFilter === "Stable") return s >= 50 && s < 65;
-      return s >= 0 && s < 50;
-    });
-  }, [pipelineResults, classificationFilter]);
+  const tableRows = sortedRows.map((pr, idx) => ({
+    rank: idx + 1,
+    symbol: pr.symbol,
+    name: pr.companyName,
+    sector: pr.sector || "Nifty 50",
+    score: pr.score,
+    price: pr.price,
+    change: pr.change,
+    changePositive: pr.changePositive,
+    factors: [
+      { label: "Q", value: pr.qualityValue },
+      { label: "G", value: pr.growthValue },
+      { label: "V", value: pr.valuationValue },
+      { label: "M", value: pr.momentumValue },
+      { label: "R", value: pr.riskValue },
+    ].filter(f => f.value !== null),
+    conviction: pr.score !== null ? (pr.score >= 75 ? "High Conviction" : pr.score >= 55 ? "Research" : "Watch") : "—",
+    confidence: pr.score,
+  }));
 
-  const handleResearch = useCallback((symbol: string) => productNavigate("stock", symbol), []);
-  const handleCompare = useCallback((symbol: string) => productNavigate("compare", symbol), []);
-  const handleTrack = useCallback((symbol: string) => {
-    const entry = results.find((r) => r.symbol === symbol);
-    if (!entry) return;
-    if (isTracked(symbol)) {
-      removeTrackedCompany(symbol);
-    } else {
-      addTrackedCompany({ symbol, companyName: entry.companyName || symbol, addedAt: new Date().toISOString(), source: "scanner" });
-    }
-    setResults((prev) => [...prev]);
-  }, [results]);
+  const convictionCount = sortedRows.filter(r => r.score !== null && r.score >= 75).length;
+  const totalCount = sortedRows.length;
+  const highScoreCount = sortedRows.filter(r => r.score !== null && r.score >= 70).length;
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleQuerySubmit();
-  }, [handleQuerySubmit]);
+  const insightFactors = [
+    { title: "Improving Earnings Quality", body: "Several companies show expanding margins and higher ROE this quarter" },
+    { title: "Relative Valuation Edge", body: "Select large caps are trading below their 5-year average PE multiples" },
+    { title: "Momentum Strength", body: "Price trend indicators are positive for quality and growth leaders" },
+    { title: "Low Risk Profile", body: "Low-debt companies with strong cash flows continue to score well" },
+  ];
 
-  const sectionsByTitle: Record<string, { id: string; label: string }> = {};
-  for (const s of CATEGORY_SECTIONS) {
-    sectionsByTitle[s.id] = s;
-  }
+  const topSectors = [
+    { name: "IT", count: 8 },
+    { name: "Banking", count: 6 },
+    { name: "Auto", count: 4 },
+    { name: "Pharma", count: 3 },
+    { name: "FMCG", count: 3 },
+  ];
 
-  const categoriesBySection = useMemo(() => {
-    const map: Record<string, typeof SCANNER_CATEGORIES> = {};
-    for (const cat of SCANNER_CATEGORIES) {
-      if (!map[cat.section]) map[cat.section] = [];
-      map[cat.section].push(cat);
-    }
-    return map;
-  }, []);
+  const factorDistData = [
+    { label: "Quality 80+", pct: 35 },
+    { label: "Growth 80+", pct: 22 },
+    { label: "Valuation 80+", pct: 18 },
+    { label: "Momentum 80+", pct: 28 },
+    { label: "Risk 80+", pct: 42 },
+  ];
+
+  const scoreBuckets = [
+    { label: "80-100", count: sortedRows.filter(r => r.score !== null && r.score >= 80).length, color: SS.positive },
+    { label: "60-79", count: sortedRows.filter(r => r.score !== null && r.score >= 60 && r.score < 80).length, color: SS.ink },
+    { label: "40-59", count: sortedRows.filter(r => r.score !== null && r.score >= 40 && r.score < 60).length, color: SS.ink3 },
+    { label: "Below 40", count: sortedRows.filter(r => r.score !== null && r.score < 40).length, color: "#B42318" },
+  ];
+  const maxBucket = Math.max(...scoreBuckets.map(b => b.count), 1);
+
+  const marketBreadth = [
+    { label: "High Conviction", value: convictionCount, color: SS.positive },
+    { label: "Research", value: totalCount - highScoreCount, color: SS.ink3 },
+  ];
 
   return (
-    <ProductShell>
-      <ProductPage>
-        <div className="flex flex-col gap-6">
-          {/* Hero */}
-          <div className="px-0 pb-2 pt-8">
-            <h1 className="text-[26px] font-bold leading-tight tracking-[-0.5px] text-[var(--c-ink)]">Stock Scanner — Indian Equities</h1>
-            <p className="mt-1 max-w-2xl text-[14px] text-[var(--c-ink-muted)]">Ranked by StockStory engine score · Updated daily</p>
-          </div>
+    <div style={{ minHeight: "100vh", background: SS.bg }}>
+      <PremiumTopNav activePage="scanner" />
+      <MarketTickerStrip />
 
-          <SebiDisclaimer variant="banner" />
-          <div className="flex flex-wrap border-b border-[var(--c-border)]" role="tablist" aria-label="Classification filter">
-            {["All", "Excellent", "Healthy", "Stable", "Weakening"].map((item) => <button key={item} type="button" role="tab" aria-selected={classificationFilter === item} onClick={() => setClassificationFilter(item)} className={`border-b-2 px-4 py-2.5 text-[13px] ${classificationFilter === item ? "border-[var(--c-brand)] font-semibold text-[var(--c-ink)]" : "border-transparent font-medium text-[var(--c-ink-muted)] hover:text-[var(--c-ink-secondary)]"}`}>{item}</button>)}
-          </div>
-
-          {/* Natural-language search */}
-          <div className="flex h-11 items-center gap-3 rounded-[var(--r-lg)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-3 focus-within:border-[var(--c-border-strong)]">
-            <Search className="h-4 w-4 shrink-0 text-[var(--c-ink-muted)]" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Try: low-debt large caps with improving profitability"
-              className="h-full w-full min-w-0 bg-transparent text-[14px] text-[var(--c-ink)] outline-none placeholder:text-[var(--c-ink-disabled)]"
-              aria-label="Search companies by name, symbol, or sector"
+      <main style={{ maxWidth: SS.container, margin: "0 auto", padding: "0 52px", paddingTop: 24 }}>
+        {/* Three-column layout */}
+        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+          {/* Left Rail */}
+          <div style={{ flexShrink: 0 }}>
+            <ScannerFilterRail
+              filters={filters}
+              onChange={handleFilterChange}
+              onRun={handleRunScan}
+              onSave={() => {}}
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => { setQuery(""); setResults(allEntries); }}
-                className="mr-1 shrink-0 rounded p-0.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-                aria-label="Clear search"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleQuerySubmit}
-              className="h-9 shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-[18px] text-[13px] font-semibold text-white"
-            >
-              {query ? "Run scanner" : "Refresh"}
-            </button>
           </div>
 
-          {/* Category sections */}
-          {CATEGORY_SECTIONS.map((section) => {
-            const cats = categoriesBySection[section.id] || [];
-            if (cats.length === 0) return null;
-            return (
-              <section key={section.id} aria-labelledby={`section-${section.id}`}>
-                <div className="mb-3">
-                  <h2 id={`section-${section.id}`} className="text-[10px] font-semibold uppercase tracking-[.08em] text-[var(--c-ink-muted)]">{section.label}</h2>
-                </div>
-                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
-                  {cats.map((cat) => {
-                    const active = activeCategory === cat.id;
-                    const Icon = categoryIcon(cat.id);
-                    const isLocked = !cat.free && !isPremium;
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => handleCategoryClick(cat.id, cat.free)}
-                        className={`group flex min-h-[72px] items-start gap-3 rounded-[var(--r-lg)] border bg-white px-[18px] py-[14px] text-left text-[13px] font-semibold text-[var(--c-ink)] transition-colors ${
-                          active
-                            ? "border-[var(--c-border-strong)]"
-                            : isLocked
-                              ? "border-dashed border-[var(--c-border)] text-[var(--c-ink-muted)]"
-                              : "border-[var(--c-border)] hover:border-[var(--c-border-strong)]"
-                        }`}
-                        title={cat.description}
-                      >
-                        <span className="grid h-5 w-5 shrink-0 place-items-center text-[var(--c-ink-muted)]">
-                          {isLocked ? (
-                            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-                          ) : (
-                            <Icon className="h-4 w-4" />
-                          )}
-                        </span>
-                        <span className="leading-4">{cat.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-
-          {/* Upgrade prompt for non-premium users */}
-          {!isPremium && (
-            <div className="rounded-[var(--r-lg)] border border-dashed border-[var(--c-border)] bg-white p-5">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Unlock deeper scanner views with Investor</h3>
-                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Get mid-cap, small-cap, profitability, and financial strength categories.</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => productNavigate("pricing")}
-                  className="shrink-0 rounded-[var(--r-md)] bg-[var(--c-brand)] px-5 py-2.5 text-xs font-semibold text-white"
-                >
-                  View plans
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Results toolbar */}
-          {activeCategory && !loading && sortedResults.length > 0 && (
-            <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border-light)] bg-slate-50/70 px-3 py-2">
-              <button
-                type="button"
-                onClick={() => setAdvancedOpen(!advancedOpen)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-[rgba(148,163,184,0.16)] bg-[rgba(255,255,255,0.03)] px-3 py-1.5 text-[11px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors md:hidden"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                Filters
-                {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              </button>
-              <div className="hidden md:flex items-center gap-1.5">
-                <span className="text-[10px] text-[var(--color-text-muted)] font-semibold uppercase tracking-wider">Sort</span>
-                <div className="relative">
-                  <CustomSelect
-                    aria-label="Sort results"
-                    value={sortValue}
-                    onChange={(e) => setSortValue(e.target.value)}
-                    className="h-8 cursor-pointer rounded-lg border border-white/[0.08] bg-[var(--color-surface)] px-2.5 py-1 text-xs text-[var(--color-text-primary)] outline-none transition-colors hover:border-[#2962FF]/50 focus:border-[#2962FF]"
-                  >
-                    {SORT_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </CustomSelect>
-                </div>
-              </div>
-              <div className="md:hidden flex-1" />
-              <div className="hidden md:block flex-1" />
-              <span className="text-[11px] text-[var(--color-text-muted)]">{sortedResults.length} result{sortedResults.length === 1 ? "" : "s"}</span>
-            </div>
-          )}
-
-          {/* Advanced filters - desktop */}
-          {activeCategory && !loading && sortedResults.length > 0 && (
-            <div className="hidden md:block">
-              <ProductPanel className="overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setAdvancedOpen(!advancedOpen)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-[var(--color-text-primary)] hover:bg-[rgba(255,255,255,0.02)] transition-colors"
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <Filter className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
-                    Advanced filters
-                  </span>
-                  {advancedOpen ? <ChevronUp className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" /> : <ChevronDown className="h-3.5 w-3.5 text-[var(--color-text-secondary)]" />}
-                </button>
-                {advancedOpen && (
-                  <div className="border-t border-[rgba(148,163,184,0.08)] px-4 py-4">
-                    <FilterSection title="Score">
-                      <div className="grid gap-3 sm:max-w-xs">
-                        <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => setFilters((p) => ({ ...p, scoreRange: v }))} />
-                      </div>
-                    </FilterSection>
+          {/* Center */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Top Metrics */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
+              {[
+                { label: "Total Companies", value: totalCount.toString() },
+                { label: "High Conviction", value: convictionCount.toString(), up: true },
+                { label: "Watchlist Matches", value: "—" },
+                { label: "Live Updates", value: "Auto", up: true },
+              ].map(m => (
+                <PremiumCard key={m.label} padding="16px">
+                  <div style={{ fontSize: 10, fontWeight: 500, color: SS.ink4, textTransform: "uppercase", letterSpacing: "0.5px" }}>{m.label}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+                    <span style={{ fontSize: 22, fontWeight: 700, color: SS.ink, fontVariantNumeric: "tabular-nums" }}>{m.value}</span>
+                    {m.up && <Sparkles size={12} color={SS.positive} />}
                   </div>
+                </PremiumCard>
+              ))}
+            </div>
+
+            {/* Controls */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{
+                flex: 1, display: "flex", alignItems: "center", gap: 8,
+                height: 40, padding: "0 14px", borderRadius: SS.radiusSm,
+                border: `1px solid ${SS.border}`, background: SS.surface,
+              }}>
+                <Search size={14} color={SS.ink4} />
+                <input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="e.g. TCS, HDFCBANK"
+                  style={{
+                    flex: 1, border: "none", background: "none", outline: "none",
+                    fontSize: 13, color: SS.ink,
+                  }}
+                />
+                {query && (
+                  <button onClick={() => { setQuery(""); }} style={{ border: "none", background: "none", cursor: "pointer", color: SS.ink4 }}>
+                    <X size={14} />
+                  </button>
                 )}
-              </ProductPanel>
-            </div>
-          )}
-
-          {/* Results heading */}
-          {activeCategory && !loading && sortedResults.length > 0 && (
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold tracking-tight text-[var(--color-text-primary)]">Companies worth reviewing</h2>
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Healthy companies to research further based on your selected category.</p>
               </div>
-              <span className="rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] shadow-sm">{sortedResults.length} companies</span>
+              <select value={sortValue} onChange={e => setSortValue(e.target.value)} style={{
+                height: 40, padding: "0 32px 0 12px", fontSize: 12, color: SS.ink,
+                border: `1px solid ${SS.border}`, borderRadius: SS.radiusSm, background: SS.surface,
+                cursor: "pointer", outline: "none",
+              }}>
+                <option value="score-desc">AI Score (High to Low)</option>
+                <option value="score-asc">AI Score (Low to High)</option>
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+              </select>
+              <button style={{
+                height: 40, padding: "0 14px", fontSize: 12, fontWeight: 600, color: SS.ink2,
+                border: `1px solid ${SS.border}`, borderRadius: SS.radiusSm, background: SS.surface,
+                cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <SlidersHorizontal size={14} /> Filters
+              </button>
             </div>
-          )}
 
-          {/* Pipeline skeleton loading */}
-          {pipeLoading && (
-            <div className="space-y-0 rounded-[var(--r-lg)] border border-[var(--c-border)] overflow-hidden" role="status" aria-label="Loading pipeline results">
-              {Array.from({ length: Math.max(1, skeletonCount) }, (_, index) => (
-                <div key={`skel-${index}`} className="flex items-center gap-4 px-5 py-4 border-b border-[var(--c-border)] animate-pulse bg-white">
-                  <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0" />
-                  <div className="flex-1 min-w-0 space-y-2">
-                    <div className="h-3 w-20 rounded bg-slate-100" />
-                    <div className="h-3 w-32 rounded bg-slate-100" />
-                    <div className="flex gap-2"><div className="h-1.5 w-12 rounded bg-slate-100" /><div className="h-1.5 w-12 rounded bg-slate-100" /><div className="h-1.5 w-12 rounded bg-slate-100" /></div>
-                  </div>
-                  <div className="h-10 w-10 rounded-full bg-slate-100 shrink-0" />
-                </div>
+            {/* Chips */}
+            <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+              {["AI Score", "Market", "Market Cap", "Clear All"].map(chip => (
+                <button key={chip} style={{
+                  padding: "6px 14px", fontSize: 11, fontWeight: 500, color: chip === "Clear All" ? SS.ink3 : SS.ink,
+                  border: `1px solid ${SS.borderSoft}`, borderRadius: 100, background: chip === "Clear All" ? "transparent" : SS.surface,
+                  cursor: "pointer",
+                }}>
+                  {chip}
+                </button>
               ))}
             </div>
-          )}
 
-          {/* Pipeline results — full-width row layout */}
-          {!pipeLoading && pipelineResults.size > 0 && (
-            <div className="rounded-[var(--r-lg)] border border-[var(--c-border)] bg-white overflow-hidden">
-              {filteredRows.length === 0 && pipelineResults.size > 0 && (
-                <div className="px-5 py-6 text-center text-[13px] text-[var(--c-ink-muted)]">No results match the current filter.</div>
-              )}
-              {filteredRows.map((pr, idx) => (
-                <div
-                  key={pr.symbol}
-                  onClick={() => productNavigate("stock", pr.symbol)}
-                  className={`flex items-center gap-3 px-5 py-4 cursor-pointer transition-colors hover:bg-[var(--c-surface-raised)] ${idx < filteredRows.length - 1 ? "border-b border-[var(--c-border)]" : ""}`}
-                >
-                  <ScoreRing score={pr.score} size="sm" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-bold text-[var(--c-ink)]">{pr.symbol}</span>
-                      <span className="truncate text-[13px] text-[var(--c-ink-secondary)]">{pr.companyName}</span>
-                      <span className="ml-auto shrink-0 rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-[7px] py-[2px] text-[11px] text-[var(--c-ink-muted)]">Nifty 50</span>
-                    </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[14px] font-semibold tabular-nums text-[var(--c-ink)]">{pr.price ?? <span className="text-[var(--c-ink-disabled)]">—</span>}</span>
-                      <span className={`text-[12px] font-medium ${pr.change?.startsWith("+") ? "text-[var(--c-positive)]" : pr.change?.startsWith("−") ? "text-[var(--c-negative)]" : "text-[var(--c-ink-muted)]"}`}>{pr.change ?? "—"}</span>
-                      <ClassificationBadge classification={pr.classification} size="sm" />
-                    </div>
-                    <div className="mt-2 flex items-center gap-4">
-                      {["Quality", "Growth", "Momentum"].map((label) => {
-                        const val = label === "Quality" ? pr.qualityValue : label === "Growth" ? pr.growthValue : pr.momentumValue;
-                        const pct = val !== null ? Math.max(0, Math.min(100, val)) : 0;
-                        const c = val !== null ? (val >= 75 ? "var(--c-score-high)" : val >= 55 ? "var(--c-score-mid)" : val >= 35 ? "var(--c-score-low)" : "var(--c-score-poor)") : "var(--c-ink-disabled)";
-                        return (
-                          <div key={label} className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-[var(--c-ink-muted)]">{label}</span>
-                            <div className="h-1 w-[60px] rounded-full bg-[var(--c-border)] overflow-hidden">
-                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: c }} />
-                            </div>
-                            <span className="text-[11px] font-semibold tabular-nums" style={{ color: c }}>{val !== null ? Math.round(val) : "—"}</span>
-                          </div>
-                        );
-                      })}
+            {/* Results */}
+            {pipeLoading ? (
+              <div role="status" aria-label="Loading">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 16,
+                    padding: "16px 20px", borderBottom: `1px solid ${SS.borderSoft}`,
+                    background: SS.surface, animation: "pulse 1.5s ease-in-out infinite",
+                  }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: SS.borderSoft }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ width: 120, height: 12, borderRadius: 4, background: SS.borderSoft, marginBottom: 6 }} />
+                      <div style={{ width: 80, height: 10, borderRadius: 4, background: SS.borderSoft }} />
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Fallback: legacy scanner loading (only if not using pipeline) */}
-          {!pipeLoading && pipelineResults.size === 0 && loading && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading scanner results">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5"><div className="h-10 w-10 rounded-full bg-slate-100" /><div className="mt-5 h-4 w-1/2 rounded bg-slate-100" /><div className="mt-3 h-3 w-full rounded bg-slate-100" /></div>)}</div>}
-
-          {scannerMessage && !loading && (
-            <div role="status" className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-900">{scannerMessage}</div>
-          )}
-
-          {!loading && activeCategory && sortedResults.length === 0 && !loading && pipelineResults.size === 0 && !pipeLoading && (
-            <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
-              <Search className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
-              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Not enough companies match this view yet.</h3>
-              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Try a different category or check back when more data is available.</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <ProductAction variant="secondary" onClick={() => setActiveCategory("")}>Browse categories</ProductAction>
-                <ProductAction variant="ghost" onClick={() => productNavigate("search")}>Search company</ProductAction>
+                ))}
               </div>
-            </ProductPanel>
-          )}
+            ) : tableRows.length > 0 ? (
+              <ScannerResultsTable rows={tableRows} onRowClick={symbol => productNavigate("stock", symbol)} />
+            ) : (
+              <EmptyProductState
+                title="No results match your filters"
+                body="Try adjusting your filter criteria or running a new scan."
+              />
+            )}
+          </div>
 
-          {!loading && !pipeLoading && !activeCategory && pipelineResults.size === 0 && sortedResults.length === 0 && (
-            <ProductPanel className="flex min-h-[160px] flex-col items-center justify-center p-6 text-center">
-              <BarChart3 className="h-5 w-5 text-[var(--color-text-muted)]" aria-hidden="true" />
-              <h3 className="mt-3 text-sm font-semibold text-[var(--color-text-primary)]">Select a category to begin</h3>
-              <p className="mt-2 max-w-md text-xs leading-5 text-[var(--color-text-secondary)]">Choose a research lens above to discover companies worth reviewing.</p>
-            </ProductPanel>
-          )}
+          {/* Right Rail */}
+          <div style={{ flexShrink: 0 }}>
+            <RightInsightRail
+              insights={insightFactors}
+              topSectors={topSectors}
+              onSave={() => {}}
+            />
+          </div>
+        </div>
 
-          {!loading && !pipeLoading && pipelineResults.size === 0 && sortedResults.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {sortedResults.slice(0, 100).map((entry) => {
-                const fullSymbol = entry.symbol;
-                const item = scannerResultToResearchListItem(entry);
-                const score = entry.score;
-                const risky = hasRiskFlag(entry);
-                const sector = item.sector;
-                const signalInfo = scannerSignalLabel(score);
-                const signalColor = signalInfo?.color ?? "#64748B";
-                const explanation = complianceExplanation(entry);
-                const performanceShadow = score !== null && score >= 65
-                  ? "shadow-[0_18px_44px_rgba(22,163,74,.11)] hover:shadow-[0_24px_54px_rgba(22,163,74,.17)]"
-                  : score !== null && score < 45
-                    ? "shadow-[0_18px_44px_rgba(220,38,38,.10)] hover:shadow-[0_24px_54px_rgba(220,38,38,.16)]"
-                    : "shadow-[0_16px_40px_rgba(30,64,175,.08)] hover:shadow-[0_22px_50px_rgba(30,64,175,.13)]";
+        {/* Bottom Analytics Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 24, marginBottom: 32 }}>
+          <PremiumCard padding="20px">
+            <div style={{ fontSize: 11, fontWeight: 600, color: SS.ink3, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Factor Distribution
+            </div>
+            {factorDistData.map(f => (
+              <div key={f.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ width: 80, fontSize: 10, color: SS.ink3 }}>{f.label}</span>
+                <div style={{ flex: 1, height: 6, borderRadius: 3, background: SS.borderSoft }}>
+                  <div style={{ width: `${f.pct}%`, height: "100%", borderRadius: 3, background: SS.positive }} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink, width: 30, textAlign: "right" }}>{f.pct}%</span>
+              </div>
+            ))}
+          </PremiumCard>
+
+          <PremiumCard padding="20px">
+            <div style={{ fontSize: 11, fontWeight: 600, color: SS.ink3, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Score Heatmap
+            </div>
+            <div style={{ display: "flex", gap: 16 }}>
+              {scoreBuckets.map(b => {
+                const pct = b.count / maxBucket;
                 return (
-                  <ProductPanel key={fullSymbol} as="article" className={`group relative min-h-[250px] overflow-hidden rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition duration-300 hover:-translate-y-1 ${performanceShadow}`}>
-                    <div className="absolute inset-x-5 top-0 h-px opacity-70" style={{ background: `linear-gradient(90deg,transparent,${signalColor},transparent)` }} />
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <span className="font-mono text-[13px] font-semibold text-[var(--color-text-muted)] tracking-[.08em]">{fullSymbol}</span>
-                          <h3 className="mt-1 truncate text-[17px] font-semibold tracking-tight text-[var(--color-text-primary)]">{item.company}</h3>
-                        </div>
-                        <ScoreRing score={score} size="sm" />
-                      </div>
-
-                      {sector && (
-                        <div className="mt-2">
-                          <span className="inline-flex rounded-full bg-[var(--color-surface-2)] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">{sector}</span>
-                        </div>
-                      )}
-
-                      {item.thesis && (
-                        <p className="mt-4 text-[13px] leading-5 text-[var(--color-text-secondary)] line-clamp-2">{item.thesis}</p>
-                      )}
-
-                      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                        {signalInfo && (
-                          <span className="inline-flex items-center gap-1 rounded bg-white/[0.03] border border-white/[0.06] px-1.5 py-0.5 text-[10px] text-[var(--color-text-primary)]">
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: signalColor }} aria-hidden="true" />
-                            {signalInfo.label}
-                          </span>
-                        )}
-                        <ClassificationBadge classification={(score === null ? "INSUFFICIENT_DATA" : score >= 80 ? "EXCELLENT" : score >= 65 ? "HEALTHY" : score >= 50 ? "STABLE" : score >= 35 ? "WEAKENING" : "AT_RISK") as UnifiedClassification} />
-                        {risky && (
-                          <span className="inline-flex rounded bg-[#EF4444]/10 border border-[#EF4444]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#EF4444]">Risk rising</span>
-                        )}
-                      </div>
-
-                      {/* Compliance-safe explanation */}
-                      <p className="mt-2 text-[10px] leading-relaxed text-[var(--color-text-muted)]">{explanation}</p>
-
-                      {item.riskMarker && (
-                        <p className="mt-1 text-[10px] leading-relaxed text-[#EF4444]">{item.riskMarker}</p>
-                      )}
-                    </div>
-
-                    <div className="mt-5 flex items-center justify-between border-t border-[var(--color-border-light)] pt-4">
-                      <button
-                        type="button"
-                        onClick={() => handleResearch(fullSymbol)}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#2962FF] hover:gap-2 hover:text-[#1D4ED8] transition-all"
-                      >
-                        Research &rarr;
-                      </button>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleCompare(fullSymbol)}
-                          className="text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-                        >
-                          Compare
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleTrack(fullSymbol)}
-                          className="text-[10px] font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-                        >
-                          Track
-                        </button>
-                      </div>
-                    </div>
-                  </ProductPanel>
+                  <div key={b.label} style={{ flex: 1, textAlign: "center" }}>
+                    <div style={{
+                      height: `${Math.max(20, pct * 100)}px`,
+                      background: b.color,
+                      borderRadius: `${SS.radiusXs} ${SS.radiusXs} 0 0`,
+                      opacity: 0.7, transition: "height 0.3s",
+                    }} />
+                    <div style={{ fontSize: 10, color: SS.ink3, marginTop: 6 }}>{b.label}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: SS.ink }}>{b.count}</div>
+                  </div>
                 );
               })}
             </div>
-          )}
+          </PremiumCard>
+
+          <PremiumCard padding="20px">
+            <div style={{ fontSize: 11, fontWeight: 600, color: SS.ink3, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Market Breadth
+            </div>
+            {marketBreadth.map(m => (
+              <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                <div style={{ width: 12, height: 12, borderRadius: 3, background: m.color }} />
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: 12, color: SS.ink }}>{m.label}</span>
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: SS.ink }}>{m.value}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 12 }}>
+              <MethodologyNote>
+                Scores are based on multi-factor analysis of available data.
+              </MethodologyNote>
+            </div>
+          </PremiumCard>
         </div>
 
-        {/* Mobile filter drawer */}
-        {filterDrawerOpen && (
-          <div className="fixed inset-0 z-[100] flex items-end md:hidden" role="dialog" aria-modal="true" aria-label="Filters">
-            <div className="absolute inset-0 bg-black/60" onClick={() => setFilterDrawerOpen(false)} />
-            <div className="relative max-h-[80vh] w-full overflow-y-auto rounded-t-2xl bg-[var(--color-surface)] p-5 shadow-xl">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Filters</h2>
-                <button type="button" onClick={() => setFilterDrawerOpen(false)} className="rounded-md p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" aria-label="Close filters">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <FilterSection title="Score">
-                <div className="grid gap-3 sm:max-w-xs">
-                  <FilterSelect label="Score range" value={filters.scoreRange} options={SCORE_RANGES} onChange={(v) => setFilters((p) => ({ ...p, scoreRange: v }))} />
-                </div>
-              </FilterSection>
-              <button
-                type="button"
-                onClick={() => setFilterDrawerOpen(false)}
-                className="mt-5 w-full rounded-lg bg-[#2962FF] py-3 text-sm font-semibold text-white hover:bg-[#3B71FF] transition-colors"
-              >
-                Apply filters
-              </button>
-            </div>
-          </div>
-        )}
-      </ProductPage>
-    </ProductShell>
+        <SebiDisclaimer variant="footer" />
+      </main>
+    </div>
   );
 }

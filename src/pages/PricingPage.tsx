@@ -90,7 +90,7 @@ export default function PricingPage(): JSX.Element {
               Research that works as hard as you do
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-6 text-[var(--color-text-secondary)]">
-              StockStory provides research context, not guaranteed returns. Upgrade for deeper scans, Healthometer breakdown, and thesis tracking.
+              StockStory provides research context to inform your decisions. Upgrade for deeper scans, Healthometer breakdown, and thesis tracking.
             </p>
           </div>
 
@@ -122,7 +122,7 @@ export default function PricingPage(): JSX.Element {
           </div>
 
           <p className="mt-8 text-center text-[11px] text-[var(--color-text-muted)]">
-            StockStory provides research context, not guaranteed returns. All research is for informational purposes and does not constitute financial advice.
+            StockStory provides research context to inform your decisions. All research is for informational purposes and does not constitute financial advice.
           </p>
         </div>
       </ProductPage>

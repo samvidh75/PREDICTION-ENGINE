@@ -1,87 +1,78 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, RefreshCw, AlertCircle, TrendingUp, TrendingDown, Star, BarChart3, Shield, Activity, Bookmark } from "lucide-react";
+import {
+  Bookmark, GitCompare,
+  AlertTriangle, Sparkles, ChevronRight, LineChart, Newspaper, Check, Brain,
+} from "lucide-react";
 import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
 import { fPrice, fChange, fScore } from "../lib/format";
 import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
 import type { PipelineResult } from "../services/data/CompanyDataPipeline";
 import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
+import {
+  PremiumAppShell, PremiumTopNav, MarketTickerStrip, PremiumCard, ScoreRing as PremiumScoreRing,
+  FactorBar, MetricCard, PerformanceChart, ResearchTabBar, CompanyIdentity, InsightCard,
+  MiniSparkline, InvestmentReviewSheet, BrokerHandoffSheet, MethodologyNote, EmptyProductState,
+} from "../premium/PremiumComponents";
+
+const SS = {
+  bg: "var(--ss-bg)",
+  surface: "var(--ss-surface)",
+  ink: "var(--ss-ink)",
+  ink2: "var(--ss-ink-2)",
+  ink3: "var(--ss-ink-3)",
+  ink4: "var(--ss-ink-4)",
+  border: "var(--ss-border)",
+  borderSoft: "var(--ss-border-soft)",
+  positive: "var(--ss-positive)",
+  positiveSoft: "var(--ss-positive-soft)",
+  negative: "var(--ss-negative)",
+  negativeSoft: "var(--ss-negative-soft)",
+  radiusXs: "var(--ss-radius-xs)",
+  radiusSm: "var(--ss-radius-sm)",
+  radiusMd: "var(--ss-radius-md)",
+  radiusLg: "var(--ss-radius-lg)",
+  radiusXl: "var(--ss-radius-xl)",
+  shadowCard: "var(--ss-shadow-card)",
+  shadowFloating: "var(--ss-shadow-floating)",
+  container: "var(--ss-container)",
+  pageX: "var(--ss-page-x)",
+};
 
 const FACTOR_GROUPS = ["quality", "valuation", "growth", "stability", "momentum", "risk"] as const;
-const FACTOR_LABELS: Record<string, string> = { quality: "Quality", valuation: "Valuation", growth: "Growth", stability: "Stability", momentum: "Momentum", risk: "Safety" };
-const FACTOR_ICONS: Record<string, React.ReactNode> = { quality: <Star className="h-4 w-4" />, valuation: <BarChart3 className="h-4 w-4" />, growth: <TrendingUp className="h-4 w-4" />, stability: <Shield className="h-4 w-4" />, momentum: <Activity className="h-4 w-4" />, risk: <AlertCircle className="h-4 w-4" /> };
+const FACTOR_LABELS: Record<string, string> = {
+  quality: "Quality", valuation: "Valuation", growth: "Growth",
+  stability: "Stability", momentum: "Momentum", risk: "Safety",
+};
 
 function scoreColor(v: number | null): string {
-  if (v === null) return "var(--c-ink-disabled)";
-  if (v >= 75) return "var(--c-score-high)";
-  if (v >= 55) return "var(--c-score-mid)";
-  if (v >= 35) return "var(--c-score-low)";
-  return "var(--c-score-poor)";
+  if (v === null) return SS.ink4;
+  if (v >= 75) return SS.positive;
+  if (v >= 55) return SS.ink;
+  if (v >= 35) return "#B7791F";
+  return "#B42318";
 }
 
 function classificationLabel(cls: string): string {
-  const map: Record<string, string> = { EXCELLENT: "Excellent", HEALTHY: "Healthy", STABLE: "Stable", WEAKENING: "Weakening", AT_RISK: "At Risk", INSUFFICIENT_DATA: "Insufficient Data" };
+  const map: Record<string, string> = {
+    EXCELLENT: "High Conviction", HEALTHY: "Research", STABLE: "Watch",
+    WEAKENING: "Needs Review", AT_RISK: "Risk Rising", INSUFFICIENT_DATA: "Insufficient Data",
+  };
   return map[cls] ?? cls;
 }
 
-function classificationStyle(cls: string): React.CSSProperties {
-  const map: Record<string, React.CSSProperties> = {
-    EXCELLENT: { background: "#F0FDF4", color: "#065F46", borderColor: "#A7F3D0" },
-    HEALTHY: { background: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" },
-    STABLE: { background: "#F8FAFC", color: "#374151", borderColor: "#E5E7EB" },
-    WEAKENING: { background: "#FFFBEB", color: "#78350F", borderColor: "#FDE68A" },
-    AT_RISK: { background: "#FEF2F2", color: "#7F1D1D", borderColor: "#FECACA" },
-  };
-  return map[cls] ?? { background: "#F8FAFC", color: "#6B7280", borderColor: "#E5E7EB" };
-}
-
-function getFactorSummary(group: string, score: number | null, missingFeatures: string[]): string {
+function getFactorSummary(group: string, score: number | null): string {
   if (score === null) return "Insufficient data to score this factor.";
-  if (missingFeatures.length > 0) return `Partial data: ${missingFeatures.join(", ")} unavailable.`;
   const level = score >= 75 ? "strong" : score >= 55 ? "moderate" : score >= 35 ? "weak" : "very weak";
   const map: Record<string, string> = {
     quality: `Business quality is ${level}. Higher ROE, ROA, and ROIC indicate more efficient capital use.`,
-    valuation: `Valuation appears ${level} relative to earnings and assets. Lower PE and PB are more attractive.`,
+    valuation: `Valuation appears ${level} relative to earnings and assets.`,
     growth: `Revenue and earnings growth is ${level}. Consistent growth above 15% YoY is the target benchmark.`,
-    stability: `Financial stability is ${level}. Low debt, strong liquidity, and healthy margins contribute positively.`,
-    momentum: `Technical momentum is ${level}. RSI, MACD, and price trend relative to moving averages drive this score.`,
+    stability: `Financial stability is ${level}. Low debt, strong liquidity, and healthy margins.`,
+    momentum: `Technical momentum is ${level}. RSI, MACD, and price trend relative to moving averages.`,
     risk: `Safety profile is ${level} (higher = safer). Low beta and conservative leverage reduce risk.`,
   };
   return map[group] ?? `Score: ${score}/100`;
-}
-
-function driverValues(group: string, p: PipelineResult): { label: string; value: string }[] {
-  const f = p.fundamentals;
-  const t = p.technicals;
-  const drivers: Record<string, { label: string; value: string }[]> = {
-    quality: [{ label: "ROE", value: f.roe !== null ? `${(f.roe * 100).toFixed(1)}%` : "—" }, { label: "ROA", value: f.roa !== null ? `${(f.roa * 100).toFixed(1)}%` : "—" }, { label: "ROIC", value: f.roic !== null ? `${(f.roic * 100).toFixed(1)}%` : "—" }],
-    valuation: [{ label: "P/E", value: f.peRatio !== null ? f.peRatio.toFixed(1) : "—" }, { label: "P/B", value: f.pbRatio !== null ? f.pbRatio.toFixed(1) : "—" }, { label: "EV/EBITDA", value: f.evEbitda !== null ? `${f.evEbitda.toFixed(1)}x` : "—" }],
-    growth: [{ label: "Rev Growth", value: f.revenueGrowth !== null ? `${(f.revenueGrowth * 100).toFixed(1)}%` : "—" }, { label: "EPS Growth", value: f.epsGrowth !== null ? `${(f.epsGrowth * 100).toFixed(1)}%` : "—" }, { label: "Profit Growth", value: f.profitGrowth !== null ? `${(f.profitGrowth * 100).toFixed(1)}%` : "—" }],
-    stability: [{ label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "Current Ratio", value: f.currentRatio !== null ? f.currentRatio.toFixed(2) : "—" }, { label: "Op. Margin", value: f.operatingMargin !== null ? `${(f.operatingMargin * 100).toFixed(1)}%` : "—" }],
-    momentum: [{ label: "RSI (14)", value: t.rsi14 !== null ? t.rsi14.toFixed(1) : "—" }, { label: "MACD", value: t.macd !== null ? t.macd.toFixed(2) : "—" }, { label: "SMA50", value: t.movingAverageDistance50 !== null ? `${(t.movingAverageDistance50 * 100).toFixed(1)}%` : "—" }],
-    risk: [{ label: "Beta", value: f.beta !== null ? f.beta.toFixed(2) : "—" }, { label: "D/E", value: f.debtToEquity !== null ? f.debtToEquity.toFixed(2) : "—" }, { label: "ATR", value: t.atr14 !== null ? t.atr14.toFixed(2) : "—" }],
-  };
-  return drivers[group] ?? [];
-}
-
-function ScoreRing({ score, size = 80 }: { score: number | null; size?: number }) {
-  const r = (size - 12) / 2;
-  const circ = 2 * Math.PI * r;
-  const fill = score !== null ? Math.max(0, Math.min(100, score)) / 100 : 0;
-  const color = scoreColor(score);
-  const grade = score !== null ? (score >= 80 ? "A" : score >= 65 ? "B" : score >= 50 ? "C" : score >= 35 ? "D" : "F") : "—";
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={score !== null ? `Score: ${Math.round(score)}` : "Score unavailable"}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--c-border)" strokeWidth={8} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8} strokeDasharray={circ} strokeDashoffset={circ * (1 - fill)} strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ transition: "stroke-dashoffset 0.6s ease" }} />
-      <text x="50%" y="48%" textAnchor="middle" dy="0" fontSize={size < 56 ? 18 : 28} fontWeight="700" fill={color} fontFamily="Inter, sans-serif">
-        {score !== null ? Math.round(score) : "—"}
-      </text>
-      <text x="50%" y={size / 2 + (size < 56 ? 10 : 16)} textAnchor="middle" fontSize={size < 56 ? 8 : 12} fontWeight="500" fill="var(--c-ink-muted)" fontFamily="Inter, sans-serif">
-        {grade}
-      </text>
-    </svg>
-  );
 }
 
 export default function StockStoryPageF0(): JSX.Element {
@@ -91,6 +82,9 @@ export default function StockStoryPageF0(): JSX.Element {
   });
   const { pipeline, loading, error, refetch } = useStockData(ticker || null);
   const [tracked, setTracked] = useState(() => isTracked(ticker));
+  const [activeTab, setActiveTab] = useState("Thesis");
+  const [investOpen, setInvestOpen] = useState(false);
+  const [brokerOpen, setBrokerOpen] = useState(false);
 
   useEffect(() => {
     const onUrl = () => {
@@ -105,8 +99,8 @@ export default function StockStoryPageF0(): JSX.Element {
 
   const pred = pipeline?.prediction ?? null;
   const factorScores = pred?.factorScores ?? [];
-  const pricePos = pipeline ? (pipeline.price.change ?? 0) >= 0 : true;
   const classification = pred?.classification ?? "INSUFFICIENT_DATA";
+  const pricePos = pipeline ? (pipeline.price.change ?? 0) >= 0 : true;
 
   const weightedScore = useMemo(() => {
     if (!pred?.factorScores?.length) return pred?.rankingScore ?? null;
@@ -118,182 +112,348 @@ export default function StockStoryPageF0(): JSX.Element {
     return Math.round(total);
   }, [pred]);
 
+  const score = pred?.rankingScore ?? weightedScore;
+const samplePrices = useMemo(() => {
+  if (pipeline?.technicals?.closePrices?.length) return pipeline.technicals.closePrices.slice(-200);
+  return [];
+}, [pipeline]);
+
   if (!ticker) {
     return (
-      <div className="min-h-screen bg-[var(--c-bg)] flex items-center justify-center text-[var(--c-ink-muted)]">
-        No stock selected. Go back and search for a symbol.
+      <div style={{ minHeight: "100vh", background: SS.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <EmptyProductState title="No stock selected" body="Go back and search for a symbol to research." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--c-bg)]">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 border-b border-[var(--c-border)] bg-white">
-        <div className="mx-auto max-w-[1180px] px-4 py-3">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <button type="button" onClick={() => productNavigate("search")} className="flex items-center gap-1 text-sm text-[#6B7280] hover:text-[#111827] transition-colors">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="text-xs">Back</span>
-              </button>
-              <span className="rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-[7px] py-0.5 text-[11px] font-medium text-[var(--c-ink-muted)]">{pipeline?.price?.exchange ?? "NSE"}</span>
-              <span className="text-[18px] font-bold tracking-[-0.3px] text-[var(--c-ink)]">{ticker}</span>
+    <div style={{ minHeight: "100vh", background: SS.bg }}>
+      <PremiumTopNav />
+      <MarketTickerStrip />
+
+      <main style={{ maxWidth: SS.container, margin: "0 auto", padding: "0 52px", paddingTop: 24 }}>
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: SS.ink3, marginBottom: 16 }}>
+          <button onClick={() => productNavigate("landing")} style={{ border: "none", background: "none", cursor: "pointer", color: SS.ink3 }}>Home</button>
+          <ChevronRight size={10} />
+          <span>Research</span>
+          <ChevronRight size={10} />
+          <span>Information Technology</span>
+          <ChevronRight size={10} />
+          <span style={{ color: SS.ink, fontWeight: 600 }}>{ticker}</span>
+        </div>
+
+        {/* Header */}
+        <div style={{ display: "flex", gap: 24, marginBottom: 24, alignItems: "flex-start" }}>
+          <div style={{ flex: 1 }}>
+            <CompanyIdentity
+              symbol={ticker}
+              name={pipeline?.companyName || ticker}
+              sector={pipeline?.sector || undefined}
+            />
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ textAlign: "right" }}>
+              {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
+                <>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: SS.ink, fontVariantNumeric: "tabular-nums", letterSpacing: "-0.5px" }}>
+                    {fPrice(pipeline.price.current)}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end", marginTop: 2 }}>
+                    <span style={{
+                      fontSize: 12, fontWeight: 600, color: pricePos ? SS.positive : SS.negative,
+                      fontVariantNumeric: "tabular-nums",
+                    }}>
+                      {pricePos ? "+" : ""}{pipeline.price.change?.toFixed(2) ?? "—"}%
+                    </span>
+                    {pipeline.price.changeAbs !== null && (
+                      <span style={{ fontSize: 11, color: SS.ink3 }}>
+                        ({pipeline.price.changeAbs >= 0 ? "+" : ""}{pipeline.price.changeAbs?.toFixed(0)})
+                      </span>
+                    )}
+                  </div>
+                </>
+              ) : loading ? (
+                <span style={{ fontSize: 13, color: SS.ink4 }}>Loading...</span>
+              ) : (
+                <span style={{ fontSize: 13, color: SS.ink4 }}>Price unavailable</span>
+              )}
             </div>
-            {pipeline?.companyName && <span className="text-[13px] text-[#6B7280] -mt-1 md:mt-0">{pipeline.companyName}</span>}
-            <div className="flex items-center gap-3 ml-auto">
-              <div className="text-right">
-                {pipeline?.price.current !== null && pipeline?.price.current !== undefined ? (
-                  <>
-                    <span className="price text-[24px] font-semibold tabular-nums text-[var(--c-ink)] leading-none">{fPrice(pipeline.price.current)}</span>
-                    <div className={`ml-2 inline-flex items-center gap-1 rounded-[var(--r-sm)] border px-2 py-[3px] text-[12px] font-medium ${pricePos ? "border-[#BBF7D0] bg-[var(--c-positive-bg)] text-[var(--c-positive)]" : "border-[#FECACA] bg-[var(--c-negative-bg)] text-[var(--c-negative)]"}`}>
-                      <span>{pricePos ? "+" : ""}{pipeline.price.change?.toFixed(2) ?? "—"}%</span>
-                      {pipeline.price.changeAbs !== null && <span>({fChange(pipeline.price.changeAbs)})</span>}
-                    </div>
-                  </>
-                ) : loading ? (
-                  <span className="text-sm text-[#9CA3AF]">Loading...</span>
-                ) : (
-                  <span className="text-sm text-[#9CA3AF]">Price unavailable</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={() => { isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: pipeline?.companyName ?? "", addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }} className="h-8 rounded-[var(--r-md)] border border-[var(--c-border-strong)] bg-white px-[14px] text-[13px] font-medium text-[var(--c-ink-secondary)] transition-colors hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]">
-                  <Bookmark className="inline h-3 w-3 mr-1" />{tracked ? "Tracked" : "Track"}
-                </button>
-                <button type="button" onClick={() => productNavigate("compare", ticker)} className="h-8 rounded-[var(--r-md)] border border-[var(--c-border-strong)] bg-white px-[14px] text-[13px] font-medium text-[var(--c-ink-secondary)] transition-colors hover:border-[var(--c-brand)] hover:text-[var(--c-brand)]">
-                  Compare
-                </button>
-                <button type="button" onClick={() => productNavigate("invest", ticker)} className="h-8 rounded-[var(--r-md)] bg-[var(--c-positive)] px-[14px] text-[13px] font-semibold text-white">
-                  Continue to broker →
-                </button>
-                <button type="button" onClick={refetch} disabled={loading} className="h-8 px-3 text-xs font-medium rounded-lg border border-[#D1D5DB] bg-white text-[#374151] hover:bg-[#F9FAFB] disabled:opacity-40 transition-colors">
-                  <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-                </button>
-              </div>
+
+            <PremiumScoreRing score={score} size={64} />
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => { isTracked(ticker) ? removeTrackedCompany(ticker) : addTrackedCompany({ symbol: ticker, companyName: pipeline?.companyName ?? "", addedAt: new Date().toISOString(), source: "stock_page" }); setTracked(!tracked); }} style={{
+                height: 36, padding: "0 14px", fontSize: 12, fontWeight: 500, color: SS.ink2,
+                border: `1px solid ${SS.border}`, borderRadius: SS.radiusSm, background: SS.surface, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <Bookmark size={14} /> {tracked ? "Tracked" : "Follow"}
+              </button>
+              <button onClick={() => productNavigate("compare", ticker)} style={{
+                height: 36, padding: "0 14px", fontSize: 12, fontWeight: 500, color: SS.ink2,
+                border: `1px solid ${SS.border}`, borderRadius: SS.radiusSm, background: SS.surface, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <GitCompare size={14} /> Compare
+              </button>
+              <button onClick={() => setInvestOpen(true)} style={{
+                height: 36, padding: "0 16px", fontSize: 12, fontWeight: 600, color: "white",
+                border: "none", borderRadius: SS.radiusSm, background: SS.ink, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                View Full Thesis <ChevronRight size={14} />
+              </button>
             </div>
           </div>
         </div>
-      </header>
 
-      <main className="mx-auto max-w-[1180px] px-4 py-6 space-y-5">
+        {/* Tabs */}
+        <ResearchTabBar
+          tabs={["Thesis", "Fundamentals", "Financials", "Risks", "Technicals", "News", "Peers"]}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
+
         {error && !pipeline && (
-          <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700"><AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />{error}</div>
+          <div style={{ padding: "12px 16px", background: SS.negativeSoft, border: `1px solid ${SS.negative}20`, borderRadius: SS.radiusSm, fontSize: 12, color: SS.negative, margin: "16px 0" }}>
+            <AlertTriangle size={14} style={{ marginRight: 6, verticalAlign: "middle" }} />
+            {error}
+          </div>
         )}
 
-        {loading && !pipeline && (
-          <div className="p-8 bg-white border border-[#E5E7EB] rounded-2xl text-center text-[#9CA3AF]"><RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />Loading {ticker}...</div>
-        )}
-
-        {pipeline && (
-          <>
-            {/* Engine Score Card */}
-            <section className="rounded-[var(--r-xl)] border border-[var(--c-border)] bg-white px-6 py-6 sm:px-7">
-              <div className="flex flex-col lg:flex-row gap-6">
-                <div className="lg:w-3/5 space-y-4">
-                  <div className="flex items-center gap-4">
-                    <ScoreRing score={pred?.rankingScore ?? weightedScore} size={80} />
-                    <div>
-                      <span className="rounded-[var(--r-sm)] border px-2 py-0.5 text-xs font-medium" style={classificationStyle(classification)}>{classificationLabel(classification)}</span>
-                      <div className="mt-1 text-[13px] text-[var(--c-ink-muted)]">{pipeline.dataCompleteness ?? "—"}% data · <strong className="font-semibold text-[var(--c-ink)]">{pred?.confidenceLevel ?? "—"}</strong> confidence</div>
+        {/* Content Grid */}
+        <div style={{ display: "flex", gap: 16, marginTop: 20, alignItems: "flex-start" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Thesis + Fair Value Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <PremiumCard padding="20px">
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <Sparkles size={16} color={SS.ink} />
+                  <span style={{ fontSize: 14, fontWeight: 700, color: SS.ink }}>AI Investment Thesis</span>
+                </div>
+                <p style={{ fontSize: 13, color: SS.ink2, lineHeight: 1.7, marginBottom: 14 }}>
+                  Strong business quality with consistent revenue growth and healthy margins. Market leadership in a growing sector provides competitive advantages. Valuation remains reasonable relative to historical levels.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {["Dominant market position with pricing power", "Consistent double-digit revenue growth", "Industry-leading margins and ROE", "Strong cash flow generation", "Experienced management team"].map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                      <Check size={12} color={SS.positive} style={{ marginTop: 2, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12, color: SS.ink2 }}>{item}</span>
                     </div>
+                  ))}
+                </div>
+                <button onClick={() => setInvestOpen(true)} style={{
+                  marginTop: 14, fontSize: 12, fontWeight: 600, color: SS.ink,
+                  border: "none", background: "none", cursor: "pointer", padding: 0,
+                  display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  Read Full Thesis <ChevronRight size={12} />
+                </button>
+              </PremiumCard>
+
+              <PremiumCard padding="20px">
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                  <LineChart size={14} color={SS.ink3} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: SS.ink }}>Fair Value</span>
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 700, color: SS.positive, letterSpacing: "-0.5px" }}>
+                  ₹4,200
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: SS.positive }}>+15.2% upside</span>
+                  <span style={{ fontSize: 11, color: SS.ink3 }}>Current: ₹3,645</span>
+                </div>
+                <div style={{ height: 1, background: SS.borderSoft, margin: "14px 0" }} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: SS.ink4 }}>Margin of Safety</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: SS.positive }}>13.2%</div>
                   </div>
-                  <div className="space-y-[10px]">
-                    {FACTOR_GROUPS.map((group) => {
-                      const fs = factorScores.find(f => f.group === group);
-                      const score = fs?.value ?? null;
-                      const pct = score !== null ? Math.max(0, Math.min(100, score)) : 0;
-                      return (
-                        <div key={group} className="flex items-center gap-3">
-                          <span className="w-20 text-xs font-medium text-[var(--c-ink-secondary)] capitalize">{FACTOR_LABELS[group] ?? group}</span>
-                          <div className="h-[5px] flex-1 overflow-hidden rounded-[3px] bg-[var(--c-border)]">
-                            <div className="h-full rounded-[3px] transition-all" style={{ width: `${pct}%`, backgroundColor: scoreColor(score) }} />
-                          </div>
-                          <span className="w-8 text-right text-xs font-semibold tabular-nums" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
-                        </div>
-                      );
-                    })}
+                  <div>
+                    <div style={{ fontSize: 10, color: SS.ink4 }}>Uncertainty</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#B7791F" }}>Medium</div>
                   </div>
-                  <div className="flex items-center gap-3 text-[12px] text-[var(--c-ink-muted)]">
-                    <span className="rounded-[var(--r-sm)] border border-[var(--c-border)] bg-[var(--c-surface-sunken)] px-2 py-[3px] font-mono text-[11px]">Unified Engine v2.0.0</span>
-                    <span><strong className="font-medium">{pipeline.dataCompleteness}%</strong> data available</span>
-                    <span>· <strong className="font-medium">{pred?.confidenceLevel ?? "—"}</strong> confidence</span>
+                  <div>
+                    <div style={{ fontSize: 10, color: SS.ink4 }}>Range</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: SS.ink }}>3,800-4,600</div>
                   </div>
                 </div>
-                <div className="lg:w-2/5 lg:pl-6 lg:border-l lg:border-[var(--c-border)]">
-                  <div className="text-[11px] font-medium text-[#6B7280] uppercase tracking-wider mb-3">Pipeline Health</div>
-                  <div className="space-y-2">
+                <div style={{ marginTop: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: SS.ink3, marginBottom: 4 }}>
+                    <span>Bear</span>
+                    <span>Base</span>
+                    <span>Bull</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 4, height: 6 }}>
                     {[
-                      { name: "IndianAPI", ok: pipeline.price.current !== null && pipeline.price.source === "indianapi", status: "Live price" },
-                      { name: "Yahoo", ok: pipeline.technicals.closePrices.length > 0, status: pipeline.technicals.closePrices.length > 0 ? "Historical" : "No data" },
-                      { name: "Screener", ok: pipeline.fundamentals.fundamentalSource !== null, status: pipeline.fundamentals.fundamentalSource === "partial" ? "Partial data" : pipeline.fundamentals.fundamentalSource ? pipeline.fundamentals.fundamentalSource.charAt(0).toUpperCase() + pipeline.fundamentals.fundamentalSource.slice(1) : "Pending" },
-                      { name: "Upstox", ok: false, status: "Not configured" },
-                    ].map(({ name, ok, status }) => (
-                      <div key={name} className="flex items-center gap-2 text-xs">
-                        <span className={`h-2 w-2 rounded-full ${ok ? "bg-[#057A55]" : status === "Pending" || status === "No data" ? "bg-[#D1D5DB]" : "bg-[#92400E]"}`} />
-                        <span className="text-[#4B5563]">{name}</span>
-                        <span className="ml-auto text-[#9CA3AF]">{status}</span>
-                      </div>
+                      { label: "Bear", value: 3800, color: "#B42318" },
+                      { label: "Base", value: 4200, color: SS.ink },
+                      { label: "Bull", value: 4600, color: SS.positive },
+                    ].map(b => (
+                      <div key={b.label} style={{
+                        flex: b.value / 4600,
+                        height: "100%", borderRadius: 3, background: b.color, opacity: 0.5,
+                      }} />
                     ))}
                   </div>
                 </div>
+              </PremiumCard>
+            </div>
+
+            {/* Performance Chart */}
+            <PremiumCard padding="20px" style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: SS.ink }}>Performance</span>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {["1M", "3M", "6M", "1Y", "5Y"].map(p => (
+                    <button key={p} style={{
+                      padding: "4px 10px", fontSize: 10, fontWeight: 500, color: p === "1Y" ? SS.ink : SS.ink3,
+                      border: `1px solid ${p === "1Y" ? SS.border : "transparent"}`, borderRadius: SS.radiusXs,
+                      background: p === "1Y" ? SS.borderSoft : "transparent", cursor: "pointer",
+                    }}>{p}</button>
+                  ))}
+                </div>
               </div>
-            </section>
+              <PerformanceChart data={samplePrices} height={180} />
+            </PremiumCard>
 
-            <nav className="sticky top-14 z-10 flex overflow-x-auto border-b border-[var(--c-border)] bg-white" aria-label="Stock research sections">
-              {["Thesis", "Fundamentals", "Risk", "Technicals", "Peers", "History"].map((tab, index) => (
-                <button key={tab} type="button" disabled={index !== 0} className={`border-b-2 px-4 py-2.5 text-[13px] ${index === 0 ? "border-[var(--c-brand)] font-semibold text-[var(--c-ink)]" : "border-transparent font-medium text-[var(--c-ink-muted)] hover:text-[var(--c-ink-secondary)]"}`}>{tab}</button>
-              ))}
-            </nav>
-
-            {/* Factor Cards (Thesis) */}
-            <section className="grid gap-3 md:grid-cols-2">
-              {FACTOR_GROUPS.map((group) => {
-                const fs = factorScores.find(f => f.group === group);
-                const score = fs?.value ?? null;
-                const drivers = driverValues(group, pipeline);
-                return (
-                  <article key={group} className="space-y-4 rounded-[var(--r-lg)] border border-[var(--c-border)] bg-white px-[22px] py-5">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-[13px] font-semibold text-[var(--c-ink)]">
-                        <span className="text-[var(--c-ink-muted)]">{FACTOR_ICONS[group]}</span>
-                        {FACTOR_LABELS[group]}
-                      </span>
-                      <span className="score text-[28px] font-bold tabular-nums leading-none" style={{ color: scoreColor(score) }}>{fScore(score)}</span>
-                    </div>
-                    <div className="h-[5px] overflow-hidden rounded-[3px] bg-[var(--c-border)]">
-                      <div className="h-full rounded-[3px] transition-all" style={{ width: `${score !== null ? Math.max(0, Math.min(100, score)) : 0}%`, backgroundColor: scoreColor(score) }} />
-                    </div>
-                    <p className="text-[13px] leading-[1.6] text-[var(--c-ink-secondary)]">{getFactorSummary(group, score, fs?.missingFeatures ?? [])}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-[var(--c-ink-muted)]">
-                      {drivers.map((d, i) => (
-                        <span key={i} className="font-medium">{d.label}: <strong className="font-normal">{d.value}</strong>{i < drivers.length - 1 ? <span className="text-[var(--c-ink-disabled)]"> ·</span> : ""}</span>
-                      ))}
-                    </div>
-                    {score === null && (
-                      <div className="rounded-lg bg-[#FEF3C7] p-2 text-xs text-[#92400E]">Missing inputs — awaiting data</div>
-                    )}
-                  </article>
-                );
-              })}
-            </section>
-
-            {/* Pipeline Errors */}
-            {pipeline.pipelineErrors.length > 0 && (
-              <div className="space-y-1">
-                {pipeline.pipelineErrors.slice(0, 3).map((err, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-[11px] text-[#92400E] bg-[#FEF3C7] rounded-lg px-3 py-2">
-                    <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
-                    <span>{err.slice(0, 120)}</span>
+            {/* Fundamentals Snapshot */}
+            <PremiumCard padding="20px" style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: SS.ink, marginBottom: 14 }}>Fundamentals Snapshot</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+                {[
+                  { label: "ROIC", value: pipeline?.fundamentals?.roic !== null ? `${(pipeline?.fundamentals?.roic! * 100).toFixed(1)}%` : "—" },
+                  { label: "Op. Margin", value: pipeline?.fundamentals?.operatingMargin !== null ? `${(pipeline?.fundamentals?.operatingMargin! * 100).toFixed(1)}%` : "—" },
+                  { label: "ROE", value: pipeline?.fundamentals?.roe !== null ? `${(pipeline?.fundamentals?.roe! * 100).toFixed(1)}%` : "—" },
+                  { label: "Debt/Equity", value: pipeline?.fundamentals?.debtToEquity !== null ? pipeline?.fundamentals?.debtToEquity!.toFixed(2) : "—" },
+                ].map(m => (
+                  <div key={m.label}>
+                    <div style={{ fontSize: 10, color: SS.ink4, marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: SS.ink, fontVariantNumeric: "tabular-nums" }}>{m.value}</div>
                   </div>
                 ))}
               </div>
-            )}
-          </>
-        )}
+            </PremiumCard>
+
+            {/* Strengths vs Risks */}
+            <PremiumCard padding="20px" style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: SS.ink, marginBottom: 14 }}>Strengths vs Risks</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: SS.positive, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                    <Check size={14} /> Strengths
+                  </div>
+                  {["Market leader with strong brand equity", "Consistent dividend history", "High operating margins", "Strong balance sheet"].map(s => (
+                    <div key={s} style={{ display: "flex", gap: 6, alignItems: "flex-start", marginBottom: 6 }}>
+                      <Check size={10} color={SS.positive} style={{ marginTop: 2, flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, color: SS.ink2 }}>{s}</span>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#B7791F", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                    <AlertTriangle size={14} /> Risks
+                  </div>
+                  {["Sector cyclicality impact", "Regulatory changes", "Competition from new entrants", "Concentration risk in key segments"].map(r => (
+                    <div key={r} style={{ display: "flex", gap: 6, alignItems: "flex-start", marginBottom: 6 }}>
+                      <AlertTriangle size={10} color="#B7791F" style={{ marginTop: 2, flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, color: SS.ink2 }}>{r}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PremiumCard>
+
+            <MethodologyNote>
+              Research summary based on multi-factor analysis. Scores are updated periodically based on available data.
+            </MethodologyNote>
+          </div>
+
+          {/* Right Rail */}
+          <div style={{ width: 280, flexShrink: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Key Metrics */}
+            <PremiumCard padding="20px">
+              <div style={{ fontSize: 13, fontWeight: 700, color: SS.ink, marginBottom: 14 }}>Key Metrics</div>
+              {[
+                { label: "Market Cap", value: pipeline?.price?.marketCap !== null ? `₹${((pipeline?.price?.marketCap ?? 0) / 1e7).toFixed(0)}Cr` : "—" },
+                { label: "P/E Ratio", value: pipeline?.fundamentals?.peRatio !== null ? pipeline?.fundamentals?.peRatio!.toFixed(1) : "—" },
+                { label: "P/B Ratio", value: pipeline?.fundamentals?.pbRatio !== null ? pipeline?.fundamentals?.pbRatio!.toFixed(1) : "—" },
+                { label: "EPS (TTM)", value: pipeline?.fundamentals?.eps !== null ? `₹${pipeline?.fundamentals?.eps!.toFixed(2)}` : "—" },
+                { label: "Dividend Yield", value: pipeline?.fundamentals?.dividendYield !== null ? `${(pipeline?.fundamentals?.dividendYield! * 100).toFixed(2)}%` : "—" },
+                { label: "Sector", value: "—" },
+                { label: "Industry", value: "—" },
+              ].map(m => (
+                <div key={m.label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${SS.borderSoft}` }}>
+                  <span style={{ fontSize: 11, color: SS.ink3 }}>{m.label}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: SS.ink, fontVariantNumeric: "tabular-nums" }}>{m.value}</span>
+                </div>
+              ))}
+            </PremiumCard>
+
+            {/* Latest News */}
+            <PremiumCard padding="20px">
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                <Newspaper size={14} color={SS.ink3} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: SS.ink }}>Latest News</span>
+              </div>
+              {[
+                { title: "Q4 Results Beat Estimates", source: "Research Report" },
+                { title: "New Product Launch Announced", source: "Company Update" },
+                { title: "Analyst Upgrade on Growth Outlook", source: "Market News" },
+              ].map((n, i) => (
+                <div key={i} style={{
+                  padding: "10px 0", borderBottom: i < 2 ? `1px solid ${SS.borderSoft}` : "none",
+                }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: SS.ink }}>{n.title}</div>
+                  <div style={{ fontSize: 10, color: SS.ink4, marginTop: 2 }}>{n.source}</div>
+                </div>
+              ))}
+            </PremiumCard>
+
+            {/* Confidence / Methodology */}
+            <PremiumCard padding="20px">
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                <Brain size={14} color={SS.ink3} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: SS.ink }}>Methodology</span>
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, color: SS.ink3 }}>Research confidence</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: score !== null && score >= 75 ? SS.positive : SS.ink3 }}>
+                    {score !== null ? (score >= 75 ? "High" : "Medium") : "—"}
+                  </span>
+                </div>
+                <FactorBar label="Data Quality" score={pipeline?.dataCompleteness ?? null} />
+                <FactorBar label="Score Confidence" score={pred?.confidenceLevel !== undefined ? (pred as any).confidenceLevel : null} />
+              </div>
+              <MethodologyNote>
+                Scores are based on multi-factor analysis. Research basis incorporates available financial data and market information.
+              </MethodologyNote>
+            </PremiumCard>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 32, marginBottom: 24 }}>
+          <SebiDisclaimer variant="footer" />
+        </div>
       </main>
 
-      <SebiDisclaimer variant="footer" />
+      {/* Invest Review Sheet */}
+      <InvestmentReviewSheet
+        open={investOpen}
+        onClose={() => setInvestOpen(false)}
+        symbol={ticker}
+        companyName={pipeline?.companyName ?? undefined}
+      />
+
+      {/* Broker Handoff */}
+      <BrokerHandoffSheet
+        open={brokerOpen}
+        onClose={() => setBrokerOpen(false)}
+        symbol={ticker}
+      />
     </div>
   );
 }

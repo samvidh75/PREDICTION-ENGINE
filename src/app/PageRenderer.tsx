@@ -121,12 +121,16 @@ function renderAuthenticatedPage(pageKey: PageKey, hasStockId: boolean): JSX.Ele
   }
 }
 
+const SELF_NAV_PAGES: PageKey[] = ["landing", "scanner", "stock", "company"];
+
 export default function PageRenderer({ pageKey, isAuthenticated, hasStockId }: PageRendererProps): JSX.Element {
   const publicView = PUBLIC_PAGES.includes(pageKey) ? renderPublicPage(pageKey) : <PublicLandingPage />;
   const page = !isAuthenticated
-    ? <>{pageKey !== "login" && pageKey !== "signup" && <TopNav />}{publicView}<SebiDisclaimer variant="footer" /></>
+    ? <>{pageKey !== "login" && pageKey !== "signup" && !SELF_NAV_PAGES.includes(pageKey) && <TopNav />}{publicView}{!SELF_NAV_PAGES.includes(pageKey) && <SebiDisclaimer variant="footer" />}</>
     : pageKey === "about"
       ? <PublicAboutPage />
-      : <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}<SebiDisclaimer variant="footer" /></AppLayout>;
-  return <PageErrorBoundary><Suspense fallback={<div className="min-h-screen bg-[#F6F8FB] pt-28"><div className="mx-auto h-48 max-w-5xl animate-pulse rounded-2xl bg-white shadow-sm" /></div>}>{page}</Suspense></PageErrorBoundary>;
+      : SELF_NAV_PAGES.includes(pageKey)
+        ? renderAuthenticatedPage(pageKey, hasStockId)
+        : <AppLayout>{renderAuthenticatedPage(pageKey, hasStockId)}<SebiDisclaimer variant="footer" /></AppLayout>;
+  return <PageErrorBoundary><Suspense fallback={<div className="min-h-screen bg-[var(--ss-bg)] pt-28"><div className="mx-auto h-48 max-w-5xl animate-pulse rounded-2xl bg-white shadow-sm" /></div>}>{page}</Suspense></PageErrorBoundary>;
 }

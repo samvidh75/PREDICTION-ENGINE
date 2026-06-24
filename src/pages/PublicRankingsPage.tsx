@@ -347,7 +347,7 @@ export const PublicRankingsPage: React.FC = () => {
               </summary>
               <div className="border-t border-white/[0.06] px-4 py-3 text-xs leading-relaxed text-[var(--color-text-secondary)] space-y-2">
                 <p><strong className="text-[var(--color-text-primary)]">Research Score (0–100)</strong> — Multi-factor engine combining quality, valuation, growth, momentum, stability, and risk. Higher is stronger fundamentals.</p>
-                <p><strong className="text-[var(--color-text-primary)]">Scores are live</strong> — Each session computes real-time scores from live providers. No cached or fabricated scores.</p>
+                <p><strong className="text-[var(--color-text-primary)]">Scores are live</strong> — Each session computes real-time scores from available data. No cached or fabricated scores.</p>
                 <p><strong className="text-[var(--color-text-primary)]">No buy/sell calls</strong> — StockStory does not issue trading recommendations. Use scores to prioritize your own research.</p>
               </div>
             </details>
