@@ -84,10 +84,10 @@ describe('Part AB — No raw rendering defects', () => {
 describe('Part AB — Scanner', () => {
   it('ScannerPage renders category sections', () => {
     renderWithProviders(<ScannerPage />);
-    expect(screen.getByText('AI Scanner')).toBeInTheDocument();
-    expect(screen.getByText('Market segment')).toBeInTheDocument();
-    expect(screen.getByText('Business quality')).toBeInTheDocument();
-    expect(screen.getByText('Low-debt leaders')).toBeInTheDocument();
+    expect(screen.getAllByText('AI Stock Scanner').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('sector')).toBeInTheDocument();
+    expect(screen.getByText('quality')).toBeInTheDocument();
+    expect(screen.getByText('risk')).toBeInTheDocument();
     expect(screen.queryByText(/Free scans|Premium scans/i)).not.toBeInTheDocument();
   });
 

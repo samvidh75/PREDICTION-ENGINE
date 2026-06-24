@@ -13,43 +13,43 @@ function renderWithProviders(ui: React.ReactElement) {
   return render(<LayoutProvider>{ui}</LayoutProvider>);
 }
 
-describe('TrustCentrePage (How StockStory Thinks)', () => {
-  it('renders How StockStory Thinks heading', () => {
+describe('TrustCentrePage (How StockStory thinks)', () => {
+  it('renders How StockStory thinks heading', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('How StockStory Thinks')).toBeInTheDocument();
+    expect(screen.getByText('How StockStory thinks')).toBeInTheDocument();
   });
 
   it('renders methodology sections', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Research workflow')).toBeInTheDocument();
-    expect(screen.getByText('Conviction and research dimensions')).toBeInTheDocument();
-    expect(screen.getByText('Research is not a recommendation')).toBeInTheDocument();
-    expect(screen.getByText('Handling of partial information')).toBeInTheDocument();
-    expect(screen.getByText('Broker handoff philosophy')).toBeInTheDocument();
-    expect(screen.getByText('Compliance statement')).toBeInTheDocument();
+    expect(screen.getByText('Research, not guarantees')).toBeInTheDocument();
+    expect(screen.getByText('The five core factors')).toBeInTheDocument();
+    expect(screen.getByText('How to read conviction')).toBeInTheDocument();
+    expect(screen.getByText('Before you invest')).toBeInTheDocument();
+    expect(screen.getByText('Responsible use')).toBeInTheDocument();
+    expect(screen.getByText('Read the full company thesis and understand the narrative')).toBeInTheDocument();
   });
 
   it('renders score dimensions', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Financial strength')).toBeInTheDocument();
+    expect(screen.getByText('Quality')).toBeInTheDocument();
     expect(screen.getByText('Growth')).toBeInTheDocument();
-    expect(screen.getByText('Valuation context')).toBeInTheDocument();
+    expect(screen.getByText('Valuation')).toBeInTheDocument();
     expect(screen.getByText('Momentum')).toBeInTheDocument();
-    expect(screen.getByText('Risk context')).toBeInTheDocument();
-    expect(screen.getByText('Conviction')).toBeInTheDocument();
+    expect(screen.getByText('Risk')).toBeInTheDocument();
+    expect(screen.getByText('High Conviction')).toBeInTheDocument();
   });
 
   it('renders compliance pills', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('Research workspace')).toBeInTheDocument();
-    expect(screen.getByText('Transparent methodology')).toBeInTheDocument();
-    expect(screen.getByText('Structured factor view')).toBeInTheDocument();
+    expect(screen.getByText('StockStory is not a guarantee of future returns')).toBeInTheDocument();
+    expect(screen.getByText('All investments carry market risk')).toBeInTheDocument();
+    expect(screen.getByText('Always do your own research before investing')).toBeInTheDocument();
   });
 
-  it('renders action buttons', () => {
+  it('renders methodology page sections', () => {
     renderWithProviders(<TrustCentrePage />);
-    expect(screen.getByText('View rankings')).toBeInTheDocument();
-    expect(screen.getByText('Read mission')).toBeInTheDocument();
+    expect(screen.getByText('Research, not guarantees')).toBeInTheDocument();
+    expect(screen.getByText('The five core factors')).toBeInTheDocument();
   });
 
   it('contains no backend/provider vocabulary', () => {

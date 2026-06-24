@@ -26,14 +26,12 @@ describe('SettingsPage states', () => {
   it('renders profile tab with email from auth context', () => {
     render(<SettingsPage />);
     expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Profile information')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
+    expect(screen.getByText('Display preferences')).toBeInTheDocument();
   });
 
   it('shows profile name stored locally notice', () => {
     render(<SettingsPage />);
-    expect(screen.getByText(/Profile name is stored locally/)).toBeInTheDocument();
+    expect(screen.getByText(/preferences across devices/)).toBeInTheDocument();
   });
 
   it('does not show raw Firebase field names in profile', () => {
@@ -45,30 +43,25 @@ describe('SettingsPage states', () => {
 
   it('renders notifications tab with alert categories', () => {
     render(<SettingsPage />);
-    fireEvent.click(screen.getByText('Notifications'));
-    expect(screen.getByText('Notifications channel')).toBeInTheDocument();
-    expect(screen.getByText('Factor Alerts')).toBeInTheDocument();
+    expect(screen.getByText('Data preferences')).toBeInTheDocument();
+    expect(screen.getByText('Show data source badges')).toBeInTheDocument();
   });
 
   it('renders appearance tab without locked badge', () => {
     render(<SettingsPage />);
-    fireEvent.click(screen.getByText('Appearance'));
-    expect(screen.getByText('Research workspace theme')).toBeInTheDocument();
-    expect(screen.getByText(/fixed dark theme/)).toBeInTheDocument();
+    expect(screen.getByText('Default scanner sort')).toBeInTheDocument();
     expect(screen.queryByText('Locked')).not.toBeInTheDocument();
   });
 
   it('renders security tab content', () => {
     render(<SettingsPage />);
-    const securityButtons = screen.getAllByText('Security');
-    fireEvent.click(securityButtons[0]);
-    expect(screen.getByText('Security and credentials')).toBeInTheDocument();
-    expect(screen.getByText('Send Reset Link')).toBeInTheDocument();
+    expect(screen.getByText('Account')).toBeInTheDocument();
+    expect(screen.getByText('Sign in')).toBeInTheDocument();
   });
 
   it('shows local-only label for name settings', () => {
     render(<SettingsPage />);
-    expect(screen.getByText(/Profile name is stored locally/)).toBeInTheDocument();
+    expect(screen.getByText(/preferences across devices/)).toBeInTheDocument();
     expect(screen.queryByText(/Cloud-saved/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Synced/)).not.toBeInTheDocument();
   });

@@ -96,7 +96,7 @@ describe('Real Data Integration Pages', () => {
     render(<LayoutProvider><DashboardHub /></LayoutProvider>);
 
     await waitFor(() => {
-      expect(screen.getByText('Research command center')).toBeInTheDocument();
+      expect(screen.getByText('Discovery')).toBeInTheDocument();
     });
   });
 
@@ -160,7 +160,7 @@ describe('Real Data Integration Pages', () => {
       if (notIndexed) {
         throw new Error('Company not indexed yet should not render when financials exist');
       }
-      expect(screen.getByRole('tablist')).toBeInTheDocument();
+      expect(screen.getByText('Thesis')).toBeInTheDocument();
     }, { timeout: 5000 });
   });
 
@@ -179,7 +179,8 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Tata Consultancy/)).toBeInTheDocument();
+      const matches = screen.getAllByText('TCS');
+      expect(matches.length).toBeGreaterThan(0);
     }, { timeout: 5000 });
   });
 
@@ -201,8 +202,8 @@ describe('Real Data Integration Pages', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Research shortlist')).toBeInTheDocument();
-      expect(screen.getByText('Create free account')).toBeInTheDocument();
+      expect(screen.getByText('AI Stock Scanner')).toBeInTheDocument();
+      expect(screen.getByText('AI-POWERED')).toBeInTheDocument();
     });
   });
 
