@@ -23,9 +23,9 @@ import { narrativeEngine } from "../services/NarrativeEngine";
 const VALIDATION_SYMBOLS = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "HAL"];
 
 async function main() {
-  console.log("=================================================");
-  console.log("    StockStory Intelligence Engine Validation    ");
-  console.log("=================================================");
+  console.info("=================================================");
+  console.info("    StockStory Intelligence Engine Validation    ");
+  console.info("=================================================");
 
   const validationReport: any = {
     timestamp: new Date().toISOString(),
@@ -36,19 +36,19 @@ async function main() {
 
   try {
     // 1. Fetch Market-wide Intelligence (Phase 4)
-    console.log("Generating Market Intelligence...");
+    console.info("Generating Market Intelligence...");
     const marketOutlook = await marketIntelligenceEngine.generateMarketReport();
     validationReport.marketOutlook = marketOutlook;
 
     // 2. Fetch Portfolio-wide Intelligence (Phase 5)
-    console.log("Generating Portfolio Intelligence...");
+    console.info("Generating Portfolio Intelligence...");
     const mockPortfolio = VALIDATION_SYMBOLS.map(sym => ({ symbol: sym, weight: 0.20 }));
     const portfolioOutlook = await portfolioIntelligenceEngine.evaluatePortfolio(mockPortfolio);
     validationReport.portfolioOutlook = portfolioOutlook;
 
     // 3. Process each validation symbol
     for (const sym of VALIDATION_SYMBOLS) {
-      console.log(`Processing intelligence snapshot for ${sym}...`);
+      console.info(`Processing intelligence snapshot for ${sym}...`);
 
       // Fetch latest features
       const featRes = await pool.query(
@@ -129,7 +129,7 @@ async function main() {
     // Write validation report
     const path = join(REPORTS_DIR, "INTELLIGENCE_VALIDATION_REPORT.json");
     writeFileSync(path, JSON.stringify(validationReport, null, 2), "utf-8");
-    console.log(`\n✓ Intelligence validation completed. Report written: ${path}`);
+    console.info(`\n✓ Intelligence validation completed. Report written: ${path}`);
 
   } catch (err: any) {
     console.error("❌ Intelligence validation failed:", err.message);

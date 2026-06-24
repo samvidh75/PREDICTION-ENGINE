@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 async function runExplainabilityPipeline() {
-  console.log('Starting Explainability and Ranking Attribution System Ingestion...');
+  console.info('Starting Explainability and Ranking Attribution System Ingestion...');
   
   // Create directories
   const reportsDir = path.join(process.cwd(), 'src', 'stockstory', 'reports');
@@ -180,7 +180,7 @@ async function runExplainabilityPipeline() {
     });
   }
 
-  console.log(`Evaluated ${evaluations.length} total companies.`);
+  console.info(`Evaluated ${evaluations.length} total companies.`);
 
   // PHASE 1: Ranking Universe Analysis & Sorts
   const top20Health = [...evaluations].sort((a, b) => b.output.healthScore - a.output.healthScore).slice(0, 20);
@@ -341,7 +341,7 @@ async function runExplainabilityPipeline() {
   });
 
   fs.writeFileSync('StockStoryExplainabilityReport.md', finalReportMd, 'utf8');
-  console.log('StockStoryExplainabilityReport.md written successfully.');
+  console.info('StockStoryExplainabilityReport.md written successfully.');
 }
 
 runExplainabilityPipeline().catch(err => {

@@ -5,17 +5,17 @@ import { FeatureEngine } from "../services/FeatureEngine";
 import { FactorEngine } from "../services/FactorEngine";
 
 async function main() {
-  console.log("=== Phase 3: Real Indian Market Population Script ===");
+  console.info("=== Phase 3: Real Indian Market Population Script ===");
   const stocks = generate500Stocks();
-  console.log(`Loaded ${stocks.length} dynamically generated stocks.`);
+  console.info(`Loaded ${stocks.length} dynamically generated stocks.`);
 
   // 0. Truncate existing data to clear out old synthetic symbols
-  console.log("Purging old warehouse tables to replace synthetic universe...");
+  console.info("Purging old warehouse tables to replace synthetic universe...");
   await pool.query("TRUNCATE TABLE symbols, daily_prices, financial_snapshots, feature_snapshots, factor_snapshots CASCADE");
-  console.log("Purge complete.");
+  console.info("Purge complete.");
 
   // 1. Ingest into symbols table
-  console.log("Ingesting symbols into database...");
+  console.info("Ingesting symbols into database...");
   for (const stock of stocks) {
     await pool.query(
       `INSERT INTO symbols (symbol, exchange, isin, company_name, sector, industry, listing_status)
@@ -33,10 +33,10 @@ async function main() {
       ]
     );
   }
-  console.log("Symbols table ingestion complete.");
+  console.info("Symbols table ingestion complete.");
 
   // 2. Ingest basic financial snapshots
-  console.log("Ingesting basic financial snapshots...");
+  console.info("Ingesting basic financial snapshots...");
   for (const stock of stocks) {
     const peRatio = parseFloat((12 + Math.random() * 48).toFixed(2));
     const eps = parseFloat((5 + Math.random() * 95).toFixed(2));
@@ -73,10 +73,10 @@ async function main() {
       ]
     );
   }
-  console.log("Financial snapshots ingestion complete.");
+  console.info("Financial snapshots ingestion complete.");
 
   // 3. Generate 5 years of daily candles
-  console.log("Generating 5 years of daily candles for 500 symbols...");
+  console.info("Generating 5 years of daily candles for 500 symbols...");
   // Gather dates (approx. 1250 trading days)
   const dates: string[] = [];
   const currentDate = new Date("2021-06-01");
@@ -90,10 +90,10 @@ async function main() {
     }
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  console.log(`Total trading days calculated: ${dates.length}`);
+  console.info(`Total trading days calculated: ${dates.length}`);
 
   // Ingest daily prices in batches per symbol to optimize query memory
-  console.log("Populating daily_prices...");
+  console.info("Populating daily_prices...");
   for (let s = 0; s < stocks.length; s++) {
     const stock = stocks[s];
     const values: any[] = [];
@@ -136,13 +136,13 @@ async function main() {
     }
 
     if ((s + 1) % 50 === 0) {
-      console.log(`  Ingested prices for ${s + 1} / ${stocks.length} symbols...`);
+      console.info(`  Ingested prices for ${s + 1} / ${stocks.length} symbols...`);
     }
   }
-  console.log("Daily prices table population complete.");
+  console.info("Daily prices table population complete.");
 
   // 4. Calculate features and factors
-  console.log("Running feature & factor calculation pipelines on 500 symbols...");
+  console.info("Running feature & factor calculation pipelines on 500 symbols...");
   const featureEngine = new FeatureEngine();
   const factorEngine = new FactorEngine();
 
@@ -162,10 +162,10 @@ async function main() {
         }
       })
     );
-    console.log(`  Processed calculation engines for ${Math.min(i + concurrency, stocks.length)} / ${stocks.length} symbols...`);
+    console.info(`  Processed calculation engines for ${Math.min(i + concurrency, stocks.length)} / ${stocks.length} symbols...`);
   }
 
-  console.log("=== Population & Engine calculation successfully complete! ===");
+  console.info("=== Population & Engine calculation successfully complete! ===");
   await pool.end();
 }
 

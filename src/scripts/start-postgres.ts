@@ -13,10 +13,10 @@ const PGSQL_DIR = join(BASE_DIR, 'postgres-bin', 'pgsql');
 const POSTGRES_EXE = join(PGSQL_DIR, 'bin', `postgres${PG_EXE_SUFFIX}`);
 
 async function start() {
-  console.log('Starting PostgreSQL server...');
+  console.info('Starting PostgreSQL server...');
 
   if (existsSync(PID_FILE)) {
-    console.log('Removing stale PID file...');
+    console.info('Removing stale PID file...');
     try {
       unlinkSync(PID_FILE);
     } catch (e: any) {
@@ -33,11 +33,11 @@ async function start() {
   });
 
   child.unref();
-  console.log(`Spawned postgres with PID: ${child.pid}`);
+  console.info(`Spawned postgres with PID: ${child.pid}`);
 
   // Wait 4 seconds for server to start and bind
   await new Promise((r) => setTimeout(r, 4000));
-  console.log('PostgreSQL start sequence complete. Checking server status...');
+  console.info('PostgreSQL start sequence complete. Checking server status...');
 }
 
 start().catch((err) => {

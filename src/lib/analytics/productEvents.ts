@@ -120,7 +120,7 @@ export function trackEvent(
       window.dataLayer.push({ event, ...properties });
     }
     if (process.env.NODE_ENV === "development") {
-      console.log(`[Analytics] ${event}`, properties ?? "");
+      console.info(`[Analytics] ${event}`, properties ?? "");
     }
   } catch {
   }

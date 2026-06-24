@@ -114,7 +114,7 @@ async function runHealthCheck(): Promise<void> {
   }
 
   writeFileSync('DailyProviderHealthReport.md', md, 'utf8');
-  console.log(`DailyProviderHealthReport.md written. Fully passed rows: ${passedRows}/${results.length}`);
+  console.info(`DailyProviderHealthReport.md written. Fully passed rows: ${passedRows}/${results.length}`);
 }
 
 runHealthCheck().catch((error) => {

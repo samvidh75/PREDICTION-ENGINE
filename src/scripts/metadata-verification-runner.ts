@@ -8,7 +8,7 @@ import { DataIntegrityEngine } from '../services/data/DataIntegrityEngine';
 import fs from 'fs';
 
 async function runMetadataValidation() {
-  console.log('Running Metadata Completeness & Accuracy Checks...');
+  console.info('Running Metadata Completeness & Accuracy Checks...');
   const integrity = new DataIntegrityEngine();
 
   const res = await pool.query('SELECT symbol, company_name, sector, industry, exchange, isin FROM symbols');
@@ -74,7 +74,7 @@ async function runMetadataValidation() {
   }
 
   fs.writeFileSync('MetadataCompletenessReport.md', md, 'utf8');
-  console.log('MetadataCompletenessReport.md written successfully.');
+  console.info('MetadataCompletenessReport.md written successfully.');
   await pool.end();
 }
 

@@ -13,7 +13,7 @@ async function main() {
   const active = getActiveFactorCount();
   const cats = getCategoryCounts();
 
-  console.log(JSON.stringify({
+  console.info(JSON.stringify({
     status: "ok",
     modelVersion: "prediction-engine-v2.0.0",
     factorsDefined: total,

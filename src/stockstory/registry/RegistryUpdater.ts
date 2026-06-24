@@ -523,6 +523,6 @@ export class RegistryUpdater {
     const timestamp = new Date().toISOString();
     const logLine = `[${timestamp}] ${message}`;
     this.auditLog.push(logLine);
-    console.log(logLine);
+    console.info(logLine);
   }
 }

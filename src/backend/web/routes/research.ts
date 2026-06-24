@@ -43,6 +43,20 @@ function productSafeParse<T>(data: string): T {
   return JSON.parse(data) as T;
 }
 
+const PROVIDER_TIMEOUT = 8000;
+
+function withTimeout<T>(promise: Promise<T>, defaultVal: T, label: string, log?: any): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${PROVIDER_TIMEOUT}ms`)), PROVIDER_TIMEOUT)
+    ),
+  ]).catch((err) => {
+    log?.warn?.({ err, label }, "provider call failed");
+    return defaultVal;
+  });
+}
+
 export const researchRoutes: FastifyPluginAsync = async (app) => {
   // ── Existing: fundamentals-coverage ──────────────────────────────────
   app.get("/api/research/fundamentals-coverage", async (req, reply) => {
@@ -175,8 +189,8 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
 
     try {
       const [metaRes, fsRes, dpRes, quote, factorRes, featureRes, prRes] = await Promise.all([
-        MarketDataGateway.getCompany(sym).catch(() => null),
-        query(
+        withTimeout(MarketDataGateway.getCompany(sym), `MarketDataGateway.getCompany(${sym})`, req.log),
+        withTimeout(query(
           `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
                   debt_to_equity, current_ratio, operating_margin,
                   net_margin, gross_margin, revenue_growth, profit_growth,
@@ -186,38 +200,38 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
              AND pe_ratio IS NOT NULL
            ORDER BY snapshot_date DESC LIMIT 1`,
           [sym]
-        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
-        query(
+        ), `financial_snapshots(${sym})`, req.log),
+        withTimeout(query(
           `SELECT trade_date, close, high, low, volume
            FROM daily_prices
            WHERE symbol = $1
            ORDER BY trade_date DESC LIMIT 252`,
           [sym]
-        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
-        MarketDataGateway.getQuote(sym).catch(() => null),
-        query(
+        ), `daily_prices(${sym})`, req.log),
+        withTimeout(MarketDataGateway.getQuote(sym), `MarketDataGateway.getQuote(${sym})`, req.log),
+        withTimeout(query(
           `SELECT quality_factor, value_factor, growth_factor,
                   momentum_factor, risk_factor, sector_strength_factor
            FROM factor_snapshots
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
            ORDER BY trade_date DESC LIMIT 1`,
           [sym]
-        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
-        query(
+        ), `factor_snapshots(${sym})`, req.log),
+        withTimeout(query(
           `SELECT volatility, momentum, rsi, trend_strength
            FROM feature_snapshots
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
            ORDER BY trade_date DESC LIMIT 1`,
           [sym]
-        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
-        query(
+        ), `feature_snapshots(${sym})`, req.log),
+        withTimeout(query(
           `SELECT ranking_score, classification, confidence_score, confidence_level
            FROM prediction_registry
            WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
              AND ranking_score IS NOT NULL
            ORDER BY prediction_date DESC LIMIT 1`,
           [sym]
-        ).catch(() => ({ rows: [] as Record<string, unknown>[], rowCount: 0 })),
+        ), `prediction_registry(${sym})`, req.log),
       ]);
 
       const fsRow = (fsRes.rows?.[0] || null) as Record<string, unknown> | null;

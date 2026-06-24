@@ -63,9 +63,9 @@ function logProgress(symbol: string, status: 'done' | 'fail' | 'skip', duration:
   const line = `[${pct}%] ${symbol}: ${status} (${duration.toFixed(1)}s) | ${progress.completed} done, ${progress.failed} failed, ${remaining} left | elapsed ${elapsed.toFixed(0)}s, ETA ${eta.toFixed(0)}s`;
   
   if (reason) {
-    console.log(`${line} — ${reason}`);
+    console.info(`${line} — ${reason}`);
   } else {
-    console.log(line);
+    console.info(line);
   }
 }
 
@@ -295,12 +295,12 @@ async function populateSymbol(
 
 // ── Main entry point ───────────────────────────────────────────────
 async function main(): Promise<void> {
-  console.log('=== TRACK-19: Real Data Universe Builder ===\n');
+  console.info('=== TRACK-19: Real Data Universe Builder ===\n');
   
   // Validate database connection
   try {
     await pool.query('SELECT 1');
-    console.log('✅ Database connected');
+    console.info('✅ Database connected');
   } catch (err: any) {
     console.error('❌ Database connection failed:', err.message);
     console.error('Ensure PostgreSQL is running and DATABASE_URL is set.');
@@ -309,7 +309,7 @@ async function main(): Promise<void> {
 
   const registry = MasterCompanyRegistry.getInstance();
   const allEntries = registry.getAllEntries();
-  console.log(`✅ MasterCompanyRegistry: ${allEntries.length} verified companies\n`);
+  console.info(`✅ MasterCompanyRegistry: ${allEntries.length} verified companies\n`);
 
   // Priority: NIFTY 50 heavyweights first (sorted by market cap)
   const entries = [...allEntries].sort((a, b) => (b.marketCap ?? 0) - (a.marketCap ?? 0));
@@ -319,7 +319,7 @@ async function main(): Promise<void> {
   const featureEngine = new FeatureEngine();
   const factorEngine = new FactorEngine();
 
-  console.log(`Starting pipeline for ${entries.length} symbols...\n`);
+  console.info(`Starting pipeline for ${entries.length} symbols...\n`);
 
   // Process sequentially to respect API rate limits
   // Upstox: ~20 req/min → 3s delay between symbols
@@ -343,18 +343,18 @@ async function main(): Promise<void> {
   }
 
   // ── TRACK-25A: Invoke NightlyPopulationOrchestrator for advanced stages ──
-  console.log(`\n=== Invoking NightlyPopulationOrchestrator (TTM + Derived + Quality + Confidence + Anomaly) ===`);
+  console.info(`\n=== Invoking NightlyPopulationOrchestrator (TTM + Derived + Quality + Confidence + Anomaly) ===`);
   const successfulSymbols = results.filter(r => r.status === 'success').map(r => r.symbol);
   if (successfulSymbols.length > 0) {
     try {
       const orchestrator = new NightlyPopulationOrchestrator({ batchSize: 5, cooldownMs: 1000 });
       const orchResult = await orchestrator.run(successfulSymbols);
-      console.log(`Orchestrator result: ${orchResult.symbolsSucceeded}/${orchResult.symbolsProcessed} succeeded`);
+      console.info(`Orchestrator result: ${orchResult.symbolsSucceeded}/${orchResult.symbolsProcessed} succeeded`);
     } catch (orchErr: any) {
       console.warn(`Orchestrator run failed (non-fatal): ${orchErr.message}`);
     }
   } else {
-    console.log('No successful symbols — skipping orchestrator stages.');
+    console.info('No successful symbols — skipping orchestrator stages.');
   }
 
   // ── Summary ───────────────────────────────────────────────────
@@ -362,10 +362,10 @@ async function main(): Promise<void> {
   const succeeded = results.filter(r => r.status === 'success');
   const failed = results.filter(r => r.status === 'failure');
 
-  console.log(`\n=== Pipeline Complete ===`);
-  console.log(`⏱ Total time: ${totalTime.toFixed(0)}s (${(totalTime / 60).toFixed(1)} min)`);
-  console.log(`✅ Succeeded: ${succeeded.length}/${entries.length}`);
-  console.log(`❌ Failed: ${failed.length}/${entries.length}`);
+  console.info(`\n=== Pipeline Complete ===`);
+  console.info(`⏱ Total time: ${totalTime.toFixed(0)}s (${(totalTime / 60).toFixed(1)} min)`);
+  console.info(`✅ Succeeded: ${succeeded.length}/${entries.length}`);
+  console.info(`❌ Failed: ${failed.length}/${entries.length}`);
 
   // Per-step coverage
   const finCoverage = results.filter(r => r.steps.financials).length;
@@ -373,23 +373,23 @@ async function main(): Promise<void> {
   const featCoverage = results.filter(r => r.steps.features).length;
   const factCoverage = results.filter(r => r.steps.factors).length;
 
-  console.log(`\n📊 Step Coverage:`);
-  console.log(`  Financial snapshots: ${finCoverage}/${entries.length} (${(finCoverage / entries.length * 100).toFixed(0)}%)`);
-  console.log(`  Daily prices: ${priceCoverage}/${entries.length} (${(priceCoverage / entries.length * 100).toFixed(0)}%)`);
-  console.log(`  Feature snapshots: ${featCoverage}/${entries.length} (${(featCoverage / entries.length * 100).toFixed(0)}%)`);
-  console.log(`  Factor snapshots: ${factCoverage}/${entries.length} (${(factCoverage / entries.length * 100).toFixed(0)}%)`);
+  console.info(`\n📊 Step Coverage:`);
+  console.info(`  Financial snapshots: ${finCoverage}/${entries.length} (${(finCoverage / entries.length * 100).toFixed(0)}%)`);
+  console.info(`  Daily prices: ${priceCoverage}/${entries.length} (${(priceCoverage / entries.length * 100).toFixed(0)}%)`);
+  console.info(`  Feature snapshots: ${featCoverage}/${entries.length} (${(featCoverage / entries.length * 100).toFixed(0)}%)`);
+  console.info(`  Factor snapshots: ${factCoverage}/${entries.length} (${(factCoverage / entries.length * 100).toFixed(0)}%)`);
 
   // Average runtime per symbol
   const avgTime = results.length > 0
     ? results.reduce((a, b) => a + b.duration, 0) / results.length
     : 0;
-  console.log(`\n⏱ Average time per symbol: ${avgTime.toFixed(1)}s`);
+  console.info(`\n⏱ Average time per symbol: ${avgTime.toFixed(1)}s`);
 
   // Write failure report
   if (failed.length > 0) {
-    console.log(`\n❌ Failures:`);
+    console.info(`\n❌ Failures:`);
     for (const f of failed) {
-      console.log(`  ${f.symbol}: ${f.error || 'unknown error'}`);
+      console.info(`  ${f.symbol}: ${f.error || 'unknown error'}`);
     }
   }
 
@@ -474,7 +474,7 @@ async function main(): Promise<void> {
 
   fs.writeFileSync(path.join(reportsDir, 'FinalVerdict.md'), verdictMd, 'utf8');
 
-  console.log(`\n📄 Reports written to ${reportsDir}`);
+  console.info(`\n📄 Reports written to ${reportsDir}`);
 
   await pool.end();
 }

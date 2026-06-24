@@ -21,7 +21,7 @@ export class InternationalizationFramework {
 
   public static setCurrency(curr: SupportedCurrency): void {
     this.activeCurrency = curr;
-    console.log(`[Internationalization] Switched currency context to ${curr}`);
+    console.info(`[Internationalization] Switched currency context to ${curr}`);
   }
 
   public static getActiveConfig(): ExchangeConfig {

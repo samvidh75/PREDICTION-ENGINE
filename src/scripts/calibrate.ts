@@ -60,13 +60,13 @@ function getPearsonCorrelation(x: number[], y: number[]): number {
 }
 
 async function main() {
-  console.log("=== StockStory Calibration Analysis ===");
+  console.info("=== StockStory Calibration Analysis ===");
 
   // 1. Fetch data in bulk
-  console.log("Fetching bulk snapshots from DB...");
+  console.info("Fetching bulk snapshots from DB...");
   const symbolsRes = await pool.query("SELECT symbol, sector FROM symbols");
   const symbols = symbolsRes.rows;
-  console.log(`Loaded ${symbols.length} symbols.`);
+  console.info(`Loaded ${symbols.length} symbols.`);
 
   const featuresRes = await pool.query(`
     WITH Ranked AS (
@@ -128,7 +128,7 @@ async function main() {
   }
 
   // 2. Evaluate all symbols through the engine
-  console.log("Running StockStory evaluations...");
+  console.info("Running StockStory evaluations...");
   const evaluations: any[] = [];
   const sectorScores = new Map<string, number[]>();
 
@@ -230,7 +230,7 @@ async function main() {
     sectorScores.get(sector)!.push(res.healthScore);
   }
 
-  console.log(`Evaluated ${evaluations.length} stocks successfully.`);
+  console.info(`Evaluated ${evaluations.length} stocks successfully.`);
 
   // 3. Compute Stats
   const metrics = ["growth", "quality", "stability", "momentum", "valuation", "risk", "healthScore"];
@@ -365,17 +365,17 @@ Based on the distribution diagnostics, we recommend the following recalibrated w
   // Write to both workspace and artifacts directory
   const workspacePath = path.join(process.cwd(), "EngineCalibrationReport.md");
   fs.writeFileSync(workspacePath, content, "utf8");
-  console.log(`Saved EngineCalibrationReport.md to: ${workspacePath}`);
+  console.info(`Saved EngineCalibrationReport.md to: ${workspacePath}`);
 
   const artifactDir = process.env.ARTIFACT_OUT_DIR ?? "";
   if (artifactDir && fs.existsSync(artifactDir)) {
     const artifactPath = path.join(artifactDir, "EngineCalibrationReport.md");
     fs.writeFileSync(artifactPath, content, "utf8");
-    console.log(`Saved EngineCalibrationReport.md to: ${artifactPath}`);
+    console.info(`Saved EngineCalibrationReport.md to: ${artifactPath}`);
   }
 
   await pool.end();
-  console.log("Calibration complete!");
+  console.info("Calibration complete!");
 }
 
 main().catch(err => {

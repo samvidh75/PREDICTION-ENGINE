@@ -16,7 +16,7 @@ async function main() {
   const executionReport: any[] = [];
 
   for (const sym of SYMBOLS) {
-    console.log(`Evaluating live execution for ${sym}...`);
+    console.info(`Evaluating live execution for ${sym}...`);
     const t0 = Date.now();
 
     // Find sector for symbol
@@ -107,7 +107,7 @@ async function main() {
 
   const outputPath = join(process.cwd(), "LIVE_INTELLIGENCE_EXECUTION_REPORT.json");
   writeFileSync(outputPath, JSON.stringify(executionReport, null, 2), "utf-8");
-  console.log(`✓ Execution report written to ${outputPath}`);
+  console.info(`✓ Execution report written to ${outputPath}`);
   await pool.end();
 }
 

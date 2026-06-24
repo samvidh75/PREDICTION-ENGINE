@@ -111,9 +111,9 @@ export class NightlyPopulationOrchestrator {
     const runId = new Date().toISOString();
     const stages: Record<string, { success: boolean; durationMs: number; details: string }> = {};
 
-    console.log('═══════════════════════════════════════════════');
-    console.log(`NightlyPopulation: ${runId}`);
-    console.log('═══════════════════════════════════════════════');
+    console.info('═══════════════════════════════════════════════');
+    console.info(`NightlyPopulation: ${runId}`);
+    console.info('═══════════════════════════════════════════════');
 
     // Stage 0: Cleanup old checkpoints
     CheckpointManager.cleanupOldCheckpoints();
@@ -121,7 +121,7 @@ export class NightlyPopulationOrchestrator {
 
     try {
       // ── Stage 1: Registry Update ──────────────────────
-      console.log('\n[1/10] Registry Update...');
+      console.info('\n[1/10] Registry Update...');
       let stageStart = Date.now();
       try {
         const registryResult = await this.registry.runUpdate();
@@ -150,14 +150,14 @@ export class NightlyPopulationOrchestrator {
       // Get active symbols from DB
       const activeSymbols = symbols ?? await this.getActiveSymbols();
       this.checkpoint.setTotalSymbols(activeSymbols.length);
-      console.log(`Active symbols: ${activeSymbols.length}`);
+      console.info(`Active symbols: ${activeSymbols.length}`);
 
       // Filter out already-completed symbols (from previous crash recovery)
       const workingSymbols = this.checkpoint.getRemainingSymbols(activeSymbols);
-      console.log(`Remaining to process: ${workingSymbols.length}/${activeSymbols.length}`);
+      console.info(`Remaining to process: ${workingSymbols.length}/${activeSymbols.length}`);
 
       // ── Stage 2: Financials + Statements ───────────────
-      console.log('\n[2/10] Financials & Statements...');
+      console.info('\n[2/10] Financials & Statements...');
       stageStart = Date.now();
       await this.processBatchedStage('financials', workingSymbols, async (symbol) => {
         this.checkpoint.recordStageCompletion('financials', true);
@@ -171,7 +171,7 @@ export class NightlyPopulationOrchestrator {
       };
 
       // ── Stage 3: TTM Calculation ──────────────────────
-      console.log('\n[3/10] TTM Calculation...');
+      console.info('\n[3/10] TTM Calculation...');
       stageStart = Date.now();
       let ttmCount = 0;
       try {
@@ -194,7 +194,7 @@ export class NightlyPopulationOrchestrator {
       };
 
       // ── Stage 4: Derived Metrics ───────────────────────
-      console.log('\n[4/10] Derived Metrics...');
+      console.info('\n[4/10] Derived Metrics...');
       stageStart = Date.now();
       this.checkpoint.setCurrentStage('derived');
       let derivedCount = 0;
@@ -224,7 +224,7 @@ export class NightlyPopulationOrchestrator {
       stages['8_rankings'] = { success: true, durationMs: 0, details: 'Delegated to SectorPercentileEngine' };
 
       // ── Stage 9: Data Quality ────────────────────────
-      console.log('\n[9/10] Data Quality Validation...');
+      console.info('\n[9/10] Data Quality Validation...');
       stageStart = Date.now();
       this.checkpoint.setCurrentStage('quality');
       const qualityReport = this.quality.generateReport();
@@ -236,7 +236,7 @@ export class NightlyPopulationOrchestrator {
       };
 
       // ── Stage 10: Telemetry & Persistence ────────────
-      console.log('\n[10/10] Telemetry & Health...');
+      console.info('\n[10/10] Telemetry & Health...');
       stageStart = Date.now();
       this.checkpoint.setCurrentStage('telemetry');
       
@@ -245,7 +245,7 @@ export class NightlyPopulationOrchestrator {
       
       // Health summary
       const healthSummary = this.health.getHealthSummary();
-      console.log(healthSummary);
+      console.info(healthSummary);
 
       stages['10_telemetry'] = {
         success: true,
@@ -280,10 +280,10 @@ export class NightlyPopulationOrchestrator {
       success: true,
     };
 
-    console.log('\n═══════════════════════════════════════════════');
-    console.log(`Pipeline complete: ${result.symbolsSucceeded}/${result.symbolsProcessed} succeeded`);
-    console.log(`Duration: ${(totalDuration / 60000).toFixed(1)} min`);
-    console.log('═══════════════════════════════════════════════');
+    console.info('\n═══════════════════════════════════════════════');
+    console.info(`Pipeline complete: ${result.symbolsSucceeded}/${result.symbolsProcessed} succeeded`);
+    console.info(`Duration: ${(totalDuration / 60000).toFixed(1)} min`);
+    console.info('═══════════════════════════════════════════════');
 
     return result;
   }
@@ -332,7 +332,7 @@ export class NightlyPopulationOrchestrator {
       const remainingSymbols = symbols.length - i - batch.length;
       this.checkpoint.updatePerformance(avgTime, remainingSymbols * avgTime);
 
-      console.log(`  Batch ${Math.floor(i / batchSize) + 1}: ${batchSuccesses}/${batch.length} success (${batchDuration}ms)`);
+      console.info(`  Batch ${Math.floor(i / batchSize) + 1}: ${batchSuccesses}/${batch.length} success (${batchDuration}ms)`);
 
       // Cooldown between batches
       if (i + batchSize < symbols.length) {

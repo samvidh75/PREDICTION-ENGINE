@@ -14,7 +14,7 @@ const activeDisplayable = allActive.filter((f) => f.displayable).length;
 const activeHidden = allActive.length - activeDisplayable;
 const coverageRatio = +(active / total).toFixed(3);
 
-console.log(JSON.stringify({
+console.info(JSON.stringify({
   status: "ok",
   modelVersion: "prediction-engine-v2.0.0",
   factorsDefined: total,

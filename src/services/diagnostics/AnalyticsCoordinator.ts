@@ -16,6 +16,6 @@ export type BetaEventName =
 export class AnalyticsCoordinator {
   public static trackEvent(event: BetaEventName, details: string): void {
     const timestamp = new Date().toISOString();
-    console.log(`[Analytics] [${timestamp}] Event: ${event} // Details: ${details}`);
+    console.info(`[Analytics] [${timestamp}] Event: ${event} // Details: ${details}`);
   }
 }

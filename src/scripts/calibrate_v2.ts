@@ -86,7 +86,7 @@ function generateHistogram(arr: number[]): { bin: string; count: number; bar: st
 }
 
 async function main() {
-  console.log("=== StockStory V2 Calibration Analysis ===");
+  console.info("=== StockStory V2 Calibration Analysis ===");
 
   // 1. Fetch data in bulk
   const symbolsRes = await pool.query("SELECT symbol, sector FROM symbols");
@@ -385,18 +385,18 @@ Correlation of individual factors relative to final **Health Score** under diffe
   // Write to workspace
   const workspacePath = path.join(process.cwd(), "EngineCalibrationV2.md");
   fs.writeFileSync(workspacePath, mdContent, "utf8");
-  console.log(`Saved EngineCalibrationV2.md to: ${workspacePath}`);
+  console.info(`Saved EngineCalibrationV2.md to: ${workspacePath}`);
 
   // Write to artifacts
   const artifactDir = process.env.ARTIFACT_OUT_DIR ?? "";
   if (artifactDir && fs.existsSync(artifactDir)) {
     const artifactPath = path.join(artifactDir, "EngineCalibrationV2.md");
     fs.writeFileSync(artifactPath, mdContent, "utf8");
-    console.log(`Saved EngineCalibrationV2.md to: ${artifactPath}`);
+    console.info(`Saved EngineCalibrationV2.md to: ${artifactPath}`);
   }
 
   await pool.end();
-  console.log("V2 Calibration complete!");
+  console.info("V2 Calibration complete!");
 }
 
 main().catch(err => {

@@ -273,7 +273,7 @@ export class CheckpointManager {
           const stats = fs.statSync(filePath);
           if (now - stats.mtimeMs > maxAge) {
             fs.unlinkSync(filePath);
-            console.log(`CheckpointManager: cleaned up old checkpoint ${file}`);
+            console.info(`CheckpointManager: cleaned up old checkpoint ${file}`);
           }
         }
       }

@@ -303,14 +303,14 @@ export class PipelineAlertService {
     // In production, integrate with nodemailer or a transactional email service.
     // For now, log that an email would have been sent.
     this.logLocal(alert);
-    console.log(`[PipelineAlertService] Email would be sent to ${this.config.email.to}: ${alert.message}`);
+    console.info(`[PipelineAlertService] Email would be sent to ${this.config.email.to}: ${alert.message}`);
   }
 
   private logLocal(alert: Alert): void {
     const prefix = alert.severity === 'CRITICAL' ? '🔴' :
       alert.severity === 'WARNING' ? '🟡' : '🔵';
     const timestamp = alert.timestamp.substring(0, 19).replace('T', ' ');
-    console.log(`${prefix} [${timestamp}] ${alert.component}: ${alert.message}`);
+    console.info(`${prefix} [${timestamp}] ${alert.component}: ${alert.message}`);
   }
 }
 

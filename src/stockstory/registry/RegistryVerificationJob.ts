@@ -51,11 +51,11 @@ export class RegistryVerificationJob {
     this.issues = [];
     const runDate = new Date().toISOString().split('T')[0];
 
-    console.log('RegistryVerificationJob: starting verification...');
+    console.info('RegistryVerificationJob: starting verification...');
 
     // Get baseline counts
     const counts = await this.getCounts();
-    console.log(`RegistryVerificationJob: ${counts.totalRecords} total records, ${counts.activeRecords} active`);
+    console.info(`RegistryVerificationJob: ${counts.totalRecords} total records, ${counts.activeRecords} active`);
 
     // Run checks
     await this.checkMissingIsins();
@@ -67,7 +67,7 @@ export class RegistryVerificationJob {
     const summary = this.buildSummary();
     const passed = this.issues.filter(i => i.severity === 'high').length === 0;
 
-    console.log(`RegistryVerificationJob: complete. ${summary.totalIssues} issues found (${passed ? 'PASS' : 'FAIL'})`);
+    console.info(`RegistryVerificationJob: complete. ${summary.totalIssues} issues found (${passed ? 'PASS' : 'FAIL'})`);
 
     return {
       runDate,

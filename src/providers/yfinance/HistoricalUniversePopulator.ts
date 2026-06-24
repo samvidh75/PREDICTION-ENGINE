@@ -112,11 +112,11 @@ export class HistoricalUniversePopulator {
     universe: 'NIFTY50' | 'NIFTY100' | 'NIFTY500',
   ): Promise<PopulationResult> {
     const symbols = IndianSymbolMapper.getUniverse(universe);
-    console.log(
+    console.info(
       `[HistoricalUniversePopulator] Starting population for ${universe} — ${symbols.length} symbols`,
     );
     const result = await this.populateSymbols(symbols);
-    console.log(
+    console.info(
       `[HistoricalUniversePopulator] Completed ${universe}: ` +
         `${result.success} success, ${result.failed} failed, ${result.totalRows} total rows`,
     );
@@ -214,7 +214,7 @@ export class HistoricalUniversePopulator {
 
     // Step 2: For each symbol, backfill data and compute quality
     for (const symbol of symbols) {
-      console.log(`[HistoricalUniversePopulator] Processing ${symbol}...`);
+      console.info(`[HistoricalUniversePopulator] Processing ${symbol}...`);
 
       try {
         const rows = batchData[symbol];
@@ -254,7 +254,7 @@ export class HistoricalUniversePopulator {
         }
 
         results[symbol] = { success: true, rowCount, qualityScore };
-        console.log(
+        console.info(
           `[HistoricalUniversePopulator] ✓ ${symbol}: ${rowCount} rows, quality=${qualityScore}`,
         );
       } catch (err: any) {

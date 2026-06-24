@@ -16,7 +16,7 @@ async function validate() {
       results[sym] = { error: (e as Error).message, status: 'failure' };
     }
   }
-  console.log(JSON.stringify(results, null, 2));
+  console.info(JSON.stringify(results, null, 2));
 }
 
 validate();

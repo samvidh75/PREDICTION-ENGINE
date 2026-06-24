@@ -30,7 +30,7 @@ export class UserJourneyEngine {
       }
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existing));
       if (import.meta.env.DEV) {
-        console.log(`[UserJourneyEngine] Tracked: ${type}`, metadata);
+        console.info(`[UserJourneyEngine] Tracked: ${type}`, metadata);
       }
     } catch (e) {
       if (import.meta.env.DEV) {

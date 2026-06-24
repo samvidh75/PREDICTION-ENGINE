@@ -9,11 +9,11 @@ import * as fs from 'fs';
 const SYMBOLS = ['RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'SBIN'];
 
 async function runReconciliation() {
-  console.log('Reconciling quotes for ProviderAccuracyReport.md...');
+  console.info('Reconciling quotes for ProviderAccuracyReport.md...');
   const results = await ProviderValidation.reconcileQuotes(SYMBOLS);
   const report = ProviderValidation.generateReport(results);
   fs.writeFileSync('ProviderAccuracyReport.md', report, 'utf8');
-  console.log('ProviderAccuracyReport.md written successfully.');
+  console.info('ProviderAccuracyReport.md written successfully.');
 }
 
 runReconciliation().catch(err => {

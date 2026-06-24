@@ -42,7 +42,7 @@ export const isFirebaseClientConfigured = Boolean(
 );
 
 if (import.meta.env.DEV) {
-  console.log("[Firebase bootstrap] env diagnostics", {
+  console.info("[Firebase bootstrap] env diagnostics", {
     hasApiKey: Boolean(API_KEY && !API_KEY.includes("placeholder")),
     hasMessagingSenderId: Boolean(MESSAGING_SENDER_ID),
     hasAppId: Boolean(APP_ID),
