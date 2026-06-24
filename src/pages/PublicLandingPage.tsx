@@ -7,6 +7,7 @@ import GradientMesh from "../components/ui/GradientMesh";
 import { useStockData } from "../hooks/useStockData";
 import { productNavigate } from "../components/product/ProductUI";
 import { shareStock } from "../lib/referral";
+import { trackUserAction } from "../lib/analytics";
 import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const deltas = [3,18,-5,12,-8,22,-3,15,6,-4,19,-7,11,-2,16,4,-9,23,-1,14];
@@ -105,11 +106,11 @@ export default function PublicLandingPage() {
                   className="bg-[#533afd] text-white text-[16px] font-[400] rounded-[9999px] px-[16px] py-[8px] hover:bg-[#4434d4] active:scale-[0.97] flex items-center gap-2">
                   View Full Research <ArrowRight size={14} />
                 </button>
-                <button onClick={() => openTrade("HDFCBANK", data?.price?.current ?? null)}
+                <button onClick={() => { openTrade("HDFCBANK", data?.price?.current ?? null); trackUserAction('buy_click', 'HDFCBANK'); }}
                   className="bg-white text-[#533afd] text-[14px] font-[400] rounded-[9999px] px-[14px] py-[8px] border border-[#533afd] active:scale-[0.97] flex items-center gap-1.5">
                   <ShoppingCart size={13} /> Buy
                 </button>
-                <button onClick={() => shareStock("HDFCBANK", data?.price?.companyName ?? "HDFC Bank")}
+                <button onClick={() => { shareStock("HDFCBANK", data?.price?.companyName ?? "HDFC Bank"); trackUserAction('share', 'HDFCBANK'); }}
                   className="bg-white text-[#64748d] text-[13px] font-[400] rounded-[9999px] px-[12px] py-[8px] border border-[#e3e8ee] active:scale-[0.97] flex items-center gap-1.5">
                   <Share2 size={12} /> Share
                 </button>

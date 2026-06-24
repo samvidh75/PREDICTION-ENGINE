@@ -10,6 +10,8 @@ import { fMarketCap, fPrice, fRatio } from "../lib/format";
 import { productNavigate } from "../components/product/ProductUI";
 import { addTrackedCompany, isTracked, removeTrackedCompany } from "../lib/track/trackStore";
 import { shareStock } from "../lib/referral";
+import { addRecentlyViewed } from "../lib/preferences";
+import { trackUserAction } from "../lib/analytics";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const fallbackTicker = "TCS";
@@ -36,6 +38,9 @@ export default function StockStoryPageF0() {
   const [tab, setTab] = useState("Thesis");
   const [tracked, setTracked] = useState(() => isTracked(ticker));
   const [tradeOpen, setTradeOpen] = useState(false);
+
+  // Track this stock as recently viewed
+  useEffect(() => { addRecentlyViewed(ticker); }, [ticker]);
 
   const f = data?.fundamentals;
   const p = data?.price;
@@ -116,9 +121,9 @@ export default function StockStoryPageF0() {
                   className="h-[30px] px-3 border border-[#e3e8ee] rounded-[8px] text-[10px] text-[#64748d] active:scale-[0.97] hover:border-[#ccc] flex items-center gap-1.5"><Star size={11}/> {tracked?'Following':'Follow'}</button>
                 <button onClick={() => productNavigate("compare",ticker)}
                   className="h-[30px] px-3 border border-[#e3e8ee] rounded-[8px] text-[10px] text-[#64748d] active:scale-[0.97]">⇄ Compare</button>
-                <button onClick={() => setTradeOpen(true)}
+                <button onClick={() => { setTradeOpen(true); trackUserAction('buy_click', ticker); }}
                   className="h-[30px] px-3 bg-[#1a7f4b] text-white text-[10px] font-[400] rounded-[9999px] active:scale-[0.97] hover:opacity-90 flex items-center gap-1.5"><ShoppingCart size={11}/> Buy</button>
-                <button onClick={() => shareStock(ticker,companyName)}
+                <button onClick={() => { shareStock(ticker,companyName); trackUserAction('share', ticker); }}
                   className="h-[30px] px-3 border border-[#e3e8ee] rounded-[9999px] text-[10px] text-[#64748d] active:scale-[0.97] flex items-center gap-1.5"><Share2 size={11}/> Share</button>
                 <button onClick={() => setTab('Thesis')}
                   className="h-[30px] px-3 bg-[#533afd] text-white text-[10px] font-[400] rounded-[9999px] active:scale-[0.97] hover:bg-[#4434d4] flex items-center gap-1.5">Thesis <ArrowUpRight size={11}/></button>
