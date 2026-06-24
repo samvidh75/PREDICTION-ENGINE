@@ -6,6 +6,7 @@ import { api } from "../../services/api/client";
 import { useAuth } from "../../context/AuthContext";
 import ProfileButton from "../navigation/ProfileButton";
 import { CommandPalette } from "../intelligence/CommandPalette";
+import GradientMesh from "../ui/GradientMesh";
 
 const indices = [
   { name: "NIFTY 50", symbol: "^NSEI" },
@@ -13,55 +14,47 @@ const indices = [
   { name: "BANK NIFTY", symbol: "^NSEBANK" },
   { name: "NIFTY IT", symbol: "^CNXIT" },
 ] as const;
-
 interface IndexState { price: number | null; change: number | null }
-
 const navRoutes: Record<string, string> = {
-  Research: "landing",
-  Scanner: "scanner",
-  Compare: "compare",
-  Watchlist: "watchlist",
-  Pricing: "pricing",
-  Learn: "methodology",
+  Research: "landing", Scanner: "scanner", Compare: "compare",
+  Watchlist: "watchlist", Pricing: "pricing", Learn: "methodology",
 };
 
 function isMarketOpen() {
   const now = new Date();
   const ist = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-  const h = ist.getHours(), m = ist.getMinutes();
-  const day = ist.getDay();
-  return day >= 1 && day <= 5 && (h > 9 || (h === 9 && m >= 15)) && (h < 15 || (h === 15 && m <= 30));
+  return ist.getDay() >= 1 && ist.getDay() <= 5 &&
+    ((ist.getHours() > 9 || (ist.getHours() === 9 && ist.getMinutes() >= 15)) &&
+     (ist.getHours() < 15 || (ist.getHours() === 15 && ist.getMinutes() <= 30)));
 }
 
 export function TopNav({ active = "" }: { active?: string }) {
   const { isAuthenticated, user } = useAuth();
   return (
-    <nav className="h-[44px] bg-[#000000] flex items-center px-5 sticky top-0 z-50">
-      <div className="max-w-[1280px] w-full mx-auto flex items-center">
+    <nav className="h-[64px] bg-white/90 backdrop-blur-md flex items-center px-6 sticky top-0 z-50 border-b border-[#e3e8ee]">
+      <div className="max-w-[1200px] w-full mx-auto flex items-center">
         <button onClick={() => productNavigate("landing")}><Logo /></button>
-        <div className="hidden md:flex items-center gap-[20px] ml-auto mr-auto">
+        <div className="hidden md:flex items-center gap-[20px] ml-10">
           {Object.entries(navRoutes).map(([label, route]) => (
             <button key={label} onClick={() => productNavigate(route)}
-              className="text-[12px] font-[400] text-white/80 hover:text-white tracking-[-0.12px] transition-colors">
+              className="text-[14px] font-[400] text-[#64748d] hover:text-[#0d253d] tracking-[-0.2px] transition-colors">
               {label}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-[10px]">
-          <button className="w-[28px] h-[28px] flex items-center justify-center text-white/60 hover:text-white transition-colors"
-            onClick={() => productNavigate("search")} aria-label="Search">
-            <Search size={14} />
+        <div className="ml-auto flex items-center gap-3">
+          <button onClick={() => productNavigate("search")} aria-label="Search"
+            className="w-[34px] h-[34px] flex items-center justify-center text-[#64748d] hover:text-[#0d253d] transition-colors">
+            <Search size={15} />
           </button>
-          {isAuthenticated && user ? (
-            <ProfileButton />
-          ) : (
+          {isAuthenticated && user ? <ProfileButton /> : (
             <>
               <button onClick={() => productNavigate("login")}
-                className="bg-[#1d1d1f] text-white text-[12px] font-[400] tracking-[-0.12px] px-[15px] py-[8px] rounded-[8px] hover:bg-[#333] transition-colors active:scale-[0.95]">
+                className="text-[14px] font-[400] text-[#64748d] hover:text-[#0d253d] tracking-[-0.2px] transition-colors px-3 py-1.5">
                 Sign in
               </button>
               <button onClick={() => productNavigate("signup")}
-                className="bg-[#0066cc] text-white text-[12px] font-[400] tracking-[-0.12px] px-[15px] py-[8px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95]">
+                className="bg-[#533afd] text-white text-[14px] font-[400] rounded-[9999px] px-[16px] py-[8px] hover:bg-[#4434d4] transition-colors active:scale-[0.97]">
                 Start Free Trial
               </button>
             </>
@@ -69,24 +62,6 @@ export function TopNav({ active = "" }: { active?: string }) {
         </div>
       </div>
     </nav>
-  );
-}
-
-export function SubNav({ title, active }: { title: string; active?: string }) {
-  return (
-    <div className="h-[52px] bg-[rgba(245,245,247,0.8)] backdrop-blur-[20px] backdrop-saturate-[180%] border-b border-[rgba(0,0,0,0.08)] flex items-center px-5 sticky top-[44px] z-40">
-      <div className="max-w-[1280px] w-full mx-auto flex items-center">
-        <span className="text-[21px] font-[600] text-[#1d1d1f] leading-[1.19] tracking-[0.231px]">{title}</span>
-        <div className="ml-auto flex items-center gap-[16px]">
-          <span className="text-[14px] font-[400] text-[#7a7a7a] tracking-[-0.224px]">Overview</span>
-          <span className="text-[14px] font-[400] text-[#7a7a7a] tracking-[-0.224px]">Features</span>
-          <span className="text-[14px] font-[400] text-[#7a7a7a] tracking-[-0.224px]">Compare</span>
-          <button className="bg-[#0066cc] text-white text-[14px] font-[400] tracking-[-0.224px] px-[15px] py-[8px] rounded-[9999px] hover:opacity-90 transition-opacity active:scale-[0.95]">
-            Get Started
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -98,9 +73,9 @@ export function MarketTicker() {
     Promise.allSettled(indices.map(i => api.price.getQuote(i.symbol))).then(settled => {
       if (!active) return;
       const next: Record<string, IndexState> = {};
-      indices.forEach((index, pos) => {
+      indices.forEach((idx, pos) => {
         const r = settled[pos];
-        next[index.symbol] = r.status === "fulfilled" && r.value != null
+        next[idx.symbol] = r.status === "fulfilled" && r.value != null
           ? { price: r.value.price ?? null, change: r.value.changePercent ?? null }
           : { price: null, change: null };
       });
@@ -110,20 +85,20 @@ export function MarketTicker() {
   }, []);
 
   return (
-    <div className="h-[36px] bg-white border-b border-[#e0e0e0] flex items-center px-5">
-      <div className="max-w-[1280px] w-full mx-auto flex items-center gap-5">
-        {indices.map(index => {
-          const q = quotes[index.symbol];
+    <div className="h-[40px] bg-[#f6f9fc] border-b border-[#e3e8ee] flex items-center px-6">
+      <div className="max-w-[1200px] w-full mx-auto flex items-center gap-5">
+        {indices.map(idx => {
+          const q = quotes[idx.symbol];
           const ch = q?.change ?? null;
           const pr = q?.price ?? null;
           return (
-            <div key={index.name} className="flex items-center gap-1.5">
-              <span className="text-[10px] font-[600] text-[#7a7a7a] tracking-[0.03em]">{index.name}</span>
-              <span className="text-[11px] font-[600] text-[#1d1d1f] tabular">
-                {pr !== null ? pr.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+            <div key={idx.name} className="flex items-center gap-2">
+              <span className="text-[11px] font-[400] text-[#64748d] tracking-[-0.2px]">{idx.name}</span>
+              <span className="text-[12px] font-[400] text-[#0d253d] tabular">
+                {pr !== null ? pr.toLocaleString("en-IN", { minimumFractionDigits: 2 }) : "—"}
               </span>
               {ch !== null && (
-                <span className={`text-[10px] font-[500] ${ch >= 0 ? 'text-[#1a7f4b]' : 'text-[#c0392b]'}`}>
+                <span className={`text-[11px] font-[400] ${ch >= 0 ? 'text-[#1a7f4b]' : 'text-[#c0392b]'}`}>
                   {ch >= 0 ? '+' : ''}{ch.toFixed(2)}%
                 </span>
               )}
@@ -132,7 +107,9 @@ export function MarketTicker() {
         })}
         <div className="ml-auto flex items-center gap-1.5">
           <div className={`w-[5px] h-[5px] rounded-full ${open ? 'bg-[#22c55e]' : 'bg-[#ccc]'}`} />
-          <span className={`text-[10px] font-[500] ${open ? 'text-[#1a7f4b]' : 'text-[#7a7a7a]'}`}>{open ? 'Open' : 'Closed'}</span>
+          <span className={`text-[10px] font-[400] ${open ? 'text-[#1a7f4b]' : 'text-[#64748d]'}`}>
+            {open ? 'Open' : 'Closed'}
+          </span>
         </div>
       </div>
     </div>
@@ -153,12 +130,11 @@ export default function AppShell({ children, active }: { children: React.ReactNo
   }, []);
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen">
+    <div className="bg-white min-h-screen relative">
       <a href="#ss-main-content" className="sr-only focus:not-sr-only focus:absolute focus:p-2 focus:bg-white focus:z-[100]">Skip to main content</a>
       <TopNav active={active} />
-      <SubNav title="Research" active={active} />
       <MarketTicker />
-      <main id="ss-main-content">{children}</main>
+      <main id="ss-main-content" className="relative">{children}</main>
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
     </div>
   );
