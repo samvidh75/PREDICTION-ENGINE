@@ -42,7 +42,7 @@
       "destination": "/stockstory-mark.svg"
     },
     {
-      "source": "/(.*)",
+      "source": "/login",
       "destination": "/index.html"
     }
   ]
