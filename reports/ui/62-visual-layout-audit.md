@@ -1,6 +1,6 @@
 # Visual Layout Audit
 
-Date: 2026-06-23
+Date: 2026-06-24
 Checks: content width, empty right area, bottom dock on desktop, horizontal overflow, raw tokens
 
 ## Results
@@ -10,33 +10,33 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Empty right: 0px
 - Bottom dock visible: no
 - Overflow: no
-- Giant blank region: YES
+- Giant blank region: no
 - Low contrast hero: YES
-- Primary CTAs: missing
+- Primary CTAs: ok
 - Status: **FAIL**
-- Errors: giant blank card/region detected on public route; hero heading appears low contrast; primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast
 
 ### landing @ desktop-1920
 - Content: 1920px / Viewport: 1920px
 - Empty right: 0px
 - Bottom dock visible: no
 - Overflow: no
-- Giant blank region: YES
+- Giant blank region: no
 - Low contrast hero: YES
-- Primary CTAs: missing
+- Primary CTAs: ok
 - Status: **FAIL**
-- Errors: giant blank card/region detected on public route; hero heading appears low contrast; primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast
 
 ### landing @ mobile-390
 - Content: 390px / Viewport: 390px
 - Empty right: 0px
 - Bottom dock visible: no
 - Overflow: no
-- Giant blank region: YES
+- Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: missing
 - Status: **FAIL**
-- Errors: giant blank card/region detected on public route; hero heading appears low contrast; primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast; primary CTAs missing or not detectable
 
 ### landing @ tablet-768
 - Content: 768px / Viewport: 768px
@@ -174,12 +174,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: hero heading appears low contrast
+- Errors: horizontal overflow 251px; hero heading appears low contrast
 
 ### about @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -187,10 +187,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
-- Primary CTAs: missing
+- Low contrast hero: YES
+- Primary CTAs: ok
 - Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast
 
 ### about @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -198,10 +198,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
-- Primary CTAs: missing
+- Low contrast hero: YES
+- Primary CTAs: ok
 - Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast
 
 ### about @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -209,10 +209,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: missing
 - Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast; primary CTAs missing or not detectable
 
 ### about @ tablet-768
 - Content: 768px / Viewport: 768px
@@ -220,10 +220,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: missing
 - Status: **FAIL**
-- Errors: primary CTAs missing or not detectable
+- Errors: hero heading appears low contrast; primary CTAs missing or not detectable
 
 ### dashboard-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -275,9 +275,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: hero heading appears low contrast
 
 ### search-auth @ desktop-1920
 - Content: 1920px / Viewport: 1920px
@@ -285,9 +286,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: hero heading appears low contrast
 
 ### search-auth @ mobile-390
 - Content: 390px / Viewport: 390px
@@ -295,9 +297,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: hero heading appears low contrast
 
 ### search-auth @ tablet-768
 - Content: 768px / Viewport: 768px
@@ -305,9 +308,10 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Bottom dock visible: no
 - Overflow: no
 - Giant blank region: no
-- Low contrast hero: no
+- Low contrast hero: YES
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: hero heading appears low contrast
 
 ### compare-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -346,12 +350,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: hero heading appears low contrast
+- Errors: horizontal overflow 251px; hero heading appears low contrast
 
 ### watchlist-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -390,12 +394,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: hero heading appears low contrast
+- Errors: horizontal overflow 251px; hero heading appears low contrast
 
 ### portfolio-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -434,12 +438,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: YES
 - Primary CTAs: ok
 - Status: **FAIL**
-- Errors: hero heading appears low contrast
+- Errors: horizontal overflow 251px; hero heading appears low contrast
 
 ### company-reliance-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px

@@ -1,15 +1,23 @@
+import { useEffect, useState } from "react";
 import { Menu, Search } from "lucide-react";
 import Logo from "../brand/Logo";
 import { MiniSparkline } from "../ui/ResearchUI";
 import { productNavigate } from "../product/ProductUI";
+import { api } from "../../services/api/client";
+import { useAuth } from "../../context/AuthContext";
+import ProfileButton from "../navigation/ProfileButton";
+import { CommandPalette } from "../intelligence/CommandPalette";
 
 const indices = [
-  { name: "NIFTY 50", value: "22,502.35", change: "+1.15%" },
-  { name: "SENSEX", value: "74,115.17", change: "+1.10%" },
-  { name: "BANK NIFTY", value: "48,753.30", change: "+1.35%" },
-  { name: "NIFTY IT", value: "35,392.20", change: "+1.80%" },
-];
-const spark = [12, 14, 13, 16, 12, 11, 15, 17, 16, 20, 18, 22, 21, 24, 23, 30];
+  { name: "NIFTY 50", symbol: "^NSEI" },
+  { name: "SENSEX", symbol: "^BSESN" },
+  { name: "BANK NIFTY", symbol: "^NSEBANK" },
+  { name: "NIFTY IT", symbol: "^CNXIT" },
+] as const;
+interface IndexState {
+  price: number | null;
+  change: number | null;
+}
 const navRoutes = {
   Research: "landing",
   Scanner: "scanner",
@@ -19,6 +27,7 @@ const navRoutes = {
   Learn: "methodology",
 } as const;
 export function TopNav({ active = "" }: { active?: string }) {
+  const { isAuthenticated, user } = useAuth();
   return (
     <header className="topnav">
       <button
@@ -48,12 +57,21 @@ export function TopNav({ active = "" }: { active?: string }) {
         >
           <Search size={16} />
         </button>
-        <button className="sign" onClick={() => productNavigate("login")}>
-          Sign in
-        </button>
-        <button className="primary" onClick={() => productNavigate("signup")}>
-          Start Free Trial ↗
-        </button>
+        {isAuthenticated && user ? (
+          <ProfileButton />
+        ) : (
+          <>
+            <button className="sign" onClick={() => productNavigate("login")}>
+              Sign in
+            </button>
+            <button
+              className="primary"
+              onClick={() => productNavigate("signup")}
+            >
+              Start Free Trial ↗
+            </button>
+          </>
+        )}
         <button
           className="hamb"
           onClick={() => productNavigate("more")}
@@ -81,19 +99,65 @@ function marketOpen() {
 }
 export function MarketTicker() {
   const open = marketOpen();
+  const [quotes, setQuotes] = useState<Record<string, IndexState>>({});
+  useEffect(() => {
+    let active = true;
+    if (typeof api.getQuote !== "function")
+      return () => {
+        active = false;
+      };
+    Promise.allSettled(indices.map((index) => api.getQuote(index.symbol))).then(
+      (settled) => {
+        if (!active) return;
+        const next: Record<string, IndexState> = {};
+        indices.forEach((index, position) => {
+          const result = settled[position];
+          next[index.symbol] =
+            result.status === "fulfilled"
+              ? {
+                  price: result.value.price ?? null,
+                  change: result.value.changePercent ?? null,
+                }
+              : { price: null, change: null };
+        });
+        setQuotes(next);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
   return (
     <div className="ticker">
       <div className="ticker-scroll">
-        {indices.map((i) => (
-          <div className="ticker-cell" key={i.name}>
-            <div>
-              <small>{i.name}</small>
-              <strong className="num">{i.value}</strong>
+        {indices.map((index) => {
+          const quote = quotes[index.symbol];
+          return (
+            <div className="ticker-cell" key={index.name}>
+              <div>
+                <small>{index.name}</small>
+                <strong className="num">
+                  {quote?.price == null
+                    ? "—"
+                    : quote.price.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                </strong>
+              </div>
+              <em
+                className={
+                  quote?.change != null && quote.change < 0 ? "negative" : ""
+                }
+              >
+                {quote?.change == null
+                  ? "—"
+                  : `${quote.change > 0 ? "+" : ""}${quote.change.toFixed(2)}%`}
+              </em>
+              <MiniSparkline data={[]} />
             </div>
-            <em>{i.change}</em>
-            <MiniSparkline data={spark} />
-          </div>
-        ))}
+          );
+        })}
         <div className="market-status">
           <div>
             <i className={open ? "pulse" : ""} />
@@ -112,11 +176,29 @@ export default function AppShell({
   children: React.ReactNode;
   active?: string;
 }) {
+  const [commandOpen, setCommandOpen] = useState(false);
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", onShortcut);
+    return () => document.removeEventListener("keydown", onShortcut);
+  }, []);
   return (
     <div className="app-shell">
+      <a href="#ss-main-content" className="skip-link">
+        Skip to main content
+      </a>
       <TopNav active={active} />
       <MarketTicker />
-      <main id="main-content">{children}</main>
+      <main id="ss-main-content">{children}</main>
+      <CommandPalette
+        open={commandOpen}
+        onClose={() => setCommandOpen(false)}
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   isTracked,
   removeTrackedCompany,
 } from "../lib/track/trackStore";
+import { InvestmentReviewSheet } from "../premium/PremiumComponents";
 
 const fallbackTicker = "TCS",
   factorNames = ["quality", "growth", "valuation", "risk", "momentum"];
@@ -45,6 +46,7 @@ export default function StockStoryPageF0() {
   const { pipeline, loading } = useStockData(ticker);
   const [tab, setTab] = useState("Thesis");
   const [tracked, setTracked] = useState(() => isTracked(ticker));
+  const [reviewOpen, setReviewOpen] = useState(false);
   const pred = pipeline?.prediction,
     score = pred?.rankingScore ?? null,
     f = pipeline?.fundamentals,
@@ -66,7 +68,7 @@ export default function StockStoryPageF0() {
                 <p>
                   <b>{ticker}</b>　
                   <span>{pipeline?.price.exchange ?? "NSE"}</span>　
-                  <small>Research coverage</small>
+                  <small>Equity research</small>
                 </p>
               </div>
             </div>
@@ -91,6 +93,9 @@ export default function StockStoryPageF0() {
               </button>
               <button className="primary" onClick={() => setTab("Thesis")}>
                 View Full Thesis　↗
+              </button>
+              <button className="primary" onClick={() => setReviewOpen(true)}>
+                Invest review
               </button>
             </div>
           </div>
@@ -139,7 +144,14 @@ export default function StockStoryPageF0() {
               <section>
                 <ScoreRing score={score} size={116} strokeWidth={9} />
                 <small>
-                  AI Confidence: <b>High</b>
+                  Research confidence:{" "}
+                  <b>
+                    {(pipeline?.dataCompleteness ?? 0) >= 75
+                      ? "High"
+                      : (pipeline?.dataCompleteness ?? 0) >= 50
+                        ? "Moderate"
+                        : "Building"}
+                  </b>
                 </small>
               </section>
               <FactorPanel factors={pred?.factorScores ?? []} />
@@ -176,7 +188,7 @@ export default function StockStoryPageF0() {
                     <h2>
                       <Sparkles size={17} /> AI Investment Thesis
                     </h2>
-                    <small>Generated today　•　Updated daily</small>
+                    <small>Research summary</small>
                   </header>
                   <div className="thesis-lead">
                     {pred?.explanation ??
@@ -241,7 +253,8 @@ export default function StockStoryPageF0() {
                     </>
                   ) : (
                     <div className="empty-chart">
-                      Historical performance is unavailable.
+                      Performance will appear when enough market history is
+                      ready to review.
                     </div>
                   )}
                   <button onClick={() => setTab("Technicals")}>
@@ -340,20 +353,20 @@ export default function StockStoryPageF0() {
               <Card>
                 <h2>Latest News</h2>
                 <div className="empty-news">
-                  No verified news is available right now.
+                  No major updates to review here yet.
                 </div>
                 <button onClick={() => setTab("News")}>View All News　›</button>
               </Card>
               <Card>
-                <h2>Data Confidence　ⓘ</h2>
+                <h2>Research Basis　ⓘ</h2>
                 <div className="metric">
                   <span>Overall Confidence</span>
                   <b className="green">{pipeline?.dataCompleteness ?? 0}%</b>
                 </div>
                 {[
-                  "1000+ Data Sources",
-                  "AI Cross-Verification",
-                  "Human Analyst Review",
+                  "Structured financial checks",
+                  "Valuation and risk review",
+                  "Momentum context",
                 ].map((x) => (
                   <div className="confidence-row" key={x}>
                     {x}
@@ -374,6 +387,14 @@ export default function StockStoryPageF0() {
           </div>
         )}
       </div>
+      <InvestmentReviewSheet
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        symbol={ticker}
+        companyName={pipeline?.companyName ?? ticker}
+        thesis={pred?.explanation}
+        risks={pred?.keyRisks ?? []}
+      />
     </AppShell>
   );
 }
