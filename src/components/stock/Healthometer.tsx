@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 600);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
+
 interface HealthometerProps {
   score: number | null;
   factors: {
@@ -48,6 +59,7 @@ const STATE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 export const Healthometer = ({ score, factors, thesis, stateLabel, proAnalysis, isPro, onUpgradeClick }: HealthometerProps) => {
+  const isMobile = useIsMobile();
   const [barsAnimated, setBarsAnimated] = useState(false);
 
   useEffect(() => {
@@ -85,7 +97,11 @@ export const Healthometer = ({ score, factors, thesis, stateLabel, proAnalysis, 
         Research Score
       </div>
 
-      <div style={{ display:'flex', gap:32, alignItems:'flex-start', marginBottom:20 }}>
+      <div style={{
+        display:'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? 20 : 32, alignItems:'flex-start', marginBottom:20
+      }}>
 
         <div style={{ flexShrink:0, minWidth:120 }}>
           <div style={{

@@ -1,5 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { useStockData } from "../hooks/useStockData";
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
 import { Healthometer } from "../components/stock/Healthometer";
 import { PriceChart } from "../components/stock/PriceChart";
 import { CompanyHeader } from "../components/stock/CompanyHeader";
@@ -10,8 +21,10 @@ import { FinancialCharts } from "../components/stock/FinancialCharts";
 import { fMarketCap, fPercent } from "../lib/format";
 
 export default function StockResearchPage({ symbol }: { symbol: string }) {
+  const isMobile = useIsMobile();
   const { data, loading, error } = useStockData(symbol);
   const [showProModal, setShowProModal] = useState(false);
+  const [isTracked, setIsTracked] = useState(false);
 
   const healthScore = useMemo(() => {
     if (data?.health?.score != null) return data.health.score;
@@ -112,36 +125,79 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
   }
 
   return (
-    <div className="page-content">
-      <CompanyHeader symbol={symbol} quote={quoteData} snapshot={snapshotData} />
-      <PriceChart symbol={symbol} />
-      <Healthometer
-        score={healthScore}
-        factors={factors}
-        thesis={thesis}
-        stateLabel={stateLabel}
-        isPro={false}
-        onUpgradeClick={() => setShowProModal(true)}
-      />
-      <MetricsGrid
-        snapshot={snapshotData}
-        quote={quoteData}
-        isPro={false}
-        onUpgradeClick={() => setShowProModal(true)}
-      />
+    <>
+      <div className="page-content">
+        <CompanyHeader symbol={symbol} quote={quoteData} snapshot={snapshotData} />
+        <PriceChart symbol={symbol} />
+        <Healthometer
+          score={healthScore}
+          factors={factors}
+          thesis={thesis}
+          stateLabel={stateLabel}
+          isPro={false}
+          onUpgradeClick={() => setShowProModal(true)}
+        />
+        <MetricsGrid
+          snapshot={snapshotData}
+          quote={quoteData}
+          isPro={false}
+          onUpgradeClick={() => setShowProModal(true)}
+        />
 
-      <CompanyInfo symbol={symbol} snapshot={{ companyName: data?.price.companyName }} />
+        <CompanyInfo symbol={symbol} snapshot={{ companyName: data?.price.companyName }} />
 
-      <FinancialCharts data={data?.annualFinancials} />
+        <FinancialCharts data={data?.annualFinancials} />
 
-      {/* Footer */}
-      <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', textAlign:'center', padding:'16px 0 32px' }}>
-        {data?.fetchedAt ? `Research view prepared ${new Date(data.fetchedAt).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric' })}` : 'Based on latest available market data.'}
-        <br />
-        StockStory is an AI research layer for Indian equities.
+        {/* Footer */}
+        <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', textAlign:'center', padding:'16px 0 32px' }}>
+          {data?.fetchedAt ? `Research view prepared ${new Date(data.fetchedAt).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric' })}` : 'Based on latest available market data.'}
+          <br />
+          StockStory is an AI research layer for Indian equities.
+        </div>
+
+        <ProUpgradeModal isOpen={showProModal} onClose={() => setShowProModal(false)} symbol={symbol} />
       </div>
 
-      <ProUpgradeModal isOpen={showProModal} onClose={() => setShowProModal(false)} symbol={symbol} />
-    </div>
+      {isMobile && (
+        <div className="sticky-bottom-bar" style={{
+          position:'fixed', bottom:60, left:0, right:0, zIndex:80,
+          background:'rgba(248,248,246,0.96)',
+          backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
+          borderTop:'1px solid var(--border)',
+          display:'grid', gridTemplateColumns:'1fr 1fr 1.5fr',
+          gap:8, padding:'10px 16px',
+          paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
+        }}>
+          <button onClick={() => setIsTracked(!isTracked)} style={{
+            height:44, borderRadius:'var(--r-md)',
+            background:'var(--surface)', color:'var(--text-500)',
+            border:'1px solid var(--border)',
+            fontSize:'var(--sz-sm)', fontWeight:600, cursor:'pointer',
+            fontFamily:'var(--font)',
+          }}>
+            {isTracked ? '♥ Tracked' : '♡ Track'}
+          </button>
+          <a href={`/compare?stocks=${symbol}`} style={{
+            height:44, borderRadius:'var(--r-md)',
+            background:'var(--surface)', color:'var(--text-500)',
+            border:'1px solid var(--border)',
+            fontSize:'var(--sz-sm)', fontWeight:600, cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            textDecoration:'none',
+          }}>
+            ⊕ Compare
+          </a>
+          <button onClick={() => {}} style={{
+            height:44, borderRadius:'var(--r-md)',
+            background:'var(--brand)', color:'var(--text-inverse)',
+            border:'none',
+            fontSize:'var(--sz-sm)', fontWeight:700, cursor:'pointer',
+            fontFamily:'var(--font)',
+          }}>
+            Invest →
+          </button>
+        </div>
+      )}
+    </>
   );
 }
