@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Bookmark,
@@ -402,7 +403,10 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
         </div>
       </header>
 
-      <div className="mx-auto w-full" style={{ maxWidth: 1320, padding: isMobile ? "0 16px" : "0 24px" }}>
+      <div
+        className="mx-auto w-full"
+        style={{ maxWidth: 1320, padding: isMobile ? "0 16px" : "0 24px", animation: "fadeIn 0.4s ease" }}
+      >
         <div style={{ padding: "16px 0 12px" }}>
           <button
             onClick={() => navigate("")}

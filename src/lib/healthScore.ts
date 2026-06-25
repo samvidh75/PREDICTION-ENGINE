@@ -287,11 +287,11 @@ export function computeHealthScore(input: HealthInput): HealthResult {
  */
 export function getHealthLabel(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return 'Very Healthy'
-    case 'healthy': return 'Healthy'
-    case 'average': return 'Stable'
-    case 'weakening': return 'Weakening'
-    case 'poor': return 'Unhealthy'
+    case 'very_healthy': return 'Optimal'
+    case 'healthy': return 'Corrective'
+    case 'average': return 'Accumulating'
+    case 'weakening': return 'Vulnerable'
+    case 'poor': return 'Vulnerable'
     default: return '—'
   }
 }
@@ -301,11 +301,11 @@ export function getHealthLabel(composite: HealthResult['composite']): string {
  */
 export function getHealthColor(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return '#16A34A'
-    case 'healthy': return '#22C55E'
-    case 'average': return '#2962FF'
-    case 'weakening': return '#F59E0B'
-    case 'poor': return '#DC2626'
+    case 'very_healthy': return '#06D6A0'
+    case 'healthy': return '#00B4D8'
+    case 'average': return '#7B2FF7'
+    case 'weakening': return '#D946EF'
+    case 'poor': return '#D946EF'
     default: return '#9CA3AF'
   }
 }
