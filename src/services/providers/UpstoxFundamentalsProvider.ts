@@ -90,8 +90,8 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
       const cleaned = raw.replace(/%$/, '').trim();
       const num = parseFloat(cleaned);
       if (isNaN(num)) return undefined;
-      // Ratios like ROE, ROA, ROCE come as percentages (e.g., "8.94%")
-      if (raw.includes('%')) return num / 100;
+      // IMPORTANT: Ratios like ROE, ROA, ROCE come as percentages (e.g., "8.94%")
+      // DO NOT divide by 100 — 8.94% means 8.94, not 0.0894
       return num;
     };
 
