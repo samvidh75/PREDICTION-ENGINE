@@ -185,7 +185,7 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
 
           {error && (
             <p style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", marginTop: 12 }}>
-              Live news feed will appear once the backend news service is available.
+              Live news feed will appear once the news service is available.
             </p>
           )}
         </div>

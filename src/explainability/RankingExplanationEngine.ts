@@ -194,7 +194,7 @@ function buildWeaknessDescription(engine: string, score: number, fin: any, feat:
 
 function buildConfidenceNarrative(level: string, score: number, engines: Record<string, number>): string {
   const dispersion = Math.max(...Object.values(engines)) - Math.min(...Object.values(engines));
-  if (level === 'Very High') return `Very high confidence (${score}/100). All data from verified API providers with strong signal agreement across engines.`;
+  if (level === 'Very High') return `Very high confidence (${score}/100). Data quality is strong with well-aligned signals across all analytical engines.`;
   if (level === 'High') return `High confidence (${score}/100). Most data is fresh from reliable sources. Engine signals are ${dispersion < 30 ? 'well-aligned' : 'moderately dispersed'}.`;
   if (level === 'Medium') return `Medium confidence (${score}/100). Some data may be stale or from unverified sources. ${dispersion > 40 ? 'High dispersion between engines — use directionally.' : ''}`;
   return `Low confidence (${score}/100). Data is sparse or stale. This ranking should be treated as tentative.`;

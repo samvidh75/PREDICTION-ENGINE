@@ -107,7 +107,7 @@ export class ConfidenceRuntimeIntegration {
         agreement: false,
         delta,
         recommendation: 'use_v2',
-        reason: `V2 differs from V1 by ${delta} points. V2 incorporates provider quality and snapshot freshness — V1 only uses factor signal agreement. V2 is more reliable.`,
+        reason: `V2 differs from V1 by ${delta} points. V2 incorporates additional data quality inputs — V1 only uses factor signal agreement. V2 is more reliable.`,
       };
     }
 
@@ -116,7 +116,7 @@ export class ConfidenceRuntimeIntegration {
         agreement: false,
         delta,
         recommendation: 'upgrade_v1',
-        reason: `V2 scores ${delta} points higher — provider data quality and snapshot completeness improve confidence over V1's factor-only assessment.`,
+        reason: `V2 scores ${delta} points higher — broader data inputs and snapshot completeness improve confidence over V1's factor-only assessment.`,
       };
     }
 

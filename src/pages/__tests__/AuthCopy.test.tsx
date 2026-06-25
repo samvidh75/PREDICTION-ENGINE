@@ -77,7 +77,7 @@ describe('Auth Pages Copy & Flow Integration', () => {
       window.history.pushState({}, '', '/login');
       render(<LoginPage />);
 
-      expect(screen.getByText('Sign in')).toBeInTheDocument();
+      expect(screen.getByText('Initialize your research session.')).toBeInTheDocument();
       expect(screen.getByText('Sign in to continue your research.')).toBeInTheDocument();
       expect(screen.getByText('Need an account? Create one')).toBeInTheDocument();
     });
@@ -86,7 +86,7 @@ describe('Auth Pages Copy & Flow Integration', () => {
       window.history.pushState({}, '', '/login?returnTo=' + encodeURIComponent('?page=company&id=ITC'));
       render(<LoginPage />);
 
-      expect(screen.getByText('Sign in')).toBeInTheDocument();
+      expect(screen.getByText('Initialize your research session.')).toBeInTheDocument();
       expect(screen.getByText('Sign in to continue researching ITC.')).toBeInTheDocument();
     });
 

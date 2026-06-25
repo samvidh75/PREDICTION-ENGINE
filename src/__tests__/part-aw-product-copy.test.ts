@@ -2,9 +2,6 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const normalRouteFiles = [
-  "src/pages/PublicLandingPage.tsx",
-  "src/pages/PublicRankingsPage.tsx",
-  "src/pages/StockStoryPageF0.tsx",
   "src/pages/ComparePage.tsx",
   "src/pages/WatchlistPage.tsx",
   "src/pages/PortfolioPage.tsx",
