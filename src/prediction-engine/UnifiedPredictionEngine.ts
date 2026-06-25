@@ -28,9 +28,9 @@ function factor(score: number | null, reason: string): EngineFactorScore {
 function qualityScore(input: EngineInput): EngineFactorScore {
   if (![input.roe, input.roce, input.debtToEquity].some(present)) return factor(null, "no data");
   let score = 0;
-  if (present(input.roe)) score += input.roe > 20 ? 35 : input.roe > 15 ? 25 : input.roe > 10 ? 15 : 0;
-  if (present(input.roce)) score += input.roce > 20 ? 35 : input.roce > 15 ? 25 : input.roce > 10 ? 15 : 0;
-  if (present(input.debtToEquity)) score += input.debtToEquity < 0.5 ? 30 : input.debtToEquity < 1 ? 20 : input.debtToEquity < 1.5 ? 10 : 0;
+  if (present(input.roe)) score += input.roe > 20 ? 35 : input.roe > 15 ? 25 : input.roe > 10 ? 15 : 5;
+  if (present(input.roce)) score += input.roce > 20 ? 35 : input.roce > 15 ? 25 : input.roce > 10 ? 15 : 5;
+  if (present(input.debtToEquity)) score += input.debtToEquity < 0.3 ? 30 : input.debtToEquity < 0.7 ? 22 : input.debtToEquity < 1.5 ? 12 : 0;
   return factor(score, "ROE, ROCE and leverage quality");
 }
 
@@ -46,7 +46,7 @@ function valuationScore(input: EngineInput): EngineFactorScore {
 function growthScore(input: EngineInput): EngineFactorScore {
   if (!present(input.revenueGrowth) && !present(input.profitGrowth)) return factor(null, "no data");
   const points = (value: number | null) =>
-    !present(value) ? 0 : value > 20 ? 50 : value > 15 ? 40 : value > 10 ? 30 : value > 5 ? 15 : 0;
+    !present(value) ? 0 : value > 20 ? 50 : value > 15 ? 40 : value > 10 ? 30 : value > 5 ? 20 : value > 0 ? 10 : 0;
   return factor(points(input.revenueGrowth) + points(input.profitGrowth), "Revenue and profit growth");
 }
 

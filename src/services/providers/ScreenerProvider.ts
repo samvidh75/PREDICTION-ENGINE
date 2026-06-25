@@ -7,7 +7,6 @@ import type { ProviderAuthorizationConfig } from './authorization/types';
 import {
   normalizeSymbol,
   parseIndianNumber,
-  parsePercentageFraction,
   parseCurrencyToInr,
   finiteNumberOrNull,
 } from './normalization/FinancialNormalization';
@@ -104,7 +103,7 @@ export class ScreenerProvider implements FinancialProvider {
       const raw = r[key];
       if (!raw) return null;
       if (raw.includes('%')) {
-        return parsePercentageFraction(raw);
+        return parseIndianNumber(raw);
       }
       if (key === 'Market Cap' || key === 'Free Float') {
         return parseIndianNumber(raw);
