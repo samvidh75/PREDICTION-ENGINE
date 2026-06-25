@@ -38,10 +38,8 @@ export default function MobileBottomNav() {
       <nav
         style={{
           height: 'var(--nav-h)',
-          background: '#0a0a0a',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          background: '#FFFFFF',
+          borderTop: '1px solid var(--border)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
         className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden"
@@ -59,14 +57,14 @@ export default function MobileBottomNav() {
               <Icon
                 size={20}
                 style={{
-                  color: isActive || isMenuActive ? '#06D6A0' : 'rgba(255,255,255,0.45)',
+                  color: isActive || isMenuActive ? 'var(--action)' : 'var(--text-muted)',
                 }}
               />
               <span
                 style={{
                   fontSize: 10,
                   fontWeight: isActive || isMenuActive ? 600 : 400,
-                  color: isActive || isMenuActive ? '#06D6A0' : 'rgba(255,255,255,0.45)',
+                  color: isActive || isMenuActive ? 'var(--action)' : 'var(--text-muted)',
                   lineHeight: 1,
                 }}
               >
