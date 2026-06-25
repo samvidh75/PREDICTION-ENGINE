@@ -139,18 +139,28 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
   }), [data]);
 
   const prediction = useMemo(
-    () => data ? UnifiedPredictionEngine.predict({
-      peRatio: data.fundamentals.peRatio,
-      pbRatio: data.fundamentals.pbRatio,
-      roe: data.fundamentals.roe,
-      roce: data.fundamentals.roce,
-      debtToEquity: data.fundamentals.debtToEquity,
-      currentRatio: data.fundamentals.currentRatio,
-      revenueGrowth: data.fundamentals.revenueGrowth,
-      profitGrowth: data.fundamentals.profitGrowth,
-      dividendYield: data.fundamentals.dividendYield,
-      closes: data.historical.closes,
-    }) : null,
+    () => {
+      if (!data) return null;
+      const engineResult = UnifiedPredictionEngine.predict({
+        peRatio: data.fundamentals.peRatio,
+        pbRatio: data.fundamentals.pbRatio,
+        roe: data.fundamentals.roe,
+        roce: data.fundamentals.roce,
+        debtToEquity: data.fundamentals.debtToEquity,
+        currentRatio: data.fundamentals.currentRatio,
+        revenueGrowth: data.fundamentals.revenueGrowth,
+        profitGrowth: data.fundamentals.profitGrowth,
+        dividendYield: data.fundamentals.dividendYield,
+        closes: data.historical.closes,
+      });
+      if (engineResult?.composite !== null && engineResult?.composite !== undefined) {
+        return engineResult;
+      }
+      if (data.health?.score !== null && data.health?.score !== undefined) {
+        return { ...engineResult, composite: data.health.score, classification: data.health.classification || engineResult?.classification };
+      }
+      return engineResult;
+    },
     [data],
   );
 
@@ -219,10 +229,17 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
         ? `${data?.price.companyName ?? symbol} is a banking institution offering retail banking, corporate banking, treasury, and wealth management services.`
         : `${data?.price.companyName ?? symbol} operates in the Indian market with a diversified business model and established market presence.`;
 
+  const hasHealth = data?.health?.score !== null && data?.health?.classification !== null;
+  const healthItem = hasHealth ? [
+    { label: "Health Score", value: `${data?.health?.classification} (${data?.health?.score})` },
+  ] : [];
+
   const companyFacts = [
-    { label: "Sector", value: data?.price.sector ?? "—" },
+    { label: "Sector", value: data?.price.sector ?? data?.health?.sector ?? "—" },
+    { label: "Industry", value: data?.price.industry ?? "—" },
     { label: "Exchange", value: data?.price.exchange ?? "NSE" },
     { label: "Market Cap", value: data?.price.marketCap ? fMarketCap(data.price.marketCap) : "—" },
+    ...healthItem,
   ];
 
   const dataUpdated = data?.fetchedAt
@@ -323,6 +340,12 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 <>
                   <span style={{ fontSize: 11, color: "#64748B" }}>·</span>
                   <span style={{ fontSize: 11, color: "#64748B" }}>{data.price.sector}</span>
+                </>
+              )}
+              {data?.price.industry && (
+                <>
+                  <span style={{ fontSize: 11, color: "#64748B" }}>·</span>
+                  <span style={{ fontSize: 11, color: "#64748B" }}>{data.price.industry}</span>
                 </>
               )}
             </div>
