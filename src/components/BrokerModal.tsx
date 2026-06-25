@@ -1,4 +1,58 @@
-import {useEffect} from "react";
-import {X} from "lucide-react";
-import {brokers} from "../data/brokers";
-export default function BrokerModal({symbol,price,onClose}:{symbol:string;price:number|null;onClose:()=>void}){useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==="Escape")onClose();};document.addEventListener("keydown",close);const previous=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{document.removeEventListener("keydown",close);document.body.style.overflow=previous;};},[onClose]);return <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="broker-title" onMouseDown={event=>{if(event.target===event.currentTarget)onClose();}}><div className="max-h-[80vh] w-[480px] max-w-full overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-5 flex items-center justify-between"><h2 id="broker-title" className="text-[20px] font-extrabold">Choose your broker</h2><button autoFocus onClick={onClose} className="rounded-lg p-2 text-[#888] hover:bg-[#f4f4f1] hover:text-[#111]" aria-label="Close broker selection"><X className="h-4 w-4"/></button></div><p className="mb-5 text-[13px] leading-5 text-[#777]">Select your broker to invest in {symbol}. You'll be redirected to their platform to complete the order.</p><div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{brokers.map(broker=><a key={broker.name} href={broker.orderUrl(symbol,price)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl border border-[#e8e8e8] p-4 no-underline transition-colors hover:border-[#1a7f4b] hover:bg-[#fafff8]"><span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg border bg-white"><img src={broker.logo} alt="" className="max-h-8 max-w-8" onError={event=>{event.currentTarget.style.display="none";}}/></span><span><span className="block text-[13px] font-bold text-[#0a0a0a]">{broker.name}</span><span className="mt-1 block text-[10px] text-[#888]">{broker.tagline}</span></span></a>)}</div><p className="mt-5 text-[10px] leading-[1.5] text-[#bbb]">StockStory India is not a broker. You will be redirected to your chosen broker's website. This is not investment advice.</p></div></div>;}
+import Modal from "../components/ui/Modal";
+import { BROKER_PARTNERS } from "./trade/brokers";
+
+export default function BrokerModal({ symbol, price, onClose }: { symbol: string; price: number | null; onClose: () => void }) {
+  return (
+    <Modal open={true} onClose={onClose} title="Choose your broker" width={520}>
+      <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>
+        Select your broker to invest in <strong style={{ color: '#0A0A0A' }}>
+        {symbol}</strong>. You'll be redirected to their platform to complete
+        your order.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {BROKER_PARTNERS.map(b => (
+          <a key={b.name} href={b.referralUrl} target="_blank" rel="noopener noreferrer"
+             style={{
+               display: 'flex', alignItems: 'center', gap: 12,
+               padding: '14px 16px', borderRadius: 12,
+               border: '1.5px solid #E8E8E8', textDecoration: 'none',
+               transition: 'border-color 0.15s, background 0.15s',
+               cursor: 'pointer',
+             }}
+             onMouseEnter={e => {
+               e.currentTarget.style.borderColor = '#1a7f4b'
+               e.currentTarget.style.background = '#FAFFF8'
+             }}
+             onMouseLeave={e => {
+               e.currentTarget.style.borderColor = '#E8E8E8'
+               e.currentTarget.style.background = '#fff'
+             }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8,
+                          background: b.color + '15', border: '1px solid ' + b.color + '30',
+                          display: 'flex', alignItems: 'center',
+                          justifyContent: 'center', fontSize: 13,
+                          fontWeight: 700, color: b.color, flexShrink: 0 }}>
+              {b.logo}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0A0A' }}>
+                {b.name}
+              </div>
+              <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>
+                {b.description}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <p style={{ fontSize: 10, color: '#BBB', marginTop: 20, lineHeight: 1.5,
+                   borderTop: '1px solid #F5F5F5', paddingTop: 14 }}>
+        StockStory India is not a broker and does not execute trades.
+        Clicking a broker opens their website in a new tab.
+        This is not investment advice.
+      </p>
+    </Modal>
+  )
+}

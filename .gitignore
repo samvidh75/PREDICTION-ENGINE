@@ -86,3 +86,4 @@ reports/track-8d/*
 artifacts/
 tmp-debug.html
 :memory:*
+.tmp.drivedownload/
