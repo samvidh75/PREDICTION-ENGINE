@@ -20,12 +20,11 @@ export const scoreColor = getScoreColor;
 
 export function getScoreLabel(s: number | null): string {
   if (!s) return "—";
-  if (s >= 90) return "High conviction";
-  if (s >= 80) return "High conviction";
-  if (s >= 65) return "Conviction";
-  if (s >= 50) return "Neutral";
-  if (s >= 35) return "Watch";
-  return "Risk rising";
+  if (s >= 85) return "Very Healthy";
+  if (s >= 65) return "Healthy";
+  if (s >= 50) return "Average";
+  if (s >= 35) return "Weakening";
+  return "Poor";
 }
 
 export const scoreLabel = getScoreLabel;
@@ -40,11 +39,11 @@ export function scoreColorBg(s: number | null): string {
 
 export function getSignalFromScore(s: number | null) {
   if (s === null) return { text: "—", color: "#bbb" };
-  if (s >= 80) return { text: "High conviction", color: "#1a7f4b" };
-  if (s >= 65) return { text: "Conviction", color: "#1a7f4b" };
-  if (s >= 50) return { text: "Neutral", color: "#1A56DB" };
-  if (s >= 35) return { text: "Watch", color: "#B45309" };
-  return { text: "Risk rising", color: "#C0392B" };
+  if (s >= 85) return { text: "Very Healthy", color: "#16A34A" };
+  if (s >= 65) return { text: "Healthy", color: "#22C55E" };
+  if (s >= 50) return { text: "Average", color: "#2962FF" };
+  if (s >= 35) return { text: "Weakening", color: "#F59E0B" };
+  return { text: "Poor", color: "#EF4444" };
 }
 
 export default function ScoreRing({ score, size, showLabel = false, animate = true }: ScoreRingProps) {
