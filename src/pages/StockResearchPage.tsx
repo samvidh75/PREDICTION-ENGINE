@@ -177,7 +177,6 @@ function FactorCard({
         background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
         padding: 20,
         borderLeft: `3px solid ${color}`,
       }}
@@ -328,7 +327,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               background: "var(--surface)",
               border: "1px solid var(--border)",
               borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
               padding: 32,
               textAlign: "center",
             }}
@@ -502,7 +500,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -521,7 +518,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -557,7 +553,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                       WebkitBackdropFilter: "blur(8px)",
                       border: "1px solid rgba(229,231,235,0.5)",
                       borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                       padding: isMobile ? 14 : 20,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                     }}
@@ -580,7 +575,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -605,7 +599,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -640,7 +633,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -677,7 +669,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                   textAlign: "center",
                 }}
@@ -701,7 +692,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -754,7 +744,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: isMobile ? 14 : 20,
                 }}
               >
@@ -804,7 +793,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -849,7 +837,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -870,7 +857,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -889,7 +875,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                 padding: "18px",
                 textAlign: "center",
               }}
@@ -907,7 +892,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                 padding: isMobile ? 14 : 20,
               }}
             >
@@ -947,7 +931,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
-        boxShadow: "var(--shadow-sm)",
                 padding: isMobile ? 14 : 20,
                 display: "flex",
                 flexDirection: "column",
