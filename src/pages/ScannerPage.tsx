@@ -182,7 +182,7 @@ export default function ScannerPage() {
           <div>
             <h1
               style={{
-                fontSize: 24,
+                fontSize: 28,
                 fontWeight: 800,
                 letterSpacing: "-0.5px",
                 margin: 0,
@@ -193,7 +193,7 @@ export default function ScannerPage() {
             </h1>
             <p
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: "var(--text-secondary)",
                 margin: "4px 0 0",
               }}
@@ -830,22 +830,6 @@ export default function ScannerPage() {
           })}
         </div>
 
-        {/* Footer */}
-        <div
-          style={{
-            textAlign: "center",
-            padding: "24px 0 32px",
-            fontSize: 10,
-            color: "var(--text-muted)",
-            lineHeight: 1.6,
-          }}
-        >
-          Research scores are for educational purposes only. Not investment
-          advice.
-          <br />
-          StockStory India is not SEBI-registered. Consult a SEBI-registered
-          adviser.
-        </div>
       </main>
     </div>
   )
