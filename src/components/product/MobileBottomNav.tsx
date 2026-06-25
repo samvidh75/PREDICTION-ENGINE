@@ -38,11 +38,12 @@ export default function MobileBottomNav() {
       <nav
         style={{
           height: 72,
-          background: '#0D1117',
-          borderTop: '1px solid rgba(148,163,184,0.16)',
+          background: '#FFFFFF',
+          borderTop: '1px solid var(--border)',
+          boxShadow: '0 -1px 3px rgba(0,0,0,0.04)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
-        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden backdrop-blur-md"
+        className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around md:hidden"
       >
         {TABS.map(({ page, label, icon: Icon }) => {
           const isActive = page !== '__menu__' && (route === page || (!route && page === ''));
@@ -60,15 +61,16 @@ export default function MobileBottomNav() {
                     page === '__menu__' && menuOpen
                       ? 'var(--text-primary)'
                       : isActive
-                        ? 'var(--text-primary)'
-                        : 'var(--text-secondary)',
+                        ? 'var(--action)'
+                        : 'var(--text-muted)',
                 }}
               />
               <span
                 style={{
                   fontSize: 10,
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  color: isActive ? 'var(--action)' : 'var(--text-muted)',
                   lineHeight: 1,
+                  fontWeight: isActive ? 600 : 400,
                 }}
               >
                 {label}

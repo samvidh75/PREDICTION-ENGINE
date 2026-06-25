@@ -37,8 +37,9 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
     <header
       style={{
         height: 64,
-        background: '#0D1117',
-        borderBottom: '1px solid rgba(148,163,184,0.16)',
+        background: '#FFFFFF',
+        borderBottom: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-sm)',
       }}
       className="flex items-center px-4 sticky top-0 z-50"
     >
@@ -57,8 +58,9 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
                   onClick={() => navigate(page)}
                   style={{
                     color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    fontWeight: isActive ? 600 : 400,
                   }}
-                  className="text-[14px] font-[400] hover:text-[var(--text-primary)] tracking-[-0.2px] transition-colors"
+                  className="text-[14px] hover:text-[var(--text-primary)] tracking-[-0.2px] transition-colors"
                 >
                   {label}
                 </button>
@@ -70,10 +72,10 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => setPricingOpen(true)}
-            className={`text-[12px] font-[400] rounded-[9999px] px-[12px] py-[6px] transition-all active:scale-[0.97] flex items-center gap-1.5 ${
+            className={`text-[12px] font-[500] rounded-[9999px] px-[12px] py-[6px] transition-all active:scale-[0.97] flex items-center gap-1.5 ${
               premium
-                ? 'bg-[rgba(41,98,255,0.1)] text-[#2962FF] border border-[#2962FF]'
-                : 'bg-[rgba(41,98,255,0.1)] text-[#2962FF] hover:bg-[rgba(41,98,255,0.2)]'
+                ? 'bg-[var(--action-soft)] text-[var(--action)] border border-[var(--action)]'
+                : 'bg-[var(--action-soft)] text-[var(--action)] hover:bg-[rgba(41,98,255,0.15)]'
             }`}
           >
             <Crown size={12} /> {premium ? 'Premium' : 'Upgrade'}
@@ -97,7 +99,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
               </button>
               <button
                 onClick={() => navigate('signup')}
-                className="bg-[#2962FF] text-white text-[14px] font-[400] rounded-[9999px] px-[16px] py-[8px] hover:bg-[#2554d4] transition-colors active:scale-[0.97]"
+                className="bg-[var(--action)] text-white text-[14px] font-[500] rounded-[9999px] px-[16px] py-[8px] hover:bg-[var(--action-hover)] transition-colors active:scale-[0.97]"
               >
                 Start Free Trial
               </button>

@@ -17,7 +17,7 @@ export default function ProductShell({ children }: { children: React.ReactNode }
       <ProductTopBar compact={isMobile} />
       <main
         className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8"
-        style={{ maxWidth: 1320 }}
+        style={{ maxWidth: 1320, paddingBottom: isMobile ? 96 : 48 }}
       >
         {children}
       </main>
