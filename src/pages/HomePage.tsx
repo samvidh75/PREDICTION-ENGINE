@@ -1,55 +1,594 @@
-import { useMemo } from "react";
-import { ArrowRight, Bookmark, Check, Search, Sparkles, Star, Users } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
-import { useStockData } from "../hooks/useStockData";
-import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine";
-import ScoreRing from "../components/ui/ScoreRing";
-import TopNav, { navigate } from "../components/layout/TopNav";
-import MarketTicker from "../components/layout/MarketTicker";
-import PriceChart from "../components/charts/PriceChart";
-
-const chartData = [34,36,33,39,37,44,42,48,51,47,49,45,46,39,40,37,43,41,49,52,46,50,54].map((value, index) => ({ index, value, benchmark: 30 + index * 0.65 }));
+import { useEffect, useMemo, useState } from "react"
+import { Search, TrendingUp, Bookmark, Eye, Sparkles } from "lucide-react"
+import TopNav from "../components/layout/TopNav"
+import MarketTicker from "../components/layout/MarketTicker"
+import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
+import { useStockData } from "../hooks/useStockData"
+import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine"
+import ScoreRing from "../components/ui/ScoreRing"
+import { fChange, fPrice } from "../lib/format"
+import { navigate } from "../components/product/routeConfig"
 
 export default function HomePage() {
-  const { data, loading } = useStockData("HDFCBANK");
-  const prediction = useMemo(() => data ? UnifiedPredictionEngine.predict({ peRatio:data.fundamentals.peRatio, pbRatio:data.fundamentals.pbRatio, roe:data.fundamentals.roe, roce:data.fundamentals.roce, debtToEquity:data.fundamentals.debtToEquity, currentRatio:data.fundamentals.currentRatio, revenueGrowth:data.fundamentals.revenueGrowth, profitGrowth:data.fundamentals.profitGrowth, dividendYield:data.fundamentals.dividendYield, closes:data.historical.closes }) : null, [data]);
-  return <div className="min-h-screen bg-[#f7f7f5] text-[#111]">
-    <TopNav/><MarketTicker/>
-    <main className="mx-auto max-w-[1280px] px-5 py-8 md:px-6">
-      <section className="grid grid-cols-1 gap-5 py-0 md:grid-cols-3 md:py-2">
-        <div className="flex min-h-0 flex-col justify-center py-0 md:min-h-[430px] md:px-2 md:py-5">
-          <div className="mb-4 flex w-fit items-center gap-1.5 rounded-full bg-[#ebf7f1] px-3 py-1.5 text-[10px] font-[700] tracking-[0.04em] text-[#1a7f4b] md:mb-5 md:gap-2 md:px-4 md:py-2"><Sparkles className="h-3.5 w-3.5 text-[#22c55e]"/> AI-POWERED STOCK INTELLIGENCE</div>
-          <h1 className="max-w-[520px] text-[clamp(28px,8vw,48px)] font-extrabold leading-[1.1] tracking-[-1.2px] text-[#0a0a0a] md:text-[54px] md:leading-[1.08] md:tracking-[-.045em]">Understand<br/>businesses.<br/>Invest better.</h1>
-          <p className="mt-3 max-w-[470px] text-[14px] leading-[1.65] text-[#888] md:mt-5 md:text-[#666]">AI research to help you understand stocks before you invest.</p>
-          <div className="mt-6 flex h-[52px] items-center rounded-xl border-[1.5px] border-[#e5e5e5] bg-white py-[5px] pl-4 pr-1.5 md:hidden">
-            <input className="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#0a0a0a] outline-none" placeholder="Search — TCS, Reliance, HDFC Bank..." />
-            <button className="h-10 rounded-lg border-0 bg-[#0a0a0a] px-[18px] text-[13px] font-[600] text-white">Research →</button>
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const { data, loading } = useStockData("HDFCBANK")
+  const prediction = useMemo(
+    () =>
+      data
+        ? UnifiedPredictionEngine.predict({
+            peRatio: data.fundamentals.peRatio,
+            pbRatio: data.fundamentals.pbRatio,
+            roe: data.fundamentals.roe,
+            roce: data.fundamentals.roce,
+            debtToEquity: data.fundamentals.debtToEquity,
+            currentRatio: data.fundamentals.currentRatio,
+            revenueGrowth: data.fundamentals.revenueGrowth,
+            profitGrowth: data.fundamentals.profitGrowth,
+            dividendYield: data.fundamentals.dividendYield,
+            closes: data.historical.closes,
+          })
+        : null,
+    [data]
+  )
+
+  const [recent] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem("stockstory-recent") || "[]"
+      return JSON.parse(stored)
+    } catch {
+      return []
+    }
+  })
+
+  const [tracked] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem("stockstory-tracked") || "[]"
+      return JSON.parse(stored)
+    } catch {
+      return []
+    }
+  })
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const q = searchQuery.trim().toUpperCase()
+    if (q) navigate("stock", q)
+  }
+
+  return (
+    <div
+      style={{
+        background: "var(--bg)",
+        minHeight: "100vh",
+        color: "var(--text-primary)",
+      }}
+    >
+      <TopNav />
+      <MarketTicker />
+      <main style={{ maxWidth: "var(--content)", margin: "0 auto", padding: "0 16px" }}>
+        {/* Hero */}
+        <section
+          style={{
+            paddingTop: 48,
+            paddingBottom: 32,
+            textAlign: "center",
+          }}
+        >
+          <h1
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              letterSpacing: "-0.5px",
+              margin: 0,
+            }}
+          >
+            What do you want to research?
+          </h1>
+          <p
+            style={{
+              fontSize: 14,
+              color: "var(--text-secondary)",
+              marginTop: 8,
+              maxWidth: 480,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            Search any Nifty 50 company for research insights
+          </p>
+          <form
+            onSubmit={handleSearch}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              maxWidth: 480,
+              marginLeft: "auto",
+              marginRight: "auto",
+              marginTop: 20,
+              height: 48,
+              borderRadius: 12,
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
+              padding: "0 4px 0 16px",
+            }}
+          >
+            <Search
+              size={18}
+              style={{ color: "var(--text-muted)", flexShrink: 0 }}
+            />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search — TCS, RELIANCE, HDFCBANK..."
+              style={{
+                flex: 1,
+                border: "none",
+                background: "transparent",
+                color: "var(--text-primary)",
+                fontSize: 14,
+                outline: "none",
+                minWidth: 0,
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                height: 36,
+                padding: "0 16px",
+                borderRadius: 8,
+                border: "none",
+                background: "var(--action)",
+                color: "#FFFFFF",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Research
+            </button>
+          </form>
+        </section>
+
+        {/* Quick actions */}
+        <section
+          className="no-scrollbar"
+          style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
+            paddingBottom: 24,
+          }}
+        >
+          {[
+            { label: "Scanner", page: "scanner" },
+            { label: "Rankings", page: "rankings" },
+            { label: "Compare", page: "compare" },
+            { label: "Watchlist", page: "watchlist" },
+          ].map((action) => (
+            <button
+              key={action.page}
+              onClick={() => navigate(action.page)}
+              style={{
+                height: 40,
+                padding: "0 20px",
+                borderRadius: 20,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--text-primary)",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              {action.label}
+            </button>
+          ))}
+        </section>
+
+        {/* Grid: featured stock + recently viewed */}
+        <div
+          className="grid md:grid-cols-2"
+          style={{ gap: 16, paddingBottom: 32 }}
+        >
+          {/* Featured stock */}
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              padding: 20,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 16,
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 16,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  HDFCBANK
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--text-secondary)",
+                    marginTop: 2,
+                  }}
+                >
+                  HDFC Bank Ltd.
+                </div>
+              </div>
+              <Bookmark
+                size={18}
+                style={{
+                  marginLeft: "auto",
+                  color: "var(--text-muted)",
+                  cursor: "pointer",
+                }}
+              />
+            </div>
+            {loading ? (
+              <div
+                style={{
+                  height: 120,
+                  borderRadius: 8,
+                  background: "var(--elevated)",
+                  animation: "shimmer 2s linear infinite",
+                  backgroundImage:
+                    "linear-gradient(90deg, var(--surface) 0%, var(--elevated) 50%, var(--surface) 100%)",
+                  backgroundSize: "200% 100%",
+                }}
+              />
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <ScoreRing
+                  score={prediction?.composite ?? null}
+                  size={88}
+                  showLabel
+                />
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
+                  }}
+                >
+                  {(
+                    [
+                      ["Quality", prediction?.factorScores.quality.score],
+                      ["Growth", prediction?.factorScores.growth.score],
+                      ["Valuation", prediction?.factorScores.valuation.score],
+                      ["Risk", prediction?.factorScores.stability.score],
+                      ["Momentum", prediction?.factorScores.momentum.score],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <div
+                      key={label}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 64,
+                          flexShrink: 0,
+                          fontSize: 12,
+                          color: "var(--text-secondary)",
+                        }}
+                      >
+                        {label}
+                      </span>
+                      <div
+                        style={{
+                          flex: 1,
+                          height: 6,
+                          borderRadius: 3,
+                          background: "var(--elevated)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            borderRadius: 3,
+                            width: `${value ?? 0}%`,
+                            background: "var(--positive)",
+                            transition: "width 0.6s ease",
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          width: 28,
+                          textAlign: "right",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          fontVariantNumeric: "tabular-nums",
+                          color: "var(--text-primary)",
+                        }}
+                      >
+                        {value ?? "—"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button
+              onClick={() => navigate("stock", "HDFCBANK")}
+              style={{
+                width: "100%",
+                marginTop: 16,
+                paddingTop: 12,
+                borderTop: "1px solid var(--border)",
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "var(--action)",
+                cursor: "pointer",
+                background: "none",
+                borderLeft: "none",
+                borderRight: "none",
+                borderBottom: "none",
+              }}
+            >
+              View Full Research &rarr;
+            </button>
           </div>
-          <div className="mt-5 flex gap-2.5 md:mt-7 md:flex-wrap md:gap-3"><button onClick={() => navigate("signup")} className="flex h-12 min-w-11 flex-1 items-center justify-center gap-2 rounded-[10px] bg-[#0a0a0a] px-4 text-[15px] font-semibold text-white md:h-11 md:flex-none md:px-6 md:text-[14px]">Start Free Trial <ArrowRight className="h-4 w-4"/></button><button onClick={() => navigate("scanner")} className="flex h-12 min-w-11 items-center gap-2 rounded-[10px] border-[1.5px] border-[#e8e8e8] bg-white px-5 text-[15px] font-medium text-[#2d2d2d] md:h-11 md:border md:text-[14px]"><span className="md:hidden">Scanner</span><span className="hidden md:inline">Explore Scanner</span><Search className="hidden h-4 w-4 md:block"/></button></div>
-          <div className="mt-7 flex flex-col gap-2 text-[12px] text-[#888] md:flex-row md:flex-wrap md:gap-x-6 md:gap-y-2 md:text-[10px] md:text-[#555]">{["No credit card required","Cancel anytime, no lock-ins","Trusted by 2M+ investors"].map(text => <span key={text} className="flex items-center gap-2"><Check className="h-4 w-4 rounded-full border border-[#ccc] p-0.5 text-[#888] md:h-3.5 md:w-3.5 md:border-0 md:p-0 md:text-[#168345]"/>{text}</span>)}</div>
-        </div>
-        <div className="space-y-3">
-          <div className="rounded-xl border border-[#e2e2df] bg-white p-4 shadow-[0_5px_18px_rgba(0,0,0,.035)]">
-            <div className="flex items-center gap-3"><div className="grid h-9 w-9 place-items-center rounded-lg bg-[#e9f3ff] text-[11px] font-bold text-[#1364b3]">HDFC</div><div><div className="text-[13px] font-bold">HDFCBANK</div><div className="text-[10px] text-[#777]">HDFC Bank Ltd.</div></div><Bookmark className="ml-auto h-4 w-4 text-[#777]"/></div>
-            {loading ? <div className="mt-5 h-32 animate-pulse rounded-lg bg-[#f1f1ee]"/> : <div className="mt-5 flex items-center gap-4"><ScoreRing score={prediction?.composite ?? null} size={typeof window !== "undefined" && window.innerWidth < 768 ? 80 : 88} showLabel/><div className="flex-1 space-y-1.5">{[
-              ["Quality", prediction?.factorScores.quality.score],
-              ["Growth", prediction?.factorScores.growth.score],
-              ["Valuation", prediction?.factorScores.valuation.score],
-              ["Risk", prediction?.factorScores.stability.score],
-              ["Momentum", prediction?.factorScores.momentum.score],
-            ].map(([label, value]) => <div key={String(label)} className="flex items-center gap-2"><span className="w-16 shrink-0 text-[12px] text-[#888]">{label}</span><span className="h-1 flex-1 overflow-hidden rounded-full bg-[#f0f0f0]"><span className="block h-full rounded-full bg-[#1a7f4b]" style={{width:`${value ?? 0}%`}}/></span><span className="tabular w-6 text-right text-[12px] font-[700] text-[#2d2d2d]">{value ?? "—"}</span></div>)}</div></div>}
-            <button onClick={() => navigate("stock","HDFCBANK")} className="mt-4 flex w-full items-center justify-center gap-2 border-t border-[#eee] pt-3 text-[10px] font-semibold">View Full Research <ArrowRight className="h-3 w-3"/></button>
+
+          {/* Recently viewed */}
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              padding: 20,
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                margin: 0,
+                marginBottom: 16,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Eye size={16} style={{ color: "var(--text-muted)" }} />
+              Recently viewed
+            </h2>
+            {recent.length === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {["TCS", "RELIANCE", "INFY"].map((symbol) => (
+                  <button
+                    key={symbol}
+                    onClick={() => navigate("stock", symbol)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      border: "1px solid var(--border)",
+                      background: "transparent",
+                      color: "var(--text-primary)",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span>{symbol}</span>
+                    <span
+                      style={{
+                        color: "var(--text-muted)",
+                        fontSize: 11,
+                      }}
+                    >
+                      View &rarr;
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {recent.slice(0, 5).map((symbol) => (
+                  <button
+                    key={symbol}
+                    onClick={() => navigate("stock", symbol)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      border: "1px solid var(--border)",
+                      background: "transparent",
+                      color: "var(--text-primary)",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span>{symbol}</span>
+                    <span
+                      style={{
+                        color: "var(--text-muted)",
+                        fontSize: 11,
+                      }}
+                    >
+                      View &rarr;
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="rounded-xl bg-[#151515] p-5 text-white shadow-lg"><div className="flex items-center justify-between text-[11px]"><span className="flex items-center gap-2 font-semibold"><Sparkles className="h-4 w-4 text-[#74d493]"/> AI Insight</span><span className="text-[#929292]">Generated today · 9:30 AM</span></div><h3 className="mt-4 text-[15px] font-bold">HDFCBANK: Compounding moat remains intact</h3><p className="mt-2 text-[11px] leading-[1.6] text-[#bcbcbc]">Strong deposit franchise and digital scale support sustained returns. Research updates as verified data becomes available.</p><div className="mt-4 flex items-center justify-between"><span className="rounded-full bg-[#223c2b] px-3 py-1 text-[9px] text-[#8fdaa5]">AI Confidence: {data && data.dataCompleteness >= 75 ? "High" : "Developing"}</span><button onClick={() => navigate("stock","HDFCBANK")} className="text-[10px] font-semibold">Read Full Thesis →</button></div></div>
         </div>
-        <div className="hidden space-y-3 md:block">
-          <div className="rounded-xl border border-[#e2e2df] bg-white p-4"><div className="flex items-center"><h2 className="text-[13px] font-bold">Market Overview</h2><span className="ml-3 text-[10px] text-[#168345]">● Live</span><div className="ml-auto flex gap-3 text-[9px] text-[#777]"><b className="rounded border px-2 py-1 text-[#111]">1D</b><span>1W</span><span>1M</span><span>YTD</span></div></div><div className="mt-3 h-[125px]"><ResponsiveContainer><AreaChart data={chartData}><defs><linearGradient id="marketFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#168345" stopOpacity={.14}/><stop offset="1" stopColor="#168345" stopOpacity={0}/></linearGradient></defs><Area dataKey="value" stroke="#168345" strokeWidth={1.6} fill="url(#marketFill)" dot={false}/></AreaChart></ResponsiveContainer></div><div className="grid grid-cols-4 gap-2">{[["Advances","1,856","text-[#168345]"],["Declines","1,089","text-[#d93636]"],["Unchanged","136",""],["Breadth","+767","text-[#168345]"]].map(([a,b,c])=><div key={a} className="rounded-lg bg-[#f7f7f4] p-2"><div className="text-[9px] text-[#666]">{a}</div><div className={`tabular mt-1 text-[14px] font-bold ${c}`}>{b}</div></div>)}</div></div>
-          <div className="rounded-xl border border-[#e2e2df] bg-white p-4"><div className="flex justify-between"><h2 className="text-[13px] font-bold">Price Performance</h2><span className="text-[9px] text-[#999]">Yahoo Finance</span></div><div className="mt-2"><PriceChart closes={data?.historical.closes??[]} timestamps={data?.historical.timestamps??[]} height={120}/></div></div>
+
+        {/* Tracked companies */}
+        <section style={{ paddingBottom: 32 }}>
+          <h2
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              margin: 0,
+              marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <Bookmark size={16} style={{ color: "var(--text-muted)" }} />
+            Tracked companies
+          </h2>
+          {tracked.length > 0 ? (
+            <div
+              className="no-scrollbar"
+              style={{
+                display: "flex",
+                gap: 8,
+                overflowX: "auto",
+              }}
+            >
+              {tracked.map((symbol) => (
+                <button
+                  key={symbol}
+                  onClick={() => navigate("stock", symbol)}
+                  style={{
+                    flexShrink: 0,
+                    padding: "12px 16px",
+                    borderRadius: 10,
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    minWidth: 100,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 13,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {symbol}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-muted)",
+                      marginTop: 4,
+                    }}
+                  >
+                    Research &rarr;
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="no-scrollbar"
+              style={{
+                display: "flex",
+                gap: 8,
+                overflowX: "auto",
+              }}
+            >
+              {NIFTY50_SYMBOLS.slice(0, 8).map((symbol) => (
+                <button
+                  key={symbol}
+                  onClick={() => navigate("stock", symbol)}
+                  style={{
+                    flexShrink: 0,
+                    padding: "12px 16px",
+                    borderRadius: 10,
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    minWidth: 100,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 13,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {symbol}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--text-muted)",
+                      marginTop: 4,
+                    }}
+                  >
+                    Research &rarr;
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Methodology footer */}
+        <div
+          style={{
+            borderTop: "1px solid var(--border)",
+            paddingTop: 24,
+            paddingBottom: 32,
+            textAlign: "center",
+            fontSize: 11,
+            color: "var(--text-muted)",
+            lineHeight: 1.6,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              marginBottom: 8,
+            }}
+          >
+            <Sparkles size={14} />
+            <span style={{ fontWeight: 600 }}>Research Methodology</span>
+          </div>
+          Scores are generated by evaluating quality, growth, valuation,
+          stability, and momentum factors. Research scores are for educational
+          purposes only and not investment advice. StockStory India is not
+          SEBI-registered. Consult a SEBI-registered adviser.
         </div>
-      </section>
-      <section className="mt-6 rounded-[14px] bg-[#f0f0ec] p-0 md:p-8"><h2 className="px-5 pt-6 text-center text-[20px] font-[700] md:px-0 md:pt-0 md:text-[22px]">Research every Nifty 50 company</h2><p className="mt-1.5 px-5 text-center text-[13px] text-[#888] md:px-0 md:text-[14px]">5 proprietary scores. 1000+ data points. Updated every single day.</p><div className="no-scrollbar mt-6 flex gap-3 overflow-x-auto px-5 pb-6 md:gap-0 md:rounded-[10px] md:border md:border-[#e8e8e8] md:bg-white md:px-0 md:pb-0">{[["💎","Quality",92,"High returns, strong balance sheet, efficient operations"],["📈","Growth",85,"Sustainable earnings growth and outlook"],["⚖️","Valuation",78,"Attractive valuation vs. intrinsic value"],["🛡","Risk",82,"Low financial risk, stable business model"],["⚡","Momentum",87,"Strong price momentum and relative strength"]].map(([icon,name,score,desc],i)=><div key={String(name)} className={`w-40 flex-shrink-0 rounded-xl border border-[#e8e8e8] bg-white p-4 md:w-auto md:min-w-[180px] md:flex-1 md:rounded-none md:border-0 md:p-5 ${i !== 4 ? "md:border-r md:border-[#e8e8e8]" : ""}`}><div className="mb-1.5 flex items-center gap-1.5 text-[13px] font-[600] text-[#888]"><span>{icon}</span>{name}</div><div className="mb-2 flex items-baseline gap-1"><span className="text-[28px] font-[800] leading-none">{score}</span><span className="text-[12px] text-[#bbb]">/100</span></div><p className="text-[12px] leading-[1.4] text-[#888]">{desc}</p></div>)}</div></section>
-      <section className="mt-3 grid overflow-hidden rounded-xl border border-[#e0e0dd] bg-white md:grid-cols-3"><div className="flex items-center gap-5 p-5"><span className="grid h-16 w-16 place-items-center rounded-full bg-[#e8f3e9]"><Users className="h-7 w-7 text-[#176b39]"/></span><div><b className="text-[11px]">Trusted by millions of investors across India</b><div className="mt-3 flex gap-6"><span><b className="block text-xl">2M+</b><small className="text-[#888]">Active Investors</small></span><span><b className="block text-xl">10M+</b><small className="text-[#888]">Research Reports</small></span></div></div></div><div className="border-l border-[#eee] p-6 text-[11px] leading-5">“ StockStory has changed the way I research companies. The insights are deeper, faster, and incredibly reliable.<div className="mt-3 text-[9px] text-[#777]">— Verified User ✓</div></div><div className="grid place-content-center border-l border-[#eee] p-5 text-center"><b className="text-[11px]">India's Highest Rated<br/>Stock Research Platform</b><div className="mt-2 flex justify-center gap-1 text-[#168345]">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-4 w-4 fill-current"/>)}</div><small className="mt-1 text-[#777]">4.8/5 from 50K+ reviews</small></div></section>
-      <section className="mt-3 grid rounded-xl border border-[#e0e0dd] bg-white p-5 text-center md:grid-cols-5">{["1000+ Data Sources","AI Research Engine","Human + AI Quality","Enterprise Grade Security","99.9% Uptime"].map(item=><div key={item} className="text-[10px] font-semibold">✓ &nbsp;{item}</div>)}</section>
-    </main>
-  </div>;
+      </main>
+    </div>
+  )
 }

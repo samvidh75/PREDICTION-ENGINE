@@ -14,14 +14,14 @@ export const scoreLabel = (score: number | null) =>
   score === null
     ? "Unavailable"
     : score >= 85
-      ? "Excellent"
+      ? "High conviction"
       : score >= 70
-        ? "Very Good"
+        ? "High conviction"
         : score >= 55
-          ? "Fair"
+          ? "Conviction"
           : score >= 35
-            ? "Weak"
-            : "Poor";
+            ? "Watch"
+            : "Risk rising";
 export function ScoreRing({
   score,
   size,

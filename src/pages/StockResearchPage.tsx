@@ -1,47 +1,999 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, ExternalLink, Shield, Star, X } from "lucide-react";
+import {
+  ArrowRight,
+  Bookmark,
+  GitCompare,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  BarChart3,
+  Shield,
+  Eye,
+  Activity,
+  Target,
+  BookOpen,
+  Sparkles,
+} from "lucide-react";
 import { useStockData } from "../hooks/useStockData";
 import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine";
-import ScoreRing, { getScoreColor, scoreColor } from "../components/ui/ScoreRing";
+import ScoreRing, { getScoreColor, getScoreLabel } from "../components/ui/ScoreRing";
 import SignalLight from "../components/ui/SignalLight";
-import TopNav, { navigate } from "../components/layout/TopNav";
-import MarketTicker from "../components/layout/MarketTicker";
 import { fMarketCap, fPercent, fPrice, fRatio, fRelativeTime } from "../lib/format";
 import BrokerModal from "../components/BrokerModal";
 import PriceChart from "../components/charts/PriceChart";
+import { Skeleton } from "../components/ui/Skeleton";
+import { navigate } from "../components/product/routeConfig";
 
-const IT_THESIS="A high-quality IT services business with strong free cash flow and resilient earnings supported by digital transformation demand.";
-const BANK_THESIS="A well-capitalised private sector bank with improving asset quality and a strong deposit franchise.";
-const FMCG_THESIS="A consumer staples business with pricing power and consistent volume growth in Indian markets.";
-const OTHER_THESIS="A Nifty 50 constituent with data currently being compiled by our research engine.";
-const IT_STRENGTHS=["Consistent revenue growth from cloud and digital services","Industry-leading operating margins from scale and automation","Strong balance sheet with minimal debt","Large deal pipeline supporting future growth visibility","Attractive valuation relative to global IT peers"];
-const DEFAULT_STRENGTHS=["Established market position","Financial data reviewed across available sources","Operating performance tracked over time","Balance sheet monitored for changes","Valuation compared with reported fundamentals"];
+const IT_THESIS =
+  "A high-quality IT services business with strong free cash flow and resilient earnings supported by digital transformation demand.";
+const BANK_THESIS =
+  "A well-capitalised private sector bank with improving asset quality and a strong deposit franchise.";
+const FMCG_THESIS =
+  "A consumer staples business with pricing power and consistent volume growth in Indian markets.";
+const OTHER_THESIS =
+  "A Nifty 50 constituent with data currently being compiled by our research engine.";
+
+const IT_BULL: string[] = [
+  "Consistent revenue growth from cloud and digital services",
+  "Industry-leading operating margins from scale and automation",
+  "Strong balance sheet with minimal debt",
+];
+const IT_BEAR: string[] = [
+  "Macro slowdown affecting discretionary IT spending",
+  "Employee attrition and wage cost pressures",
+  "Currency fluctuations impacting reported margins",
+];
+const BANK_BULL: string[] = [
+  "Improving asset quality with declining NPAs",
+  "Strong deposit franchise providing stable funding",
+  "Healthy credit growth driven by economic expansion",
+];
+const BANK_BEAR: string[] = [
+  "Regulatory changes could impact lending margins",
+  "Asset quality sensitive to economic cycles",
+  "Intense competition from fintech and smaller banks",
+];
+const FMCG_BULL: string[] = [
+  "Pricing power from strong brand portfolio",
+  "Consistent volume growth across urban and rural markets",
+  "High operating margins from efficient distribution",
+];
+const FMCG_BEAR: string[] = [
+  "Input cost inflation pressuring margins",
+  "Slowdown in rural demand affecting volume growth",
+  "Intense competition from regional and new-age brands",
+];
+const DEFAULT_BULL: string[] = [
+  "Established market position with competitive advantages",
+  "Financial performance tracked across multiple indicators",
+  "Balance sheet monitored for stability and efficiency",
+];
+const DEFAULT_BEAR: string[] = [
+  "Demand cyclicality could impact near-term performance",
+  "Competitive intensity may pressure margins",
+  "Regulatory changes are a potential headwind",
+];
+
+const CHECKLIST = [
+  "Review recent quarterly earnings and management commentary",
+  "Assess valuation relative to historical range and peers",
+  "Evaluate debt ratios and interest payment capacity",
+  "Check promoter holding trend and institutional activity",
+  "Verify dividend track record and payout consistency",
+];
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
+
+function factorScoreColor(score: number | null): string {
+  if (score === null || score === undefined) return "var(--text-muted)";
+  if (score >= 80) return "#16A34A";
+  if (score >= 65) return "#22C55E";
+  if (score >= 50) return "#2962FF";
+  if (score >= 35) return "#F59E0B";
+  return "#EF4444";
+}
+
+function getRiskColor(riskScore: number | null): string {
+  if (riskScore === null || riskScore === undefined) return "var(--text-muted)";
+  if (riskScore >= 80) return "#EF4444";
+  if (riskScore >= 65) return "#F59E0B";
+  if (riskScore >= 50) return "#2962FF";
+  if (riskScore >= 35) return "#22C55E";
+  return "#16A34A";
+}
+
+function getFactorExplanation(factor: string, score: number | null): string {
+  if (score === null) return "Insufficient data to evaluate this factor.";
+  switch (factor) {
+    case "quality":
+      if (score >= 80) return "Exceptional profitability and capital efficiency.";
+      if (score >= 65) return "Above-average returns with manageable financial leverage.";
+      if (score >= 50) return "Adequate profitability with reasonable financial health.";
+      if (score >= 35) return "Below-average profitability metrics raise some concerns.";
+      return "Weak profitability and elevated financial risk.";
+    case "valuation":
+      if (score >= 80) return "Stock appears significantly undervalued relative to earnings.";
+      if (score >= 65) return "Valuation is attractive with a reasonable margin of safety.";
+      if (score >= 50) return "Valuation is fair and broadly in line with fundamentals.";
+      if (score >= 35) return "Valuation appears elevated relative to historical averages.";
+      return "Stock is trading at a significant premium to intrinsic value.";
+    case "growth":
+      if (score >= 80) return "Strong revenue and profit growth trajectory.";
+      if (score >= 65) return "Healthy growth rates above industry average.";
+      if (score >= 50) return "Moderate growth in line with economic expansion.";
+      if (score >= 35) return "Growth is slowing and below recent historical trends.";
+      return "Declining revenue or profitability trend.";
+    case "risk":
+      if (score >= 80) return "Elevated financial or operational risk factors present.";
+      if (score >= 65) return "Above-average risk factors warrant closer monitoring.";
+      if (score >= 50) return "Moderate risk profile with generally sound financials.";
+      if (score >= 35) return "Below-average risk with solid financial structure.";
+      return "Strong financial stability with minimal risk factors.";
+    case "momentum":
+      if (score >= 80) return "Strong positive price momentum with technical alignment.";
+      if (score >= 65) return "Favorable price action supported by bullish technicals.";
+      if (score >= 50) return "Neutral momentum with mixed technical indicators.";
+      if (score >= 35) return "Weakening price momentum suggesting increased caution.";
+      return "Bearish price momentum with deteriorating technical structure.";
+    default:
+      return "";
+  }
+}
+
+function FactorCard({
+  name,
+  score,
+  reason,
+  isRisk = false,
+}: {
+  name: string;
+  score: number | null;
+  reason: string;
+  isRisk?: boolean;
+}) {
+  const color = isRisk ? getRiskColor(score) : factorScoreColor(score);
+  const explanation = getFactorExplanation(name.toLowerCase(), score);
+
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        padding: "16px 18px",
+        borderLeft: `3px solid ${color}`,
+      }}
+    >
+      <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        {name}
+      </div>
+      <div style={{ fontSize: 24, fontWeight: 700, color, marginTop: 4 }}>
+        {score !== null && score !== undefined ? score : "—"}
+      </div>
+      <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, marginTop: 6 }}>
+        {explanation}
+      </div>
+      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 8, lineHeight: 1.4 }}>
+        {reason}
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+      {icon && <span style={{ color: "var(--action)", flexShrink: 0 }}>{icon}</span>}
+      <h2 style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.02em" }}>
+        {children}
+      </h2>
+    </div>
+  );
+}
 
 export default function StockResearchPage({ symbol }: { symbol: string }) {
-  const {data,loading,error,refetch}=useStockData(symbol); const [tab,setTab]=useState("Thesis"); const [period,setPeriod]=useState("1M"); const [brokerOpen,setBrokerOpen]=useState(false);
-  useEffect(()=>{const open=(event:MouseEvent)=>{if((event.target as HTMLElement).closest("[data-broker-trigger]"))setBrokerOpen(true);};document.addEventListener("click",open);return()=>document.removeEventListener("click",open);},[]);
-  const prediction=useMemo(()=>data?UnifiedPredictionEngine.predict({peRatio:data.fundamentals.peRatio,pbRatio:data.fundamentals.pbRatio,roe:data.fundamentals.roe,roce:data.fundamentals.roce,debtToEquity:data.fundamentals.debtToEquity,currentRatio:data.fundamentals.currentRatio,revenueGrowth:data.fundamentals.revenueGrowth,profitGrowth:data.fundamentals.profitGrowth,dividendYield:data.fundamentals.dividendYield,closes:data.historical.closes}):null,[data]);
-  const sector=(data?.price.sector??"").toLowerCase(); const isIT=sector.includes("it")||sector.includes("technology"); const isBank=sector.includes("bank"); const isFmcg=sector.includes("fmcg")||sector.includes("consumer"); const thesis=isIT?IT_THESIS:isBank?BANK_THESIS:isFmcg?FMCG_THESIS:OTHER_THESIS; const strengths=isIT?IT_STRENGTHS:DEFAULT_STRENGTHS;
-  const fairValue=data&&data.fundamentals.eps!==null&&data.fundamentals.peRatio!==null?data.fundamentals.eps*data.fundamentals.peRatio*1.05:null; const upside=fairValue!==null&&data?.price.current?((fairValue-data.price.current)/data.price.current)*100:null;
-  const confidence=!data?"—":data.dataCompleteness>=75?"High":data.dataCompleteness>=50?"Medium":"Low"; const positive=(data?.price.change??0)>=0;
-  if(loading&&!data)return <div className="min-h-screen bg-[#f7f7f5]"><TopNav/><MarketTicker/><div className="mx-auto max-w-[1240px] space-y-5 px-4 py-8 md:px-6">{Array.from({length:5}).map((_,i)=><div key={i} className="h-28 animate-pulse rounded-xl bg-[#eaeaE7]"/>)}</div></div>;
-  return <div className="min-h-screen bg-[#f7f7f5]"><TopNav/><MarketTicker/>{brokerOpen&&<BrokerModal symbol={symbol} price={data?.price.current??null} onClose={()=>setBrokerOpen(false)}/>}<main className="mx-auto max-w-[1240px] px-4 py-5 md:px-6">
-    <div className="text-[9px] text-[#888]"><button onClick={()=>navigate("home")}>Home</button>　›　Research　›　{data?.price.sector??"Sector unavailable"}　›　<b className="text-[#333]">{symbol}</b></div>
-    {error&&!data?<div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6 text-sm">Market data is temporarily unavailable. <button onClick={()=>void refetch()} className="font-bold underline">Try again</button></div>:<>
-    <section className="mt-5 grid gap-3 border-b border-[#e8e8e8] pb-4 md:gap-5 md:pb-5 lg:grid-cols-[1fr_340px]"><div className="flex flex-col gap-4"><div style={{marginBottom:0}}><div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}><span style={{fontSize:11,fontWeight:700,color:'#888',background:'#F5F5F5',border:'1px solid #E8E8E8',borderRadius:4,padding:'2px 7px',letterSpacing:'0.05em'}}>{data?.price.exchange??"NSE"}</span><span style={{fontSize:11,color:'#BBB'}}>·</span><span style={{fontSize:11,color:'#888'}}>{symbol}</span><span style={{fontSize:11,color:'#BBB'}}>·</span><span style={{fontSize:11,color:'#888'}}>ISIN: —</span></div><h1 style={{fontSize:28,fontWeight:800,color:'#0A0A0A',letterSpacing:'-0.7px',lineHeight:1.1,margin:0}}>{data?.price.companyName??symbol}</h1></div><div><span className="block text-[9px] font-semibold text-[#168345]">● Live</span><div className="tabular mt-1 text-[30px] font-extrabold leading-none tracking-[-1px] md:text-[38px]">{fPrice(data?.price.current??null)}</div><div className={`tabular mt-2 inline-flex rounded-md px-2 py-1 text-[13px] font-semibold md:mt-1 md:bg-transparent md:p-0 md:text-[12px] ${positive?"bg-[#ebf7f1] text-[#168345]":"bg-[#fef0ee] text-[#d03838]"}`}>{data?.price.changeAbs===null?"—":`${data?.price.changeAbs!==null&&(data?.price.changeAbs??0)>=0?"+":""}${data?.price.changeAbs?.toFixed(2)}`} ({data?.price.change===null?"—":fPercent(data?.price.change??null)})</div></div><dl className="grid grid-cols-2 gap-x-8 gap-y-2 text-[9px]"><div><dt className="text-[#888]">Market Cap</dt><dd className="mt-1 font-semibold">{fMarketCap(data?.price.marketCap??null)}</dd></div><div><dt className="text-[#888]">Sector</dt><dd className="mt-1 font-semibold">{data?.price.sector??"—"}</dd></div><div><dt className="text-[#888]">Industry</dt><dd className="mt-1 font-semibold">{data?.price.sector??"—"}</dd></div><div><dt className="text-[#888]">Data as of</dt><dd className="mt-1 font-semibold">{fRelativeTime(data?.fetchedAt??null)}</dd></div></dl><div className="mt-4 grid grid-cols-3 gap-2 md:mt-5 md:flex md:flex-wrap md:gap-3"><button className="h-11 rounded-[10px] border-0 bg-[#f5f5f5] px-2 text-[14px] font-[500] text-[#2d2d2d] md:rounded-lg md:border md:bg-white md:px-5 md:text-[10px] md:font-semibold"><Star className="mr-1 inline h-3.5 w-3.5"/>Follow</button><button onClick={()=>navigate("compare",symbol)} className="h-11 rounded-[10px] border-0 bg-[#f5f5f5] px-2 text-[14px] font-[500] text-[#2d2d2d] md:rounded-lg md:border md:bg-white md:px-5 md:text-[10px] md:font-semibold">Compare</button><button data-broker-trigger className="h-11 rounded-[10px] border-0 bg-[#176b39] px-2 text-[14px] font-[600] text-white md:rounded-lg md:px-5 md:text-[10px]">Invest →<ExternalLink className="ml-2 hidden h-3.5 w-3.5 md:inline"/></button></div></div>
-      <div className="w-full rounded-[14px] border-[1.5px] border-[#e8e8e8] bg-white p-4 shadow-sm md:p-5 lg:w-[340px]"><h2 className="text-[11px] font-[700] tracking-[0.05em] text-[#888]">StockStory Score ⓘ</h2><div className="mt-3 flex items-center gap-4 md:gap-5"><div className="text-center"><div style={{position:'relative',display:'inline-flex'}}><div style={{position:'absolute',inset:0,borderRadius:'50%',background:`${getScoreColor(prediction?.composite??null)}08`}}/><ScoreRing score={prediction?.composite??null} size={typeof window !== "undefined" && window.innerWidth < 768 ? 72 : 100} showLabel/></div><div className="mt-2 text-[8px] text-[#888]">AI Confidence: <b className="text-[#168345]">{confidence}</b></div></div><div className="flex-1 space-y-1.5 md:space-y-2">{[
-        ["Quality", prediction?.factorScores.quality.score],
-        ["Growth", prediction?.factorScores.growth.score],
-        ["Valuation", prediction?.factorScores.valuation.score],
-        ["Risk", prediction?.factorScores.stability.score],
-        ["Momentum", prediction?.factorScores.momentum.score],
-      ].map(([label,value])=><div key={String(label)} className="flex items-center gap-2 text-[11px]"><span className="w-16 text-[#888]">{label}</span><span className="h-1.5 flex-1 rounded bg-[#f0f0f0]"><span className="block h-1.5 rounded" style={{width:`${value??0}%`,background:scoreColor(value as number | null)}}/></span><b className="tabular w-6 text-right">{value??"—"}</b><span className="text-[#bbb]">›</span></div>)}</div></div></div>
-    </section>
-    <nav className="no-scrollbar sticky top-14 z-30 mt-4 flex gap-2 overflow-x-auto border-b border-[#e8e8e8] bg-white px-0 md:mt-6 md:gap-8 md:bg-[#f7f7f5]" aria-label="Research sections">{["Thesis","Fundamentals","Financials","Risks","Technicals","News","Peers"].map(name=><button key={name} onClick={()=>setTab(name)} className={`h-11 min-w-11 flex-shrink-0 whitespace-nowrap border-b-[2.5px] px-3 text-[13px] md:px-0 md:text-[10px] ${tab===name?"border-[#1a7f4b] font-[700] text-[#0a0a0a]":"border-transparent font-[500] text-[#888] md:text-[#555]"}`}>{name}</button>)}</nav>
-    {tab!=="Thesis"?(tab==="Technicals"?<div className="mt-4 rounded-xl border bg-white p-5"><div className="mb-6 flex items-center gap-4 rounded-2xl bg-[#0a0a0a] p-5"><SignalLight signal={prediction?.technicals.overallSignal??null} size="lg"/><div><div className="text-[14px] font-[700] text-white">Technical Signal</div><div className="mt-0.5 text-[12px] text-white/50">Based on RSI, MACD, and moving averages from {data?.historical.closes.length??0} trading days of data</div></div></div><div className="grid gap-3 md:grid-cols-2"><div className="rounded-xl border-[1.5px] border-[#e8e8e8] bg-white p-4"><div className="mb-2 text-[11px] font-[700] uppercase tracking-[0.08em] text-[#888]">RSI (14)</div>{prediction?.technicals.rsi14!==null&&prediction?.technicals.rsi14!==undefined?<><div className="tabular mb-1 text-[36px] font-[800] leading-none tracking-[-1px] text-[#0a0a0a]">{prediction.technicals.rsi14.toFixed(1)}</div><SignalLight signal={prediction.technicals.rsiZone==="overbought"?"bearish":prediction.technicals.rsiZone==="oversold"?"bullish":"neutral"}/><div className="mt-2 text-[12px] text-[#888]">{prediction.technicals.rsiZone==="overbought"?"RSI above 70 - potentially overbought":prediction.technicals.rsiZone==="oversold"?"RSI below 30 - potentially oversold":"RSI in neutral range (30-70)"}</div></>:<div className="text-[13px] text-[#bbb]">Insufficient price history (need 15+ days)</div>}</div><div className="rounded-xl border-[1.5px] border-[#e8e8e8] bg-white p-4"><div className="mb-2 text-[11px] font-[700] uppercase tracking-[0.08em] text-[#888]">MACD</div>{prediction?.technicals.macd!==null&&prediction?.technicals.macd!==undefined?<><div className="tabular mb-1 text-[36px] font-[800] leading-none tracking-[-1px]" style={{color:(prediction.technicals.macdHist??0)>0?'#1a7f4b':'#c0392b'}}>{prediction.technicals.macd.toFixed(2)}</div><SignalLight signal={(prediction.technicals.macdHist??0)>0?'bullish':(prediction.technicals.macdHist??0)<0?'bearish':'neutral'}/><div className="mt-2 text-[12px] text-[#888]">Signal: {prediction.technicals.macdSignal?.toFixed(2)} · Histogram: {prediction.technicals.macdHist?.toFixed(2)}</div></>:<div className="text-[13px] text-[#bbb]">Insufficient price history (need 35+ days)</div>}</div><div className="rounded-xl border-[1.5px] border-[#e8e8e8] bg-white p-4"><div className="mb-2 text-[11px] font-[700] uppercase tracking-[0.08em] text-[#888]">Moving Averages</div>{[{label:'SMA 20',value:prediction?.technicals.sma20,above:prediction?.technicals.aboveSma20},{label:'SMA 50',value:prediction?.technicals.sma50,above:prediction?.technicals.aboveSma50}].map(ma=><div key={ma.label} className="mb-2 flex items-center justify-between text-[13px]"><span className="text-[#555]">{ma.label}</span><div className="flex items-center gap-2"><span className="tabular font-[700]">{ma.value?`₹${ma.value.toFixed(0)}`:'—'}</span>{ma.above!==null&&ma.above!==undefined?<span className={`rounded-full px-2 py-0.5 text-[10px] font-[700] ${ma.above?'bg-[#ebf7f1] text-[#1a7f4b]':'bg-[#fef0ee] text-[#c0392b]'}`}>{ma.above?'↑ Above':'↓ Below'}</span>:null}</div></div>)}</div><div className="rounded-xl border-[1.5px] border-[#e8e8e8] bg-white p-4"><div className="mb-2 text-[11px] font-[700] uppercase tracking-[0.08em] text-[#888]">Momentum Score</div><div className="tabular mb-2 text-[36px] font-[800] leading-none tracking-[-1px]" style={{color:getScoreColor(prediction?.factorScores.momentum.score??null)}}>{prediction?.factorScores.momentum.score??'—'}</div><div className="text-[12px] text-[#888]">{prediction?.factorScores.momentum.reason??'Insufficient data'}</div></div></div><div className="mt-5 text-center text-[11px] text-[#bbb]">Technical indicators computed from {data?.historical.closes.length??0} days of Yahoo Finance price history</div></div>:<div className="mt-4 rounded-xl border bg-white p-12 text-center"><h2 className="text-lg font-bold">{tab}</h2><p className="mt-2 text-sm text-[#777]">Detailed {tab.toLowerCase()} data is being compiled from verified sources.</p></div>):<div className="mt-4 grid gap-4 lg:grid-cols-[1fr_285px]"><div className="space-y-4"><div className="grid gap-4 md:grid-cols-[1.25fr_.75fr]"><article className="rounded-xl border bg-white p-5"><h2 className="text-[13px] font-bold text-[#173b25]">✦ &nbsp; AI Investment Thesis <span className="ml-2 text-[8px] font-normal text-[#999]">Generated today · Updated daily</span></h2><p className="mt-4 rounded-lg border border-[#efe7d8] bg-[#fffdf8] p-4 text-[11px] font-semibold leading-5">{thesis}</p><ul className="mt-4 space-y-2">{strengths.map(item=><li key={item} className="flex gap-2 text-[9px]"><Check className="h-3.5 w-3.5 shrink-0 rounded-full border border-[#58b376] p-0.5 text-[#168345]"/>{item}</li>)}</ul><button data-broker-trigger className="mt-5 rounded-lg border px-4 py-2.5 text-[9px] font-semibold">Read Full Thesis　→</button></article><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Fair Value (DCF) ⓘ</h2>{fairValue===null?<p className="mt-6 text-[11px] leading-5 text-[#777]">Fair value estimate requires earnings data not yet available.</p>:<><div className="tabular mt-5 text-[25px] font-extrabold">{fPrice(fairValue)} <span className={`text-[9px] ${upside!==null&&upside>=0?"text-[#168345]":"text-[#d03838]"}`}>{upside===null?"—":`${upside>=0?"+":""}${upside.toFixed(1)}% ${upside>=0?"Upside":"Downside"}`}</span></div><dl className="mt-5 space-y-3 border-t pt-4 text-[9px]"><div className="flex justify-between"><dt className="text-[#777]">Current Price</dt><dd className="font-semibold">{fPrice(data?.price.current??null)}</dd></div><div className="flex justify-between"><dt className="text-[#777]">Margin of Safety</dt><dd className="font-semibold text-[#168345]">{upside===null?"—":fPercent(upside)}</dd></div><div className="flex justify-between"><dt className="text-[#777]">Uncertainty</dt><dd className="font-semibold">Medium</dd></div></dl><div className="mt-8 h-1 rounded bg-[#ddd]"><span className="mx-auto block h-3 w-3 -translate-y-1 rounded-full bg-[#168345]"/></div><div className="mt-3 flex justify-between text-[8px]"><span>Bear Case<br/><b>{fPrice(fairValue*.8)}</b></span><span className="text-center">Base Case<br/><b>{fPrice(fairValue)}</b></span><span className="text-right">Bull Case<br/><b>{fPrice(fairValue*1.2)}</b></span></div></>}</article></div>
-      <div className="grid gap-4 md:grid-cols-2"><article className="rounded-xl border bg-white p-5"><div className="flex justify-between"><h2 className="text-[12px] font-bold">Performance ⓘ</h2><div className="flex gap-3">{["1M","3M","1Y","5Y"].map(name=><button onClick={()=>setPeriod(name)} key={name} className={`rounded px-2 py-1 text-[8px] ${period===name?"bg-[#eaf5ec] text-[#168345]":"text-[#777]"}`}>{name}</button>)}</div></div>{period!=="1M"?<div className="grid h-40 place-items-center text-[10px] text-[#888]">Price history loading...</div>:<div className="mt-4"><PriceChart closes={data?.historical.closes??[]} timestamps={data?.historical.timestamps??[]} height={160}/></div>}<p className="mt-2 text-[8px] text-[#777]">Real Yahoo Finance daily closing prices</p><button className="mt-3 text-[8px] font-semibold text-[#168345]">View Detailed Chart　›</button></article><article className="rounded-xl border bg-white p-5"><div className="flex justify-between"><h2 className="text-[12px] font-bold">Fundamentals Snapshot ⓘ</h2><span className="rounded bg-[#f0f5f0] px-2 py-1 text-[7px] text-[#168345]">Screener.in</span></div><dl className="mt-4">{[["Revenue","—"],["Net Profit","—"],["Operating Margin","—"],["ROE",fPercent(data?.fundamentals.roe??null)],["EPS",data?.fundamentals.eps===null?"—":fPrice(data?.fundamentals.eps??null)],["Free Cash Flow","—"]].map(([name,value])=><div key={name} className="flex justify-between border-b py-2 text-[9px]"><dt className="text-[#666]">{name}</dt><dd className="tabular font-semibold">{value}</dd></div>)}</dl><button className="mt-3 text-[8px] font-semibold text-[#168345]">View Full Financials　›</button></article></div>
-      <div className="grid gap-4 md:grid-cols-[1.2fr_.8fr]"><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Strengths vs Risks ⓘ</h2><div className="mt-4 grid grid-cols-[1fr_100px_1fr] gap-4"><div><b className="text-[8px] text-[#168345]">Key Strengths</b>{strengths.slice(0,4).map(item=><p key={item} className="mt-2 flex gap-2 text-[8px]"><Check className="h-3 w-3 text-[#168345]"/>{item}</p>)}</div><div className="grid place-items-center"><span className="grid h-20 w-20 place-items-center rounded-full border-2 border-[#168345] bg-[#f0f7f1]"><Shield className="h-8 w-8 text-[#168345]"/></span></div><div><b className="text-[8px]">Key Risks</b>{(isIT?["Macro slowdown affecting IT spending","Employee attrition and wage pressure","Currency fluctuations affecting margins","Competition and pricing pressure"]:["Demand cyclicality","Input cost pressure","Regulatory changes","Competitive intensity"]).map(item=><p key={item} className="mt-2 flex gap-2 text-[8px]"><X className="h-3 w-3 text-[#d03838]"/>{item}</p>)}</div></div></article><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Analyst Consensus</h2><div className="mt-7 rounded-lg bg-[#f6f6f3] p-5 text-center text-[10px] leading-5 text-[#777]">Analyst consensus data is not yet available for this stock.</div></article></div></div>
-      <aside className="space-y-4"><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Key Metrics</h2><dl className="mt-3">{[["52 Week Range",`${fPrice(data?.price.weekLow52??null)} — ${fPrice(data?.price.weekHigh52??null)}`],["Market Cap",fMarketCap(data?.price.marketCap??null)],["PE (TTM)",fRatio(data?.fundamentals.peRatio??null)],["ROE (TTM)",fPercent(data?.fundamentals.roe??null)],["Dividend Yield",fPercent(data?.fundamentals.dividendYield??null)]].map(([name,value])=><div key={name} className="flex justify-between py-1.5 text-[8px]"><dt className="text-[#777]">{name}</dt><dd className="tabular font-semibold">{value}</dd></div>)}</dl><button className="mt-3 text-[8px] font-semibold text-[#168345]">View More Metrics　›</button></article><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Latest News</h2><p className="mt-4 text-[9px] text-[#777]">News for {symbol} coming soon.</p>{[1,2].map(item=><div key={item} className="mt-3 h-11 animate-pulse rounded bg-[#efefec]"/>)}</article><article className="rounded-xl border bg-white p-5"><h2 className="text-[12px] font-bold">Data Confidence ⓘ</h2><div className="mt-4 flex justify-between text-[9px]"><span>Overall Confidence</span><b className={confidence==="High"?"text-[#168345]":confidence==="Medium"?"text-[#b27800]":"text-[#d03838]"}>{confidence}</b></div>{[["1000+ Data Sources",data?.price.error===null],["Screener Data",data?.fundamentals.error===null],["Historical Prices",(data?.historical.closes.length??0)>5]].map(([name,ok])=><div key={String(name)} className="mt-4 flex justify-between text-[8px]"><span>{name}</span><span className={ok?"text-[#168345]":"text-[#aaa]"}>{ok?"●":"○"}</span></div>)}<button className="mt-5 text-[8px] font-semibold">Learn About Our Data　›</button></article><p className="border-t pt-3 text-[9px] leading-4 text-[#888]">Research scores and factor analysis are for educational purposes only. Not investment advice. StockStory India is not a SEBI-registered investment adviser. Consult a SEBI-registered adviser before investing.</p></aside></div>}</>
-    }
-  </main></div>;
+  const { data, loading, error, refetch } = useStockData(symbol);
+  const isMobile = useIsMobile();
+  const [period, setPeriod] = useState("1M");
+  const [brokerOpen, setBrokerOpen] = useState(false);
+
+  useEffect(() => {
+    const open = (event: MouseEvent) => {
+      if ((event.target as HTMLElement).closest("[data-broker-trigger]")) setBrokerOpen(true);
+    };
+    document.addEventListener("click", open);
+    return () => document.removeEventListener("click", open);
+  }, []);
+
+  const prediction = useMemo(
+    () =>
+      data
+        ? UnifiedPredictionEngine.predict({
+            peRatio: data.fundamentals.peRatio,
+            pbRatio: data.fundamentals.pbRatio,
+            roe: data.fundamentals.roe,
+            roce: data.fundamentals.roce,
+            debtToEquity: data.fundamentals.debtToEquity,
+            currentRatio: data.fundamentals.currentRatio,
+            revenueGrowth: data.fundamentals.revenueGrowth,
+            profitGrowth: data.fundamentals.profitGrowth,
+            dividendYield: data.fundamentals.dividendYield,
+            closes: data.historical.closes,
+          })
+        : null,
+    [data],
+  );
+
+  const sector = (data?.price.sector ?? "").toLowerCase();
+  const isIT = sector.includes("it") || sector.includes("technology");
+  const isBank = sector.includes("bank");
+  const isFmcg = sector.includes("fmcg") || sector.includes("consumer");
+
+  const thesis = isIT ? IT_THESIS : isBank ? BANK_THESIS : isFmcg ? FMCG_THESIS : OTHER_THESIS;
+  const bullCase = isIT ? IT_BULL : isBank ? BANK_BULL : isFmcg ? FMCG_BULL : DEFAULT_BULL;
+  const bearCase = isIT ? IT_BEAR : isBank ? BANK_BEAR : isFmcg ? FMCG_BEAR : DEFAULT_BEAR;
+
+  const positive = (data?.price.change ?? 0) >= 0;
+
+  const fairValue =
+    data && data.fundamentals.eps !== null && data.fundamentals.peRatio !== null
+      ? data.fundamentals.eps * data.fundamentals.peRatio * 1.05
+      : null;
+  const upside =
+    fairValue !== null && data?.price.current
+      ? ((fairValue - data.price.current) / data.price.current) * 100
+      : null;
+
+  const riskScore =
+    prediction?.factorScores.stability.score !== null &&
+    prediction?.factorScores.stability.score !== undefined
+      ? Math.max(0, Math.min(100, 100 - prediction.factorScores.stability.score))
+      : null;
+
+  if (loading && !data) {
+    return (
+      <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+        <header
+          style={{
+            height: 64,
+            background: "var(--surface)",
+            borderBottom: "1px solid var(--border)",
+          }}
+          className="flex items-center px-4 sticky top-0 z-50"
+        >
+          <div className="w-full mx-auto flex items-center" style={{ maxWidth: 1320 }}>
+            <div style={{ width: 100, height: 28, background: "var(--border)", borderRadius: 8 }} />
+          </div>
+        </header>
+        <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8" style={{ maxWidth: 1320 }}>
+          <div style={{ display: "grid", gap: 24, gridTemplateColumns: "1fr" }}>
+            <Skeleton h={40} r={8} />
+            <Skeleton h={80} r={12} />
+            <Skeleton h={60} r={12} />
+            <Skeleton h={60} r={12} />
+            <Skeleton h={120} r={12} />
+            <Skeleton h={120} r={12} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
+        <header
+          style={{
+            height: 64,
+            background: "var(--surface)",
+            borderBottom: "1px solid var(--border)",
+          }}
+          className="flex items-center px-4 sticky top-0 z-50"
+        >
+          <div className="w-full mx-auto flex items-center" style={{ maxWidth: 1320 }}>
+            <div style={{ width: 100, height: 28, background: "var(--border)", borderRadius: 8 }} />
+          </div>
+        </header>
+        <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8" style={{ maxWidth: 1320 }}>
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              padding: 32,
+              textAlign: "center",
+            }}
+          >
+            <AlertTriangle size={28} style={{ color: "var(--caution)" }} />
+            <p style={{ color: "var(--text-primary)", fontSize: 15, fontWeight: 600, marginTop: 12 }}>
+              Market data is temporarily unavailable
+            </p>
+            <p style={{ color: "var(--text-secondary)", fontSize: 13, marginTop: 4 }}>
+              Please try again shortly.
+            </p>
+            <button
+              onClick={() => void refetch()}
+              style={{
+                marginTop: 16,
+                background: "var(--action)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                padding: "8px 20px",
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const RenderFactorCards = () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <FactorCard name="Quality" score={prediction?.factorScores.quality.score ?? null} reason={prediction?.factorScores.quality.reason ?? "Insufficient data"} />
+      <FactorCard name="Valuation" score={prediction?.factorScores.valuation.score ?? null} reason={prediction?.factorScores.valuation.reason ?? "Insufficient data"} />
+      <FactorCard name="Growth" score={prediction?.factorScores.growth.score ?? null} reason={prediction?.factorScores.growth.reason ?? "Insufficient data"} />
+      <FactorCard name="Risk" score={riskScore} reason={prediction?.factorScores.stability.reason ?? "Insufficient data"} isRisk />
+      <FactorCard name="Momentum" score={prediction?.factorScores.momentum.score ?? null} reason={prediction?.factorScores.momentum.reason ?? "Insufficient data"} />
+    </div>
+  );
+
+  const convictionLabel =
+    prediction?.composite !== null && prediction?.composite !== undefined ? getScoreLabel(prediction.composite) : "—";
+
+  const desktopScoreRingSize = 52;
+  const mobileScoreRingSize = 44;
+
+  return (
+    <div style={{ background: "var(--bg)", minHeight: "100vh", paddingBottom: isMobile ? 144 : 0 }}>
+      <header
+        style={{
+          height: 64,
+          background: "var(--surface)",
+          borderBottom: "1px solid var(--border)",
+        }}
+        className="flex items-center px-4 sticky top-0 z-50"
+      >
+        <div className="w-full mx-auto flex items-center" style={{ maxWidth: 1320 }}>
+          <button onClick={() => navigate("")} className="flex items-center">
+            <span style={{ fontWeight: 800, fontSize: 16, color: "var(--text-primary)", letterSpacing: "-0.3px" }}>
+              StockStory<span style={{ color: "var(--positive)" }}>.</span>India
+            </span>
+          </button>
+          <nav className="hidden md:flex items-center gap-5 ml-10" style={{ color: "var(--text-secondary)", fontSize: 14 }}>
+            <button onClick={() => navigate("")} style={{ color: "var(--text-primary)", fontWeight: 500 }}>
+              Home
+            </button>
+            <button onClick={() => navigate("scanner")}>Scanner</button>
+            <button onClick={() => navigate("rankings")}>Rankings</button>
+            <button onClick={() => navigate("watchlist")}>Watchlist</button>
+          </nav>
+        </div>
+      </header>
+
+      <div className="mx-auto w-full" style={{ maxWidth: 1320, padding: isMobile ? "0 16px" : "0 24px" }}>
+        <div style={{ padding: "16px 0 12px" }}>
+          <button
+            onClick={() => navigate("")}
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            ← Back to Home
+          </button>
+        </div>
+
+        {brokerOpen && (
+          <BrokerModal symbol={symbol} price={data?.price.current ?? null} onClose={() => setBrokerOpen(false)} />
+        )}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 0",
+            borderBottom: "1px solid var(--border)",
+            marginBottom: 20,
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: "var(--text-muted)",
+                  background: "rgba(148,163,184,0.08)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 4,
+                  padding: "1px 6px",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {data?.price.exchange ?? "NSE"}
+              </span>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{symbol}</span>
+              {data?.price.sector && (
+                <>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>·</span>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{data.price.sector}</span>
+                </>
+              )}
+            </div>
+            <h1
+              style={{
+                fontSize: isMobile ? 26 : 32,
+                fontWeight: 800,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.7px",
+                lineHeight: 1.1,
+                margin: 0,
+              }}
+            >
+              {data?.price.companyName ?? symbol}
+            </h1>
+          </div>
+
+          <div style={{ flexShrink: 0, marginLeft: 16, textAlign: "center" }}>
+            <ScoreRing
+              score={prediction?.composite ?? null}
+              size={isMobile ? mobileScoreRingSize : desktopScoreRingSize}
+              showLabel={!isMobile && (desktopScoreRingSize >= 80)}
+            />
+            {!isMobile && prediction?.composite !== null ? (
+              <div style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 4 }}>
+                {convictionLabel}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="lg:grid lg:grid-cols-[8fr_4fr] lg:gap-8">
+          <div style={{ display: "flex", flexDirection: "column", gap: 24, minWidth: 0 }}>
+            <section>
+              <SectionTitle icon={<Sparkles size={14} />}>
+                AI Thesis
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
+                  {thesis}
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<Activity size={14} />}>
+                What Changed
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
+                  Track this company to receive change notifications.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<Info size={14} />}>
+                Why It Matters
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
+                  {isIT
+                    ? "The IT services sector forms the backbone of India's export-driven knowledge economy, contributing significantly to GDP and employment. Companies in this space are bellwethers for global tech spending trends."
+                    : isBank
+                      ? "India's banking sector is a critical driver of economic growth, with credit expansion closely tracking GDP. Banks with strong deposit franchises and asset quality discipline tend to outperform through cycles."
+                      : isFmcg
+                        ? "The FMCG sector reflects the health of Indian consumption across urban and rural markets. Companies with strong brand equity and distribution networks are well-positioned to capture rising discretionary spending."
+                        : "This company operates in a sector that is a significant component of the Indian economy. Understanding its performance provides insight into broader market dynamics and investment opportunities."}
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<CheckCircle2 size={14} />}>
+                Bull Case
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                  {bullCase.map((item, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 8,
+                        fontSize: 13,
+                        color: "var(--text-secondary)",
+                        lineHeight: 1.6,
+                        padding: "4px 0",
+                      }}
+                    >
+                      <span style={{ color: "var(--positive)", flexShrink: 0, marginTop: 3 }}>●</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<AlertTriangle size={14} />}>
+                Bear Case
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                  {bearCase.map((item, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 8,
+                        fontSize: 13,
+                        color: "var(--text-secondary)",
+                        lineHeight: 1.6,
+                        padding: "4px 0",
+                      }}
+                    >
+                      <span style={{ color: "var(--negative)", flexShrink: 0, marginTop: 3 }}>●</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            {isMobile && <RenderFactorCards />}
+
+            <section>
+              <SectionTitle icon={<GitCompare size={14} />}>
+                Peer Context
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "24px 18px",
+                  textAlign: "center",
+                }}
+              >
+                <BarChart3 size={20} style={{ color: "var(--text-muted)" }} />
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8 }}>
+                  Peer comparison data coming soon.
+                </p>
+                <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+                  Compare this company against its industry peers across key financial metrics.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<BookOpen size={14} />}>
+                Investment Checklist
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                  {CHECKLIST.map((item, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 10,
+                        fontSize: 13,
+                        color: "var(--text-secondary)",
+                        lineHeight: 1.6,
+                        padding: "6px 0",
+                        borderBottom: i < CHECKLIST.length - 1 ? "1px solid var(--border)" : "none",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: 4,
+                          border: "1.5px solid var(--border)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          marginTop: 1,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          color: "var(--text-muted)",
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle icon={<TrendingUp size={14} />}>
+                Price History
+              </SectionTitle>
+              <div
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: "16px 18px",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 12 }}>
+                  {["1M", "3M", "1Y", "5Y"].map((name) => (
+                    <button
+                      key={name}
+                      onClick={() => setPeriod(name)}
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        padding: "4px 10px",
+                        borderRadius: 6,
+                        border: "none",
+                        cursor: "pointer",
+                        background:
+                          period === name
+                            ? "rgba(41,98,255,0.15)"
+                            : "transparent",
+                        color:
+                          period === name
+                            ? "var(--action)"
+                            : "var(--text-muted)",
+                      }}
+                    >
+                      {name}
+                    </button>
+                  ))}
+                </div>
+                <PriceChart
+                  closes={data?.historical.closes ?? []}
+                  timestamps={data?.historical.timestamps ?? []}
+                  height={isMobile ? 140 : 180}
+                />
+                <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8, textAlign: "right" }}>
+                  Daily closing prices
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <aside className="hidden lg:block" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: "18px",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+                Research Health
+              </div>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <ScoreRing score={prediction?.composite ?? null} size={80} showLabel />
+              </div>
+              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 10 }}>
+                Conviction: <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{convictionLabel}</span>
+              </div>
+            </div>
+
+            <RenderFactorCards />
+
+            <div
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: "16px 18px",
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
+                Key Metrics
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  ["Market Cap", fMarketCap(data?.price.marketCap ?? null)],
+                  ["P/E (TTM)", fRatio(data?.fundamentals.peRatio ?? null)],
+                  ["ROE", fPercent(data?.fundamentals.roe ?? null)],
+                  ["52W Range", `${fPrice(data?.price.weekLow52 ?? null)} — ${fPrice(data?.price.weekHigh52 ?? null)}`],
+                  ["Dividend Yield", fPercent(data?.fundamentals.dividendYield ?? null)],
+                ].map(([label, value]) => (
+                  <div
+                    key={String(label)}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      fontSize: 12,
+                      paddingBottom: 8,
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                  >
+                    <span style={{ color: "var(--text-muted)" }}>{label}</span>
+                    <span style={{ fontWeight: 600, color: "var(--text-primary)", fontVariantNumeric: "tabular-nums" }}>
+                      {value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: "16px 18px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+                Actions
+              </div>
+              <button
+                style={{
+                  width: "100%",
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "1px solid var(--border)",
+                  background: "transparent",
+                  color: "var(--text-primary)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <Bookmark size={14} /> Track
+              </button>
+              <button
+                style={{
+                  width: "100%",
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "1px solid var(--border)",
+                  background: "transparent",
+                  color: "var(--text-primary)",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <GitCompare size={14} /> Compare
+              </button>
+              <button
+                style={{
+                  width: "100%",
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "var(--action)",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+                data-broker-trigger
+              >
+                Invest <ArrowRight size={14} />
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 72,
+            left: 0,
+            right: 0,
+            height: 72,
+            background: "var(--surface)",
+            borderTop: "1px solid var(--border)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            zIndex: 40,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "0 16px",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          <button
+            style={{
+              flex: 1,
+              height: 44,
+              borderRadius: 10,
+              border: "1px solid var(--border)",
+              background: "transparent",
+              color: "var(--text-primary)",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            <Bookmark size={15} /> Track
+          </button>
+          <button
+            style={{
+              flex: 1,
+              height: 44,
+              borderRadius: 10,
+              border: "1px solid var(--border)",
+              background: "transparent",
+              color: "var(--text-primary)",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            <GitCompare size={15} /> Compare
+          </button>
+          <button
+            style={{
+              flex: 1,
+              height: 44,
+              borderRadius: 10,
+              border: "none",
+              background: "var(--action)",
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+            data-broker-trigger
+          >
+            Invest <ArrowRight size={15} />
+          </button>
+        </div>
+      )}
+
+      {isMobile && (
+        <nav
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 72,
+            background: "var(--surface)",
+            borderTop: "1px solid var(--border)",
+            zIndex: 50,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-around",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          {[
+            { icon: "Home", label: "Home", page: "" },
+            { icon: "BarChart3", label: "Scanner", page: "scanner" },
+            { icon: "Search", label: "Search", page: "search" },
+            { icon: "Bookmark", label: "Watchlist", page: "watchlist" },
+          ].map(({ label, page }) => (
+            <button
+              key={label}
+              onClick={() => navigate(page)}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 2,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "var(--text-secondary)",
+                fontSize: 10,
+                minWidth: 48,
+                height: 48,
+              }}
+            >
+              <span style={{ fontSize: 20 }}>
+                {label === "Home" ? "⌂" : label === "Scanner" ? "≡" : label === "Search" ? "⌕" : "◈"}
+              </span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+    </div>
+  );
 }

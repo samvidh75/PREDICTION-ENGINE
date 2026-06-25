@@ -7,7 +7,7 @@ export function ScoreRing({ score, size = 106 }: { score: number | null; size?: 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg viewBox="0 0 100 100" className="-rotate-90"><circle cx="50" cy="50" r={radius} fill="none" stroke="#e8ebe7" strokeWidth="8"/><circle cx="50" cy="50" r={radius} fill="none" stroke="#168345" strokeLinecap="round" strokeWidth="8" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - value / 100)} /></svg>
-      <div className="absolute inset-0 grid place-content-center text-center"><div className="tabular text-[27px] font-extrabold leading-none">{score ?? "—"}</div><div className="mt-1 text-[9px] text-[#777]">/100</div><div className="text-[9px] font-semibold text-[#168345]">{score === null ? "No data" : score >= 80 ? "Excellent" : score >= 65 ? "Healthy" : score >= 50 ? "Stable" : "Watch"}</div></div>
+      <div className="absolute inset-0 grid place-content-center text-center"><div className="tabular text-[27px] font-extrabold leading-none">{score ?? "—"}</div><div className="mt-1 text-[9px] text-[#777]">/100</div><div className="text-[9px] font-semibold text-[#168345]">{score === null ? "No data" : score >= 80 ? "High conviction" : score >= 65 ? "Conviction" : score >= 50 ? "Neutral" : "Watch"}</div></div>
     </div>
   );
 }
