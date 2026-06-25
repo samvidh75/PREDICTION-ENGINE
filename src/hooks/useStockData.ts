@@ -31,6 +31,12 @@ interface StockData {
   dataCompleteness: number
   fetchedAt: string
   errors: string[]
+  annualFinancials?: Array<{
+    fiscalYear: string
+    revenue: number | null
+    pat: number | null
+    operatingProfit: number | null
+  }>
 }
 
 const memCache = new Map<string, { data: StockData; ts: number }>()

@@ -504,7 +504,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
             <SectionCard>
               <SectionTitle>Financial Performance</SectionTitle>
               <SafeBlock>
-                <FinancialHistogram height={isMobile ? 200 : 220} />
+                <FinancialHistogram data={data?.annualFinancials ?? []} height={isMobile ? 200 : 220} />
               </SafeBlock>
             </SectionCard>
 
