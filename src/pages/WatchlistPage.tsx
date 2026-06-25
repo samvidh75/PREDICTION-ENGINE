@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Bookmark, Search, ArrowUpRight, TrendingUp, TrendingDown, ChevronRight, RefreshCw, AlertTriangle, Check, X, Clock, GitCompare, Star, Sparkles, Eye } from "lucide-react";
 import {
   PremiumAppShell, PremiumCard, ScorePill, FactorChip, MiniSparkline,
@@ -13,29 +13,29 @@ import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 import { ClassificationBadge } from "../components/ui/ClassificationBadge";
 
 const S = {
-  bg: "var(--ss-bg)",
-  bgSoft: "var(--ss-bg-soft)",
-  surface: "var(--ss-surface)",
-  ink: "var(--ss-ink)",
-  ink2: "var(--ss-ink-2)",
-  ink3: "var(--ss-ink-3)",
-  ink4: "var(--ss-ink-4)",
-  border: "var(--ss-border)",
-  borderSoft: "var(--ss-border-soft)",
-  positive: "var(--ss-positive)",
-  positiveSoft: "var(--ss-positive-soft)",
-  negative: "var(--ss-negative)",
-  negativeSoft: "var(--ss-negative-soft)",
-  caution: "var(--ss-caution)",
-  cautionSoft: "var(--ss-caution-soft)",
-  action: "var(--ss-action)",
-  radiusXs: "var(--ss-radius-xs)",
-  radiusSm: "var(--ss-radius-sm)",
-  radiusMd: "var(--ss-radius-md)",
-  radiusLg: "var(--ss-radius-lg)",
-  shadowCard: "var(--ss-shadow-card)",
-  shadowFloating: "var(--ss-shadow-floating)",
-  container: "var(--ss-container)",
+  bg: "var(--bg-page)",
+  bgSoft: "var(--bg-chip)",
+  surface: "var(--bg-card)",
+  ink: "var(--text-primary)",
+  ink2: "var(--text-body)",
+  ink3: "var(--text-secondary)",
+  ink4: "var(--text-muted)",
+  border: "var(--border)",
+  borderSoft: "var(--border)",
+  positive: "var(--green)",
+  positiveSoft: "var(--green-light)",
+  negative: "var(--red)",
+  negativeSoft: "var(--red-light)",
+  caution: "var(--amber)",
+  cautionSoft: "var(--amber-light)",
+  action: "var(--brand)",
+  radiusXs: "var(--radius-sm)",
+  radiusSm: "var(--radius-sm)",
+  radiusMd: "var(--radius-md)",
+  radiusLg: "var(--radius-lg)",
+  shadowCard: "var(--shadow-card)",
+  shadowFloating: "var(--shadow-raised)",
+  container: "1080px",
 };
 
 const iconBtn: React.CSSProperties = {
@@ -114,6 +114,28 @@ export default function WatchlistPage() {
     }
     window.dispatchEvent(new Event("trackchange"));
   }, []);
+
+  const [sortBy, setSortBy] = useState<'recent' | 'score' | 'change'>('recent');
+
+  const sortedTracked = useMemo(() => {
+    const copy = [...tracked];
+    switch (sortBy) {
+      case 'score':
+        return copy.sort((a, b) => {
+          const sa = results[a.symbol]?.prediction?.healthScore ?? -1;
+          const sb = results[b.symbol]?.prediction?.healthScore ?? -1;
+          return sb - sa;
+        });
+      case 'change':
+        return copy.sort((a, b) => {
+          const ca = results[a.symbol]?.price?.change ?? 0;
+          const cb = results[b.symbol]?.price?.change ?? 0;
+          return Math.abs(cb) - Math.abs(ca);
+        });
+      default:
+        return copy.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+    }
+  }, [tracked, results, sortBy]);
 
   const improving = tracked.filter(t => {
     const r = results[t.symbol];
@@ -289,8 +311,6 @@ export default function WatchlistPage() {
     );
   }
 
-  const allTracked = tracked;
-
   return (
     <PremiumAppShell activePage="watchlist">
       <ProductPageHeader
@@ -298,18 +318,34 @@ export default function WatchlistPage() {
         description="Track companies you are researching and review what changed."
         badge={`${tracked.length} tracked`}
         actions={
-          <button
-            onClick={handleRefreshAll}
-            disabled={loading.size > 0}
-            style={{
-              ...secondaryBtn,
-              opacity: loading.size > 0 ? 0.5 : 1,
-              pointerEvents: loading.size > 0 ? "none" : "auto",
-            }}
-          >
-            <RefreshCw size={13} />
-            {loading.size > 0 ? `Loading ${loading.size}` : "Refresh"}
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            {/* Sort controls */}
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as 'recent' | 'score' | 'change')}
+              style={{
+                height: 36, padding: "0 10px", borderRadius: S.radiusSm,
+                border: `1px solid ${S.border}`, background: S.surface,
+                color: S.ink2, fontSize: 12, fontWeight: 600, outline: "none",
+              }}
+            >
+              <option value="recent">Recently Added</option>
+              <option value="score">By Score</option>
+              <option value="change">By Change %</option>
+            </select>
+            <button
+              onClick={handleRefreshAll}
+              disabled={loading.size > 0}
+              style={{
+                ...secondaryBtn,
+                opacity: loading.size > 0 ? 0.5 : 1,
+                pointerEvents: loading.size > 0 ? "none" : "auto",
+              }}
+            >
+              <RefreshCw size={13} />
+              {loading.size > 0 ? `Loading ${loading.size}` : "Refresh"}
+            </button>
+          </div>
         }
       />
 
@@ -335,7 +371,7 @@ export default function WatchlistPage() {
       {sectionCard(
         "All tracked companies",
         <Eye size={15} />,
-        allTracked,
+        sortedTracked,
       )}
 
       <InvestmentReviewSheet
