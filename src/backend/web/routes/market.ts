@@ -108,7 +108,9 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           volume: price?.volume ?? null,
           weekHigh52: price?.week52High ?? null,
           weekLow52: price?.week52Low ?? null,
-          marketCap: price?.marketCap ?? profile?.marketCap ?? null,
+          marketCap: (price?.marketCap ?? profile?.marketCap)
+            ? (price?.marketCap ?? profile?.marketCap ?? 0) * 10000000
+            : null,
           exchange: profile?.exchange ?? "NSE",
           companyName: profile?.companyName ?? sym,
           sector: profile?.sector ?? stockstoryData?.sector ?? null,

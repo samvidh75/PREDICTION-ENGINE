@@ -221,13 +221,15 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
   const isIT = sectorLower.includes("it") || sectorLower.includes("technology");
   const isBank = sectorLower.includes("bank");
 
-  const companyDescription = !sector
-    ? `Company profile details are being compiled for ${data?.price.companyName ?? symbol}.`
-    : isIT
-      ? `${data?.price.companyName ?? symbol} is an IT services company providing software development, consulting, and business process outsourcing to global clients.`
-      : isBank
-        ? `${data?.price.companyName ?? symbol} is a banking institution offering retail banking, corporate banking, treasury, and wealth management services.`
-        : `${data?.price.companyName ?? symbol} operates in the Indian market with a diversified business model and established market presence.`;
+  const companyDescription = data?.price?.description
+    ? data.price.description
+    : !sector
+      ? `Company profile details are being compiled for ${data?.price.companyName ?? symbol}.`
+      : isIT
+        ? `${data?.price.companyName ?? symbol} is an IT services company providing software development, consulting, and business process outsourcing to global clients.`
+        : isBank
+          ? `${data?.price.companyName ?? symbol} is a banking institution offering retail banking, corporate banking, treasury, and wealth management services.`
+          : `${data?.price.companyName ?? symbol} operates in the Indian market with a diversified business model and established market presence.`;
 
   const hasHealth = data?.health?.score !== null && data?.health?.classification !== null;
   const healthItem = hasHealth ? [
