@@ -22,9 +22,9 @@ export const fNumber = (v: number | null): string =>
 
 export const fMarketCap = (v: number | null): string => {
   if (v === null) return '—'
-  if (v >= 1e12) return `₹${(v / 1e12).toFixed(1)}L Cr`
-  if (v >= 1e9) return `₹${(v / 1e9).toFixed(0)} Cr`
-  return `₹${(v / 1e7).toFixed(0)} Cr`
+  if (v >= 100_000) return `₹${(v / 100_000).toFixed(1)}L Cr`
+  if (v >= 1_000) return `₹${(v / 1_000).toFixed(1)}K Cr`
+  return `₹${v.toFixed(0)} Cr`
 }
 
 export const fScore = (v: number | null): string =>

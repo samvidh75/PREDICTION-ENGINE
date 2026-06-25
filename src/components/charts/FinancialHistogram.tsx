@@ -9,14 +9,35 @@ interface AnnualEntry {
 }
 
 function formatValue(value: number): string {
-  if (value >= 1e7) return `₹${(value / 1e7).toFixed(1)}Cr`;
-  if (value >= 1e5) return `₹${(value / 1e5).toFixed(1)}L`;
-  return `₹${value.toLocaleString("en-IN")}`;
+  if (value >= 1e7) return `\u20B9${(value / 1e7).toFixed(1)}Cr`;
+  if (value >= 1e5) return `\u20B9${(value / 1e5).toFixed(1)}L`;
+  return `\u20B9${value.toLocaleString("en-IN")}`;
+}
+
+function ChartTooltip({ active, payload, label, tabLabel }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: "var(--surface)", border: "1px solid var(--border)",
+      borderRadius: "var(--r-lg)", padding: "12px 16px",
+      boxShadow: "var(--sh-float)", fontFamily: "var(--font)", minWidth: 160,
+    }}>
+      <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", fontWeight: 600, marginBottom: 4 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-900)", letterSpacing: "-0.02em" }}>
+        {formatValue(payload[0].value)}
+      </div>
+      <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", marginTop: 2 }}>
+        {tabLabel}
+      </div>
+    </div>
+  );
 }
 
 export default function FinancialHistogram({
   data,
-  height = 220,
+  height = 240,
 }: {
   data?: AnnualEntry[] | null;
   height?: number;
@@ -31,12 +52,14 @@ export default function FinancialHistogram({
   const tabs: { key: TabKey; label: string; visible: boolean }[] = [
     { key: "revenue", label: "Revenue", visible: hasAnyRevenue },
     { key: "pat", label: "PAT", visible: hasAnyPat },
-    { key: "op", label: "Operating Profit", visible: hasAnyOp },
+    { key: "op", label: "EBITDA", visible: hasAnyOp },
   ];
   const visibleTabs = tabs.filter(t => t.visible);
   const [activeTab, setActiveTab] = useState<TabKey>(
     visibleTabs.length > 0 ? visibleTabs[0].key : "revenue"
   );
+
+  const tabLabel = activeTab === "revenue" ? "Revenue" : activeTab === "pat" ? "PAT" : "EBITDA";
 
   const chartData = useMemo(() => {
     return entries.map(e => ({
@@ -60,11 +83,12 @@ export default function FinancialHistogram({
                 padding: "0 14px",
                 borderRadius: 20,
                 border: activeTab === key ? "none" : "1px solid var(--border)",
-                background: activeTab === key ? "var(--action)" : "#FFFFFF",
-                color: activeTab === key ? "#FFFFFF" : "var(--text-secondary)",
+                background: activeTab === key ? "var(--brand)" : "#FFFFFF",
+                color: activeTab === key ? "#FFFFFF" : "var(--text-500)",
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
+                fontFamily: "var(--font)",
                 transition: "all 0.15s ease",
               }}
             >
@@ -82,7 +106,7 @@ export default function FinancialHistogram({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            color: "#9CA3AF",
+            color: "var(--text-300)",
             fontSize: 13,
             gap: 4,
           }}
@@ -95,37 +119,29 @@ export default function FinancialHistogram({
             <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <XAxis
                 dataKey="year"
-                tick={{ fontSize: 11, fill: "#6B7280", fontWeight: 600 }}
+                tick={{ fontSize: 11, fill: "#6B7280", fontWeight: 600, fontFamily: "var(--font)" }}
                 tickLine={false}
                 axisLine={{ stroke: "#E5E7EB" }}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                tick={{ fontSize: 10, fill: "#9CA3AF", fontFamily: "var(--font)" }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v: number) => formatValue(v)}
-                width={64}
+                width={72}
               />
-              <Tooltip
-                contentStyle={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 8,
-                  color: "#111827",
-                  fontSize: 12,
-                  padding: "8px 14px",
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.06)",
-                }}
-                formatter={(value: any) => {
-                  const label = activeTab === "revenue" ? "Revenue" : activeTab === "pat" ? "PAT" : "Operating Profit";
-                  return [`${formatValue(value)}`, label];
-                }}
-                labelStyle={{ color: "#6B7280", fontSize: 11 }}
-              />
+              <Tooltip content={<ChartTooltip tabLabel={tabLabel} />} />
               <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                {chartData.map((_entry, i) => (
-                  <Cell key={i} fill="#2962FF" style={{ transition: "fill 0.3s ease" }} />
-                ))}
+                {chartData.map((_entry, i) => {
+                  const isCurrentFy = _entry.year.includes("26") || _entry.year === "FY2026";
+                  return (
+                    <Cell
+                      key={i}
+                      fill={isCurrentFy ? "#1A56DB" : "#2563EB"}
+                      fillOpacity={isCurrentFy ? 0.7 : 1}
+                    />
+                  );
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
