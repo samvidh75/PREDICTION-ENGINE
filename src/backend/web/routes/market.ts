@@ -2,6 +2,17 @@ import type { FastifyPluginAsync } from "fastify";
 import { indianApiService } from "../../integrations/indianapi/IndianApiService";
 import { unifiedMarketDataService } from "../../integrations/market/UnifiedMarketDataService";
 
+function safeNum(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const cleaned = v.replace(/[₹,CrL%,\s]/g, "");
+    const n = Number(cleaned);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
 const marketRoutes: FastifyPluginAsync = async (app) => {
   app.get("/api/market/stock/:symbol/summary", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
@@ -81,17 +92,21 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      const [priceResult, profileResult, fundaResult, ssResult] = await Promise.all([
+      const [priceResult, profileResult, fundaResult, ssResult, indiaRawResult] = await Promise.all([
         indianApiService.getPrice(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getProfile(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getFundamentals(sym).catch(() => ({ ok: false, data: null } as any)),
         fetch(`${process.env.RAILWAY_URL || "https://prediction-engine-production-f7a8.up.railway.app"}/api/stockstory/${sym}`)
           .then(r => r.ok ? r.json() : null).catch(() => null) as any,
+        fetch(`https://stock.indianapi.in/stock?name=${encodeURIComponent(sym)}`, {
+          headers: { "X-API-KEY": process.env.INDIANAPI_KEY || "" },
+        }).then(r => r.ok ? r.json() : null).catch(() => null) as any,
       ]);
       const price = priceResult?.data ?? null;
       const profile = profileResult?.data ?? null;
       const fundamentals = fundaResult?.data ?? null;
       const stockstoryData = ssResult?.data ?? null;
+      const indiaRaw = indiaRawResult ?? null;
 
       const hasAnyData = price || profile || fundamentals || stockstoryData;
       const dataCompleteness = stockstoryData ? 0.6 : (hasAnyData ? 0.3 : 0.0);
@@ -139,6 +154,27 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           confidence: stockstoryData.confidence ?? null,
           sector: stockstoryData.sector ?? null,
         } : null,
+        annualFinancials: (() => {
+          const raw = indiaRaw?.financials ?? [];
+          if (!Array.isArray(raw) || raw.length === 0) return [];
+          const entries: Array<{ fiscalYear: string; revenue: number | null; pat: number | null; operatingProfit: number | null }> = [];
+          for (const entry of raw) {
+            if (entry.Type !== "Annual") continue;
+            const fy = entry.FiscalYear;
+            if (!fy) continue;
+            const inc = entry.stockFinancialMap?.INC ?? [];
+            const revenue = inc.find((i: any) => /^revenue$/i.test(i.key || "") || /^(total\s+)?revenue$/i.test((i.displayName||"").trim()));
+            const netIncome = inc.find((i: any) => /^net\s*income$/i.test(i.key || "") || /^net\s*income$/i.test((i.displayName||"").trim()));
+            const opIncome = inc.find((i: any) => /^operating\s*income$/i.test(i.key || "") || /^operating\s*income$/i.test((i.displayName||"").trim()));
+            entries.push({
+              fiscalYear: `FY${fy}`,
+              revenue: revenue ? safeNum(revenue.value) : null,
+              pat: netIncome ? safeNum(netIncome.value) : null,
+              operatingProfit: opIncome ? safeNum(opIncome.value) : null,
+            });
+          }
+          return entries.sort((a: any, b: any) => a.fiscalYear.localeCompare(b.fiscalYear));
+        })(),
         historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
         dataCompleteness,
         fetchedAt: new Date().toISOString(),
