@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Download, Search } from "lucide-react"
+import { Download, Search, BarChart3 } from "lucide-react"
 import TopNav from "../components/layout/TopNav"
 import MarketTicker from "../components/layout/MarketTicker"
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
@@ -189,14 +189,14 @@ export default function ScannerPage() {
           <div>
             <h1
               style={{
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: 800,
                 letterSpacing: "-0.5px",
                 margin: 0,
                 color: "var(--text-primary)",
               }}
             >
-              AI Stock Scanner
+              AI Research Scanner
             </h1>
             <p
               style={{
@@ -205,7 +205,7 @@ export default function ScannerPage() {
                 margin: "4px 0 0",
               }}
             >
-              Nifty 50 &middot; Ranked by conviction score
+              Stocks screened across Quality, Valuation, Growth, Risk &amp; Momentum
             </p>
           </div>
           <div className="hidden md:flex" style={{ gap: 8 }}>
@@ -280,7 +280,7 @@ export default function ScannerPage() {
                     ? "none"
                     : "1px solid var(--border)",
                 background:
-                  activePreset === preset ? "var(--action)" : "var(--surface)",
+                  activePreset === preset ? "var(--brand)" : "var(--bg-chip)",
                 color:
                   activePreset === preset
                     ? "#FFFFFF"
