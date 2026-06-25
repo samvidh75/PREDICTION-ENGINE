@@ -11,6 +11,7 @@ import { fPrice } from "../lib/format";
 import { getTrackedCompanies, addTrackedCompany, removeTrackedCompany, isTracked } from "../lib/track/trackStore";
 import { SebiDisclaimer } from "../components/compliance/SebiDisclaimer";
 import { ClassificationBadge } from "../components/ui/ClassificationBadge";
+import ProUpgradeModal from "../components/ProUpgradeModal";
 
 const S = {
   bg: "var(--bg-page)",
@@ -65,6 +66,7 @@ export default function WatchlistPage() {
   const [loading, setLoading] = useState<Set<string>>(new Set());
   const [investSheet, setInvestSheet] = useState<{ symbol: string; companyName?: string } | null>(null);
   const [brokerSheet, setBrokerSheet] = useState<{ symbol: string } | null>(null);
+  const [proOpen, setProOpen] = useState(false);
 
   const refresh = useCallback(() => setTracked(getTrackedCompanies()), []);
 
@@ -386,8 +388,18 @@ export default function WatchlistPage() {
         symbol={brokerSheet?.symbol}
       />
 
+      <div style={{ textAlign: "center", padding: "8px 0" }}>
+        <button onClick={() => setProOpen(true)} style={{
+          background: "none", border: "none", color: "var(--brand)", fontSize: 13,
+          fontWeight: 600, cursor: "pointer",
+        }}>
+          Pro: Thesis alerts when a tracked stock changes conviction →
+        </button>
+      </div>
+
       <MobileProductNav activePage="watchlist" />
       <SebiDisclaimer />
+      <ProUpgradeModal open={proOpen} onClose={() => setProOpen(false)} location="watchlist" />
     </PremiumAppShell>
   );
 }
