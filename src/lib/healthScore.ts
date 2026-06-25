@@ -263,10 +263,10 @@ export function computeHealthScore(input: HealthInput): HealthResult {
 
   const composite: HealthResult['composite'] =
     compositeScore === null ? null :
-    compositeScore >= 80 ? 'very_healthy' :
-    compositeScore >= 65 ? 'healthy' :
-    compositeScore >= 50 ? 'average' :
-    compositeScore >= 35 ? 'weakening' :
+    compositeScore >= 90 ? 'very_healthy' :
+    compositeScore >= 75 ? 'healthy' :
+    compositeScore >= 60 ? 'average' :
+    compositeScore >= 40 ? 'weakening' :
     'poor'
 
   return {
@@ -287,11 +287,11 @@ export function computeHealthScore(input: HealthInput): HealthResult {
  */
 export function getHealthLabel(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return 'Very Healthy'
-    case 'healthy': return 'Healthy'
-    case 'average': return 'Stable'
-    case 'weakening': return 'Weakening'
-    case 'poor': return 'Unhealthy'
+    case 'very_healthy': return 'Exceptional'
+    case 'healthy': return 'Very Healthy'
+    case 'average': return 'Healthy'
+    case 'weakening': return 'Needs Review'
+    case 'poor': return 'Weak'
     default: return '—'
   }
 }
@@ -303,9 +303,9 @@ export function getHealthColor(composite: HealthResult['composite']): string {
   switch (composite) {
     case 'very_healthy': return '#16A34A'
     case 'healthy': return '#22C55E'
-    case 'average': return '#2962FF'
+    case 'average': return '#2563EB'
     case 'weakening': return '#F59E0B'
-    case 'poor': return '#EF4444'
+    case 'poor': return '#DC2626'
     default: return '#9CA3AF'
   }
 }
