@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState, type ReactNode } from "react";
+import Logo from "../brand/Logo";
 import { useAuth } from "../../context/AuthContext";
 
 function useIsMobile() {
@@ -7,179 +7,158 @@ function useIsMobile() {
   useEffect(() => {
     const check = () => setMobile(window.innerWidth < 768);
     check();
-    window.addEventListener("resize", check);
+    const r = window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
   return mobile;
 }
 
+function currentPage(): string {
+  const path = window.location.pathname.replace(/^\//, "").split("/")[0];
+  return path || "home";
+}
+
 const NAV_ITEMS = [
-  { path: '/',          label: 'Home',     icon: '⌂' },
-  { path: '/scanner',   label: 'Scanner',  icon: '⚡' },
-  { path: '/watchlist', label: 'Watchlist',icon: '♡' },
-  { path: '/compare',   label: 'Compare',  icon: '⊕' },
+  { href: "/",          label: "Home",     icon: "\u2302" },
+  { href: "/scanner",   label: "Scanner",  icon: "\u2695" },
+  { href: "/watchlist", label: "Watchlist", icon: "\u2661" },
+  { href: "/compare",   label: "Compare",  icon: "\u2295" },
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
-  const location = useLocation();
   const { user, logout } = useAuth();
+  const [current, setCurrent] = useState(currentPage());
 
-  const activePath = location.pathname;
+  useEffect(() => {
+    const sync = () => setCurrent(currentPage());
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, []);
+
+  const active = current;
+
+  const sidebarNavLink = (href: string, label: string, icon: string) => {
+    const isActive = (href === "/" ? active === "home" : active === href.replace("/", "")) || 
+                     (href !== "/" && active.startsWith(href.replace("/", "")));
+    return (
+      <a
+        key={href}
+        href={href}
+        style={{
+          display: "flex", alignItems: "center", gap: 10, width: "100%",
+          padding: "10px 20px",
+          fontSize: 14, fontWeight: isActive ? 600 : 500,
+          color: isActive ? "var(--brand)" : "var(--text-500)",
+          borderLeft: isActive ? "3px solid var(--brand)" : "3px solid transparent",
+          background: isActive ? "var(--brand-tint)" : "transparent",
+          textDecoration: "none", lineHeight: 1,
+          transition: "all var(--t-instant)",
+        }}
+      >
+        <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{icon}</span>
+        {label}
+      </a>
+    );
+  };
+
+  const bottomNavLink = (href: string, label: string, icon: string) => {
+    const isActive = (href === "/" ? active === "home" : active === href.replace("/", ""));
+    return (
+      <a
+        key={href}
+        href={href}
+        style={{
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 2, height: 44, minWidth: 48,
+          color: isActive ? "var(--brand)" : "var(--text-300)",
+          textDecoration: "none", fontSize: 10, fontWeight: 600,
+        }}
+      >
+        <span style={{ fontSize: 20 }}>{icon}</span>
+        <span>{label}</span>
+      </a>
+    );
+  };
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--page)', paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
-        <div style={{
-          position: 'sticky', top: 0,
-          background: 'rgba(248, 248, 246, 0.92)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid var(--border)',
-          height: 52,
-          display: 'flex', alignItems: 'center',
-          padding: '0 16px',
-          zIndex: 90,
-        }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <img src="/logo-mark.svg" alt="" style={{ width:24, height:24 }} />
-            <div style={{ fontSize:14, fontWeight:800, color:'var(--text-900)', letterSpacing:'-0.02em' }}>
-              StockStory
-            </div>
-          </div>
-        </div>
-
-        <div style={{ padding: '16px 16px 0' }}>
+      <div style={{ minHeight: "100vh", background: "var(--page)", paddingBottom: "76px" }}>
+        <div style={{ padding: "16px 16px 0" }}>
           {children}
         </div>
-
         <nav style={{
-          position:'fixed', bottom:0, left:0, right:0, zIndex:200,
-          height:60, background:'var(--surface)',
-          borderTop:'1px solid var(--border)',
-          display:'flex', alignItems:'stretch',
-          paddingBottom:'env(safe-area-inset-bottom)',
+          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+          height: 60, background: "var(--surface)",
+          borderTop: "1px solid var(--border)",
+          display: "flex", alignItems: "stretch",
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}>
-          {NAV_ITEMS.map(item => {
-            const isActive = activePath === item.path || (item.path !== '/' && activePath.startsWith(item.path));
-            return (
-              <Link key={item.path} to={item.path} style={{
-                flex:1, display:'flex', flexDirection:'column', alignItems:'center',
-                justifyContent:'center', gap:2,
-                color: isActive ? 'var(--brand)' : 'var(--text-300)',
-                textDecoration:'none', fontSize:10, fontWeight:600,
-              }}>
-                <span style={{ fontSize:20 }}>{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
+          {NAV_ITEMS.map(item => bottomNavLink(item.href, item.label, item.icon))}
         </nav>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page)' }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--page)" }}>
       <aside style={{
-        width: 220, flexShrink: 0, background: 'var(--surface)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex', flexDirection: 'column', height: '100vh',
-        position: 'fixed', top: 0, left: 0,
+        width: 220, flexShrink: 0, background: "var(--surface)",
+        borderRight: "1px solid var(--border)",
+        display: "flex", flexDirection: "column", height: "100vh",
+        position: "sticky", top: 0, zIndex: 100,
       }}>
-        {/* Logo */}
-        <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10, padding:'4px 0' }}>
-            <img src="/logo-mark.svg" alt="StockStory" style={{ width:32, height:32, flexShrink:0 }} />
-            <div>
-              <div style={{
-                fontSize:15, fontWeight:800, color:'var(--text-900)',
-                letterSpacing:'-0.02em', lineHeight:1.1
-              }}>
-                StockStory
-              </div>
-              <div style={{
-                fontSize:10, fontWeight:600, color:'var(--text-300)',
-                letterSpacing:'0.08em', textTransform:'uppercase', lineHeight:1
-              }}>
-                India · Research
-              </div>
-            </div>
-          </div>
+        <div style={{ padding: "20px 12px" }}>
+          <Logo />
         </div>
 
-        {/* Nav links */}
-        <nav style={{ flex: 1, padding: '8px 0' }}>
-          {NAV_ITEMS.map(item => {
-            const isActive = activePath === item.path || (item.path !== '/' && activePath.startsWith(item.path));
-            return (
-              <Link key={item.path} to={item.path} style={{
-                display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                padding: '10px 20px',
-                cursor: 'pointer', fontSize: 14, fontWeight: isActive ? 600 : 500,
-                color: isActive ? 'var(--brand)' : 'var(--text-500)',
-                borderLeft: isActive ? '3px solid var(--brand)' : '3px solid transparent',
-                background: isActive ? 'var(--brand-tint)' : 'transparent',
-                textDecoration: 'none',
-              }}>
-                <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
+        <nav style={{ flex: 1, padding: "8px 0" }}>
+          {NAV_ITEMS.map(item => sidebarNavLink(item.href, item.label, item.icon))}
         </nav>
 
-        {/* Auth area + Footer */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)' }}>
+        <div style={{ padding: "12px", borderTop: "1px solid var(--border)" }}>
           {user ? (
-            <div style={{ marginBottom:12 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                 <div style={{
-                  width:30, height:30, borderRadius:'50%',
-                  background:'var(--brand-tint)', display:'flex', alignItems:'center',
-                  justifyContent:'center', fontSize:12, fontWeight:700, color:'var(--brand-text)'
+                  width: 30, height: 30, borderRadius: "50%",
+                  background: "var(--brand-tint)", display: "flex", alignItems: "center",
+                  justifyContent: "center", fontSize: 12, fontWeight: 700, color: "var(--brand)",
                 }}>
-                  {(user.displayName || user.email || '?').slice(0,2).toUpperCase()}
+                  {user.displayName?.slice(0, 2).toUpperCase() || user.email?.slice(0, 2).toUpperCase() || "S"}
                 </div>
                 <div>
-                  <div style={{ fontSize:13, fontWeight:600, color:'var(--text-900)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-900)" }}>
                     {user.displayName || user.email}
-                  </div>
-                  <div style={{ fontSize:11, color:'var(--text-300)' }}>
-                    {(user as any).isPro ? '⭐ Pro' : 'Free'}
                   </div>
                 </div>
               </div>
               <button onClick={logout} style={{
-                fontSize:12, color:'var(--text-300)',
-                background:'none', border:'none', cursor:'pointer', padding:0, fontFamily:'var(--font)',
+                fontSize: 12, color: "var(--text-300)",
+                background: "none", border: "none", cursor: "pointer", padding: 0,
               }}>
                 Sign out
               </button>
             </div>
           ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:12 }}>
-              <Link to="/login" style={{ fontSize:13, fontWeight:600, color:'var(--brand-text)' }}>
-                Sign in →
-              </Link>
-              <Link to="/register" style={{ fontSize:12, color:'var(--text-500)' }}>
-                Create account
-              </Link>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <a href="/login" style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)" }}>Sign in \u2192</a>
+              <a href="/register" style={{ fontSize: 12, color: "var(--text-500)" }}>Create account</a>
             </div>
           )}
-          <div style={{
-            fontSize:10, color:'var(--text-300)', lineHeight:1.5,
-            borderTop:'1px solid var(--border)', paddingTop:12, marginTop:4
-          }}>
-            Not SEBI-registered<br/>
-            Not investment advice<br/>
-            © 2025 StockStory India
-          </div>
+        </div>
+
+        <div style={{
+          fontSize: 10, color: "var(--text-300)", lineHeight: 1.5,
+          padding: "12px", textAlign: "center",
+        }}>
+          Not SEBI-registered<br />
+          Not investment advice<br />
+          \u00A9 2025 StockStory India
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="content-area" style={{ marginLeft: 220, padding: 'var(--sp-8) var(--sp-10)', minHeight: '100vh', background: 'var(--page)', flex:1 }}>
+      <main style={{ flex: 1, minWidth: 0, padding: "32px 40px", background: "var(--page)" }}>
         {children}
       </main>
     </div>

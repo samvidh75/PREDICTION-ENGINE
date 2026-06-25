@@ -23,7 +23,7 @@ export const fNumber = (v: number | null): string =>
 export const fMarketCap = (v: number | null): string => {
   if (v === null) return '—'
   if (v >= 100_000) return `₹${(v / 100_000).toFixed(1)}L Cr`
-  if (v >= 1_000)   return `₹${(v / 1_000).toFixed(1)}K Cr`
+  if (v >= 1_000) return `₹${(v / 1_000).toFixed(1)}K Cr`
   return `₹${v.toFixed(0)} Cr`
 }
 

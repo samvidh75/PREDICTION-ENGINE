@@ -129,6 +129,8 @@
     "predictions:outcomes": "tsx scripts/outcomes/materialize-prediction-outcomes.ts",
     "predictions:calibrate": "tsx scripts/validate-prediction-calibration.ts",
     "data:hydrate": "tsx scripts/hydrate-production-data.ts",
+    "ingest:screener": "tsx scripts/ingest-screener.ts",
+    "ingest:screener": "tsx scripts/ingest-screener.ts",
     "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
     "backtest:unified-engine": "tsx scripts/backtest-unified-engine.ts",
     "validate:unified-ranking": "tsx scripts/validate-unified-ranking.ts",
