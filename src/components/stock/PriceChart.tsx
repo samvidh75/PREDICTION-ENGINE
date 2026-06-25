@@ -79,7 +79,7 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
               background: r === range ? "var(--text-900)" : "transparent",
               color: r === range ? "var(--text-inverse)" : "var(--text-500)",
               border: r === range ? "none" : "1px solid var(--border)",
-              transition: "all var(--t-instant)", fontFamily: "var(--font)",
+              transition: "all var(--t-fast)", fontFamily: "var(--font)",
             }}
           >
             {r}
@@ -91,8 +91,8 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
         <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isPositive ? "#16A34A" : "#DC2626"} stopOpacity={0.13} />
-              <stop offset="100%" stopColor={isPositive ? "#16A34A" : "#DC2626"} stopOpacity={0} />
+              <stop offset="0%" stopColor={isPositive ? "#1A7F4B" : "#C0392B"} stopOpacity={0.13} />
+              <stop offset="100%" stopColor={isPositive ? "#1A7F4B" : "#C0392B"} stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis

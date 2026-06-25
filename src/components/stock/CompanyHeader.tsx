@@ -54,18 +54,18 @@ export default function CompanyHeader({
 
         <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
           <button style={{
-            height: 36, padding: "0 14px", borderRadius: "var(--r-md)",
+            height: 40, padding: "0 16px", borderRadius: "var(--r-md)",
             background: "var(--surface)", color: "var(--text-500)",
-            border: "1px solid var(--border)", fontSize: "var(--sz-sm)",
+            border: "1px solid var(--border)", fontSize: 14,
             fontWeight: 600, cursor: "pointer", fontFamily: "var(--font)",
             display: "flex", alignItems: "center", gap: 5,
           }}>
             \u2661 Track
           </button>
           <a href={`/compare?stocks=${symbol}`} style={{
-            height: 36, padding: "0 14px", borderRadius: "var(--r-md)",
+            height: 40, padding: "0 16px", borderRadius: "var(--r-md)",
             background: "var(--surface)", color: "var(--text-500)",
-            border: "1px solid var(--border)", fontSize: "var(--sz-sm)",
+            border: "1px solid var(--border)", fontSize: 14,
             fontWeight: 600, display: "flex", alignItems: "center", gap: 5,
             textDecoration: "none", lineHeight: 1,
           }}>
@@ -103,9 +103,9 @@ export default function CompanyHeader({
         </div>
 
         <button onClick={() => {}} style={{
-          height: 44, padding: "0 22px", borderRadius: "var(--r-md)",
+          height: 44, padding: "0 24px", borderRadius: "var(--r-md)",
           background: "var(--brand)", color: "var(--text-inverse)",
-          border: "none", fontSize: "var(--sz-base)", fontWeight: 700,
+          border: "none", fontSize: 14, fontWeight: 600,
           cursor: "pointer", fontFamily: "var(--font)",
           display: "flex", alignItems: "center", gap: 6,
           whiteSpace: "nowrap",

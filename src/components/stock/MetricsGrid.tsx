@@ -112,7 +112,7 @@ function MetricTile({
           position: 'absolute', inset: 0,
           borderRadius: 'var(--r-lg)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(248,248,246,0.6)',
+          background: 'rgba(249,249,247,0.6)',
           backdropFilter: 'blur(0.5px)',
           gap: 6, flexDirection: 'column',
         }}>

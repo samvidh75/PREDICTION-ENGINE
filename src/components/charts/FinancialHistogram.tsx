@@ -119,12 +119,12 @@ export default function FinancialHistogram({
             <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <XAxis
                 dataKey="year"
-                tick={{ fontSize: 11, fill: "#6B7280", fontWeight: 600, fontFamily: "var(--font)" }}
+                tick={{ fontSize: 11, fill: "var(--text-500)", fontWeight: 600, fontFamily: "var(--font)" }}
                 tickLine={false}
-                axisLine={{ stroke: "#E5E7EB" }}
+                axisLine={{ stroke: "var(--border)" }}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#9CA3AF", fontFamily: "var(--font)" }}
+                tick={{ fontSize: 10, fill: "var(--text-300)", fontFamily: "var(--font)" }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(v: number) => formatValue(v)}
@@ -137,7 +137,7 @@ export default function FinancialHistogram({
                   return (
                     <Cell
                       key={i}
-                      fill={isCurrentFy ? "#1A56DB" : "#2563EB"}
+                      fill="var(--brand)"
                       fillOpacity={isCurrentFy ? 0.7 : 1}
                     />
                   );

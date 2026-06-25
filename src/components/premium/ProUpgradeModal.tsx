@@ -67,7 +67,7 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
             background: "var(--page)", border: "none",
             borderRadius: "50%", width: 32, height: 32,
             display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", fontSize: 16, color: "var(--text-400)",
+            cursor: "pointer", fontSize: 16, color: "var(--text-300)",
             fontFamily: "var(--font)",
           }}
           aria-label="Close"
@@ -88,7 +88,7 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-900)", margin: "0 0 6px", letterSpacing: "-0.03em" }}>
             {submitted ? "You're on the list" : "Upgrade to Pro"}
           </h2>
-          <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-400)", margin: 0, lineHeight: 1.6 }}>
+          <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-500)", margin: 0, lineHeight: 1.6 }}>
             {submitted
               ? "We'll email you as soon as Pro is ready."
               : "The research edge every serious Indian investor needs."}
@@ -116,7 +116,7 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
                   <span style={{ color: "var(--green)", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>&#10003;</span>
                   <div>
                     <div style={{ fontSize: "var(--sz-sm)", fontWeight: 600, color: "var(--text-900)" }}>{f.title}</div>
-                    <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-400)", marginTop: 1 }}>{f.desc}</div>
+                    <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-500)", marginTop: 1 }}>{f.desc}</div>
                   </div>
                 </div>
               ))}
@@ -124,9 +124,9 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
 
             <div style={{ textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 30, fontWeight: 800, color: "var(--text-900)", letterSpacing: "-0.02em" }}>
-                &#x20B9;299<span style={{ fontSize: 15, fontWeight: 500, color: "var(--text-400)" }}> / month</span>
+                &#x20B9;299<span style={{ fontSize: 15, fontWeight: 500, color: "var(--text-500)" }}> / month</span>
               </div>
-              <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-400)", marginTop: 4 }}>
+              <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-500)", marginTop: 4 }}>
                 &#x20B9;2,499 / year (save 30%)
               </div>
             </div>
@@ -134,11 +134,11 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
             <button
               onClick={() => onClose()}
               style={{
-                width: "100%", height: 48,
-                background: "var(--text-900)", color: "var(--text-inverse)",
-                border: "none", borderRadius: "var(--r-lg)",
-                fontSize: "var(--sz-sm)", fontWeight: 600, cursor: "pointer",
-                marginBottom: 16,
+                width: "100%", height: 44,
+                background: "var(--brand)", color: "var(--text-inverse)",
+                border: "none", borderRadius: "var(--r-md)",
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+                fontFamily: "var(--font)", marginBottom: 16,
               }}
             >
               Get Pro &#x2014; &#x20B9;299/mo
@@ -151,7 +151,7 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
             </div>
 
             <div>
-              <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-400)", textAlign: "center", marginBottom: 8 }}>
+              <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-500)", textAlign: "center", marginBottom: 8 }}>
                 Join the waitlist for founding member pricing
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -161,23 +161,23 @@ export default function ProUpgradeModal({ open, onClose, symbol, source = "stock
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleNotify()}
                   style={{
-                    flex: 1, padding: "10px 14px",
-                    border: "1px solid var(--border)", borderRadius: "var(--r-lg)",
-                    fontSize: "var(--sz-sm)", fontFamily: "var(--font)",
-                    outline: "none", background: "var(--page)", color: "var(--text-900)",
+                    flex: 1, height: 44, padding: "0 14px",
+                    border: "1px solid var(--border)", borderRadius: "var(--r-md)",
+                    fontSize: 15, fontFamily: "var(--font)",
+                    outline: "none", background: "var(--surface)", color: "var(--text-900)",
                   }}
                 />
                 <button
                   onClick={handleNotify}
                   disabled={loading || !email.includes("@")}
                   style={{
-                    padding: "10px 20px",
-                    background: loading || !email.includes("@") ? "var(--text-200)" : "var(--text-900)",
-                    color: loading || !email.includes("@") ? "var(--text-400)" : "var(--text-inverse)",
-                    border: "none", borderRadius: "var(--r-lg)",
-                    fontSize: "var(--sz-sm)", fontWeight: 600,
+                    height: 44, padding: "0 20px",
+                    background: loading || !email.includes("@") ? "var(--text-300)" : "var(--text-900)",
+                    color: "var(--text-inverse)",
+                    border: "none", borderRadius: "var(--r-md)",
+                    fontSize: 14, fontWeight: 600,
                     cursor: loading || !email.includes("@") ? "default" : "pointer",
-                    fontFamily: "var(--font)",
+                    fontFamily: "var(--font)", opacity: loading || !email.includes("@") ? 0.5 : 1,
                   }}
                 >
                   {loading ? "Sending\u2026" : "Notify me"}
