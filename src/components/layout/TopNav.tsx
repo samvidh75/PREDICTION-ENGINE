@@ -5,8 +5,7 @@ const NAV_LINKS = [
   { label: "Scanner", href: "/?page=scanner" },
   { label: "Compare", href: "/?page=compare" },
   { label: "Watchlist", href: "/?page=watchlist" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Learn", href: "/learn", dropdown: true },
+  { label: "Methodology", href: "/?page=methodology" },
 ];
 
 function isCurrentPage(href: string): boolean {
@@ -96,7 +95,19 @@ export default function TopNav() {
 
       {menuOpen ? (
         <div className="fixed bottom-0 left-0 right-0 top-[56px] z-[49] flex flex-col overflow-y-auto border-t border-[#e8e8e8] bg-white px-6 py-4 md:hidden">
-          {NAV_LINKS.map((link) => (
+          <div className="text-[11px] font-[600] tracking-[0.08em] text-[#999] uppercase px-1 py-2">
+            Navigation
+          </div>
+          {[
+            { label: "Home", href: "/" },
+            { label: "Scanner", href: "/?page=scanner" },
+            { label: "Search", href: "/?page=search" },
+            { label: "Compare", href: "/?page=compare" },
+            { label: "Watchlist", href: "/?page=watchlist" },
+            { label: "Portfolio", href: "/?page=portfolio" },
+            { label: "Alerts", href: "/?page=alerts" },
+            { label: "Methodology", href: "/?page=methodology" },
+          ].map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -106,10 +117,6 @@ export default function TopNav() {
               {link.label}
             </a>
           ))}
-          <div className="mt-5 flex flex-col gap-2.5">
-            <button className="h-12 rounded-[10px] border-0 bg-[#0a0a0a] text-[16px] font-[600] text-white">Start Free Trial ↗</button>
-            <button className="h-12 rounded-[10px] border border-[#e8e8e8] bg-white text-[16px] font-[500] text-[#2d2d2d]">Sign in</button>
-          </div>
         </div>
       ) : null}
     </>

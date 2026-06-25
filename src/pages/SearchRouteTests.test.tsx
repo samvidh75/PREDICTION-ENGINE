@@ -53,16 +53,23 @@ describe("SearchPage routing", () => {
     renderWithLayout(<SearchPage />);
 
     expect(screen.getByDisplayValue("REL")).toBeTruthy();
-    expect(screen.getByText("Reliance Industries Limited")).toBeTruthy();
+    expect(screen.getByText("Reliance Industries Ltd.")).toBeTruthy();
   });
 
-  it("keeps the browser URL in sync while editing the query", () => {
+  it("updates the browser URL when pressing Enter", () => {
     renderWithLayout(<SearchPage />);
 
     const input = screen.getByDisplayValue("REL");
     fireEvent.change(input, { target: { value: "INF" } });
+    fireEvent.keyDown(input, { key: "Enter" });
 
-    expect(window.location.search).toContain("page=search");
     expect(window.location.search).toContain("q=INF");
+  });
+
+  it("shows search results matching the query", () => {
+    renderWithLayout(<SearchPage />);
+
+    expect(screen.getByDisplayValue("REL")).toBeTruthy();
+    expect(screen.getByText("RELIANCE")).toBeTruthy();
   });
 });

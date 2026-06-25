@@ -1,36 +1,14 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Search, TrendingUp, Bookmark, Eye, BarChart3, Award, GitCompare } from "lucide-react"
 import TopNav from "../components/layout/TopNav"
 import MarketTicker from "../components/layout/MarketTicker"
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
-import { useStockData } from "../hooks/useStockData"
-import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine"
-import ScoreRing from "../components/ui/ScoreRing"
-import { fChange, fPrice } from "../lib/format"
 import { navigate } from "../components/product/routeConfig"
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("")
 
-  const { data, loading } = useStockData("HDFCBANK")
-  const prediction = useMemo(
-    () =>
-      data
-        ? UnifiedPredictionEngine.predict({
-            peRatio: data.fundamentals.peRatio,
-            pbRatio: data.fundamentals.pbRatio,
-            roe: data.fundamentals.roe,
-            roce: data.fundamentals.roce,
-            debtToEquity: data.fundamentals.debtToEquity,
-            currentRatio: data.fundamentals.currentRatio,
-            revenueGrowth: data.fundamentals.revenueGrowth,
-            profitGrowth: data.fundamentals.profitGrowth,
-            dividendYield: data.fundamentals.dividendYield,
-            closes: data.historical.closes,
-          })
-        : null,
-    [data]
-  )
+  const TOP_TRACKED = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "ITC"]
 
   const [recent] = useState<string[]>(() => {
     try {
@@ -204,7 +182,7 @@ export default function HomePage() {
           className="grid md:grid-cols-2"
           style={{ gap: 16, paddingBottom: 32 }}
         >
-          {/* Featured stock */}
+          {/* Explore companies */}
           <div
             style={{
               background: "#FFFFFF",
@@ -214,153 +192,46 @@ export default function HomePage() {
               boxShadow: "var(--shadow-sm)",
             }}
           >
-            <div
+            <h2
               style={{
+                fontSize: 14,
+                fontWeight: 700,
+                margin: 0,
+                marginBottom: 16,
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
-                marginBottom: 16,
+                gap: 8,
               }}
             >
-              <div>
-                <div
+              <TrendingUp size={16} style={{ color: "var(--text-muted)" }} />
+              Explore companies
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {TOP_TRACKED.map((symbol) => (
+                <button
+                  key={symbol}
+                  onClick={() => navigate("stock", symbol)}
                   style={{
-                    fontWeight: 700,
-                    fontSize: 16,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  HDFCBANK
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "var(--text-secondary)",
-                    marginTop: 2,
-                  }}
-                >
-                  HDFC Bank Ltd.
-                </div>
-              </div>
-              <Bookmark
-                size={18}
-                style={{
-                  marginLeft: "auto",
-                  color: "var(--text-muted)",
-                  cursor: "pointer",
-                }}
-              />
-            </div>
-            {loading ? (
-              <div
-                style={{
-                  height: 120,
-                  borderRadius: 8,
-                  background: "var(--elevated)",
-                  animation: "shimmer 2s linear infinite",
-                  backgroundImage:
-                    "linear-gradient(90deg, #FFF 0%, var(--elevated) 50%, #FFF 100%)",
-                  backgroundSize: "200% 100%",
-                }}
-              />
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <ScoreRing
-                  score={prediction?.composite ?? null}
-                  size={88}
-                  showLabel
-                />
-                <div
-                  style={{
-                    flex: 1,
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 6,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    border: "1px solid var(--border)",
+                    background: "transparent",
+                    color: "var(--text-primary)",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontWeight: 600,
                   }}
                 >
-                  {(
-                    [
-                      ["Quality", prediction?.factorScores.quality.score],
-                      ["Growth", prediction?.factorScores.growth.score],
-                      ["Valuation", prediction?.factorScores.valuation.score],
-                      ["Risk", prediction?.factorScores.stability.score],
-                      ["Momentum", prediction?.factorScores.momentum.score],
-                    ] as const
-                  ).map(([label, value]) => (
-                    <div
-                      key={label}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 64,
-                          flexShrink: 0,
-                          fontSize: 12,
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        {label}
-                      </span>
-                      <div
-                        style={{
-                          flex: 1,
-                          height: 6,
-                          borderRadius: 3,
-                          background: "var(--elevated)",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            borderRadius: 3,
-                            width: `${value ?? 0}%`,
-                            background: "var(--positive)",
-                            transition: "width 0.6s ease",
-                          }}
-                        />
-                      </div>
-                      <span
-                        style={{
-                          width: 28,
-                          textAlign: "right",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--text-primary)",
-                        }}
-                      >
-                        {value ?? "—"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <button
-              onClick={() => navigate("stock", "HDFCBANK")}
-              style={{
-                width: "100%",
-                marginTop: 16,
-                paddingTop: 12,
-                borderTop: "1px solid var(--border)",
-                textAlign: "center",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "var(--action)",
-                cursor: "pointer",
-                background: "none",
-                borderLeft: "none",
-                borderRight: "none",
-                borderBottom: "none",
-              }}
-            >
-              View Full Research &rarr;
-            </button>
+                  <span>{symbol}</span>
+                  <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
+                    View &rarr;
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Recently viewed */}
