@@ -23,6 +23,8 @@ import { fMarketCap, fPercent, fPrice, fRatio, fRelativeTime } from "../lib/form
 import BrokerModal from "../components/BrokerModal";
 import PriceChart from "../components/charts/PriceChart";
 import { Skeleton } from "../components/ui/Skeleton";
+import FinancialHistogram from "../components/charts/FinancialHistogram";
+import { SafeBlock } from "../components/ErrorBoundary";
 import { navigate } from "../components/product/routeConfig";
 
 const IT_THESIS =
@@ -726,7 +728,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 12 }}>
-                  {["1M", "3M", "1Y", "5Y"].map((name) => (
+                  {["1D", "1W", "1M", "YTD", "1Y", "5Y", "MAX"].map((name) => (
                     <button
                       key={name}
                       onClick={() => setPeriod(name)}
@@ -751,11 +753,13 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                     </button>
                   ))}
                 </div>
-                <PriceChart
-                  closes={data?.historical.closes ?? []}
-                  timestamps={data?.historical.timestamps ?? []}
-                  height={isMobile ? 140 : 180}
-                />
+                <SafeBlock>
+                  <PriceChart
+                    closes={data?.historical.closes ?? []}
+                    timestamps={data?.historical.timestamps ?? []}
+                    height={isMobile ? 140 : 180}
+                  />
+                </SafeBlock>
                 <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8, textAlign: "right" }}>
                   Daily closing prices
                 </p>
@@ -803,6 +807,26 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                     </div>
                   ))}
                 </div>
+              </div>
+            </section>
+
+            {/* Financial Histograms */}
+            <section>
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: 20,
+                  boxShadow: "var(--shadow-sm)",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+                  Financial Performance
+                </div>
+                <SafeBlock>
+                  <FinancialHistogram height={isMobile ? 200 : 220} />
+                </SafeBlock>
               </div>
             </section>
 

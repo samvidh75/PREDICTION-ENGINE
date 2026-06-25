@@ -47,29 +47,20 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="min-h-screen bg-[#0D1117] flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-[#161B22] border border-[rgba(148,163,184,0.16)] rounded-xl p-6 text-center">
-            <h2 className="text-lg font-semibold text-[#E6EDF3] mb-2">Something went wrong</h2>
-            <details className="mb-4">
-              <summary className="text-sm text-[#9AA7B5] cursor-pointer hover:text-[#E6EDF3]">Technical details</summary>
-              <p className="mt-2 text-xs text-[#888888] font-mono text-left bg-[#0D1117] rounded p-3 break-words">
-                {this.state.error.message}
-              </p>
-            </details>
+        <div className="flex items-center justify-center p-6" style={{ minHeight: 200 }}>
+          <div className="max-w-md w-full bg-white border border-[var(--border)] rounded-xl p-6 text-center">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Unable to load</h2>
+            <p className="text-sm text-[var(--text-secondary)] mb-4">
+              This section encountered a temporary issue.
+            </p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={this.handleRetry}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[#E6EDF3] bg-[#2962FF] rounded-lg hover:bg-[#1E4FC7] transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[var(--action)] rounded-lg hover:bg-[var(--action-hover)] transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
-                Try again
+                Retry
               </button>
-              <a
-                href="/?page=scanner"
-                className="text-sm text-[#9AA7B5] hover:text-[#E6EDF3] transition-colors"
-              >
-                Go to scanner
-              </a>
             </div>
           </div>
         </div>
@@ -81,3 +72,11 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 export default ErrorBoundary;
+
+export function SafeBlock({ children, fallback }: { children: ReactNode; fallback?: ReactNode }) {
+  return (
+    <ErrorBoundary fallback={fallback ?? <div style={{ height: 200, borderRadius: 12, background: '#F9FAFB', border: '1px solid var(--border)' }} />}>
+      {children}
+    </ErrorBoundary>
+  );
+}
