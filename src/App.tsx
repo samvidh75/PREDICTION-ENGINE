@@ -1,3 +1,5 @@
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./core/config/QueryClientConfig";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { LayoutProvider } from "./context/LayoutContext";
@@ -18,31 +20,33 @@ import ForgotPasswordPage from "./pages/LoginPage";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <LayoutProvider>
-        <TokenProvider tokenVars={buildTokenCssVars()}>
-          <PageErrorBoundary>
-            <BrowserRouter>
-              <AppShell>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/stock/:symbol" element={<StockPage />} />
-                  <Route path="/scanner" element={<ScannerPage />} />
-                  <Route path="/watchlist" element={<WatchlistPage />} />
-                  <Route path="/compare" element={<ComparePage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                  <Route path="/pricing" element={<PricingPage />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </AppShell>
-            </BrowserRouter>
-          </PageErrorBoundary>
-        </TokenProvider>
-      </LayoutProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <LayoutProvider>
+          <TokenProvider tokenVars={buildTokenCssVars()}>
+            <PageErrorBoundary>
+              <BrowserRouter>
+                <AppShell>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/stock/:symbol" element={<StockPage />} />
+                    <Route path="/scanner" element={<ScannerPage />} />
+                    <Route path="/watchlist" element={<WatchlistPage />} />
+                    <Route path="/compare" element={<ComparePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/pricing" element={<PricingPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                  </Routes>
+                </AppShell>
+              </BrowserRouter>
+            </PageErrorBoundary>
+          </TokenProvider>
+        </LayoutProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
