@@ -17,10 +17,38 @@ a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button { font-family: inherit; }
 
+/* Safe area insets for mobile */
+.sticky-bottom,
+.bottom-nav,
+.sticky-bottom-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Touch targets — minimum 44px on mobile */
+@media (max-width: 767px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  button, a, [role="button"], .btn-reset {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 @layer utilities {
   .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+/* Mobile-first responsive helpers */
+@media (max-width: 767px) {
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 768px) {
+  .hide-desktop { display: none !important; }
 }
 
 @keyframes modalIn {
