@@ -41,14 +41,15 @@ export default function MobileMenuPanel({ onClose }: { onClose: () => void }) {
       <div
         ref={ref}
         style={{
-          background: '#0D1117',
+          background: '#FFFFFF',
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
+          boxShadow: 'var(--shadow-lg)',
         }}
         className="relative w-full max-w-md mx-auto p-4"
       >
         <div className="flex items-center justify-between mb-4">
-          <span style={{ color: 'var(--text-primary)' }} className="text-[14px] font-[600]">Menu</span>
+          <span style={{ color: 'var(--text-primary)' }} className="text-[16px] font-[700]">Menu</span>
           <button onClick={onClose} className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             <X size={18} />
           </button>
