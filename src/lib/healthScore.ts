@@ -289,7 +289,7 @@ export function getHealthLabel(composite: HealthResult['composite']): string {
   switch (composite) {
     case 'very_healthy': return 'Very Healthy'
     case 'healthy': return 'Healthy'
-    case 'average': return 'Average'
+    case 'average': return 'Stable'
     case 'weakening': return 'Weakening'
     case 'poor': return 'Poor'
     default: return '—'
