@@ -26,7 +26,8 @@ import { Skeleton } from "../components/ui/Skeleton";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import { SafeBlock } from "../components/ErrorBoundary";
 import NewsFeed from "../components/news/NewsFeed";
-import { computeHealthScore, getHealthLabel, getHealthColor } from "../lib/healthScore";
+import HealthGauge from "../components/ui/HealthGauge";
+import { computeHealthScore } from "../lib/healthScore";
 import { navigate } from "../components/product/routeConfig";
 
 const IT_THESIS =
@@ -542,15 +543,17 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 ].map(([label, value, color]) => (
                   <div key={String(label)}
                     style={{
-                      background: "#FFFFFF",
-                      border: "1px solid var(--border)",
-                      borderRadius: 10,
-                      padding: "14px 16px",
-                      boxShadow: "var(--shadow-sm)",
+                      background: "rgba(255,255,255,0.7)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                      border: "1px solid rgba(229,231,235,0.5)",
+                      borderRadius: 12,
+                      padding: "16px 18px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                     }}
                   >
-                    <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500, marginBottom: 4 }}>{label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: color as string, fontVariantNumeric: "tabular-nums" }}>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500, letterSpacing: "0.03em", marginBottom: 6 }}>{label}</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: color as string, fontVariantNumeric: "tabular-nums" }}>
                       {value}
                     </div>
                   </div>
@@ -874,20 +877,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
                 Research Health
               </div>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <ScoreRing score={prediction?.composite ?? null} size={80} showLabel />
-              </div>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 10 }}>
-                Health: <span style={{ fontWeight: 600, color: getHealthColor(health.composite) }}>{getHealthLabel(health.composite)}</span>
-              </div>
-              <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 10, fontSize: 10, color: "var(--text-muted)" }}>
-                {health.altmanZ !== null && (
-                  <span>Z-Score: {health.altmanZ.toFixed(2)}</span>
-                )}
-                {health.piotroskiF !== null && (
-                  <span>F-Score: {health.piotroskiF}/9</span>
-                )}
-              </div>
+              <HealthGauge composite={health.composite} score={health.compositeScore} altmanZ={health.altmanZ} piotroskiF={health.piotroskiF} size={100} />
             </div>
 
             <RenderFactorCards />
