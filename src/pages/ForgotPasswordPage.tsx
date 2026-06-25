@@ -65,16 +65,17 @@ export default function ForgotPasswordPage() {
             <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-900)", margin: "0 0 8px" }}>
               Check your email
             </h1>
-            <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-400)", lineHeight: 1.6, margin: "0 0 24px" }}>
+            <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-500)", lineHeight: 1.6, margin: "0 0 24px" }}>
               We sent a password reset link to <strong style={{ color: "var(--text-900)" }}>{email}</strong>.
               Click the link in the email to reset your password.
             </p>
             <button
               onClick={() => { setStage("email"); setEmail(""); }}
               style={{
-                width: "100%", padding: "12px 20px", fontSize: "var(--sz-sm)", fontWeight: 600,
-                background: "var(--text-900)", color: "var(--text-inverse)",
-                border: "none", borderRadius: "var(--r-lg)", cursor: "pointer",
+                width: "100%", height: 44, padding: "0 24px", fontSize: 14, fontWeight: 600,
+                background: "var(--brand)", color: "var(--text-inverse)",
+                border: "none", borderRadius: "var(--r-md)", cursor: "pointer",
+                fontFamily: "var(--font)",
               }}
             >
               Resend reset link
@@ -85,7 +86,7 @@ export default function ForgotPasswordPage() {
             <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-900)", margin: "0 0 4px" }}>
               Reset your password
             </h1>
-            <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-400)", margin: "0 0 24px", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "var(--sz-sm)", color: "var(--text-500)", margin: "0 0 24px", lineHeight: 1.5 }}>
               Enter the email address linked to your account and we'll send you a password reset link.
             </p>
 
@@ -101,13 +102,13 @@ export default function ForgotPasswordPage() {
                 required
                 autoFocus
                 style={{
-                  width: "100%", padding: "12px 14px",
-                  fontSize: "var(--sz-sm)", fontFamily: "var(--font)",
+                  width: "100%", height: 44, padding: "0 14px",
+                  fontSize: 15, fontFamily: "var(--font)",
                   border: `1px solid ${error ? "var(--red)" : "var(--border)"}`,
-                  borderRadius: "var(--r-lg)", outline: "none",
-                  background: "var(--page)", color: "var(--text-900)",
+                  borderRadius: "var(--r-md)", outline: "none",
+                  background: "var(--surface)", color: "var(--text-900)",
                   boxSizing: "border-box", marginBottom: error ? 8 : 20,
-                  transition: "border-color var(--t-instant)",
+                  transition: "border-color var(--t-fast)",
                 }}
               />
 
@@ -125,12 +126,12 @@ export default function ForgotPasswordPage() {
                 type="submit"
                 disabled={loading || !email}
                 style={{
-                  width: "100%", padding: "12px 20px",
-                  fontSize: "var(--sz-sm)", fontWeight: 600,
-                  background: loading || !email ? "var(--text-200)" : "var(--text-900)",
-                  color: loading || !email ? "var(--text-400)" : "var(--text-inverse)",
-                  border: "none", borderRadius: "var(--r-lg)", cursor: loading || !email ? "default" : "pointer",
-                  transition: "all var(--t-instant)",
+                  width: "100%", height: 44, padding: "0 24px",
+                  fontSize: 14, fontWeight: 600,
+                  background: loading || !email ? "var(--text-300)" : "var(--brand)",
+                  color: "var(--text-inverse)",
+                  border: "none", borderRadius: "var(--r-md)", cursor: loading || !email ? "default" : "pointer",
+                  fontFamily: "var(--font)", opacity: loading || !email ? 0.5 : 1,
                 }}
               >
                 {loading ? "Sending\u2026" : "Send reset link"}

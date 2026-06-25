@@ -60,6 +60,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
     currentRatio: data?.fundamentals.currentRatio ?? null,
     marketCap: data?.price.marketCap ?? null,
     peRatio: data?.fundamentals.peRatio ?? null,
+    pbRatio: data?.fundamentals.pbRatio ?? null,
     eps: data?.fundamentals.eps ?? null,
   }), [data]);
 
@@ -90,23 +91,24 @@ export default function StockPage({ symbol }: { symbol: string }) {
             background: "var(--surface)", border: "1px solid var(--border)",
             borderRadius: "var(--r-lg)", padding: 40, textAlign: "center",
           }}>
-            <AlertTriangle size={28} color="#F59E0B" />
+            <AlertTriangle size={28} color="var(--amber)" />
             <p style={{ color: "var(--text-900)", fontSize: 15, fontWeight: 600, marginTop: 12 }}>
               Market data is temporarily unavailable
             </p>
             <p style={{ color: "var(--text-500)", fontSize: 13, marginTop: 4 }}>
               Please try again shortly.
             </p>
-            <button
-              onClick={() => void refetch()}
-              style={{
-                marginTop: 16, background: "var(--brand)", color: "#fff",
-                border: "none", borderRadius: 8, padding: "8px 20px",
-                fontSize: 13, fontWeight: 600, cursor: "pointer",
-              }}
-            >
-              Retry
-            </button>
+              <button
+                onClick={() => void refetch()}
+                style={{
+                  marginTop: 16, background: "var(--brand)", color: "#fff",
+                  border: "none", borderRadius: "var(--r-md)", height: 44,
+                  padding: "0 24px", fontSize: 14, fontWeight: 600,
+                  cursor: "pointer", fontFamily: "var(--font)",
+                }}
+              >
+                Retry
+              </button>
           </div>
         </div>
       </AppShell>
@@ -148,13 +150,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
         <div style={{ margin: "16px 0" }}>
           <Healthometer
             score={health.compositeScore}
-            factors={{
-              quality: health.compositeScore ?? 50,
-              valuation: health.altmanZ !== null ? Math.min(100, Math.max(0, (health.altmanZ / 5) * 100)) : 50,
-              growth: data?.fundamentals?.revenueGrowth != null ? Math.min(100, 50 + data.fundamentals.revenueGrowth * 2) : 50,
-              riskStability: data?.fundamentals?.debtToEquity != null ? Math.min(100, Math.max(0, 100 - data.fundamentals.debtToEquity * 30)) : 50,
-              momentum: data?.fundamentals?.profitGrowth != null ? Math.min(100, 50 + data.fundamentals.profitGrowth * 2) : 50,
-            }}
+            factors={health.factors}
             thesis={null}
             stateLabel={(() => {
               const s = health.compositeScore;

@@ -48,7 +48,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           borderLeft: isActive ? "3px solid var(--brand)" : "3px solid transparent",
           background: isActive ? "var(--brand-tint)" : "transparent",
           textDecoration: "none", lineHeight: 1,
-          transition: "all var(--t-instant)",
+          transition: "all var(--t-fast)",
         }}
       >
         <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{icon}</span>
@@ -78,13 +78,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: "100vh", background: "var(--page)", paddingBottom: "76px" }}>
+      <div style={{ minHeight: "100vh", background: "var(--page)", paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}>
         <div style={{ padding: "16px 16px 0" }}>
           {children}
         </div>
         <nav style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
-          height: 60, background: "var(--surface)",
+          height: 64, background: "var(--surface)",
           borderTop: "1px solid var(--border)",
           display: "flex", alignItems: "stretch",
           paddingBottom: "env(safe-area-inset-bottom)",
@@ -153,7 +153,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main style={{ flex: 1, minWidth: 0, padding: "32px 40px", background: "var(--page)" }}>
+      <main style={{ flex: 1, minWidth: 0, padding: "24px 24px", background: "var(--page)" }}>
         {children}
       </main>
     </div>

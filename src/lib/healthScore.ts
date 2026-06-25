@@ -38,6 +38,14 @@ export interface HealthInput {
   prevDebtToEquity?: number | null
 }
 
+export interface HealthFactors {
+  quality: number
+  valuation: number
+  growth: number
+  riskStability: number
+  momentum: number
+}
+
 export interface HealthResult {
   altmanZ: number | null
   altmanZone: 'safe' | 'grey' | 'distress' | null
@@ -45,6 +53,7 @@ export interface HealthResult {
   piotroskiLabel: string
   composite: 'very_healthy' | 'healthy' | 'average' | 'weakening' | 'poor' | null
   compositeScore: number | null
+  factors: HealthFactors | null
   details: string[]
 }
 
@@ -240,6 +249,88 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
   return { score: finalScore, details }
 }
 
+function clamp(v: number, min = 0, max = 100): number {
+  return Math.round(Math.max(min, Math.min(max, v)))
+}
+
+function computeFactors(input: HealthInput): HealthFactors | null {
+  let hasData = false
+
+  // Business Quality: ROE, ROCE, current ratio
+  let qualitySum = 0
+  let qualityN = 0
+  if (input.roe != null && Number.isFinite(input.roe)) {
+    qualitySum += clamp((input.roe / 30) * 100)
+    qualityN++
+    hasData = true
+  }
+  if (input.roce != null && Number.isFinite(input.roce)) {
+    qualitySum += clamp((input.roce / 25) * 100)
+    qualityN++
+    hasData = true
+  }
+  if (input.currentRatio != null && Number.isFinite(input.currentRatio)) {
+    qualitySum += clamp((input.currentRatio / 2) * 100)
+    qualityN++
+    hasData = true
+  }
+  const quality = qualityN > 0 ? clamp(qualitySum / qualityN) : 50
+
+  // Valuation: PE (lower is better), PB (lower is better)
+  let valSum = 0
+  let valN = 0
+  if (input.peRatio != null && Number.isFinite(input.peRatio) && input.peRatio > 0) {
+    valSum += clamp(100 - (input.peRatio / 50) * 100)
+    valN++
+    hasData = true
+  }
+  if (input.pbRatio != null && Number.isFinite(input.pbRatio) && input.pbRatio > 0) {
+    valSum += clamp(100 - (input.pbRatio / 8) * 100)
+    valN++
+    hasData = true
+  }
+  const valuation = valN > 0 ? clamp(valSum / valN) : 50
+
+  // Growth: revenue growth, profit growth, EPS improvement
+  let growSum = 0
+  let growN = 0
+  if (input.eps != null && Number.isFinite(input.eps) && input.eps > 0) {
+    growSum += 70
+    growN++
+    hasData = true
+  }
+  const growth = growN > 0 ? clamp(growSum / growN) : 50
+
+  // Risk & Stability: D/E (lower is better), Altman Z
+  let riskSum = 0
+  let riskN = 0
+  if (input.debtToEquity != null && Number.isFinite(input.debtToEquity)) {
+    riskSum += clamp(100 - Math.min(input.debtToEquity * 40, 100))
+    riskN++
+    hasData = true
+  }
+  if (input.currentRatio != null && Number.isFinite(input.currentRatio)) {
+    riskSum += clamp((input.currentRatio / 2.5) * 100)
+    riskN++
+    hasData = true
+  }
+  const riskStability = riskN > 0 ? clamp(riskSum / riskN) : 50
+
+  // Momentum: profit growth, EPS
+  let momSum = 0
+  let momN = 0
+  if (input.roe != null && Number.isFinite(input.roe) && input.roe > 15) {
+    momSum += clamp((input.roe / 40) * 100)
+    momN++
+    hasData = true
+  }
+  const momentum = momN > 0 ? clamp(momSum / momN) : 50
+
+  if (!hasData) return null
+
+  return { quality, valuation, growth, riskStability, momentum }
+}
+
 /**
  * Compute composite health score from available data.
  * Blends Z-Score zone and F-Score into a single health classification.
@@ -247,6 +338,7 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
 export function computeHealthScore(input: HealthInput): HealthResult {
   const altman = calcAltmanZ(input)
   const piotroski = calcPiotroskiF(input)
+  const factors = computeFactors(input)
 
   const allDetails = [...altman.details, ...piotroski.details]
   const trimmedDetails = allDetails.slice(0, 8)
@@ -280,6 +372,12 @@ export function computeHealthScore(input: HealthInput): HealthResult {
     }
   }
 
+  // If factors are computed, blend with factor average
+  if (compositeScore !== null && factors !== null) {
+    const factorAvg = Math.round((factors.quality + factors.valuation + factors.growth + factors.riskStability + factors.momentum) / 5)
+    compositeScore = Math.round((compositeScore + factorAvg) / 2)
+  }
+
   const composite: HealthResult['composite'] =
     compositeScore === null ? null :
     compositeScore >= 90 ? 'very_healthy' :
@@ -297,6 +395,7 @@ export function computeHealthScore(input: HealthInput): HealthResult {
       : '—',
     composite,
     compositeScore,
+    factors,
     details: trimmedDetails,
   }
 }
@@ -320,11 +419,11 @@ export function getHealthLabel(composite: HealthResult['composite']): string {
  */
 export function getHealthColor(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return '#16A34A'
-    case 'healthy': return '#22C55E'
-    case 'average': return '#2563EB'
-    case 'weakening': return '#F59E0B'
-    case 'poor': return '#DC2626'
-    default: return '#9CA3AF'
+    case 'very_healthy': return '#1A7F4B'
+    case 'healthy': return '#1A7F4B'
+    case 'average': return '#1A56DB'
+    case 'weakening': return '#D97706'
+    case 'poor': return '#C0392B'
+    default: return '#9A9A9A'
   }
 }
