@@ -4,32 +4,33 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0a0a0a;
-  --surface: rgba(255,255,255,0.04);
-  --elevated: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.14);
-  --text-primary: #FFFFFF;
-  --text-secondary: rgba(255,255,255,0.65);
-  --text-muted: rgba(255,255,255,0.35);
-  --action: #06D6A0;
-  --action-hover: #05B788;
-  --action-soft: rgba(6,214,160,0.12);
-  --positive: #06D6A0;
-  --positive-soft: rgba(6,214,160,0.1);
-  --caution: #D946EF;
-  --caution-soft: rgba(217,70,239,0.1);
-  --negative: #D946EF;
-  --negative-soft: rgba(217,70,239,0.1);
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --elevated: #F9FAFB;
+  --border: #E5E7EB;
+  --border-strong: #D1D5DB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --action: #2962FF;
+  --action-hover: #1D4ED8;
+  --action-soft: rgba(41,98,255,0.08);
+  --positive: #16A34A;
+  --positive-soft: rgba(22,163,74,0.08);
+  --caution: #F59E0B;
+  --caution-soft: rgba(245,158,11,0.08);
+  --negative: #EF4444;
+  --negative-soft: rgba(239,68,68,0.08);
 
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
 
   --header-h: 64px;
   --nav-h: 64px;

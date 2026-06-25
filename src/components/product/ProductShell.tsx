@@ -13,13 +13,12 @@ export default function ProductShell({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <div style={{ background: '#0a0a0a', minHeight: '100vh', color: '#FFFFFF' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <ProductTopBar compact={isMobile} />
       <main
         className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8"
         style={{
           maxWidth: 'var(--content)',
-          paddingTop: 'calc(var(--header-h) + 24px)',
           paddingBottom: isMobile ? 'calc(var(--nav-h) + 24px)' : 48,
         }}
       >
