@@ -1,13 +1,11 @@
-import logoMark from "../../assets/logo-mark.svg";
-
 export default function Logo() {
   return (
-    <div className="flex items-center gap-2.5 cursor-pointer">
-      <img src={logoMark} alt="S" width={32} height={32} />
-      <div>
-        <div className="text-[16px] font-[400] text-[#0d253d] tracking-[-0.2px] leading-none">StockStory</div>
-        <div className="text-[9px] font-[400] text-[#64748d] tracking-[0.08em] mt-[1px]">India</div>
+    <a href="/" className="flex items-center gap-2.5 no-underline">
+      <img src="/logo-mark.svg" alt="S" width={36} height={36} className="flex-shrink-0" />
+      <div className="leading-none">
+        <div className="text-[17px] font-[800] text-[#0a0a0a] tracking-[-0.5px]">StockStory</div>
+        <div className="mt-[2px] text-[9px] font-[600] text-[#888] tracking-[0.15em]">India</div>
       </div>
-    </div>
+    </a>
   );
 }
