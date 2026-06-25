@@ -102,15 +102,15 @@ export class IndianApiService {
   }
 
   async getFundamentals(symbol: string): Promise<IndianApiFetchResult<FundamentalSnapshot>> {
-    return rawFetch<FundamentalSnapshot>({ path: `/stock_fundamentals?name=${encodeURIComponent(symbol)}`, layer: "fundamentals" });
+    return rawFetch<FundamentalSnapshot>({ path: `/stock?name=${encodeURIComponent(symbol)}`, layer: "fundamentals" });
   }
 
   async getFinancials(symbol: string): Promise<IndianApiFetchResult<FinancialStatementTable>> {
-    return rawFetch<FinancialStatementTable>({ path: `/stock_fundamentals?name=${encodeURIComponent(symbol)}`, layer: "financials" });
+    return rawFetch<FinancialStatementTable>({ path: `/stock?name=${encodeURIComponent(symbol)}`, layer: "financials" });
   }
 
   async getShareholding(symbol: string): Promise<IndianApiFetchResult<ShareholdingTrend>> {
-    return rawFetch<ShareholdingTrend>({ path: `/stock_fundamentals?name=${encodeURIComponent(symbol)}`, layer: "shareholding" });
+    return rawFetch<ShareholdingTrend>({ path: `/stock?name=${encodeURIComponent(symbol)}`, layer: "shareholding" });
   }
 
   async getFullSnapshot(symbol: string, include?: LayerKind[]): Promise<IndianApiFetchResult<UnifiedIndianStockSnapshot>> {
