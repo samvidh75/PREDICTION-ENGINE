@@ -1,7 +1,8 @@
 <svg width="36" height="36" viewBox="0 0 36 36" fill="none"
      xmlns="http://www.w3.org/2000/svg">
-  <rect width="36" height="36" rx="8" fill="#0A0A0A"/>
-  <path d="M11 25.5c0-3 2.2-4.5 5-4.5s5-1.8 5-4.5c0-2.2-1.7-4-4.5-4"
-        stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-  <circle cx="11.5" cy="25.5" r="1.5" fill="white"/>
+  <rect width="36" height="36" rx="9" fill="#0A0A0A"/>
+  <text x="18" y="24" textAnchor="middle"
+        fontFamily="Georgia, 'Times New Roman', serif"
+        fontSize="20" fontWeight="700" fill="white"
+        letterSpacing="-1">S</text>
 </svg>

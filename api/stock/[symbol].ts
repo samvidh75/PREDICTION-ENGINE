@@ -1,194 +1,141 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-type ProviderPayload = Record<string, unknown> & { _error?: string };
-
-const providerTimeout = (ms: number): Promise<never> =>
-  new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms));
-
-async function safeProvider(
-  label: string,
-  operation: () => Promise<ProviderPayload>,
-  timeoutMs = 7_000,
-): Promise<ProviderPayload> {
-  try {
-    return await Promise.race([operation(), providerTimeout(timeoutMs)]);
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "unknown error";
-    return { _error: `${label}: ${message}` };
-  }
-}
-
-export const config = { maxDuration: 30 };
-
-function asNumber(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Number(value.replace(/[,%₹\s]/g, ""));
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
+const CACHE = new Map<string, { data: any; expiresAt: number }>()
+const CACHE_TTL = 60_000
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const rawSymbol = Array.isArray(req.query.symbol)
-    ? req.query.symbol[0]
-    : req.query.symbol;
-  const symbol = String(rawSymbol || "").toUpperCase().trim();
-  if (!symbol) return res.status(400).json({ error: "symbol required" });
+  const rawSymbol = Array.isArray(req.query.symbol) ? req.query.symbol[0] : req.query.symbol
+  const symbol = String(rawSymbol ?? '').toUpperCase().trim()
+  if (!symbol) return res.status(400).json({ error: 'symbol required' })
 
-  const indianApiKey = process.env.INDIANAPI_KEY || "";
-  const [priceData, fundamentalData, historicalData, researchData, backendQuoteData] = await Promise.all([
-    safeProvider("price", async () => {
-      if (!indianApiKey) return { _error: "price: INDIANAPI_KEY not configured" };
-      const response = await fetch(
-        `https://indian-stock-market-api2.p.rapidapi.com/stock?name=${encodeURIComponent(symbol)}`,
-        {
-          headers: {
-            "X-RapidAPI-Key": indianApiKey,
-            "X-RapidAPI-Host": "indian-stock-market-api2.p.rapidapi.com",
-          },
-        },
-      );
-      if (!response.ok) return { _error: `price HTTP ${response.status}` };
-      return (await response.json()) as ProviderPayload;
+  const cached = CACHE.get(symbol)
+  if (cached && Date.now() < cached.expiresAt) {
+    res.setHeader('X-Cache', 'HIT')
+    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30')
+    return res.status(200).json(cached.data)
+  }
+
+  const INDIAN_KEY = process.env.INDIANAPI_KEY ?? ''
+  const timeout = (ms: number, label: string) =>
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timeout`)), ms))
+
+  const safe = async <T>(label: string, fn: () => Promise<T>): Promise<T | null> => {
+    try { return await Promise.race([fn(), timeout(7000, label)]) }
+    catch { return null }
+  }
+
+  const [price, screener, historical] = await Promise.all([
+
+    safe('price', async () => {
+      if (!INDIAN_KEY) return null
+      const url = `https://indian-stock-market-api2.p.rapidapi.com/stock?name=${symbol}`
+      const r = await fetch(url, { headers: {
+        'X-RapidAPI-Key': INDIAN_KEY,
+        'X-RapidAPI-Host': 'indian-stock-market-api2.p.rapidapi.com'
+      }})
+      return r.ok ? r.json() : null
     }),
-    safeProvider("screener", async () => {
-      const response = await fetch(
-        `https://www.screener.in/api/company/${encodeURIComponent(symbol)}/`,
-        { headers: { Accept: "application/json" } },
-      );
-      if (!response.ok) return { _error: `screener HTTP ${response.status}` };
-      return (await response.json()) as ProviderPayload;
+
+    safe('screener', async () => {
+      const r = await fetch(`https://www.screener.in/api/company/${symbol}/`, {
+        headers: { Accept: 'application/json',
+                   'User-Agent': 'Mozilla/5.0 StockStory/2.0' }
+      })
+      return r.ok ? r.json() : null
     }),
-    safeProvider("historical", async () => {
-      const ticker = `${symbol}.NS`;
-      const response = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1mo`,
-        { headers: { "User-Agent": "Mozilla/5.0" } },
-      );
-      if (!response.ok) return { _error: `yahoo HTTP ${response.status}` };
-      const payload = (await response.json()) as {
-        chart?: { result?: Array<{ timestamp?: number[]; indicators?: { quote?: Array<{ close?: Array<number | null> }> } }> };
-      };
-      const result = payload.chart?.result?.[0];
+
+    safe('historical', async () => {
+      const ticker = `${symbol}.NS`
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=3mo`
+      const r = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 StockStory/2.0' }
+      })
+      if (!r.ok) return null
+      const d = await r.json()
+      const result = d?.chart?.result?.[0]
+      if (!result) return null
       return {
-        closes: (result?.indicators?.quote?.[0]?.close ?? []).filter(
-          (close): close is number => typeof close === "number" && Number.isFinite(close),
-        ),
-        timestamps: result?.timestamp ?? [],
-      };
+        closes:     result.indicators?.quote?.[0]?.close?.filter(Boolean) ?? [],
+        highs:      result.indicators?.quote?.[0]?.high?.filter(Boolean)  ?? [],
+        lows:       result.indicators?.quote?.[0]?.low?.filter(Boolean)   ?? [],
+        timestamps: result.timestamp ?? [],
+      }
     }),
-    safeProvider("research", async () => {
-      const baseUrl = process.env.BACKEND_BASE_URL || "https://prediction-engine-production-f7a8.up.railway.app";
-      const response = await fetch(`${baseUrl}/api/research/company/${encodeURIComponent(symbol)}`);
-      if (!response.ok) return { _error: `research HTTP ${response.status}` };
-      const payload = (await response.json()) as { data?: Record<string, unknown> };
-      return payload.data ?? { _error: "research: empty response" };
-    }, 15_000),
-    safeProvider("backend quote", async () => {
-      const baseUrl = process.env.BACKEND_BASE_URL || "https://prediction-engine-production-f7a8.up.railway.app";
-      const response = await fetch(`${baseUrl}/api/market-data/quote/${encodeURIComponent(symbol)}`);
-      if (!response.ok) return { _error: `backend quote HTTP ${response.status}` };
-      return (await response.json()) as ProviderPayload;
-    }),
-  ]);
+  ])
 
-  const researchQuote = researchData.quote && typeof researchData.quote === "object"
-    ? researchData.quote as Record<string, unknown>
-    : {};
-  const researchFundamentals = researchData.fundamentals && typeof researchData.fundamentals === "object"
-    ? researchData.fundamentals as Record<string, unknown>
-    : {};
-  const researchProfile = researchData.profile && typeof researchData.profile === "object"
-    ? researchData.profile as Record<string, unknown>
-    : {};
+  const priceData = {
+    current:    price?.currentPrice ?? price?.price ?? null,
+    change:     price?.percentChange ?? price?.pChange ?? null,
+    changeAbs:  price?.change ?? null,
+    open:       price?.open ?? null,
+    high:       price?.dayHigh ?? null,
+    low:        price?.dayLow ?? null,
+    volume:     price?.volume ?? null,
+    weekHigh52: price?.['52WeekHigh'] ?? price?.yearHigh ?? null,
+    weekLow52:  price?.['52WeekLow']  ?? price?.yearLow  ?? null,
+    marketCap:  price?.marketCap ?? null,
+    exchange:   price?.exchange  ?? 'NSE',
+    companyName:price?.companyName ?? price?.name ?? symbol,
+    sector:     price?.sector ?? null,
+    error:      price ? null : 'price_unavailable',
+  }
 
-  const price = {
-    current: asNumber(priceData.currentPrice ?? priceData.price ?? backendQuoteData.price ?? researchQuote.lastPrice),
-    change: asNumber(priceData.percentChange ?? priceData.pChange ?? backendQuoteData.changePercent ?? researchQuote.changePercent),
-    changeAbs: asNumber(priceData.change ?? backendQuoteData.change ?? researchQuote.change),
-    open: asNumber(priceData.open ?? backendQuoteData.open ?? researchQuote.open),
-    high: asNumber(priceData.dayHigh ?? priceData.high ?? backendQuoteData.high ?? researchQuote.high),
-    low: asNumber(priceData.dayLow ?? priceData.low ?? backendQuoteData.low ?? researchQuote.low),
-    volume: asNumber(priceData.volume ?? backendQuoteData.volume ?? researchQuote.volume),
-    weekHigh52: asNumber(priceData["52WeekHigh"] ?? priceData.yearHigh ?? researchQuote.week52High),
-    weekLow52: asNumber(priceData["52WeekLow"] ?? priceData.yearLow ?? researchQuote.week52Low),
-    marketCap: asNumber(priceData.marketCap ?? researchQuote.marketCap),
-    exchange: typeof priceData.exchange === "string" ? priceData.exchange : "NSE",
-    companyName:
-      typeof (priceData.companyName ?? priceData.name) === "string"
-        ? String(priceData.companyName ?? priceData.name)
-        : typeof researchProfile.companyName === "string" ? researchProfile.companyName : symbol,
-    sector: typeof priceData.sector === "string" ? priceData.sector : typeof researchProfile.sector === "string" ? researchProfile.sector : null,
-    source: priceData._error ? (asNumber(backendQuoteData.price ?? researchQuote.lastPrice) === null ? "unavailable" : "research-cache") : "indianapi",
-    priceError: priceData._error && asNumber(backendQuoteData.price ?? researchQuote.lastPrice) === null ? priceData._error : null,
-  };
+  const ratios  = screener?.ratios  ?? {}
+  const cgSales = screener?.compoundedSalesGrowth  ?? {}
+  const cgProfit= screener?.compoundedProfitGrowth ?? {}
 
-  const ratios =
-    fundamentalData.ratios && typeof fundamentalData.ratios === "object"
-      ? (fundamentalData.ratios as Record<string, unknown>)
-      : {};
-  const salesGrowth = fundamentalData.compoundedSalesGrowth as Record<string, unknown> | undefined;
-  const profitGrowth = fundamentalData.compoundedProfitGrowth as Record<string, unknown> | undefined;
-  const percentFallback = (value: unknown) => {
-    const parsed = asNumber(value);
-    return parsed === null ? null : Math.abs(parsed) <= 2 ? parsed * 100 : parsed;
-  };
   const fundamentals = {
-    peRatio: asNumber(ratios["Stock P/E"]) ?? asNumber(researchFundamentals.peRatio),
-    pbRatio: asNumber(ratios["Price to Book"]) ?? asNumber(researchFundamentals.pbRatio),
-    roe: asNumber(ratios["Return on equity"]) ?? percentFallback(researchFundamentals.roe),
-    roce: asNumber(ratios.ROCE) ?? percentFallback(researchFundamentals.roic),
-    debtToEquity: asNumber(ratios["Debt to equity"]) ?? asNumber(researchFundamentals.debtToEquity),
-    currentRatio: asNumber(ratios["Current ratio"]) ?? asNumber(researchFundamentals.currentRatio),
-    dividendYield: asNumber(ratios["Dividend Yield"]) ?? percentFallback(researchFundamentals.dividendYield),
-    eps: asNumber(ratios["EPS in Rs"]) ?? asNumber(researchFundamentals.eps),
-    revenueGrowth: asNumber(salesGrowth?.["3 Years"]) ?? percentFallback(researchFundamentals.revenueGrowth),
-    profitGrowth: asNumber(profitGrowth?.["3 Years"]) ?? percentFallback(researchFundamentals.profitGrowth),
-    netMargin: percentFallback(researchFundamentals.netMargin),
-    operatingMargin: percentFallback(researchFundamentals.operatingMargin),
-    marketCap: asNumber(ratios["Market Cap"]) ?? price.marketCap,
-    fundamentalSource: fundamentalData._error ? (asNumber(researchFundamentals.peRatio) === null ? "unavailable" : "research-cache") : "screener",
-    fundamentalError: fundamentalData._error && asNumber(researchFundamentals.peRatio) === null ? fundamentalData._error : null,
-  };
+    peRatio:        toNum(ratios['Stock P/E']),
+    pbRatio:        toNum(ratios['Price to Book']),
+    roe:            toNum(ratios['Return on equity']),
+    roce:           toNum(ratios['ROCE']),
+    dividendYield:  toNum(ratios['Dividend Yield']),
+    eps:            toNum(ratios['EPS in Rs']),
+    debtToEquity:   toNum(ratios['Debt to equity']),
+    currentRatio:   toNum(ratios['Current ratio']),
+    revenueGrowth:  toNum(cgSales['3 Years']),
+    profitGrowth:   toNum(cgProfit['3 Years']),
+    marketCap:      toNum(ratios['Market Cap']),
+    error:          screener ? null : 'fundamentals_unavailable',
+  }
 
-  const closes = Array.isArray(historicalData.closes)
-    ? historicalData.closes.filter((value): value is number => typeof value === "number")
-    : [];
-  const timestamps = Array.isArray(historicalData.timestamps)
-    ? historicalData.timestamps.filter((value): value is number => typeof value === "number")
-    : [];
-  const historical = {
-    closes,
-    timestamps,
-    source: historicalData._error ? "unavailable" : "yahoo",
-    error: historicalData._error ?? null,
-  };
+  const historicalData = {
+    closes:     historical?.closes     ?? [],
+    highs:      historical?.highs      ?? [],
+    lows:       historical?.lows       ?? [],
+    timestamps: historical?.timestamps ?? [],
+    error:      historical ? null : 'historical_unavailable',
+  }
 
-  const completenessFields = [
-    price.current,
-    price.change,
-    fundamentals.peRatio,
-    fundamentals.roe,
-    fundamentals.debtToEquity,
-    fundamentals.revenueGrowth,
-    fundamentals.eps,
-    historical.closes.length > 0 ? 1 : null,
-  ];
-  const dataCompleteness = Math.round(
-    (completenessFields.filter((field) => field !== null).length /
-      completenessFields.length) *
-      100,
-  );
+  const completeness = computeCompleteness(priceData, fundamentals, historicalData)
 
-  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=30");
-  return res.status(200).json({
+  const result = {
     symbol,
-    price,
+    price:        priceData,
     fundamentals,
-    historical,
-    dataCompleteness,
-    fetchedAt: new Date().toISOString(),
-    errors: [price.priceError, fundamentals.fundamentalError, historical.error].filter(Boolean),
-  });
+    historical:   historicalData,
+    dataCompleteness: completeness,
+    fetchedAt:    new Date().toISOString(),
+    errors:       [priceData.error, fundamentals.error, historicalData.error]
+                    .filter(Boolean),
+  }
+
+  CACHE.set(symbol, { data: result, expiresAt: Date.now() + CACHE_TTL })
+
+  res.setHeader('X-Cache', 'MISS')
+  res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30')
+  return res.status(200).json(result)
+}
+
+function toNum(v: any): number | null {
+  const n = parseFloat(v)
+  return isNaN(n) ? null : n
+}
+
+function computeCompleteness(p: any, f: any, h: any): number {
+  const fields = [p.current, p.change, f.peRatio, f.roe, f.roce,
+                  f.debtToEquity, f.revenueGrowth, f.eps,
+                  h.closes.length > 0 ? 1 : null]
+  return Math.round(fields.filter(x => x !== null).length / fields.length * 100)
 }

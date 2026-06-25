@@ -1,7 +1,7 @@
 import React from "react";
 import { Check, Sparkles, Lock, ArrowUpRight } from "lucide-react";
 import { ProductPage, ProductShell, ProductAction } from "../components/product/ProductUI";
-import StockStoryLogo from "../components/brand/StockStoryLogo";
+import Logo from "../components/brand/Logo";
 
 interface PlanFeature {
   name: string;
@@ -81,7 +81,7 @@ export default function PricingPage(): JSX.Element {
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <div className="flex justify-center">
-              <StockStoryLogo variant="lockup" size="md" />
+              <Logo />
             </div>
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-4 py-1.5 text-xs font-semibold text-[#10A37F] shadow-sm">
               <Sparkles className="h-3.5 w-3.5" /> Premium research

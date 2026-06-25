@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Home, BarChart3, Search, Bookmark, ArrowLeftRight, DollarSign, BookOpen, Settings } from "lucide-react";
 import { NavLink } from "./NavLink";
-import StockStoryLogo from "../brand/StockStoryLogo";
+import Logo from "../brand/Logo";
 
 interface RailItem {
   page: string;
@@ -53,11 +53,8 @@ export default function DesktopRail(): JSX.Element {
     >
       {/* Brand */}
       <div className="flex items-center h-16 px-3 shrink-0 overflow-hidden border-b border-[var(--color-border)]">
-        <div className="shrink-0 group-hover:hidden block">
-          <StockStoryLogo variant="mark" size="sm" />
-        </div>
-        <div className="hidden group-hover:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-          <StockStoryLogo variant="lockup" size="sm" />
+        <div className="shrink-0 block">
+          <Logo />
         </div>
       </div>
 

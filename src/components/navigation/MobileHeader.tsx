@@ -1,6 +1,6 @@
 import React from "react";
 import { Menu, Search } from "lucide-react";
-import StockStoryLogo from "../brand/StockStoryLogo";
+import Logo from "../brand/Logo";
 
 export const MobileHeader: React.FC<{ onMenuClick?: () => void }> = ({ onMenuClick }) => {
   const handleAction = () => {
@@ -16,7 +16,7 @@ export const MobileHeader: React.FC<{ onMenuClick?: () => void }> = ({ onMenuCli
 
   return (
     <header className="fixed top-0 left-0 right-0 h-15 bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#2a2e39] flex items-center justify-between px-4 z-50 md:hidden select-none">
-      <StockStoryLogo variant="mark" size="sm" tone="light" />
+      <Logo />
 
       {/* Menu target wrapped in an explicit 48px x 48px touch target hit-box */}
       <button

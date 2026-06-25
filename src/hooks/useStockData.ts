@@ -1,111 +1,81 @@
-import { useCallback, useEffect, useState } from "react";
-import { getCache, setCache } from "../lib/cache";
+import { useState, useEffect, useCallback, useRef } from 'react'
 
-export interface StockData {
-  symbol: string;
+interface StockData {
+  symbol: string
   price: {
-    current: number | null;
-    change: number | null;
-    changeAbs: number | null;
-    open: number | null;
-    high: number | null;
-    low: number | null;
-    volume: number | null;
-    weekHigh52: number | null;
-    weekLow52: number | null;
-    marketCap: number | null;
-    exchange: string;
-    companyName: string;
-    sector: string | null;
-    source: string;
-    priceError: string | null;
-  };
+    current: number | null; change: number | null; changeAbs: number | null
+    open: number | null; high: number | null; low: number | null
+    volume: number | null; weekHigh52: number | null; weekLow52: number | null
+    marketCap: number | null; exchange: string; companyName: string
+    sector: string | null; error: string | null
+  }
   fundamentals: {
-    peRatio: number | null;
-    pbRatio: number | null;
-    roe: number | null;
-    roce: number | null;
-    debtToEquity: number | null;
-    currentRatio: number | null;
-    dividendYield: number | null;
-    eps: number | null;
-    revenueGrowth: number | null;
-    profitGrowth: number | null;
-    netMargin: number | null;
-    operatingMargin: number | null;
-    marketCap: number | null;
-    fundamentalSource: string;
-    fundamentalError: string | null;
-  };
+    peRatio: number | null; pbRatio: number | null
+    roe: number | null; roce: number | null
+    dividendYield: number | null; eps: number | null
+    debtToEquity: number | null; currentRatio: number | null
+    revenueGrowth: number | null; profitGrowth: number | null
+    marketCap: number | null; error: string | null
+  }
   historical: {
-    closes: number[];
-    highs: number[];
-    lows: number[];
-    timestamps: number[];
-    source: string;
-    error: string | null;
-  };
-  dataCompleteness: number;
-  fetchedAt: string;
-  errors: string[];
+    closes: number[]; highs: number[]
+    lows: number[]; timestamps: number[]
+    error: string | null
+  }
+  dataCompleteness: number
+  fetchedAt: string
+  errors: string[]
 }
+
+const memCache = new Map<string, { data: StockData; ts: number }>()
+const CACHE_MS = 60_000
 
 export function useStockData(symbol: string | null) {
-  const [data, setData] = useState<StockData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData]       = useState<StockData | null>(() => {
+    if (!symbol) return null
+    const c = memCache.get(symbol)
+    return (c && Date.now() - c.ts < CACHE_MS) ? c.data : null
+  })
+  const [loading, setLoading] = useState(!data)
+  const [error, setError]     = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
-  const fetchStock = useCallback(async () => {
-    if (!symbol) return;
+  const fetch_ = useCallback(async (sym: string) => {
+    abortRef.current?.abort()
+    abortRef.current = new AbortController()
 
-    // Cache-first: try to load from cache immediately
-    const cacheKey = `stock_${symbol}`;
-    const cached = getCache<StockData>(cacheKey);
-    if (cached.data) {
-      setData(cached.data);
-      setLoading(false);
-      // If stale, refresh in background
-      if (!cached.isStale) return;
-    }
-
-    setLoading(!cached.data); // Only show loading if no cached data
+    setLoading(true)
     try {
-      const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const nextData = (await response.json()) as StockData;
-      const historicalResponse = await fetch(`/api/historical/${encodeURIComponent(symbol)}?range=3mo`);
-      const historicalPayload = historicalResponse.ok
-        ? await historicalResponse.json() as { closes?: number[]; highs?: number[]; lows?: number[]; timestamps?: number[] }
-        : null;
-      const mergedData: StockData = historicalPayload
-        ? {
-            ...nextData,
-            historical: {
-              ...nextData.historical,
-              closes: historicalPayload.closes ?? nextData.historical.closes ?? [],
-              highs: historicalPayload.highs ?? [],
-              lows: historicalPayload.lows ?? [],
-              timestamps: historicalPayload.timestamps ?? nextData.historical.timestamps ?? [],
-              source: "yahoo",
-              error: null,
-            },
-          }
-        : nextData;
-      setData(mergedData);
-      setCache(cacheKey, mergedData);
-      setError(null);
-      setLoading(false);
-    } catch (nextError: unknown) {
-      if (!cached.data) {
-        setError(nextError instanceof Error ? nextError.message : "Failed to load stock data");
-        setLoading(false);
-      }
+      const r = await fetch(`/api/stock/${sym}`, {
+        signal: abortRef.current.signal,
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const d: StockData = await r.json()
+      memCache.set(sym, { data: d, ts: Date.now() })
+      setData(d)
+      setError(null)
+    } catch (e: any) {
+      if (e.name === 'AbortError') return
+      setError(e.message)
+    } finally {
+      setLoading(false)
     }
-  }, [symbol]);
+  }, [])
 
-  useEffect(() => { void fetchStock(); }, [fetchStock]);
+  useEffect(() => {
+    if (!symbol) return
+    const cached = memCache.get(symbol)
+    if (cached && Date.now() - cached.ts < CACHE_MS) {
+      setData(cached.data)
+      setLoading(false)
+      return
+    }
+    fetch_(symbol)
+    return () => { abortRef.current?.abort() }
+  }, [symbol, fetch_])
 
-  return { data, loading, error, refetch: fetchStock };
+  return { data, loading, error, refetch: () => symbol && fetch_(symbol) }
 }
 
-export default useStockData;
+export type { StockData }
+export default useStockData
