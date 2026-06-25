@@ -376,7 +376,20 @@ describe('Classification bands', () => {
     }
   });
 
-  it('score < 35 → AT_RISK', () => {
+  it('score < 35 → AT_RISK (with sufficient data)', () => {
+    const result = engine.evaluate(fullInput({
+      close: 10, closePrices: [50, 48, 45, 42, 40, 38, 35, 33, 30, 28, 25, 22, 20, 18, 15, 12, 10],
+      peRatio: 35, pbRatio: 6, roe: 5, roa: 3, roic: 4,
+      beta: 3.0, debtToEquity: 8.0, currentRatio: 0.2,
+      dividendYield: null, marketCap: 1e6,
+      revenueGrowth: -5, epsGrowth: -8,
+    }));
+    if (result.rankingScore !== null && result.rankingScore < 35) {
+      expect(result.classification).toBe('AT_RISK');
+    }
+  });
+
+  it('partial data (>3 null inputs) → STABLE capped', () => {
     const result = engine.evaluate(fullInput({
       close: 10, closePrices: [20, 18, 15, 12, 10],
       peRatio: null, pbRatio: null, roe: null, roa: null, roic: null,
@@ -384,8 +397,10 @@ describe('Classification bands', () => {
       dividendYield: null, marketCap: 1e6,
       revenueGrowth: null, epsGrowth: null,
     }));
-    if (result.rankingScore !== null && result.rankingScore < 35) {
-      expect(result.classification).toBe('AT_RISK');
+    // With 5 of 7 inputs null, engine caps score at 50 and labels STABLE
+    expect(result.classification).toBe('STABLE');
+    if (result.rankingScore !== null) {
+      expect(result.rankingScore).toBeLessThanOrEqual(50);
     }
   });
 

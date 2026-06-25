@@ -279,17 +279,35 @@ export class UnifiedPredictionEngine {
       }
     }
 
-    const composite = availableWeight > 0
+    // Guard: if more than 3 of 7 factor inputs are null, set confidence low
+    const factorInputs = [input.roe, input.roce, input.debtToEquity, input.peRatio, input.pbRatio, input.revenueGrowth, input.profitGrowth]
+    const nullCount = factorInputs.filter(v => v === null || v === undefined).length
+
+    let composite = availableWeight > 0
       ? Math.round(weightedSum / availableWeight)
       : null
 
-    const classification =
-      composite === null ? 'INSUFFICIENT_DATA' :
-      composite >= 80    ? 'EXCELLENT' :
-      composite >= 65    ? 'HEALTHY'   :
-      composite >= 50    ? 'STABLE'    :
-      composite >= 35    ? 'WEAKENING' :
-                           'AT_RISK'
+    let classification: EngineOutput['classification']
+
+    if (nullCount > 3 && composite !== null) {
+      // Partial data: cap displayed score and label as partial
+      composite = Math.min(composite, 50)
+      classification = 'STABLE'
+    } else {
+      classification =
+        composite === null ? 'INSUFFICIENT_DATA' :
+        composite >= 80    ? 'EXCELLENT' :
+        composite >= 65    ? 'HEALTHY'   :
+        composite >= 50    ? 'STABLE'    :
+        composite >= 35    ? 'WEAKENING' :
+                             'AT_RISK'
+    }
+
+    // If availableWeight < 0.35 (less than quality + stability combined), downgrade
+    if (availableWeight > 0 && availableWeight < 0.35) {
+      classification = classification === 'EXCELLENT' ? 'HEALTHY' :
+                       classification === 'HEALTHY'   ? 'STABLE' : classification
+    }
 
     const filledCount = Object.values(factors).filter(f => f.score !== null).length
     const dataCompleteness = Math.round(filledCount / 5 * 100)
