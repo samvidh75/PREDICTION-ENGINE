@@ -18,11 +18,11 @@ interface RequestOptions {
 
 const pendingRequests = new Map<string, Promise<unknown>>();
 
-async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+async function fetchWithTimeout(url: string, timeoutMs: number, headers?: Record<string, string>): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url, { signal: controller.signal, headers });
     return res;
   } finally {
     clearTimeout(timer);
@@ -55,7 +55,7 @@ async function rawFetch<T>(opts: RequestOptions): Promise<IndianApiFetchResult<T
 
   const promise = (async () => {
     try {
-      const res = await fetchWithTimeout(url, TIMEOUT_MS);
+      const res = await fetchWithTimeout(url, TIMEOUT_MS, headers);
       if (!res.ok) {
         if (res.status === 429) throw new IndianApiError("Rate limit", "RATE_LIMITED", true, 429);
         if (res.status >= 500) throw new IndianApiError("Provider error", "PROVIDER_ERROR", true, res.status);
