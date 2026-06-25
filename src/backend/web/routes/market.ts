@@ -81,17 +81,16 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      const priceResult = await indianApiService.getPrice(sym);
-      const profileResult = await indianApiService.getProfile(sym);
-      const fundaResult = await indianApiService.getFundamentals(sym);
-      const price = priceResult.data ?? null;
-      const profile = profileResult.data ?? null;
-      const fundamentals = fundaResult.data ?? null;
+      const [priceResult, profileResult, fundaResult] = await Promise.all([
+        indianApiService.getPrice(sym).catch(() => ({ ok: false, data: null } as any)),
+        indianApiService.getProfile(sym).catch(() => ({ ok: false, data: null } as any)),
+        indianApiService.getFundamentals(sym).catch(() => ({ ok: false, data: null } as any)),
+      ]);
+      const price = priceResult?.data ?? null;
+      const profile = profileResult?.data ?? null;
+      const fundamentals = fundaResult?.data ?? null;
 
-      const closes: number[] = [];
-      const highs: number[] = [];
-      const lows: number[] = [];
-      const timestamps: number[] = [];
+      const hasAnyData = price || profile || fundamentals;
 
       return {
         symbol: sym,
@@ -125,19 +124,21 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           marketCap: profile?.marketCap ?? null,
           error: null,
         },
-        historical: {
-          closes,
-          highs,
-          lows,
-          timestamps,
-          error: null,
-        },
-        dataCompleteness: 0.0,
+        historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
+        dataCompleteness: hasAnyData ? 0.3 : 0.0,
         fetchedAt: new Date().toISOString(),
-        errors: [],
+        errors: hasAnyData ? [] : ["Market data not yet available for this symbol"],
       };
     } catch (err: any) {
-      return reply.status(500).send({ ok: false, message: "Stock data is not yet available." });
+      return {
+        symbol: sym.toUpperCase().trim(),
+        price: { current: null, change: null, changeAbs: null, open: null, high: null, low: null, volume: null, weekHigh52: null, weekLow52: null, marketCap: null, exchange: "NSE", companyName: sym.toUpperCase().trim(), sector: null, error: null },
+        fundamentals: { peRatio: null, pbRatio: null, roe: null, roce: null, dividendYield: null, eps: null, debtToEquity: null, currentRatio: null, revenueGrowth: null, profitGrowth: null, marketCap: null, error: null },
+        historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
+        dataCompleteness: 0.0,
+        fetchedAt: new Date().toISOString(),
+        errors: ["Market data not yet available for this symbol"],
+      };
     }
   });
 
