@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['SF Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
@@ -28,7 +28,9 @@ module.exports = {
           magenta: '#f96bee',
           lemon: '#9b6829',
         },
-        green: { DEFAULT: '#1a7f4b', light: '#22c55e', bg: '#ebf7f1' },
+        green: { DEFAULT: '#1a7f4b', mid: '#22c55e', bg: '#ebf7f1', dark: '#0d5c34' },
+        ink: { DEFAULT: '#0a0a0a', 2: '#2d2d2d', 3: '#555', 4: '#888', 5: '#bbb' },
+        line: { DEFAULT: '#e8e8e8', light: '#f5f5f5' },
         red: { DEFAULT: '#c0392b', soft: '#fff1f0' },
       },
       fontSize: {
