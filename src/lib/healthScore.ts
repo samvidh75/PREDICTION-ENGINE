@@ -287,11 +287,11 @@ export function computeHealthScore(input: HealthInput): HealthResult {
  */
 export function getHealthLabel(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return 'Optimal'
-    case 'healthy': return 'Corrective'
-    case 'average': return 'Accumulating'
-    case 'weakening': return 'Vulnerable'
-    case 'poor': return 'Vulnerable'
+    case 'very_healthy': return 'Very Healthy'
+    case 'healthy': return 'Healthy'
+    case 'average': return 'Stable'
+    case 'weakening': return 'Weakening'
+    case 'poor': return 'Unhealthy'
     default: return '—'
   }
 }
