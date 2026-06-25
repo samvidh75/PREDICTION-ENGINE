@@ -1,100 +1,151 @@
-import { useState } from "react";
-import { COMPANY_PROFILES, type CompanyProfile } from "../../data/companyProfiles";
+import { fMarketCap } from "../../lib/format";
+
+const COMPANY_PROFILES: Record<string, {
+  description: string;
+  founded: string;
+  ceo: string;
+  hq: string;
+  employees: number;
+  website: string;
+  isin: string;
+  segments: string[];
+}> = {
+  TCS: {
+    description: "Tata Consultancy Services (TCS) is an Indian multinational information technology (IT) services, consulting, and business solutions company. Headquartered in Mumbai, it is a subsidiary of the Tata Group and operates in 150+ locations across 46 countries. TCS is the largest IT services company in India by market capitalization and revenue.",
+    founded: "1968",
+    ceo: "K. Krithivasan",
+    hq: "Mumbai, Maharashtra",
+    employees: 616171,
+    website: "https://www.tcs.com",
+    isin: "INE467B01029",
+    segments: ["Banking, Financial Services & Insurance", "Retail & CPG", "Communication, Media & Technology", "Manufacturing", "Life Sciences & Healthcare"],
+  },
+  RELIANCE: {
+    description: "Reliance Industries Limited (RIL) is an Indian multinational conglomerate holding company, headquartered in Mumbai. Its businesses include energy, petrochemicals, textiles, natural gas, retail, and telecommunications (Jio).",
+    founded: "1966",
+    ceo: "Mukesh D. Ambani",
+    hq: "Mumbai, Maharashtra",
+    employees: 389414,
+    website: "https://www.ril.com",
+    isin: "INE002A01018",
+    segments: ["Oil & Gas", "Refining & Marketing", "Petrochemicals", "Telecom (Jio)", "Retail"],
+  },
+  HDFCBANK: {
+    description: "HDFC Bank Limited is an Indian banking and financial services company headquartered in Mumbai. It is India's largest private sector bank by assets and market capitalization.",
+    founded: "1994",
+    ceo: "Sashidhar Jagdishan",
+    hq: "Mumbai, Maharashtra",
+    employees: 177000,
+    website: "https://www.hdfcbank.com",
+    isin: "INE040A01034",
+    segments: ["Retail Banking", "Corporate Banking", "Treasury", "Wealth Management"],
+  },
+  INFY: {
+    description: "Infosys Limited is an Indian multinational information technology company that provides business consulting, information technology, and outsourcing services.",
+    founded: "1981",
+    ceo: "Salil Parekh",
+    hq: "Bengaluru, Karnataka",
+    employees: 336294,
+    website: "https://www.infosys.com",
+    isin: "INE009A01021",
+    segments: ["Financial Services", "Retail", "Communication", "Energy & Utilities", "Manufacturing"],
+  },
+  ICICIBANK: {
+    description: "ICICI Bank Limited is an Indian private sector bank headquartered in Mumbai. It offers a wide range of banking products and financial services to corporate and retail customers.",
+    founded: "1994",
+    ceo: "Sandeep Bakhshi",
+    hq: "Mumbai, Maharashtra",
+    employees: 130000,
+    website: "https://www.icicibank.com",
+    isin: "INE090A01021",
+    segments: ["Retail Banking", "Corporate Banking", "Treasury", "Insurance"],
+  },
+};
 
 interface CompanyInfoProps {
   symbol: string;
-  snapshot?: {
-    companyName?: string;
-    about?: string;
-  } | null;
+  companyName: string;
+  sector: string | null;
+  industry: string | null;
+  description: string | null;
+  exchange: string;
+  marketCap: number | null;
 }
 
-export const CompanyInfo = ({ symbol, snapshot }: CompanyInfoProps) => {
-  const profile = COMPANY_PROFILES[symbol];
-  const [expanded, setExpanded] = useState(false);
+export default function CompanyInfo({
+  symbol, companyName, sector, industry, description, exchange, marketCap,
+}: CompanyInfoProps) {
+  const profile = COMPANY_PROFILES[symbol.toUpperCase()];
 
-  const about = profile?.about ?? snapshot?.about ?? 
-    `${snapshot?.companyName ?? symbol} is a publicly listed Indian company on the NSE and BSE.`;
-  
-  const truncated = about.length > 300 && !expanded;
-  const displayText = truncated ? about.slice(0, 300) + '...' : about;
-
-  const facts: { label: string; value: string | number | null; isLink?: boolean }[] = [
-    { label:'Founded',        value: profile?.founded?.toString() ?? '—' },
-    { label:'CEO / MD',       value: profile?.ceo ?? '—' },
-    { label:'Headquarters',   value: profile?.hq ?? '—' },
-    { label:'Employees',      value: profile?.employees ?? '—' },
-    { label:'Listed since',   value: profile?.listingDate ?? '—' },
-    { label:'NSE Symbol',     value: symbol },
-    { label:'BSE Code',       value: profile?.bseCode ?? '—' },
-    { label:'Website',        value: profile?.website ?? null, isLink: true },
-  ].filter(f => f.value !== '—');
+  const desc = profile?.description || description
+    ? `${description} ${companyName} operates in the ${sector?.toLowerCase() || "Indian"} sector with a diversified business model and established market presence.`
+    : `${companyName} is a leading player in the ${sector?.toLowerCase() || "Indian"} sector with a diversified business model and established market presence.`;
 
   return (
-    <div style={{ 
-      background:'var(--surface)', border:'1px solid var(--border)',
-      borderRadius:'var(--r-lg)', padding:'24px', margin:'12px 0',
+    <div style={{
+      background: "var(--surface)", border: "1px solid var(--border)",
+      borderRadius: "var(--r-lg)", padding: 24,
     }}>
-      <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-        textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:14 }}>
-        About {profile?.fullName ?? snapshot?.companyName ?? symbol}
+      <div style={{
+        fontSize: "var(--sz-xs)", fontWeight: 700, color: "var(--text-300)",
+        textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16,
+      }}>
+        About {companyName}
       </div>
-      
-      <p style={{ fontSize:'var(--sz-base)', color:'var(--text-500)', 
-        lineHeight:1.7, marginBottom:4 }}>
-        {displayText}
+
+      <p style={{ fontSize: "var(--sz-base)", color: "var(--text-500)", lineHeight: 1.7, marginBottom: 20 }}>
+        {desc}
       </p>
-      {about.length > 300 && (
-        <button onClick={() => setExpanded(!expanded)} style={{
-          background:'none', border:'none', cursor:'pointer', padding:0,
-          fontSize:'var(--sz-sm)', fontWeight:600, color:'var(--brand-text)',
-          fontFamily:'var(--font)',
-        }}>
-          {expanded ? 'Show less' : 'Read more →'}
-        </button>
-      )}
 
-      <div style={{ height:1, background:'var(--border)', margin:'20px 0' }} />
-
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px 24px' }}>
-        {facts.map(fact => (
-          <div key={fact.label} style={{ display:'flex', flexDirection:'column', gap:2 }}>
-            <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-              textTransform:'uppercase', letterSpacing:'0.05em' }}>
-              {fact.label}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
+        {[
+          { label: "Founded", value: profile?.founded || "\u2014" },
+          { label: "CEO", value: profile?.ceo || "\u2014" },
+          { label: "Headquarters", value: profile?.hq || "\u2014" },
+          { label: "Employees", value: profile?.employees ? profile.employees.toLocaleString("en-IN") : "\u2014" },
+          { label: "Website", value: profile?.website
+            ? <a href={profile.website} target="_blank" rel="noopener" style={{ color: "var(--brand)", fontSize: "var(--sz-sm)" }}>{new URL(profile.website).hostname}</a>
+            : "\u2014" },
+          { label: "Exchange", value: exchange },
+          { label: "ISIN", value: profile?.isin || "\u2014" },
+          { label: "Sector", value: sector || "\u2014" },
+          { label: "Industry", value: industry || "\u2014" },
+        ].map((f, i) => (
+          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{
+              fontSize: "var(--sz-xs)", color: "var(--text-300)", fontWeight: 600,
+              textTransform: "uppercase", letterSpacing: "0.05em",
+            }}>
+              {f.label}
             </div>
-            {fact.isLink && fact.value ? (
-              <a href={`https://${fact.value}`} target="_blank" rel="noopener noreferrer"
-                style={{ fontSize:'var(--sz-sm)', fontWeight:500, color:'var(--brand-text)' }}>
-                {fact.value} ↗
-              </a>
-            ) : (
-              <div style={{ fontSize:'var(--sz-sm)', fontWeight:600, color:'var(--text-900)' }}>
-                {fact.value}
-              </div>
-            )}
+            <div style={{ fontSize: "var(--sz-sm)", fontWeight: 600, color: "var(--text-900)" }}>
+              {f.value}
+            </div>
           </div>
         ))}
       </div>
 
-      {profile?.sectors && (
-        <>
-          <div style={{ height:1, background:'var(--border)', margin:'20px 0 14px' }} />
-          <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-            {profile.sectors.map(s => (
-              <span key={s} style={{
-                padding:'4px 10px', borderRadius:'var(--r-pill)',
-                background:'var(--chip)', color:'var(--text-500)',
-                fontSize:'var(--sz-xs)', fontWeight:600,
+      {profile?.segments && (
+        <div>
+          <div style={{
+            fontSize: "var(--sz-xs)", color: "var(--text-300)", fontWeight: 600,
+            textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8,
+          }}>
+            Business Segments
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {profile.segments.map((seg, i) => (
+              <span key={i} style={{
+                fontSize: "var(--sz-sm)", fontWeight: 500, color: "var(--text-500)",
+                padding: "4px 10px", borderRadius: "var(--r-pill)",
+                background: "var(--chip)",
               }}>
-                {s}
+                {seg}
               </span>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
-};
-
-export default CompanyInfo;
+}

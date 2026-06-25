@@ -13,11 +13,18 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-body { min-height: 100vh; }
-a { color: var(--brand-text); text-decoration: none; }
+body { min-height: 100vh; overflow-x: hidden; }
+
+a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
-button { font-family: var(--font); }
+
+button { font-family: var(--font); cursor: pointer; }
 input, select, textarea { font-family: var(--font); }
+
+.tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 @keyframes shimmer {
   0%   { background-position: -600% 0; }
@@ -36,60 +43,14 @@ input, select, textarea { font-family: var(--font); }
   border-radius: var(--r-sm);
 }
 
-/* Content area: starts after 220px sidebar */
-.content-area {
-  margin-left: 220px;
-  padding: var(--sp-8) var(--sp-10);
-  min-height: 100vh;
-  background: var(--page);
-}
-
-.page-content {
-  max-width: 900px;
-  width: 100%;
-}
-
-.page-content.wide {
-  max-width: 1060px;
-}
-
-/* Tabular numbers */
-.tabular {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Mobile */
 @media (max-width: 767px) {
   .hide-mobile { display: none !important; }
-  .content-area {
-    margin-left: 0;
-    padding: var(--sp-4) var(--sp-4) 80px;
-  }
-}
-
-/* Metrics grid responsive */
-@media (max-width: 900px) { .metrics-grid { grid-template-columns: repeat(3, 1fr) !important; } }
-@media (max-width: 640px) { .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-
-/* Mobile sticky bottom bar */
-@media (min-width: 768px) {
-  .sticky-bottom-bar { display: none !important; }
 }
 @media (min-width: 768px) {
   .hide-desktop { display: none !important; }
 }
 
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95) translateY(8px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.sticky-bottom,
+.bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
