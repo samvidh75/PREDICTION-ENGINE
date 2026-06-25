@@ -379,31 +379,44 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
 
         {/* 2. Price Graph */}
         <SectionCard style={{ marginBottom: 16, padding: isMobile ? 14 : 20 }}>
-          {/* 3. Time Intervals */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-            {["1D", "1W", "1M", "3M", "6M", "1Y", "5Y", "MAX"].map((name) => (
-              <button
-                key={name}
-                onClick={() => setPeriod(name)}
-                style={{
-                  fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
-                  border: period === name ? "none" : "1px solid rgba(15,23,42,0.10)",
-                  background: period === name ? "#111827" : "transparent",
-                  color: period === name ? "#FFFFFF" : "#64748B",
-                  cursor: "pointer",
-                }}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-          <SafeBlock>
-            <PriceChart
-              closes={data?.historical.closes ?? []}
-              timestamps={data?.historical.timestamps ?? []}
-              height={isMobile ? 180 : 240}
-            />
-          </SafeBlock>
+          {data?.historical.closes && data.historical.closes.length > 0 ? (
+            <>
+              {/* 3. Time Intervals */}
+              <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+                {["1D", "1W", "1M", "3M", "6M", "1Y", "5Y", "MAX"].map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => setPeriod(name)}
+                    style={{
+                      fontSize: 10, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
+                      border: period === name ? "none" : "1px solid rgba(15,23,42,0.10)",
+                      background: period === name ? "#111827" : "transparent",
+                      color: period === name ? "#FFFFFF" : "#64748B",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+              <SafeBlock>
+                <PriceChart
+                  closes={data?.historical.closes ?? []}
+                  timestamps={data?.historical.timestamps ?? []}
+                  height={isMobile ? 180 : 240}
+                />
+              </SafeBlock>
+            </>
+          ) : (
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#64748B", marginBottom: 4 }}>
+                Price history is not available yet.
+              </div>
+              <div style={{ fontSize: 11, color: "#94A3B8" }}>
+                Current price and fundamentals remain available above.
+              </div>
+            </div>
+          )}
         </SectionCard>
 
         <div className="lg:grid lg:grid-cols-[8fr_4fr] lg:gap-6">
