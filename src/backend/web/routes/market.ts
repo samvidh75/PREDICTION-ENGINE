@@ -77,6 +77,70 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
     return { ok: true, data: result.data, dataState: result.data?.dataState ?? "partial" };
   });
 
+  app.get("/api/stock/:symbol", async (request, reply) => {
+    const { symbol } = request.params as { symbol: string };
+    const sym = symbol.toUpperCase().trim();
+    try {
+      const priceResult = await indianApiService.getPrice(sym);
+      const profileResult = await indianApiService.getProfile(sym);
+      const fundaResult = await indianApiService.getFundamentals(sym);
+      const price = priceResult.data ?? null;
+      const profile = profileResult.data ?? null;
+      const fundamentals = fundaResult.data ?? null;
+
+      const closes: number[] = [];
+      const highs: number[] = [];
+      const lows: number[] = [];
+      const timestamps: number[] = [];
+
+      return {
+        symbol: sym,
+        price: {
+          current: price?.price ?? null,
+          change: price?.change ?? null,
+          changeAbs: price?.changePercent ?? null,
+          open: price?.open ?? null,
+          high: price?.high ?? null,
+          low: price?.low ?? null,
+          volume: price?.volume ?? null,
+          weekHigh52: price?.week52High ?? null,
+          weekLow52: price?.week52Low ?? null,
+          marketCap: price?.marketCap ?? null,
+          exchange: profile?.exchange ?? "NSE",
+          companyName: profile?.companyName ?? sym,
+          sector: profile?.sector ?? null,
+          error: null,
+        },
+        fundamentals: {
+          peRatio: fundamentals?.peRatio ?? null,
+          pbRatio: fundamentals?.pbRatio ?? null,
+          roe: fundamentals?.roe ?? null,
+          roce: fundamentals?.roce ?? null,
+          dividendYield: fundamentals?.dividendYield ?? null,
+          eps: fundamentals?.eps ?? null,
+          debtToEquity: fundamentals?.debtToEquity ?? null,
+          currentRatio: fundamentals?.currentRatio ?? null,
+          revenueGrowth: fundamentals?.salesGrowth ?? null,
+          profitGrowth: fundamentals?.profitGrowth ?? null,
+          marketCap: profile?.marketCap ?? null,
+          error: null,
+        },
+        historical: {
+          closes,
+          highs,
+          lows,
+          timestamps,
+          error: null,
+        },
+        dataCompleteness: 0.0,
+        fetchedAt: new Date().toISOString(),
+        errors: [],
+      };
+    } catch (err: any) {
+      return reply.status(500).send({ ok: false, message: "Stock data is not yet available." });
+    }
+  });
+
   app.get("/api/market/stock/:symbol/enrichment", async (request, reply) => {
     const { symbol } = request.params as { symbol: string };
     const result = await unifiedMarketDataService.getFullSnapshot(symbol.toUpperCase().trim());
