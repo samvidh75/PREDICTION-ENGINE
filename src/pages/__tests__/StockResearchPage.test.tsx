@@ -57,7 +57,10 @@ const mockPartialData = {
   price: {
     ...mockFullData.price,
     sector: null,
+    industry: null,
+    description: null,
   },
+  health: null,
   fundamentals: {
     ...mockFullData.fundamentals,
     peRatio: null,
@@ -252,7 +255,7 @@ describe("StockResearchPage", () => {
     });
 
     const { container } = render(<StockResearchPage symbol="TCS" />);
-    expect(container.querySelector('[style*="background: rgb(247, 248, 250)"]')).toBeTruthy();
+    expect(container.querySelector('[style*="background: rgb(243, 244, 246)"]')).toBeTruthy();
     const text = container.textContent || "";
     expect(text).toContain("Tata Consultancy Services");
   });
