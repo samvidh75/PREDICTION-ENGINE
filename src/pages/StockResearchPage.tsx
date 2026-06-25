@@ -495,7 +495,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
 
             {/* 12. Methodology & Data Update Note */}
             <div style={{ fontSize: 10, color: "#94A3B8", textAlign: "center", padding: "8px 0" }}>
-              {dataUpdated ? `Data updated: ${dataUpdated}` : "Data is being compiled from multiple sources."}
+              {dataUpdated ? `Research view prepared ${dataUpdated}` : "Based on latest available market data."}
               <br />
               StockStory is an AI research layer for Indian equities.
             </div>
