@@ -136,14 +136,16 @@ function calcAltmanZ(input: HealthInput): { z: number | null; zone: HealthResult
 function calcPiotroskiF(input: HealthInput): { score: number | null; details: string[] } {
   const details: string[] = []
   let score = 0
+  let evaluatedAny = false
 
   // --- Profitability (4 points) ---
 
   // 1. Positive Net Income
   if (present(input.netIncome) && input.netIncome! > 0) {
-    score++
+    score++; evaluatedAny = true
     details.push('✓ Positive Net Income')
   } else if (present(input.roe)) {
+    evaluatedAny = true
     // ROE positive implies net income positive
     if (input.roe! > 0) {
       score++
@@ -155,14 +157,16 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
 
   // 2. Positive Operating Cash Flow
   if (present(input.operatingCashFlow) && input.operatingCashFlow! > 0) {
-    score++
+    score++; evaluatedAny = true
     details.push('✓ Positive Operating Cash Flow')
   } else {
+    evaluatedAny = evaluatedAny || present(input.roe) || present(input.netIncome)
     details.push('? Operating Cash Flow data unavailable')
   }
 
   // 3. ROA higher than previous year (use ROE as proxy)
   if (present(input.roe) && present(input.prevRoe)) {
+    evaluatedAny = true
     if (input.roe! > input.prevRoe!) {
       score++
       details.push('✓ ROE improving YoY')
@@ -170,13 +174,14 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
       details.push('✗ ROE declining YoY')
     }
   } else if (present(input.roe) && input.roe! > 10) {
-    // If we can't compare, give benefit of doubt for strong ROE
+    evaluatedAny = true
     score++
     details.push('✓ Strong ROE (>10%)')
   }
 
   // 4. Cash Flow from Operations > Net Income
   if (present(input.operatingCashFlow) && present(input.netIncome)) {
+    evaluatedAny = true
     if (input.operatingCashFlow! > input.netIncome!) {
       score++
       details.push('✓ Operating CF > Net Income')
@@ -189,6 +194,7 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
 
   // 5. Long-term debt lower than previous year
   if (present(input.debtToEquity) && present(input.prevDebtToEquity)) {
+    evaluatedAny = true
     if (input.debtToEquity! < input.prevDebtToEquity!) {
       score++
       details.push('✓ D/E ratio improving')
@@ -196,12 +202,14 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
       details.push('✗ D/E ratio deteriorating')
     }
   } else if (present(input.debtToEquity) && input.debtToEquity! < 0.5) {
+    evaluatedAny = true
     score++
     details.push('✓ Low debt (D/E < 0.5)')
   }
 
   // 6. Current ratio higher than previous year
   if (present(input.currentRatio) && present(input.prevCurrentRatio)) {
+    evaluatedAny = true
     if (input.currentRatio! > input.prevCurrentRatio!) {
       score++
       details.push('✓ Current ratio improving')
@@ -209,6 +217,7 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
       details.push('✗ Current ratio declining')
     }
   } else if (present(input.currentRatio) && input.currentRatio! > 1.5) {
+    evaluatedAny = true
     score++
     details.push('✓ Healthy current ratio (>1.5)')
   }
@@ -222,11 +231,12 @@ function calcPiotroskiF(input: HealthInput): { score: number | null; details: st
   // 9. Asset turnover higher than previous year (skip - data unavailable)
 
   if (present(input.roce) && input.roce! > 15) {
+    evaluatedAny = true
     score++
     details.push('✓ Strong ROCE (>15%)')
   }
 
-  const finalScore = score
+  const finalScore = evaluatedAny ? score : null
   return { score: finalScore, details }
 }
 
@@ -256,8 +266,17 @@ export function computeHealthScore(input: HealthInput): HealthResult {
     const fScore = (piotroski.score / 9) * 100
     if (compositeScore !== null) {
       compositeScore = Math.round((compositeScore + fScore) / 2)
-    } else {
+    } else if (piotroski.score > 0) {
       compositeScore = Math.round(fScore)
+    }
+  }
+
+  // If we have an Altman zone but no F-Score, still use the Altman score
+  if (compositeScore === null && altman.zone !== null) {
+    switch (altman.zone) {
+      case 'safe': compositeScore = 75; break
+      case 'grey': compositeScore = 50; break
+      case 'distress': compositeScore = 25; break
     }
   }
 
@@ -292,7 +311,7 @@ export function getHealthLabel(composite: HealthResult['composite']): string {
     case 'average': return 'Healthy'
     case 'weakening': return 'Needs Review'
     case 'poor': return 'Weak'
-    default: return '—'
+    default: return 'Not enough data'
   }
 }
 

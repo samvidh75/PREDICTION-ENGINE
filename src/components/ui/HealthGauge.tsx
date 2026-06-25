@@ -18,7 +18,8 @@ export default function HealthGauge({
 }: HealthGaugeProps) {
   const color = getHealthColor(composite);
   const label = getHealthLabel(composite);
-  const displayScore = score ?? 50;
+  const hasScore = score !== null && score !== undefined;
+  const displayScore = hasScore ? score : 50;
   const strokeW = Math.max(6, Math.round(size * 0.08));
   const r = size / 2 - strokeW - 4;
   const circ = 2 * Math.PI * r;

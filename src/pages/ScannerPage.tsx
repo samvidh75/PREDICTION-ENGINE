@@ -105,6 +105,7 @@ export default function ScannerPage() {
     setRows([])
     setLoaded(0)
     const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 30000)
     const next: ScanRow[] = []
     for (let start = 0; start < NIFTY50_SYMBOLS.length; start += 5) {
       const batch = NIFTY50_SYMBOLS.slice(start, start + 5)
@@ -113,9 +114,14 @@ export default function ScannerPage() {
           try {
             const response = await fetch(`/api/stock/${symbol}`, {
               signal: controller.signal,
+              cache: "no-cache",
             })
+            await new Promise(r => setTimeout(r, 200)) // rate limit
             if (!response.ok) return null
-            const data = (await response.json()) as StockData
+            const text = await response.text()
+            if (!text || text.length < 10) return null
+            const data = JSON.parse(text) as StockData
+            if (!data.symbol && !data.price?.companyName) return null
             return { data, prediction: UnifiedPredictionEngine.predict(inputFor(data)) }
           } catch {
             return null
@@ -126,8 +132,9 @@ export default function ScannerPage() {
       setRows([...next])
       setLoaded(Math.min(start + batch.length, NIFTY50_SYMBOLS.length))
     }
+    clearTimeout(timeout)
     setLoading(false)
-    return () => controller.abort()
+    return () => { controller.abort(); clearTimeout(timeout); }
   }, [])
 
   useEffect(() => {
@@ -554,7 +561,14 @@ export default function ScannerPage() {
                       fontSize: 13,
                     }}
                   >
-                    Scanning Nifty 50 stocks...
+                    {loaded === 0 ? "Loading Nifty 50 data..." : `Loaded ${loaded}/${NIFTY50_SYMBOLS.length} stocks...`}
+                  </td>
+                </tr>
+              )}
+              {!loading && rows.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={{ padding: 32, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+                    No data available yet. Please try again later.
                   </td>
                 </tr>
               )}
