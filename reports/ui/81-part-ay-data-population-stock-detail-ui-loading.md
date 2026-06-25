@@ -82,10 +82,17 @@ The `stockstory` prediction data is available because it's pre-computed and stor
 - Error handling improved with `.catch()` wrappers around all API calls
 - Data completeness tracked via `dataCompleteness` field
 
+## IndianAPI Header Fix (Critical Bug)
+The root cause of all empty market data was identified and fixed:
+
+**Bug:** `IndianApiService.rawFetch()` declared the `X-API-KEY` header (line 53-54) but the `fetchWithTimeout()` function only accepted `(url, timeoutMs)` — it **never passed headers** to `fetch()`. The API key was configured in Railway but never actually sent with any request. Every IndianAPI call returned HTTP 400 because the auth header was missing.
+
+**Fix:** Updated `fetchWithTimeout()` to accept an optional `headers` parameter and pass it to `fetch()`. Updated the call site in `rawFetch()` to forward the headers.
+
 ## Remaining Issues
-1. IndianAPI key needs to be configured in Railway environment for live market data
-2. Vercel deploy needs to complete for the b1d188458 rewrite to take effect
-3. Data pipeline coverage (`symbols_covered`) only counts market data, not stockstory predictions
+1. Vercel deploy needs to complete for the b1d188458 rewrite to take effect
+2. Data pipeline coverage (`symbols_covered`) only counts market data, not stockstory predictions
+3. IndianAPI price/fundamentals still return partial/empty data for some symbols (data availability, not a bug)
 
 ## Defects Found (this pass)
 | ID | Severity | Route | Issue | Fix |
