@@ -7,7 +7,8 @@ interface StockData {
     open: number | null; high: number | null; low: number | null
     volume: number | null; weekHigh52: number | null; weekLow52: number | null
     marketCap: number | null; exchange: string; companyName: string
-    sector: string | null; error: string | null
+    sector: string | null; industry: string | null; description: string | null
+    website: string | null; error: string | null
   }
   fundamentals: {
     peRatio: number | null; pbRatio: number | null
@@ -17,6 +18,11 @@ interface StockData {
     revenueGrowth: number | null; profitGrowth: number | null
     marketCap: number | null; error: string | null
   }
+  health: {
+    score: number | null; classification: string | null
+    confidence: { level: string; score: number } | null
+    sector: string | null
+  } | null
   historical: {
     closes: number[]; highs: number[]
     lows: number[]; timestamps: number[]
