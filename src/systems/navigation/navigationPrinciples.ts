@@ -8,7 +8,7 @@ export const navigationPrinciples = {
 
   layout: {
     topbarIsolation: true,
-    sidebarCollapsible: true,
+    railCollapsible: true,
     persistentNavigation: true,
     mobileOptimised: true,
   },

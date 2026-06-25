@@ -15,7 +15,7 @@ export const designPrinciples = {
   },
 
   navigation: {
-    sidebarStyle: 'minimal-premium',
+    railStyle: 'minimal-premium',
     topbarIsolation: true,
     responsivePriority: 'mobile-first',
   },
