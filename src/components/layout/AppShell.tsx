@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { navigate } from "../product/routeConfig";
+import Logo from "../brand/Logo";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -43,10 +44,28 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (isMobile) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', paddingBottom: 68 }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '0 16px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
+        {/* Mobile top bar for navigation context */}
+        <div style={{
+          position: 'sticky', top: 0,
+          background: 'rgba(249, 249, 247, 0.92)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border)',
+          height: 52,
+          display: 'flex', alignItems: 'center',
+          padding: '0 16px',
+          zIndex: 90,
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+            StockStory
+          </div>
+        </div>
+        
+        <div style={{ padding: '16px 16px 0' }}>
           {children}
         </div>
+
         {/* Bottom nav */}
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, height: 60,
@@ -86,13 +105,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
         position: 'sticky', top: 0,
       }}>
         {/* Logo */}
-        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>
-            StockStory
-          </div>
-          <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.15em', marginTop: 2 }}>
-            INDIA
-          </div>
+        <div style={{ padding: '20px 12px', borderBottom: '1px solid var(--border)' }}>
+          <Logo />
         </div>
 
         {/* Nav links */}
@@ -121,8 +135,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div style={{ padding: '12px 20px', borderTop: '1px solid var(--border)', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-          Research-first investor tool
+        <div style={{ 
+          padding: '16px 12px', 
+          borderTop: '1px solid var(--border)', 
+          fontSize: 11, 
+          color: 'var(--text-muted)', 
+          lineHeight: 1.4,
+          textAlign: 'center',
+        }}>
+          © 2025 StockStory India · Not SEBI-registered
         </div>
       </aside>
 
