@@ -37,7 +37,7 @@ export default function MobileBottomNav() {
     <>
       <nav
         style={{
-          height: 72,
+          height: 'var(--nav-h)',
           background: '#FFFFFF',
           borderTop: '1px solid var(--border)',
           boxShadow: '0 -1px 3px rgba(0,0,0,0.04)',
@@ -47,30 +47,26 @@ export default function MobileBottomNav() {
       >
         {TABS.map(({ page, label, icon: Icon }) => {
           const isActive = page !== '__menu__' && (route === page || (!route && page === ''));
+          const isMenuActive = page === '__menu__' && menuOpen;
           return (
             <button
               key={page}
               onClick={() => handleTab(page)}
-              className="flex flex-col items-center gap-1"
-              style={{ minWidth: 48, height: 48 }}
+              className="flex flex-col items-center justify-center gap-0.5"
+              style={{ minWidth: 48, height: 48, padding: 0 }}
             >
               <Icon
                 size={20}
                 style={{
-                  color:
-                    page === '__menu__' && menuOpen
-                      ? 'var(--text-primary)'
-                      : isActive
-                        ? 'var(--action)'
-                        : 'var(--text-muted)',
+                  color: isActive || isMenuActive ? 'var(--action)' : 'var(--text-muted)',
                 }}
               />
               <span
                 style={{
                   fontSize: 10,
-                  color: isActive ? 'var(--action)' : 'var(--text-muted)',
+                  fontWeight: isActive || isMenuActive ? 600 : 400,
+                  color: isActive || isMenuActive ? 'var(--action)' : 'var(--text-muted)',
                   lineHeight: 1,
-                  fontWeight: isActive ? 600 : 400,
                 }}
               >
                 {label}

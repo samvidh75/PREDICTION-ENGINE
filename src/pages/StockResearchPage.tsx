@@ -441,18 +441,18 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 </>
               )}
             </div>
-            <h1
-              style={{
-                fontSize: isMobile ? 26 : 32,
-                fontWeight: 800,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.7px",
-                lineHeight: 1.1,
-                margin: 0,
-              }}
-            >
-              {data?.price.companyName ?? symbol}
-            </h1>
+              <h1
+                style={{
+                  fontSize: isMobile ? 26 : 32,
+                  fontWeight: 800,
+                  color: "var(--text-primary)",
+                  letterSpacing: "-0.5px",
+                  lineHeight: 1.2,
+                  margin: 0,
+                }}
+              >
+                {data?.price.companyName ?? symbol}
+              </h1>
           </div>
 
           <div style={{ flexShrink: 0, marginLeft: 16, textAlign: "center" }}>
@@ -869,10 +869,10 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
         <div
           style={{
             position: "fixed",
-            bottom: 72,
+            bottom: 64,
             left: 0,
             right: 0,
-            height: 72,
+            height: 64,
             background: "var(--surface)",
             borderTop: "1px solid var(--border)",
             backdropFilter: "blur(12px)",
@@ -926,12 +926,12 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
           <button
             style={{
               flex: 1,
-              height: 44,
-              borderRadius: 10,
-              border: "none",
-              background: "var(--action)",
-              color: "#fff",
-              fontSize: 12,
+              height: 40,
+              borderRadius: 8,
+              border: "1px solid var(--border)",
+              background: "transparent",
+              color: "var(--text-primary)",
+              fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",
               display: "flex",
@@ -953,8 +953,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
             bottom: 0,
             left: 0,
             right: 0,
-            height: 72,
-            background: "var(--surface)",
+            height: 64,
+            background: "#FFFFFF",
             borderTop: "1px solid var(--border)",
             zIndex: 50,
             display: "flex",

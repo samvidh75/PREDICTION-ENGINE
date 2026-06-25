@@ -16,8 +16,11 @@ export default function ProductShell({ children }: { children: React.ReactNode }
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <ProductTopBar compact={isMobile} />
       <main
-        className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8"
-        style={{ maxWidth: 1320, paddingBottom: isMobile ? 96 : 48 }}
+        className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8"
+        style={{
+          maxWidth: 'var(--content)',
+          paddingBottom: isMobile ? 'calc(var(--nav-h) + 24px)' : 48,
+        }}
       >
         {children}
       </main>
