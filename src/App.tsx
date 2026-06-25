@@ -1,82 +1,73 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { LayoutProvider } from "./context/LayoutContext";
+import TokenProvider from "./shared/ui/foundations/TokenProvider";
+import { buildTokenCssVars } from "./shared/ui/foundations/tokenCssVarMaps";
+import PageErrorBoundary from "./components/diagnostics/PageErrorBoundary";
+import AppShell from "./components/layout/AppShell";
 import HomePage from "./pages/HomePage";
 import ScannerPage from "./pages/ScannerPage";
 import StockResearchPage from "./pages/StockResearchPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import ComparePage from "./pages/ComparePage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/SignupPage";
 import PricingPage from "./pages/PricingPage";
 import SearchPage from "./pages/SearchPage";
-import { AuthProvider } from "./context/AuthContext";
-import { LayoutProvider } from "./context/LayoutContext";
-import TokenProvider from "./shared/ui/foundations/TokenProvider";
-import { buildTokenCssVars } from "./shared/ui/foundations/tokenCssVarMaps";
-import PageErrorBoundary from "./components/diagnostics/PageErrorBoundary";
+import ForgotPasswordPage from "./pages/LoginPage";
 
-type PublicRoute = "home" | "scanner" | "stock" | "watchlist" | "compare" | "login" | "pricing" | "search";
-
-function readRoute(): { page: PublicRoute; symbol: string } {
-  const url = new URL(window.location.href);
-  const path = url.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
-  const requested = (path === "login" ? "login" : url.searchParams.get("page") || "home").toLowerCase();
-  const page: PublicRoute = requested === "landing" ? "home" : ["home","scanner","stock","watchlist","compare","login","pricing","search"].includes(requested) ? requested as PublicRoute : "home";
-  return { page, symbol: (url.searchParams.get("id") || url.searchParams.get("symbol") || "TCS").toUpperCase().trim() };
+export default function App() {
+  return (
+    <AuthProvider>
+      <LayoutProvider>
+        <TokenProvider tokenVars={buildTokenCssVars()}>
+          <PageErrorBoundary>
+            <BrowserRouter>
+              <AppShell>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/stock/:symbol" element={<StockPage />} />
+                  <Route path="/scanner" element={<ScannerPage />} />
+                  <Route path="/watchlist" element={<WatchlistPage />} />
+                  <Route path="/compare" element={<ComparePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/pricing" element={<PricingPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </AppShell>
+            </BrowserRouter>
+          </PageErrorBoundary>
+        </TokenProvider>
+      </LayoutProvider>
+    </AuthProvider>
+  );
 }
 
-const ROUTE_META: Record<string, { title: string; desc: string }> = {
-  home:     { title: "StockStory India — AI-Powered Stock Research & Analysis Platform", desc: "AI-powered research on Nifty 50 stocks. Proprietary scores across 5 dimensions: Quality, Growth, Valuation, Momentum & Risk." },
-  scanner:  { title: "Stock Scanner — Research Nifty 50 Stocks | StockStory India", desc: "Browse Nifty 50 stocks sorted by quality, growth, value, momentum, and risk scores. Find high-conviction investment research ideas." },
-  search:   { title: "Search Companies — StockStory India", desc: "Search for Indian stock research — find company fundamentals, health scores, financial history, and comparison tools." },
-  stock:    { title: "Stock Research Report — StockStory India", desc: "Detailed research report with fundamentals, health score, financial history, and comparison tools." },
-  compare:  { title: "Compare Stocks — StockStory India", desc: "Compare Indian stocks side by side — fundamentals, health scores, financial performance, and research insights." },
-  watchlist:{ title: "Watchlist — StockStory India", desc: "Track companies you are researching. Monitor fundamentals, health scores, and performance over time." },
-  portfolio:{ title: "Portfolio — StockStory India", desc: "Track your investment portfolio and research insights." },
-  alerts:   { title: "Alerts — StockStory India", desc: "Set up alerts for stock price movements, score changes, and research updates." },
-  methodology:{ title: "Methodology — StockStory India", desc: "Learn how StockStory scores Indian stocks across quality, growth, valuation, momentum, and risk dimensions." },
-  pricing:  { title: "Pricing — StockStory India", desc: "StockStory India pricing plans for AI-powered stock research." },
-  login:    { title: "Sign In — StockStory India", desc: "Sign in to your StockStory India account." },
-};
+function StockPage() {
+  const params = new URLSearchParams(window.location.search);
+  const symbolFromSearch = (params.get("id") || params.get("symbol") || "TCS").toUpperCase().trim();
 
-function updateMeta(title: string, desc: string) {
-  document.title = title;
+  return <GlobalStockPage symbol={symbolFromSearch} />;
+}
+
+import { useParams } from "react-router-dom";
+
+function GlobalStockPage({ symbol: propSymbol }: { symbol?: string }) {
+  const routeParams = useParams<{ symbol: string }>();
+  const params = new URLSearchParams(window.location.search);
+  const symbolSearch = (params.get("id") || params.get("symbol") || "").toUpperCase().trim();
+  const symbol = propSymbol || routeParams.symbol || symbolSearch || "TCS";
+
+  const meta = {
+    title: `Research ${symbol} — StockStory India`,
+    desc: `Research ${symbol} with fundamentals, health score, financial history, and comparison tools.`
+  };
+  document.title = meta.title;
   const descEl = document.querySelector('meta[name="description"]');
-  if (descEl) descEl.setAttribute("content", desc);
-  const ogTitle = document.querySelector('meta[property="og:title"]');
-  if (ogTitle) ogTitle.setAttribute("content", title);
-  const ogDesc = document.querySelector('meta[property="og:description"]');
-  if (ogDesc) ogDesc.setAttribute("content", desc);
-  const twTitle = document.querySelector('meta[name="twitter:title"]');
-  if (twTitle) twTitle.setAttribute("content", title);
-  const twDesc = document.querySelector('meta[name="twitter:description"]');
-  if (twDesc) twDesc.setAttribute("content", desc);
+  if (descEl) descEl.setAttribute("content", meta.desc);
+
+  return <StockResearchPage symbol={symbol} />;
 }
-
-function PublicRouter() {
-  const [route,setRoute]=useState(readRoute);
-  useEffect(()=>{
-    const sync=()=>setRoute(readRoute());
-    window.addEventListener("popstate",sync);
-    window.addEventListener("urlchange",sync);
-    return()=>{window.removeEventListener("popstate",sync);window.removeEventListener("urlchange",sync);};
-  },[]);
-
-  const page = route.page === "stock" ? "stock" : route.page === "home" ? "home" : route.page;
-  const meta = ROUTE_META[page] || ROUTE_META.home;
-  const symbolTitle = route.page === "stock" ? `Research ${route.symbol} — StockStory India` : meta.title;
-  const symbolDesc = route.page === "stock" ? `Research ${route.symbol} with fundamentals, health score, financial history, and comparison tools.` : meta.desc;
-
-  useEffect(() => { updateMeta(symbolTitle, symbolDesc); }, [symbolTitle, symbolDesc]);
-
-  if(route.page==="scanner")return <ScannerPage/>;
-  if(route.page==="stock")return <StockResearchPage symbol={route.symbol}/>;
-  if(route.page==="watchlist")return <WatchlistPage/>;
-  if(route.page==="compare")return <ComparePage/>;
-  if(route.page==="login")return <LoginPage/>;
-  if(route.page==="pricing")return <PricingPage/>;
-  if(route.page==="search")return <SearchPage/>;
-  return <HomePage/>;
-}
-
-import AppShell from "./components/layout/AppShell";
-
-export default function App(){return <AuthProvider><LayoutProvider><TokenProvider tokenVars={buildTokenCssVars()}><PageErrorBoundary><AppShell><PublicRouter/></AppShell></PageErrorBoundary></TokenProvider></LayoutProvider></AuthProvider>;}
