@@ -125,6 +125,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
   const [showAllFacts, setShowAllFacts] = useState(false);
 
   const positive = (data?.price.change ?? 0) >= 0;
+  const lastClose = data?.historical.closes?.length ? data.historical.closes[data.historical.closes.length - 1] : null;
+  const displayPrice = data?.price.current ?? lastClose ?? null;
 
   const health = useMemo(() => computeHealthScore({
     roe: data?.fundamentals.roe ?? null,
@@ -204,15 +206,18 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
     },
   ], [data, prediction]);
 
-  const sector = (data?.price.sector ?? "").toLowerCase();
-  const isIT = sector.includes("it") || sector.includes("technology");
-  const isBank = sector.includes("bank");
+  const sector = (data?.price.sector ?? null);
+  const sectorLower = (sector ?? "").toLowerCase();
+  const isIT = sectorLower.includes("it") || sectorLower.includes("technology");
+  const isBank = sectorLower.includes("bank");
 
-  const companyDescription = isIT
-    ? `${data?.price.companyName ?? symbol} is an IT services company providing software development, consulting, and business process outsourcing to global clients.`
-    : isBank
-      ? `${data?.price.companyName ?? symbol} is a banking institution offering retail banking, corporate banking, treasury, and wealth management services.`
-      : `${data?.price.companyName ?? symbol} operates in the Indian market with a diversified business model and established market presence.`;
+  const companyDescription = !sector
+    ? `Company profile details are being compiled for ${data?.price.companyName ?? symbol}.`
+    : isIT
+      ? `${data?.price.companyName ?? symbol} is an IT services company providing software development, consulting, and business process outsourcing to global clients.`
+      : isBank
+        ? `${data?.price.companyName ?? symbol} is a banking institution offering retail banking, corporate banking, treasury, and wealth management services.`
+        : `${data?.price.companyName ?? symbol} operates in the Indian market with a diversified business model and established market presence.`;
 
   const companyFacts = [
     { label: "Sector", value: data?.price.sector ?? "—" },
@@ -329,7 +334,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
             </h1>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
               <span style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontVariantNumeric: "tabular-nums" }}>
-                {data?.price.current ? fPrice(data.price.current) : "—"}
+                {displayPrice ? fPrice(displayPrice) : "—"}
               </span>
               {data?.price.change !== null && data?.price.change !== undefined && (
                 <span style={{
