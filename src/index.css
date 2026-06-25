@@ -71,6 +71,15 @@ input, select, textarea { font-family: var(--font); }
     padding: var(--sp-4) var(--sp-4) 80px;
   }
 }
+
+/* Metrics grid responsive */
+@media (max-width: 900px) { .metrics-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+@media (max-width: 640px) { .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+
+/* Mobile sticky bottom bar */
+@media (min-width: 768px) {
+  .sticky-bottom-bar { display: none !important; }
+}
 @media (min-width: 768px) {
   .hide-desktop { display: none !important; }
 }

@@ -1,6 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mobile;
+}
 
 const RANGES = ['1D','5D','1M','3M','6M','1Y','3Y'] as const;
 
@@ -23,6 +34,7 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 };
 
 export const PriceChart = ({ symbol }: { symbol: string }) => {
+  const isMobile = useIsMobile();
   const [range, setRange] = useState<string>('1Y');
   const { data, isLoading, isError } = useQuery(
     {
@@ -72,7 +84,9 @@ export const PriceChart = ({ symbol }: { symbol: string }) => {
       <div style={{ display:'flex', gap:4, marginBottom:16, flexWrap:'wrap' }}>
         {RANGES.map(r => (
           <button key={r} onClick={() => setRange(r)} style={{
-            padding:'5px 12px', fontSize:'var(--sz-xs)', fontWeight:700,
+            padding: isMobile ? '4px 9px' : '5px 12px',
+            fontSize: isMobile ? 'var(--sz-2xs)' : 'var(--sz-xs)',
+            fontWeight:700,
             borderRadius:'var(--r-pill)', cursor:'pointer',
             background: r === range ? 'var(--text-900)' : 'transparent',
             color: r === range ? 'var(--text-inverse)' : 'var(--text-500)',
@@ -84,7 +98,7 @@ export const PriceChart = ({ symbol }: { symbol: string }) => {
         ))}
       </div>
 
-      <ResponsiveContainer width="100%" height={260}>
+      <ResponsiveContainer width="100%" height={isMobile ? 200 : 260}>
         <AreaChart data={data} margin={{ top:4, right:4, bottom:0, left:0 }}>
           <defs>
             <linearGradient id={`grad-${symbol}-${range}`} x1="0" y1="0" x2="0" y2="1">
