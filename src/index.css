@@ -1,49 +1,48 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-@import "./design-system/tokens.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './design-system/tokens.css';
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html {
-  font-family: var(--font-sans);
-  background: var(--bg-page);
-  color: var(--text-body);
+  font-family: var(--font);
+  font-size: var(--sz-base);
+  line-height: 1.55;
+  color: var(--text-700);
+  background: var(--page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
-body { margin: 0; min-height: 100vh; overflow-x: hidden; }
+
+body { min-height: 100vh; overflow-x: hidden; }
+
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
-button { font-family: inherit; }
 
-/* Safe area insets for mobile */
-.sticky-bottom,
-.bottom-nav,
-.sticky-bottom-bar {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+button { font-family: var(--font); cursor: pointer; }
+input, select, textarea { font-family: var(--font); }
+
+.tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@keyframes shimmer {
+  0%   { background-position: -600% 0; }
+  100% { background-position:  600% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #EEEEEA 25%, #E2E2DE 50%, #EEEEEA 75%);
+  background-size: 600% 100%;
+  animation: shimmer 1.8s ease infinite;
+  border-radius: var(--r-sm);
 }
 
-/* Touch targets — minimum 44px on mobile */
-@media (max-width: 767px) {
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  button, a, [role="button"], .btn-reset {
-    min-height: 44px;
-    min-width: 44px;
-  }
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-focus);
+  border-radius: var(--r-sm);
 }
 
-@layer utilities {
-  .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-}
-
-/* Mobile-first responsive helpers */
 @media (max-width: 767px) {
   .hide-mobile { display: none !important; }
 }
@@ -51,15 +50,7 @@ button { font-family: inherit; }
   .hide-desktop { display: none !important; }
 }
 
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.95) translateY(8px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
-}
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.sticky-bottom,
+.bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
