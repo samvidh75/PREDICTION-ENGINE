@@ -19,72 +19,133 @@ function safeStr(v: unknown): string | null {
   return null;
 }
 
+function extractPrice(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  if (typeof raw === 'string') {
+    const n = Number(raw.replace(/[₹,]/g, ''));
+    if (Number.isFinite(n)) return n;
+  }
+  if (typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    for (const key of ['NSE', 'BSE', 'nse', 'bse', 'price', 'last']) {
+      const v = obj[key];
+      if (v !== undefined && v !== null) {
+        if (typeof v === 'number' && Number.isFinite(v)) return v;
+        if (typeof v === 'string') {
+          const n = Number(v.replace(/[₹,]/g, ''));
+          if (Number.isFinite(n)) return n;
+        }
+      }
+    }
+  }
+  return null;
+}
+
 export function mapToMarketLivePrice(raw: unknown): MarketLivePrice {
   const r = (raw as Record<string, unknown>) ?? {};
+  const cp = r.currentPrice;
+  const metrics = r.keyMetrics;
+  const mcap = findMetric(metrics, 'Market Cap');
+  const beta = findMetric(metrics, 'Beta');
+  const week52High = r.yearHigh ?? findMetric(metrics, '52 week High');
+  const week52Low = r.yearLow ?? findMetric(metrics, '52 week Low');
+
   return {
-    symbol: safeStr(r.symbol ?? r.name) ?? "",
-    price: r.price !== undefined ? safeNum(r.price) : safeNum(r.last_price ?? r.lastPrice ?? r.close),
-    previousClose: safeNum(r.previous_close ?? r.previousClose),
-    open: safeNum(r.open),
-    high: safeNum(r.high),
-    low: safeNum(r.low),
-    change: safeNum(r.change),
-    changePercent: safeNum(r.change_percent ?? r.changePercent ?? r.pChange),
-    volume: safeNum(r.volume ?? r.total_traded_volume),
-    avgVolume: safeNum(r.avg_volume ?? r.averageVolume),
-    week52High: safeNum(r.week_52_high ?? r.week52High ?? r["52_week_high"]),
-    week52Low: safeNum(r.week_52_low ?? r.week52Low ?? r["52_week_low"]),
-    marketCap: safeNum(r.market_cap ?? r.marketCap),
-    tradedValue: safeNum(r.total_traded_value),
-    lastTradedAt: safeStr(r.last_traded_at ?? r.lastTradedAt ?? r.last_trade_time),
-    exchange: safeStr(r.exchange),
+    symbol: safeStr(r.name ?? r.symbol) ?? "",
+    price: extractPrice(cp),
+    previousClose: null,
+    open: null,
+    high: null,
+    low: null,
+    change: r.percentChange !== undefined ? safeNum(r.percentChange) : null,
+    changePercent: r.percentChange !== undefined ? safeNum(r.percentChange) : null,
+    volume: null,
+    avgVolume: null,
+    week52High: safeNum(week52High),
+    week52Low: safeNum(week52Low),
+    marketCap: safeNum(mcap),
+    tradedValue: null,
+    lastTradedAt: null,
+    exchange: "NSE",
     currency: "INR",
-    halted: !!r.halted || !!r.suspended,
-    delisted: !!r.delisted,
-    dataState: r.price !== undefined || r.last_price !== undefined ? "available" : "partial",
+    halted: false,
+    delisted: false,
+    dataState: extractPrice(cp) !== null ? "available" : "partial",
   };
 }
 
 export function mapToProfile(raw: unknown): CompanyProfileOverview {
   const r = (raw as Record<string, unknown>) ?? {};
+  const metrics = r.keyMetrics;
+  const mcap = findMetric(metrics, 'Market Cap');
   return {
-    symbol: safeStr(r.symbol ?? r.name) ?? "",
-    companyName: safeStr(r.company_name ?? r.companyName ?? r.name) ?? "Unidentified security",
-    shortName: safeStr(r.short_name ?? r.shortName),
-    nseTicker: safeStr(r.nse_ticker ?? r.nseSymbol ?? r.nse_symbol),
-    bseCode: safeStr(String(r.bse_code ?? r.bseCode ?? "")),
-    isin: safeStr(r.isin),
-    sector: safeStr(r.sector),
+    symbol: safeStr(r.name ?? r.symbol) ?? "",
+    companyName: safeStr(r.companyName ?? r.name) ?? "Unidentified security",
+    shortName: null,
+    nseTicker: null,
+    bseCode: null,
+    isin: null,
+    sector: safeStr(r.industry),
     industry: safeStr(r.industry),
-    description: safeStr(r.description),
-    website: safeStr(r.website),
-    marketCap: safeNum(r.market_cap ?? r.marketCap),
-    listingDate: safeStr(r.listing_date ?? r.listingDate),
-    faceValue: safeNum(r.face_value ?? r.faceValue),
-    exchange: safeStr(r.exchange),
-    dataState: r.company_name || r.name ? "available" : "partial",
+    description: safeStr(r.companyProfile),
+    website: null,
+    marketCap: safeNum(mcap),
+    listingDate: null,
+    faceValue: null,
+    exchange: "NSE",
+    dataState: r.companyName ? "available" : "partial",
   };
+}
+
+function findMetric(metrics: any, displayNamePattern: string): string | null {
+  if (!metrics || typeof metrics !== 'object') return null;
+  for (const category of Object.values(metrics)) {
+    if (Array.isArray(category)) {
+      for (const item of category) {
+        if (typeof item === 'object' && item !== null) {
+          const dn = String(item.displayName || '').toLowerCase();
+          if (dn.includes(displayNamePattern.toLowerCase())) {
+            const val = item.value;
+            return val !== null && val !== undefined && val !== 'None' ? String(val) : null;
+          }
+        }
+      }
+    }
+  }
+  return null;
 }
 
 export function mapToFundamentals(raw: unknown): FundamentalSnapshot {
   const r = (raw as Record<string, unknown>) ?? {};
+  const metrics = r.keyMetrics;
+  const pe = findMetric(metrics, 'P/E excluding extraordinary items, most recent fiscal year');
+  const pb = findMetric(metrics, 'Price to Book - most recent fiscal year');
+  const divYield = findMetric(metrics, 'Current Dividend Yield');
+  const eps = findMetric(metrics, 'EPS including extraordinary items - trailing 12 month');
+  const bv = findMetric(metrics, 'Book value per share - most recent fiscal year');
+  const de = findMetric(metrics, 'Total debt/total equity - most recent fiscal year');
+  const cr = findMetric(metrics, 'Current ratio - most recent fiscal year');
+  const roce = findMetric(metrics, 'ROCE');
+  const roe = findMetric(metrics, 'Return on average equity');
+
   return {
-    symbol: safeStr(r.symbol ?? r.name) ?? "",
-    peRatio: safeNum(r.pe_ratio ?? r.peRatio ?? r.pe),
-    pbRatio: safeNum(r.pb_ratio ?? r.pbRatio ?? r.pb),
-    roce: safeNum(r.roce),
-    roe: safeNum(r.roe),
-    debtToEquity: safeNum(r.debt_to_equity ?? r.debtToEquity ?? r["debt/equity"]),
-    dividendYield: safeNum(r.dividend_yield ?? r.dividendYield),
-    eps: safeNum(r.eps),
-    bookValue: safeNum(r.book_value ?? r.bookValue),
-    salesGrowth: safeNum(r.sales_growth ?? r.salesGrowth ?? r.revenue_growth),
-    profitGrowth: safeNum(r.profit_growth ?? r.profitGrowth),
-    operatingMargin: safeNum(r.operating_margin ?? r.operatingMargin),
-    netMargin: safeNum(r.net_margin ?? r.netMargin),
-    currentRatio: safeNum(r.current_ratio ?? r.currentRatio),
-    interestCoverage: safeNum(r.interest_coverage ?? r.interestCoverage),
-    dataState: r.pe_ratio || r.roe ? "available" : "partial",
+    symbol: safeStr(r.name ?? r.symbol) ?? "",
+    peRatio: safeNum(pe),
+    pbRatio: safeNum(pb),
+    roce: safeNum(roce),
+    roe: safeNum(roe),
+    debtToEquity: safeNum(de),
+    dividendYield: safeNum(divYield),
+    eps: safeNum(eps),
+    bookValue: safeNum(bv),
+    salesGrowth: null,
+    profitGrowth: null,
+    operatingMargin: null,
+    netMargin: null,
+    currentRatio: safeNum(cr),
+    interestCoverage: null,
+    dataState: pe || roe ? "available" : "partial",
   };
 }
 
