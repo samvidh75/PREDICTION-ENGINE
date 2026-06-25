@@ -257,10 +257,10 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
         </header>
         <div className="mx-auto w-full px-4 py-6" style={{ maxWidth: 1200 }}>
           <div style={{ display: "grid", gap: 20 }}>
-            <Skeleton h={32} r={8} />
-            <Skeleton h={200} r={12} />
-            <Skeleton h={100} r={12} />
-            <Skeleton h={160} r={12} />
+            <Skeleton height={32} radius={8} />
+            <Skeleton height={200} radius={12} />
+            <Skeleton height={100} radius={12} />
+            <Skeleton height={160} radius={12} />
           </div>
         </div>
       </div>
@@ -288,7 +288,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               onClick={() => void refetch()}
               style={{
                 marginTop: 16,
-                background: "#111827",
+                background: "var(--brand)",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -524,7 +524,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 </button>
                 <button style={{
                   width: "100%", padding: "10px 16px", borderRadius: 8,
-                  border: "none", background: "#111827", color: "#FFFFFF",
+                  border: "none", background: "var(--brand)", color: "#FFFFFF",
                   fontSize: 13, fontWeight: 600, cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 }}>
@@ -581,7 +581,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
           </button>
           <button style={{
             flex: 1, height: 40, borderRadius: 8, border: "none",
-            background: "#111827", color: "#FFFFFF", fontSize: 12, fontWeight: 600,
+            background: "var(--brand)", color: "#FFFFFF", fontSize: 12, fontWeight: 600,
             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
           }}>
             Invest <ArrowRight size={15} />

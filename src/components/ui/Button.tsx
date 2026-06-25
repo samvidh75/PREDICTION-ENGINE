@@ -1,47 +1,34 @@
-import React from "react";
+import type { ReactNode } from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
-  glass?: boolean;
-  children: React.ReactNode;
-}
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  size = "md",
-  glass = false,
-  children,
-  className = "",
-  ...props
+type ButtonAttrs = React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+export const Button = ({ children, variant = 'secondary', onClick, disabled, fullWidth, size = 'md', style, type, className, title }: {
+  children: ReactNode; variant?: ButtonVariant; onClick?: () => void;
+  disabled?: boolean; fullWidth?: boolean; size?: 'sm' | 'md' | 'lg'; style?: React.CSSProperties;
+  type?: ButtonAttrs['type']; className?: string; title?: string;
 }) => {
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2962FF] active:scale-[0.99]";
-
-  const variants: Record<string, string> = {
-    primary: "bg-[#2962FF] text-white hover:bg-[#3B71FF] border border-[#2962FF]",
-    secondary: glass
-      ? "border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:border-[#2962FF]/60"
-      : "bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:border-[#2962FF]/60 border border-[rgba(148,163,184,0.16)]",
-    outline: "bg-transparent border border-[rgba(148,163,184,0.16)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[#2962FF]/60",
-    ghost: "bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[rgba(15,23,42,0.03)] border border-transparent",
-    danger: "bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#FCA5A5] hover:bg-[#EF4444]/15",
+  const base: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+    fontFamily: 'var(--font-sans)', fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
+    border: 'none', borderRadius: 'var(--radius-md)', transition: 'all 0.15s ease',
+    width: fullWidth ? '100%' : undefined, opacity: disabled ? 0.5 : 1,
   };
-
-  const sizes: Record<string, string> = {
-    sm: "h-8 px-3 text-xs",
-    md: "h-10 px-4 text-sm",
-    lg: "h-11 px-5 text-sm",
+  const sizes: Record<string, React.CSSProperties> = {
+    sm: { padding: '7px 14px', fontSize: 13 },
+    md: { padding: '10px 20px', fontSize: 14 },
+    lg: { padding: '13px 28px', fontSize: 15 },
   };
-
+  const variants: Record<ButtonVariant, React.CSSProperties> = {
+    primary:   { background: 'var(--brand)', color: '#fff' },
+    secondary: { background: 'var(--bg-chip)', color: 'var(--text-primary)', border: '1px solid var(--border)' },
+    ghost:     { background: 'transparent', color: 'var(--text-secondary)' },
+    danger:    { background: 'var(--red-light)', color: 'var(--red)' },
+  };
   return (
-    <button
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    >
+    <button type={type} className={className} title={title} style={{ ...base, ...sizes[size], ...variants[variant], ...style }} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
 };
-
-export default Button;

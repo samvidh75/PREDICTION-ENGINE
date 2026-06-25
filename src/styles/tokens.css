@@ -1,0 +1,47 @@
+:root {
+  /* Backgrounds */
+  --bg-page:        #F8F8F6;   /* warm off-white page canvas */
+  --bg-card:        #FFFFFF;   /* pure white cards */
+  --bg-card-hover:  #FAFAF8;   /* subtle hover */
+  --bg-chip:        #F2F2EF;   /* tag/chip surfaces */
+
+  /* Brand */
+  --brand:          #1A56DB;   /* deep navy blue — sole accent */
+  --brand-light:    #EEF3FD;   /* brand tint backgrounds */
+  --brand-dark:     #1240A8;   /* brand hover/pressed */
+
+  /* Semantic */
+  --green:          #1A7F4B;   /* bull / healthy / positive */
+  --green-light:    #EDFAF3;
+  --red:            #C0392B;   /* bear / risk / negative */
+  --red-light:      #FEF0EE;
+  --amber:          #D97706;   /* caution / watch */
+  --amber-light:    #FFFBEB;
+
+  /* Text */
+  --text-primary:   #0F0F0F;   /* near-black headings */
+  --text-body:      #2C2C2C;   /* body copy */
+  --text-secondary: #5C5C5C;   /* labels, captions */
+  --text-muted:     #9A9A9A;   /* hints, placeholders */
+  --text-inverse:   #FFFFFF;
+
+  /* Borders */
+  --border:         #E8E8E4;   /* default hairline */
+  --border-strong:  #D0D0CA;   /* emphasis */
+  --border-focus:   #1A56DB;   /* keyboard focus rings */
+
+  /* Typography */
+  --font-sans:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:      'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing */
+  --radius-sm:      6px;
+  --radius-md:      10px;
+  --radius-lg:      14px;
+  --radius-xl:      20px;
+
+  /* Elevation (hairline shadows only — no drop shadows) */
+  --shadow-card:    0 0 0 1px var(--border);
+  --shadow-raised:  0 1px 3px rgba(0,0,0,0.06), 0 0 0 1px var(--border);
+  --shadow-modal:   0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px var(--border);
+}
