@@ -36,6 +36,18 @@ export interface EngineOutput {
     stability: EngineFactorScore;
     momentum: EngineFactorScore;
   };
+  technicals: {
+    rsi14: number | null;
+    macd: number | null;
+    macdSignal: number | null;
+    macdHist: number | null;
+    sma20: number | null;
+    sma50: number | null;
+    aboveSma20: boolean | null;
+    aboveSma50: boolean | null;
+    rsiZone: 'overbought' | 'neutral' | 'oversold' | null;
+    overallSignal: 'bullish' | 'neutral' | 'bearish' | null;
+  };
   dataCompleteness: number;
   availableWeight: number;
 }
