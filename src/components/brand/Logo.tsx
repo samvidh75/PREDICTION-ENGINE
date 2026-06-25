@@ -1,13 +1,21 @@
-import logoSrc from '../../assets/logo.svg';
-
 export default function Logo() {
   return (
-    <a href="/" className="flex items-center gap-2.5 no-underline">
-      <img src={logoSrc} alt="StockStory" width={28} height={28} className="flex-shrink-0" />
-      <div className="leading-none">
-        <div className="text-[16px] font-[700] text-[var(--text-primary)] tracking-[-0.02em]">StockStory</div>
-        <div className="mt-[2px] text-[11px] font-[500] text-[var(--text-secondary)] tracking-[0.08em]">India</div>
+    <div style={{ display:'flex', alignItems:'center', gap:10, padding:'4px 0' }}>
+      <img src="/logo-mark.svg" alt="StockStory" style={{ width:32, height:32, flexShrink:0 }} />
+      <div>
+        <div style={{
+          fontSize:15, fontWeight:800, color:'var(--text-900)',
+          letterSpacing:'-0.02em', lineHeight:1.1
+        }}>
+          StockStory
+        </div>
+        <div style={{
+          fontSize:10, fontWeight:600, color:'var(--text-300)',
+          letterSpacing:'0.08em', textTransform:'uppercase', lineHeight:1
+        }}>
+          India · Research
+        </div>
       </div>
-    </a>
+    </div>
   );
 }

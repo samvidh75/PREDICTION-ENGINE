@@ -1,25 +1,21 @@
 export const ROUTES = {
-  home: { page: '', label: 'Home', icon: 'Home' },
-  scanner: { page: 'scanner', label: 'Scanner', icon: 'BarChart3' },
-  rankings: { page: 'rankings', label: 'Rankings', icon: 'Award' },
-  search: { page: 'search', label: 'Search', icon: 'Search' },
-  compare: { page: 'compare', label: 'Compare', icon: 'GitCompare' },
-  watchlist: { page: 'watchlist', label: 'Watchlist', icon: 'Bookmark' },
-  portfolio: { page: 'portfolio', label: 'Portfolio', icon: 'Briefcase' },
-  alerts: { page: 'alerts', label: 'Alerts', icon: 'Bell' },
-  methodology: { page: 'methodology', label: 'Methodology', icon: 'BookOpen' },
-  settings: { page: 'settings', label: 'Settings', icon: 'Settings' },
-  pricing: { page: 'pricing', label: 'Pricing', icon: 'Crown' },
-} as const
+  home: { path: '/', label: 'Home', icon: 'Home' },
+  scanner: { path: '/scanner', label: 'Scanner', icon: 'BarChart3' },
+  search: { path: '/search', label: 'Search', icon: 'Search' },
+  compare: { path: '/compare', label: 'Compare', icon: 'GitCompare' },
+  watchlist: { path: '/watchlist', label: 'Watchlist', icon: 'Bookmark' },
+  portfolio: { path: '/portfolio', label: 'Portfolio', icon: 'Briefcase' },
+  alerts: { path: '/alerts', label: 'Alerts', icon: 'Bell' },
+  pricing: { path: '/pricing', label: 'Pricing', icon: 'Crown' },
+} as const;
 
-export function currentRoute(): string {
-  return new URLSearchParams(window.location.search).get('page') || ''
+export function navigate(path: string, symbol?: string) {
+  const p = symbol ? `/${path}/${symbol}` : path.startsWith('/') ? path : `/${path}`;
+  window.history.pushState({}, '', p);
+  window.dispatchEvent(new Event('urlchange'));
 }
 
-export function navigate(page: string, id?: string) {
-  const params = new URLSearchParams(window.location.search)
-  params.set('page', page)
-  if (id) params.set('id', id)
-  window.history.pushState({}, '', `?${params.toString()}`)
-  window.dispatchEvent(new Event('urlchange'))
+export function currentRoute(): string {
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  return path || 'home';
 }
