@@ -1,31 +1,31 @@
 import React from "react";
 
-interface PipelineHealthBadgeProps {
+interface DataIntegrityBadgeProps {
   errors: string[];
-  providerName?: string;
+  label?: string;
 }
 
-export function PipelineHealthBadge({ errors, providerName }: PipelineHealthBadgeProps) {
+export function DataIntegrityBadge({ errors, label }: DataIntegrityBadgeProps) {
   const hasErrors = errors.length > 0;
   const color = hasErrors ? "#EF4444" : "#22C55E";
-  const label = hasErrors ? `${errors.length} error${errors.length !== 1 ? "s" : ""}` : "OK";
-  const tooltip = hasErrors ? errors.join(" | ") : (providerName ? `${providerName}: healthy` : "All providers healthy");
+  const displayLabel = hasErrors ? `${errors.length} issue${errors.length !== 1 ? "s" : ""}` : "OK";
+  const tooltip = hasErrors ? errors.join(" | ") : (label ? `${label}: OK` : "All data OK");
 
   return (
     <span
       className="inline-flex items-center gap-1 text-[10px] font-medium text-[#64748B]"
       title={tooltip}
-      aria-label={`Pipeline health: ${label}`}
+      aria-label={`Data status: ${displayLabel}`}
     >
       <span
         className="h-2 w-2 rounded-full shrink-0"
         style={{ backgroundColor: color }}
         aria-hidden="true"
       />
-      {providerName && <span className="text-[#94A3B8]">{providerName}:</span>}
-      <span style={{ color }}>{label}</span>
+      {label && <span className="text-[#94A3B8]">{label}:</span>}
+      <span style={{ color }}>{displayLabel}</span>
     </span>
   );
 }
 
-export default PipelineHealthBadge;
+export default DataIntegrityBadge;

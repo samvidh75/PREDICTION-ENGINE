@@ -20,7 +20,7 @@ const DEFAULTS: UserPreferences = {
 };
 
 const SORT_LABELS: Record<UserPreferences["defaultSort"], string> = {
-  score: "Score",
+  score: "Conviction",
   quality: "Quality",
   growth: "Growth",
   momentum: "Momentum",
@@ -155,32 +155,32 @@ export const SettingsPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="block text-sm font-semibold text-[#E6EDF3]">
-                    Show data source badges
+                    Show data badges
                   </span>
                   <span className="mt-0.5 block text-xs text-[#9AA7B5]">
-                    Display source attribution badges on stock pages
+                    Display data attribution badges on stock pages
                   </span>
                 </div>
                 <Toggle
                   checked={prefs.showSourceBadges}
                   onChange={(v) => update("showSourceBadges", v)}
-                  label="Show data source badges"
+                  label="Show data badges"
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <span className="block text-sm font-semibold text-[#E6EDF3]">
-                    Show pipeline health panel
+                    Show data status panel
                   </span>
                   <span className="mt-0.5 block text-xs text-[#9AA7B5]">
-                    Display pipeline health indicator on the stock detail page
+                    Display data status indicator on the stock detail page
                   </span>
                 </div>
                 <Toggle
                   checked={prefs.showPipelineHealth}
                   onChange={(v) => update("showPipelineHealth", v)}
-                  label="Show pipeline health panel"
+                  label="Show data status panel"
                 />
               </div>
             </div>

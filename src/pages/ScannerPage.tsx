@@ -1,40 +1,852 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Bell, ChevronRight, Download, Search, Sparkles, Star, Trophy } from "lucide-react";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import TopNav, { navigate } from "../components/layout/TopNav";
-import MarketTicker from "../components/layout/MarketTicker";
-import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse";
-import type { StockData } from "../hooks/useStockData";
-import { UnifiedPredictionEngine, type EngineOutput } from "../prediction-engine/UnifiedPredictionEngine";
-import { fChange, fPrice } from "../lib/format";
-import { getScoreColor } from "../components/ui/ScoreRing";
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Download, Search } from "lucide-react"
+import TopNav from "../components/layout/TopNav"
+import MarketTicker from "../components/layout/MarketTicker"
+import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
+import { useStockData } from "../hooks/useStockData"
+import type { StockData } from "../hooks/useStockData"
+import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine"
+import type { EngineOutput } from "../prediction-engine/UnifiedPredictionEngine"
+import { getScoreColor } from "../components/ui/ScoreRing"
+import { fChange, fPrice } from "../lib/format"
+import { navigate } from "../components/product/routeConfig"
 
-type ScanRow = { data: StockData; prediction: EngineOutput };
-const displayNames: Record<string,string> = { RELIANCE:"Reliance Industries",TCS:"Tata Consultancy Services",HDFCBANK:"HDFC Bank Ltd.",INFY:"Infosys Limited",ICICIBANK:"ICICI Bank Ltd.",SUNPHARMA:"Sun Pharmaceutical Industries",HINDUNILVR:"Hindustan Unilever",SBIN:"State Bank of India",ITC:"ITC Limited",BHARTIARTL:"Bharti Airtel" };
-const inputFor = (data: StockData) => ({ peRatio:data.fundamentals.peRatio,pbRatio:data.fundamentals.pbRatio,roe:data.fundamentals.roe,roce:data.fundamentals.roce,debtToEquity:data.fundamentals.debtToEquity,currentRatio:data.fundamentals.currentRatio,revenueGrowth:data.fundamentals.revenueGrowth,profitGrowth:data.fundamentals.profitGrowth,dividendYield:data.fundamentals.dividendYield,closes:data.historical.closes });
-const signal: Record<string,[string,string]> = { EXCELLENT:["Strong Buy ↗","text-[#168345]"],HEALTHY:["Buy ↗","text-[#168345]"],STABLE:["Accumulate →","text-[#2367ad]"],WEAKENING:["Watch ⚠","text-[#b27800]"],AT_RISK:["Avoid ↘","text-[#d03838]"],INSUFFICIENT_DATA:["—","text-[#999]"] };
+type ScanRow = { data: StockData; prediction: EngineOutput }
 
-function ScoreBox({ score }: { score: number | null }) { return <div className="w-12 rounded-lg border border-[#cee5d3] bg-[#f1f8f2] px-1 py-1 text-center"><b className="tabular block text-[16px] text-[#168345]">{score ?? "—"}</b><span className="block text-[8px] text-[#3b784f]">{score === null ? "No data" : score >= 80 ? "Excellent" : score >= 65 ? "Healthy" : "Stable"}</span></div>; }
-function FactorMinis({ prediction }: { prediction: EngineOutput }) { const factors=[["Q",prediction.factorScores.quality.score],["G",prediction.factorScores.growth.score],["V",prediction.factorScores.valuation.score],["S",prediction.factorScores.stability.score],["M",prediction.factorScores.momentum.score]] as const; return <div className="flex gap-1">{factors.map(([name,value])=><div key={name} className="w-7 rounded border border-[#dce8dc] bg-[#f5faf5] py-1 text-center"><span className="block text-[7px] text-[#555]">{name}</span><b className="tabular block text-[8px] text-[#168345]">{value ?? "—"}</b></div>)}</div>; }
+const displayNames: Record<string, string> = {
+  RELIANCE: "Reliance Industries",
+  TCS: "Tata Consultancy Services",
+  HDFCBANK: "HDFC Bank Ltd.",
+  INFY: "Infosys Limited",
+  ICICIBANK: "ICICI Bank Ltd.",
+  SUNPHARMA: "Sun Pharmaceutical Industries",
+  HINDUNILVR: "Hindustan Unilever",
+  SBIN: "State Bank of India",
+  ITC: "ITC Limited",
+  BHARTIARTL: "Bharti Airtel",
+}
+
+const inputFor = (data: StockData) => ({
+  peRatio: data.fundamentals.peRatio,
+  pbRatio: data.fundamentals.pbRatio,
+  roe: data.fundamentals.roe,
+  roce: data.fundamentals.roce,
+  debtToEquity: data.fundamentals.debtToEquity,
+  currentRatio: data.fundamentals.currentRatio,
+  revenueGrowth: data.fundamentals.revenueGrowth,
+  profitGrowth: data.fundamentals.profitGrowth,
+  dividendYield: data.fundamentals.dividendYield,
+  closes: data.historical.closes,
+})
+
+const signal: Record<string, [string, string]> = {
+  EXCELLENT: ["High conviction", "var(--positive)"],
+  HEALTHY: ["Conviction", "var(--positive)"],
+  STABLE: ["Neutral", "var(--caution)"],
+  WEAKENING: ["Watch", "var(--caution)"],
+  AT_RISK: ["Risk rising", "var(--negative)"],
+  INSUFFICIENT_DATA: ["—", "var(--text-muted)"],
+}
+
+const PRESETS = [
+  "Quality compounders",
+  "Undervalued quality",
+  "Improving momentum",
+  "Low debt leaders",
+  "Earnings acceleration",
+  "Dividend stability",
+  "Turnaround watch",
+  "Risk rising",
+]
+
+const CLASS_FILTER_OPTIONS = [
+  { value: "All", label: "All classifications" },
+  { value: "Excellent", label: "High conviction" },
+  { value: "Healthy", label: "Conviction" },
+  { value: "Stable", label: "Neutral" },
+  { value: "Weakening", label: "Watch" },
+  { value: "At Risk", label: "Risk rising" },
+]
+
+function getKeyReason(prediction: EngineOutput): string {
+  const factors = prediction.factorScores
+  const entries = [
+    factors.quality,
+    factors.growth,
+    factors.valuation,
+    factors.stability,
+    factors.momentum,
+  ]
+  const best = entries.reduce((a, b) =>
+    (a.score ?? 0) >= (b.score ?? 0) ? a : b
+  )
+  const short = best.reason?.split("·")[0]?.trim() || "—"
+  return short
+}
+
+function getRiskLabel(score: number | null): { label: string; color: string } {
+  if (score === null) return { label: "—", color: "var(--text-muted)" }
+  if (score >= 70) return { label: "Low", color: "var(--positive)" }
+  if (score >= 50) return { label: "Moderate", color: "var(--caution)" }
+  return { label: "Elevated", color: "var(--negative)" }
+}
 
 export default function ScannerPage() {
-  const [rows,setRows]=useState<ScanRow[]>([]); const [loading,setLoading]=useState(false); const [loaded,setLoaded]=useState(0); const [query,setQuery]=useState(""); const [page,setPage]=useState(1); const [updated,setUpdated]=useState<string|null>(null); const [chips,setChips]=useState(["AI Score ≥ 50","Market: NSE & BSE","Market Cap: Large, Mid"]); const [classFilter,setClassFilter]=useState("All");
-  const runScan=useCallback(async()=>{setLoading(true);setRows([]);setLoaded(0);const controller=new AbortController();const next:ScanRow[]=[];for(let start=0;start<NIFTY50_SYMBOLS.length;start+=5){const batch=NIFTY50_SYMBOLS.slice(start,start+5);const results=await Promise.all(batch.map(async symbol=>{try{const response=await fetch(`/api/stock/${symbol}`,{signal:controller.signal});if(!response.ok)return null;const data=await response.json() as StockData;return {data,prediction:UnifiedPredictionEngine.predict(inputFor(data))};}catch{return null;}}));next.push(...results.filter((row):row is ScanRow=>row!==null));setRows([...next]);setLoaded(Math.min(start+batch.length,NIFTY50_SYMBOLS.length));}setUpdated(new Date().toISOString());setLoading(false);return()=>controller.abort();},[]);
-  useEffect(()=>{void runScan();},[runScan]);
-  const ranked=useMemo(()=>rows.filter(row=>`${row.data.symbol} ${row.data.price.companyName}`.toLowerCase().includes(query.toLowerCase())).filter(row=>classFilter==="All"||row.prediction.classification===classFilter.toUpperCase()).sort((a,b)=>(b.prediction.composite??-1)-(a.prediction.composite??-1)),[rows,query,classFilter]);
-  const visible=ranked.slice((page-1)*10,page*10); const pageCount=Math.max(1,Math.ceil(ranked.length/10));
-  const high=rows.filter(row=>(row.prediction.composite??0)>=80).length; const advances=rows.filter(row=>(row.data.price.change??0)>0).length; const declines=rows.filter(row=>(row.data.price.change??0)<0).length; const unchanged=rows.length-advances-declines;
-  const averages=useMemo(()=>["quality","growth","valuation","stability","momentum"].map(name=>{const values=rows.map(row=>row.prediction.factorScores[name as keyof EngineOutput["factorScores"]].score).filter((v):v is number=>v!==null);return {name,value:values.length?Math.round(values.reduce((a,b)=>a+b,0)/values.length):0};}),[rows]);
-  const exportRows=()=>{const csv=["Rank,Symbol,Company,Score,Price,Change",...ranked.map((row,index)=>[index+1,row.data.symbol,row.data.price.companyName,row.prediction.composite,row.data.price.current,row.data.price.change].join(","))].join("\n");const link=document.createElement("a");link.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));link.download="stockstory-scan.csv";link.click();URL.revokeObjectURL(link.href);};
-  return <div className="min-h-screen bg-[#f7f7f5]"><TopNav/><MarketTicker/><main className="mx-auto max-w-[1380px] px-0 py-0 md:px-5 md:py-5"><div className="border-b border-[#e8e8e8] bg-white px-5 pt-5 md:hidden"><h1 className="mb-1 text-[22px] font-[800] tracking-[-0.5px] text-[#0a0a0a]">AI Stock Scanner</h1><p className="mb-3.5 text-[13px] text-[#888]">Nifty 50 · Ranked by research score</p><div className="mb-3 flex h-[38px] items-center gap-2 rounded-lg border border-[#e8e8e8] bg-[#f5f5f5] px-3"><span className="text-[14px] text-[#bbb]">⌕</span><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Search stocks..." className="min-w-0 flex-1 border-0 bg-transparent text-[13px] text-[#0a0a0a] outline-none"/></div><div className="no-scrollbar flex gap-2 overflow-x-auto pb-3">{["All","Excellent","Healthy","Stable","Weakening"].map(filter=><button key={filter} onClick={()=>setClassFilter(filter)} className={`h-[30px] flex-shrink-0 rounded-full px-3.5 text-[12px] font-[600] ${classFilter===filter?"border-0 bg-[#0a0a0a] text-white":"border border-[#e8e8e8] bg-white text-[#555]"}`}>{filter}</button>)}</div></div><div className="grid gap-4 md:h-[calc(100vh-104px)] md:grid-cols-[240px_minmax(0,1fr)_240px]">
-    <aside className="hidden overflow-y-auto border-r border-[#e8e8e8] bg-white md:block"><div className="p-4"><div className="flex items-center gap-2"><h1 className="text-[17px] font-extrabold">AI Stock Scanner</h1><span className="rounded-full bg-[#edf7ef] px-2 py-1 text-[8px] font-bold text-[#168345]">AI-POWERED</span></div><p className="mt-2 text-[10px] leading-4 text-[#666]">Find high-quality, high-conviction stocks using AI & factor intelligence.</p><button className="mt-4 rounded-lg border px-3 py-2 text-[10px] font-semibold">▣ &nbsp; Saved Screens</button></div><div className="border-t p-4"><div className="mb-2 flex justify-between text-[11px] font-bold">Filters <button onClick={()=>setChips([])} className="text-[9px] font-normal text-[#777]">Reset All</button></div>{["Universe","Score Range","Sector","Quality","Growth","Valuation","Momentum","Market Cap","Risk"].map((name,index)=><div key={name} className="flex min-h-11 items-center border-b border-[#eee] text-[10px]"><Sparkles className="mr-2 h-3 w-3 text-[#168345]"/><span>{name}</span>{index===1?<div className="ml-auto h-1 w-20 rounded bg-[#b7d9bf]"><span className="block h-1 w-3/4 bg-[#168345]"/></div>:<ChevronRight className="ml-auto h-3 w-3 text-[#888]"/>}</div>)}<button disabled={loading} onClick={()=>void runScan()} className="mt-4 h-11 w-full rounded-lg bg-[#171717] text-[11px] font-semibold text-white disabled:opacity-60">{loading?`Loading ${loaded} of 50...`:"Run Scan ✦"}</button><button onClick={()=>localStorage.setItem("stockstory-saved-scan",JSON.stringify(chips))} className="mt-2 h-11 w-full rounded-lg border text-[10px]">▣ &nbsp; Save as New Screen</button></div></aside>
-    <section className="min-w-0 overflow-y-auto"><div className="hidden grid rounded-xl border border-[#e1e1de] bg-white sm:grid-cols-4 md:grid">{[["Total Companies",rows.length,""],["High Conviction",high,"text-[#168345]"],["Watchlist Matches",0,""],["Live Updates",updated?"Just now":"Loading","text-[#168345]"]].map(([name,value,color],i)=><div key={String(name)} className={`p-4 md:p-5 ${i?"sm:border-l sm:border-[#eee]":""}`}><div className="text-[9px] font-semibold">{name}</div><div className={`tabular mt-2 text-[20px] font-extrabold ${color}`}>{value}</div><div className="mt-1 text-[8px] text-[#888]">{i===0?"Scanned universe":i===1?"Score ≥ 80":i===2?"In your watchlist":"Real-time data"}</div></div>)}</div>
-      <div className="hidden mt-3 flex-wrap items-center gap-3 md:flex"><label className="relative flex-1"><Search className="absolute left-3 top-2.5 h-4 w-4 text-[#777]"/><input value={query} onChange={event=>{setQuery(event.target.value);setPage(1);}} placeholder="Search for a company" className="h-9 w-full rounded-lg border border-[#dededb] bg-white pl-9 pr-3 text-[10px] outline-none focus:border-[#168345]"/></label><select className="h-9 rounded-lg border bg-white px-3 text-[10px]" aria-label="Sort stocks"><option>AI Score (High to Low)</option></select><button onClick={exportRows} className="flex h-9 items-center gap-2 rounded-lg border bg-white px-3 text-[10px]"><Download className="h-3.5 w-3.5"/> Export</button></div>
-      <div className="my-3 hidden flex-wrap gap-2 md:flex">{chips.map(chip=><button key={chip} onClick={()=>setChips(current=>current.filter(item=>item!==chip))} className="rounded-full border border-[#d9e8db] bg-[#f0f7f1] px-3 py-1.5 text-[9px] text-[#356942]">{chip} &nbsp;×</button>)}{chips.length>0&&<button onClick={()=>setChips([])} className="text-[9px] text-[#777]">Clear All</button>}</div>
-      <div className="block md:hidden">{ranked.map((row,index)=>{const score=row.prediction.composite;const [signalText]=signal[row.prediction.classification];return <div key={row.data.symbol} onClick={()=>navigate("stock",row.data.symbol)} className="flex cursor-pointer items-center gap-3 border-b border-[#f5f5f5] bg-white px-5 py-3.5"><span className="w-5 flex-shrink-0 text-center text-[12px] font-[700] text-[#bbb]">{index+1}</span><div className="min-w-0 flex-1"><div className="mb-0.5 text-[14px] font-[700] text-[#0a0a0a]">{row.data.symbol}</div><div className="truncate text-[11px] text-[#888]">{row.data.price.companyName||displayNames[row.data.symbol]||row.data.symbol}</div></div><div className="flex-shrink-0 text-right"><div className="tabular mb-0.5 text-[16px] font-[800]" style={{color:getScoreColor(score)}}>{score??"—"}</div><div className="tabular text-[11px] text-[#888]">{row.data.price.current?`₹${Number(row.data.price.current).toLocaleString("en-IN",{maximumFractionDigits:0})}`:"—"}</div></div><div className="flex-shrink-0 text-right"><span className={`text-[12px] font-[600] ${(row.data.price.change??0)>=0?"text-[#1a7f4b]":"text-[#c0392b]"}`}>{row.data.price.change!==null?`${(row.data.price.change??0)>=0?"+":""}${row.data.price.change?.toFixed(1)}%`:"—"}</span><div className="mt-1"><span className={`rounded-full px-1.5 py-0.5 text-[9px] font-[700] ${signalText.includes("Strong")?"bg-[#ebf7f1] text-[#1a7f4b]":"bg-[#f5f5f5] text-[#888]"}`}>{signalText.replace(" ↗","").replace(" →","").replace(" ⚠","").replace(" ↘","")}</span></div></div><span className="flex-shrink-0 text-[16px] text-[#ddd]">›</span></div>})}{loading&&ranked.length===0?<div className="p-5 text-[13px] text-[#888]">Loading ranked stocks...</div>:null}</div>
-      <div className="hidden overflow-hidden rounded-xl border border-[#e1e1de] bg-white md:block"><div className="overflow-x-auto"><table className="w-full min-w-[820px] border-collapse text-left"><thead className="border-b bg-[#fafaf8] text-[8px] text-[#555]"><tr>{["Rank","Company","Sector","AI Score","Price (₹)","1D Change","Factors","AI Signal","Confidence"].map(h=><th key={h} className="px-3 py-3 font-semibold">{h}</th>)}</tr></thead><tbody>{visible.map((row,index)=>{const score=row.prediction.composite;const [signalText,signalColor]=signal[row.prediction.classification];return <tr key={row.data.symbol} onClick={()=>navigate("stock",row.data.symbol)} className="cursor-pointer border-b border-[#eee] hover:bg-[#fbfdfb]"><td className="px-3 py-3 text-[11px] font-bold">{(page-1)*10+index+1}</td><td className="px-3 py-3"><div className="flex items-center gap-2"><b className="block text-[10px]">{row.data.symbol}</b><small className="block max-w-[125px] truncate text-[8px] text-[#777]">{row.data.price.companyName||displayNames[row.data.symbol]||row.data.symbol}</small></div></td><td className="px-3 py-3 text-[9px]">{row.data.price.sector??"—"}</td><td className="px-3 py-3"><ScoreBox score={score}/></td><td className="tabular px-3 py-3 text-[10px] font-semibold">{fPrice(row.data.price.current)}</td><td className={`tabular px-3 py-3 text-[10px] font-semibold ${(row.data.price.change??0)>=0?"text-[#168345]":"text-[#d03838]"}`}>{fChange(row.data.price.change)}</td><td className="px-3 py-3"><FactorMinis prediction={row.prediction}/></td><td className={`px-3 py-3 text-[9px] font-semibold ${signalColor}`}>{signalText}</td><td className="px-3 py-3"><span className="inline-flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-[#28a55a] text-[8px] font-bold">{row.prediction.dataCompleteness}%</span></td></tr>})}{loading&&visible.length===0&&Array.from({length:6}).map((_,i)=><tr key={i}><td colSpan={9} className="p-3"><div className="h-9 animate-pulse rounded bg-[#efefec]"/></td></tr>)}</tbody></table></div><div className="flex items-center justify-between p-4 text-[9px] text-[#777]"><span>Showing {ranked.length?((page-1)*10+1):0} to {Math.min(page*10,ranked.length)} of {ranked.length} results</span><div className="flex gap-2"><button disabled={page===1} onClick={()=>setPage(p=>p-1)} className="rounded border px-3 py-1 disabled:opacity-30">‹</button><span className="rounded border border-[#b7d9bf] bg-[#f0f7f1] px-3 py-1 text-[#168345]">{page}</span><button disabled={page===pageCount} onClick={()=>setPage(p=>p+1)} className="rounded border px-3 py-1 disabled:opacity-30">›</button></div></div></div>
-      <div className="mt-3 hidden gap-3 md:grid md:grid-cols-3"><div className="rounded-xl border bg-white p-4"><h3 className="text-[10px] font-bold">Factor Distribution</h3><div className="mt-3 space-y-2">{averages.map(item=><div key={item.name} className="grid grid-cols-[58px_1fr_20px] items-center gap-2 text-[8px]"><span className="capitalize">{item.name}</span><span className="h-1.5 rounded bg-[#eee]"><span className="block h-1.5 rounded bg-[#168345]" style={{width:`${item.value}%`}}/></span><b>{item.value}</b></div>)}</div></div><div className="rounded-xl border bg-white p-4"><h3 className="text-[10px] font-bold">Score Heatmap</h3><div className="mt-4 grid grid-cols-7 gap-1">{Array.from({length:49}).map((_,i)=>{const value=rows[i%Math.max(rows.length,1)]?.prediction.composite??50;return <span key={i} className={`aspect-square rounded-sm ${value>=65?"bg-[#7fc894]":value>=50?"bg-[#d6eadb]":"bg-[#edb2aa]"}`}/>})}</div><div className="mt-3 text-[8px] text-[#777]">Low Score &nbsp; ▬ &nbsp; High Score</div></div><div className="rounded-xl border bg-white p-4"><h3 className="text-[10px] font-bold">Market Breadth</h3><div className="flex items-center"><div className="h-28 w-28"><ResponsiveContainer><PieChart><Pie data={[{v:advances},{v:declines},{v:unchanged}]} dataKey="v" innerRadius={30} outerRadius={44}><Cell fill="#18a252"/><Cell fill="#d93b3b"/><Cell fill="#bbb"/></Pie></PieChart></ResponsiveContainer></div><div className="text-[9px]"><b className="block text-[17px] text-[#168345]">{advances}</b>Advances<b className="mt-2 block text-[17px] text-[#d03838]">{declines}</b>Declines</div></div></div></div>
-    </section>
-    <aside className="hidden space-y-3 overflow-y-auto border-l border-[#e8e8e8] bg-white md:block"><div className="p-4"><h2 className="flex items-center gap-2 text-[14px] font-bold"><Sparkles className="h-4 w-4 text-[#168345]"/> AI Insights</h2><p className="mt-3 text-[9px] font-semibold">Why these stocks rank high today</p>{[["Improving Earnings Quality","Strong earnings growth and healthy margins."],["Relative Valuation Edge","Trading at attractive valuations."],["Momentum Strength","Prices above key moving averages."],["Low Risk Profile","Lower drawdowns and stable balance sheets."]].map(([title,body])=><div key={title} className="border-b py-4"><div className="flex gap-3"><Trophy className="h-4 w-4 text-[#168345]"/><div><b className="text-[9px]">{title}</b><p className="mt-1 text-[8px] leading-4 text-[#666]">{body}</p></div></div></div>)}</div><div className="border-t p-4"><h3 className="text-[10px] font-bold">Top Sectors in Scan</h3>{["IT Services","Banks","Pharma","Auto","FMCG"].map((sector,index)=><div key={sector} className="mt-3 grid grid-cols-[62px_1fr_18px] items-center gap-2 text-[8px]"><span>{sector}</span><span className="h-0.5 bg-[#168345]"/><b>{86-index*2}</b></div>)}</div><div className="border-t p-5"><div className="flex justify-between"><h3 className="text-[14px] font-bold">Make it Yours</h3><Bell className="h-5 w-5 text-[#888]"/></div><p className="mt-2 text-[9px] leading-4 text-[#666]">Save this scan and get alerts on matching stocks.</p><button onClick={()=>localStorage.setItem("stockstory-saved-scan",JSON.stringify(chips))} className="mt-4 h-11 w-full rounded-lg border text-[10px] font-semibold">▣ &nbsp; Save This Scan</button></div></aside>
-  </div><p className="mt-5 text-center text-[10px] leading-5 text-[#888]">Scores are for educational purposes only. Not investment advice. StockStory India is not SEBI-registered. Consult a SEBI-registered adviser.</p></main></div>;
+  const [rows, setRows] = useState<ScanRow[]>([])
+  const [loading, setLoading] = useState(false)
+  const [loaded, setLoaded] = useState(0)
+  const [query, setQuery] = useState("")
+  const [page, setPage] = useState(1)
+  const [classFilter, setClassFilter] = useState("All")
+  const [activePreset, setActivePreset] = useState<string | null>(null)
+
+  const runScan = useCallback(async () => {
+    setLoading(true)
+    setRows([])
+    setLoaded(0)
+    const controller = new AbortController()
+    const next: ScanRow[] = []
+    for (let start = 0; start < NIFTY50_SYMBOLS.length; start += 5) {
+      const batch = NIFTY50_SYMBOLS.slice(start, start + 5)
+      const results = await Promise.all(
+        batch.map(async (symbol) => {
+          try {
+            const response = await fetch(`/api/stock/${symbol}`, {
+              signal: controller.signal,
+            })
+            if (!response.ok) return null
+            const data = (await response.json()) as StockData
+            return { data, prediction: UnifiedPredictionEngine.predict(inputFor(data)) }
+          } catch {
+            return null
+          }
+        })
+      )
+      next.push(...results.filter((row): row is ScanRow => row !== null))
+      setRows([...next])
+      setLoaded(Math.min(start + batch.length, NIFTY50_SYMBOLS.length))
+    }
+    setLoading(false)
+    return () => controller.abort()
+  }, [])
+
+  useEffect(() => {
+    void runScan()
+  }, [runScan])
+
+  const ranked = useMemo(() => {
+    let filtered = rows
+    if (query) {
+      const q = query.toLowerCase()
+      filtered = filtered.filter(
+        (row) =>
+          row.data.symbol.toLowerCase().includes(q) ||
+          (row.data.price.companyName || "").toLowerCase().includes(q)
+      )
+    }
+    if (classFilter !== "All") {
+      const target = classFilter.toUpperCase().replace(/\s+/g, "_")
+      filtered = filtered.filter(
+        (row) => row.prediction.classification === target
+      )
+    }
+    return [...filtered].sort(
+      (a, b) => (b.prediction.composite ?? -1) - (a.prediction.composite ?? -1)
+    )
+  }, [rows, query, classFilter])
+
+  const visible = ranked.slice((page - 1) * 10, page * 10)
+  const pageCount = Math.max(1, Math.ceil(ranked.length / 10))
+
+  return (
+    <div
+      style={{
+        background: "var(--bg)",
+        minHeight: "100vh",
+        color: "var(--text-primary)",
+      }}
+    >
+      <TopNav />
+      <MarketTicker />
+      <main style={{ maxWidth: "var(--content)", margin: "0 auto", padding: "0 16px" }}>
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingTop: 24,
+            paddingBottom: 16,
+          }}
+        >
+          <div>
+            <h1
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                letterSpacing: "-0.5px",
+                margin: 0,
+                color: "var(--text-primary)",
+              }}
+            >
+              AI Stock Scanner
+            </h1>
+            <p
+              style={{
+                fontSize: 13,
+                color: "var(--text-secondary)",
+                margin: "4px 0 0",
+              }}
+            >
+              Nifty 50 &middot; Ranked by conviction score
+            </p>
+          </div>
+          <div className="hidden md:flex" style={{ gap: 8 }}>
+            <button
+              onClick={() => {
+                const csv = [
+                  "Rank,Symbol,Company,Conviction,Price,Change",
+                  ...ranked.map((row, i) =>
+                    [
+                      i + 1,
+                      row.data.symbol,
+                      row.data.price.companyName ||
+                        displayNames[row.data.symbol] ||
+                        row.data.symbol,
+                      row.prediction.composite,
+                      row.data.price.current,
+                      fChange(row.data.price.change),
+                    ].join(",")
+                  ),
+                ].join("\n")
+                const link = document.createElement("a")
+                link.href = URL.createObjectURL(
+                  new Blob([csv], { type: "text/csv" })
+                )
+                link.download = "stockstory-scan.csv"
+                link.click()
+                URL.revokeObjectURL(link.href)
+              }}
+              style={{
+                height: 36,
+                padding: "0 16px",
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--text-secondary)",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <Download size={14} />
+              Export
+            </button>
+          </div>
+        </div>
+
+        {/* Preset chips */}
+        <div
+          className="no-scrollbar"
+          style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
+            paddingBottom: 16,
+          }}
+        >
+          {PRESETS.map((preset) => (
+            <button
+              key={preset}
+              onClick={() =>
+                setActivePreset(activePreset === preset ? null : preset)
+              }
+              style={{
+                height: 32,
+                padding: "0 14px",
+                borderRadius: 20,
+                border:
+                  activePreset === preset
+                    ? "none"
+                    : "1px solid var(--border)",
+                background:
+                  activePreset === preset ? "var(--action)" : "var(--surface)",
+                color:
+                  activePreset === preset
+                    ? "#FFFFFF"
+                    : "var(--text-secondary)",
+                fontSize: 12,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              {preset}
+            </button>
+          ))}
+        </div>
+
+        {/* Filter bar */}
+        <div
+          className="flex flex-col md:flex-row"
+          style={{ gap: 12, paddingBottom: 16 }}
+        >
+          <div style={{ position: "relative", flex: 1 }}>
+            <Search
+              size={16}
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--text-muted)",
+                pointerEvents: "none",
+              }}
+            />
+            <input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setPage(1)
+              }}
+              placeholder="Search for a company..."
+              style={{
+                width: "100%",
+                height: 40,
+                paddingLeft: 36,
+                paddingRight: 12,
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--text-primary)",
+                fontSize: 13,
+                outline: "none",
+              }}
+            />
+          </div>
+          <select
+            value={classFilter}
+            onChange={(e) => {
+              setClassFilter(e.target.value)
+              setPage(1)
+            }}
+            style={{
+              height: 40,
+              padding: "0 12px",
+              borderRadius: 8,
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
+              color: "var(--text-primary)",
+              fontSize: 13,
+              outline: "none",
+              minWidth: 180,
+            }}
+          >
+            {CLASS_FILTER_OPTIONS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Desktop results table */}
+        <div
+          className="hidden md:block"
+          style={{
+            borderRadius: 12,
+            border: "1px solid var(--border)",
+            overflow: "hidden",
+          }}
+        >
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr
+                style={{
+                  background: "var(--surface)",
+                  borderBottom: "1px solid var(--border)",
+                }}
+              >
+                {[
+                  "Rank",
+                  "Company",
+                  "Sector",
+                  "Conviction",
+                  "Key Reason",
+                  "Risk",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      padding: "12px 16px",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                      color: "var(--text-muted)",
+                      textAlign: "left",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {visible.map((row, index) => {
+                const score = row.prediction.composite
+                const [signalText, signalColor] =
+                  signal[row.prediction.classification]
+                const risk = getRiskLabel(
+                  row.prediction.factorScores.stability.score
+                )
+                const reason = getKeyReason(row.prediction)
+                const company =
+                  row.data.price.companyName ||
+                  displayNames[row.data.symbol] ||
+                  row.data.symbol
+                return (
+                  <tr
+                    key={row.data.symbol}
+                    onClick={() => navigate("stock", row.data.symbol)}
+                    className="hover:bg-[rgba(148,163,184,0.04)]"
+                    style={{
+                      cursor: "pointer",
+                      borderBottom: "1px solid var(--border)",
+                      transition: "background 0.15s",
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: "14px 16px",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      {(page - 1) * 10 + index + 1}
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: 14,
+                          color: "var(--text-primary)",
+                        }}
+                      >
+                        {row.data.symbol}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "var(--text-secondary)",
+                          marginTop: 2,
+                        }}
+                      >
+                        {company}
+                      </div>
+                    </td>
+                    <td
+                      style={{
+                        padding: "14px 16px",
+                        fontSize: 12,
+                        color: "var(--text-secondary)",
+                      }}
+                    >
+                      {row.data.price.sector || "—"}
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 800,
+                            fontVariantNumeric: "tabular-nums",
+                            color: getScoreColor(score),
+                          }}
+                        >
+                          {score ?? "—"}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: signalColor,
+                          }}
+                        >
+                          {signalText}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      style={{
+                        padding: "14px 16px",
+                        fontSize: 12,
+                        color: "var(--text-secondary)",
+                        maxWidth: 220,
+                      }}
+                    >
+                      <span
+                        className="truncate block"
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {reason}
+                      </span>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: risk.color,
+                        }}
+                      >
+                        {risk.label}
+                      </span>
+                    </td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate("stock", row.data.symbol)
+                        }}
+                        style={{
+                          height: 28,
+                          padding: "0 10px",
+                          borderRadius: 6,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          color: "var(--text-secondary)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Research
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+              {loading && visible.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    style={{
+                      padding: 32,
+                      textAlign: "center",
+                      color: "var(--text-muted)",
+                      fontSize: 13,
+                    }}
+                  >
+                    Scanning Nifty 50 stocks...
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {pageCount > 1 && (
+          <div
+            className="hidden md:flex"
+            style={{
+              justifyContent: "center",
+              gap: 8,
+              padding: "16px 0",
+              alignItems: "center",
+            }}
+          >
+            <button
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              style={{
+                padding: "6px 14px",
+                borderRadius: 6,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color:
+                  page === 1 ? "var(--text-muted)" : "var(--text-primary)",
+                fontSize: 12,
+                cursor: page === 1 ? "default" : "pointer",
+              }}
+            >
+              Previous
+            </button>
+            <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+              Page {page} of {pageCount}
+            </span>
+            <button
+              disabled={page === pageCount}
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+              style={{
+                padding: "6px 14px",
+                borderRadius: 6,
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color:
+                  page === pageCount
+                    ? "var(--text-muted)"
+                    : "var(--text-primary)",
+                fontSize: 12,
+                cursor: page === pageCount ? "default" : "pointer",
+              }}
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {/* Mobile result cards */}
+        <div
+          className="md:hidden"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            paddingBottom: 24,
+          }}
+        >
+          {loading && ranked.length === 0 && (
+            <div
+              style={{
+                padding: 32,
+                textAlign: "center",
+                color: "var(--text-muted)",
+                fontSize: 13,
+              }}
+            >
+              Scanning Nifty 50 stocks...
+            </div>
+          )}
+          {visible.map((row, index) => {
+            const score = row.prediction.composite
+            const [signalText, signalColor] =
+              signal[row.prediction.classification]
+            const risk = getRiskLabel(
+              row.prediction.factorScores.stability.score
+            )
+            const company =
+              row.data.price.companyName ||
+              displayNames[row.data.symbol] ||
+              row.data.symbol
+            return (
+              <div
+                key={row.data.symbol}
+                onClick={() => navigate("stock", row.data.symbol)}
+                style={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: 16,
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "var(--text-muted)",
+                      minWidth: 20,
+                    }}
+                  >
+                    {(page - 1) * 10 + index + 1}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 15,
+                            color: "var(--text-primary)",
+                          }}
+                        >
+                          {row.data.symbol}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 800,
+                            fontVariantNumeric: "tabular-nums",
+                            color: getScoreColor(score),
+                            marginLeft: 12,
+                          }}
+                        >
+                          {score ?? "—"}
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: signalColor,
+                        }}
+                      >
+                        {signalText}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "var(--text-secondary)",
+                        marginTop: 2,
+                      }}
+                    >
+                      {company}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 16,
+                        marginTop: 8,
+                        fontSize: 12,
+                        color: "var(--text-secondary)",
+                      }}
+                    >
+                      <span>{row.data.price.sector || "—"}</span>
+                      <span style={{ fontWeight: 600, color: risk.color }}>
+                        Risk: {risk.label}
+                      </span>
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          color:
+                            (row.data.price.change ?? 0) >= 0
+                              ? "var(--positive)"
+                              : "var(--negative)",
+                        }}
+                      >
+                        {fChange(row.data.price.change)}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "var(--text-muted)",
+                        marginTop: 6,
+                      }}
+                    >
+                      {getKeyReason(row.prediction)}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        marginTop: 12,
+                      }}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate("stock", row.data.symbol)
+                        }}
+                        style={{
+                          height: 30,
+                          padding: "0 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          color: "var(--text-secondary)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Research
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate("compare", row.data.symbol)
+                        }}
+                        style={{
+                          height: 30,
+                          padding: "0 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          color: "var(--text-secondary)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Compare
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          navigate("watchlist", row.data.symbol)
+                        }}
+                        style={{
+                          height: 30,
+                          padding: "0 12px",
+                          borderRadius: 6,
+                          border: "1px solid var(--border)",
+                          background: "transparent",
+                          color: "var(--text-secondary)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Track
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            textAlign: "center",
+            padding: "24px 0 32px",
+            fontSize: 10,
+            color: "var(--text-muted)",
+            lineHeight: 1.6,
+          }}
+        >
+          Research scores are for educational purposes only. Not investment
+          advice.
+          <br />
+          StockStory India is not SEBI-registered. Consult a SEBI-registered
+          adviser.
+        </div>
+      </main>
+    </div>
+  )
 }

@@ -18,12 +18,12 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = 
 };
 
 const LABEL_MAP: Record<string, string> = {
-  EXCELLENT:         "Excellent",
-  HEALTHY:           "Healthy",
-  STABLE:            "Stable",
-  WEAKENING:         "Weakening",
-  AT_RISK:           "At Risk",
-  INSUFFICIENT_DATA: "Insufficient Data",
+  EXCELLENT:         "High conviction",
+  HEALTHY:           "Conviction",
+  STABLE:            "Neutral",
+  WEAKENING:         "Watch",
+  AT_RISK:           "Risk rising",
+  INSUFFICIENT_DATA: "Insufficient data",
 };
 
 const SIZE_CLS: Record<BadgeSize, string> = {

@@ -109,38 +109,38 @@ export function DataFreshnessBadge({ date }: FreshnessBadgeProps) {
   );
 }
 
-interface SourceBadgeProps {
-  source?: string | null;
+interface DataBadgeProps {
+  label?: string | null;
 }
 
-export function SourceBadge({ source }: SourceBadgeProps) {
+export function DataBadge({ label }: DataBadgeProps) {
   return (
     <span className="inline-flex items-center rounded-lg bg-[var(--color-surface-raised)]/80 backdrop-blur-sm px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-text-secondary)] font-mono select-none">
-      {source || "Unavailable"}
+      {label || "Not available"}
     </span>
   );
 }
 
-interface ProviderStatusPillProps {
+interface DataStatusPillProps {
   name: string;
   status:
     | { lifecycle: string; required: boolean; status: string; message: string }
     | string;
 }
 
-function providerPillStyle(status: string): { bg: string; text: string; border: string; label: string } {
+function dataPillStyle(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "healthy":
       return { bg: "bg-emerald-50/60", text: "text-emerald-700", border: "border-emerald-200/50", label: "Active" };
     case "present":
-      return { bg: "bg-emerald-50/60", text: "text-emerald-700", border: "border-emerald-200/50", label: "Configured" };
+      return { bg: "bg-emerald-50/60", text: "text-emerald-700", border: "border-emerald-200/50", label: "Available" };
     case "disabled":
     case "deprecated":
-      return { bg: "bg-[var(--color-surface-raised)]/60", text: "text-[var(--color-text-secondary)]", border: "border-[rgba(148,163,184,0.16)]", label: "Deprecated" };
+      return { bg: "bg-[var(--color-surface-raised)]/60", text: "text-[var(--color-text-secondary)]", border: "border-[rgba(148,163,184,0.16)]", label: "Not available" };
     case "missing_optional":
       return { bg: "bg-[var(--color-surface-raised)]/60", text: "text-[var(--color-text-secondary)]", border: "border-[rgba(148,163,184,0.16)]", label: "Optional" };
     case "missing_required":
-      return { bg: "bg-slate-50/60", text: "text-slate-700", border: "border-slate-200/50", label: "Required" };
+      return { bg: "bg-slate-50/60", text: "text-slate-700", border: "border-slate-200/50", label: "Expected" };
     default:
       return { bg: "bg-slate-50/60", text: "text-slate-700", border: "border-slate-200/50", label: status };
   }
@@ -152,12 +152,12 @@ function displayName(raw: string): string {
   return parts.join(" ");
 }
 
-export function ProviderStatusPill({ name, status }: ProviderStatusPillProps) {
+export function DataStatusPill({ name, status }: DataStatusPillProps) {
   const parsed = typeof status === "string"
     ? { lifecycle: "unknown", required: false, status, message: "" }
     : status;
 
-  const style = providerPillStyle(parsed.status);
+  const style = dataPillStyle(parsed.status);
   return (
     <div className="flex flex-col gap-0.5 px-3 py-2 text-xs border-b border-white/20 last:border-0">
       <div className="flex items-center justify-between gap-3">
