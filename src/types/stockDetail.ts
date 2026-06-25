@@ -16,7 +16,7 @@ export interface HealthBreakdown {
 
 export interface MetricItem {
   label: string;
-  value: number | null;
+  value: number | string | null;
   unit?: string;
   change?: number | null;
 }
