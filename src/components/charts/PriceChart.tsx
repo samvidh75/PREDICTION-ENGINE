@@ -41,12 +41,12 @@ export default function PriceChart({ closes, timestamps, height = 160 }: PriceCh
             width={64}
           />
           <Tooltip
-            contentStyle={{ background: "#0A0A0A", border: "none", borderRadius: 8, color: "#fff", fontSize: 12, padding: "6px 12px" }}
+            contentStyle={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 8, color: "#111827", fontSize: 12, padding: "8px 14px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.06)" }}
             formatter={(value) => {
               const numeric = typeof value === "number" ? value : Number(value ?? 0);
               return [`₹${numeric.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`, "Price"];
             }}
-            labelStyle={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}
+            labelStyle={{ color: "#6B7280", fontSize: 11 }}
           />
           <Line type="monotone" dataKey="price" stroke={lineColor} strokeWidth={2} dot={false} activeDot={{ r: 4, fill: lineColor, stroke: "#fff", strokeWidth: 2 }} />
         </LineChart>

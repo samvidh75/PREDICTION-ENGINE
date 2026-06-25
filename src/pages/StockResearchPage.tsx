@@ -507,6 +507,43 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </div>
             </section>
 
+            {/* Key Metrics Grid */}
+            <section>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}>
+                {[
+                  ["P/E Ratio", fRatio(data?.fundamentals.peRatio ?? null), "var(--text-primary)"],
+                  ["Market Cap", fMarketCap(data?.price.marketCap ?? null), "var(--text-primary)"],
+                  ["RSI (14)", prediction?.technicals.rsi14 !== null && prediction?.technicals.rsi14 !== undefined ? prediction.technicals.rsi14.toFixed(1) : "—",
+                    prediction?.technicals.rsi14 !== null && prediction?.technicals.rsi14 !== undefined
+                      ? prediction.technicals.rsi14 > 70 ? "var(--negative)" : prediction.technicals.rsi14 < 30 ? "var(--positive)" : "var(--text-primary)"
+                      : "var(--text-muted)"],
+                  ["MACD", prediction?.technicals.macd !== null && prediction?.technicals.macd !== undefined ? prediction.technicals.macd.toFixed(2) : "—",
+                    prediction?.technicals.macdHist !== null && prediction?.technicals.macdHist !== undefined
+                      ? prediction.technicals.macdHist > 0 ? "var(--positive)" : "var(--negative)"
+                      : "var(--text-muted)"],
+                ].map(([label, value, color]) => (
+                  <div key={String(label)}
+                    style={{
+                      background: "#FFFFFF",
+                      border: "1px solid var(--border)",
+                      borderRadius: 10,
+                      padding: "14px 16px",
+                      boxShadow: "var(--shadow-sm)",
+                    }}
+                  >
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500, marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: color as string, fontVariantNumeric: "tabular-nums" }}>
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <section>
               <SectionTitle icon={<Info size={14} />}>
                 Why It Matters
@@ -722,6 +759,75 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 <p style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8, textAlign: "right" }}>
                   Daily closing prices
                 </p>
+              </div>
+            </section>
+
+            {/* Corporate Narrative */}
+            <section>
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: 20,
+                  boxShadow: "var(--shadow-sm)",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+                  About {data?.price.companyName ?? symbol}
+                </div>
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
+                  {isIT
+                    ? `${data?.price.companyName ?? symbol} is a leading IT services company based in India, providing software development, consulting, and business process outsourcing services to global clients across industries including banking, financial services, insurance, retail, and manufacturing.`
+                    : isBank
+                      ? `${data?.price.companyName ?? symbol} is a major Indian banking institution offering a comprehensive range of financial products and services including retail banking, corporate banking, treasury operations, and wealth management across domestic and international markets.`
+                      : `${data?.price.companyName ?? symbol} operates within the Indian market, serving customers through a diversified business model. The company has established itself as a significant player in its sector with a strong market presence.`}
+                </p>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 16,
+                  marginTop: 16,
+                  paddingTop: 16,
+                  borderTop: "1px solid var(--border)",
+                }}>
+                  {[
+                    ["Founded", "Information pending"],
+                    ["Sector", data?.price.sector ?? "—"],
+                    ["Exchange", data?.price.exchange ?? "NSE"],
+                    ["Market Cap", fMarketCap(data?.price.marketCap ?? null)],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* News Feed */}
+            <section>
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid var(--border)",
+                  borderRadius: 12,
+                  padding: 20,
+                  boxShadow: "var(--shadow-sm)",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+                  News & Updates
+                </div>
+                <div style={{ padding: "20px 0", textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>
+                    News feed will appear here once available.
+                  </p>
+                  <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
+                    Track this company to get the latest news and updates.
+                  </p>
+                </div>
               </div>
             </section>
           </div>
