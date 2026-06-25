@@ -1,79 +1,92 @@
-type MiniSparklineProps = {
-  values: number[];
-  width: number;
-  height: number;
-  color: string;
-};
+import { useEffect, useState } from "react";
 
-const indices = [
-  { name: "NIFTY 50", value: "25,342.30", change: 0.42, history: [40, 42, 41, 44, 45, 47, 46, 49] },
-  { name: "SENSEX", value: "83,105.12", change: 0.36, history: [35, 36, 38, 37, 39, 42, 41, 43] },
-  { name: "BANK NIFTY", value: "56,824.75", change: -0.18, history: [48, 47, 49, 45, 44, 43, 42, 41] },
-  { name: "NIFTY IT", value: "38,902.60", change: 0.64, history: [30, 32, 34, 33, 35, 37, 39, 40] },
+const INDICES = [
+  { name: "NIFTY 50", symbol: "NIFTY" },
+  { name: "SENSEX", symbol: "SENSEX" },
+  { name: "BANK NIFTY", symbol: "BANKNIFTY" },
+  { name: "NIFTY IT", symbol: "NIFTYIT" },
 ];
 
-export function MiniSparkline({ values, width, height, color }: MiniSparklineProps) {
-  const safeValues = values.length > 1 ? values : [1, 1];
-  const min = Math.min(...safeValues);
-  const max = Math.max(...safeValues);
-  const span = max - min || 1;
-  const points = safeValues
-    .map((value, index) => {
-      const x = (index / (safeValues.length - 1)) * width;
-      const y = height - ((value - min) / span) * (height - 4) - 2;
-      return `${x},${y}`;
-    })
-    .join(" ");
-  const area = `0,${height} ${points} ${width},${height}`;
+type IndexQuote = {
+  name: string;
+  symbol: string;
+  value: number | null;
+  change: number | null;
+};
 
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="flex-shrink-0">
-      <polygon points={area} fill={color} opacity="0.08" />
-      <polyline points={points} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+function isMarketOpen(): boolean {
+  const now = new Date();
+  const ist = new Date(now.getTime() + 5.5 * 3600000);
+  const day = ist.getUTCDay();
+  const mins = ist.getUTCHours() * 60 + ist.getUTCMinutes();
+  return day >= 1 && day <= 5 && mins >= 555 && mins <= 930;
 }
 
-function isMarketOpen() {
-  const now = new Date();
-  const ist = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-  const day = ist.getUTCDay();
-  const h = ist.getUTCHours();
-  const m = ist.getUTCMinutes();
-  const totalMin = h * 60 + m;
-  return day >= 1 && day <= 5 && totalMin >= 555 && totalMin <= 930;
+async function fetchIndex(symbol: string): Promise<{ value: number | null; change: number | null }> {
+  try {
+    const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
+    if (!response.ok) return { value: null, change: null };
+    const data = await response.json();
+    return {
+      value: typeof data?.price?.current === "number" ? data.price.current : null,
+      change: typeof data?.price?.change === "number" ? data.price.change : null,
+    };
+  } catch {
+    return { value: null, change: null };
+  }
 }
 
 export default function MarketTicker() {
+  const [indices, setIndices] = useState<IndexQuote[]>(() =>
+    INDICES.map((idx) => ({ ...idx, value: null, change: null })),
+  );
   const open = isMarketOpen();
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      const next = await Promise.all(
+        INDICES.map(async (idx) => ({
+          ...idx,
+          ...(await fetchIndex(idx.symbol)),
+        })),
+      );
+      if (mounted) setIndices(next);
+    };
+    void load();
+    const id = window.setInterval(load, 60000);
+    return () => {
+      mounted = false;
+      window.clearInterval(id);
+    };
+  }, []);
+
   return (
-    <div className="no-scrollbar flex h-[48px] overflow-x-auto border-b border-[#e8e8e8] bg-white">
+    <div className="no-scrollbar flex h-10 items-center overflow-x-auto border-b border-[#e8e8e8] bg-white [-webkit-overflow-scrolling:touch]">
       {indices.map((idx, index) => (
         <div
           key={idx.name}
-          className={`flex min-w-[170px] flex-shrink-0 items-center gap-3 px-5 md:flex-1 ${
-            index < indices.length - 1 ? "border-r border-[#e8e8e8]" : ""
-          }`}
+          className="flex flex-shrink-0 items-center gap-2 whitespace-nowrap px-4"
+          style={{ borderRight: index < indices.length - 1 ? "1px solid #f0f0f0" : "none" }}
         >
-          <div>
-            <div className="mb-0.5 text-[10px] font-[600] leading-none tracking-[0.04em] text-[#888]">{idx.name}</div>
-            <div className="tabular text-[14px] font-[700] leading-none text-[#0a0a0a]">{idx.value ?? "—"}</div>
-          </div>
-          <span className={`flex-shrink-0 text-[12px] font-[600] ${idx.change >= 0 ? "text-[#1a7f4b]" : "text-[#c0392b]"}`}>
-            {idx.change >= 0 ? "+" : ""}
-            {(idx.change ?? 0).toFixed(2)}%
+          <span className="text-[10px] font-[600] tracking-[0.04em] text-[#999]">{idx.name}</span>
+          <span className="tabular text-[13px] font-[700] tracking-[-0.2px] text-[#0a0a0a]">
+            {idx.value !== null ? Number(idx.value).toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}
           </span>
-          <MiniSparkline values={idx.history.length ? idx.history : [1, 1]} width={60} height={24} color={idx.change >= 0 ? "#1a7f4b" : "#c0392b"} />
+          {idx.change !== null ? (
+            <span className={`text-[11px] font-[600] ${idx.change >= 0 ? "text-[#1a7f4b]" : "text-[#c0392b]"}`}>
+              {idx.change >= 0 ? "+" : ""}
+              {idx.change.toFixed(2)}%
+            </span>
+          ) : null}
         </div>
       ))}
-      <div className="hidden flex-shrink-0 items-center gap-2.5 border-l border-[#e8e8e8] px-5 sm:flex">
-        <div className={`h-[7px] w-[7px] flex-shrink-0 rounded-full ${open ? "bg-[#22c55e]" : "bg-[#ccc]"}`} />
-        <div>
-          <div className={`mb-0.5 text-[12px] font-[600] leading-none ${open ? "text-[#1a7f4b]" : "text-[#888]"}`}>
-            {open ? "Market is Open" : "Market Closed"}
-          </div>
-          <div className="text-[11px] text-[#888]">Closes 3:30 PM</div>
-        </div>
+
+      <div className="ml-auto flex flex-shrink-0 items-center gap-1.5 px-4">
+        <div className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${open ? "bg-[#22c55e]" : "bg-[#ccc]"}`} />
+        <span className={`whitespace-nowrap text-[11px] font-[600] ${open ? "text-[#1a7f4b]" : "text-[#888]"}`}>
+          {open ? "Market Open" : "Market Closed"}
+        </span>
       </div>
     </div>
   );
