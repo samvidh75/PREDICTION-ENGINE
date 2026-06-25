@@ -112,7 +112,7 @@ function SectionCard({ children, style }: { children: React.ReactNode; style?: R
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", letterSpacing: "0.02em", margin: 0, marginBottom: 16 }}>
+    <h2 style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", letterSpacing: "-0.02em", margin: 0, marginBottom: 16 }}>
       {children}
     </h2>
   );
@@ -231,7 +231,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
 
   if (loading && !data) {
     return (
-      <div style={{ background: "#F7F8FA", minHeight: "100vh" }}>
+      <div style={{ background: "#F3F4F6", minHeight: "100vh" }}>
         <header style={{ height: 64, background: "#FFFFFF", borderBottom: "1px solid rgba(15,23,42,0.10)" }} className="flex items-center px-4 sticky top-0 z-50">
           <div className="w-full mx-auto flex items-center" style={{ maxWidth: 1200 }}>
             <div style={{ width: 100, height: 28, background: "#F3F4F6", borderRadius: 8 }} />
@@ -251,7 +251,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
 
   if (error && !data) {
     return (
-      <div style={{ background: "#F7F8FA", minHeight: "100vh" }}>
+      <div style={{ background: "#F3F4F6", minHeight: "100vh" }}>
         <header style={{ height: 64, background: "#FFFFFF", borderBottom: "1px solid rgba(15,23,42,0.10)" }} className="flex items-center px-4 sticky top-0 z-50">
           <div className="w-full mx-auto flex items-center" style={{ maxWidth: 1200 }}>
             <div style={{ width: 100, height: 28, background: "#F3F4F6", borderRadius: 8 }} />
@@ -289,7 +289,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
   }
 
   return (
-    <div style={{ background: "#F7F8FA", minHeight: "100vh", paddingBottom: isMobile ? 144 : 40 }}>
+    <div style={{ background: "#F3F4F6", minHeight: "100vh", paddingBottom: isMobile ? 144 : 40 }}>
       {/* 1. Stock Name / Header */}
       <div className="mx-auto w-full" style={{ maxWidth: 1200, padding: isMobile ? "0 16px" : "0 24px" }}>
         <div style={{ padding: "16px 0 12px" }}>
