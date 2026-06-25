@@ -76,7 +76,7 @@ function useIsMobile() {
   return mobile;
 }
 
-function MetricValue({ value, unit, change }: { value: number | null; unit?: string; change?: number | null }) {
+function MetricValue({ value, unit, change }: { value: number | string | null; unit?: string; change?: number | null }) {
   if (value === null || value === undefined) {
     return <span style={{ fontSize: 20, fontWeight: 700, color: "#94A3B8", fontVariantNumeric: "tabular-nums" }}>—</span>;
   }
@@ -170,7 +170,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
       metrics: [
         { label: "P/E Ratio", value: data?.fundamentals.peRatio ?? null },
         { label: "P/B Ratio", value: data?.fundamentals.pbRatio ?? null },
-        { label: "Market Cap", value: data?.price.marketCap ?? null, unit: " Cr" },
+        { label: "Market Cap", value: data?.price.marketCap ? fMarketCap(data.price.marketCap) : null, unit: "" },
         { label: "EPS", value: data?.fundamentals.eps ?? null },
         { label: "Dividend Yield", value: data?.fundamentals.dividendYield ?? null, unit: "%" },
       ],
