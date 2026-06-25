@@ -1,1 +1,3 @@
-export { TopNav as default, TopNav } from "../layout/AppShell";
+import TopNav from "../layout/TopNav";
+export default TopNav;
+export { TopNav };
