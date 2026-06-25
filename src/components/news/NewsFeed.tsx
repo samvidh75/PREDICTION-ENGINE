@@ -9,59 +9,42 @@ interface NewsItem {
   snippet: string;
 }
 
-interface AdItem {
-  title: string;
-  snippet: string;
-  sponsor: string;
-}
-
-const ADS: AdItem[] = [
-  {
-    title: "Top brokerages reveal targets for this sector",
-    snippet: "Leading financial institutions have updated their outlook, citing strong fundamentals and growth trajectory.",
-    sponsor: "Sponsored",
-  },
-  {
-    title: "Institutional investors increase allocation to Indian equities",
-    snippet: "Foreign portfolio investors are rotating capital into high-conviction Indian names amid global market shifts.",
-    sponsor: "Sponsored",
-  },
-];
-
-// Fallback news when API is unavailable
-const FALLBACK_NEWS: NewsItem[] = [
-  { title: "Markets open higher tracking global cues", source: "Economic Times", date: new Date().toISOString().split('T')[0], link: "#", snippet: "Benchmark indices opened in the green today." },
-  { title: "Sector outlook remains positive for near term", source: "Business Standard", date: new Date().toISOString().split('T')[0], link: "#", snippet: "Analysts maintain positive outlook on the sector." },
-  { title: "Company announces expansion plans", source: "Mint", date: new Date().toISOString().split('T')[0], link: "#", snippet: "The company is investing in new growth initiatives." },
-];
-
 export default function NewsFeed({ symbol }: { symbol: string }) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [noSource, setNoSource] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchNews() {
       try {
-        // Try backend proxy first
         const res = await fetch(`/api/news/${symbol}`, {
           signal: AbortSignal.timeout(5000),
         });
         if (!cancelled && res.ok) {
           const data = await res.json();
-          setNews(data.articles || []);
-          setLoading(false);
-          return;
+          const items = (data.items || []).map((item: any) => ({
+            title: item.headline || "",
+            source: item.publisher || "News",
+            date: item.publishedAt ? new Date(item.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+            link: item.url || "",
+            snippet: item.summary || "",
+          })).filter((item: NewsItem) => item.title && item.link);
+
+          if (!cancelled) {
+            setNews(items);
+            setLoading(false);
+            return;
+          }
         }
       } catch {
-        // Backend unavailable - use fallback
+        // News source unavailable
       }
 
       if (!cancelled) {
-        setNews(FALLBACK_NEWS);
-        setError(true);
+        setNews([]);
+        setNoSource(true);
         setLoading(false);
       }
     }
@@ -70,126 +53,86 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
     return () => { cancelled = true; };
   }, [symbol]);
 
-  // Interleave ads with news items
-  const feedItems: ({ type: 'news'; item: NewsItem } | { type: 'ad'; item: AdItem })[] = [];
-
-  news.forEach((item, i) => {
-    feedItems.push({ type: 'news', item });
-    // Insert ads at positions 2 and 5 (0-indexed)
-    if (i === 1 && ADS.length > 0) {
-      feedItems.push({ type: 'ad', item: ADS[0] });
-    }
-    if (i === 4 && ADS.length > 1) {
-      feedItems.push({ type: 'ad', item: ADS[1] });
-    }
-  });
-
-  return (
-    <div>
-      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
-        News & Updates
-      </div>
-
-      {loading ? (
+  if (loading) {
+    return (
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+          Recent news
+        </div>
         <div style={{ padding: "20px 0", textAlign: "center" }}>
           <div style={{ height: 12, width: "60%", background: "var(--elevated)", borderRadius: 6, margin: "0 auto 8px" }} />
           <div style={{ height: 12, width: "40%", background: "var(--elevated)", borderRadius: 6, margin: "0 auto" }} />
         </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          {feedItems.map((entry, i) => {
-            if (entry.type === 'ad') {
-              const ad = entry.item;
-              return (
-                <a
-                  key={`ad-${i}`}
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "block",
-                    padding: "14px 16px",
-                    marginBottom: 8,
-                    borderRadius: 10,
-                    border: "1px solid var(--border)",
-                    background: "#FFFFFF",
-                    textDecoration: "none",
-                    boxShadow: "var(--shadow-sm)",
-                    transition: "box-shadow 0.15s ease",
-                  }}
-                  className="hover:shadow-md"
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                    <span style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                      color: "var(--text-muted)",
-                      background: "var(--elevated)",
-                      padding: "1px 6px",
-                      borderRadius: 3,
-                    }}>
-                      {ad.sponsor}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.4 }}>
-                    {ad.title}
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4, lineHeight: 1.5 }}>
-                    {ad.snippet}
-                  </div>
-                </a>
-              );
-            }
+      </div>
+    );
+  }
 
-            const newsItem = entry.item;
-            return (
-              <a
-                key={`news-${i}`}
-                href={newsItem.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "block",
-                  padding: "14px 16px",
-                  marginBottom: 8,
-                  borderRadius: 10,
-                  border: "1px solid var(--border)",
-                  background: "#FFFFFF",
-                  textDecoration: "none",
-                  boxShadow: "var(--shadow-sm)",
-                  transition: "box-shadow 0.15s ease",
-                }}
-                className="hover:shadow-md"
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <Newspaper size={12} style={{ color: "var(--text-muted)" }} />
-                  <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 500 }}>
-                    {newsItem.source}
-                  </span>
+  if (news.length === 0) {
+    return (
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+          Recent news
+        </div>
+        <div style={{ textAlign: "center", padding: "24px 0" }}>
+          <Newspaper size={20} style={{ color: "var(--text-muted)", margin: "0 auto 8px", display: "block" }} />
+          <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
+            Recent news is not available yet.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
+        Recent news
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {news.slice(0, 10).map((item, i) => (
+          <a
+            key={`news-${i}`}
+            href={item.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block",
+              padding: "14px 16px",
+              marginBottom: 8,
+              borderRadius: 10,
+              border: "1px solid var(--border)",
+              background: "#FFFFFF",
+              textDecoration: "none",
+              boxShadow: "var(--shadow-sm)",
+              transition: "box-shadow 0.15s ease",
+            }}
+            className="hover:shadow-md"
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+              <Newspaper size={12} style={{ color: "var(--text-muted)" }} />
+              <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 500 }}>
+                {item.source}
+              </span>
+              {item.date && (
+                <>
                   <span style={{ fontSize: 10, color: "var(--text-muted)" }}>·</span>
                   <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
-                    {newsItem.date}
+                    {item.date}
                   </span>
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.4 }}>
-                  {newsItem.title}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4, lineHeight: 1.5 }}>
-                  {newsItem.snippet}
-                </div>
-              </a>
-            );
-          })}
-
-          {error && (
-            <p style={{ fontSize: 11, color: "var(--text-muted)", textAlign: "center", marginTop: 12 }}>
-              Live news feed will appear once the news service is available.
-            </p>
-          )}
-        </div>
-      )}
+                </>
+              )}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.4 }}>
+              {item.title}
+            </div>
+            {item.snippet && (
+              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4, lineHeight: 1.5 }}>
+                {item.snippet}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
     </div>
   );
 }

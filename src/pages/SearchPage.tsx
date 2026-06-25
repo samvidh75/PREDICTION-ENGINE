@@ -6,7 +6,7 @@ import TopNav from "../components/layout/TopNav"
 import MarketTicker from "../components/layout/MarketTicker"
 
 const DISPLAY_NAMES: Record<string, string> = {
-  RELIANCE: "Reliance Industries", TCS: "Tata Consultancy Services",
+  RELIANCE: "Reliance Industries Ltd.", TCS: "Tata Consultancy Services Ltd.",
   HDFCBANK: "HDFC Bank", INFY: "Infosys", ICICIBANK: "ICICI Bank",
   SBIN: "State Bank of India", ITC: "ITC", HINDUNILVR: "Hindustan Unilever",
   LT: "Larsen & Toubro", BHARTIARTL: "Bharti Airtel",

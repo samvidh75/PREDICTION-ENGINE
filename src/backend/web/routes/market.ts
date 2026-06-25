@@ -1,4 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
+import { query } from "../../../db/index";
 import { indianApiService } from "../../integrations/indianapi/IndianApiService";
 import { unifiedMarketDataService } from "../../integrations/market/UnifiedMarketDataService";
 
@@ -92,7 +93,7 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      const [priceResult, profileResult, fundaResult, ssResult, indiaRawResult] = await Promise.all([
+      const [priceResult, profileResult, fundaResult, ssResult, indiaRawResult, historyResult] = await Promise.all([
         indianApiService.getPrice(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getProfile(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getFundamentals(sym).catch(() => ({ ok: false, data: null } as any)),
@@ -101,12 +102,17 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
         fetch(`https://stock.indianapi.in/stock?name=${encodeURIComponent(sym)}`, {
           headers: { "X-API-KEY": process.env.INDIANAPI_KEY || "" },
         }).then(r => r.ok ? r.json() : null).catch(() => null) as any,
+        query(
+          `SELECT trade_date, close, high, low, volume FROM daily_prices WHERE UPPER(REPLACE(symbol, ' ', '')) = $1 AND close > 0 ORDER BY trade_date ASC`,
+          [sym],
+        ).then(r => r.rows || []).catch(() => [] as any[]),
       ]);
       const price = priceResult?.data ?? null;
       const profile = profileResult?.data ?? null;
       const fundamentals = fundaResult?.data ?? null;
       const stockstoryData = ssResult?.data ?? null;
       const indiaRaw = indiaRawResult ?? null;
+      const dailyPrices = (historyResult as any[] || []).filter((r: any) => r.close > 0);
 
       const hasAnyData = price || profile || fundamentals || stockstoryData;
       const dataCompleteness = stockstoryData ? 0.6 : (hasAnyData ? 0.3 : 0.0);
@@ -175,7 +181,13 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           }
           return entries.sort((a: any, b: any) => a.fiscalYear.localeCompare(b.fiscalYear));
         })(),
-        historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
+        historical: {
+          closes: dailyPrices.map((r: any) => parseFloat(r.close)),
+          highs: dailyPrices.map((r: any) => r.high ? parseFloat(r.high) : null).filter((x: any) => x !== null),
+          lows: dailyPrices.map((r: any) => r.low ? parseFloat(r.low) : null).filter((x: any) => x !== null),
+          timestamps: dailyPrices.map((r: any) => Math.floor(new Date(r.trade_date).getTime() / 1000)),
+          error: null,
+        },
         dataCompleteness,
         fetchedAt: new Date().toISOString(),
         errors: [],

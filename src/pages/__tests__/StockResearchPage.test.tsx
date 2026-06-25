@@ -143,7 +143,7 @@ describe("StockResearchPage", () => {
     });
   });
 
-  it("renders price chart section", async () => {
+  it("renders price chart section when candles exist", async () => {
     (useStockData as ReturnType<typeof vi.fn>).mockReturnValue({
       data: mockFullData,
       loading: false,
@@ -151,12 +151,28 @@ describe("StockResearchPage", () => {
       refetch: vi.fn(),
     });
 
+    const { container } = render(<StockResearchPage symbol="TCS" />);
+    await waitFor(() => {
+      const chartDivs = container.querySelectorAll('.recharts-responsive-container');
+      expect(chartDivs.length).toBeGreaterThan(0);
+    });
+  });
+
+  it("shows Price history text when no candles exist", async () => {
+    const noHistoryData = {
+      ...mockFullData,
+      historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
+    };
+    (useStockData as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: noHistoryData,
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
     render(<StockResearchPage symbol="TCS" />);
     await waitFor(() => {
-      const intervals = ["1D", "1W", "1M", "3M", "6M", "1Y", "5Y", "MAX"];
-      intervals.forEach((interval) => {
-        expect(screen.getByText(interval)).toBeDefined();
-      });
+      expect(screen.getByText("Price history")).toBeDefined();
     });
   });
 
@@ -202,7 +218,7 @@ describe("StockResearchPage", () => {
     });
   });
 
-  it("renders News & Updates section", async () => {
+  it("renders news section", async () => {
     (useStockData as ReturnType<typeof vi.fn>).mockReturnValue({
       data: mockFullData,
       loading: false,
@@ -212,7 +228,7 @@ describe("StockResearchPage", () => {
 
     render(<StockResearchPage symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getAllByText("News & Updates").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText("Recent news").length).toBeGreaterThanOrEqual(1);
     });
   });
 
