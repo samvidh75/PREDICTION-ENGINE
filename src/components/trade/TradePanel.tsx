@@ -125,7 +125,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
               </div>
               <button onClick={handleConfirm}
                 className="w-full h-[40px] bg-[#533afd] text-white text-[14px] font-[400] rounded-[9999px] flex items-center justify-center gap-2 active:scale-[0.97] hover:bg-[#4434d4] transition-colors">
-                Buy {quantity} shares <ExternalLink size={13} />
+                Open {selectedBroker?.name} <ExternalLink size={13} />
               </button>
             </>
           )}

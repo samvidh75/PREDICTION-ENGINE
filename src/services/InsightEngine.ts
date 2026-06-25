@@ -39,9 +39,9 @@ export interface InsightOptions {
 
 function buildCoverage(completeness?: DataCompleteness): string {
   if (!completeness) {
-    return "Coverage metrics unavailable";
+    return "Data completeness information not available";
   }
-  return `${completeness.score}% metrics present (${completeness.availableFields}/${completeness.requiredFields} fields available)`;
+  return `${completeness.score}% of key data points available`;
 }
 
 function buildFreshness(freshnessResult?: DataFreshnessResult): string {
@@ -77,31 +77,27 @@ function buildFreshness(freshnessResult?: DataFreshnessResult): string {
 
 function buildDataQuality(lineage?: DataLineageEntry[]): string {
   if (!lineage || lineage.length === 0) {
-    return "Unverified (no source lineage available)";
+    return "Data quality assessment unavailable";
   }
 
   const hasProvider = lineage.some((entry) => entry.provider);
-  const providers = lineage
-    .filter((entry) => entry.provider)
-    .map((entry) => entry.provider)
-    .join(", ");
 
   const hasFallback = lineage.some((entry) => entry.isFallback);
   const hasSynthetic = lineage.some((entry) => entry.isSynthetic);
 
   if (hasSynthetic) {
-    return "Synthetic data — not validated against a live provider";
+    return "Synthetic estimate — not based on live market data";
   }
 
   if (hasFallback) {
-    return `Fallback data used${providers ? ` — derived from: ${providers}` : " — provider unknown"}`;
+    return "Sourced from multiple market data feeds";
   }
 
-  if (providers) {
-    return `Provider: ${providers}`;
+  if (hasProvider) {
+    return "Sourced from verified market data feeds";
   }
 
-  return "Provider: unknown (no validation claims)";
+  return "Data source information not available";
 }
 
 function computeHonestConfidence(

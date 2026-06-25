@@ -49,7 +49,7 @@ export function useUnifiedQuotes(symbols: string[]): Record<string, UnifiedQuote
             [symbol]: {
               quote: null,
               loading: false,
-              error: error instanceof Error ? error.message : "Quote unavailable",
+              error: error instanceof Error ? error.message : "Price not available",
             },
           }));
         }

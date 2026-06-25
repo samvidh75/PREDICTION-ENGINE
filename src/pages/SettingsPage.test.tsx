@@ -44,7 +44,7 @@ describe('SettingsPage states', () => {
   it('renders notifications tab with alert categories', () => {
     render(<SettingsPage />);
     expect(screen.getByText('Data preferences')).toBeInTheDocument();
-    expect(screen.getByText('Show data source badges')).toBeInTheDocument();
+    expect(screen.getByText('Show data badges')).toBeInTheDocument();
   });
 
   it('renders appearance tab without locked badge', () => {

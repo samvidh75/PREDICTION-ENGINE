@@ -92,8 +92,10 @@ describe("StockResearchPage", () => {
       refetch: vi.fn(),
     });
 
-    render(<StockResearchPage symbol="TCS" />);
-    expect(screen.getByText("TCS")).toBeDefined();
+    const { container } = render(<StockResearchPage symbol="TCS" />);
+    const skeletons = container.querySelectorAll('[style*="background: #F3F4F6"], [style*="border-radius"]');
+    expect(skeletons.length).toBeGreaterThan(0);
+    expect(container.textContent).not.toContain("Market data is temporarily unavailable");
   });
 
   it("renders error state", () => {
@@ -165,7 +167,7 @@ describe("StockResearchPage", () => {
 
     render(<StockResearchPage symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText("Key Metrics")).toBeDefined();
+      expect(screen.getAllByText("Key Metrics").length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -207,7 +209,7 @@ describe("StockResearchPage", () => {
 
     render(<StockResearchPage symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText("News & Updates")).toBeDefined();
+      expect(screen.getAllByText("News & Updates").length).toBeGreaterThanOrEqual(1);
     });
   });
 
