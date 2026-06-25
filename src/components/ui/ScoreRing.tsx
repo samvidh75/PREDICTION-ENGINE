@@ -1,25 +1,34 @@
-export function scoreColor(s: number | null): string {
-  if (!s) return "#e8e8e8";
-  if (s >= 80) return "#0d5c34";
-  if (s >= 65) return "#1a7f4b";
-  if (s >= 50) return "#1a56db";
-  if (s >= 35) return "#b45309";
-  return "#c0392b";
+import { useEffect, useState } from "react";
+
+interface ScoreRingProps {
+  score: number | null;
+  size: number;
+  showLabel?: boolean;
+  animate?: boolean;
 }
 
-export const getScoreColor = scoreColor;
+export function getScoreColor(s: number | null): string {
+  if (!s) return "#E8E8E8";
+  if (s >= 80) return "#0D5C34";
+  if (s >= 65) return "#1a7f4b";
+  if (s >= 50) return "#1A56DB";
+  if (s >= 35) return "#B45309";
+  return "#C0392B";
+}
 
-export function scoreLabel(s: number | null): string {
+export const scoreColor = getScoreColor;
+
+export function getScoreLabel(s: number | null): string {
   if (!s) return "—";
   if (s >= 90) return "Excellent";
   if (s >= 80) return "Very Good";
-  if (s >= 70) return "Good";
-  if (s >= 55) return "Fair";
-  if (s >= 40) return "Weak";
+  if (s >= 65) return "Good";
+  if (s >= 50) return "Fair";
+  if (s >= 35) return "Weak";
   return "Poor";
 }
 
-export const getScoreLabel = scoreLabel;
+export const scoreLabel = getScoreLabel;
 
 export function scoreColorBg(s: number | null): string {
   if (!s) return "#f5f5f5";
@@ -33,72 +42,77 @@ export function getSignalFromScore(s: number | null) {
   if (s === null) return { text: "—", color: "#bbb" };
   if (s >= 80) return { text: "Strong Buy ↗", color: "#1a7f4b" };
   if (s >= 65) return { text: "Buy ↗", color: "#1a7f4b" };
-  if (s >= 50) return { text: "Accumulate →", color: "#1a56db" };
-  if (s >= 35) return { text: "Watch ⚠", color: "#b45309" };
-  return { text: "Avoid ↘", color: "#c0392b" };
+  if (s >= 50) return { text: "Accumulate →", color: "#1A56DB" };
+  if (s >= 35) return { text: "Watch ⚠", color: "#B45309" };
+  return { text: "Avoid ↘", color: "#C0392B" };
 }
 
-interface ScoreRingProps {
-  score: number | null;
-  size: number;
-  showLabel?: boolean;
-}
+export default function ScoreRing({ score, size, showLabel = false, animate = true }: ScoreRingProps) {
+  const [displayed, setDisplayed] = useState(animate ? 0 : score);
 
-export default function ScoreRing({ score, size, showLabel = false }: ScoreRingProps) {
-  const strokeW = Math.max(6, size * 0.09);
-  const r = size / 2 - strokeW / 2;
+  useEffect(() => {
+    if (!animate || !score) {
+      setDisplayed(score);
+      return undefined;
+    }
+    setDisplayed(0);
+    const t = window.setTimeout(() => setDisplayed(score), 100);
+    return () => window.clearTimeout(t);
+  }, [animate, score]);
+
+  const strokeW = Math.max(6, Math.round(size * 0.09));
+  const r = size / 2 - strokeW;
   const circ = 2 * Math.PI * r;
-  const filled = score ? (score / 100) * circ : 0;
-  const color = scoreColor(score);
-  const label = scoreLabel(score);
-  const scoreFontSize = size * 0.27;
-  const labelFontSize = size * 0.12;
+  const fill = ((displayed ?? 0) / 100) * circ;
+  const color = getScoreColor(score);
+  const scoreFontSize = Math.round(size * 0.265);
+  const labelFontSize = Math.round(size * 0.115);
+  const scoreY = showLabel ? size / 2 - labelFontSize * 0.6 : size / 2;
+  const labelY = size / 2 + scoreFontSize * 0.42;
 
   return (
-    <div style={{ width: size, height: size + (showLabel ? labelFontSize + 6 : 0) }} className="flex flex-col items-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#EBEBEB" strokeWidth={strokeW} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeW}
-          strokeLinecap="round"
-          strokeDasharray={`${filled} ${circ}`}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dasharray 0.8s ease" }}
-        />
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0, display: "block" }}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#EBEBEB" strokeWidth={strokeW} />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeW}
+        strokeLinecap="round"
+        strokeDasharray={`${fill} ${circ}`}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        style={{ transition: animate ? "stroke-dasharray 0.9s cubic-bezier(.4,0,.2,1)" : "none" }}
+      />
+      <text
+        x={size / 2}
+        y={scoreY}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={scoreFontSize}
+        fontWeight="800"
+        fontFamily="Inter, sans-serif"
+        fill={score ? color : "#BBB"}
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {score ?? "—"}
+      </text>
+      {showLabel && size >= 80 && score ? (
         <text
           x={size / 2}
-          y={size / 2 + (showLabel ? -labelFontSize * 0.4 : 0)}
+          y={labelY}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={scoreFontSize}
-          fontWeight="800"
+          fontSize={labelFontSize}
+          fontWeight="600"
           fontFamily="Inter, sans-serif"
-          fill={score ? color : "#ccc"}
-          style={{ fontVariantNumeric: "tabular-nums" }}
+          fill={color}
         >
-          {score ?? "—"}
+          {getScoreLabel(score)}
         </text>
-        {showLabel && size >= 80 ? (
-          <text
-            x={size / 2}
-            y={size / 2 + scoreFontSize * 0.55}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize={labelFontSize}
-            fontWeight="600"
-            fontFamily="Inter, sans-serif"
-            fill={score ? color : "#ccc"}
-          >
-            {label}
-          </text>
-        ) : null}
-      </svg>
-    </div>
+      ) : null}
+    </svg>
   );
 }
 
@@ -109,39 +123,17 @@ export function ConfidenceRing({ pct, size = 28 }: { pct: number; size?: number 
   return (
     <svg width={size} height={size}>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e8e8e8" strokeWidth={3} />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        fill="none"
-        stroke="#1a7f4b"
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeDasharray={`${filled} ${circ}`}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1a7f4b" strokeWidth={3} strokeLinecap="round" strokeDasharray={`${filled} ${circ}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
     </svg>
   );
 }
 
-export function MiniSparkline({
-  data,
-  color = "#1a7f4b",
-  width = 48,
-  height = 20,
-}: {
-  data: number[];
-  color?: string;
-  width?: number;
-  height?: number;
-}) {
+export function MiniSparkline({ data, color = "#1a7f4b", width = 48, height = 20 }: { data: number[]; color?: string; width?: number; height?: number }) {
   if (data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
-  const pts = data
-    .map((value, index) => `${(index / (data.length - 1)) * width},${height - 2 - ((value - min) / range) * (height - 5)}`)
-    .join(" ");
+  const pts = data.map((value, index) => `${(index / (data.length - 1)) * width},${height - 2 - ((value - min) / range) * (height - 5)}`).join(" ");
   return (
     <svg width={width} height={height} aria-hidden="true">
       <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
