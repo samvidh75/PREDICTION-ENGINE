@@ -1,42 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BarChart, Bar, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
 
-type Metric = "revenue" | "pat" | "ebitda";
-
-const METRICS: { key: Metric; label: string }[] = [
-  { key: "revenue", label: "Revenue" },
-  { key: "pat", label: "PAT" },
-  { key: "ebitda", label: "EBITDA" },
-];
-
-// Sample data structure — in production, this comes from the API
-const SAMPLE_DATA: Record<Metric, { year: string; value: number }[]> = {
-  revenue: [
-    { year: "FY22", value: 0 },
-    { year: "FY23", value: 0 },
-    { year: "FY24", value: 0 },
-    { year: "FY25", value: 0 },
-    { year: "FY26", value: 0 },
-  ],
-  pat: [
-    { year: "FY22", value: 0 },
-    { year: "FY23", value: 0 },
-    { year: "FY24", value: 0 },
-    { year: "FY25", value: 0 },
-    { year: "FY26", value: 0 },
-  ],
-  ebitda: [
-    { year: "FY22", value: 0 },
-    { year: "FY23", value: 0 },
-    { year: "FY24", value: 0 },
-    { year: "FY25", value: 0 },
-    { year: "FY26", value: 0 },
-  ],
-};
+interface AnnualEntry {
+  fiscalYear: string;
+  revenue: number | null;
+  pat: number | null;
+  operatingProfit: number | null;
+}
 
 function formatValue(value: number): string {
-  if (value === 0) return "—";
-  if (value >= 1e9) return `₹${(value / 1e9).toFixed(1)}B`;
   if (value >= 1e7) return `₹${(value / 1e7).toFixed(1)}Cr`;
   if (value >= 1e5) return `₹${(value / 1e5).toFixed(1)}L`;
   return `₹${value.toLocaleString("en-IN")}`;
@@ -46,41 +18,62 @@ export default function FinancialHistogram({
   data,
   height = 220,
 }: {
-  data?: Record<Metric, { year: string; value: number }[]>;
+  data?: AnnualEntry[] | null;
   height?: number;
 }) {
-  const [activeMetric, setActiveMetric] = useState<Metric>("revenue");
-  const chartData = (data ?? SAMPLE_DATA)[activeMetric];
+  const entries = data ?? [];
 
-  const hasData = chartData.some((d) => d.value > 0);
+  const hasAnyRevenue = entries.some(e => e.revenue !== null && e.revenue > 0);
+  const hasAnyPat = entries.some(e => e.pat !== null && e.pat > 0);
+  const hasAnyOp = entries.some(e => e.operatingProfit !== null && e.operatingProfit > 0);
+
+  type TabKey = "revenue" | "pat" | "op";
+  const tabs: { key: TabKey; label: string; visible: boolean }[] = [
+    { key: "revenue", label: "Revenue", visible: hasAnyRevenue },
+    { key: "pat", label: "PAT", visible: hasAnyPat },
+    { key: "op", label: "Operating Profit", visible: hasAnyOp },
+  ];
+  const visibleTabs = tabs.filter(t => t.visible);
+  const [activeTab, setActiveTab] = useState<TabKey>(
+    visibleTabs.length > 0 ? visibleTabs[0].key : "revenue"
+  );
+
+  const chartData = useMemo(() => {
+    return entries.map(e => ({
+      year: e.fiscalYear,
+      value: activeTab === "revenue" ? (e.revenue ?? 0) : activeTab === "pat" ? (e.pat ?? 0) : (e.operatingProfit ?? 0),
+    })).filter(d => d.value > 0);
+  }, [entries, activeTab]);
+
+  const hasData = chartData.length > 0;
 
   return (
     <div>
-      {/* Metric toggles */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        {METRICS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveMetric(key)}
-            style={{
-              height: 32,
-              padding: "0 14px",
-              borderRadius: 20,
-              border: activeMetric === key ? "none" : "1px solid var(--border)",
-              background: activeMetric === key ? "var(--action)" : "#FFFFFF",
-              color: activeMetric === key ? "#FFFFFF" : "var(--text-secondary)",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {visibleTabs.length > 1 && (
+        <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+          {visibleTabs.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              style={{
+                height: 32,
+                padding: "0 14px",
+                borderRadius: 20,
+                border: activeTab === key ? "none" : "1px solid var(--border)",
+                background: activeTab === key ? "var(--action)" : "#FFFFFF",
+                color: activeTab === key ? "#FFFFFF" : "var(--text-secondary)",
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Chart */}
       {!hasData ? (
         <div
           style={{
@@ -89,13 +82,12 @@ export default function FinancialHistogram({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            color: "var(--text-muted)",
+            color: "#9CA3AF",
             fontSize: 13,
             gap: 4,
           }}
         >
-          <span>Financial data loading</span>
-          <span style={{ fontSize: 11 }}>Annual reports are being processed</span>
+          <span>Annual financial history is not available yet.</span>
         </div>
       ) : (
         <div style={{ height }}>
@@ -125,19 +117,14 @@ export default function FinancialHistogram({
                   boxShadow: "0 4px 6px -1px rgba(0,0,0,0.06)",
                 }}
                 formatter={(value: any) => {
-                  if (value === 0) return ["Data pending", activeMetric === "revenue" ? "Revenue" : activeMetric === "pat" ? "PAT" : "EBITDA"];
-                  const label = activeMetric === "revenue" ? "Revenue" : activeMetric === "pat" ? "PAT" : "EBITDA";
+                  const label = activeTab === "revenue" ? "Revenue" : activeTab === "pat" ? "PAT" : "Operating Profit";
                   return [`${formatValue(value)}`, label];
                 }}
                 labelStyle={{ color: "#6B7280", fontSize: 11 }}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                {chartData.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.value > 0 ? "#2962FF" : "#E5E7EB"}
-                    style={{ transition: "fill 0.3s ease" }}
-                  />
+                {chartData.map((_entry, i) => (
+                  <Cell key={i} fill="#2962FF" style={{ transition: "fill 0.3s ease" }} />
                 ))}
               </Bar>
             </BarChart>
@@ -147,5 +134,3 @@ export default function FinancialHistogram({
     </div>
   );
 }
-
-export type { Metric };
