@@ -27,7 +27,7 @@ export const LoginPage: React.FC = () => {
         <div className="space-y-5">
           <div className="space-y-2">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">Research workspace</div>
-            <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-3xl">Return to your research.</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] md:text-3xl">Initialize your research session.</h2>
             <p className="max-w-lg text-sm leading-6 text-[var(--color-text-secondary)]">Company health, valuation context, risk signals — everything ready to review.</p>
           </div>
 
@@ -35,7 +35,7 @@ export const LoginPage: React.FC = () => {
 
           <div className="flex flex-wrap gap-3 text-xs text-[#64748B]"><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" /> Research-first</span><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#3B66F6]" /> Broker handoff</span><span className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#64748B]" /> No trading calls</span></div>
         </div>
-        <ProductFormPanel title="Sign in" body={contextMessage || "Sign in to continue your research."}>
+        <ProductFormPanel title="Initialize Session" body={contextMessage || "Sign in to continue your research."}>
           <CinematicAuthGateway onAuthed={onAuthed} initialStage="login" restoreOnMount={false} contextMessage={contextMessage} />
           <div className="mt-4 flex flex-col items-center gap-2">
             <ProductAction variant="ghost" onClick={() => productNavigate("signup")}>Need an account? Create one</ProductAction>

@@ -217,7 +217,7 @@ export default function CinematicAuthGateway({
               </div>
 
               <Button type="button" disabled={busy || !canLogin} title={!canLogin ? "Enter an email address and a password with at least 6 characters." : undefined} onClick={() => void runAuth(() => authService.signInWithEmail(loginEmail, loginPassword), "email")} className="w-full h-11 text-sm font-semibold">
-                Sign in
+                Initialize Session
               </Button>
               {!canLogin && <p className="text-center text-[11px] text-[var(--color-text-muted)]">Enter an email and password to enable sign in.</p>}
 
@@ -284,7 +284,7 @@ export default function CinematicAuthGateway({
 
         {error && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-[13px] leading-[1.5] text-[#FCA5A5]"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-[13px] leading-[1.5] text-[#DC2626]"
             role="alert"
           >
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#EF4444]" />
@@ -293,7 +293,7 @@ export default function CinematicAuthGateway({
         )}
         {success && (
           <div
-            className="mt-4 flex items-start gap-2 rounded-lg border border-[#16A34A]/30 bg-[#16A34A]/10 p-3 text-[13px] leading-[1.5] text-[#86EFAC]"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-[#16A34A]/30 bg-[#16A34A]/10 p-3 text-[13px] leading-[1.5] text-[#16A34A]"
             role="status"
           >
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
