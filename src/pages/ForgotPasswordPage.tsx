@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authService } from "../services/auth/authService";
 
 type Stage = "email" | "sent" | "error";
 
 export default function ForgotPasswordPage() {
+  useEffect(() => {
+    document.title = "Reset Password — StockStory India";
+    const descEl = document.querySelector('meta[name="description"]');
+    if (descEl) descEl.setAttribute("content", "Reset your StockStory India account password.");
+  }, []);
+
   const [email, setEmail] = useState("");
   const [stage, setStage] = useState<Stage>("email");
   const [error, setError] = useState("");

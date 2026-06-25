@@ -18,17 +18,24 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import PricingPage from "./pages/PricingPage";
 import SearchPage from "./pages/SearchPage";
 
+function usePageMeta(title: string, desc: string) {
+  document.title = title;
+  const descEl = document.querySelector('meta[name="description"]');
+  if (descEl) descEl.setAttribute("content", desc);
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.setAttribute("content", title);
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.setAttribute("content", desc);
+}
+
 function StockPageWrapper() {
   const { symbol } = useParams<{ symbol: string }>();
   const params = new URLSearchParams(window.location.search);
   const resolvedSymbol = (symbol || params.get("id") || params.get("symbol") || "TCS").toUpperCase().trim();
-  const meta = {
-    title: `Research ${resolvedSymbol} — StockStory India`,
-    desc: `Research ${resolvedSymbol} with fundamentals, health score, financial history, and comparison tools.`
-  };
-  document.title = meta.title;
-  const descEl = document.querySelector('meta[name="description"]');
-  if (descEl) descEl.setAttribute("content", meta.desc);
+  usePageMeta(
+    `Research ${resolvedSymbol} — StockStory India`,
+    `Research ${resolvedSymbol} with fundamentals, health score, financial history, and comparison tools.`
+  );
   return <StockDetailPage symbol={resolvedSymbol} />;
 }
 
