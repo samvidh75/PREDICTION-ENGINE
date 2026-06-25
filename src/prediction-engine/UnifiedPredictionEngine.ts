@@ -73,6 +73,87 @@ function momentumScore(input: EngineInput): EngineFactorScore {
   return factor(score, "Price trend and recent return");
 }
 
+function sma(values: number[], period: number): number | null {
+  if (values.length < period) return null;
+  const slice = values.slice(-period);
+  return slice.reduce((sum, value) => sum + value, 0) / period;
+}
+
+function ema(values: number[], period: number): number[] {
+  if (values.length === 0) return [];
+  const k = 2 / (period + 1);
+  const result: number[] = [values[0]];
+  for (let index = 1; index < values.length; index += 1) {
+    result.push(values[index] * k + result[index - 1] * (1 - k));
+  }
+  return result;
+}
+
+function rsi(values: number[], period = 14): number | null {
+  if (values.length < period + 1) return null;
+  let avgGain = 0;
+  let avgLoss = 0;
+  for (let index = 1; index <= period; index += 1) {
+    const change = values[index] - values[index - 1];
+    if (change >= 0) avgGain += change;
+    else avgLoss += Math.abs(change);
+  }
+  avgGain /= period;
+  avgLoss /= period;
+  for (let index = period + 1; index < values.length; index += 1) {
+    const change = values[index] - values[index - 1];
+    const gain = change > 0 ? change : 0;
+    const loss = change < 0 ? Math.abs(change) : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+  }
+  if (avgLoss === 0) return 100;
+  return 100 - 100 / (1 + avgGain / avgLoss);
+}
+
+function macd(values: number[]): { macd: number | null; signal: number | null; hist: number | null } {
+  if (values.length < 35) return { macd: null, signal: null, hist: null };
+  const ema12 = ema(values, 12);
+  const ema26 = ema(values, 26);
+  const line = ema26.map((value, index) => ema12[index] - value);
+  const signalLine = ema(line, 9);
+  const lastMacd = line[line.length - 1];
+  const lastSignal = signalLine[signalLine.length - 1];
+  return { macd: lastMacd, signal: lastSignal, hist: lastMacd - lastSignal };
+}
+
+function computeTechnicals(closesInput: number[]): EngineOutput["technicals"] {
+  const closes = closesInput.filter((value) => Number.isFinite(value) && value > 0);
+  const current = closes.at(-1) ?? null;
+  const rsi14 = rsi(closes);
+  const macdValues = macd(closes);
+  const sma20 = sma(closes, 20);
+  const sma50 = sma(closes, 50);
+  const aboveSma20 = current !== null && sma20 !== null ? current > sma20 : null;
+  const aboveSma50 = current !== null && sma50 !== null ? current > sma50 : null;
+  const rsiZone = rsi14 === null ? null : rsi14 > 70 ? "overbought" : rsi14 < 30 ? "oversold" : "neutral";
+  const overallSignal =
+    rsi14 === null || macdValues.hist === null || aboveSma20 === null
+      ? null
+      : rsi14 > 55 && macdValues.hist > 0 && aboveSma20
+        ? "bullish"
+        : rsi14 < 45 && macdValues.hist < 0 && !aboveSma20
+          ? "bearish"
+          : "neutral";
+  return {
+    rsi14: rsi14 === null ? null : Math.round(rsi14 * 10) / 10,
+    macd: macdValues.macd === null ? null : Math.round(macdValues.macd * 100) / 100,
+    macdSignal: macdValues.signal === null ? null : Math.round(macdValues.signal * 100) / 100,
+    macdHist: macdValues.hist === null ? null : Math.round(macdValues.hist * 100) / 100,
+    sma20: sma20 === null ? null : Math.round(sma20 * 100) / 100,
+    sma50: sma50 === null ? null : Math.round(sma50 * 100) / 100,
+    aboveSma20,
+    aboveSma50,
+    rsiZone,
+    overallSignal,
+  };
+}
+
 function classificationFor(score: number | null): UnifiedClassification {
   if (score === null) return "INSUFFICIENT_DATA";
   if (score >= 80) return "EXCELLENT";
@@ -141,6 +222,7 @@ export class UnifiedPredictionEngine {
       composite,
       classification: classificationFor(composite),
       factorScores,
+      technicals: computeTechnicals(input.closes),
       dataCompleteness,
       availableWeight,
     };

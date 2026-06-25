@@ -39,6 +39,8 @@ export interface StockData {
   };
   historical: {
     closes: number[];
+    highs: number[];
+    lows: number[];
     timestamps: number[];
     source: string;
     error: string | null;
@@ -71,8 +73,26 @@ export function useStockData(symbol: string | null) {
       const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const nextData = (await response.json()) as StockData;
-      setData(nextData);
-      setCache(cacheKey, nextData);
+      const historicalResponse = await fetch(`/api/historical/${encodeURIComponent(symbol)}?range=3mo`);
+      const historicalPayload = historicalResponse.ok
+        ? await historicalResponse.json() as { closes?: number[]; highs?: number[]; lows?: number[]; timestamps?: number[] }
+        : null;
+      const mergedData: StockData = historicalPayload
+        ? {
+            ...nextData,
+            historical: {
+              ...nextData.historical,
+              closes: historicalPayload.closes ?? nextData.historical.closes ?? [],
+              highs: historicalPayload.highs ?? [],
+              lows: historicalPayload.lows ?? [],
+              timestamps: historicalPayload.timestamps ?? nextData.historical.timestamps ?? [],
+              source: "yahoo",
+              error: null,
+            },
+          }
+        : nextData;
+      setData(mergedData);
+      setCache(cacheKey, mergedData);
       setError(null);
       setLoading(false);
     } catch (nextError: unknown) {
