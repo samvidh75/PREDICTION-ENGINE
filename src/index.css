@@ -1,64 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "./styles/tokens.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #f6f9fc;
-  --surface: #FFFFFF;
-  --elevated: #FFFFFF;
-  --border: #e3e8ee;
-  --border-strong: #a8c3de;
-  --text-primary: #0d253d;
-  --text-secondary: #273951;
-  --text-muted: #64748d;
-  --text-faint: #94A3B8;
-  --action: #533afd;
-  --action-hover: #4434d4;
-  --action-press: #2e2b8c;
-  --action-soft: rgba(83,58,253,0.08);
-  --positive: #16A34A;
-  --positive-soft: rgba(22,163,74,0.08);
-  --caution: #F59E0B;
-  --caution-soft: rgba(245,158,11,0.08);
-  --negative: #DC2626;
-  --negative-soft: rgba(220,38,38,0.08);
-
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-pill: 9999px;
-
-  --shadow-sm: 0 1px 3px rgba(0,55,112,0.08);
-  --shadow-md: 0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0,55,112,0.08), 0 4px 6px -4px rgba(0,55,112,0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0,55,112,0.10), 0 8px 10px -6px rgba(0,55,112,0.04);
-
-  --header-h: 64px;
-  --nav-h: 64px;
-  --content: 1200px;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-
-body {
-  font-feature-settings: "ss01";
-}
-
-@layer base {
-  *, *::before, *::after { box-sizing: border-box; }
-  html {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  body { margin: 0; padding: 0; overflow-x: hidden; }
-  a { color: inherit; text-decoration: none; }
-  button { font-family: inherit; }
-  input, textarea, select { font-family: inherit; }
-}
+body { margin: 0; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; }
 
 @layer utilities {
   .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }

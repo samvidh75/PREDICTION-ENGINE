@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { AlertTriangle, X } from "lucide-react";
-import Button from "./Button";
+import { Button } from "./Button";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -63,7 +63,7 @@ export default function ConfirmDialog({
         </div>
         <p className="mt-3 text-sm leading-relaxed text-[#64748B]">{message}</p>
         <div className="mt-6 flex items-center justify-end gap-3">
-          <Button variant="secondary" size="sm" glass onClick={onCancel}>
+          <Button variant="secondary" size="sm" onClick={onCancel}>
             {cancelLabel}
           </Button>
           <button

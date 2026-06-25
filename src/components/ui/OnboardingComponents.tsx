@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CheckCircle2, Circle, AlertCircle, ShieldCheck, X } from "lucide-react";
 import { Button } from "./Button";
-import Card from "./Card";
+import { Card } from "./Card";
 
 interface OpsHealthMetrics {
   predictions_today?: number;

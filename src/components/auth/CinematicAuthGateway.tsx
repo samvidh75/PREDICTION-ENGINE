@@ -4,7 +4,7 @@ import type { AuthUser } from "../../services/auth/authService";
 import { authService } from "../../services/auth/authService";
 import { AnalyticsCoordinator } from "../../services/diagnostics/AnalyticsCoordinator";
 import { mapAuthError } from "../../services/auth/authErrorMapper";
-import Button from "../ui/Button";
+import { Button } from "../ui/Button";
 import Input from "../ui/Input";
 
 type Stage = "login" | "signup" | "forgot";
