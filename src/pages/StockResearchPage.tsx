@@ -21,6 +21,7 @@ import ScoreRing, { getScoreColor, getScoreLabel } from "../components/ui/ScoreR
 import SignalLight from "../components/ui/SignalLight";
 import { fMarketCap, fPercent, fPrice, fRatio, fRelativeTime } from "../lib/format";
 import BrokerModal from "../components/BrokerModal";
+import ThesisCard from "../components/ui/ThesisCard";
 import PriceChart from "../components/charts/PriceChart";
 import { Skeleton } from "../components/ui/Skeleton";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
@@ -932,6 +933,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 gap: 8,
               }}
             >
+              <ThesisCard symbol={symbol} companyName={data?.price.companyName ?? undefined} />
+
               <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
                 Actions
               </div>
@@ -991,7 +994,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 }}
                 data-broker-trigger
               >
-                Invest <ArrowRight size={14} />
+                Execute via Broker <ArrowRight size={14} />
               </button>
             </div>
           </aside>
@@ -1074,7 +1077,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
             }}
             data-broker-trigger
           >
-            Invest <ArrowRight size={15} />
+            Execute via Broker <ArrowRight size={15} />
           </button>
         </div>
       )}
