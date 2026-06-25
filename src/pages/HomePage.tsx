@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Search, TrendingUp, Bookmark, Eye } from "lucide-react"
+import { Search, TrendingUp, Bookmark, Eye, BarChart3, Award, GitCompare } from "lucide-react"
 import TopNav from "../components/layout/TopNav"
 import MarketTicker from "../components/layout/MarketTicker"
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
@@ -70,8 +70,8 @@ export default function HomePage() {
         {/* Hero */}
         <section
           style={{
-            paddingTop: 48,
-            paddingBottom: 32,
+            paddingTop: 40,
+            paddingBottom: 24,
             textAlign: "center",
           }}
         >
@@ -97,7 +97,7 @@ export default function HomePage() {
               marginRight: "auto",
             }}
           >
-            Search any Nifty 50 company for research insights
+            Search any Nifty 50 company for insights
           </p>
           <form
             onSubmit={handleSearch}
@@ -112,8 +112,9 @@ export default function HomePage() {
               height: 48,
               borderRadius: 12,
               border: "1px solid var(--border)",
-              background: "var(--surface)",
+              background: "#FFFFFF",
               padding: "0 4px 0 16px",
+              boxShadow: "var(--shadow-sm)",
             }}
           >
             <Search
@@ -123,13 +124,13 @@ export default function HomePage() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search — TCS, RELIANCE, HDFCBANK..."
+              placeholder="Search symbol — TCS, RELIANCE, HDFCBANK..."
               style={{
                 flex: 1,
                 border: "none",
                 background: "transparent",
                 color: "var(--text-primary)",
-                fontSize: 14,
+                fontSize: 15,
                 outline: "none",
                 minWidth: 0,
               }}
@@ -165,28 +166,34 @@ export default function HomePage() {
           }}
         >
           {[
-            { label: "Scanner", page: "scanner" },
-            { label: "Rankings", page: "rankings" },
-            { label: "Compare", page: "compare" },
-            { label: "Watchlist", page: "watchlist" },
+            { label: "Scanner", icon: BarChart3, page: "scanner" },
+            { label: "Rankings", icon: Award, page: "rankings" },
+            { label: "Compare", icon: GitCompare, page: "compare" },
+            { label: "Watchlist", icon: Bookmark, page: "watchlist" },
           ].map((action) => (
             <button
               key={action.page}
               onClick={() => navigate(action.page)}
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
                 height: 40,
                 padding: "0 20px",
                 borderRadius: 20,
                 border: "1px solid var(--border)",
-                background: "var(--surface)",
+                background: "#FFFFFF",
                 color: "var(--text-primary)",
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
+                boxShadow: "var(--shadow-sm)",
               }}
+              className="hover:shadow-md transition-shadow duration-150 active:scale-[0.97]"
             >
+              <action.icon size={16} style={{ color: "var(--action)" }} />
               {action.label}
             </button>
           ))}
@@ -200,10 +207,11 @@ export default function HomePage() {
           {/* Featured stock */}
           <div
             style={{
-              background: "var(--surface)",
+              background: "#FFFFFF",
               border: "1px solid var(--border)",
               borderRadius: 12,
               padding: 20,
+              boxShadow: "var(--shadow-sm)",
             }}
           >
             <div
@@ -251,7 +259,7 @@ export default function HomePage() {
                   background: "var(--elevated)",
                   animation: "shimmer 2s linear infinite",
                   backgroundImage:
-                    "linear-gradient(90deg, var(--surface) 0%, var(--elevated) 50%, var(--surface) 100%)",
+                    "linear-gradient(90deg, #FFF 0%, var(--elevated) 50%, #FFF 100%)",
                   backgroundSize: "200% 100%",
                 }}
               />
@@ -358,10 +366,11 @@ export default function HomePage() {
           {/* Recently viewed */}
           <div
             style={{
-              background: "var(--surface)",
+              background: "#FFFFFF",
               border: "1px solid var(--border)",
               borderRadius: 12,
               padding: 20,
+              boxShadow: "var(--shadow-sm)",
             }}
           >
             <h2
@@ -379,13 +388,7 @@ export default function HomePage() {
               Recently viewed
             </h2>
             {recent.length === 0 ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {["TCS", "RELIANCE", "INFY"].map((symbol) => (
                   <button
                     key={symbol}
@@ -486,10 +489,11 @@ export default function HomePage() {
                     padding: "12px 16px",
                     borderRadius: 10,
                     border: "1px solid var(--border)",
-                    background: "var(--surface)",
+                    background: "#FFFFFF",
                     cursor: "pointer",
                     textAlign: "left",
                     minWidth: 100,
+                    boxShadow: "var(--shadow-sm)",
                   }}
                 >
                   <div
@@ -531,10 +535,11 @@ export default function HomePage() {
                     padding: "12px 16px",
                     borderRadius: 10,
                     border: "1px solid var(--border)",
-                    background: "var(--surface)",
+                    background: "#FFFFFF",
                     cursor: "pointer",
                     textAlign: "left",
                     minWidth: 100,
+                    boxShadow: "var(--shadow-sm)",
                   }}
                 >
                   <div
@@ -560,7 +565,6 @@ export default function HomePage() {
             </div>
           )}
         </section>
-
       </main>
     </div>
   )

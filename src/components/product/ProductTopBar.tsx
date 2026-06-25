@@ -49,7 +49,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
         </button>
 
         {!compact && (
-          <div className="hidden md:flex items-center gap-5 ml-10">
+          <div className="hidden md:flex items-center gap-1 ml-10">
             {DESKTOP_NAV_LINKS.map(({ page, label }) => {
               const isActive = route === page || (!route && page === '');
               return (
@@ -59,10 +59,25 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
                   style={{
                     color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                     fontWeight: isActive ? 600 : 400,
+                    position: 'relative',
                   }}
-                  className="text-[14px] hover:text-[var(--text-primary)] transition-colors"
+                  className="text-[14px] px-3 py-2 hover:text-[var(--text-primary)] transition-all duration-150 active:scale-[0.97]"
                 >
                   {label}
+                  {isActive && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 20,
+                        height: 2,
+                        borderRadius: 1,
+                        background: 'var(--action)',
+                      }}
+                    />
+                  )}
                 </button>
               );
             })}
@@ -72,7 +87,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
         <div className="ml-auto flex items-center gap-2 shrink-0">
           <button
             onClick={() => setPricingOpen(true)}
-            className={`text-[12px] font-[500] rounded-[9999px] px-[12px] py-[6px] transition-all active:scale-[0.97] flex items-center gap-1.5 ${
+            className={`text-[12px] font-[500] rounded-[9999px] px-[12px] py-[6px] transition-all duration-150 active:scale-[0.97] flex items-center gap-1.5 ${
               premium
                 ? 'bg-[var(--action-soft)] text-[var(--action)] border border-[var(--action)]'
                 : 'bg-[var(--action-soft)] text-[var(--action)] hover:bg-[rgba(41,98,255,0.15)]'
@@ -83,7 +98,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
           <button
             onClick={() => navigate('search')}
             aria-label="Search"
-            className="w-[34px] h-[34px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="w-[34px] h-[34px] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150 active:scale-[0.95]"
           >
             <Search size={15} />
           </button>
@@ -93,13 +108,13 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
             <>
               <button
                 onClick={() => navigate('login')}
-                className="text-[14px] font-[400] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-3 py-1.5"
+                className="text-[14px] font-[400] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150 px-3 py-1.5 active:scale-[0.97]"
               >
                 Sign in
               </button>
               <button
                 onClick={() => navigate('signup')}
-                className="bg-[var(--action)] text-white text-[14px] font-[500] rounded-[9999px] px-[16px] py-[8px] hover:bg-[var(--action-hover)] transition-colors active:scale-[0.97]"
+                className="bg-[var(--action)] text-white text-[14px] font-[500] rounded-[9999px] px-[16px] py-[8px] hover:bg-[var(--action-hover)] transition-all duration-150 active:scale-[0.97]"
                 style={{ minHeight: 36 }}
               >
                 Start Free Trial
