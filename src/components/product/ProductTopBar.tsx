@@ -37,11 +37,12 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
     <header
       style={{
         height: 'var(--header-h)',
-        background: '#FFFFFF',
-        borderBottom: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-sm)',
+        background: '#0a0a0a',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}
-      className="flex items-center px-4 sm:px-6 sticky top-0 z-50"
+      className="flex items-center px-4 sm:px-6 fixed top-0 left-0 right-0 z-50"
     >
       <div className="w-full mx-auto flex items-center" style={{ maxWidth: 'var(--content)' }}>
         <button onClick={() => navigate('')} className="flex items-center shrink-0">
@@ -57,7 +58,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
                   key={page}
                   onClick={() => navigate(page)}
                   style={{
-                    color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    color: isActive ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
                     fontWeight: isActive ? 600 : 400,
                     position: 'relative',
                   }}
@@ -108,7 +109,7 @@ export default function ProductTopBar({ compact = false }: { compact?: boolean }
             <>
               <button
                 onClick={() => navigate('login')}
-                className="text-[14px] font-[400] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150 px-3 py-1.5 active:scale-[0.97]"
+                className="text-[14px] font-[400] text-[rgba(255,255,255,0.55)] hover:text-[#FFFFFF] transition-colors duration-150 px-3 py-1.5 active:scale-[0.97]"
               >
                 Sign in
               </button>
