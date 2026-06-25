@@ -2,7 +2,7 @@ import "./env-shim";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import "./styles/index.css";
+import "./index.css";
 
 document.documentElement.classList.add("light");
 
