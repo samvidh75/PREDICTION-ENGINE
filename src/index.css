@@ -4,38 +4,45 @@
 @tailwind utilities;
 
 :root {
-  --bg: #F3F4F6;
+  --bg: #f6f9fc;
   --surface: #FFFFFF;
-  --elevated: #F9FAFB;
-  --border: #E5E7EB;
-  --border-strong: #D1D5DB;
-  --text-primary: #111827;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  --action: #2962FF;
-  --action-hover: #1D4ED8;
-  --action-soft: rgba(41,98,255,0.08);
+  --elevated: #FFFFFF;
+  --border: #e3e8ee;
+  --border-strong: #a8c3de;
+  --text-primary: #0d253d;
+  --text-secondary: #273951;
+  --text-muted: #64748d;
+  --text-faint: #94A3B8;
+  --action: #533afd;
+  --action-hover: #4434d4;
+  --action-press: #2e2b8c;
+  --action-soft: rgba(83,58,253,0.08);
   --positive: #16A34A;
   --positive-soft: rgba(22,163,74,0.08);
   --caution: #F59E0B;
   --caution-soft: rgba(245,158,11,0.08);
-  --negative: #EF4444;
-  --negative-soft: rgba(239,68,68,0.08);
+  --negative: #DC2626;
+  --negative-soft: rgba(220,38,38,0.08);
 
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-pill: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,55,112,0.08);
+  --shadow-md: 0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,55,112,0.08), 0 4px 6px -4px rgba(0,55,112,0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0,55,112,0.10), 0 8px 10px -6px rgba(0,55,112,0.04);
 
   --header-h: 64px;
   --nav-h: 64px;
   --content: 1200px;
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  font-feature-settings: "ss01";
 }
 
 @layer base {
