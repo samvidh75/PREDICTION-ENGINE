@@ -81,16 +81,20 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
     const { symbol } = request.params as { symbol: string };
     const sym = symbol.toUpperCase().trim();
     try {
-      const [priceResult, profileResult, fundaResult] = await Promise.all([
+      const [priceResult, profileResult, fundaResult, ssResult] = await Promise.all([
         indianApiService.getPrice(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getProfile(sym).catch(() => ({ ok: false, data: null } as any)),
         indianApiService.getFundamentals(sym).catch(() => ({ ok: false, data: null } as any)),
+        fetch(`${process.env.RAILWAY_URL || "https://prediction-engine-production-f7a8.up.railway.app"}/api/stockstory/${sym}`)
+          .then(r => r.ok ? r.json() : null).catch(() => null) as any,
       ]);
       const price = priceResult?.data ?? null;
       const profile = profileResult?.data ?? null;
       const fundamentals = fundaResult?.data ?? null;
+      const stockstoryData = ssResult?.data ?? null;
 
-      const hasAnyData = price || profile || fundamentals;
+      const hasAnyData = price || profile || fundamentals || stockstoryData;
+      const dataCompleteness = stockstoryData ? 0.6 : (hasAnyData ? 0.3 : 0.0);
 
       return {
         symbol: sym,
@@ -104,10 +108,13 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           volume: price?.volume ?? null,
           weekHigh52: price?.week52High ?? null,
           weekLow52: price?.week52Low ?? null,
-          marketCap: price?.marketCap ?? null,
+          marketCap: price?.marketCap ?? profile?.marketCap ?? null,
           exchange: profile?.exchange ?? "NSE",
           companyName: profile?.companyName ?? sym,
-          sector: profile?.sector ?? null,
+          sector: profile?.sector ?? stockstoryData?.sector ?? null,
+          industry: profile?.industry ?? null,
+          description: profile?.description ?? null,
+          website: profile?.website ?? null,
           error: null,
         },
         fundamentals: {
@@ -124,20 +131,27 @@ const marketRoutes: FastifyPluginAsync = async (app) => {
           marketCap: profile?.marketCap ?? null,
           error: null,
         },
+        health: stockstoryData ? {
+          score: stockstoryData.healthScore ?? null,
+          classification: stockstoryData.classification ?? null,
+          confidence: stockstoryData.confidence ?? null,
+          sector: stockstoryData.sector ?? null,
+        } : null,
         historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
-        dataCompleteness: hasAnyData ? 0.3 : 0.0,
+        dataCompleteness,
         fetchedAt: new Date().toISOString(),
-        errors: hasAnyData ? [] : ["Market data not yet available for this symbol"],
+        errors: [],
       };
     } catch (err: any) {
       return {
-        symbol: sym.toUpperCase().trim(),
-        price: { current: null, change: null, changeAbs: null, open: null, high: null, low: null, volume: null, weekHigh52: null, weekLow52: null, marketCap: null, exchange: "NSE", companyName: sym.toUpperCase().trim(), sector: null, error: null },
+        symbol: sym,
+        price: { current: null, change: null, changeAbs: null, open: null, high: null, low: null, volume: null, weekHigh52: null, weekLow52: null, marketCap: null, exchange: "NSE", companyName: sym, sector: null, industry: null, description: null, website: null, error: null },
         fundamentals: { peRatio: null, pbRatio: null, roe: null, roce: null, dividendYield: null, eps: null, debtToEquity: null, currentRatio: null, revenueGrowth: null, profitGrowth: null, marketCap: null, error: null },
+        health: null,
         historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
         dataCompleteness: 0.0,
         fetchedAt: new Date().toISOString(),
-        errors: ["Market data not yet available for this symbol"],
+        errors: [],
       };
     }
   });
