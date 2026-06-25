@@ -25,6 +25,8 @@ import PriceChart from "../components/charts/PriceChart";
 import { Skeleton } from "../components/ui/Skeleton";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import { SafeBlock } from "../components/ErrorBoundary";
+import NewsFeed from "../components/news/NewsFeed";
+import { computeHealthScore, getHealthLabel, getHealthColor } from "../lib/healthScore";
 import { navigate } from "../components/product/routeConfig";
 
 const IT_THESIS =
@@ -261,6 +263,16 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
     prediction?.factorScores.stability.score !== undefined
       ? Math.max(0, Math.min(100, 100 - prediction.factorScores.stability.score))
       : null;
+
+  const health = useMemo(() => computeHealthScore({
+    roe: data?.fundamentals.roe ?? null,
+    roce: data?.fundamentals.roce ?? null,
+    debtToEquity: data?.fundamentals.debtToEquity ?? null,
+    currentRatio: data?.fundamentals.currentRatio ?? null,
+    marketCap: data?.price.marketCap ?? null,
+    peRatio: data?.fundamentals.peRatio ?? null,
+    eps: data?.fundamentals.eps ?? null,
+  }), [data])
 
   if (loading && !data) {
     return (
@@ -844,14 +856,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>
                   News & Updates
                 </div>
-                <div style={{ padding: "20px 0", textAlign: "center" }}>
-                  <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>
-                    News feed will appear here once available.
-                  </p>
-                  <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
-                    Track this company to get the latest news and updates.
-                  </p>
-                </div>
+                <NewsFeed symbol={symbol} />
               </div>
             </section>
           </div>
@@ -873,7 +878,15 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 <ScoreRing score={prediction?.composite ?? null} size={80} showLabel />
               </div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 10 }}>
-                Conviction: <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{convictionLabel}</span>
+                Health: <span style={{ fontWeight: 600, color: getHealthColor(health.composite) }}>{getHealthLabel(health.composite)}</span>
+              </div>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 10, fontSize: 10, color: "var(--text-muted)" }}>
+                {health.altmanZ !== null && (
+                  <span>Z-Score: {health.altmanZ.toFixed(2)}</span>
+                )}
+                {health.piotroskiF !== null && (
+                  <span>F-Score: {health.piotroskiF}/9</span>
+                )}
               </div>
             </div>
 
