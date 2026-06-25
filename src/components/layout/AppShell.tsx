@@ -39,7 +39,7 @@ export function TopNav({ active = "" }: { active?: string }) {
   const [pricingOpen, setPricingOpen] = useState(false);
   const premium = isPremium();
   return (
-    <nav style={{ background: '#0D1117', borderBottom: '1px solid rgba(148,163,184,0.16)' }}
+    <nav style={{ background: '#FFFFFF', borderBottom: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}
       className="h-[64px] flex items-center px-6 sticky top-0 z-50">
       <div className="max-w-[1200px] w-full mx-auto flex items-center">
         <button onClick={() => productNavigate("landing")}><Logo /></button>
@@ -103,7 +103,7 @@ export function MarketTicker() {
   }, []);
 
   return (
-    <div style={{ background: 'var(--surface)', borderBottom: '1px solid rgba(148,163,184,0.16)' }}
+    <div style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
       className="h-[40px] flex items-center px-6">
       <div className="max-w-[1200px] w-full mx-auto flex items-center gap-5">
         {indices.map(idx => {
