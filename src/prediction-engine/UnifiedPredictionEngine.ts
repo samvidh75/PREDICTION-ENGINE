@@ -31,7 +31,7 @@ function qualityScore(input: EngineInput): EngineFactorScore {
   if (present(input.roe)) score += input.roe > 20 ? 35 : input.roe > 15 ? 25 : input.roe > 10 ? 15 : 5;
   if (present(input.roce)) score += input.roce > 20 ? 35 : input.roce > 15 ? 25 : input.roce > 10 ? 15 : 5;
   if (present(input.debtToEquity)) score += input.debtToEquity < 0.3 ? 30 : input.debtToEquity < 0.7 ? 22 : input.debtToEquity < 1.5 ? 12 : 0;
-  return factor(score, "ROE, ROCE and leverage quality");
+  return factor(Math.min(score, 92), "ROE, ROCE and leverage quality");
 }
 
 function valuationScore(input: EngineInput): EngineFactorScore {
