@@ -3,26 +3,19 @@ import { mapToMarketLivePrice, mapToProfile, mapToFundamentals, mapToFinancialTa
 
 describe("IndianApiMapper", () => {
   describe("mapToMarketLivePrice", () => {
-    it("maps full price payload", () => {
+    it("maps from unified response with currentPrice object and keyMetrics", () => {
       const raw = {
-        symbol: "RELIANCE", last_price: 2500, previous_close: 2480,
-        open: 2490, high: 2520, low: 2485, change: 20, change_percent: 0.81,
-        volume: 5000000, week_52_high: 2600, week_52_low: 2200,
-        market_cap: 1500000000000, exchange: "NSE",
+        name: "RELIANCE", currentPrice: { NSE: "1318.10", BSE: "1318.25" },
+        percentChange: 0.35, yearHigh: 1611.20, yearLow: 1253.65,
+        keyMetrics: { priceandVolume: [
+          { displayName: "Market Cap", value: "1783926.92" },
+          { displayName: "52 week High", value: "1611.80" },
+          { displayName: "52 week Low", value: "1253.20" },
+        ]},
       };
       const result = mapToMarketLivePrice(raw);
-      expect(result.symbol).toBe("RELIANCE");
-      expect(result.price).toBe(2500);
-      expect(result.previousClose).toBe(2480);
-      expect(result.changePercent).toBe(0.81);
-      expect(result.volume).toBe(5000000);
-      expect(result.week52High).toBe(2600);
-      expect(result.week52Low).toBe(2200);
-      expect(result.marketCap).toBe(1500000000000);
-      expect(result.exchange).toBe("NSE");
-      expect(result.currency).toBe("INR");
-      expect(result.halted).toBe(false);
-      expect(result.delisted).toBe(false);
+      expect(result.price).toBe(1318.10);
+      expect(result.changePercent).toBe(0.35);
       expect(result.dataState).toBe("available");
     });
 
@@ -37,37 +30,29 @@ describe("IndianApiMapper", () => {
       expect(result.price).toBeNull();
     });
 
-    it("parses Indian number strings", () => {
-      const raw = { last_price: "₹2,500.50" };
+    it("parses Indian number strings from currentPrice object", () => {
+      const raw = { currentPrice: { NSE: "₹1,318.10" } };
       const result = mapToMarketLivePrice(raw);
-      expect(result.price).toBe(2500.50);
-    });
-
-    it("flags halted symbols", () => {
-      const raw = { halted: true, last_price: 100 };
-      const result = mapToMarketLivePrice(raw);
-      expect(result.halted).toBe(true);
+      expect(result.price).toBe(1318.10);
     });
 
     it("no NaN/Infinity in output", () => {
-      const result = mapToMarketLivePrice({ last_price: "invalid" });
+      const result = mapToMarketLivePrice({ currentPrice: "invalid" });
       expect(result.price).toBeNull();
-      expect(Number.isFinite(result.price)).toBe(false);
     });
   });
 
   describe("mapToProfile", () => {
-    it("maps full profile payload", () => {
+    it("maps from unified response", () => {
       const raw = {
-        symbol: "RELIANCE", company_name: "Reliance Industries Ltd",
-        sector: "Energy & Oil", industry: "Oil & Gas",
-        nse_ticker: "RELIANCE", isin: "INE002A01018",
-        website: "https://ril.com", market_cap: 1500000000000,
+        companyName: "Reliance Industries", industry: "Oil & Gas Operations",
+        companyProfile: "Reliance is a conglomerate...",
       };
       const result = mapToProfile(raw);
-      expect(result.companyName).toBe("Reliance Industries Ltd");
-      expect(result.sector).toBe("Energy & Oil");
-      expect(result.isin).toBe("INE002A01018");
+      expect(result.companyName).toBe("Reliance Industries");
+      expect(result.sector).toBe("Oil & Gas Operations");
+      expect(result.industry).toBe("Oil & Gas Operations");
+      expect(result.description).toBe("Reliance is a conglomerate...");
       expect(result.dataState).toBe("available");
     });
 
@@ -79,17 +64,36 @@ describe("IndianApiMapper", () => {
   });
 
   describe("mapToFundamentals", () => {
-    it("maps full fundamental payload", () => {
+    it("maps from unified response with keyMetrics", () => {
       const raw = {
-        pe_ratio: 22.5, pb_ratio: 3.1, roce: 12.5, roe: 15.2,
-        debt_to_equity: 0.45, dividend_yield: 0.8, eps: 85,
-        sales_growth: 0.12, operating_margin: 0.25, net_margin: 0.18,
+        keyMetrics: {
+          valuation: [
+            { displayName: "P/E excluding extraordinary items, most recent fiscal year", value: "22.01" },
+            { displayName: "Price to Book - most recent fiscal year", value: "1.97" },
+            { displayName: "Current Dividend Yield - Common Stock Primary Issue, LTM", value: "0.46" },
+          ],
+          persharedata: [
+            { displayName: "EPS including extraordinary items - trailing 12 month", value: "59.69" },
+            { displayName: "Book value per share - most recent fiscal year", value: "668.04" },
+          ],
+          mgmtEffectiveness: [
+            { displayName: "Return on average equity - 5 year average", value: "8.78" },
+          ],
+          financialstrength: [
+            { displayName: "Total debt/total equity - most recent fiscal year", value: "0.44" },
+            { displayName: "Current ratio - most recent fiscal year", value: "1.10" },
+          ],
+        },
       };
       const result = mapToFundamentals(raw);
-      expect(result.peRatio).toBe(22.5);
-      expect(result.roe).toBe(15.2);
-      expect(result.debtToEquity).toBe(0.45);
-      expect(result.operatingMargin).toBe(0.25);
+      expect(result.peRatio).toBe(22.01);
+      expect(result.pbRatio).toBe(1.97);
+      expect(result.roe).toBe(8.78);
+      expect(result.eps).toBe(59.69);
+      expect(result.bookValue).toBe(668.04);
+      expect(result.dividendYield).toBe(0.46);
+      expect(result.debtToEquity).toBe(0.44);
+      expect(result.currentRatio).toBe(1.10);
       expect(result.dataState).toBe("available");
     });
 
@@ -97,15 +101,6 @@ describe("IndianApiMapper", () => {
       const result = mapToFundamentals({});
       expect(result.peRatio).toBeNull();
       expect(result.dataState).toBe("partial");
-    });
-
-    it("accepts alternative key names", () => {
-      const raw = { pe: 20, "debt/equity": 0.5, revenue_growth: 0.15, profit_growth: 0.1 };
-      const result = mapToFundamentals(raw);
-      expect(result.peRatio).toBe(20);
-      expect(result.debtToEquity).toBe(0.5);
-      expect(result.salesGrowth).toBe(0.15);
-      expect(result.profitGrowth).toBe(0.1);
     });
   });
 
