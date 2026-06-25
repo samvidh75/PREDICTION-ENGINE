@@ -10,6 +10,7 @@ import type { EngineOutput } from "../prediction-engine/UnifiedPredictionEngine"
 import { getScoreColor } from "../components/ui/ScoreRing"
 import { fChange, fPrice } from "../lib/format"
 import { navigate } from "../components/product/routeConfig"
+import ProUpgradeModal from "../components/ProUpgradeModal"
 
 type ScanRow = { data: StockData; prediction: EngineOutput }
 
@@ -99,6 +100,7 @@ export default function ScannerPage() {
   const [page, setPage] = useState(1)
   const [classFilter, setClassFilter] = useState("All")
   const [activePreset, setActivePreset] = useState<string | null>(null)
+  const [proOpen, setProOpen] = useState(false)
 
   const runScan = useCallback(async () => {
     setLoading(true)
@@ -844,7 +846,21 @@ export default function ScannerPage() {
           })}
         </div>
 
+        {/* Pro upgrade CTA */}
+        {!loading && rows.length >= 5 && (
+          <div style={{ textAlign: "center", paddingTop: 16, paddingBottom: 8 }}>
+            <button onClick={() => setProOpen(true)} style={{
+              background: "none", border: "none", color: "var(--brand)", fontSize: 13,
+              fontWeight: 600, cursor: "pointer",
+            }}>
+              See 50+ results with Pro →
+            </button>
+          </div>
+        )}
+
       </main>
+
+      <ProUpgradeModal open={proOpen} onClose={() => setProOpen(false)} location="scanner" />
     </div>
   )
 }
