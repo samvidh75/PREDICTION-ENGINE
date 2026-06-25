@@ -177,7 +177,8 @@ function FactorCard({
         background: "var(--surface)",
         border: "1px solid var(--border)",
         borderRadius: 12,
-        padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+        padding: 20,
         borderLeft: `3px solid ${color}`,
       }}
     >
@@ -327,6 +328,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               background: "var(--surface)",
               border: "1px solid var(--border)",
               borderRadius: 12,
+        boxShadow: "var(--shadow-sm)",
               padding: 32,
               textAlign: "center",
             }}
@@ -463,7 +465,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
             </div>
               <h1
                 style={{
-                  fontSize: isMobile ? 26 : 32,
+                  fontSize: isMobile ? 28 : 32,
                   fontWeight: 800,
                   color: "var(--text-primary)",
                   letterSpacing: "-0.5px",
@@ -500,7 +502,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
@@ -518,7 +521,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, margin: 0 }}>
@@ -553,7 +557,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                       WebkitBackdropFilter: "blur(8px)",
                       border: "1px solid rgba(229,231,235,0.5)",
                       borderRadius: 12,
-                      padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                      padding: isMobile ? 14 : 20,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                     }}
                   >
@@ -575,7 +580,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, margin: 0 }}>
@@ -599,7 +605,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
@@ -633,7 +640,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
@@ -669,7 +677,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "24px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                   textAlign: "center",
                 }}
               >
@@ -692,7 +701,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
@@ -744,7 +754,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
-                  padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                  padding: isMobile ? 14 : 20,
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginBottom: 12 }}>
@@ -793,6 +804,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
+        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -837,6 +849,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
+        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -857,6 +870,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                   background: "#FFFFFF",
                   border: "1px solid var(--border)",
                   borderRadius: 12,
+        boxShadow: "var(--shadow-sm)",
                   padding: 20,
                   boxShadow: "var(--shadow-sm)",
                 }}
@@ -875,6 +889,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
+        boxShadow: "var(--shadow-sm)",
                 padding: "18px",
                 textAlign: "center",
               }}
@@ -892,7 +907,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
-                padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                padding: isMobile ? 14 : 20,
               }}
             >
               <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
@@ -931,7 +947,8 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
                 background: "var(--surface)",
                 border: "1px solid var(--border)",
                 borderRadius: 12,
-                padding: "16px 18px",
+        boxShadow: "var(--shadow-sm)",
+                padding: isMobile ? 14 : 20,
                 display: "flex",
                 flexDirection: "column",
                 gap: 8,
