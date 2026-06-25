@@ -1,21 +1,18 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import Logo from "../brand/Logo";
 import { useAuth } from "../../context/AuthContext";
+import NavLink from "../../shared/ui/NavLink";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
   useEffect(() => {
     const check = () => setMobile(window.innerWidth < 768);
     check();
-    const r = window.addEventListener("resize", check);
+    window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
   return mobile;
-}
-
-function currentPage(): string {
-  const path = window.location.pathname.replace(/^\//, "").split("/")[0];
-  return path || "home";
 }
 
 const NAV_ITEMS = [
@@ -25,24 +22,22 @@ const NAV_ITEMS = [
   { href: "/compare",   label: "Compare",  icon: "\u2295" },
 ];
 
+const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
+
 export default function AppShell({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const { user, logout } = useAuth();
-  const [current, setCurrent] = useState(currentPage());
+  const location = useLocation();
+  const active = location.pathname === "/" ? "home" : location.pathname.replace(/^\//, "").split("/")[0];
 
-  useEffect(() => {
-    const sync = () => setCurrent(currentPage());
-    window.addEventListener("popstate", sync);
-    return () => window.removeEventListener("popstate", sync);
-  }, []);
-
-  const active = current;
+  if (AUTH_ROUTES.includes(location.pathname)) {
+    return <>{children}</>;
+  }
 
   const sidebarNavLink = (href: string, label: string, icon: string) => {
-    const isActive = (href === "/" ? active === "home" : active === href.replace("/", "")) || 
-                     (href !== "/" && active.startsWith(href.replace("/", "")));
+    const isActive = href === "/" ? active === "home" : active.startsWith(href.replace("/", ""));
     return (
-      <a
+      <NavLink
         key={href}
         href={href}
         style={{
@@ -58,14 +53,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
       >
         <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{icon}</span>
         {label}
-      </a>
+      </NavLink>
     );
   };
 
   const bottomNavLink = (href: string, label: string, icon: string) => {
-    const isActive = (href === "/" ? active === "home" : active === href.replace("/", ""));
+    const isActive = href === "/" ? active === "home" : active === href.replace("/", "");
     return (
-      <a
+      <NavLink
         key={href}
         href={href}
         style={{
@@ -77,7 +72,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       >
         <span style={{ fontSize: 20 }}>{icon}</span>
         <span>{label}</span>
-      </a>
+      </NavLink>
     );
   };
 
@@ -142,8 +137,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <a href="/login" style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)" }}>Sign in \u2192</a>
-              <a href="/register" style={{ fontSize: 12, color: "var(--text-500)" }}>Create account</a>
+              <NavLink href="/login" style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", textDecoration: "none" }}>Sign in \u2192</NavLink>
+              <NavLink href="/register" style={{ fontSize: 12, color: "var(--text-500)", textDecoration: "none" }}>Create account</NavLink>
             </div>
           )}
         </div>
