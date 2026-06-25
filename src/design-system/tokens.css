@@ -1,0 +1,101 @@
+/* StockStory India Design Tokens */
+/* Compiled from APPLE-DESIGN.md and STRIPE-DESIGN.md */
+
+:root {
+  /* Color - Page & Surface */
+  --bg-page: #F9F9F7;
+  --card-bg: #FFFFFF;
+  --card-hover: #FAFAF8;
+  --chip-bg: #F2F1EE;
+
+  /* Color - Brand */
+  --brand: #1A56DB;
+  --brand-light: #EEF3FD;
+  --brand-dark: #1240A8;
+
+  /* Color - Semantic */
+  --green: #1A7F4B;
+  --green-light: #EDFAF3;
+  --red: #C0392B;
+  --red-light: #FEF0EE;
+  --amber: #D97706;
+  --amber-light: #FFFBEB;
+
+  /* Color - Text */
+  --text-primary: #0F0F0F;
+  --text-body: #2C2C2C;
+  --text-secondary: #5C5C5C;
+  --text-muted: #9A9A9A;
+
+  /* Color - Borders */
+  --border: #E8E8E4;
+  --border-strong: #D0D0CA;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing (4px base) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 64px;
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 100px;
+
+  /* Shadows */
+  --shadow-card: 0 0 0 1px var(--border);
+  --shadow-raised: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border);
+  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border);
+
+  /* Transitions */
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.35s ease;
+}
+
+/* Additional semantic tokens from DESIGN.md */
+:root {
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --elevated: #F9FAFB;
+  --action: #2962FF;
+  --positive: #16A34A;
+  --caution: #F59E0B;
+  --negative: #EF4444;
+
+  --action-soft: rgba(41, 98, 255, 0.08);
+  --positive-soft: rgba(22, 163, 74, 0.08);
+  --caution-soft: rgba(245, 158, 11, 0.08);
+  --negative-soft: rgba(239, 68, 68, 0.08);
+
+  /* Additional shadows from DESIGN.md */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+/* Ensure consistent box sizing */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}

@@ -1,6 +1,6 @@
 # Visual Layout Audit
 
-Date: 2026-06-24
+Date: 2026-06-25
 Checks: content width, empty right area, bottom dock on desktop, horizontal overflow, raw tokens
 
 ## Results
@@ -39,11 +39,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### rankings @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -79,11 +80,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### signals @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -119,11 +121,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### trust @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -159,11 +162,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### about @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -199,11 +203,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### dashboard-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -239,11 +244,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### search-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -279,11 +285,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### compare-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -399,11 +406,12 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Content: 768px / Viewport: 768px
 - Empty right: 0px
 - Bottom dock visible: no
-- Overflow: no
+- Overflow: YES
 - Giant blank region: no
 - Low contrast hero: no
 - Primary CTAs: ok
-- Status: **PASS**
+- Status: **FAIL**
+- Errors: horizontal overflow 189px
 
 ### company-reliance-auth @ desktop-1440
 - Content: 1440px / Viewport: 1440px
@@ -446,4 +454,4 @@ Checks: content width, empty right area, bottom dock on desktop, horizontal over
 - Status: **PASS**
 
 ## Summary
-All checks passed.
+Some checks failed. See above for details.
