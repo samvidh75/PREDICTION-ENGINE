@@ -12,6 +12,8 @@
  *   FRONTEND_URL — frontend URL (default: https://www.stockstory-india.com)
  */
 
+export {};
+
 const RAILWAY = process.env.RAILWAY_URL || "https://prediction-engine-production-f7a8.up.railway.app";
 const FRONTEND = process.env.FRONTEND_URL || "https://www.stockstory-india.com";
 
