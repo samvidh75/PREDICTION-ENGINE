@@ -55,6 +55,7 @@
     "diagnose:symbol-gaps": "tsx scripts/diagnose-scored-symbol-gaps.ts",
     "smoke:production": "tsx scripts/smoke-production.ts",
     "verify:data:production": "tsx scripts/verify-production-data-quality.ts",
+    "verify:data:coverage": "tsx scripts/verify-data-coverage.ts",
     "verify:symbols:production": "tsx scripts/verify-symbol-universe.ts",
     "upstox:config": "tsx scripts/upstox-config.ts",
     "upstox:auth-url": "tsx scripts/upstox-auth-url.ts",
