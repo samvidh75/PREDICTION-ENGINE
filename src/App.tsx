@@ -77,4 +77,6 @@ function PublicRouter() {
   return <HomePage/>;
 }
 
-export default function App(){return <AuthProvider><LayoutProvider><TokenProvider tokenVars={buildTokenCssVars()}><PageErrorBoundary><PublicRouter/></PageErrorBoundary></TokenProvider></LayoutProvider></AuthProvider>;}
+import AppShell from "./components/layout/AppShell";
+
+export default function App(){return <AuthProvider><LayoutProvider><TokenProvider tokenVars={buildTokenCssVars()}><PageErrorBoundary><AppShell><PublicRouter/></AppShell></PageErrorBoundary></TokenProvider></LayoutProvider></AuthProvider>;}
