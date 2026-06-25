@@ -5,6 +5,8 @@ import { PriceChart } from "../components/stock/PriceChart";
 import { CompanyHeader } from "../components/stock/CompanyHeader";
 import { MetricsGrid, formatMarketCap } from "../components/stock/MetricsGrid";
 import { ProUpgradeModal } from "../components/stock/ProUpgradeModal";
+import { CompanyInfo } from "../components/stock/CompanyInfo";
+import { FinancialCharts } from "../components/stock/FinancialCharts";
 import { fMarketCap, fPercent } from "../lib/format";
 
 export default function StockResearchPage({ symbol }: { symbol: string }) {
@@ -128,63 +130,9 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
         onUpgradeClick={() => setShowProModal(true)}
       />
 
-      {/* Company Info */}
-      <div style={{
-        background:'var(--surface)', border:'1px solid var(--border)',
-        borderRadius:'var(--r-lg)', padding:'24px',
-        margin:'12px 0',
-      }}>
-        <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-          textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:16 }}>
-          About {data?.price.companyName || symbol}
-        </div>
+      <CompanyInfo symbol={symbol} snapshot={{ companyName: data?.price.companyName }} />
 
-        {data?.price.description ? (
-          <p style={{ fontSize:'var(--sz-base)', color:'var(--text-500)', lineHeight:1.7, margin:0 }}>
-            {data.price.description}
-          </p>
-        ) : data?.price.sector && data?.price.sector.toLowerCase().includes('it') ? (
-          <p style={{ fontSize:'var(--sz-base)', color:'var(--text-500)', lineHeight:1.7, margin:0 }}>
-            {data?.price.companyName || symbol} is an IT services company providing software development, consulting, and business process outsourcing to global clients.
-          </p>
-        ) : (
-          <p style={{ fontSize:'var(--sz-base)', color:'var(--text-500)', lineHeight:1.7, margin:0 }}>
-            {data?.price.companyName || symbol} operates in the Indian market with a diversified business model and established market presence.
-          </p>
-        )}
-
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginTop:16 }}>
-          {[
-            { label:'Sector', value: data?.price.sector ?? '—' },
-            { label:'Industry', value: data?.price.industry ?? data?.price.sector ?? '—' },
-            { label:'Exchange', value: data?.price.exchange ?? 'NSE' },
-            { label:'Market Cap', value: data?.price.marketCap ? formatMarketCap(data.price.marketCap) : '—' },
-          ].map(fact => (
-            <div key={fact.label}>
-              <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', marginBottom:2 }}>{fact.label}</div>
-              <div style={{ fontSize:'var(--sz-sm)', fontWeight:600, color:'var(--text-900)' }}>{fact.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Financial Performance */}
-      <FinancialSection symbol={symbol} data={data} />
-
-      {/* News */}
-      <div style={{
-        background:'var(--surface)', border:'1px solid var(--border)',
-        borderRadius:'var(--r-lg)', padding:'24px',
-        margin:'12px 0',
-      }}>
-        <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-          textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:16 }}>
-          News & Updates
-        </div>
-        <div style={{ fontSize:'var(--sz-sm)', color:'var(--text-300)', textAlign:'center', padding:'20px 0' }}>
-          News feed loading...
-        </div>
-      </div>
+      <FinancialCharts data={data?.annualFinancials} />
 
       {/* Footer */}
       <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', textAlign:'center', padding:'16px 0 32px' }}>
@@ -194,73 +142,6 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
       </div>
 
       <ProUpgradeModal isOpen={showProModal} onClose={() => setShowProModal(false)} symbol={symbol} />
-    </div>
-  );
-}
-
-function FinancialSection({ symbol, data }: { symbol: string; data: any }) {
-  const financials = data?.annualFinancials ?? [];
-  const hasData = financials.length > 0;
-
-  return (
-    <div style={{
-      background:'var(--surface)', border:'1px solid var(--border)',
-      borderRadius:'var(--r-lg)', padding:'24px',
-      margin:'12px 0',
-    }}>
-      <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-        textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:16 }}>
-        Financial Performance
-      </div>
-
-      {!hasData ? (
-        <div style={{ fontSize:'var(--sz-sm)', color:'var(--text-300)', textAlign:'center', padding:'24px 0' }}>
-          Annual financial history is being compiled.
-        </div>
-      ) : (
-        <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-          {['revenue', 'pat', 'operatingProfit'].filter(k => financials.some((e: any) => e[k] != null && e[k] > 0)).map(k => (
-            <div key={k}>
-              <div style={{ fontSize:'var(--sz-sm)', fontWeight:600, color:'var(--text-900)', marginBottom:10, textTransform:'capitalize' }}>
-                {k === 'operatingProfit' ? 'Operating Profit' : k === 'pat' ? 'Net Profit' : 'Revenue'}
-              </div>
-              <div style={{ display:'flex', gap:6, alignItems:'flex-end', height:120 }}>
-                {financials.map((entry: any, i: number) => {
-                  const val = entry[k];
-                  if (val == null || val <= 0) return null;
-                  const maxVal = Math.max(...financials.filter((e: any) => e[k] != null).map((e: any) => e[k]));
-                  const pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
-                  const fyYear = entry.fiscalYear || '';
-                  const isCurrentFY = fyYear === 'FY2026' || fyYear.includes('2026');
-                  return (
-                    <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-                      <div style={{
-                        width:'100%', maxWidth:48, height:`${Math.max(pct, 5)}%`,
-                        background: isCurrentFY ? 'var(--amber)' : 'var(--brand)',
-                        borderRadius:'var(--r-sm) var(--r-sm) 0 0',
-                        minHeight:8,
-                        position:'relative',
-                        transition:'height 600ms cubic-bezier(0.16,1,0.3,1)',
-                      }}>
-                        {isCurrentFY && (
-                          <span style={{
-                            position:'absolute', top:-18, left:'50%', transform:'translateX(-50%)',
-                            fontSize:9, fontWeight:700, color:'var(--amber)',
-                            whiteSpace:'nowrap',
-                          }}>
-                            (TTM)
-                          </span>
-                        )}
-                      </div>
-                      <span style={{ fontSize:9, color:'var(--text-300)', fontWeight:600 }}>{fyYear.replace('FY', '')}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
