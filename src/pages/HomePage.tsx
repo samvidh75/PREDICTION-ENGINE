@@ -82,30 +82,30 @@ export default function HomePage() {
         ))}
       </section>
 
-      {/* AI Research Lenses */}
-      <section style={{ paddingBottom: 24 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", margin: "0 0 12px" }}>
-          Discover opportunities
-        </h2>
-        <div className="no-scrollbar" style={{ display: "flex", gap: 12, overflowX: "auto" }}>
-          {[
-            { title: "Quality Compounders", desc: "Strong fundamentals, consistent growth", icon: "★" },
-            { title: "Undervalued Gems", desc: "Trading below intrinsic value", icon: "▼" },
-            { title: "Momentum Movers", desc: "Strong price momentum", icon: "▲" },
-            { title: "Low Risk Steady", desc: "Stable returns, low volatility", icon: "●" },
-          ].map((lens) => (
-            <button key={lens.title} onClick={() => navigate("scanner")} style={{
-              flexShrink: 0, minWidth: 180, padding: "16px 20px", borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--border)", background: "var(--bg-card)", cursor: "pointer",
-              textAlign: "left", boxShadow: "var(--shadow-card)",
-            }}>
-              <div style={{ fontSize: 22, marginBottom: 8 }}>{lens.icon}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{lens.title}</div>
-              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{lens.desc}</div>
-            </button>
-          ))}
-        </div>
-      </section>
+       {/* AI Research Lenses */}
+       <section style={{ paddingBottom: 24 }}>
+         <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", margin: "0 0 12px" }}>
+           Discover opportunities
+         </h2>
+         <div className="no-scrollbar" style={{ display: "flex", gap: 12, overflowX: "auto" }}>
+           {[
+             { title: "Quality Compounders", desc: "High ROE · Low debt · Growth", icon: "📊", preset: "quality" },
+             { title: "Undervalued Gems", desc: "PE below fair value", icon: "💎", preset: "undervalued" },
+             { title: "Momentum Movers", desc: "RSI strength · MACD signal", icon: "⚡", preset: "momentum" },
+             { title: "Low Risk Steady", desc: "Debt-free · Stable returns", icon: "🛡", preset: "lowrisk" },
+           ].map((lens) => (
+             <button key={lens.title} onClick={() => navigate("scanner")} style={{
+               flexShrink: 0, minWidth: 200, padding: "16px 20px", borderRadius: "var(--radius-lg)",
+               border: "1px solid var(--border)", background: "var(--bg-card)", cursor: "pointer",
+               textAlign: "left", boxShadow: "var(--shadow-card)",
+             }}>
+               <div style={{ fontSize: 24, marginBottom: 8 }}>{lens.icon}</div>
+               <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{lens.title}</div>
+               <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{lens.desc}</div>
+             </button>
+           ))}
+         </div>
+       </section>
 
       {/* Recently researched + Explore grid */}
       <div className="grid md:grid-cols-2" style={{ gap: 16, paddingBottom: 32 }}>
