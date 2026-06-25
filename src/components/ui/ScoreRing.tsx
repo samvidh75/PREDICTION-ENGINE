@@ -7,6 +7,8 @@ export function scoreColor(s: number | null): string {
   return "#c0392b";
 }
 
+export const getScoreColor = scoreColor;
+
 export function scoreLabel(s: number | null): string {
   if (!s) return "—";
   if (s >= 90) return "Excellent";
@@ -16,6 +18,8 @@ export function scoreLabel(s: number | null): string {
   if (s >= 40) return "Weak";
   return "Poor";
 }
+
+export const getScoreLabel = scoreLabel;
 
 export function scoreColorBg(s: number | null): string {
   if (!s) return "#f5f5f5";
@@ -116,6 +120,31 @@ export function ConfidenceRing({ pct, size = 28 }: { pct: number; size?: number 
         strokeDasharray={`${filled} ${circ}`}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
       />
+    </svg>
+  );
+}
+
+export function MiniSparkline({
+  data,
+  color = "#1a7f4b",
+  width = 48,
+  height = 20,
+}: {
+  data: number[];
+  color?: string;
+  width?: number;
+  height?: number;
+}) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const pts = data
+    .map((value, index) => `${(index / (data.length - 1)) * width},${height - 2 - ((value - min) / range) * (height - 5)}`)
+    .join(" ");
+  return (
+    <svg width={width} height={height} aria-hidden="true">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
   );
 }
