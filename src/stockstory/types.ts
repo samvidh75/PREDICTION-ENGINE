@@ -191,28 +191,13 @@ export interface StockStoryOutput {
   dataFreshness: 'Live' | 'Recent' | 'Stale' | 'Unavailable';
 }
 
-// ─── Scoring Utilities ────────────────────────────────────────────
+// ─── Scoring Utilities (re-exported from canonical @/types) ───────
 
-/** Clamp a value to 0-100 range */
-export function clampScore(v: number): number {
-  return Math.max(0, Math.min(100, Math.round(v)));
-}
+export { clampScore, weightedAverage } from '@/types';
 
 /** Safely convert a raw DB value to a finite number or null. Rejects NaN, Infinity, -Infinity. */
 export function isFiniteNumber(raw: unknown): number | null {
   if (raw === null || raw === undefined || raw === '') return null;
   const n = Number(raw);
   return Number.isFinite(n) ? n : null;
-}
-
-
-
-/** Weighted average of scored components */
-export function weightedAverage(
-  components: Array<{ score: number; weight: number }>
-): number {
-  const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
-  if (totalWeight === 0) return 50;
-  const avg = components.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight;
-  return clampScore(avg);
 }
