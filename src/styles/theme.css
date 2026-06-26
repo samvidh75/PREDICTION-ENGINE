@@ -100,16 +100,15 @@
 
 .card {
   background-color: var(--page);
-  border-radius: var(--r-lg);
-  padding: var(--sp-6);
-  box-shadow: var(--sh-card);
+  border-radius: 8px;   /* Stripe cap: max 8px */
+  padding: var(--sp-6); /* 24px */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Stripe shadow */
   border: 1px solid var(--border);
-  transition: box-shadow var(--t-base), transform var(--t-base);
+  transition: box-shadow var(--t-base);
 }
 
 .card:hover {
-  box-shadow: var(--sh-raised);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 @media (max-width: 480px) {
@@ -120,16 +119,19 @@
 }
 
 .btn {
-  padding: var(--sp-2) var(--sp-5);
+  padding: 0 32px;        /* Stripe: 12px 32px (height via min-height) */
   border: none;
-  border-radius: var(--r-md);
+  border-radius: 6px;     /* Stripe: 6px button radius */
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--t-fast);
+  transition: background var(--t-base), box-shadow var(--t-base);
   font-family: var(--font);
-  font-size: var(--sz-base);
+  font-size: 16px;
   white-space: nowrap;
-  min-height: 44px;
+  min-height: 44px;       /* Apple HIG: touch target min */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary {

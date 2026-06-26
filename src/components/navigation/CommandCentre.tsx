@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { StockSearchEngine } from "../../services/stocks/StockSearchIndex";
+import { StockSearchIndex } from "../../services/stocks/StockSearchIndex";
 import { SearchRankingEngine } from "../../services/search/SearchRankingEngine";
 import { RecentSearchStore } from "../../services/search/RecentSearchStore";
 import { navigateToStock } from "../../architecture/navigation/routeCoordinator";
@@ -38,7 +38,7 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
 
   const searchResults = useMemo(() => {
     if (query.trim().length < 2) return [];
-    const raw = StockSearchEngine.search(query, 12);
+    const raw = StockSearchIndex.search(query, 12);
     return SearchRankingEngine.rank(raw, query).slice(0, 8);
   }, [query]);
   const liveQuotes = useUnifiedQuotes(searchResults.map((stock) => stock.ticker));
