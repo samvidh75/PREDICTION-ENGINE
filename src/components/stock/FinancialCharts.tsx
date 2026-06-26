@@ -193,7 +193,7 @@ export const FinancialCharts = ({ data }: FinancialChartsProps) => {
                   {chartData.map((entry, index) => (
                     <Cell
                       key={index}
-                      fill={hoveredIndex === index ? '#1240A8' : '#1A56DB'}
+                      fill={hoveredIndex === index ? 'var(--brand-hover)' : 'var(--brand)'}
                       opacity={hoveredIndex !== null && hoveredIndex !== index ? 0.45 : 1}
                       style={{ cursor:'default', transition:'opacity 100ms, fill 100ms' }}
                     />

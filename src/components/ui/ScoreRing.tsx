@@ -8,12 +8,12 @@ interface ScoreRingProps {
 }
 
 export function getScoreColor(s: number | null): string {
-  if (!s) return "#E8E8E8";
-  if (s >= 80) return "#0D5C34";
-  if (s >= 65) return "#1a7f4b";
-  if (s >= 50) return "#1A56DB";
-  if (s >= 35) return "#B45309";
-  return "#C0392B";
+  if (!s) return "var(--text-300)";
+  if (s >= 80) return "var(--green-text)";
+  if (s >= 65) return "var(--green-text)";
+  if (s >= 50) return "var(--brand)";
+  if (s >= 35) return "var(--amber-text)";
+  return "var(--red-text)";
 }
 
 export const scoreColor = getScoreColor;

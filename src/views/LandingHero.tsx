@@ -70,7 +70,7 @@ export const LandingHero: React.FC = () => {
             className={`w-full h-11 rounded-none font-medium text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 select-none min-h-[48px] active:scale-[0.98] duration-100 ${
               isConnecting
                 ? "bg-[#0D1117] border border-[rgba(148,163,184,0.16)] text-[#9AA7B5] cursor-not-allowed"
-                : "bg-[#0A0A0A] text-white hover:bg-[#1A1A1A]"
+                : "bg-[var(--text-900)] text-white hover:bg-[#333]"
             }`}
           >
             {isConnecting ? (

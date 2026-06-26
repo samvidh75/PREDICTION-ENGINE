@@ -90,7 +90,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
             type="button"
             onClick={() => { setOrderType("BUY"); setMarginError(null); }}
             className={`w-full h-full flex items-center justify-center font-bold text-xs uppercase transition-colors rounded-none ${
-              orderType === "BUY" ? "bg-[#0A0A0A] text-white" : "text-[#9AA7B5]"
+              orderType === "BUY" ? "bg-[var(--text-900)] text-white" : "text-[var(--text-500)]"
             }`}
           >
             Buy Position
@@ -99,7 +99,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
             type="button"
             onClick={() => { setOrderType("SELL"); setMarginError(null); }}
             className={`w-full h-full flex items-center justify-center font-bold text-xs uppercase transition-colors rounded-none ${
-              orderType === "SELL" ? "bg-[#0A0A0A] text-white" : "text-[#9AA7B5]"
+              orderType === "SELL" ? "bg-[var(--text-900)] text-white" : "text-[var(--text-500)]"
             }`}
           >
             Sell Position
@@ -149,7 +149,7 @@ export const OrderTicket: React.FC<OrderTicketProps> = ({
         <button
           type="submit"
           disabled={isExecuting}
-          className="w-full h-11 rounded-none bg-[#0A0A0A] text-white hover:bg-[#1A1A1A] font-medium text-xs uppercase tracking-wider flex items-center justify-center space-x-2 active:scale-[0.98] transition-transform duration-100 ease-out select-none min-h-[48px]"
+          className="w-full h-11 rounded-none bg-[var(--text-900)] text-white hover:bg-[#333] font-medium text-xs uppercase tracking-wider flex items-center justify-center space-x-2 active:scale-[0.98] transition-transform duration-100 ease-out select-none min-h-[48px]"
         >
           {isExecuting ? (
             <Loader2 className="w-4 h-4 animate-spin text-white" />

@@ -43,8 +43,8 @@ export const Navbar: React.FC = () => {
             StockStory
           </span>
           <span style={{
-            fontSize: 9, fontWeight: 600, color: '#1A56DB',
-            background: '#EBF5FF', padding: '2px 5px', borderRadius: 4,
+            fontSize: 9, fontWeight: 600, color: 'var(--brand)',
+            background: 'var(--brand-tint)', padding: '2px 5px', borderRadius: 4,
             letterSpacing: '1.5px', marginLeft: 4
           }}>
             INDIA

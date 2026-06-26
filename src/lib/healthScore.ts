@@ -419,11 +419,11 @@ export function getHealthLabel(composite: HealthResult['composite']): string {
  */
 export function getHealthColor(composite: HealthResult['composite']): string {
   switch (composite) {
-    case 'very_healthy': return '#1A7F4B'
-    case 'healthy': return '#1A7F4B'
-    case 'average': return '#1A56DB'
-    case 'weakening': return '#D97706'
-    case 'poor': return '#C0392B'
-    default: return '#9A9A9A'
+    case 'very_healthy': return 'var(--green-text)'
+    case 'healthy': return 'var(--green-text)'
+    case 'average': return 'var(--brand)'
+    case 'weakening': return 'var(--amber-text)'
+    case 'poor': return 'var(--red-text)'
+    default: return 'var(--text-300)'
   }
 }
