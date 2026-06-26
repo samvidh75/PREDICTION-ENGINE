@@ -137,7 +137,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <NavLink href="/login" style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", textDecoration: "none" }}>Sign in \u2192</NavLink>
+              <NavLink href="/login" style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", textDecoration: "none" }}>{'Sign in \u2192'}</NavLink>
               <NavLink href="/register" style={{ fontSize: 12, color: "var(--text-500)", textDecoration: "none" }}>Create account</NavLink>
             </div>
           )}
@@ -149,7 +149,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         }}>
           Not SEBI-registered<br />
           Not investment advice<br />
-          \u00A9 2025 StockStory India
+          {'\u00A9 2025 StockStory India'}
         </div>
       </aside>
 

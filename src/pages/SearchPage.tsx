@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react"
 import { NIFTY50_SYMBOLS, SYMBOL_DISPLAY_MAP } from "../services/universe/StockUniverse"
 import { useStockData } from "../hooks/useStockData"
 import { navigate } from "../components/product/routeConfig"
-import TopNav from "../components/layout/TopNav"
-import MarketTicker from "../components/layout/MarketTicker"
 
 export default function SearchPage() {
   const [query, setQuery] = useState("")
@@ -23,10 +21,8 @@ export default function SearchPage() {
   }, [query])
 
   return (
-    <div style={{ background: "#F3F4F6", minHeight: "100vh" }}>
-      <TopNav />
-      <MarketTicker />
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "0 16px" }}>
+    <div style={{ minHeight: "100vh" }}>
+      <main style={{ padding: "0 4px" }}>
         <div style={{ padding: "24px 0 16px" }}>
           <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.5px", margin: 0, color: "#0F172A" }}>
             Search Companies
