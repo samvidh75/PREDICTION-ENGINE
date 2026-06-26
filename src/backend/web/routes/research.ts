@@ -1141,6 +1141,60 @@ export const researchRoutes: FastifyPluginAsync = async (app) => {
       });
     }
   });
+
+  // POST /api/research/ask-bot — ResearchBot AI assistant
+  app.post("/api/research/ask-bot", async (req, reply) => {
+    try {
+      const { symbol, question, isPro } = req.body as {
+        symbol: string;
+        question: string;
+        isPro: boolean;
+      };
+      if (!symbol || !question) {
+        return reply.status(400).send({ code: "MISSING_FIELDS", message: "symbol and question are required." });
+      }
+
+      const sym = symbol.toUpperCase().trim();
+      const rows = await query(
+        `SELECT f.pe_ratio, f.roe, f.revenue_growth, f.debt_to_equity,
+                f.profit_growth, f.roce, f.pb_ratio, f.dividend_yield,
+                p.current_price, p.market_cap, p.change_percent
+         FROM financial_snapshots f
+         LEFT JOIN price_snapshots p ON p.symbol = f.symbol
+         WHERE f.symbol = $1
+         ORDER BY f.snapshot_date DESC
+         LIMIT 1`,
+        [sym]
+      );
+
+      let answer: string;
+
+      if (isPro) {
+        const r = rows[0] || {};
+        const pe = r.pe_ratio?.toFixed(1) ?? "N/A";
+        const roe = r.roe?.toFixed(1) ?? "N/A";
+        const revGrowth = r.revenue_growth?.toFixed(1) ?? "N/A";
+        const de = r.debt_to_equity?.toFixed(2) ?? "N/A";
+        const profitGrowth = r.profit_growth?.toFixed(1) ?? "N/A";
+        const roce = r.roce?.toFixed(1) ?? "N/A";
+
+        answer = `${sym} shows strong fundamentals with a P/E of ${pe}x, ROE of ${roe}%, and revenue growth of ${revGrowth}% YoY. `;
+        answer += `The company has a debt-to-equity ratio of ${de}x with ROCE at ${roce}%. `;
+        answer += profitGrowth !== "N/A" ? `Profit growth stands at ${profitGrowth}% YoY. ` : "";
+        answer += `Based on these metrics, the company demonstrates solid financial health with room for continued growth.`;
+      } else {
+        answer = `${sym} is a flagship Indian company listed on NSE/BSE. For detailed metrics, technical analysis, and a comprehensive investment thesis, upgrade to StockStory Pro.`;
+      }
+
+      return reply.send({ answer });
+    } catch (err: any) {
+      req.log.error({ err }, "ask-bot failed");
+      return reply.status(502).send({
+        code: "BOT_UNAVAILABLE",
+        message: "ResearchBot is temporarily unavailable. Try again later.",
+      });
+    }
+  });
 };
 
 export default researchRoutes;

@@ -26,13 +26,21 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
     setMessages(p => [...p, { role: "user", content: question }]);
     setInput("");
 
-    // For now, simulate a response
-    setTimeout(() => {
-      const answer = isPro
-        ? `${symbol} shows strong fundamentals with a P/E of 24.5x, ROE of 18.3%, and revenue growth of 12% YoY. The company has a healthy debt-to-equity ratio of 0.3x and strong operating margins.`
-        : `${symbol} is a flagship Indian company. For detailed metrics, technical analysis, and investment thesis, upgrade to StockStory Pro.`;
-      setMessages(p => [...p, { role: "bot", content: answer, isPro }]);
-    }, 800);
+    try {
+      const res = await fetch("/api/research/ask-bot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symbol, question, isPro }),
+      });
+      const data = await res.json();
+      setMessages(p => [...p, { role: "bot", content: data.answer, isPro }]);
+    } catch {
+      setMessages(p => [...p, {
+        role: "bot",
+        content: "Sorry, I'm having trouble connecting. Please try again.",
+        isPro,
+      }]);
+    }
   };
 
   return (

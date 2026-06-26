@@ -16,6 +16,7 @@ import CompanyInfo from "../components/stock/CompanyInfo";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import NewsFeed from "../components/news/NewsFeed";
 import ProUpgradeModal from "../components/stock/ProUpgradeModal";
+import ProPaywallGate from "../components/premium/ProPaywallGate";
 import ResearchBot from "../components/stock/ResearchBot";
 import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
 import { computeHealthScore } from "../lib/healthScore";
@@ -132,18 +133,20 @@ export default function StockPage({ symbol }: { symbol: string }) {
 
         {/* 3. Score Display */}
         <div style={{ margin: "16px 0" }}>
-          <div style={{
-            background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: 16, padding: "20px",
-          }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#6E6E6E", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
-              Score Overview
+          <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
+            <div style={{
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: 16, padding: "20px",
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#6E6E6E", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
+                Score Overview
+              </div>
+              <ScoreSemiCircles
+                overallScore={health.compositeScore ?? 50}
+                riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
+              />
             </div>
-            <ScoreSemiCircles
-              overallScore={health.compositeScore ?? 50}
-              riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
-            />
-          </div>
+          </ProPaywallGate>
         </div>
 
         {/* 4. Healthometer */}
@@ -190,22 +193,24 @@ export default function StockPage({ symbol }: { symbol: string }) {
           />
         </div>
 
-        {/* 6. Financial Histogram */}
+        {/* 6. Financial Performance */}
         <div style={{ margin: "16px 0" }}>
-          <div style={{
-            background: "var(--surface)", border: "1px solid var(--border)",
-            borderRadius: "var(--r-lg)", padding: 24,
-          }}>
+          <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
             <div style={{
-              fontSize: "var(--sz-xs)", fontWeight: 700, color: "var(--text-300)",
-              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16,
+              background: "var(--surface)", border: "1px solid var(--border)",
+              borderRadius: "var(--r-lg)", padding: 24,
             }}>
-              Financial Performance
+              <div style={{
+                fontSize: "var(--sz-xs)", fontWeight: 700, color: "var(--text-300)",
+                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 16,
+              }}>
+                Financial Performance
+              </div>
+              <SafeBlock>
+                <FinancialHistogram data={data?.annualFinancials ?? []} height={isMobile ? 200 : 240} />
+              </SafeBlock>
             </div>
-            <SafeBlock>
-              <FinancialHistogram data={data?.annualFinancials ?? []} height={isMobile ? 200 : 240} />
-            </SafeBlock>
-          </div>
+          </ProPaywallGate>
         </div>
 
         {/* 7. News */}
