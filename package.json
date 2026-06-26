@@ -140,6 +140,7 @@
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
     "audit:accessibility-smoke": "tsx scripts/audit-accessibility-smoke.ts",
     "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
+    "eval:ai:local": "tsx scripts/run-ai-eval.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
     "probe:akshare": "python3 scripts/probe-akshare-provider.py",
