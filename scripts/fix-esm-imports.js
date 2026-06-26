@@ -16,9 +16,9 @@ function walk(dir) {
   return files;
 }
 
-const distDir = path.resolve('dist/backend');
+const distDir = path.resolve('dist');
 if (!fs.existsSync(distDir)) {
-  console.log('No dist/backend directory found.');
+  console.log('No dist/ directory found.');
   process.exit(0);
 }
 
