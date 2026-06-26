@@ -57,12 +57,12 @@ interface Recommendation {
 
 export class IntelligenceService {
   private client: AxiosInstance;
-  private modelName = 'mistral';
-  private sglangUrl = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || 'http://localhost:11434';
+  private modelName = process.env.OLLAMA_MODEL || 'mistral';
 
   constructor() {
+    const url = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://localhost:11434';
     this.client = axios.create({
-      baseURL: this.sglangUrl,
+      baseURL: url,
       timeout: 60000,
     });
   }
@@ -321,16 +321,19 @@ Rank these stocks for investment. Return JSON:
     temperature = 0.7
   ): Promise<string> {
     try {
-      const response = await this.client.post('/v1/completions', {
+      const response = await this.client.post('/api/generate', {
         model: this.modelName,
         prompt,
-        max_tokens: maxTokens,
-        temperature,
-        top_p: 0.9,
+        options: {
+          num_predict: maxTokens,
+          temperature,
+          top_p: 0.9,
+        },
+        stream: false,
       });
-      return response.data.choices[0].text;
+      return response.data.response;
     } catch (error) {
-      console.error('SGLang generation error:', error);
+      console.error('Ollama generation error:', error);
       throw new Error('Failed to generate text');
     }
   }
