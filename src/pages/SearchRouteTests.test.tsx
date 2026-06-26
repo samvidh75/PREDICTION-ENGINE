@@ -1,9 +1,12 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { LayoutProvider } from "../context/LayoutContext";
 import SearchPage from "./SearchPage";
 
-const renderWithLayout = (ui: React.ReactElement) => render(<LayoutProvider>{ui}</LayoutProvider>);
+const renderWithLayout = (ui: React.ReactElement) => render(
+  <MemoryRouter><LayoutProvider>{ui}</LayoutProvider></MemoryRouter>
+);
 
 vi.mock("../services/stocks/StockSearchEngine", () => ({
   StockSearchEngine: {

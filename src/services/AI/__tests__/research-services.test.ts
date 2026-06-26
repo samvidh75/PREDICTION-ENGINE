@@ -14,11 +14,17 @@ vi.mock('../../../db/index', () => ({
   query: vi.fn().mockResolvedValue({ rows: [] }),
 }));
 
+vi.mock('../../MarketConfigService', () => ({
+  marketConfigService: {
+    getMarketStatus: vi.fn().mockResolvedValue({ isOpen: true }),
+  },
+}));
+
 const mockAxios = vi.mocked(axios);
 
 function mockSglangResponse(text: string) {
   mockAxios.post.mockResolvedValue({
-    data: { text, usage: { completion_tokens: 50 } },
+    data: { response: text, usage: { completion_tokens: 50 } },
   });
 }
 

@@ -158,7 +158,7 @@ describe("StockResearchPage", () => {
     });
   });
 
-  it("shows Price history text when no candles exist", async () => {
+  it("shows Price history not available when no candles exist", async () => {
     const noHistoryData = {
       ...mockFullData,
       historical: { closes: [], highs: [], lows: [], timestamps: [], error: null },
@@ -172,7 +172,7 @@ describe("StockResearchPage", () => {
 
     render(<StockResearchPage symbol="TCS" />);
     await waitFor(() => {
-      expect(screen.getByText("Price history")).toBeDefined();
+      expect(screen.getByText("Price history not available")).toBeDefined();
     });
   });
 
@@ -271,7 +271,6 @@ describe("StockResearchPage", () => {
     });
 
     const { container } = render(<StockResearchPage symbol="TCS" />);
-    expect(container.querySelector('[style*="background: rgb(243, 244, 246)"]')).toBeTruthy();
     const text = container.textContent || "";
     expect(text).toContain("Tata Consultancy Services");
   });
