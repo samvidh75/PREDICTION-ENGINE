@@ -211,7 +211,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
       {/* Mobile sticky bottom bar */}
       {isMobile && (
         <div style={{
-          position:'fixed', bottom:64, left:0, right:0, zIndex:80,
+          position:'fixed', bottom:72, left:0, right:0, zIndex:80,
           background:'rgba(248,248,246,0.96)',
           backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
           borderTop:'1px solid var(--border)',

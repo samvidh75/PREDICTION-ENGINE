@@ -1,21 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
-import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
+import { NIFTY50_SYMBOLS, SYMBOL_DISPLAY_MAP } from "../services/universe/StockUniverse"
 import { useStockData } from "../hooks/useStockData"
 import { navigate } from "../components/product/routeConfig"
 import TopNav from "../components/layout/TopNav"
 import MarketTicker from "../components/layout/MarketTicker"
-
-const DISPLAY_NAMES: Record<string, string> = {
-  RELIANCE: "Reliance Industries Ltd.", TCS: "Tata Consultancy Services Ltd.",
-  HDFCBANK: "HDFC Bank", INFY: "Infosys", ICICIBANK: "ICICI Bank",
-  SBIN: "State Bank of India", ITC: "ITC", HINDUNILVR: "Hindustan Unilever",
-  LT: "Larsen & Toubro", BHARTIARTL: "Bharti Airtel",
-  KOTAKBANK: "Kotak Mahindra Bank", AXISBANK: "Axis Bank",
-  BAJFINANCE: "Bajaj Finance", ASIANPAINT: "Asian Paints",
-  MARUTI: "Maruti Suzuki", SUNPHARMA: "Sun Pharmaceutical",
-  TITAN: "Titan", ULTRACEMCO: "UltraTech Cement",
-  WIPRO: "Wipro", ONGC: "Oil and Natural Gas Corporation",
-}
 
 export default function SearchPage() {
   const [query, setQuery] = useState("")
@@ -29,7 +17,7 @@ export default function SearchPage() {
     if (!query.trim()) return []
     const ql = query.toLowerCase()
     return NIFTY50_SYMBOLS.filter((sym: string) => {
-      const name = (DISPLAY_NAMES[sym] || sym).toLowerCase()
+      const name = (SYMBOL_DISPLAY_MAP[sym] || sym).toLowerCase()
       return sym.toLowerCase().includes(ql) || name.includes(ql)
     }).slice(0, 20)
   }, [query])
@@ -78,7 +66,7 @@ export default function SearchPage() {
         {matched.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 24 }}>
             {matched.map((sym: string) => (
-              <SearchResultRow key={sym} symbol={sym} displayName={DISPLAY_NAMES[sym] || sym} />
+              <SearchResultRow key={sym} symbol={sym} displayName={SYMBOL_DISPLAY_MAP[sym] || sym} />
             ))}
           </div>
         )}

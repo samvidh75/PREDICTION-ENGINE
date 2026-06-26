@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useStockData } from "../hooks/useStockData";
 import { UnifiedPredictionEngine } from "../prediction-engine/UnifiedPredictionEngine";
+import { SYMBOL_DISPLAY_MAP } from "../services/universe/StockUniverse";
 import ScoreRing from "../components/ui/ScoreRing";
 import { fMarketCap, fPercent, fPrice, fRatio, fRelativeTime } from "../lib/format";
 import PriceChart from "../components/charts/PriceChart";
@@ -36,34 +37,6 @@ import HealthGauge from "../components/ui/HealthGauge";
 import { computeHealthScore, getHealthLabel, getHealthColor } from "../lib/healthScore";
 import { navigate } from "../components/product/routeConfig";
 import type { StockDetailResponse, MetricsGroup } from "../types/stockDetail";
-
-const DISPLAY_NAMES: Record<string, string> = {
-  RELIANCE: "Reliance Industries Ltd.",
-  TCS: "Tata Consultancy Services Ltd.",
-  HDFCBANK: "HDFC Bank Ltd.",
-  INFY: "Infosys Ltd.",
-  ICICIBANK: "ICICI Bank Ltd.",
-  SBIN: "State Bank of India",
-  ITC: "ITC Ltd.",
-  HINDUNILVR: "Hindustan Unilever Ltd.",
-  LT: "Larsen & Toubro Ltd.",
-  BHARTIARTL: "Bharti Airtel Ltd.",
-  SUNPHARMA: "Sun Pharmaceutical Industries Ltd.",
-  BAJFINANCE: "Bajaj Finance Ltd.",
-  KOTAKBANK: "Kotak Mahindra Bank Ltd.",
-  AXISBANK: "Axis Bank Ltd.",
-  MARUTI: "Maruti Suzuki India Ltd.",
-  TITAN: "Titan Company Ltd.",
-  NTPC: "NTPC Ltd.",
-  ONGC: "Oil and Natural Gas Corporation Ltd.",
-  WIPRO: "Wipro Ltd.",
-  HCLTECH: "HCL Technologies Ltd.",
-  POWERGRID: "Power Grid Corporation of India Ltd.",
-  "M&M": "Mahindra & Mahindra Ltd.",
-  NESTLEIND: "Nestlé India Ltd.",
-  ULTRACEMCO: "UltraTech Cement Ltd.",
-  ASIANPAINT: "Asian Paints Ltd.",
-};
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -325,7 +298,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               fontSize: isMobile ? 28 : 32, fontWeight: 800, color: "#0F172A",
               letterSpacing: "-0.5px", lineHeight: 1.2, margin: 0,
             }}>
-              {data?.price.companyName && data?.price.companyName !== symbol ? data.price.companyName : (DISPLAY_NAMES[symbol] ?? symbol)}
+              {data?.price.companyName && data?.price.companyName !== symbol ? data.price.companyName : (SYMBOL_DISPLAY_MAP[symbol] ?? symbol)}
             </h1>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 4 }}>
               <span style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontVariantNumeric: "tabular-nums" }}>
