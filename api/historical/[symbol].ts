@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const volumes = (quotes.volume ?? []).filter((v: number | null) => v !== null);
     const timestamps = result.timestamp ?? [];
 
-    let data = closes.map((close: number, i: number) => ({
+    const data = closes.map((close: number, i: number) => ({
       date: timestamps[i]
         ? new Date(timestamps[i] * 1000).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })
         : `Day ${i + 1}`,

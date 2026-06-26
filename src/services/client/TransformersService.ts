@@ -2,16 +2,21 @@ import { pipeline } from '@xenova/transformers';
 
 let extractor: any = null;
 let qaModel: any = null;
+let textGenModel: any = null;
 
 async function initializeModels() {
   if (!extractor) {
-    console.log('Loading feature extractor (one-time, cached)...');
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   }
 
   if (!qaModel) {
-    console.log('Loading QA model (one-time, cached)...');
     qaModel = await pipeline('question-answering', 'Xenova/distilbert-base-uncased-distilled-squad');
+  }
+}
+
+async function initializeTextGen() {
+  if (!textGenModel) {
+    textGenModel = await pipeline('text-generation', 'Xenova/distilgpt2');
   }
 }
 
@@ -33,6 +38,19 @@ export class TransformersService {
     const answer = await qaModel(question, context);
 
     return answer.answer;
+  }
+
+  static async generateText(prompt: string, maxTokens: number = 150): Promise<string> {
+    await initializeTextGen();
+
+    const result = await textGenModel(prompt, {
+      max_new_tokens: maxTokens,
+      do_sample: true,
+      temperature: 0.7,
+    });
+
+    const output = Array.isArray(result) ? result[0] : result;
+    return output.generated_text;
   }
 
   static async classifyIntent(query: string): Promise<string> {

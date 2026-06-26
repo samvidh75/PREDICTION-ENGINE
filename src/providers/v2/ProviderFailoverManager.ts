@@ -93,7 +93,7 @@ export class ProviderFailoverManager {
     const sourceMap: Record<string, string> = {};
     const failures: FailoverResult['failures'] = [];
     const providerSummary: Record<string, { attempted: number; succeeded: number; failed: number }> = {};
-    let totalRetries = 0;
+    const totalRetries = 0;
     const completedProviders = new Set<string>();
 
     // Build a field→provider priority map and a union of all candidate providers

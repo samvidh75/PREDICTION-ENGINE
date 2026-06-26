@@ -22,8 +22,7 @@ export class ScreenerWorker {
 
     const symbol = this.queue.shift()!;
     try {
-      const data = await screenerService.getFundamentals(symbol);
-      console.log(`[ScreenerWorker] ${symbol}: ${data ? 'OK' : 'FAILED'}`);
+      await screenerService.getFundamentals(symbol);
     } catch (e) {
       console.error(`[ScreenerWorker] ${symbol}: ${e}`);
       this.queue.push(symbol);

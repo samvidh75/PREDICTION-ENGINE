@@ -8,6 +8,8 @@ import { ScannerThesisService } from '../ScannerThesisService';
 import { ThesisTrackingService } from '../ThesisTrackingService';
 
 vi.mock('axios');
+import { sglangService } from '../SGLangService';
+
 vi.mock('../../../db/index', () => ({
   query: vi.fn().mockResolvedValue({ rows: [] }),
 }));
@@ -19,6 +21,11 @@ function mockSglangResponse(text: string) {
     data: { text, usage: { completion_tokens: 50 } },
   });
 }
+
+beforeEach(() => {
+  sglangService.useExternal = true;
+  vi.clearAllMocks();
+});
 
 describe('ResearchBotService', () => {
   let service: ResearchBotService;

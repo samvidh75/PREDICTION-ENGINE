@@ -79,7 +79,7 @@ const anchorResults: CompanyResults[] = [];
 for (const sym of ANCHOR_SYMBOLS) {
   console.log(`   Fetching ${sym}...`);
   const fields: Record<string, FieldResult> = {};
-  let source = '';
+  const source = '';
 
   // Use Registry + Yahoo fallback
   const entry = registry.lookup(sym);

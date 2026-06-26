@@ -8,8 +8,3 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     timestamp: new Date(),
   });
 }
-
-export function requestLogger(req: Request, _res: Response, next: NextFunction) {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-}

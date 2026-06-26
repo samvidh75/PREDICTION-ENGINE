@@ -27,25 +27,6 @@ export function trackQueryMetrics(
   if (metrics.length > MAX_LOCAL_METRICS) {
     metrics.shift();
   }
-
-  const emoji =
-    duration < 50
-      ? '\u26A1'
-      : duration < 500
-        ? '\uD83D\uDE80'
-        : '\uD83D\uDCE1';
-
-  console.log(
-    `${emoji} [${method.toUpperCase()}] ${duration.toFixed(0)}ms - "${query.slice(0, 50)}..."`
-  );
-
-  if (duration < 50) {
-    console.log('Regex parser handled this (instant, offline)');
-  } else if (duration < 500) {
-    console.log('Browser AI handled this (Transformers.js, offline)');
-  } else {
-    console.log('API fallback used (Groq, free tier)');
-  }
 }
 
 export function getAggregatedMetrics() {
@@ -88,9 +69,8 @@ export function persistMetricsToLocalStorage() {
   try {
     const aggregated = getAggregatedMetrics();
     localStorage.setItem('stockstory_metrics', JSON.stringify(aggregated));
-    console.log('Metrics persisted to localStorage');
   } catch (e) {
-    console.warn('Failed to persist metrics (storage quota exceeded)');
+    // handle silently in production
   }
 }
 
@@ -99,7 +79,6 @@ export function retrievePersistedMetrics() {
     const data = localStorage.getItem('stockstory_metrics');
     return data ? JSON.parse(data) : null;
   } catch (e) {
-    console.warn('Failed to retrieve persisted metrics');
     return null;
   }
 }
@@ -107,5 +86,4 @@ export function retrievePersistedMetrics() {
 export function clearMetrics() {
   metrics.length = 0;
   localStorage.removeItem('stockstory_metrics');
-  console.log('Metrics cleared');
 }

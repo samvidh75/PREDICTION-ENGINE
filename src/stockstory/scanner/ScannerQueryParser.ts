@@ -88,7 +88,7 @@ export class ScannerQueryParser {
 
     const filters: ScannerFilter[] = [];
     let sort: ScannerQueryPlan['sort'] = 'score';
-    let explanation = 'Custom filters applied based on your query.';
+    const explanation = 'Custom filters applied based on your query.';
     const matchedPhrases: string[] = [];
 
     if (/low debt|low leverage|debt[\s-]?free|zero debt|low d\/e/.test(lower)) {

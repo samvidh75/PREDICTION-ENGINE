@@ -102,7 +102,6 @@ export function logAuthState(entry: Omit<AuthLogEntry, 'timestamp' | 'userAgent'
         (entry.elapsedMs != null ? ` elapsed=${Math.round(entry.elapsedMs / 1000)}s` : '') +
         (entry.error ? ` err="${entry.error}"` : '') +
         (entry.targetPage ? ` page=${entry.targetPage}` : ''),
-      full,
     );
   }
 

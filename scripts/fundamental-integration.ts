@@ -248,7 +248,7 @@ for (const entry of universe) {
   const vol = computeVol(prices);
 
   // Fetch financial data (Yahoo-derived estimates)
-  let fin = extractFromRegistryAndPrices(sym, entry.marketCap, prices, history);
+  const fin = extractFromRegistryAndPrices(sym, entry.marketCap, prices, history);
   fin.symbol = sym;
 
   const sector = entry.sector;

@@ -19,7 +19,7 @@ const UPSTOX_API = "https://api.upstox.com/v2";
 
 type TokenStatus = "present" | "missing" | "valid" | "expired" | "unauthorized" | "network_error" | "provider_error" | "unknown";
 
-let exitCode = 0;
+const exitCode = 0;
 
 function tokenStatusLabel(status: TokenStatus, extra?: string): string {
   const labels: Record<TokenStatus, string> = {
