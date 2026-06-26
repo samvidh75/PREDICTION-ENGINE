@@ -29,9 +29,9 @@
 
   --border: #E8E8E4;
   --border-strong: #D0D0CA;
-  --border-focus: 0 0 0 3px var(--brand-tint);
+  --border-focus: rgba(26,86,219,0.5);
 
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
   --sz-2xs: 10px;
@@ -72,6 +72,7 @@
   --sh-modal:  0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
   --sh-focus:  0 0 0 3px var(--brand-tint);
 
+  --t-instant: 80ms ease;
   --t-fast:   0.12s ease;
   --t-base:   0.2s ease;
   --t-slow:   0.35s ease;

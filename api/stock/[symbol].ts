@@ -85,6 +85,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const cgSales = screener?.compoundedSalesGrowth  ?? {}
   const cgProfit= screener?.compoundedProfitGrowth ?? {}
 
+  const rawMc = ratios['Market Cap'];
+  const parsedMc = parseMarketCap(rawMc);
+  console.log(`[${symbol}] Raw market cap: ${JSON.stringify(rawMc)} → parsed: ${parsedMc}`);
+
   const fundamentals = {
     peRatio:        toNum(ratios['Stock P/E']),
     pbRatio:        toNum(ratios['Price to Book']),
@@ -96,7 +100,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     currentRatio:   toNum(ratios['Current ratio']),
     revenueGrowth:  toNum(cgSales['3 Years']),
     profitGrowth:   toNum(cgProfit['3 Years']),
-    marketCap:      toNum(ratios['Market Cap']),
+    marketCap:      parsedMc,
     error:          screener ? null : 'fundamentals_unavailable',
   }
 
@@ -184,6 +188,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 function toNum(v: any): number | null {
   const n = parseFloat(v)
   return isNaN(n) ? null : n
+}
+
+function parseMarketCap(raw: any): number | null {
+  if (raw == null) return null;
+  if (typeof raw === 'number') return raw;
+  const s = String(raw).replace(/[₹,\s]/g, '').replace(' Cr', '').replace('Cr', '').trim();
+  if (s.toLowerCase().includes('l')) {
+    return parseFloat(s.replace(/[lL]/g, '')) * 100_000;
+  }
+  const v = parseFloat(s);
+  return isNaN(v) ? null : v;
 }
 
 function computeCompleteness(p: any, f: any, h: any): number {

@@ -1,27 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  Bookmark,
-  GitCompare,
-  TrendingUp,
   AlertTriangle,
-  CheckCircle2,
-  Info,
-  BarChart3,
-  Target,
-  BookOpen,
-  Sparkles,
-  ExternalLink,
-  Building2,
-  Calendar,
-  MapPin,
-  Globe,
-  Users,
-  FileText,
-  Shield,
-  Activity,
-  Disc3,
 } from "lucide-react";
 import { useStockData } from "../hooks/useStockData";
 import { fMarketCap, fPercent, fPrice, fRatio, fRelativeTime } from "../lib/format";
@@ -35,6 +15,7 @@ import MetricsGrid from "../components/stock/MetricsGrid";
 import CompanyInfo from "../components/stock/CompanyInfo";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import NewsFeed from "../components/news/NewsFeed";
+import ProUpgradeModal from "../components/stock/ProUpgradeModal";
 import { computeHealthScore } from "../lib/healthScore";
 
 function useIsMobile() {
@@ -52,6 +33,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
   const { data, loading, error, refetch } = useStockData(symbol);
   const isMobile = useIsMobile();
   const [showProModal, setShowProModal] = useState(false);
+  const [isTracked, setIsTracked] = useState(false);
 
   const health = useMemo(() => computeHealthScore({
     roe: data?.fundamentals.roe ?? null,
@@ -225,6 +207,53 @@ export default function StockPage({ symbol }: { symbol: string }) {
           StockStory is an AI research layer for Indian equities.
         </div>
       </div>
+
+      {/* Mobile sticky bottom bar */}
+      {isMobile && (
+        <div style={{
+          position:'fixed', bottom:64, left:0, right:0, zIndex:80,
+          background:'rgba(248,248,246,0.96)',
+          backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
+          borderTop:'1px solid var(--border)',
+          display:'grid', gridTemplateColumns:'1fr 1fr 1.5fr',
+          gap:8, padding:'10px 16px',
+          paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
+        }}>
+          <button onClick={() => setIsTracked(!isTracked)} style={{
+            height:44, borderRadius:'var(--r-md)',
+            background: isTracked ? 'var(--red-tint)' : 'var(--surface)',
+            color: isTracked ? 'var(--red-text)' : 'var(--text-500)',
+            border: isTracked ? '1px solid #FCA5A5' : '1px solid var(--border)',
+            fontSize:'var(--sz-sm)', fontWeight:600, cursor:'pointer',
+            fontFamily:'var(--font)',
+          }}>
+            {isTracked ? '\u2665 Tracked' : '\u2661 Track'}
+          </button>
+          <a href={`/compare?stocks=${symbol}`} style={{
+            height:44, borderRadius:'var(--r-md)',
+            background:'var(--surface)', color:'var(--text-500)',
+            border:'1px solid var(--border)', fontSize:'var(--sz-sm)',
+            fontWeight:600, display:'flex', alignItems:'center',
+            justifyContent:'center', textDecoration:'none',
+          }}>
+            \u2295 Compare
+          </a>
+          <button style={{
+            height:44, borderRadius:'var(--r-md)',
+            background:'var(--brand)', color:'var(--text-inverse)',
+            border:'none', fontSize:'var(--sz-sm)', fontWeight:700,
+            cursor:'pointer', fontFamily:'var(--font)',
+          }}>
+            Invest \u2192
+          </button>
+        </div>
+      )}
+
+      <ProUpgradeModal
+        isOpen={showProModal}
+        onClose={() => setShowProModal(false)}
+        symbol={symbol}
+      />
     </AppShell>
   );
 }
