@@ -1,51 +1,59 @@
 import { sglangService } from './SGLangService';
-import { routellmService } from './RouteLLMService';
-import type { Fundamentals } from '@/types';
+import type { StockAnalysis } from './types';
+
+export interface ThesisInput {
+  peRatio?: number | null;
+  roe?: number | null;
+  revenueGrowth?: number | null;
+}
 
 export class LLMGateway {
   async askBot(
     symbol: string,
-    question: string,
-    user: { isPro: boolean }
-  ): Promise<{
-    answer: string;
-    confidence: number;
-    routedTo: 'weak' | 'strong';
-  }> {
-    const result = await routellmService.routeQuery(question, user);
-    const confidence = result.answer.toLowerCase().includes('confident') ? 0.9 : 0.7;
-    return { answer: result.answer, confidence, routedTo: result.routedTo };
+    question: string
+  ): Promise<{ answer: string; confidence: number }> {
+    const result = await sglangService.generateStructured(
+      `You are a stock research assistant analyzing ${symbol}. The user asks: ${question}. Provide a helpful, factual response based on available data.`,
+      {
+        type: 'object',
+        properties: {
+          answer: { type: 'string' },
+          confidence: { type: 'number' },
+        },
+        required: ['answer', 'confidence'],
+      },
+      300
+    );
+
+    return {
+      answer: result.answer,
+      confidence: result.confidence ?? 0.7,
+    };
   }
 
-  async analyzeStockParallel(
+  async analyzeStock(
     symbol: string,
-    fundamentals: Fundamentals,
-    _isPro: boolean
-  ): Promise<{
-    quality: string;
-    valuation: string;
-    growth: string;
-    risk: string;
-  }> {
+    fundamentals: {
+      roe?: number | null;
+      roic?: number | null;
+      peRatio?: number | null;
+      pbRatio?: number | null;
+      revenueGrowth?: number | null;
+      debtEquity?: number | null;
+    }
+  ): Promise<StockAnalysis> {
     return sglangService.analyzeStockParallel(symbol, fundamentals);
   }
 
   async generateThesis(
     symbol: string,
-    fundamentals: Fundamentals,
-    isPro: boolean
+    fundamentals: ThesisInput
   ): Promise<string> {
-    return routellmService.generateThesis(symbol, fundamentals, isPro);
+    return sglangService.generateThesis(symbol, fundamentals);
   }
 
-  async health(): Promise<{
-    sglang: boolean;
-    routellm: boolean;
-  }> {
-    return {
-      sglang: await sglangService.health(),
-      routellm: await routellmService.health(),
-    };
+  async health(): Promise<boolean> {
+    return sglangService.health();
   }
 }
 

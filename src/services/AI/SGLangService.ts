@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { llmResponsesQueries } from '@/db/queries/llm-responses';
+import type { SGLangResponse, StockAnalysis } from './types';
 
 const SGLANG_API = process.env.SGLANG_URL || 'http://localhost:30000';
 
@@ -10,42 +10,21 @@ export class SGLangService {
     maxTokens: number = 500
   ): Promise<Record<string, any>> {
     const startTime = Date.now();
-    try {
-      const response = await axios.post(`${SGLANG_API}/generate`, {
+    const response = await axios.post(
+      `${SGLANG_API}/generate`,
+      {
         text: prompt,
         sampling_params: { max_new_tokens: maxTokens, temperature: 0.3 },
         json_schema: jsonSchema,
-      });
-      const parsed = JSON.parse(response.data.text);
-      const latencyMs = Date.now() - startTime;
-      const tokens = response.data.usage?.completion_tokens || maxTokens;
+      },
+      { timeout: 30000 }
+    );
 
-      await llmResponsesQueries.logCall({
-        service: 'sglang',
-        method: 'generateStructured',
-        inputTokens: prompt.length / 4,
-        outputTokens: tokens,
-        latencyMs,
-        costEstimate: tokens * 0.0000001,
-        routedTo: 'weak',
-        success: true,
-      });
+    const text = response.data.text;
+    const tokens = response.data.usage?.completion_tokens || maxTokens;
+    const latencyMs = Date.now() - startTime;
 
-      return parsed;
-    } catch (e) {
-      await llmResponsesQueries.logCall({
-        service: 'sglang',
-        method: 'generateStructured',
-        inputTokens: prompt.length / 4,
-        outputTokens: 0,
-        latencyMs: Date.now() - startTime,
-        costEstimate: 0,
-        routedTo: 'weak',
-        success: false,
-        errorMessage: String(e),
-      });
-      throw e;
-    }
+    return JSON.parse(text);
   }
 
   async parallelGenerate(
@@ -63,27 +42,40 @@ export class SGLangService {
 
   async analyzeStockParallel(
     symbol: string,
-    fundamentals: { roe?: number | null; roic?: number | null; peRatio?: number | null; pbRatio?: number | null; revenueGrowth?: number | null; debtEquity?: number | null }
-  ): Promise<{ quality: string; valuation: string; growth: string; risk: string }> {
+    fundamentals: {
+      roe?: number | null;
+      roic?: number | null;
+      peRatio?: number | null;
+      pbRatio?: number | null;
+      revenueGrowth?: number | null;
+      debtEquity?: number | null;
+    }
+  ): Promise<StockAnalysis> {
+    const schema = {
+      type: 'object' as const,
+      properties: { analysis: { type: 'string' as const } },
+      required: ['analysis'],
+    };
+
     const [quality, valuation, growth, risk] = await Promise.all([
       this.generateStructured(
-        `Analyze quality of ${symbol}: ROE=${fundamentals.roe}%, ROIC=${fundamentals.roic}%`,
-        { type: 'object', properties: { analysis: { type: 'string' } } },
+        `Analyze quality of ${symbol}: ROE=${fundamentals.roe ?? 'N/A'}%, ROIC=${fundamentals.roic ?? 'N/A'}%`,
+        schema,
         200
       ),
       this.generateStructured(
-        `Analyze valuation of ${symbol}: PE=${fundamentals.peRatio}x, PB=${fundamentals.pbRatio}x`,
-        { type: 'object', properties: { analysis: { type: 'string' } } },
+        `Analyze valuation of ${symbol}: PE=${fundamentals.peRatio ?? 'N/A'}x, PB=${fundamentals.pbRatio ?? 'N/A'}x`,
+        schema,
         200
       ),
       this.generateStructured(
-        `Analyze growth of ${symbol}: Revenue Growth=${fundamentals.revenueGrowth}%`,
-        { type: 'object', properties: { analysis: { type: 'string' } } },
+        `Analyze growth of ${symbol}: Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%`,
+        schema,
         200
       ),
       this.generateStructured(
-        `Analyze risk of ${symbol}: Debt/Equity=${fundamentals.debtEquity}x`,
-        { type: 'object', properties: { analysis: { type: 'string' } } },
+        `Analyze risk of ${symbol}: Debt/Equity=${fundamentals.debtEquity ?? 'N/A'}x`,
+        schema,
         200
       ),
     ]);
@@ -96,11 +88,38 @@ export class SGLangService {
     };
   }
 
+  async generateThesis(
+    symbol: string,
+    fundamentals: {
+      peRatio?: number | null;
+      roe?: number | null;
+      revenueGrowth?: number | null;
+    }
+  ): Promise<string> {
+    const prompt = [
+      `Generate a one-sentence investment thesis for ${symbol}.`,
+      `Financial context: PE=${fundamentals.peRatio ?? 'N/A'}x,`,
+      `ROE=${fundamentals.roe ?? 'N/A'}%,`,
+      `Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%.`,
+      `Be specific about what makes this company attractive or concerning.`,
+    ].join(' ');
+
+    const result = await this.generateStructured(prompt, {
+      type: 'object',
+      properties: { thesis: { type: 'string' } },
+      required: ['thesis'],
+    }, 200);
+
+    return result.thesis;
+  }
+
   async health(): Promise<boolean> {
     try {
       const response = await axios.get(`${SGLANG_API}/health`, { timeout: 5000 });
       return response.status === 200;
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }
 }
 
