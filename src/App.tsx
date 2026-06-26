@@ -28,6 +28,7 @@ import TrustCentrePage from "./pages/TrustCentrePage";
 import IPOCenterPage from "./pages/IPOCenterPage";
 import TrackPage from "./pages/TrackPage";
 import MorePage from "./pages/MorePage";
+import { MetricsDashboard } from "./components/admin/MetricsDashboard";
 
 function usePageMeta(title: string, desc: string) {
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function App() {
                     <Route path="/ipo" element={<RouteMetaPage><IPOCenterPage /></RouteMetaPage>} />
                     <Route path="/track" element={<RouteMetaPage><TrackPage /></RouteMetaPage>} />
                     <Route path="/more" element={<RouteMetaPage><MorePage /></RouteMetaPage>} />
+                    <Route path="/admin/metrics" element={<MetricsDashboard />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </AppShell>
