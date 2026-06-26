@@ -148,7 +148,8 @@ function scoreValuation(fin?: IndiaEquityFundamentals): FactorScore {
 }
 
 function scoreStability(fin?: IndiaEquityFundamentals, tech?: IndiaEquityTechnicals): FactorScore {
-  const sizeScore = finite(fin?.marketCap) ? clamp((Math.log10(Math.max(fin.marketCap, 1)) - 9) * 16) : 50;
+  const marketCap = fin?.marketCap;
+  const sizeScore = finite(marketCap) ? clamp((Math.log10(Math.max(marketCap, 1)) - 9) * 16) : 50;
   const score = average([
     { score: lowerIsBetter(fin?.debtToEquity, 0, 3), weight: 1.7 },
     { score: higherIsBetter(fin?.currentRatio, 0.7, 2.5), weight: 0.8 },
