@@ -66,6 +66,26 @@ The output labels avoid direct recommendation language and stay within research-
 - Needs review
 - Risk rising
 
+## Current integration status
+
+Completed:
+
+- deterministic market brain core
+- adapter from normalized StockStory-style engine input into `IndiaEquityPacket`
+- research contract that converts engine output into a product-safe frontend shape
+- guardrails that block direct recommendation language before compliance review
+- unit tests for core scoring, adapter behavior, research contract output, and guardrails
+
+Not yet wired:
+
+- backend read endpoint
+- company research page
+- scanner results
+- compare page
+- watchlist thesis tracker
+- portfolio thesis monitor
+- backtesting and calibration reports
+
 ## GitHub repositories reviewed for inspiration
 
 No external code was copied into this repository. The following public repositories were useful as research references for possible future adapters and tooling patterns:
@@ -80,11 +100,11 @@ Any future integration must be reviewed for license, reliability, legality, data
 ## Next implementation steps
 
 1. Wire `evaluateIndiaEquity` to existing internal normalized stock snapshots.
-2. Add unit tests for the factor scoring boundaries.
-3. Add a backend-only adapter that converts current engine inputs into `IndiaEquityPacket`.
-4. Add a research narrative adapter that converts `IndiaMarketBrainResult` into product-facing copy.
+2. Add a backend read endpoint that returns the product-safe research contract.
+3. Integrate the research contract into company research, scanner, compare, watchlist, and portfolio thesis-monitor surfaces.
+4. Add backtesting snapshots and calibration reports.
 5. Keep provider/API status out of normal frontend routes.
-6. Add audit checks to prevent direct recommendation language before compliance review.
+6. Keep audit checks active to prevent direct recommendation language before compliance review.
 
 ## Non-goals
 
