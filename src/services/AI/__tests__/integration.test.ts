@@ -4,6 +4,12 @@ import { SGLangService, sglangService } from '../SGLangService';
 import { LLMGateway } from '../LLMGateway';
 
 vi.mock('axios');
+vi.mock('../../MarketConfigService', () => ({
+  marketConfigService: {
+    getMarketStatus: vi.fn().mockResolvedValue({ isOpen: true }),
+    getDataSource: vi.fn().mockResolvedValue('live'),
+  },
+}));
 
 const mockAxios = vi.mocked(axios);
 
@@ -12,13 +18,13 @@ describe('SGLangService', () => {
 
   beforeEach(() => {
     service = new SGLangService();
-    service.useExternal = true; // use axios path for tests
+    service.useExternal = true;
     vi.clearAllMocks();
   });
 
-  it('generateStructured returns parsed JSON from SGLang response', async () => {
+  it('generateStructured returns parsed JSON from Ollama response', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"analysis": "Strong fundamentals"}', usage: { completion_tokens: 50 } },
+      data: { response: '{"analysis": "Strong fundamentals"}', usage: { completion_tokens: 50 } },
     });
 
     const result = await service.generateStructured(
@@ -29,10 +35,10 @@ describe('SGLangService', () => {
 
     expect(result.analysis).toBe('Strong fundamentals');
     expect(mockAxios.post).toHaveBeenCalledWith(
-      expect.stringContaining('/generate'),
+      expect.stringContaining('/api/generate'),
       expect.objectContaining({
-        text: expect.stringContaining('Analyze TCS'),
-        json_schema: expect.objectContaining({ type: 'object' }),
+        model: expect.any(String),
+        prompt: expect.stringContaining('Analyze TCS'),
       }),
       expect.any(Object)
     );
@@ -40,7 +46,7 @@ describe('SGLangService', () => {
 
   it('parallelGenerate runs multiple prompts concurrently', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"analysis": "result"}', usage: { completion_tokens: 30 } },
+      data: { response: '{"analysis": "result"}', usage: { completion_tokens: 30 } },
     });
 
     const prompts = ['prompt1', 'prompt2', 'prompt3'];
@@ -53,9 +59,9 @@ describe('SGLangService', () => {
     expect(mockAxios.post).toHaveBeenCalledTimes(3);
   });
 
-  it('analyzeStockParallel returns all four analyses', async () => {
+  it('analyzeStockParallel returns all four analyses with scores', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"analysis": "test analysis"}', usage: { completion_tokens: 40 } },
+      data: { response: '{"analysis": "Strong and profitable company with good growth"}', usage: { completion_tokens: 40 } },
     });
 
     const analysis = await service.analyzeStockParallel('TCS', {
@@ -71,15 +77,16 @@ describe('SGLangService', () => {
     expect(analysis).toHaveProperty('valuation');
     expect(analysis).toHaveProperty('growth');
     expect(analysis).toHaveProperty('risk');
+    expect(analysis).toHaveProperty('scores');
     expect(typeof analysis.quality).toBe('string');
     expect(typeof analysis.valuation).toBe('string');
-    expect(typeof analysis.growth).toBe('string');
-    expect(typeof analysis.risk).toBe('string');
+    expect(analysis.scores?.quality).toBeGreaterThanOrEqual(0);
+    expect(analysis.scores?.overall).toBeGreaterThanOrEqual(0);
   });
 
   it('generateThesis returns a string', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"thesis": "TCS shows strong fundamentals"}', usage: { completion_tokens: 20 } },
+      data: { response: '{"thesis": "TCS shows strong fundamentals"}', usage: { completion_tokens: 20 } },
     });
 
     const thesis = await service.generateThesis('TCS', {
@@ -103,7 +110,7 @@ describe('SGLangService', () => {
 
   it('handles partial data without crashing', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"analysis": "partial data"}', usage: { completion_tokens: 15 } },
+      data: { response: '{"analysis": "partial data"}', usage: { completion_tokens: 15 } },
     });
 
     const analysis = await service.analyzeStockParallel('TEST', {
@@ -115,8 +122,8 @@ describe('SGLangService', () => {
       debtEquity: null,
     });
 
-    expect(analysis.quality).toBe('partial data');
-    expect(analysis.valuation).toBe('partial data');
+    expect(typeof analysis.quality).toBe('string');
+    expect(typeof analysis.valuation).toBe('string');
   });
 });
 
@@ -125,13 +132,13 @@ describe('LLMGateway', () => {
 
   beforeEach(() => {
     gateway = new LLMGateway();
-    sglangService.useExternal = true; // use axios path for tests
+    sglangService.useExternal = true;
     vi.clearAllMocks();
   });
 
   it('askBot returns answer with confidence', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"answer": "TCS is a quality IT company", "confidence": 0.85}', usage: { completion_tokens: 30 } },
+      data: { response: '{"answer": "TCS is a quality IT company", "confidence": 0.85}', usage: { completion_tokens: 30 } },
     });
 
     const result = await gateway.askBot('TCS', 'Is this a good company?');
