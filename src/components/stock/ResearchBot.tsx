@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSmartQuery } from "@/hooks/useSmartQuery";
+import { trackQueryMetrics } from "@/utils/analytics";
 
 interface Message {
   role: "user" | "bot";
@@ -23,12 +24,18 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { processQuery, loading, result, method } = useSmartQuery();
 
+  const startTimeRef = useRef(0);
+
   const handleAsk = async (question: string) => {
     if (!question.trim()) return;
     setMessages(p => [...p, { role: "user", content: question }]);
     setInput("");
+    startTimeRef.current = performance.now();
 
     await processQuery(question);
+
+    const duration = performance.now() - startTimeRef.current;
+    trackQueryMetrics(method as any || 'error', duration, question, !result?.error);
 
     if (result) {
       const methodLabel = method === 'regex' ? ' (instant, offline)'
