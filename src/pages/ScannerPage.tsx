@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Download, Search, BarChart3 } from "lucide-react"
-import TopNav from "../components/layout/TopNav"
-import MarketTicker from "../components/layout/MarketTicker"
 import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
 import { useStockData } from "../hooks/useStockData"
 import type { StockData } from "../hooks/useStockData"
@@ -168,16 +166,8 @@ export default function ScannerPage() {
   const pageCount = Math.max(1, Math.ceil(ranked.length / 10))
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        minHeight: "100vh",
-        color: "var(--text-primary)",
-      }}
-    >
-      <TopNav />
-      <MarketTicker />
-      <main style={{ maxWidth: "var(--content)", margin: "0 auto", padding: "0 16px" }}>
+    <div style={{ minHeight: "100vh" }}>
+      <main style={{ padding: "0 4px" }}>
         {/* Header */}
         <div
           style={{

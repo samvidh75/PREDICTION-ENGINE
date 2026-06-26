@@ -5,18 +5,23 @@
   --chip:          #f0f0f0;
   --chip-hover:    #e5e5e5;
 
-  --brand:         #0066CC;
-  --brand-tint:    rgba(0,102,204,0.08);
-  --brand-hover:   #0055AA;
-  --brand-light:   rgba(0,102,204,0.12);
-  --brand-subtle:  #CCE5FF;
+  --brand:         #1A56DB;
+  --brand-tint:    rgba(26,86,219,0.08);
+  --brand-hover:   #1446b3;
+  --brand-light:   rgba(26,86,219,0.12);
+  --brand-subtle:  #dce9ff;
 
-  --green:         #34C759;
-  --green-tint:    rgba(52,199,89,0.12);
-  --green-text:    #248A3D;
-  --red:           #FF3B30;
-  --red-tint:      rgba(255,59,48,0.12);
-  --red-text:      #C41E1E;
+  --green:         #1A7F4B;
+  --green-tint:    rgba(26,127,75,0.10);
+  --green-text:    #1A7F4B;
+  --red:           #DC2626;
+  --red-tint:      rgba(220,38,38,0.10);
+  --red-text:      #DC2626;
+
+  /* Semantic aliases used by scanner/prediction components */
+  --positive:      #1A7F4B;
+  --negative:      #DC2626;
+  --caution:       #D97706;
   --amber:         #FF9F0A;
   --amber-tint:    rgba(255,159,10,0.12);
   --amber-text:    #B26500;
@@ -71,6 +76,14 @@
   --sh-float:  0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04);
   --sh-modal:  0 16px 48px rgba(0,55,112,0.12), 0 4px 12px rgba(0,55,112,0.06);
   --sh-focus:  0 0 0 3px var(--brand-tint);
+
+  /* Additional aliases for cross-component compatibility */
+  --surface:       #FFFFFF;
+  --bg:            #FFFFFF;
+  --caution:       #D97706;
+  --amber:         #D97706;
+  --amber-tint:    rgba(217,119,6,0.10);
+  --amber-text:    #B45309;
 
   --pro-gradient: linear-gradient(135deg, rgba(0,102,204,0.04) 0%, rgba(52,199,89,0.03) 100%);
 

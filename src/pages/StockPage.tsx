@@ -17,7 +17,6 @@ import FinancialHistogram from "../components/charts/FinancialHistogram";
 import NewsFeed from "../components/news/NewsFeed";
 import ProUpgradeModal from "../components/stock/ProUpgradeModal";
 import ProPaywallGate from "../components/premium/ProPaywallGate";
-import ResearchBot from "../components/stock/ResearchBot";
 import { IntelligentAnalysis } from "../components/stock/IntelligentAnalysis";
 import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
 import ShareholdingsChart from "../components/stock/ShareholdingsChart";
@@ -327,8 +326,6 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </button>
         </div>
       )}
-
-      <ResearchBot symbol={symbol} isPro={false} />
 
       <ProUpgradeModal
         isOpen={showProModal}

@@ -287,21 +287,20 @@ export class UnifiedPredictionEngine {
       ? Math.round(weightedSum / availableWeight)
       : null
 
+    // If all factor inputs are null but we have price/momentum data, use momentum score alone
+    if (composite === null && factors.momentum.score !== null) {
+      composite = factors.momentum.score
+    }
+
     let classification: EngineOutput['classification']
 
-    if (nullCount > 3 && composite !== null) {
-      // Partial data: cap displayed score and label as partial
-      composite = Math.min(composite, 50)
-      classification = 'STABLE'
-    } else {
-      classification =
-        composite === null ? 'INSUFFICIENT_DATA' :
-        composite >= 80    ? 'EXCELLENT' :
-        composite >= 65    ? 'HEALTHY'   :
-        composite >= 50    ? 'STABLE'    :
-        composite >= 35    ? 'WEAKENING' :
-                             'AT_RISK'
-    }
+    classification =
+      composite === null ? 'INSUFFICIENT_DATA' :
+      composite >= 80    ? 'EXCELLENT' :
+      composite >= 65    ? 'HEALTHY'   :
+      composite >= 50    ? 'STABLE'    :
+      composite >= 35    ? 'WEAKENING' :
+                           'AT_RISK'
 
     // If availableWeight < 0.35 (less than quality + stability combined), downgrade
     if (availableWeight > 0 && availableWeight < 0.35) {
