@@ -1,9 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) || '';
-const supabaseKey = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || '';
+let client: SupabaseClient | null = null;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+function getClient(): SupabaseClient {
+  if (!client) {
+    const supabaseUrl = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) || '';
+    const supabaseKey = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || '';
+    client = createClient(supabaseUrl, supabaseKey);
+  }
+  return client;
+}
 
 export class SupabaseService {
   static async searchStocks(criteria: {
@@ -11,6 +17,7 @@ export class SupabaseService {
     roe_min?: number;
     industry?: string;
   }) {
+    const supabase = getClient();
     let query = supabase.from('stocks').select('*');
 
     if (criteria.pe_max) {
@@ -32,6 +39,7 @@ export class SupabaseService {
   }
 
   static async vectorSearch(embedding: number[], limit = 10) {
+    const supabase = getClient();
     const { data, error } = await supabase.rpc('match_stocks', {
       embedding,
       match_count: limit,
@@ -42,6 +50,7 @@ export class SupabaseService {
   }
 
   static async logSearch(query: string, method: string, results: any) {
+    const supabase = getClient();
     await supabase.from('search_history').insert({
       query,
       method,

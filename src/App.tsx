@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { runHealthCheck } from "@/utils/health-check";
 import { queryClient } from "./core/config/QueryClientConfig";
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
@@ -99,6 +100,15 @@ function StockResearchPageWrapper() {
 export { useNavigate };
 
 export default function App() {
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      runHealthCheck().then(health => {
+        const ok = health.services.supabase && health.services.groq && health.services.transformers;
+        console.log(ok ? 'All services healthy' : 'Some services have issues');
+      });
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
