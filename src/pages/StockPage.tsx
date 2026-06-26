@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -19,7 +19,10 @@ import ProUpgradeModal from "../components/stock/ProUpgradeModal";
 import ProPaywallGate from "../components/premium/ProPaywallGate";
 import ResearchBot from "../components/stock/ResearchBot";
 import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
+import ShareholdingsChart from "../components/stock/ShareholdingsChart";
+import { FinancialCharts } from "../components/stock/FinancialCharts";
 import { computeHealthScore } from "../lib/healthScore";
+import { analytics } from "../analytics/EventAnalyticsEngine";
 
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
@@ -37,6 +40,40 @@ export default function StockPage({ symbol }: { symbol: string }) {
   const isMobile = useIsMobile();
   const [showProModal, setShowProModal] = useState(false);
   const [isTracked, setIsTracked] = useState(false);
+  const [shareholdersData, setShareholdersData] = useState<Array<{ category: string; percent: number; change: number }> | null>(null);
+  const [shareholdersLoading, setShareholdersLoading] = useState(false);
+
+  const fetchShareholders = useCallback(async (sym: string) => {
+    setShareholdersLoading(true);
+    try {
+      const res = await fetch(`/api/market/stock/${sym}/shareholding`);
+      if (!res.ok) return;
+      const result = await res.json();
+      const latest = result.data?.snapshots?.[result.data.snapshots.length - 1];
+      if (!latest) return;
+      setShareholdersData([
+        { category: "Promoters", percent: latest.promoter ?? 0, change: 0 },
+        { category: "FIIs", percent: latest.fii ?? 0, change: 0 },
+        { category: "DIIs", percent: latest.dii ?? 0, change: 0 },
+        { category: "Public", percent: latest.public_ ?? 0, change: 0 },
+      ]);
+    } catch {
+      // Best-effort shareholders fetch
+    } finally {
+      setShareholdersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (symbol) fetchShareholders(symbol);
+  }, [symbol, fetchShareholders]);
+
+  useEffect(() => {
+    if (symbol) {
+      analytics.trackStockView(symbol, "stock-page", false);
+      analytics.trackPageVisit(`/stock/${symbol}`);
+    }
+  }, [symbol]);
 
   const health = useMemo(() => computeHealthScore({
     roe: data?.fundamentals.roe ?? null,
@@ -213,7 +250,21 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </ProPaywallGate>
         </div>
 
-        {/* 7. News */}
+        {/* 7. Financial Charts (Tabs + YoY) */}
+        {data?.annualFinancials && data.annualFinancials.length > 0 && (
+          <div style={{ margin: "16px 0" }}>
+            <FinancialCharts data={data.annualFinancials} />
+          </div>
+        )}
+
+        {/* 8. Shareholdings */}
+        {shareholdersData && shareholdersData.length > 0 && (
+          <div style={{ margin: "16px 0" }}>
+            <ShareholdingsChart shareholdersData={shareholdersData} />
+          </div>
+        )}
+
+        {/* 9. News */}
         <div style={{ margin: "16px 0" }}>
           <div style={{
             background: "var(--surface)", border: "1px solid var(--border)",

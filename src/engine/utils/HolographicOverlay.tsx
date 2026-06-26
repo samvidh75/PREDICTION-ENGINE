@@ -20,7 +20,7 @@ export interface HologramConfig {
 }
 
 const DEFAULT_CONFIG: HologramConfig = {
-  width: 400,
+  width: Math.min(400, typeof window !== 'undefined' ? window.innerWidth - 32 : 400),
   height: 300,
   padding: 20,
   gridSize: 40,

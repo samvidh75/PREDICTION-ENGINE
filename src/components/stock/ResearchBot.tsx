@@ -73,8 +73,9 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
 
       {isOpen && (
         <div style={{
-          position: "fixed", bottom: 172, right: 24, zIndex: 100,
-          width: 340, height: 450, background: "var(--page)",
+          position: "fixed", bottom: 172, right: 16, zIndex: 100,
+          width: "min(calc(100vw - 32px), 380px)", height: "min(450px, calc(100vh - 280px))",
+          background: "var(--page)",
           border: "1px solid var(--border)", borderRadius: 16,
           display: "flex", flexDirection: "column",
           boxShadow: "var(--sh-modal)",

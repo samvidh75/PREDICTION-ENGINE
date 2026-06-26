@@ -3,6 +3,47 @@
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1200px;
   --breakpoint-ultra: 1920px;
+
+  --color-primary: var(--brand);
+  --color-primary-dark: var(--brand-hover);
+  --color-white: var(--page);
+  --color-light: var(--surface);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-900);
+  --color-text-secondary: var(--text-500);
+  --color-text-muted: var(--text-300);
+  --color-secondary: var(--green);
+  --color-accent: var(--amber);
+  --color-danger: var(--red-text);
+  --color-warning: var(--amber-text);
+  --color-success: var(--green-text);
+
+  --spacing-xs: var(--sp-1);
+  --spacing-sm: var(--sp-2);
+  --spacing-md: var(--sp-4);
+  --spacing-lg: var(--sp-6);
+  --spacing-xl: var(--sp-8);
+  --spacing-2xl: var(--sp-10);
+
+  --font-family: var(--font);
+  --font-size-xs: var(--sz-2xs);
+  --font-size-sm: var(--sz-sm);
+  --font-size-base: var(--sz-base);
+  --font-size-lg: var(--sz-lg);
+  --font-size-xl: var(--sz-xl);
+  --font-size-2xl: var(--sz-2xl);
+
+  --shadow-sm: var(--sh-card);
+  --shadow-md: var(--sh-raised);
+  --shadow-lg: var(--sh-float);
+
+  --radius-sm: var(--r-xs);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+
+  --transition-fast: var(--t-fast);
+  --transition-base: var(--t-base);
+  --transition-slow: var(--t-slow);
 }
 
 @media (max-width: 480px) {
@@ -10,6 +51,7 @@
     --sz-xl: 20px;
     --sz-2xl: 26px;
     --sz-3xl: 30px;
+    font-size: 14px;
   }
 }
 
@@ -78,6 +120,7 @@
   font-family: var(--font);
   font-size: var(--sz-base);
   white-space: nowrap;
+  min-height: 44px;
 }
 
 .btn-primary {
@@ -102,7 +145,7 @@
 @media (max-width: 480px) {
   .btn {
     width: 100%;
-    padding: var(--sp-3);
+    padding: var(--sp-4);
   }
 }
 
@@ -115,8 +158,7 @@
 .gap-md { gap: var(--sp-4); }
 .gap-lg { gap: var(--sp-6); }
 
-@media (max-width: 480px) {
-  html {
-    font-size: 14px;
-  }
+.responsive-hidden {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
