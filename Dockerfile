@@ -48,8 +48,13 @@ COPY scripts/probe-nsepython-provider.py ./scripts/probe-nsepython-provider.py
 # Copy compiled frontend assets
 COPY --from=builder /app/dist ./dist
 
-# Copy compiled backend JavaScript
-COPY --from=builder /app/dist/backend ./dist/backend
+# Copy source code (for tsx runtime resolution of @/ path aliases)
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig*.json ./
+COPY --from=builder /app/package.json ./
+
+# Copy compiled frontend assets and backend JS
+COPY --from=builder /app/dist ./dist
 
 # Copy database migrations (may be needed at runtime)
 COPY --from=builder /app/src/db/migrations ./src/db/migrations
@@ -59,4 +64,5 @@ COPY --from=builder /app/src/db/migrations ./src/db/migrations
 EXPOSE 4001
 
 # ── Start ─────────────────────────────────────────────────────────────────────
-CMD ["node", "--experimental-specifier-resolution=node", "dist/backend/startServer.js"]
+# Use tsx to resolve @/ path aliases correctly
+CMD ["npx", "tsx", "src/backend/startServer.ts"]
