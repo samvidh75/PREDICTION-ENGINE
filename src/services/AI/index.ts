@@ -6,4 +6,7 @@ export { stockSnapshotService } from './StockSnapshotService';
 export { stockComparisonService } from './StockComparisonService';
 export { scannerThesisService } from './ScannerThesisService';
 export { thesisTrackingService } from './ThesisTrackingService';
+export { freeLLMService } from './FreeLLMService';
+export { freeVectorDBService } from './FreeVectorDBService';
+export { freeMetricsService } from './FreeMetricsService';
 export type { SGLangResponse, ResearchBotResponse, StockAnalysis, LLMMetrics } from './types';
