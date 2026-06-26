@@ -7,16 +7,30 @@ html {
   font-size: var(--sz-base);
   line-height: 1.55;
   color: var(--text-700);
-  background: var(--page);
+  background: var(--page) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-body { min-height: 100vh; overflow-x: hidden; }
+body { min-height: 100vh; overflow-x: hidden; background: var(--page) !important; }
 
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+input, select, textarea {
+  background: var(--chip);
+  color: var(--text-700);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  font-size: var(--sz-sm);
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-tint);
+}
 
 button { font-family: var(--font); cursor: pointer; }
 input, select, textarea { font-family: var(--font); }
@@ -31,7 +45,7 @@ input, select, textarea { font-family: var(--font); }
   100% { background-position:  600% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #EEEEEA 25%, #E2E2DE 50%, #EEEEEA 75%);
+  background: linear-gradient(90deg, #1A1A1A 25%, #252525 50%, #1A1A1A 75%);
   background-size: 600% 100%;
   animation: shimmer 1.8s ease infinite;
   border-radius: var(--r-sm);
@@ -75,8 +89,17 @@ input, select, textarea { font-family: var(--font); }
 @media (max-width: 768px) {
   .content-area {
     margin-left: 0;
-    padding: 16px 16px 80px;
+    padding: 12px 16px 80px;
   }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .shareholdings-tabs { flex-direction: column; }
+  .chart { height: 200px !important; }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid { grid-template-columns: 1fr !important; }
+  .company-header { flex-direction: column; }
+  .sticky-bottom-bar { height: 56px; padding: 8px; }
 }
 
 @media (max-width: 900px) {

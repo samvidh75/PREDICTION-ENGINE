@@ -1,35 +1,35 @@
 :root {
-  --page:          #F9F9F7;
-  --surface:       #FFFFFF;
-  --surface-hover: #FAFAF8;
-  --chip:          #F2F1EE;
-  --chip-hover:    #E8E8E4;
+  --page:          #0F0F0F;
+  --surface:       #1A1A1A;
+  --surface-hover: #252525;
+  --chip:          #262626;
+  --chip-hover:    #333333;
 
-  --brand:         #1A56DB;
-  --brand-tint:    #EEF3FD;
-  --brand-hover:   #1240A8;
-  --brand-dark:    #0F172A;
+  --brand:         #FFB81C;
+  --brand-tint:    rgba(255,184,28,0.15);
+  --brand-hover:   #E6A817;
+  --brand-light:   rgba(255,184,28,0.15);
 
-  --green:         #1A7F4B;
-  --green-tint:    #EDFAF3;
-  --green-text:    #1A7F4B;
-  --red:           #C0392B;
-  --red-tint:      #FEF0EE;
-  --red-text:      #C0392B;
-  --amber:         #D97706;
-  --amber-tint:    #FFFBEB;
-  --amber-text:    #B45309;
+  --green:         #2DD4BF;
+  --green-tint:    rgba(45,212,191,0.15);
+  --green-text:    #2DD4BF;
+  --red:           #FF4757;
+  --red-tint:      rgba(255,71,87,0.15);
+  --red-text:      #FF4757;
+  --amber:         #FFA502;
+  --amber-tint:    rgba(255,165,2,0.15);
+  --amber-text:    #FFA502;
 
-  --text-900: #0F0F0F;
-  --text-700: #2C2C2C;
-  --text-500: #5C5C5C;
-  --text-300: #9A9A9A;
-  --text-body: #2C2C2C;
-  --text-inverse: #FFFFFF;
+  --text-900: #FFFFFF;
+  --text-700: #E3E3E3;
+  --text-500: #A0A0A0;
+  --text-300: #6E6E6E;
+  --text-body: #E3E3E3;
+  --text-inverse: #0F0F0F;
 
-  --border: #E8E8E4;
-  --border-strong: #D0D0CA;
-  --border-focus: rgba(26,86,219,0.5);
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.14);
+  --border-focus: rgba(255,184,28,0.5);
 
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
@@ -66,10 +66,12 @@
   --r-pill: 9999px;
 
   --sh-card:   0 0 0 1px var(--border);
-  --sh-raised: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px var(--border);
-  --sh-float:  0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px var(--border);
-  --sh-modal:  0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+  --sh-raised: 0 1px 4px rgba(0,0,0,0.3), 0 0 0 1px var(--border);
+  --sh-float:  0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
+  --sh-modal:  0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
   --sh-focus:  0 0 0 3px var(--brand-tint);
+
+  --pro-gradient: linear-gradient(135deg, rgba(255,184,28,0.1) 0%, rgba(45,212,191,0.05) 100%);
 
   --t-instant: 80ms ease;
   --t-fast:   0.12s ease;
