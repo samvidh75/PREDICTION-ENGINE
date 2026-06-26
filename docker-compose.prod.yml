@@ -1,0 +1,50 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# StockStory India — Production Overrides
+# Apply with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  # Free tier resource limits for Railway
+  ollama:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+
+  qdrant:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  prometheus:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  grafana:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
