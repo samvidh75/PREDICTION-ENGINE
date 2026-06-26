@@ -1,159 +1,108 @@
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import { researchBotService } from '../../../services/AI/ResearchBotService';
-import { scoreExplanationService } from '../../../services/AI/ScoreExplanationService';
-import { stockSnapshotService } from '../../../services/AI/StockSnapshotService';
-import { stockComparisonService } from '../../../services/AI/StockComparisonService';
-import { scannerThesisService } from '../../../services/AI/ScannerThesisService';
-import { thesisTrackingService } from '../../../services/AI/ThesisTrackingService';
-import { sglangService } from '../../../services/AI/SGLangService';
-import { llmResponsesQueries } from '../../../db/queries/llm-responses';
-import type { ScoreExplanationInput } from '../../../services/AI/ScoreExplanationService';
-import type { ScannerThesisInput } from '../../../services/AI/ScannerThesisService';
+import { freeLLMService } from '../../../services/AI/FreeLLMService';
+import { freeVectorDBService } from '../../../services/AI/FreeVectorDBService';
+import { freeMetricsService } from '../../../services/AI/FreeMetricsService';
 
-const llmResearchRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
-  fastify.post<{ Body: { symbol: string; question: string; sessionId?: string } }>(
-    '/api/research-bot/chat',
+const freeStackRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
+  // ── Free Stack: Ollama LLM ──────────────────────────────────────────────────
+  fastify.post<{ Body: { symbol: string; message: string } }>(
+    '/api/free/chat',
     async (request, _reply) => {
-      const { symbol, question, sessionId } = request.body;
-      const result = await researchBotService.chat(symbol, question, sessionId);
-      return result;
+      const { symbol, message } = request.body;
+      const start = Date.now();
+      const answer = await freeLLMService.askBot(symbol, message);
+      freeMetricsService.trackLLMCall('ollama', Date.now() - start, true);
+      return { answer, symbol };
     }
   );
 
-  fastify.post<{
-    Body: ScoreExplanationInput;
-  }>('/api/research/explain-score', async (request, _reply) => {
-    const result = await scoreExplanationService.generateScoreExplanation(request.body);
-    return result;
-  });
-
-  fastify.post<{
-    Body: {
-      symbol: string;
-      price: number;
-      changePercent: number;
-      peRatio?: number | null;
-      pbRatio?: number | null;
-      roe?: number | null;
-      roic?: number | null;
-      revenueGrowth?: number | null;
-      debtEquity?: number | null;
-      marketCap?: number | null;
-    };
-  }>('/api/research/snapshot', async (request, _reply) => {
-    const input = {
-      symbol: request.body.symbol,
-      price: request.body.price,
-      changePercent: request.body.changePercent,
-      peRatio: request.body.peRatio ?? null,
-      pbRatio: request.body.pbRatio ?? null,
-      roe: request.body.roe ?? null,
-      roic: request.body.roic ?? null,
-      revenueGrowth: request.body.revenueGrowth ?? null,
-      debtEquity: request.body.debtEquity ?? null,
-      marketCap: request.body.marketCap ?? null,
-    };
-    const result = await stockSnapshotService.generateSnapshot(input);
-    return result;
-  });
-
-  fastify.post<{
-    Body: {
-      stocks: Array<{
-        symbol: string;
-        companyName: string;
-        score: number;
-        quality: number;
-        valuation: number;
-        growth: number;
-        stability: number;
-        momentum: number;
-        risk: number;
-      }>;
-    };
-  }>('/api/research/compare', async (request, _reply) => {
-    const result = await stockComparisonService.compare(request.body.stocks);
-    return result;
-  });
-
-  fastify.post<{
-    Body: { stocks: ScannerThesisInput[] };
-  }>('/api/scanner/generate-theses', async (request, _reply) => {
-    const results = await scannerThesisService.batchGenerate(request.body.stocks);
-    for (const r of results) {
-      if (r.thesis) {
-        await scannerThesisService.cacheThesis(r.symbol, r.thesis);
-      }
-    }
-    return { theses: results };
-  });
-
-  fastify.get<{ Params: { symbol: string } }>(
-    '/api/scanner/thesis/:symbol',
+  fastify.post<{ Body: { symbol: string; score: number } }>(
+    '/api/free/explain-score',
     async (request, _reply) => {
-      const thesis = await scannerThesisService.getCachedThesis(request.params.symbol);
-      if (!thesis) {
-        return { symbol: request.params.symbol, thesis: null };
-      }
-      return { symbol: request.params.symbol, thesis };
+      const { symbol, score } = request.body;
+      const explanation = await freeLLMService.explainScore(symbol, score);
+      return { explanation, symbol, score };
     }
   );
 
-  fastify.post<{
-    Body: {
-      symbol: string;
-      currentScore: number;
-      previousScore: number;
-      previousThesis: string;
-    };
-  }>('/api/research/check-thesis-change', async (request, _reply) => {
-    const result = await thesisTrackingService.detectChange(
-      request.body.symbol,
-      request.body.currentScore,
-      request.body.previousScore,
-      request.body.previousThesis
-    );
-    return result;
-  });
-
-  fastify.post<{ Body: { symbol: string; thesis: string; score: number } }>(
-    '/api/research/save-thesis',
-    async (request, _reply) => {
-      await thesisTrackingService.saveSnapshot(
-        request.body.symbol,
-        request.body.thesis,
-        request.body.score
-      );
-      return { saved: true };
-    }
-  );
-
-  fastify.get<{ Params: { symbol: string } }>(
-    '/api/research/thesis/:symbol',
-    async (request, _reply) => {
-      const snapshot = await thesisTrackingService.getSnapshot(request.params.symbol);
-      return snapshot || { symbol: request.params.symbol, thesis: null };
-    }
-  );
-
-  fastify.get('/api/llm/metrics', async (_request, _reply) => {
-    const [hourly, daily] = await Promise.all([
-      llmResponsesQueries.getMetrics('1h'),
-      llmResponsesQueries.getMetrics('24h'),
-    ]);
-    return {
-      hourly: hourly.rows[0] || { total_queries: 0, avg_tokens: 0, total_cost: 0 },
-      daily: daily.rows[0] || { total_queries: 0, avg_tokens: 0, total_cost: 0 },
-    };
-  });
-
-  fastify.get('/api/llm/sglang/health', async (_request, _reply) => {
-    const healthy = await sglangService.health();
+  // ── Free Stack: Ollama Health ─────────────────────────────────────────────
+  fastify.get('/api/free/ollama/health', async (_request, _reply) => {
+    const healthy = await freeLLMService.health();
     return {
       status: healthy ? 'ok' : 'down',
-      url: process.env.SGLANG_URL || 'http://localhost:30000',
+      url: process.env.OLLAMA_URL || 'http://localhost:11434',
     };
+  });
+
+  // ── Free Stack: Qdrant Vector Search ────────────────────────────────────
+  fastify.post<{ Body: { query: string; vector: number[]; limit?: number } }>(
+    '/api/free/search',
+    async (request, _reply) => {
+      const { vector, limit } = request.body;
+      const results = await freeVectorDBService.searchStocks(vector, limit);
+      freeMetricsService.trackVectorSearch('stocks');
+      return { results };
+    }
+  );
+
+  fastify.post<{ Body: { symbol: string; vector: number[]; payload?: Record<string, any> } }>(
+    '/api/free/store',
+    async (request, _reply) => {
+      const { symbol, vector, payload } = request.body;
+      await freeVectorDBService.storeStock(symbol, vector, payload);
+      return { stored: true, symbol };
+    }
+  );
+
+  // ── Free Stack: Qdrant Health ─────────────────────────────────────────────
+  fastify.get('/api/free/qdrant/health', async (_request, _reply) => {
+    const healthy = await freeVectorDBService.health();
+    return {
+      status: healthy ? 'ok' : 'down',
+      url: process.env.QDRANT_URL || 'http://localhost:6333',
+    };
+  });
+
+  // ── Free Stack: Prometheus Metrics ──────────────────────────────────────
+  fastify.get('/api/free/metrics', async (_request, reply) => {
+    const metrics = await freeMetricsService.getMetrics();
+    reply.header('Content-Type', freeMetricsService.getContentType());
+    return reply.send(metrics);
+  });
+
+  // ── Free Stack: Overall Health ───────────────────────────────────────────
+  fastify.get('/api/free/health', async (_request, _reply) => {
+    const [ollamaOk, qdrantOk] = await Promise.all([
+      freeLLMService.health(),
+      freeVectorDBService.health(),
+    ]);
+    return {
+      status: ollamaOk && qdrantOk ? 'ok' : 'degraded',
+      services: {
+        ollama: { status: ollamaOk ? 'ok' : 'down' },
+        qdrant: { status: qdrantOk ? 'ok' : 'down' },
+      },
+    };
+  });
+
+  fastify.post('/api/admin/pull-model', async (_request, reply) => {
+    const model = process.env.OLLAMA_MODEL || 'llama3.1:7b-instruct-q4_K_M';
+    const response = await fetch(`http://ollama:11434/api/pull`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: model }),
+    });
+    const reader = response.body?.getReader();
+    if (!reader) return reply.status(500).send({ error: 'no reader' });
+    const decoder = new TextDecoder();
+    let result = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      result += decoder.decode(value, { stream: true });
+    }
+    return { pulled: true, model, output: result };
   });
 };
 
-export default llmResearchRoutes;
+export default freeStackRoutes;
