@@ -1,0 +1,55 @@
+alerts:
+  - name: sglang-health-failed
+    description: SGLang server health check has failed 3 consecutive times
+    severity: critical
+    condition: "healthcheck_failures >= 3"
+    window: 5m
+    action: restart_container
+    notification:
+      - slack: #alerts
+      - email: admin@stockstory.in
+
+  - name: sglang-high-latency
+    description: SGLang response time exceeds 30 second threshold
+    severity: warning
+    condition: "p99_latency_ms > 30000"
+    window: 15m
+    action: log_and_monitor
+    notification:
+      - slack: #performance
+
+  - name: sglang-low-success-rate
+    description: SGLang success rate below 90%
+    severity: warning
+    condition: "success_rate < 0.90"
+    window: 30m
+    action: investigate
+    notification:
+      - slack: #alerts
+
+  - name: sglang-memory-high
+    description: SGLang container memory usage above 7GB
+    severity: warning
+    condition: "memory_usage_bytes > 7516192768"
+    window: 5m
+    action: scale_up_or_restart
+    notification:
+      - slack: #infra
+
+  - name: llm-cost-overrun
+    description: LLM daily cost exceeds budget
+    severity: warning
+    condition: "daily_cost > 0.01"  # Always $0 in CPU mode
+    window: 24h
+    action: review_routing
+    notification:
+      - slack: #finance
+
+  - name: thesis-cache-stale
+    description: Thesis cache hit rate below 50%
+    severity: info
+    condition: "cache_hit_rate < 0.50"
+    window: 24h
+    action: review_ttl
+    notification:
+      - slack: #performance
