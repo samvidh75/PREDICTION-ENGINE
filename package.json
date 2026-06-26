@@ -130,7 +130,6 @@
     "predictions:calibrate": "tsx scripts/validate-prediction-calibration.ts",
     "data:hydrate": "tsx scripts/hydrate-production-data.ts",
     "ingest:screener": "tsx scripts/ingest-screener.ts",
-    "ingest:screener": "tsx scripts/ingest-screener.ts",
     "ingest:fundamentals": "tsx scripts/ingest-fundamentals.ts",
     "backtest:unified-engine": "tsx scripts/backtest-unified-engine.ts",
     "validate:unified-ranking": "tsx scripts/validate-unified-ranking.ts",
@@ -197,6 +196,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
+    "@railway/cli": "^5.23.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/jest-dom": "^6.0.0",

@@ -54,3 +54,37 @@ input, select, textarea { font-family: var(--font); }
 .bottom-nav {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ── Layout: content area after sidebar ───────────────── */
+.content-area {
+  margin-left: 220px;
+  padding: var(--sp-8) var(--sp-10);
+  min-height: 100vh;
+  background: var(--page);
+}
+
+.page-content {
+  max-width: 900px;
+  width: 100%;
+}
+
+.page-content.wide {
+  max-width: 1060px;
+}
+
+@media (max-width: 768px) {
+  .content-area {
+    margin-left: 0;
+    padding: 16px 16px 80px;
+  }
+}
+
+@media (max-width: 900px) {
+  .metrics-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+@media (max-width: 640px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .company-header-top { flex-direction: column; align-items: flex-start; }
+  .company-header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+}

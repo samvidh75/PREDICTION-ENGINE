@@ -14,7 +14,7 @@ interface TradePanelProps {
 function StepDot({ active, done }: { active: boolean; done: boolean }) {
   return (
     <div className={`w-[18px] h-[18px] rounded-full flex items-center justify-center text-[8px] font-[400] transition-all ${
-      done ? 'bg-[#533afd] text-white' : active ? 'bg-[#533afd] text-white' : 'bg-[#f6f9fc] text-[#bbb]'
+      done ? 'bg-[#1A56DB] text-white' : active ? 'bg-[#1A56DB] text-white' : 'bg-[#f6f9fc] text-[#bbb]'
     }`}>
       {done ? <Check size={9} /> : active ? '›' : ''}
     </div>
@@ -53,7 +53,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
         <div className="p-5">
           <div className="flex items-center justify-between bg-[#f6f9fc] rounded-[8px] p-3 mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-[32px] h-[32px] rounded-[6px] bg-[#533afd] flex items-center justify-center text-white text-[11px] font-[400]">{symbol.slice(0,2)}</div>
+              <div className="w-[32px] h-[32px] rounded-[6px] bg-[#1A56DB] flex items-center justify-center text-white text-[11px] font-[400]">{symbol.slice(0,2)}</div>
               <div>
                 <div className="text-[13px] font-[400] text-[#0d253d] tracking-[-0.2px]">{symbol}</div>
                 <div className="text-[10px] text-[#64748d]">{companyName}</div>
@@ -61,7 +61,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
             </div>
             <div className="text-right">
               <div className="text-[14px] font-[400] text-[#0d253d] tabular">{price ? `₹${price.toFixed(2)}` : '—'}</div>
-              {score && <div className="text-[8px] text-[#533afd]">Score: {score}</div>}
+              {score && <div className="text-[8px] text-[#1A56DB]">Score: {score}</div>}
             </div>
           </div>
 
@@ -70,9 +70,9 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
             <StepDot active={step==="confirm"} done={step==="done"} /><div className="h-[1px] w-[32px] bg-[#e3e8ee]" />
             <StepDot active={step==="done"} done={false} />
             <div className="flex items-center gap-1 ml-2 text-[9px] text-[#64748d]">
-              <span className={step==="choose"?"text-[#533afd]":""}>Choose</span><span className="text-[#ddd]">·</span>
-              <span className={step==="confirm"?"text-[#533afd]":""}>Confirm</span><span className="text-[#ddd]">·</span>
-              <span className={step==="done"?"text-[#533afd]":""}>Trade</span>
+              <span className={step==="choose"?"text-[#1A56DB]":""}>Choose</span><span className="text-[#ddd]">·</span>
+              <span className={step==="confirm"?"text-[#1A56DB]":""}>Confirm</span><span className="text-[#ddd]">·</span>
+              <span className={step==="done"?"text-[#1A56DB]":""}>Trade</span>
             </div>
           </div>
 
@@ -82,7 +82,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
               <div className="space-y-2">
                 {BROKER_PARTNERS.map(broker => (
                   <button key={broker.id} onClick={() => handleBrokerSelect(broker)}
-                    className="w-full flex items-center gap-3 p-3 border border-[#e3e8ee] rounded-[10px] hover:border-[#533afd] hover:bg-[#f6f9fc] transition-all active:scale-[0.98] text-left">
+                    className="w-full flex items-center gap-3 p-3 border border-[#e3e8ee] rounded-[10px] hover:border-[#1A56DB] hover:bg-[#f6f9fc] transition-all active:scale-[0.98] text-left">
                     <div className="w-[36px] h-[36px] rounded-[8px] flex items-center justify-center text-white text-[12px] font-[400] flex-shrink-0" style={{background:broker.color}}>{broker.logo}</div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[12px] font-[400] text-[#0d253d]">{broker.name}</div>
@@ -104,7 +104,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
                 <div className="flex items-center gap-2.5 mb-2.5">
                   <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center text-white text-[11px] font-[400]" style={{background:selectedBroker.color}}>{selectedBroker.logo}</div>
                   <div><div className="text-[12px] font-[400] text-[#0d253d]">{selectedBroker.name}</div></div>
-                  <button onClick={handleReset} className="ml-auto text-[10px] text-[#533afd]">Change</button>
+                  <button onClick={handleReset} className="ml-auto text-[10px] text-[#1A56DB]">Change</button>
                 </div>
                 <div className="space-y-1.5 text-[11px]">
                   <div className="flex justify-between"><span className="text-[#64748d]">Stock</span><span className="text-[#0d253d] tabular">{symbol}</span></div>
@@ -124,7 +124,7 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
                 </div>
               </div>
               <button onClick={handleConfirm}
-                className="w-full h-[40px] bg-[#533afd] text-white text-[14px] font-[400] rounded-[9999px] flex items-center justify-center gap-2 active:scale-[0.97] hover:bg-[#4434d4] transition-colors">
+                className="w-full h-[40px] bg-[#1A56DB] text-white text-[14px] font-[400] rounded-[9999px] flex items-center justify-center gap-2 active:scale-[0.97] hover:bg-[#1240A8] transition-colors">
                 Open {selectedBroker?.name} <ExternalLink size={13} />
               </button>
             </>
@@ -132,10 +132,10 @@ export default function TradePanel({ open, onClose, symbol, companyName, price, 
 
           {step === "done" && (
             <div className="text-center py-5">
-              <div className="w-[48px] h-[48px] rounded-full bg-[#f6f9fc] flex items-center justify-center mx-auto mb-3"><Check size={20} className="text-[#533afd]" /></div>
+              <div className="w-[48px] h-[48px] rounded-full bg-[#f6f9fc] flex items-center justify-center mx-auto mb-3"><Check size={20} className="text-[#1A56DB]" /></div>
               <h3 className="text-[14px] font-[400] text-[#0d253d] mb-1">Opening {selectedBroker?.name}…</h3>
               <p className="text-[10px] text-[#64748d]">Complete your purchase on the broker's platform.</p>
-              <button onClick={handleClose} className="mt-3 text-[10px] text-[#533afd] underline">Close</button>
+              <button onClick={handleClose} className="mt-3 text-[10px] text-[#1A56DB] underline">Close</button>
             </div>
           )}
         </div>

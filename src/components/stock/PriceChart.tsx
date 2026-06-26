@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useHistoricalData } from "../../hooks/useHistoricalData";
 
 interface PriceChartProps {
   symbol: string;
   height?: number;
+}
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [query]);
+  return matches;
 }
 
 const RANGES = ["1D", "5D", "1M", "3M", "6M", "1Y", "3Y"] as const;
@@ -27,7 +39,9 @@ function ChartTooltip({ active, payload, label }: any) {
   );
 }
 
-export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
+export default function PriceChart({ symbol, height }: PriceChartProps) {
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const chartHeight = height ?? (isMobile ? 200 : 260);
   const [range, setRange] = useState("1Y");
   const { data, loading, error } = useHistoricalData(symbol, range);
 
@@ -39,7 +53,7 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
   if (loading) {
     return (
       <div style={{ margin: "12px 0" }}>
-        <div className="skeleton" style={{ height, borderRadius: "var(--r-lg)" }} />
+        <div className="skeleton" style={{ height: chartHeight, borderRadius: "var(--r-lg)" }} />
       </div>
     );
   }
@@ -47,7 +61,7 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
   if (error || !data || data.length < 2) {
     return (
       <div style={{
-        height, display: "flex", flexDirection: "column", alignItems: "center",
+        height: chartHeight, display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", gap: 8,
         border: "1px dashed var(--border)", borderRadius: "var(--r-lg)",
         margin: "12px 0",
@@ -74,7 +88,7 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
             key={r}
             onClick={() => setRange(r)}
             style={{
-              padding: "5px 12px", fontSize: "var(--sz-xs)", fontWeight: 700,
+              padding: isMobile ? "4px 9px" : "5px 12px", fontSize: isMobile ? 10 : "var(--sz-xs)", fontWeight: 700,
               borderRadius: "var(--r-pill)", cursor: "pointer",
               background: r === range ? "var(--text-900)" : "transparent",
               color: r === range ? "var(--text-inverse)" : "var(--text-500)",
@@ -87,10 +101,10 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
         ))}
       </div>
 
-      <ResponsiveContainer width="100%" height={height - 60}>
+      <ResponsiveContainer width="100%" height={chartHeight - 60}>
         <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <defs>
-            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={`priceGrad-${symbol}-${range}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={isPositive ? "#1A7F4B" : "#C0392B"} stopOpacity={0.13} />
               <stop offset="100%" stopColor={isPositive ? "#1A7F4B" : "#C0392B"} stopOpacity={0} />
             </linearGradient>
@@ -117,7 +131,7 @@ export default function PriceChart({ symbol, height = 260 }: PriceChartProps) {
             dataKey="close"
             stroke={lineColor}
             strokeWidth={2}
-            fill="url(#priceGrad)"
+            fill={`url(#priceGrad-${symbol}-${range})`}
             dot={false}
             activeDot={{ r: 4, fill: lineColor, stroke: "var(--surface)", strokeWidth: 2 }}
           />

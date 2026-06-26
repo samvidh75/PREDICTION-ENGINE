@@ -6,7 +6,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#533afd",
+  "theme_color": "#0F172A",
   "lang": "en-IN",
   "scope": "/",
   "categories": ["finance", "business", "investing"],
@@ -17,8 +17,8 @@
     { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
-    { "name": "Stock Research", "short_name": "Research", "description": "AI-powered stock research", "url": "/?page=scanner", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Watchlist", "short_name": "Watchlist", "description": "Your saved companies", "url": "/?page=watchlist", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Compare Stocks", "short_name": "Compare", "description": "Compare companies side-by-side", "url": "/?page=compare", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Stock Research", "short_name": "Research", "description": "AI-powered stock research", "url": "/scanner", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Watchlist", "short_name": "Watchlist", "description": "Your saved companies", "url": "/watchlist", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Compare Stocks", "short_name": "Compare", "description": "Compare companies side-by-side", "url": "/compare", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ]
 }

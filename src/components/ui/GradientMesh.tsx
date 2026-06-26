@@ -19,8 +19,8 @@ export default function GradientMesh() {
             <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
           </radialGradient>
           <radialGradient id="g4" cx="75%" cy="25%" r="40%">
-            <stop offset="0%" stopColor="#533afd" stopOpacity="0.12"/>
-            <stop offset="60%" stopColor="#533afd" stopOpacity="0.05"/>
+            <stop offset="0%" stopColor="#1A56DB" stopOpacity="0.10"/>
+            <stop offset="60%" stopColor="#1A56DB" stopOpacity="0.04"/>
             <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
           </radialGradient>
           <radialGradient id="g5" cx="85%" cy="45%" r="35%">

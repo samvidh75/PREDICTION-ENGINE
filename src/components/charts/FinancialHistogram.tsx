@@ -8,32 +8,51 @@ interface AnnualEntry {
   operatingProfit: number | null;
 }
 
-function formatValue(value: number): string {
-  if (value >= 1e7) return `\u20B9${(value / 1e7).toFixed(1)}Cr`;
-  if (value >= 1e5) return `\u20B9${(value / 1e5).toFixed(1)}L`;
-  return `\u20B9${value.toLocaleString("en-IN")}`;
-}
+const getCurrentFY = (): string => {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const fyYear = month >= 4 ? year + 1 : year;
+  return `FY${fyYear}`;
+};
 
-function ChartTooltip({ active, payload, label, tabLabel }: any) {
+const formatChartValue = (crores: number): string => {
+  if (crores >= 100_000) return `\u20B9${(crores / 100_000).toFixed(2)}L Cr`;
+  if (crores >= 1_000)   return `\u20B9${(crores / 1_000).toFixed(1)}K Cr`;
+  return `\u20B9${crores.toFixed(0)} Cr`;
+};
+
+const formatChartYAxis = (value: number): string => {
+  if (value === 0)          return '\u20B90';
+  if (value >= 100_000)     return `\u20B9${(value / 100_000).toFixed(1)}L Cr`;
+  if (value >= 10_000)      return `\u20B9${(value / 10_000).toFixed(0)}K Cr`;
+  if (value >= 1_000)       return `\u20B9${(value / 1_000).toFixed(1)}K Cr`;
+  return `\u20B9${value} Cr`;
+};
+
+const FinancialTooltip = ({ active, payload, label, tabLabel }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
       background: "var(--surface)", border: "1px solid var(--border)",
-      borderRadius: "var(--r-lg)", padding: "12px 16px",
-      boxShadow: "var(--sh-float)", fontFamily: "var(--font)", minWidth: 160,
+      borderRadius: "var(--r-lg)", padding: "16px 20px",
+      boxShadow: "var(--sh-float)", fontFamily: "var(--font)",
+      minWidth: 190,
     }}>
-      <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", fontWeight: 600, marginBottom: 4 }}>
-        {label}
+      <div style={{ fontSize: "var(--sz-xs)", fontWeight: 700, color: "var(--text-300)",
+        textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
+        {label}{label === getCurrentFY() ? " (TTM)" : ""}
       </div>
-      <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text-900)", letterSpacing: "-0.02em" }}>
-        {formatValue(payload[0].value)}
-      </div>
-      <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", marginTop: 2 }}>
+      <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", marginBottom: 4 }}>
         {tabLabel}
+      </div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text-900)",
+        letterSpacing: "-0.025em", marginBottom: 8 }}>
+        {formatChartValue(payload[0].value)}
       </div>
     </div>
   );
-}
+};
 
 export default function FinancialHistogram({
   data,
@@ -51,15 +70,15 @@ export default function FinancialHistogram({
   type TabKey = "revenue" | "pat" | "op";
   const tabs: { key: TabKey; label: string; visible: boolean }[] = [
     { key: "revenue", label: "Revenue", visible: hasAnyRevenue },
-    { key: "pat", label: "PAT", visible: hasAnyPat },
-    { key: "op", label: "EBITDA", visible: hasAnyOp },
+    { key: "pat", label: "Net Profit", visible: hasAnyPat },
+    { key: "op", label: "Operating Profit", visible: hasAnyOp },
   ];
   const visibleTabs = tabs.filter(t => t.visible);
   const [activeTab, setActiveTab] = useState<TabKey>(
     visibleTabs.length > 0 ? visibleTabs[0].key : "revenue"
   );
 
-  const tabLabel = activeTab === "revenue" ? "Revenue" : activeTab === "pat" ? "PAT" : "EBITDA";
+  const tabLabel = activeTab === "revenue" ? "Revenue" : activeTab === "pat" ? "Net Profit (PAT)" : "Operating Profit";
 
   const chartData = useMemo(() => {
     return entries.map(e => ({
@@ -69,27 +88,32 @@ export default function FinancialHistogram({
   }, [entries, activeTab]);
 
   const hasData = chartData.length > 0;
+  const currentFY = getCurrentFY();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const maxValue = Math.max(...chartData.map(d => d.value), 1);
+  const yAxisDomain = [0, maxValue * 1.15];
 
   return (
     <div>
       {visibleTabs.length > 1 && (
-        <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        <div style={{
+          display: "flex", background: "var(--chip)", borderRadius: "var(--r-md)",
+          padding: 4, gap: 2, width: "fit-content", marginBottom: 20,
+        }}>
           {visibleTabs.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
               style={{
-                height: 32,
-                padding: "0 14px",
-                borderRadius: 20,
-                border: activeTab === key ? "none" : "1px solid var(--border)",
-                background: activeTab === key ? "var(--brand)" : "#FFFFFF",
-                color: activeTab === key ? "#FFFFFF" : "var(--text-500)",
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
+                padding: "7px 16px", fontSize: "var(--sz-sm)",
+                fontWeight: activeTab === key ? 700 : 500,
+                color: activeTab === key ? "var(--text-900)" : "var(--text-500)",
+                background: activeTab === key ? "var(--surface)" : "transparent",
+                border: "none", borderRadius: "var(--r-sm)", cursor: "pointer",
                 fontFamily: "var(--font)",
-                transition: "all 0.15s ease",
+                boxShadow: activeTab === key ? "var(--sh-raised)" : "none",
+                transition: "all var(--t-fast)",
               }}
             >
               {label}
@@ -124,21 +148,25 @@ export default function FinancialHistogram({
                 axisLine={{ stroke: "var(--border)" }}
               />
               <YAxis
+                domain={yAxisDomain}
                 tick={{ fontSize: 10, fill: "var(--text-300)", fontFamily: "var(--font)" }}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(v: number) => formatValue(v)}
+                tickFormatter={(v: number) => formatChartYAxis(v)}
                 width={72}
               />
-              <Tooltip content={<ChartTooltip tabLabel={tabLabel} />} />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={48}>
+              <Tooltip content={<FinancialTooltip tabLabel={tabLabel} />} />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={48}
+                onMouseEnter={(_, index) => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}>
                 {chartData.map((_entry, i) => {
-                  const isCurrentFy = _entry.year.includes("26") || _entry.year === "FY2026";
+                  const isCurrentFY = _entry.year === currentFY;
                   return (
                     <Cell
                       key={i}
-                      fill="var(--brand)"
-                      fillOpacity={isCurrentFy ? 0.7 : 1}
+                      fill={hoveredIndex === i ? "#1240A8" : "#1A56DB"}
+                      opacity={hoveredIndex !== null && hoveredIndex !== i ? 0.45 : 1}
+                      style={{ transition: "opacity 100ms, fill 100ms" }}
                     />
                   );
                 })}

@@ -7,7 +7,6 @@ const NAV_LINKS = [
   { label: "Scanner", href: "/scanner" },
   { label: "Compare", href: "/compare" },
   { label: "Watchlist", href: "/watchlist" },
-  { label: "Methodology", href: "/methodology" },
 ];
 
 export default function TopNav() {
@@ -92,7 +91,6 @@ export default function TopNav() {
             { label: "Watchlist", href: "/watchlist" },
             { label: "Portfolio", href: "/portfolio" },
             { label: "Alerts", href: "/alerts" },
-            { label: "Methodology", href: "/methodology" },
           ].map((link) => (
             <NavLink
               key={link.href}
