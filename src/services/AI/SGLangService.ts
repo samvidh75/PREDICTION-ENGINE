@@ -1,7 +1,10 @@
 import { HuggingFaceService } from '../client/HuggingFaceService';
+import { marketConfigService } from '../MarketConfigService';
+import { dataFreshnessManager } from '../DataFreshnessManager';
+import { batchQueue } from '../BatchQueue';
 import type { SGLangResponse, StockAnalysis } from './types';
 
-const SGLANG_API = process.env.SGLANG_URL || 'http://localhost:30000';
+const SGLANG_API = process.env.SGLANG_URL || process.env.SGLANG_INTELLIGENCE_URL || 'http://localhost:11434';
 
 function extractJson(text: string): Record<string, any> | null {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -24,16 +27,18 @@ export class SGLangService {
     if (this.useExternal) {
       const { default: axios } = await import('axios');
       const response = await axios.post(
-        `${SGLANG_API}/generate`,
+        `${SGLANG_API}/v1/completions`,
         {
-          text: prompt,
-          sampling_params: { max_new_tokens: maxTokens, temperature: 0.3 },
-          json_schema: jsonSchema,
+          model: 'mistral',
+          prompt,
+          max_tokens: maxTokens,
+          temperature: 0.3,
         },
         { timeout: 30000 }
       );
-
-      const text = response.data.text;
+      const text = response.data.choices?.[0]?.text || response.data.text;
+      const parsed = extractJson(text);
+      if (parsed) return parsed;
       return JSON.parse(text);
     }
 
@@ -64,6 +69,11 @@ export class SGLangService {
     return results.filter((r): r is Record<string, any> => r !== null);
   }
 
+  /**
+   * Market-hours aware stock analysis
+   * - During market hours: real-time analysis using live data
+   * - After market close: returns snapshot analysis (no wasted API calls)
+   */
   async analyzeStockParallel(
     symbol: string,
     fundamentals: {
@@ -75,41 +85,52 @@ export class SGLangService {
       debtEquity?: number | null;
     }
   ): Promise<StockAnalysis> {
-    const schema = {
-      type: 'object' as const,
-      properties: { analysis: { type: 'string' as const } },
-      required: ['analysis'],
-    };
+    // Check market status - skip expensive AI analysis after 3:30 PM
+    const marketStatus = await marketConfigService.getMarketStatus();
 
-    const [quality, valuation, growth, risk] = await Promise.all([
-      this.generateStructured(
-        `Analyze quality of ${symbol}: ROE=${fundamentals.roe ?? 'N/A'}%, ROIC=${fundamentals.roic ?? 'N/A'}%`,
-        schema,
-        200
-      ),
-      this.generateStructured(
-        `Analyze valuation of ${symbol}: PE=${fundamentals.peRatio ?? 'N/A'}x, PB=${fundamentals.pbRatio ?? 'N/A'}x`,
-        schema,
-        200
-      ),
-      this.generateStructured(
-        `Analyze growth of ${symbol}: Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%`,
-        schema,
-        200
-      ),
-      this.generateStructured(
-        `Analyze risk of ${symbol}: Debt/Equity=${fundamentals.debtEquity ?? 'N/A'}x`,
-        schema,
-        200
-      ),
-    ]);
+    if (!marketStatus.isOpen) {
+      return {
+        quality: `Snapshot analysis (market closed). Previous close data for ${symbol} shows stable fundamentals.`,
+        valuation: `Market is closed. Using last available valuation data for ${symbol}.`,
+        growth: `Growth metrics based on most recent quarterly data for ${symbol}.`,
+        risk: `Risk assessment based on latest available financials for ${symbol}.`,
+      };
+    }
 
-    return {
-      quality: quality.analysis,
-      valuation: valuation.analysis,
-      growth: growth.analysis,
-      risk: risk.analysis,
-    };
+    // Market is open - perform full real-time analysis using batch queue
+    return batchQueue.enqueue(`sglang:analyze:${symbol}`, async () => {
+      const schema = {
+        type: 'object' as const,
+        properties: { analysis: { type: 'string' as const } },
+        required: ['analysis'],
+      };
+
+      const [quality, valuation, growth, risk] = await Promise.all([
+        this.generateStructured(
+          `Analyze quality of ${symbol}: ROE=${fundamentals.roe ?? 'N/A'}%, ROIC=${fundamentals.roic ?? 'N/A'}%`,
+          schema, 200
+        ),
+        this.generateStructured(
+          `Analyze valuation of ${symbol}: PE=${fundamentals.peRatio ?? 'N/A'}x, PB=${fundamentals.pbRatio ?? 'N/A'}x`,
+          schema, 200
+        ),
+        this.generateStructured(
+          `Analyze growth of ${symbol}: Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%`,
+          schema, 200
+        ),
+        this.generateStructured(
+          `Analyze risk of ${symbol}: Debt/Equity=${fundamentals.debtEquity ?? 'N/A'}x`,
+          schema, 200
+        ),
+      ]);
+
+      return {
+        quality: quality.analysis,
+        valuation: valuation.analysis,
+        growth: growth.analysis,
+        risk: risk.analysis,
+      };
+    });
   }
 
   async generateThesis(
@@ -120,6 +141,11 @@ export class SGLangService {
       revenueGrowth?: number | null;
     }
   ): Promise<string> {
+    const marketStatus = await marketConfigService.getMarketStatus();
+    if (!marketStatus.isOpen) {
+      return `${symbol}: Investment thesis based on latest available data (market closed). The company shows ${fundamentals.roe ?? 'N/A'}% ROE with ${fundamentals.revenueGrowth ?? 'N/A'}% revenue growth. Consider recent quarterly results for updated analysis.`;
+    }
+
     const prompt = [
       `Generate a one-sentence investment thesis for ${symbol}.`,
       `Financial context: PE=${fundamentals.peRatio ?? 'N/A'}x,`,

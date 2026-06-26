@@ -1,0 +1,119 @@
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  background-color: var(--page);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 0 var(--sp-4);
+  transition: border-color var(--t-fast);
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--brand);
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: var(--sp-4) 0;
+  font-size: var(--sz-base);
+  color: var(--text-900);
+  background: transparent;
+  font-family: var(--font);
+}
+
+.input::placeholder {
+  color: var(--text-300);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.freshness {
+  font-size: var(--sz-2xs);
+  color: var(--text-500);
+  margin-top: var(--sp-1);
+  padding-left: var(--sp-1);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: var(--sp-1);
+  background-color: var(--page);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-raised);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  transition: background-color var(--t-fast);
+  cursor: pointer;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item:hover {
+  background-color: var(--surface);
+}
+
+.symbol {
+  font-weight: 700;
+  color: var(--brand);
+  font-size: var(--sz-sm);
+  min-width: 80px;
+}
+
+.name {
+  flex: 1;
+  color: var(--text-900);
+  font-size: var(--sz-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sector {
+  color: var(--text-500);
+  font-size: var(--sz-2xs);
+  background-color: var(--surface);
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+}
+
+.empty {
+  padding: var(--sp-4);
+  text-align: center;
+  color: var(--text-500);
+  font-size: var(--sz-sm);
+}

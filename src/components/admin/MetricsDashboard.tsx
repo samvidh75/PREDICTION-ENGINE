@@ -1,94 +1,93 @@
-import { useState, useEffect } from 'react';
-import { getAggregatedMetrics, exportMetricsAsJSON, clearMetrics } from '@/utils/analytics';
+import { useState } from 'react';
+
+type MetricTab = 'llm' | 'vector' | 'system';
+
+interface MetricCard {
+  label: string;
+  value: string | number;
+  status: 'ok' | 'warn' | 'error';
+}
+
+const initialMetrics: Record<MetricTab, MetricCard[]> = {
+  llm: [
+    { label: 'Total Queries', value: '--', status: 'ok' },
+    { label: 'Avg Latency', value: '-- ms', status: 'ok' },
+    { label: 'Cache Hit Rate', value: '--%', status: 'ok' },
+    { label: 'Error Rate', value: '--%', status: 'ok' },
+  ],
+  vector: [
+    { label: 'Qdrant Status', value: '--', status: 'ok' },
+    { label: 'Collection Size', value: '--', status: 'ok' },
+    { label: 'Avg Search Time', value: '-- ms', status: 'ok' },
+    { label: 'Total Vectors', value: '--', status: 'ok' },
+  ],
+  system: [
+    { label: 'Memory Usage', value: '--%', status: 'ok' },
+    { label: 'CPU Load', value: '--%', status: 'ok' },
+    { label: 'Uptime', value: '--', status: 'ok' },
+    { label: 'Active Requests', value: '--', status: 'ok' },
+  ],
+};
 
 export function MetricsDashboard() {
-  const [metrics, setMetrics] = useState(getAggregatedMetrics());
+  const [activeTab, setActiveTab] = useState<MetricTab>('llm');
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMetrics(getAggregatedMetrics());
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!metrics || metrics.totalQueries === 0) {
-    return (
-      <div style={{ padding: 24, fontFamily: 'var(--font)' }}>
-        <h2>Metrics Dashboard</h2>
-        <p>No queries recorded yet. Try searching in the ResearchBot to see analytics.</p>
-      </div>
-    );
-  }
-
-  const offlinePct = (metrics.methods.regex.percentage + metrics.methods.transformers.percentage).toFixed(0);
+  const metrics = initialMetrics[activeTab];
 
   return (
-    <div style={{ padding: 32, fontFamily: 'var(--font)', maxWidth: 800, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ margin: 0 }}>Platform Metrics</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => { const json = exportMetricsAsJSON(); console.log(json); alert('Exported to console'); }}
-            style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--chip)', cursor: 'pointer', fontSize: 13 }}
-          >
-            Export JSON
-          </button>
-          <button
-            onClick={() => { clearMetrics(); setMetrics(getAggregatedMetrics()); }}
-            style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--chip)', cursor: 'pointer', fontSize: 13 }}
-          >
-            Clear
-          </button>
-        </div>
+    <div style={{ padding: 'var(--sp-6)', maxWidth: 1000, margin: '0 auto' }}>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-900)', marginBottom: 'var(--sp-6)' }}>
+        System Metrics
+      </h1>
+
+      <div style={{ display: 'flex', gap: 'var(--sp-2)', marginBottom: 'var(--sp-6)' }}>
+        <TabButton label="LLM" tab="llm" active={activeTab} onClick={setActiveTab} />
+        <TabButton label="Vector DB" tab="vector" active={activeTab} onClick={setActiveTab} />
+        <TabButton label="System" tab="system" active={activeTab} onClick={setActiveTab} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
-        <div style={{ background: 'var(--card)', borderRadius: 12, padding: 20, border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 12, color: 'var(--text-500)', marginBottom: 4 }}>Total Queries</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-900)' }}>{metrics.totalQueries}</div>
-        </div>
-        <div style={{ background: 'var(--card)', borderRadius: 12, padding: 20, border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: 12, color: 'var(--text-500)', marginBottom: 4 }}>Success Rate</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: metrics.successRate > 90 ? 'var(--green-text)' : 'var(--red-text)' }}>
-            {metrics.successRate.toFixed(1)}%
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
-        {(['regex', 'transformers', 'groq'] as const).map((method) => {
-          const m = metrics.methods[method];
-          const labels = { regex: { emoji: '\u26A1', label: 'Regex Parser' }, transformers: { emoji: '\uD83D\uDE80', label: 'Browser AI' }, groq: { emoji: '\uD83D\uDCE1', label: 'API Fallback' } };
-          const l = labels[method];
-          return (
-            <div key={method} style={{ background: 'var(--card)', borderRadius: 12, padding: 16, border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 20, marginBottom: 4 }}>{l.emoji}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-500)', marginBottom: 4 }}>{l.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-900)' }}>{m.count}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-500)' }}>{m.percentage.toFixed(0)}%</div>
-              <div style={{ fontSize: 11, color: 'var(--text-400)' }}>Avg: {m.avgDuration.toFixed(0)}ms</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--sp-4)' }}>
+        {metrics.map((m) => (
+          <div key={m.label} style={{
+            backgroundColor: 'var(--page)',
+            padding: 'var(--sp-4)',
+            borderRadius: 'var(--r-md)',
+            boxShadow: 'var(--sh-card)',
+            border: '1px solid var(--border)',
+          }}>
+            <div style={{ fontSize: 'var(--sz-sm)', color: 'var(--text-500)', marginBottom: 'var(--sp-2)' }}>
+              {m.label}
             </div>
-          );
-        })}
+            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-900)' }}>
+              {m.value}
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div style={{ background: 'var(--card)', borderRadius: 12, padding: 20, border: '1px solid var(--border)' }}>
-        <h3 style={{ margin: '0 0 12px', fontSize: 15 }}>Cost Insights</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, color: 'var(--text-700)' }}>
-          <p style={{ margin: 0 }}>
-            {metrics.methods.regex.percentage.toFixed(0)}% queries are OFFLINE (Regex) - No API needed!
-          </p>
-          <p style={{ margin: 0 }}>
-            {offlinePct}% queries are BROWSER-BASED - Zero server load!
-          </p>
-          <p style={{ margin: 0 }}>
-            Only {metrics.methods.groq.percentage.toFixed(0)}% fall back to Groq API (free tier)
-          </p>
-          <p style={{ margin: '8px 0 0', fontSize: 15, fontWeight: 600, color: 'var(--green-text)' }}>
-            Total cost: Rs 0 (all free tiers)
-          </p>
-        </div>
-      </div>
+      <p style={{ marginTop: 'var(--sp-6)', color: 'var(--text-500)', fontSize: 'var(--sz-sm)' }}>
+        Metrics are displayed once the LLM pipeline processes queries.
+      </p>
     </div>
+  );
+}
+
+function TabButton({ label, tab, active, onClick }: { label: string; tab: MetricTab; active: MetricTab; onClick: (t: MetricTab) => void }) {
+  return (
+    <button
+      onClick={() => onClick(tab)}
+      style={{
+        padding: 'var(--sp-2) var(--sp-4)',
+        border: 'none',
+        borderRadius: 'var(--r-md)',
+        fontWeight: 600,
+        cursor: 'pointer',
+        backgroundColor: active === tab ? 'var(--brand)' : 'var(--surface)',
+        color: active === tab ? 'var(--text-inverse)' : 'var(--text-700)',
+        transition: 'all var(--t-fast)',
+      }}
+    >
+      {label}
+    </button>
   );
 }
