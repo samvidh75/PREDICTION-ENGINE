@@ -5,6 +5,7 @@ import { ShareholdingChart } from './ShareholdingChart';
 import { FinancialChart } from './FinancialChart';
 import PriceChart from './PriceChart';
 import { UpgradeBanner } from '../premium/UpgradeBanner';
+import { IntelligentAnalysis } from './IntelligentAnalysis';
 
 export function StockDetail() {
   const { symbol } = useParams<{ symbol: string }>();
@@ -44,6 +45,8 @@ export function StockDetail() {
 
         {shareholding && <ShareholdingChart data={shareholding} />}
         {financials && <FinancialChart data={financials} />}
+
+        <IntelligentAnalysis symbol={stock.symbol} />
 
         <section className={styles.actionsSection}>
           <button className={styles.btnPrimary}>Track Stock</button>

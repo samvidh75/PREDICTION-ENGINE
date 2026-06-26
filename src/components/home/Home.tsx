@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSmartQuery } from '@/hooks/useSmartQuery';
 import styles from './Home.module.css';
+import { SearchBar } from './SearchBar';
 
 export function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +55,10 @@ export function Home() {
                 {loading ? 'Searching...' : 'Search'}
               </button>
             </form>
+
+            <div className={styles.quickSearch}>
+              <SearchBar />
+            </div>
 
             {result && (
               <div className={styles.resultBox}>

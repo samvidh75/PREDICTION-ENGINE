@@ -30,10 +30,20 @@ import { stockPageSnapshotRoutes } from "./stockPageSnapshot";
 import { leadsRoutes } from "./leads";
 import dailyFeedRoutes from "./dailyFeed";
 import llmResearchRoutes from "./llm-research";
+import intelligenceAiRoutes from "./intelligence-ai";
+import marketHoursRoutes from "./market-hours";
+import stockUniverseRoutes from "./stock-universe";
+import sglangRoutes from "./sglang";
+import scannerRoutes from "./scanner";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(llmResearchRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(intelligenceAiRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(marketHoursRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(stockUniverseRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(sglangRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(scannerRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(discoveryRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(searchRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(healthometerRoutes as unknown as never, { encapsulate: false } as never);
