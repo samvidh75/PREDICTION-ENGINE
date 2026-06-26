@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSmartQuery } from "@/hooks/useSmartQuery";
 
 interface Message {
   role: "user" | "bot";
@@ -20,24 +21,25 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
   ]);
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { processQuery, loading, result, method } = useSmartQuery();
 
   const handleAsk = async (question: string) => {
     if (!question.trim()) return;
     setMessages(p => [...p, { role: "user", content: question }]);
     setInput("");
 
-    try {
-      const res = await fetch("/api/research/ask-bot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symbol, question, isPro }),
-      });
-      const data = await res.json();
-      setMessages(p => [...p, { role: "bot", content: data.answer, isPro }]);
-    } catch {
+    await processQuery(question);
+
+    if (result) {
+      const methodLabel = method === 'regex' ? ' (instant, offline)'
+        : method === 'transformers' ? ' (browser AI, offline)'
+        : method === 'groq' ? ' (API, free tier)'
+        : '';
+      const content = typeof result === 'string' ? result
+        : JSON.stringify(result, null, 2);
       setMessages(p => [...p, {
         role: "bot",
-        content: "Sorry, I'm having trouble connecting. Please try again.",
+        content: `${content}\n\n_Processed via: ${method}${methodLabel}_`,
         isPro,
       }]);
     }
@@ -45,7 +47,6 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
 
   return (
     <>
-      {/* Floating button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -63,7 +64,6 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
         {"\uD83E\uDD16"}
       </button>
 
-      {/* Chat panel */}
       {isOpen && (
         <div style={{
           position: "fixed", bottom: 172, right: 24, zIndex: 100,
@@ -73,7 +73,6 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
           boxShadow: "var(--sh-modal)",
           overflow: "hidden",
         }}>
-          {/* Header */}
           <div style={{
             padding: "14px 16px", borderBottom: "1px solid var(--border)",
             display: "flex", alignItems: "center", gap: 8,
@@ -87,7 +86,6 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
             </div>
           </div>
 
-          {/* Messages */}
           <div style={{
             flex: 1, overflow: "auto", padding: 16,
             display: "flex", flexDirection: "column", gap: 12,
@@ -114,9 +112,17 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
                 )}
               </div>
             ))}
+            {loading && (
+              <div style={{
+                alignSelf: "flex-start", background: "var(--chip)",
+                color: "var(--text-500)", padding: "10px 14px",
+                borderRadius: 10, fontSize: 13, fontStyle: "italic",
+              }}>
+                Analyzing...
+              </div>
+            )}
           </div>
 
-          {/* Input */}
           <div style={{
             padding: 12, borderTop: "1px solid var(--border)",
             display: "flex", gap: 8,
@@ -126,6 +132,7 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") handleAsk(input); }}
               placeholder={isPro ? "Ask anything..." : "Free: basic questions"}
+              disabled={loading}
               style={{
                 flex: 1, background: "var(--chip)", color: "var(--text-700)",
                 border: "1px solid var(--border)", borderRadius: 8,
@@ -135,9 +142,11 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
             />
             <button
               onClick={() => handleAsk(input)}
+              disabled={loading}
               style={{
-                width: 36, height: 36, background: "var(--brand)", border: "none",
-                borderRadius: 8, cursor: "pointer", fontSize: 16,
+                width: 36, height: 36, background: loading ? "var(--text-300)" : "var(--brand)",
+                border: "none", borderRadius: 8, cursor: loading ? "not-allowed" : "pointer",
+                fontSize: 16,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 color: "var(--text-inverse)",
               }}

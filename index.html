@@ -72,6 +72,15 @@
       });
     </script>
 
+    <!-- ── WebGPU AI (Transformers.js, client-side, ₹0) ─────────────────── -->
+    <script type="module">
+      import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
+      window.Transformers = { pipeline };
+      pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2').then(() => {
+        console.log('✅ Models loaded in browser, ready for offline AI');
+      });
+    </script>
+
     <!-- ── Structured Data: Organization + WebSite + Sitelinks Search ───── -->
     <script type="application/ld+json">
       {
