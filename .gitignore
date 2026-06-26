@@ -89,3 +89,4 @@ artifacts/
 tmp-debug.html
 :memory:*
 .tmp.drivedownload/
+.aider*

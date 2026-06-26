@@ -120,6 +120,35 @@ services:
       retries: 3
       start_period: 60s
 
+  # ── SGLang — Fast LLM inference server (optional GPU acceleration) ─────
+  sglang:
+    build:
+      context: ./infrastructure/sglang-server
+      dockerfile: Dockerfile.cpu
+    container_name: stockstory_sglang
+    restart: unless-stopped
+    ports:
+      - "8000:30000"
+    environment:
+      SGLANG_URL: http://sglang:30000
+      OLLAMA_URL: http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - stockstory_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:30000/v1/models"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+
   # ── Qdrant — Free vector database (replaces Pinecone) ──────────────────
   qdrant:
     image: qdrant/qdrant:latest

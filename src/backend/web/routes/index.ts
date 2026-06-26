@@ -35,6 +35,7 @@ import marketHoursRoutes from "./market-hours";
 import stockUniverseRoutes from "./stock-universe";
 import sglangRoutes from "./sglang";
 import scannerRoutes from "./scanner";
+import stripeRoutes from "./stripe";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
@@ -72,6 +73,7 @@ const routes: FastifyPluginAsync = async (app) => {
   await app.register(stockPageSnapshotRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(leadsRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(dailyFeedRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(stripeRoutes as unknown as never, { encapsulate: false } as never);
 };
 
 export default routes;

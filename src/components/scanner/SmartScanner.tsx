@@ -13,31 +13,39 @@ interface ScanResult {
   scannedAt: string;
 }
 
+type Strategy = 'all' | 'value' | 'growth' | 'quality' | 'momentum';
+
+const STRATEGIES: { key: Strategy; label: string }[] = [
+  { key: 'all', label: 'Top Rated' },
+  { key: 'value', label: 'Best Value' },
+  { key: 'growth', label: 'High Growth' },
+  { key: 'quality', label: 'Quality' },
+  { key: 'momentum', label: 'Momentum' },
+];
+
 export function SmartScanner() {
   const [results, setResults] = useState<ScanResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [scanType, setScanType] = useState<'all' | 'sector'>('all');
-  const [freshness, setFreshness] = useState('');
+  const [strategy, setStrategy] = useState<Strategy>('all');
+  const [marketState, setMarketState] = useState('');
 
   useEffect(() => {
     fetch('/api/market/status')
       .then(r => r.json())
       .then(d => {
-        setFreshness(d.isOpen ? 'Live analysis' : 'Market closed — using cached data');
+        setMarketState(d.isOpen ? 'Live AI analysis' : 'Market closed — using cached data');
       })
       .catch(() => {});
   }, []);
 
   useEffect(() => {
     runScan();
-  }, [scanType]);
+  }, [strategy]);
 
   const runScan = async () => {
     setLoading(true);
     try {
-      const url = scanType === 'all'
-        ? '/api/scanner/all?limit=50'
-        : '/api/scanner/sector/Technology?limit=30';
+      const url = `/api/scanner/strategy?strategy=${strategy}&limit=50`;
       const res = await fetch(url);
       const data = await res.json();
       setResults(data.results || []);
@@ -57,29 +65,26 @@ export function SmartScanner() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Smart Scanner</h2>
-        {freshness && <span className={styles.freshness}>{freshness}</span>}
+        <h2 className={styles.title}>AI Smart Scanner</h2>
+        {marketState && <span className={styles.marketStateLabel}>{marketState}</span>}
       </div>
 
       <div className={styles.tabs}>
-        <button
-          className={scanType === 'all' ? styles.active : ''}
-          onClick={() => setScanType('all')}
-        >
-          All Stocks
-        </button>
-        <button
-          className={scanType === 'sector' ? styles.active : ''}
-          onClick={() => setScanType('sector')}
-        >
-          Technology
-        </button>
+        {STRATEGIES.map(s => (
+          <button
+            key={s.key}
+            className={strategy === s.key ? styles.active : ''}
+            onClick={() => setStrategy(s.key)}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
 
       {loading && (
         <div className={styles.loading}>
           <div className={styles.spinner} />
-          <p>AI scanning stocks...</p>
+          <p>AI scanning stocks ({strategy})...</p>
         </div>
       )}
 

@@ -11,7 +11,7 @@ interface BatchItem<T> {
 export class BatchQueue {
   private queue = new Map<string, BatchItem<any>>();
   private timer: ReturnType<typeof setTimeout> | null = null;
-  private batchDuration = 60000;
+  private batchDuration = Math.max(10000, Math.min(120000, parseInt(process.env.BATCH_QUEUE_DURATION_MS || '120000', 10)));
 
   async enqueue<T>(key: string, executor: () => Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {

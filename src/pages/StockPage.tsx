@@ -18,6 +18,7 @@ import NewsFeed from "../components/news/NewsFeed";
 import ProUpgradeModal from "../components/stock/ProUpgradeModal";
 import ProPaywallGate from "../components/premium/ProPaywallGate";
 import ResearchBot from "../components/stock/ResearchBot";
+import { IntelligentAnalysis } from "../components/stock/IntelligentAnalysis";
 import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
 import ShareholdingsChart from "../components/stock/ShareholdingsChart";
 import { FinancialCharts } from "../components/stock/FinancialCharts";
@@ -207,6 +208,11 @@ export default function StockPage({ symbol }: { symbol: string }) {
           />
         </div>
 
+        {/* 4a. AI Intelligence Analysis */}
+        <div style={{ margin: "16px 0" }}>
+          <IntelligentAnalysis symbol={symbol} />
+        </div>
+
         {/* 4. Key Metrics */}
         <div style={{ margin: "16px 0" }}>
           <MetricsGrid
@@ -274,7 +280,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </div>
         </div>
 
-        {/* 8. Data freshness note */}
+        {/* 8. Data recency note */}
         <div style={{ fontSize: 10, color: "var(--text-300)", textAlign: "center", padding: "16px 0" }}>
           {dataUpdated ? `Research view prepared ${dataUpdated}` : "Based on latest available market data."}
           <br />
