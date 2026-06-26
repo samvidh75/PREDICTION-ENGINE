@@ -37,7 +37,7 @@
     "test:integration:postgres": "cross-env NODE_ENV=test VITEST_MODE=integration DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run",
     "test:integration:postgres:ci": "cross-env REQUIRE_POSTGRES_INTEGRATION=true NODE_ENV=test VITEST_MODE=integration DB_ADAPTER=postgres ALLOW_SQLITE_FALLBACK=false COOKIE_SECRET=test-only-ci-secret vitest run",
     "seed:ci": "tsx scripts/seed-ci-fixtures.ts",
-    "test:production": "vitest run test/production.test.ts",
+    "test:production": "vitest run tests/production.test.ts",
     "test:watch": "vitest",
     "test:coverage": "node scripts/run-vitest-ci.mjs --coverage",
     "test:coverage:ci": "npm run test:coverage",
