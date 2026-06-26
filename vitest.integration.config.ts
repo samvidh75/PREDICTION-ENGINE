@@ -1,18 +1,9 @@
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    environment: 'node',
-    globals: true,
-    fileParallelism: false,
-    include: [
-      'src/__tests__/integration/**/*.test.ts',
-    ],
-    exclude: [
-      'node_modules/**',
-      'dist/**',
-      'coverage/**',
-    ],
-    testTimeout: 30000,
-  },
-});
+/**
+ * Integration test config — thin wrapper around vitest.config.ts.
+ * Set VITEST_MODE=integration to activate integration profile.
+ *
+ * Usage:
+ *   VITEST_MODE=integration vitest run
+ *   VITEST_MODE=integration npx vitest run
+ */
+export { default } from "./vitest.config";
