@@ -1,0 +1,47 @@
+import { describe, it, expect } from 'vitest';
+
+const API_URL = 'https://prediction-engine-production-f7a8.up.railway.app';
+
+describe('Production Deployment Tests', () => {
+  it('should have all services healthy', async () => {
+    const response = await fetch(`${API_URL}/api/free/health`);
+    const data = await response.json();
+
+    expect(data.status).toBe('ok');
+    expect(data.services.ollama.status).toBe('ok');
+    expect(data.services.qdrant.status).toBe('ok');
+  });
+
+  it('should process LLM requests', async () => {
+    const response = await fetch(`${API_URL}/api/free/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        symbol: 'TCS',
+        message: 'What is PE ratio?',
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.answer).toBeTruthy();
+  });
+
+  it('should perform vector search', async () => {
+    const response = await fetch(`${API_URL}/api/free/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'TCS valuation', vector: [0.1] }),
+    });
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should expose metrics', async () => {
+    const response = await fetch(`${API_URL}/api/free/metrics`);
+    const text = await response.text();
+
+    expect(text).toContain('llm_calls_total');
+    expect(text).toContain('llm_latency_seconds');
+  });
+});
