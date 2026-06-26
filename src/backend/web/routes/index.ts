@@ -29,9 +29,11 @@ import superScanRoutes from "./superScans";
 import { stockPageSnapshotRoutes } from "./stockPageSnapshot";
 import { leadsRoutes } from "./leads";
 import dailyFeedRoutes from "./dailyFeed";
+import llmResearchRoutes from "./llm-research";
 
 const routes: FastifyPluginAsync = async (app) => {
   await app.register(healthRoutes as unknown as never, { encapsulate: false } as never);
+  await app.register(llmResearchRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(discoveryRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(searchRoutes as unknown as never, { encapsulate: false } as never);
   await app.register(healthometerRoutes as unknown as never, { encapsulate: false } as never);
