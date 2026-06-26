@@ -1,0 +1,240 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #F7F7F5;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.filterSection {
+  background-color: #FFFFFF;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.filterTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin: 0 0 1rem 0;
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.presetBtn {
+  padding: 0.75rem 1rem;
+  background-color: #F7F7F5;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666666;
+}
+
+.presetBtn:hover {
+  background-color: #E5E5E0;
+}
+
+.presetBtn.active {
+  background-color: #1A56DB;
+  color: white;
+  border-color: #1A56DB;
+}
+
+.resultsSection {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.resultCount {
+  color: #666666;
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table thead {
+  background-color: #F7F7F5;
+  border-bottom: 2px solid #E5E5E0;
+}
+
+.table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #E5E5E0;
+  color: #666666;
+}
+
+.table tbody tr:hover {
+  background-color: #F7F7F5;
+}
+
+.symbol {
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.symbol a {
+  text-decoration: none;
+  color: #1A56DB;
+  transition: color 0.2s;
+}
+
+.symbol a:hover {
+  color: #1449C0;
+}
+
+.score {
+  background-color: #E8F0FE;
+  color: #1A56DB;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtn {
+  padding: 0.5rem 1rem;
+  background-color: #F7F7F5;
+  border: 1px solid #E5E5E0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background-color: #E5E5E0;
+  border-color: #CCCCCC;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background-color: #F7F7F5;
+  border: 1px solid #E5E5E0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pagination button:hover {
+  background-color: #1A56DB;
+  color: white;
+  border-color: #1A56DB;
+}
+
+.loading {
+  text-align: center;
+  color: #666666;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .presetGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .actionBtn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .presetGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .presetBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .tableWrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem 0.25rem;
+  }
+}
