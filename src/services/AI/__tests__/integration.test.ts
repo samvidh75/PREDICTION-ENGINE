@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axios from 'axios';
-import { SGLangService } from '../SGLangService';
+import { SGLangService, sglangService } from '../SGLangService';
 import { LLMGateway } from '../LLMGateway';
 
 vi.mock('axios');
@@ -12,6 +12,7 @@ describe('SGLangService', () => {
 
   beforeEach(() => {
     service = new SGLangService();
+    service.useExternal = true; // use axios path for tests
     vi.clearAllMocks();
   });
 
@@ -124,6 +125,7 @@ describe('LLMGateway', () => {
 
   beforeEach(() => {
     gateway = new LLMGateway();
+    sglangService.useExternal = true; // use axios path for tests
     vi.clearAllMocks();
   });
 

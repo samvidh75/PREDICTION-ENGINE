@@ -279,7 +279,7 @@ async function main(): Promise<void> {
   // Normalize and validate
   const results: ImportResult[] = [];
   let okCount = 0;
-  let skipCount = 0;
+  const skipCount = 0;
   let errCount = 0;
 
   for (let i = 0; i < rawRows.length; i++) {

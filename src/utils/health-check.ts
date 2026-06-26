@@ -50,30 +50,5 @@ export async function runHealthCheck() {
 export async function printHealthCheck() {
   const health = await runHealthCheck();
 
-  console.log('StockStory Health Check');
-  console.log(`Time: ${health.timestamp}`);
-  console.log('');
-  console.log('Services:');
-  console.log(`  ${health.services.regex ? 'PASS' : 'FAIL'} Regex Parser`);
-  console.log(`  ${health.services.transformers ? 'PASS' : 'FAIL'} Transformers.js`);
-  console.log(`  ${health.services.supabase ? 'PASS' : 'FAIL'} Supabase`);
-  console.log(`  ${health.services.groq ? 'PASS' : 'FAIL'} Groq API`);
-
-  if (health.errors.length > 0) {
-    console.log('');
-    console.log('Errors:');
-    health.errors.forEach((e) => console.log(`  WARN: ${e}`));
-  }
-
-  const allOk =
-    health.services.regex &&
-    health.services.transformers &&
-    health.services.supabase &&
-    health.services.groq;
-
-  console.log('');
-  console.log(allOk ? 'All services healthy' : 'Some services have issues');
-  console.log('Total cost: Rs 0/month');
-
   return health;
 }

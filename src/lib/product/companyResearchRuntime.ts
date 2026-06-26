@@ -73,7 +73,7 @@ function buildValuationContext(financialSnapshot: FinancialSnapshotView): Valuat
 
 function buildRiskContext(financialSnapshot: FinancialSnapshotView): RiskContext {
   let debtWarning: string | null = null;
-  let volatilityNote: string | null = null;
+  const volatilityNote: string | null = null;
 
   if (financialSnapshot.debtEquity !== null) {
     if (financialSnapshot.debtEquity > 1.5) debtWarning = "Above-average leverage";

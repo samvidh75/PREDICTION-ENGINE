@@ -1,5 +1,5 @@
 :root {
-  --breakpoint-mobile: 480px;
+  --breakpoint-mobile: 375px;
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1200px;
   --breakpoint-ultra: 1920px;
@@ -44,6 +44,15 @@
   --transition-fast: var(--t-fast);
   --transition-base: var(--t-base);
   --transition-slow: var(--t-slow);
+}
+
+@media (max-width: 375px) {
+  :root {
+    --sz-xl: 18px;
+    --sz-2xl: 24px;
+    --sz-3xl: 28px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -161,4 +170,20 @@
 .responsive-hidden {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Additional mobile responsive utilities */
+@media (max-width: 375px) {
+  .btn {
+    min-height: 44px;
+    padding: var(--sp-3) var(--sp-4);
+  }
+  
+  .card {
+    padding: var(--sp-3);
+  }
+  
+  .container {
+    padding: 0 var(--sp-3);
+  }
 }

@@ -1,21 +1,16 @@
 import { Router } from 'express';
-import { sglangService } from '../services/AI/SGLangService';
-
-const SGLANG_API = process.env.SGLANG_URL || 'http://localhost:30000';
+import { HuggingFaceService } from '../services/client/HuggingFaceService';
 
 const router = Router();
 
 router.get('/llm-health', async (_req, res) => {
-  const sglangHealthy = await sglangService.health();
+  const healthy = await HuggingFaceService.generateText('ping', 5)
+    .then(() => true)
+    .catch(() => false);
 
-  res.status(sglangHealthy ? 200 : 503).json({
-    status: sglangHealthy ? 'ok' : 'degraded',
-    services: {
-      sglang: {
-        status: sglangHealthy ? 'ok' : 'down',
-        url: SGLANG_API,
-      },
-    },
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'ok' : 'degraded',
+    provider: 'huggingface',
     timestamp: new Date().toISOString(),
   });
 });

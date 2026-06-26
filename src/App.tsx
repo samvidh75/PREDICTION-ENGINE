@@ -104,7 +104,6 @@ export default function App() {
     if (import.meta.env.DEV) {
       runHealthCheck().then(health => {
         const ok = health.services.supabase && health.services.groq && health.services.transformers;
-        console.log(ok ? 'All services healthy' : 'Some services have issues');
       });
     }
   }, []);

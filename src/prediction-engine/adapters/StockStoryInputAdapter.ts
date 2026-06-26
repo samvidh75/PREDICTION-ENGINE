@@ -35,10 +35,10 @@ export function adaptStockStoryInputs(
   const tradeDates = prices.map(p => p.tradeDate);
 
   let latestClose: number | null = null;
-  let latestOpen: number | null = null;
-  let latestHigh: number | null = null;
-  let latestLow: number | null = null;
-  let latestVolume: number | null = null;
+  const latestOpen: number | null = null;
+  const latestHigh: number | null = null;
+  const latestLow: number | null = null;
+  const latestVolume: number | null = null;
   if (prices.length > 0) {
     const last = prices[prices.length - 1];
     latestClose = finiteOrNull(last.close);

@@ -16,7 +16,6 @@ export class CacheCleanupWorker {
   }
 
   private run(): void {
-    console.log(`[CacheCleanup] cache size: ${cacheService.size()}`);
   }
 }
 

@@ -1,53 +1,48 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
+interface StockPoint {
+  id: number;
+  vector: number[];
+  payload: Record<string, any>;
+}
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB) || 1);
+}
 
 export class FreeVectorDBService {
-  private client: QdrantClient;
-
-  constructor() {
-    this.client = new QdrantClient({ url: QDRANT_URL });
-  }
+  private stocks: StockPoint[] = [];
 
   async searchStocks(queryVector: number[], limit = 10): Promise<any> {
-    const collections = await this.client.getCollections();
-    const hasStocks = collections.collections.some(c => c.name === 'stocks');
-    if (!hasStocks) return [];
+    const scored = this.stocks
+      .map(point => ({
+        ...point,
+        score: cosineSimilarity(queryVector, point.vector),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
 
-    const results = await this.client.search('stocks', {
-      vector: queryVector,
-      limit,
-    });
-    return results;
+    return scored.map(s => ({
+      id: s.id,
+      score: s.score,
+      payload: s.payload,
+    }));
   }
 
   async storeStock(symbol: string, vector: number[], payload: Record<string, any> = {}): Promise<void> {
-    const collections = await this.client.getCollections();
-    const hasStocks = collections.collections.some(c => c.name === 'stocks');
-    if (!hasStocks) {
-      await this.client.createCollection('stocks', {
-        vectors: { size: vector.length, distance: 'Cosine' },
-      });
-    }
-
-    await this.client.upsert('stocks', {
-      points: [
-        {
-          id: Date.now(),
-          vector,
-          payload: { symbol, ...payload, timestamp: new Date().toISOString() },
-        },
-      ],
+    this.stocks.push({
+      id: Date.now(),
+      vector,
+      payload: { symbol, ...payload, timestamp: new Date().toISOString() },
     });
   }
 
   async health(): Promise<boolean> {
-    try {
-      await this.client.getCollections();
-      return true;
-    } catch {
-      return false;
-    }
+    return true;
   }
 }
 

@@ -199,8 +199,8 @@ async function main(): Promise<void> {
   for (let i = 0; i < options.symbols.length; i += options.batchSize) {
     const batch = options.symbols.slice(i, i + options.batchSize);
     const batchResults = await Promise.all(batch.map(async (symbol) => {
-      let row = fetchFromNsepython(symbol);
-      let source = row ? "nsepython" : null;
+      const row = fetchFromNsepython(symbol);
+      const source = row ? "nsepython" : null;
       // nselib fallback removed — evaluated and not active. See docs/data/nselib-provider.md
       if (!row) {
         return { symbol, status: "skipped", fields: 0, source: null, error: "no data from any source" };

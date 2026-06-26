@@ -4,14 +4,14 @@ import { freeVectorDBService } from '../../../services/AI/FreeVectorDBService';
 import { freeMetricsService } from '../../../services/AI/FreeMetricsService';
 
 const freeStackRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
-  // ── Free Stack: Ollama LLM ──────────────────────────────────────────────────
+  // ── Free Stack: On-device LLM (Transformers.js) ───────────────────────────
   fastify.post<{ Body: { symbol: string; message: string } }>(
     '/api/free/chat',
     async (request, _reply) => {
       const { symbol, message } = request.body;
       const start = Date.now();
       const answer = await freeLLMService.askBot(symbol, message);
-      freeMetricsService.trackLLMCall('ollama', Date.now() - start, true);
+      freeMetricsService.trackLLMCall('huggingface', Date.now() - start, true);
       return { answer, symbol };
     }
   );
@@ -25,12 +25,12 @@ const freeStackRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
     }
   );
 
-  // ── Free Stack: Ollama Health ─────────────────────────────────────────────
-  fastify.get('/api/free/ollama/health', async (_request, _reply) => {
+  // ── Free Stack: LLM Health ─────────────────────────────────────────────
+  fastify.get('/api/free/llm/health', async (_request, _reply) => {
     const healthy = await freeLLMService.health();
     return {
       status: healthy ? 'ok' : 'down',
-      url: process.env.OLLAMA_URL || 'http://localhost:11434',
+      provider: 'huggingface',
     };
   });
 
@@ -72,37 +72,17 @@ const freeStackRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
 
   // ── Free Stack: Overall Health ───────────────────────────────────────────
   fastify.get('/api/free/health', async (_request, _reply) => {
-    const [ollamaOk, qdrantOk] = await Promise.all([
+    const [llmOk, qdrantOk] = await Promise.all([
       freeLLMService.health(),
       freeVectorDBService.health(),
     ]);
     return {
-      status: ollamaOk && qdrantOk ? 'ok' : 'degraded',
+      status: llmOk && qdrantOk ? 'ok' : 'degraded',
       services: {
-        ollama: { status: ollamaOk ? 'ok' : 'down' },
+        llm: { status: llmOk ? 'ok' : 'down', provider: 'huggingface' },
         qdrant: { status: qdrantOk ? 'ok' : 'down' },
       },
     };
-  });
-
-  fastify.post('/api/admin/pull-model', async (request, reply) => {
-    const body = request.body as any;
-    const model = body?.model || process.env.OLLAMA_MODEL || 'llama3.1:8b';
-    const response = await fetch(`http://ollama:11434/api/pull`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: model }),
-    });
-    const reader = response.body?.getReader();
-    if (!reader) return reply.status(500).send({ error: 'no reader' });
-    const decoder = new TextDecoder();
-    let result = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      result += decoder.decode(value, { stream: true });
-    }
-    return { pulled: true, model, output: result };
   });
 };
 

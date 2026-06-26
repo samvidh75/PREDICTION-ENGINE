@@ -36,7 +36,7 @@ console.log('📋 Phase 1: Readiness Audit');
 
 console.log('   ⚠️ No financial data provider configured');
 
-let auditMd = `# Readiness Audit — TRACK-7D
+const auditMd = `# Readiness Audit — TRACK-7D
 
 **Generated:** ${new Date().toISOString()}
 **Financial Data Provider:** Not configured

@@ -1,30 +1,54 @@
-import axios from 'axios';
+import { HuggingFaceService } from '../client/HuggingFaceService';
 import type { SGLangResponse, StockAnalysis } from './types';
 
 const SGLANG_API = process.env.SGLANG_URL || 'http://localhost:30000';
 
+function extractJson(text: string): Record<string, any> | null {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch { /* not valid JSON */ }
+  }
+  return null;
+}
+
 export class SGLangService {
+  useExternal = process.env.SGLANG_URL !== undefined;
+
   async generateStructured(
     prompt: string,
     jsonSchema: Record<string, any>,
     maxTokens: number = 500
   ): Promise<Record<string, any>> {
-    const startTime = Date.now();
-    const response = await axios.post(
-      `${SGLANG_API}/generate`,
-      {
-        text: prompt,
-        sampling_params: { max_new_tokens: maxTokens, temperature: 0.3 },
-        json_schema: jsonSchema,
-      },
-      { timeout: 30000 }
+    if (this.useExternal) {
+      const { default: axios } = await import('axios');
+      const response = await axios.post(
+        `${SGLANG_API}/generate`,
+        {
+          text: prompt,
+          sampling_params: { max_new_tokens: maxTokens, temperature: 0.3 },
+          json_schema: jsonSchema,
+        },
+        { timeout: 30000 }
+      );
+
+      const text = response.data.text;
+      return JSON.parse(text);
+    }
+
+    const text = await HuggingFaceService.generateText(prompt, maxTokens);
+    const parsed = extractJson(text);
+    if (parsed) return parsed;
+
+    const text2 = await HuggingFaceService.generateText(
+      `${prompt}\n\nRespond with valid JSON matching this schema: ${JSON.stringify(jsonSchema)}`,
+      maxTokens
     );
+    const parsed2 = extractJson(text2);
+    if (parsed2) return parsed2;
 
-    const text = response.data.text;
-    const tokens = response.data.usage?.completion_tokens || maxTokens;
-    const latencyMs = Date.now() - startTime;
-
-    return JSON.parse(text);
+    return { text, analysis: text };
   }
 
   async parallelGenerate(
@@ -110,13 +134,22 @@ export class SGLangService {
       required: ['thesis'],
     }, 200);
 
-    return result.thesis;
+    return result.thesis || result.text || prompt;
   }
 
   async health(): Promise<boolean> {
+    if (this.useExternal) {
+      try {
+        const { default: axios } = await import('axios');
+        const response = await axios.get(`${SGLANG_API}/health`, { timeout: 5000 });
+        return response.status === 200;
+      } catch {
+        return false;
+      }
+    }
     try {
-      const response = await axios.get(`${SGLANG_API}/health`, { timeout: 5000 });
-      return response.status === 200;
+      await HuggingFaceService.generateText('ping', 5);
+      return true;
     } catch {
       return false;
     }
