@@ -12,7 +12,7 @@ export const ROUTES = {
 export function navigate(path: string, symbol?: string) {
   const p = symbol ? `/${path}/${symbol}` : path.startsWith('/') ? path : `/${path}`;
   window.history.pushState({}, '', p);
-  window.dispatchEvent(new Event('urlchange'));
+  window.dispatchEvent(new PopStateEvent('popstate', { bubbles: false }));
 }
 
 export function currentRoute(): string {

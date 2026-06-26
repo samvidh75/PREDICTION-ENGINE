@@ -11,6 +11,7 @@ import AppShell from "./components/layout/AppShell";
 import HomePage from "./pages/HomePage";
 import ScannerPage from "./pages/ScannerPage";
 import StockDetailPage from "./pages/StockPage";
+import StockResearchPage from "./pages/StockResearchPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import ComparePage from "./pages/ComparePage";
 import LoginPage from "./pages/LoginPage";
@@ -18,6 +19,15 @@ import RegisterPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import PricingPage from "./pages/PricingPage";
 import SearchPage from "./pages/SearchPage";
+import AlertsPage from "./pages/AlertsPage";
+import PortfolioPage from "./pages/PortfolioPage";
+import SettingsPage from "./pages/SettingsPage";
+import TermsPage from "./pages/TermsPage";
+import PublicAboutPage from "./pages/PublicAboutPage";
+import TrustCentrePage from "./pages/TrustCentrePage";
+import IPOCenterPage from "./pages/IPOCenterPage";
+import TrackPage from "./pages/TrackPage";
+import MorePage from "./pages/MorePage";
 
 function usePageMeta(title: string, desc: string) {
   useEffect(() => {
@@ -46,6 +56,15 @@ const ROUTE_META: Record<string, { title: string; desc: string }> = {
   "/login":       { title: "Sign In — StockStory India", desc: "Sign in to your StockStory India account." },
   "/register":    { title: "Create Account — StockStory India", desc: "Create your StockStory India account." },
   "/forgot-password": { title: "Reset Password — StockStory India", desc: "Reset your StockStory India account password." },
+  "/alerts":      { title: "Alerts — StockStory India", desc: "Manage stock alerts and notifications." },
+  "/portfolio":   { title: "Portfolio — StockStory India", desc: "Track your stock theses and portfolio." },
+  "/settings":    { title: "Settings — StockStory India", desc: "Manage your account settings." },
+  "/terms":       { title: "Terms & Disclosures — StockStory India", desc: "Terms of service and disclosures." },
+  "/about":       { title: "About — StockStory India", desc: "About StockStory India." },
+  "/methodology": { title: "Methodology — StockStory India", desc: "Our research methodology and scoring system." },
+  "/ipo":         { title: "IPO Center — StockStory India", desc: "Track upcoming and recent IPOs." },
+  "/track":       { title: "Track — StockStory India", desc: "Track your stock research theses." },
+  "/more":        { title: "More — StockStory India", desc: "Explore more features." },
 };
 
 function RouteMetaPage({ children }: { children: React.ReactNode }) {
@@ -64,6 +83,16 @@ function StockPageWrapper() {
     `Research ${resolvedSymbol} with fundamentals, health score, financial history, and comparison tools.`
   );
   return <StockDetailPage symbol={resolvedSymbol} />;
+}
+
+function StockResearchPageWrapper() {
+  const { symbol } = useParams<{ symbol: string }>();
+  const resolvedSymbol = (symbol || "TCS").toUpperCase().trim();
+  usePageMeta(
+    `Deep Research ${resolvedSymbol} — StockStory India`,
+    `Deep research on ${resolvedSymbol} with comprehensive analysis.`
+  );
+  return <StockResearchPage symbol={resolvedSymbol} />;
 }
 
 export { useNavigate };
@@ -88,6 +117,16 @@ export default function App() {
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/pricing" element={<RouteMetaPage><PricingPage /></RouteMetaPage>} />
                     <Route path="/search" element={<RouteMetaPage><SearchPage /></RouteMetaPage>} />
+                    <Route path="/stock/research/:symbol" element={<StockResearchPageWrapper />} />
+                    <Route path="/alerts" element={<RouteMetaPage><AlertsPage /></RouteMetaPage>} />
+                    <Route path="/portfolio" element={<RouteMetaPage><PortfolioPage /></RouteMetaPage>} />
+                    <Route path="/settings" element={<RouteMetaPage><SettingsPage /></RouteMetaPage>} />
+                    <Route path="/terms" element={<RouteMetaPage><TermsPage /></RouteMetaPage>} />
+                    <Route path="/about" element={<RouteMetaPage><PublicAboutPage /></RouteMetaPage>} />
+                    <Route path="/methodology" element={<RouteMetaPage><TrustCentrePage /></RouteMetaPage>} />
+                    <Route path="/ipo" element={<RouteMetaPage><IPOCenterPage /></RouteMetaPage>} />
+                    <Route path="/track" element={<RouteMetaPage><TrackPage /></RouteMetaPage>} />
+                    <Route path="/more" element={<RouteMetaPage><MorePage /></RouteMetaPage>} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </AppShell>
