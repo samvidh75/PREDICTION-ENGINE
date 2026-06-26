@@ -85,8 +85,9 @@ const freeStackRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => 
     };
   });
 
-  fastify.post('/api/admin/pull-model', async (_request, reply) => {
-    const model = process.env.OLLAMA_MODEL || 'llama3.1:7b-instruct-q4_K_M';
+  fastify.post('/api/admin/pull-model', async (request, reply) => {
+    const body = request.body as any;
+    const model = body?.model || process.env.OLLAMA_MODEL || 'llama3.1:8b';
     const response = await fetch(`http://ollama:11434/api/pull`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
