@@ -47,7 +47,8 @@ export class TransformersService {
       'news_search',
     ]);
 
-    return result.labels[0];
+    const output = Array.isArray(result) ? result[0] : result;
+    return output.labels[0];
   }
 
   static async canHandle(query: string): Promise<boolean> {
