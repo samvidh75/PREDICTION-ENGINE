@@ -5,15 +5,9 @@
   "framework": "vite",
   "env": {
     "VITE_SCREENER_ENABLED": "true",
-    "VITE_GROQ_API_KEY": {
-      "description": "Groq API key (free tier)"
-    },
-    "VITE_SUPABASE_URL": {
-      "description": "Supabase project URL"
-    },
-    "VITE_SUPABASE_ANON_KEY": {
-      "description": "Supabase anonymous key"
-    }
+    "VITE_GROQ_API_KEY": "",
+    "VITE_SUPABASE_URL": "",
+    "VITE_SUPABASE_ANON_KEY": ""
   },
   "headers": [
     {
