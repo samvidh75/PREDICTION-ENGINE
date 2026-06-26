@@ -1,0 +1,27 @@
+name: Deploy to Railway (FREE)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway up --force
+
+      - name: Run health check
+        run: |
+          sleep 30
+          curl -f https://prediction-engine-production-f7a8.up.railway.app/api/free/health || exit 1
+          echo "✅ Deployment successful"
