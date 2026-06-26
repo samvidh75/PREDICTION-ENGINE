@@ -59,4 +59,4 @@ COPY --from=builder /app/src/db/migrations ./src/db/migrations
 EXPOSE 4001
 
 # ── Start ─────────────────────────────────────────────────────────────────────
-CMD ["node", "dist/backend/backend/startServer.js"]
+CMD ["node", "dist/backend/startServer.js"]
