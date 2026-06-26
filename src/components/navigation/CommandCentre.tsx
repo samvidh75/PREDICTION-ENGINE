@@ -48,9 +48,8 @@ export default function CommandCentre({ isOpen, onClose }: Props): JSX.Element |
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Search company universe">
       <div 
-        className="relative border border-white/10 p-6 flex flex-col justify-between overflow-hidden"
+        className="relative border border-white/10 p-6 flex flex-col justify-between overflow-hidden w-[calc(100vw-32px)] max-w-[700px]"
         style={{
-          width: 700,
           height: 600,
           borderRadius: 20,
           background: "rgba(5, 7, 10, 0.97)",

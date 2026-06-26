@@ -7,7 +7,17 @@ interface PriceChartProps {
   height?: number;
 }
 
-const RANGES = ["1D", "5D", "1M", "3M", "6M", "1Y", "3Y"] as const;
+const RANGES = ["1W", "1M", "3M", "6M", "1Y", "3Y", "5Y"] as const;
+
+const RANGE_URL_MAP: Record<string, string> = {
+  "1W": "1w",
+  "1M": "1mo",
+  "3M": "3mo",
+  "6M": "6mo",
+  "1Y": "1y",
+  "3Y": "3y",
+  "5Y": "5y",
+};
 
 function formatPrice(v: number) {
   return `\u20B9${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}K`;
@@ -15,7 +25,8 @@ function formatPrice(v: number) {
 
 export default function PriceChart({ symbol, height }: PriceChartProps) {
   const [range, setRange] = useState("1Y");
-  const { data, loading, error } = useHistoricalData(symbol, range);
+  const apiRange = RANGE_URL_MAP[range] ?? "1y";
+  const { data, loading, error } = useHistoricalData(symbol, apiRange);
 
   const isNegative = data && data.length > 1
     ? data[data.length - 1].close < data[0].close
