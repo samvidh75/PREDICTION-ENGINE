@@ -19,7 +19,7 @@ function isDisplayable(stock: RegisteredStock): boolean {
   return true;
 }
 
-export class StockSearchEngine {
+export class StockSearchIndex {
   static search(query: string, limit: number = 10): SearchCandidate[] {
     const q = query.trim().toLowerCase();
     if (!q) return [];

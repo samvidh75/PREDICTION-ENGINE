@@ -43,13 +43,13 @@ function scoreMatch(queryNorm: string, keyNorm: string): number {
   return overlap > 0 ? 2 + Math.min(3, overlap) : 0;
 }
 
-import { StockSearchEngine } from "../stocks/StockSearchIndex";
+import { StockSearchIndex } from "../stocks/StockSearchIndex";
 
 /**
  * Resolves known company-name queries into best-effort ticker candidates.
  */
 export function resolveStockCandidatesFromCompanyQuery(query: string): StockCandidate[] {
-  const results = StockSearchEngine.search(query, 5);
+  const results = StockSearchIndex.search(query, 5);
   return results.map(r => ({
     ticker: r.ticker,
     companyName: r.companyName
