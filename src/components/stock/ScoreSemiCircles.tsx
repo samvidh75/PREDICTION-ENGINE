@@ -4,9 +4,9 @@ interface ScoreSemiCirclesProps {
 }
 
 function getColor(score: number): string {
-  if (score >= 75) return "#2DD4BF";
-  if (score >= 50) return "#FFA502";
-  return "#FF4757";
+  if (score >= 75) return "var(--green-text)";
+  if (score >= 50) return "var(--amber-text)";
+  return "var(--red-text)";
 }
 
 function strokeDasharray(score: number): string {
@@ -23,7 +23,7 @@ export default function ScoreSemiCircles({ overallScore, riskScore }: ScoreSemiC
         <circle
           cx={50} cy={100} r={50}
           fill="none"
-          stroke="rgba(255,255,255,0.1)"
+          stroke="var(--border)"
           strokeWidth={8}
           strokeDasharray={`${Math.PI * 100} ${Math.PI * 100}`}
           strokeDashoffset={-Math.PI * 50}
@@ -39,10 +39,10 @@ export default function ScoreSemiCircles({ overallScore, riskScore }: ScoreSemiC
           strokeLinecap="round"
           opacity={0.8}
         />
-        <text x={50} y={94} textAnchor="middle" fontSize={24} fontWeight={800} fill="white">
+        <text x={50} y={94} textAnchor="middle" fontSize={24} fontWeight={800} fill="var(--text-900)">
           {overallScore}
         </text>
-        <text x={50} y={114} textAnchor="middle" fontSize={9} fill="#6E6E6E" fontWeight={600}>
+        <text x={50} y={114} textAnchor="middle" fontSize={9} fill="var(--text-300)" fontWeight={600}>
           Health
         </text>
       </g>
@@ -52,7 +52,7 @@ export default function ScoreSemiCircles({ overallScore, riskScore }: ScoreSemiC
         <circle
           cx={150} cy={100} r={50}
           fill="none"
-          stroke="rgba(255,255,255,0.1)"
+          stroke="var(--border)"
           strokeWidth={8}
           strokeDasharray={`${Math.PI * 100} ${Math.PI * 100}`}
           strokeDashoffset={-Math.PI * 50}
@@ -68,10 +68,10 @@ export default function ScoreSemiCircles({ overallScore, riskScore }: ScoreSemiC
           strokeLinecap="round"
           opacity={0.8}
         />
-        <text x={150} y={94} textAnchor="middle" fontSize={24} fontWeight={800} fill="white">
+        <text x={150} y={94} textAnchor="middle" fontSize={24} fontWeight={800} fill="var(--text-900)">
           {riskScore}
         </text>
-        <text x={150} y={114} textAnchor="middle" fontSize={9} fill="#6E6E6E" fontWeight={600}>
+        <text x={150} y={114} textAnchor="middle" fontSize={9} fill="var(--text-300)" fontWeight={600}>
           Risk
         </text>
       </g>

@@ -138,7 +138,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
               background: "var(--surface)", border: "1px solid var(--border)",
               borderRadius: 16, padding: "20px",
             }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#6E6E6E", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-300)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
                 Score Overview
               </div>
               <ScoreSemiCircles
@@ -243,8 +243,8 @@ export default function StockPage({ symbol }: { symbol: string }) {
         }}>
           <button onClick={() => setIsTracked(!isTracked)} style={{
             height:44, borderRadius:8,
-            background: isTracked ? 'rgba(45,212,191,0.15)' : 'transparent',
-            color: isTracked ? '#2DD4BF' : '#A0A0A0',
+            background: isTracked ? 'var(--green-tint)' : 'transparent',
+            color: isTracked ? 'var(--green-text)' : 'var(--text-500)',
             border:'1px solid var(--border)',
             fontSize:12, fontWeight:600, cursor:'pointer',
             fontFamily:'var(--font)',
@@ -253,7 +253,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </button>
           <a href={`/compare?stocks=${symbol}`} style={{
             height:44, borderRadius:8,
-            background:'transparent', color:'#A0A0A0',
+            background:'transparent', color:'var(--text-500)',
             border:'1px solid var(--border)', fontSize:12,
             fontWeight:600, display:'flex', alignItems:'center',
             justifyContent:'center', textDecoration:'none',
@@ -262,7 +262,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </a>
           <button style={{
             height:44, borderRadius:8,
-            background:'#FFB81C', color:'#0F0F0F',
+            background:'var(--brand)', color:'var(--text-inverse)',
             border:'none', fontSize:12, fontWeight:700,
             cursor:'pointer', fontFamily:'var(--font)',
           }}>

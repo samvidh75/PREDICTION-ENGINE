@@ -18,7 +18,7 @@ export default function ProPaywallGate({ isLocked, children, onUnlockClick }: Pr
       <div style={{
         position: "absolute",
         inset: 0,
-        background: "linear-gradient(135deg, rgba(255,184,28,0.08) 0%, rgba(45,212,191,0.04) 100%)",
+        background: "var(--pro-gradient)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -30,8 +30,8 @@ export default function ProPaywallGate({ isLocked, children, onUnlockClick }: Pr
           width: 80,
           height: 80,
           borderRadius: "50%",
-          background: "linear-gradient(135deg, rgba(255,184,28,0.15) 0%, rgba(0,0,0,0.3) 100%)",
-          border: "2px solid #FFB81C",
+          background: "linear-gradient(135deg, var(--brand-tint) 0%, rgba(0,0,0,0.05) 100%)",
+          border: "2px solid var(--brand)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -41,24 +41,24 @@ export default function ProPaywallGate({ isLocked, children, onUnlockClick }: Pr
         </div>
 
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "white", marginBottom: 4 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-900)", marginBottom: 4 }}>
             Pro Feature
           </div>
-          <div style={{ fontSize: 13, color: "#A0A0A0" }}>
+          <div style={{ fontSize: 13, color: "var(--text-500)" }}>
             Unlock with StockStory Pro
           </div>
         </div>
 
         <button
           onClick={onUnlockClick}
-          onMouseOver={e => (e.currentTarget.style.background = "#E6A817")}
-          onMouseOut={e => (e.currentTarget.style.background = "#FFB81C")}
+          onMouseOver={e => (e.currentTarget.style.background = "var(--brand-hover)")}
+          onMouseOut={e => (e.currentTarget.style.background = "var(--brand)")}
           style={{
             padding: "10px 20px",
-            background: "#FFB81C",
-            color: "#0F0F0F",
+            background: "var(--brand)",
+            color: "var(--text-inverse)",
             border: "none",
-            borderRadius: 8,
+            borderRadius: "var(--r-pill)",
             fontSize: 14,
             fontWeight: 700,
             cursor: "pointer",

@@ -51,10 +51,10 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
         style={{
           position: "fixed", bottom: 100, right: 24, zIndex: 100,
           width: 60, height: 60, borderRadius: "50%",
-          background: "linear-gradient(135deg, #FFB81C 0%, #2DD4BF 100%)",
+          background: "var(--brand)",
           border: "none", cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 24, boxShadow: "0 4px 20px rgba(255,184,28,0.3)",
+          fontSize: 24, boxShadow: "var(--sh-float)",
           transition: "transform 200ms",
           transform: isOpen ? "scale(0.95)" : "scale(1)",
         }}
@@ -67,10 +67,10 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
       {isOpen && (
         <div style={{
           position: "fixed", bottom: 172, right: 24, zIndex: 100,
-          width: 340, height: 450, background: "var(--surface)",
+          width: 340, height: 450, background: "var(--page)",
           border: "1px solid var(--border)", borderRadius: 16,
           display: "flex", flexDirection: "column",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
+          boxShadow: "var(--sh-modal)",
           overflow: "hidden",
         }}>
           {/* Header */}
@@ -80,8 +80,8 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
           }}>
             <span style={{ fontSize: 20 }}>{"\uD83E\uDD16"}</span>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>ResearchBot</div>
-              <div style={{ fontSize: 10, color: isPro ? "#2DD4BF" : "#6E6E6E" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-900)" }}>ResearchBot</div>
+              <div style={{ fontSize: 10, color: isPro ? "var(--green-text)" : "var(--text-300)" }}>
                 {isPro ? "Pro tier" : "Free tier"}
               </div>
             </div>
@@ -97,8 +97,8 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
                 key={i}
                 style={{
                   alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                  background: m.role === "user" ? "#2DD4BF" : "#262626",
-                  color: m.role === "user" ? "#0F0F0F" : "white",
+                  background: m.role === "user" ? "var(--brand)" : "var(--chip)",
+                  color: m.role === "user" ? "var(--text-inverse)" : "var(--text-900)",
                   padding: "10px 14px",
                   borderRadius: 10,
                   fontSize: 13,
@@ -108,7 +108,7 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
               >
                 {m.content}
                 {m.role === "bot" && !m.isPro && (
-                  <div style={{ fontSize: 10, opacity: 0.7, marginTop: 4 }}>
+                  <div style={{ fontSize: 10, opacity: 0.7, marginTop: 4, color: "var(--text-500)" }}>
                     {"\uD83D\uDCA1"} Pro users see deeper insights
                   </div>
                 )}
@@ -127,7 +127,7 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
               onKeyDown={e => { if (e.key === "Enter") handleAsk(input); }}
               placeholder={isPro ? "Ask anything..." : "Free: basic questions"}
               style={{
-                flex: 1, background: "#262626", color: "white",
+                flex: 1, background: "var(--chip)", color: "var(--text-700)",
                 border: "1px solid var(--border)", borderRadius: 8,
                 padding: "8px 12px", fontSize: 13, fontFamily: "var(--font)",
                 outline: "none",
@@ -136,9 +136,10 @@ export default function ResearchBot({ symbol, isPro }: ResearchBotProps) {
             <button
               onClick={() => handleAsk(input)}
               style={{
-                width: 36, height: 36, background: "#FFB81C", border: "none",
+                width: 36, height: 36, background: "var(--brand)", border: "none",
                 borderRadius: 8, cursor: "pointer", fontSize: 16,
                 display: "flex", alignItems: "center", justifyContent: "center",
+                color: "var(--text-inverse)",
               }}
             >
               {"\u2197"}

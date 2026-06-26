@@ -305,9 +305,9 @@ function StageOne({
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <div style={{ fontSize: 32, fontWeight: 600,
-                  color: (prediction.rankingScore ?? 0) >= 75 ? '#057A55' :
-                         (prediction.rankingScore ?? 0) >= 55 ? '#1A56DB' :
-                         (prediction.rankingScore ?? 0) >= 35 ? '#92400E' : '#C81E1E' }}>
+                  color: (prediction.rankingScore ?? 0) >= 75 ? 'var(--green-text)' :
+                         (prediction.rankingScore ?? 0) >= 55 ? 'var(--brand)' :
+                         (prediction.rankingScore ?? 0) >= 35 ? 'var(--amber-text)' : 'var(--red-text)' }}>
                   {prediction.rankingScore ?? '—'}
                 </div>
                 <div>

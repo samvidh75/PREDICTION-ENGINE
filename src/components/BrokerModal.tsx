@@ -4,8 +4,8 @@ import { BROKER_PARTNERS } from "./trade/brokers";
 export default function BrokerModal({ symbol, price, onClose }: { symbol: string; price: number | null; onClose: () => void }) {
   return (
     <Modal open={true} onClose={onClose} title="Choose your broker" width={520}>
-      <p style={{ fontSize: 13, color: '#888', marginBottom: 20, lineHeight: 1.6 }}>
-        Select your broker to invest in <strong style={{ color: '#0A0A0A' }}>
+      <p style={{ fontSize: 13, color: 'var(--text-500)', marginBottom: 20, lineHeight: 1.6 }}>
+        Select your broker to invest in <strong style={{ color: 'var(--text-900)' }}>
         {symbol}</strong>. You'll be redirected to their platform to complete
         your order.
       </p>
@@ -16,17 +16,17 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
              style={{
                display: 'flex', alignItems: 'center', gap: 12,
                padding: '14px 16px', borderRadius: 12,
-               border: '1.5px solid #E8E8E8', textDecoration: 'none',
+               border: '1.5px solid var(--border)', textDecoration: 'none',
                transition: 'border-color 0.15s, background 0.15s',
                cursor: 'pointer',
              }}
              onMouseEnter={e => {
-               e.currentTarget.style.borderColor = '#1a7f4b'
-               e.currentTarget.style.background = '#FAFFF8'
+               e.currentTarget.style.borderColor = 'var(--green-text)'
+               e.currentTarget.style.background = 'var(--green-tint)'
              }}
              onMouseLeave={e => {
-               e.currentTarget.style.borderColor = '#E8E8E8'
-               e.currentTarget.style.background = '#fff'
+               e.currentTarget.style.borderColor = 'var(--border)'
+               e.currentTarget.style.background = 'transparent'
              }}>
             <div style={{ width: 36, height: 36, borderRadius: 8,
                           background: b.color + '15', border: '1px solid ' + b.color + '30',
@@ -36,10 +36,10 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
               {b.logo}
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0A0A' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-900)' }}>
                 {b.name}
               </div>
-              <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-500)', marginTop: 1 }}>
                 {b.description}
               </div>
             </div>
@@ -47,8 +47,8 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
         ))}
       </div>
 
-      <p style={{ fontSize: 10, color: '#BBB', marginTop: 20, lineHeight: 1.5,
-                   borderTop: '1px solid #F5F5F5', paddingTop: 14 }}>
+      <p style={{ fontSize: 10, color: 'var(--text-300)', marginTop: 20, lineHeight: 1.5,
+                   borderTop: '1px solid var(--border)', paddingTop: 14 }}>
         StockStory India is not a broker and does not execute trades.
         Clicking a broker opens their website in a new tab.
         This is not investment advice.

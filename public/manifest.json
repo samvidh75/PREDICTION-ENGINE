@@ -6,7 +6,7 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#0F172A",
+  "theme_color": "#0066CC",
   "lang": "en-IN",
   "scope": "/",
   "categories": ["finance", "business", "investing"],

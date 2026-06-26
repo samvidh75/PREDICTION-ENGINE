@@ -164,7 +164,7 @@ export default function FinancialHistogram({
                   return (
                     <Cell
                       key={i}
-                      fill={hoveredIndex === i ? "#1240A8" : "#1A56DB"}
+                      fill={hoveredIndex === i ? "var(--brand-hover)" : "var(--brand)"}
                       opacity={hoveredIndex !== null && hoveredIndex !== i ? 0.45 : 1}
                       style={{ transition: "opacity 100ms, fill 100ms" }}
                     />

@@ -21,7 +21,7 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
     ? data[data.length - 1].close < data[0].close
     : false;
 
-  const lineColor = isNegative ? "#FF4757" : "#2DD4BF";
+  const lineColor = isNegative ? "var(--red-text)" : "var(--green-text)" ;
   const fillColor = lineColor;
 
   const currentPrice = data?.[data.length - 1]?.close ?? null;
@@ -63,7 +63,7 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
       {/* Price + change — top left */}
       <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: "white", letterSpacing: "-0.02em" }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: "var(--text-900)", letterSpacing: "-0.02em" }}>
             {currentPrice !== null ? `\u20B9${currentPrice.toLocaleString("en-IN", { minimumFractionDigits: 2 })}` : "—"}
           </div>
           {change !== null && changePercent !== null && (
@@ -81,9 +81,9 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
               onClick={() => setRange(r)}
               style={{
                 padding: "6px 11px", fontSize: 11, fontWeight: 700,
-                background: r === range ? "rgba(255,184,28,0.2)" : "transparent",
-                color: r === range ? "#FFB81C" : "#6E6E6E",
-                border: r === range ? "1px solid #FFB81C" : "1px solid #262626",
+                background: r === range ? "var(--brand-tint)" : "transparent",
+                color: r === range ? "var(--brand)" : "var(--text-300)",
+                border: r === range ? "1px solid var(--brand)" : "1px solid var(--border-strong)",
                 borderRadius: 6, cursor: "pointer", fontFamily: "var(--font)",
                 transition: "all 100ms",
               }}
@@ -104,16 +104,16 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
             </linearGradient>
           </defs>
 
-          <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <CartesianGrid strokeDasharray="0" stroke="var(--border)" vertical={false} />
           <XAxis
             dataKey="date"
-            tick={{ fontSize: 11, fill: "#6E6E6E", fontFamily: "var(--font)" }}
+            tick={{ fontSize: 11, fill: "var(--text-300)", fontFamily: "var(--font)" }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             orientation="right"
-            tick={{ fontSize: 11, fill: "#6E6E6E", fontFamily: "var(--font)" }}
+            tick={{ fontSize: 11, fill: "var(--text-300)", fontFamily: "var(--font)" }}
             tickLine={false}
             axisLine={false}
             width={60}
@@ -125,10 +125,11 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
               const val = payload[0].value as number;
               return (
                 <div style={{
-                  background: "#252525", border: "1px solid rgba(255,255,255,0.12)",
+                  background: "var(--surface)", border: "1px solid var(--border-strong)",
                   borderRadius: 10, padding: "12px 14px", fontFamily: "var(--font)",
+                  boxShadow: "var(--sh-float)",
                 }}>
-                  <div style={{ fontSize: 12, color: "#A0A0A0", marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 12, color: "var(--text-500)", marginBottom: 4 }}>{label}</div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: lineColor }}>
                     \u20B9{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </div>

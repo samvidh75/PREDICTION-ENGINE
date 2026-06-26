@@ -14,8 +14,8 @@ interface FinancialChartProps {
 }
 
 const METRIC_LABELS = { revenue: "Revenue (\u20B9 Cr)", pat: "Net Profit (\u20B9 Cr)", ebitda: "EBITDA (\u20B9 Cr)" };
-const BAR_COLOR = "#2DD4BF";
-const HOVER_COLOR = "#FFB81C";
+const BAR_COLOR = "var(--green-text)";
+const HOVER_COLOR = "var(--brand)";
 
 export default function FinancialChart({ data, metric }: FinancialChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -23,15 +23,15 @@ export default function FinancialChart({ data, metric }: FinancialChartProps) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data} margin={{ top: 16, right: 16, bottom: 40, left: 0 }}>
-        <CartesianGrid strokeDasharray="0" stroke="rgba(255,255,255,0.06)" vertical={false} />
+        <CartesianGrid strokeDasharray="0" stroke="var(--border)" vertical={false} />
         <XAxis
           dataKey="period"
-          tick={{ fontSize: 11, fill: "#6E6E6E", fontFamily: "var(--font)" }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          tick={{ fontSize: 11, fill: "#6E6E6E", fontFamily: "var(--font)" }}
+            tick={{ fontSize: 11, fill: "var(--text-300)", fontFamily: "var(--font)" }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 11, fill: "var(--text-300)", fontFamily: "var(--font)" }}
           axisLine={false}
           tickLine={false}
           width={50}
@@ -43,16 +43,16 @@ export default function FinancialChart({ data, metric }: FinancialChartProps) {
             const val = payload[0].value as number;
             return (
               <div style={{
-                background: "#252525",
-                border: "1px solid rgba(255,255,255,0.12)",
+                background: "var(--surface)",
+                border: "1px solid var(--border-strong)",
                 borderRadius: 10,
                 padding: "12px 14px",
                 fontFamily: "var(--font)",
               }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#FFB81C" }}>
-                  \u20B9{(val / 1000).toFixed(1)}K Cr
-                </div>
-                <div style={{ fontSize: 11, color: "#A0A0A0", marginTop: 3 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--brand)" }}>
+                    \u20B9{(val / 1000).toFixed(1)}K Cr
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-500)", marginTop: 3 }}>
                   {METRIC_LABELS[metric]}
                 </div>
               </div>
