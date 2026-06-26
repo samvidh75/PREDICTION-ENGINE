@@ -1,3 +1,8 @@
+export { IndianAPIProvider } from './IndianAPI';
+export { YahooProvider } from './Yahoo';
+export { ScreenerProvider } from './Screener';
+export { UpstoxProvider } from './Upstox';
+
 export interface IDataProvider {
   name: string;
   isAvailable(): Promise<boolean>;
