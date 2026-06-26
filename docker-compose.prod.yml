@@ -36,6 +36,9 @@ services:
           cpus: "0.25"
 
   postgres:
+    environment:
+      POSTGRES_MAX_CONNECTIONS: 20
+      POSTGRES_SHARED_BUFFERS: 256MB
     deploy:
       resources:
         limits:

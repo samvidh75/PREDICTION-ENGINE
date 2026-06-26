@@ -1,0 +1,14 @@
+config:
+  target: "https://prediction-engine-production-f7a8.up.railway.app"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+
+scenarios:
+  - name: "LLM Requests"
+    flow:
+      - post:
+          url: "/api/free/chat"
+          json:
+            symbol: "TCS"
+            message: "What is PE?"
