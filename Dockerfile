@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: build ───────────────────────────────────────────────────────────
-FROM node:22-alpine3.20 AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
@@ -18,20 +18,27 @@ RUN npm run build
 RUN npm run compile:backend
 
 # ── Stage 2: production runtime ───────────────────────────────────────────────
-FROM node:22-alpine3.20 AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 RUN mkdir -p data
 
-# Install Python 3.12 (Alpine 3.20) for public NSE data providers
-# jugaad-data, nsepython — no credentials needed
-RUN apk add --no-cache python3 py3-pip py3-virtualenv && \
+# Install Python 3 for public NSE data providers
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip python3-venv && \
+    rm -rf /var/lib/apt/lists/* && \
     python3 --version
 
 ENV NODE_ENV=production
 
-# Only install production dependencies
+# Install all dependencies (tsx needed for runtime path alias resolution)
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile --omit=dev
+RUN npm ci --frozen-lockfile
+
+# Remove dev dependencies except tsx (needed for runtime)
+RUN npm prune --omit=dev || true && \
+    npm install --no-save tsx 2>/dev/null || true
+
+# Ensure tsx is available
+RUN npx tsx --version
 
 # Create Python venv and install dependencies
 # Using venv avoids PEP 668 --break-system-packages requirement
@@ -44,9 +51,6 @@ RUN pip install --no-cache-dir -r requirements-nse.txt
 COPY scripts/check-python-runtime.ts ./scripts/check-python-runtime.ts
 COPY scripts/probe-jugaad-data-provider.py ./scripts/probe-jugaad-data-provider.py
 COPY scripts/probe-nsepython-provider.py ./scripts/probe-nsepython-provider.py
-
-# Copy compiled frontend assets
-COPY --from=builder /app/dist ./dist
 
 # Copy source code (for tsx runtime resolution of @/ path aliases)
 COPY --from=builder /app/src ./src
