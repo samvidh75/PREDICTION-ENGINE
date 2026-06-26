@@ -1,0 +1,76 @@
+# Canary Rollout Configuration
+# Phased rollout of SGLang LLM features to production users
+
+stages:
+  - name: 10-percent
+    percentage: 10
+    duration_hours: 6
+    success_criteria:
+      max_latency_ms: 30000
+      max_error_rate: 0.001
+      min_success_rate: 0.99
+    rollback_conditions:
+      - latency_p99_exceeds: 60000
+      - error_rate_exceeds: 0.01
+    monitoring:
+      check_interval_minutes: 10
+      alerts:
+        - sglang-health-failed
+        - sglang-high-latency
+
+  - name: 25-percent
+    percentage: 25
+    duration_hours: 12
+    success_criteria:
+      max_latency_ms: 30000
+      max_error_rate: 0.001
+      min_success_rate: 0.99
+    rollback_conditions:
+      - latency_p99_exceeds: 45000
+      - error_rate_exceeds: 0.005
+    monitoring:
+      check_interval_minutes: 15
+
+  - name: 50-percent
+    percentage: 50
+    duration_hours: 24
+    success_criteria:
+      max_latency_ms: 30000
+      max_error_rate: 0.0005
+      min_success_rate: 0.995
+    rollback_conditions:
+      - latency_p99_exceeds: 45000
+      - error_rate_exceeds: 0.002
+    monitoring:
+      check_interval_minutes: 30
+
+  - name: 100-percent
+    percentage: 100
+    duration_hours: 0
+    success_criteria:
+      max_latency_ms: 30000
+      max_error_rate: 0.0001
+      min_success_rate: 0.999
+    rollback_conditions:
+      - latency_p99_exceeds: 60000
+      - error_rate_exceeds: 0.001
+    monitoring:
+      check_interval_minutes: 60
+
+feature_flags:
+  sglang:
+    enabled: false  # Master toggle
+    cpu_mode: true
+    timeout_ms: 30000
+
+rollback_procedure:
+  steps:
+    - action: "Set ENABLE_SGLANG=false in Railway"
+      duration: 10s
+      impact: "Falls back to deterministic narratives"
+    - action: "Verify fallback working via /api/llm-health"
+      duration: 10s
+    - action: "Restore previous SGLANG_URL if changed"
+      duration: 30s
+    - action: "Notify team via Slack"
+      duration: 0s
