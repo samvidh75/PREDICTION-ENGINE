@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styles from './StockDetail.module.css';
+import { ShareholdingChart } from './ShareholdingChart';
+import { FinancialChart } from './FinancialChart';
 
 export function StockDetail() {
   const { symbol } = useParams<{ symbol: string }>();
@@ -85,17 +87,40 @@ export function StockDetail() {
           <button className={styles.btnSecondary}>Invest</button>
         </section>
 
-        <section className={styles.newsSection}>
-          <h2 className={styles.sectionTitle}>Recent News</h2>
-          <div className={styles.newsList}>
-            {stock.news.map((item: string, idx: number) => (
-              <div key={idx} className={styles.newsItem}>
-                {item}
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
+<section className={styles.newsSection}>
+            <h2 className={styles.sectionTitle}>Recent News</h2>
+            <div className={styles.newsList}>
+              {stock.news.map((item: string, idx: number) => (
+                <div key={idx} className={styles.newsItem}>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <ShareholdingChart
+            data={{
+              promoter: 51.0,
+              fii: 20.77,
+              dii: 19.26,
+              retails: 8.97,
+              qoqChange: {
+                promoter: 0,
+                fii: 1.35,
+                dii: -1.09,
+                retails: -0.26,
+              },
+            }}
+          />
+
+          <FinancialChart
+            data={{
+              quarters: ['Mar-25', 'Jun-25', 'Sep-25', 'Dec-25', 'Mar-26'],
+              revenue: [2596, 3040, 3293, 3170, 3155],
+              netProfit: [800, 950, 1100, 1050, 1020],
+            }}
+          />
+        </main>
     </div>
   );
 }
