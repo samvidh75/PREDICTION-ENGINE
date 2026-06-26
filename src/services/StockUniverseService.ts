@@ -25,7 +25,7 @@ export class StockUniverseService {
     try {
       const res = await query(
         `SELECT * FROM stocks
-         WHERE is_active = 1
+         WHERE is_active
            AND (UPPER(symbol) LIKE UPPER($1) OR UPPER(name) LIKE UPPER($2))
          ORDER BY
            CASE WHEN UPPER(symbol) = UPPER($3) THEN 0 ELSE 1 END,
