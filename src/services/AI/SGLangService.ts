@@ -4,7 +4,8 @@ import { dataFreshnessManager } from '../DataFreshnessManager';
 import { batchQueue } from '../BatchQueue';
 import type { SGLangResponse, StockAnalysis } from './types';
 
-const SGLANG_API = process.env.SGLANG_URL || process.env.SGLANG_INTELLIGENCE_URL || 'http://localhost:11434';
+const OLLAMA_URL = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'mistral';
 
 function extractJson(text: string): Record<string, any> | null {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -27,16 +28,16 @@ export class SGLangService {
     if (this.useExternal) {
       const { default: axios } = await import('axios');
       const response = await axios.post(
-        `${SGLANG_API}/v1/completions`,
+        `${OLLAMA_URL}/api/generate`,
         {
-          model: 'mistral',
+          model: OLLAMA_MODEL,
           prompt,
-          max_tokens: maxTokens,
-          temperature: 0.3,
+          options: { num_predict: maxTokens, temperature: 0.3 },
+          stream: false,
         },
         { timeout: 30000 }
       );
-      const text = response.data.choices?.[0]?.text || response.data.text;
+      const text = response.data.response;
       const parsed = extractJson(text);
       if (parsed) return parsed;
       return JSON.parse(text);
@@ -167,7 +168,7 @@ export class SGLangService {
     if (this.useExternal) {
       try {
         const { default: axios } = await import('axios');
-        const response = await axios.get(`${SGLANG_API}/health`, { timeout: 5000 });
+        const response = await axios.get(`${OLLAMA_URL}/api/tags`, { timeout: 5000 });
         return response.status === 200;
       } catch {
         return false;
