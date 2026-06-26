@@ -8,6 +8,13 @@ vi.mock('../../MarketConfigService', () => ({
   marketConfigService: {
     getMarketStatus: vi.fn().mockResolvedValue({ isOpen: true }),
     getDataSource: vi.fn().mockResolvedValue('live'),
+    shouldFetchFreshData: vi.fn().mockResolvedValue(true),
+  },
+}));
+vi.mock('../../BatchQueue', () => ({
+  batchQueue: {
+    enqueue: vi.fn((_key: string, executor: () => Promise<any>) => executor()),
+    getQueueSize: vi.fn().mockReturnValue(0),
   },
 }));
 

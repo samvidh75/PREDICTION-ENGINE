@@ -17,6 +17,14 @@ vi.mock('../../../db/index', () => ({
 vi.mock('../../MarketConfigService', () => ({
   marketConfigService: {
     getMarketStatus: vi.fn().mockResolvedValue({ isOpen: true }),
+    shouldFetchFreshData: vi.fn().mockResolvedValue(true),
+  },
+}));
+
+vi.mock('../../BatchQueue', () => ({
+  batchQueue: {
+    enqueue: vi.fn((_key: string, executor: () => Promise<any>) => executor()),
+    getQueueSize: vi.fn().mockReturnValue(0),
   },
 }));
 
@@ -104,7 +112,7 @@ describe('StockSnapshotService', () => {
 
   it('generates snapshot with all four analysis dimensions', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"analysis": "Strong margins and ROE"}', usage: { completion_tokens: 30 } },
+      data: { response: '{"analysis": "Strong margins and ROE"}', usage: { completion_tokens: 30 } },
     });
 
     const result = await service.generateSnapshot({
@@ -177,7 +185,7 @@ describe('ScannerThesisService', () => {
 
   it('batch generates theses for multiple stocks', async () => {
     mockAxios.post.mockResolvedValue({
-      data: { text: '{"thesis": "Generic thesis"}', usage: { completion_tokens: 20 } },
+      data: { response: '{"thesis": "Generic thesis"}', usage: { completion_tokens: 20 } },
     });
     const results = await service.batchGenerate([
       { symbol: 'TCS', companyName: 'TCS Ltd', score: 75, quality: 85, valuation: 35, growth: 55, momentum: 60 },
