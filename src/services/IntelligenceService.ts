@@ -333,9 +333,11 @@ Rank these stocks for investment. Return JSON:
       });
       return response.data.response;
     } catch (error: any) {
-      const detail = error?.response?.data || error?.message || String(error);
-      console.error('Ollama generation error:', JSON.stringify(detail));
-      throw new Error(`Failed to generate text: ${typeof detail === 'string' ? detail : JSON.stringify(detail)}`);
+      const errData = error?.response?.data;
+      const errMsg = error?.message || String(error);
+      const errStatus = error?.response?.status;
+      console.error('Ollama generation error:', { status: errStatus, data: errData, message: errMsg });
+      throw new Error(`Ollama error (${errStatus}): ${errMsg} ${errData ? JSON.stringify(errData).slice(0, 200) : ''}`);
     }
   }
 

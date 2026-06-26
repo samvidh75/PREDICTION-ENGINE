@@ -46,6 +46,34 @@ const sglangRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     },
   );
 
+  fastify.get('/api/sglang/ollama-test', async (_request, reply) => {
+    try {
+      const { default: axios } = await import('axios');
+      const ollamaUrl = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://ollama:11434';
+      const model = process.env.OLLAMA_MODEL || 'qwen2.5:0.5b';
+
+      const [tagsRes, genRes] = await Promise.allSettled([
+        axios.get(`${ollamaUrl}/api/tags`, { timeout: 5000 }),
+        axios.post(`${ollamaUrl}/api/generate`, {
+          model,
+          prompt: 'Say OK',
+          options: { num_predict: 10 },
+          stream: false,
+        }, { timeout: 30000 }),
+      ]);
+
+      return reply.send({
+        tagsStatus: tagsRes.status === 'fulfilled' ? (tagsRes.value.data?.models || []).map((m: any) => m.name) : tagsRes.reason?.message,
+        genStatus: genRes.status === 'fulfilled' ? genRes.value.data : String(genRes.reason?.response?.data || genRes.reason?.message),
+      });
+    } catch (error) {
+      return reply.status(500).send({
+        error: 'Ollama test failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
+
   fastify.post<{ Body: { symbol: string; fundamentals?: any } }>(
     '/api/sglang/thesis',
     async (request, reply) => {
