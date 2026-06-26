@@ -6,8 +6,7 @@
     "noEmit": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
-    "types": ["vite/client", "vitest/globals"],
-    "paths": {}
+    "types": ["vite/client", "vitest/globals"]
   },
   "include": [
     "src/env-shim.js",
@@ -55,6 +54,7 @@
     "src/types/**/*.tsx",
     "src/systems/**/*.ts",
     "src/systems/**/*.tsx",
+    "src/engines/**/*.ts",
     "src/**/*.d.ts"
   ],
   "exclude": [
@@ -86,7 +86,6 @@
     "src/risk/**",
     "src/stockstory/**",
     "src/symbols/**",
-    "src/engines/**",
     "src/engine/**",
     "src/explainability/**",
     "src/core/**",
