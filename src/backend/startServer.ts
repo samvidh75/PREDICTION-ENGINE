@@ -186,12 +186,52 @@ async function runStartupMaintenanceJob(): Promise<void> {
 const port = Number(process.env.PORT ?? 4001);
 const host = process.env.HOST ?? "0.0.0.0";
 
+async function pullOllamaModel(): Promise<void> {
+  const ollamaUrl = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || process.env.OLLAMA_URL;
+  const model = process.env.OLLAMA_MODEL || 'llama3.2:1b';
+  if (!ollamaUrl) return;
+  try {
+    console.info(`[ollama] Checking model "${model}"...`);
+    const { default: axios } = await import('axios');
+    const tagsRes = await axios.get(`${ollamaUrl}/api/tags`, { timeout: 5000 });
+    const models = tagsRes.data.models || [];
+    if (models.some((m: any) => m.name === model || m.name?.startsWith(model))) {
+      console.info(`[ollama] Model "${model}" already available`);
+      return;
+    }
+    console.info(`[ollama] Pulling model "${model}" (this may take a while)...`);
+    await axios.post(`${ollamaUrl}/api/pull`, { model, stream: false }, { timeout: 300000 });
+    console.info(`[ollama] Model "${model}" pulled successfully`);
+  } catch (err) {
+    console.warn(`[ollama] Could not pull model: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
 async function main(): Promise<void> {
   // Run production maintenance job if env var is set (inside Railway container with PG access).
   await runStartupMaintenanceJob();
 
   // Run pending migrations on startup.
   await runStartupMigrations();
+
+  // Pull Ollama model if not available (Railway deployment)
+  await pullOllamaModel();
+
+  // Seed stock universe on first deploy
+  try {
+    const { stockUniverseService } = await import('../services/StockUniverseService');
+    const { StockUniverseSyncJob } = await import('../jobs/StockUniverseSyncJob');
+    const stats = await stockUniverseService.getUniverseStats();
+    if (stats.totalStocks === 0) {
+      console.info('[startup] Seeding stock universe...');
+      await StockUniverseSyncJob.syncAll();
+      console.info('[startup] Stock universe seeded');
+    } else {
+      console.info(`[startup] Stock universe already seeded (${stats.totalStocks} stocks)`);
+    }
+  } catch (err) {
+    console.warn(`[startup] Could not seed stocks: ${err instanceof Error ? err.message : String(err)}`);
+  }
 
   const app = await buildServer();
 
