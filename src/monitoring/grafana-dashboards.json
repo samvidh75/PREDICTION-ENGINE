@@ -1,0 +1,41 @@
+{
+  "dashboards": [
+    {
+      "name": "StockStory LLM Metrics",
+      "panels": [
+        {
+          "title": "LLM Calls Per Hour",
+          "targets": [
+            {
+              "expr": "rate(llm_calls_total[1h])"
+            }
+          ]
+        },
+        {
+          "title": "Average LLM Latency",
+          "targets": [
+            {
+              "expr": "avg(llm_latency_seconds)"
+            }
+          ]
+        },
+        {
+          "title": "Vector Search Count",
+          "targets": [
+            {
+              "expr": "rate(vector_searches_total[1h])"
+            }
+          ]
+        },
+        {
+          "title": "Ollama Model Memory",
+          "targets": [
+            {
+              "expr": "ollama_model_memory_bytes"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
