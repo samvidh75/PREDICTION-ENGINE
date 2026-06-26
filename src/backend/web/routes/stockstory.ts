@@ -23,6 +23,13 @@ import {
 import { assessPredictionSnapshotFreshness } from '../../../shared/data/DataFreshness';
 import { healthometerEngine } from '../../../stockstory/healthometer/HealthometerEngine';
 import type { HealthometerScore } from '../../../stockstory/healthometer/types';
+import { evaluateMarketBrainInput, toMarketBrainResearchView } from '../../../systems/market-brain';
+
+const asFiniteNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 
 export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/stockstory/:ticker', async (request, reply) => {
@@ -38,11 +45,6 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         message: `Horizon ${query.horizon} is not valid. Allowed: ${VALID_HORIZONS.join(', ')}`,
       });
     }
-    const asFiniteNumber = (value: unknown): number | null => {
-      if (value === null || value === undefined || value === '') return null;
-      const parsed = Number(value);
-      return Number.isFinite(parsed) ? parsed : null;
-    };
 
     try {
       // Step 1 — Check if symbol exists in the symbols table
@@ -353,6 +355,96 @@ export const stockstoryRoutes: FastifyPluginAsync = async (app) => {
         'BACKEND_UNAVAILABLE',
         `StockStory evaluation is temporarily unavailable for ${symbol}.`
       );
+    }
+  });
+
+  app.get('/api/stockstory/:ticker/research', async (request, reply) => {
+    const log = request.log;
+    const { ticker } = request.params as { ticker: string };
+    const symbol = ticker.toUpperCase().trim();
+
+    try {
+      const symInfo = await pool.query(
+        `SELECT symbol, sector FROM symbols WHERE symbol = $1`,
+        [symbol]
+      );
+
+      if (symInfo.rows.length === 0) {
+        return reply.status(404).send({
+          code: 'SYMBOL_NOT_IN_UNIVERSE',
+          symbol,
+          message: 'This company is not available in the research universe yet.',
+        });
+      }
+
+      const sector = symInfo.rows[0].sector || 'General';
+      const [financialRes, featureRes] = await Promise.all([
+        pool.query(
+          `SELECT pe_ratio, pb_ratio, ev_ebitda, roe, roa, roce,
+                  debt_to_equity, current_ratio, operating_margin,
+                  revenue_growth, profit_growth, fcf_yield,
+                  market_cap, dividend_yield
+           FROM financial_snapshots
+           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+           ORDER BY snapshot_date DESC LIMIT 1`,
+          [symbol]
+        ),
+        pool.query(
+          `SELECT volatility, momentum, rsi, trend_strength
+           FROM feature_snapshots
+           WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+           ORDER BY trade_date DESC LIMIT 1`,
+          [symbol]
+        ),
+      ]);
+
+      const financials = (financialRes.rows?.[0] || null) as Record<string, unknown> | null;
+      const features = (featureRes.rows?.[0] || null) as Record<string, unknown> | null;
+      const result = evaluateMarketBrainInput(
+        {
+          symbol,
+          sector: { name: sector },
+          financials: {
+            peRatio: asFiniteNumber(financials?.pe_ratio),
+            pbRatio: asFiniteNumber(financials?.pb_ratio),
+            evEbitda: asFiniteNumber(financials?.ev_ebitda),
+            roe: asFiniteNumber(financials?.roe),
+            roa: asFiniteNumber(financials?.roa),
+            roic: asFiniteNumber(financials?.roce),
+            debtToEquity: asFiniteNumber(financials?.debt_to_equity),
+            currentRatio: asFiniteNumber(financials?.current_ratio),
+            operatingMargin: asFiniteNumber(financials?.operating_margin),
+            revenueGrowth: asFiniteNumber(financials?.revenue_growth),
+            profitGrowth: asFiniteNumber(financials?.profit_growth),
+            fcfYield: asFiniteNumber(financials?.fcf_yield),
+            marketCap: asFiniteNumber(financials?.market_cap),
+            dividendYield: asFiniteNumber(financials?.dividend_yield),
+          },
+          features: {
+            volatility: asFiniteNumber(features?.volatility),
+            momentum: asFiniteNumber(features?.momentum),
+            rsi: asFiniteNumber(features?.rsi),
+            trendStrength: asFiniteNumber(features?.trend_strength),
+          },
+        },
+        {
+          name: symbol,
+          sector,
+        }
+      );
+
+      return reply.send({
+        symbol,
+        companyName: result.companyName,
+        research: toMarketBrainResearchView(result),
+      });
+    } catch (err: any) {
+      log.error({ err, symbol }, 'market brain research failed');
+      return reply.status(503).send({
+        code: 'RESEARCH_TEMPORARILY_UNAVAILABLE',
+        symbol,
+        message: 'Research is temporarily unavailable for this company.',
+      });
     }
   });
 };
