@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { runHealthCheck } from "@/utils/health-check";
 import { queryClient } from "./core/config/QueryClientConfig";
@@ -9,27 +9,32 @@ import TokenProvider from "./shared/ui/foundations/TokenProvider";
 import { buildTokenCssVars } from "./shared/ui/foundations/tokenCssVarMaps";
 import PageErrorBoundary from "./components/diagnostics/PageErrorBoundary";
 import AppShell from "./components/layout/AppShell";
-import HomePage from "./pages/HomePage";
-import ScannerPage from "./pages/ScannerPage";
-import StockDetailPage from "./pages/StockPage";
-import StockResearchPage from "./pages/StockResearchPage";
-import WatchlistPage from "./pages/WatchlistPage";
-import ComparePage from "./pages/ComparePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/SignupPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import PricingPage from "./pages/PricingPage";
-import SearchPage from "./pages/SearchPage";
-import AlertsPage from "./pages/AlertsPage";
-import PortfolioPage from "./pages/PortfolioPage";
-import SettingsPage from "./pages/SettingsPage";
-import TermsPage from "./pages/TermsPage";
-import PublicAboutPage from "./pages/PublicAboutPage";
-import TrustCentrePage from "./pages/TrustCentrePage";
-import IPOCenterPage from "./pages/IPOCenterPage";
-import TrackPage from "./pages/TrackPage";
-import MorePage from "./pages/MorePage";
-import { MetricsDashboard } from "./components/admin/MetricsDashboard";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ScannerPage = lazy(() => import("./pages/ScannerPage"));
+const StockDetailPage = lazy(() => import("./pages/StockPage"));
+const StockResearchPage = lazy(() => import("./pages/StockResearchPage"));
+const WatchlistPage = lazy(() => import("./pages/WatchlistPage"));
+const ComparePage = lazy(() => import("./pages/ComparePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/SignupPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const PricingPage = lazy(() => import("./pages/PricingPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage"));
+const AlertsPage = lazy(() => import("./pages/AlertsPage"));
+const PortfolioPage = lazy(() => import("./pages/PortfolioPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const PublicAboutPage = lazy(() => import("./pages/PublicAboutPage"));
+const TrustCentrePage = lazy(() => import("./pages/TrustCentrePage"));
+const IPOCenterPage = lazy(() => import("./pages/IPOCenterPage"));
+const TrackPage = lazy(() => import("./pages/TrackPage"));
+const MorePage = lazy(() => import("./pages/MorePage"));
+const MetricsDashboard = lazy(() => import("./components/admin/MetricsDashboard").then(m => ({ default: m.MetricsDashboard })));
+
+function PageSuspense({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading...</div>}>{children}</Suspense>;
+}
 
 function usePageMeta(title: string, desc: string) {
   useEffect(() => {
@@ -117,27 +122,27 @@ export default function App() {
               <BrowserRouter>
                 <AppShell>
                   <Routes>
-                    <Route path="/" element={<RouteMetaPage><HomePage /></RouteMetaPage>} />
-                    <Route path="/stock/:symbol" element={<StockPageWrapper />} />
-                    <Route path="/scanner" element={<RouteMetaPage><ScannerPage /></RouteMetaPage>} />
-                    <Route path="/watchlist" element={<RouteMetaPage><WatchlistPage /></RouteMetaPage>} />
-                    <Route path="/compare" element={<RouteMetaPage><ComparePage /></RouteMetaPage>} />
-                    <Route path="/login" element={<RouteMetaPage><LoginPage /></RouteMetaPage>} />
-                    <Route path="/register" element={<RouteMetaPage><RegisterPage /></RouteMetaPage>} />
-                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                    <Route path="/pricing" element={<RouteMetaPage><PricingPage /></RouteMetaPage>} />
-                    <Route path="/search" element={<RouteMetaPage><SearchPage /></RouteMetaPage>} />
-                    <Route path="/stock/research/:symbol" element={<StockResearchPageWrapper />} />
-                    <Route path="/alerts" element={<RouteMetaPage><AlertsPage /></RouteMetaPage>} />
-                    <Route path="/portfolio" element={<RouteMetaPage><PortfolioPage /></RouteMetaPage>} />
-                    <Route path="/settings" element={<RouteMetaPage><SettingsPage /></RouteMetaPage>} />
-                    <Route path="/terms" element={<RouteMetaPage><TermsPage /></RouteMetaPage>} />
-                    <Route path="/about" element={<RouteMetaPage><PublicAboutPage /></RouteMetaPage>} />
-                    <Route path="/methodology" element={<RouteMetaPage><TrustCentrePage /></RouteMetaPage>} />
-                    <Route path="/ipo" element={<RouteMetaPage><IPOCenterPage /></RouteMetaPage>} />
-                    <Route path="/track" element={<RouteMetaPage><TrackPage /></RouteMetaPage>} />
-                    <Route path="/more" element={<RouteMetaPage><MorePage /></RouteMetaPage>} />
-                    <Route path="/admin/metrics" element={<MetricsDashboard />} />
+                    <Route path="/" element={<PageSuspense><RouteMetaPage><HomePage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/stock/:symbol" element={<PageSuspense><StockPageWrapper /></PageSuspense>} />
+                    <Route path="/scanner" element={<PageSuspense><RouteMetaPage><ScannerPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/watchlist" element={<PageSuspense><RouteMetaPage><WatchlistPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/compare" element={<PageSuspense><RouteMetaPage><ComparePage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/login" element={<PageSuspense><RouteMetaPage><LoginPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/register" element={<PageSuspense><RouteMetaPage><RegisterPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/forgot-password" element={<PageSuspense><ForgotPasswordPage /></PageSuspense>} />
+                    <Route path="/pricing" element={<PageSuspense><RouteMetaPage><PricingPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/search" element={<PageSuspense><RouteMetaPage><SearchPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/stock/research/:symbol" element={<PageSuspense><StockResearchPageWrapper /></PageSuspense>} />
+                    <Route path="/alerts" element={<PageSuspense><RouteMetaPage><AlertsPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/portfolio" element={<PageSuspense><RouteMetaPage><PortfolioPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/settings" element={<PageSuspense><RouteMetaPage><SettingsPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/terms" element={<PageSuspense><RouteMetaPage><TermsPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/about" element={<PageSuspense><RouteMetaPage><PublicAboutPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/methodology" element={<PageSuspense><RouteMetaPage><TrustCentrePage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/ipo" element={<PageSuspense><RouteMetaPage><IPOCenterPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/track" element={<PageSuspense><RouteMetaPage><TrackPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/more" element={<PageSuspense><RouteMetaPage><MorePage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/admin/metrics" element={<PageSuspense><MetricsDashboard /></PageSuspense>} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </AppShell>

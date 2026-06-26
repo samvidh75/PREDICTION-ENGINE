@@ -20,7 +20,7 @@
   color: var(--text-900);
 }
 
-.freshness {
+.marketStateLabel {
   font-size: var(--sz-2xs);
   color: var(--text-500);
 }

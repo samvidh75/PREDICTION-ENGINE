@@ -21,9 +21,9 @@ interface MarketSnapshot {
 export class MarketConfigService {
   private static instance: MarketConfigService;
 
-  private readonly MARKET_OPEN = 9 * 60 + 30;
-  private readonly MARKET_CLOSE = 15 * 60 + 30;
-  private readonly PREOPEN = 9 * 60;
+  private readonly MARKET_OPEN = this.parseTime(process.env.MARKET_OPEN || '09:30');
+  private readonly MARKET_CLOSE = this.parseTime(process.env.MARKET_CLOSE || '15:30');
+  private readonly PREOPEN = this.MARKET_OPEN - 30;
 
   private holidays: string[] = [];
   private holidaysLoaded = false;
@@ -168,6 +168,11 @@ export class MarketConfigService {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────
+
+  private parseTime(timeStr: string): number {
+    const [h, m] = timeStr.split(':').map(Number);
+    return (h || 9) * 60 + (m || 30);
+  }
 
   private toIST(date: Date): Date {
     return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));

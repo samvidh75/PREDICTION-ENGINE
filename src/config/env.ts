@@ -7,6 +7,11 @@ export const ENV = {
   PORT: parseInt(process.env.PORT || '3001', 10),
   CACHE_TTL_MS: parseInt(process.env.CACHE_TTL_MS || '300000', 10),
   SCREENER_RATE_LIMIT_MS: parseInt(process.env.SCREENER_RATE_LIMIT_MS || '12000', 10),
+  MARKET_TIMEZONE: process.env.MARKET_TIMEZONE || 'Asia/Kolkata',
+  MARKET_OPEN: process.env.MARKET_OPEN || '09:30',
+  MARKET_CLOSE: process.env.MARKET_CLOSE || '15:30',
+  SGLANG_URL: process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://localhost:11434',
+  OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'mistral',
 };
 
 export const isProd = ENV.NODE_ENV === 'production';

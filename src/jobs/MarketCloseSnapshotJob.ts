@@ -1,5 +1,6 @@
 import { marketConfigService } from '../services/MarketConfigService';
 import { quoteService } from '../services/QuoteService';
+import { stockUniverseService } from '../services/StockUniverseService';
 import { query } from '../db/index';
 
 interface SnapshotJobResult {
@@ -8,19 +9,6 @@ interface SnapshotJobResult {
   stocksCount: number;
   error?: string;
 }
-
-const WATCHLIST_SYMBOLS = [
-  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
-  'HINDUNILVR', 'ITC', 'SBIN', 'BHARTIARTL', 'KOTAKBANK',
-  'BAJFINANCE', 'LT', 'WIPRO', 'AXISBANK', 'TITAN',
-  'ASIANPAINT', 'MARUTI', 'SUNPHARMA', 'NTPC', 'ONGC',
-  'POWERGRID', 'NESTLEIND', 'M&M', 'TATAMOTORS', 'TATASTEEL',
-  'JSWSTEEL', 'TECHM', 'HCLTECH', 'INDUSINDBK', 'BAJAJFINSV',
-  'ADANIENT', 'ADANIPORTS', 'DRREDDY', 'CIPLA', 'ULTRACEMCO',
-  'GRASIM', 'DIVISLAB', 'HDFCLIFE', 'SBILIFE', 'EICHERMOT',
-  'COALINDIA', 'BRITANNIA', 'HEROMOTOCO', 'BPCL', 'HINDALCO',
-  'IOC', 'SHREECEM', 'LTIM', 'BAJAJHLDNG', 'DMART',
-];
 
 export class MarketCloseSnapshotJob {
   static async execute(): Promise<SnapshotJobResult> {
@@ -38,13 +26,17 @@ export class MarketCloseSnapshotJob {
         };
       }
 
+      const universe = await stockUniverseService.getTopStocks('NSE', 2000);
+      const symbols = universe.map(s => s.symbol);
+      console.info(`[SnapshotJob] Snapshotting ${symbols.length} stocks from universe`);
+
       const snapshotData: Record<string, any> = {};
       const batchSize = 10;
       let successCount = 0;
       let failCount = 0;
 
-      for (let i = 0; i < WATCHLIST_SYMBOLS.length; i += batchSize) {
-        const batch = WATCHLIST_SYMBOLS.slice(i, i + batchSize);
+      for (let i = 0; i < symbols.length; i += batchSize) {
+        const batch = symbols.slice(i, i + batchSize);
         const results = await Promise.allSettled(
           batch.map(async (symbol) => {
             const quote = await quoteService.getQuote(symbol);
@@ -61,7 +53,7 @@ export class MarketCloseSnapshotJob {
           }
         }
 
-        console.info(`[SnapshotJob] Progress: ${Math.min(i + batchSize, WATCHLIST_SYMBOLS.length)}/${WATCHLIST_SYMBOLS.length}`);
+        console.info(`[SnapshotJob] Progress: ${Math.min(i + batchSize, symbols.length)}/${symbols.length}`);
       }
 
       const metadata = {

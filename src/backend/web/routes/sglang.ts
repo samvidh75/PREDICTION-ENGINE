@@ -93,6 +93,42 @@ const sglangRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       }
     },
   );
+
+  fastify.post<{ Body: { symbol: string; fundamentals?: any } }>(
+    '/api/sglang/risks',
+    async (request, reply) => {
+      try {
+        const { symbol } = request.body;
+        const risks = await sglangService.generateRiskFactors(symbol);
+        return reply.send({ symbol, risks, timestamp: new Date().toISOString() });
+      } catch (error) {
+        return reply.status(500).send({
+          error: 'Risk generation failed',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    },
+  );
+
+  fastify.post<{ Body: { symbol: string; fundamentals?: any } }>(
+    '/api/sglang/bullbear',
+    async (request, reply) => {
+      try {
+        const { symbol, fundamentals = {} } = request.body;
+        const result = await sglangService.generateBullBearCase(symbol, {
+          peRatio: fundamentals.peRatio ?? null,
+          roe: fundamentals.roe ?? null,
+          revenueGrowth: fundamentals.revenueGrowth ?? null,
+        });
+        return reply.send({ symbol, ...result, timestamp: new Date().toISOString() });
+      } catch (error) {
+        return reply.status(500).send({
+          error: 'Bull/bear generation failed',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    },
+  );
 };
 
 export default sglangRoutes;

@@ -7,7 +7,8 @@ import type { SGLangResponse, StockAnalysis } from './types';
 const OLLAMA_URL = process.env.SGLANG_INTELLIGENCE_URL || process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'mistral';
 
-function extractJson(text: string): Record<string, any> | null {
+function extractJson(text: string | undefined | null): Record<string, any> | null {
+  if (!text) return null;
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
     try {
@@ -15,6 +16,26 @@ function extractJson(text: string): Record<string, any> | null {
     } catch { /* not valid JSON */ }
   }
   return null;
+}
+
+function sentimentScore(text: string, isRisk: boolean = false): number {
+  if (!text) return 50;
+  const lower = text.toLowerCase();
+  const positive = ['strong', 'excellent', 'good', 'positive', 'growth', 'stable', 'profitable',
+    'low', 'improving', 'best', 'great', 'outperform', 'attractive', 'growing', 'efficient',
+    'high quality', 'robust', 'superior', 'impressive', 'favorable', 'healthy', 'solid'];
+  const negative = ['weak', 'poor', 'negative', 'decline', 'high', 'risky', 'concern', 'bad',
+    'falling', 'deteriorating', 'volatile', 'risk', 'warning', 'caution', 'debt', 'struggling',
+    'underperform', 'challenging', 'unfavorable', 'overvalued', 'expensive'];
+
+  let score = 50;
+  for (const word of positive) {
+    if (lower.includes(word)) score += isRisk ? -5 : 8;
+  }
+  for (const word of negative) {
+    if (lower.includes(word)) score += isRisk ? 5 : -8;
+  }
+  return Math.max(0, Math.min(100, score));
 }
 
 export class SGLangService {
@@ -25,7 +46,7 @@ export class SGLangService {
     jsonSchema: Record<string, any>,
     maxTokens: number = 500
   ): Promise<Record<string, any>> {
-    if (this.useExternal) {
+    if (this.useExternal || process.env.OLLAMA_URL) {
       const { default: axios } = await import('axios');
       const response = await axios.post(
         `${OLLAMA_URL}/api/generate`,
@@ -40,7 +61,7 @@ export class SGLangService {
       const text = response.data.response;
       const parsed = extractJson(text);
       if (parsed) return parsed;
-      return JSON.parse(text);
+      try { return JSON.parse(text); } catch { return { text, analysis: text }; }
     }
 
     const text = await HuggingFaceService.generateText(prompt, maxTokens);
@@ -71,9 +92,8 @@ export class SGLangService {
   }
 
   /**
-   * Market-hours aware stock analysis
-   * - During market hours: real-time analysis using live data
-   * - After market close: returns snapshot analysis (no wasted API calls)
+   * Market-hours aware stock analysis with scoring
+   * Returns text analysis + numeric scores for all dimensions
    */
   async analyzeStockParallel(
     symbol: string,
@@ -86,19 +106,19 @@ export class SGLangService {
       debtEquity?: number | null;
     }
   ): Promise<StockAnalysis> {
-    // Check market status - skip expensive AI analysis after 3:30 PM
     const marketStatus = await marketConfigService.getMarketStatus();
 
     if (!marketStatus.isOpen) {
+      const text = `Snapshot analysis (market closed). Previous close data for ${symbol} shows stable fundamentals.`;
       return {
-        quality: `Snapshot analysis (market closed). Previous close data for ${symbol} shows stable fundamentals.`,
-        valuation: `Market is closed. Using last available valuation data for ${symbol}.`,
+        quality: text,
+        valuation: text,
         growth: `Growth metrics based on most recent quarterly data for ${symbol}.`,
         risk: `Risk assessment based on latest available financials for ${symbol}.`,
+        scores: { quality: 50, valuation: 50, growth: 50, risk: 50, overall: 50 },
       };
     }
 
-    // Market is open - perform full real-time analysis using batch queue
     return batchQueue.enqueue(`sglang:analyze:${symbol}`, async () => {
       const schema = {
         type: 'object' as const,
@@ -108,30 +128,73 @@ export class SGLangService {
 
       const [quality, valuation, growth, risk] = await Promise.all([
         this.generateStructured(
-          `Analyze quality of ${symbol}: ROE=${fundamentals.roe ?? 'N/A'}%, ROIC=${fundamentals.roic ?? 'N/A'}%`,
+          `Analyze business quality of ${symbol}. ROE=${fundamentals.roe ?? 'N/A'}%, ROIC=${fundamentals.roic ?? 'N/A'}%. Assess competitive advantage, management quality, and financial strength.`,
           schema, 200
         ),
         this.generateStructured(
-          `Analyze valuation of ${symbol}: PE=${fundamentals.peRatio ?? 'N/A'}x, PB=${fundamentals.pbRatio ?? 'N/A'}x`,
+          `Analyze valuation of ${symbol}. PE=${fundamentals.peRatio ?? 'N/A'}x, PB=${fundamentals.pbRatio ?? 'N/A'}x. Assess if the stock is fairly valued, overvalued, or undervalued.`,
           schema, 200
         ),
         this.generateStructured(
-          `Analyze growth of ${symbol}: Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%`,
+          `Analyze growth prospects of ${symbol}. Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%. Assess revenue trends, earnings growth, and future outlook.`,
           schema, 200
         ),
         this.generateStructured(
-          `Analyze risk of ${symbol}: Debt/Equity=${fundamentals.debtEquity ?? 'N/A'}x`,
+          `Analyze risk factors for ${symbol}. Debt/Equity=${fundamentals.debtEquity ?? 'N/A'}x. Assess financial risk, business risk, and any red flags.`,
           schema, 200
         ),
       ]);
 
-      return {
-        quality: quality.analysis,
-        valuation: valuation.analysis,
-        growth: growth.analysis,
-        risk: risk.analysis,
+      const qText = quality?.analysis || quality?.text || `Quality analysis for ${symbol}`;
+      const vText = valuation?.analysis || valuation?.text || `Valuation analysis for ${symbol}`;
+      const gText = growth?.analysis || growth?.text || `Growth analysis for ${symbol}`;
+      const rText = risk?.analysis || risk?.text || `Risk analysis for ${symbol}`;
+
+      const scores = {
+        quality: sentimentScore(qText),
+        valuation: sentimentScore(vText),
+        growth: sentimentScore(gText),
+        risk: sentimentScore(rText, true),
+        overall: 0,
       };
+      scores.overall = Math.round((scores.quality + scores.valuation + scores.growth + (100 - scores.risk)) / 4);
+
+      return { quality: qText, valuation: vText, growth: gText, risk: rText, scores };
     });
+  }
+
+  async generateRiskFactors(symbol: string): Promise<string[]> {
+    try {
+      const result = await this.generateStructured(
+        `List 3-5 specific risk factors for investing in ${symbol}. Be specific and data-driven. Format as JSON array of strings.`,
+        { type: 'object', properties: { risks: { type: 'array', items: { type: 'string' } } }, required: ['risks'] },
+        300
+      );
+      return result?.risks || [`Consider consulting latest financial reports for ${symbol} risk assessment.`];
+    } catch {
+      return [`Risk data temporarily unavailable for ${symbol}.`];
+    }
+  }
+
+  async generateBullBearCase(symbol: string, fundamentals: {
+    peRatio?: number | null; roe?: number | null; revenueGrowth?: number | null;
+  }): Promise<{ bull: string; bear: string }> {
+    try {
+      const result = await this.generateStructured(
+        `Provide a bull case and bear case for investing in ${symbol}. PE=${fundamentals.peRatio ?? 'N/A'}x, ROE=${fundamentals.roe ?? 'N/A'}%, Revenue Growth=${fundamentals.revenueGrowth ?? 'N/A'}%. Return JSON with "bull" and "bear" strings.`,
+        { type: 'object', properties: { bull: { type: 'string' }, bear: { type: 'string' } }, required: ['bull', 'bear'] },
+        300
+      );
+      return {
+        bull: result?.bull || `${symbol} shows potential based on available data.`,
+        bear: result?.bear || `Consider downside risks for ${symbol} before investing.`,
+      };
+    } catch {
+      return {
+        bull: `${symbol} investment case requires further fundamental analysis.`,
+        bear: `Market conditions and company-specific risks should be evaluated.`,
+      };
+    }
   }
 
   async generateThesis(

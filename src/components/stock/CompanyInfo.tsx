@@ -77,8 +77,9 @@ export default function CompanyInfo({
 }: CompanyInfoProps) {
   const profile = COMPANY_PROFILES[symbol.toUpperCase()];
 
-  const desc = profile?.description || description
-    ? `${description} ${companyName} operates in the ${sector?.toLowerCase() || "Indian"} sector with a diversified business model and established market presence.`
+  const effectiveDescription = profile?.description || description || '';
+  const desc = effectiveDescription
+    ? `${effectiveDescription} ${companyName} operates in the ${sector?.toLowerCase() || "Indian"} sector with a diversified business model and established market presence.`
     : `${companyName} is a leading player in the ${sector?.toLowerCase() || "Indian"} sector with a diversified business model and established market presence.`;
 
   return (

@@ -14,6 +14,13 @@ export interface StockAnalysis {
   valuation: string;
   growth: string;
   risk: string;
+  scores?: {
+    quality: number;
+    valuation: number;
+    growth: number;
+    risk: number;
+    overall: number;
+  };
 }
 
 export interface LLMMetrics {
