@@ -1,2 +1,6 @@
-// Canonical services will be implemented in subsequent refactoring steps.
-// Currently the existing services in src/services/ continue to serve.
+export { quoteService } from './QuoteService';
+export { historicalService } from './HistoricalService';
+export { screenerService } from './ScreenerService';
+export { newsService } from './NewsService';
+export { cacheService } from './CacheService';
+export type { NewsItem } from './NewsService';
