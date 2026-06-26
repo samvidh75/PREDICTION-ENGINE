@@ -16,6 +16,8 @@ import CompanyInfo from "../components/stock/CompanyInfo";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import NewsFeed from "../components/news/NewsFeed";
 import ProUpgradeModal from "../components/stock/ProUpgradeModal";
+import ResearchBot from "../components/stock/ResearchBot";
+import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
 import { computeHealthScore } from "../lib/healthScore";
 
 function useIsMobile() {
@@ -128,7 +130,23 @@ export default function StockPage({ symbol }: { symbol: string }) {
           height={isMobile ? 180 : 260}
         />
 
-        {/* 3. Healthometer */}
+        {/* 3. Score Display */}
+        <div style={{ margin: "16px 0" }}>
+          <div style={{
+            background: "var(--surface)", border: "1px solid var(--border)",
+            borderRadius: 16, padding: "20px",
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#6E6E6E", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
+              Score Overview
+            </div>
+            <ScoreSemiCircles
+              overallScore={health.compositeScore ?? 50}
+              riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
+            />
+          </div>
+        </div>
+
+        {/* 4. Healthometer */}
         <div style={{ margin: "16px 0" }}>
           <Healthometer
             score={health.compositeScore}
@@ -211,43 +229,44 @@ export default function StockPage({ symbol }: { symbol: string }) {
       {/* Mobile sticky bottom bar */}
       {isMobile && (
         <div style={{
-          position:'fixed', bottom:72, left:0, right:0, zIndex:80,
-          background:'rgba(248,248,246,0.96)',
-          backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
+          position:'fixed', bottom:0, left:0, right:0, zIndex:50,
+          background:'var(--surface)',
           borderTop:'1px solid var(--border)',
-          display:'grid', gridTemplateColumns:'1fr 1fr 1.5fr',
-          gap:8, padding:'10px 16px',
+          display:'grid', gridTemplateColumns:'1fr 1fr 1.2fr',
+          gap:8, padding:'10px 12px',
           paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
         }}>
           <button onClick={() => setIsTracked(!isTracked)} style={{
-            height:44, borderRadius:'var(--r-md)',
-            background: isTracked ? 'var(--red-tint)' : 'var(--surface)',
-            color: isTracked ? 'var(--red-text)' : 'var(--text-500)',
-            border: isTracked ? '1px solid #FCA5A5' : '1px solid var(--border)',
-            fontSize:'var(--sz-sm)', fontWeight:600, cursor:'pointer',
+            height:44, borderRadius:8,
+            background: isTracked ? 'rgba(45,212,191,0.15)' : 'transparent',
+            color: isTracked ? '#2DD4BF' : '#A0A0A0',
+            border:'1px solid var(--border)',
+            fontSize:12, fontWeight:600, cursor:'pointer',
             fontFamily:'var(--font)',
           }}>
             {isTracked ? '\u2665 Tracked' : '\u2661 Track'}
           </button>
           <a href={`/compare?stocks=${symbol}`} style={{
-            height:44, borderRadius:'var(--r-md)',
-            background:'var(--surface)', color:'var(--text-500)',
-            border:'1px solid var(--border)', fontSize:'var(--sz-sm)',
+            height:44, borderRadius:8,
+            background:'transparent', color:'#A0A0A0',
+            border:'1px solid var(--border)', fontSize:12,
             fontWeight:600, display:'flex', alignItems:'center',
             justifyContent:'center', textDecoration:'none',
           }}>
             \u2295 Compare
           </a>
           <button style={{
-            height:44, borderRadius:'var(--r-md)',
-            background:'var(--brand)', color:'var(--text-inverse)',
-            border:'none', fontSize:'var(--sz-sm)', fontWeight:700,
+            height:44, borderRadius:8,
+            background:'#FFB81C', color:'#0F0F0F',
+            border:'none', fontSize:12, fontWeight:700,
             cursor:'pointer', fontFamily:'var(--font)',
           }}>
             Invest \u2192
           </button>
         </div>
       )}
+
+      <ResearchBot symbol={symbol} isPro={false} />
 
       <ProUpgradeModal
         isOpen={showProModal}
