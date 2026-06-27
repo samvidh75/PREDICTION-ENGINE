@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import MarketBrainResearchPanel from './MarketBrainResearchPanel';
 import { useMarketBrainResearch } from '../../hooks/useMarketBrainResearch';
@@ -65,5 +65,36 @@ describe('MarketBrainResearchPanel', () => {
     render(<MarketBrainResearchPanel symbol="TCS" />);
 
     expect(screen.getByText('Research narrative is temporarily unavailable. Market data sections remain available.')).toBeDefined();
+  });
+
+  it('keeps the existing narrative visible while a refresh is loading', () => {
+    vi.mocked(useMarketBrainResearch).mockReturnValue({
+      data: mockResearch,
+      loading: true,
+      error: null,
+      reload: vi.fn(),
+    });
+
+    render(<MarketBrainResearchPanel symbol="TCS" />);
+
+    expect(screen.getByText('TCS is marked High conviction with 82/100 conviction.')).toBeDefined();
+    expect(screen.getByLabelText('Refresh market brain research')).toBeDisabled();
+  });
+
+  it('calls reload from the refresh action without exposing backend details', () => {
+    const reload = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useMarketBrainResearch).mockReturnValue({
+      data: mockResearch,
+      loading: false,
+      error: null,
+      reload,
+    });
+
+    render(<MarketBrainResearchPanel symbol="TCS" />);
+
+    fireEvent.click(screen.getByLabelText('Refresh market brain research'));
+
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/api|endpoint|stockstory|provider/i)).toBeNull();
   });
 });
