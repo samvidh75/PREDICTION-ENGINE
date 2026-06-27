@@ -112,4 +112,35 @@ describe('useMarketBrainResearch', () => {
     expect(fetchMarketBrainResearch).toHaveBeenNthCalledWith(1, 'TCS');
     expect(fetchMarketBrainResearch).toHaveBeenNthCalledWith(2, 'INFY');
   });
+
+  it('ignores stale reload responses after the symbol changes', async () => {
+    let resolveReload: (value: MarketBrainResearchResponse) => void = () => undefined;
+    const reloadRequest = new Promise<MarketBrainResearchResponse>((resolve) => {
+      resolveReload = resolve;
+    });
+
+    vi.mocked(fetchMarketBrainResearch)
+      .mockResolvedValueOnce(makeResearch('TCS', 'TCS initial narrative'))
+      .mockReturnValueOnce(reloadRequest)
+      .mockResolvedValueOnce(makeResearch('INFY', 'INFY current narrative'));
+
+    const { rerender } = render(<HookProbe symbol="TCS" />);
+
+    await waitFor(() => expect(screen.getByLabelText('headline-state').textContent).toBe('TCS initial narrative'));
+
+    fireEvent.click(screen.getByText('reload'));
+    rerender(<HookProbe symbol="INFY" />);
+
+    await waitFor(() => expect(screen.getByLabelText('headline-state').textContent).toBe('INFY current narrative'));
+
+    await act(async () => {
+      resolveReload(makeResearch('TCS', 'TCS stale reload narrative'));
+      await reloadRequest;
+    });
+
+    expect(screen.getByLabelText('headline-state').textContent).toBe('INFY current narrative');
+    expect(fetchMarketBrainResearch).toHaveBeenNthCalledWith(1, 'TCS');
+    expect(fetchMarketBrainResearch).toHaveBeenNthCalledWith(2, 'TCS');
+    expect(fetchMarketBrainResearch).toHaveBeenNthCalledWith(3, 'INFY');
+  });
 });
