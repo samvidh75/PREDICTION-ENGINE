@@ -54,7 +54,7 @@ async function bootstrap() {
     env: process.env.NODE_ENV ?? "development",
     db: process.env.DATABASE_URL ? "configured" : "missing",
     redis: process.env.REDIS_URL ? "configured" : "not configured",
-    sglang: process.env.SGLANG_URL ? process.env.SGLANG_URL : "not configured",
+    aiProvider: process.env.GROQ_API_KEY ? "groq" : process.env.GEMINI_API_KEY ? "gemini" : process.env.OPENAI_API_KEY ? "openai" : "deterministic",
   }));
 
   // Initialize DB (non-fatal if missing — health endpoint still responds)
