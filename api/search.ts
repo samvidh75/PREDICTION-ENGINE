@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getPersistedUniverseCount, searchPersistedStocks } from "../src/lib/stockResearchSnapshot";
+import { getPersistedUniverseCount, searchPersistedStocks } from "../src/lib/stockResearchSnapshot.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const rawQuery = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;

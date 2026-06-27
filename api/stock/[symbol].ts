@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getPersistedStockResearch } from "../../src/lib/stockResearchSnapshot";
+import { getPersistedStockResearch } from "../../src/lib/stockResearchSnapshot.js";
 
 const CACHE = new Map<string, { data: unknown; expiresAt: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
@@ -31,28 +31,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       current: research.price,
       changeAbs: research.change,
       changePercent: research.changePercent,
-      weekHigh52: Number((research.price * 1.16).toFixed(2)),
-      weekLow52: Number((research.price * 0.84).toFixed(2)),
       marketCap: research.marketCap,
     },
     fundamentals: {
       pe: research.pe,
       industryPe: research.industryPe,
       pb: research.pb,
-      roe: research.roe,
-      debtToEquity: research.debtToEquity,
       dividendYield: research.dividendYield,
-      revenueGrowth: research.revenueGrowth,
-      profitGrowth: research.profitGrowth,
       eps: research.eps,
-      interestCoverage: research.interestCoverage,
     },
-    technicals: {
-      rsi: research.rsi,
-      macdSignal: research.macdSignal,
-      above50Dma: research.above50Dma,
-      volatility: research.volatility,
-    },
+    roe: research.roe,
+    debtToEquity: research.debtToEquity,
+    revenueGrowth: research.revenueGrowth,
+    profitGrowth: research.profitGrowth,
+    rsi: research.rsi,
     scores: research.scores,
     confidenceMeter: research.confidenceMeter,
     timeline: research.timeline,
@@ -73,7 +65,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     shareholding: research.shareholding,
     news: research.news,
     thesis: research.thesis,
-    fetchedAt: new Date().toISOString(),
   };
 
   CACHE.set(symbol, { data: payload, expiresAt: Date.now() + CACHE_TTL });
