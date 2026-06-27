@@ -106,138 +106,111 @@ export { useNavigate };
 
 const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
 
+const NAV_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
+
 function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const navLinkStyle = (isActive: boolean): React.CSSProperties => ({
+    fontSize: "12px",
+    fontWeight: 400,
+    letterSpacing: "-0.01em",
+    color: isActive ? "#1D1D1F" : "#6E6E73",
+    textDecoration: "none",
+    padding: "0 10px",
+    height: "44px",
+    display: "inline-flex",
+    alignItems: "center",
+    transition: "color 150ms ease",
+    fontFamily: NAV_FONT,
+    whiteSpace: "nowrap",
+  });
 
   return (
     <header style={{
       position: "sticky",
       top: 0,
       zIndex: 1000,
-      height: "64px",
-      background: "#FFFFFF",
-      borderBottom: "1px solid #E5E5E5",
+      height: "44px",
+      background: "rgba(255,255,255,0.82)",
+      backdropFilter: "saturate(180%) blur(20px)",
+      WebkitBackdropFilter: "saturate(180%) blur(20px)",
+      borderBottom: "1px solid rgba(0,0,0,0.12)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      padding: "0 24px",
+      padding: "0 22px",
     }}>
       <div style={{
         width: "100%",
-        maxWidth: "1080px",
+        maxWidth: "980px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
       }}>
-        {/* Left: Logo & Navigation */}
-        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <div onClick={() => navigate("/")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-            <Logo />
-          </div>
-          {/* Nav links */}
-          <nav style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <NavLink to="/" style={({ isActive }) => ({
-              fontSize: "14px",
-              fontWeight: 600,
-              color: isActive ? "#0070F3" : "#666666",
-              textDecoration: "none",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              transition: "all 150ms ease",
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            })}>Home</NavLink>
-            <NavLink to="/scanner" style={({ isActive }) => ({
-              fontSize: "14px",
-              fontWeight: 600,
-              color: isActive ? "#0070F3" : "#666666",
-              textDecoration: "none",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              transition: "all 150ms ease",
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            })}>Scanner</NavLink>
-            <NavLink to="/watchlist" style={({ isActive }) => ({
-              fontSize: "14px",
-              fontWeight: 600,
-              color: isActive ? "#0070F3" : "#666666",
-              textDecoration: "none",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              transition: "all 150ms ease",
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            })}>Watchlist</NavLink>
-            <NavLink to="/compare" style={({ isActive }) => ({
-              fontSize: "14px",
-              fontWeight: 600,
-              color: isActive ? "#0070F3" : "#666666",
-              textDecoration: "none",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              transition: "all 150ms ease",
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            })}>Compare</NavLink>
-          </nav>
+        {/* Left: Logo */}
+        <div onClick={() => navigate("/")} style={{ cursor: "pointer", flexShrink: 0 }}>
+          <span style={{
+            fontSize: "17px",
+            fontWeight: 700,
+            color: "#1D1D1F",
+            letterSpacing: "-0.03em",
+            fontFamily: NAV_FONT,
+          }}>
+            StockStory
+          </span>
         </div>
 
-        {/* Right: Auth Profile */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        {/* Center: Navigation */}
+        <nav style={{ display: "flex", alignItems: "center" }} className="hide-mobile">
+          <NavLink to="/" style={({ isActive }) => navLinkStyle(isActive)}>Home</NavLink>
+          <NavLink to="/scanner" style={({ isActive }) => navLinkStyle(isActive)}>Scanner</NavLink>
+          <NavLink to="/watchlist" style={({ isActive }) => navLinkStyle(isActive)}>Watchlist</NavLink>
+          <NavLink to="/compare" style={({ isActive }) => navLinkStyle(isActive)}>Compare</NavLink>
+          <NavLink to="/alerts" style={({ isActive }) => navLinkStyle(isActive)}>Alerts</NavLink>
+          <NavLink to="/pricing" style={({ isActive }) => navLinkStyle(isActive)}>Pricing</NavLink>
+        </nav>
+
+        {/* Right: Auth */}
+        <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }}>
           {user ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <div style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: "rgba(0,112,243,0.08)",
-                color: "#0070F3",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 700,
-                fontSize: "13px",
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              }}>
-                {user.displayName?.slice(0, 2).toUpperCase() || user.email?.slice(0, 2).toUpperCase() || "U"}
-              </div>
+            <>
               <span className="hide-mobile" style={{
-                fontSize: "14px",
-                color: "#111111",
-                fontWeight: 500,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: "12px",
+                color: "#6E6E73",
+                fontFamily: NAV_FONT,
+                padding: "0 10px",
               }}>
-                {user.displayName || user.email}
+                {user.displayName || user.email?.split("@")[0]}
               </span>
               <button onClick={logout} style={{
-                fontSize: "13px",
-                color: "#666666",
+                fontSize: "12px",
+                color: "#0066CC",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                padding: "4px 8px",
-                fontWeight: 600,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                padding: "0 10px",
+                height: "44px",
+                fontFamily: NAV_FONT,
+                letterSpacing: "-0.01em",
               }}>Sign out</button>
-            </div>
+            </>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <>
               <NavLink to="/login" style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color: "#0070F3",
+                fontSize: "12px",
+                fontWeight: 400,
+                color: "#0066CC",
                 textDecoration: "none",
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                padding: "0 10px",
+                height: "44px",
+                display: "inline-flex",
+                alignItems: "center",
+                fontFamily: NAV_FONT,
+                letterSpacing: "-0.01em",
               }}>Sign in</NavLink>
-              <NavLink to="/register" style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color: "#ffffff",
-                background: "#0070F3",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                textDecoration: "none",
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              }}>Create account</NavLink>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -259,9 +232,9 @@ function Layout({ children }: { children: React.ReactNode }) {
       <main style={{
         flex: 1,
         width: "100%",
-        maxWidth: "1080px",
+        maxWidth: "980px",
         margin: "0 auto",
-        padding: "24px",
+        padding: "40px 22px 80px",
         background: "#FFFFFF",
       }}>
         {children}

@@ -9,11 +9,11 @@ html, body, #root {
 }
 
 html {
-  font-family: var(--font);
-  font-size: var(--sz-base);
-  line-height: 1.55;
-  color: var(--text-700);
-  background: var(--page) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.47;
+  color: #1D1D1F;
+  background: #FFFFFF !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

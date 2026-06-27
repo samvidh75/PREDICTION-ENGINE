@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NIFTY50_SYMBOLS } from '../services/universe/StockUniverse';
 import type { StockData } from '../hooks/useStockData';
 import { UnifiedPredictionEngine } from '../prediction-engine/UnifiedPredictionEngine';
 import type { EngineOutput } from '../prediction-engine/UnifiedPredictionEngine';
 import { fChange } from '../lib/format';
 import { navigate } from '../components/product/routeConfig';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
-import { colors, typography, spacing, radius, shadow } from '../styles';
+
+/* ─── constants ───────────────────────────────────────────────────────────── */
+
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
 
 /* ─── types ───────────────────────────────────────────────────────────────── */
 
@@ -19,10 +19,10 @@ type ScanRow = { data: StockData; prediction: EngineOutput };
 
 const displayNames: Record<string, string> = {
   RELIANCE: 'Reliance Industries', TCS: 'Tata Consultancy Services',
-  HDFCBANK: 'HDFC Bank',          INFY: 'Infosys',
-  ICICIBANK: 'ICICI Bank',        SUNPHARMA: 'Sun Pharma',
+  HDFCBANK: 'HDFC Bank',           INFY: 'Infosys',
+  ICICIBANK: 'ICICI Bank',         SUNPHARMA: 'Sun Pharma',
   HINDUNILVR: 'Hindustan Unilever', SBIN: 'State Bank of India',
-  ITC: 'ITC Limited',             BHARTIARTL: 'Bharti Airtel',
+  ITC: 'ITC Limited',              BHARTIARTL: 'Bharti Airtel',
 };
 
 const inputFor = (data: StockData) => ({
@@ -34,10 +34,10 @@ const inputFor = (data: StockData) => ({
 });
 
 function getConviction(score: number | null): { label: string; color: string; bg: string } {
-  if (score === null) return { label: 'No data',        color: colors.text.tertiary, bg: colors.bg.secondary };
-  if (score >= 75)    return { label: 'High conviction', color: colors.on.success,   bg: colors.tint.success  };
-  if (score >= 50)    return { label: 'Neutral',         color: colors.on.warning,   bg: colors.tint.warning  };
-  return               { label: 'Risk rising',           color: colors.on.error,     bg: colors.tint.error    };
+  if (score === null) return { label: 'No data',         color: '#AEAEB2', bg: '#F5F5F7' };
+  if (score >= 75)    return { label: 'High conviction',  color: '#1D7A3D', bg: '#E8F5EE' };
+  if (score >= 50)    return { label: 'Neutral',          color: '#B45309', bg: '#FEF3C7' };
+  return               { label: 'Risk rising',            color: '#D93025', bg: '#FDE8E6' };
 }
 
 const PRESETS = [
@@ -64,7 +64,6 @@ export default function ScannerPage() {
   const [page,         setPage]        = useState(1);
   const [classFilter,  setClassFilter] = useState('All');
   const [activePreset, setActivePreset]= useState<string | null>(null);
-
 
   const runScan = useCallback(async () => {
     setLoading(true); setRows([]); setLoaded(0);
@@ -106,7 +105,7 @@ export default function ScannerPage() {
     return [...f].sort((a, b) => (b.prediction.composite ?? -1) - (a.prediction.composite ?? -1));
   }, [rows, query, classFilter]);
 
-  const PER_PAGE  = 10;
+  const PER_PAGE  = 15;
   const visible   = ranked.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const pageCount = Math.max(1, Math.ceil(ranked.length / PER_PAGE));
 
@@ -123,65 +122,185 @@ export default function ScannerPage() {
     URL.revokeObjectURL(a.href);
   };
 
-  const cell: React.CSSProperties = { padding: `${spacing.base} ${spacing.base}`, verticalAlign: 'middle' };
-
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg.primary }}>
+    <div style={{ fontFamily: FONT, color: '#1D1D1F' }}>
 
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', paddingTop: spacing.xl, paddingBottom: spacing.lg }}>
+      {/* ── Page header ────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
-          <h1 style={{ ...typography.sectionTitle, color: colors.text.primary, margin: 0 }}>Scanner</h1>
-          <p style={{ ...typography.secondaryText, color: colors.text.secondary, marginTop: spacing.xs }}>
-            Nifty 50 — scored across quality, valuation, growth, risk {'&'} momentum
+          <h1 style={{
+            fontSize: '40px',
+            fontWeight: 600,
+            color: '#1D1D1F',
+            margin: '0 0 8px',
+            letterSpacing: '-0.003em',
+            lineHeight: 1.08,
+            fontFamily: FONT,
+          }}>
+            Stock Scanner
+          </h1>
+          <p style={{ fontSize: '17px', color: '#6E6E73', margin: 0, fontFamily: FONT, letterSpacing: '-0.022em' }}>
+            Nifty 50 — scored across quality, valuation, growth, risk &amp; momentum
           </p>
         </div>
-        <Button variant="secondary" size="sm" onClick={exportCSV}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+        <button
+          onClick={exportCSV}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: '1px solid #D2D2D7',
+            background: '#FFFFFF',
+            color: '#1D1D1F',
+            fontSize: '14px',
+            fontWeight: 500,
+            cursor: 'pointer',
+            fontFamily: FONT,
+            letterSpacing: '-0.016em',
+            flexShrink: 0,
+            transition: 'background 150ms ease',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F7')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#FFFFFF')}
+        >
           <Download size={14} /> Export CSV
-        </Button>
+        </button>
       </div>
 
-      {/* ── Preset chips ─────────────────────────────────────────────────── */}
-      <div className="no-scrollbar" style={{ display: 'flex', gap: spacing.sm, overflowX: 'auto', paddingBottom: spacing.lg }}>
+      {/* ── Preset chips ───────────────────────────────────────────────────── */}
+      <div
+        className="no-scrollbar"
+        style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '20px' }}
+      >
         {PRESETS.map(p => (
-          <button key={p} onClick={() => setActivePreset(activePreset === p ? null : p)} style={{
-            height: '32px', padding: `0 ${spacing.base}`, borderRadius: '9999px',
-            border:      activePreset === p ? `1px solid ${colors.primary}` : `1px solid ${colors.bg.tertiary}`,
-            background:  activePreset === p ? colors.tint.primary           : colors.bg.primary,
-            color:       activePreset === p ? colors.primary                : colors.text.secondary,
-            fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer',
-            flexShrink: 0, transition: 'all 200ms ease',
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          }}>{p}</button>
+          <button
+            key={p}
+            onClick={() => setActivePreset(activePreset === p ? null : p)}
+            style={{
+              height: '30px',
+              padding: '0 14px',
+              borderRadius: '9999px',
+              border: activePreset === p ? '1px solid #1D1D1F' : '1px solid #D2D2D7',
+              background: activePreset === p ? '#1D1D1F' : 'transparent',
+              color: activePreset === p ? '#FFFFFF' : '#6E6E73',
+              fontSize: '13px',
+              fontWeight: 400,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'all 150ms ease',
+              fontFamily: FONT,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {p}
+          </button>
         ))}
       </div>
 
-      {/* ── Filters ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: spacing.sm, paddingBottom: spacing.base, flexWrap: 'wrap' }}>
+      {/* ── Filters ────────────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
-          <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: colors.text.tertiary, pointerEvents: 'none' }} />
-          <Input value={query} onChange={e => { setQuery(e.target.value); setPage(1); }}
-            placeholder="Search company or symbol…" style={{ paddingLeft: '36px' }} />
+          <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#AEAEB2', pointerEvents: 'none' }} />
+          <input
+            value={query}
+            onChange={e => { setQuery(e.target.value); setPage(1); }}
+            placeholder="Search company or symbol…"
+            style={{
+              width: '100%',
+              height: '40px',
+              paddingLeft: '36px',
+              paddingRight: '12px',
+              border: '1px solid #D2D2D7',
+              borderRadius: '8px',
+              background: '#FFFFFF',
+              color: '#1D1D1F',
+              fontSize: '14px',
+              outline: 'none',
+              fontFamily: FONT,
+              letterSpacing: '-0.016em',
+              boxSizing: 'border-box',
+              transition: 'border-color 150ms ease',
+            }}
+            onFocus={e => (e.currentTarget.style.borderColor = '#0066CC')}
+            onBlur={e => (e.currentTarget.style.borderColor = '#D2D2D7')}
+          />
         </div>
-        <select value={classFilter} onChange={e => { setClassFilter(e.target.value); setPage(1); }} style={{
-          height: '44px', padding: `0 ${spacing.base}`,
-          border: `1px solid ${colors.bg.tertiary}`, borderRadius: radius.sm,
-          background: colors.bg.primary, color: colors.text.primary,
-          fontSize: '16px', outline: 'none', minWidth: '160px',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        }}>
+        <select
+          value={classFilter}
+          onChange={e => { setClassFilter(e.target.value); setPage(1); }}
+          style={{
+            height: '40px',
+            padding: '0 12px',
+            border: '1px solid #D2D2D7',
+            borderRadius: '8px',
+            background: '#FFFFFF',
+            color: '#1D1D1F',
+            fontSize: '14px',
+            outline: 'none',
+            minWidth: '150px',
+            fontFamily: FONT,
+            letterSpacing: '-0.016em',
+          }}
+        >
           {CLASS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
 
-      {/* ── Desktop table ─────────────────────────────────────────────────── */}
-      <div className="hidden md:block" style={{ borderRadius: radius.md, border: `1px solid ${colors.bg.tertiary}`, overflow: 'hidden', boxShadow: shadow.card, marginBottom: spacing.base }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      {/* Loading bar */}
+      {loading && (
+        <div style={{
+          height: '3px',
+          background: '#F5F5F7',
+          borderRadius: '2px',
+          overflow: 'hidden',
+          marginBottom: '16px',
+        }}>
+          <div style={{
+            height: '100%',
+            width: `${Math.round((loaded / NIFTY50_SYMBOLS.length) * 100)}%`,
+            background: '#1D1D1F',
+            borderRadius: '2px',
+            transition: 'width 300ms ease',
+          }} />
+        </div>
+      )}
+
+      {/* ── Table ─────────────────────────────────────────────────────────── */}
+      <div style={{
+        border: '1px solid #D2D2D7',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        marginBottom: '20px',
+      }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FONT }}>
           <thead>
-            <tr style={{ background: colors.bg.secondary, borderBottom: `1px solid ${colors.bg.tertiary}` }}>
-              {['#', 'Company', 'Rating', 'Conviction', ''].map((h, i) => (
-                <th key={i} style={{ ...cell, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: colors.text.tertiary, textAlign: i === 2 ? 'right' : 'left' }}>{h}</th>
+            <tr style={{ background: '#F5F5F7', borderBottom: '1px solid #D2D2D7' }}>
+              {[
+                { label: '#',           width: '44px',  align: 'left'  },
+                { label: 'Company',     width: 'auto',  align: 'left'  },
+                { label: 'Score',       width: '90px',  align: 'right' },
+                { label: 'Conviction',  width: '140px', align: 'left'  },
+                { label: '',            width: '100px', align: 'right' },
+              ].map((h, i) => (
+                <th
+                  key={i}
+                  style={{
+                    padding: '10px 14px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    color: '#AEAEB2',
+                    textAlign: h.align as 'left' | 'right',
+                    width: h.width,
+                    fontFamily: FONT,
+                  }}
+                >
+                  {h.label}
+                </th>
               ))}
             </tr>
           </thead>
@@ -191,93 +310,160 @@ export default function ScannerPage() {
               const cv    = getConviction(score);
               const name  = row.data.price.companyName || displayNames[row.data.symbol] || row.data.symbol;
               const chg   = row.data.price.change ?? 0;
+              const rank  = (page - 1) * PER_PAGE + idx + 1;
               return (
-                <tr key={row.data.symbol} onClick={() => navigate('stock', row.data.symbol)}
-                  style={{ cursor: 'pointer', borderBottom: `1px solid ${colors.bg.tertiary}`, transition: 'background 150ms ease' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = colors.bg.secondary)}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                  <td style={{ ...cell, ...typography.caption, color: colors.text.tertiary, width: '40px' }}>{(page - 1) * PER_PAGE + idx + 1}</td>
-                  <td style={cell}>
-                    <div style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{row.data.symbol}</div>
-                    <div style={{ ...typography.caption, color: colors.text.secondary, marginTop: '2px' }}>{name}</div>
+                <tr
+                  key={row.data.symbol}
+                  onClick={() => navigate('stock', row.data.symbol)}
+                  style={{
+                    cursor: 'pointer',
+                    borderBottom: '1px solid #F5F5F7',
+                    transition: 'background 100ms ease',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#F5F5F7')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <td style={{ padding: '13px 14px', fontSize: '13px', color: '#AEAEB2', width: '44px', fontVariantNumeric: 'tabular-nums' }}>
+                    {rank}
                   </td>
-                  <td style={{ ...cell, textAlign: 'right', width: '110px' }}>
-                    <span style={{ fontSize: '20px', fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: cv.color }}>{score ?? '—'}</span>
-                    <span style={{ ...typography.caption, color: colors.text.tertiary, marginLeft: '2px' }}>/100</span>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: chg >= 0 ? colors.on.success : colors.on.error }}>{fChange(chg)}</div>
+                  <td style={{ padding: '13px 14px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 600, color: '#1D1D1F', letterSpacing: '-0.016em' }}>{row.data.symbol}</div>
+                    <div style={{ fontSize: '12px', color: '#6E6E73', marginTop: '1px' }}>{name}</div>
                   </td>
-                  <td style={{ ...cell, width: '160px' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 10px', borderRadius: '9999px', background: cv.bg, color: cv.color, fontSize: '12px', fontWeight: 600 }}>
+                  <td style={{ padding: '13px 14px', textAlign: 'right', width: '90px' }}>
+                    <span style={{ fontSize: '22px', fontWeight: 600, color: cv.color, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em' }}>
+                      {score ?? '—'}
+                    </span>
+                    {score !== null && <span style={{ fontSize: '11px', color: '#AEAEB2', marginLeft: '1px' }}>/100</span>}
+                    <div style={{ fontSize: '12px', fontWeight: 500, color: chg >= 0 ? '#1D7A3D' : '#D93025', fontVariantNumeric: 'tabular-nums' }}>
+                      {fChange(chg)}
+                    </div>
+                  </td>
+                  <td style={{ padding: '13px 14px', width: '140px' }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '3px 10px',
+                      borderRadius: '9999px',
+                      background: cv.bg,
+                      color: cv.color,
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      fontFamily: FONT,
+                    }}>
                       {cv.label}
                     </span>
                   </td>
-                  <td style={{ ...cell, textAlign: 'right', width: '100px' }}>
-                    <Button variant="secondary" size="sm" onClick={e => { e.stopPropagation(); navigate('stock', row.data.symbol); }}>Research</Button>
+                  <td style={{ padding: '13px 14px', textAlign: 'right', width: '100px' }}>
+                    <button
+                      onClick={e => { e.stopPropagation(); navigate('stock', row.data.symbol); }}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '6px',
+                        border: '1px solid #D2D2D7',
+                        background: 'transparent',
+                        color: '#1D1D1F',
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        fontFamily: FONT,
+                        letterSpacing: '-0.01em',
+                        transition: 'background 100ms ease',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#E8E8ED')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      Research
+                    </button>
                   </td>
                 </tr>
               );
             })}
+
             {loading && visible.length === 0 && (
-              <tr><td colSpan={5} style={{ padding: spacing.xxl, textAlign: 'center', ...typography.secondaryText, color: colors.text.tertiary }}>
-                {loaded === 0 ? 'Loading Nifty 50 data…' : `Loading ${loaded} / ${NIFTY50_SYMBOLS.length} stocks…`}
-              </td></tr>
+              <tr>
+                <td colSpan={5} style={{ padding: '48px', textAlign: 'center', color: '#AEAEB2', fontSize: '15px', fontFamily: FONT }}>
+                  {loaded === 0
+                    ? 'Loading Nifty 50 data…'
+                    : `Scanning ${loaded} / ${NIFTY50_SYMBOLS.length} stocks…`}
+                </td>
+              </tr>
             )}
             {!loading && rows.length === 0 && (
-              <tr><td colSpan={5} style={{ padding: spacing.xxl, textAlign: 'center', ...typography.secondaryText, color: colors.text.tertiary }}>No data yet. Try again in a moment.</td></tr>
+              <tr>
+                <td colSpan={5} style={{ padding: '48px', textAlign: 'center', color: '#AEAEB2', fontSize: '15px', fontFamily: FONT }}>
+                  No data yet. Try again in a moment.
+                </td>
+              </tr>
+            )}
+            {!loading && rows.length > 0 && visible.length === 0 && (
+              <tr>
+                <td colSpan={5} style={{ padding: '48px', textAlign: 'center', color: '#AEAEB2', fontSize: '15px', fontFamily: FONT }}>
+                  No results for current filter.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* ── Mobile cards ─────────────────────────────────────────────────── */}
-      <div className="md:hidden" style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm, paddingBottom: spacing.lg }}>
-        {loading && ranked.length === 0 && (
-          <div style={{ padding: spacing.xxl, textAlign: 'center', ...typography.secondaryText, color: colors.text.tertiary }}>Scanning Nifty 50…</div>
-        )}
-        {visible.map((row, idx) => {
-          const score = row.prediction.composite;
-          const cv    = getConviction(score);
-          const name  = row.data.price.companyName || displayNames[row.data.symbol] || row.data.symbol;
-          const chg   = row.data.price.change ?? 0;
-          return (
-            <Card key={row.data.symbol} onClick={() => navigate('stock', row.data.symbol)} padding="md">
-              <div style={{ display: 'flex', gap: spacing.sm }}>
-                <span style={{ ...typography.caption, color: colors.text.tertiary, minWidth: '20px', paddingTop: '2px' }}>{(page - 1) * PER_PAGE + idx + 1}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                      <span style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{row.data.symbol}</span>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: chg >= 0 ? colors.on.success : colors.on.error, marginLeft: spacing.sm }}>{fChange(chg)}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '20px', fontWeight: 600, color: cv.color, fontVariantNumeric: 'tabular-nums' }}>{score ?? '—'}</span>
-                      <span style={{ ...typography.caption, color: colors.text.tertiary }}>/100</span>
-                    </div>
-                  </div>
-                  <div style={{ ...typography.caption, color: colors.text.secondary, marginTop: '2px' }}>{name}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.sm }}>
-                    <span style={{ padding: '3px 10px', borderRadius: '9999px', background: cv.bg, color: cv.color, fontSize: '12px', fontWeight: 600 }}>{cv.label}</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <Button variant="secondary" size="sm" onClick={e => { e.stopPropagation(); navigate('stock', row.data.symbol); }}>Research</Button>
-                      <Button variant="secondary" size="sm" onClick={e => { e.stopPropagation(); navigate('compare', row.data.symbol); }}>Compare</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* ── Pagination ───────────────────────────────────────────────────── */}
+      {/* ── Pagination ─────────────────────────────────────────────────────── */}
       {pageCount > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: spacing.sm, padding: `${spacing.base} 0` }}>
-          <Button variant="secondary" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Previous</Button>
-          <span style={{ ...typography.secondaryText, color: colors.text.secondary, minWidth: '80px', textAlign: 'center' }}>{page} / {pageCount}</span>
-          <Button variant="secondary" size="sm" disabled={page === pageCount} onClick={() => setPage(p => Math.min(pageCount, p + 1))}>Next</Button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              border: '1px solid #D2D2D7',
+              background: 'transparent',
+              color: page === 1 ? '#AEAEB2' : '#1D1D1F',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: page === 1 ? 'not-allowed' : 'pointer',
+              fontFamily: FONT,
+              opacity: page === 1 ? 0.5 : 1,
+            }}
+          >
+            <ChevronLeft size={14} /> Previous
+          </button>
+          <span style={{ fontSize: '14px', color: '#6E6E73', fontFamily: FONT, minWidth: '80px', textAlign: 'center' }}>
+            {page} of {pageCount}
+          </span>
+          <button
+            disabled={page === pageCount}
+            onClick={() => setPage(p => Math.min(pageCount, p + 1))}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '7px 14px',
+              borderRadius: '8px',
+              border: '1px solid #D2D2D7',
+              background: 'transparent',
+              color: page === pageCount ? '#AEAEB2' : '#1D1D1F',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: page === pageCount ? 'not-allowed' : 'pointer',
+              fontFamily: FONT,
+              opacity: page === pageCount ? 0.5 : 1,
+            }}
+          >
+            Next <ChevronRight size={14} />
+          </button>
         </div>
       )}
 
+      {/* Status footer */}
+      {loading && loaded > 0 && (
+        <p style={{ textAlign: 'center', fontSize: '13px', color: '#AEAEB2', marginTop: '16px', fontFamily: FONT }}>
+          Scanning… {loaded} / {NIFTY50_SYMBOLS.length} loaded
+        </p>
+      )}
 
     </div>
   );

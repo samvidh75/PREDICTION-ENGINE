@@ -1,48 +1,49 @@
 :root {
-  /* Backgrounds — pure white, no warm tints */
+  /* Backgrounds — Apple pure white system */
   --bg-page:        #FFFFFF;
   --bg-card:        #FFFFFF;
-  --bg-card-hover:  #FAFAFA;
-  --bg-chip:        #F5F5F5;
+  --bg-card-hover:  #F5F5F7;
+  --bg-chip:        #F5F5F7;
+  --bg-section:     #F5F5F7;
 
-  /* Brand — Stripe blue, NOT #1A56DB */
-  --brand:          #0070F3;
-  --brand-light:    #E6F0FE;
-  --brand-dark:     #0051CC;
+  /* Brand — Apple black (primary CTA) */
+  --brand:          #0066CC;
+  --brand-light:    #E5F0FA;
+  --brand-dark:     #004499;
 
   /* Semantic */
-  --green:          #13C23E;
-  --green-light:    #E8F9ED;
-  --red:            #F5222D;
-  --red-light:      #FFF1F0;
-  --amber:          #FAAD14;
-  --amber-light:    #FFFBE6;
+  --green:          #1D7A3D;
+  --green-light:    #E8F5EE;
+  --red:            #D93025;
+  --red-light:      #FDE8E6;
+  --amber:          #B45309;
+  --amber-light:    #FEF3C7;
 
-  /* Text */
-  --text-primary:   #111111;
-  --text-body:      #333333;
-  --text-secondary: #666666;
-  --text-muted:     #999999;
+  /* Text — Apple near-black system */
+  --text-primary:   #1D1D1F;
+  --text-body:      #3A3A3C;
+  --text-secondary: #6E6E73;
+  --text-muted:     #AEAEB2;
   --text-inverse:   #FFFFFF;
 
-  /* Borders */
-  --border:         #E5E5E5;
-  --border-strong:  #D9D9D9;
-  --border-focus:   #0070F3;
+  /* Borders — Apple hairline */
+  --border:         #D2D2D7;
+  --border-strong:  #AEAEB2;
+  --border-focus:   #0066CC;
 
-  /* Typography — system fonts, NO Inter */
-  --font-sans:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font:           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono:      "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  /* Typography — Apple SF Pro system font stack */
+  --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font:           -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:      "SF Mono", "SFMono-Regular", ui-monospace, Menlo, monospace;
 
-  /* Radius — max 8px */
+  /* Radius — Apple standard */
   --radius-sm:      4px;
-  --radius-md:      6px;
-  --radius-lg:      8px;
-  --radius-xl:      8px;
+  --radius-md:      8px;
+  --radius-lg:      12px;
+  --radius-xl:      18px;
 
-  /* Elevation — minimal */
-  --shadow-card:    0 1px 3px rgba(0,0,0,0.08);
-  --shadow-raised:  0 4px 12px rgba(0,0,0,0.12);
-  --shadow-modal:   0 8px 24px rgba(0,0,0,0.14);
+  /* Elevation — Apple minimal */
+  --shadow-card:    0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.06);
+  --shadow-raised:  0 4px 16px rgba(0,0,0,0.08);
+  --shadow-modal:   0 20px 60px rgba(0,0,0,0.12);
 }
