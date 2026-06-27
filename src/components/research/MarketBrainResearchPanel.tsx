@@ -81,8 +81,11 @@ function EvidenceReviewStatus({ evidenceReview }: { evidenceReview: MarketBrainE
   );
 }
 
-function ResearchBody({ research }: { research: MarketBrainResearchView }) {
-  const generated = new Date(research.generatedAt).toLocaleString('en-IN', {
+function formatGeneratedAt(generatedAt: string): string {
+  const generatedDate = new Date(generatedAt);
+  if (Number.isNaN(generatedDate.getTime())) return 'Generated time unavailable.';
+
+  const generated = generatedDate.toLocaleString('en-IN', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -90,6 +93,10 @@ function ResearchBody({ research }: { research: MarketBrainResearchView }) {
     minute: '2-digit',
   });
 
+  return `Generated ${generated}.`;
+}
+
+function ResearchBody({ research }: { research: MarketBrainResearchView }) {
   return (
     <div style={{ display: 'grid', gap: 18 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -123,7 +130,7 @@ function ResearchBody({ research }: { research: MarketBrainResearchView }) {
       )}
 
       <div style={{ borderTop: '1px solid rgba(15,23,42,0.08)', paddingTop: 12, fontSize: 11, color: '#64748B', lineHeight: 1.5 }}>
-        {research.methodNote} Generated {generated}.
+        {research.methodNote} {formatGeneratedAt(research.generatedAt)}
       </div>
     </div>
   );
