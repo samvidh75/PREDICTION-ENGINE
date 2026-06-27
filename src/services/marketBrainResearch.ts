@@ -134,13 +134,20 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
   };
 };
 
+const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
 const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
+  const symbol = asTrimmedString(payload.symbol) || asTrimmedString(research.symbol);
+  const companyName = asTrimmedString(payload.companyName) || asTrimmedString(research.companyName);
+
   return {
-    symbol: typeof payload.symbol === 'string' ? payload.symbol : String(research.symbol ?? '').toUpperCase(),
-    companyName: typeof payload.companyName === 'string' ? payload.companyName : String(research.companyName ?? ''),
+    symbol: normalizeSymbol(symbol),
+    companyName,
     research: {
       ...(research as MarketBrainResearchView),
+      symbol: normalizeSymbol(symbol),
+      companyName,
       thesis: asStringArray(research.thesis),
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
