@@ -37,10 +37,6 @@
   --shadow-md: var(--sh-raised);
   --shadow-lg: var(--sh-float);
 
-  --radius-sm: var(--r-xs);
-  --radius-md: var(--r-md);
-  --radius-lg: var(--r-lg);
-
   --transition-fast: var(--t-fast);
   --transition-base: var(--t-base);
   --transition-slow: var(--t-slow);

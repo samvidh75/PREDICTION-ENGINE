@@ -146,7 +146,7 @@ Provide a clear, informative answer based on the context. Be concise but compreh
     const prompt = `Original Investment Thesis for ${symbol}:
 Bull Case: ${originalThesis.bullCase}
 Bear Case: ${originalThesis.bearCase}
-Key Risks: ${originalThesis.keyRisks.join(', ')}
+Key Risks: ${(originalThesis.keyRisks ?? []).join(', ')}
 
 Current Analysis Scores:
 Quality: ${currentAnalysis.quality.score}/100
@@ -276,7 +276,7 @@ Generate an investment thesis. Return JSON:
 Overall Analysis Score: ${overallScore.toFixed(0)}/100
 Bull Case: ${thesis.bullCase}
 Bear Case: ${thesis.bearCase}
-Key Risks: ${thesis.keyRisks.join(', ')}
+Key Risks: ${(thesis.keyRisks ?? []).join(', ')}
 
 Generate a recommendation. Return JSON:
 {
