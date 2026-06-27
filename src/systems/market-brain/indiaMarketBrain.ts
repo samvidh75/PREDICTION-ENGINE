@@ -80,6 +80,7 @@ export interface IndiaMarketBrainResult {
   risksToReview: string[];
   whatToWatch: string[];
   missingEvidence: MarketDataDomain[];
+  partialEvidence: MarketDataDomain[];
   complianceNote: string;
   generatedAt: string;
 }
@@ -228,6 +229,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const ownership = scoreOwnership(packet.ownership);
   const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
   const missing = evidenceCoverage.missing;
+  const partial = evidenceCoverage.partial;
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -263,6 +265,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
       'Whether the original thesis improves or weakens after new evidence.',
     ],
     missingEvidence: missing,
+    partialEvidence: partial,
     complianceNote: 'Research-only output. Not personal investment advice.',
     generatedAt: new Date().toISOString(),
   };
