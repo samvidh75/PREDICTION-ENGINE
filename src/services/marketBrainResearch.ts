@@ -74,7 +74,7 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
   if (!value) return EMPTY_EVIDENCE_REVIEW;
   const partial = Array.isArray(value.partial) ? value.partial : [];
   const missing = Array.isArray(value.missing) ? value.missing : [];
-  const needsReview = Boolean(value.needsReview ?? partial.length > 0 || missing.length > 0);
+  const needsReview = value.needsReview ?? (partial.length > 0 || missing.length > 0);
 
   return {
     needsReview,
