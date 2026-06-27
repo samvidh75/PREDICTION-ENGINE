@@ -69,6 +69,30 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.factorViews).toEqual([]);
   });
 
+  it('normalizes response identity fields before public rendering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        symbol: ' tcs ',
+        companyName: ' Tata Consultancy Services ',
+        research: {
+          ...responsePayload.research,
+          symbol: ' tcs ',
+          companyName: ' Tata Consultancy Services ',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.symbol).toBe('TCS');
+    expect(result.companyName).toBe('Tata Consultancy Services');
+    expect(result.research.symbol).toBe('TCS');
+    expect(result.research.companyName).toBe('Tata Consultancy Services');
+  });
+
   it('filters unknown evidence domains from public client metadata', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
