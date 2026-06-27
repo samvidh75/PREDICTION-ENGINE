@@ -89,6 +89,19 @@ describe('toMarketBrainResearchView', () => {
     expect(view.factorViews.find((factor) => factor.key === 'valuation')?.summary).toBe('Valuation needs peer and history context.');
   });
 
+  it('rejects direct recommendation language before returning public research copy', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+    const unsafeCopy = ['Strong', 'Buy'].join(' ');
+
+    expect(() => toMarketBrainResearchView({
+      ...result,
+      headline: unsafeCopy,
+    })).toThrow('Market brain copy contains recommendation language that requires compliance review.');
+  });
+
   it('surfaces partial evidence as review metadata without marking it missing', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
