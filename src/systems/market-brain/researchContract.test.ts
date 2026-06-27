@@ -55,6 +55,27 @@ describe('toMarketBrainResearchView', () => {
     expect(view.evidenceReview.summary).toBe('Required research evidence is available for this view.');
   });
 
+  it('uses the shared narrative fallback for empty research risk bullets', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: {
+        instrument_master: 'ready',
+        prices: 'ready',
+        fundamentals: 'ready',
+        financial_statements: 'ready',
+        technicals: 'ready',
+        sector_context: 'ready',
+      },
+    });
+
+    const view = toMarketBrainResearchView({
+      ...result,
+      risksToReview: [],
+    });
+
+    expect(view.risksToReview).toEqual(['No dominant signal yet.']);
+  });
+
   it('surfaces partial evidence as review metadata without marking it missing', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
@@ -74,5 +95,27 @@ describe('toMarketBrainResearchView', () => {
     expect(view.evidenceReview.partial).toEqual(['fundamentals']);
     expect(view.evidenceReview.missing).toEqual([]);
     expect(view.evidenceReview.summary).toContain('Needs review: fundamentals.');
+  });
+
+  it('rejects unsafe factor copy before it can reach frontend surfaces', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: {
+        instrument_master: 'ready',
+        prices: 'ready',
+        fundamentals: 'ready',
+        financial_statements: 'ready',
+        technicals: 'ready',
+        sector_context: 'ready',
+      },
+    });
+
+    expect(() => toMarketBrainResearchView({
+      ...result,
+      quality: {
+        ...result.quality,
+        drivers: ['Strong Buy setup.'],
+      },
+    })).toThrow('Market brain copy contains recommendation language');
   });
 });
