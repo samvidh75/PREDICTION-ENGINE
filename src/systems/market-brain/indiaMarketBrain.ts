@@ -1,3 +1,5 @@
+import { normalizeEvidenceCoverage } from './evidenceNormalization';
+
 export type MarketDataDomain =
   | 'instrument_master'
   | 'prices'
@@ -208,14 +210,9 @@ function scoreOwnership(own?: IndiaEquityOwnership): FactorScore {
   };
 }
 
-function missingEvidence(packet: IndiaEquityPacket): MarketDataDomain[] {
-  const required: MarketDataDomain[] = ['instrument_master', 'prices', 'fundamentals', 'financial_statements', 'technicals', 'sector_context'];
-  return required.filter((domain) => packet.evidence?.[domain] !== 'ready');
-}
-
-function researchState(convictionScore: number, riskScore: number, missingCount: number): ResearchState {
+function researchState(convictionScore: number, riskScore: number, unusableCount: number): ResearchState {
   if (riskScore >= 72) return 'Risk rising';
-  if (missingCount >= 3) return 'Needs review';
+  if (unusableCount >= 3) return 'Needs review';
   if (convictionScore >= 78 && riskScore <= 45) return 'High conviction';
   if (convictionScore >= 68 && riskScore <= 55) return 'Thesis improving';
   return 'Watch';
@@ -229,7 +226,8 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const momentum = scoreMomentum(packet.technicals);
   const risk = scoreRisk(packet.fundamentals, packet.technicals, packet.ownership);
   const ownership = scoreOwnership(packet.ownership);
-  const missing = missingEvidence(packet);
+  const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
+  const missing = evidenceCoverage.missing;
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -247,7 +245,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   return {
     symbol: packet.symbol.toUpperCase(),
     companyName: packet.companyName,
-    researchState: researchState(convictionScore, risk.score, missing.length),
+    researchState: researchState(convictionScore, risk.score, evidenceCoverage.missing.length),
     convictionScore,
     quality,
     growth,
