@@ -88,6 +88,7 @@ export interface IndiaMarketBrainResult {
 
 const clamp = (value: number): number => Math.min(100, Math.max(0, value));
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
 const higherIsBetter = (value: number | null | undefined, low: number, high: number): number => {
   if (!finite(value)) return 50;
@@ -246,7 +247,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const risksToReview = unique([quality.risks, growth.risks, valuation.risks, stability.risks, momentum.risks, risk.risks, ownership.risks]);
 
   return {
-    symbol: packet.symbol.toUpperCase(),
+    symbol: normalizeSymbol(packet.symbol),
     companyName: packet.companyName,
     researchState: researchState(convictionScore, risk.score, evidenceCoverage.missing.length),
     convictionScore,
