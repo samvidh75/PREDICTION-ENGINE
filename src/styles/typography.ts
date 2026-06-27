@@ -79,5 +79,4 @@ export const typography = {
   },
 } as const satisfies Record<string, React.CSSProperties>;
 
-export { FONT_STACK };
 export type Typography = typeof typography;
