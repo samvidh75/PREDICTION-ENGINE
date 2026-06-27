@@ -1,4 +1,5 @@
 import { query } from '../db/index';
+import logger from '../config/logger';
 
 export interface StockEntry {
   id: number;
@@ -33,10 +34,10 @@ export class StockUniverseService {
          LIMIT $4`,
         [pattern, `%${queryStr}%`, upper, limit],
       );
-      console.log(`[StockUniverse] search found ${res.rows.length} result(s) for "${queryStr}"`);
+      logger.info({ query: queryStr, results: res.rows.length }, '[StockUniverse] Search completed');
       return res.rows.map(r => this.mapRow(r));
     } catch (err) {
-      console.error(`[StockUniverse] search error for "${queryStr}":`, err);
+      logger.error({ err, query: queryStr }, '[StockUniverse] Search failed');
       return [];
     }
   }
@@ -144,7 +145,7 @@ export class StockUniverseService {
       );
       return true;
     } catch (err) {
-      console.error('[StockUniverse] upsert error:', err);
+      logger.error({ err, symbol: stock.symbol }, '[StockUniverse] Upsert failed');
       return false;
     }
   }

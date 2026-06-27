@@ -25,8 +25,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     symbol: research.symbol,
     companyName: research.companyName,
     exchange: research.exchangeBadge,
-    sector: research.sector,
-    industry: research.industry,
+    sector: research.sector || "Uncategorized",
+    industry: research.industry || "Uncategorized",
     price: {
       current: research.price,
       changeAbs: research.change,
@@ -63,6 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     priceHistory: research.priceHistory,
     financials: research.financials,
     shareholding: research.shareholding,
+    shareholdings: research.shareholding,
     news: research.news,
     thesis: research.thesis,
   };

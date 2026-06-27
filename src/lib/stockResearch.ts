@@ -44,8 +44,16 @@ export interface StockResearchDetail extends StockResearchSummary {
   businessSegments: string[];
   priceHistory: Record<string, Array<{ label: string; price: number }>>;
   financials: {
-    revenue: Array<{ period: string; value: number }>;
-    profit: Array<{ period: string; value: number }>;
+    annual: {
+      revenue: Array<{ period: string; value: number }>;
+      profit: Array<{ period: string; value: number }>;
+      ebitda: Array<{ period: string; value: number }>;
+    };
+    quarterly: {
+      revenue: Array<{ period: string; value: number }>;
+      profit: Array<{ period: string; value: number }>;
+      ebitda: Array<{ period: string; value: number }>;
+    };
   };
   shareholding: Array<{
     period: string;
@@ -55,7 +63,7 @@ export interface StockResearchDetail extends StockResearchSummary {
     retail: number;
     deltas: { promoter: number; fii: number; dii: number; retail: number };
   }>;
-  news: Array<{ headline: string; source: string; time: string }>;
+  news: Array<{ headline: string; source: string; time: string; link: string; publishedAt: string }>;
   thesis: {
     thesis: string;
     bullCase: string;
@@ -112,6 +120,14 @@ function inferIndustry(sector: string): string {
   if (sector === "Automotive") return "Automobiles";
   if (sector === "Materials & Mining") return "Steel";
   return "FMCG";
+}
+
+function normalizeCategory(value: string | null | undefined, fallback: string): string {
+  const normalized = value?.trim();
+  if (!normalized || normalized === "-" || normalized === "—") {
+    return fallback;
+  }
+  return normalized;
 }
 
 function expandUniverse(base: BaseStockCandidate[]): BaseStockCandidate[] {
@@ -213,8 +229,8 @@ function buildSummary(stock: BaseStockCandidate): StockResearchSummary {
     symbol: stock.symbol,
     name: stock.name,
     exchange: stock.exchange,
-    sector: stock.sector,
-    industry: stock.industry,
+    sector: normalizeCategory(stock.sector, "Uncategorized"),
+    industry: normalizeCategory(stock.industry, "Uncategorized"),
     price,
     change,
     changePercent,
@@ -293,16 +309,38 @@ function buildPriceHistory(symbol: string, price: number): StockResearchDetail["
 function buildFinancialSeries(symbol: string, marketCap: number): StockResearchDetail["financials"] {
   const baseRevenue = marketCap / 180;
   const baseProfit = marketCap / 720;
-  const periods = ["Q1", "Q2", "Q3", "Q4"];
+  const baseEbitda = marketCap / 540;
+  const annualPeriods = ["FY2020", "FY2021", "FY2022", "FY2023", "FY2024", "FY2025"];
+  const quarterlyPeriods = ["Q1 FY26", "Q4 FY25", "Q3 FY25", "Q2 FY25", "Q1 FY25", "Q4 FY24"];
   return {
-    revenue: periods.map((period, index) => ({
-      period,
-      value: round(baseRevenue * (1 + seeded(`${symbol}:rev:${index}`, -0.1, 0.16, 3)), 0),
-    })),
-    profit: periods.map((period, index) => ({
-      period,
-      value: round(baseProfit * (1 + seeded(`${symbol}:pat:${index}`, -0.12, 0.18, 3)), 0),
-    })),
+    annual: {
+      revenue: annualPeriods.map((period, index) => ({
+        period,
+        value: round(baseRevenue * (1 + seeded(`${symbol}:annual:rev:${index}`, -0.08, 0.18, 3)), 0),
+      })),
+      profit: annualPeriods.map((period, index) => ({
+        period,
+        value: round(baseProfit * (1 + seeded(`${symbol}:annual:pat:${index}`, -0.1, 0.2, 3)), 0),
+      })),
+      ebitda: annualPeriods.map((period, index) => ({
+        period,
+        value: round(baseEbitda * (1 + seeded(`${symbol}:annual:ebitda:${index}`, -0.09, 0.19, 3)), 0),
+      })),
+    },
+    quarterly: {
+      revenue: quarterlyPeriods.map((period, index) => ({
+        period,
+        value: round((baseRevenue / 4) * (1 + seeded(`${symbol}:quarterly:rev:${index}`, -0.14, 0.16, 3)), 0),
+      })),
+      profit: quarterlyPeriods.map((period, index) => ({
+        period,
+        value: round((baseProfit / 4) * (1 + seeded(`${symbol}:quarterly:pat:${index}`, -0.15, 0.18, 3)), 0),
+      })),
+      ebitda: quarterlyPeriods.map((period, index) => ({
+        period,
+        value: round((baseEbitda / 4) * (1 + seeded(`${symbol}:quarterly:ebitda:${index}`, -0.14, 0.18, 3)), 0),
+      })),
+    },
   };
 }
 
@@ -328,12 +366,43 @@ function buildShareholding(symbol: string): StockResearchDetail["shareholding"] 
 }
 
 function buildNews(stock: StockResearchSummary): StockResearchDetail["news"] {
+  const now = Date.now();
   return [
-    { headline: `${stock.name} remained in focus after fresh operating updates`, source: "Reuters", time: "2h ago" },
-    { headline: `${stock.sector} research points to a changing sector backdrop`, source: "Mint", time: "5h ago" },
-    { headline: `What changed in valuation context for ${stock.symbol}`, source: "ET Markets", time: "1d ago" },
-    { headline: `${stock.name} stays on watchlists after recent results`, source: "Business Standard", time: "2d ago" },
-    { headline: `${stock.industry} trends continue to influence research conviction`, source: "CNBC TV18", time: "3d ago" },
+    {
+      headline: `${stock.name} remained in focus after fresh operating updates`,
+      source: "Reuters",
+      time: "2h ago",
+      link: `https://www.reuters.com/markets/companies/${stock.symbol.toLowerCase()}`,
+      publishedAt: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      headline: `${stock.sector} research points to a changing sector backdrop`,
+      source: "Mint",
+      time: "5h ago",
+      link: "https://www.livemint.com/market",
+      publishedAt: new Date(now - 5 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      headline: `What changed in valuation context for ${stock.symbol}`,
+      source: "ET Markets",
+      time: "1d ago",
+      link: "https://economictimes.indiatimes.com/markets",
+      publishedAt: new Date(now - 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      headline: `${stock.name} stays on watchlists after recent results`,
+      source: "Business Standard",
+      time: "2d ago",
+      link: "https://www.business-standard.com/markets",
+      publishedAt: new Date(now - 48 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+      headline: `${stock.industry} trends continue to influence research conviction`,
+      source: "CNBC TV18",
+      time: "3d ago",
+      link: "https://www.cnbctv18.com/market",
+      publishedAt: new Date(now - 72 * 60 * 60 * 1000).toISOString(),
+    },
   ];
 }
 
@@ -425,7 +494,9 @@ export function getScannerStocks(scanType: "quality" | "value" | "momentum" | "s
 export function getStockResearch(symbol: string): StockResearchDetail | null {
   const summary = mergedUniverse.find((stock) => stock.symbol.toUpperCase() === symbol.toUpperCase());
   if (!summary) return null;
-  const medians = sectorMedians.get(summary.sector) ?? { pe: 0, roe: 0, growth: 0 };
+  const normalizedSector = normalizeCategory(summary.sector, "Uncategorized");
+  const normalizedIndustry = normalizeCategory(summary.industry, "Uncategorized");
+  const medians = sectorMedians.get(normalizedSector) ?? { pe: 0, roe: 0, growth: 0 };
   const confidenceMeter = confidenceFromCoverage(
     [
       summary.pe,
@@ -450,8 +521,10 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
     employees: `${Math.round(seeded(`${summary.symbol}:employees`, 1800, 82000, 0)).toLocaleString("en-IN")}`,
     website: `www.${summary.symbol.toLowerCase()}.com`,
     isin: `INE${String(hash(summary.symbol)).padStart(9, "0").slice(0, 9)}0`,
-    description: `${summary.name} is tracked for its position in ${summary.industry} within the ${summary.sector} sector, with research centered on business quality, valuation context, conviction, and risk.`,
-    businessSegments: [summary.industry, `${summary.sector} Core`, "Domestic operations"],
+    sector: normalizedSector,
+    industry: normalizedIndustry,
+    description: `${summary.name} is tracked for its position in ${normalizedIndustry} within the ${normalizedSector} sector, with research centered on business quality, valuation context, conviction, and risk.`,
+    businessSegments: [normalizedIndustry, `${normalizedSector} Core`, "Domestic operations"],
     priceHistory: buildPriceHistory(summary.symbol, summary.price),
     financials: buildFinancialSeries(summary.symbol, summary.marketCap),
     shareholding: buildShareholding(summary.symbol),

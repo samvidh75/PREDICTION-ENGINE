@@ -1,3 +1,5 @@
+import logger from '../config/logger';
+
 type RequestKey = string;
 
 interface PendingRequest<T> {
@@ -15,7 +17,7 @@ export class RequestDeduplicator {
   static async execute<T>(key: RequestKey, executor: () => Promise<T>): Promise<T> {
     const existing = this.pending.get(key);
     if (existing) {
-      console.log(`[Dedup] Reusing pending request: ${key}`);
+      logger.debug({ key }, '[Dedup] Reusing pending request');
       return existing.promise;
     }
 
@@ -41,7 +43,7 @@ export class RequestDeduplicator {
     });
 
     try {
-      console.log(`[Dedup] Executing: ${key}`);
+      logger.debug({ key }, '[Dedup] Executing request');
       const result = await executor();
       resolve!(result);
       clearTimeout(timeoutId);

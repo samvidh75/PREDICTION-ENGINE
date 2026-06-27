@@ -16,7 +16,7 @@ export function AppRoutes() {
         <Route path="/scanner" element={<ScannerPage />} />
         <Route path="/watchlist" element={<PlaceholderPage title="Watchlist" />} />
         <Route path="/compare" element={<PlaceholderPage title="Compare" />} />
-        <Route path="/stock/:symbol" element={<StockPage />} />
+        <Route path="/stock/:symbol/*" element={<StockPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
