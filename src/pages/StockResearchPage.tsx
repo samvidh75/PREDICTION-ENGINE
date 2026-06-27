@@ -33,6 +33,7 @@ import { Skeleton } from "../components/ui/Skeleton";
 import FinancialHistogram from "../components/charts/FinancialHistogram";
 import { SafeBlock } from "../components/ErrorBoundary";
 import NewsFeed from "../components/news/NewsFeed";
+import MarketBrainResearchPanel from "../components/research/MarketBrainResearchPanel";
 import HealthGauge from "../components/ui/HealthGauge";
 import { computeHealthScore, getHealthLabel, getHealthColor } from "../lib/healthScore";
 import { navigate } from "../components/product/routeConfig";
@@ -351,7 +352,12 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
 
         <div className="lg:grid lg:grid-cols-[8fr_4fr] lg:gap-6">
           <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 0 }}>
-            {/* 4. Healthometer */}
+            {/* 4. Market Brain */}
+            <SafeBlock>
+              <MarketBrainResearchPanel symbol={symbol} />
+            </SafeBlock>
+
+            {/* 5. Healthometer */}
             <SectionCard>
               <SectionTitle>Healthometer</SectionTitle>
               <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
@@ -389,7 +395,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </div>
             </SectionCard>
 
-            {/* 5. Key Metrics */}
+            {/* 6. Key Metrics */}
             <SectionCard>
               <SectionTitle>Key Metrics</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr", gap: 16 }}>
@@ -409,7 +415,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </div>
             </SectionCard>
 
-            {/* 6. Company Details & Business Summary */}
+            {/* 7. Company Details & Business Summary */}
             <SectionCard>
               <SectionTitle>About {data?.price.companyName ?? symbol}</SectionTitle>
               <p style={{ fontSize: 13, color: "#475569", lineHeight: 1.7, margin: 0 }}>
@@ -417,7 +423,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </p>
             </SectionCard>
 
-            {/* 7. Company Facts */}
+            {/* 8. Company Facts */}
             <SectionCard>
               <SectionTitle>Company Facts</SectionTitle>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -430,7 +436,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </div>
             </SectionCard>
 
-            {/* 8. Financial Histogram */}
+            {/* 9. Financial Histogram */}
             <SectionCard>
               <SectionTitle>Financial Performance</SectionTitle>
               <SafeBlock>
@@ -438,7 +444,7 @@ export default function StockResearchPage({ symbol }: { symbol: string }) {
               </SafeBlock>
             </SectionCard>
 
-            {/* 9. News */}
+            {/* 10. News */}
             <SectionCard>
               <SectionTitle>News & Updates</SectionTitle>
               <NewsFeed symbol={symbol} />
