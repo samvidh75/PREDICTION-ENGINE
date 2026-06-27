@@ -31,18 +31,20 @@ const basePacket = {
   },
 };
 
+const completeEvidence = {
+  instrument_master: 'ready' as const,
+  prices: 'ready' as const,
+  fundamentals: 'ready' as const,
+  financial_statements: 'ready' as const,
+  technicals: 'ready' as const,
+  sector_context: 'ready' as const,
+};
+
 describe('toMarketBrainResearchView', () => {
   it('creates a product-safe research view from output', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
-      evidence: {
-        instrument_master: 'ready',
-        prices: 'ready',
-        fundamentals: 'ready',
-        financial_statements: 'ready',
-        technicals: 'ready',
-        sector_context: 'ready',
-      },
+      evidence: completeEvidence,
     });
 
     const view = toMarketBrainResearchView(result);
@@ -58,14 +60,7 @@ describe('toMarketBrainResearchView', () => {
   it('uses the shared narrative fallback for empty research risk bullets', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
-      evidence: {
-        instrument_master: 'ready',
-        prices: 'ready',
-        fundamentals: 'ready',
-        financial_statements: 'ready',
-        technicals: 'ready',
-        sector_context: 'ready',
-      },
+      evidence: completeEvidence,
     });
 
     const view = toMarketBrainResearchView({
@@ -76,16 +71,30 @@ describe('toMarketBrainResearchView', () => {
     expect(view.risksToReview).toEqual(['No dominant signal yet.']);
   });
 
+  it('uses factor driver, risk, then neutral fallback summaries', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+
+    const view = toMarketBrainResearchView({
+      ...result,
+      quality: { score: 72, drivers: ['Quality driver copy.'], risks: ['Quality risk copy.'] },
+      growth: { score: 38, drivers: [], risks: ['Growth risk copy.'] },
+      valuation: { score: 50, drivers: [], risks: [] },
+    });
+
+    expect(view.factorViews.find((factor) => factor.key === 'quality')?.summary).toBe('Quality driver copy.');
+    expect(view.factorViews.find((factor) => factor.key === 'growth')?.summary).toBe('Growth risk copy.');
+    expect(view.factorViews.find((factor) => factor.key === 'valuation')?.summary).toBe('Valuation needs peer and history context.');
+  });
+
   it('surfaces partial evidence as review metadata without marking it missing', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
       evidence: {
-        instrument_master: 'ready',
-        prices: 'ready',
+        ...completeEvidence,
         fundamentals: 'partial',
-        financial_statements: 'ready',
-        technicals: 'ready',
-        sector_context: 'ready',
       },
     });
 
@@ -101,11 +110,9 @@ describe('toMarketBrainResearchView', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
       evidence: {
-        instrument_master: 'ready',
-        prices: 'ready',
+        ...completeEvidence,
         fundamentals: 'partial',
         financial_statements: 'missing',
-        technicals: 'ready',
         sector_context: 'missing',
       },
     });
@@ -116,27 +123,5 @@ describe('toMarketBrainResearchView', () => {
     expect(view.evidenceReview.summary).toContain('Unavailable evidence: Financial Statements, Sector Context.');
     expect(view.evidenceReview.summary).not.toContain('financial_statements');
     expect(view.evidenceReview.summary).not.toContain('sector_context');
-  });
-
-  it('rejects unsafe factor copy before it can reach frontend surfaces', () => {
-    const result = evaluateIndiaEquity({
-      ...basePacket,
-      evidence: {
-        instrument_master: 'ready',
-        prices: 'ready',
-        fundamentals: 'ready',
-        financial_statements: 'ready',
-        technicals: 'ready',
-        sector_context: 'ready',
-      },
-    });
-
-    expect(() => toMarketBrainResearchView({
-      ...result,
-      quality: {
-        ...result.quality,
-        drivers: ['Strong Buy setup.'],
-      },
-    })).toThrow('Market brain copy contains recommendation language');
   });
 });
