@@ -157,17 +157,20 @@ function classifyCompositeScore(score: number): string {
 
 function buildDriverDescription(engine: string, score: number, fin: any): string {
   switch (engine) {
-    case 'Quality':
+    case 'Quality': {
       const roic = fin?.roic != null ? Number(fin.roic) : null;
       const roe = fin?.roe != null ? Number(fin.roe) : null;
       return `Strong quality score (${score}). ${roic ? `High ROIC of ${(roic*100).toFixed(1)}%. ` : ''}${roe ? `ROE of ${(roe*100).toFixed(1)}%. ` : ''}Fundamentals are robust.`;
-    case 'Growth':
+    }
+    case 'Growth': {
       const revG = fin?.revenue_growth != null ? `${(Number(fin.revenue_growth)*100).toFixed(1)}% revenue growth` : '';
       const epsG = fin?.eps_growth != null ? `${(Number(fin.eps_growth)*100).toFixed(1)}% EPS growth` : '';
       return `Strong growth score (${score}). ${[revG, epsG].filter(Boolean).join(', ') || 'Growth trajectory is accelerating.'}`;
-    case 'Value':
+    }
+    case 'Value': {
       const pe = fin?.pe_ratio != null ? Number(fin.pe_ratio).toFixed(1) : '';
       return `Strong value score (${score}). ${pe ? `PE ratio of ${pe}. ` : ''}Valuation is attractive relative to fundamentals.`;
+    }
     case 'Momentum':
       return `Strong momentum score (${score}). Price trend shows institutional follow-through with high conviction.`;
     default:

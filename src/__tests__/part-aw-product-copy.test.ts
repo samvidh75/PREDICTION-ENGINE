@@ -7,7 +7,7 @@ const normalRouteFiles = [
   "src/pages/PortfolioPage.tsx",
   "src/pages/AlertsPage.tsx",
   "src/pages/TrustCentrePage.tsx",
-  "src/components/layout/AppShell.tsx",
+  "src/App.tsx",
 ];
 
 const forbiddenRenderedPhrases = [

@@ -19,7 +19,7 @@ function load(): TrackedCompany[] {
 function save(items: TrackedCompany[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {}
+  } catch {/* silent */}
 }
 
 export function getTrackedCompanies(): TrackedCompany[] {

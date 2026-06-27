@@ -36,11 +36,11 @@ export function getStaleSnapshot(symbol: string): StockPageSnapshot | null {
 export function setCachedSnapshot(symbol: string, snapshot: StockPageSnapshot): void {
   try {
     sessionStorage.setItem(storageKey(symbol), JSON.stringify({ snapshot, ts: Date.now() }));
-  } catch {}
+  } catch {/* silent */}
 }
 
 export function clearCachedSnapshot(symbol: string): void {
   try {
     sessionStorage.removeItem(storageKey(symbol));
-  } catch {}
+  } catch {/* silent */}
 }

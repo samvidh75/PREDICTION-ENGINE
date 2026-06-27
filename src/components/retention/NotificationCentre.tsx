@@ -29,7 +29,7 @@ export const NotificationCentre: React.FC<{ userId?: string }> = ({ userId = 'an
       const data = await res.json();
       setAlerts(data.alerts || []);
       setUnreadCount(data.unreadCount || 0);
-    } catch {}
+    } catch {/* silent */}
     setLoading(false);
   }, [userId]);
 

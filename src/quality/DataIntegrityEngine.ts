@@ -52,11 +52,11 @@ export class DataIntegrityEngine {
               if (total > 0 && nonnull / total < 0.5) {
                 checks.push({ table, field: col.column_name, issue: `>50% null values (${nonnull}/${total} non-null)`, severity: 'warning', count: total - nonnull });
               }
-            } catch {}
+            } catch {/* silent */}
           }
-        } catch {}
+        } catch {/* silent */}
       }
-    } catch {}
+    } catch {/* silent */}
 
     // NaN/Infinity check
     try {
@@ -64,7 +64,7 @@ export class DataIntegrityEngine {
       if (parseInt(r.rows[0].c) > 0) {
         checks.push({ table: 'daily_prices', field: 'price', issue: 'NaN values found in OHLC data', severity: 'critical', count: parseInt(r.rows[0].c) });
       }
-    } catch {}
+    } catch {/* silent */}
 
     // Stale data check
     try {
@@ -85,9 +85,9 @@ export class DataIntegrityEngine {
           } else {
             checks.push({ table: t.name, field: t.col, issue: 'No data — table is empty', severity: 'warning', count: 0 });
           }
-        } catch {}
+        } catch {/* silent */}
       }
-    } catch {}
+    } catch {/* silent */}
 
     // Duplicate row check
     try {
@@ -95,7 +95,7 @@ export class DataIntegrityEngine {
       if (parseInt(r.rows[0].c) > 0) {
         checks.push({ table: 'daily_prices', field: 'symbol, trade_date', issue: 'Duplicate (symbol, date) rows detected', severity: 'critical', count: parseInt(r.rows[0].c) });
       }
-    } catch {}
+    } catch {/* silent */}
 
     // Impossible financial values
     try {
@@ -107,7 +107,7 @@ export class DataIntegrityEngine {
 
       const r3 = await pool.query(`SELECT COUNT(*) c FROM financial_snapshots WHERE market_cap < 0`);
       if (parseInt(r3.rows[0].c) > 0) checks.push({ table: 'financial_snapshots', field: 'market_cap', issue: 'Negative market cap', severity: 'critical', count: parseInt(r3.rows[0].c) });
-    } catch {}
+    } catch {/* silent */}
 
     // Score: start at 100, subtract per issue
     let score = 100;

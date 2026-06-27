@@ -20,7 +20,7 @@ export class SnapshotFreshnessMonitor {
   async check(): Promise<FreshnessReport> {
     const tables: FreshnessEntry[] = [];
     let dbOk = false;
-    try { await pool.query('SELECT 1'); dbOk = true; } catch {}
+    try { await pool.query('SELECT 1'); dbOk = true; } catch {/* silent */}
 
     if (!dbOk) {
       return {

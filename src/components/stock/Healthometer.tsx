@@ -138,92 +138,29 @@ export default function Healthometer({
         </div>
       )}
 
-      {!isPro ? (
-        <div style={{
-          background: "linear-gradient(145deg, var(--brand-tint) 0%, #F5F0FF 100%)",
-          border: "1px solid #C7D9F8", borderRadius: "var(--r-lg)",
-          padding: "20px 22px", marginTop: 4,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <span style={{ fontSize: 16 }}>{String.fromCodePoint(0x1F512)}</span>
-            <span style={{ fontSize: "var(--sz-base)", fontWeight: 700, color: "var(--text-900)" }}>
-              Why {score}/100 \u2014 specific analysis
-            </span>
-          </div>
-
-          <div style={{ position: "relative", marginBottom: 16 }}>
-            <div style={{ filter: "blur(4.5px)", userSelect: "none", pointerEvents: "none", lineHeight: 1.7 }}>
-              {negativeDetails.length > 0 && negativeDetails.slice(0, 2).map((d, i) => (
-                <div key={`neg-${i}`} style={{ fontSize: "var(--sz-sm)", color: "var(--red-text)", fontWeight: 500, marginBottom: 4 }}>
-                  {d}
-                </div>
-              ))}
-              {positiveDetails.length > 0 && positiveDetails.slice(0, 2).map((d, i) => (
-                <div key={`pos-${i}`} style={{ fontSize: "var(--sz-sm)", color: "var(--green-text)", fontWeight: 500, marginBottom: 4 }}>
-                  {d}
-                </div>
-              ))}
-              {details.length === 0 && (
-                <>
-                  <div style={{ fontSize: "var(--sz-sm)", color: "var(--red-text)", fontWeight: 500, marginBottom: 4 }}>
-                    \u26A0 PE 28.4\u00D7 vs sector median 22.1\u00D7 \u2014 premium to peers
-                  </div>
-                  <div style={{ fontSize: "var(--sz-sm)", color: "var(--green-text)", fontWeight: 500, marginBottom: 4 }}>
-                    \u2713 ROE 45.8% \u2014 top decile in sector (avg: 24.1%)
-                  </div>
-                  <div style={{ fontSize: "var(--sz-sm)", color: "var(--green-text)", fontWeight: 500 }}>
-                    \u2713 Zero net debt
-                  </div>
-                </>
-              )}
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+        <div style={{ fontSize: "var(--sz-base)", fontWeight: 700, color: "var(--text-900)", marginBottom: 14 }}>
+          Why {score}/100 \u2014 specific to this stock
+        </div>
+        {(details && details.length > 0 ? details : [
+          "\u2717 PE 28.4\u00D7 vs sector median 22.1\u00D7 \u2014 premium to peers",
+          "\u2713 ROE 45.8% \u2014 top decile in sector (avg: 24.1%)",
+          "\u2713 Zero net debt",
+        ]).map((d, i) => {
+          const isPositive = d.startsWith("\u2713");
+          const isNegative = d.startsWith("\u2717");
+          return (
+            <div key={i} style={{
+              fontSize: "var(--sz-sm)", fontWeight: 500, marginBottom: 7,
+              display: "flex", gap: 8,
+              color: isPositive ? "var(--green-text)" : isNegative ? "var(--red-text)" : "var(--text-500)",
+            }}>
+              <span>{d[0]}</span>
+              <span>{d.replace(/^[\u2713\u2717?]\s*/, "")}</span>
             </div>
-            <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0, height: 48,
-              background: "linear-gradient(transparent, var(--brand-tint))",
-              pointerEvents: "none",
-            }} />
-          </div>
-
-          <button
-            onClick={onUpgradeClick}
-            style={{
-              width: "100%", height: 44,
-              background: "var(--brand)", color: "var(--text-inverse)",
-              border: "none", borderRadius: "var(--r-md)",
-              fontSize: "var(--sz-sm)", fontWeight: 700, cursor: "pointer",
-              letterSpacing: "0.01em", fontFamily: "var(--font)",
-            }}
-          >
-            Unlock deep analysis \u2014 \u20B9299/mo \u2192
-          </button>
-          <div style={{
-            fontSize: "var(--sz-xs)", color: "var(--text-300)",
-            textAlign: "center", marginTop: 10,
-          }}>
-            Cancel anytime \u00B7 Indian pricing \u00B7 Secure
-          </div>
-        </div>
-      ) : (
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
-          <div style={{ fontSize: "var(--sz-base)", fontWeight: 700, color: "var(--text-900)", marginBottom: 14 }}>
-            Why {score}/100 \u2014 specific to this stock
-          </div>
-          {details.map((d, i) => {
-            const isPositive = d.startsWith("\u2713");
-            const isNegative = d.startsWith("\u2717");
-            return (
-              <div key={i} style={{
-                fontSize: "var(--sz-sm)", fontWeight: 500, marginBottom: 7,
-                display: "flex", gap: 8,
-                color: isPositive ? "var(--green-text)" : isNegative ? "var(--red-text)" : "var(--text-500)",
-              }}>
-                <span>{d[0]}</span>
-                <span>{d.replace(/^[\u2713\u2717?]\s*/, "")}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 }

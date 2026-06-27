@@ -136,8 +136,7 @@ export class BenchmarkEngine {
         symbols = NIFTY100_SYMBOLS;
         break;
       case 'NIFTY500':
-      case 'EQUAL_WEIGHT_UNIVERSE':
-        // Discover from active registry
+      case 'EQUAL_WEIGHT_UNIVERSE': {
         const regResult = await query(
           `SELECT symbol FROM master_security_registry
            WHERE listing_status = 'Active'
@@ -148,6 +147,7 @@ export class BenchmarkEngine {
           symbols = symbols.slice(0, 500);
         }
         break;
+      }
     }
 
     const { dates, prices, returns } = await this.fetchIndexPrices(symbols, startDate, endDate);

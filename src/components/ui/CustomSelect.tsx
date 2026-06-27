@@ -1,5 +1,6 @@
 import React, { SelectHTMLAttributes, forwardRef } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CustomSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {}
 
 export const CustomSelect = forwardRef<HTMLSelectElement, CustomSelectProps>((props, ref) => {

@@ -213,7 +213,7 @@ export class DailyPipelineScheduler {
   }
 
   private releaseLock(): void {
-    try { fs.unlinkSync(LOCK_FILE); } catch {}
+    try { fs.unlinkSync(LOCK_FILE); } catch {/* silent */}
   }
 
   private async logPipelineStart(runId: string, phase: string): Promise<void> {
@@ -224,7 +224,7 @@ export class DailyPipelineScheduler {
          VALUES ($1, $2, 'running', NOW())`,
         [id, `${runId}:${phase}`]
       );
-    } catch {}
+    } catch {/* silent */}
   }
 
   private async logPipelineComplete(runId: string, phase: string, status: string): Promise<void> {
@@ -234,7 +234,7 @@ export class DailyPipelineScheduler {
          WHERE phase = $2 AND completed_at IS NULL`,
         [status, `${runId}:${phase}`]
       );
-    } catch {}
+    } catch {/* silent */}
   }
 
   private sleep(ms: number): Promise<void> {

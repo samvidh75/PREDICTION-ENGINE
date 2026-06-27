@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", "coverage", "tmp-verification", "reports/archive", "**/*.cjs", "fix.js"] },
+  { ignores: ["dist", "node_modules", "coverage", "tmp-verification", "reports/archive", "**/*.cjs", "fix.js", ".tmp"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

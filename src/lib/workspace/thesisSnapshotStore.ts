@@ -40,7 +40,7 @@ export const thesisSnapshotStore = {
     try {
       localStorage.setItem(storageKey(uid), JSON.stringify(all));
       window.dispatchEvent(new CustomEvent("snapshotchange", { detail: { symbol: key } }));
-    } catch {}
+    } catch {/* silent */}
   },
 
   detectChanges(snapshot: ThesisSnapshot): ResearchChangeEvent[] {
@@ -52,6 +52,6 @@ export const thesisSnapshotStore = {
     const uid = loadUid();
     try {
       localStorage.removeItem(storageKey(uid));
-    } catch {}
+    } catch {/* silent */}
   },
 };

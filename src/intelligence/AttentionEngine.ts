@@ -254,7 +254,7 @@ export class AttentionEngine {
         try {
           const tick = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
           tick.forEach((t: string) => tickers.add(t));
-        } catch {}
+        } catch {/* silent */}
       }
       return [...tickers];
     } catch { return []; }
@@ -271,7 +271,7 @@ export class AttentionEngine {
         try {
           const tick = typeof r.tickers === 'string' ? JSON.parse(r.tickers || '[]') : r.tickers;
           tick.forEach((t: string) => tickers.add(t));
-        } catch {}
+        } catch {/* silent */}
       }
       return [...tickers];
     } catch { return []; }

@@ -18,7 +18,7 @@ function load(): RecentResearch[] {
 function save(items: RecentResearch[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {}
+  } catch {/* silent */}
 }
 
 export function getRecentResearch(): RecentResearch[] {

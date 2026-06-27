@@ -58,7 +58,7 @@ export class YahooFallbackProvider implements MarketDataProvider {
       };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      throw new Error(`Yahoo fallback error for ${symbol}: ${msg}`);
+      throw new Error(`Yahoo fallback error for ${symbol}: ${msg}`, { cause: err });
     } finally {
       clearTimeout(timer);
     }
@@ -110,7 +110,7 @@ export class YahooFallbackProvider implements MarketDataProvider {
       return candles;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      throw new Error(`Yahoo historical fallback error for ${symbol}: ${msg}`);
+      throw new Error(`Yahoo historical fallback error for ${symbol}: ${msg}`, { cause: err });
     } finally {
       clearTimeout(timer);
     }
