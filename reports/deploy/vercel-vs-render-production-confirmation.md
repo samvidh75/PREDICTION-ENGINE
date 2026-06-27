@@ -1,7 +1,8 @@
 # Vercel vs Render — Production Deployment Confirmation
 
-> **Date:** 2025-06-28  
+> **Date:** 2026-06-28  
 > **Scope:** StockStory India — full production deployment architecture
+> **Commit:** `3e50d048` — pushed to `origin/main`
 
 ---
 
@@ -273,9 +274,17 @@ The Render backend is not deployed. To deploy it:
 
 ---
 
+## Secrets & Environment File Policy
+
+The actual production secrets are stored **encrypted** in the Vercel Dashboard (26 env vars marked "sensitive" or "encrypted" type). These **cannot be extracted** via the Vercel CLI — they are only visible in the web dashboard.
+
+Files containing secrets:
+- **`.env.production`** — committed with public-by-design values (Firebase config, Google OAuth client ID). Sensitive values (DATABASE_URL, API keys) noted as `vercel-encrypted`.
+- **`.env.example` / `.env.production.example`** — variable names only, safe for public reference.
+- **Vercel Dashboard** — all actual secret values live here encrypted.
+
 ## Commit Summary
 
-Files committed:
-- `.env.example` — updated VITE_* vars to Vercel domain; documented Render as optional
-- `.env.production.example` — same updates for production template
-- `reports/deploy/vercel-vs-render-production-confirmation.md` — this report
+Files committed (2 commits):
+1. `2d07a0ef` — `.env.example`, `.env.production.example`, `reports/deploy/vercel-vs-render-production-confirmation.md`
+2. `3e50d048` — `.gitignore`, `.env.production` (live config with public values, encrypted secrets noted)
