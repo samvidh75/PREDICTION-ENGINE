@@ -16,9 +16,10 @@ import { authenticatedFetchJSON } from "../auth/authenticatedFetch";
 
 function resolveBaseUrl(): string {
   if (typeof window === "undefined") return "";
-  // In production, Vercel rewrites /api/* to the Railway backend.
+  // In production, Vercel serverless functions handle /api/* directly.
   // In dev, Vite proxies /api/* to VITE_API_TARGET (default localhost:4001).
-  // Both cases use relative /api paths — no absolute URL needed.
+  // For Render backend access (health, WebSocket), use VITE_API_BASE_URL.
+  // Both cases use relative /api paths — no absolute URL needed for most calls.
   return "";
 }
 

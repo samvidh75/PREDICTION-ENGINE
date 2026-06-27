@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
-const API_URL = process.env.PRODUCTION_TEST_URL || 'https://prediction-engine-production-f7a8.up.railway.app';
+const API_URL = process.env.PRODUCTION_TEST_URL || 'https://stockstory-api.onrender.com';
 let serverReachable = false;
 
 beforeAll(async () => {

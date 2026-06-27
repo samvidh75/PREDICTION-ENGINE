@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   for (const symbol of NIFTY_50) {
     try {
       const r = await fetch(
-        `https://prediction-engine-production-f7a8.up.railway.app/api/market-data/snapshot/${symbol}`,
+        `${process.env.RENDER_API_URL || 'https://stockstory-api.onrender.com'}/api/market-data/snapshot/${symbol}`,
         {
           headers: { 'Authorization': `Bearer ${process.env.INTERNAL_API_KEY}` },
           signal: AbortSignal.timeout(10000),

@@ -3,7 +3,7 @@
 //
 // DEPLOYMENT NOTE — required env vars:
 //   Vercel (frontend):  VITE_INDIANAPI_KEY (maps to @indianapi-key Vercel secret)
-//   Railway (backend):  INDIANAPI_KEY, UPSTOX_ACCESS_TOKEN
+//   Render/Fastify: INDIANAPI_KEY, UPSTOX_ACCESS_TOKEN
 // Historical price data is fetched via /api/historical/:symbol (backend proxy)
 // to avoid browser CORS blocks on direct Yahoo Finance requests.
 
