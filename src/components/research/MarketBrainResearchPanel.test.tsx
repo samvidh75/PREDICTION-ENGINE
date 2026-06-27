@@ -54,6 +54,31 @@ describe('MarketBrainResearchPanel', () => {
     expect(screen.queryByText(/buy|sell|hold/i)).toBeNull();
   });
 
+  it('does not render an evidence warning when required evidence is ready', () => {
+    vi.mocked(useMarketBrainResearch).mockReturnValue({
+      data: {
+        ...mockResearch,
+        research: {
+          ...mockResearch.research,
+          evidenceReview: {
+            needsReview: false,
+            partial: [],
+            missing: [],
+            summary: 'Required research evidence is available for this view.',
+          },
+        },
+      },
+      loading: false,
+      error: null,
+      reload: vi.fn(),
+    });
+
+    render(<MarketBrainResearchPanel symbol="TCS" />);
+
+    expect(screen.queryByLabelText('Research evidence status')).toBeNull();
+    expect(screen.queryByText('Required research evidence is available for this view.')).toBeNull();
+  });
+
   it('renders safe fallback when research is unavailable', () => {
     vi.mocked(useMarketBrainResearch).mockReturnValue({
       data: null,
