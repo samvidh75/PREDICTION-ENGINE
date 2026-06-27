@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties, MouseEvent } from 'react';
-import { colors, spacing, radius, shadow, transition } from '../../styles';
+import { colors, spacing, radius } from '../../styles';
 
 interface CardProps {
   children:  ReactNode;
@@ -27,16 +27,14 @@ export function Card({ children, padding = 'md', onClick, style, className }: Ca
         border:       `1px solid ${colors.bg.tertiary}`,
         borderRadius: radius.md,           // 8px max
         padding:      PADDING[padding],
-        boxShadow:    shadow.card,         // 0 1px 3px rgba(0,0,0,0.08)
-        transition:   `box-shadow ${transition.base}`,
         cursor:       isClickable ? 'pointer' : 'default',
         ...style,
       }}
       onMouseEnter={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.boxShadow = shadow.raised;
+        e.currentTarget.style.background = colors.bg.secondary;
       } : undefined}
       onMouseLeave={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.boxShadow = shadow.card;
+        e.currentTarget.style.background = colors.bg.primary;
       } : undefined}
     >
       {children}

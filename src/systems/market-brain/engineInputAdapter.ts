@@ -29,7 +29,6 @@ export function toIndiaEquityPacket(input: EngineLikeInput, company?: CompanyLik
     symbol: input.symbol,
     companyName: company?.companyName ?? company?.name ?? input.symbol.toUpperCase(),
     sector: company?.sector ?? input.sector?.name ?? null,
-    industry: company?.industry ?? null,
     asOf: input.tradeDate ?? new Date().toISOString(),
     fundamentals: input.financials,
     technicals: input.features,

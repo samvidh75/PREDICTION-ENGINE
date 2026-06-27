@@ -40,7 +40,7 @@ const FinancialTooltip = ({ active, payload, label, tabLabel }: any) => {
       minWidth: 190,
     }}>
       <div style={{ fontSize: "var(--sz-xs)", fontWeight: 700, color: "var(--text-300)",
-        textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
+        textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 12 }}>
         {label}{label === getCurrentFY() ? " (TTM)" : ""}
       </div>
       <div style={{ fontSize: "var(--sz-xs)", color: "var(--text-300)", marginBottom: 4 }}>
@@ -99,14 +99,14 @@ export default function FinancialHistogram({
       {visibleTabs.length > 1 && (
         <div style={{
           display: "flex", background: "var(--chip)", borderRadius: "var(--r-md)",
-          padding: 4, gap: 2, width: "fit-content", marginBottom: 20,
+          padding: 4, gap: 4, width: "fit-content", marginBottom: 20,
         }}>
           {visibleTabs.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
               style={{
-                padding: "7px 16px", fontSize: "var(--sz-sm)",
+                padding: "8px 16px", fontSize: "var(--sz-sm)",
                 fontWeight: activeTab === key ? 700 : 500,
                 color: activeTab === key ? "var(--text-900)" : "var(--text-500)",
                 background: activeTab === key ? "var(--surface)" : "transparent",

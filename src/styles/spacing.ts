@@ -29,13 +29,6 @@ export const radius = {
   pill: '9999px', // pill shapes only
 } as const;
 
-export const shadow = {
-  card:   '0 1px 3px rgba(0,0,0,0.08)',
-  raised: '0 4px 12px rgba(0,0,0,0.12)',
-  modal:  '0 8px 24px rgba(0,0,0,0.14)',
-  focus:  '0 0 0 2px rgba(0,112,243,0.25)',
-} as const;
-
 export const transition = {
   fast:   '150ms ease',
   base:   '200ms ease',

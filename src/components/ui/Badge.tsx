@@ -16,7 +16,7 @@ export const Badge = ({ children, variant = 'default', style }: {
   <span style={{
     ...styles[variant],
     display: 'inline-flex', alignItems: 'center', gap: 4,
-    padding: '3px 10px', borderRadius: 100, fontSize: 12, fontWeight: 600,
+    padding: '4px 12px', borderRadius: 100, fontSize: 12, fontWeight: 600,
     letterSpacing: '0.01em', whiteSpace: 'nowrap',
     ...style,
   }}>

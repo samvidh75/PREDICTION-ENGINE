@@ -134,11 +134,11 @@ export default function CompanyInfo({
           }}>
             Business Segments
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {profile.segments.map((seg, i) => (
               <span key={i} style={{
                 fontSize: "var(--sz-sm)", fontWeight: 500, color: "var(--text-500)",
-                padding: "4px 10px", borderRadius: "var(--r-pill)",
+                padding: "4px 12px", borderRadius: "var(--r-pill)",
                 background: "var(--chip)",
               }}>
                 {seg}

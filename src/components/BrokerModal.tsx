@@ -10,12 +10,12 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
         your order.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {BROKER_PARTNERS.map(b => (
           <a key={b.name} href={b.referralUrl} target="_blank" rel="noopener noreferrer"
              style={{
                display: 'flex', alignItems: 'center', gap: 12,
-               padding: '14px 16px', borderRadius: 12,
+               padding: '16px 16px', borderRadius: 12,
                border: '1.5px solid var(--border)', textDecoration: 'none',
                transition: 'border-color 0.15s, background 0.15s',
                cursor: 'pointer',
@@ -39,7 +39,7 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
               <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-900)' }}>
                 {b.name}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-500)', marginTop: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-500)', marginTop: 4 }}>
                 {b.description}
               </div>
             </div>
@@ -48,7 +48,7 @@ export default function BrokerModal({ symbol, price, onClose }: { symbol: string
       </div>
 
       <p style={{ fontSize: 10, color: 'var(--text-300)', marginTop: 20, lineHeight: 1.5,
-                   borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                   borderTop: '1px solid var(--border)', paddingTop: 16 }}>
         StockStory India is not a broker and does not execute trades.
         Clicking a broker opens their website in a new tab.
         This is not investment advice.

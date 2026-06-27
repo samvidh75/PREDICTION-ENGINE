@@ -1,4 +1,5 @@
 import React from "react";
+import { spacing } from "../styles";
 
 export type SpatialFrameVariant = "onboarding" | "private" | "public";
 
@@ -9,33 +10,55 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function getSpatialFrameClassNames(variant: SpatialFrameVariant, isMobile: boolean): string {
-  // Centralized padding + z-layer discipline for major experience surfaces.
-  // Keep these values aligned with existing page spacing to avoid jarring regressions.
+const VARIANT_Z: Record<SpatialFrameVariant, number> = {
+  onboarding: 20,
+  public: 10,
+  private: 10,
+};
+
+function getPt(variant: SpatialFrameVariant): string {
   switch (variant) {
     case "onboarding":
-      return isMobile
-        ? "relative z-[20] ss-px-20 ss-pt-96 ss-pb-64"
-        : "relative z-[20] ss-px-20 ss-px-72-sm ss-pt-96 ss-pb-64";
-
-    // Public About-like pages use pt-[110px] pb-[64px] in the current codebase.
+      return `calc(${spacing.xxxl} + ${spacing.xl})`;
     case "public":
-      return isMobile
-        ? "relative z-[10] ss-px-20 ss-pt-110 ss-pb-64"
-        : "relative z-[10] ss-px-20 ss-px-72-sm ss-pt-110 ss-pb-64";
-
-    // Most private app pages use z-[10], pt-[96px], pb-[80px] today.
+      return "112px";
     case "private":
     default:
-      return isMobile
-        ? "relative z-[10] ss-px-20 ss-pt-96 ss-pb-80"
-        : "relative z-[10] ss-px-20 ss-px-72-sm ss-pt-96 ss-pb-80";
+      return `calc(${spacing.xxxl} + ${spacing.xl})`;
   }
+}
+
+function getPb(variant: SpatialFrameVariant): string {
+  switch (variant) {
+    case "onboarding":
+      return spacing.xxxl;
+    case "public":
+      return spacing.xxxl;
+    case "private":
+    default:
+      return "80px";
+  }
+}
+
+export function getSpatialFrameStyle(variant: SpatialFrameVariant, isMobile: boolean): React.CSSProperties {
+  return {
+    paddingLeft: isMobile ? spacing.pagePadSm : spacing.pagePad,
+    paddingRight: isMobile ? spacing.pagePadSm : spacing.pagePad,
+    paddingTop: getPt(variant),
+    paddingBottom: getPb(variant),
+  };
+}
+
+export function getSpatialFrameClassNames(variant: SpatialFrameVariant): string {
+  return `relative z-[${VARIANT_Z[variant]}]`;
 }
 
 export default function SpatialFrame({ variant, isMobile = false, className, children }: Props): JSX.Element {
   return (
-    <div className={[getSpatialFrameClassNames(variant, isMobile), className ?? ""].join(" ").trim()}>
+    <div
+      className={[getSpatialFrameClassNames(variant), className ?? ""].join(" ").trim()}
+      style={getSpatialFrameStyle(variant, isMobile)}
+    >
       {children}
     </div>
   );

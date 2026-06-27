@@ -15,7 +15,7 @@ const BASE: CSSProperties = {
   display:        'inline-flex',
   alignItems:     'center',
   justifyContent: 'center',
-  gap:            '6px',
+  gap:            '8px',
   fontFamily:     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontWeight:     600,
   border:         'none',

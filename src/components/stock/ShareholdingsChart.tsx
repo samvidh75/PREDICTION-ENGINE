@@ -39,7 +39,7 @@ export default function ShareholdingsChart({ shareholdersData }: ShareholdingsCh
               key={p}
               onClick={() => setSelectedPeriod(p)}
               style={{
-                padding: "6px 12px",
+                padding: "8px 12px",
                 background: p === selectedPeriod ? "var(--brand-tint)" : "transparent",
                 color: p === selectedPeriod ? "var(--brand)" : "var(--text-300)",
                 border: p === selectedPeriod ? "1px solid var(--brand)" : "1px solid transparent",
@@ -58,7 +58,7 @@ export default function ShareholdingsChart({ shareholdersData }: ShareholdingsCh
       </div>
 
       {shareholdersData.map(sh => (
-        <div key={sh.category} style={{ marginBottom: 18 }}>
+        <div key={sh.category} style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
             <div style={{ fontSize: 13, color: "var(--text-700)", fontWeight: 500 }}>
               {sh.category}
