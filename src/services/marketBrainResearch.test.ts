@@ -93,6 +93,56 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.evidenceReview.missing).toEqual(['sector_context']);
   });
 
+  it('filters malformed factor views from public client output', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          factorViews: [
+            {
+              key: 'quality',
+              label: 'Quality',
+              score: 78,
+              summary: 'Quality evidence is available for this research view.',
+            },
+            {
+              key: 'legacy_factor',
+              label: 'Legacy factor',
+              score: 10,
+              summary: 'Unsupported factor metadata should not reach public rendering.',
+            },
+            {
+              key: 'risk',
+              label: '',
+              score: 40,
+              summary: 'Blank labels should not reach public rendering.',
+            },
+            {
+              key: 'momentum',
+              label: 'Momentum',
+              score: Number.NaN,
+              summary: 'Non-finite scores should not reach public rendering.',
+            },
+          ],
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.factorViews).toEqual([
+      {
+        key: 'quality',
+        label: 'Quality',
+        score: 78,
+        summary: 'Quality evidence is available for this research view.',
+      },
+    ]);
+  });
+
   it('throws a typed error for unavailable research', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
