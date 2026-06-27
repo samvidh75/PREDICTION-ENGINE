@@ -30,7 +30,10 @@ export function safePercent(value: unknown): number | null {
   return n;
 }
 
-export { clampScore } from '@/types';
+/** Clamp a value to 0-100. */
+export function clampScore(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
 
 export function hasSufficientData(values: (number | null)[], minCount: number): boolean {
   const present = values.filter(v => v !== null).length;
