@@ -4,6 +4,7 @@ import { scanByType, type ScanType } from "../services/scanner/scoringEngine";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
+import { colors, typography, radius } from "../design/tokens";
 
 const SCANS: ScanType[] = ["quality", "value", "momentum", "stable"];
 
@@ -38,7 +39,7 @@ export default function ScannerPage() {
   return (
     <div style={{ display: "grid", gap: "24px" }}>
       <div style={{ display: "grid", gap: "16px" }}>
-        <h1 style={{ color: "var(--text-primary)", fontSize: "var(--sz-2xl)", fontWeight: 600, lineHeight: "1.25" }}>Scanner</h1>
+        <h1 style={{ color: "colors.gray900", fontSize: "typography.h1.desktop.size", fontWeight: 600, lineHeight: "1.25" }}>Scanner</h1>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           {SCANS.map((scan) => (
             <Button key={scan} variant={scan === scanType ? "primary" : "secondary"} onClick={() => setScanType(scan)}>
@@ -53,7 +54,7 @@ export default function ScannerPage() {
           style={{
             maxWidth: "360px",
             minHeight: "44px",
-            border: "1px solid var(--border)",
+            border: "1px solid colors.gray100",
             borderRadius: "44px",
             padding: "0 16px",
           }}
@@ -75,14 +76,14 @@ export default function ScannerPage() {
               <div
                 key={col.key}
                 style={{
-                  color: "var(--text-300)",
+                  color: "colors.gray600",
                   fontSize: label,
                   fontWeight: 500,
                   lineHeight: "1.4",
                   textTransform: "uppercase",
                   letterSpacing: "0.04em",
                   padding: `0 8px 8px`,
-                  borderBottom: "1px solid var(--border)",
+                  borderBottom: "1px solid colors.gray100",
                   textAlign: col.key === "company" ? "left" : "right",
                 }}
               >
@@ -100,14 +101,14 @@ export default function ScannerPage() {
                 }}
               >
                 {[
-                  { value: String(index + 1), color: "var(--text-300)" },
-                  { value: stock.symbol, color: "var(--text-primary)", bold: true },
-                  { value: String(stock.quality ?? "-"), color: "var(--text-700)" },
-                  { value: String(stock.valuation ?? "-"), color: "var(--text-700)" },
-                  { value: String(stock.growth ?? "-"), color: "var(--text-700)" },
-                  { value: String(stock.risk ?? "-"), color: "var(--text-700)" },
-                  { value: String(stock.technical ?? "-"), color: "var(--text-700)" },
-                  { value: `${stock.overall ?? "-"}%`, color: "var(--text-700)" },
+                  { value: String(index + 1), color: "colors.gray600" },
+                  { value: stock.symbol, color: "colors.gray900", bold: true },
+                  { value: String(stock.quality ?? "-"), color: "colors.gray900" },
+                  { value: String(stock.valuation ?? "-"), color: "colors.gray900" },
+                  { value: String(stock.growth ?? "-"), color: "colors.gray900" },
+                  { value: String(stock.risk ?? "-"), color: "colors.gray900" },
+                  { value: String(stock.technical ?? "-"), color: "colors.gray900" },
+                  { value: `${stock.overall ?? "-"}%`, color: "colors.gray900" },
                 ].map((cell, ci) => (
                   <div
                     key={ci}
@@ -118,8 +119,8 @@ export default function ScannerPage() {
                       lineHeight: "1.4",
                       padding: "8px 8px",
                       textAlign: ci === 1 ? "left" : "right",
-                      borderBottom: "1px solid var(--border)",
-                      background: index % 2 === 0 ? "transparent" : "var(--chip)",
+                      borderBottom: "1px solid colors.gray100",
+                      background: index % 2 === 0 ? "transparent" : "colors.gray50",
                       transition: "background 120ms ease",
                       borderRadius: ci === 0 ? "6px 0 0 6px" : ci === 7 ? "0 6px 6px 0" : "0",
                     }}
