@@ -467,7 +467,7 @@ export function buildNeuralMarketSynthesisEngine(inputs: NeuralMarketSynthesisIn
               ? "rotation becomes more constructive while staying measured"
               : "rotation stays steady with structural continuity";
 
-    return `Sector rotation matrix (context lens): ${a} → ${b} → ${c} → ${d}. Under current confidence, attention migrates as breadth and liquidity conditioning shift. In this synthesis, sector rotation is interpreted as probabilistic context for pacing and narrative focus—never as a prediction. Tone: ${tone}. ${sectorRelativeStrengthNote}`;
+    return `Sector rotation matrix (context lens): ${a}, ${b}, ${c}, ${d}. Under current confidence, attention migrates as breadth and liquidity conditioning shift. In this synthesis, sector rotation is interpreted as probabilistic context for pacing and narrative focus, never as a prediction. Tone: ${tone}. ${sectorRelativeStrengthNote}`;
   })();
 
   const liquidityIntelligenceCore = (() => {

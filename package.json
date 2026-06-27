@@ -42,6 +42,8 @@
     "test:coverage": "node scripts/run-vitest-ci.mjs --coverage",
     "test:coverage:ci": "npm run test:coverage",
     "preview": "vite preview",
+    "universe:generate": "tsx scripts/generate-stock-universe.ts",
+    "universe:sync": "tsx scripts/sync-official-symbols.ts && npm run universe:generate",
     "validate:schema": "tsx scripts/validate-schema-contract.ts",
     "validate:data-integrity": "tsx scripts/validate-data-integrity.ts",
     "validate:query-schema": "tsx scripts/audit-query-schema-compatibility.ts",

@@ -1,6 +1,7 @@
 export interface ScreenerParsedResult {
   companyName: string;
   sector: string;
+  industry: string;
   isin?: string;
   ratios: Record<string, string>;
   quarterlyResults: Array<Record<string, string>>;
@@ -42,6 +43,8 @@ export class ScreenerParser {
   private static readonly SECTOR_CLASS = /class="[^"]*\bsector\b[^"]*"[^>]*>([^<]+)</i;
 
   private static readonly SECTOR_META = /<meta\s+name="[^"]*\bsector\b[^"]*"\s+content="([^"]+)"/i;
+  private static readonly INDUSTRY_CLASS = /class="[^"]*\bindustry\b[^"]*"[^>]*>([^<]+)</i;
+  private static readonly INDUSTRY_META = /<meta\s+name="[^"]*\bindustry\b[^"]*"\s+content="([^"]+)"/i;
 
   private static escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -118,6 +121,10 @@ export class ScreenerParser {
       html.match(ScreenerParser.SECTOR_CLASS)?.[1]?.trim()
       ?? html.match(ScreenerParser.SECTOR_META)?.[1]?.trim()
       ?? '';
+    const industry =
+      html.match(ScreenerParser.INDUSTRY_CLASS)?.[1]?.trim()
+      ?? html.match(ScreenerParser.INDUSTRY_META)?.[1]?.trim()
+      ?? '';
     const isin = html.match(ScreenerParser.INDIAN_ISIN)?.[1]?.trim();
 
     const ratios: Record<string, string> = {};
@@ -146,6 +153,7 @@ export class ScreenerParser {
     return {
       companyName,
       sector,
+      industry,
       isin,
       ratios,
       quarterlyResults,
@@ -166,6 +174,8 @@ export class ScreenerParser {
     pledgedPromoterHolding: string | null;
   } {
     const extractPct = (label: string): string | null => {
+      const tableValue = ScreenerParser.extractCellValue(html, label);
+      if (tableValue) return tableValue;
       const esc = ScreenerParser.escapeRegex(label);
       const p = new RegExp(`${esc}[^<]*<[^>]*>([^<]+)`, 'i');
       const m = html.match(p);

@@ -1,137 +1,137 @@
-import { useState, useMemo } from 'react';
-import { spacing, typography, colors } from '../styles';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
-import { scanByType, type ScanType, type FactorScores } from '../services/scanner/scoringEngine';
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { scanByType, type ScanType } from "../services/scanner/scoringEngine";
+import { Button } from "../ui/Button";
+import { Card } from "../ui/Card";
+import { useResponsiveValue } from "../ui/responsive";
 
-interface ScanResult extends FactorScores {
-  rank: number;
-  symbol: string;
-  name: string;
-}
+const SCANS: ScanType[] = ["quality", "value", "momentum", "stable"];
 
-interface ScannerPageProps {
-  onSelectStock?: (symbol: string) => void;
-}
+const COLUMNS = [
+  { key: "rank", label: "#", width: "32px" },
+  { key: "company", label: "Company", width: "1fr" },
+  { key: "quality", label: "Quality", width: "64px" },
+  { key: "valuation", label: "Val", width: "56px" },
+  { key: "growth", label: "Growth", width: "64px" },
+  { key: "risk", label: "Risk", width: "56px" },
+  { key: "technical", label: "Tech", width: "56px" },
+  { key: "overall", label: "%", width: "48px" },
+] as const;
 
-const SCAN_OPTIONS: { value: ScanType; label: string }[] = [
-  { value: 'quality', label: 'Quality' },
-  { value: 'value', label: 'Value' },
-  { value: 'momentum', label: 'Momentum' },
-  { value: 'stable', label: 'Stable' },
-];
-
-function convictionColor(conviction: number): string {
-  if (conviction >= 75) return colors.success;
-  if (conviction >= 60) return colors.primary;
-  if (conviction >= 45) return colors.warning;
-  return colors.error;
-}
-
-export default function ScannerPage({ onSelectStock }: ScannerPageProps) {
-  const [scanType, setScanType] = useState<ScanType>('quality');
-  const [search, setSearch] = useState('');
-
-  const results: ScanResult[] = useMemo(() => {
-    return scanByType(scanType).map((s, i) => ({
-      rank: i + 1,
-      symbol: s.symbol,
-      name: s.name,
-      quality: s.quality,
-      valuation: s.valuation,
-      growth: s.growth,
-      risk: s.risk,
-      technical: s.technical,
-      overall: s.overall,
-    }));
-  }, [scanType]);
-
-  const filtered = results.filter((r) =>
-    r.symbol.toLowerCase().includes(search.toLowerCase()) ||
-    r.name.toLowerCase().includes(search.toLowerCase())
+export default function ScannerPage() {
+  const navigate = useNavigate();
+  const [scanType, setScanType] = useState<ScanType>("quality");
+  const [query, setQuery] = useState("");
+  const label = useResponsiveValue("13px", "14px");
+  const results = useMemo(
+    () =>
+      scanByType(scanType).filter(
+        (item) =>
+          item.symbol.toLowerCase().includes(query.toLowerCase()) ||
+          item.name.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [query, scanType],
   );
 
+  const displayResults = results.slice(0, 50);
+
   return (
-    <div style={{ background: colors.bg.secondary, minHeight: '100vh', paddingTop: spacing.xl, paddingBottom: spacing.xxl }}>
-      <div style={{ maxWidth: '1060px', margin: '0 auto', paddingLeft: spacing.xl, paddingRight: spacing.xl }}>
-        <div style={{ marginBottom: spacing.xl }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.lg, flexWrap: 'wrap', gap: spacing.base }}>
-            <h1 style={{ ...typography.pageTitle, color: colors.text.primary, margin: 0 }}>
-              Scanner
-            </h1>
-            <div style={{ display: 'flex', gap: spacing.sm }}>
-              {SCAN_OPTIONS.map((opt) => (
-                <Button
-                  key={opt.value}
-                  variant={scanType === opt.value ? 'primary' : 'secondary'}
-                  size="sm"
-                  onClick={() => setScanType(opt.value)}
-                >
-                  {opt.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-          <div style={{ maxWidth: '360px' }}>
-            <Input
-              placeholder="Search symbol or company..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+    <div style={{ display: "grid", gap: "24px" }}>
+      <div style={{ display: "grid", gap: "16px" }}>
+        <h1 style={{ color: "var(--text-primary)", fontSize: "var(--sz-2xl)", fontWeight: 600, lineHeight: "1.25" }}>Scanner</h1>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          {SCANS.map((scan) => (
+            <Button key={scan} variant={scan === scanType ? "primary" : "secondary"} onClick={() => setScanType(scan)}>
+              {scan}
+            </Button>
+          ))}
+        </div>
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search symbol or company"
+          style={{
+            maxWidth: "360px",
+            minHeight: "44px",
+            border: "1px solid var(--border)",
+            borderRadius: "44px",
+            padding: "0 16px",
+          }}
+        />
+      </div>
+
+      <Card>
+        <div style={{ overflowX: "auto" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: COLUMNS.map((c) => c.width).join(" "),
+              gap: "12px",
+              minWidth: "600px",
+              padding: "4px",
+            }}
+          >
+            {COLUMNS.map((col) => (
+              <div
+                key={col.key}
+                style={{
+                  color: "var(--text-300)",
+                  fontSize: label,
+                  fontWeight: 500,
+                  lineHeight: "1.4",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  padding: `0 8px 8px`,
+                  borderBottom: "1px solid var(--border)",
+                  textAlign: col.key === "company" ? "left" : "right",
+                }}
+              >
+                {col.label}
+              </div>
+            ))}
+            {displayResults.map((stock, index) => (
+              <button
+                key={stock.symbol}
+                onClick={() => navigate(`/stock/${stock.symbol}`)}
+                style={{
+                  all: "unset",
+                  display: "contents",
+                  cursor: "pointer",
+                }}
+              >
+                {[
+                  { value: String(index + 1), color: "var(--text-300)" },
+                  { value: stock.symbol, color: "var(--text-primary)", bold: true },
+                  { value: String(stock.quality ?? "-"), color: "var(--text-700)" },
+                  { value: String(stock.valuation ?? "-"), color: "var(--text-700)" },
+                  { value: String(stock.growth ?? "-"), color: "var(--text-700)" },
+                  { value: String(stock.risk ?? "-"), color: "var(--text-700)" },
+                  { value: String(stock.technical ?? "-"), color: "var(--text-700)" },
+                  { value: `${stock.overall ?? "-"}%`, color: "var(--text-700)" },
+                ].map((cell, ci) => (
+                  <div
+                    key={ci}
+                    style={{
+                      color: cell.color,
+                      fontSize: label,
+                      fontWeight: cell.bold ? 600 : 400,
+                      lineHeight: "1.4",
+                      padding: "8px 8px",
+                      textAlign: ci === 1 ? "left" : "right",
+                      borderBottom: "1px solid var(--border)",
+                      background: index % 2 === 0 ? "transparent" : "var(--chip)",
+                      transition: "background 120ms ease",
+                      borderRadius: ci === 0 ? "6px 0 0 6px" : ci === 7 ? "0 6px 6px 0" : "0",
+                    }}
+                  >
+                    {cell.value}
+                  </div>
+                ))}
+              </button>
+            ))}
           </div>
         </div>
-
-        <Card padding="sm">
-          {filtered.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
-              <p style={{ ...typography.bodyText, color: colors.text.secondary }}>No results found</p>
-            </div>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-                <thead>
-                  <tr style={{ borderBottom: `1px solid ${colors.bg.tertiary}` }}>
-                    {['#', 'Company', 'Quality', 'Val.', 'Growth', 'Risk', 'Tech', 'Conviction'].map((h) => (
-                      <th key={h} style={{
-                        ...typography.caption, padding: `${spacing.sm} ${spacing.sm}`,
-                        textAlign: h === '#' || h === 'Company' ? 'left' : 'right',
-                        color: colors.text.secondary, fontWeight: 600, whiteSpace: 'nowrap',
-                      }}>
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((r) => (
-                    <tr key={r.symbol} style={{
-                      borderBottom: `1px solid ${colors.bg.tertiary}`,
-                      transition: 'background 150ms ease', cursor: 'pointer',
-                    }}
-                      onClick={() => onSelectStock?.(r.symbol)}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = colors.bg.primary; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <td style={{ ...typography.caption, padding: spacing.sm, color: colors.text.secondary }}>{r.rank}</td>
-                      <td style={{ padding: spacing.sm }}>
-                        <div style={{ ...typography.bodyEmphasis, color: colors.text.primary, fontSize: '14px' }}>{r.symbol}</div>
-                        <div style={{ ...typography.caption, color: colors.text.secondary }}>{r.name}</div>
-                      </td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, color: colors.text.primary }}>{r.quality}</td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, color: colors.text.primary }}>{r.valuation}</td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, color: colors.text.primary }}>{r.growth}</td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, color: colors.text.primary }}>{r.risk}</td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, color: colors.text.primary }}>{r.technical}</td>
-                      <td style={{ padding: spacing.sm, textAlign: 'right', ...typography.caption, fontWeight: 600, color: convictionColor(r.overall) }}>{r.overall}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
