@@ -193,7 +193,7 @@ export interface StockStoryOutput {
 
 // ─── Scoring Utilities (re-exported from canonical @/types) ───────
 
-export { clampScore, weightedAverage } from '@/types';
+export { clampScore, weightedAverage } from './scoring/ScoreNormalizer';
 
 /** Safely convert a raw DB value to a finite number or null. Rejects NaN, Infinity, -Infinity. */
 export function isFiniteNumber(raw: unknown): number | null {

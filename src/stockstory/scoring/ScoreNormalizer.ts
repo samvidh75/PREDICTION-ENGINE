@@ -25,6 +25,9 @@ export function normalize(value: number): number {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+/** Alias for normalize — clamp a score to 0-100. */
+export const clampScore = normalize;
+
 /**
  * Get the ScoreBand for a given 0-100 value.
  */
