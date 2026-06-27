@@ -1,9 +1,27 @@
 export type MarketBrainResearchState = 'High conviction' | 'Thesis improving' | 'Watch' | 'Needs review' | 'Risk rising';
 
+export type MarketBrainEvidenceDomain =
+  | 'instrument_master'
+  | 'prices'
+  | 'fundamentals'
+  | 'financial_statements'
+  | 'shareholding'
+  | 'corporate_actions'
+  | 'news_events'
+  | 'technicals'
+  | 'sector_context';
+
 export interface MarketBrainFactorView {
   key: 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
   label: string;
   score: number;
+  summary: string;
+}
+
+export interface MarketBrainEvidenceReviewView {
+  needsReview: boolean;
+  partial: MarketBrainEvidenceDomain[];
+  missing: MarketBrainEvidenceDomain[];
   summary: string;
 }
 
@@ -16,6 +34,7 @@ export interface MarketBrainResearchView {
   thesis: string[];
   risksToReview: string[];
   whatToWatch: string[];
+  evidenceReview: MarketBrainEvidenceReviewView;
   factorViews: MarketBrainFactorView[];
   methodNote: string;
   generatedAt: string;
