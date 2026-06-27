@@ -68,7 +68,7 @@ export class RankingInputValidator {
           failures.push({ check: 'minimumConfidence', detail: `Confidence score ${conf} < required 20` });
         }
       }
-    } catch {}
+    } catch { /* db query failure - skip check */ }
 
     // Check 3: Provider freshness (financial data < 90 days)
     try {
@@ -84,7 +84,7 @@ export class RankingInputValidator {
       } else {
         failures.push({ check: 'providerFreshness', detail: 'No financial snapshot data for symbol' });
       }
-    } catch {}
+    } catch { /* db query failure - skip check */ }
 
     // Check 4: Sector completeness
     try {
@@ -95,14 +95,14 @@ export class RankingInputValidator {
       if (r.rows.length === 0 || !r.rows[0].sector) {
         failures.push({ check: 'sectorCompleteness', detail: 'Symbol has no sector assignment' });
       }
-    } catch {}
+    } catch { /* db query failure - skip check */ }
 
     return { symbol, valid: failures.length === 0, failures };
   }
 
   async validateBatch(symbols: string[]): Promise<BatchValidationResult> {
     let dbOk = false;
-    try { await pool.query('SELECT 1'); dbOk = true; } catch {}
+    try { await pool.query('SELECT 1'); dbOk = true; } catch { /* db unavailable */ }
 
     if (!dbOk) {
       return {

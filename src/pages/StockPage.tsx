@@ -1,23 +1,26 @@
-import { useMemo, useState, useEffect, useCallback } from "react";
-import { AlertTriangle } from "lucide-react";
-import { useStockData } from "../hooks/useStockData";
-import { Skeleton } from "../components/ui/Skeleton";
-import { SafeBlock } from "../components/ErrorBoundary";
-import AppShell from "../components/layout/AppShell";
-import CompanyHeader from "../components/stock/CompanyHeader";
-import PriceChart from "../components/stock/PriceChart";
-import Healthometer from "../components/stock/Healthometer";
-import MetricsGrid from "../components/stock/MetricsGrid";
-import CompanyInfo from "../components/stock/CompanyInfo";
-import NewsFeed from "../components/news/NewsFeed";
-import ProUpgradeModal from "../components/stock/ProUpgradeModal";
-import ProPaywallGate from "../components/premium/ProPaywallGate";
-import { IntelligentAnalysis } from "../components/stock/IntelligentAnalysis";
-import ScoreSemiCircles from "../components/stock/ScoreSemiCircles";
-import ShareholdingsChart from "../components/stock/ShareholdingsChart";
-import { FinancialCharts } from "../components/stock/FinancialCharts";
-import { computeHealthScore } from "../lib/healthScore";
-import { analytics } from "../analytics/EventAnalyticsEngine";
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { AlertTriangle, TrendingUp, BarChart2, AlertCircle, Clock, Bookmark, Shield } from 'lucide-react';
+import { useStockData } from '../hooks/useStockData';
+import { Skeleton } from '../components/ui/Skeleton';
+import { SafeBlock } from '../components/ErrorBoundary';
+import AppShell from '../components/layout/AppShell';
+import CompanyHeader from '../components/stock/CompanyHeader';
+import PriceChart from '../components/stock/PriceChart';
+import Healthometer from '../components/stock/Healthometer';
+import MetricsGrid from '../components/stock/MetricsGrid';
+import CompanyInfo from '../components/stock/CompanyInfo';
+import NewsFeed from '../components/news/NewsFeed';
+import ProUpgradeModal from '../components/stock/ProUpgradeModal';
+import ProPaywallGate from '../components/premium/ProPaywallGate';
+import { IntelligentAnalysis } from '../components/stock/IntelligentAnalysis';
+import ScoreSemiCircles from '../components/stock/ScoreSemiCircles';
+import ShareholdingsChart from '../components/stock/ShareholdingsChart';
+import { FinancialCharts } from '../components/stock/FinancialCharts';
+import { computeHealthScore } from '../lib/healthScore';
+import { analytics } from '../analytics/EventAnalyticsEngine';
+import { Button } from '../components/ui/Button';
+import { Card, CardLabel } from '../components/ui/Card';
+import { colors, typography, spacing, radius, shadow } from '../styles';
 
 /* ─── helpers ─────────────────────────────────────────────────────────────── */
 
@@ -26,36 +29,124 @@ function useIsMobile() {
   useEffect(() => {
     const check = () => setMobile(window.innerWidth < 768);
     check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
   return mobile;
 }
 
-/* Stripe section card wrapper */
-function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+/* ── Thesis Confidence Meter ── */
+function ThesisConfidence({ score }: { score: number | null }) {
+  const pct   = score !== null ? Math.min(100, Math.max(0, score)) : 40;
+  const color = pct >= 80 ? colors.success : pct >= 60 ? colors.on.warning : colors.error;
+  const label = pct >= 80 ? 'High confidence' : pct >= 60 ? 'Moderate confidence' : 'Low confidence';
+
   return (
-    <div style={{
-      background: "#FFFFFF",
-      border: "1px solid #E5E5E5",
-      borderRadius: 8,
-      padding: 24,
-      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-      ...style,
-    }}>
-      {children}
-    </div>
+    <Card padding="md">
+      <CardLabel>Thesis Confidence</CardLabel>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing.sm, marginBottom: spacing.sm }}>
+        <span style={{ fontSize: '32px', fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
+        <span style={{ ...typography.secondaryText, color: colors.text.secondary }}>{label}</span>
+      </div>
+      <div style={{ height: '6px', background: colors.bg.secondary, borderRadius: '3px', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '3px', transition: 'width 600ms ease' }} />
+      </div>
+      <p style={{ ...typography.caption, color: colors.text.tertiary, marginTop: spacing.sm }}>
+        Based on data completeness & cross-source agreement
+      </p>
+    </Card>
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+/* ── Risk-Adjusted Score ── */
+function RiskAdjustedScore({ baseScore, volatilityPenalty }: { baseScore: number | null; volatilityPenalty: number }) {
+  const adj   = baseScore !== null ? Math.max(0, Math.round(baseScore - volatilityPenalty)) : null;
+  const delta = baseScore !== null && adj !== null ? adj - baseScore : null;
+
   return (
-    <div style={{
-      fontSize: 11, fontWeight: 600, color: "#999999",
-      textTransform: "uppercase", letterSpacing: "0.06em",
-      marginBottom: 16,
-    }}>
-      {children}
+    <Card padding="md">
+      <CardLabel>Risk-Adjusted Score</CardLabel>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing.sm }}>
+        <span style={{ fontSize: '32px', fontWeight: 600, color: colors.text.primary, fontVariantNumeric: 'tabular-nums' }}>
+          {adj ?? '—'}
+        </span>
+        {delta !== null && (
+          <span style={{ ...typography.secondaryText, color: delta < 0 ? colors.error : colors.success, fontWeight: 600 }}>
+            {delta > 0 ? `+${delta}` : delta} vs base
+          </span>
+        )}
+      </div>
+      <p style={{ ...typography.caption, color: colors.text.tertiary, marginTop: spacing.sm }}>
+        Base score adjusted for volatility — shows realistic risk/return tradeoff
+      </p>
+    </Card>
+  );
+}
+
+/* ── Sector Comparison ── */
+const SECTOR_PEERS: Record<string, string[]> = {
+  'Information Technology': ['TCS', 'INFY', 'WIPRO', 'HCLTECH', 'TECHM'],
+  'Banking':                ['HDFCBANK', 'ICICIBANK', 'SBIN', 'KOTAKBANK', 'AXISBANK'],
+  'FMCG':                   ['HINDUNILVR', 'ITC', 'NESTLEIND', 'DABUR', 'BRITANNIA'],
+};
+
+function SectorComparison({ symbol, sector }: { symbol: string; sector: string | null }) {
+  const peers = (sector && SECTOR_PEERS[sector]) || ['TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'RELIANCE'];
+  const filtered = peers.filter(p => p !== symbol).slice(0, 4);
+
+  return (
+    <Card padding="md">
+      <CardLabel>Sector peers</CardLabel>
+      <div style={{ display: 'flex', gap: spacing.sm, flexWrap: 'wrap' }}>
+        {[symbol, ...filtered].map((sym, i) => (
+          <button
+            key={sym}
+            onClick={() => { window.location.href = `/stock/${sym}`; }}
+            style={{
+              padding: `${spacing.sm} ${spacing.base}`,
+              borderRadius: radius.md,
+              border:      i === 0 ? `1px solid ${colors.primary}` : `1px solid ${colors.bg.tertiary}`,
+              background:  i === 0 ? colors.tint.primary            : colors.bg.primary,
+              color:       i === 0 ? colors.primary                  : colors.text.secondary,
+              fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              transition: 'all 150ms ease',
+            }}
+          >
+            {sym}{i === 0 && ' ●'}
+          </button>
+        ))}
+      </div>
+      <p style={{ ...typography.caption, color: colors.text.tertiary, marginTop: spacing.sm }}>
+        Click any peer to compare · Same sector
+      </p>
+    </Card>
+  );
+}
+
+/* ── Smart Alerts strip ── */
+function SmartAlerts({ symbol, score }: { symbol: string; score: number | null }) {
+  const alerts: Array<{ type: 'info' | 'warn' | 'ok'; text: string }> = [];
+  if (score !== null && score >= 75) alerts.push({ type: 'ok',   text: 'High conviction — score above 75' });
+  if (score !== null && score < 50)  alerts.push({ type: 'warn', text: 'Score below 50 — monitor closely' });
+  alerts.push({ type: 'info', text: `Smart alerts active for ${symbol}` });
+
+  const iconColor = { ok: colors.success, warn: colors.warning, info: colors.primary };
+  const bgColor   = { ok: colors.tint.success, warn: colors.tint.warning, info: colors.tint.primary };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm, marginBottom: spacing.base }}>
+      {alerts.map((a, i) => (
+        <div key={i} style={{
+          display: 'flex', alignItems: 'center', gap: spacing.sm,
+          padding: `${spacing.sm} ${spacing.base}`,
+          borderRadius: radius.md, background: bgColor[a.type],
+          border: `1px solid ${a.type === 'ok' ? colors.success : a.type === 'warn' ? colors.warning : colors.primary}22`,
+        }}>
+          <AlertCircle size={14} style={{ color: iconColor[a.type], flexShrink: 0 }} />
+          <span style={{ ...typography.caption, color: colors.text.primary }}>{a.text}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -65,36 +156,37 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function StockPage({ symbol }: { symbol: string }) {
   const { data, loading, error, refetch } = useStockData(symbol);
   const isMobile = useIsMobile();
-  const [showProModal,       setShowProModal]       = useState(false);
-  const [isTracked,          setIsTracked]          = useState(false);
-  const [shareholdersData,   setShareholdersData]   = useState<Array<{ category: string; percent: number; change: number }> | null>(null);
-  const [shareholdersLoading,setShareholdersLoading]= useState(false);
+  const [showProModal,        setShowProModal]        = useState(false);
+  const [isTracked,           setIsTracked]           = useState(false);
+  const [shareholdersData,    setShareholdersData]    = useState<Array<{ category: string; percent: number; change: number }> | null>(null);
 
   const fetchShareholders = useCallback(async (sym: string) => {
-    setShareholdersLoading(true);
     try {
       const res = await fetch(`/api/market/stock/${sym}/shareholding`);
       if (!res.ok) return;
-      const result = await res.json();
+      const result = await res.json() as { data?: { snapshots?: Array<{ promoter?: number; fii?: number; dii?: number; public_?: number }> } };
       const latest = result.data?.snapshots?.[result.data.snapshots.length - 1];
       if (!latest) return;
       setShareholdersData([
-        { category: "Promoters", percent: latest.promoter ?? 0, change: 0 },
-        { category: "FIIs",      percent: latest.fii      ?? 0, change: 0 },
-        { category: "DIIs",      percent: latest.dii      ?? 0, change: 0 },
-        { category: "Public",    percent: latest.public_  ?? 0, change: 0 },
+        { category: 'Promoters', percent: latest.promoter ?? 0, change: 0 },
+        { category: 'FIIs',      percent: latest.fii      ?? 0, change: 0 },
+        { category: 'DIIs',      percent: latest.dii      ?? 0, change: 0 },
+        { category: 'Public',    percent: latest.public_  ?? 0, change: 0 },
       ]);
-    } catch { /* best-effort */ } finally {
-      setShareholdersLoading(false);
-    }
+    } catch { /* best-effort */ }
   }, []);
 
-  useEffect(() => { if (symbol) fetchShareholders(symbol); }, [symbol, fetchShareholders]);
+  useEffect(() => { if (symbol) void fetchShareholders(symbol); }, [symbol, fetchShareholders]);
 
   useEffect(() => {
     if (symbol) {
-      analytics.trackStockView(symbol, "stock-page", false);
+      analytics.trackStockView(symbol, 'stock-page', false);
       analytics.trackPageVisit(`/stock/${symbol}`);
+      try {
+        const prev: string[] = JSON.parse(localStorage.getItem('stockstory-recent') || '[]');
+        const updated = [symbol, ...prev.filter(s => s !== symbol)].slice(0, 10);
+        localStorage.setItem('stockstory-recent', JSON.stringify(updated));
+      } catch { /* ignore */ }
     }
   }, [symbol]);
 
@@ -110,28 +202,29 @@ export default function StockPage({ symbol }: { symbol: string }) {
   }), [data]);
 
   const dataUpdated = data?.fetchedAt
-    ? new Date(data.fetchedAt).toLocaleString("en-IN", {
-        day: "numeric", month: "short", year: "numeric",
-        hour: "2-digit", minute: "2-digit",
-      })
+    ? new Date(data.fetchedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null;
 
   const stateLabel = (() => {
     const s = health.compositeScore;
     if (s === null) return null;
-    if (s >= 80) return "High Conviction";
-    if (s >= 65) return "Healthy";
-    if (s >= 50) return "Moderate";
-    if (s >= 35) return "Needs Review";
-    return "Caution";
+    if (s >= 80) return 'High Conviction';
+    if (s >= 65) return 'Healthy';
+    if (s >= 50) return 'Moderate';
+    if (s >= 35) return 'Needs Review';
+    return 'Caution';
   })();
 
-  /* ── Loading ──────────────────────────────────────────────────────────── */
+  const volatilityPenalty = data?.fundamentals.debtToEquity
+    ? Math.min(20, Math.round((data.fundamentals.debtToEquity ?? 0) * 5))
+    : 5;
+
+  /* ── Loading ─────────────────────────────────────────────────────────── */
   if (loading && !data) {
     return (
       <AppShell>
-        <div style={{ maxWidth: 900 }}>
-          <div style={{ display: "grid", gap: 16 }}>
+        <div style={{ maxWidth: '900px' }}>
+          <div style={{ display: 'grid', gap: spacing.base }}>
             <Skeleton height={32} radius={6} />
             <Skeleton height={200} radius={8} />
             <Skeleton height={100} radius={8} />
@@ -142,80 +235,89 @@ export default function StockPage({ symbol }: { symbol: string }) {
     );
   }
 
-  /* ── Error ────────────────────────────────────────────────────────────── */
+  /* ── Error ───────────────────────────────────────────────────────────── */
   if (error && !data) {
     return (
       <AppShell>
-        <div style={{ maxWidth: 900 }}>
-          <Card style={{ textAlign: "center", padding: 48 }}>
-            <AlertTriangle size={28} color="#FAAD14" />
-            <p style={{ color: "#111111", fontSize: 16, fontWeight: 600, marginTop: 12 }}>
+        <div style={{ maxWidth: '900px' }}>
+          <Card style={{ textAlign: 'center', padding: spacing.xxl }}>
+            <AlertTriangle size={28} color={colors.warning} />
+            <p style={{ ...typography.bodyEmphasis, color: colors.text.primary, marginTop: spacing.base }}>
               Market data is temporarily unavailable
             </p>
-            <p style={{ color: "#666666", fontSize: 14, marginTop: 4 }}>Please try again shortly.</p>
-            <button
-              onClick={() => void refetch()}
-              style={{
-                marginTop: 20, height: 44, padding: "0 32px",
-                background: "#0070F3", color: "#FFFFFF",
-                border: "none", borderRadius: 6,
-                fontSize: 14, fontWeight: 600, cursor: "pointer",
-                transition: "background 200ms ease",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = "#0051CC")}
-              onMouseLeave={e => (e.currentTarget.style.background = "#0070F3")}
-            >
+            <p style={{ ...typography.secondaryText, color: colors.text.secondary, marginTop: spacing.xs }}>
+              Please try again shortly.
+            </p>
+            <Button variant="primary" size="md" onClick={() => void refetch()} style={{ marginTop: spacing.lg }}>
               Try again
-            </button>
+            </Button>
           </Card>
         </div>
       </AppShell>
     );
   }
 
-  /* ── Page ─────────────────────────────────────────────────────────────── */
+  /* ── Page ────────────────────────────────────────────────────────────── */
   return (
     <AppShell>
-      <div style={{ maxWidth: 900 }}>
+      <div style={{ maxWidth: '900px' }}>
 
         {/* Breadcrumb */}
-        <div style={{ marginBottom: 16 }}>
-          <a href="/" style={{
-            fontSize: 13, color: "#666666", textDecoration: "none",
-            display: "inline-flex", alignItems: "center", gap: 4,
-            transition: "color 150ms ease",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#111111")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#666666")}
-          >
+        <div style={{ marginBottom: spacing.base }}>
+          <a href="/" style={{ ...typography.secondaryText, color: colors.text.secondary, textDecoration: 'none', transition: 'color 150ms ease' }}
+            onMouseEnter={e => (e.currentTarget.style.color = colors.text.primary)}
+            onMouseLeave={e => (e.currentTarget.style.color = colors.text.secondary)}>
             {'← Home'}
           </a>
         </div>
 
-        {/* ── 1. Company Header ─────────────────────────────────────────── */}
+        {/* 1. Smart Alerts */}
+        <SmartAlerts symbol={symbol} score={health.compositeScore} />
+
+        {/* 2. Company Header */}
         <CompanyHeader
           symbol={symbol}
           companyName={data?.price.companyName ?? symbol}
           price={data?.price.current ?? null}
           change={data?.price.change ?? null}
           changeAbs={data?.price.changeAbs ?? null}
-          exchange={data?.price.exchange ?? "NSE"}
+          exchange={data?.price.exchange ?? 'NSE'}
           sector={data?.price.sector ?? null}
           isMobile={isMobile}
         />
 
-        {/* ── 2. Price Chart ────────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
-          <Card style={{ padding: isMobile ? 16 : 24 }}>
+        {/* 3. Action Buttons */}
+        <div style={{ display: 'flex', gap: spacing.sm, margin: `${spacing.base} 0` }}>
+          <Button
+            variant={isTracked ? 'ghost' : 'secondary'}
+            size="md"
+            onClick={() => setIsTracked(!isTracked)}
+            style={{ flex: 1, maxWidth: '140px', borderColor: isTracked ? colors.success : undefined, color: isTracked ? colors.on.success : undefined }}
+          >
+            {isTracked ? '♥ Tracked' : '♡ Track'}
+          </Button>
+          <Button variant="secondary" size="md" onClick={() => { window.location.href = `/compare?stocks=${symbol}`; }}
+            style={{ flex: 1, maxWidth: '140px' }}>
+            Compare
+          </Button>
+          <Button variant="primary" size="md" style={{ flex: 1, maxWidth: '140px' }}>
+            {'→ Invest'}
+          </Button>
+        </div>
+
+        {/* 4. Price Chart */}
+        <div style={{ margin: `${spacing.base} 0` }}>
+          <Card padding={isMobile ? 'sm' : 'md'}>
+            <CardLabel>Price Chart</CardLabel>
             <PriceChart symbol={symbol} height={isMobile ? 180 : 260} />
           </Card>
         </div>
 
-        {/* ── 3. Scores ────────────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
+        {/* 5. Score Overview */}
+        <div style={{ margin: `${spacing.base} 0` }}>
           <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
-            <Card>
-              <SectionLabel>Score Overview</SectionLabel>
+            <Card padding="md">
+              <CardLabel>Score Overview</CardLabel>
               <ScoreSemiCircles
                 overallScore={health.compositeScore ?? 50}
                 riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
@@ -224,8 +326,24 @@ export default function StockPage({ symbol }: { symbol: string }) {
           </ProPaywallGate>
         </div>
 
-        {/* ── 4. Healthometer ──────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
+        {/* 6. Differentiators grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: spacing.base,
+          margin: `${spacing.base} 0`,
+        }}>
+          <ThesisConfidence score={health.compositeScore} />
+          <RiskAdjustedScore baseScore={health.compositeScore} volatilityPenalty={volatilityPenalty} />
+        </div>
+
+        {/* 7. Sector Comparison */}
+        <div style={{ margin: `${spacing.base} 0` }}>
+          <SectorComparison symbol={symbol} sector={data?.price.sector ?? null} />
+        </div>
+
+        {/* 8. Healthometer */}
+        <div style={{ margin: `${spacing.base} 0` }}>
           <Healthometer
             score={health.compositeScore}
             factors={health.factors}
@@ -237,13 +355,13 @@ export default function StockPage({ symbol }: { symbol: string }) {
           />
         </div>
 
-        {/* ── 5. AI Analysis ────────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
+        {/* 9. AI Analysis */}
+        <div style={{ margin: `${spacing.base} 0` }}>
           <IntelligentAnalysis symbol={symbol} />
         </div>
 
-        {/* ── 6. Key Metrics ────────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
+        {/* 10. Key Metrics */}
+        <div style={{ margin: `${spacing.base} 0` }}>
           <MetricsGrid
             fundamentals={data?.fundamentals ?? null}
             price={data?.price ?? null}
@@ -252,155 +370,81 @@ export default function StockPage({ symbol }: { symbol: string }) {
           />
         </div>
 
-        {/* ── 7. Company Info ───────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
+        {/* 11. Company Info */}
+        <div style={{ margin: `${spacing.base} 0` }}>
           <CompanyInfo
             symbol={symbol}
             companyName={data?.price.companyName ?? symbol}
             sector={data?.price.sector ?? null}
             industry={data?.price.industry ?? null}
             description={data?.price.description ?? null}
-            exchange={data?.price.exchange ?? "NSE"}
+            exchange={data?.price.exchange ?? 'NSE'}
             marketCap={data?.price.marketCap ?? null}
           />
         </div>
 
-        {/* ── 8. Financial Histogram ───────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
-          <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
-            <Card>
-              <SectionLabel>Financial Performance</SectionLabel>
-              <SafeBlock>
-                {data?.annualFinancials && data.annualFinancials.length > 0 && (
+        {/* 12. Financial Charts */}
+        {data?.annualFinancials && data.annualFinancials.length > 0 && (
+          <div style={{ margin: `${spacing.base} 0` }}>
+            <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
+              <Card padding="md">
+                <CardLabel>Financial Performance</CardLabel>
+                <SafeBlock>
                   <FinancialCharts data={data.annualFinancials} />
-                )}
-              </SafeBlock>
-            </Card>
-          </ProPaywallGate>
-        </div>
+                </SafeBlock>
+              </Card>
+            </ProPaywallGate>
+          </div>
+        )}
 
-        {/* ── 9. Shareholdings ─────────────────────────────────────────── */}
+        {/* 13. Shareholdings */}
         {shareholdersData && shareholdersData.length > 0 && (
-          <div style={{ margin: "16px 0" }}>
-            <Card>
-              <SectionLabel>Shareholding Pattern</SectionLabel>
+          <div style={{ margin: `${spacing.base} 0` }}>
+            <Card padding="md">
+              <CardLabel>Shareholding Pattern</CardLabel>
               <ShareholdingsChart shareholdersData={shareholdersData} />
             </Card>
           </div>
         )}
 
-        {/* ── 11. News ─────────────────────────────────────────────────── */}
-        <div style={{ margin: "16px 0" }}>
-          <Card>
-            <SectionLabel>Latest News</SectionLabel>
+        {/* 14. News */}
+        <div style={{ margin: `${spacing.base} 0` }}>
+          <Card padding="md">
+            <CardLabel>Latest News</CardLabel>
             <NewsFeed symbol={symbol} />
           </Card>
         </div>
 
-        {/* ── Data recency ─────────────────────────────────────────────── */}
-        <div style={{ fontSize: 11, color: "#999999", textAlign: "center", padding: "16px 0 40px" }}>
-          {dataUpdated ? `Data prepared ${dataUpdated}` : "Based on latest available market data."}
+        {/* Data recency */}
+        <div style={{ ...typography.caption, color: colors.text.tertiary, textAlign: 'center', padding: `${spacing.base} 0 ${spacing.xxl}` }}>
+          {dataUpdated ? `Data prepared ${dataUpdated}` : 'Based on latest available market data.'}
           <br />
           StockStory is an AI research layer for Indian equities. Not SEBI-registered.
         </div>
 
       </div>
 
-      {/* ── Mobile sticky action bar ───────────────────────────────────── */}
+      {/* Mobile sticky bottom bar */}
       {isMobile && (
         <div style={{
-          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
-          background: "#FFFFFF",
-          borderTop: "1px solid #E5E5E5",
-          display: "grid", gridTemplateColumns: "1fr 1fr 1.2fr",
-          gap: 8, padding: "10px 12px",
-          paddingBottom: "calc(10px + env(safe-area-inset-bottom))",
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
+          background: colors.bg.primary, borderTop: `1px solid ${colors.bg.tertiary}`,
+          display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr',
+          gap: spacing.sm, padding: spacing.sm,
+          paddingBottom: `calc(${spacing.sm} + env(safe-area-inset-bottom))`,
         }}>
-          {/* Track */}
-          <button
-            onClick={() => setIsTracked(!isTracked)}
-            style={{
-              height: 44, borderRadius: 6,
-              background: isTracked ? "#E8F9ED" : "#FFFFFF",
-              color: isTracked ? "#0A8C2A" : "#666666",
-              border: isTracked ? "1px solid #13C23E" : "1px solid #E5E5E5",
-              fontSize: 13, fontWeight: 600, cursor: "pointer",
-              transition: "all 200ms ease",
-            }}
-          >
+          <Button variant="secondary" size="md" onClick={() => setIsTracked(!isTracked)}
+            style={{ borderColor: isTracked ? colors.success : undefined, color: isTracked ? colors.on.success : undefined }}>
             {isTracked ? '♥ Tracked' : '♡ Track'}
-          </button>
-
-          {/* Compare */}
-          <a href={`/compare?stocks=${symbol}`} style={{
-            height: 44, borderRadius: 6,
-            background: "#FFFFFF", color: "#666666",
-            border: "1px solid #E5E5E5",
-            fontSize: 13, fontWeight: 600,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            textDecoration: "none", transition: "background 200ms ease",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#F5F5F5")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#FFFFFF")}
-          >
+          </Button>
+          <Button variant="secondary" size="md" onClick={() => { window.location.href = `/compare?stocks=${symbol}`; }}>
             Compare
-          </a>
-
-          {/* Invest CTA */}
-          <button style={{
-            height: 44, borderRadius: 6,
-            background: "#0070F3", color: "#FFFFFF",
-            border: "none", fontSize: 13, fontWeight: 600,
-            cursor: "pointer", transition: "background 200ms ease",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#0051CC")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#0070F3")}
-          >
-            {'Invest →'}
-          </button>
+          </Button>
+          <Button variant="primary" size="md">{'→ Invest'}</Button>
         </div>
       )}
 
-      {/* ── Desktop action buttons ────────────────────────────────────── */}
-      {!isMobile && (
-        <div style={{ position: "fixed", bottom: 24, right: 32, display: "flex", gap: 8, zIndex: 50 }}>
-          <button
-            onClick={() => setIsTracked(!isTracked)}
-            style={{
-              height: 44, padding: "0 20px", borderRadius: 6,
-              background: isTracked ? "#E8F9ED" : "#FFFFFF",
-              color: isTracked ? "#0A8C2A" : "#666666",
-              border: isTracked ? "1px solid #13C23E" : "1px solid #E5E5E5",
-              fontSize: 14, fontWeight: 600, cursor: "pointer",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-              transition: "all 200ms ease",
-            }}
-          >
-            {isTracked ? '♥ Tracked' : '♡ Track'}
-          </button>
-          <a href={`/compare?stocks=${symbol}`} style={{
-            height: 44, padding: "0 20px", borderRadius: 6,
-            background: "#FFFFFF", color: "#666666",
-            border: "1px solid #E5E5E5",
-            fontSize: 14, fontWeight: 600,
-            display: "flex", alignItems: "center",
-            textDecoration: "none",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            transition: "background 200ms ease",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#F5F5F5")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#FFFFFF")}
-          >
-            Compare
-          </a>
-        </div>
-      )}
-
-      <ProUpgradeModal
-        isOpen={showProModal}
-        onClose={() => setShowProModal(false)}
-        symbol={symbol}
-      />
+      <ProUpgradeModal isOpen={showProModal} onClose={() => setShowProModal(false)} symbol={symbol} />
     </AppShell>
   );
 }

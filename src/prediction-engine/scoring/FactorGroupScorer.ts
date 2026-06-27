@@ -1,3 +1,4 @@
+import { clampScore } from '@/types';
 import { UnifiedFeatureValue, UnifiedFactorScore, UnifiedFactorGroup } from '../types';
 
 export interface FactorGroupDefinition {
@@ -25,10 +26,6 @@ function scoreFromBreakpoints(
     }
   }
   return sorted[sorted.length - 1].y;
-}
-
-function clampScore(v: number): number {
-  return Math.max(0, Math.min(100, Math.round(v)));
 }
 
 function featureValue(features: Map<string, UnifiedFeatureValue>, id: string): number | null {

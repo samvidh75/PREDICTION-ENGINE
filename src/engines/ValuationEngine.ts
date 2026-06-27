@@ -1,75 +1,28 @@
-import type { EngineInput, EngineResult } from './types';
-import { VALUATION_THRESHOLDS as V } from './calibration';
-import { clampScore, weightedAverage } from '@/types';
+import type { EngineInput } from './types';
+import { clampScore } from '@/types';
+
+const THRESHOLDS = {
+  PE_CHEAP: 15, PE_FAIR: 25, PE_EXPENSIVE: 35, PE_EXTREME: 50,
+  PB_CHEAP: 1.5, PB_FAIR: 3, PB_EXPENSIVE: 5, PB_EXTREME: 8,
+  EV_CHEAP: 8, EV_FAIR: 15, EV_EXPENSIVE: 25, EV_EXTREME: 40,
+};
+
+function scoreInverse(value: number | null | undefined, cheap: number, fair: number, expensive: number, extreme: number): { score: number; confidence: 'high' | 'medium' | 'low' } {
+  if (value === null || value === undefined) return { score: 0, confidence: 'low' };
+  if (value <= cheap) return { score: 95, confidence: 'high' };
+  if (value <= fair) return { score: 75, confidence: 'high' };
+  if (value <= expensive) return { score: 50, confidence: 'medium' };
+  if (value <= extreme) return { score: 30, confidence: 'medium' };
+  return { score: 10, confidence: 'low' };
+}
 
 export class ValuationEngine {
-  static evaluate(input: EngineInput): EngineResult {
-    const { peRatio, pbRatio, evEbitda, fcfYield, dividendYield } = input.fundamentals;
-
-    let peScore = 50;
-    if (peRatio !== null) {
-      if (peRatio <= 0) peScore = 20;
-      else if (peRatio <= V.PE_CHEAP) peScore = 95;
-      else if (peRatio <= V.PE_FAIR) peScore = 75;
-      else if (peRatio <= V.PE_EXPENSIVE) peScore = 50;
-      else if (peRatio <= V.PE_EXTREME) peScore = 30;
-      else peScore = 10;
-    }
-
-    let pbScore = 50;
-    if (pbRatio !== null) {
-      if (pbRatio <= 0) pbScore = 15;
-      else if (pbRatio <= V.PB_CHEAP) pbScore = 90;
-      else if (pbRatio <= V.PB_FAIR) pbScore = 65;
-      else if (pbRatio <= V.PB_EXPENSIVE) pbScore = 45;
-      else if (pbRatio <= V.PB_EXTREME) pbScore = 25;
-      else pbScore = 10;
-    }
-
-    let evScore = 50;
-    if (evEbitda !== null) {
-      if (evEbitda <= 0) evScore = 20;
-      else if (evEbitda <= V.EV_CHEAP) evScore = 90;
-      else if (evEbitda <= V.EV_FAIR) evScore = 70;
-      else if (evEbitda <= V.EV_EXPENSIVE) evScore = 50;
-      else if (evEbitda <= V.EV_EXTREME) evScore = 30;
-      else evScore = 15;
-    }
-
-    let fcfScore = 50;
-    if (fcfYield !== null) {
-      if (fcfYield >= 0.08) fcfScore = 95;
-      else if (fcfYield >= 0.05) fcfScore = 80;
-      else if (fcfYield >= 0.03) fcfScore = 65;
-      else if (fcfYield >= 0.02) fcfScore = 50;
-      else if (fcfYield >= 0) fcfScore = 35;
-      else fcfScore = 20;
-    }
-
-    let divScore = 50;
-    if (dividendYield !== null) {
-      if (dividendYield >= 0.20) divScore = 10;
-      else if (dividendYield >= 0.12) divScore = 25;
-      else if (dividendYield >= 0.08) divScore = 50;
-      else if (dividendYield >= 0.04) divScore = 90;
-      else if (dividendYield >= 0.03) divScore = 80;
-      else if (dividendYield >= 0.02) divScore = 65;
-      else if (dividendYield >= 0.01) divScore = 50;
-      else if (dividendYield >= 0.005) divScore = 35;
-      else divScore = 20;
-    }
-
-    const score = weightedAverage([
-      { score: peScore, weight: 2 },
-      { score: pbScore, weight: 2 },
-      { score: evScore, weight: evEbitda !== null ? 2 : 0 },
-      { score: fcfScore, weight: 3 },
-      { score: divScore, weight: dividendYield !== null ? 1.5 : 0 },
-    ]);
-
-    const missingFields = [peRatio, pbRatio].filter(f => f === null).length;
-    const confidence: 'high' | 'medium' | 'low' = missingFields > 1 ? 'low' : missingFields > 0 ? 'medium' : 'high';
-
+  static evaluate(input: EngineInput): { score: number; confidence: 'high' | 'medium' | 'low' } {
+    const fund = input.fundamentals;
+    const pe = scoreInverse(fund?.peRatio, THRESHOLDS.PE_CHEAP, THRESHOLDS.PE_FAIR, THRESHOLDS.PE_EXPENSIVE, THRESHOLDS.PE_EXTREME);
+    const pb = scoreInverse(fund?.pbRatio, THRESHOLDS.PB_CHEAP, THRESHOLDS.PB_FAIR, THRESHOLDS.PB_EXPENSIVE, THRESHOLDS.PB_EXTREME);
+    const score = clampScore(Math.round(pe.score * 0.6 + pb.score * 0.4));
+    const confidence: 'high' | 'medium' | 'low' = pe.confidence === 'low' || pb.confidence === 'low' ? 'low' : pe.confidence === 'high' && pb.confidence === 'high' ? 'high' : 'medium';
     return { score, confidence };
   }
 }

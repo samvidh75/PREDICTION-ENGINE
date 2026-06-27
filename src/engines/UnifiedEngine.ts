@@ -4,8 +4,15 @@ import { ValuationEngine } from './ValuationEngine';
 import { GrowthEngine } from './GrowthEngine';
 import { RiskEngine } from './RiskEngine';
 import { MomentumEngine } from './MomentumEngine';
-import { ENGINE_WEIGHTS } from './calibration';
 import { clampScore } from '@/types';
+
+const ENGINE_WEIGHTS = {
+  QUALITY: 0.40,
+  VALUATION: 0.25,
+  GROWTH: 0.15,
+  RISK: 0.15,
+  MOMENTUM: 0.05,
+};
 
 export interface UnifiedOutput {
   score: number;

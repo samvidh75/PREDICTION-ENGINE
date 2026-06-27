@@ -1,11 +1,10 @@
-import { signInWithGoogle } from './authService';
+import { authService } from './auth/authService';
 import { fetchUserProfile } from './profileService';
 import type { UserProfile } from '../types/user';
 
 export const handleSecureSignIn = async (setProfile: (p: UserProfile | null) => void) => {
   try {
-    // 1. Execute Auth Handshake
-    const user = await signInWithGoogle();
+    const user = await authService.signInWithGoogle();
 
     // 2. Hydrate User Entitlements from Firestore
     const profileData = await fetchUserProfile(user.uid);

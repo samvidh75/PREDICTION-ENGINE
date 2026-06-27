@@ -1,3 +1,4 @@
+import { clampScore } from '@/types';
 import { UnifiedConfidenceLevel } from '../types';
 
 export interface ConfidenceResult {
@@ -8,10 +9,6 @@ export interface ConfidenceResult {
     freshnessScore: number;
     providerConfidence: number;
   };
-}
-
-function clampScore(v: number): number {
-  return Math.max(0, Math.min(100, Math.round(v)));
 }
 
 export function computeConfidence(
