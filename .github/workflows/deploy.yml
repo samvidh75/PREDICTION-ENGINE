@@ -1,4 +1,4 @@
-name: Deploy to Railway (FREE)
+name: CI — Typecheck & Build
 
 on:
   push:
@@ -6,22 +6,24 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Deploy to Railway
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          railway up --force
+      - run: npm ci
 
-      - name: Run health check
-        run: |
-          sleep 30
-          curl -f https://prediction-engine-production-f7a8.up.railway.app/api/free/health || exit 1
-          echo "✅ Deployment successful"
+      - name: Compile backend
+        run: npm run compile:backend
+
+      - name: Typecheck frontend
+        run: npm run typecheck:frontend
+
+      - name: Notify
+        run: echo "✅ Build passed — Render blueprint auto-deploys from main"

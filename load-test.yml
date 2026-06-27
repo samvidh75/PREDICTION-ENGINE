@@ -1,5 +1,5 @@
 config:
-  target: "https://prediction-engine-production-f7a8.up.railway.app"
+  target: "https://stockstory-api.onrender.com"
   phases:
     - duration: 60
       arrivalRate: 10
