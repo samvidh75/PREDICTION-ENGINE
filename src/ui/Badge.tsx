@@ -1,11 +1,13 @@
+import { colors, radius } from "../design/tokens";
+
 export function Badge({ value, label }: { value: number | string; label?: string }) {
   const numeric = typeof value === "number" ? value : 60;
   const tone =
     numeric >= 75
-      ? { background: "var(--green-light)", text: "var(--green)", border: "var(--green)" }
+      ? { background: "#EEF8EE", text: colors.success, border: colors.success }
       : numeric >= 50
-        ? { background: "var(--chip)", text: "var(--text-700)", border: "var(--border)" }
-        : { background: "var(--red-light)", text: "var(--red)", border: "var(--red)" };
+        ? { background: colors.gray50, text: colors.gray900, border: colors.gray100 }
+        : { background: "#FDEEF1", text: colors.danger, border: colors.danger };
 
   return (
     <span
@@ -15,7 +17,7 @@ export function Badge({ value, label }: { value: number | string; label?: string
         gap: "4px",
         minHeight: "24px",
         padding: "0 12px",
-        borderRadius: "var(--radius-xl)",
+        borderRadius: radius.pill,
         border: `1px solid ${tone.border}`,
         background: tone.background,
         color: tone.text,
