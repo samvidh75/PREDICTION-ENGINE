@@ -1,3 +1,4 @@
+import { clampScore } from '@/types';
 import { UnifiedFactorScore } from '../types';
 
 export const COMPOSITE_WEIGHTS: Record<string, number> = {
@@ -19,10 +20,6 @@ export interface CompositeResult {
   riskDampening: number;
   rankingScore: number | null;
   availableWeight: number;
-}
-
-function clampScore(v: number): number {
-  return Math.max(0, Math.min(100, Math.round(v)));
 }
 
 export function computeCompositeScore(factorScores: UnifiedFactorScore[]): CompositeResult {

@@ -1,34 +1,102 @@
-import type { ReactNode } from "react";
+import type { ReactNode, ButtonHTMLAttributes, CSSProperties } from 'react';
+import { colors, radius, transition } from '../../styles';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonSize    = 'sm' | 'md' | 'lg';
 
-type ButtonAttrs = React.ButtonHTMLAttributes<HTMLButtonElement>;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?:   ButtonVariant;
+  size?:      ButtonSize;
+  fullWidth?: boolean;
+  children:   ReactNode;
+}
 
-export const Button = ({ children, variant = 'secondary', onClick, disabled, fullWidth, size = 'md', style, type, className, title }: {
-  children: ReactNode; variant?: ButtonVariant; onClick?: () => void;
-  disabled?: boolean; fullWidth?: boolean; size?: 'sm' | 'md' | 'lg'; style?: React.CSSProperties;
-  type?: ButtonAttrs['type']; className?: string; title?: string;
-}) => {
-  const base: React.CSSProperties = {
-    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-    fontFamily: 'var(--font-sans)', fontWeight: 600, cursor: disabled ? 'not-allowed' : 'pointer',
-    border: 'none', borderRadius: 'var(--radius-md)', transition: 'all 0.15s ease',
-    width: fullWidth ? '100%' : undefined, opacity: disabled ? 0.5 : 1,
+const BASE: CSSProperties = {
+  display:        'inline-flex',
+  alignItems:     'center',
+  justifyContent: 'center',
+  gap:            '6px',
+  fontFamily:     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontWeight:     600,
+  border:         'none',
+  borderRadius:   radius.sm,      // 6px — Stripe standard
+  cursor:         'pointer',
+  transition:     `background ${transition.base}, box-shadow ${transition.base}, opacity ${transition.fast}`,
+  whiteSpace:     'nowrap',
+  textDecoration: 'none',
+  lineHeight:     1,
+};
+
+const VARIANTS: Record<ButtonVariant, CSSProperties> = {
+  primary: {
+    background: colors.primary,
+    color:      colors.text.inverse,
+  },
+  secondary: {
+    background: colors.bg.primary,
+    color:      colors.text.primary,
+    border:     `1px solid ${colors.bg.tertiary}`,
+  },
+  ghost: {
+    background: 'transparent',
+    color:      colors.primary,
+  },
+  danger: {
+    background: colors.tint.error,
+    color:      colors.on.error,
+    border:     `1px solid rgba(245,34,45,0.20)`,
+  },
+};
+
+const SIZES: Record<ButtonSize, CSSProperties> = {
+  sm: { fontSize: '14px', padding: '8px 16px',  height: '36px' },
+  md: { fontSize: '16px', padding: '12px 24px', height: '44px' },   // Apple HIG touch min
+  lg: { fontSize: '16px', padding: '16px 32px', height: '52px' },
+};
+
+export function Button({
+  variant   = 'secondary',
+  size      = 'md',
+  fullWidth = false,
+  disabled  = false,
+  children,
+  style,
+  onMouseEnter,
+  onMouseLeave,
+  ...rest
+}: ButtonProps) {
+  const hoverBg: Record<ButtonVariant, string> = {
+    primary:   colors.on.primary,       // #0051CC
+    secondary: colors.bg.secondary,     // #F5F5F5
+    ghost:     colors.bg.secondary,
+    danger:    'rgba(245,34,45,0.14)',
   };
-  const sizes: Record<string, React.CSSProperties> = {
-    sm: { padding: '7px 14px', fontSize: 13 },
-    md: { padding: '10px 20px', fontSize: 14 },
-    lg: { padding: '13px 28px', fontSize: 15 },
-  };
-  const variants: Record<ButtonVariant, React.CSSProperties> = {
-    primary:   { background: 'var(--brand)', color: '#fff' },
-    secondary: { background: 'var(--bg-chip)', color: 'var(--text-primary)', border: '1px solid var(--border)' },
-    ghost:     { background: 'transparent', color: 'var(--text-secondary)' },
-    danger:    { background: 'var(--red-light)', color: 'var(--red)' },
-  };
+
   return (
-    <button type={type} className={className} title={title} style={{ ...base, ...sizes[size], ...variants[variant], ...style }} onClick={onClick} disabled={disabled}>
+    <button
+      disabled={disabled}
+      style={{
+        ...BASE,
+        ...VARIANTS[variant],
+        ...SIZES[size],
+        width:   fullWidth ? '100%' : undefined,
+        opacity: disabled  ? 0.45  : 1,
+        cursor:  disabled  ? 'not-allowed' : 'pointer',
+        ...style,
+      }}
+      onMouseEnter={e => {
+        if (!disabled) e.currentTarget.style.background = hoverBg[variant];
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={e => {
+        if (!disabled) e.currentTarget.style.background = (VARIANTS[variant].background as string) ?? 'transparent';
+        onMouseLeave?.(e);
+      }}
+      {...rest}
+    >
       {children}
     </button>
   );
-};
+}
+
+export default Button;

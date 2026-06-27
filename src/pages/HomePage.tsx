@@ -1,201 +1,237 @@
-import { useState } from "react"
-import { Search, Bookmark, Eye, BarChart3, GitCompare, Shield } from "lucide-react"
-import { NIFTY50_SYMBOLS } from "../services/universe/StockUniverse"
-import { navigate } from "../components/product/routeConfig"
+import { useState } from 'react';
+import { Search, BarChart3, GitCompare, Bookmark, Shield, TrendingUp, AlertCircle, Clock } from 'lucide-react';
+import { NIFTY50_SYMBOLS } from '../services/universe/StockUniverse';
+import { navigate } from '../components/product/routeConfig';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { colors, typography, spacing, radius, shadow } from '../styles';
+
+/* ─── static data ─────────────────────────────────────────────────────────── */
 
 const DISCOVER = [
-  { title: "Quality Compounders", desc: "High ROE · Low debt · Growth", icon: "📊" },
-  { title: "Undervalued Gems", desc: "PE below fair value", icon: "💎" },
-  { title: "Momentum Movers", desc: "RSI strength · MACD signal", icon: "⚡" },
-  { title: "Low Risk Steady", desc: "Debt-free · Stable returns", icon: "🛡" },
-]
+  { icon: '📊', title: 'Quality Compounders',  desc: 'High ROE · Low debt · Consistent growth'     },
+  { icon: '💎', title: 'Undervalued Gems',      desc: 'Trading below intrinsic value'               },
+  { icon: '⚡', title: 'Momentum Movers',       desc: 'RSI strength · MACD crossover signal'        },
+  { icon: '🛡', title: 'Stable Defenders',      desc: 'Debt-free · Low volatility · Steady returns' },
+] as const;
 
 const QUICK_ACTIONS = [
-  { label: "Scanner", icon: BarChart3, page: "scanner" },
-  { label: "Compare", icon: GitCompare, page: "compare" },
-  { label: "Watchlist", icon: Bookmark, page: "watchlist" },
-  { label: "Methodology", icon: Shield, page: "methodology" },
-]
+  { label: 'Scanner',     icon: BarChart3,  page: 'scanner'     },
+  { label: 'Compare',     icon: GitCompare, page: 'compare'     },
+  { label: 'Watchlist',   icon: Bookmark,   page: 'watchlist'   },
+  { label: 'Methodology', icon: Shield,     page: 'methodology' },
+] as const;
+
+function getRecent():  string[] { try { return JSON.parse(localStorage.getItem('stockstory-recent')  || '[]') as string[]; } catch { return []; } }
+function getTracked(): string[] { try { return JSON.parse(localStorage.getItem('stockstory-tracked') || '[]') as string[]; } catch { return []; } }
+
+/* ─── page ────────────────────────────────────────────────────────────────── */
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [query,   setQuery]   = useState('');
+  const [recent]              = useState<string[]>(getRecent);
+  const [tracked]             = useState<string[]>(getTracked);
 
-  const [recent] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem("stockstory-recent") || "[]") } catch { return [] }
-  })
-  const [tracked] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem("stockstory-tracked") || "[]") } catch { return [] }
-  })
+  const handleSearch = () => {
+    const q = query.trim().toUpperCase();
+    if (q) navigate('stock', q);
+  };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    const q = searchQuery.trim().toUpperCase()
-    if (q) navigate("stock", q)
-  }
+  const popular = (recent.length > 0 ? recent : NIFTY50_SYMBOLS).slice(0, 8);
 
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 860 }}>
+    <div style={{ minHeight: '100vh', background: colors.bg.primary }}>
 
-      {/* Hero */}
-      <section style={{ paddingTop: 48, paddingBottom: 32, textAlign: "center" }}>
-        <h1 style={{
-          fontSize: 32, fontWeight: 800, color: "var(--text-900)",
-          letterSpacing: "-0.6px", margin: 0, lineHeight: 1.2,
-          fontFamily: "var(--font)",
-        }}>
+      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      <section style={{
+        paddingTop:    spacing.xxxl,
+        paddingBottom: spacing.xl,
+        textAlign:     'center',
+        borderBottom:  `1px solid ${colors.bg.tertiary}`,
+        marginBottom:  spacing.xl,
+      }}>
+        <h1 style={{ ...typography.sectionTitle, color: colors.text.primary, margin: 0 }}>
           Research Indian stocks
         </h1>
-        <p style={{
-          fontSize: 16, color: "var(--text-500)", marginTop: 10,
-          maxWidth: 440, marginLeft: "auto", marginRight: "auto", lineHeight: 1.5,
-        }}>
+        <p style={{ ...typography.bodyText, color: colors.text.secondary, marginTop: spacing.sm, marginBottom: spacing.lg }}>
           Institutional-grade analysis on Nifty 50 companies
         </p>
 
-        <form onSubmit={handleSearch} style={{
-          display: "flex", alignItems: "center", gap: 0, maxWidth: 520,
-          margin: "24px auto 0",
-          border: "1px solid var(--border-strong)", borderRadius: "var(--r-md)",
-          background: "#fff", overflow: "hidden",
-          boxShadow: "var(--sh-raised)",
+        {/* Search bar */}
+        <div style={{
+          maxWidth:     '560px',
+          margin:       '0 auto',
+          display:      'flex',
+          border:       `1px solid ${colors.bg.tertiary}`,
+          borderRadius: '8px',
+          overflow:     'hidden',
+          boxShadow:    shadow.card,
+          background:   colors.bg.primary,
         }}>
-          <Search size={16} style={{ color: "var(--text-300)", flexShrink: 0, marginLeft: 14 }} />
+          <Search size={16} style={{ color: colors.text.tertiary, flexShrink: 0, margin: '14px 0 0 14px' }} />
           <input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search — TCS, HDFC Bank, Reliance…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            placeholder="TCS, HDFC Bank, Reliance…"
             style={{
-              flex: 1, border: "none", background: "transparent",
-              color: "var(--text-900)", fontSize: 15, outline: "none",
-              padding: "13px 12px", minWidth: 0, fontFamily: "var(--font)",
+              flex:       1,
+              border:     'none',
+              background: 'transparent',
+              color:      colors.text.primary,
+              fontSize:   '16px',
+              outline:    'none',
+              padding:    `${spacing.sm} ${spacing.sm}`,
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              minWidth:   0,
             }}
           />
-          <button type="submit" style={{
-            height: 48, padding: "0 20px", borderRadius: 0, border: "none",
-            borderLeft: "1px solid var(--border)",
-            background: "var(--brand)", color: "#fff",
-            fontSize: 14, fontWeight: 700, cursor: "pointer",
-            whiteSpace: "nowrap", fontFamily: "var(--font)",
-            flexShrink: 0,
-          }}>
+          <Button variant="primary" size="md" onClick={handleSearch}
+            style={{ borderRadius: 0, height: '48px', flexShrink: 0 }}>
             Research
-          </button>
-        </form>
+          </Button>
+        </div>
+
+        {/* Quick action pills */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: spacing.sm, marginTop: spacing.lg, flexWrap: 'wrap' }}>
+          {QUICK_ACTIONS.map(action => (
+            <button
+              key={action.page}
+              onClick={() => navigate(action.page)}
+              style={{
+                display:      'inline-flex', alignItems: 'center', gap: '6px',
+                height:       '34px', padding: `0 ${spacing.base}`,
+                borderRadius: '9999px', border: `1px solid ${colors.bg.tertiary}`,
+                background:   colors.bg.primary, color: colors.text.secondary,
+                fontSize:     '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+                transition:   'background 150ms ease',
+                fontFamily:   '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = colors.bg.secondary)}
+              onMouseLeave={e => (e.currentTarget.style.background = colors.bg.primary)}
+            >
+              <action.icon size={13} style={{ color: colors.primary }} />
+              {action.label}
+            </button>
+          ))}
+        </div>
       </section>
 
-      {/* Quick action pills */}
-      <section className="no-scrollbar" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 32 }}>
-        {QUICK_ACTIONS.map((action) => (
-          <button key={action.page} onClick={() => navigate(action.page)} style={{
-            display: "inline-flex", alignItems: "center", gap: 7, height: 36,
-            padding: "0 16px", borderRadius: "var(--r-pill)",
-            border: "1px solid var(--border-strong)",
-            background: "#fff", color: "var(--text-700)",
-            fontSize: 13, fontWeight: 600, cursor: "pointer",
-            whiteSpace: "nowrap", flexShrink: 0,
-            fontFamily: "var(--font)",
-          }}>
-            <action.icon size={14} style={{ color: "var(--brand)" }} />
-            {action.label}
-          </button>
-        ))}
-      </section>
-
-      {/* Divider */}
-      <div style={{ borderTop: "1px solid var(--border)", marginBottom: 32 }} />
-
-      {/* Discover opportunities */}
-      <section style={{ paddingBottom: 40 }}>
-        <h2 style={{
-          fontSize: 20, fontWeight: 800, color: "var(--text-900)",
-          margin: "0 0 16px", letterSpacing: "-0.3px",
-          fontFamily: "var(--font)",
-        }}>
+      {/* ── Discover opportunities ─────────────────────────────────────── */}
+      <section style={{ marginBottom: spacing.xl }}>
+        <h2 style={{ ...typography.cardTitle, color: colors.text.primary, margin: `0 0 ${spacing.base}` }}>
           Discover opportunities
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-          {DISCOVER.map((lens) => (
-            <button key={lens.title} onClick={() => navigate("scanner")} style={{
-              padding: "20px 16px", borderRadius: "var(--r-md)",
-              border: "1px solid var(--border)", background: "#fff",
-              cursor: "pointer", textAlign: "left",
-              transition: "background var(--t-fast)",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#fafafa")}
-            onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
-            >
-              <div style={{ fontSize: 22, marginBottom: 10, lineHeight: 1 }}>{lens.icon}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-900)", marginBottom: 4, fontFamily: "var(--font)" }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: spacing.base }}>
+          {DISCOVER.map(lens => (
+            <Card key={lens.title} onClick={() => navigate('scanner')} padding="md">
+              <div style={{ fontSize: '24px', marginBottom: spacing.sm }}>{lens.icon}</div>
+              <div style={{ ...typography.bodyEmphasis, color: colors.text.primary, marginBottom: spacing.xs }}>
                 {lens.title}
               </div>
-              <div style={{ fontSize: 12, color: "var(--text-500)", lineHeight: 1.4 }}>{lens.desc}</div>
-            </button>
+              <div style={{ ...typography.caption, color: colors.text.secondary, lineHeight: 1.4 }}>
+                {lens.desc}
+              </div>
+            </Card>
           ))}
         </div>
       </section>
 
-      {/* Divider */}
-      <div style={{ borderTop: "1px solid var(--border)", marginBottom: 32 }} />
+      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
 
-      {/* Recently viewed */}
-      <section style={{ paddingBottom: 32 }}>
-        <h2 style={{
-          fontSize: 20, fontWeight: 800, color: "var(--text-900)",
-          margin: "0 0 16px", letterSpacing: "-0.3px",
-          fontFamily: "var(--font)",
-        }}>
-          {recent.length > 0 ? "Recently viewed" : "Popular stocks"}
-        </h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {(recent.length > 0 ? recent.slice(0, 8) : NIFTY50_SYMBOLS.slice(0, 8)).map((symbol) => (
-            <button key={symbol} onClick={() => navigate("stock", symbol)} style={{
-              padding: "10px 16px", borderRadius: "var(--r-md)",
-              border: "1px solid var(--border)", background: "#fff",
-              cursor: "pointer", fontFamily: "var(--font)",
-              transition: "background var(--t-fast)",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#fafafa")}
-            onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
+      {/* ── Recent / Popular ───────────────────────────────────────────── */}
+      <section style={{ marginBottom: spacing.xl }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.base }}>
+          {recent.length > 0
+            ? <><Clock size={14} style={{ color: colors.text.tertiary }} /><h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Recently viewed</h2></>
+            : <><TrendingUp size={14} style={{ color: colors.text.tertiary }} /><h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Popular stocks</h2></>
+          }
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing.sm }}>
+          {popular.map(sym => (
+            <button
+              key={sym}
+              onClick={() => navigate('stock', sym)}
+              style={{
+                padding: `${spacing.sm} ${spacing.base}`, borderRadius: radius.md,
+                border: `1px solid ${colors.bg.tertiary}`, background: colors.bg.primary,
+                cursor: 'pointer', textAlign: 'left',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                transition: 'background 150ms ease, box-shadow 150ms ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = colors.bg.secondary; e.currentTarget.style.boxShadow = shadow.raised; }}
+              onMouseLeave={e => { e.currentTarget.style.background = colors.bg.primary;   e.currentTarget.style.boxShadow = 'none'; }}
             >
-              <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text-900)" }}>{symbol}</div>
-              <div style={{ fontSize: 11, color: "var(--text-300)", marginTop: 2 }}>Research →</div>
+              <div style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{sym}</div>
+              <div style={{ ...typography.caption, color: colors.text.tertiary, marginTop: '2px' }}>Research →</div>
             </button>
           ))}
         </div>
       </section>
 
-      {/* Tracked companies (only if user has any) */}
+      {/* ── Tracked ────────────────────────────────────────────────────── */}
       {tracked.length > 0 && (
-        <section style={{ paddingBottom: 40 }}>
-          <div style={{ borderTop: "1px solid var(--border)", marginBottom: 32 }} />
-          <h2 style={{
-            fontSize: 20, fontWeight: 800, color: "var(--text-900)",
-            margin: "0 0 16px", letterSpacing: "-0.3px",
-            fontFamily: "var(--font)",
-          }}>
-            Tracked
-          </h2>
-          <div className="no-scrollbar" style={{ display: "flex", gap: 8, overflowX: "auto" }}>
-            {tracked.map((symbol) => (
-              <button key={symbol} onClick={() => navigate("stock", symbol)} style={{
-                flexShrink: 0, padding: "12px 16px", borderRadius: "var(--r-md)",
-                border: "1px solid var(--border)", background: "#fff",
-                cursor: "pointer", textAlign: "left", minWidth: 100,
-              }}>
-                <div style={{ fontWeight: 700, fontSize: 13, color: "var(--text-900)" }}>{symbol}</div>
-                <div style={{ fontSize: 11, color: "var(--text-300)", marginTop: 2 }}>Research →</div>
-              </button>
-            ))}
-          </div>
-        </section>
+        <>
+          <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
+          <section style={{ marginBottom: spacing.xl }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.base }}>
+              <Bookmark size={14} style={{ color: colors.text.tertiary }} />
+              <h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Tracked</h2>
+            </div>
+            <div className="no-scrollbar" style={{ display: 'flex', gap: spacing.sm, overflowX: 'auto' }}>
+              {tracked.map(sym => (
+                <button key={sym} onClick={() => navigate('stock', sym)} style={{
+                  flexShrink: 0, padding: `${spacing.sm} ${spacing.base}`,
+                  borderRadius: radius.md, border: `1px solid ${colors.bg.tertiary}`,
+                  background: colors.bg.primary, cursor: 'pointer', textAlign: 'left', minWidth: '90px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  transition: 'background 150ms ease',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = colors.bg.secondary)}
+                onMouseLeave={e => (e.currentTarget.style.background = colors.bg.primary)}>
+                  <div style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{sym}</div>
+                  <div style={{ ...typography.caption, color: colors.text.tertiary, marginTop: '2px' }}>Tracked</div>
+                </button>
+              ))}
+            </div>
+          </section>
+        </>
       )}
 
-      {/* Footer */}
-      <div style={{ borderTop: "1px solid var(--border)", padding: "24px 0", marginTop: 8 }}>
-        <p style={{ fontSize: 11, color: "var(--text-300)", lineHeight: 1.6, margin: 0 }}>
-          {'© 2025 StockStory India · Not SEBI-registered · Not investment advice · For educational purposes only'}
+      {/* ── Differentiators ────────────────────────────────────────────── */}
+      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
+      <section style={{ marginBottom: spacing.xl }}>
+        <h2 style={{ ...typography.bodyEmphasis, color: colors.text.secondary, margin: `0 0 ${spacing.base}`, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          What makes StockStory different
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: spacing.base }}>
+          {[
+            { icon: <AlertCircle size={14} style={{ color: colors.primary  }} />, title: 'Smart Alerts',    desc: 'Get notified when ROE drops or PE dips below peers'    },
+            { icon: <TrendingUp  size={14} style={{ color: colors.success  }} />, title: 'Thesis Timeline', desc: 'Track how a stock\'s conviction score changed over time' },
+            { icon: <BarChart3   size={14} style={{ color: colors.warning  }} />, title: 'Sector Compare',  desc: 'Auto-compare against 5 closest peers in sector'         },
+            { icon: <Shield      size={14} style={{ color: colors.error    }} />, title: 'Risk-Adj Score',  desc: 'Score adjusted for volatility, not just returns'        },
+          ].map(d => (
+            <div key={d.title} style={{
+              display: 'flex', alignItems: 'flex-start', gap: spacing.sm,
+              padding: spacing.base, borderRadius: radius.md, border: `1px solid ${colors.bg.tertiary}`,
+            }}>
+              <div style={{ flexShrink: 0, marginTop: '2px' }}>{d.icon}</div>
+              <div>
+                <div style={{ ...typography.caption, fontWeight: 600, color: colors.text.primary }}>{d.title}</div>
+                <div style={{ ...typography.caption, color: colors.text.secondary, marginTop: '2px', lineHeight: 1.4 }}>{d.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, padding: `${spacing.lg} 0` }}>
+        <p style={{ ...typography.caption, color: colors.text.tertiary, margin: 0 }}>
+          {'© 2025 StockStory India · Not SEBI-registered · Not investment advice · Educational purposes only'}
         </p>
       </div>
+
     </div>
-  )
+  );
 }

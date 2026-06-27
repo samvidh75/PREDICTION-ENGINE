@@ -6,4 +6,4 @@ export { MomentumEngine } from './MomentumEngine';
 export { UnifiedEngine } from './UnifiedEngine';
 export type { UnifiedOutput } from './UnifiedEngine';
 export type { EngineInput, EngineResult } from './types';
-export { ENGINE_WEIGHTS } from './calibration';
+export { DerivedMetricsEngine } from './DerivedMetricsEngine';

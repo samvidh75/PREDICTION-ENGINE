@@ -1,37 +1,83 @@
-import React from "react";
+import React, { type CSSProperties } from 'react';
+import { colors, radius, transition, spacing } from '../../styles';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  glass?: boolean;
 }
 
+const BASE: CSSProperties = {
+  width:        '100%',
+  height:       '44px',               // Apple HIG touch target
+  padding:      `0 ${spacing.base}`,  // 12px 16px
+  fontSize:     '16px',
+  fontFamily:   '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontWeight:   400,
+  border:       `1px solid ${colors.bg.tertiary}`,  // #D9D9D9 ~ E5E5E5
+  borderRadius: radius.sm,            // 6px
+  background:   colors.bg.primary,
+  color:        colors.text.primary,
+  outline:      'none',
+  transition:   `border-color ${transition.base}`,
+  boxSizing:    'border-box',
+};
+
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, id, glass = false, className = "", ...props }, ref) => {
-    const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
+  ({ label, error, id, style, onFocus, onBlur, disabled, ...rest }, ref) => {
+    const inputId = id ?? (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+
     return (
-      <div className="w-full text-left">
+      <div style={{ width: '100%' }}>
         {label && (
-          <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-[var(--color-text-secondary)]">
+          <label
+            htmlFor={inputId}
+            style={{
+              display:      'block',
+              fontSize:     '14px',
+              fontWeight:   600,
+              color:        colors.text.primary,
+              marginBottom: spacing.sm,
+            }}
+          >
             {label}
           </label>
         )}
         <input
-          id={inputId}
           ref={ref}
-          className={`h-10 w-full rounded-lg text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-secondary)] transition-colors focus:border-[#2962FF] focus:outline-none focus:ring-2 focus:ring-[#2962FF]/20 disabled:bg-[var(--color-surface-raised)] disabled:text-[var(--color-text-secondary)] disabled:cursor-not-allowed ${
-            glass
-              ? "border border-[rgba(148,163,184,0.16)] bg-[var(--color-surface-raised)]"
-              : "bg-[var(--color-surface-raised)] border border-[rgba(148,163,184,0.16)]"
-          } px-3 ${className}`}
-          {...props}
+          id={inputId}
+          disabled={disabled}
+          style={{
+            ...BASE,
+            borderColor: error ? colors.error : colors.bg.tertiary,
+            borderWidth: error ? '2px' : '1px',
+            background:  disabled ? colors.bg.secondary : colors.bg.primary,
+            color:       disabled ? colors.text.tertiary : colors.text.primary,
+            cursor:      disabled ? 'not-allowed' : 'text',
+            ...style,
+          }}
+          onFocus={e => {
+            if (!disabled && !error) {
+              e.currentTarget.style.borderColor = colors.primary;
+              e.currentTarget.style.borderWidth = '2px';
+            }
+            onFocus?.(e);
+          }}
+          onBlur={e => {
+            e.currentTarget.style.borderColor = error ? colors.error : colors.bg.tertiary;
+            e.currentTarget.style.borderWidth = error ? '2px' : '1px';
+            onBlur?.(e);
+          }}
+          {...rest}
         />
-        {error && <p className="mt-1.5 text-xs text-[#FCA5A5]">{error}</p>}
+        {error && (
+          <span style={{ fontSize: '12px', color: colors.error, marginTop: spacing.xs, display: 'block' }}>
+            {error}
+          </span>
+        )}
       </div>
     );
   }
 );
 
-Input.displayName = "Input";
-
+Input.displayName = 'Input';
 export default Input;
