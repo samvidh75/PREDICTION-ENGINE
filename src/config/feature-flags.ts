@@ -1,8 +1,6 @@
 export interface FeatureFlags {
-  sglang: {
+  localAi: {
     enabled: boolean;
-    cpuMode: boolean;
-    timeoutMs: number;
   };
   researchBot: {
     enabled: boolean;
@@ -32,10 +30,8 @@ export interface FeatureFlags {
 
 export function loadFeatureFlags(): FeatureFlags {
   return {
-    sglang: {
-      enabled: process.env.ENABLE_SGLANG === 'true',
-      cpuMode: process.env.SGLANG_CPU_MODE === 'true',
-      timeoutMs: parseInt(process.env.SGLANG_TIMEOUT_MS || '30000', 10),
+    localAi: {
+      enabled: process.env.LOCAL_AI_ENABLED === 'true',
     },
     researchBot: {
       enabled: process.env.ENABLE_RESEARCH_BOT !== 'false',

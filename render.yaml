@@ -10,7 +10,7 @@
 #
 # ── Optional but recommended ────────────────────────────────────────────────
 #   REDIS_URL     → Upstash Redis free tier (for rate limiting + cache)
-#   SGLANG_URL    → SGLang LLM inference URL (for AI features)
+#   GROQ_API_KEY → Groq LLM API key (free, for AI analysis features)
 
 services:
   - type: web
@@ -62,10 +62,10 @@ services:
       - key: REDIS_URL
         sync: false
 
-      # ── LLM / AI (SGLang — optional, backend degrades when absent) ────
+      # ── LLM / AI (optional — backend uses deterministic fallback when absent) ─
       - key: SGLANG_URL
         sync: false
-      - key: ENABLE_SGLANG
+      - key: LOCAL_AI_ENABLED
         value: "false"
       - key: ENABLE_RESEARCH_BOT
         value: "true"

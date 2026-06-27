@@ -10,7 +10,9 @@ export const ENV = {
   MARKET_TIMEZONE: process.env.MARKET_TIMEZONE || 'Asia/Kolkata',
   MARKET_OPEN: process.env.MARKET_OPEN || '09:30',
   MARKET_CLOSE: process.env.MARKET_CLOSE || '15:30',
-  SGLANG_URL: process.env.SGLANG_URL || process.env.OLLAMA_URL || 'http://localhost:11434',
+  LOCAL_AI_ENABLED: process.env.LOCAL_AI_ENABLED === 'true',
+  SGLANG_URL: process.env.SGLANG_URL || '',
+  OLLAMA_URL: process.env.OLLAMA_URL || '',
   OLLAMA_MODEL: process.env.OLLAMA_MODEL || 'mistral',
 };
 
