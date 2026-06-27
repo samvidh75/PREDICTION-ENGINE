@@ -32,13 +32,12 @@ The separate Render backend was configured in `render.yaml` but **not deployed**
 
 ## Redis — Upgraded from Ephemeral to Permanent
 
-The initial Redis setup used an ephemeral database from `upstash.com/start-redis` (expires 2026-06-30, REST API only). This was replaced with a **permanent Upstash Redis** database created via the [Upstash Console](https://console.upstash.com):
+The Redis setup was upgraded from an ephemeral starter database to a **permanent Upstash Redis** database created via the [Upstash Console](https://console.upstash.com):
 
-- **Name:** `stockstory-redis`
+- **Name:** `gentle-phoenix-101030`
 - **Region:** Singapore (`ap-southeast-1`)
 - **Protocol:** Full TLS TCP (`rediss://`) — verified with `redis` npm package (v5.12.1)
-- **Verification:** `PING → PONG`, `SET/GET` working ✅
-- **Vercel env:** `REDIS_URL` updated in production and redeployed
+- **Vercel env:** `REDIS_URL` updated in production and redeployed ✅
 
 ---
 
@@ -102,9 +101,8 @@ Users ──→ https://www.stockstory-india.com
 |--------|-------|
 | **Type** | Upstash Redis (serverless, permanent) — created via Upstash Console, Singapore (`ap-southeast-1`) |
 | **Status** | ✅ **Configured and verified** — TCP/TLS protocol working (`rediss://`), PING → PONG, SET/GET verified |
-| **Connection** | `REDIS_URL` set in Vercel production env with permanent TLS connection string |
+| **Connection** | `REDIS_URL` set in Vercel production env with permanent TLS connection string (`gentle-phoenix-101030`) |
 | **Vercel env** | ✅ `REDIS_URL` — Upstash permanent Redis (Production) |
-| **Previous** | Ephemeral tier was replaced with a permanent database created via the Upstash Console |
 
 ---
 
@@ -238,16 +236,17 @@ All providers use real configured API keys in Vercel environment variables. No m
 
 ## Remaining Manual Steps
 
-### Redis — Claim Upstash Database (recommended)
+### Redis — Upstash Permanent Database
 
-The ephemeral Redis database expires on **2026-06-30**. To keep it permanently:
+✅ **Upstash Redis is already configured permanently** via the Upstash Console:
 
-1. Visit https://upstash.com/start-redis/console/ef15ee55-7287-4dac-aa2d-50308929c193
-2. Click **Claim** and sign in with GitHub/Google
-3. After claiming, standard Redis protocol (`rediss://`) becomes available
-4. Update `REDIS_URL` in [Vercel dashboard](https://vercel.com/samvidh75s-projects/prediction-engine/settings/environment-variables) if the connection string changes
+- **Database Name:** `gentle-phoenix-101030` (Permanent)
+- **Region:** Singapore (`ap-southeast-1`)
+- **Protocol:** TLS TCP (`rediss://`) — full Redis protocol support
+- **Verification:** `PING → PONG`, `SET/GET` working ✅
+- **Vercel env:** `REDIS_URL` updated in production with permanent connection string ✅
 
-Alternatively, create a new database via the [Upstash Console](https://console.upstash.com) and set `REDIS_URL` to `rediss://default:<token>@<host>:6379`.
+No further Redis setup needed.
 
 ### Render Backend (optional)
 
