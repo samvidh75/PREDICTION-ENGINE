@@ -94,7 +94,28 @@ describe('toMarketBrainResearchView', () => {
     expect(view.evidenceReview.needsReview).toBe(true);
     expect(view.evidenceReview.partial).toEqual(['fundamentals']);
     expect(view.evidenceReview.missing).toEqual([]);
-    expect(view.evidenceReview.summary).toContain('Needs review: fundamentals.');
+    expect(view.evidenceReview.summary).toContain('Needs review: Fundamentals.');
+  });
+
+  it('renders public evidence labels without raw domain keys', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: {
+        instrument_master: 'ready',
+        prices: 'ready',
+        fundamentals: 'partial',
+        financial_statements: 'missing',
+        technicals: 'ready',
+        sector_context: 'missing',
+      },
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    expect(view.evidenceReview.summary).toContain('Needs review: Fundamentals.');
+    expect(view.evidenceReview.summary).toContain('Unavailable evidence: Financial Statements, Sector Context.');
+    expect(view.evidenceReview.summary).not.toContain('financial_statements');
+    expect(view.evidenceReview.summary).not.toContain('sector_context');
   });
 
   it('rejects unsafe factor copy before it can reach frontend surfaces', () => {
