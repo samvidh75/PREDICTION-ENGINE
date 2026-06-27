@@ -54,8 +54,8 @@ function ResearchList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function EvidenceReviewStatus({ evidenceReview }: { evidenceReview: MarketBrainEvidenceReviewView }) {
-  if (!evidenceReview.needsReview && !evidenceReview.summary) return null;
+function EvidenceReviewStatus({ evidenceReview }: { evidenceReview?: MarketBrainEvidenceReviewView }) {
+  if (!evidenceReview?.needsReview && !evidenceReview?.summary) return null;
 
   return (
     <div
@@ -75,7 +75,7 @@ function EvidenceReviewStatus({ evidenceReview }: { evidenceReview: MarketBrainE
         <div style={{ fontSize: 11, color: '#92400E', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4 }}>
           Research evidence status
         </div>
-        <div style={{ fontSize: 13, lineHeight: 1.5, color: '#475569' }}>{evidenceReview.summary}</div>
+        <div style={{ fontSize: 13, lineHeight: 1.5, color: '#475569' }}>{evidenceReview?.summary}</div>
       </div>
     </div>
   );
