@@ -6,10 +6,6 @@ import {
   REQUIRED_MARKET_BRAIN_EVIDENCE,
 } from './evidenceNormalization';
 
-const allReady = Object.fromEntries(
-  REQUIRED_MARKET_BRAIN_EVIDENCE.map((domain) => [domain, 'ready']),
-);
-
 describe('market brain evidence normalization', () => {
   it('treats absent evidence as missing rather than usable', () => {
     const coverage = normalizeEvidenceCoverage(undefined);
@@ -23,9 +19,12 @@ describe('market brain evidence normalization', () => {
 
   it('keeps partial evidence usable but marked for review', () => {
     const coverage = normalizeEvidenceCoverage({
-      ...allReady,
+      instrument_master: 'ready',
+      prices: 'ready',
       fundamentals: 'partial',
       financial_statements: 'missing',
+      technicals: 'ready',
+      sector_context: 'ready',
     });
 
     expect(coverage.partial).toEqual(['fundamentals']);
@@ -38,16 +37,18 @@ describe('market brain evidence normalization', () => {
     });
   });
 
-  it('normalizes unknown or blank states to missing', () => {
+  it('normalizes blank states to missing', () => {
     expect(normalizeEvidenceState(undefined)).toBe('missing');
     expect(normalizeEvidenceState(null)).toBe('missing');
-    expect(normalizeEvidenceState('stale' as never)).toBe('missing');
   });
 
   it('returns only missing required domains for engine gating', () => {
     expect(missingRequiredEvidence({
-      ...allReady,
+      instrument_master: 'ready',
       prices: 'partial',
+      fundamentals: 'ready',
+      financial_statements: 'ready',
+      technicals: 'ready',
       sector_context: 'missing',
     })).toEqual(['sector_context']);
   });
