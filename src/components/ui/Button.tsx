@@ -1,4 +1,5 @@
 import { color, font, radius, layout } from '../../design/tokens';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
@@ -8,14 +9,24 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-export function Button({ variant = 'primary', children, style, ...props }: ButtonProps) {
+export function Button({ variant = 'primary', children, style, className, ...props }: ButtonProps) {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  const height = isDesktop ? layout.buttonHeightDesktop : layout.buttonHeightMobile;
+
   const base: React.CSSProperties = {
     fontFamily: font,
     borderRadius: radius.pill,
     border: 'none',
     cursor: 'pointer',
     fontWeight: 600,
+    height,
+    padding: `0 20px`,
     transition: 'background 0.15s ease',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
   };
 
   const variants: Record<ButtonVariant, React.CSSProperties> = {
@@ -36,6 +47,7 @@ export function Button({ variant = 'primary', children, style, ...props }: Butto
 
   return (
     <button
+      className={className}
       style={{ ...base, ...variants[variant], ...style }}
       {...props}
     >
