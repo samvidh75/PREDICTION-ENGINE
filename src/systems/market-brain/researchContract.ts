@@ -1,10 +1,17 @@
 import { assertMarketBrainCopyIsCompliant } from './marketBrainGuardrails';
-import type { FactorScore, IndiaMarketBrainResult } from './indiaMarketBrain';
+import type { FactorScore, IndiaMarketBrainResult, MarketDataDomain } from './indiaMarketBrain';
 
 export interface MarketBrainFactorView {
   key: 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
   label: string;
   score: number;
+  summary: string;
+}
+
+export interface MarketBrainEvidenceReviewView {
+  needsReview: boolean;
+  partial: MarketDataDomain[];
+  missing: MarketDataDomain[];
   summary: string;
 }
 
@@ -17,6 +24,7 @@ export interface MarketBrainResearchView {
   thesis: string[];
   risksToReview: string[];
   whatToWatch: string[];
+  evidenceReview: MarketBrainEvidenceReviewView;
   factorViews: MarketBrainFactorView[];
   methodNote: string;
   generatedAt: string;
@@ -26,6 +34,27 @@ const summarizeFactor = (factor: FactorScore, fallback: string): string => {
   if (factor.drivers.length > 0) return factor.drivers[0];
   if (factor.risks.length > 0) return factor.risks[0];
   return fallback;
+};
+
+const humanizeDomain = (domain: MarketDataDomain): string => domain.replace(/_/g, ' ');
+
+const buildEvidenceReview = (result: IndiaMarketBrainResult): MarketBrainEvidenceReviewView => {
+  const partial = result.partialEvidence;
+  const missing = result.missingEvidence;
+  const needsReview = partial.length > 0 || missing.length > 0;
+  const summary = !needsReview
+    ? 'Required research evidence is available for this view.'
+    : [
+        partial.length > 0 ? `Needs review: ${partial.map(humanizeDomain).join(', ')}.` : '',
+        missing.length > 0 ? `Unavailable evidence: ${missing.map(humanizeDomain).join(', ')}.` : '',
+      ].filter(Boolean).join(' ');
+
+  return {
+    needsReview,
+    partial,
+    missing,
+    summary,
+  };
 };
 
 const buildFactorViews = (result: IndiaMarketBrainResult): MarketBrainFactorView[] => [
@@ -84,6 +113,7 @@ export function toMarketBrainResearchView(result: IndiaMarketBrainResult): Marke
     thesis: result.thesis,
     risksToReview: result.risksToReview.length > 0 ? result.risksToReview : ['No dominant risk signal in the current research view.'],
     whatToWatch: result.whatToWatch,
+    evidenceReview: buildEvidenceReview(result),
     factorViews: buildFactorViews(result),
     methodNote: result.complianceNote,
     generatedAt: result.generatedAt,
@@ -94,6 +124,7 @@ export function toMarketBrainResearchView(result: IndiaMarketBrainResult): Marke
     ...view.thesis,
     ...view.risksToReview,
     ...view.whatToWatch,
+    view.evidenceReview.summary,
     view.methodNote,
     ...view.factorViews.map((factor) => factor.summary),
   ].join(' '));
