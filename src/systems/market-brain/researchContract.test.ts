@@ -89,7 +89,7 @@ describe('toMarketBrainResearchView', () => {
     expect(view.factorViews.find((factor) => factor.key === 'valuation')?.summary).toBe('Valuation needs peer and history context.');
   });
 
-  it('rejects direct recommendation language before returning public research copy', () => {
+  it('rejects direct recommendation language before returning public factor copy', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
       evidence: completeEvidence,
@@ -98,7 +98,7 @@ describe('toMarketBrainResearchView', () => {
 
     expect(() => toMarketBrainResearchView({
       ...result,
-      headline: unsafeCopy,
+      quality: { score: 72, drivers: [unsafeCopy], risks: [] },
     })).toThrow('Market brain copy contains recommendation language that requires compliance review.');
   });
 
