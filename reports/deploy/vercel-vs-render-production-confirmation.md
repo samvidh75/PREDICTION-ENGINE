@@ -10,6 +10,7 @@
 **Full Vercel deployment is VALID and is the current production architecture.**
 
 The app runs entirely on Vercel with no Render backend required for core functionality.
+PostgreSQL (Neon) and Redis (Upstash) are configured in Vercel env vars for the optional Render backend.
 
 ---
 
@@ -25,7 +26,7 @@ The app runs entirely on Vercel with no Render backend required for core functio
 | All API endpoints work? | **Yes** — 7 Vercel serverless functions tested and verified |
 
 **Rejected: split deployment (Vercel + Render).**  
-The separate Render backend was configured in `render.yaml` but **never deployed** — the service at `stockstory-api.onrender.com` returns 404 (no server running). It is unnecessary for the current app.
+The separate Render backend was configured in `render.yaml` but **not deployed** — the service at `stockstory-api.onrender.com` returns 404. It is available for future use.
 
 ---
 
@@ -75,9 +76,11 @@ Users ──→ https://www.stockstory-india.com
 
 | Detail | Value |
 |--------|-------|
-| **Type** | PostgreSQL (Neon) — configured in Vercel env as `DATABASE_URL` |
-| **Usage** | Needed by Render backend for migrations. Vercel API functions do not use DB directly — they use in-memory stock data from JSON snapshot |
-| **Status** | Available for Render backend if deployed; not required for current Vercel-only deployment |
+| **Type** | PostgreSQL (Neon) — `stockstory-india` project in Singapore (`ap-southeast-1`) |
+| **Status** | ✅ **Configured and migrated** — 70 tables created (all 34 migrations applied) |
+| **Connection** | `DATABASE_URL` set in Vercel production env (Neon pooled connection, SSL required) |
+| **Vercel env** | ✅ `DATABASE_URL` — Neon PostgreSQL (Production) |
+| **Render backend** | Not deployed, but DB is ready for it |
 
 ---
 
@@ -85,9 +88,12 @@ Users ──→ https://www.stockstory-india.com
 
 | Detail | Value |
 |--------|-------|
-| **Type** | Redis via Upstash (optional) |
-| **Usage** | Only used by Render backend for distributed caching |
-| **Status** | Not required. Vercel API functions use in-memory cache |
+| **Type** | Upstash Redis (serverless, ephemeral) — provisioned via `upstash.com/start-redis` |
+| **Status** | ✅ **Configured** — REST API verified (PONG, SET/GET working) |
+| **Connection** | `REDIS_URL` set in Vercel production env |
+| **Vercel env** | ✅ `REDIS_URL` — Upstash (Production) |
+| **Note** | The ephemeral database expires 2026-06-30. To keep it permanently, claim it at: https://upstash.com/start-redis/console/ef15ee55-7287-4dac-aa2d-50308929c193 |
+| **Redis protocol** | Standard `redis://` TCP not available on ephemeral tier. Claiming the database or creating a permanent one via the [Upstash Console](https://console.upstash.com) enables full Redis protocol support.
 
 ---
 
@@ -99,6 +105,8 @@ These are set in Vercel dashboard (production environment) and used by the serve
 
 | Variable | Purpose |
 |----------|---------|
+| `DATABASE_URL` | PostgreSQL via Neon — migrations applied, 70 tables |
+| `REDIS_URL` | Upstash Redis — REST API verified, TCP pending claim |
 | `INDIANAPI_KEY` | IndianAPI provider — real-time stock data |
 | `UPSTOX_ACCESS_TOKEN` | Upstox broker API — market data |
 | `UPSTOX_API_KEY` | Upstox broker API — authentication |
@@ -190,7 +198,16 @@ All providers use real configured API keys in Vercel environment variables. No m
 
 ---
 
-## CORS Verification
+## Database & Redis Verification (Post-Configuration)
+
+| Check | Status | Details |
+|-------|--------|---------|
+| Neon DB connection | ✅ Connected | PostgreSQL 18.4, Singapore region |
+| Schema migrations | ✅ All 34 applied | 70 tables created |
+| Vercel DATABASE_URL | ✅ Set | Production env |
+| Redis REST API | ✅ Verified | PONG, SET/GET working |
+| Vercel REDIS_URL | ✅ Set | Production env |
+| Redis TCP protocol | ⚠️ Pending | Requires claiming at Upstash console URL
 
 ✅ **No CORS issues** — frontend and API are served from the same Vercel domain (`www.stockstory-india.com`). All API calls use relative paths (`/api/stock?symbol=TCS`). Same-origin requests do not require CORS headers.
 
@@ -210,14 +227,39 @@ All providers use real configured API keys in Vercel environment variables. No m
 
 ## Remaining Manual Steps
 
-> **None required for the current architecture.**
+### Redis — Claim Upstash Database (recommended)
 
-Optional future steps if/when the Render backend is deployed:
+The ephemeral Redis database expires on **2026-06-30**. To keep it permanently:
 
-1. Deploy Render service via `render.yaml` or Render dashboard
-2. Set Render env vars (DATABASE_URL, COOKIE_SECRET, etc.) in Render dashboard
-3. Point Render service health check to `/healthz`
-4. Update VITE_API_BASE_URL if frontend code is changed to call Render API directly
+1. Visit https://upstash.com/start-redis/console/ef15ee55-7287-4dac-aa2d-50308929c193
+2. Click **Claim** and sign in with GitHub/Google
+3. After claiming, standard Redis protocol (`rediss://`) becomes available
+4. Update `REDIS_URL` in [Vercel dashboard](https://vercel.com/samvidh75s-projects/prediction-engine/settings/environment-variables) if the connection string changes
+
+Alternatively, create a new database via the [Upstash Console](https://console.upstash.com) and set `REDIS_URL` to `rediss://default:<token>@<host>:6379`.
+
+### Render Backend (optional)
+
+The Render backend is not deployed. To deploy it:
+
+1. Go to https://dashboard.render.com/
+2. Connect the `samvidh75/PREDICTION-ENGINE` repo
+3. Select **Blueprint** deployment — it auto-detects `render.yaml`
+4. Set env vars in Render dashboard:
+   - `DATABASE_URL` — copy from Vercel env
+   - `REDIS_URL` — copy from Vercel env
+   - `COOKIE_SECRET` — generate with `openssl rand -base64 64`
+   - `INDIANAPI_KEY` — copy from Vercel env (if needed on backend)
+5. Health check: `/healthz`
+6. Region: `singapore`
+
+### Long-lived Upstash Account (alternative)
+
+1. Go to https://console.upstash.com
+2. Sign up with GitHub
+3. Create a new Redis database (Singapore region, free tier)
+4. Copy the `REDIS_URL` from the console (format: `rediss://default:<token>@<host>:6379`)
+5. Set it in [Vercel env vars](https://vercel.com/samvidh75s-projects/prediction-engine/settings/environment-variables)
 
 ---
 
