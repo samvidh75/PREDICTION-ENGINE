@@ -2,10 +2,8 @@
  * APPLE TYPOGRAPHY SYSTEM — SF Pro inspired
  * Tight letter-spacing on headlines, generous line-height on body
  */
-const FONT_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
+export const FONT_STACK = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
 const FONT_MONO  = '"SF Mono", "SFMono-Regular", ui-monospace, Menlo, monospace';
-
-export { FONT_STACK };
 
 export const typography = {
   // ── Type scale — Apple headline style ──────────────────────────────────
