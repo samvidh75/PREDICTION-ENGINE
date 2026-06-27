@@ -54,9 +54,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes("node_modules/firebase")) {
               return "firebase";
             }
-            if (id.includes("node_modules/@xenova/transformers") || id.includes("onnxruntime")) {
-              return "transformers";
-            }
             return undefined;
           },
         },
