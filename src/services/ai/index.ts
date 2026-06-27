@@ -17,7 +17,7 @@ export function getAIProvider(): AIProvider {
     console.log('[AI] Using LocalOllamaProvider (LOCAL_AI_ENABLED=true)');
   } else {
     const external = new ExternalLLMProvider();
-    const hasKey = !!(process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
+    const hasKey = !!(process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
     if (hasKey) {
       _instance = new CachedAIProvider(external);
       console.log('[AI] Using ExternalLLMProvider with caching');

@@ -21,7 +21,7 @@ export class ExternalLLMProvider implements AIProvider {
 
   constructor() {
     this.fallback = new DeterministicResearchProvider();
-    this.groqKey = process.env.GROQ_API_KEY || '';
+    this.groqKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || '';
     this.geminiKey = process.env.GEMINI_API_KEY || '';
     this.openaiKey = process.env.OPENAI_API_KEY || '';
     const preferred = process.env.AI_PROVIDER || '';
