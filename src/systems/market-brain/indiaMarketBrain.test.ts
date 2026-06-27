@@ -58,6 +58,15 @@ describe('evaluateIndiaEquity', () => {
     expect(result.complianceNote).toContain('Research-only');
   });
 
+  it('trims and uppercases symbols before returning engine output', () => {
+    const result = evaluateIndiaEquity({
+      ...strongPacket,
+      symbol: ' sample ',
+    });
+
+    expect(result.symbol).toBe('SAMPLE');
+  });
+
   it('marks output for review when required evidence domains are missing', () => {
     const result = evaluateIndiaEquity({
       symbol: 'sample',
