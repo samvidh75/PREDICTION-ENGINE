@@ -1,21 +1,23 @@
 import type { ReactNode, CSSProperties, MouseEvent } from 'react';
-import { color, radius, space } from '../../design/tokens';
+import { color, radius, space, layout, elevation } from '../../design/tokens';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 interface CardProps {
-  children:  ReactNode;
-  padding?:  'sm' | 'md' | 'lg';
-  onClick?:  () => void;
-  style?:    CSSProperties;
+  children: ReactNode;
+  padding?: 'sm' | 'md' | 'lg';
+  onClick?: () => void;
+  style?: CSSProperties;
   className?: string;
 }
 
 const PADDING = {
-  sm: space[3],   // 12px
-  md: space[4],   // 16px
-  lg: space[6],   // 24px
+  sm: space[3],
+  md: space[4],
+  lg: space[6],
 } as const;
 
 export function Card({ children, padding = 'md', onClick, style, className }: CardProps) {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
   const isClickable = Boolean(onClick);
 
   return (
@@ -23,18 +25,19 @@ export function Card({ children, padding = 'md', onClick, style, className }: Ca
       className={className}
       onClick={onClick}
       style={{
-        background:   color.bg,
-        border:       `1px solid ${color.border}`,
+        background: color.bgAlt,
+        border: `1px solid ${color.border}`,
         borderRadius: radius.md,
-        padding:      PADDING[padding],
-        cursor:       isClickable ? 'pointer' : 'default',
+        padding: PADDING[padding],
+        boxShadow: elevation.card,
+        cursor: isClickable ? 'pointer' : 'default',
         ...style,
       }}
       onMouseEnter={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.background = color.bgAlt;
+        e.currentTarget.style.background = color.bg;
       } : undefined}
       onMouseLeave={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.background = color.bg;
+        e.currentTarget.style.background = color.bgAlt;
       } : undefined}
     >
       {children}
@@ -45,12 +48,12 @@ export function Card({ children, padding = 'md', onClick, style, className }: Ca
 export function CardLabel({ children }: { children: ReactNode }) {
   return (
     <div style={{
-      fontSize:       '11px',
-      fontWeight:     600,
-      color:          color.textMuted,
-      textTransform:  'uppercase',
-      letterSpacing:  '0.06em',
-      marginBottom:   space[3],
+      fontSize: '12px',
+      fontWeight: 500,
+      color: color.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: '0.04em',
+      marginBottom: space[3],
     }}>
       {children}
     </div>
