@@ -1,6 +1,6 @@
 import { AlertTriangle, Brain, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useMarketBrainResearch } from '../../hooks/useMarketBrainResearch';
-import type { MarketBrainFactorView, MarketBrainResearchView } from '../../services/marketBrainResearch';
+import type { MarketBrainEvidenceReviewView, MarketBrainFactorView, MarketBrainResearchView } from '../../services/marketBrainResearch';
 
 function ResearchPill({ children }: { children: React.ReactNode }) {
   return (
@@ -54,6 +54,33 @@ function ResearchList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
+function EvidenceReviewStatus({ evidenceReview }: { evidenceReview: MarketBrainEvidenceReviewView }) {
+  if (!evidenceReview.needsReview && !evidenceReview.summary) return null;
+
+  return (
+    <div
+      aria-label="Research evidence status"
+      style={{
+        border: '1px solid rgba(245,158,11,0.22)',
+        background: 'rgba(245,158,11,0.07)',
+        borderRadius: 10,
+        padding: 12,
+        display: 'flex',
+        gap: 10,
+        alignItems: 'flex-start',
+      }}
+    >
+      <AlertTriangle size={15} color="#B45309" />
+      <div>
+        <div style={{ fontSize: 11, color: '#92400E', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4 }}>
+          Research evidence status
+        </div>
+        <div style={{ fontSize: 13, lineHeight: 1.5, color: '#475569' }}>{evidenceReview.summary}</div>
+      </div>
+    </div>
+  );
+}
+
 function ResearchBody({ research }: { research: MarketBrainResearchView }) {
   const generated = new Date(research.generatedAt).toLocaleString('en-IN', {
     day: 'numeric',
@@ -77,6 +104,8 @@ function ResearchBody({ research }: { research: MarketBrainResearchView }) {
           <ShieldCheck size={14} /> Research output only
         </div>
       </div>
+
+      <EvidenceReviewStatus evidenceReview={research.evidenceReview} />
 
       <div style={{ display: 'grid', gap: 16 }}>
         <ResearchList title="Thesis drivers" items={research.thesis} />
