@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { colors, typography, spacing } from './styles';
+import { color, font, space, radius } from './design/tokens';
 import { Button } from './components/ui/Button';
 import HomePage from './pages/HomePage';
 import StockDetailPage from './pages/StockPage';
@@ -17,29 +17,29 @@ export default function App() {
   };
 
   return (
-    <div style={{ background: colors.bg.primary, minHeight: '100vh' }}>
+    <div style={{ background: color.bg, minHeight: '100vh', fontFamily: font, color: color.text }}>
       <header style={{
-        background: colors.bg.secondary,
-        borderBottom: `1px solid ${colors.bg.tertiary}`,
-        padding: `${spacing.sm} ${spacing.xl}`,
+        background: color.bgAlt,
+        borderBottom: `1px solid ${color.border}`,
+        padding: `${space[3]} ${space[6]}`,
         position: 'sticky', top: 0, zIndex: 100,
       }}>
-        <div style={{ maxWidth: '1060px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.lg }}>
-            <span style={{ ...typography.bodyEmphasis, color: colors.text.primary, cursor: 'pointer', fontSize: '16px' }}
+        <div style={{ maxWidth: '1120px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: space[6] }}>
+            <span style={{ fontWeight: 600, fontSize: '16px', color: color.text, cursor: 'pointer' }}
               onClick={() => navigate('home')}>
               StockStory
             </span>
-            <nav style={{ display: 'flex', gap: spacing.xs }}>
+            <nav style={{ display: 'flex', gap: space[2] }}>
               {(['home', 'scanner'] as PageType[]).map((p) => (
-                <Button key={p} variant={currentPage === p ? 'primary' : 'ghost'} size="sm"
+                <Button key={p} variant={currentPage === p ? 'primary' : 'ghost'}
                   onClick={() => navigate(p)}>
                   {p === 'home' ? 'Home' : 'Scanner'}
                 </Button>
               ))}
             </nav>
           </div>
-          <Button variant="ghost" size="sm">Account</Button>
+          <Button variant="ghost">Account</Button>
         </div>
       </header>
 
@@ -50,15 +50,15 @@ export default function App() {
       </main>
 
       <footer style={{
-        background: colors.bg.secondary,
-        padding: `${spacing.xl} ${spacing.xl}`,
-        borderTop: `1px solid ${colors.bg.tertiary}`,
+        background: color.bgAlt,
+        padding: `${space[6]} ${space[6]}`,
+        borderTop: `1px solid ${color.border}`,
       }}>
-        <div style={{ maxWidth: '1060px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ ...typography.caption, color: colors.text.secondary, margin: 0 }}>
+        <div style={{ maxWidth: '1120px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>
             &copy; 2025 StockStory India. Not SEBI-registered. Not investment advice.
           </p>
-          <p style={{ ...typography.caption, color: colors.text.secondary, margin: 0 }}>
+          <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>
             StockStory
           </p>
         </div>

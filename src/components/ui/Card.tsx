@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties, MouseEvent } from 'react';
-import { colors, spacing, radius } from '../../styles';
+import { color, radius, space } from '../../design/tokens';
 
 interface CardProps {
   children:  ReactNode;
@@ -10,9 +10,9 @@ interface CardProps {
 }
 
 const PADDING = {
-  sm: spacing.base,   // 16px
-  md: spacing.lg,     // 24px
-  lg: spacing.xl,     // 32px
+  sm: space[3],   // 12px
+  md: space[4],   // 16px
+  lg: space[6],   // 24px
 } as const;
 
 export function Card({ children, padding = 'md', onClick, style, className }: CardProps) {
@@ -23,18 +23,18 @@ export function Card({ children, padding = 'md', onClick, style, className }: Ca
       className={className}
       onClick={onClick}
       style={{
-        background:   colors.bg.primary,
-        border:       `1px solid ${colors.bg.tertiary}`,
-        borderRadius: radius.md,           // 8px max
+        background:   color.bg,
+        border:       `1px solid ${color.border}`,
+        borderRadius: radius.md,
         padding:      PADDING[padding],
         cursor:       isClickable ? 'pointer' : 'default',
         ...style,
       }}
       onMouseEnter={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.background = colors.bg.secondary;
+        e.currentTarget.style.background = color.bgAlt;
       } : undefined}
       onMouseLeave={isClickable ? (e: MouseEvent<HTMLDivElement>) => {
-        e.currentTarget.style.background = colors.bg.primary;
+        e.currentTarget.style.background = color.bg;
       } : undefined}
     >
       {children}
@@ -42,16 +42,15 @@ export function Card({ children, padding = 'md', onClick, style, className }: Ca
   );
 }
 
-/** Uppercase label used at top of each card section */
 export function CardLabel({ children }: { children: ReactNode }) {
   return (
     <div style={{
       fontSize:       '11px',
       fontWeight:     600,
-      color:          colors.text.tertiary,
+      color:          color.textMuted,
       textTransform:  'uppercase',
       letterSpacing:  '0.06em',
-      marginBottom:   spacing.base,
+      marginBottom:   space[3],
     }}>
       {children}
     </div>
