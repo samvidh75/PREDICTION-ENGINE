@@ -11,8 +11,10 @@ export type MarketBrainEvidenceDomain =
   | 'technicals'
   | 'sector_context';
 
+export type MarketBrainFactorKey = 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
+
 export interface MarketBrainFactorView {
-  key: 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
+  key: MarketBrainFactorKey;
   label: string;
   score: number;
   summary: string;
@@ -71,6 +73,16 @@ const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>([
   'sector_context',
 ]);
 
+const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>([
+  'quality',
+  'growth',
+  'valuation',
+  'stability',
+  'momentum',
+  'risk',
+  'ownership',
+]);
+
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
   partial: [],
@@ -86,6 +98,21 @@ const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Arra
   ? value.filter((item): item is MarketBrainEvidenceDomain => (
     typeof item === 'string' && MARKET_BRAIN_EVIDENCE_DOMAINS.has(item as MarketBrainEvidenceDomain)
   ))
+  : []);
+
+const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArray(value)
+  ? value.filter((item): item is MarketBrainFactorView => {
+    if (!item || typeof item !== 'object') return false;
+    const candidate = item as Partial<MarketBrainFactorView>;
+    return typeof candidate.key === 'string'
+      && MARKET_BRAIN_FACTOR_KEYS.has(candidate.key as MarketBrainFactorKey)
+      && typeof candidate.label === 'string'
+      && candidate.label.trim().length > 0
+      && typeof candidate.summary === 'string'
+      && candidate.summary.trim().length > 0
+      && typeof candidate.score === 'number'
+      && Number.isFinite(candidate.score);
+  })
   : []);
 
 const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> | undefined): MarketBrainEvidenceReviewView => {
@@ -115,7 +142,7 @@ const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
-      factorViews: Array.isArray(research.factorViews) ? research.factorViews : [],
+      factorViews: asFactorViews(research.factorViews),
     },
   };
 };
