@@ -69,6 +69,30 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.factorViews).toEqual([]);
   });
 
+  it('filters unknown evidence domains from public client metadata', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          evidenceReview: {
+            needsReview: true,
+            partial: ['fundamentals', 'unknown_domain'],
+            missing: ['sector_context', 'legacy_domain'],
+            summary: 'Some research evidence needs review.',
+          },
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.evidenceReview.partial).toEqual(['fundamentals']);
+    expect(result.research.evidenceReview.missing).toEqual(['sector_context']);
+  });
+
   it('throws a typed error for unavailable research', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
