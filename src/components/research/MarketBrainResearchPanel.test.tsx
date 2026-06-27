@@ -19,6 +19,12 @@ const mockResearch = {
     thesis: ['Quality metrics support the business thesis.'],
     risksToReview: ['Valuation requires monitoring against growth delivery.'],
     whatToWatch: ['Margin trajectory in the next reported period.'],
+    evidenceReview: {
+      needsReview: true,
+      partial: ['financial_statements' as const],
+      missing: [],
+      summary: 'Some research evidence is partial, so the narrative should be reviewed with the next filing cycle.',
+    },
     factorViews: [
       { key: 'quality' as const, label: 'Quality', score: 88, summary: 'Return profile remains durable.' },
     ],
@@ -42,6 +48,8 @@ describe('MarketBrainResearchPanel', () => {
     expect(screen.getByText('Research output only')).toBeDefined();
     expect(screen.getByText('High conviction')).toBeDefined();
     expect(screen.getByText('TCS is marked High conviction with 82/100 conviction.')).toBeDefined();
+    expect(screen.getByLabelText('Research evidence status')).toBeDefined();
+    expect(screen.getByText('Some research evidence is partial, so the narrative should be reviewed with the next filing cycle.')).toBeDefined();
     expect(screen.queryByText(/provider/i)).toBeNull();
     expect(screen.queryByText(/buy|sell|hold/i)).toBeNull();
   });
