@@ -6,7 +6,6 @@ import { UnifiedPredictionEngine } from '../prediction-engine/UnifiedPredictionE
 import type { EngineOutput } from '../prediction-engine/UnifiedPredictionEngine';
 import { fChange } from '../lib/format';
 import { navigate } from '../components/product/routeConfig';
-import ProUpgradeModal from '../components/ProUpgradeModal';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -65,7 +64,7 @@ export default function ScannerPage() {
   const [page,         setPage]        = useState(1);
   const [classFilter,  setClassFilter] = useState('All');
   const [activePreset, setActivePreset]= useState<string | null>(null);
-  const [proOpen,      setProOpen]     = useState(false);
+
 
   const runScan = useCallback(async () => {
     setLoading(true); setRows([]); setLoaded(0);
@@ -279,13 +278,7 @@ export default function ScannerPage() {
         </div>
       )}
 
-      {!loading && rows.length >= 5 && (
-        <div style={{ textAlign: 'center', padding: `${spacing.sm} 0 ${spacing.lg}` }}>
-          <Button variant="ghost" size="sm" onClick={() => setProOpen(true)}>Unlock all results with Pro →</Button>
-        </div>
-      )}
 
-      <ProUpgradeModal open={proOpen} onClose={() => setProOpen(false)} location="scanner" />
     </div>
   );
 }

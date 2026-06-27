@@ -122,8 +122,7 @@ export function trackEvent(
     if (process.env.NODE_ENV === "development") {
       console.info(`[Analytics] ${event}`, properties ?? "");
     }
-  } catch {
-  }
+  } catch {/* silent */}
 }
 
 export function useAnalytics(): { track: typeof trackEvent } {

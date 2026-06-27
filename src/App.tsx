@@ -2,13 +2,13 @@ import { lazy, Suspense, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { runHealthCheck } from "@/utils/health-check";
 import { queryClient } from "./core/config/QueryClientConfig";
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate, NavLink } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LayoutProvider } from "./context/LayoutContext";
 import TokenProvider from "./shared/ui/foundations/TokenProvider";
 import { buildTokenCssVars } from "./shared/ui/foundations/tokenCssVarMaps";
 import PageErrorBoundary from "./components/diagnostics/PageErrorBoundary";
-import AppShell from "./components/layout/AppShell";
+import Logo from "./components/brand/Logo";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ScannerPage = lazy(() => import("./pages/ScannerPage"));
@@ -104,6 +104,172 @@ function StockResearchPageWrapper() {
 
 export { useNavigate };
 
+const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
+
+function Header() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <header style={{
+      position: "sticky",
+      top: 0,
+      zIndex: 1000,
+      height: "64px",
+      background: "#FFFFFF",
+      borderBottom: "1px solid #E5E5E5",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "0 24px",
+    }}>
+      <div style={{
+        width: "100%",
+        maxWidth: "1080px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        {/* Left: Logo & Navigation */}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+          <div onClick={() => navigate("/")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+            <Logo />
+          </div>
+          {/* Nav links */}
+          <nav style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <NavLink to="/" style={({ isActive }) => ({
+              fontSize: "14px",
+              fontWeight: 600,
+              color: isActive ? "#0070F3" : "#666666",
+              textDecoration: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              transition: "all 150ms ease",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            })}>Home</NavLink>
+            <NavLink to="/scanner" style={({ isActive }) => ({
+              fontSize: "14px",
+              fontWeight: 600,
+              color: isActive ? "#0070F3" : "#666666",
+              textDecoration: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              transition: "all 150ms ease",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            })}>Scanner</NavLink>
+            <NavLink to="/watchlist" style={({ isActive }) => ({
+              fontSize: "14px",
+              fontWeight: 600,
+              color: isActive ? "#0070F3" : "#666666",
+              textDecoration: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              transition: "all 150ms ease",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            })}>Watchlist</NavLink>
+            <NavLink to="/compare" style={({ isActive }) => ({
+              fontSize: "14px",
+              fontWeight: 600,
+              color: isActive ? "#0070F3" : "#666666",
+              textDecoration: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              transition: "all 150ms ease",
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            })}>Compare</NavLink>
+          </nav>
+        </div>
+
+        {/* Right: Auth Profile */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "rgba(0,112,243,0.08)",
+                color: "#0070F3",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+                fontSize: "13px",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}>
+                {user.displayName?.slice(0, 2).toUpperCase() || user.email?.slice(0, 2).toUpperCase() || "U"}
+              </div>
+              <span className="hide-mobile" style={{
+                fontSize: "14px",
+                color: "#111111",
+                fontWeight: 500,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}>
+                {user.displayName || user.email}
+              </span>
+              <button onClick={logout} style={{
+                fontSize: "13px",
+                color: "#666666",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "4px 8px",
+                fontWeight: 600,
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}>Sign out</button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <NavLink to="/login" style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "#0070F3",
+                textDecoration: "none",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}>Sign in</NavLink>
+              <NavLink to="/register" style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "#ffffff",
+                background: "#0070F3",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                textDecoration: "none",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              }}>Create account</NavLink>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const isAuthPage = AUTH_ROUTES.includes(location.pathname);
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#FFFFFF" }}>
+      <Header />
+      <main style={{
+        flex: 1,
+        width: "100%",
+        maxWidth: "1080px",
+        margin: "0 auto",
+        padding: "24px",
+        background: "#FFFFFF",
+      }}>
+        {children}
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -120,12 +286,12 @@ export default function App() {
           <TokenProvider tokenVars={buildTokenCssVars()}>
             <PageErrorBoundary>
               <BrowserRouter>
-                <AppShell>
+                <Layout>
                   <Routes>
                     <Route path="/" element={<PageSuspense><RouteMetaPage><HomePage /></RouteMetaPage></PageSuspense>} />
                     <Route path="/stock/:symbol" element={<PageSuspense><StockPageWrapper /></PageSuspense>} />
                     <Route path="/scanner" element={<PageSuspense><RouteMetaPage><ScannerPage /></RouteMetaPage></PageSuspense>} />
-                    <Route path="/watchlist" element={<PageSuspense><RouteMetaPage><WatchlistPage /></RouteMetaPage></PageSuspense>} />
+                    <Route path="/watchlist" element={<PageSuspense><RouteMetaPage><RouteMetaPage><WatchlistPage /></RouteMetaPage></RouteMetaPage></PageSuspense>} />
                     <Route path="/compare" element={<PageSuspense><RouteMetaPage><ComparePage /></RouteMetaPage></PageSuspense>} />
                     <Route path="/login" element={<PageSuspense><RouteMetaPage><LoginPage /></RouteMetaPage></PageSuspense>} />
                     <Route path="/register" element={<PageSuspense><RouteMetaPage><RegisterPage /></RouteMetaPage></PageSuspense>} />
@@ -145,7 +311,7 @@ export default function App() {
                     <Route path="/admin/metrics" element={<PageSuspense><MetricsDashboard /></PageSuspense>} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
-                </AppShell>
+                </Layout>
               </BrowserRouter>
             </PageErrorBoundary>
           </TokenProvider>

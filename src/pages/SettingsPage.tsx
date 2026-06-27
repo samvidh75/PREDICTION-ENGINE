@@ -31,7 +31,7 @@ function loadPreferences(): UserPreferences {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
-  } catch {}
+  } catch {/* silent */}
   return DEFAULTS;
 }
 

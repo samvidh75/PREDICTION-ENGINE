@@ -128,7 +128,12 @@ export default function MetricsGrid({ fundamentals, price, isPro, onUpgradeClick
   const f = fundamentals;
   const p = price;
 
-  const freeMetrics = [
+  const pv = (v: number | null | undefined, formatter?: (v: number) => string): string | null => {
+    if (v == null) return null;
+    return formatter ? formatter(v) : v.toString();
+  };
+
+  const allMetrics = [
     { label: 'Market Cap',     value: f?.marketCap ? fMarketCap(f.marketCap) : null,                                        signal: null },
     { label: 'P/E Ratio',      value: f?.peRatio != null ? `${f.peRatio.toFixed(1)}\u00D7` : null,                          signal: getSignal('pe', f?.peRatio ?? null) },
     { label: 'ROE',            value: f?.roe != null ? `${f.roe.toFixed(1)}%` : null,                                       signal: getSignal('roe', f?.roe ?? null) },
@@ -137,13 +142,6 @@ export default function MetricsGrid({ fundamentals, price, isPro, onUpgradeClick
     { label: '52W Low',        value: p?.weekLow52 ? `\u20B9${p.weekLow52.toLocaleString('en-IN')}` : null,               signal: null },
     { label: 'EPS',            value: f?.eps != null ? `\u20B9${f.eps.toFixed(2)}` : null,                                 signal: null },
     { label: 'Div. Yield',     value: f?.dividendYield != null ? `${f.dividendYield.toFixed(2)}%` : null,                  signal: getSignal('dividendYield', f?.dividendYield ?? null) },
-  ];
-
-  const pv = (v: number | null | undefined, formatter?: (v: number) => string): string | null => {
-    if (v == null) return null;
-    return formatter ? formatter(v) : v.toString();
-  };
-  const proMetrics = [
     { label: 'P/B Ratio',     value: pv(f?.pbRatio, v => `${v.toFixed(2)}\u00D7`),                             signal: getSignal('pb', f?.pbRatio ?? null) },
     { label: 'ROCE',          value: pv(f?.roce, v => `${v.toFixed(1)}%`),                                     signal: null },
     { label: 'Debt/Equity',   value: pv(f?.debtToEquity, v => v.toFixed(2)),                                  signal: getSignal('debtEquity', f?.debtToEquity ?? null) },
@@ -167,35 +165,8 @@ export default function MetricsGrid({ fundamentals, price, isPro, onUpgradeClick
         className="metrics-grid"
         style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(4, 1fr)' }}
       >
-        {freeMetrics.map(m => (
+        {allMetrics.map(m => (
           <MetricTile key={m.label} label={m.label} value={m.value} signal={m.signal} isBlurred={false} />
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '16px 0 12px' }}>
-        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-        <span style={{
-          fontSize: 'var(--sz-xs)', color: 'var(--text-300)', fontWeight: 700,
-          textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap',
-        }}>
-          Pro metrics \u2014 additional data points
-        </span>
-        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-      </div>
-
-      <div
-        className="metrics-grid"
-        style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(4, 1fr)' }}
-      >
-        {proMetrics.map(m => (
-          <MetricTile
-            key={m.label}
-            label={m.label}
-            value={m.value}
-            signal={m.signal}
-            isBlurred={!isPro}
-            onBlurClick={onUpgradeClick}
-          />
         ))}
       </div>
 
@@ -206,3 +177,5 @@ export default function MetricsGrid({ fundamentals, price, isPro, onUpgradeClick
     </div>
   );
 }
+
+

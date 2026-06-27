@@ -16,7 +16,7 @@ export class RankingHealthMonitor {
   async check(): Promise<RankingHealth> {
     const warnings: string[] = [];
     let dbOk = false;
-    try { await pool.query('SELECT 1'); dbOk = true; } catch {}
+    try { await pool.query('SELECT 1'); dbOk = true; } catch {/* silent */}
 
     if (!dbOk) {
       warnings.push('Database unavailable');
@@ -41,7 +41,7 @@ export class RankingHealthMonitor {
       const r = await pool.query('SELECT MAX(snapshot_date) mx, AVG(factor_score) av FROM factor_snapshots');
       lastRankingDate = r.rows[0]?.mx ?? null;
       avgScore = r.rows[0]?.av ? Math.round(parseFloat(r.rows[0].av) * 100) / 100 : null;
-    } catch {}
+    } catch {/* silent */}
 
     if (symbolCount > 0 && avgScore != null) {
       return { status: 'ONLINE', lastRankingDate, symbolCount, avgScore, warnings };

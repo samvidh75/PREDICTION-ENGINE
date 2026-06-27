@@ -267,7 +267,7 @@ test.describe("Rankings redirected to Scanner", () => {
 test.describe("Public navigation", () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-      try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch {}
+    try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch {/* silent */}
     });
     await mockAllApi(page);
   });

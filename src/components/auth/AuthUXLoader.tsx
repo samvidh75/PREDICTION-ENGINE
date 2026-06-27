@@ -78,7 +78,7 @@ function logAuthState(phase: LoaderPhase, targetPage: string, elapsedMs: number,
   if (typeof window !== 'undefined') {
     try {
       window.dispatchEvent(new CustomEvent('ss:auth-ux-state', { detail: entry }));
-    } catch {}
+    } catch {/* silent */}
   }
 }
 

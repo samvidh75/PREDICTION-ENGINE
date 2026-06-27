@@ -83,7 +83,7 @@ export class PipelineRecoveryService {
     // Release stale lock
     try {
       fs.unlinkSync(LOCK_FILE);
-    } catch {}
+    } catch {/* silent */}
 
     // Mark any 'running' phases as 'interrupted'
     try {
@@ -91,7 +91,7 @@ export class PipelineRecoveryService {
         `UPDATE pipeline_health SET status = 'interrupted', completed_at = NOW()
          WHERE status = 'running' AND completed_at IS NULL`
       );
-    } catch {}
+    } catch {/* silent */}
 
     return { success: true, reason: `Stale lock released. ${status.failedPhases.length} phases marked as interrupted.` };
   }

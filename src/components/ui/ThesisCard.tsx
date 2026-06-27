@@ -16,7 +16,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
 
   const save = () => {
     setNote(draft);
-    try { localStorage.setItem(`thesis_${symbol}`, draft); } catch {}
+    try { localStorage.setItem(`thesis_${symbol}`, draft); } catch {/* silent */}
     setEditing(false);
   };
 

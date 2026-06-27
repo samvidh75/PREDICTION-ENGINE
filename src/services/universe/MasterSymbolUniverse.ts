@@ -16,7 +16,7 @@ export interface SymbolRecord {
 
 function toSymbolRecord(row: Record<string, unknown>): SymbolRecord {
   return {
-    id: Number(row.id) ?? 0,
+    id: row.id != null ? Number(row.id) : 0,
     symbol: String(row.symbol ?? ''),
     exchange: String(row.exchange ?? ''),
     isin: row.isin ? String(row.isin) : null,

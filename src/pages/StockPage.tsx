@@ -3,15 +3,12 @@ import { AlertTriangle, TrendingUp, BarChart2, AlertCircle, Clock, Bookmark, Shi
 import { useStockData } from '../hooks/useStockData';
 import { Skeleton } from '../components/ui/Skeleton';
 import { SafeBlock } from '../components/ErrorBoundary';
-import AppShell from '../components/layout/AppShell';
 import CompanyHeader from '../components/stock/CompanyHeader';
 import PriceChart from '../components/stock/PriceChart';
 import Healthometer from '../components/stock/Healthometer';
 import MetricsGrid from '../components/stock/MetricsGrid';
 import CompanyInfo from '../components/stock/CompanyInfo';
 import NewsFeed from '../components/news/NewsFeed';
-import ProUpgradeModal from '../components/stock/ProUpgradeModal';
-import ProPaywallGate from '../components/premium/ProPaywallGate';
 import { IntelligentAnalysis } from '../components/stock/IntelligentAnalysis';
 import ScoreSemiCircles from '../components/stock/ScoreSemiCircles';
 import ShareholdingsChart from '../components/stock/ShareholdingsChart';
@@ -156,7 +153,7 @@ function SmartAlerts({ symbol, score }: { symbol: string; score: number | null }
 export default function StockPage({ symbol }: { symbol: string }) {
   const { data, loading, error, refetch } = useStockData(symbol);
   const isMobile = useIsMobile();
-  const [showProModal,        setShowProModal]        = useState(false);
+
   const [isTracked,           setIsTracked]           = useState(false);
   const [shareholdersData,    setShareholdersData]    = useState<Array<{ category: string; percent: number; change: number }> | null>(null);
 
@@ -222,7 +219,7 @@ export default function StockPage({ symbol }: { symbol: string }) {
   /* ── Loading ─────────────────────────────────────────────────────────── */
   if (loading && !data) {
     return (
-      <AppShell>
+      <>
         <div style={{ maxWidth: '900px' }}>
           <div style={{ display: 'grid', gap: spacing.base }}>
             <Skeleton height={32} radius={6} />
@@ -231,14 +228,14 @@ export default function StockPage({ symbol }: { symbol: string }) {
             <Skeleton height={160} radius={8} />
           </div>
         </div>
-      </AppShell>
+      </>
     );
   }
 
   /* ── Error ───────────────────────────────────────────────────────────── */
   if (error && !data) {
     return (
-      <AppShell>
+      <>
         <div style={{ maxWidth: '900px' }}>
           <Card style={{ textAlign: 'center', padding: spacing.xxl }}>
             <AlertTriangle size={28} color={colors.warning} />
@@ -253,13 +250,13 @@ export default function StockPage({ symbol }: { symbol: string }) {
             </Button>
           </Card>
         </div>
-      </AppShell>
+      </>
     );
   }
 
   /* ── Page ────────────────────────────────────────────────────────────── */
   return (
-    <AppShell>
+    <>
       <div style={{ maxWidth: '900px' }}>
 
         {/* Breadcrumb */}
@@ -315,15 +312,13 @@ export default function StockPage({ symbol }: { symbol: string }) {
 
         {/* 5. Score Overview */}
         <div style={{ margin: `${spacing.base} 0` }}>
-          <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
-            <Card padding="md">
-              <CardLabel>Score Overview</CardLabel>
-              <ScoreSemiCircles
-                overallScore={health.compositeScore ?? 50}
-                riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
-              />
-            </Card>
-          </ProPaywallGate>
+          <Card padding="md">
+            <CardLabel>Score Overview</CardLabel>
+            <ScoreSemiCircles
+              overallScore={health.compositeScore ?? 50}
+              riskScore={Math.min(100, Math.max(0, 100 - (health.compositeScore ?? 50)))}
+            />
+          </Card>
         </div>
 
         {/* 6. Differentiators grid */}
@@ -350,8 +345,8 @@ export default function StockPage({ symbol }: { symbol: string }) {
             thesis={null}
             stateLabel={stateLabel}
             details={health.details}
-            isPro={false}
-            onUpgradeClick={() => setShowProModal(true)}
+            isPro={true}
+            onUpgradeClick={() => {}}
           />
         </div>
 
@@ -365,8 +360,8 @@ export default function StockPage({ symbol }: { symbol: string }) {
           <MetricsGrid
             fundamentals={data?.fundamentals ?? null}
             price={data?.price ?? null}
-            isPro={false}
-            onUpgradeClick={() => setShowProModal(true)}
+            isPro={true}
+            onUpgradeClick={() => {}}
           />
         </div>
 
@@ -386,14 +381,12 @@ export default function StockPage({ symbol }: { symbol: string }) {
         {/* 12. Financial Charts */}
         {data?.annualFinancials && data.annualFinancials.length > 0 && (
           <div style={{ margin: `${spacing.base} 0` }}>
-            <ProPaywallGate isLocked={false} onUnlockClick={() => setShowProModal(true)}>
-              <Card padding="md">
-                <CardLabel>Financial Performance</CardLabel>
-                <SafeBlock>
-                  <FinancialCharts data={data.annualFinancials} />
-                </SafeBlock>
-              </Card>
-            </ProPaywallGate>
+            <Card padding="md">
+              <CardLabel>Financial Performance</CardLabel>
+              <SafeBlock>
+                <FinancialCharts data={data.annualFinancials} />
+              </SafeBlock>
+            </Card>
           </div>
         )}
 
@@ -444,7 +437,6 @@ export default function StockPage({ symbol }: { symbol: string }) {
         </div>
       )}
 
-      <ProUpgradeModal isOpen={showProModal} onClose={() => setShowProModal(false)} symbol={symbol} />
-    </AppShell>
+    </>
   );
 }

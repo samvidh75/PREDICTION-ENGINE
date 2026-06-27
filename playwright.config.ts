@@ -2,13 +2,17 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/playwright',
-  fullyParallel: true,
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? [['html', { open: 'never' }], ['list']] : 'list',
+  fullyParallel: false,
+  retries: 0,
+  workers: 1,
+  timeout: 60000,
+  reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:4173',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
+    launchOptions: {
+      args: ['--disable-gpu', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    },
   },
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1 --port 4173',
