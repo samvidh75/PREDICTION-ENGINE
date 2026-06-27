@@ -5,11 +5,11 @@ export function Stat({ label, value }: { label: string; value: string | number |
     <div style={{ display: "grid", gap: "4px" }}>
       <span
         style={{
-          color: colors.gray600,
+          color: colors.textSecondary,
           fontSize: typography.caption.desktop.size,
           fontWeight: 500,
           lineHeight: typography.caption.desktop.line,
-          letterSpacing: "0.04em",
+          letterSpacing: "0.02em",
           textTransform: "uppercase",
         }}
       >
@@ -17,10 +17,10 @@ export function Stat({ label, value }: { label: string; value: string | number |
       </span>
       <span
         style={{
-          color: colors.gray900,
+          color: colors.textPrimary,
           fontSize: typography.body.desktop.size,
           fontWeight: 600,
-          lineHeight: "1.2",
+          lineHeight: "1.3",
         }}
       >
         {value ?? "—"}
