@@ -100,6 +100,10 @@ const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Arra
   ))
   : []);
 
+const isPublicScore = (value: unknown): value is number => (
+  typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100
+);
+
 const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArray(value)
   ? value.filter((item): item is MarketBrainFactorView => {
     if (!item || typeof item !== 'object') return false;
@@ -110,8 +114,7 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArra
       && candidate.label.trim().length > 0
       && typeof candidate.summary === 'string'
       && candidate.summary.trim().length > 0
-      && typeof candidate.score === 'number'
-      && Number.isFinite(candidate.score);
+      && isPublicScore(candidate.score);
   })
   : []);
 
