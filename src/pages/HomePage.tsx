@@ -56,11 +56,11 @@ export default function HomePage() {
           paddingBottom: layout.pagePaddingDesktop,
         }}
       >
-        <div style={{ maxWidth: "600px", display: "grid", gap: space[6] }}>
+        <div style={{ maxWidth: "640px", display: "grid", gap: space[6] }}>
           <div style={{ display: "grid", gap: space[4] }}>
             <h1
               style={{
-                color: colors.gray900,
+                color: colors.textPrimary,
                 fontSize: typography.hero.desktop.size,
                 fontWeight: typography.hero.desktop.weight,
                 lineHeight: typography.hero.desktop.line,
@@ -71,7 +71,7 @@ export default function HomePage() {
             </h1>
             <p
               style={{
-                color: colors.gray600,
+                color: colors.textSecondary,
                 fontSize: typography.body.desktop.size,
                 fontWeight: 400,
                 lineHeight: typography.body.desktop.line,
@@ -95,12 +95,12 @@ export default function HomePage() {
                 height: "44px",
                 minWidth: "240px",
                 flex: "1 1 280px",
-                borderRadius: "6px",
-                border: `1px solid ${colors.gray100}`,
-                padding: "0 12px",
+                borderRadius: "10px",
+                border: `1px solid ${colors.border}`,
+                padding: "0 16px",
                 fontSize: typography.body.desktop.size,
-                color: colors.gray900,
-                background: colors.white,
+                color: colors.textPrimary,
+                background: colors.card,
                 outline: "none",
               }}
             />
@@ -113,18 +113,19 @@ export default function HomePage() {
                   key={result.symbol}
                   onClick={() => navigate(`/stock/${result.symbol}`)}
                   style={{
-                    border: `1px solid ${colors.gray100}`,
-                    borderRadius: "6px",
-                    background: colors.gray50,
-                    padding: space[3],
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: "10px",
+                    background: colors.card,
+                    padding: `${space[3]} ${space[4]}`,
                     display: "flex",
                     justifyContent: "space-between",
                     gap: space[3],
                     cursor: "pointer",
+                    textAlign: "left",
                   }}
                 >
-                  <span>{result.symbol}</span>
-                  <span style={{ color: colors.gray600 }}>{result.name}</span>
+                  <span style={{ fontWeight: 600 }}>{result.symbol}</span>
+                  <span style={{ color: colors.textSecondary }}>{result.name}</span>
                 </button>
               ))}
             </div>
@@ -136,10 +137,11 @@ export default function HomePage() {
       <section style={{ display: "grid", gap: space[6] }}>
         <h2
           style={{
-            color: colors.gray900,
+            color: colors.textPrimary,
             fontSize: typography.h1.desktop.size,
             fontWeight: typography.h1.desktop.weight,
             lineHeight: typography.h1.desktop.line,
+            letterSpacing: typography.h1.desktop.track,
           }}
         >
           Discover opportunities
@@ -153,11 +155,21 @@ export default function HomePage() {
         >
           {DISCOVER.map((item) => (
             <Card key={item.title}>
-              <div style={{ display: "grid", gap: space[3] }}>
-                <item.icon color={colors.primary} size={20} strokeWidth={1.75} />
+              <div style={{ display: "grid", gap: space[4] }}>
+                <div style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "8px",
+                  background: "rgba(0,122,255,0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <item.icon color={colors.primary} size={18} strokeWidth={1.75} />
+                </div>
                 <h3
                   style={{
-                    color: colors.gray900,
+                    color: colors.textPrimary,
                     fontSize: typography.h3.desktop.size,
                     fontWeight: typography.h3.desktop.weight,
                     lineHeight: typography.h3.desktop.line,
@@ -167,7 +179,7 @@ export default function HomePage() {
                 </h3>
                 <p
                   style={{
-                    color: colors.gray600,
+                    color: colors.textSecondary,
                     fontSize: typography.body.desktop.size,
                     fontWeight: 400,
                     lineHeight: typography.body.desktop.line,
@@ -185,10 +197,11 @@ export default function HomePage() {
       <section style={{ display: "grid", gap: space[6] }}>
         <h2
           style={{
-            color: colors.gray900,
+            color: colors.textPrimary,
             fontSize: typography.h1.desktop.size,
             fontWeight: typography.h1.desktop.weight,
             lineHeight: typography.h1.desktop.line,
+            letterSpacing: typography.h1.desktop.track,
           }}
         >
           Recently researched

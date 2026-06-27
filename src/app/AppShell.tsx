@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { GitCompare, Home, Search, Star } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { colors, typography, space, radius, layout, components } from "../design/tokens";
+import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
@@ -15,11 +15,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div
       style={{
         fontFamily: typography.fontFamily,
-        color: colors.gray900,
-        background: colors.white,
+        color: colors.textPrimary,
+        background: colors.page,
         minHeight: "100vh",
       }}
     >
+      {/* DESKTOP SIDEBAR */}
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
           StockStory
@@ -31,19 +32,21 @@ export function AppShell({ children }: { children: ReactNode }) {
               to={item.to}
               className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
             >
-              <item.icon size={18} strokeWidth={1.75} />
+              <item.icon size={20} strokeWidth={1.75} />
               <span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
       </aside>
 
+      {/* MOBILE TOP BAR */}
       <header className="mobile-brand">
         <NavLink to="/" style={mobileBrandLinkStyle}>
           StockStory
         </NavLink>
       </header>
 
+      {/* MOBILE TAB BAR */}
       <nav className="tabbar" aria-label="Primary">
         {NAV.map((item) => (
           <NavLink
@@ -51,24 +54,27 @@ export function AppShell({ children }: { children: ReactNode }) {
             to={item.to}
             className={({ isActive }) => `tab-link${isActive ? " is-active" : ""}`}
           >
-            <item.icon size={20} strokeWidth={1.75} />
+            <item.icon size={22} strokeWidth={1.5} />
             <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
+      {/* CONTENT */}
       <main className="content">{children}</main>
 
       <style>{`
+        /* ===== DESKTOP SIDEBAR ===== */
         .rail { display:none; }
         .rail .nav-link,
         .tab-link {
-          color:${colors.gray600};
+          color:${colors.textSecondary};
           text-decoration:none;
           display:flex;
           align-items:center;
           justify-content:center;
           gap:${space[2]};
+          transition:color ${animation.standard};
         }
         .rail .nav-link {
           min-height:${components.button.heightDesktop};
@@ -77,19 +83,29 @@ export function AppShell({ children }: { children: ReactNode }) {
           padding:0 ${space[3]};
           font-size:${typography.body.desktop.size};
           font-weight:500;
+          color:${colors.textSecondary};
         }
         .rail .nav-link.is-active {
           color:${colors.primary};
-          background:${colors.gray50};
+          background:rgba(0,122,255,0.08);
         }
+        .rail .nav-link:hover {
+          color:${colors.textPrimary};
+        }
+
+        /* ===== MOBILE BRAND BAR ===== */
         .mobile-brand {
           display:flex;
           align-items:center;
-          height:${components.navBar.heightMobile};
+          height:${components.navBar.heightDesktop};
           padding:0 ${layout.pagePaddingMobile};
-          border-bottom:${layout.borderWidth} solid ${colors.gray100};
-          background:${colors.white};
+          border-bottom:${layout.borderWidth} solid ${colors.border};
+          background:rgba(242,242,247,0.82);
+          backdrop-filter:blur(20px);
+          -webkit-backdrop-filter:blur(20px);
         }
+
+        /* ===== MOBILE TAB BAR ===== */
         .tabbar {
           position:fixed;
           bottom:0;
@@ -97,25 +113,32 @@ export function AppShell({ children }: { children: ReactNode }) {
           right:0;
           height:${components.navBar.heightMobile};
           display:flex;
-          border-top:${layout.borderWidth} solid ${colors.gray100};
-          background:${colors.white};
+          border-top:${layout.borderWidth} solid ${colors.border};
+          background:rgba(242,242,247,0.82);
+          backdrop-filter:blur(20px);
+          -webkit-backdrop-filter:blur(20px);
           z-index:10;
+          padding-bottom:env(safe-area-inset-bottom);
         }
         .tab-link {
           flex:1;
           flex-direction:column;
-          font-size:${typography.caption.desktop.size};
+          font-size:${typography.caption2.desktop.size};
           font-weight:500;
-          line-height:${typography.caption.desktop.line};
+          line-height:${typography.caption2.desktop.line};
+          gap:2px;
         }
         .tab-link.is-active {
           color:${colors.primary};
         }
+
+        /* ===== CONTENT ===== */
         .content {
           padding:${layout.pagePaddingMobile};
-          padding-bottom:calc(${components.navBar.heightMobile} + ${space[4]});
+          padding-bottom:calc(${components.navBar.heightMobile} + ${space[4]} + env(safe-area-inset-bottom, 0px));
           width:100%;
         }
+
         @media (min-width:768px) {
           .mobile-brand { display:none; }
           .rail {
@@ -125,9 +148,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             position:fixed;
             top:0;
             bottom:0;
-            border-right:${layout.borderWidth} solid ${colors.gray100};
+            border-right:${layout.borderWidth} solid ${colors.border};
             padding:${space[6]};
-            background:${colors.white};
+            background:rgba(242,242,247,0.78);
+            backdrop-filter:blur(24px);
+            -webkit-backdrop-filter:blur(24px);
             overflow-y:auto;
           }
           .tabbar { display:none; }
@@ -144,9 +169,9 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 const brandLinkStyle = {
-  color: colors.gray900,
+  color: colors.textPrimary,
   fontSize: typography.h2.desktop.size,
-  fontWeight: 600,
+  fontWeight: 700,
   lineHeight: typography.h2.desktop.line,
   textDecoration: "none",
   marginBottom: space[8],
@@ -160,7 +185,7 @@ const navStackStyle = {
 };
 
 const mobileBrandLinkStyle = {
-  color: colors.gray900,
+  color: colors.textPrimary,
   fontSize: typography.h3.desktop.size,
   fontWeight: 600,
   lineHeight: typography.h3.desktop.line,

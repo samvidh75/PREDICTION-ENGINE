@@ -1,22 +1,17 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { colors, typography, radius, layout, components, shadows } from "../design/tokens";
 import { useResponsiveValue } from "./responsive";
-import { colors, radius, layout } from "../design/tokens";
 
-export function Card({
-  children,
-  style,
-}: {
-  children: ReactNode;
-  style?: CSSProperties;
-}) {
-  const padding = useResponsiveValue(layout.cardPaddingMobile, layout.cardPaddingDesktop);
+export function Card({ children, style }: { children: ReactNode; style?: React.CSSProperties }) {
+  const padding = useResponsiveValue(components.card.paddingMobile, components.card.paddingDesktop);
 
   return (
     <section
       style={{
-        background: colors.gray50,
-        border: `${layout.borderWidth} solid ${colors.gray100}`,
+        background: colors.card,
+        border: `${layout.borderWidth} solid ${colors.border}`,
         borderRadius: radius.lg,
+        boxShadow: shadows.card,
         padding,
         ...style,
       }}
@@ -28,18 +23,19 @@ export function Card({
 
 export function CardLabel({ children }: { children: ReactNode }) {
   return (
-    <div
+    <span
       style={{
-        color: colors.gray600,
-        fontSize: "12px",
+        color: colors.textSecondary,
+        fontSize: typography.caption.desktop.size,
         fontWeight: 500,
-        lineHeight: "1.4",
-        letterSpacing: "0.04em",
+        lineHeight: typography.caption.desktop.line,
+        letterSpacing: "0.02em",
         textTransform: "uppercase",
-        marginBottom: "12px",
+        marginBottom: "8px",
+        display: "block",
       }}
     >
       {children}
-    </div>
+    </span>
   );
 }

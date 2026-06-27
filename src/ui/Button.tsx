@@ -1,21 +1,26 @@
-import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
-import { useResponsiveValue } from "./responsive";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { colors, typography, radius, layout, components, animation } from "../design/tokens";
+import { useResponsiveValue } from "./responsive";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "destructive";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  variant?: ButtonVariant;
-}
-
-const variants: Record<ButtonVariant, CSSProperties> = {
-  primary:   { background: colors.primary, color: colors.white, border: `${layout.borderWidth} solid ${colors.primary}` },
-  secondary: { background: colors.white, color: colors.gray900, border: `${layout.borderWidth} solid ${colors.gray100}` },
-  ghost:     { background: "transparent", color: colors.gray600, border: "1px solid transparent" },
+const STYLE_MAP: Record<Variant, { background: string; color: string; border: string }> = {
+  primary:     { background: colors.primary, color: "#FFFFFF", border: `1px solid ${colors.primary}` },
+  secondary:   { background: colors.card, color: colors.textPrimary, border: `1px solid ${colors.border}` },
+  ghost:       { background: "transparent", color: colors.primary, border: "1px solid transparent" },
+  destructive: { background: colors.danger, color: "#FFFFFF", border: `1px solid ${colors.danger}` },
 };
 
-export function Button({ children, variant = "primary", style, ...props }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  style,
+  children,
+  ...props
+}: {
+  variant?: Variant;
+  children: ReactNode;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const base = STYLE_MAP[variant];
   const height = useResponsiveValue(components.button.heightMobile, components.button.heightDesktop);
 
   return (
@@ -23,29 +28,29 @@ export function Button({ children, variant = "primary", style, ...props }: Butto
       {...props}
       style={{
         minHeight: height,
-        minWidth: components.button.heightDesktop,
-        borderRadius: radius.pill,
+        minWidth: "44px",
+        borderRadius: radius.md,
         fontFamily: typography.fontFamily,
-        fontSize: typography.body.desktop.size,
-        fontWeight: 500,
-        padding: `${components.button.paddingY} ${components.button.paddingX}`,
+        fontSize: typography.callout.desktop.size,
+        fontWeight: 600,
+        padding: `0 ${components.button.paddingX}`,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         gap: "8px",
-        transition: `filter ${animation.fast} ${animation.easing}, background-color ${animation.fast} ${animation.easing}`,
-        ...variants[variant],
+        transition: `filter ${animation.standard}, background-color ${animation.standard}, box-shadow ${animation.standard}`,
+        ...base,
         ...style,
       }}
-      onMouseEnter={(event) => {
-        if (variant === "primary") {
-          event.currentTarget.style.filter = "brightness(0.92)";
+      onMouseEnter={(e) => {
+        if (variant === "primary" || variant === "destructive") {
+          e.currentTarget.style.filter = "brightness(0.92)";
         }
-        props.onMouseEnter?.(event);
+        props.onMouseEnter?.(e);
       }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.filter = "none";
-        props.onMouseLeave?.(event);
+      onMouseLeave={(e) => {
+        e.currentTarget.style.filter = "";
+        props.onMouseLeave?.(e);
       }}
     >
       {children}

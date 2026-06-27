@@ -1,5 +1,9 @@
 @import "./styles/tokens.css";
 
+/* ============================================================================
+   STOCKSTORY GLOBAL STYLES — APPLE HUMAN INTERFACE GUIDELINES
+   ============================================================================ */
+
 /* RESET */
 *, *::before, *::after {
   margin: 0;
@@ -12,31 +16,31 @@ html, body, #root {
   height: 100%;
 }
 
-/* BASE TYPOGRAPHY */
+/* BASE TYPOGRAPHY — SF Pro system defaults */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #1A1A1A;
-  background: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #000000;
+  background: #F2F2F7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* HEADINGS */
 h1, h2, h3, h4, h5, h6 {
-  color: #1A1A1A;
+  color: #000000;
   font-weight: 600;
   line-height: 1.2;
 }
 
-h1 { font-size: 32px; } /* Desktop h1 */
-h2 { font-size: 24px; } /* Desktop h2 */
-h3 { font-size: 18px; } /* h3 = consistent */
+h1 { font-size: 28px; letter-spacing: -0.01em; }
+h2 { font-size: 22px; }
+h3 { font-size: 20px; }
 
 /* LINKS */
 a {
-  color: #635BFF;
+  color: #007AFF;
   text-decoration: none;
 }
 
@@ -44,7 +48,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* BASE BUTTONS & INPUTS */
+/* BASE INTERACTIVES */
 button, input, select, textarea {
   font-family: inherit;
   font-size: inherit;
@@ -60,22 +64,24 @@ button {
 
 input {
   outline: none;
-  border: 1px solid #E3E8EE;
-  border-radius: 6px;
-  padding: 0 12px;
+  border: 1px solid #E5E5EA;
+  border-radius: 10px;
+  padding: 0 16px;
   height: 44px;
-  font-size: 16px;
-  color: #1A1A1A;
+  font-size: 17px;
+  color: #000000;
   background: #FFFFFF;
+  transition: border-color 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
+              box-shadow 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 input:focus {
-  border-color: #635BFF;
-  box-shadow: 0 0 0 1px #635BFF;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
 }
 
 input::placeholder {
-  color: #697386;
+  color: #C7C7CC;
 }
 
 /* RESPONSIVE */
@@ -84,6 +90,6 @@ input::placeholder {
   h2 { font-size: 20px; }
 
   body {
-    padding-bottom: 56px; /* Room for bottom tab bar */
+    padding-bottom: 50px; /* Room for tab bar */
   }
 }

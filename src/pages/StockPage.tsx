@@ -67,11 +67,11 @@ function formatNewsTime(value?: string): string {
 function Ring({ label, value }: { label: string; value: number }) {
   const circumference = 2 * Math.PI * 40;
   const strokeDashoffset = circumference - (value / 100) * circumference;
-  const color = value >= 75 ? "colors.success" : value >= 50 ? "colors.primary" : "colors.danger";
+  const color = value >= 75 ? colors.success : value >= 50 ? colors.primary : colors.danger;
   return (
     <div style={{ display: "grid", justifyItems: "center", gap: "8px" }}>
       <svg width="96" height="96" viewBox="0 0 96 96">
-        <circle cx="48" cy="48" r="40" fill="none" stroke="colors.gray100" strokeWidth="8" />
+        <circle cx="48" cy="48" r="40" fill="none" stroke={colors.border} strokeWidth="8" />
         <circle
           cx="48"
           cy="48"
@@ -84,11 +84,11 @@ function Ring({ label, value }: { label: string; value: number }) {
           strokeLinecap="round"
           transform="rotate(-90 48 48)"
         />
-        <text x="48" y="52" textAnchor="middle" fontSize="20" fontWeight="600" fill="colors.gray900">
+        <text x="48" y="52" textAnchor="middle" fontSize="20" fontWeight="600" fill={colors.textPrimary}>
           {value}
         </text>
       </svg>
-      <span style={{ color: "colors.gray600", fontSize: "12px", letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ color: colors.textSecondary, fontSize: "12px", letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</span>
     </div>
   );
 }
@@ -96,9 +96,9 @@ function Ring({ label, value }: { label: string; value: number }) {
 function StockSkeleton() {
   return (
     <div style={{ display: "grid", gap: "16px" }}>
-      <div style={{ height: "24px", width: "120px", background: "colors.gray50", borderRadius: "6px" }} />
-      <div style={{ height: "40px", width: "240px", background: "colors.gray50", borderRadius: "8px" }} />
-      <div style={{ height: "240px", background: "colors.gray50", borderRadius: "8px" }} />
+      <div style={{ height: "24px", width: "120px", background: colors.fill, borderRadius: "6px" }} />
+      <div style={{ height: "40px", width: "240px", background: colors.fill, borderRadius: "8px" }} />
+      <div style={{ height: "240px", background: colors.fill, borderRadius: "8px" }} />
     </div>
   );
 }
@@ -116,7 +116,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
   const [period, setPeriod] = useState(shareholdingSeries[0]?.period ?? "Mar'26");
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
-  const trendColor = isUp ? "colors.success" : "colors.danger";
+  const trendColor = isUp ? colors.success : colors.danger;
   const shareholding = shareholdingSeries.find((item) => item.period === period) ?? shareholdingSeries[0];
   const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
   const financialChartData = selectedFinancialSeries.map((item) => ({
@@ -138,16 +138,16 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <div style={{ display: "grid", gap: "12px" }}>
           <button
             onClick={() => navigate(-1)}
-            style={{ border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: "8px", color: "colors.gray600", cursor: "pointer" }}
+            style={{ border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: "8px", color: colors.textSecondary, cursor: "pointer" }}
           >
             <ArrowLeft size={16} />
             <span>Back</span>
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
             <Badge value={60} label={stock.exchange} />
-            <h1 style={{ color: "colors.gray900", fontSize: "typography.h1.desktop.size", fontWeight: 600, lineHeight: "1.25" }}>{stock.symbol}</h1>
+            <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25" }}>{stock.symbol}</h1>
           </div>
-          <p style={{ color: "colors.gray600", fontSize: "typography.body.desktop.size", fontWeight: 400, lineHeight: "1.6" }}>{stock.companyName}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6" }}>{stock.companyName}</p>
         </div>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <Button variant="secondary">Track</Button>
@@ -160,7 +160,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
       </section>
 
       <section style={{ display: "grid", gap: "12px" }}>
-        <div style={{ color: "colors.gray900", fontSize: "typography.hero.desktop.size", fontWeight: 600, lineHeight: "1.1" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
+        <div style={{ color: colors.textPrimary, fontSize: typography.hero.desktop.size, fontWeight: 600, lineHeight: "1.1" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: trendColor }}>
           {isUp ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
           <span>{`${isUp ? "+" : ""}${stock.price.changeAbs.toFixed(2)} (${stock.price.changePercent.toFixed(2)}%)`}</span>
@@ -184,9 +184,9 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
                   <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} stroke="colors.gray100" />
-              <XAxis dataKey="label" stroke="colors.gray600" />
-              <YAxis stroke="colors.gray600" domain={["dataMin", "dataMax"]} />
+              <CartesianGrid vertical={false} stroke={colors.border} />
+              <XAxis dataKey="label" stroke={colors.textSecondary} />
+              <YAxis stroke={colors.textSecondary} domain={["dataMin", "dataMax"]} />
               <Area dataKey="price" stroke={trendColor} fill="url(#trendFill)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
@@ -211,7 +211,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           <div style={{ display: "grid", gap: "12px" }}>
             <Ring label="Confidence" value={stock.confidenceMeter} />
             <Badge value={stock.scores.riskAdjusted ?? stock.scores.health ?? 0} label="Risk-adjusted" />
-            <p style={{ color: "colors.gray600", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>
+            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>
               Timeline drift: {stock.timeline.map((item) => item.health).join(" • ")}
             </p>
           </div>
@@ -236,7 +236,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
 
       <Card>
         <CardLabel>About company</CardLabel>
-        <p style={{ color: "colors.gray900", fontSize: "typography.body.desktop.size", fontWeight: 400, lineHeight: "1.6", marginBottom: "16px" }}>
+        <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6", marginBottom: "16px" }}>
           {stock.description}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "16px" }}>
@@ -271,18 +271,18 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <div style={{ width: "100%", height: "280px" }}>
           <ResponsiveContainer>
             <BarChart data={financialChartData}>
-              <CartesianGrid vertical={false} stroke="colors.gray100" />
-              <XAxis dataKey="period" stroke="colors.gray600" />
-              <YAxis stroke="colors.gray600" />
+              <CartesianGrid vertical={false} stroke={colors.border} />
+              <XAxis dataKey="period" stroke={colors.textSecondary} />
+              <YAxis stroke={colors.textSecondary} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                 {financialChartData.map((entry) => (
-                  <Cell key={entry.period} fill="colors.primary" />
+                  <Cell key={entry.period} fill={colors.primary} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <p style={{ color: "colors.gray600", fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
+        <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
       </Card>
 
       <Card>
@@ -308,13 +308,13 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
               <div key={item.label} style={{ display: "grid", gap: "8px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
                   <span>{item.label}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? "colors.success" : "colors.danger" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger }}>
                     {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
                     {item.value.toFixed(1)}%
                   </span>
                 </div>
-                <div style={{ height: "8px", background: "colors.gray100", borderRadius: "radius.lg", overflow: "hidden" }}>
-                  <div style={{ width: `${item.value}%`, height: "100%", background: "colors.primary" }} />
+                <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
+                  <div style={{ width: `${item.value}%`, height: "100%", background: colors.primary }} />
                 </div>
               </div>
             );
@@ -337,16 +337,16 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
                   display: "flex",
                   gap: "12px",
                   textDecoration: "none",
-                  border: "1px solid colors.gray100",
-                  borderRadius: "radius.lg",
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: radius.lg,
                   padding: "12px",
                   color: "inherit",
                 }}
               >
-                <Building2 color="colors.primary" size={18} />
+                <Building2 color={colors.primary} size={18} />
                 <div style={{ display: "grid", gap: "4px" }}>
-                  <div style={{ color: "colors.gray900" }}>{item.headline}</div>
-                  <div style={{ color: "colors.gray600", fontSize: "12px" }}>{`${item.source}${secondary ? ` · ${secondary}` : ""}`}</div>
+                  <div style={{ color: colors.textPrimary }}>{item.headline}</div>
+                  <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{`${item.source}${secondary ? ` · ${secondary}` : ""}`}</div>
                 </div>
               </a>
             );
@@ -358,10 +358,10 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <CardLabel>Research thesis</CardLabel>
         <div style={{ display: "grid", gap: "12px" }}>
           <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
-          <p style={{ color: "colors.gray600", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
-          <p style={{ color: "colors.gray900", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>{`Bull case: ${stock.thesis.bullCase}`}</p>
-          <p style={{ color: "colors.gray900", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>{`Bear case: ${stock.thesis.bearCase}`}</p>
-          <p style={{ color: "colors.gray600", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>{`What to watch: ${stock.thesis.whatToWatch}`}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`Bull case: ${stock.thesis.bullCase}`}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`Bear case: ${stock.thesis.bearCase}`}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`What to watch: ${stock.thesis.whatToWatch}`}</p>
         </div>
       </Card>
 
@@ -369,7 +369,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <CardLabel>What changed</CardLabel>
         <div style={{ display: "grid", gap: "12px" }}>
           {stock.whatChanged.map((item) => (
-            <p key={item} style={{ color: "colors.gray600", fontSize: "typography.body.desktop.size", lineHeight: "1.6" }}>
+            <p key={item} style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>
               {item}
             </p>
           ))}
