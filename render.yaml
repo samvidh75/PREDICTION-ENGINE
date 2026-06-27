@@ -1,7 +1,16 @@
 # render.yaml
 # Render Blueprint — StockStory India
-# Deploys a single Web Service (backend API) on Render free tier.
-# Frontend remains on Vercel; this service provides the database-backed API.
+# Deploys the backend API service on Render free tier.
+# Frontend remains on Vercel.
+#
+# ── Manual Dashboard setup required (sync: false) ──────────────────────────
+#   DATABASE_URL  → Neon PostgreSQL connection string
+#   COOKIE_SECRET → openssl rand -base64 64
+#   INDIANAPI_KEY → from stock.indianapi.in (optional, for live market data)
+#
+# ── Optional but recommended ────────────────────────────────────────────────
+#   REDIS_URL     → Upstash Redis free tier (for rate limiting + cache)
+#   SGLANG_URL    → SGLang LLM inference URL (for AI features)
 
 services:
   - type: web
@@ -10,54 +19,83 @@ services:
     region: singapore
     plan: free
     branch: main
-
     buildCommand: npm ci && npm run compile:backend
     startCommand: npm start
-
     healthCheckPath: /healthz
-
     autoDeploy: true
 
     envVars:
+      # ── Runtime ────────────────────────────────────────────────────────
       - key: NODE_ENV
         value: production
-
       - key: NODE_VERSION
         value: 22.12.0
-
       - key: HOST
         value: 0.0.0.0
-
       - key: PORT
         value: 10000
+      - key: LOG_LEVEL
+        value: info
 
-      # ── Database (Neon PostgreSQL) ──
-      # Set in Dashboard: postgresql://user:pass@host/db?sslmode=require
+      # ── Database (PostgreSQL via Neon free tier) ───────────────────────
       - key: DATABASE_URL
         sync: false
 
-      # ── Security ──
-      # Generate: openssl rand -base64 64
-      - key: COOKIE_SECRET
-        sync: false
-
-      # ── Database Policy ──
       - key: DB_ADAPTER
         value: postgres
-
       - key: ALLOW_SQLITE_FALLBACK
         value: "false"
-
       - key: ALLOW_SQLITE_IN_PRODUCTION
         value: "false"
-
       - key: FORCE_MIGRATIONS
         value: "true"
 
-      # ── CORS — allow Vercel frontend ──
+      # ── Security ───────────────────────────────────────────────────────
+      - key: COOKIE_SECRET
+        sync: false
+
+      # ── CORS ───────────────────────────────────────────────────────────
       - key: EXTRA_ALLOWED_ORIGINS
         value: https://stockstory-india.com
 
-      # ── Logging ──
-      - key: LOG_LEVEL
-        value: info
+      # ── Redis (optional — backend uses in-memory cache when absent) ────
+      - key: REDIS_URL
+        sync: false
+
+      # ── LLM / AI (SGLang — optional, backend degrades when absent) ────
+      - key: SGLANG_URL
+        sync: false
+      - key: ENABLE_SGLANG
+        value: "false"
+      - key: ENABLE_RESEARCH_BOT
+        value: "true"
+      - key: ENABLE_SCORE_EXPLANATIONS
+        value: "true"
+      - key: ENABLE_STOCK_SNAPSHOTS
+        value: "true"
+      - key: ENABLE_STOCK_COMPARISON
+        value: "true"
+      - key: ENABLE_SCANNER_THESES
+        value: "true"
+      - key: ENABLE_THESIS_TRACKING
+        value: "true"
+
+      # ── Market Data (optional — required for live provider data) ───────
+      - key: INDIANAPI_KEY
+        sync: false
+
+      # ── Firebase (optional — required for auth) ────────────────────────
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS
+        sync: false
+
+      # ── Upstox (optional — for broker integration) ─────────────────────
+      - key: UPSTOX_ACCESS_TOKEN
+        sync: false
+      - key: UPSTOX_CLIENT_SECRET
+        sync: false
