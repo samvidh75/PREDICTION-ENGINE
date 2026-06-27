@@ -10,7 +10,7 @@
     "declaration": false
   },
   "include": [
-    "src/backend/**/*",
+    "src/render/**/*",
     "src/db/**/*",
     "src/intelligence/SignalValidationEngine.ts",
     "src/intelligence/PredictionDiffEngine.ts",
