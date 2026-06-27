@@ -30,6 +30,18 @@ The separate Render backend was configured in `render.yaml` but **not deployed**
 
 ---
 
+## Redis — Upgraded from Ephemeral to Permanent
+
+The initial Redis setup used an ephemeral database from `upstash.com/start-redis` (expires 2026-06-30, REST API only). This was replaced with a **permanent Upstash Redis** database created via the [Upstash Console](https://console.upstash.com):
+
+- **Name:** `stockstory-redis`
+- **Region:** Singapore (`ap-southeast-1`)
+- **Protocol:** Full TLS TCP (`rediss://`) — verified with `redis` npm package (v5.12.1)
+- **Verification:** `PING → PONG`, `SET/GET` working ✅
+- **Vercel env:** `REDIS_URL` updated in production and redeployed
+
+---
+
 ## Final Deployed Architecture
 
 ```
@@ -88,12 +100,11 @@ Users ──→ https://www.stockstory-india.com
 
 | Detail | Value |
 |--------|-------|
-| **Type** | Upstash Redis (serverless, ephemeral) — provisioned via `upstash.com/start-redis` |
-| **Status** | ✅ **Configured** — REST API verified (PONG, SET/GET working) |
-| **Connection** | `REDIS_URL` set in Vercel production env |
-| **Vercel env** | ✅ `REDIS_URL` — Upstash (Production) |
-| **Note** | The ephemeral database expires 2026-06-30. To keep it permanently, claim it at: https://upstash.com/start-redis/console/ef15ee55-7287-4dac-aa2d-50308929c193 |
-| **Redis protocol** | Standard `redis://` TCP not available on ephemeral tier. Claiming the database or creating a permanent one via the [Upstash Console](https://console.upstash.com) enables full Redis protocol support.
+| **Type** | Upstash Redis (serverless, permanent) — created via Upstash Console, Singapore (`ap-southeast-1`) |
+| **Status** | ✅ **Configured and verified** — TCP/TLS protocol working (`rediss://`), PING → PONG, SET/GET verified |
+| **Connection** | `REDIS_URL` set in Vercel production env with permanent TLS connection string |
+| **Vercel env** | ✅ `REDIS_URL` — Upstash permanent Redis (Production) |
+| **Previous** | Ephemeral tier was replaced with a permanent database created via the Upstash Console |
 
 ---
 
@@ -105,8 +116,8 @@ These are set in Vercel dashboard (production environment) and used by the serve
 
 | Variable | Purpose |
 |----------|---------|
-| `DATABASE_URL` | PostgreSQL via Neon — migrations applied, 70 tables |
-| `REDIS_URL` | Upstash Redis — REST API verified, TCP pending claim |
+| `DATABASE_URL` | PostgreSQL via Neon — migrations applied, 70 tables, Singapore |
+| `REDIS_URL` | Upstash Redis — permanent TLS TCP connection, Singapore |
 | `INDIANAPI_KEY` | IndianAPI provider — real-time stock data |
 | `UPSTOX_ACCESS_TOKEN` | Upstox broker API — market data |
 | `UPSTOX_API_KEY` | Upstox broker API — authentication |
