@@ -143,6 +143,49 @@ describe('fetchMarketBrainResearch', () => {
     ]);
   });
 
+  it('filters out-of-range factor scores from public client output', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          factorViews: [
+            {
+              key: 'quality',
+              label: 'Quality',
+              score: 0,
+              summary: 'Lower bound score is valid for this research view.',
+            },
+            {
+              key: 'growth',
+              label: 'Growth',
+              score: 100,
+              summary: 'Upper bound score is valid for this research view.',
+            },
+            {
+              key: 'valuation',
+              label: 'Valuation',
+              score: -1,
+              summary: 'Negative scores should not reach public rendering.',
+            },
+            {
+              key: 'momentum',
+              label: 'Momentum',
+              score: 101,
+              summary: 'Scores above the public range should not reach public rendering.',
+            },
+          ],
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.factorViews.map((factorView) => factorView.score)).toEqual([0, 100]);
+  });
+
   it('throws a typed error for unavailable research', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
