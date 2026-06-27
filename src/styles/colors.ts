@@ -4,7 +4,7 @@
  */
 export const colors = {
   // ── Brand ──────────────────────────────────────────────────────────────
-  primary:   '#0070F3',   // Stripe Blue  — CTAs, links, focus rings
+  primary:   '#635BFF',   // Stripe Purple-blue  — CTAs, links, focus rings
   success:   '#13C23E',   // Stripe Green — gains, positive signals
   error:     '#F5222D',   // Stripe Red   — losses, warnings
   warning:   '#FAAD14',   // Stripe Amber — alerts, caution
@@ -37,7 +37,7 @@ export const colors = {
     success: '#0A8C2A',
     error:   '#CF1322',
     warning: '#D48806',
-    primary: '#0051CC',
+    primary: '#4E47E6',
   },
 } as const;
 

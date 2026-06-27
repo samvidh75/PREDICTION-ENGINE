@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BarChart3, Building2, Landmark, ShieldAlert } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Badge } from "../ui/Badge";
@@ -35,14 +35,33 @@ type StockResearchDetail = {
   sectorRelative: Array<{ label: string; company: string; sectorMedian: string }>;
   description: string;
   companyProfile: { founded: string; ceo: string; hq: string; employees: string; website: string; isin: string; businessSegments: string[] };
-  financials: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }> };
+  financials: {
+    annual: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
+    quarterly: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
+  };
   shareholding: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
-  news: Array<{ headline: string; source: string; time: string }>;
+  shareholdings?: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
+  news: Array<{ headline: string; source: string; time: string; link?: string; publishedAt?: string }>;
   thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
   priceHistory: Record<string, Array<{ label: string; price: number }>>;
 };
 
 const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
+const FINANCIAL_METRICS = ["revenue", "profit", "ebitda"] as const;
+const FINANCIAL_PERIODS = ["annual", "quarterly"] as const;
+
+type FinancialMetric = (typeof FINANCIAL_METRICS)[number];
+type FinancialPeriod = (typeof FINANCIAL_PERIODS)[number];
+
+function formatNewsTime(value?: string): string {
+  if (!value) return "";
+  const timestamp = Date.parse(value);
+  if (Number.isNaN(timestamp)) return value;
+  const minutesAgo = Math.round((Date.now() - timestamp) / 60000);
+  if (minutesAgo < 60) return `${Math.max(minutesAgo, 1)}m ago`;
+  if (minutesAgo < 1440) return `${Math.round(minutesAgo / 60)}h ago`;
+  return `${Math.round(minutesAgo / 1440)}d ago`;
+}
 
 function Ring({ label, value }: { label: string; value: number }) {
   const circumference = 2 * Math.PI * 40;
@@ -90,11 +109,20 @@ function StockError({ symbol }: { symbol: string }) {
 function StockView({ stock }: { stock: StockResearchDetail }) {
   const navigate = useNavigate();
   const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
-  const [period, setPeriod] = useState(stock.shareholding[0]?.period ?? "Mar'26");
+  const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
+  const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
+  const shareholdingSeries = stock.shareholdings ?? stock.shareholding ?? [];
+  const [period, setPeriod] = useState(shareholdingSeries[0]?.period ?? "Mar'26");
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
   const trendColor = isUp ? "var(--green)" : "var(--red)";
-  const shareholding = stock.shareholding.find((item) => item.period === period) ?? stock.shareholding[0];
+  const shareholding = shareholdingSeries.find((item) => item.period === period) ?? shareholdingSeries[0];
+  const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
+  const financialChartData = selectedFinancialSeries.map((item) => ({
+    period: item.period,
+    value: Math.round(item.value / 10000000),
+  }));
+  const newsItems = stock.news.slice(0, 5);
   const factorBadges = [
     { label: "Quality", value: stock.scores.quality ?? 0 },
     { label: "Valuation", value: stock.scores.valuation ?? 0 },
@@ -232,34 +260,35 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Financials</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <Button variant="secondary">Revenue</Button>
-            <Button variant="ghost">Net Profit</Button>
-            <Button variant="secondary">Quarterly</Button>
-            <Button variant="ghost">Yearly</Button>
+            <Button variant={financialMetric === "revenue" ? "primary" : "secondary"} onClick={() => setFinancialMetric("revenue")}>Revenue</Button>
+            <Button variant={financialMetric === "profit" ? "primary" : "secondary"} onClick={() => setFinancialMetric("profit")}>Profit</Button>
+            <Button variant={financialMetric === "ebitda" ? "primary" : "secondary"} onClick={() => setFinancialMetric("ebitda")}>EBITDA</Button>
+            <Button variant={financialPeriod === "annual" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("annual")}>Annual</Button>
+            <Button variant={financialPeriod === "quarterly" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("quarterly")}>Quarterly</Button>
           </div>
         </div>
         <div style={{ width: "100%", height: "280px" }}>
           <ResponsiveContainer>
-            <BarChart data={stock.financials.revenue.map((item, index) => ({ period: item.period, revenue: item.value, profit: stock.financials.profit[index]?.value ?? 0 }))}>
+            <BarChart data={financialChartData}>
               <CartesianGrid vertical={false} stroke="var(--border)" />
               <XAxis dataKey="period" stroke="var(--text-300)" />
               <YAxis stroke="var(--text-300)" />
-              <Bar dataKey="revenue" radius={[6, 6, 0, 0]}>
-                {stock.financials.revenue.map((entry) => (
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {financialChartData.map((entry) => (
                   <Cell key={entry.period} fill="var(--brand)" />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <p style={{ color: "var(--text-300)", fontSize: "12px", marginTop: "12px" }}>all values in ₹ Cr</p>
+        <p style={{ color: "var(--text-300)", fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
       </Card>
 
       <Card>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            {stock.shareholding.map((value) => (
+            {shareholdingSeries.map((value) => (
               <Button key={value.period} variant={value.period === period ? "secondary" : "ghost"} onClick={() => setPeriod(value.period)}>
                 {value.period}
               </Button>
@@ -268,10 +297,10 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
         <div style={{ display: "grid", gap: "16px" }}>
           {[
-            { label: "Promoter", value: shareholding.promoter, delta: shareholding.deltas.promoter },
-            { label: "FII", value: shareholding.fii, delta: shareholding.deltas.fii },
-            { label: "DII", value: shareholding.dii, delta: shareholding.deltas.dii },
-            { label: "Retail", value: shareholding.retail, delta: shareholding.deltas.retail },
+            { label: "Promoter", value: shareholding?.promoter ?? 0, delta: shareholding?.deltas.promoter ?? 0 },
+            { label: "FII", value: shareholding?.fii ?? 0, delta: shareholding?.deltas.fii ?? 0 },
+            { label: "DII", value: shareholding?.dii ?? 0, delta: shareholding?.deltas.dii ?? 0 },
+            { label: "Retail", value: shareholding?.retail ?? 0, delta: shareholding?.deltas.retail ?? 0 },
           ].map((item) => {
             const positive = item.delta >= 0;
             return (
@@ -293,19 +322,32 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
       </Card>
 
       <Card>
-        <CardLabel>News</CardLabel>
+        <CardLabel>Latest news</CardLabel>
         <div style={{ display: "grid", gap: "16px" }}>
-          {stock.news.map((item, index) => {
-            const icons = [Building2, Landmark, BarChart3, ShieldAlert, Building2] as const;
-            const Icon = icons[index] ?? Building2;
+          {newsItems.map((item) => {
+            const secondary = formatNewsTime(item.publishedAt) || item.time;
             return (
-              <div key={item.headline} style={{ display: "flex", gap: "12px" }}>
-                <Icon color="var(--brand)" size={18} />
+              <a
+                key={item.headline}
+                href={item.link || "#"}
+                target={item.link ? "_blank" : undefined}
+                rel={item.link ? "noopener noreferrer" : undefined}
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  textDecoration: "none",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius-lg)",
+                  padding: "12px",
+                  color: "inherit",
+                }}
+              >
+                <Building2 color="var(--brand)" size={18} />
                 <div style={{ display: "grid", gap: "4px" }}>
                   <div style={{ color: "var(--text-primary)" }}>{item.headline}</div>
-                  <div style={{ color: "var(--text-300)", fontSize: "12px" }}>{`${item.source} · ${item.time}`}</div>
+                  <div style={{ color: "var(--text-300)", fontSize: "12px" }}>{`${item.source}${secondary ? ` · ${secondary}` : ""}`}</div>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>

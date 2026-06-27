@@ -1,4 +1,5 @@
 import { cacheService } from './CacheService';
+import logger from '../config/logger';
 
 interface BatchItem<T> {
   key: string;
@@ -22,10 +23,10 @@ export class BatchQueue {
       }
 
       this.queue.set(key, { key, executor, resolve, reject, addedAt: Date.now() });
-      console.log(`[BatchQueue] Queued: ${key} (total: ${this.queue.size})`);
+      logger.debug({ key, queueSize: this.queue.size }, '[BatchQueue] Queued request');
 
       if (!this.timer) {
-        console.log(`[BatchQueue] Timer started (${this.batchDuration}ms)`);
+        logger.debug({ batchDurationMs: this.batchDuration }, '[BatchQueue] Timer started');
         this.timer = setTimeout(() => this.processBatch(), this.batchDuration);
       }
     });
@@ -39,7 +40,7 @@ export class BatchQueue {
 
     const items = Array.from(this.queue.values());
     const uniqueKeys = new Set(items.map(i => i.key));
-    console.log(`[BatchQueue] Processing ${items.length} items (${uniqueKeys.size} unique)`);
+    logger.debug({ items: items.length, uniqueKeys: uniqueKeys.size }, '[BatchQueue] Processing batch');
 
     this.queue.clear();
     this.timer = null;
@@ -54,7 +55,7 @@ export class BatchQueue {
         items[i].reject(result.reason);
       }
     }
-    console.log(`[BatchQueue] Batch done`);
+    logger.debug('[BatchQueue] Batch done');
   }
 
   async flush(): Promise<void> {
