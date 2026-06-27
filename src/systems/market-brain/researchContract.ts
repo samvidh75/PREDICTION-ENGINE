@@ -1,5 +1,6 @@
 import { assertMarketBrainCopyIsCompliant } from './marketBrainGuardrails';
 import type { FactorScore, IndiaMarketBrainResult, MarketDataDomain } from './indiaMarketBrain';
+import { buildMarketBrainNarrative } from './researchNarrative';
 
 export interface MarketBrainFactorView {
   key: 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
@@ -103,19 +104,19 @@ const buildFactorViews = (result: IndiaMarketBrainResult): MarketBrainFactorView
 ];
 
 export function toMarketBrainResearchView(result: IndiaMarketBrainResult): MarketBrainResearchView {
-  const headline = `${result.companyName} is marked ${result.researchState} with ${result.convictionScore}/100 conviction.`;
+  const narrative = buildMarketBrainNarrative(result);
   const view: MarketBrainResearchView = {
     symbol: result.symbol,
     companyName: result.companyName,
     state: result.researchState,
     convictionScore: result.convictionScore,
-    headline,
-    thesis: result.thesis,
-    risksToReview: result.risksToReview.length > 0 ? result.risksToReview : ['No dominant risk signal in the current research view.'],
-    whatToWatch: result.whatToWatch,
+    headline: narrative.headline,
+    thesis: narrative.thesis,
+    risksToReview: narrative.risks,
+    whatToWatch: narrative.watchNext,
     evidenceReview: buildEvidenceReview(result),
     factorViews: buildFactorViews(result),
-    methodNote: result.complianceNote,
+    methodNote: narrative.methodNote,
     generatedAt: result.generatedAt,
   };
 
