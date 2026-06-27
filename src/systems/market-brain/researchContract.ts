@@ -37,7 +37,10 @@ const summarizeFactor = (factor: FactorScore, fallback: string): string => {
   return fallback;
 };
 
-const humanizeDomain = (domain: MarketDataDomain): string => domain.replace(/_/g, ' ');
+const humanizeDomain = (domain: MarketDataDomain): string => domain
+  .split('_')
+  .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+  .join(' ');
 
 const buildEvidenceReview = (result: IndiaMarketBrainResult): MarketBrainEvidenceReviewView => {
   const partial = result.partialEvidence;
