@@ -1,4 +1,5 @@
 import type { IndiaMarketBrainResult } from './indiaMarketBrain';
+import { assertMarketBrainCopyIsCompliant } from './marketBrainGuardrails';
 
 const joinBullets = (items: string[]): string[] => items.length > 0 ? items : ['No dominant signal yet.'];
 
@@ -10,14 +11,28 @@ export interface MarketBrainNarrative {
   methodNote: string;
 }
 
+const checkNarrativeCopy = (narrative: MarketBrainNarrative): void => {
+  assertMarketBrainCopyIsCompliant([
+    narrative.headline,
+    ...narrative.thesis,
+    ...narrative.risks,
+    ...narrative.watchNext,
+    narrative.methodNote,
+  ].join(' '));
+};
+
 export function buildMarketBrainNarrative(result: IndiaMarketBrainResult): MarketBrainNarrative {
-  return {
+  const narrative = {
     headline: `${result.companyName} is marked ${result.researchState} with ${result.convictionScore}/100 conviction.`,
     thesis: joinBullets(result.thesis),
     risks: joinBullets(result.risksToReview),
     watchNext: joinBullets(result.whatToWatch),
     methodNote: result.complianceNote,
   };
+
+  checkNarrativeCopy(narrative);
+
+  return narrative;
 }
 
 export function renderMarketBrainNarrative(result: IndiaMarketBrainResult): string {
