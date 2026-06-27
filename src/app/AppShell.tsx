@@ -61,7 +61,21 @@ export function AppShell({ children }: { children: ReactNode }) {
       </nav>
 
       {/* CONTENT */}
-      <main className="content">{children}</main>
+      <main className="content">
+        {children}
+        <footer style={{
+          marginTop: "64px",
+          paddingTop: "24px",
+          borderTop: `1px solid ${colors.border}`,
+          fontSize: "12px",
+          color: colors.textSecondary,
+          lineHeight: "1.6",
+        }}>
+          <p>
+            © 2026 StockStory India. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
+          </p>
+        </footer>
+      </main>
 
       <style>{`
         /* ===== DESKTOP SIDEBAR ===== */

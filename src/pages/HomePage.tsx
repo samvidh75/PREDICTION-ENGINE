@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, space, layout, media } from "../design/tokens";
+import { SEBIComplianceBanner } from "../components/SEBICompliance";
 
 const DISCOVER = [
   { icon: TrendingUp, title: "Quality Compounders", body: "High return businesses with durable operating discipline." },
@@ -46,6 +47,7 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
+      <SEBIComplianceBanner />
       {/* HERO */}
       <section
         style={{

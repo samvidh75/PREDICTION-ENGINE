@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
+import { SEBIComplianceBanner } from "../components/SEBICompliance";
 
 const SCANS: ScanType[] = ["quality", "value", "momentum", "stable"];
 
@@ -38,6 +39,7 @@ export default function ScannerPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
+      <SEBIComplianceBanner />
       <div style={{ display: "grid", gap: "16px" }}>
         <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25" }}>Scanner</h1>
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -102,7 +104,7 @@ export default function ScannerPage() {
               >
                 {[
                   { value: String(index + 1), color: colors.textSecondary },
-                  { value: stock.symbol, color: colors.textPrimary, bold: true },
+                  { value: stock.name || stock.symbol, color: colors.textPrimary, bold: true },
                   { value: String(stock.quality ?? "-"), color: colors.textPrimary },
                   { value: String(stock.valuation ?? "-"), color: colors.textPrimary },
                   { value: String(stock.growth ?? "-"), color: colors.textPrimary },

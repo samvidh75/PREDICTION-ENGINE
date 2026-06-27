@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,6 +8,9 @@ import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
 import { useResponsiveValue } from "../ui/responsive";
+import { SEBIComplianceBanner } from "../components/SEBICompliance";
+import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
+import type { AIAnalysis } from "../services/llm/AIAnalysisService";
 import { colors, typography, radius } from "../design/tokens";
 
 type StockResearchDetail = {
@@ -108,6 +111,29 @@ function StockError({ symbol }: { symbol: string }) {
 }
 
 function StockView({ stock }: { stock: StockResearchDetail }) {
+  const [ai, setAi] = useState<AIAnalysis | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const scores = {
+      quality: stock.scores.quality ?? 50,
+      valuation: stock.scores.valuation ?? 50,
+      growth: stock.scores.growth ?? 50,
+      risk: stock.scores.risk ?? 50,
+      technical: stock.scores.momentum ?? 50,
+    };
+    setAiLoading(true);
+    generateStockAnalysis(stock.symbol, stock.companyName, stock.price.current, scores, stock.thesis?.thesis)
+      .then((result) => {
+        if (!cancelled) { setAi(result); setAiLoading(false); }
+      })
+      .catch(() => {
+        if (!cancelled) { setAi(fallbackAnalysis(scores)); setAiLoading(false); }
+      });
+    return () => { cancelled = true; };
+  }, [stock.symbol]);
+
   const navigate = useNavigate();
   const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
   const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
@@ -134,6 +160,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
+      <SEBIComplianceBanner />
       <section style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: "12px" }}>
           <button
@@ -364,6 +391,28 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`What to watch: ${stock.thesis.whatToWatch}`}</p>
         </div>
       </Card>
+
+      {ai && (
+        <Card>
+          <CardLabel>AI Analysis</CardLabel>
+          <div style={{ display: "grid", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <div style={{
+                width: "8px", height: "8px", borderRadius: "50%",
+                background: ai.state === "High Conviction" ? colors.success : ai.state === "Risk Rising" ? colors.danger : colors.warning,
+              }} />
+              <span style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>{ai.state}</span>
+              <span style={{ fontSize: "12px", color: colors.textSecondary, marginLeft: "8px" }}>
+                Confidence: {ai.confidence}%
+              </span>
+            </div>
+            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{ai.thesis}</p>
+            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>Bull case: {ai.bullCase}</p>
+            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>Bear case: {ai.bearCase}</p>
+            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>What to watch: {ai.whatToWatch}</p>
+          </div>
+        </Card>
+      )}
 
       <Card>
         <CardLabel>What changed</CardLabel>
