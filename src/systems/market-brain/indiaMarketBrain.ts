@@ -1,3 +1,5 @@
+import { normalizeEvidenceCoverage } from './evidenceNormalization';
+
 export type MarketDataDomain =
   | 'instrument_master'
   | 'prices'
@@ -49,6 +51,7 @@ export interface IndiaEquityPacket {
   symbol: string;
   companyName: string;
   sector?: string | null;
+  industry?: string | null;
   asOf: string;
   fundamentals?: IndiaEquityFundamentals;
   technicals?: IndiaEquityTechnicals;
@@ -78,6 +81,7 @@ export interface IndiaMarketBrainResult {
   risksToReview: string[];
   whatToWatch: string[];
   missingEvidence: MarketDataDomain[];
+  partialEvidence: MarketDataDomain[];
   complianceNote: string;
   generatedAt: string;
 }
@@ -113,9 +117,9 @@ function scoreQuality(fin?: IndiaEquityFundamentals): FactorScore {
   return {
     score,
     drivers: [
-      ...(score >= 70 ? ['Quality metrics support the business thesis.'] : []),
-      ...((fin?.roe ?? 0) >= 18 ? ['Return on equity is a positive quality signal.'] : []),
-      ...((fin?.roic ?? 0) >= 18 ? ['Capital efficiency is a positive quality signal.'] : []),
+      ...(score >= 70 ? ['Quality metrics strengthen the research thesis.'] : []),
+      ...((fin?.roe ?? 0) >= 18 ? ['Return on equity is a favorable quality signal.'] : []),
+      ...((fin?.roic ?? 0) >= 18 ? ['Capital efficiency is a favorable quality signal.'] : []),
     ],
     risks: score < 45 ? ['Quality evidence is not strong enough yet.'] : [],
   };
@@ -128,7 +132,7 @@ function scoreGrowth(fin?: IndiaEquityFundamentals): FactorScore {
   ]);
   return {
     score,
-    drivers: score >= 70 ? ['Growth trends support an improving thesis.'] : [],
+    drivers: score >= 70 ? ['Growth trends strengthen the thesis.'] : [],
     risks: (fin?.profitGrowth ?? 0) < 0 && finite(fin?.profitGrowth) ? ['Profit growth is negative and needs review.'] : [],
   };
 }
@@ -142,7 +146,7 @@ function scoreValuation(fin?: IndiaEquityFundamentals): FactorScore {
   ]);
   return {
     score,
-    drivers: score >= 70 ? ['Valuation appears supportive relative to core metrics.'] : [],
+    drivers: score >= 70 ? ['Valuation metrics appear constructive relative to core inputs.'] : [],
     risks: (fin?.peRatio ?? 0) > 60 ? ['Earnings multiple is elevated and needs justification.'] : [],
   };
 }
@@ -158,7 +162,7 @@ function scoreStability(fin?: IndiaEquityFundamentals, tech?: IndiaEquityTechnic
   ]);
   return {
     score,
-    drivers: score >= 70 ? ['Stability signals are supportive.'] : [],
+    drivers: score >= 70 ? ['Stability signals are constructive.'] : [],
     risks: (fin?.debtToEquity ?? 0) > 2 ? ['Leverage is elevated and needs review.'] : [],
   };
 }
@@ -172,7 +176,7 @@ function scoreMomentum(tech?: IndiaEquityTechnicals): FactorScore {
   ]);
   return {
     score,
-    drivers: score >= 70 ? ['Momentum is supportive.'] : [],
+    drivers: score >= 70 ? ['Momentum is constructive.'] : [],
     risks: (tech?.rsi ?? 0) > 75 ? ['Momentum may be overheated.'] : [],
   };
 }
@@ -203,19 +207,14 @@ function scoreOwnership(own?: IndiaEquityOwnership): FactorScore {
   ]);
   return {
     score,
-    drivers: score >= 70 ? ['Ownership signals support the research view.'] : [],
+    drivers: score >= 70 ? ['Ownership signals strengthen the research view.'] : [],
     risks: (own?.promoterPledge ?? 0) > 10 ? ['Promoter pledge weakens governance comfort.'] : [],
   };
 }
 
-function missingEvidence(packet: IndiaEquityPacket): MarketDataDomain[] {
-  const required: MarketDataDomain[] = ['instrument_master', 'prices', 'fundamentals', 'financial_statements', 'technicals', 'sector_context'];
-  return required.filter((domain) => packet.evidence?.[domain] !== 'ready');
-}
-
-function researchState(convictionScore: number, riskScore: number, missingCount: number): ResearchState {
+function researchState(convictionScore: number, riskScore: number, unusableCount: number): ResearchState {
   if (riskScore >= 72) return 'Risk rising';
-  if (missingCount >= 3) return 'Needs review';
+  if (unusableCount >= 3) return 'Needs review';
   if (convictionScore >= 78 && riskScore <= 45) return 'High conviction';
   if (convictionScore >= 68 && riskScore <= 55) return 'Thesis improving';
   return 'Watch';
@@ -229,7 +228,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const momentum = scoreMomentum(packet.technicals);
   const risk = scoreRisk(packet.fundamentals, packet.technicals, packet.ownership);
   const ownership = scoreOwnership(packet.ownership);
-  const missing = missingEvidence(packet);
+  const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
+  const missing = evidenceCoverage.missing;
+  const partial = evidenceCoverage.partial;
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -247,7 +248,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   return {
     symbol: packet.symbol.toUpperCase(),
     companyName: packet.companyName,
-    researchState: researchState(convictionScore, risk.score, missing.length),
+    researchState: researchState(convictionScore, risk.score, evidenceCoverage.missing.length),
     convictionScore,
     quality,
     growth,
@@ -265,7 +266,8 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
       'Whether the original thesis improves or weakens after new evidence.',
     ],
     missingEvidence: missing,
-    complianceNote: 'Research-only output. Not personal investment advice.',
+    partialEvidence: partial,
+    complianceNote: 'Research-only output.',
     generatedAt: new Date().toISOString(),
   };
 }
