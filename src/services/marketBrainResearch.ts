@@ -59,6 +59,18 @@ export class MarketBrainResearchError extends Error {
 
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
+const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>([
+  'instrument_master',
+  'prices',
+  'fundamentals',
+  'financial_statements',
+  'shareholding',
+  'corporate_actions',
+  'news_events',
+  'technicals',
+  'sector_context',
+]);
+
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
   partial: [],
@@ -70,10 +82,16 @@ const asStringArray = (value: unknown): string[] => (Array.isArray(value)
   ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
   : []);
 
+const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Array.isArray(value)
+  ? value.filter((item): item is MarketBrainEvidenceDomain => (
+    typeof item === 'string' && MARKET_BRAIN_EVIDENCE_DOMAINS.has(item as MarketBrainEvidenceDomain)
+  ))
+  : []);
+
 const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> | undefined): MarketBrainEvidenceReviewView => {
   if (!value) return EMPTY_EVIDENCE_REVIEW;
-  const partial = Array.isArray(value.partial) ? value.partial : [];
-  const missing = Array.isArray(value.missing) ? value.missing : [];
+  const partial = asEvidenceDomains(value.partial);
+  const missing = asEvidenceDomains(value.missing);
   const needsReview = value.needsReview ?? (partial.length > 0 || missing.length > 0);
 
   return {
