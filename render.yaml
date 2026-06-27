@@ -1,35 +1,23 @@
 # render.yaml
 # Render Blueprint — StockStory India
-# Docs: https://render.com/docs/blueprint-spec
-#
-# Deploys:
-#   1. stockstory-api  — Fastify backend (Web Service, persistent Node 20)
-#   2. stockstory-migrate — one-off DB migration job (runs before server starts)
+# Deploys a single Web Service (backend API) on Render free tier.
+# Frontend remains on Vercel; this service provides the database-backed API.
 
 services:
-  # ── Backend API — persistent Fastify server ──────────────────────────────
   - type: web
     name: stockstory-api
     runtime: node
-    region: singapore          # closest to India
-    plan: starter              # $7/mo — upgrade to standard for production load
+    region: singapore
+    plan: free
     branch: main
 
-    buildCommand: npm ci && npm run compile:backend && npm run build
-
-    # Start: run compiled JavaScript (production-optimized, no tsx needed at runtime)
-    # Render injects PORT automatically — startServer.js reads process.env.PORT
+    buildCommand: npm ci && npm run compile:backend
     startCommand: npm start
 
-    # Health check — Render uses /readyz to confirm DB + migrations are ready
-    healthCheckPath: /readyz
+    healthCheckPath: /healthz
 
-    # Auto-deploy on every push to main
     autoDeploy: true
 
-    # Environment variables
-    # Set secret values in Render Dashboard → Environment tab
-    # Values marked "sync: false" must be set manually in the Dashboard
     envVars:
       - key: NODE_ENV
         value: production
@@ -37,24 +25,23 @@ services:
       - key: NODE_VERSION
         value: 22.12.0
 
-      - key: PORT
-        value: 4001
+      - key: HOST
+        value: 0.0.0.0
 
-      # ── Database (Neon PostgreSQL) ──────────────────────────────────────
+      - key: PORT
+        value: 10000
+
+      # ── Database (Neon PostgreSQL) ──
       # Set in Dashboard: postgresql://user:pass@host/db?sslmode=require
       - key: DATABASE_URL
         sync: false
 
-      # ── Security ───────────────────────────────────────────────────────
+      # ── Security ──
       # Generate: openssl rand -base64 64
       - key: COOKIE_SECRET
         sync: false
 
-      # ── Market Data APIs ───────────────────────────────────────────────
-      - key: INDIANAPI_KEY
-        sync: false
-
-      # ── Database Policy ────────────────────────────────────────────────
+      # ── Database Policy ──
       - key: DB_ADAPTER
         value: postgres
 
@@ -64,51 +51,13 @@ services:
       - key: ALLOW_SQLITE_IN_PRODUCTION
         value: "false"
 
-      # ── Firebase Admin ─────────────────────────────────────────────────
-      - key: FIREBASE_PROJECT_ID
-        sync: false
+      - key: FORCE_MIGRATIONS
+        value: "true"
 
-      - key: FIREBASE_CLIENT_EMAIL
-        sync: false
-
-      - key: FIREBASE_PRIVATE_KEY
-        sync: false
-
-      - key: FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS
-        sync: false
-
-      # ── CORS — allow Vercel frontend ───────────────────────────────────
-      # Already hardcoded in env.ts as https://stockstory-india.com
-      # Set this if you need to add extra origins at runtime
+      # ── CORS — allow Vercel frontend ──
       - key: EXTRA_ALLOWED_ORIGINS
         value: https://stockstory-india.com
 
-  # ── One-off DB migration job ─────────────────────────────────────────────
-  # Runs migrations before the API starts.
-  # Trigger manually from Dashboard or via API on each deploy.
-  - type: worker
-    name: stockstory-migrate
-    runtime: node
-    region: singapore
-    plan: starter
-    branch: main
-    buildCommand: npm ci && npm run build:backend
-    startCommand: npm run migrate
-    envVars:
-      - key: NODE_ENV
-        value: production
-
-      - key: NODE_VERSION
-        value: 22.12.0
-
-      - key: DATABASE_URL
-        sync: false
-
-      - key: DB_ADAPTER
-        value: postgres
-
-      - key: ALLOW_SQLITE_FALLBACK
-        value: "false"
-
-      - key: ALLOW_SQLITE_IN_PRODUCTION
-        value: "false"
+      # ── Logging ──
+      - key: LOG_LEVEL
+        value: info
