@@ -97,4 +97,24 @@ describe('MarketBrainResearchPanel', () => {
     expect(reload).toHaveBeenCalledTimes(1);
     expect(screen.queryByText(/api|endpoint|stockstory|provider/i)).toBeNull();
   });
+
+  it('renders a safe generated-time fallback when research metadata is malformed', () => {
+    vi.mocked(useMarketBrainResearch).mockReturnValue({
+      data: {
+        ...mockResearch,
+        research: {
+          ...mockResearch.research,
+          generatedAt: 'not-a-date',
+        },
+      },
+      loading: false,
+      error: null,
+      reload: vi.fn(),
+    });
+
+    render(<MarketBrainResearchPanel symbol="TCS" />);
+
+    expect(screen.getByText(/Generated time unavailable\./)).toBeDefined();
+    expect(screen.queryByText(/Invalid Date/i)).toBeNull();
+  });
 });
