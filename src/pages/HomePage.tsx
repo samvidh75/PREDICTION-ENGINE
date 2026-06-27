@@ -1,36 +1,115 @@
 import { useState } from 'react';
-import { Search, BarChart3, GitCompare, Bookmark, Shield, TrendingUp, AlertCircle, Clock } from 'lucide-react';
+import { Search, BarChart3, GitCompare, Bookmark, TrendingUp, Clock, ChevronRight } from 'lucide-react';
 import { NIFTY50_SYMBOLS } from '../services/universe/StockUniverse';
 import { navigate } from '../components/product/routeConfig';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { colors, typography, spacing, radius, shadow } from '../styles';
 
-/* ─── static data ─────────────────────────────────────────────────────────── */
+/* ─── constants ───────────────────────────────────────────────────────────── */
+
+const FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
 
 const DISCOVER = [
-  { icon: '📊', title: 'Quality Compounders',  desc: 'High ROE · Low debt · Consistent growth'     },
-  { icon: '💎', title: 'Undervalued Gems',      desc: 'Trading below intrinsic value'               },
-  { icon: '⚡', title: 'Momentum Movers',       desc: 'RSI strength · MACD crossover signal'        },
-  { icon: '🛡', title: 'Stable Defenders',      desc: 'Debt-free · Low volatility · Steady returns' },
+  {
+    title: 'Quality Compounders',
+    desc: 'High ROE, low debt, consistent earnings growth year over year.',
+    sub: 'Filter by fundamentals',
+    page: 'scanner',
+  },
+  {
+    title: 'Undervalued Gems',
+    desc: 'Stocks trading below fair value PE with strong balance sheets.',
+    sub: 'Value screening',
+    page: 'scanner',
+  },
+  {
+    title: 'Momentum Movers',
+    desc: 'Strong RSI with positive MACD crossover signals.',
+    sub: 'Technical signals',
+    page: 'scanner',
+  },
+  {
+    title: 'Stable Defenders',
+    desc: 'Debt-free businesses with low volatility and steady dividends.',
+    sub: 'Low-risk picks',
+    page: 'scanner',
+  },
 ] as const;
 
-const QUICK_ACTIONS = [
-  { label: 'Scanner',     icon: BarChart3,  page: 'scanner'     },
-  { label: 'Compare',     icon: GitCompare, page: 'compare'     },
-  { label: 'Watchlist',   icon: Bookmark,   page: 'watchlist'   },
-  { label: 'Methodology', icon: Shield,     page: 'methodology' },
+const FEATURES = [
+  {
+    label: 'Score',
+    title: 'Conviction score.',
+    desc: 'Every stock gets a 0–100 score across quality, growth, valuation, risk, and momentum.',
+    href: 'scanner',
+    linkText: 'Browse stocks',
+  },
+  {
+    label: 'Compare',
+    title: 'Side-by-side analysis.',
+    desc: 'Compare any two Nifty 50 companies across all five dimensions instantly.',
+    href: 'compare',
+    linkText: 'Compare now',
+  },
+  {
+    label: 'Track',
+    title: 'Watchlist intelligence.',
+    desc: 'Track the stocks you care about and monitor thesis changes over time.',
+    href: 'watchlist',
+    linkText: 'Open watchlist',
+  },
 ] as const;
 
 function getRecent():  string[] { try { return JSON.parse(localStorage.getItem('stockstory-recent')  || '[]') as string[]; } catch { return []; } }
-function getTracked(): string[] { try { return JSON.parse(localStorage.getItem('stockstory-tracked') || '[]') as string[]; } catch { return []; } }
+
+/* ─── components ──────────────────────────────────────────────────────────── */
+
+function FeatureCard({ item }: { item: (typeof FEATURES)[number] }) {
+  return (
+    <div
+      style={{
+        background: '#F5F5F7',
+        borderRadius: '18px',
+        padding: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        cursor: 'pointer',
+        transition: 'transform 250ms ease, box-shadow 250ms ease',
+      }}
+      onClick={() => navigate(item.href)}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'none';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+      }}
+    >
+      <div style={{ fontSize: '11px', fontWeight: 600, color: '#6E6E73', letterSpacing: '0.06em', textTransform: 'uppercase', fontFamily: FONT }}>{item.label}</div>
+      <div style={{ fontSize: '24px', fontWeight: 600, color: '#1D1D1F', lineHeight: 1.1, letterSpacing: '-0.02em', fontFamily: FONT }}>{item.title}</div>
+      <p style={{ fontSize: '15px', color: '#6E6E73', lineHeight: 1.5, fontFamily: FONT, margin: 0 }}>{item.desc}</p>
+      <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
+        <span style={{
+          fontSize: '15px',
+          fontWeight: 400,
+          color: '#0066CC',
+          fontFamily: FONT,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+        }}>
+          {item.linkText} <ChevronRight size={14} />
+        </span>
+      </div>
+    </div>
+  );
+}
 
 /* ─── page ────────────────────────────────────────────────────────────────── */
 
 export default function HomePage() {
-  const [query,   setQuery]   = useState('');
-  const [recent]              = useState<string[]>(getRecent);
-  const [tracked]             = useState<string[]>(getTracked);
+  const [query, setQuery] = useState('');
+  const [recent]          = useState<string[]>(getRecent);
 
   const handleSearch = () => {
     const q = query.trim().toUpperCase();
@@ -40,197 +119,271 @@ export default function HomePage() {
   const popular = (recent.length > 0 ? recent : NIFTY50_SYMBOLS).slice(0, 8);
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.bg.primary }}>
+    <div style={{ fontFamily: FONT, color: '#1D1D1F' }}>
 
-      {/* ── Hero ───────────────────────────────────────────────────────── */}
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section style={{
-        paddingTop:    spacing.xxxl,
-        paddingBottom: spacing.xl,
-        textAlign:     'center',
-        borderBottom:  `1px solid ${colors.bg.tertiary}`,
-        marginBottom:  spacing.xl,
+        textAlign: 'center',
+        padding: '80px 0 64px',
+        borderBottom: '1px solid #D2D2D7',
+        marginBottom: '64px',
       }}>
-        <h1 style={{ ...typography.sectionTitle, color: colors.text.primary, margin: 0 }}>
-          Research Indian stocks
-        </h1>
-        <p style={{ ...typography.bodyText, color: colors.text.secondary, marginTop: spacing.sm, marginBottom: spacing.lg }}>
-          Institutional-grade analysis on Nifty 50 companies
+        <p style={{
+          fontSize: '14px',
+          fontWeight: 600,
+          color: '#6E6E73',
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          marginBottom: '16px',
+          fontFamily: FONT,
+        }}>
+          AI-Powered Stock Research
         </p>
 
-        {/* Search bar */}
-        <div style={{
-          maxWidth:     '560px',
-          margin:       '0 auto',
-          display:      'flex',
-          border:       `1px solid ${colors.bg.tertiary}`,
-          borderRadius: '8px',
-          overflow:     'hidden',
-          boxShadow:    shadow.card,
-          background:   colors.bg.primary,
+        <h1 style={{
+          fontSize: 'clamp(40px, 6vw, 64px)',
+          fontWeight: 600,
+          color: '#1D1D1F',
+          lineHeight: 1.05,
+          letterSpacing: '-0.005em',
+          margin: '0 auto 20px',
+          maxWidth: '720px',
+          fontFamily: FONT,
         }}>
-          <Search size={16} style={{ color: colors.text.tertiary, flexShrink: 0, margin: '14px 0 0 14px' }} />
+          Research Indian stocks.<br />Understand before you invest.
+        </h1>
+
+        <p style={{
+          fontSize: '19px',
+          fontWeight: 400,
+          color: '#6E6E73',
+          lineHeight: 1.47,
+          letterSpacing: '-0.022em',
+          margin: '0 auto 40px',
+          maxWidth: '520px',
+          fontFamily: FONT,
+        }}>
+          Institutional-grade analysis on Nifty 50 companies — scores, charts, financials, and news in one place.
+        </p>
+
+        {/* Search bar — Apple style */}
+        <div style={{
+          maxWidth: '520px',
+          margin: '0 auto 24px',
+          display: 'flex',
+          alignItems: 'center',
+          border: '1px solid #D2D2D7',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          background: '#FFFFFF',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          height: '50px',
+        }}>
+          <Search size={16} style={{ color: '#AEAEB2', flexShrink: 0, marginLeft: '16px' }} />
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            placeholder="TCS, HDFC Bank, Reliance…"
+            placeholder="Search TCS, HDFC Bank, Reliance…"
             style={{
-              flex:       1,
-              border:     'none',
+              flex: 1,
+              border: 'none',
               background: 'transparent',
-              color:      colors.text.primary,
-              fontSize:   '16px',
-              outline:    'none',
-              padding:    `${spacing.sm} ${spacing.sm}`,
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              minWidth:   0,
+              color: '#1D1D1F',
+              fontSize: '15px',
+              outline: 'none',
+              padding: '0 12px',
+              fontFamily: FONT,
+              letterSpacing: '-0.016em',
             }}
           />
-          <Button variant="primary" size="md" onClick={handleSearch}
-            style={{ borderRadius: 0, height: '48px', flexShrink: 0 }}>
+          <button
+            onClick={handleSearch}
+            style={{
+              height: '50px',
+              padding: '0 24px',
+              background: '#1D1D1F',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '15px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              fontFamily: FONT,
+              letterSpacing: '-0.016em',
+              flexShrink: 0,
+              transition: 'background 150ms ease',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#3A3A3C')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#1D1D1F')}
+          >
             Research
-          </Button>
+          </button>
         </div>
 
-        {/* Quick action pills */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: spacing.sm, marginTop: spacing.lg, flexWrap: 'wrap' }}>
-          {QUICK_ACTIONS.map(action => (
+        {/* Quick nav pills */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Scanner', icon: BarChart3, page: 'scanner' },
+            { label: 'Compare', icon: GitCompare, page: 'compare' },
+            { label: 'Watchlist', icon: Bookmark,  page: 'watchlist' },
+          ].map(action => (
             <button
               key={action.page}
               onClick={() => navigate(action.page)}
               style={{
-                display:      'inline-flex', alignItems: 'center', gap: '6px',
-                height:       '34px', padding: `0 ${spacing.base}`,
-                borderRadius: '9999px', border: `1px solid ${colors.bg.tertiary}`,
-                background:   colors.bg.primary, color: colors.text.secondary,
-                fontSize:     '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-                transition:   'background 150ms ease',
-                fontFamily:   '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                height: '30px',
+                padding: '0 14px',
+                borderRadius: '9999px',
+                border: '1px solid #D2D2D7',
+                background: 'transparent',
+                color: '#6E6E73',
+                fontSize: '13px',
+                fontWeight: 400,
+                cursor: 'pointer',
+                fontFamily: FONT,
+                letterSpacing: '-0.01em',
+                transition: 'border-color 150ms ease, color 150ms ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = colors.bg.secondary)}
-              onMouseLeave={e => (e.currentTarget.style.background = colors.bg.primary)}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = '#1D1D1F';
+                e.currentTarget.style.color = '#1D1D1F';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#D2D2D7';
+                e.currentTarget.style.color = '#6E6E73';
+              }}
             >
-              <action.icon size={13} style={{ color: colors.primary }} />
+              <action.icon size={12} />
               {action.label}
             </button>
           ))}
         </div>
       </section>
 
-      {/* ── Discover opportunities ─────────────────────────────────────── */}
-      <section style={{ marginBottom: spacing.xl }}>
-        <h2 style={{ ...typography.cardTitle, color: colors.text.primary, margin: `0 0 ${spacing.base}` }}>
-          Discover opportunities
+      {/* ── Discover section ───────────────────────────────────────────────── */}
+      <section style={{ marginBottom: '80px' }}>
+        <h2 style={{
+          fontSize: '28px',
+          fontWeight: 600,
+          color: '#1D1D1F',
+          letterSpacing: '-0.01em',
+          margin: '0 0 32px',
+          fontFamily: FONT,
+        }}>
+          Discover opportunities.
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: spacing.base }}>
-          {DISCOVER.map(lens => (
-            <Card key={lens.title} onClick={() => navigate('scanner')} padding="md">
-              <div style={{ fontSize: '24px', marginBottom: spacing.sm }}>{lens.icon}</div>
-              <div style={{ ...typography.bodyEmphasis, color: colors.text.primary, marginBottom: spacing.xs }}>
-                {lens.title}
-              </div>
-              <div style={{ ...typography.caption, color: colors.text.secondary, lineHeight: 1.4 }}>
-                {lens.desc}
-              </div>
-            </Card>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+          gap: '16px',
+        }}>
+          {DISCOVER.map(item => (
+            <div
+              key={item.title}
+              onClick={() => navigate(item.page)}
+              style={{
+                background: '#F5F5F7',
+                borderRadius: '18px',
+                padding: '28px 24px',
+                cursor: 'pointer',
+                transition: 'transform 200ms ease, box-shadow 200ms ease',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.07)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = 'none';
+                (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+              }}
+            >
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#AEAEB2', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px', fontFamily: FONT }}>{item.sub}</div>
+              <div style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F', marginBottom: '8px', lineHeight: 1.2, fontFamily: FONT }}>{item.title}</div>
+              <p style={{ fontSize: '14px', color: '#6E6E73', lineHeight: 1.5, fontFamily: FONT, margin: 0 }}>{item.desc}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
+      {/* ── Feature highlight cards ────────────────────────────────────────── */}
+      <section style={{ marginBottom: '80px' }}>
+        <h2 style={{
+          fontSize: '28px',
+          fontWeight: 600,
+          color: '#1D1D1F',
+          letterSpacing: '-0.01em',
+          margin: '0 0 32px',
+          fontFamily: FONT,
+        }}>
+          Everything you need to research a stock.
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+          {FEATURES.map(item => <FeatureCard key={item.label} item={item} />)}
+        </div>
+      </section>
 
-      {/* ── Recent / Popular ───────────────────────────────────────────── */}
-      <section style={{ marginBottom: spacing.xl }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.base }}>
+      {/* ── Recently viewed / Popular ──────────────────────────────────────── */}
+      <section style={{
+        borderTop: '1px solid #D2D2D7',
+        paddingTop: '48px',
+        marginBottom: '80px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
           {recent.length > 0
-            ? <><Clock size={14} style={{ color: colors.text.tertiary }} /><h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Recently viewed</h2></>
-            : <><TrendingUp size={14} style={{ color: colors.text.tertiary }} /><h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Popular stocks</h2></>
+            ? <><Clock size={14} style={{ color: '#AEAEB2' }} /><h2 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F', margin: 0, fontFamily: FONT }}>Recently viewed</h2></>
+            : <><TrendingUp size={14} style={{ color: '#AEAEB2' }} /><h2 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1F', margin: 0, fontFamily: FONT }}>Popular stocks</h2></>
           }
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: spacing.sm }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {popular.map(sym => (
             <button
               key={sym}
               onClick={() => navigate('stock', sym)}
               style={{
-                padding: `${spacing.sm} ${spacing.base}`, borderRadius: radius.md,
-                border: `1px solid ${colors.bg.tertiary}`, background: colors.bg.primary,
-                cursor: 'pointer', textAlign: 'left',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                transition: 'background 150ms ease, box-shadow 150ms ease',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: '1px solid #D2D2D7',
+                background: '#FFFFFF',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: FONT,
+                transition: 'background 150ms ease, border-color 150ms ease',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = colors.bg.secondary; e.currentTarget.style.boxShadow = shadow.raised; }}
-              onMouseLeave={e => { e.currentTarget.style.background = colors.bg.primary;   e.currentTarget.style.boxShadow = 'none'; }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#F5F5F7';
+                e.currentTarget.style.borderColor = '#AEAEB2';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#FFFFFF';
+                e.currentTarget.style.borderColor = '#D2D2D7';
+              }}
             >
-              <div style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{sym}</div>
-              <div style={{ ...typography.caption, color: colors.text.tertiary, marginTop: '2px' }}>Research →</div>
+              <div style={{ fontSize: '15px', fontWeight: 600, color: '#1D1D1F', letterSpacing: '-0.016em' }}>{sym}</div>
+              <div style={{ fontSize: '12px', color: '#AEAEB2', marginTop: '2px' }}>Research →</div>
             </button>
           ))}
         </div>
       </section>
 
-      {/* ── Tracked ────────────────────────────────────────────────────── */}
-      {tracked.length > 0 && (
-        <>
-          <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
-          <section style={{ marginBottom: spacing.xl }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.base }}>
-              <Bookmark size={14} style={{ color: colors.text.tertiary }} />
-              <h2 style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>Tracked</h2>
-            </div>
-            <div className="no-scrollbar" style={{ display: 'flex', gap: spacing.sm, overflowX: 'auto' }}>
-              {tracked.map(sym => (
-                <button key={sym} onClick={() => navigate('stock', sym)} style={{
-                  flexShrink: 0, padding: `${spacing.sm} ${spacing.base}`,
-                  borderRadius: radius.md, border: `1px solid ${colors.bg.tertiary}`,
-                  background: colors.bg.primary, cursor: 'pointer', textAlign: 'left', minWidth: '90px',
-                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  transition: 'background 150ms ease',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = colors.bg.secondary)}
-                onMouseLeave={e => (e.currentTarget.style.background = colors.bg.primary)}>
-                  <div style={{ ...typography.bodyEmphasis, color: colors.text.primary }}>{sym}</div>
-                  <div style={{ ...typography.caption, color: colors.text.tertiary, marginTop: '2px' }}>Tracked</div>
-                </button>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* ── Differentiators ────────────────────────────────────────────── */}
-      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, marginBottom: spacing.xl }} />
-      <section style={{ marginBottom: spacing.xl }}>
-        <h2 style={{ ...typography.bodyEmphasis, color: colors.text.secondary, margin: `0 0 ${spacing.base}`, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          What makes StockStory different
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: spacing.base }}>
-          {[
-            { icon: <AlertCircle size={14} style={{ color: colors.primary  }} />, title: 'Smart Alerts',    desc: 'Get notified when ROE drops or PE dips below peers'    },
-            { icon: <TrendingUp  size={14} style={{ color: colors.success  }} />, title: 'Thesis Timeline', desc: 'Track how a stock\'s conviction score changed over time' },
-            { icon: <BarChart3   size={14} style={{ color: colors.warning  }} />, title: 'Sector Compare',  desc: 'Auto-compare against 5 closest peers in sector'         },
-            { icon: <Shield      size={14} style={{ color: colors.error    }} />, title: 'Risk-Adj Score',  desc: 'Score adjusted for volatility, not just returns'        },
-          ].map(d => (
-            <div key={d.title} style={{
-              display: 'flex', alignItems: 'flex-start', gap: spacing.sm,
-              padding: spacing.base, borderRadius: radius.md, border: `1px solid ${colors.bg.tertiary}`,
-            }}>
-              <div style={{ flexShrink: 0, marginTop: '2px' }}>{d.icon}</div>
-              <div>
-                <div style={{ ...typography.caption, fontWeight: 600, color: colors.text.primary }}>{d.title}</div>
-                <div style={{ ...typography.caption, color: colors.text.secondary, marginTop: '2px', lineHeight: 1.4 }}>{d.desc}</div>
-              </div>
-            </div>
+      {/* ── Footer ─────────────────────────────────────────────────────────── */}
+      <footer style={{
+        borderTop: '1px solid #D2D2D7',
+        padding: '24px 0',
+      }}>
+        <p style={{ fontSize: '12px', color: '#AEAEB2', margin: 0, fontFamily: FONT, lineHeight: 1.6 }}>
+          Copyright &copy; 2025 StockStory India. Not SEBI-registered. Not investment advice. For educational purposes only.
+        </p>
+        <div style={{ display: 'flex', gap: '20px', marginTop: '8px', flexWrap: 'wrap' }}>
+          {[['Terms', '/terms'], ['About', '/about'], ['Methodology', '/methodology'], ['Pricing', '/pricing']].map(([label, href]) => (
+            <a key={href} href={href} style={{ fontSize: '12px', color: '#6E6E73', textDecoration: 'none', fontFamily: FONT }}>
+              {label}
+            </a>
           ))}
         </div>
-      </section>
-
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <div style={{ borderTop: `1px solid ${colors.bg.tertiary}`, padding: `${spacing.lg} 0` }}>
-        <p style={{ ...typography.caption, color: colors.text.tertiary, margin: 0 }}>
-          {'© 2025 StockStory India · Not SEBI-registered · Not investment advice · Educational purposes only'}
-        </p>
-      </div>
+      </footer>
 
     </div>
   );
