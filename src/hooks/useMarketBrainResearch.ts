@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   fetchMarketBrainResearch,
   type MarketBrainResearchResponse,
@@ -15,62 +15,55 @@ const normalizeSymbol = (symbol: string | null | undefined): string => (symbol ?
 
 export function useMarketBrainResearch(symbol: string | null | undefined): UseMarketBrainResearchResult {
   const normalizedSymbol = useMemo(() => normalizeSymbol(symbol), [symbol]);
+  const requestIdRef = useRef(0);
   const [data, setData] = useState<MarketBrainResearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const reload = useCallback(async () => {
-    if (!normalizedSymbol) {
-      setData(null);
-      setError(null);
-      setLoading(false);
-      return;
-    }
+  const reset = useCallback(() => {
+    requestIdRef.current += 1;
+    setData(null);
+    setError(null);
+    setLoading(false);
+  }, []);
 
-    const controller = new AbortController();
+  const loadResearch = useCallback(async (requestedSymbol: string) => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
     setLoading(true);
     setError(null);
 
     try {
-      const result = await fetchMarketBrainResearch(normalizedSymbol, { signal: controller.signal });
+      const result = await fetchMarketBrainResearch(requestedSymbol);
+      if (requestIdRef.current !== requestId) return;
       setData(result);
     } catch (err) {
+      if (requestIdRef.current !== requestId) return;
       if (err instanceof Error && err.name === 'AbortError') return;
       setError(err instanceof Error ? err.message : 'Research is temporarily unavailable.');
       setData(null);
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === requestId) setLoading(false);
     }
-  }, [normalizedSymbol]);
+  }, []);
 
-  useEffect(() => {
-    let active = true;
+  const reload = useCallback(async () => {
     if (!normalizedSymbol) {
-      setData(null);
-      setError(null);
-      setLoading(false);
+      reset();
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    fetchMarketBrainResearch(normalizedSymbol)
-      .then((result) => {
-        if (active) setData(result);
-      })
-      .catch((err) => {
-        if (!active) return;
-        setError(err instanceof Error ? err.message : 'Research is temporarily unavailable.');
-        setData(null);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    await loadResearch(normalizedSymbol);
+  }, [loadResearch, normalizedSymbol, reset]);
 
-    return () => {
-      active = false;
-    };
-  }, [normalizedSymbol]);
+  useEffect(() => {
+    if (!normalizedSymbol) {
+      reset();
+      return;
+    }
+
+    void loadResearch(normalizedSymbol);
+  }, [loadResearch, normalizedSymbol, reset]);
 
   return { data, loading, error, reload };
 }
