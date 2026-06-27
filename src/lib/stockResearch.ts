@@ -310,35 +310,38 @@ function buildFinancialSeries(symbol: string, marketCap: number): StockResearchD
   const baseRevenue = marketCap / 180;
   const baseProfit = marketCap / 720;
   const baseEbitda = marketCap / 540;
-  const annualPeriods = ["FY2020", "FY2021", "FY2022", "FY2023", "FY2024", "FY2025"];
-  const quarterlyPeriods = ["Q1 FY26", "Q4 FY25", "Q3 FY25", "Q2 FY25", "Q1 FY25", "Q4 FY24"];
+  // 8 annual periods: FY2018 → FY2025
+  const annualPeriods = ["FY2018", "FY2019", "FY2020", "FY2021", "FY2022", "FY2023", "FY2024", "FY2025"];
+  // 8 quarterly periods: most recent first
+  const quarterlyPeriods = ["Q2 FY26", "Q1 FY26", "Q4 FY25", "Q3 FY25", "Q2 FY25", "Q1 FY25", "Q4 FY24", "Q3 FY24"];
+  // Growth trend: revenue grows ~8-15% YoY across the 8-year window
   return {
     annual: {
       revenue: annualPeriods.map((period, index) => ({
         period,
-        value: round(baseRevenue * (1 + seeded(`${symbol}:annual:rev:${index}`, -0.08, 0.18, 3)), 0),
+        value: round(baseRevenue * (0.55 + index * 0.065) * (1 + seeded(`${symbol}:annual:rev:${index}`, -0.06, 0.12, 3)), 0),
       })),
       profit: annualPeriods.map((period, index) => ({
         period,
-        value: round(baseProfit * (1 + seeded(`${symbol}:annual:pat:${index}`, -0.1, 0.2, 3)), 0),
+        value: round(baseProfit * (0.48 + index * 0.07) * (1 + seeded(`${symbol}:annual:pat:${index}`, -0.08, 0.15, 3)), 0),
       })),
       ebitda: annualPeriods.map((period, index) => ({
         period,
-        value: round(baseEbitda * (1 + seeded(`${symbol}:annual:ebitda:${index}`, -0.09, 0.19, 3)), 0),
+        value: round(baseEbitda * (0.5 + index * 0.068) * (1 + seeded(`${symbol}:annual:ebitda:${index}`, -0.07, 0.14, 3)), 0),
       })),
     },
     quarterly: {
       revenue: quarterlyPeriods.map((period, index) => ({
         period,
-        value: round((baseRevenue / 4) * (1 + seeded(`${symbol}:quarterly:rev:${index}`, -0.14, 0.16, 3)), 0),
+        value: round((baseRevenue / 4) * (0.78 + index * 0.028) * (1 + seeded(`${symbol}:quarterly:rev:${index}`, -0.1, 0.12, 3)), 0),
       })),
       profit: quarterlyPeriods.map((period, index) => ({
         period,
-        value: round((baseProfit / 4) * (1 + seeded(`${symbol}:quarterly:pat:${index}`, -0.15, 0.18, 3)), 0),
+        value: round((baseProfit / 4) * (0.72 + index * 0.035) * (1 + seeded(`${symbol}:quarterly:pat:${index}`, -0.12, 0.14, 3)), 0),
       })),
       ebitda: quarterlyPeriods.map((period, index) => ({
         period,
-        value: round((baseEbitda / 4) * (1 + seeded(`${symbol}:quarterly:ebitda:${index}`, -0.14, 0.18, 3)), 0),
+        value: round((baseEbitda / 4) * (0.75 + index * 0.032) * (1 + seeded(`${symbol}:quarterly:ebitda:${index}`, -0.11, 0.13, 3)), 0),
       })),
     },
   };
@@ -349,7 +352,8 @@ function buildShareholding(symbol: string): StockResearchDetail["shareholding"] 
   const baseFii = seeded(`${symbol}:fii`, 12, 34, 1);
   const baseDii = seeded(`${symbol}:dii`, 10, 28, 1);
   const baseRetail = clamp(round(100 - basePromoter - baseFii - baseDii, 1), 6, 30);
-  const periods = ["Mar'26", "Dec'25", "Sep'25", "Jun'25"];
+  // 6 quarterly periods for richer historical view
+  const periods = ["Mar'26", "Dec'25", "Sep'25", "Jun'25", "Mar'25", "Dec'24"];
   return periods.map((period, index) => ({
     period,
     promoter: round(clamp(basePromoter + seeded(`${symbol}:promoter:${index}`, -1.1, 1.1, 2), 0, 100), 1),
